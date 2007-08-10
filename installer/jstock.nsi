@@ -1,0 +1,187 @@
+; Definitions for Java 1.6 Detection
+!define JRE_VERSION "1.6"
+!define JRE_URL "http://javadl.sun.com/webapps/download/AutoDL?BundleId=11292"
+!define PRODUCT_NAME "JStock"
+
+; The name of the installer
+Name ${PRODUCT_NAME}
+
+; The file to write
+OutFile "jstock-0.9.1-setup.exe"
+
+LicenseData "gpl.txt"
+ 
+; The default installation directory
+InstallDir $PROGRAMFILES\${PRODUCT_NAME}
+
+; The text to prompt the user to enter a directory
+DirText "This will install JStock on your computer. Choose a directory"
+
+Page license
+page directory
+Page instfiles
+
+; The stuff to install
+Section "" ;No components page, name is not important
+
+Call DetectJRE
+
+; Set output path to the installation directory.
+SetOutPath $INSTDIR
+
+; Put file there
+File /r jstock\jstock.jar
+File /r jstock\indicator
+File /r jstock\config
+File /r jstock\lib
+File chart.ico
+
+CreateDirectory "$SMPROGRAMS\${PRODUCT_NAME}"
+CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\${PRODUCT_NAME}.lnk" "$INSTDIR\jstock.jar" "" "$INSTDIR\chart.ico"
+CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\Uninstall ${PRODUCT_NAME}.lnk" "$INSTDIR\Uninstall.exe" 
+
+WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}" "DisplayName" "${PRODUCT_NAME} (remove only)"
+WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}" "UninstallString" "$INSTDIR\Uninstall.exe"
+
+; Tell the compiler to write an uninstaller and to look for a "Uninstall" section
+WriteUninstaller $INSTDIR\Uninstall.exe
+
+SectionEnd ; end the section
+
+ ; The uninstall section
+Section "Uninstall"
+
+RMDir /r $INSTDIR\indicator
+RMDir /r $INSTDIR\config
+RMDir /r $INSTDIR\lib
+
+Delete $INSTDIR\chart.ico
+Delete $INSTDIR\jstock.jar
+Delete $INSTDIR\Uninstall.exe
+
+Delete "$SMPROGRAMS\${PRODUCT_NAME}"
+Delete "$SMPROGRAMS\${PRODUCT_NAME}\${PRODUCT_NAME}.lnk"
+RMDIR "$SMPROGRAMS\${PRODUCT_NAME}\Uninstall ${PRODUCT_NAME}.lnk"
+
+DeleteRegKey HKEY_LOCAL_MACHINE "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
+
+RMDir $INSTDIR
+
+SectionEnd
+
+Function VersionCompare
+	!define VersionCompare `!insertmacro VersionCompareCall`
+ 
+	!macro VersionCompareCall _VER1 _VER2 _RESULT
+		Push `${_VER1}`
+		Push `${_VER2}`
+		Call VersionCompare
+		Pop ${_RESULT}
+	!macroend
+ 
+	Exch $1
+	Exch
+	Exch $0
+	Exch
+	Push $2
+	Push $3
+	Push $4
+	Push $5
+	Push $6
+	Push $7
+ 
+	begin:
+	StrCpy $2 -1
+	IntOp $2 $2 + 1
+	StrCpy $3 $0 1 $2
+	StrCmp $3 '' +2
+	StrCmp $3 '.' 0 -3
+	StrCpy $4 $0 $2
+	IntOp $2 $2 + 1
+	StrCpy $0 $0 '' $2
+ 
+	StrCpy $2 -1
+	IntOp $2 $2 + 1
+	StrCpy $3 $1 1 $2
+	StrCmp $3 '' +2
+	StrCmp $3 '.' 0 -3
+	StrCpy $5 $1 $2
+	IntOp $2 $2 + 1
+	StrCpy $1 $1 '' $2
+ 
+	StrCmp $4$5 '' equal
+ 
+	StrCpy $6 -1
+	IntOp $6 $6 + 1
+	StrCpy $3 $4 1 $6
+	StrCmp $3 '0' -2
+	StrCmp $3 '' 0 +2
+	StrCpy $4 0
+ 
+	StrCpy $7 -1
+	IntOp $7 $7 + 1
+	StrCpy $3 $5 1 $7
+	StrCmp $3 '0' -2
+	StrCmp $3 '' 0 +2
+	StrCpy $5 0
+ 
+	StrCmp $4 0 0 +2
+	StrCmp $5 0 begin newer2
+	StrCmp $5 0 newer1
+	IntCmp $6 $7 0 newer1 newer2
+ 
+	StrCpy $4 '1$4'
+	StrCpy $5 '1$5'
+	IntCmp $4 $5 begin newer2 newer1
+ 
+	equal:
+	StrCpy $0 0
+	goto end
+	newer1:
+	StrCpy $0 1
+	goto end
+	newer2:
+	StrCpy $0 2
+ 
+	end:
+	Pop $7
+	Pop $6
+	Pop $5
+	Pop $4
+	Pop $3
+	Pop $2
+	Pop $1
+	Exch $0
+FunctionEnd
+
+Function GetJRE
+        MessageBox MB_OK "${PRODUCT_NAME} uses Java ${JRE_VERSION}, it will now \
+                         be downloaded and installed"
+ 
+        StrCpy $2 "$TEMP\Java Runtime Environment.exe"
+        nsisdl::download /TIMEOUT=30000 ${JRE_URL} $2
+        Pop $R0 ;Get the return value
+                StrCmp $R0 "success" +3
+                MessageBox MB_OK "Download failed: $R0"
+                Quit
+        ExecWait $2
+        Delete $2
+FunctionEnd
+ 
+ 
+Function DetectJRE
+	ReadRegStr $2 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment" \
+             "CurrentVersion"
+
+	${VersionCompare} ${JRE_VERSION} $2 $R0
+	; $R0="0" if versions are equal
+	; $R0="1" if JRE_VERSION is newer
+	; $R0="2" if JRE_VERSION is older
+  	
+	StrCmp $R0 0 done
+	StrCmp $R0 2 done
+
+  	Call GetJRE
+  
+  	done:
+FunctionEnd

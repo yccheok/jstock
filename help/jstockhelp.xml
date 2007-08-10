@@ -1,0 +1,367 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
+<book>
+    <bookinfo>
+        <title>JStock Help</title> 
+    </bookinfo>
+    
+    <chapter>    
+        <title>Introduction</title>
+        <para>JStock is an utility which provides KLSE (Kuala Lumpur Stock Exchange) real time monitoring. It had been integrated with a powerful highly customized stock indicators, which will help you to answer the following questions :</para>
+
+        <para>
+            <orderedlist>
+                <listitem><para>What is all the KLSE stocks with 3 years lowest selling price?</para></listitem>
+                <listitem><para>What is all the Main board stocks with today's volume greater than yesterday's volume?</para></listitem>
+                <listitem><para>What is all the Banking industry stocks with today's buying price lesser than 7 days average buying price?</para></listitem>
+            </orderedlist>            
+        </para>
+    </chapter>
+    
+    <chapter>
+        <title>Real-Time Stock Info</title>
+        <para>In order to watch the real time stock price movement, user may click on the following tab.</para>
+        
+        <para>
+            <mediaobject>
+                <imageobject><imagedata fileref="real-time-info.png" format="PNG"/></imageobject>
+                <textobject><phrase>Real-Time Info Tab</phrase></textobject>
+            </mediaobject>        
+        </para>
+        
+        <para>
+            To add a watched stock, just simply enter the prefix stock symbol or stock code, and press ENTER. The intelligent stock search system will prompt you for a list of stock selection.
+        </para>
+        
+        <para>
+            <mediaobject>
+                <imageobject><imagedata fileref="real-time-info-search.png" format="PNG"/></imageobject>
+                <textobject><phrase>Real-Time Info Search</phrase></textobject>
+            </mediaobject>        
+        </para>
+
+        <para>
+            To view the stock history, just simply select the particular stock, right click and select History.
+        </para>
+
+        <para>
+            <mediaobject>
+                <imageobject><imagedata fileref="real-time-info-history.png" format="PNG"/></imageobject>
+                <textobject><phrase>Real-Time Info History</phrase></textobject>
+            </mediaobject>        
+        </para>
+
+        <para>
+            Here is how the history will look like.
+        </para>
+        
+        <para>
+            <mediaobject>
+                <imageobject><imagedata fileref="pricevolume.png" format="PNG"/></imageobject>
+                <textobject><phrase>Price Volume History</phrase></textobject>
+            </mediaobject>        
+        </para>
+
+        <para>
+            The chart was able to zoom in to a very detailed level.
+        </para>
+
+        <para>
+            <mediaobject>
+                <imageobject><imagedata fileref="pricevolume2.png" format="PNG"/></imageobject>
+                <textobject><phrase>Price Volume History (zoomed)</phrase></textobject>
+            </mediaobject>        
+        </para>
+
+        <para>
+            We do also include candlestick chart too.
+        </para>
+
+        <para>
+            <mediaobject>
+                <imageobject><imagedata fileref="candlestick.png" format="PNG"/></imageobject>
+                <textobject><phrase>Candlestick History (zoomed)</phrase></textobject>
+            </mediaobject>        
+        </para>
+        
+    </chapter>
+    
+    <chapter>
+        <title>Stock Indicator Editor</title>
+        <para>In order to create your own indicator/ rule to monitor the dynamic movement of the stock market, user may click on the following tab.</para>
+
+        <para>
+            <mediaobject>
+                <imageobject><imagedata fileref="stock-indicator-editor.png" format="PNG"/></imageobject>
+                <textobject><phrase>Stock Indicator Editor Tab</phrase></textobject>
+            </mediaobject>            
+        </para>
+        
+        <para>User may then access the indicator components from the following toolbar.</para>
+
+        <para>
+            <mediaobject>
+                <imageobject><imagedata fileref="stock-indicator-editor-toolbar.png" format="PNG"/></imageobject>
+                <textobject><phrase>Stock Indicator Editor Toolbar</phrase></textobject>
+            </mediaobject>            
+        </para>
+        
+        <para>Each of the component's functionality is described as below.</para>
+  
+        <table frame="topbot"><title>Component Description</title>
+            <tgroup cols="2">
+                <thead>
+                <row><entry>Component</entry><entry>Description</entry></row>
+            </thead>
+            <tbody>
+                <row>
+                    <entry>
+                        <mediaobject>
+                            <imageobject><imagedata fileref="bell.png" format="PNG"/></imageobject>
+                            <textobject><phrase>Alert</phrase></textobject>
+                        </mediaobject>                          
+                    </entry>                    
+                    <entry>
+                        <para id="alert">Alert.</para><para></para>                         
+                        <para>
+                            In every indicator which you built, it must consist at least (and only) single alert component.
+                        </para>
+                    </entry>
+                </row>
+                
+                <row>                    
+                    <entry>
+                        <mediaobject>
+                            <imageobject><imagedata fileref="bookmark.png" format="PNG"/></imageobject>
+                            <textobject><phrase>Real Time Stock Information. </phrase></textobject>
+                        </mediaobject>                          
+                    </entry>                    
+                    <entry>
+                        <para>Real time stock information.</para><para></para>
+                        <para>
+                            This represents today real time stock information.
+                            You may choose Open Price, Last Price, High Price, Low Price, Volume, Change Price,
+                            Change Price in Percentage, Last Volume, 1st/2nd/3rd Buy Price, 1st/2nd/3rd Buy Quantity, 1st/2nd/3rd Sell Price, 
+                            1st/2nd/3rd Sell Quantity.                            
+                        </para>
+                    </entry>
+                </row>
+
+                <row>
+                    <entry>
+                        <mediaobject>
+                            <imageobject><imagedata fileref="bookmarks_list_add2.png" format="PNG"/></imageobject>
+                            <textobject><phrase>Stock History Information</phrase></textobject>
+                        </mediaobject>                          
+                    </entry>                    
+                    <entry>
+                        <para>Stock history information.</para><para></para>
+                        <para>
+                            You may specific the stock history information in specific date. 
+                            For example, you may specific average stock last price information from 14th June 2005 to 16th December 2006.
+                            You may either choose Maximum, Minimum or Average. You may also choose Open Price, Last Price, High Price, Low Price,
+                            and Volume.
+                        </para>
+                    </entry>
+                </row>
+                
+                <row>
+                    <entry>
+                        <mediaobject>
+                            <imageobject><imagedata fileref="bookmarks_list_add.png" format="PNG"/></imageobject>
+                            <textobject><phrase>Stock Relative History Information</phrase></textobject>
+                        </mediaobject>                          
+                    </entry>                    
+                    <entry>
+                        <para>Stock relative history information.</para><para></para>
+                        <para>
+                            You may specific the stock relative history information in specific date. 
+                            For example, you may specific average stock last 14 days price information.
+                            You may either choose Maximum, Minimum or Average. You may also choose Open Price, Last Price, High Price, Low Price,
+                            and Volume.
+                        </para>
+                    </entry>
+                </row>
+                
+                <row>
+                    <entry>
+                        <mediaobject>
+                            <imageobject><imagedata fileref="constant.png" format="PNG"/></imageobject>
+                            <textobject><phrase>Constant</phrase></textobject>
+                        </mediaobject>                          
+                    </entry>                    
+                    <entry>
+                        <para>Constant.</para><para></para>
+                        <para>
+                            You may specific any constant number like 1, 10, 200, -5.
+                        </para>
+                    </entry>
+                </row>
+                
+                <row>
+                    <entry>
+                        <mediaobject>
+                            <imageobject><imagedata fileref="math.png" format="PNG"/></imageobject>
+                            <textobject><phrase>Arithmetic</phrase></textobject>
+                        </mediaobject>                          
+                    </entry>                    
+                    <entry>
+                        <para>Arithmetic.</para><para></para>
+                        <para>
+                            You may perform one of the arithmetic operation, add/ minus/ multiplication/ division.
+                        </para>
+                    </entry>
+                </row>
+
+                <row>
+                    <entry>
+                        <mediaobject>
+                            <imageobject><imagedata fileref="compare.png" format="PNG"/></imageobject>
+                            <textobject><phrase>Equality</phrase></textobject>
+                        </mediaobject>                          
+                    </entry>                    
+                    <entry>
+                        <para>Equality.</para><para></para>
+                        <para>
+                            You may perform the following equality/ comparison operation, equal/ greater than/ lesser than/ equal or greater than/ equal or lesser than.
+                        </para>
+                    </entry>
+                </row>
+                
+                <row>
+                    <entry>
+                        <mediaobject>
+                            <imageobject><imagedata fileref="logical.png" format="PNG"/></imageobject>
+                            <textobject><phrase>Logical</phrase></textobject>
+                        </mediaobject>                          
+                    </entry>                    
+                    <entry>
+                        <para>Logical.</para><para></para>
+                        <para>
+                            You may perform the following logical operation. There are two : OR/ AND. For example, you want something
+                        </para>
+                        <para>
+                            "When today price is lesser than yesterday price OR today volume is lesser than yesterday volume"
+                        </para>                        
+                        <para>
+                            "When today price is lesser than yesterday price AND today volume is lesser than yesterday volume"
+                        </para>
+                    </entry>
+                </row>
+                
+            </tbody>
+          </tgroup>
+        </table>
+        
+        <section>
+            <title>Example of building an indicator</title>
+            <para>Here is an example, to show you how to build a simple indicator, to find out stock "its closing price is in 14 days highest".</para>
+            <para>First, we will draft out our equation to <emphasis>Real Time Stock's Last Price >= Maximum from 14 days Stock's Last Price</emphasis></para>
+            <para>
+                From the equation, we know that we need to following component : 
+                <orderedlist>
+                    <listitem><para>Real time stock information</para></listitem>
+                    <listitem><para>Relative stock history</para></listitem>
+                    <listitem><para>Equality</para></listitem>
+                    <listitem><para>Alert</para></listitem>
+                </orderedlist>                         
+            </para>
+            <para>
+                we will first add the all the components to the drawing area as below :
+                <mediaobject>
+                    <imageobject><imagedata fileref="stock-indicator-editor-step1.png" format="PNG"/></imageobject>
+                    <textobject><phrase>Stock Indicator Editor Step 1</phrase></textobject>
+                </mediaobject>                  
+            </para>
+            
+            <para>
+                We will then connect all the components all together as below :
+                <mediaobject>
+                    <imageobject><imagedata fileref="stock-indicator-editor-step2.png" format="PNG"/></imageobject>
+                    <textobject><phrase>Stock Indicator Editor Step 2</phrase></textobject>
+                </mediaobject>                  
+            </para>            
+            
+            <para>
+                We will need to make changes on the properties of Relative stock history and Equality, so that we can specific number of days. By right click on the 
+                Relative stock history, select properties, select function=Max, type=LastPrice. Also perform right click on the Equality, select 
+                properties, select equality=GreaterOrEqual. 
+                <mediaobject>
+                    <imageobject><imagedata fileref="stock-indicator-editor-step3.png" format="PNG"/></imageobject>
+                    <textobject><phrase>Stock Indicator Editor Step 3</phrase></textobject>
+                </mediaobject>                  
+                
+                <mediaobject>
+                    <imageobject><imagedata fileref="stock-indicator-editor-step4.png" format="PNG"/></imageobject>
+                    <textobject><phrase>Stock Indicator Editor Step 4</phrase></textobject>
+                </mediaobject>                                  
+            </para>  
+            
+            <para>
+                In order to see whether we had build our indicator in correct way, we may inject in some test data. For example,
+                we may check whether pbbank stock will meet this indicator criteria. Just key in pbbank in the text field, and press
+                "Simulate" button. 
+                <mediaobject>
+                    <imageobject><imagedata fileref="stock-indicator-editor-step5.png" format="PNG"/></imageobject>
+                    <textobject><phrase>Stock Indicator Editor Step 5</phrase></textobject>
+                </mediaobject>                                  
+                <mediaobject>
+                    <imageobject><imagedata fileref="stock-indicator-editor-step6.png" format="PNG"/></imageobject>
+                    <textobject><phrase>Stock Indicator Editor Step 6</phrase></textobject>
+                </mediaobject>                 
+            </para>
+            
+            <para>
+                Once we are happy with our own built indicator, we can save it by clicking on the Save button. We are done! :)
+                <mediaobject>
+                    <imageobject><imagedata fileref="stock-indicator-editor-step7.png" format="PNG"/></imageobject>
+                    <textobject><phrase>Stock Indicator Editor Step 7</phrase></textobject>
+                </mediaobject>                                                
+            </para>
+            
+        </section>
+    
+    </chapter>
+    
+    <chapter>
+        <title>Stock Indicator Scanner</title>
+        <para>By just building our own indicator is not enough. We wish to have an automated way to scan through the entire stock market, to see which stocks had meet our criteria.</para>
+        
+        <para>
+            <mediaobject>
+                <imageobject><imagedata fileref="stock-indicator-scanner.png" format="PNG"/></imageobject>
+                <textobject><phrase>Stock Indicator Scanner Tab</phrase></textobject>
+            </mediaobject>        
+        </para>   
+        
+        <para>
+            For example, we wish to search for <emphasis>All banking stock with its current stock price is in 14 days highest</emphasis>. Just follow the steps below:            
+        </para>
+        
+        <para>            
+            <mediaobject>
+                <imageobject><imagedata fileref="stock-indicator-scanner-step1.png" format="PNG"/></imageobject>
+                <textobject><phrase>Stock Indicator Scanner Step 1</phrase></textobject>
+            </mediaobject>
+            <mediaobject>
+                <imageobject><imagedata fileref="stock-indicator-scanner-step2.png" format="PNG"/></imageobject>
+                <textobject><phrase>Stock Indicator Scanner Step 2</phrase></textobject>
+            </mediaobject>
+            <mediaobject>
+                <imageobject><imagedata fileref="stock-indicator-scanner-step3.png" format="PNG"/></imageobject>
+                <textobject><phrase>Stock Indicator Scanner Step 3</phrase></textobject>
+            </mediaobject>
+            <mediaobject>
+                <imageobject><imagedata fileref="stock-indicator-scanner-step4.png" format="PNG"/></imageobject>
+                <textobject><phrase>Stock Indicator Scanner Step 4</phrase></textobject>
+            </mediaobject>
+        </para>
+    </chapter>
+    
+    <chapter>
+        <title>Contact</title>
+        <para> 
+            Author may be contacted through <email>yccheok@yahoo.com</email>
+        </para>
+    </chapter>
+</book>
