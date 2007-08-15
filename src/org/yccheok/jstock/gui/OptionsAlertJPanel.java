@@ -218,6 +218,20 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        if(jTextField2.getText().length() == 0)
+        {
+            JOptionPane.showMessageDialog(this, "Email address cannot be empty", "Empty email", JOptionPane.WARNING_MESSAGE);
+            jTextField2.requestFocus();
+            return;
+        }
+
+        if(jPasswordField1.getPassword().length == 0)
+        {
+            JOptionPane.showMessageDialog(this, "Email password cannot be empty", "Empty password", JOptionPane.WARNING_MESSAGE);
+            jPasswordField1.requestFocus();
+            return;
+        }   
+            
         try {
 // TODO add your handling code here:
             GoogleMail.Send(
@@ -265,7 +279,7 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         jCheckBox2.setSelected(jStockOptions.isSendEmail());
         jTextField2.setText(jStockOptions.getEmail());
         jPasswordField1.setText(jStockOptions.getEmailPassword());
-        System.out.println(jStockOptions.isSingleIndicatorAlert());
+
         if(jStockOptions.isSingleIndicatorAlert())
             jRadioButton1.setSelected(true);
         else
