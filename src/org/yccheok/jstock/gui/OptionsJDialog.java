@@ -85,7 +85,7 @@ public class OptionsJDialog extends javax.swing.JDialog implements JStockOptions
         if(apply(jStockOptions) == false)
             return;
         
-        this.setVisible(true);
+        this.setVisible(false);
         this.dispose();        
     }//GEN-LAST:event_jButton1ActionPerformed
 
