@@ -167,6 +167,24 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
         private StockHistoryServer historyServer;
     }
     
+    public synchronized void clearStockCodes() {
+        final ThreadPoolExecutor threadPoolExecutor = ((ThreadPoolExecutor)pool);        
+        final int nThreads = threadPoolExecutor.getMaximumPoolSize();        
+        
+        stockCodesWriterLock.lock();
+        
+        stockCodes.clear();
+        
+        histories.clear();
+        
+        stockCodesWriterLock.unlock();
+
+        threadPoolExecutor.shutdownNow();  
+        
+        // pool is not valid any more. Discard it and re-create.
+        pool = Executors.newFixedThreadPool(nThreads);        
+    }
+    
     // synchronized, to avoid addStockCode and removeStockCode at the same time
     public synchronized boolean removeStockCode(String code) {
         stockCodesWriterLock.lock();
