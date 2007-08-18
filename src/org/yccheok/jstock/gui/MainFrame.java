@@ -144,6 +144,9 @@ public class MainFrame extends javax.swing.JFrame {
         jMenu3 = new javax.swing.JMenu();
         jMenuItem2 = new javax.swing.JMenuItem();
         jMenuItem1 = new javax.swing.JMenuItem();
+        jMenu5 = new javax.swing.JMenu();
+        jMenuItem4 = new javax.swing.JMenuItem();
+        jMenuItem7 = new javax.swing.JMenuItem();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem6 = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
@@ -447,6 +450,27 @@ public class MainFrame extends javax.swing.JFrame {
 
         jMenuBar2.add(jMenu3);
 
+        jMenu5.setText("Edit");
+        jMenuItem4.setText("Add Stocks...");
+        jMenuItem4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem4ActionPerformed(evt);
+            }
+        });
+
+        jMenu5.add(jMenuItem4);
+
+        jMenuItem7.setText("Clear All Stocks");
+        jMenuItem7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem7ActionPerformed(evt);
+            }
+        });
+
+        jMenu5.add(jMenuItem7);
+
+        jMenuBar2.add(jMenu5);
+
         jMenu1.setText("Options");
         jMenuItem6.setText("Options...");
         jMenuItem6.addActionListener(new java.awt.event.ActionListener() {
@@ -490,6 +514,22 @@ public class MainFrame extends javax.swing.JFrame {
         java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
         setBounds((screenSize.width-952)/2, (screenSize.height-478)/2, 952, 478);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
+// TODO add your handling code here:
+        if(this.getStockCodeAndSymbolDatabase() == null) {
+            javax.swing.JOptionPane.showMessageDialog(this, "We haven't connected to KLSE server.", "Not Connected", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        
+        StockJDialog stockJDialog = new StockJDialog(this, true);
+        stockJDialog.setVisible(true);
+    }//GEN-LAST:event_jMenuItem4ActionPerformed
+
+    private void jMenuItem7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem7ActionPerformed
+// TODO add your handling code here:
+        this.clearAllStocks();
+    }//GEN-LAST:event_jMenuItem7ActionPerformed
 
     private void loadFromTextFile(File file) {
         /* Text file */
@@ -606,6 +646,10 @@ public class MainFrame extends javax.swing.JFrame {
         {
             log.error("", exp);
         }        
+    }
+    
+    public RealTimeStockMonitor getRealTimeStockMonitor() {
+        return realTimeStockMonitor;
     }
     
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
@@ -835,9 +879,29 @@ public class MainFrame extends javax.swing.JFrame {
         });
     }
     
+    private void clearAllStocks() {
+        assert(java.awt.EventQueue.isDispatchThread());
+        
+        StockTableModel tableModel = (StockTableModel)jTable1.getModel();            
+            
+        stockCodeHistoryGUI.clear();
+        realTimeStockMonitor.clearStockCodes();
+        stockHistoryMonitor.clearStockCodes();
+        tableModel.clearAllStocks();     
+        
+        updateBuyerSellerInformation(null);
+        
+        if(stockCodeHistoryGUI.size() == 0) {
+            statusBar.setProgressBar(false);
+            statusBar.setMainMessage("Connected");
+        }        
+    }
+    
     // Should we synchronized the jTable1, or post the job at GUI event dispatch
     // queue?    
     private void deteleSelectedTableRow() {
+        assert(java.awt.EventQueue.isDispatchThread());
+        
         StockTableModel tableModel = (StockTableModel)jTable1.getModel();            
 
         int prevRow = Integer.MAX_VALUE;
@@ -1254,7 +1318,9 @@ public class MainFrame extends javax.swing.JFrame {
     
     // Should we synchronized the jTable1, or post the job at GUI event dispatch
     // queue?
-    private void addStockToTable(final Stock stock) {
+    public void addStockToTable(final Stock stock) {
+        assert(java.awt.EventQueue.isDispatchThread());
+        
         StockTableModel tableModel = (StockTableModel)jTable1.getModel();
         tableModel.addStock(stock);
     }
@@ -1965,12 +2031,15 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenu jMenu4;
+    private javax.swing.JMenu jMenu5;
     private javax.swing.JMenuBar jMenuBar2;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
+    private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JMenuItem jMenuItem5;
     private javax.swing.JMenuItem jMenuItem6;
+    private javax.swing.JMenuItem jMenuItem7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel2;
