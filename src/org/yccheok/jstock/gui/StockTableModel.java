@@ -93,6 +93,18 @@ public class StockTableModel extends AbstractTableModel {
         }
     }
     
+    public void clearAllStocks() {
+        final int size = stocks.size();
+        
+        if(size == 0) return;
+        
+        tableModel.clear();
+        stocks.clear();
+        rowStockCodeMapping.clear();
+            
+        this.fireTableRowsDeleted(0, size - 1);
+    }
+    
     public void removeStock(Stock stock) {
         Integer row = rowStockCodeMapping.get(stock.getCode());
         
