@@ -17,3 +17,15 @@ v0-02
 
 2.  User may choose to display a single stock although there is multiple 
     indicators being triggered.
+
+=============
+version 0.9.1
+=============
+1.  Initial release to the public.
+
+=============
+version 0.9.2
+=============
+1.  Fix email feature, which is caused by changes in GMAIL SMTP service.
+
+2.  [ 1776936 ] Load all the entire market stocks into the Real-Time Monitor.
