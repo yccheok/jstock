@@ -81,9 +81,9 @@ public class AboutJDialog extends javax.swing.JDialog {
         jLabel3.setFont(new java.awt.Font("Dialog", 1, 18));
         jLabel3.setForeground(new java.awt.Color(0, 0, 255));
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel3.setText("version 0.9.1");
+        jLabel3.setText("version 0.9.2");
 
-        jLabel4.setText("<html>\nJStock is a stock analysis tool which help you to pick stocks in an automated way.\n<br>\n<br>\nCopyright &copy; 2007 Yan Cheng Cheok <a href=\"mailto:yccheok@yahoo.com\">yccheok@yahoo.com</a>\n</html>");
+        jLabel4.setText("<html>\nJStock is a stock analysis tool which help you to pick stocks in an automated way.\n<br>\n<br>\nCopyright &copy; 2007 Yan Cheng Cheok <a href=\"mailto:yccheok@yahoo.com\">yccheok@yahoo.com</a>\n<br>\n<br>\nProject website : <a href=\"http://sourceforge.net/projects/jstock\">http://sourceforge.net/projects/jstock</a>\n</html>");
 
         jScrollPane2.setBorder(javax.swing.BorderFactory.createTitledBorder("License"));
         jScrollPane2.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -120,13 +120,13 @@ public class AboutJDialog extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 160, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 115, Short.MAX_VALUE)
                 .addContainerGap())
         );
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
         java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-451)/2, (screenSize.height-569)/2, 451, 569);
+        setBounds((screenSize.width-451)/2, (screenSize.height-555)/2, 451, 555);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
