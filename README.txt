@@ -29,3 +29,9 @@ version 0.9.2
 1.  Fix email feature, which is caused by changes in GMAIL SMTP service.
 
 2.  [ 1776936 ] Load all the entire market stocks into the Real-Time Monitor.
+
+
+=============
+version 0.9.3
+=============
+1. [ 1830911 ] Bug fixed : Uninstall doesn't remove shortcut.
