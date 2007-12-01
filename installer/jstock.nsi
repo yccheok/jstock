@@ -2,73 +2,52 @@
 !define JRE_VERSION "1.6"
 !define JRE_URL "http://javadl.sun.com/webapps/download/AutoDL?BundleId=11292"
 !define PRODUCT_NAME "JStock"
-
 ; The name of the installer
 Name ${PRODUCT_NAME}
-
 ; The file to write
 OutFile "jstock-0.9.1-setup.exe"
-
 LicenseData "gpl.txt"
  
 ; The default installation directory
 InstallDir $PROGRAMFILES\${PRODUCT_NAME}
-
 ; The text to prompt the user to enter a directory
 DirText "This will install JStock on your computer. Choose a directory"
-
 Page license
 page directory
 Page instfiles
-
 ; The stuff to install
 Section "" ;No components page, name is not important
-
 Call DetectJRE
-
 ; Set output path to the installation directory.
 SetOutPath $INSTDIR
-
 ; Put file there
 File /r jstock\jstock.jar
 File /r jstock\indicator
 File /r jstock\config
 File /r jstock\lib
 File chart.ico
-
 CreateDirectory "$SMPROGRAMS\${PRODUCT_NAME}"
 CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\${PRODUCT_NAME}.lnk" "$INSTDIR\jstock.jar" "" "$INSTDIR\chart.ico"
 CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\Uninstall ${PRODUCT_NAME}.lnk" "$INSTDIR\Uninstall.exe" 
-
 WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}" "DisplayName" "${PRODUCT_NAME} (remove only)"
 WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}" "UninstallString" "$INSTDIR\Uninstall.exe"
-
 ; Tell the compiler to write an uninstaller and to look for a "Uninstall" section
 WriteUninstaller $INSTDIR\Uninstall.exe
-
 SectionEnd ; end the section
-
  ; The uninstall section
 Section "Uninstall"
-
 RMDir /r $INSTDIR\indicator
 RMDir /r $INSTDIR\config
 RMDir /r $INSTDIR\lib
-
 Delete $INSTDIR\chart.ico
 Delete $INSTDIR\jstock.jar
 Delete $INSTDIR\Uninstall.exe
-
-Delete "$SMPROGRAMS\${PRODUCT_NAME}"
+Delete "$SMPROGRAMS\${PRODUCT_NAME}\Uninstall ${PRODUCT_NAME}.lnk"
 Delete "$SMPROGRAMS\${PRODUCT_NAME}\${PRODUCT_NAME}.lnk"
-RMDIR "$SMPROGRAMS\${PRODUCT_NAME}\Uninstall ${PRODUCT_NAME}.lnk"
-
+RMDIR "$SMPROGRAMS\${PRODUCT_NAME}"
 DeleteRegKey HKEY_LOCAL_MACHINE "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
-
 RMDir $INSTDIR
-
 SectionEnd
-
 Function VersionCompare
 	!define VersionCompare `!insertmacro VersionCompareCall`
  
@@ -153,7 +132,6 @@ Function VersionCompare
 	Pop $1
 	Exch $0
 FunctionEnd
-
 Function GetJRE
         MessageBox MB_OK "${PRODUCT_NAME} uses Java ${JRE_VERSION}, it will now \
                          be downloaded and installed"
@@ -172,7 +150,6 @@ FunctionEnd
 Function DetectJRE
 	ReadRegStr $2 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment" \
              "CurrentVersion"
-
 	${VersionCompare} ${JRE_VERSION} $2 $R0
 	; $R0="0" if versions are equal
 	; $R0="1" if JRE_VERSION is newer
@@ -180,7 +157,6 @@ Function DetectJRE
   	
 	StrCmp $R0 0 done
 	StrCmp $R0 2 done
-
   	Call GetJRE
   
   	done:
