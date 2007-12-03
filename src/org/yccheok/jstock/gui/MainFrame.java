@@ -852,6 +852,9 @@ public class MainFrame extends javax.swing.JFrame {
                 Stock stock = tableModel.getStock(modelIndex);
                 updateBuyerSellerInformation(stock);
             }
+            else {
+            	updateBuyerSellerInformation(null);
+            }
             
             return;
         }
@@ -1325,6 +1328,24 @@ public class MainFrame extends javax.swing.JFrame {
         tableModel.addStock(stock);
     }
     
+    // Only will return true if the selected stock is the one and only one.
+    private boolean isStockBeingSelected(final Stock stock) {
+        int[] rows = MainFrame.this.jTable1.getSelectedRows();
+            
+        if(rows.length == 1) {
+            int row = rows[0];
+                
+            StockTableModel tableModel = (StockTableModel)jTable1.getModel();
+            int modelIndex = jTable1.convertRowIndexToModel(row);
+            if(stock.getCode().equals(tableModel.getStock(modelIndex).getCode()))
+            {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
     private void updateStockToTable(final Stock stock) {
         StockTableModel tableModel = (StockTableModel)jTable1.getModel();
         tableModel.updateStock(stock);
@@ -1720,6 +1741,10 @@ public class MainFrame extends javax.swing.JFrame {
            public void run() {
                 for(Stock stock : stocks) {
                     updateStockToTable(stock);
+                    
+                    if(isStockBeingSelected(stock)) {
+                        MainFrame.this.updateBuyerSellerInformation(stock);
+                    }
                 }               
            } 
         });
@@ -1797,6 +1822,10 @@ public class MainFrame extends javax.swing.JFrame {
                 int modelIndex = jTable1.convertRowIndexToModel(row);
                 Stock stock = tableModel.getStock(modelIndex);
                 updateBuyerSellerInformation(stock);
+            }
+            else {
+                updateBuyerSellerInformation(null);
+                
             }
         }
         
