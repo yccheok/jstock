@@ -741,8 +741,8 @@ public class MainFrame extends javax.swing.JFrame {
         optionsJDialog.setVisible(true);
     }//GEN-LAST:event_jMenuItem6ActionPerformed
 
-    public JStockOptions getJStockOptions() {
-        return this.jStockOptions;
+    public static JStockOptions getJStockOptions() {
+        return MainFrame.jStockOptions;
     }
     
     /* Dangerous! We didn't perform proper clean up, because we do not want
@@ -1229,7 +1229,7 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel34.setText("" + stock.getSecondBuyQuantity());
         jLabel26.setText("" + stock.getBuyQuantity());
         jLabel29.setText("" + stock.getSellQuantity());
-        jLabel30.setText("" + stock.getSecondBuyQuantity());
+        jLabel30.setText("" + stock.getSecondSellQuantity());
         jLabel38.setText("" + stock.getThirdSellQuantity());
     }
     
@@ -1979,6 +1979,24 @@ public class MainFrame extends javax.swing.JFrame {
         return this.indicatorPanel.getIndicatorProjectManager();
     }
     
+    public static final java.util.concurrent.Executor getTableCellMonitor() {
+        return MainFrame.tableCellMonitor;
+    }
+    
+    public void repaintTable() {
+        Component c = jTabbedPane1.getSelectedComponent();
+        
+        if(c instanceof IndicatorScannerJPanel) {
+            indicatorScannerJPanel.repaintTable();
+        }
+        else if(c instanceof IndicatorPanel) {
+            
+        }
+        else {
+            this.jTable1.repaint();
+        }
+    }
+    
     private TrayIcon trayIcon;
     
     private static final Log log = LogFactory.getLog(MainFrame.class);
@@ -1999,7 +2017,8 @@ public class MainFrame extends javax.swing.JFrame {
     private StockCodeAndSymbolDatabaseTask stockCodeAndSymbolDatabaseTask;
     private Thread marketThread;
     private StockHistorySerializer stockHistorySerializer;
-    private JStockOptions jStockOptions;
+    /* One and only one. */
+    private static JStockOptions jStockOptions;
     
     // As workaround to overcome the bug, when new look n feel being applied during runtime, the original
     // KeyListner for ComboBoxEditor will be removed.
@@ -2016,6 +2035,8 @@ public class MainFrame extends javax.swing.JFrame {
     
     private org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
     private org.yccheok.jstock.engine.Observer<StockHistoryMonitor, StockHistoryMonitor.StockHistoryRunnable> stockHistoryMonitorObserver = this.getStockHistoryMonitorObserver();
+
+    private static final java.util.concurrent.Executor tableCellMonitor = java.util.concurrent.Executors.newFixedThreadPool(4);
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
