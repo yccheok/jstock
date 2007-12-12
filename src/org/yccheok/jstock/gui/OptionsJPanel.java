@@ -111,7 +111,9 @@ public class OptionsJPanel extends javax.swing.JPanel implements JStockOptionsOb
         optionsPasswordJPanel = new OptionsPasswordJPanel();
         optionsNetworkJPanel = new OptionsNetworkJPanel();
         optionsSpeedJPanel = new OptionsSpeedJPanel();
-
+        optionsColorJPanel = new OptionsColorJPanel();
+        
+        addButton("Color", "/images/32x32/colors.png", optionsColorJPanel, jButtonBar1, buttonGroup1);        
         addButton("Alert", "/images/32x32/bell.png", optionsAlertJPanel, jButtonBar1, buttonGroup1);
         addButton("Password", "/images/32x32/unlock.png", optionsPasswordJPanel, jButtonBar1, buttonGroup1);
         addButton("Network", "/images/32x32/connect_to_network.png", optionsNetworkJPanel, jButtonBar1, buttonGroup1);
@@ -119,6 +121,7 @@ public class OptionsJPanel extends javax.swing.JPanel implements JStockOptionsOb
     }
 
     public void set(JStockOptions jStockOptions) {
+        optionsColorJPanel.set(jStockOptions);
         optionsAlertJPanel.set(jStockOptions);
         optionsNetworkJPanel.set(jStockOptions);
         optionsPasswordJPanel.set(jStockOptions);
@@ -126,11 +129,21 @@ public class OptionsJPanel extends javax.swing.JPanel implements JStockOptionsOb
     }
 
     public boolean apply(JStockOptions jStockOptions) {
+        /* FIXME : We should make use of JStockOptionsObserver interface. */
+        if(optionsColorJPanel.apply(jStockOptions) == false)
+        {
+            final JToggleButton button = map.get("Color");
+            
+            button.setSelected(true);
+            button.doClick();
+            return false;
+        }
+        
         if(optionsAlertJPanel.apply(jStockOptions) == false)
         {
             final JToggleButton button = map.get("Alert");
             
-            //button.setSelected(true);
+            button.setSelected(true);
             button.doClick();
             return false;
         }
@@ -170,6 +183,7 @@ public class OptionsJPanel extends javax.swing.JPanel implements JStockOptionsOb
     private OptionsNetworkJPanel optionsNetworkJPanel;
     private OptionsPasswordJPanel optionsPasswordJPanel;
     private OptionsSpeedJPanel optionsSpeedJPanel;
+    private OptionsColorJPanel optionsColorJPanel;
     
     private java.util.Map<String, JToggleButton> map = new java.util.HashMap<String, JToggleButton>();
     
