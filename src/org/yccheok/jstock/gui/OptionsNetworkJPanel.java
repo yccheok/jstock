@@ -93,7 +93,7 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
         jXHeader1.setTitle("Proxy Server");
         add(jXHeader1, java.awt.BorderLayout.NORTH);
 
-        jLabel1.setText("Proxy server");
+        jLabel1.setText("Proxy Server");
 
         jLabel2.setText("Port");
 
