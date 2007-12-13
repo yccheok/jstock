@@ -30,15 +30,24 @@ import org.yccheok.jstock.engine.*;
  *
  * @author yccheok
  */
-public class StockTableModel extends AbstractTableModel {
+public class StockTableModel extends AbstractTableModelWithMemory {
     
     /** Creates a new instance of StockTableModel */
     public StockTableModel() {
         for(int i = 0; i < columnNames.length; i++) {
             columnNameMapping.put(columnNames[i], i);
         }
+                
     }
 
+    public Object getOldValueAt(int rowIndex, int columnIndex) {
+        List<Object> stockInfo = oldTableModel.get(rowIndex);
+        
+        if(null == stockInfo) return null;
+        
+        return stockInfo.get(columnIndex);        
+    }
+    
     public Object getValueAt(int rowIndex, int columnIndex)
     {
         List<Object> stockInfo = tableModel.get(rowIndex);
@@ -75,7 +84,8 @@ public class StockTableModel extends AbstractTableModel {
         Integer row = rowStockCodeMapping.get(stock.getCode());
         
         if(row != null) {
-            tableModel.set(row, stockToList(stock));
+            oldTableModel.set(row, tableModel.get(row));
+            tableModel.set(row, stockToList(stock));            
             stocks.set(row, stock);
             this.fireTableRowsUpdated(row, row);            
         }        
@@ -86,6 +96,7 @@ public class StockTableModel extends AbstractTableModel {
         
         if(row == null) {
             tableModel.add(stockToList(stock));
+            oldTableModel.add(null);
             stocks.add(stock);
             final int rowIndex = tableModel.size() - 1;
             rowStockCodeMapping.put(stock.getCode(), rowIndex);
@@ -99,6 +110,7 @@ public class StockTableModel extends AbstractTableModel {
         if(size == 0) return;
         
         tableModel.clear();
+        oldTableModel.clear();
         stocks.clear();
         rowStockCodeMapping.clear();
             
@@ -110,6 +122,7 @@ public class StockTableModel extends AbstractTableModel {
         
         if(row != null) {
             tableModel.remove(row);
+            oldTableModel.remove(row);
             stocks.remove(row);
             rowStockCodeMapping.remove(stock.getCode());
             
@@ -132,6 +145,7 @@ public class StockTableModel extends AbstractTableModel {
     }
     
     public void removeRow(int row) {
+        oldTableModel.remove(row);
         List<Object> list = tableModel.remove(row);
         stocks.remove(row);        
         // 0 is stock code.
@@ -178,6 +192,7 @@ public class StockTableModel extends AbstractTableModel {
     }
     
     private List<List<Object>> tableModel = new ArrayList<List<Object>>();
+    private List<List<Object>> oldTableModel = new ArrayList<List<Object>>();
     private List<Stock> stocks = new ArrayList<Stock>();
     // Used to get column by Name in fast way.
     private Map<String, Integer> columnNameMapping = new HashMap<String, Integer>();
