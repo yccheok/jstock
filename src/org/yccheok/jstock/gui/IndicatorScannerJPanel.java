@@ -581,6 +581,10 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         }
     }
     
+    public void repaintTable() {
+        jTable1.repaint();
+    }
+    
     private Wizard wizard;
     private RealTimeStockMonitor realTimeStockMonitor;
     private org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
