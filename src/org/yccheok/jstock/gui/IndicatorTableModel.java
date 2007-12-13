@@ -31,7 +31,7 @@ import org.yccheok.jstock.analysis.*;
  *
  * @author yccheok
  */
-public class IndicatorTableModel extends AbstractTableModel {
+public class IndicatorTableModel extends AbstractTableModelWithMemory {
     
     /** Creates a new instance of IndicatorTableModel */
     public IndicatorTableModel() {
@@ -55,6 +55,13 @@ public class IndicatorTableModel extends AbstractTableModel {
         return indicatorInfo.get(columnIndex);        
     }
     
+    public Object getOldValueAt(int rowIndex, int columnIndex) {
+        List<Object> indicatorInfo = oldTableModel.get(rowIndex);
+        
+        if(null == indicatorInfo) return null;
+        
+        return indicatorInfo.get(columnIndex);        
+    }
     
     public String getColumnName(int col) {
         return columnNames[col];
@@ -77,12 +84,14 @@ public class IndicatorTableModel extends AbstractTableModel {
         
         if(row == null) {
             tableModel.add(indicatorToList(indicator));
+            oldTableModel.add(null);
             indicators.add(indicator);
             final int rowIndex = tableModel.size() - 1;
             rowIndicatorMapping.put(getIndicatorKey(indicator), rowIndex);
             fireTableRowsInserted(rowIndex, rowIndex);
         }
         else {
+            oldTableModel.set(row, tableModel.get(row));
             tableModel.set(row, indicatorToList(indicator));
             indicators.set(row, indicator);
             this.fireTableRowsUpdated(row, row);            
@@ -94,6 +103,7 @@ public class IndicatorTableModel extends AbstractTableModel {
         
         if(row != null) {
             tableModel.remove(row);
+            oldTableModel.remove(row);
             indicators.remove(row);
             rowIndicatorMapping.remove(getIndicatorKey(indicator));
             
@@ -142,6 +152,7 @@ public class IndicatorTableModel extends AbstractTableModel {
         if(size == 0) return;
         
         tableModel.clear();
+        oldTableModel.clear();
         indicators.clear();
         rowIndicatorMapping.clear();
         this.fireTableRowsDeleted(0, size - 1);
@@ -149,6 +160,7 @@ public class IndicatorTableModel extends AbstractTableModel {
     
     public void removeRow(int row) {
         List<Object> list = tableModel.remove(row);
+        oldTableModel.remove(row);
         indicators.remove(row);        
         // 0 is indicator, 1 is stock code.
         rowIndicatorMapping.remove(list.get(0).toString() + list.get(1).toString());
@@ -181,6 +193,7 @@ public class IndicatorTableModel extends AbstractTableModel {
     }
     
     private List<List<Object>> tableModel = new ArrayList<List<Object>>();
+    private List<List<Object>> oldTableModel = new ArrayList<List<Object>>();
     private List<Indicator> indicators = new ArrayList<Indicator>();
     // Used to get column by Name in fast way.
     private Map<String, Integer> columnNameMapping = new HashMap<String, Integer>();
