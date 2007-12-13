@@ -1979,10 +1979,6 @@ public class MainFrame extends javax.swing.JFrame {
         return this.indicatorPanel.getIndicatorProjectManager();
     }
     
-    public static final java.util.concurrent.Executor getTableCellMonitor() {
-        return MainFrame.tableCellMonitor;
-    }
-    
     public void repaintTable() {
         Component c = jTabbedPane1.getSelectedComponent();
         
@@ -2036,8 +2032,6 @@ public class MainFrame extends javax.swing.JFrame {
     private org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
     private org.yccheok.jstock.engine.Observer<StockHistoryMonitor, StockHistoryMonitor.StockHistoryRunnable> stockHistoryMonitorObserver = this.getStockHistoryMonitorObserver();
 
-    private static final java.util.concurrent.Executor tableCellMonitor = java.util.concurrent.Executors.newFixedThreadPool(4);
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JComboBox jComboBox1;
