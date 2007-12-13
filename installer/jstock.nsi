@@ -5,7 +5,7 @@
 ; The name of the installer
 Name ${PRODUCT_NAME}
 ; The file to write
-OutFile "jstock-0.9.1-setup.exe"
+OutFile "jstock-0.9.3-setup.exe"
 LicenseData "gpl.txt"
  
 ; The default installation directory
