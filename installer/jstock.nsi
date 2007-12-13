@@ -4,6 +4,9 @@
 !define PRODUCT_NAME "JStock"
 ; The name of the installer
 Name ${PRODUCT_NAME}
+
+RequestExecutionLevel admin	;Workaround for Vista
+
 ; The file to write
 OutFile "jstock-0.9.3-setup.exe"
 LicenseData "gpl.txt"
@@ -17,6 +20,7 @@ page directory
 Page instfiles
 ; The stuff to install
 Section "" ;No components page, name is not important
+SetShellVarContext all	;Workaround for Vista
 Call DetectJRE
 ; Set output path to the installation directory.
 SetOutPath $INSTDIR
@@ -36,6 +40,7 @@ WriteUninstaller $INSTDIR\Uninstall.exe
 SectionEnd ; end the section
  ; The uninstall section
 Section "Uninstall"
+SetShellVarContext all	;Workaround for Vista
 RMDir /r $INSTDIR\indicator
 RMDir /r $INSTDIR\config
 RMDir /r $INSTDIR\lib
