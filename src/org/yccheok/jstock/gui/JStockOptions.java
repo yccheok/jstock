@@ -22,11 +22,21 @@
 
 package org.yccheok.jstock.gui;
 
+import java.awt.Color;
+
 /**
  *
  * @author yccheok
  */
 public class JStockOptions {
+    
+    public static final java.awt.Color DEFAULT_NORMAL_TEXT_FOREGROUND_COLOR = Color.BLACK;
+    public static final java.awt.Color DEFAULT_HIGHER_NUMERICAL_VALUE_FOREGROUND_COLOR = new java.awt.Color(50, 150, 0);
+    public static final java.awt.Color DEFAULT_LOWER_NUMERICAL_VALUE_FOREGROUND_COLOR = new java.awt.Color(200, 0, 50);
+    public static final java.awt.Color DEFAULT_FIRST_ROW_BACKGROUND_COLOR = Color.WHITE;
+    public static final java.awt.Color DEFAULT_SECOND_ROW_BACKGROUND_COLOR = new java.awt.Color(255, 255, 204);
+    public static final java.awt.Color DEFAULT_AUTO_UPDATE_FOREGROUND_COLOR = Color.BLACK;
+    public static final java.awt.Color DEFAULT_AUTO_UPDATE_BACKGROUND_COLOR = Color.RED;
     
     /** Creates a new instance of JStockOptions */
     public JStockOptions() {
@@ -42,6 +52,17 @@ public class JStockOptions {
         setScanningSpeed(0);
         setAlertSpeed(5);
         setLookNFeel("");
+        
+        this.setNormalTextForegroundColor(DEFAULT_NORMAL_TEXT_FOREGROUND_COLOR);
+        this.setHigherNumericalValueForegroundColor(DEFAULT_HIGHER_NUMERICAL_VALUE_FOREGROUND_COLOR);
+        this.setLowerNumericalValueForegroundColor(DEFAULT_LOWER_NUMERICAL_VALUE_FOREGROUND_COLOR);
+        
+        setFirstRowBackgroundColor(DEFAULT_FIRST_ROW_BACKGROUND_COLOR);
+        setSecondRowBackgroundColor(DEFAULT_SECOND_ROW_BACKGROUND_COLOR);
+                
+        this.setEnableColorChange(false);
+        this.setAutoUpdateForegroundColor(DEFAULT_AUTO_UPDATE_FOREGROUND_COLOR);
+        this.setAutoUpdateBackgroundColor(DEFAULT_AUTO_UPDATE_BACKGROUND_COLOR);        
     }
     
     private boolean singleIndicatorAlert;
@@ -56,6 +77,15 @@ public class JStockOptions {
     private int scanningSpeed;  /* In second. */
     private int alertSpeed;
     private String looknFeel;
+    
+    private Color normalTextForegroundColor;
+    private Color lowerNumericalValueForegroundColor;
+    private Color higherNumericalValueForegroundColor;
+    private Color firstRowBackgroundColor;
+    private Color secondRowBackgroundColor;
+    private Color autoUpdateForegroundColor;
+    private Color autoUpdateBackgroundColor;
+    private boolean enableColorChange;
     
     public String getLooknFeel() {
         return looknFeel;
@@ -152,4 +182,68 @@ public class JStockOptions {
     public void setAlertSpeed(int alertSpeed) {
         this.alertSpeed = alertSpeed;
     }    
+
+    public Color getNormalTextForegroundColor() {
+        return normalTextForegroundColor;
+    }
+
+    public void setNormalTextForegroundColor(Color normalTextForegroundColor) {
+        this.normalTextForegroundColor = normalTextForegroundColor;
+    }
+
+    public Color getLowerNumericalValueForegroundColor() {
+        return lowerNumericalValueForegroundColor;
+    }
+
+    public void setLowerNumericalValueForegroundColor(Color lowerNumericalValueForegroundColor) {
+        this.lowerNumericalValueForegroundColor = lowerNumericalValueForegroundColor;
+    }
+
+    public Color getHigherNumericalValueForegroundColor() {
+        return higherNumericalValueForegroundColor;
+    }
+
+    public void setHigherNumericalValueForegroundColor(Color higherNumericalValueForegroundColor) {
+        this.higherNumericalValueForegroundColor = higherNumericalValueForegroundColor;
+    }
+
+    public Color getFirstRowBackgroundColor() {
+        return firstRowBackgroundColor;
+    }
+
+    public void setFirstRowBackgroundColor(Color firstRowBackgroundColor) {
+        this.firstRowBackgroundColor = firstRowBackgroundColor;
+    }
+
+    public Color getSecondRowBackgroundColor() {
+        return secondRowBackgroundColor;
+    }
+
+    public void setSecondRowBackgroundColor(Color secondRowBackgroundColor) {
+        this.secondRowBackgroundColor = secondRowBackgroundColor;
+    }
+
+    public Color getAutoUpdateForegroundColor() {
+        return autoUpdateForegroundColor;
+    }
+
+    public void setAutoUpdateForegroundColor(Color autoUpdateForegroundColor) {
+        this.autoUpdateForegroundColor = autoUpdateForegroundColor;
+    }
+
+    public Color getAutoUpdateBackgroundColor() {
+        return autoUpdateBackgroundColor;
+    }
+
+    public void setAutoUpdateBackgroundColor(Color autoUpdateBackgroundColor) {
+        this.autoUpdateBackgroundColor = autoUpdateBackgroundColor;
+    }
+
+    public boolean isEnableColorChange() {
+        return enableColorChange;
+    }
+
+    public void setEnableColorChange(boolean enableColorChange) {
+        this.enableColorChange = enableColorChange;
+    }
 }
