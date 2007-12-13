@@ -35,3 +35,9 @@ version 0.9.2
 version 0.9.3
 =============
 1. [ 1830911 ] Bug fixed : Uninstall doesn't remove shortcut.
+
+2. Support color customization.
+
+3. Bug fixed on second sell quantity.
+
+4. Option object as static.
