@@ -66,7 +66,12 @@ public class OperatorIndicator implements Indicator {
     
     public void setStock(Stock stock)
     {
-        this.stock = stock;
+        if((sharesIssued == -1) || (marketCapital == -1)) {
+            this.stock = stock;
+        }
+        else {
+            this.stock = new StockEx(stock, marketCapital, sharesIssued);
+        }
         
         for(Operator operator : operators) {
             if(operator instanceof StockOperator) {
@@ -86,7 +91,10 @@ public class OperatorIndicator implements Indicator {
                 /* Time consuming */
                 ((StockRelativeHistoryOperator)operator).calculate(stockHistoryServer);                
             }
-        }        
+        }
+        
+        sharesIssued = stockHistoryServer.getSharesIssued();
+        marketCapital = stockHistoryServer.getMarketCapital();
     }
     
     public void setName(String name) {
@@ -152,6 +160,10 @@ public class OperatorIndicator implements Indicator {
     private List<Operator> operators = new ArrayList<Operator>();
     private String name;
     private Stock stock;
+    
+    // So that we are able to convert Stock to StockEx.
+    private long sharesIssued = -1;
+    private long marketCapital = -1;
     
     private static final Log log = LogFactory.getLog(OperatorIndicator.class);    
 }
