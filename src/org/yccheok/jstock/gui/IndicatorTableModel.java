@@ -139,6 +139,16 @@ public class IndicatorTableModel extends AbstractTableModelWithMemory {
         list.add(stock.getSellPrice());
         list.add(stock.getSellQuantity());
         
+        if(stock instanceof StockEx) {
+            StockEx stockEx = (StockEx)stock;
+            list.add(stockEx.getMarketCapital());
+            list.add(stockEx.getSharesIssued());
+        }
+        else {
+            list.add(0);
+            list.add(0);
+        }
+        
         return list;
     }
     
@@ -199,6 +209,6 @@ public class IndicatorTableModel extends AbstractTableModelWithMemory {
     private Map<String, Integer> columnNameMapping = new HashMap<String, Integer>();
     // Used to get row by Stock in fast way.
     private Map<String, Integer> rowIndicatorMapping = new HashMap<String, Integer>();
-    private String[] columnNames =  {"Indicator",   "Code",        "Symbol",       "Open",     "Last",        "High",         "Low",      "Vol",          "Chg",      "Chg (%)",      "L.Vol",        "Buy",      "B.Qty",        "Sell",         "S.Qty"};
-    private Class[] columnClasses = {String.class, String.class, String.class, Double.class, Double.class, Double.class, Double.class, Integer.class, Double.class, Double.class, Integer.class, Double.class, Integer.class, Double.class, Integer.class};    
+    private String[] columnNames =  {"Indicator",   "Code",        "Symbol",       "Open",     "Last",        "High",         "Low",      "Vol",          "Chg",      "Chg (%)",      "L.Vol",        "Buy",      "B.Qty",        "Sell",         "S.Qty",  "M.Capital", "S.Issued"};
+    private Class[] columnClasses = {String.class, String.class, String.class, Double.class, Double.class, Double.class, Double.class, Integer.class, Double.class, Double.class, Integer.class, Double.class, Integer.class, Double.class, Integer.class, Long.class, Long.class};    
 }
