@@ -46,7 +46,9 @@ public class StockHistoryOperator extends AbstractOperator {
         HighPrice,
         LowPrice,
         LastPrice,
-        Volume
+        Volume,
+        MarketCapital,
+        SharesIssued
     }
     
     /** Creates a new instance of StockHistoryOperator */
@@ -115,6 +117,14 @@ public class StockHistoryOperator extends AbstractOperator {
                 // ???
                 for(Stock stock : stocks)
                     values.add(new Double(stock.getVolume()));
+                break;
+                
+            case MarketCapital:
+                values.add(new Double(stockHistoryServer.getMarketCapital()));
+                break;
+                
+            case SharesIssued:
+                values.add(new Double(stockHistoryServer.getSharesIssued()));
                 break;
                 
             default:
