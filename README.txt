@@ -41,3 +41,11 @@ version 0.9.3
 3. Bug fixed on second sell quantity.
 
 4. Option object as static.
+
+
+=============
+version 0.9.4
+=============
+1. Added Market Capital and Shares Issued, in Indicator Scanner.
+
+2. Bug fixed. Click on empty area, should clear indicator table selection.
