@@ -831,6 +831,7 @@ public class MainFrame extends javax.swing.JFrame {
     private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseClicked
 // TODO add your handling code here:
         this.jTable1.getSelectionModel().clearSelection();
+        this.indicatorScannerJPanel.clearTableSelection();
         updateBuyerSellerInformation(null);
     }//GEN-LAST:event_formMouseClicked
 
