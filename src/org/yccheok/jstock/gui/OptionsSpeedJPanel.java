@@ -58,10 +58,10 @@ public class OptionsSpeedJPanel extends javax.swing.JPanel implements JStockOpti
 
         jLabel1.setText("Stock scanning speed (second)");
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "0", "1", "5", "10", "20", "30", "40", "50", "60" }));
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "1", "5", "10", "20", "30", "40", "50", "60" }));
 
         jLabel2.setFont(new java.awt.Font("Dialog", 0, 10));
-        jLabel2.setText("(0 means fastest)");
+        jLabel2.setText("(smaller means faster)");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -91,7 +91,7 @@ public class OptionsSpeedJPanel extends javax.swing.JPanel implements JStockOpti
     }// </editor-fold>//GEN-END:initComponents
 
     public void set(JStockOptions jStockOptions) {
-        jComboBox1.setSelectedItem("" + jStockOptions.getScanningSpeed());
+        jComboBox1.setSelectedItem("" + jStockOptions.getScanningSpeed() / 1000);
     }
 
     public boolean apply(JStockOptions jStockOptions) {
@@ -103,7 +103,12 @@ public class OptionsSpeedJPanel extends javax.swing.JPanel implements JStockOpti
             log.error("", exp);
         }
 
-        jStockOptions.setScanningSpeed(speed);
+        jStockOptions.setScanningSpeed(speed * 1000);
+
+        MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, this);
+        if(m != null) {
+            m.updateScanningSpeed(jStockOptions.getScanningSpeed());
+        }
         
         return true;
     }
