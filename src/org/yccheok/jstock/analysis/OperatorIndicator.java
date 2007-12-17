@@ -131,6 +131,16 @@ public class OperatorIndicator implements Indicator {
         }        
     }
     
+    public boolean isStockHistoryServerNeeded() {
+        for(Operator operator : operators) {
+            if((operator instanceof StockHistoryOperator) || (operator instanceof StockRelativeHistoryOperator)) {
+                return true;
+            }
+        }        
+        
+        return false;
+    }
+    
     public boolean isTriggered()
     {        
         for(Operator operator : operators) {
