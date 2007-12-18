@@ -49,7 +49,7 @@ public class JStockOptions {
         setIndicatorPassword("");
         setProxyServer("");
         setProxyPort(-1);
-        setScanningSpeed(0);
+        setScanningSpeed(1000);
         setAlertSpeed(5);
         setLookNFeel("");
         
