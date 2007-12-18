@@ -49,3 +49,10 @@ version 0.9.4
 1. Added Market Capital and Shares Issued, in Indicator Scanner.
 
 2. Bug fixed. Click on empty area, should clear indicator table selection.
+
+=============
+version 0.9.5
+=============
+1. Bug fixed on stock scanning speed.
+
+2. [1851625] Bug fixed on indicator scanning. We will only download history only when there is a need.
