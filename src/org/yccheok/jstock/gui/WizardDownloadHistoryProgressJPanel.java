@@ -119,51 +119,78 @@ public class WizardDownloadHistoryProgressJPanel extends javax.swing.JPanel {
             int count = 0;
             
             publish(count);
+
+            // First, check whether there is a need to get stock history.
+            boolean isHistoryNeeded = false;
+            for(String project : projects) {
+                if(DownloadHistoryTask.this.isCancelled() || !DownloadHistoryTask.this.runnable) {
+                    return null;
+                }
+
+                final OperatorIndicator operatorIndicator = indicatorProjectManager.getOperatorIndicator(project);
+                
+                if(operatorIndicator != null) {
+                    if(operatorIndicator.isStockHistoryServerNeeded()) {
+                        isHistoryNeeded = true;
+                        break;
+                    }
+                }
+            }
             
             for(final String code : codes) {
 
                 StockHistoryServer stockHistoryServer = null;
 
-                for(StockServerFactory stockServerFactory : stockServerFactories) {
-                    if(DownloadHistoryTask.this.isCancelled() || !DownloadHistoryTask.this.runnable) {
-                        return null;
-                    }
-
-                    stockHistoryServer = stockServerFactory.getStockHistoryServer(code);                    
-
-                    if(stockHistoryServer != null) {
-                        /*
-                        if(stockHistorySerializer.save(stockHistoryServer) == false)
-                        {
-                            log.error("Error in serializing stock code " + code);
-                        } 
-                        */
-                        break;
-                    }
-                }
-
-                if(stockHistoryServer != null) {
-                    java.util.List<OperatorIndicator> result = operatorIndicators.get(code);
-
-                    for(String project : projects) {
+                if(isHistoryNeeded) {
+                    for(StockServerFactory stockServerFactory : stockServerFactories) {
                         if(DownloadHistoryTask.this.isCancelled() || !DownloadHistoryTask.this.runnable) {
                             return null;
                         }
 
-                        final OperatorIndicator operatorIndicator = indicatorProjectManager.getOperatorIndicator(project);
+                        stockHistoryServer = stockServerFactory.getStockHistoryServer(code);                    
 
-                        if(operatorIndicator != null) {
-                            final Stock stock = Utils.getEmptyStock(code, stockCodeAndSymbolDatabase.codeToSymbol(code));                    
-
-                            operatorIndicator.setStockHistoryServer(stockHistoryServer);
-
-                            operatorIndicator.setStock(stock);
-
-                            operatorIndicator.preCalculate();
-
-                            result.add(operatorIndicator);
-                        }                    
+                        if(stockHistoryServer != null) {
+                            /*
+                            if(stockHistorySerializer.save(stockHistoryServer) == false)
+                            {
+                                log.error("Error in serializing stock code " + code);
+                            } 
+                            */
+                            break;
+                        }
                     }
+                }
+                
+                java.util.List<OperatorIndicator> result = operatorIndicators.get(code);
+
+                for(String project : projects) {
+                    if(DownloadHistoryTask.this.isCancelled() || !DownloadHistoryTask.this.runnable) {
+                        return null;
+                    }
+
+                    final OperatorIndicator operatorIndicator = indicatorProjectManager.getOperatorIndicator(project);
+
+                    if(operatorIndicator != null) {
+                        final Stock stock = Utils.getEmptyStock(code, stockCodeAndSymbolDatabase.codeToSymbol(code));                    
+
+                        if(operatorIndicator.isStockHistoryServerNeeded()) {
+							if(stockHistoryServer != null)
+							{
+                            	operatorIndicator.setStockHistoryServer(stockHistoryServer);
+							}
+							else
+							{
+								// We need history but we fail to get one. Skip this project.
+								continue;
+							}
+                        }
+                        
+                        operatorIndicator.setStock(stock);
+
+                        operatorIndicator.preCalculate();
+
+                        result.add(operatorIndicator);
+                    }                    
                 }
 
                 count++;
