@@ -849,57 +849,61 @@ public class IndicatorPanel extends JPanel implements ChangeListener {
     private void simulate(final String code) {                
         MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, IndicatorPanel.this);
 
-        m.setStatusBar(true, "Stock history retrieving in progress...");
+        // First, check whether there is a need to get history.
+        final IndicatorDefaultDrawing indicatorDefaultDrawing = (IndicatorDefaultDrawing)this.view.getDrawing();
+        final OperatorIndicator operatorIndicator = indicatorDefaultDrawing.getOperatorIndicator();
         
-        // Action!
-        StockHistoryServer stockHistoryServer = m.getStockHistoryMonitor().getStockHistoryServer(code);
+        if(operatorIndicator.isStockHistoryServerNeeded()) {
+            m.setStatusBar(true, "Stock history retrieving in progress...");
 
-        if(stockHistoryServer == null) {
-        
-            final java.util.concurrent.CountDownLatch countDownLatch = new java.util.concurrent.CountDownLatch(1);
-            
-            org.yccheok.jstock.engine.Observer observer = new org.yccheok.jstock.engine.Observer<StockHistoryMonitor, StockHistoryMonitor.StockHistoryRunnable>() {
-                public void update(StockHistoryMonitor monitor, StockHistoryMonitor.StockHistoryRunnable runnable)
-                {
-                    if(runnable.getCode().equals(code)) {
-                        countDownLatch.countDown();
+            // Action!
+            StockHistoryServer stockHistoryServer = m.getStockHistoryMonitor().getStockHistoryServer(code);
+
+            if(stockHistoryServer == null) {
+
+                final java.util.concurrent.CountDownLatch countDownLatch = new java.util.concurrent.CountDownLatch(1);
+
+                org.yccheok.jstock.engine.Observer observer = new org.yccheok.jstock.engine.Observer<StockHistoryMonitor, StockHistoryMonitor.StockHistoryRunnable>() {
+                    public void update(StockHistoryMonitor monitor, StockHistoryMonitor.StockHistoryRunnable runnable)
+                    {
+                        if(runnable.getCode().equals(code)) {
+                            countDownLatch.countDown();
+                        }
                     }
+                };
+
+                m.getStockHistoryMonitor().attach(observer);
+
+                m.getStockHistoryMonitor().addStockCode(code);            
+
+                try {
+                    countDownLatch.await();
                 }
-            };
-        
-            m.getStockHistoryMonitor().attach(observer);
-            
-            m.getStockHistoryMonitor().addStockCode(code);            
-            
-            try {
-                countDownLatch.await();
+                catch(java.lang.InterruptedException exp) {
+                    log.error("", exp);
+                    return;
+                }
+
+                m.getStockHistoryMonitor().dettach(observer);
+
+                stockHistoryServer = m.getStockHistoryMonitor().getStockHistoryServer(code);
             }
-            catch(java.lang.InterruptedException exp) {
-                log.error("", exp);
+
+            if(stockHistoryServer == null) {
+                this.jButton4.setEnabled(true);
+                this.jButton6.setEnabled(false);     
+
+                m.setStatusBar(false, "Database not found");            
                 return;
             }
-            
-            m.getStockHistoryMonitor().dettach(observer);
-            
-            stockHistoryServer = m.getStockHistoryMonitor().getStockHistoryServer(code);
-        }
-        
-        if(stockHistoryServer == null) {
-            this.jButton4.setEnabled(true);
-            this.jButton6.setEnabled(false);     
-      
-            m.setStatusBar(false, "Database not found");            
-            return;
-        }
-        
-        if(Thread.interrupted())
-            return;
-        
-        m.setStatusBar(true, "Stock history information calculation in progress...");
-        
-        IndicatorDefaultDrawing indicatorDefaultDrawing = (IndicatorDefaultDrawing)this.view.getDrawing();
-        OperatorIndicator operatorIndicator = indicatorDefaultDrawing.getOperatorIndicator();
-        operatorIndicator.setStockHistoryServer(stockHistoryServer);
+
+            if(Thread.interrupted())
+                return;
+
+            m.setStatusBar(true, "Stock history information calculation in progress...");
+
+            operatorIndicator.setStockHistoryServer(stockHistoryServer);
+        }   /* if(operatorIndicator.isStockHistoryServerNeeded()) { */
         
         if(Thread.interrupted())
             return;
