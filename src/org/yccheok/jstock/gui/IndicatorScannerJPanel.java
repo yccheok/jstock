@@ -338,8 +338,12 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         wizard.getDialog().setLocationRelativeTo(null);
     }
     
+    public void updateScanningSpeed(int speed) {
+        this.realTimeStockMonitor.setDelay(speed);
+    }
+    
     public void initRealTimeStockMonitor(java.util.List<StockServerFactory> stockServerFactories) {
-        realTimeStockMonitor = new RealTimeStockMonitor(4, 20, 1000);
+        realTimeStockMonitor = new RealTimeStockMonitor(4, 20, MainFrame.getJStockOptions().getScanningSpeed());
         
         for(StockServerFactory factory : stockServerFactories) {
             realTimeStockMonitor.addStockServerFactory(factory);
