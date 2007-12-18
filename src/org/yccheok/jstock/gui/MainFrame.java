@@ -1425,8 +1425,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     private class MarketRunnable implements Runnable {
-        public MarketRunnable(int delay) {
-            this.delay = delay;
+        public MarketRunnable() {
         }
         
         public void run() {
@@ -1444,15 +1443,13 @@ public class MainFrame extends javax.swing.JFrame {
                 }
                 
                 try {
-                    Thread.sleep(delay);
+                    Thread.sleep(MainFrame.jStockOptions.getScanningSpeed());
                 }
                 catch(InterruptedException exp) {
                     break;
                 }
             }
         }        
-        
-        private int delay;
     }
     
     private class StockCodeAndSymbolDatabaseTask extends SwingWorker<Boolean, Void> {
@@ -1544,7 +1541,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     private void initRealTimeStockMonitor() {
-        realTimeStockMonitor = new RealTimeStockMonitor(4, 20, 1000);
+        realTimeStockMonitor = new RealTimeStockMonitor(4, 20, jStockOptions.getScanningSpeed());
         
         for(StockServerFactory factory : stockServerFactories) {
             realTimeStockMonitor.addStockServerFactory(factory);
@@ -1574,6 +1571,11 @@ public class MainFrame extends javax.swing.JFrame {
         
         if(jStockOptions == null)
             jStockOptions = new JStockOptions();
+        
+        /* Hard core fix. */
+        if(jStockOptions.getScanningSpeed() == 0) {
+            jStockOptions.setScanningSpeed(1000);
+        }
         
         this.setLookAndFeel(jStockOptions.getLooknFeel());
         
@@ -1720,7 +1722,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     private void initMarketThread() {
-        this.marketThread = new Thread(new MarketRunnable(1000));
+        this.marketThread = new Thread(new MarketRunnable());
         this.marketThread.start();
     }
     
@@ -1978,6 +1980,11 @@ public class MainFrame extends javax.swing.JFrame {
     public IndicatorProjectManager getIndicatorProjectManager()
     {
         return this.indicatorPanel.getIndicatorProjectManager();
+    }
+    
+    public void updateScanningSpeed(int speed) {
+        this.realTimeStockMonitor.setDelay(speed);
+        indicatorScannerJPanel.updateScanningSpeed(speed);
     }
     
     public void repaintTable() {
