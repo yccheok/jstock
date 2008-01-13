@@ -65,6 +65,8 @@ public class MainFrame extends javax.swing.JFrame {
         
         createStockIndicatorEditor();
         createIndicatorScannerJPanel();
+        createPortfolioManagementJPanel();
+        
         createIconsAndToolTipTextForJTabbedPane();
         
         this.createSystemTrayIcon();
@@ -205,7 +207,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         this.jTable1.getModel().addTableModelListener(this.getTableModelListener());
 
-        this.jTable1.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener());
+        this.jTable1.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(1));
         this.jTable1.addMouseListener(new TableRowPopupListener());
         jTable1.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
@@ -1011,6 +1013,12 @@ public class MainFrame extends javax.swing.JFrame {
         this.indicatorPanel.initjComboBox1EditorComponentKeyListerner();
     }
     
+    private void createPortfolioManagementJPanel() {
+        portfolioManagementJPanel = new PortfolioManagementJPanel();
+        
+        jTabbedPane1.addTab("Portfolio Management", portfolioManagementJPanel);
+    }
+    
     private void createStockIndicatorEditor() {
         indicatorPanel = new IndicatorPanel(); 
                 
@@ -1031,9 +1039,11 @@ public class MainFrame extends javax.swing.JFrame {
         this.jTabbedPane1.setIconAt(0, this.getImageIcon("/images/16x16/strokedocker.png"));
         this.jTabbedPane1.setIconAt(1, this.getImageIcon("/images/16x16/color_line.png"));
         this.jTabbedPane1.setIconAt(2, this.getImageIcon("/images/16x16/bell.png"));
+        this.jTabbedPane1.setIconAt(3, this.getImageIcon("/images/16x16/calc.png"));
         this.jTabbedPane1.setToolTipTextAt(0, "Watch your favorite stock movement in real time");
         this.jTabbedPane1.setToolTipTextAt(1, "Customize your own stock indicator for alert purpose");
         this.jTabbedPane1.setToolTipTextAt(2, "Scan through the entire KLSE market so that you will be informed what to sell or buy");
+        this.jTabbedPane1.setToolTipTextAt(3, "Manage your real time portfolio, which enable you to track buy and sell records");
     }
             
     public void createLookAndFeelMenuItem() {
@@ -1149,46 +1159,6 @@ public class MainFrame extends javax.swing.JFrame {
         header.addMouseMotionListener(tips);        
     }
     
-    private JPopupMenu getMyTableColumnSelectionPopupMenu(final int mouseXLocation) {
-        JPopupMenu popup = new JPopupMenu();
-        TableModel tableModel = jTable1.getModel();
-        final int col = tableModel.getColumnCount();
-        
-        for(int i=1; i<col; i++) {
-            String name = tableModel.getColumnName(i);            
-            
-            boolean isVisible = true;
-            
-            try {
-                TableColumn tableColumn = jTable1.getColumn(name);
-            }
-            catch(java.lang.IllegalArgumentException exp) {
-                isVisible = false;
-            }
-            
-            javax.swing.JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(name, isVisible);
-                        
-            menuItem.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent evt) {
-                    String name = evt.getActionCommand();
-                    JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem)evt.getSource();
-                    if(menuItem.isSelected() == false) {
-                        JTableUtilities.removeTableColumn(jTable1, name);
-                    }
-                    else {
-                        TableColumnModel colModel = jTable1.getColumnModel();
-                        int vColIndex = colModel.getColumnIndexAtX(mouseXLocation);
-                        JTableUtilities.insertTableColumnFromModel(jTable1, name, vColIndex);
-                    }
-                }
-            });
-            
-            popup.add(menuItem);            
-        }
-        
-        return popup;
-    }
-    
     private Color getColor( double price, double referencePrice) {
         if(price < referencePrice) {
             return new Color(lowerColor.getRGB());
@@ -1232,22 +1202,6 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel29.setText("" + stock.getSellQuantity());
         jLabel30.setText("" + stock.getSecondSellQuantity());
         jLabel38.setText("" + stock.getThirdSellQuantity());
-    }
-    
-    private class TableColumnSelectionPopupListener extends MouseAdapter {        
-        public void mousePressed(MouseEvent e) {
-            maybeShowPopup(e);
-        }
-
-        public void mouseReleased(MouseEvent e) {
-            maybeShowPopup(e);
-        }
-
-        private void maybeShowPopup(MouseEvent e) {
-            if (e.isPopupTrigger()) {
-                getMyTableColumnSelectionPopupMenu(e.getX()).show(e.getComponent(), e.getX(), e.getY());
-            }
-        }
     }
     
     private MouseAdapter getMyJXStatusBarImageLabelMouseAdapter() {
@@ -2036,6 +1990,7 @@ public class MainFrame extends javax.swing.JFrame {
     
     private IndicatorPanel indicatorPanel;
     private IndicatorScannerJPanel indicatorScannerJPanel;
+    private PortfolioManagementJPanel portfolioManagementJPanel;
     
     private org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
     private org.yccheok.jstock.engine.Observer<StockHistoryMonitor, StockHistoryMonitor.StockHistoryRunnable> stockHistoryMonitorObserver = this.getStockHistoryMonitorObserver();
