@@ -18,11 +18,15 @@
 
 package org.yccheok.jstock.portfolio;
 
+import org.yccheok.jstock.gui.treetable.AbstractTreeTableable;
+import org.yccheok.jstock.gui.treetable.TreeTableable;
+import org.yccheok.jstock.engine.*;
+
 /**
  *
  * @author Owner
  */
-public class Transaction {
+public class Transaction extends AbstractTreeTableable {
     public Transaction(Contract contract, Broker broker, StampDuty stampDuty, ClearingFee clearingFee)
     {
         this.contract = contract;
@@ -40,6 +44,15 @@ public class Transaction {
             netTotal = this.contract.getTotal() - this.calculatedBroker - this.calculatedStampDuty - this.calculatdClearingFee;            
     }
     
+    public void setTransactionSummary(TransactionSummary transactionSummary) {
+        this.transactionSummary = transactionSummary;        
+    }
+    
+    public TransactionSummary getTransactionSummary() {
+        return this.transactionSummary;
+    }
+    
+    private TransactionSummary transactionSummary;
     
     private Contract contract;
     private Broker broker;
@@ -87,7 +100,27 @@ public class Transaction {
         return contract.getQuantity();
     }
     
+    public SimpleDate getDate() {
+        return contract.getDate();
+    }
+    
     public double getNetTotal() {
         return netTotal;
+    }
+
+    public TreeTableable getParent() {
+        return this.getTransactionSummary();
+    }
+
+    public int getSize() {
+        return 0;
+    }
+
+    public TreeTableable getChild(int index) {
+        return null;
+    }
+    
+    public String toString() {
+        return contract.getStock().getSymbol();
     }
 }
