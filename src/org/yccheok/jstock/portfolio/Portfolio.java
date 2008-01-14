@@ -20,12 +20,15 @@ package org.yccheok.jstock.portfolio;
 
 import java.util.List;
 import java.util.ArrayList;
+import org.yccheok.jstock.gui.treetable.AbstractTreeTableable;
+import org.yccheok.jstock.gui.treetable.TreeTableable;
 
 /**
  *
  * @author Owner
  */
-public class Portfolio {
+public class Portfolio extends AbstractTreeTableable {
+    
     public int getSize() {
         return transactionSummaries.size();        
     }
@@ -64,7 +67,7 @@ public class Portfolio {
             }
         }
         
-        TransactionSummary transactionSummary = new TransactionSummary();
+        TransactionSummary transactionSummary = new TransactionSummary(this);
         transactionSummary.addTransaction(transaction);
         
         return this.transactionSummaries.add(transactionSummary);
@@ -90,5 +93,17 @@ public class Portfolio {
         return result;        
     }
     
-    private List<TransactionSummary> transactionSummaries = new ArrayList<TransactionSummary>();    
+    private List<TransactionSummary> transactionSummaries = new ArrayList<TransactionSummary>();
+
+    public TreeTableable getParent() {
+        return null;
+    }
+
+    public TreeTableable getChild(int index) {
+        return getTransactionSummary(index);
+    }
+    
+    public String toString() {
+        return "Portfolio";
+    }
 }
