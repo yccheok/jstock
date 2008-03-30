@@ -94,6 +94,8 @@ public class CIMBStockServer implements StockServer {
             finally {
                 method.releaseConnection();
             }
+            
+            break;
         }
         
         if(stocks == null) throw new StockNotFoundException("Cannot get symbol=" + symbol);
