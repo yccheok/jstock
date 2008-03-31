@@ -142,6 +142,18 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
         return status;
     }    
     
+    public synchronized void softStart() {
+        for(StockMonitor stockMonitor : stockMonitors) {
+            stockMonitor.softStart();
+        }
+    }
+
+    public synchronized void softStop() {
+        for(StockMonitor stockMonitor : stockMonitors) {
+            stockMonitor.softStop();
+        }
+    }    
+    
     public synchronized void start() {
         // Do we need to remove any old thread?
         final int numOfMonitorRequired = this.getNumOfRequiredThread();
@@ -192,11 +204,37 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
         return Math.min(numOfThreadRequired, maxThread);
     }
     
-    private class StockMonitor extends Thread {
+    private class StockMonitor extends Thread {    
+        private volatile Status status = Status.Normal;
+    
         public StockMonitor(int index) {
             this.index = index;
             thread = this;
         }
+        
+        private synchronized void softWait() throws InterruptedException {
+            synchronized (this) {
+                if (status == Status.Pause) {
+                    while (status != Status.Resume) {
+                        wait();
+                    }
+
+                    status = Status.Normal;
+                }
+            }
+        }
+
+        public synchronized void softStart() {
+            if(status == Status.Pause) {
+                status = Status.Resume;
+                notify();
+            }
+        }
+
+        public synchronized void softStop() {
+            status = Status.Pause;
+            notify();
+        }    
         
         public void run() {
             final Thread thisThread = Thread.currentThread();
@@ -205,6 +243,13 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
             final int step = numOfStockPerIteration * maxThread;
             
             while(thisThread == thread) {
+                try {
+                    softWait();
+                }
+                catch(InterruptedException exp) {
+                    log.error("", exp);
+                    break;
+                }
                 
                 for(int currIndex = index; thisThread == thread; currIndex += step) {
                     ListIterator<String> listIterator = null;
@@ -269,6 +314,12 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
         private volatile Thread thread;
     }
     
+    private enum Status {
+        Pause,
+        Resume,
+        Normal
+    };
+        
     // Delay in ms
     private volatile long delay;
     private final int maxThread;
