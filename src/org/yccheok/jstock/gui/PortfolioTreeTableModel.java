@@ -18,19 +18,26 @@
 
 package org.yccheok.jstock.gui;
 
-import org.yccheok.jstock.gui.treetable.*;
+import java.text.SimpleDateFormat;
+import org.jdesktop.swingx.treetable.*;
 import org.yccheok.jstock.portfolio.*;
 import org.yccheok.jstock.engine.*;
 import java.util.*;
+import javax.swing.tree.TreePath;
 
 /**
  *
  * @author Owner
  */
-public class PortfolioTreeTableModel extends AbstractTreeTableModel {
+public class PortfolioTreeTableModel extends DefaultTreeTableModel {
     private java.util.Map<String, Double> stockLastPrice = new java.util.HashMap<String, Double>();
     
-    private Portfolio portfolio;
+    public double getLastPrice(String code) {
+        Object price = stockLastPrice.get(code);
+        if(price == null) return 0.0;
+                
+        return (Double)price;
+    }
     
     // Names of the columns.
     private static final String[]  cNames = {
@@ -71,41 +78,57 @@ public class PortfolioTreeTableModel extends AbstractTreeTableModel {
         Double.class,
         Double.class
     };
-       
-    public PortfolioTreeTableModel(Portfolio portfolio) {
-        super(portfolio) ;
-        
-        this.portfolio = portfolio;
-        
-        
-        
-        
-                Contract contract = new Contract(
-                        Utils.getEmptyStock("1234", "pbbank"), 
-                        new SimpleDate(2008, 0, 31), 
-                        Contract.Type.Buy, 
-                        1000, 
-                        2.00);
-                
-                Broker broker = new SimpleBroker("SimpleBroker", 1000, 100, 2.0);
-                
-                StampDuty stampDuty = new SimpleStampDuty("SimpleStampDuty", 1000, 100, 2.0);
-               
-                ClearingFee clearingFee = new SimpleClearingFee("SimpleClearingfee", 1000, 100, 2.0);
-                        
-                Transaction transaction = new Transaction(contract, broker, stampDuty, clearingFee);        
-                
-                portfolio.addTransaction(transaction);
-    }
 
     public PortfolioTreeTableModel() {
-        this(new Portfolio()) ;
+        super(new Portfolio()) ;
     }
     
-    public void updateStockLastPrice(org.yccheok.jstock.engine.Stock stock, double lastPrice) {
-        stockLastPrice.put(stock.getCode(), lastPrice);
-    }
+    public boolean updateStockLastPrice(org.yccheok.jstock.engine.Stock stock) {
+        boolean status = false;
+        
+        stockLastPrice.put(stock.getCode(), stock.getLastPrice());
+        
+        final Portfolio portfolio = (Portfolio)getRoot();
+        final int count = portfolio.getChildCount();
+        
+        TransactionSummary transactionSummary = null;
+        
+        for(int i=0; i<count; i++) {
+            transactionSummary = (TransactionSummary)portfolio.getChildAt(i);
             
+            assert(transactionSummary.getChildCount() > 0);
+            
+            final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
+            
+            if(true == transaction.getContract().getStock().getCode().equals(stock.getCode())) {
+                break;
+            }
+        }
+        
+        if(null == transactionSummary) return status;
+        
+        final int num = transactionSummary.getChildCount();
+        
+        for(int i=0; i<num; i++) {
+            final Transaction transaction = (Transaction)transactionSummary.getChildAt(i);
+                        
+            this.modelSupport.fireChildChanged(new TreePath(getPathToRoot(transaction)), i, transaction);
+            
+            status = true;
+        }
+                
+        fireTreeTableNodeChanged(transactionSummary);
+        fireTreeTableNodeChanged(getRoot());
+                
+        return status;
+    }
+    
+    public void fireTreeTableNodeChanged(TreeTableNode node) {
+        TreeTableNode[] nodes = new TreeTableNode[] { node };
+        this.modelSupport.firePathChanged(new TreePath(nodes));        
+    }
+    
+    @Override
     public int getColumnCount() {
         assert(cNames.length == cTypes.length);
         return cNames.length;
@@ -121,7 +144,7 @@ public class PortfolioTreeTableModel extends AbstractTreeTableModel {
         return cNames[column];        
     }
 
-    private double getStockCurrentValue(Transaction transaction) {
+    private double getCurrentValue(Transaction transaction) {
         final String code = transaction.getContract().getStock().getCode();
         final Double lastPrice = this.stockLastPrice.get(code);
 
@@ -130,8 +153,11 @@ public class PortfolioTreeTableModel extends AbstractTreeTableModel {
         return lastPrice * transaction.getQuantity();        
     }
     
-    private double getStockCurrentValue(TransactionSummary transactionSummary) {
-        final String code = transactionSummary.getTransaction(0).getContract().getStock().getCode();
+    public double getCurrentValue(TransactionSummary transactionSummary) {
+        final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
+        
+        final String code = transaction.getContract().getStock().getCode();
+        
         final Double lastPrice = this.stockLastPrice.get(code);
 
         if(lastPrice == null) return 0.0;
@@ -139,8 +165,9 @@ public class PortfolioTreeTableModel extends AbstractTreeTableModel {
         return lastPrice * transactionSummary.getQuantity();
     }
     
-    private double getStockCurrentPrice(Transaction transaction) {
+    private double getCurrentPrice(Transaction transaction) {
         final String code = transaction.getContract().getStock().getCode();
+        
         final Double lastPrice = this.stockLastPrice.get(code);
 
         if(lastPrice == null) return 0.0;
@@ -148,8 +175,11 @@ public class PortfolioTreeTableModel extends AbstractTreeTableModel {
         return lastPrice;        
     }
     
-    private double getStockCurrentPrice(TransactionSummary transactionSummary) {
-        final String code = transactionSummary.getTransaction(0).getContract().getStock().getCode();
+    public double getCurrentPrice(TransactionSummary transactionSummary) {
+        final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
+        
+        final String code = transaction.getContract().getStock().getCode();
+
         final Double lastPrice = this.stockLastPrice.get(code);
 
         if(lastPrice == null) return 0.0;
@@ -157,32 +187,74 @@ public class PortfolioTreeTableModel extends AbstractTreeTableModel {
         return lastPrice;
     }
     
-    private double getStockGainLossValue(Portfolio portfolio) {
-        return getStockCurrentValue(portfolio) - portfolio.getTotal();
+    private double getGainLossValue(Portfolio portfolio) {
+        return getCurrentValue(portfolio) - portfolio.getTotal();
     }
     
-    private double getStockGainLossPercentage(Portfolio portfolio) {
-        return (getStockCurrentValue(portfolio) - portfolio.getTotal()) / portfolio.getTotal() * 100.0;        
+    private double getGainLossPercentage(Portfolio portfolio) {
+        if(portfolio.getTotal() == 0) return 0.0;
+        
+        return (getCurrentValue(portfolio) - portfolio.getTotal()) / portfolio.getTotal() * 100.0;        
+    }
+
+    public double getGainLossPercentage(TransactionSummary transactionSummary) {
+        if(transactionSummary.getTotal() == 0) return 0.0;
+        
+        return (getCurrentValue(transactionSummary) - transactionSummary.getTotal()) / transactionSummary.getTotal() * 100.0;        
     }
     
-    private double getStockNetGainLossValue(Portfolio portfolio) {
-        return getStockCurrentValue(portfolio) - portfolio.getNetTotal();
+    public double getNetGainLossValue(TransactionSummary transactionSummary) {
+        return getCurrentValue(transactionSummary) - transactionSummary.getNetTotal();
     }
     
-    private double getStockNetGainLossPercentage(Portfolio portfolio) {
-        return (getStockCurrentValue(portfolio) - portfolio.getNetTotal()) / portfolio.getNetTotal() * 100.0;        
+    public double getNetGainLossPercentage(TransactionSummary transactionSummary) {
+        if(transactionSummary.getTotal() == 0) return 0.0;
+        
+        return (getCurrentValue(transactionSummary) - transactionSummary.getNetTotal()) / transactionSummary.getNetTotal() * 100.0;        
     }
     
-    private double getStockCurrentValue(Portfolio portfolio) {
-        final int portfolioSize = portfolio.getSize();
+    private double getGainLossPercentage(Transaction transaction) {
+        if(transaction.getTotal() == 0) return 0.0;
+        
+        return (getCurrentValue(transaction) - transaction.getTotal()) / transaction.getTotal() * 100.0;        
+    }
+    
+    private double getNetGainLossValue(Transaction transaction) {
+        return getCurrentValue(transaction) - transaction.getNetTotal();
+    }
+    
+    private double getNetGainLossPercentage(Transaction transaction) {
+        if(transaction.getTotal() == 0) return 0.0;
+        
+        return (getCurrentValue(transaction) - transaction.getNetTotal()) / transaction.getNetTotal() * 100.0;        
+    }
+    
+    private double getNetGainLossValue(Portfolio portfolio) {
+        return getCurrentValue(portfolio) - portfolio.getNetTotal();
+    }
+    
+    private double getNetGainLossPercentage(Portfolio portfolio) {
+        if(portfolio.getTotal() == 0) return 0.0;
+        
+        return (getCurrentValue(portfolio) - portfolio.getNetTotal()) / portfolio.getNetTotal() * 100.0;        
+    }
+    
+    private double getCurrentValue(Portfolio portfolio) {
+        final int count = portfolio.getChildCount();
         
         double result = 0.0;
         
-        for(int i=0; i<portfolioSize; i++) {
-            final TransactionSummary transactionSummary = portfolio.getTransactionSummary(i);
-            assert(transactionSummary.getSize() > 0);
+        for(int i=0; i<count; i++) {
+            Object o = portfolio.getChildAt(i);
             
-            final String code = transactionSummary.getTransaction(0).getContract().getStock().getCode();
+            assert(o instanceof TransactionSummary);
+            
+            final TransactionSummary transactionSummary = (TransactionSummary)o;
+                    
+            assert(transactionSummary.getChildCount() > 0);            
+
+            final String code = ((Transaction)transactionSummary.getChildAt(0)).getContract().getStock().getCode();
+            
             final Double lastPrice = this.stockLastPrice.get(code);
             
             if(lastPrice == null) continue;
@@ -195,6 +267,19 @@ public class PortfolioTreeTableModel extends AbstractTreeTableModel {
         return result;
     }
     
+    public double getPurchasePrice(TransactionSummary transactionSummary) {
+        return transactionSummary.getTotal() / transactionSummary.getQuantity();
+    }
+    
+    public double getGainLossPrice(TransactionSummary transactionSummary) {
+        return this.getCurrentPrice(transactionSummary) - (transactionSummary.getTotal() / transactionSummary.getQuantity());        
+    }
+    
+    public double getGainLossValue(TransactionSummary transactionSummary) {
+        return this.getCurrentValue(transactionSummary) - transactionSummary.getTotal();        
+    }
+    
+    @Override
     public Object getValueAt(Object node, int column) {
         if(node instanceof Portfolio) {
             final Portfolio portfolio = (Portfolio)node;
@@ -207,19 +292,31 @@ public class PortfolioTreeTableModel extends AbstractTreeTableModel {
                     return portfolio.getTotal();
                     
                 case 6:
-                    return getStockCurrentValue(portfolio);
+                    return getCurrentValue(portfolio);
                     
                 case 8:
-                    return this.getStockGainLossValue(portfolio);
+                    return this.getGainLossValue(portfolio);
                     
                 case 9:
-                    return this.getStockGainLossPercentage(portfolio);
+                    return this.getGainLossPercentage(portfolio);
     
+                case 10:
+                    return portfolio.getCalculatedBroker();
+                    
+                case 11:
+                    return portfolio.getCalculatedClearingFee();
+                    
+                case 12:
+                    return portfolio.getCalculatedStampDuty();
+                    
+                case 13:
+                    return portfolio.getNetTotal();
+                    
                 case 14:
-                    return this.getStockNetGainLossValue(portfolio);
+                    return this.getNetGainLossValue(portfolio);
                     
                 case 15:
-                    return this.getStockNetGainLossPercentage(portfolio);
+                    return this.getNetGainLossPercentage(portfolio);
                                              
                 default:
                     return null;
@@ -229,24 +326,54 @@ public class PortfolioTreeTableModel extends AbstractTreeTableModel {
         if(node instanceof TransactionSummary) {
             final TransactionSummary transactionSummary = (TransactionSummary)node;
             
+            if(transactionSummary.getChildCount() <= 0) return null;
+            
             switch(column) {
                 case 0:
-                    return transactionSummary.getTransaction(0).getContract().getStock().getSymbol();
+                    return ((Transaction)transactionSummary.getChildAt(0)).getContract().getStock().getSymbol();
                     
                 case 2:
                     return transactionSummary.getQuantity();
                     
                 case 3:
-                    return transactionSummary.getTotal() / transactionSummary.getQuantity();
+                    return this.getPurchasePrice(transactionSummary);
                     
                 case 4:
-                    return this.getStockCurrentPrice(transactionSummary);
+                    return this.getCurrentPrice(transactionSummary);
                     
                 case 5:
                     return transactionSummary.getTotal();
                     
                 case 6:
-                    return this.getStockCurrentValue(transactionSummary);
+                    return this.getCurrentValue(transactionSummary);
+                    
+                case 7:
+                    return this.getGainLossPrice(transactionSummary);
+                    
+                case 8:
+                    return this.getGainLossValue(transactionSummary);
+                    
+                case 9:
+                    return this.getGainLossPercentage(transactionSummary);
+                    
+                case 10:
+                    return transactionSummary.getCalculatedBroker();
+                    
+                case 11:
+                    return transactionSummary.getCalculatdClearingFee();
+                    
+                case 12:
+                    return transactionSummary.getCalculatedStampDuty();
+                    
+                case 13:
+                    return transactionSummary.getNetTotal();
+                    
+                case 14:
+                    return this.getNetGainLossValue(transactionSummary);
+                    
+                case 15:
+                    return this.getNetGainLossPercentage(transactionSummary);                    
+                    
             }
         }
         
@@ -254,54 +381,88 @@ public class PortfolioTreeTableModel extends AbstractTreeTableModel {
             final Transaction transaction = (Transaction)node;
             
             switch(column) {
+                case 0:
+                    return (transaction).getContract().getStock().getSymbol();
+
                 case 1:
-                    return transaction.getContract().getDate();
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yy");
+                    return simpleDateFormat.format(transaction.getContract().getDate().getCalendar().getTime());
                     
                 case 2:
                     return transaction.getQuantity();
+                    
+                case 3:
+                    return transaction.getContract().getPrice();
+                    
+                case 4:
+                    return this.getCurrentPrice(transaction);
+                    
+                case 5:
+                    return transaction.getTotal();
+                    
+                case 6:
+                    return this.getCurrentValue(transaction);
+                    
+                case 7:
+                    return this.getCurrentPrice(transaction) - (transaction.getTotal() / transaction.getQuantity());
+                    
+                case 8:
+                    return this.getCurrentValue(transaction) - transaction.getTotal();
+                    
+                case 9:
+                    return this.getGainLossPercentage(transaction);
+                    
+                case 10:
+                    return transaction.getCalculatedBroker();
+                    
+                case 11:
+                    return transaction.getCalculatdClearingFee();
+                    
+                case 12:
+                    return transaction.getCalculatedStampDuty();
+                    
+                case 13:
+                    return transaction.getNetTotal();
+                    
+                case 14:
+                    return this.getNetGainLossValue(transaction);
+                    
+                case 15:
+                    return this.getNetGainLossPercentage(transaction);                    
+                    
             }
         }
         
 	return null; 
     }
 
-    public Object getChild(Object parent, int index) {
-        if(parent instanceof TreeTableable) {
-            final TreeTableable treeTableable = (TreeTableable)parent;
+    public void addTransaction(Transaction transaction) {
+        final Portfolio portfolio = (Portfolio)this.getRoot();
+        
+        final int size = portfolio.getChildCount();
+        
+        final String code = transaction.getContract().getStock().getCode();
+        
+        TransactionSummary transactionSummary = null;
+        
+        for(int i=0; i<size; i++) {
+            TransactionSummary t = (TransactionSummary)portfolio.getChildAt(i);
             
-            return treeTableable.getChild(index);
+            if(((Transaction)t.getChildAt(0)).getContract().getStock().getCode().equals(code)) {
+                transactionSummary = t;
+                break;
+            }
         }
         
-        return null;
-    }
-
-    public int getChildCount(Object parent) {
-        if(parent instanceof TreeTableable) {
-            final TreeTableable treeTableable = (TreeTableable)parent;
-            return treeTableable.getSize();
+        if(transactionSummary == null) {
+            transactionSummary = new TransactionSummary();
+            this.insertNodeInto(transactionSummary, portfolio, portfolio.getChildCount());
         }
+       
+        this.insertNodeInto(transaction, transactionSummary, transactionSummary.getChildCount());
         
-        return 0;
-    }
-
-    public boolean addTransaction(Transaction transaction) {
-        if(portfolio.addTransaction(transaction)) {
-            Object[] children = { transaction };
-            int[] index = { this.getIndexOfChild(transaction.getParent(), transaction) };
-           		
-            final TreeTableable[] path = transaction.getPath();
-            fireTreeStructureChanged(this, path, null,
-					 null);
-                             
-            this.fireTreeNodesInserted(
-                    (Object)portfolio, 
-                    (Object[])transaction.getPath(), 
-                    index,
-                    children);
-            
-            return true;
-        }
-        
-        return false;
+        // Workaround to solve root is not being updated when children are not 
+        // being collapse.
+        fireTreeTableNodeChanged(getRoot());
     }
 }
