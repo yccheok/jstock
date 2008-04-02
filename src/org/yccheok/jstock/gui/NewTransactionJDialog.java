@@ -13,6 +13,7 @@ import java.text.NumberFormat;
 import java.util.Date;
 import javax.swing.JFormattedTextField;
 import javax.swing.text.NumberFormatter;
+import javax.swing.SwingUtilities;
 import net.sf.nachocalendar.CalendarFactory;
 import net.sf.nachocalendar.components.DateField;
 import org.apache.commons.logging.Log;
@@ -372,10 +373,13 @@ public class NewTransactionJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void update() {
-        final int unit = (Integer)this.jSpinner1.getValue();
-        final double price = (Double)jFormattedTextField1.getValue();
-        this.jFormattedTextField2.setValue(price * (double)unit);                
-        this.jFormattedTextField6.setValue(price * (double)unit);
+        SwingUtilities.invokeLater(new Runnable() { public void run() {
+            final int unit = (Integer)jSpinner1.getValue();
+            final double price = (Double)jFormattedTextField1.getValue();
+            jFormattedTextField2.setValue(price * (double)unit);                
+            jFormattedTextField6.setValue(price * (double)unit);
+        }});
+
     }
     
     private void jSpinner1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinner1StateChanged
