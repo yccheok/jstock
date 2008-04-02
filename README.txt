@@ -56,3 +56,18 @@ version 0.9.5
 1. Bug fixed on stock scanning speed.
 
 2. [1851625] Bug fixed on indicator scanning. We will only download history only when there is a need.
+
+=============
+version 0.9.6
+=============
+1. Bug fixed on getStockBySymbol(String symbol). We forget to break after successl. 
+   This cause Indicator Editor Panel takes a long time to retrieve a real time sample data.
+
+2. Bug fixed on IndicatorPanel. Avoid from calling stop when state change. This is to avoid
+   GUI from being freezed.
+
+3. Apply soft start/ soft stop in MainFrame, to avoid GUI from being freezed.
+
+4. Bug fixed. Forget to update GUI state.
+
+5. Porfolio feature by using tree table from SwingLabs.
