@@ -239,6 +239,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
         return c;        
     }    
     
+    @Override
     public Component getTableCellRendererComponent(
                             JTable table, Object color,
                             boolean isSelected, boolean hasFocus,
