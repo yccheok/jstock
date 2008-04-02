@@ -35,9 +35,7 @@ import org.yccheok.jstock.engine.*;
 import com.thoughtworks.xstream.*;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import org.apache.commons.net.TimeTCPClient;
-import org.apache.commons.net.TimeUDPClient;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -71,7 +69,6 @@ public class MainFrame extends javax.swing.JFrame {
         
         this.createSystemTrayIcon();
         
-        this.initJStockOptions();
         this.initUsernameAndPassword();
         this.initTableHeaderToolTips();               
         this.initjComboBox1EditorComponentKeyListerner();
@@ -911,6 +908,26 @@ public class MainFrame extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
+
+        /* Workaround to solve JXTreeTable look n feel cannot be changed on the fly. */
+        initJStockOptions();
+        
+        try {
+            UIManager.setLookAndFeel(MainFrame.getJStockOptions().getLooknFeel());
+        }
+        catch(java.lang.ClassNotFoundException exp) {
+            log.error("", exp);
+        }
+        catch(java.lang.InstantiationException exp) {
+            log.error("", exp);
+        }
+        catch(java.lang.IllegalAccessException exp) {
+            log.error("", exp);
+        }
+        catch(javax.swing.UnsupportedLookAndFeelException exp) {
+            log.error("", exp);
+        }
+        
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 MainFrame mainFrame = new MainFrame();                
@@ -1560,13 +1577,13 @@ public class MainFrame extends javax.swing.JFrame {
         this.portfolioManagementJPanel.initRealTimeStockMonitor(Collections.unmodifiableList(stockServerFactories));
     }
 
-    private void initJStockOptions() {
+    private static void initJStockOptions() {
         try {
             File f = new File("config" + File.separator + "options.xml");
 
             XStream xStream = new XStream();
             InputStream inputStream = new java.io.FileInputStream(f);
-            this.jStockOptions = (JStockOptions)xStream.fromXML(inputStream);
+            jStockOptions = (JStockOptions)xStream.fromXML(inputStream);
             
             log.info("jstockOptions loaded from " + f.toString() + " successfully.");            
         }
@@ -1584,9 +1601,7 @@ public class MainFrame extends javax.swing.JFrame {
         if(jStockOptions.getScanningSpeed() == 0) {
             jStockOptions.setScanningSpeed(1000);
         }
-        
-        this.setLookAndFeel(jStockOptions.getLooknFeel());
-        
+                
         final String proxyHost = jStockOptions.getProxyServer();
         final int proxyPort = jStockOptions.getProxyPort();
         
