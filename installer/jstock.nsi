@@ -44,14 +44,15 @@ SetShellVarContext all	;Workaround for Vista
 RMDir /r $INSTDIR\indicator
 RMDir /r $INSTDIR\config
 RMDir /r $INSTDIR\lib
+RMDir /r $INSTDIR\history
 Delete $INSTDIR\chart.ico
 Delete $INSTDIR\jstock.jar
 Delete $INSTDIR\Uninstall.exe
 Delete "$SMPROGRAMS\${PRODUCT_NAME}\Uninstall ${PRODUCT_NAME}.lnk"
 Delete "$SMPROGRAMS\${PRODUCT_NAME}\${PRODUCT_NAME}.lnk"
-RMDIR "$SMPROGRAMS\${PRODUCT_NAME}"
+RMDIR /r "$SMPROGRAMS\${PRODUCT_NAME}"
 DeleteRegKey HKEY_LOCAL_MACHINE "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
-RMDir $INSTDIR
+RMDir /r $INSTDIR
 SectionEnd
 Function VersionCompare
 	!define VersionCompare `!insertmacro VersionCompareCall`
