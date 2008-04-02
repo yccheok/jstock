@@ -166,6 +166,10 @@ public class Wizard extends WindowAdapter implements PropertyChangeListener {
         
         wizardDialog.setModal(true);
         wizardDialog.pack();
+        
+        // Workaround against problem in new version of swingx-0.9.2
+        wizardDialog.setSize(750, wizardDialog.getHeight());
+        
         // Cheok : Display location should be relative to the owner.
         wizardDialog.setLocationRelativeTo(this.getOwner());
         wizardDialog.setVisible(true);
