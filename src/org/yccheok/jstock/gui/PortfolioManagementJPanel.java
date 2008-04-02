@@ -268,7 +268,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private void showPortfolioChartJDialog() {
         final MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, this);
         final PortfolioTreeTableModel portfolioTreeTableModel = (PortfolioTreeTableModel)treeTable.getTreeTableModel();
-        PortfolioChartJDialog portfolioChartJDialog = new PortfolioChartJDialog(m, true, portfolioTreeTableModel);
+        PortfolioChartJDialog portfolioChartJDialog = new PortfolioChartJDialog(m, false, portfolioTreeTableModel);
         portfolioChartJDialog.setVisible(true);                                    
     }
     
