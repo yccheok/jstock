@@ -29,8 +29,6 @@ import org.jhotdraw.draw.*;
 import org.jhotdraw.draw.action.*;
 import org.jhotdraw.gui.*;
 import javax.swing.event.*;
-import javax.swing.table.TableModel;
-import org.jhotdraw.xml.JavaxDOMInput;
 import org.yccheok.jstock.engine.*;
 import org.yccheok.jstock.analysis.*;
 
@@ -794,6 +792,7 @@ public class IndicatorPanel extends JPanel implements ChangeListener {
             return success;
          }
 
+        @Override
          protected void process(java.util.List<Stock> stocks) {
              for (Stock stock : stocks) {
                  MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, IndicatorPanel.this);
@@ -863,7 +862,7 @@ public class IndicatorPanel extends JPanel implements ChangeListener {
 
                 final java.util.concurrent.CountDownLatch countDownLatch = new java.util.concurrent.CountDownLatch(1);
 
-                org.yccheok.jstock.engine.Observer observer = new org.yccheok.jstock.engine.Observer<StockHistoryMonitor, StockHistoryMonitor.StockHistoryRunnable>() {
+                org.yccheok.jstock.engine.Observer<StockHistoryMonitor, StockHistoryMonitor.StockHistoryRunnable> observer = new org.yccheok.jstock.engine.Observer<StockHistoryMonitor, StockHistoryMonitor.StockHistoryRunnable>() {
                     public void update(StockHistoryMonitor monitor, StockHistoryMonitor.StockHistoryRunnable runnable)
                     {
                         if(runnable.getCode().equals(code)) {
@@ -976,7 +975,9 @@ public class IndicatorPanel extends JPanel implements ChangeListener {
             jButton3.setEnabled(status);
         }
         else {
-            stop();
+            /* We will not call stop, to avoid GUI from being freezed. But, is it
+             * safe to do so?
+             */
             
             this.jButton4.setEnabled(true);
             this.jButton6.setEnabled(false);
