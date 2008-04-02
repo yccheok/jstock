@@ -19,44 +19,26 @@
 package org.yccheok.jstock.portfolio;
 
 import java.util.*;
-import org.yccheok.jstock.gui.treetable.AbstractTreeTableable;
-import org.yccheok.jstock.gui.treetable.TreeTableable;
+import org.jdesktop.swingx.treetable.*;
 
 /**
  *
  * @author Owner
  */
-public class TransactionSummary extends AbstractTreeTableable {
-    public TransactionSummary(Portfolio portfolio) {
-        this.portfolio = portfolio;
-    }
+public class TransactionSummary extends DefaultMutableTreeTableNode {
 
-    public Portfolio getPortfolio() {
-        return portfolio;
-    }
-    
-    public int getSize() {
-        return transactions.size();
-    }
-    
-    public Transaction getTransaction(int index) {
-        return transactions.get(index);
-    }
-    
-    public boolean addTransaction(Transaction transaction) {
-        transaction.setTransactionSummary(this);
-        return transactions.add(transaction);
-    }
-    
-    public boolean removeTransaction(Transaction transaction) {
-        transaction.setTransactionSummary(null);
-        return transactions.remove(transaction);
-    }
-    
     public int getQuantity() {
         int result = 0;
         
-        for(Transaction transaction : transactions) {
+        final int count = this.getChildCount();
+        
+        for(int i=0; i<count; i++) {
+            Object o = this.getChildAt(i);
+            
+            assert(o instanceof Transaction);
+            
+            final Transaction transaction = (Transaction)o;
+            
             int quantity = transaction.getQuantity();
             
             if(transaction.getContract().getType() == Contract.Type.Buy) {
@@ -92,19 +74,35 @@ public class TransactionSummary extends AbstractTreeTableable {
     public double getCalculatedBroker() {
         double result = 0.0;
         
-        for(Transaction transaction : transactions) {
+        final int count = this.getChildCount();
+        
+        for(int i=0; i<count; i++) {
+            Object o = this.getChildAt(i);
+            
+            assert(o instanceof Transaction);
+            
+            final Transaction transaction = (Transaction)o;
+            
             double calculatedBroker = transaction.getCalculatedBroker();
             
             result += calculatedBroker;
         }
-        
+
         return result;        
     }
 
     public double getCalculatedStampDuty() {
         double result = 0.0;
         
-        for(Transaction transaction : transactions) {
+        final int count = this.getChildCount();
+        
+        for(int i=0; i<count; i++) {
+            Object o = this.getChildAt(i);
+            
+            assert(o instanceof Transaction);
+            
+            final Transaction transaction = (Transaction)o;
+            
             double calculatedStampDuty = transaction.getCalculatedStampDuty();
             
             result += calculatedStampDuty;
@@ -116,7 +114,15 @@ public class TransactionSummary extends AbstractTreeTableable {
     public double getCalculatdClearingFee() {
         double result = 0.0;
         
-        for(Transaction transaction : transactions) {
+        final int count = this.getChildCount();
+        
+        for(int i=0; i<count; i++) {
+            Object o = this.getChildAt(i);
+            
+            assert(o instanceof Transaction);
+            
+            final Transaction transaction = (Transaction)o;
+            
             double calculatedClearingFee = transaction.getCalculatdClearingFee();
             
             result += calculatedClearingFee;
@@ -128,7 +134,15 @@ public class TransactionSummary extends AbstractTreeTableable {
     public double getTotal() {
         double result = 0.0;
         
-        for(Transaction transaction : transactions) {
+        final int count = this.getChildCount();
+        
+        for(int i=0; i<count; i++) {
+            Object o = this.getChildAt(i);
+            
+            assert(o instanceof Transaction);
+            
+            final Transaction transaction = (Transaction)o;
+            
             double total = transaction.getTotal();
             
             result += total;
@@ -140,7 +154,15 @@ public class TransactionSummary extends AbstractTreeTableable {
     public double getNetTotal() {
         double result = 0.0;
         
-        for(Transaction transaction : transactions) {
+        final int count = this.getChildCount();
+        
+        for(int i=0; i<count; i++) {
+            Object o = this.getChildAt(i);
+            
+            assert(o instanceof Transaction);
+            
+            final Transaction transaction = (Transaction)o;
+            
             double netTotal = transaction.getNetTotal();
             
             result += netTotal;
@@ -148,23 +170,12 @@ public class TransactionSummary extends AbstractTreeTableable {
         
         return result;        
     }
-    
-    private List<Transaction> transactions = new ArrayList<Transaction>();
-    private Portfolio portfolio;
-    
-    public TreeTableable getParent() {
-        return portfolio;
-    }
-
-    public TreeTableable getChild(int index) {
-        return this.getTransaction(index);
-    }
-    
+       
     public String toString() {
-        if(transactions.size() > 0) {
-            return transactions.get(0).toString();
+        if(this.getChildCount() > 0) {
+            return this.getChildAt(0).toString();
         }
         
-        return "No Summary";
+        return "";
     }
 }
