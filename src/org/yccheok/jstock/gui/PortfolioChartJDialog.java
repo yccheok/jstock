@@ -39,7 +39,7 @@ public class PortfolioChartJDialog extends javax.swing.JDialog {
     
     /** Creates new form PortfolioChartJDialog */
     public PortfolioChartJDialog(java.awt.Frame parent, boolean modal, PortfolioTreeTableModel portfolioTreeTableModel) {
-        super(parent, modal);
+        super(parent, "Portfolio Summary", modal);
         initComponents();
         
         this.portfolioTreeTableModel = portfolioTreeTableModel;
@@ -95,7 +95,7 @@ public class PortfolioChartJDialog extends javax.swing.JDialog {
             
             if(transactionSummary.getChildCount() <= 0) continue;
             
-            Transaction transaction = (Transaction)transactionSummary.getChildAt(i);
+            Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
             final String symbol = transaction.getContract().getStock().getSymbol();
             
             /* Should use reflection technology. */
