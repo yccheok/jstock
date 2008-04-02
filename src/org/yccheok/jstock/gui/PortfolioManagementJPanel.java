@@ -20,24 +20,42 @@
 
 package org.yccheok.jstock.gui;
 
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+import com.thoughtworks.xstream.XStream;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import javax.swing.ImageIcon;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 
+import javax.swing.tree.TreePath;
+import org.apache.commons.logging.*;
 import org.yccheok.jstock.portfolio.*;
 import org.yccheok.jstock.engine.*;
-import org.yccheok.jstock.gui.treetable.*;
+import org.jdesktop.swingx.treetable.*;
 
 /**
  *
  * @author  Owner
  */
-public class PortfolioManagementJPanel extends javax.swing.JPanel implements ChangeListener {
+public class PortfolioManagementJPanel extends javax.swing.JPanel {
     
     /** Creates new form PortfoliioJPanel */
     public PortfolioManagementJPanel() {
         initComponents();        
         
         this.initJTreeTable();
+        this.initPortfolio();
     }
     
     /** This method is called from within the constructor to
@@ -48,14 +66,21 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel implements Cha
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPanel1 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
         jPanel2 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
-        jPanel1 = new javax.swing.JPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
 
         setLayout(new java.awt.BorderLayout());
 
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Portfolio Management"));
+        jPanel1.setLayout(new java.awt.BorderLayout());
+        jPanel1.add(jScrollPane1, java.awt.BorderLayout.CENTER);
+
+        add(jPanel1, java.awt.BorderLayout.CENTER);
+
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/inbox.png"))); // NOI18N
         jButton1.setText("New Trasaction...");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -64,56 +89,417 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel implements Cha
         });
         jPanel2.add(jButton1);
 
+        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/button_cancel.png"))); // NOI18N
         jButton2.setText("Delete Transaction");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
         jPanel2.add(jButton2);
 
         add(jPanel2, java.awt.BorderLayout.SOUTH);
-
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Portfolio Management"));
-        jPanel1.setLayout(new java.awt.BorderLayout());
-        jPanel1.add(jScrollPane1, java.awt.BorderLayout.CENTER);
-
-        add(jPanel1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        if(jTable1 instanceof org.yccheok.jstock.gui.treetable.JTreeTable) {
-            final org.yccheok.jstock.gui.treetable.JTreeTable jTreeTable = (org.yccheok.jstock.gui.treetable.JTreeTable)jTable1;
-            final TreeTableModel treeTableModel = jTreeTable.getTreeTableModel();
-            
-            if(treeTableModel instanceof PortfolioTreeTableModel) {
-                final PortfolioTreeTableModel portfolioTreeTableModel = (PortfolioTreeTableModel)treeTableModel;
-                System.out.println("Transaction added");
-                
-              
-                
-                Contract contract = new Contract(
-                        Utils.getEmptyStock("1234", "pbbank"), 
-                        new SimpleDate(2008, 0, 31), 
-                        Contract.Type.Buy, 
-                        1000, 
-                        2.00);
-                
-                Broker broker = new SimpleBroker("SimpleBroker", 1000, 100, 2.0);
-                
-                StampDuty stampDuty = new SimpleStampDuty("SimpleStampDuty", 1000, 100, 2.0);
-               
-                ClearingFee clearingFee = new SimpleClearingFee("SimpleClearingfee", 1000, 100, 2.0);
-                        
-                Transaction transaction = new Transaction(contract, broker, stampDuty, clearingFee);
-                
-                portfolioTreeTableModel.addTransaction(transaction);                
-            }
-        }
+        this.showNewTransactionJDialog(getSelectedStockSymbolForNewTransactionJDialog(), getSelectedStockLastPriceForNewTransactionJDialog(), true);
     }//GEN-LAST:event_jButton1ActionPerformed
     
-    private void initJTreeTable() {
-        jTable1 = new org.yccheok.jstock.gui.treetable.JTreeTable();
-        jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
-        jTable1.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(1)); 
-        this.jScrollPane1.setViewportView(jTable1);
+    private boolean isValidTreeTableNode(TreeTableModel treeTableModel, Object node) {
+        boolean result = false;
+        
+        final Object root = treeTableModel.getRoot();
+        
+        if (node instanceof TreeTableNode) {
+            TreeTableNode ttn = (TreeTableNode) node;
+
+            while (!result && ttn != null) {
+                result = ttn == root;
+
+                ttn = ttn.getParent();
+            }
+        }
+
+        return result;
     }
+    
+    private String getSelectedStockSymbolForNewTransactionJDialog() {
+        final TreePath[] treePaths = treeTable.getTreeSelectionModel().getSelectionPaths();
+
+        if(treePaths == null) return "";
+        
+        if(treePaths.length == 1) {
+            if(treePaths[0].getLastPathComponent() instanceof TransactionSummary) {
+                final TransactionSummary transactionSummary = (TransactionSummary)treePaths[0].getLastPathComponent();
+                assert(transactionSummary.getChildCount() > 0);
+                final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
+                return transaction.getContract().getStock().getSymbol();
+                
+            }
+            else if(treePaths[0].getLastPathComponent() instanceof Transaction) {
+                final Transaction transaction = (Transaction)treePaths[0].getLastPathComponent();
+                return transaction.getContract().getStock().getSymbol();
+            }
+        }        
+        
+        return "";
+    }
+    
+    private double getSelectedStockLastPriceForNewTransactionJDialog() {
+        final TreePath[] treePaths = treeTable.getTreeSelectionModel().getSelectionPaths();
+        final PortfolioTreeTableModel portfolioTreeTableModel = (PortfolioTreeTableModel)treeTable.getTreeTableModel();
+        
+        if(treePaths == null) return 0.0;
+        
+        if(treePaths.length == 1) {
+            if(treePaths[0].getLastPathComponent() instanceof TransactionSummary) {
+                final TransactionSummary transactionSummary = (TransactionSummary)treePaths[0].getLastPathComponent();
+                assert(transactionSummary.getChildCount() > 0);
+                final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
+                final String code = transaction.getContract().getStock().getCode();
+                return portfolioTreeTableModel.getLastPrice(code);
+            }
+            else if(treePaths[0].getLastPathComponent() instanceof Transaction) {
+                final Transaction transaction = (Transaction)treePaths[0].getLastPathComponent();
+                final String code = transaction.getContract().getStock().getCode();
+                return portfolioTreeTableModel.getLastPrice(code);
+            }
+        }        
+        
+        return 0.0;
+    }
+    
+    public void showNewTransactionJDialog(String stockSymbol, double lastPrice, boolean JComboBoxEnabled) {
+
+        final MainFrame mainFrame = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, PortfolioManagementJPanel.this);
+
+        final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = mainFrame.getStockCodeAndSymbolDatabase();
+        
+        if(stockCodeAndSymbolDatabase == null) {
+            javax.swing.JOptionPane.showMessageDialog(this, "We haven't connected to KLSE server.", "Not Connected", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        
+        NewTransactionJDialog newTransactionJDialog = new NewTransactionJDialog(mainFrame, true);
+        newTransactionJDialog.setLocationRelativeTo(this);
+        newTransactionJDialog.setStockSymbol(stockSymbol);
+        newTransactionJDialog.setPrice(lastPrice);
+        newTransactionJDialog.setJComboBoxEnabled(JComboBoxEnabled);
+        newTransactionJDialog.setStockCodeAndSymbolDatabase(stockCodeAndSymbolDatabase);
+        newTransactionJDialog.initjComboBox1EditorComponentKeyListerner();                
+        newTransactionJDialog.setVisible(true);
+        
+        final Transaction transaction = newTransactionJDialog.getTransaction();
+        if(transaction != null) {
+            this.addTransaction(transaction);
+        }
+    }
+    
+    public void clearTableSelection() {
+        treeTable.getSelectionModel().clearSelection();
+    }
+    
+    private void deteleSelectedTreeTableRow() {
+        final PortfolioTreeTableModel portfolioTreeTableModel = (PortfolioTreeTableModel)treeTable.getTreeTableModel();
+        final TreePath[] treePaths = treeTable.getTreeSelectionModel().getSelectionPaths();
+        for(TreePath treePath : treePaths) {
+            final Object o = treePath.getLastPathComponent();
+
+            if(portfolioTreeTableModel.getRoot() == o) continue;
+            
+            final MutableTreeTableNode mutableTreeTableNode = (MutableTreeTableNode)o;
+
+            if(isValidTreeTableNode(portfolioTreeTableModel, mutableTreeTableNode) == false) {
+                portfolioTreeTableModel.fireTreeTableNodeChanged(mutableTreeTableNode);
+                continue;
+            }
+                        
+            if(o instanceof Transaction)
+                portfolioTreeTableModel.removeNodeFromParent(mutableTreeTableNode);
+            else if(o instanceof TransactionSummary) {
+                portfolioTreeTableModel.removeNodeFromParent(mutableTreeTableNode);
+            }
+        }        
+    }
+    
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        deteleSelectedTreeTableRow();
+    }//GEN-LAST:event_jButton2ActionPerformed
+    
+    private boolean isOnlyTreeTableRootBeingSelected() {
+        if(treeTable.getSelectedRowCount() != 1) return false;
+        
+        final TreePath[] treePaths = treeTable.getTreeSelectionModel().getSelectionPaths();
+        
+        final Object o = treePaths[0].getLastPathComponent();
+
+        final PortfolioTreeTableModel portfolioTreeTableModel = (PortfolioTreeTableModel)treeTable.getTreeTableModel();
+        
+        return (portfolioTreeTableModel.getRoot() == o);
+    }
+        
+    private class TableRowPopupListener extends MouseAdapter {
+        
+        public void mouseClicked(MouseEvent evt) {
+        }
+        
+        public void mousePressed(MouseEvent e) {
+            maybeShowPopup(e);
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            maybeShowPopup(e);
+        }
+        
+        private void maybeShowPopup(MouseEvent e) {
+            if (e.isPopupTrigger()) {
+                getMyJTablePopupMenu().show(e.getComponent(), e.getX(), e.getY());
+            }
+        }
+    }
+        
+    private ImageIcon getImageIcon(String imageIcon) {
+        return new javax.swing.ImageIcon(getClass().getResource(imageIcon));
+    }
+    
+    private void showPortfolioChartJDialog() {
+        final MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, this);
+        final PortfolioTreeTableModel portfolioTreeTableModel = (PortfolioTreeTableModel)treeTable.getTreeTableModel();
+        PortfolioChartJDialog portfolioChartJDialog = new PortfolioChartJDialog(m, true, portfolioTreeTableModel);
+        portfolioChartJDialog.setVisible(true);                                    
+    }
+    
+    private JPopupMenu getMyJTablePopupMenu() {                
+        JPopupMenu popup = new JPopupMenu();
+
+        JMenuItem menuItem = new JMenuItem("New Transaction...", this.getImageIcon("/images/16x16/inbox.png"));
+
+        menuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                PortfolioManagementJPanel.this.showNewTransactionJDialog(getSelectedStockSymbolForNewTransactionJDialog(), getSelectedStockLastPriceForNewTransactionJDialog(), true);
+            }
+        });
+
+        popup.add(menuItem);
+
+        popup.addSeparator();
+        
+        menuItem = new JMenuItem("Portfolio Chart...", this.getImageIcon("/images/16x16/chart.png"));
+        
+        menuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                PortfolioManagementJPanel.this.showPortfolioChartJDialog();
+            }
+        });
+
+        popup.add(menuItem);                
+        
+        if(isOnlyTreeTableRootBeingSelected() == false && (treeTable.getSelectedRow() > 0)) {
+            popup.addSeparator();
+            
+            final MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, this);
+                                
+            menuItem = new JMenuItem("History...", this.getImageIcon("/images/16x16/strokedocker.png"));
+
+            menuItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent evt) {
+                        List<Stock> stocks = getSelectedStock();
+
+                        for(Stock stock : stocks) {
+                            m.displayHistoryChart(stock);
+                        }
+                    }
+            });
+                        
+            popup.add(menuItem);
+            popup.addSeparator();
+            
+            menuItem = new JMenuItem("Delete Transaction", this.getImageIcon("/images/16x16/button_cancel.png"));
+
+            menuItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent evt) {
+                        PortfolioManagementJPanel.this.deteleSelectedTreeTableRow();
+                    }
+            });
+
+            popup.add(menuItem);
+        }
+        
+        return popup;
+    }
+
+    private void initJTreeTable() {
+        treeTable = new org.jdesktop.swingx.JXTreeTable(new PortfolioTreeTableModel());   
+        treeTable.setRootVisible(true);
+        treeTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+        treeTable.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(1)); 
+        // treeTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        this.treeTable.addMouseListener(new TableRowPopupListener());
+
+        this.jScrollPane1.setViewportView(treeTable);        
+    }
+
+    private void addTransaction(Transaction transaction) {
+        final PortfolioTreeTableModel portfolioTreeTableModel = (PortfolioTreeTableModel)treeTable.getTreeTableModel();
+        portfolioTreeTableModel.addTransaction(transaction);
+        this.realTimeStockMonitor.addStockCode(transaction.getContract().getStock().getCode());
+    }
+    
+    private void updateRealTimeStockMonitorAccordingToPortfolioTreeTableModel() {
+        if(this.realTimeStockMonitor == null) return;
+        
+        final PortfolioTreeTableModel portfolioTreeTableModel = (PortfolioTreeTableModel)treeTable.getTreeTableModel();
+                
+        if(portfolioTreeTableModel != null) {
+            this.treeTable.setTreeTableModel(portfolioTreeTableModel);
+            
+            Portfolio portfolio = (Portfolio)portfolioTreeTableModel.getRoot();
+            final int count = portfolio.getChildCount();
+            
+            for(int i=0; i<count; i++) {
+                TransactionSummary transactionSummary = (TransactionSummary)portfolio.getChildAt(i);
+                
+                if(transactionSummary.getChildCount() <= 0) continue;
+                
+                final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
+
+                this.realTimeStockMonitor.addStockCode(transaction.getContract().getStock().getCode());
+            }
+        }
+        
+    }
+    
+    private List<Stock> getSelectedStock() {
+        final TreePath[] treePaths = treeTable.getTreeSelectionModel().getSelectionPaths();
+        List<Stock> stocks = new ArrayList<Stock>();
+        Set<String> s = new HashSet<String>();
+        
+        for(TreePath treePath : treePaths) {
+            if(treePath.getLastPathComponent() instanceof TransactionSummary) {
+                final TransactionSummary transactionSummary = (TransactionSummary)treePaths[0].getLastPathComponent();
+                assert(transactionSummary.getChildCount() > 0);
+                final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
+                final Stock stock = transaction.getContract().getStock();
+                final String code = stock.getCode();
+                
+                if(s.contains(code)) continue;
+                
+                stocks.add(stock);
+                s.add(code);
+            }
+            else if(treePath.getLastPathComponent() instanceof Transaction) {
+                final Transaction transaction = (Transaction)treePaths[0].getLastPathComponent();
+                final Stock stock = transaction.getContract().getStock();
+                final String code = stock.getCode();
+                
+                if(s.contains(code)) continue;
+                
+                stocks.add(stock);
+                s.add(code);
+            }                        
+        }
+        
+        return Collections.unmodifiableList(stocks);
+    }
+    
+    private void initPortfolio() {
+        try {
+            File f = new File("config" + File.separator + "portfolio.xml");
+
+            XStream xStream = new XStream();
+            InputStream inputStream = new java.io.FileInputStream(f);
+            final PortfolioTreeTableModel portfolioTreeTableModel = (PortfolioTreeTableModel)xStream.fromXML(inputStream);
+            this.treeTable.setTreeTableModel(portfolioTreeTableModel);
+        }
+        catch(java.io.FileNotFoundException exp) {
+            log.error("", exp);
+        }
+        catch(com.thoughtworks.xstream.core.BaseException exp) {
+            log.error("", exp);
+        }
+        
+        updateRealTimeStockMonitorAccordingToPortfolioTreeTableModel();
+    }
+    
+    public boolean savePortfolio() {
+        if(Utils.createDirectoryIfDoesNotExist("config") == false)
+        {
+            return false;
+        }
+        
+        File f = new File("config" + File.separator + "portfolio.xml");
+                
+        XStream xStream = new XStream();   
+        
+        try {
+            OutputStream outputStream = new FileOutputStream(f);
+            final PortfolioTreeTableModel portfolioTreeTableModel = (PortfolioTreeTableModel)treeTable.getTreeTableModel();
+            xStream.toXML(portfolioTreeTableModel, outputStream);  
+        }
+        catch(java.io.FileNotFoundException exp) {
+            log.error("", exp);
+            return false;
+        }
+        catch(com.thoughtworks.xstream.core.BaseException exp) {
+            log.error("", exp);
+            return false;
+        }
+                      
+        return true;
+    }
+    
+    public void initRealTimeStockMonitor(java.util.List<StockServerFactory> stockServerFactories) {
+        realTimeStockMonitor = new RealTimeStockMonitor(4, 20, MainFrame.getJStockOptions().getScanningSpeed());
+        
+        for(StockServerFactory factory : stockServerFactories) {
+            realTimeStockMonitor.addStockServerFactory(factory);
+        }
+        
+        realTimeStockMonitor.attach(this.realTimeStockMonitorObserver);
+        
+        updateRealTimeStockMonitorAccordingToPortfolioTreeTableModel();
+    }
+    
+    // This is the workaround to overcome Erasure by generics. We are unable to make MainFrame to
+    // two observers at the same time.
+    private org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> getRealTimeStockMonitorObserver() {
+        return new org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>>() {
+            public void update(RealTimeStockMonitor monitor, java.util.List<Stock> stocks)
+            {
+                PortfolioManagementJPanel.this.update(monitor, stocks);
+            }
+        };
+    }
+    
+    public void update(RealTimeStockMonitor monitor, final java.util.List<Stock> stocks) {
+        final PortfolioTreeTableModel portfolioTreeTableModel = (PortfolioTreeTableModel)treeTable.getTreeTableModel();
+ 
+        for(Stock stock : stocks) {
+            if(false == portfolioTreeTableModel.updateStockLastPrice(stock)) {
+                this.realTimeStockMonitor.removeStockCode(stock.getCode());
+            }
+        }                
+    }  
+    
+    public void softStart() {
+        if(realTimeStockMonitor == null) return;
+                
+        realTimeStockMonitor.softStart();
+    }
+    
+    public void softStop() {
+        if(realTimeStockMonitor == null) return;
+        
+        realTimeStockMonitor.softStop();
+    }
+    
+    private static final Log log = LogFactory.getLog(PortfolioManagementJPanel.class);
+    
+    private RealTimeStockMonitor realTimeStockMonitor = null;
+    private org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
@@ -123,9 +509,5 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel implements Cha
     private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
 
-    private javax.swing.JTable jTable1;
-            
-    public void stateChanged(ChangeEvent e) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }    
+    private org.jdesktop.swingx.JXTreeTable treeTable; 
 }
