@@ -694,14 +694,21 @@ public class MainFrame extends javax.swing.JFrame {
         }
     }
     
+    // Policy : Each pane should have their own real time stock monitoring.
+    //
+    //          Each pane should share history monitoring with main frame, 
+    //          for optimized history retrieving purpose.
+    //
     private void jTabbedPane1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jTabbedPane1StateChanged
 // TODO add your handling code here:
         JTabbedPane pane = (JTabbedPane)evt.getSource();
-        if(pane.getSelectedComponent() == this.jPanel8) {            
-            if(realTimeStockMonitor != null) {                
-                this.realTimeStockMonitor.start();
+        if(pane.getSelectedComponent() == this.jPanel8) {  
+            if(realTimeStockMonitor != null) {  
+                this.realTimeStockMonitor.softStart();
+                this.portfolioManagementJPanel.softStop();
                 this.realTimeStockMonitor.attach(this.realTimeStockMonitorObserver);
                 log.info("Start real time stock monitor and re-attach observer.");
+                log.info("Stop portfolio monitor.");
             }
             if(stockHistoryMonitor != null) {                
                 this.stockHistoryMonitor.attach(this.stockHistoryMonitorObserver);
@@ -710,9 +717,16 @@ public class MainFrame extends javax.swing.JFrame {
         }
         else if(pane.getSelectedComponent() == this.indicatorPanel) {
             if(realTimeStockMonitor != null) {                
-                this.realTimeStockMonitor.stop();
+
+                // Take note that we will not soft stop indicatorPanel itself, because
+                // we wish to get alert all the time, even we are not visually looking
+                // at that panel.
+                //
+                this.realTimeStockMonitor.softStop();
+                this.portfolioManagementJPanel.softStop();
                 this.realTimeStockMonitor.dettach(this.realTimeStockMonitorObserver);
                 log.info("Stop real time stock monitor and dettach observer.");
+                log.info("Stop portfolio monitor.");
             }
             if(stockHistoryMonitor != null) {                
                 // No stop. May be time consuming.
@@ -721,17 +735,34 @@ public class MainFrame extends javax.swing.JFrame {
                 log.info("Stop stock history monitor and dettach observer.");
             }                
         }
-        else {
-            if(realTimeStockMonitor != null) {                
-                this.realTimeStockMonitor.stop();
+        else if(pane.getSelectedComponent() == this.indicatorScannerJPanel) {
+            if(realTimeStockMonitor != null) {
+                this.realTimeStockMonitor.softStop();
+                this.portfolioManagementJPanel.softStop();
                 this.realTimeStockMonitor.dettach(this.realTimeStockMonitorObserver);
                 log.info("Stop real time stock monitor and dettach observer.");
+                log.info("Stop portfolio monitor.");
             }
-            if(stockHistoryMonitor != null) {                
+            if(stockHistoryMonitor != null) {  
+                /* We need chart history displaying feature, by using help from MainFrame. */
                 this.stockHistoryMonitor.attach(this.stockHistoryMonitorObserver);
                 log.info("Stock history monitor re-attach observer.");
             }             
         }
+        else if(pane.getSelectedComponent() == this.portfolioManagementJPanel) {
+            if(realTimeStockMonitor != null) {                
+                this.realTimeStockMonitor.softStop();
+                this.portfolioManagementJPanel.softStart();
+                this.realTimeStockMonitor.dettach(this.realTimeStockMonitorObserver);
+                log.info("Stop real time stock monitor and dettach observer.");
+                log.info("Start portfolio monitor.");
+            }
+            if(stockHistoryMonitor != null) {  
+                /* We need chart history displaying feature, by using help from MainFrame. */
+                this.stockHistoryMonitor.attach(this.stockHistoryMonitorObserver);
+                log.info("Stock history monitor re-attach observer.");
+            }             
+        }        
     }//GEN-LAST:event_jTabbedPane1StateChanged
 
 
@@ -768,6 +799,9 @@ public class MainFrame extends javax.swing.JFrame {
         
         log.info("saveIndicatorProjectManager...");
         this.indicatorPanel.saveIndicatorProjectManager();
+
+        log.info("savePortfolio...");
+        this.portfolioManagementJPanel.savePortfolio();
         
         //log.info("stockCodeAndSymbolDatabaseTask stop...");
         //stockCodeAndSymbolDatabaseTask._stop();
@@ -834,6 +868,7 @@ public class MainFrame extends javax.swing.JFrame {
 // TODO add your handling code here:
         this.jTable1.getSelectionModel().clearSelection();
         this.indicatorScannerJPanel.clearTableSelection();
+        this.portfolioManagementJPanel.clearTableSelection();
         updateBuyerSellerInformation(null);
     }//GEN-LAST:event_formMouseClicked
 
@@ -1343,8 +1378,26 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     private JPopupMenu getMyJTablePopupMenu() {
-        JPopupMenu popup = new JPopupMenu();
-        TableModel tableModel = jTable1.getModel();            
+        final JPopupMenu popup = new JPopupMenu();
+        final TableModel tableModel = jTable1.getModel();            
+        
+        if(jTable1.getSelectedRowCount() == 1) {
+            JMenuItem menuItem = new JMenuItem("New Transaction...", this.getImageIcon("/images/16x16/inbox.png"));
+
+            menuItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent evt) {
+                    final int row = jTable1.getSelectedRow();
+                    final int modelIndex = jTable1.getRowSorter().convertRowIndexToModel(row);
+                    final Stock stock = ((StockTableModel)tableModel).getStock(modelIndex);
+                    
+                    portfolioManagementJPanel.showNewTransactionJDialog(stock.getSymbol(), stock.getLastPrice(), false);
+                }
+            });  
+            
+            popup.add(menuItem);
+            
+            popup.addSeparator();
+        }
         
         javax.swing.JMenuItem menuItem = new JMenuItem("History...", this.getImageIcon("/images/16x16/strokedocker.png"));
         
@@ -1504,6 +1557,7 @@ public class MainFrame extends javax.swing.JFrame {
         realTimeStockMonitor.attach(this.realTimeStockMonitorObserver);
         
         this.indicatorScannerJPanel.initRealTimeStockMonitor(Collections.unmodifiableList(stockServerFactories));
+        this.portfolioManagementJPanel.initRealTimeStockMonitor(Collections.unmodifiableList(stockServerFactories));
     }
 
     private void initJStockOptions() {
