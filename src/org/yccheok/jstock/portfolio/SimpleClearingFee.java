@@ -31,6 +31,13 @@ public class SimpleClearingFee implements ClearingFee {
         this.rate = rate;
     }
 
+    public SimpleClearingFee(SimpleClearingFee simpleClearingFee) {
+        this.name = simpleClearingFee.getName();
+        this.maximumRate = simpleClearingFee.getMaximumRate();
+        this.minimumRate = simpleClearingFee.getMinimumRate();
+        this.rate = simpleClearingFee.getRate();
+    }
+    
     public double calculate(Contract contact) {
         final double result = contact.getTotal() * getRate();
         if(result < getMinimumRate()) return getMinimumRate();
@@ -63,5 +70,17 @@ public class SimpleClearingFee implements ClearingFee {
     @Override
     public String toString() {
         return name;
-    }    
+    }
+
+    public void setMaximumRate(double maximumRate) {
+        this.maximumRate = maximumRate;
+    }
+
+    public void setMinimumRate(double minimumRate) {
+        this.minimumRate = minimumRate;
+    }
+
+    public void setRate(double rate) {
+        this.rate = rate;
+    }
 }
