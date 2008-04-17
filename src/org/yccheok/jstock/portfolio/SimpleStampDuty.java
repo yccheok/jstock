@@ -30,7 +30,16 @@ public class SimpleStampDuty implements StampDuty {
         this.rate = rate;
     }
     
+    public SimpleStampDuty(SimpleStampDuty simpleStampDuty) {
+        this.name = simpleStampDuty.getName();
+        this.maximumRate = simpleStampDuty.getMaximumRate();
+        this.fraction = simpleStampDuty.getFraction();
+        this.rate = simpleStampDuty.getRate();
+    }
+    
     public double calculate(Contract contract) {
+        if(fraction <= 0.0) return 0.0;
+        
         int numOfFraction = (int)(contract.getTotal() / fraction);
         double remainder = contract.getTotal() - (numOfFraction * fraction);
         
@@ -69,5 +78,18 @@ public class SimpleStampDuty implements StampDuty {
     @Override
     public String toString() {
         return name;
-    }        
+    }
+
+    public void setMaximumRate(double maximumRate) {
+        this.maximumRate = maximumRate;
+    }
+
+
+    public void setFraction(double fraction) {
+        this.fraction = fraction;
+    }
+
+    public void setRate(double rate) {
+        this.rate = rate;
+    }
 }
