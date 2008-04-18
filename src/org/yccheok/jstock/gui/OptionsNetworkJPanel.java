@@ -196,7 +196,6 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
             org.yccheok.jstock.engine.Utils.setHttpClientProxyFromSystemProperties(httpClient);
             httpClient.executeMethod(method);
             final String responde = method.getResponseBodyAsString();   
-            System.out.println(responde);
             success = true;
         }
         catch(HttpException exp) {
@@ -276,12 +275,16 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
         
         jStockOptions.setProxyServer(jTextField1.getText());
         int port = -1;
-        try {
-            port = Integer.parseInt(jFormattedTextField1.getText());
+        
+        if(jFormattedTextField1.getText().length() > 0) {
+            try {
+                port = Integer.parseInt(jFormattedTextField1.getText());
+            }
+            catch(NumberFormatException exp) {
+                log.error("", exp);
+            }
         }
-        catch(NumberFormatException exp) {
-            log.error("", exp);
-        }
+        
         jStockOptions.setProxyPort(port);
         
         return true;
