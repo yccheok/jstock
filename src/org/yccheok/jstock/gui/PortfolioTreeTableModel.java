@@ -52,8 +52,8 @@ public class PortfolioTreeTableModel extends DefaultTreeTableModel {
         "Gain/Loss Value",
         "Gain/Loss %",
         "Broker", 
-        "Stamp Duty", 
-        "Clearing Fee", 
+        "Clearing Fee",        
+        "Stamp Duty",  
         "Net Purchase Value",
         "Net Gain/Loss Value",
         "Net Gain/Loss %"
