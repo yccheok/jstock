@@ -1404,24 +1404,6 @@ public class MainFrame extends javax.swing.JFrame {
         final JPopupMenu popup = new JPopupMenu();
         final TableModel tableModel = jTable1.getModel();            
         
-        if(jTable1.getSelectedRowCount() == 1) {
-            JMenuItem menuItem = new JMenuItem("New Transaction...", this.getImageIcon("/images/16x16/inbox.png"));
-
-            menuItem.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent evt) {
-                    final int row = jTable1.getSelectedRow();
-                    final int modelIndex = jTable1.getRowSorter().convertRowIndexToModel(row);
-                    final Stock stock = ((StockTableModel)tableModel).getStock(modelIndex);
-                    
-                    portfolioManagementJPanel.showNewTransactionJDialog(stock.getSymbol(), stock.getLastPrice(), false);
-                }
-            });  
-            
-            popup.add(menuItem);
-            
-            popup.addSeparator();
-        }
-        
         javax.swing.JMenuItem menuItem = new JMenuItem("History...", this.getImageIcon("/images/16x16/strokedocker.png"));
         
 	menuItem.addActionListener(new ActionListener() {
@@ -1450,6 +1432,24 @@ public class MainFrame extends javax.swing.JFrame {
 	});
             
 	popup.add(menuItem);
+                
+        popup.addSeparator();        
+        
+        if(jTable1.getSelectedRowCount() == 1) {
+            menuItem = new JMenuItem("New Transaction...", this.getImageIcon("/images/16x16/inbox.png"));
+
+            menuItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent evt) {
+                    final int row = jTable1.getSelectedRow();
+                    final int modelIndex = jTable1.getRowSorter().convertRowIndexToModel(row);
+                    final Stock stock = ((StockTableModel)tableModel).getStock(modelIndex);
+                    
+                    portfolioManagementJPanel.showNewTransactionJDialog(stock.getSymbol(), stock.getLastPrice(), false);
+                }
+            });  
+            
+            popup.add(menuItem);            
+        }
         
         return popup;
     }
