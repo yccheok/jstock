@@ -34,6 +34,7 @@ import javax.swing.filechooser.*;
 import org.yccheok.jstock.engine.*;
 import com.thoughtworks.xstream.*;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import org.apache.commons.net.TimeTCPClient;
 
@@ -47,6 +48,7 @@ import org.apache.poi.hssf.util.*;
 import javax.help.*;
 import javax.swing.*;
 import java.net.URL;
+import javax.imageio.ImageIO;
 
 /**
  *
@@ -80,6 +82,7 @@ public class MainFrame extends javax.swing.JFrame {
         this.initRealTimeStocks();
         this.initStockHistoryMonitor();
         //this.spawnTimeServerThread();
+        this.initBrokingFirmLogos();
     }
     
     /** This method is called from within the constructor to
@@ -676,7 +679,7 @@ public class MainFrame extends javax.swing.JFrame {
         }                       
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
-    class MyFilter extends javax.swing.filechooser.FileFilter {
+    private static class MyFilter extends javax.swing.filechooser.FileFilter {
         public boolean accept(File file) {
             if (file.isDirectory()) {
                 return true;
@@ -790,6 +793,9 @@ public class MainFrame extends javax.swing.JFrame {
 
         log.info("saveJStockOptions...");
         this.saveJStockOptions();
+        
+        log.info("saveBrokingFirmLogos...");
+        this.saveBrokingFirmLogos();
         
         log.info("saveRealTimeStocks...");
         this.saveRealTimeStocks();
@@ -1577,6 +1583,21 @@ public class MainFrame extends javax.swing.JFrame {
         this.portfolioManagementJPanel.initRealTimeStockMonitor(Collections.unmodifiableList(stockServerFactories));
     }
 
+    // Only call after initJStockOptions.
+    private void initBrokingFirmLogos() {
+        final int size = jStockOptions.getBrokingFirmSize();
+
+        for(int i=0; i<size; i++) {
+            try {
+                BufferedImage bufferedImage = ImageIO.read(new File("logos" + File.separator + i + ".png"));
+
+                jStockOptions.getBrokingFirm(i).setLogo(bufferedImage);
+            } catch (IOException exp) {
+                log.error("", exp);
+            }
+        }
+    }
+    
     private static void initJStockOptions() {
         try {
             File f = new File("config" + File.separator + "options.xml");
@@ -1689,6 +1710,36 @@ public class MainFrame extends javax.swing.JFrame {
         }
                       
         return true;        
+    }
+    
+    private boolean saveBrokingFirmLogos() {
+        if(Utils.createDirectoryIfDoesNotExist("logos") == false)
+        {
+            return false;
+        }
+        
+        if(Utils.deleteDir(new File("logos"), false) == false) {
+            return false;
+        }
+        
+        final int size = MainFrame.jStockOptions.getBrokingFirmSize();
+
+        for(int i=0; i<size; i++) {
+            final Image image = jStockOptions.getBrokingFirm(i).getLogo();
+            
+            if(image == null) continue;
+            
+            File f = new File("logos" + File.separator + i + ".png");
+                       
+            try {
+                ImageIO.write(Utils.toBufferedImage(image), "png", f);
+            }
+            catch(java.io.IOException exp) {
+                log.error("", exp);
+            }
+        }
+        
+        return true;
     }
     
     private boolean saveJStockOptions() {
