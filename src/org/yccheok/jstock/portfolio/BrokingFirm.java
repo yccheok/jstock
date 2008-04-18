@@ -170,5 +170,20 @@ public class BrokingFirm {
     
     public double stampDutyCalculate(Contract contract) {
         return this.stampDuty.calculate(contract);
-    }     
+    } 
+    
+    public Broker getBroker() {
+        SimpleBroker simpleBroker = new SimpleBroker((SimpleBroker)broker);
+        return simpleBroker;
+    }
+    
+    public StampDuty getStampDuty() {
+        SimpleStampDuty simpleStampDuty = new SimpleStampDuty((SimpleStampDuty)stampDuty);
+        return simpleStampDuty;
+    }
+    
+    public ClearingFee getClearingFee() {
+        SimpleClearingFee simpleClearingFee = new SimpleClearingFee((SimpleClearingFee)clearingFee);
+        return simpleClearingFee;
+    }
 }
