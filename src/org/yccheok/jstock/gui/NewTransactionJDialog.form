@@ -222,7 +222,6 @@
         </Component>
         <Component class="javax.swing.JFormattedTextField" name="jFormattedTextField3">
           <Properties>
-            <Property name="editable" type="boolean" value="false"/>
             <Property name="value" type="java.lang.Object" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="new Double(0.0)" type="code"/>
             </Property>
@@ -236,7 +235,6 @@
         </Component>
         <Component class="javax.swing.JFormattedTextField" name="jFormattedTextField4">
           <Properties>
-            <Property name="editable" type="boolean" value="false"/>
             <Property name="value" type="java.lang.Object" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="new Double(0.0)" type="code"/>
             </Property>
@@ -250,7 +248,6 @@
         </Component>
         <Component class="javax.swing.JFormattedTextField" name="jFormattedTextField5">
           <Properties>
-            <Property name="editable" type="boolean" value="false"/>
             <Property name="value" type="java.lang.Object" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="new Double(0.0)" type="code"/>
             </Property>
@@ -306,12 +303,12 @@
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel8">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Stamp Duty"/>
+            <Property name="text" type="java.lang.String" value="Clearing Fee"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel9">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Clearing Fee"/>
+            <Property name="text" type="java.lang.String" value="Stamp Duty"/>
           </Properties>
         </Component>
       </SubComponents>

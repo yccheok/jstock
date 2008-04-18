@@ -34,8 +34,10 @@ import net.sf.nachocalendar.CalendarFactory;
 import net.sf.nachocalendar.components.DateField;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.yccheok.jstock.engine.SimpleDate;
 import org.yccheok.jstock.engine.StockCodeAndSymbolDatabase;
 import org.yccheok.jstock.portfolio.Broker;
+import org.yccheok.jstock.portfolio.BrokingFirm;
 import org.yccheok.jstock.portfolio.ClearingFee;
 import org.yccheok.jstock.portfolio.Contract;
 import org.yccheok.jstock.portfolio.SimpleBroker;
@@ -53,6 +55,21 @@ public class NewTransactionJDialog extends javax.swing.JDialog {
     public NewTransactionJDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        
+        if(shouldAutoCalculateBrokerFee())
+        {
+            this.jFormattedTextField3.setEditable(false);
+            this.jFormattedTextField4.setEditable(false);
+            this.jFormattedTextField5.setEditable(false);
+        }
+    }
+    
+    private boolean shouldAutoCalculateBrokerFee() {
+        final JStockOptions jStockOptions = MainFrame.getJStockOptions();
+        
+        return 
+                (jStockOptions.isAutoBrokerFeeCalculationEnabled()) && 
+                (jStockOptions.getSelectedBrokingFirm() != null);
     }
     
     /** This method is called from within the constructor to
@@ -127,7 +144,6 @@ public class NewTransactionJDialog extends javax.swing.JDialog {
         jFormattedTextField2.setEditable(false);
         jFormattedTextField2.setValue(new Double(0.0));
 
-        jFormattedTextField3.setEditable(false);
         jFormattedTextField3.setValue(new Double(0.0));
         jFormattedTextField3.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
@@ -135,7 +151,6 @@ public class NewTransactionJDialog extends javax.swing.JDialog {
             }
         });
 
-        jFormattedTextField4.setEditable(false);
         jFormattedTextField4.setValue(new Double(0.0));
         jFormattedTextField4.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
@@ -143,7 +158,6 @@ public class NewTransactionJDialog extends javax.swing.JDialog {
             }
         });
 
-        jFormattedTextField5.setEditable(false);
         jFormattedTextField5.setValue(new Double(0.0));
         jFormattedTextField5.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
@@ -166,9 +180,9 @@ public class NewTransactionJDialog extends javax.swing.JDialog {
 
         jLabel7.setText("Broker");
 
-        jLabel8.setText("Stamp Duty");
+        jLabel8.setText("Clearing Fee");
 
-        jLabel9.setText("Clearing Fee");
+        jLabel9.setText("Stamp Duty");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -326,10 +340,22 @@ public class NewTransactionJDialog extends javax.swing.JDialog {
             Contract.Type.Buy, 
             ((java.lang.Integer)this.jSpinner1.getValue()), 
             (Double)this.jFormattedTextField1.getValue());
-         
-        Broker broker = new SimpleBroker("SimpleBroker", 0, 0, 0);                
-        StampDuty stampDuty = new SimpleStampDuty("SimpleStampDuty", 0, 0, 0);               
-        ClearingFee clearingFee = new SimpleClearingFee("SimpleClearingfee", 0, 0, 0);
+        
+        Broker broker = null;
+        StampDuty stampDuty = null;
+        ClearingFee clearingFee = null;
+        
+        if(this.shouldAutoCalculateBrokerFee()) {
+            final BrokingFirm brokingFirm = MainFrame.getJStockOptions().getSelectedBrokingFirm();
+            broker = brokingFirm.getBroker();
+            stampDuty = brokingFirm.getStampDuty();
+            clearingFee = brokingFirm.getClearingFee();
+        }
+        else {
+            broker = new SimpleBroker("SimpleBroker", 0, 0, 0);                
+            stampDuty = new SimpleStampDuty("SimpleStampDuty", 0, 0, 0);               
+            clearingFee = new SimpleClearingFee("SimpleClearingfee", 0, 0, 0);
+        }
         
         Transaction t = new Transaction(contract, broker, stampDuty, clearingFee);
 
@@ -388,13 +414,40 @@ public class NewTransactionJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void update() {
-        SwingUtilities.invokeLater(new Runnable() { public void run() {
-            final int unit = (Integer)jSpinner1.getValue();
-            final double price = (Double)jFormattedTextField1.getValue();
-            jFormattedTextField2.setValue(price * (double)unit);                
-            jFormattedTextField6.setValue(price * (double)unit);
-        }});
-
+        
+        if(shouldAutoCalculateBrokerFee())
+        {
+            final BrokingFirm brokingFirm = MainFrame.getJStockOptions().getSelectedBrokingFirm();
+            
+            SwingUtilities.invokeLater(new Runnable() { public void run() {
+                final String name = jTextField1.getText();
+                final int unit = (Integer)jSpinner1.getValue();
+                final double price = (Double)jFormattedTextField1.getValue();
+                final DateField dateField = (DateField)jPanel3;
+                final Date date = (Date)dateField.getValue();
+                // Stock and date information is not important at this moment.
+                final Contract contract = new Contract(Utils.getEmptyStock(name, name), new SimpleDate(date), Contract.Type.Buy, unit, price);
+                final double brokerFee = brokingFirm.brokerCalculate(contract);
+                final double clearingFee = brokingFirm.clearingFeeCalculate(contract);
+                final double stampDuty = brokingFirm.stampDutyCalculate(contract);
+                jFormattedTextField3.setValue(brokerFee);
+                jFormattedTextField4.setValue(clearingFee);
+                jFormattedTextField5.setValue(stampDuty);
+                jFormattedTextField2.setValue(price * (double)unit);                
+                jFormattedTextField6.setValue(price * (double)unit + brokerFee + clearingFee + stampDuty);                
+            }});
+        }
+        else {
+            SwingUtilities.invokeLater(new Runnable() { public void run() {
+                final int unit = (Integer)jSpinner1.getValue();
+                final double price = (Double)jFormattedTextField1.getValue();
+                final double brokerFee = (Double)jFormattedTextField3.getValue();
+                final double clearingFee = (Double)jFormattedTextField4.getValue();
+                final double stampDuty = (Double)jFormattedTextField5.getValue();
+                jFormattedTextField2.setValue(price * (double)unit);                
+                jFormattedTextField6.setValue(price * (double)unit + brokerFee + clearingFee + stampDuty);
+            }});            
+        }
     }
     
     private void jSpinner1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinner1StateChanged
