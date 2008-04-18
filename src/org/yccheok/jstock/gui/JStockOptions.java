@@ -23,6 +23,9 @@
 package org.yccheok.jstock.gui;
 
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.List;
+import org.yccheok.jstock.portfolio.BrokingFirm;
 
 /**
  *
@@ -86,6 +89,58 @@ public class JStockOptions {
     private Color autoUpdateForegroundColor;
     private Color autoUpdateBackgroundColor;
     private boolean enableColorChange;
+    
+    private List<BrokingFirm> brokingFirms = new ArrayList<BrokingFirm>();
+    private int selectedBrokingFirmIndex = -1;
+    private boolean isAutoBrokerFeeCalculationEnabled = false;
+    
+    public boolean isAutoBrokerFeeCalculationEnabled() {
+        return this.isAutoBrokerFeeCalculationEnabled;
+    }
+    
+    public void setAutoBrokerFeeCalculationEnabled(boolean isAutoBrokerFeeCalculationEnabled) {
+        this.isAutoBrokerFeeCalculationEnabled = isAutoBrokerFeeCalculationEnabled;
+    }
+    
+    private Object readResolve() {
+        /* For backward compatible */
+        if(brokingFirms == null) {
+            brokingFirms = new ArrayList<BrokingFirm>();
+        }
+        
+        return this;
+    }    
+    
+    public int getBrokingFirmSize() {        
+        return brokingFirms.size();
+    }
+    
+    public BrokingFirm getBrokingFirm(int index) {
+        return brokingFirms.get(index);
+    }
+    
+    public int getSelectedBrokingFirmIndex() {
+        return selectedBrokingFirmIndex;
+    }
+    
+    public void setSelectedBrokingFirmIndex(int selectedBrokingFirmIndex) {
+        this.selectedBrokingFirmIndex = selectedBrokingFirmIndex;
+    }
+    
+    public void clearBrokingFirms() {
+        this.brokingFirms.clear();
+    }
+    
+    public void addBrokingFirm(BrokingFirm brokingFirm) {
+        this.brokingFirms.add(brokingFirm);
+    }
+    
+    public BrokingFirm getSelectedBrokingFirm() {
+        if((this.selectedBrokingFirmIndex < 0) || (this.selectedBrokingFirmIndex >= this.getBrokingFirmSize()))
+            return null;
+        
+        return this.brokingFirms.get(this.selectedBrokingFirmIndex);
+    }
     
     public String getLooknFeel() {
         return looknFeel;
