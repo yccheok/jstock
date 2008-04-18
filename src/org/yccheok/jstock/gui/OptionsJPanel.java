@@ -112,15 +112,20 @@ public class OptionsJPanel extends javax.swing.JPanel implements JStockOptionsOb
         optionsNetworkJPanel = new OptionsNetworkJPanel();
         optionsSpeedJPanel = new OptionsSpeedJPanel();
         optionsColorJPanel = new OptionsColorJPanel();
+        optionsBrokerJPanel = new OptionsBrokerJPanel();
         
+        // The size of OptionsJPanel, will be determined by the first added panel.
+        addButton("Broker", "/images/32x32/calc.png", optionsBrokerJPanel, jButtonBar1, buttonGroup1);
         addButton("Color", "/images/32x32/colors.png", optionsColorJPanel, jButtonBar1, buttonGroup1);        
         addButton("Alert", "/images/32x32/bell.png", optionsAlertJPanel, jButtonBar1, buttonGroup1);
         addButton("Password", "/images/32x32/unlock.png", optionsPasswordJPanel, jButtonBar1, buttonGroup1);
         addButton("Network", "/images/32x32/connect_to_network.png", optionsNetworkJPanel, jButtonBar1, buttonGroup1);
         addButton("Speed", "/images/32x32/clock.png", optionsSpeedJPanel, jButtonBar1, buttonGroup1);
+        
     }
 
     public void set(JStockOptions jStockOptions) {
+        optionsBrokerJPanel.set(jStockOptions);
         optionsColorJPanel.set(jStockOptions);
         optionsAlertJPanel.set(jStockOptions);
         optionsNetworkJPanel.set(jStockOptions);
@@ -130,6 +135,15 @@ public class OptionsJPanel extends javax.swing.JPanel implements JStockOptionsOb
 
     public boolean apply(JStockOptions jStockOptions) {
         /* FIXME : We should make use of JStockOptionsObserver interface. */
+        if(optionsBrokerJPanel.apply(jStockOptions) == false)
+        {
+            final JToggleButton button = map.get("Broker");
+            
+            button.setSelected(true);
+            button.doClick();
+            return false;
+        }
+        
         if(optionsColorJPanel.apply(jStockOptions) == false)
         {
             final JToggleButton button = map.get("Color");
@@ -184,6 +198,7 @@ public class OptionsJPanel extends javax.swing.JPanel implements JStockOptionsOb
     private OptionsPasswordJPanel optionsPasswordJPanel;
     private OptionsSpeedJPanel optionsSpeedJPanel;
     private OptionsColorJPanel optionsColorJPanel;
+    private OptionsBrokerJPanel optionsBrokerJPanel;
     
     private java.util.Map<String, JToggleButton> map = new java.util.HashMap<String, JToggleButton>();
     
