@@ -47,7 +47,10 @@ public class Utils {
     public Utils() {
     }
     
-    public static java.awt.Image getScaledImage(Image image, int maxWidth, int maxHeight) {        
+    public static java.awt.Image getScaledImage(Image image, int maxWidth, int maxHeight) {
+        // This code ensures that all the pixels in the image are loaded
+        image = new ImageIcon(image).getImage();
+        
         final int imgWidth = image.getWidth(null);
         final int imgHeight = image.getHeight(null);
                         
