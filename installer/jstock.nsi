@@ -45,6 +45,7 @@ RMDir /r $INSTDIR\indicator
 RMDir /r $INSTDIR\config
 RMDir /r $INSTDIR\lib
 RMDir /r $INSTDIR\history
+RMDir /r $INSTDIR\logos
 Delete $INSTDIR\chart.ico
 Delete $INSTDIR\jstock.jar
 Delete $INSTDIR\Uninstall.exe
