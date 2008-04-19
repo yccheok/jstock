@@ -39,7 +39,7 @@ public class SimpleClearingFee implements ClearingFee {
     }
     
     public double calculate(Contract contact) {
-        final double result = contact.getTotal() * getRate();
+        final double result = contact.getTotal() * getRate() / 100.0;
         if(result < getMinimumRate()) return getMinimumRate();
         if(result > getMaximumRate()) return getMaximumRate();
         
