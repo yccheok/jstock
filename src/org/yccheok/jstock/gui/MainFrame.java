@@ -1421,18 +1421,6 @@ public class MainFrame extends javax.swing.JFrame {
                 
 	popup.add(menuItem);
         
-        popup.addSeparator();
-        
-        menuItem = new JMenuItem("Delete", this.getImageIcon("/images/16x16/button_cancel.png"));
-        
-	menuItem.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent evt) {
-                    MainFrame.this.deteleSelectedTableRow();
-                }
-	});
-            
-	popup.add(menuItem);
-                
         popup.addSeparator();        
         
         if(jTable1.getSelectedRowCount() == 1) {
@@ -1450,6 +1438,18 @@ public class MainFrame extends javax.swing.JFrame {
             
             popup.add(menuItem);            
         }
+        
+        popup.addSeparator();
+        
+        menuItem = new JMenuItem("Delete", this.getImageIcon("/images/16x16/button_cancel.png"));
+        
+	menuItem.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent evt) {
+                    MainFrame.this.deteleSelectedTableRow();
+                }
+	});
+            
+	popup.add(menuItem);                
         
         return popup;
     }
