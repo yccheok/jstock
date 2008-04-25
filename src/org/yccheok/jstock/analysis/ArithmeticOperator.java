@@ -136,8 +136,9 @@ public class ArithmeticOperator extends AbstractOperator {
             BigDecimal result = null;
             
             final double d1Value = d1.doubleValue();
-            if(d1Value != 0.0)
-                result = d0.divide(d1);
+            if(d1Value != 0.0) {
+                result = d0.divide(d1, MathContext.DECIMAL64);
+            }
             return result.doubleValue();
         }
         catch(NumberFormatException exp) {
