@@ -436,6 +436,16 @@ public class PortfolioTreeTableModel extends DefaultTreeTableModel {
 	return null; 
     }
 
+    // Please take note that, after we edit with newTransaction, the resultant
+    // transaction will not equal to newTransaction. We just copy it by value.
+    //
+    public void editTransaction(Transaction newTransaction, Transaction oldTransaction) {
+        oldTransaction.copyFrom(newTransaction);
+        fireTreeTableNodeChanged(oldTransaction);
+        fireTreeTableNodeChanged(oldTransaction.getParent());
+        fireTreeTableNodeChanged(getRoot());
+    }
+    
     public void addTransaction(Transaction transaction) {
         final Portfolio portfolio = (Portfolio)this.getRoot();
         
