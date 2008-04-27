@@ -21,10 +21,14 @@ import org.yccheok.jstock.portfolio.TransactionSummary;
 public class PortfolioChartJDialog extends javax.swing.JDialog {
     
     private static final String[] cNames = {
-        "Net Gain/Loss %",
-        "Gain/Loss %",
-        "Net Gain/Loss Value",
-        "Gain/Loss Value",
+        "Net Gain %",
+        "Net Loss %",
+        "Gain %",
+        "Loss %",
+        "Net Gain Value",
+        "Net Loss Value",
+        "Gain Value",
+        "Loss Value",
         "Net Purchase Value",
         "Purchase Value", 
         "Current Value",
@@ -102,43 +106,55 @@ public class PortfolioChartJDialog extends javax.swing.JDialog {
             if(name.equals(cNames[0])) {
                 data.setValue(symbol, portfolioTreeTableModel.getNetGainLossPercentage(transactionSummary));
             }
-            else if(name.equals(cNames[1])) {
+            if(name.equals(cNames[1])) {
+                data.setValue(symbol, -portfolioTreeTableModel.getNetGainLossPercentage(transactionSummary));
+            }            
+            else if(name.equals(cNames[2])) {
                 data.setValue(symbol, portfolioTreeTableModel.getGainLossPercentage(transactionSummary));                
             }
-            else if(name.equals(cNames[2])) {
+            else if(name.equals(cNames[3])) {
+                data.setValue(symbol, -portfolioTreeTableModel.getGainLossPercentage(transactionSummary));                
+            }            
+            else if(name.equals(cNames[4])) {
                 data.setValue(symbol, portfolioTreeTableModel.getNetGainLossValue(transactionSummary));                
             }
-            else if(name.equals(cNames[3])) {
-                data.setValue(symbol, portfolioTreeTableModel.getGainLossValue(transactionSummary));                
-            }
-            else if(name.equals(cNames[4])) {
-                data.setValue(symbol, transactionSummary.getNetTotal());                
-            }
             else if(name.equals(cNames[5])) {
-                data.setValue(symbol, transactionSummary.getTotal());                
+                data.setValue(symbol, -portfolioTreeTableModel.getNetGainLossValue(transactionSummary));                
             }
             else if(name.equals(cNames[6])) {
-                data.setValue(symbol, portfolioTreeTableModel.getCurrentValue(transactionSummary));                
+                data.setValue(symbol, portfolioTreeTableModel.getGainLossValue(transactionSummary));                
             }
             else if(name.equals(cNames[7])) {
-                data.setValue(symbol, portfolioTreeTableModel.getGainLossPrice(transactionSummary));                
-            }
+                data.setValue(symbol, -portfolioTreeTableModel.getGainLossValue(transactionSummary));                
+            }            
             else if(name.equals(cNames[8])) {
-                data.setValue(symbol, portfolioTreeTableModel.getPurchasePrice(transactionSummary));                
+                data.setValue(symbol, transactionSummary.getNetTotal());                
             }
             else if(name.equals(cNames[9])) {
-                data.setValue(symbol, portfolioTreeTableModel.getCurrentPrice(transactionSummary));                
+                data.setValue(symbol, transactionSummary.getTotal());                
             }
             else if(name.equals(cNames[10])) {
-                data.setValue(symbol, transactionSummary.getQuantity());                
+                data.setValue(symbol, portfolioTreeTableModel.getCurrentValue(transactionSummary));                
             }
             else if(name.equals(cNames[11])) {
-                data.setValue(symbol, transactionSummary.getCalculatedBroker());                
+                data.setValue(symbol, portfolioTreeTableModel.getGainLossPrice(transactionSummary));                
             }
             else if(name.equals(cNames[12])) {
-                data.setValue(symbol, transactionSummary.getCalculatedStampDuty());                
+                data.setValue(symbol, portfolioTreeTableModel.getPurchasePrice(transactionSummary));                
             }
             else if(name.equals(cNames[13])) {
+                data.setValue(symbol, portfolioTreeTableModel.getCurrentPrice(transactionSummary));                
+            }
+            else if(name.equals(cNames[14])) {
+                data.setValue(symbol, transactionSummary.getQuantity());                
+            }
+            else if(name.equals(cNames[15])) {
+                data.setValue(symbol, transactionSummary.getCalculatedBroker());                
+            }
+            else if(name.equals(cNames[16])) {
+                data.setValue(symbol, transactionSummary.getCalculatedStampDuty());                
+            }
+            else if(name.equals(cNames[17])) {
                 data.setValue(symbol, transactionSummary.getCalculatdClearingFee());                
             }
             
