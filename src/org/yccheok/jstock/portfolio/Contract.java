@@ -67,6 +67,15 @@ public class Contract {
         this.total = price * quantity;
     }
     
+    public Contract(Contract contract) {
+        stock = new Stock(contract.stock);
+        date = new SimpleDate(contract.date);
+        type = contract.type;
+        quantity = contract.quantity;
+        price = contract.price;
+        total = contract.total;
+    }
+    
     private Stock stock;
     private SimpleDate date;
     private Type type;
