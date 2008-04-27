@@ -53,6 +53,17 @@ public class Transaction extends DefaultMutableTreeTableNode {
     private double calculatdClearingFee;
     private double netTotal;
     
+    public void copyFrom(Transaction transaction) {
+        contract = new Contract(transaction.contract);
+        broker = new SimpleBroker((SimpleBroker)transaction.broker);
+        stampDuty = new SimpleStampDuty((SimpleStampDuty)transaction.stampDuty);
+        clearingFee = new SimpleClearingFee((SimpleClearingFee)transaction.clearingFee);
+        this.calculatedBroker = transaction.calculatedBroker;
+        this.calculatedStampDuty = transaction.calculatedStampDuty;
+        this.calculatdClearingFee = transaction.calculatdClearingFee;
+        this.netTotal = transaction.netTotal;
+    }
+    
     public Contract getContract() {
         return contract;
     }
