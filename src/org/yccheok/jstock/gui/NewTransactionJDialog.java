@@ -321,6 +321,28 @@ public class NewTransactionJDialog extends javax.swing.JDialog {
         this.dispose();
     }//GEN-LAST:event_jButton2ActionPerformed
 
+    public void setTransaction(Transaction transaction) {
+        final String symbol = transaction.getContract().getStock().getSymbol();
+        final Date date = transaction.getContract().getDate().getCalendar().getTime();
+        final int quantity = transaction.getContract().getQuantity();
+        final double price = transaction.getContract().getPrice();
+        final double value = transaction.getTotal();
+        final double brokerFee = transaction.getCalculatedBroker();
+        final double clearingFee = transaction.getCalculatdClearingFee();
+        final double stampDuty = transaction.getCalculatedStampDuty();
+        final double netValue = transaction.getNetTotal();
+        
+        this.jTextField1.setText(symbol);
+        ((DateField)jPanel3).setValue(date);
+        this.jSpinner1.setValue(quantity);
+        this.jFormattedTextField1.setValue(price);
+        this.jFormattedTextField2.setValue(value);
+        this.jFormattedTextField3.setValue(brokerFee);
+        this.jFormattedTextField4.setValue(clearingFee);
+        this.jFormattedTextField5.setValue(stampDuty);
+        this.jFormattedTextField6.setValue(netValue);
+    }
+    
     private Transaction generateTransaction() {
         MainFrame m = (MainFrame)NewTransactionJDialog.this.getParent();
                         
@@ -331,7 +353,7 @@ public class NewTransactionJDialog extends javax.swing.JDialog {
         final String symbol = jTextField1.getText();
         final String code = stockCodeAndSymbolDatabase.symbolToCode(symbol);
         final DateField dateField = (DateField)jPanel3;
-        
+                
         Date date = (Date)dateField.getValue();
         
         Contract contract = new Contract(
@@ -352,9 +374,14 @@ public class NewTransactionJDialog extends javax.swing.JDialog {
             clearingFee = brokingFirm.getClearingFee();
         }
         else {
-            broker = new SimpleBroker("SimpleBroker", 0, 0, 0);                
-            stampDuty = new SimpleStampDuty("SimpleStampDuty", 0, 0, 0);               
-            clearingFee = new SimpleClearingFee("SimpleClearingfee", 0, 0, 0);
+            final double brokerFeeValue = (Double)this.jFormattedTextField3.getValue();
+            final double clearingFeeValue = (Double)this.jFormattedTextField4.getValue();
+            final double stampDutyValue = (Double)jFormattedTextField5.getValue();
+            
+            broker = new SimpleBroker("SimpleBroker", Double.MAX_VALUE, brokerFeeValue, 0);
+            /* We are limit to ourselves, that the fraction calculation, is based on contract's total. */
+            stampDuty = new SimpleStampDuty("SimpleStampDuty", Double.MAX_VALUE, contract.getTotal(), stampDutyValue);
+            clearingFee = new SimpleClearingFee("SimpleClearingfee", Double.MAX_VALUE, clearingFeeValue, 0);
         }
         
         Transaction t = new Transaction(contract, broker, stampDuty, clearingFee);
@@ -495,6 +522,10 @@ public class NewTransactionJDialog extends javax.swing.JDialog {
     
     public void setStockSymbol(String name) {
         this.jTextField1.setText(name);
+    }
+    
+    public void setStockSelectionEnabled(boolean flag) {
+        jComboBox1.setEnabled(flag);
     }
     
     public void setStockCodeAndSymbolDatabase(StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase) {
