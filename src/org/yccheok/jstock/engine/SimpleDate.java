@@ -53,6 +53,12 @@ public class SimpleDate implements java.lang.Comparable<SimpleDate> {
         this.date = container.get(Calendar.DATE);
     }
     
+    public SimpleDate(SimpleDate simpleDate) {
+        this.year = simpleDate.year;
+        this.month = simpleDate.month;
+        this.date = simpleDate.date;
+    }
+    
     public int hashCode() {
         int result = 37;
         result = 37 * result + year;
