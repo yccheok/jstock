@@ -170,6 +170,22 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         return 0.0;
     }
     
+    private void showEditTransactionJDialog(Transaction transaction) {
+        final MainFrame mainFrame = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, PortfolioManagementJPanel.this);
+
+        NewTransactionJDialog newTransactionJDialog = new NewTransactionJDialog(mainFrame, true);
+        newTransactionJDialog.setStockSelectionEnabled(false);
+        newTransactionJDialog.setTransaction(transaction);
+        newTransactionJDialog.setTitle("Edit " + transaction.getContract().getStock().getSymbol() + " Transaction");
+        newTransactionJDialog.setLocationRelativeTo(this);
+        newTransactionJDialog.setVisible(true);
+        
+        final Transaction newTransaction = newTransactionJDialog.getTransaction();
+        if(newTransaction != null) {
+            this.editTransaction(newTransaction, transaction);
+        }        
+    }
+    
     public void showNewTransactionJDialog(String stockSymbol, double lastPrice, boolean JComboBoxEnabled) {
 
         final MainFrame mainFrame = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, PortfolioManagementJPanel.this);
@@ -228,6 +244,22 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         deteleSelectedTreeTableRow();
     }//GEN-LAST:event_jButton2ActionPerformed
     
+    // Will return null, if more than one transaction being selected, or no
+    // transaction being selected.
+    private Transaction getSelectedTransaction() {
+        if(treeTable.getSelectedRowCount() != 1) return null;
+        
+        final TreePath[] treePaths = treeTable.getTreeSelectionModel().getSelectionPaths();
+        
+        final Object o = treePaths[0].getLastPathComponent();
+
+        if (o instanceof Transaction) {
+            return (Transaction)o;
+        }
+        
+        return null;        
+    }
+    
     private boolean isOnlyTreeTableRootBeingSelected() {
         if(treeTable.getSelectedRowCount() != 1) return false;
         
@@ -243,6 +275,12 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private class TableRowPopupListener extends MouseAdapter {
         
         public void mouseClicked(MouseEvent evt) {
+            if(evt.getClickCount() == 2) {
+                final Transaction transaction = getSelectedTransaction();
+                if(transaction != null) {
+                    PortfolioManagementJPanel.this.showEditTransactionJDialog(transaction);
+                }
+            }
         }
         
         public void mousePressed(MouseEvent e) {
@@ -286,6 +324,21 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         popup.add(menuItem);
 
         popup.addSeparator();
+        
+        final Transaction transaction = getSelectedTransaction();
+        if(transaction != null) {
+            menuItem = new JMenuItem("Edit Transaction...", this.getImageIcon("/images/16x16/edit.png"));
+            
+            menuItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent evt) {
+                    PortfolioManagementJPanel.this.showEditTransactionJDialog(transaction);
+                }
+            });            
+            
+            popup.add(menuItem);
+            
+            popup.addSeparator();    
+        }       
         
         menuItem = new JMenuItem("Portfolio Chart...", this.getImageIcon("/images/16x16/chart.png"));
         
@@ -342,6 +395,11 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         this.jScrollPane1.setViewportView(treeTable);        
     }
 
+    private void editTransaction(Transaction newTransaction, Transaction oldTransaction) {
+        final PortfolioTreeTableModel portfolioTreeTableModel = (PortfolioTreeTableModel)treeTable.getTreeTableModel();
+        portfolioTreeTableModel.editTransaction(newTransaction, oldTransaction);        
+    }
+    
     private void addTransaction(Transaction transaction) {
         final PortfolioTreeTableModel portfolioTreeTableModel = (PortfolioTreeTableModel)treeTable.getTreeTableModel();
         portfolioTreeTableModel.addTransaction(transaction);
