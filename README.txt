@@ -79,3 +79,15 @@ version 0.9.6
 version 0.9.7
 =============
 1. Support auto broker fee, stamp duty, clearing fee calculation.
+
+
+=============
+version 0.9.8
+=============
+1. Bug fixed when having non-terminating division result : 1/3
+
+2. Enable user to edit a transaction.
+
+3. Bug fixed when having manual broker fee/ stamp duty/ clearing fee calculation.
+
+4. Bug fixed. Have a workaround, to enable pie-chart able to display loss (-ve) value.
