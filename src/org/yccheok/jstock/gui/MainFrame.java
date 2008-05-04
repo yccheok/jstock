@@ -1437,9 +1437,9 @@ public class MainFrame extends javax.swing.JFrame {
             });  
             
             popup.add(menuItem);            
-        }
-        
-        popup.addSeparator();
+            
+            popup.addSeparator();
+        }                
         
         menuItem = new JMenuItem("Delete", this.getImageIcon("/images/16x16/button_cancel.png"));
         
