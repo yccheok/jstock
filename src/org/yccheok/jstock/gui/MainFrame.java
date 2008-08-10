@@ -2105,8 +2105,8 @@ public class MainFrame extends javax.swing.JFrame {
     private String username;
     private String password;
     
-    private static java.awt.Color higherColor = new java.awt.Color(50, 150, 0);
-    private static java.awt.Color lowerColor = new java.awt.Color(200, 0, 50);  
+    private static final java.awt.Color higherColor = new java.awt.Color(50, 150, 0);
+    private static final java.awt.Color lowerColor = new java.awt.Color(200, 0, 50);  
     
     private IndicatorPanel indicatorPanel;
     private IndicatorScannerJPanel indicatorScannerJPanel;
