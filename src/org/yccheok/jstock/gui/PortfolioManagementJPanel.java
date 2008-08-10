@@ -21,6 +21,7 @@
 package org.yccheok.jstock.gui;
 
 import com.thoughtworks.xstream.XStream;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -67,7 +68,12 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
+        jPanel3 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jSplitPane1 = new javax.swing.JSplitPane();
         jScrollPane1 = new javax.swing.JScrollPane();
+        jScrollPane2 = new javax.swing.JScrollPane();
         jPanel2 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
@@ -75,8 +81,27 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         setLayout(new java.awt.BorderLayout());
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Portfolio Management"));
-        jPanel1.setLayout(new java.awt.BorderLayout());
-        jPanel1.add(jScrollPane1, java.awt.BorderLayout.CENTER);
+        jPanel1.setLayout(new java.awt.BorderLayout(0, 5));
+
+        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jLabel1.setText("Net Worth (RM): ");
+        jPanel3.add(jLabel1);
+
+        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jPanel3.add(jLabel2);
+
+        jPanel1.add(jPanel3, java.awt.BorderLayout.NORTH);
+
+        jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+
+        jScrollPane1.setBorder(javax.swing.BorderFactory.createTitledBorder("Buy Record"));
+        jSplitPane1.setLeftComponent(jScrollPane1);
+
+        jScrollPane2.setBorder(javax.swing.BorderFactory.createTitledBorder("Sell Record"));
+        jSplitPane1.setRightComponent(jScrollPane2);
+
+        jPanel1.add(jSplitPane1, java.awt.BorderLayout.CENTER);
 
         add(jPanel1, java.awt.BorderLayout.CENTER);
 
@@ -148,7 +173,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     
     private double getSelectedStockLastPriceForNewTransactionJDialog() {
         final TreePath[] treePaths = treeTable.getTreeSelectionModel().getSelectionPaths();
-        final PortfolioTreeTableModel portfolioTreeTableModel = (PortfolioTreeTableModel)treeTable.getTreeTableModel();
+        final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)treeTable.getTreeTableModel();
         
         if(treePaths == null) return 0.0;
         
@@ -217,7 +242,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
     
     private void deteleSelectedTreeTableRow() {
-        final PortfolioTreeTableModel portfolioTreeTableModel = (PortfolioTreeTableModel)treeTable.getTreeTableModel();
+        final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)treeTable.getTreeTableModel();
         final TreePath[] treePaths = treeTable.getTreeSelectionModel().getSelectionPaths();
         for(TreePath treePath : treePaths) {
             final Object o = treePath.getLastPathComponent();
@@ -267,7 +292,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         
         final Object o = treePaths[0].getLastPathComponent();
 
-        final PortfolioTreeTableModel portfolioTreeTableModel = (PortfolioTreeTableModel)treeTable.getTreeTableModel();
+        final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)treeTable.getTreeTableModel();
         
         return (portfolioTreeTableModel.getRoot() == o);
     }
@@ -305,7 +330,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     
     private void showPortfolioChartJDialog() {
         final MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, this);
-        final PortfolioTreeTableModel portfolioTreeTableModel = (PortfolioTreeTableModel)treeTable.getTreeTableModel();
+        final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)treeTable.getTreeTableModel();
         PortfolioChartJDialog portfolioChartJDialog = new PortfolioChartJDialog(m, false, portfolioTreeTableModel);
         portfolioChartJDialog.setVisible(true);                                    
     }
@@ -385,7 +410,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
 
     private void initJTreeTable() {
-        treeTable = new org.jdesktop.swingx.JXTreeTable(new PortfolioTreeTableModel());   
+        treeTable = new org.jdesktop.swingx.JXTreeTable(new BuyPortfolioTreeTableModel());   
         treeTable.setRootVisible(true);
         treeTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         treeTable.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(1)); 
@@ -396,12 +421,12 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
 
     private void editTransaction(Transaction newTransaction, Transaction oldTransaction) {
-        final PortfolioTreeTableModel portfolioTreeTableModel = (PortfolioTreeTableModel)treeTable.getTreeTableModel();
+        final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)treeTable.getTreeTableModel();
         portfolioTreeTableModel.editTransaction(newTransaction, oldTransaction);        
     }
     
     private void addTransaction(Transaction transaction) {
-        final PortfolioTreeTableModel portfolioTreeTableModel = (PortfolioTreeTableModel)treeTable.getTreeTableModel();
+        final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)treeTable.getTreeTableModel();
         portfolioTreeTableModel.addTransaction(transaction);
         this.realTimeStockMonitor.addStockCode(transaction.getContract().getStock().getCode());
     }
@@ -409,7 +434,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private void updateRealTimeStockMonitorAccordingToPortfolioTreeTableModel() {
         if(this.realTimeStockMonitor == null) return;
         
-        final PortfolioTreeTableModel portfolioTreeTableModel = (PortfolioTreeTableModel)treeTable.getTreeTableModel();
+        final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)treeTable.getTreeTableModel();
                 
         if(portfolioTreeTableModel != null) {
             this.treeTable.setTreeTableModel(portfolioTreeTableModel);
@@ -469,8 +494,12 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
             XStream xStream = new XStream();
             InputStream inputStream = new java.io.FileInputStream(f);
-            final PortfolioTreeTableModel portfolioTreeTableModel = (PortfolioTreeTableModel)xStream.fromXML(inputStream);
-            this.treeTable.setTreeTableModel(portfolioTreeTableModel);
+            final Object obj = xStream.fromXML(inputStream);
+            
+            if(obj instanceof BuyPortfolioTreeTableModel) {
+                final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)xStream.fromXML(inputStream);
+                this.treeTable.setTreeTableModel(portfolioTreeTableModel);
+            }
         }
         catch(java.io.FileNotFoundException exp) {
             log.error("", exp);
@@ -494,7 +523,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         
         try {
             OutputStream outputStream = new FileOutputStream(f);
-            final PortfolioTreeTableModel portfolioTreeTableModel = (PortfolioTreeTableModel)treeTable.getTreeTableModel();
+            final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)treeTable.getTreeTableModel();
             xStream.toXML(portfolioTreeTableModel, outputStream);  
         }
         catch(java.io.FileNotFoundException exp) {
@@ -533,14 +562,44 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
     
     public void update(RealTimeStockMonitor monitor, final java.util.List<Stock> stocks) {
-        final PortfolioTreeTableModel portfolioTreeTableModel = (PortfolioTreeTableModel)treeTable.getTreeTableModel();
+        final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)treeTable.getTreeTableModel();
  
         for(Stock stock : stocks) {
             if(false == portfolioTreeTableModel.updateStockLastPrice(stock)) {
                 this.realTimeStockMonitor.removeStockCode(stock.getCode());
             }
-        }                
+        }  
+        
+        updateNetWorth();
     }  
+    
+    private void updateNetWorth() {
+        final double netWorth = 100.00;
+        
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+           public void run() {
+                final java.text.NumberFormat numberFormat = java.text.NumberFormat.getInstance();
+
+                numberFormat.setMaximumFractionDigits(2);
+                numberFormat.setMinimumFractionDigits(2);
+                
+                jLabel2.setText(numberFormat.format(netWorth));
+                jLabel2.setForeground(getColor(netWorth));
+           }
+        });
+    }
+    
+    private Color getColor(double value) {
+        if(value < 0.0) {
+            return PortfolioManagementJPanel.lowerColor;
+        }
+        
+        if(value > 0.0) {
+            return PortfolioManagementJPanel.higherColor;
+        }
+        
+        return Color.BLACK;
+    }
     
     public void softStart() {
         if(realTimeStockMonitor == null) return;
@@ -559,12 +618,20 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private RealTimeStockMonitor realTimeStockMonitor = null;
     private org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
 
+    private static final java.awt.Color higherColor = new java.awt.Color(50, 150, 0);
+    private static final java.awt.Color lowerColor = new java.awt.Color(200, 0, 50);  
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JSplitPane jSplitPane1;
     // End of variables declaration//GEN-END:variables
 
     private org.jdesktop.swingx.JXTreeTable treeTable; 
