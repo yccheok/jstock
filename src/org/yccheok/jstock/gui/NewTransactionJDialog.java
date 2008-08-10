@@ -359,7 +359,7 @@ public class NewTransactionJDialog extends javax.swing.JDialog {
         Contract contract = new Contract(
             Utils.getEmptyStock(code, symbol), 
             new org.yccheok.jstock.engine.SimpleDate(date),
-            Contract.Type.Buy, 
+            Contract.Type.valueOf(this.jComboBox2.getSelectedItem().toString()), 
             ((java.lang.Integer)this.jSpinner1.getValue()), 
             (Double)this.jFormattedTextField1.getValue());
         
