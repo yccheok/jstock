@@ -60,6 +60,23 @@ public class Portfolio extends DefaultMutableTreeTableNode {
         return result;        
     }
 
+    public double getReferenceTotal() {
+        double result = 0.0;
+     
+        final int count = this.getChildCount();
+        
+        for(int i=0; i<count; i++) {
+            Object o = this.getChildAt(i);
+            
+            assert(o instanceof TransactionSummary);
+            
+            final TransactionSummary transactionSummary = (TransactionSummary)o;
+            result += transactionSummary.getReferenceTotal();
+        }
+        
+        return result;        
+    }
+    
     public double getCalculatedBroker() {
         double result = 0.0;
      
