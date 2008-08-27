@@ -32,7 +32,7 @@ public class Transaction extends DefaultMutableTreeTableNode {
         this.broker = broker;
         this.stampDuty = stampDuty;
         this.clearingFee = clearingFee;
-        
+
         this.calculatedBroker = broker.calculate(contract);
         this.calculatedStampDuty = stampDuty.calculate(contract);
         this.calculatdClearingFee = clearingFee.calculate(contract);
@@ -104,10 +104,15 @@ public class Transaction extends DefaultMutableTreeTableNode {
         return contract.getDate();
     }
     
+    public double getReferenceTotal() {
+        return contract.getReferenceTotal();
+    }
+    
     public double getNetTotal() {
         return netTotal;
     }
     
+    @Override
     public String toString() {
         return contract.getStock().getSymbol();
     }
