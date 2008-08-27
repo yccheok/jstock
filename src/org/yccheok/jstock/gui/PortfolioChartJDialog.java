@@ -42,7 +42,7 @@ public class PortfolioChartJDialog extends javax.swing.JDialog {
     };
     
     /** Creates new form PortfolioChartJDialog */
-    public PortfolioChartJDialog(java.awt.Frame parent, boolean modal, PortfolioTreeTableModel portfolioTreeTableModel) {
+    public PortfolioChartJDialog(java.awt.Frame parent, boolean modal, BuyPortfolioTreeTableModel portfolioTreeTableModel) {
         super(parent, "Portfolio Summary", modal);
         initComponents();
         
@@ -172,7 +172,7 @@ public class PortfolioChartJDialog extends javax.swing.JDialog {
         chartPanel.setChart(freeChart);
     }//GEN-LAST:event_jComboBox1ActionPerformed
     
-    private PortfolioTreeTableModel portfolioTreeTableModel;
+    private BuyPortfolioTreeTableModel portfolioTreeTableModel;
     private ChartPanel chartPanel;
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
