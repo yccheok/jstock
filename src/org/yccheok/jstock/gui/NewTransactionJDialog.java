@@ -35,6 +35,7 @@ import net.sf.nachocalendar.components.DateField;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.SimpleDate;
+import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.StockCodeAndSymbolDatabase;
 import org.yccheok.jstock.portfolio.Broker;
 import org.yccheok.jstock.portfolio.BrokingFirm;
@@ -353,15 +354,16 @@ public class NewTransactionJDialog extends javax.swing.JDialog {
         final String symbol = jTextField1.getText();
         final String code = stockCodeAndSymbolDatabase.symbolToCode(symbol);
         final DateField dateField = (DateField)jPanel3;
-                
-        Date date = (Date)dateField.getValue();
         
-        Contract contract = new Contract(
-            Utils.getEmptyStock(code, symbol), 
-            new org.yccheok.jstock.engine.SimpleDate(date),
-            Contract.Type.valueOf(this.jComboBox2.getSelectedItem().toString()), 
-            ((java.lang.Integer)this.jSpinner1.getValue()), 
-            (Double)this.jFormattedTextField1.getValue());
+        final Stock stock = Utils.getEmptyStock(code, symbol);
+        final SimpleDate date = new SimpleDate((Date)dateField.getValue());
+        final Contract.Type type = Contract.Type.valueOf(this.jComboBox2.getSelectedItem().toString());
+        final int unit = ((java.lang.Integer)this.jSpinner1.getValue());
+        final double price = ((Double)this.jFormattedTextField1.getValue());
+        
+        Contract.ContractBuilder builder = new Contract.ContractBuilder(stock, date);
+        
+        Contract contract = builder.type(type).quantity(unit).price(price).build();
         
         Broker broker = null;
         StampDuty stampDuty = null;
@@ -453,7 +455,9 @@ public class NewTransactionJDialog extends javax.swing.JDialog {
                 final DateField dateField = (DateField)jPanel3;
                 final Date date = (Date)dateField.getValue();
                 // Stock and date information is not important at this moment.
-                final Contract contract = new Contract(Utils.getEmptyStock(name, name), new SimpleDate(date), Contract.Type.Buy, unit, price);
+                Contract.ContractBuilder builder = new Contract.ContractBuilder(Utils.getEmptyStock(name, name), new SimpleDate(date));        
+                Contract contract = builder.type(Contract.Type.Buy).quantity(unit).price(price).build();
+        
                 final double brokerFee = brokingFirm.brokerCalculate(contract);
                 final double clearingFee = brokingFirm.clearingFeeCalculate(contract);
                 final double stampDuty = brokingFirm.stampDutyCalculate(contract);
