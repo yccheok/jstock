@@ -18,7 +18,6 @@
 
 package org.yccheok.jstock.portfolio;
 
-import java.util.*;
 import org.jdesktop.swingx.treetable.*;
 
 /**
@@ -151,6 +150,26 @@ public class TransactionSummary extends DefaultMutableTreeTableNode {
         return result;
     }
     
+    public double getReferenceTotal() {
+        double result = 0.0;
+        
+        final int count = this.getChildCount();
+        
+        for(int i=0; i<count; i++) {
+            Object o = this.getChildAt(i);
+            
+            assert(o instanceof Transaction);
+            
+            final Transaction transaction = (Transaction)o;
+            
+            double total = transaction.getReferenceTotal();
+            
+            result += total;
+        }
+        
+        return result;
+    }
+    
     public double getNetTotal() {
         double result = 0.0;
         
@@ -171,6 +190,7 @@ public class TransactionSummary extends DefaultMutableTreeTableNode {
         return result;        
     }
        
+    @Override
     public String toString() {
         if(this.getChildCount() > 0) {
             return this.getChildAt(0).toString();
