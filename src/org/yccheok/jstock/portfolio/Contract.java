@@ -26,6 +26,47 @@ import org.yccheok.jstock.engine.*;
  */
 public class Contract {
 
+    public static class ContractBuilder implements Builder<Contract> {
+        private final Stock stock;
+        private final SimpleDate date;
+        
+        // Optional parameters - initialized to default values
+        private Type type = Type.Buy;
+        private int quantity = 0;
+        private double price = 0.0;
+        private double referencePrice = 0.0;
+        
+        public ContractBuilder(Stock stock, SimpleDate date) {
+            this.stock = stock;
+            this.date = date;
+        }
+        
+        public ContractBuilder type(Type val) {
+            this.type = val;
+            return this;
+        }
+
+        public ContractBuilder quantity(int val) {
+            this.quantity = val;
+            return this;
+        }
+        
+        public ContractBuilder price(double val) {
+            this.price = val;
+            return this;
+        }
+        
+        public ContractBuilder referencePrice(double val) {
+            this.referencePrice = val;
+            return this;
+        }
+        
+        public Contract build() {
+            return new Contract(this);
+        }
+        
+    }
+    
     public Stock getStock() {
         return stock;
     }
@@ -46,8 +87,16 @@ public class Contract {
         return price;
     }
     
+    public double getReferencePrice() {
+        return referencePrice;
+    }
+    
     public double getTotal() {
         return total;
+    }
+    
+    public double getReferenceTotal() {
+        return referenceTotal;
     }
     
     public enum Type
@@ -56,15 +105,17 @@ public class Contract {
         Sell
     }
     
-    public Contract(Stock stock, SimpleDate date, Type type, int quantity, double price)
+    private Contract(ContractBuilder builder)
     {
-        this.stock = stock;
-        this.date = date;
-        this.type = type;
-        this.quantity = quantity;
-        this.price = price;
+        this.stock = builder.stock;
+        this.date = builder.date;
+        this.type = builder.type;
+        this.quantity = builder.quantity;
+        this.price = builder.price;
+        this.referencePrice = builder.referencePrice;
         
         this.total = price * quantity;
+        this.referenceTotal = referencePrice * quantity;
     }
     
     public Contract(Contract contract) {
@@ -73,13 +124,19 @@ public class Contract {
         type = contract.type;
         quantity = contract.quantity;
         price = contract.price;
+        referencePrice = contract.referencePrice;
         total = contract.total;
+        referenceTotal = contract.referenceTotal;
     }
     
-    private Stock stock;
-    private SimpleDate date;
-    private Type type;
-    private int quantity;
-    private double price;    
-    private double total;
+    private final Stock stock;
+    private final SimpleDate date;
+    private final Type type;
+    private final int quantity;
+    private final double price;
+    private final double referencePrice;
+    private final double total;
+    // Reference price for the contract. Only for selling type contract usage.
+    // It means cost for owning a stock.
+    private final double referenceTotal;
 }
