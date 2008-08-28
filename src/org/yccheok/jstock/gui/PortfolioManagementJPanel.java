@@ -88,11 +88,12 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         jLabel1.setText("Net Worth (RM): ");
         jPanel3.add(jLabel1);
 
-        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 11));
         jPanel3.add(jLabel2);
 
         jPanel1.add(jPanel3, java.awt.BorderLayout.NORTH);
 
+        jSplitPane1.setDividerLocation(250);
         jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
         jScrollPane1.setBorder(javax.swing.BorderFactory.createTitledBorder("Buy Record"));
@@ -150,7 +151,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
     
     private String getSelectedStockSymbolForNewTransactionJDialog() {
-        final TreePath[] treePaths = treeTable.getTreeSelectionModel().getSelectionPaths();
+        final TreePath[] treePaths = buyTreeTable.getTreeSelectionModel().getSelectionPaths();
 
         if(treePaths == null) return "";
         
@@ -172,8 +173,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
     
     private double getSelectedStockLastPriceForNewTransactionJDialog() {
-        final TreePath[] treePaths = treeTable.getTreeSelectionModel().getSelectionPaths();
-        final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)treeTable.getTreeTableModel();
+        final TreePath[] treePaths = buyTreeTable.getTreeSelectionModel().getSelectionPaths();
+        final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
         
         if(treePaths == null) return 0.0;
         
@@ -238,12 +239,13 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
     
     public void clearTableSelection() {
-        treeTable.getSelectionModel().clearSelection();
+        buyTreeTable.getSelectionModel().clearSelection();
+        sellTreeTable.getSelectionModel().clearSelection();
     }
     
     private void deteleSelectedTreeTableRow() {
-        final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)treeTable.getTreeTableModel();
-        final TreePath[] treePaths = treeTable.getTreeSelectionModel().getSelectionPaths();
+        final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
+        final TreePath[] treePaths = buyTreeTable.getTreeSelectionModel().getSelectionPaths();
         for(TreePath treePath : treePaths) {
             final Object o = treePath.getLastPathComponent();
 
@@ -272,9 +274,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     // Will return null, if more than one transaction being selected, or no
     // transaction being selected.
     private Transaction getSelectedTransaction() {
-        if(treeTable.getSelectedRowCount() != 1) return null;
+        if(buyTreeTable.getSelectedRowCount() != 1) return null;
         
-        final TreePath[] treePaths = treeTable.getTreeSelectionModel().getSelectionPaths();
+        final TreePath[] treePaths = buyTreeTable.getTreeSelectionModel().getSelectionPaths();
         
         final Object o = treePaths[0].getLastPathComponent();
 
@@ -286,13 +288,13 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
     
     private boolean isOnlyTreeTableRootBeingSelected() {
-        if(treeTable.getSelectedRowCount() != 1) return false;
+        if(buyTreeTable.getSelectedRowCount() != 1) return false;
         
-        final TreePath[] treePaths = treeTable.getTreeSelectionModel().getSelectionPaths();
+        final TreePath[] treePaths = buyTreeTable.getTreeSelectionModel().getSelectionPaths();
         
         final Object o = treePaths[0].getLastPathComponent();
 
-        final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)treeTable.getTreeTableModel();
+        final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
         
         return (portfolioTreeTableModel.getRoot() == o);
     }
@@ -330,7 +332,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     
     private void showPortfolioChartJDialog() {
         final MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, this);
-        final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)treeTable.getTreeTableModel();
+        final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
         PortfolioChartJDialog portfolioChartJDialog = new PortfolioChartJDialog(m, false, portfolioTreeTableModel);
         portfolioChartJDialog.setVisible(true);                                    
     }
@@ -375,7 +377,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         popup.add(menuItem);                
         
-        if(isOnlyTreeTableRootBeingSelected() == false && (treeTable.getSelectedRow() > 0)) {
+        if(isOnlyTreeTableRootBeingSelected() == false && (buyTreeTable.getSelectedRow() > 0)) {
             popup.addSeparator();
             
             final MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, this);
@@ -410,23 +412,32 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
 
     private void initJTreeTable() {
-        treeTable = new org.jdesktop.swingx.JXTreeTable(new BuyPortfolioTreeTableModel());   
-        treeTable.setRootVisible(true);
-        treeTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
-        treeTable.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(1)); 
-        // treeTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        this.treeTable.addMouseListener(new TableRowPopupListener());
+        buyTreeTable = new org.jdesktop.swingx.JXTreeTable(new BuyPortfolioTreeTableModel());
+        sellTreeTable = new org.jdesktop.swingx.JXTreeTable(new SellPortfolioTreeTableModel());
+        
+        buyTreeTable.setRootVisible(true);
+        buyTreeTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+        buyTreeTable.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(1)); 
+        // buyTreeTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        this.buyTreeTable.addMouseListener(new TableRowPopupListener());
 
-        this.jScrollPane1.setViewportView(treeTable);        
+        sellTreeTable.setRootVisible(true);
+        sellTreeTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+        sellTreeTable.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(1)); 
+        // sellTreeTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        // this.sellTreeTable.addMouseListener(new TableRowPopupListener());
+        
+        this.jScrollPane1.setViewportView(buyTreeTable);
+        this.jScrollPane2.setViewportView(sellTreeTable);
     }
 
     private void editTransaction(Transaction newTransaction, Transaction oldTransaction) {
-        final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)treeTable.getTreeTableModel();
+        final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
         portfolioTreeTableModel.editTransaction(newTransaction, oldTransaction);        
     }
     
     private void addTransaction(Transaction transaction) {
-        final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)treeTable.getTreeTableModel();
+        final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
         portfolioTreeTableModel.addTransaction(transaction);
         this.realTimeStockMonitor.addStockCode(transaction.getContract().getStock().getCode());
     }
@@ -434,10 +445,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private void updateRealTimeStockMonitorAccordingToPortfolioTreeTableModel() {
         if(this.realTimeStockMonitor == null) return;
         
-        final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)treeTable.getTreeTableModel();
+        final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
                 
         if(portfolioTreeTableModel != null) {
-            this.treeTable.setTreeTableModel(portfolioTreeTableModel);
+            this.buyTreeTable.setTreeTableModel(portfolioTreeTableModel);
             
             Portfolio portfolio = (Portfolio)portfolioTreeTableModel.getRoot();
             final int count = portfolio.getChildCount();
@@ -456,7 +467,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
     
     private List<Stock> getSelectedStock() {
-        final TreePath[] treePaths = treeTable.getTreeSelectionModel().getSelectionPaths();
+        final TreePath[] treePaths = buyTreeTable.getTreeSelectionModel().getSelectionPaths();
         List<Stock> stocks = new ArrayList<Stock>();
         Set<String> s = new HashSet<String>();
         
@@ -498,7 +509,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             
             if(obj instanceof BuyPortfolioTreeTableModel) {
                 final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)xStream.fromXML(inputStream);
-                this.treeTable.setTreeTableModel(portfolioTreeTableModel);
+                this.buyTreeTable.setTreeTableModel(portfolioTreeTableModel);
             }
         }
         catch(java.io.FileNotFoundException exp) {
@@ -523,7 +534,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         
         try {
             OutputStream outputStream = new FileOutputStream(f);
-            final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)treeTable.getTreeTableModel();
+            final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
             xStream.toXML(portfolioTreeTableModel, outputStream);  
         }
         catch(java.io.FileNotFoundException exp) {
@@ -562,7 +573,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
     
     public void update(RealTimeStockMonitor monitor, final java.util.List<Stock> stocks) {
-        final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)treeTable.getTreeTableModel();
+        final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
  
         for(Stock stock : stocks) {
             if(false == portfolioTreeTableModel.updateStockLastPrice(stock)) {
@@ -634,5 +645,6 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private javax.swing.JSplitPane jSplitPane1;
     // End of variables declaration//GEN-END:variables
 
-    private org.jdesktop.swingx.JXTreeTable treeTable; 
+    private org.jdesktop.swingx.JXTreeTable buyTreeTable;
+    private org.jdesktop.swingx.JXTreeTable sellTreeTable;
 }
