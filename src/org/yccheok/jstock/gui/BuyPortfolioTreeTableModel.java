@@ -197,7 +197,7 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
     }
     
     private double getNetGainLossPercentage(Transaction transaction) {
-        if(transaction.getTotal() == 0) return 0.0;
+        if(transaction.getNetTotal() == 0) return 0.0;
         
         return (getCurrentValue(transaction) - transaction.getNetTotal()) / transaction.getNetTotal() * 100.0;        
     }
@@ -207,7 +207,7 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
     }
     
     private double getNetGainLossPercentage(Portfolio portfolio) {
-        if(portfolio.getTotal() == 0) return 0.0;
+        if(portfolio.getNetTotal() == 0) return 0.0;
         
         return (getCurrentValue(portfolio) - portfolio.getNetTotal()) / portfolio.getNetTotal() * 100.0;        
     }
@@ -241,10 +241,14 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
     }
     
     public double getPurchasePrice(TransactionSummary transactionSummary) {
+        if(transactionSummary.getQuantity() == 0.0) return 0.0;
+        
         return transactionSummary.getTotal() / transactionSummary.getQuantity();
     }
     
     public double getGainLossPrice(TransactionSummary transactionSummary) {
+        if(transactionSummary.getQuantity() == 0.0) return 0.0;
+        
         return this.getCurrentPrice(transactionSummary) - (transactionSummary.getTotal() / transactionSummary.getQuantity());        
     }
     
@@ -260,7 +264,7 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
 
     @Override
     public Class getColumnClass(int column) {
-        return this.cTypes[column];
+        return BuyPortfolioTreeTableModel.cTypes[column];
     }
 
     @Override
@@ -275,7 +279,7 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
             
             switch(column) {
                 case 0:
-                    return "Portfolio";
+                    return "Buy Portfolio";
         
                 case 5:
                     return portfolio.getTotal();
