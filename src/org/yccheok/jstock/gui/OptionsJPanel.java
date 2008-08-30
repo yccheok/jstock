@@ -113,15 +113,16 @@ public class OptionsJPanel extends javax.swing.JPanel implements JStockOptionsOb
         optionsSpeedJPanel = new OptionsSpeedJPanel();
         optionsColorJPanel = new OptionsColorJPanel();
         optionsBrokerJPanel = new OptionsBrokerJPanel();
+        optionsSellAdvisorJPanel = new OptionsSellAdvisorJPanel();
         
         // The size of OptionsJPanel, will be determined by the first added panel.
         addButton("Broker", "/images/32x32/calc.png", optionsBrokerJPanel, jButtonBar1, buttonGroup1);
         addButton("Color", "/images/32x32/colors.png", optionsColorJPanel, jButtonBar1, buttonGroup1);        
         addButton("Alert", "/images/32x32/bell.png", optionsAlertJPanel, jButtonBar1, buttonGroup1);
-        addButton("Password", "/images/32x32/unlock.png", optionsPasswordJPanel, jButtonBar1, buttonGroup1);
+        addButton("Password", "/images/32x32/encrypted.png", optionsPasswordJPanel, jButtonBar1, buttonGroup1);
         addButton("Network", "/images/32x32/connect_to_network.png", optionsNetworkJPanel, jButtonBar1, buttonGroup1);
         addButton("Speed", "/images/32x32/clock.png", optionsSpeedJPanel, jButtonBar1, buttonGroup1);
-        
+        addButton("Advisor", "/images/32x32/jabber_protocol.png", optionsSellAdvisorJPanel, jButtonBar1, buttonGroup1);
     }
 
     public void set(JStockOptions jStockOptions) {
@@ -131,6 +132,7 @@ public class OptionsJPanel extends javax.swing.JPanel implements JStockOptionsOb
         optionsNetworkJPanel.set(jStockOptions);
         optionsPasswordJPanel.set(jStockOptions);
         optionsSpeedJPanel.set(jStockOptions);       
+        optionsSellAdvisorJPanel.set(jStockOptions);
     }
 
     public boolean apply(JStockOptions jStockOptions) {
@@ -189,6 +191,15 @@ public class OptionsJPanel extends javax.swing.JPanel implements JStockOptionsOb
             return false;
         }
         
+        if(optionsSellAdvisorJPanel.apply(jStockOptions) == false)
+        {
+            final JToggleButton button = map.get("Advisor");
+            
+            button.setSelected(true);
+            button.doClick();
+            return false;
+        }
+        
         return true;
     }
             
@@ -199,6 +210,7 @@ public class OptionsJPanel extends javax.swing.JPanel implements JStockOptionsOb
     private OptionsSpeedJPanel optionsSpeedJPanel;
     private OptionsColorJPanel optionsColorJPanel;
     private OptionsBrokerJPanel optionsBrokerJPanel;
+    private OptionsSellAdvisorJPanel optionsSellAdvisorJPanel;
     
     private java.util.Map<String, JToggleButton> map = new java.util.HashMap<String, JToggleButton>();
     
