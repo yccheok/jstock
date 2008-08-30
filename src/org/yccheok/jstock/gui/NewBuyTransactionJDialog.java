@@ -26,6 +26,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.Date;
 import javax.swing.JFormattedTextField;
 import javax.swing.text.NumberFormatter;
@@ -161,7 +162,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
             }
         });
 
-        jLabel10.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel10.setFont(new java.awt.Font("Tahoma", 1, 11));
         jLabel10.setText("Net Value");
 
         jFormattedTextField6.setEditable(false);
@@ -438,12 +439,30 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
             return;
         }
         
+        commitEdit();
         this.transaction = generateTransaction();
         this.setVisible(false);
         this.dispose();
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void commitEdit() {
+        try {
+            jFormattedTextField1.commitEdit();
+            jFormattedTextField2.commitEdit();
+            jFormattedTextField3.commitEdit();
+            jFormattedTextField4.commitEdit();
+            jFormattedTextField5.commitEdit();
+            jFormattedTextField6.commitEdit();
+        } catch (ParseException ex) {
+            log.error("", ex);
+        }
+    }
+    
     private void update() {
+        // Commit the value first before updating. This is to prevent
+        // double rounding issue. We force the current value to
+        // follow the formatter text field's.
+        commitEdit();
         
         if(shouldAutoCalculateBrokerFee())
         {
@@ -558,6 +577,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
     private KeyAdapter getjComboBox1EditorComponentKeyAdapter() {
      
         return new KeyAdapter() {
+            @Override
             public void keyReleased(KeyEvent e) {
                 if(KeyEvent.VK_ENTER == e.getKeyCode()) {
 
