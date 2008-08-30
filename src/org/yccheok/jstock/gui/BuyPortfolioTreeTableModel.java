@@ -279,7 +279,7 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
             
             switch(column) {
                 case 0:
-                    return "Buy Portfolio";
+                    return "Buy";
         
                 case 5:
                     return portfolio.getTotal();
