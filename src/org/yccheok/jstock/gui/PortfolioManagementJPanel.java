@@ -166,7 +166,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        this.showNewTransactionJDialog(getSelectedStockSymbolForNewTransactionJDialog(), getSelectedStockLastPriceForNewTransactionJDialog(), true);
+        this.showNewBuyTransactionJDialog(getSelectedStockSymbolForNewTransactionJDialog(), getSelectedStockLastPriceForNewTransactionJDialog(), true);
     }//GEN-LAST:event_jButton1ActionPerformed
     
     private boolean isValidTreeTableNode(TreeTableModel treeTableModel, Object node) {
@@ -233,23 +233,44 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         return 0.0;
     }
     
+    private void showNewSellTransactionJDialog(Transaction transaction) {
+        assert(transaction.getContract().getType() == Contract.Type.Buy);
+        
+        final String stockSymbol = transaction.getContract().getStock().getSymbol();
+        final int maxSellQuantity = transaction.getQuantity();
+        double buyCost = 0.0;
+        if(transaction.getQuantity() > 0) {
+            buyCost = transaction.getNetTotal() / transaction.getQuantity();
+        }
+        final MainFrame mainFrame = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, PortfolioManagementJPanel.this);
+        
+        NewSellTransactionJDialog newSellTransactionJDialog = new NewSellTransactionJDialog(mainFrame, true);
+        newSellTransactionJDialog.setLocationRelativeTo(this);
+        newSellTransactionJDialog.setStockSymbol(stockSymbol);
+        newSellTransactionJDialog.setMaxSellQuantity(maxSellQuantity);
+        newSellTransactionJDialog.setSellQuantity(maxSellQuantity);
+        newSellTransactionJDialog.setBuyCost(buyCost);
+        newSellTransactionJDialog.setPrice(newSellTransactionJDialog.suggestBestSellingPrice());
+        newSellTransactionJDialog.setVisible(true);
+    }
+    
     private void showEditTransactionJDialog(Transaction transaction) {
         final MainFrame mainFrame = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, PortfolioManagementJPanel.this);
 
         NewBuyTransactionJDialog newTransactionJDialog = new NewBuyTransactionJDialog(mainFrame, true);
         newTransactionJDialog.setStockSelectionEnabled(false);
         newTransactionJDialog.setTransaction(transaction);
-        newTransactionJDialog.setTitle("Edit " + transaction.getContract().getStock().getSymbol() + " Transaction");
+        newTransactionJDialog.setTitle("Edit " + transaction.getContract().getStock().getSymbol() + " Buy");
         newTransactionJDialog.setLocationRelativeTo(this);
         newTransactionJDialog.setVisible(true);
         
         final Transaction newTransaction = newTransactionJDialog.getTransaction();
         if(newTransaction != null) {
-            this.editTransaction(newTransaction, transaction);
+            this.editBuyTransaction(newTransaction, transaction);
         }        
     }
     
-    public void showNewTransactionJDialog(String stockSymbol, double lastPrice, boolean JComboBoxEnabled) {
+    public void showNewBuyTransactionJDialog(String stockSymbol, double lastPrice, boolean JComboBoxEnabled) {
 
         final MainFrame mainFrame = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, PortfolioManagementJPanel.this);
 
@@ -271,7 +292,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         
         final Transaction transaction = newTransactionJDialog.getTransaction();
         if(transaction != null) {
-            this.addTransaction(transaction);
+            this.addBuyTransaction(transaction);
         }
     }
     
@@ -283,6 +304,11 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private void deteleSelectedTreeTableRow() {
         final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
         final TreePath[] treePaths = buyTreeTable.getTreeSelectionModel().getSelectionPaths();
+        
+        if(treePaths == null) {
+            return;
+        }
+        
         for(TreePath treePath : treePaths) {
             final Object o = treePath.getLastPathComponent();
 
@@ -404,21 +430,34 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private JPopupMenu getMyJTablePopupMenu() {                
         JPopupMenu popup = new JPopupMenu();
 
-        JMenuItem menuItem = new JMenuItem("New Transaction...", this.getImageIcon("/images/16x16/inbox.png"));
+        JMenuItem menuItem = new JMenuItem("Buy...", this.getImageIcon("/images/16x16/inbox.png"));
 
         menuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                PortfolioManagementJPanel.this.showNewTransactionJDialog(getSelectedStockSymbolForNewTransactionJDialog(), getSelectedStockLastPriceForNewTransactionJDialog(), true);
+                PortfolioManagementJPanel.this.showNewBuyTransactionJDialog(getSelectedStockSymbolForNewTransactionJDialog(), getSelectedStockLastPriceForNewTransactionJDialog(), true);
             }
         });
 
         popup.add(menuItem);
 
-        popup.addSeparator();
-        
         final Transaction transaction = getSelectedTransaction();
+
         if(transaction != null) {
-            menuItem = new JMenuItem("Edit Transaction...", this.getImageIcon("/images/16x16/edit.png"));
+            menuItem = new JMenuItem("Sell...", this.getImageIcon("/images/16x16/outbox.png"));
+            
+            menuItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent evt) {
+                    PortfolioManagementJPanel.this.showNewSellTransactionJDialog(transaction);
+                }
+            });            
+            
+            popup.add(menuItem);  
+        }       
+        
+        popup.addSeparator();
+                
+        if(transaction != null) {
+            menuItem = new JMenuItem("Edit...", this.getImageIcon("/images/16x16/edit.png"));
             
             menuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent evt) {
@@ -431,7 +470,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             popup.addSeparator();    
         }       
         
-        menuItem = new JMenuItem("Portfolio Chart...", this.getImageIcon("/images/16x16/chart.png"));
+        menuItem = new JMenuItem("Summary...", this.getImageIcon("/images/16x16/chart.png"));
         
         menuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
@@ -442,7 +481,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         popup.add(menuItem);                
         
         if(isOnlyTreeTableRootBeingSelected() == false && (buyTreeTable.getSelectedRow() > 0)) {
-            popup.addSeparator();
+            //popup.addSeparator();
             
             final MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, this);
                                 
@@ -461,7 +500,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             popup.add(menuItem);
             popup.addSeparator();
             
-            menuItem = new JMenuItem("Delete Transaction", this.getImageIcon("/images/16x16/button_cancel.png"));
+            menuItem = new JMenuItem("Delete", this.getImageIcon("/images/16x16/button_cancel.png"));
 
             menuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent evt) {
@@ -475,18 +514,23 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         return popup;
     }
 
-    private void editTransaction(Transaction newTransaction, Transaction oldTransaction) {
+    private void editBuyTransaction(Transaction newTransaction, Transaction oldTransaction) {
+        assert(newTransaction.getContract().getType() == Contract.Type.Buy);
+        assert(oldTransaction.getContract().getType() == Contract.Type.Buy);
+        
         final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
         portfolioTreeTableModel.editTransaction(newTransaction, oldTransaction);        
     }
     
-    private void addTransaction(Transaction transaction) {
+    private void addBuyTransaction(Transaction transaction) {
+        assert(transaction.getContract().getType() == Contract.Type.Buy);
+        
         final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
         portfolioTreeTableModel.addTransaction(transaction);
         this.realTimeStockMonitor.addStockCode(transaction.getContract().getStock().getCode());
     }
     
-    private void updateRealTimeStockMonitorAccordingToPortfolioTreeTableModel() {
+    private void updateRealTimeStockMonitorAccordingToBuyPortfolioTreeTableModel() {
         if(this.realTimeStockMonitor == null) return;
         
         final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
@@ -515,9 +559,15 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         List<Stock> stocks = new ArrayList<Stock>();
         Set<String> s = new HashSet<String>();
         
+        if(treePaths == null) {
+            return Collections.unmodifiableList(stocks);
+        }
+        
         for(TreePath treePath : treePaths) {
-            if(treePath.getLastPathComponent() instanceof TransactionSummary) {
-                final TransactionSummary transactionSummary = (TransactionSummary)treePaths[0].getLastPathComponent();
+            final Object lastPathComponent = treePath.getLastPathComponent();
+            
+            if(lastPathComponent instanceof TransactionSummary) {
+                final TransactionSummary transactionSummary = (TransactionSummary)lastPathComponent;
                 assert(transactionSummary.getChildCount() > 0);
                 final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
                 final Stock stock = transaction.getContract().getStock();
@@ -528,8 +578,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 stocks.add(stock);
                 s.add(code);
             }
-            else if(treePath.getLastPathComponent() instanceof Transaction) {
-                final Transaction transaction = (Transaction)treePaths[0].getLastPathComponent();
+            else if(lastPathComponent instanceof Transaction) {
+                final Transaction transaction = (Transaction)lastPathComponent;
                 final Stock stock = transaction.getContract().getStock();
                 final String code = stock.getCode();
                 
@@ -552,7 +602,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             final Object obj = xStream.fromXML(inputStream);
             
             if(obj instanceof BuyPortfolioTreeTableModel) {
-                final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)xStream.fromXML(inputStream);
+                final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)obj;
                 this.buyTreeTable.setTreeTableModel(portfolioTreeTableModel);
             }
         }
@@ -563,7 +613,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             log.error("", exp);
         }
         
-        updateRealTimeStockMonitorAccordingToPortfolioTreeTableModel();
+        updateRealTimeStockMonitorAccordingToBuyPortfolioTreeTableModel();
     }
     
     public boolean savePortfolio() {
@@ -602,7 +652,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         
         realTimeStockMonitor.attach(this.realTimeStockMonitorObserver);
         
-        updateRealTimeStockMonitorAccordingToPortfolioTreeTableModel();
+        updateRealTimeStockMonitorAccordingToBuyPortfolioTreeTableModel();
     }
     
     // This is the workaround to overcome Erasure by generics. We are unable to make MainFrame to
@@ -639,21 +689,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 numberFormat.setMinimumFractionDigits(2);
                 
                 jLabel2.setText(numberFormat.format(netWorth));
-                jLabel2.setForeground(getColor(netWorth));
+                jLabel2.setForeground(Utils.getColor(netWorth, 0.0));
            }
         });
-    }
-    
-    private Color getColor(double value) {
-        if(value < 0.0) {
-            return PortfolioManagementJPanel.lowerColor;
-        }
-        
-        if(value > 0.0) {
-            return PortfolioManagementJPanel.higherColor;
-        }
-        
-        return Color.BLACK;
     }
     
     public void softStart() {
@@ -673,9 +711,6 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private RealTimeStockMonitor realTimeStockMonitor = null;
     private org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
 
-    private static final java.awt.Color higherColor = new java.awt.Color(50, 150, 0);
-    private static final java.awt.Color lowerColor = new java.awt.Color(200, 0, 50);  
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private org.jdesktop.swingx.JXTreeTable buyTreeTable;
     private javax.swing.JButton jButton1;
