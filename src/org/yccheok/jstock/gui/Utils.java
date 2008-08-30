@@ -22,6 +22,7 @@
 
 package org.yccheok.jstock.gui;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
@@ -175,6 +176,18 @@ public class Utils {
         }
         
         return true;
+    }
+    
+    public static Color getColor(double price, double referencePrice) {
+        if(price < referencePrice) {
+            return JStockOptions.DEFAULT_LOWER_NUMERICAL_VALUE_FOREGROUND_COLOR;
+        }
+        
+        if(price > referencePrice) {
+            return JStockOptions.DEFAULT_HIGHER_NUMERICAL_VALUE_FOREGROUND_COLOR;
+        }
+        
+        return JStockOptions.DEFAULT_NORMAL_TEXT_FOREGROUND_COLOR;
     }
     
     public static Stock getEmptyStock(String code, String symbol) {
