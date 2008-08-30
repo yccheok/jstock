@@ -22,6 +22,8 @@ package org.yccheok.jstock.gui;
 
 import com.thoughtworks.xstream.XStream;
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -41,6 +43,7 @@ import javax.swing.JPopupMenu;
 
 import javax.swing.tree.TreePath;
 import org.apache.commons.logging.*;
+import org.jdesktop.swingx.JXTreeTable;
 import org.yccheok.jstock.portfolio.*;
 import org.yccheok.jstock.engine.*;
 import org.jdesktop.swingx.treetable.*;
@@ -55,7 +58,6 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     public PortfolioManagementJPanel() {
         initComponents();        
         
-        this.initJTreeTable();
         this.initPortfolio();
     }
     
@@ -73,11 +75,19 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         jLabel2 = new javax.swing.JLabel();
         jSplitPane1 = new javax.swing.JSplitPane();
         jScrollPane1 = new javax.swing.JScrollPane();
+        buyTreeTable = new org.jdesktop.swingx.JXTreeTable(new BuyPortfolioTreeTableModel());
         jScrollPane2 = new javax.swing.JScrollPane();
+        sellTreeTable = new org.jdesktop.swingx.JXTreeTable(new SellPortfolioTreeTableModel());
         jPanel2 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
 
+        addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                formMouseClicked(evt);
+            }
+        });
         setLayout(new java.awt.BorderLayout());
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Portfolio Management"));
@@ -96,10 +106,33 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         jSplitPane1.setDividerLocation(250);
         jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
-        jScrollPane1.setBorder(javax.swing.BorderFactory.createTitledBorder("Buy Record"));
+        jScrollPane1.setBorder(javax.swing.BorderFactory.createTitledBorder("Buy"));
+
+        buyTreeTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+        buyTreeTable.setRootVisible(true);
+        buyTreeTable.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(1)); 
+        buyTreeTable.addMouseListener(new TableRowPopupListener());
+        buyTreeTable.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
+            public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
+                buyTreeTableValueChanged(evt);
+            }
+        });
+        jScrollPane1.setViewportView(buyTreeTable);
+
         jSplitPane1.setLeftComponent(jScrollPane1);
 
-        jScrollPane2.setBorder(javax.swing.BorderFactory.createTitledBorder("Sell Record"));
+        jScrollPane2.setBorder(javax.swing.BorderFactory.createTitledBorder("Sell"));
+
+        sellTreeTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+        sellTreeTable.setRootVisible(true);
+        sellTreeTable.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(1));
+        sellTreeTable.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
+            public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
+                sellTreeTableValueChanged(evt);
+            }
+        });
+        jScrollPane2.setViewportView(sellTreeTable);
+
         jSplitPane1.setRightComponent(jScrollPane2);
 
         jPanel1.add(jSplitPane1, java.awt.BorderLayout.CENTER);
@@ -107,7 +140,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         add(jPanel1, java.awt.BorderLayout.CENTER);
 
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/inbox.png"))); // NOI18N
-        jButton1.setText("New Trasaction...");
+        jButton1.setText("Buy...");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -115,8 +148,12 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         });
         jPanel2.add(jButton1);
 
+        jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/outbox.png"))); // NOI18N
+        jButton3.setText("Sell...");
+        jPanel2.add(jButton3);
+
         jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/button_cancel.png"))); // NOI18N
-        jButton2.setText("Delete Transaction");
+        jButton2.setText("Delete");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
@@ -199,7 +236,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private void showEditTransactionJDialog(Transaction transaction) {
         final MainFrame mainFrame = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, PortfolioManagementJPanel.this);
 
-        NewTransactionJDialog newTransactionJDialog = new NewTransactionJDialog(mainFrame, true);
+        NewBuyTransactionJDialog newTransactionJDialog = new NewBuyTransactionJDialog(mainFrame, true);
         newTransactionJDialog.setStockSelectionEnabled(false);
         newTransactionJDialog.setTransaction(transaction);
         newTransactionJDialog.setTitle("Edit " + transaction.getContract().getStock().getSymbol() + " Transaction");
@@ -223,7 +260,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             return;
         }
         
-        NewTransactionJDialog newTransactionJDialog = new NewTransactionJDialog(mainFrame, true);
+        NewBuyTransactionJDialog newTransactionJDialog = new NewBuyTransactionJDialog(mainFrame, true);
         newTransactionJDialog.setLocationRelativeTo(this);
         newTransactionJDialog.setStockSymbol(stockSymbol);
         newTransactionJDialog.setPrice(lastPrice);
@@ -270,6 +307,33 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         // TODO add your handling code here:
         deteleSelectedTreeTableRow();
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void buyTreeTableValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_buyTreeTableValueChanged
+    // TODO add your handling code here:
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    if(buyTreeTable.getSelectedRowCount() > 0) {
+                        sellTreeTable.clearSelection();
+                    }
+                }        
+        });
+    }//GEN-LAST:event_buyTreeTableValueChanged
+
+    private void sellTreeTableValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_sellTreeTableValueChanged
+    // TODO add your handling code here:
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    if(sellTreeTable.getSelectedRowCount() > 0) {
+                        buyTreeTable.clearSelection();
+                    }
+                }        
+        });
+    }//GEN-LAST:event_sellTreeTableValueChanged
+
+    private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseClicked
+    // TODO add your handling code here:
+        this.clearTableSelection();
+    }//GEN-LAST:event_formMouseClicked
     
     // Will return null, if more than one transaction being selected, or no
     // transaction being selected.
@@ -409,26 +473,6 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
         
         return popup;
-    }
-
-    private void initJTreeTable() {
-        buyTreeTable = new org.jdesktop.swingx.JXTreeTable(new BuyPortfolioTreeTableModel());
-        sellTreeTable = new org.jdesktop.swingx.JXTreeTable(new SellPortfolioTreeTableModel());
-        
-        buyTreeTable.setRootVisible(true);
-        buyTreeTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
-        buyTreeTable.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(1)); 
-        // buyTreeTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        this.buyTreeTable.addMouseListener(new TableRowPopupListener());
-
-        sellTreeTable.setRootVisible(true);
-        sellTreeTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
-        sellTreeTable.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(1)); 
-        // sellTreeTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        // this.sellTreeTable.addMouseListener(new TableRowPopupListener());
-        
-        this.jScrollPane1.setViewportView(buyTreeTable);
-        this.jScrollPane2.setViewportView(sellTreeTable);
     }
 
     private void editTransaction(Transaction newTransaction, Transaction oldTransaction) {
@@ -633,8 +677,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private static final java.awt.Color lowerColor = new java.awt.Color(200, 0, 50);  
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private org.jdesktop.swingx.JXTreeTable buyTreeTable;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
@@ -643,8 +689,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSplitPane jSplitPane1;
+    private org.jdesktop.swingx.JXTreeTable sellTreeTable;
     // End of variables declaration//GEN-END:variables
 
-    private org.jdesktop.swingx.JXTreeTable buyTreeTable;
-    private org.jdesktop.swingx.JXTreeTable sellTreeTable;
 }
