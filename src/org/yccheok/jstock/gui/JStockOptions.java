@@ -94,6 +94,8 @@ public class JStockOptions {
     private int selectedBrokingFirmIndex = -1;
     private boolean isAutoBrokerFeeCalculationEnabled = false;
     
+    private double expectedProfitPercentage = 10.0;
+    
     public boolean isAutoBrokerFeeCalculationEnabled() {
         return this.isAutoBrokerFeeCalculationEnabled;
     }
@@ -301,4 +303,12 @@ public class JStockOptions {
     public void setEnableColorChange(boolean enableColorChange) {
         this.enableColorChange = enableColorChange;
     }
+    
+    public double getExpectedProfitPercentage() {
+        return expectedProfitPercentage;
+    }
+    
+    public void setExpectedProfitPercentage(double expectedProfitPercentage) {
+        this.expectedProfitPercentage = expectedProfitPercentage;
+    }    
 }
