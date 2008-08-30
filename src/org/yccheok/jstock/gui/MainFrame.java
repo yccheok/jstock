@@ -1217,18 +1217,6 @@ public class MainFrame extends javax.swing.JFrame {
         header.addMouseMotionListener(tips);        
     }
     
-    private Color getColor( double price, double referencePrice) {
-        if(price < referencePrice) {
-            return new Color(lowerColor.getRGB());
-        }
-        
-        if(price > referencePrice) {
-            return new Color(higherColor.getRGB());
-        }
-        
-        return Color.BLACK;
-    }
-    
     private void updateBuyerSellerInformation(Stock stock) {
         if(stock == null) {
             jLabel24.setText("");
@@ -1248,12 +1236,12 @@ public class MainFrame extends javax.swing.JFrame {
         
         final double openPrice = stock.getOpenPrice();
         
-        jLabel24.setText("" + stock.getThirdBuyPrice()); jLabel24.setForeground(getColor(stock.getThirdBuyPrice(), openPrice));
-        jLabel33.setText("" + stock.getSecondBuyPrice()); jLabel33.setForeground(getColor(stock.getSecondBuyPrice(), openPrice));
-        jLabel19.setText("" + stock.getBuyPrice()); jLabel19.setForeground(getColor(stock.getBuyPrice(), openPrice));
-        jLabel32.setText("" + stock.getSellPrice()); jLabel32.setForeground(getColor(stock.getSellPrice(), openPrice));
-        jLabel35.setText("" + stock.getSecondSellPrice()); jLabel35.setForeground(getColor(stock.getSecondSellPrice(), openPrice));
-        jLabel37.setText("" + stock.getThirdSellPrice()); jLabel37.setForeground(getColor(stock.getThirdSellPrice(), openPrice));
+        jLabel24.setText("" + stock.getThirdBuyPrice()); jLabel24.setForeground(Utils.getColor(stock.getThirdBuyPrice(), openPrice));
+        jLabel33.setText("" + stock.getSecondBuyPrice()); jLabel33.setForeground(Utils.getColor(stock.getSecondBuyPrice(), openPrice));
+        jLabel19.setText("" + stock.getBuyPrice()); jLabel19.setForeground(Utils.getColor(stock.getBuyPrice(), openPrice));
+        jLabel32.setText("" + stock.getSellPrice()); jLabel32.setForeground(Utils.getColor(stock.getSellPrice(), openPrice));
+        jLabel35.setText("" + stock.getSecondSellPrice()); jLabel35.setForeground(Utils.getColor(stock.getSecondSellPrice(), openPrice));
+        jLabel37.setText("" + stock.getThirdSellPrice()); jLabel37.setForeground(Utils.getColor(stock.getThirdSellPrice(), openPrice));
         jLabel25.setText("" + stock.getThirdBuyQuantity());
         jLabel34.setText("" + stock.getSecondBuyQuantity());
         jLabel26.setText("" + stock.getBuyQuantity());
@@ -1424,7 +1412,7 @@ public class MainFrame extends javax.swing.JFrame {
         popup.addSeparator();        
         
         if(jTable1.getSelectedRowCount() == 1) {
-            menuItem = new JMenuItem("New Transaction...", this.getImageIcon("/images/16x16/inbox.png"));
+            menuItem = new JMenuItem("Buy...", this.getImageIcon("/images/16x16/inbox.png"));
 
             menuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent evt) {
@@ -1432,7 +1420,7 @@ public class MainFrame extends javax.swing.JFrame {
                     final int modelIndex = jTable1.getRowSorter().convertRowIndexToModel(row);
                     final Stock stock = ((StockTableModel)tableModel).getStock(modelIndex);
                     
-                    portfolioManagementJPanel.showNewTransactionJDialog(stock.getSymbol(), stock.getLastPrice(), false);
+                    portfolioManagementJPanel.showNewBuyTransactionJDialog(stock.getSymbol(), stock.getLastPrice(), false);
                 }
             });  
             
@@ -1843,8 +1831,8 @@ public class MainFrame extends javax.swing.JFrame {
                 jLabel5.setText(numberFormat.format(market.getIndex(Stock.Board.Second)) + " (" + numberFormat.format(market.getChange(Stock.Board.Second)) + ")");
                 jLabel9.setText(numberFormat.format(market.getValue()));
                 
-                jLabel3.setForeground(getColor(market.getChange(Stock.Board.Main), 0.0));
-                jLabel5.setForeground(getColor(market.getChange(Stock.Board.Second), 0.0));
+                jLabel3.setForeground(Utils.getColor(market.getChange(Stock.Board.Main), 0.0));
+                jLabel5.setForeground(Utils.getColor(market.getChange(Stock.Board.Second), 0.0));
            }
         });
     }
@@ -2104,9 +2092,6 @@ public class MainFrame extends javax.swing.JFrame {
     
     private String username;
     private String password;
-    
-    private static final java.awt.Color higherColor = new java.awt.Color(50, 150, 0);
-    private static final java.awt.Color lowerColor = new java.awt.Color(200, 0, 50);  
     
     private IndicatorPanel indicatorPanel;
     private IndicatorScannerJPanel indicatorScannerJPanel;
