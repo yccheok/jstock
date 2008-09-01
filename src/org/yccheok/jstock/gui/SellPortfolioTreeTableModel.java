@@ -7,6 +7,7 @@ package org.yccheok.jstock.gui;
 
 import java.text.SimpleDateFormat;
 import org.jdesktop.swingx.treetable.TreeTableModel;
+import org.yccheok.jstock.portfolio.Contract;
 import org.yccheok.jstock.portfolio.Portfolio;
 import org.yccheok.jstock.portfolio.Transaction;
 import org.yccheok.jstock.portfolio.TransactionSummary;
@@ -82,6 +83,18 @@ public class SellPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel
     
     private double getGainLossValue(Portfolio portfolio) {
         return portfolio.getTotal() - portfolio.getReferenceTotal();
+    }
+    
+    public double getNetSellingValue() {
+        return ((Portfolio)getRoot()).getNetTotal();
+    }
+
+    public double getNetGainLossPercentage() {
+        return getNetGainLossPercentage((Portfolio)getRoot());
+    }
+
+    public double getNetGainLossValue() {
+        return getNetGainLossValue((Portfolio)getRoot());
     }
     
     private double getNetGainLossPercentage(Portfolio portfolio) {
@@ -316,7 +329,7 @@ public class SellPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel
     
     @Override
     public boolean isValidTransaction(Transaction transaction) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return (transaction.getContract().getType() == Contract.Type.Sell);
     }
 
 }
