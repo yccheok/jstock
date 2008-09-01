@@ -118,6 +118,11 @@ public class Contract {
         this.referenceTotal = referencePrice * quantity;
     }
     
+    public Contract setQuantity(int quantity) {
+        ContractBuilder builder = new ContractBuilder(stock, date);
+        return builder.type(type).quantity(quantity).price(price).referencePrice(referencePrice).build();
+    }
+    
     public Contract(Contract contract) {
         stock = new Stock(contract.stock);
         date = new SimpleDate(contract.date);
