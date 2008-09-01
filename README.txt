@@ -91,3 +91,15 @@ version 0.9.8
 3. Bug fixed when having manual broker fee/ stamp duty/ clearing fee calculation.
 
 4. Bug fixed. Have a workaround, to enable pie-chart able to display loss (-ve) value.
+
+
+=============
+version 0.9.9
+=============
+1. [1955258] Bug fixed. Vista compataible, by revising user data storing directory location. 
+
+2. Bug fixed from avoiding getting "yesterday" history information.
+
+3. Bug fixed during removing transaction.
+
+4. Fully support sell transaction, including sell advisor feature.
