@@ -53,6 +53,52 @@ public abstract class AbstractPortfolioTreeTableModel extends DefaultTreeTableMo
         fireTreeTableNodeChanged(getRoot());
     }
     
+    public void removeTransactionSummary(TransactionSummary transactionSummary) {
+        if(transactionSummary == null) {
+            return;
+        }
+        
+        this.removeNodeFromParent(transactionSummary);
+        
+        // Workaround to solve root is not being updated when children are not 
+        // being collapse.
+        fireTreeTableNodeChanged(getRoot());        
+    }
+    
+    public void removeTransaction(Transaction transaction) {
+        if(isValidTransaction(transaction) == false) return;
+        
+        final Portfolio portfolio = (Portfolio)this.getRoot();
+        
+        final int size = portfolio.getChildCount();
+        
+        final String code = transaction.getContract().getStock().getCode();
+        
+        TransactionSummary transactionSummary = null;
+        
+        for(int i=0; i<size; i++) {
+            TransactionSummary t = (TransactionSummary)portfolio.getChildAt(i);
+            
+            if(((Transaction)t.getChildAt(0)).getContract().getStock().getCode().equals(code)) {
+                transactionSummary = t;
+                break;
+            }
+        }
+        
+        if(transactionSummary == null) {
+            return;
+        }
+        
+        this.removeNodeFromParent(transaction);
+        if(transactionSummary.getChildCount() <= 0) {
+            this.removeNodeFromParent(transactionSummary);
+        }
+        
+        // Workaround to solve root is not being updated when children are not 
+        // being collapse.
+        fireTreeTableNodeChanged(getRoot());        
+    }
+    
     public void addTransaction(Transaction transaction) {
         if(isValidTransaction(transaction) == false) return;
         
