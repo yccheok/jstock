@@ -21,9 +21,6 @@
 package org.yccheok.jstock.gui;
 
 import com.thoughtworks.xstream.XStream;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -478,20 +475,21 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         return null;        
     }
     
-    private boolean isOnlyTreeTableRootBeingSelected() {
-        if(buyTreeTable.getSelectedRowCount() != 1) return false;
+    private boolean isOnlyTreeTableRootBeingSelected(JXTreeTable treeTable) {
+        if(treeTable.getSelectedRowCount() != 1) return false;
         
-        final TreePath[] treePaths = buyTreeTable.getTreeSelectionModel().getSelectionPaths();
+        final TreePath[] treePaths = treeTable.getTreeSelectionModel().getSelectionPaths();
         
         final Object o = treePaths[0].getLastPathComponent();
 
-        final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
+        final AbstractPortfolioTreeTableModel portfolioTreeTableModel = (AbstractPortfolioTreeTableModel)treeTable.getTreeTableModel();
         
         return (portfolioTreeTableModel.getRoot() == o);
     }
         
     private class BuyTableRowPopupListener extends MouseAdapter {
         
+        @Override
         public void mouseClicked(MouseEvent evt) {
             if(evt.getClickCount() == 2) {
                 final Transaction transaction = getSelectedTransaction(buyTreeTable);
@@ -501,6 +499,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             }
         }
         
+        @Override
         public void mousePressed(MouseEvent e) {
             maybeShowPopup(e);
         }
@@ -528,6 +527,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             }
         }
         
+        @Override
         public void mousePressed(MouseEvent e) {
             maybeShowPopup(e);
         }
@@ -595,14 +595,14 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         popup.add(menuItem);        
         
-        if(isOnlyTreeTableRootBeingSelected() == false && (sellTreeTable.getSelectedRow() > 0)) {
+        if(isOnlyTreeTableRootBeingSelected(sellTreeTable) == false && (sellTreeTable.getSelectedRow() > 0)) {
             final MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, this);
                                 
             menuItem = new JMenuItem("History...", this.getImageIcon("/images/16x16/strokedocker.png"));
 
             menuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent evt) {
-                        List<Stock> stocks = getSelectedStock();
+                        List<Stock> stocks = getSelectedStock(sellTreeTable);
 
                         for(Stock stock : stocks) {
                             m.displayHistoryChart(stock);
@@ -680,7 +680,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         popup.add(menuItem);                
         
-        if(isOnlyTreeTableRootBeingSelected() == false && (buyTreeTable.getSelectedRow() > 0)) {
+        if(isOnlyTreeTableRootBeingSelected(buyTreeTable) == false && (buyTreeTable.getSelectedRow() > 0)) {
             //popup.addSeparator();
             
             final MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, this);
@@ -689,7 +689,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
             menuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent evt) {
-                        List<Stock> stocks = getSelectedStock();
+                        List<Stock> stocks = getSelectedStock(buyTreeTable);
 
                         for(Stock stock : stocks) {
                             m.displayHistoryChart(stock);
@@ -769,8 +769,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         
     }
     
-    private List<Stock> getSelectedStock() {
-        final TreePath[] treePaths = buyTreeTable.getTreeSelectionModel().getSelectionPaths();
+    private List<Stock> getSelectedStock(JXTreeTable treeTable) {
+        final TreePath[] treePaths = treeTable.getTreeSelectionModel().getSelectionPaths();
         List<Stock> stocks = new ArrayList<Stock>();
         Set<String> s = new HashSet<String>();
         
@@ -810,7 +810,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     
     private void initPortfolio() {
         try {
-            File f = new File("config" + File.separator + "buyportfolio.xml");
+            File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "buyportfolio.xml");
 
             XStream xStream = new XStream();
             InputStream inputStream = new java.io.FileInputStream(f);
@@ -829,7 +829,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
 
         try {
-            File f = new File("config" + File.separator + "sellportfolio.xml");
+            File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "sellportfolio.xml");
 
             XStream xStream = new XStream();
             InputStream inputStream = new java.io.FileInputStream(f);
@@ -853,12 +853,12 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
     
     public boolean savePortfolio() {
-        if(Utils.createDirectoryIfDoesNotExist("config") == false)
+        if(Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config") == false)
         {
             return false;
         }
         
-        File f = new File("config" + File.separator + "buyportfolio.xml");
+        File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "buyportfolio.xml");
                 
         XStream xStream = new XStream();   
         
@@ -878,7 +878,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             status = false;
         }
            
-        f = new File("config" + File.separator + "sellportfolio.xml");
+        f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "sellportfolio.xml");
                 
         try {
             OutputStream outputStream = new FileOutputStream(f);
