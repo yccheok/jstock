@@ -211,7 +211,7 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
     }
 
     public double getNetGainLossPercentage() {
-        return getNetGainLossValue((Portfolio)getRoot());
+        return getNetGainLossPercentage((Portfolio)getRoot());
     }
     
     private double getNetGainLossPercentage(Portfolio portfolio) {
