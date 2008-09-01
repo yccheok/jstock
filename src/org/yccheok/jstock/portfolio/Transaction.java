@@ -64,6 +64,13 @@ public class Transaction extends DefaultMutableTreeTableNode {
         this.netTotal = transaction.netTotal;
     }
     
+    public Transaction setQuantity(int quantity) {
+        return new Transaction(contract.setQuantity(quantity), 
+                new SimpleBroker((SimpleBroker)broker), 
+                new SimpleStampDuty((SimpleStampDuty)stampDuty),
+                new SimpleClearingFee((SimpleClearingFee)clearingFee));
+    }
+    
     public Contract getContract() {
         return contract;
     }
