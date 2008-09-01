@@ -8,7 +8,7 @@ Name ${PRODUCT_NAME}
 RequestExecutionLevel admin	;Workaround for Vista
 
 ; The file to write
-OutFile "jstock-0.9.8-setup.exe"
+OutFile "jstock-0.9.9-setup.exe"
 LicenseData "gpl.txt"
  
 ; The default installation directory
@@ -26,7 +26,6 @@ Call DetectJRE
 SetOutPath $INSTDIR
 ; Put file there
 File /r jstock\jstock.jar
-File /r jstock\indicator
 File /r jstock\config
 File /r jstock\lib
 File chart.ico
@@ -41,11 +40,13 @@ SectionEnd ; end the section
  ; The uninstall section
 Section "Uninstall"
 SetShellVarContext all	;Workaround for Vista
-RMDir /r $INSTDIR\indicator
-RMDir /r $INSTDIR\config
+RMDir /r $PROFILE\.jstock\indicator
+RMDir /r $PROFILE\.jstock\config
+RMDir /r $PROFILE\.jstock\history
+RMDir /r $PROFILE\.jstock\logos
+RMDir /r $PROFILE\.jstock
 RMDir /r $INSTDIR\lib
-RMDir /r $INSTDIR\history
-RMDir /r $INSTDIR\logos
+RMDir /r $INSTDIR\config
 Delete $INSTDIR\chart.ico
 Delete $INSTDIR\jstock.jar
 Delete $INSTDIR\Uninstall.exe
