@@ -25,8 +25,6 @@ package org.yccheok.jstock.gui;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JFormattedTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.text.NumberFormatter;
@@ -386,6 +384,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         final double clearingFee = transaction.getCalculatdClearingFee();
         final double stampDuty = transaction.getCalculatedStampDuty();
         final double netValue = transaction.getNetTotal();
+        buyCost = transaction.getContract().getReferencePrice();
         
         this.jTextField1.setText(symbol);
         ((DateField)jPanel3).setValue(date);
@@ -406,7 +405,9 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = m.getStockCodeAndSymbolDatabase();
         
         final String symbol = jTextField1.getText();
-        final String code = stockCodeAndSymbolDatabase.symbolToCode(symbol);
+        // We want user able to perform sell even though they are not connected to
+        // stock server. Luckily, code information are useless at this moment.
+        final String code = stockCodeAndSymbolDatabase == null? "0" : stockCodeAndSymbolDatabase.symbolToCode(symbol);
         final DateField dateField = (DateField)jPanel3;
         
         final Stock stock = Utils.getEmptyStock(code, symbol);
