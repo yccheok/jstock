@@ -79,10 +79,10 @@ public class AboutJDialog extends javax.swing.JDialog {
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel2.setText("JStock");
 
-        jLabel3.setFont(new java.awt.Font("Dialog", 1, 18));
+        jLabel3.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(0, 0, 255));
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel3.setText("version 0.9.8");
+        jLabel3.setText("version 0.9.9");
 
         jLabel4.setText("<html>\nJStock is a stock analysis tool which help you to pick stocks in an automated way.\n<br>\n<br>\nCopyright &copy; 2008 Yan Cheng Cheok <a href=\"mailto:yccheok@yahoo.com\">yccheok@yahoo.com</a>\n<br>\n<br>\nProject website : <a href=\"http://sourceforge.net/projects/jstock\">http://sourceforge.net/projects/jstock</a>\n</html>");
 
