@@ -1577,7 +1577,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         for(int i=0; i<size; i++) {
             try {
-                BufferedImage bufferedImage = ImageIO.read(new File("logos" + File.separator + i + ".png"));
+                BufferedImage bufferedImage = ImageIO.read(new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "logos" + File.separator + i + ".png"));
 
                 jStockOptions.getBrokingFirm(i).setLogo(bufferedImage);
             } catch (IOException exp) {
@@ -1588,7 +1588,7 @@ public class MainFrame extends javax.swing.JFrame {
     
     private static void initJStockOptions() {
         try {
-            File f = new File("config" + File.separator + "options.xml");
+            File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "options.xml");
 
             XStream xStream = new XStream();
             InputStream inputStream = new java.io.FileInputStream(f);
@@ -1628,7 +1628,7 @@ public class MainFrame extends javax.swing.JFrame {
         java.util.List<Stock> s = null;
         
         try {
-            File f = new File("config" + File.separator + "realtimestock.xml");
+            File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "realtimestock.xml");
 
             XStream xStream = new XStream();
             InputStream inputStream = new java.io.FileInputStream(f);
@@ -1675,12 +1675,12 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     private boolean saveRealTimeStocks() {
-        if(Utils.createDirectoryIfDoesNotExist("config") == false)
+        if(Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config") == false)
         {
             return false;
         }
         
-        File f = new File("config" + File.separator + "realtimestock.xml");
+        File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "realtimestock.xml");
                 
         XStream xStream = new XStream();   
         
@@ -1701,12 +1701,12 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     private boolean saveBrokingFirmLogos() {
-        if(Utils.createDirectoryIfDoesNotExist("logos") == false)
+        if(Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "logos") == false)
         {
             return false;
         }
         
-        if(Utils.deleteDir(new File("logos"), false) == false) {
+        if(Utils.deleteDir(new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "logos"), false) == false) {
             return false;
         }
         
@@ -1717,7 +1717,7 @@ public class MainFrame extends javax.swing.JFrame {
             
             if(image == null) continue;
             
-            File f = new File("logos" + File.separator + i + ".png");
+            File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "logos" + File.separator + i + ".png");
                        
             try {
                 ImageIO.write(Utils.toBufferedImage(image), "png", f);
@@ -1731,12 +1731,12 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     private boolean saveJStockOptions() {
-        if(Utils.createDirectoryIfDoesNotExist("config") == false)
+        if(Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config") == false)
         {
             return false;
         }
         
-        File f = new File("config" + File.separator + "options.xml");
+        File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "options.xml");
                 
         XStream xStream = new XStream();   
         
@@ -1765,7 +1765,10 @@ public class MainFrame extends javax.swing.JFrame {
         
         stockHistoryMonitor.attach(this.stockHistoryMonitorObserver);
         
-        stockHistorySerializer = new StockHistorySerializer("history");
+        // We do not want "yesterday" history record.
+        org.yccheok.jstock.gui.Utils.deleteDir(new File(Utils.getUserDataDirectory() + "history"));
+        
+        stockHistorySerializer = new StockHistorySerializer(Utils.getUserDataDirectory() + "history");
         
         stockHistoryMonitor.setStockHistorySerializer(stockHistorySerializer);
     }
