@@ -202,14 +202,26 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
         return (getCurrentValue(transaction) - transaction.getNetTotal()) / transaction.getNetTotal() * 100.0;        
     }
     
+    public double getNetGainLossValue() {
+        return getNetGainLossValue((Portfolio)getRoot());
+    }
+    
     private double getNetGainLossValue(Portfolio portfolio) {
         return getCurrentValue(portfolio) - portfolio.getNetTotal();
+    }
+
+    public double getNetGainLossPercentage() {
+        return getNetGainLossValue((Portfolio)getRoot());
     }
     
     private double getNetGainLossPercentage(Portfolio portfolio) {
         if(portfolio.getNetTotal() == 0) return 0.0;
         
         return (getCurrentValue(portfolio) - portfolio.getNetTotal()) / portfolio.getNetTotal() * 100.0;        
+    }
+    
+    public double getCurrentValue() {
+        return this.getCurrentValue((Portfolio)getRoot());        
     }
     
     private double getCurrentValue(Portfolio portfolio) {
