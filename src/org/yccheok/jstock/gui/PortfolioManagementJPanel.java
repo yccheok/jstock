@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Set;
 import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
 import javax.swing.tree.TreePath;
@@ -70,9 +71,17 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
+        jPanel4 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        jPanel5 = new javax.swing.JPanel();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
         jSplitPane1 = new javax.swing.JSplitPane();
         jScrollPane1 = new javax.swing.JScrollPane();
         buyTreeTable = new org.jdesktop.swingx.JXTreeTable(new BuyPortfolioTreeTableModel());
@@ -93,15 +102,39 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Portfolio Management"));
         jPanel1.setLayout(new java.awt.BorderLayout(0, 5));
 
+        jPanel4.setLayout(new java.awt.BorderLayout());
+
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jLabel1.setText("Net Worth (RM): ");
+        jLabel1.setText("Share (RM): ");
         jPanel3.add(jLabel1);
 
-        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 11));
+        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jPanel3.add(jLabel2);
 
-        jPanel1.add(jPanel3, java.awt.BorderLayout.NORTH);
+        jLabel3.setText("Cash (RM): ");
+        jPanel3.add(jLabel3);
+
+        jLabel4.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jPanel3.add(jLabel4);
+
+        jPanel4.add(jPanel3, java.awt.BorderLayout.WEST);
+
+        jLabel5.setText("Paper Profit (RM): ");
+        jPanel5.add(jLabel5);
+
+        jLabel6.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jPanel5.add(jLabel6);
+
+        jLabel7.setText("Realized Profit (RM): ");
+        jPanel5.add(jLabel7);
+
+        jLabel8.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jPanel5.add(jLabel8);
+
+        jPanel4.add(jPanel5, java.awt.BorderLayout.EAST);
+
+        jPanel1.add(jPanel4, java.awt.BorderLayout.NORTH);
 
         jSplitPane1.setDividerLocation(250);
         jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
@@ -110,8 +143,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         buyTreeTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         buyTreeTable.setRootVisible(true);
-        buyTreeTable.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(1)); 
-        buyTreeTable.addMouseListener(new TableRowPopupListener());
+        buyTreeTable.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(1));
+        buyTreeTable.addMouseListener(new BuyTableRowPopupListener());
         buyTreeTable.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
             public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
                 buyTreeTableValueChanged(evt);
@@ -126,6 +159,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         sellTreeTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         sellTreeTable.setRootVisible(true);
         sellTreeTable.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(1));
+        sellTreeTable.addMouseListener(new SellTableRowPopupListener());
         sellTreeTable.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
             public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
                 sellTreeTableValueChanged(evt);
@@ -150,6 +184,11 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/outbox.png"))); // NOI18N
         jButton3.setText("Sell...");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
         jPanel2.add(jButton3);
 
         jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/button_cancel.png"))); // NOI18N
@@ -233,14 +272,14 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         return 0.0;
     }
     
-    private void showNewSellTransactionJDialog(Transaction transaction) {
-        assert(transaction.getContract().getType() == Contract.Type.Buy);
+    private void showNewSellTransactionJDialog(Transaction buyTransaction) {
+        assert(buyTransaction.getContract().getType() == Contract.Type.Buy);
         
-        final String stockSymbol = transaction.getContract().getStock().getSymbol();
-        final int maxSellQuantity = transaction.getQuantity();
+        final String stockSymbol = buyTransaction.getContract().getStock().getSymbol();
+        final int maxSellQuantity = buyTransaction.getQuantity();
         double buyCost = 0.0;
-        if(transaction.getQuantity() > 0) {
-            buyCost = transaction.getNetTotal() / transaction.getQuantity();
+        if(buyTransaction.getQuantity() > 0) {
+            buyCost = buyTransaction.getNetTotal() / buyTransaction.getQuantity();
         }
         final MainFrame mainFrame = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, PortfolioManagementJPanel.this);
         
@@ -249,25 +288,64 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         newSellTransactionJDialog.setStockSymbol(stockSymbol);
         newSellTransactionJDialog.setMaxSellQuantity(maxSellQuantity);
         newSellTransactionJDialog.setSellQuantity(maxSellQuantity);
+        
         newSellTransactionJDialog.setBuyCost(buyCost);
         newSellTransactionJDialog.setPrice(newSellTransactionJDialog.suggestBestSellingPrice());
         newSellTransactionJDialog.setVisible(true);
+        
+        final Transaction newSellTransaction = newSellTransactionJDialog.getTransaction();
+        if(newSellTransaction != null) {                        
+            final int remain = buyTransaction.getQuantity() - newSellTransaction.getQuantity();
+            
+            assert(remain >= 0);
+            
+            addSellTransaction(newSellTransaction);
+            
+            final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
+            
+            if(remain <= 0) {
+                portfolioTreeTableModel.removeTransaction(buyTransaction);
+            }
+            else {
+                this.editBuyTransaction(buyTransaction.setQuantity(remain), buyTransaction);
+            }
+            
+            updateWealthHeader();
+        }
     }
     
     private void showEditTransactionJDialog(Transaction transaction) {
         final MainFrame mainFrame = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, PortfolioManagementJPanel.this);
 
-        NewBuyTransactionJDialog newTransactionJDialog = new NewBuyTransactionJDialog(mainFrame, true);
-        newTransactionJDialog.setStockSelectionEnabled(false);
-        newTransactionJDialog.setTransaction(transaction);
-        newTransactionJDialog.setTitle("Edit " + transaction.getContract().getStock().getSymbol() + " Buy");
-        newTransactionJDialog.setLocationRelativeTo(this);
-        newTransactionJDialog.setVisible(true);
-        
-        final Transaction newTransaction = newTransactionJDialog.getTransaction();
-        if(newTransaction != null) {
-            this.editBuyTransaction(newTransaction, transaction);
-        }        
+        if(transaction.getContract().getType() == Contract.Type.Buy) {
+            NewBuyTransactionJDialog newTransactionJDialog = new NewBuyTransactionJDialog(mainFrame, true);
+            newTransactionJDialog.setStockSelectionEnabled(false);
+            newTransactionJDialog.setTransaction(transaction);
+            newTransactionJDialog.setTitle("Edit " + transaction.getContract().getStock().getSymbol() + " Buy");
+            newTransactionJDialog.setLocationRelativeTo(this);
+            newTransactionJDialog.setVisible(true);
+
+            final Transaction newTransaction = newTransactionJDialog.getTransaction();
+            if(newTransaction != null) {
+                this.editBuyTransaction(newTransaction, transaction);
+                updateWealthHeader();
+            }        
+        }
+        else {
+            assert(transaction.getContract().getType() == Contract.Type.Sell);
+            
+            NewSellTransactionJDialog newTransactionJDialog = new NewSellTransactionJDialog(mainFrame, true);
+            newTransactionJDialog.setTransaction(transaction);
+            newTransactionJDialog.setTitle("Edit " + transaction.getContract().getStock().getSymbol() + " Sell");
+            newTransactionJDialog.setLocationRelativeTo(this);
+            newTransactionJDialog.setVisible(true);
+
+            final Transaction newTransaction = newTransactionJDialog.getTransaction();
+            if(newTransaction != null) {
+                this.editSellTransaction(newTransaction, transaction);
+                updateWealthHeader();
+            }                    
+        }
     }
     
     public void showNewBuyTransactionJDialog(String stockSymbol, double lastPrice, boolean JComboBoxEnabled) {
@@ -293,6 +371,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         final Transaction transaction = newTransactionJDialog.getTransaction();
         if(transaction != null) {
             this.addBuyTransaction(transaction);
+            updateWealthHeader();
         }
     }
     
@@ -301,9 +380,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         sellTreeTable.getSelectionModel().clearSelection();
     }
     
-    private void deteleSelectedTreeTableRow() {
-        final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
-        final TreePath[] treePaths = buyTreeTable.getTreeSelectionModel().getSelectionPaths();
+    private void deleteSelectedTreeTableRow(org.jdesktop.swingx.JXTreeTable treeTable) {
+        final AbstractPortfolioTreeTableModel portfolioTreeTableModel = (AbstractPortfolioTreeTableModel)treeTable.getTreeTableModel();
+        final TreePath[] treePaths = treeTable.getTreeSelectionModel().getSelectionPaths();
         
         if(treePaths == null) {
             return;
@@ -317,16 +396,26 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             final MutableTreeTableNode mutableTreeTableNode = (MutableTreeTableNode)o;
 
             if(isValidTreeTableNode(portfolioTreeTableModel, mutableTreeTableNode) == false) {
+                //???
                 portfolioTreeTableModel.fireTreeTableNodeChanged(mutableTreeTableNode);
                 continue;
             }
                         
-            if(o instanceof Transaction)
-                portfolioTreeTableModel.removeNodeFromParent(mutableTreeTableNode);
+            if(o instanceof Transaction) {                
+                portfolioTreeTableModel.removeTransaction((Transaction)o);
+                
+            }
             else if(o instanceof TransactionSummary) {
-                portfolioTreeTableModel.removeNodeFromParent(mutableTreeTableNode);
+                portfolioTreeTableModel.removeTransactionSummary((TransactionSummary)o);
             }
         }        
+    }
+    
+    private void deteleSelectedTreeTableRow() {
+        deleteSelectedTreeTableRow(this.buyTreeTable);
+        deleteSelectedTreeTableRow(this.sellTreeTable);
+        
+        updateWealthHeader();
     }
     
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -335,7 +424,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void buyTreeTableValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_buyTreeTableValueChanged
-    // TODO add your handling code here:
+        // TODO add your handling code here:
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     if(buyTreeTable.getSelectedRowCount() > 0) {
@@ -346,7 +435,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_buyTreeTableValueChanged
 
     private void sellTreeTableValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_sellTreeTableValueChanged
-    // TODO add your handling code here:
+        // TODO add your handling code here:
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     if(sellTreeTable.getSelectedRowCount() > 0) {
@@ -357,16 +446,28 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_sellTreeTableValueChanged
 
     private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseClicked
-    // TODO add your handling code here:
+        // TODO add your handling code here:
         this.clearTableSelection();
     }//GEN-LAST:event_formMouseClicked
-    
-    // Will return null, if more than one transaction being selected, or no
-    // transaction being selected.
-    private Transaction getSelectedTransaction() {
-        if(buyTreeTable.getSelectedRowCount() != 1) return null;
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // TODO add your handling code here:
+        final Transaction transaction = getSelectedTransaction(buyTreeTable);
         
-        final TreePath[] treePaths = buyTreeTable.getTreeSelectionModel().getSelectionPaths();
+        if(transaction == null) {
+            JOptionPane.showMessageDialog(this, "You need to select 1 buy transaction, in order to sell it", "No buy transaction selected", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        
+        this.showNewSellTransactionJDialog(transaction);
+    }//GEN-LAST:event_jButton3ActionPerformed
+    
+    // Will return null, if more than one buyTransaction being selected, or no
+    // buyTransaction being selected.
+    private Transaction getSelectedTransaction(JXTreeTable treeTable) {
+        if(treeTable.getSelectedRowCount() != 1) return null;
+        
+        final TreePath[] treePaths = treeTable.getTreeSelectionModel().getSelectionPaths();
         
         final Object o = treePaths[0].getLastPathComponent();
 
@@ -389,11 +490,11 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         return (portfolioTreeTableModel.getRoot() == o);
     }
         
-    private class TableRowPopupListener extends MouseAdapter {
+    private class BuyTableRowPopupListener extends MouseAdapter {
         
         public void mouseClicked(MouseEvent evt) {
             if(evt.getClickCount() == 2) {
-                final Transaction transaction = getSelectedTransaction();
+                final Transaction transaction = getSelectedTransaction(buyTreeTable);
                 if(transaction != null) {
                     PortfolioManagementJPanel.this.showEditTransactionJDialog(transaction);
                 }
@@ -411,23 +512,122 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         
         private void maybeShowPopup(MouseEvent e) {
             if (e.isPopupTrigger()) {
-                getMyJTablePopupMenu().show(e.getComponent(), e.getX(), e.getY());
+                getBuyTreeTablePopupMenu().show(e.getComponent(), e.getX(), e.getY());
             }
         }
     }
+
+    private class SellTableRowPopupListener extends MouseAdapter {
         
+        public void mouseClicked(MouseEvent evt) {
+            if(evt.getClickCount() == 2) {
+                final Transaction transaction = getSelectedTransaction(sellTreeTable);
+                if(transaction != null) {
+                    PortfolioManagementJPanel.this.showEditTransactionJDialog(transaction);
+                }
+            }
+        }
+        
+        public void mousePressed(MouseEvent e) {
+            maybeShowPopup(e);
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            maybeShowPopup(e);
+        }
+        
+        private void maybeShowPopup(MouseEvent e) {
+            if (e.isPopupTrigger()) {
+                final JPopupMenu popupMenu = getSellTreeTablePopupMenu();
+                if(popupMenu != null)
+                    popupMenu.show(e.getComponent(), e.getX(), e.getY());
+            }
+        }
+    }
+    
     private ImageIcon getImageIcon(String imageIcon) {
         return new javax.swing.ImageIcon(getClass().getResource(imageIcon));
     }
     
-    private void showPortfolioChartJDialog() {
+    private void showBuyPortfolioChartJDialog() {
         final MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, this);
-        final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
-        PortfolioChartJDialog portfolioChartJDialog = new PortfolioChartJDialog(m, false, portfolioTreeTableModel);
-        portfolioChartJDialog.setVisible(true);                                    
+        final BuyPortfolioTreeTableModel buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
+        BuyPortfolioChartJDialog buyPortfolioChartJDialog = new BuyPortfolioChartJDialog(m, false, buyPortfolioTreeTableModel);
+        buyPortfolioChartJDialog.setVisible(true);                                    
     }
     
-    private JPopupMenu getMyJTablePopupMenu() {                
+    private void showSellPortfolioChartJDialog() {
+        final MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, this);
+        final SellPortfolioTreeTableModel sellPortfolioTreeTableModel = (SellPortfolioTreeTableModel)sellTreeTable.getTreeTableModel();
+        SellPortfolioChartJDialog sellPortfolioChartJDialog = new SellPortfolioChartJDialog(m, false, sellPortfolioTreeTableModel);
+        sellPortfolioChartJDialog.setVisible(true);                                    
+    }
+    
+    private JPopupMenu getSellTreeTablePopupMenu() {                
+        final Transaction transaction = getSelectedTransaction(this.sellTreeTable);
+
+        JPopupMenu popup = new JPopupMenu();
+
+        JMenuItem menuItem = null;
+        
+        if(transaction != null) {
+            menuItem = new JMenuItem("Edit...", this.getImageIcon("/images/16x16/edit.png"));
+
+            menuItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent evt) {
+                    PortfolioManagementJPanel.this.showEditTransactionJDialog(transaction);
+                }
+            });            
+
+            popup.add(menuItem);
+
+            popup.addSeparator();
+        }
+        
+       menuItem = new JMenuItem("Summary...", this.getImageIcon("/images/16x16/chart.png"));
+        
+        menuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                PortfolioManagementJPanel.this.showSellPortfolioChartJDialog();
+            }
+        });
+
+        popup.add(menuItem);        
+        
+        if(isOnlyTreeTableRootBeingSelected() == false && (sellTreeTable.getSelectedRow() > 0)) {
+            final MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, this);
+                                
+            menuItem = new JMenuItem("History...", this.getImageIcon("/images/16x16/strokedocker.png"));
+
+            menuItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent evt) {
+                        List<Stock> stocks = getSelectedStock();
+
+                        for(Stock stock : stocks) {
+                            m.displayHistoryChart(stock);
+                        }
+                    }
+            });
+                        
+            popup.add(menuItem);
+            popup.addSeparator();
+            
+            menuItem = new JMenuItem("Delete", this.getImageIcon("/images/16x16/button_cancel.png"));
+
+            menuItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent evt) {
+                        PortfolioManagementJPanel.this.deteleSelectedTreeTableRow();
+                    }
+            });
+
+            popup.add(menuItem);
+        }
+        
+        return popup;
+    }
+    
+    private JPopupMenu getBuyTreeTablePopupMenu() {                
         JPopupMenu popup = new JPopupMenu();
 
         JMenuItem menuItem = new JMenuItem("Buy...", this.getImageIcon("/images/16x16/inbox.png"));
@@ -440,7 +640,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         popup.add(menuItem);
 
-        final Transaction transaction = getSelectedTransaction();
+        final Transaction transaction = getSelectedTransaction(this.buyTreeTable);
 
         if(transaction != null) {
             menuItem = new JMenuItem("Sell...", this.getImageIcon("/images/16x16/outbox.png"));
@@ -474,7 +674,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         
         menuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                PortfolioManagementJPanel.this.showPortfolioChartJDialog();
+                PortfolioManagementJPanel.this.showBuyPortfolioChartJDialog();
             }
         });
 
@@ -514,6 +714,14 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         return popup;
     }
 
+    private void editSellTransaction(Transaction newTransaction, Transaction oldTransaction) {
+        assert(newTransaction.getContract().getType() == Contract.Type.Sell);
+        assert(oldTransaction.getContract().getType() == Contract.Type.Sell);
+        
+        final SellPortfolioTreeTableModel portfolioTreeTableModel = (SellPortfolioTreeTableModel)sellTreeTable.getTreeTableModel();
+        portfolioTreeTableModel.editTransaction(newTransaction, oldTransaction);        
+    }
+    
     private void editBuyTransaction(Transaction newTransaction, Transaction oldTransaction) {
         assert(newTransaction.getContract().getType() == Contract.Type.Buy);
         assert(oldTransaction.getContract().getType() == Contract.Type.Buy);
@@ -528,6 +736,13 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
         portfolioTreeTableModel.addTransaction(transaction);
         this.realTimeStockMonitor.addStockCode(transaction.getContract().getStock().getCode());
+    }
+
+    private void addSellTransaction(Transaction transaction) {
+        assert(transaction.getContract().getType() == Contract.Type.Sell);
+        
+        final SellPortfolioTreeTableModel portfolioTreeTableModel = (SellPortfolioTreeTableModel)sellTreeTable.getTreeTableModel();
+        portfolioTreeTableModel.addTransaction(transaction);
     }
     
     private void updateRealTimeStockMonitorAccordingToBuyPortfolioTreeTableModel() {
@@ -595,7 +810,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     
     private void initPortfolio() {
         try {
-            File f = new File("config" + File.separator + "portfolio.xml");
+            File f = new File("config" + File.separator + "buyportfolio.xml");
 
             XStream xStream = new XStream();
             InputStream inputStream = new java.io.FileInputStream(f);
@@ -612,8 +827,29 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         catch(com.thoughtworks.xstream.core.BaseException exp) {
             log.error("", exp);
         }
+
+        try {
+            File f = new File("config" + File.separator + "sellportfolio.xml");
+
+            XStream xStream = new XStream();
+            InputStream inputStream = new java.io.FileInputStream(f);
+            final Object obj = xStream.fromXML(inputStream);
+            
+            if(obj instanceof SellPortfolioTreeTableModel) {
+                final SellPortfolioTreeTableModel portfolioTreeTableModel = (SellPortfolioTreeTableModel)obj;
+                this.sellTreeTable.setTreeTableModel(portfolioTreeTableModel);
+            }
+        }
+        catch(java.io.FileNotFoundException exp) {
+            log.error("", exp);
+        }
+        catch(com.thoughtworks.xstream.core.BaseException exp) {
+            log.error("", exp);
+        }
         
         updateRealTimeStockMonitorAccordingToBuyPortfolioTreeTableModel();
+        
+        updateWealthHeader();
     }
     
     public boolean savePortfolio() {
@@ -622,9 +858,11 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             return false;
         }
         
-        File f = new File("config" + File.separator + "portfolio.xml");
+        File f = new File("config" + File.separator + "buyportfolio.xml");
                 
         XStream xStream = new XStream();   
+        
+        boolean status = true;
         
         try {
             OutputStream outputStream = new FileOutputStream(f);
@@ -633,14 +871,30 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
         catch(java.io.FileNotFoundException exp) {
             log.error("", exp);
-            return false;
+            status = false;
         }
         catch(com.thoughtworks.xstream.core.BaseException exp) {
             log.error("", exp);
-            return false;
+            status = false;
         }
-                      
-        return true;
+           
+        f = new File("config" + File.separator + "sellportfolio.xml");
+                
+        try {
+            OutputStream outputStream = new FileOutputStream(f);
+            final SellPortfolioTreeTableModel portfolioTreeTableModel = (SellPortfolioTreeTableModel)sellTreeTable.getTreeTableModel();
+            xStream.toXML(portfolioTreeTableModel, outputStream);  
+        }
+        catch(java.io.FileNotFoundException exp) {
+            log.error("", exp);
+            status = false;
+        }
+        catch(com.thoughtworks.xstream.core.BaseException exp) {
+            log.error("", exp);
+            status = false;
+        }
+        
+        return status;
     }
     
     public void initRealTimeStockMonitor(java.util.List<StockServerFactory> stockServerFactories) {
@@ -675,21 +929,41 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             }
         }  
         
-        updateNetWorth();
+        updateWealthHeader();
     }  
     
-    private void updateNetWorth() {
-        final double netWorth = 100.00;
+    private void updateWealthHeader() {
+        final BuyPortfolioTreeTableModel buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModel)this.buyTreeTable.getTreeTableModel();
+        final SellPortfolioTreeTableModel sellPortfolioTreeTableModel = (SellPortfolioTreeTableModel)this.sellTreeTable.getTreeTableModel();
+        
+        final double share = buyPortfolioTreeTableModel.getCurrentValue();
+        final double cash = sellPortfolioTreeTableModel.getNetSellingValue();
+        final double paperProfit = buyPortfolioTreeTableModel.getNetGainLossValue();
+        final double paperProfitPercentage = buyPortfolioTreeTableModel.getNetGainLossPercentage();
+        final double realizedProfit = sellPortfolioTreeTableModel.getNetGainLossValue();
+        final double realizedProfitPercentage = sellPortfolioTreeTableModel.getNetGainLossPercentage();
+        
+        final java.text.NumberFormat numberFormat = java.text.NumberFormat.getInstance();
+        numberFormat.setMaximumFractionDigits(2);
+        numberFormat.setMinimumFractionDigits(2);
+        
+        final String _share = numberFormat.format(share);
+        final String _cash = numberFormat.format(cash);
+        final String _paperProfit = numberFormat.format(paperProfit);
+        final String _paperProfitPercentage = numberFormat.format(paperProfitPercentage);
+        final String _realizedProfit = numberFormat.format(realizedProfit);
+        final String _realizedProfitPercentage = numberFormat.format(realizedProfitPercentage);
         
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
            public void run() {
-                final java.text.NumberFormat numberFormat = java.text.NumberFormat.getInstance();
-
-                numberFormat.setMaximumFractionDigits(2);
-                numberFormat.setMinimumFractionDigits(2);
-                
-                jLabel2.setText(numberFormat.format(netWorth));
-                jLabel2.setForeground(Utils.getColor(netWorth, 0.0));
+                jLabel2.setText(_share);
+                jLabel4.setText(_cash);
+                jLabel6.setText(_paperProfit + " (" + _paperProfitPercentage + "%)");
+                jLabel8.setText(_realizedProfit + " (" + _realizedProfitPercentage + "%)");
+                jLabel2.setForeground(Utils.getColor(share, 0.0));
+                jLabel4.setForeground(Utils.getColor(cash, 0.0));
+                jLabel6.setForeground(Utils.getColor(paperProfit, 0.0));
+                jLabel8.setForeground(Utils.getColor(realizedProfit, 0.0));
            }
         });
     }
@@ -718,9 +992,17 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSplitPane jSplitPane1;
