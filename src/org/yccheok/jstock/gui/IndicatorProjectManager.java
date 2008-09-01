@@ -38,21 +38,7 @@ public class IndicatorProjectManager {
     
     /** Creates a new instance of IndicatorProjectManager */
     public IndicatorProjectManager(String directory) {
-        File f = new File(directory);
-        
-        if(f.exists() == false) {
-            if(f.mkdir())
-            {
-                log.info("New directory " + directory + " created.");
-            }
-            else
-            {
-                log.error("Fail to create directory " + directory);
-            }
-        }
-        else {
-            log.info(directory + " already exists.");
-        }
+        org.yccheok.jstock.gui.Utils.createCompleteDirectoryHierarchyIfDoesNotExist(directory);
         
         this.directory = directory;
     }

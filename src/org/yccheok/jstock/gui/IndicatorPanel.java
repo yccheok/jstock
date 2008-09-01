@@ -986,7 +986,7 @@ public class IndicatorPanel extends JPanel implements ChangeListener {
     
     public void initIndicatorProjectManager() {
         try {
-            File f = new File("indicator" + File.separator + "project.xml");
+            File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "indicator" + File.separator + "project.xml");
 
             XStream xStream = new XStream();
             InputStream inputStream = new java.io.FileInputStream(f);
@@ -996,11 +996,11 @@ public class IndicatorPanel extends JPanel implements ChangeListener {
         }
         catch(java.io.FileNotFoundException exp) {
             log.error("", exp);
-            indicatorProjectManager = new IndicatorProjectManager("indicator");
+            indicatorProjectManager = new IndicatorProjectManager(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "indicator");
         }
         catch(com.thoughtworks.xstream.core.BaseException exp) {
             log.error("", exp);
-            indicatorProjectManager = new IndicatorProjectManager("indicator");
+            indicatorProjectManager = new IndicatorProjectManager(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "indicator");
         }
                         
         SwingUtilities.invokeLater(new Runnable() {
@@ -1025,7 +1025,7 @@ public class IndicatorPanel extends JPanel implements ChangeListener {
     }
     
     public boolean saveIndicatorProjectManager() {
-        File f = new File("indicator" + File.separator + "project.xml");
+        File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "indicator" + File.separator + "project.xml");
                 
         XStream xStream = new XStream();   
         
