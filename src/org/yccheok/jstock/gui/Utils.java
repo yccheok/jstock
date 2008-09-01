@@ -34,9 +34,12 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.PixelGrabber;
 import java.io.File;
+import java.io.IOException;
 import org.yccheok.jstock.engine.*;
 import java.util.*;
 import javax.swing.ImageIcon;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  *
@@ -161,6 +164,29 @@ public class Utils {
         return true;
     }
 
+    public static boolean createCompleteDirectoryHierarchyIfDoesNotExist(String directory) {
+        return createCompleteDirectoryHierarchyIfDoesNotExist(new File(directory));
+    }
+    
+    private static boolean createCompleteDirectoryHierarchyIfDoesNotExist(File f) {
+        if(f == null) return true;
+                
+        if(false == createCompleteDirectoryHierarchyIfDoesNotExist(f.getParentFile())) {
+            return false;
+        }
+        
+        String path = null;
+        
+        try {
+            path = f.getCanonicalPath();
+        } catch (IOException ex) {
+            log.error("", ex);
+            return false;
+        }
+        
+        return createDirectoryIfDoesNotExist(path);
+    }
+    
     public static boolean createDirectoryIfDoesNotExist(String directory) {
         java.io.File f = new java.io.File(directory);
         
@@ -178,6 +204,10 @@ public class Utils {
         return true;
     }
     
+    public static String getUserDataDirectory() {
+        return System.getProperty("user.home") + File.separator + ".jstock" + File.separator;
+    }
+    
     public static Color getColor(double price, double referencePrice) {
         if(price < referencePrice) {
             return JStockOptions.DEFAULT_LOWER_NUMERICAL_VALUE_FOREGROUND_COLOR;
@@ -188,6 +218,24 @@ public class Utils {
         }
         
         return JStockOptions.DEFAULT_NORMAL_TEXT_FOREGROUND_COLOR;
+    }
+    
+    // Deletes all files and subdirectories under dir.
+    // Returns true if all deletions were successful.
+    // If a deletion fails, the method stops attempting to delete and returns false.
+    public static boolean deleteDir(File dir) {
+        if (dir.isDirectory()) {
+            String[] children = dir.list();
+            for (int i=0; i<children.length; i++) {
+                boolean success = deleteDir(new File(dir, children[i]));
+                if (!success) {
+                    return false;
+                }
+            }
+        }
+    
+        // The directory is now empty so delete it
+        return dir.delete();
     }
     
     public static Stock getEmptyStock(String code, String symbol) {
@@ -218,5 +266,7 @@ public class Utils {
                             0,
                             Calendar.getInstance()                                        
                             );                
-    }    
+    } 
+    
+    private static final Log log = LogFactory.getLog(Utils.class);
 }
