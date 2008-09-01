@@ -40,35 +40,11 @@ public class TransactionSummary extends DefaultMutableTreeTableNode {
             
             int quantity = transaction.getQuantity();
             
-            if(transaction.getContract().getType() == Contract.Type.Buy) {
-                result += quantity;
-            }
-            else {
-                result -= quantity;
-            }
+            result += quantity;
         }
         
         return result;        
     }
-    
-    /*
-    public double getRealizedProfit() {
-        double result = 0.0;
-        
-        for(Transaction transaction : transactions) {
-            double total = transaction.getTotal();
-            
-            if(transaction.getContract().getType() == Contract.Type.Buy) {
-                result -= total;
-            }
-            else {
-                result += total;
-            }
-        }
-        
-        return result;
-    }
-    */
     
     public double getCalculatedBroker() {
         double result = 0.0;
