@@ -22,6 +22,8 @@
 
 package org.yccheok.jstock.engine;
 
+import java.util.List;
+
 /**
  *
  * @author yccheok
@@ -32,6 +34,7 @@ public interface Market {
     public int getNumOfStockChange(ChangeType type);
     public long getVolume();
     public double getValue();
+    public Country getCountry();
     
     public enum ChangeType
     {
@@ -39,4 +42,11 @@ public interface Market {
         Down,
         Unchange;
     }
+    
+    public enum Country
+    {
+        Malaysia,
+        UnitedState,
+        Singapore
+    };
 }
