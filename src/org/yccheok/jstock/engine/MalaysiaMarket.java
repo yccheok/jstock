@@ -55,26 +55,31 @@ public class MalaysiaMarket implements Market {
         this.value = value;
     }
     
+    @Override
     public double getIndex(Stock.Board board)
     {
         return indexMap.get(board);
     }
     
+    @Override
     public double getChange(Stock.Board board)
     {
         return changeMap.get(board);
     }
     
+    @Override
     public int getNumOfStockChange(ChangeType type)
     {
         return numMap.get(type);
     }
 
+    @Override
     public long getVolume()
     {
         return volume;
     }
     
+    @Override
     public double getValue() {
         return value;
     }
@@ -84,4 +89,9 @@ public class MalaysiaMarket implements Market {
     private Map<ChangeType, Integer> numMap = new HashMap<ChangeType, Integer>();
     private long volume;
     private double value;
+
+    @Override
+    public Country getCountry() {
+        return Country.Malaysia;
+    }
 }
