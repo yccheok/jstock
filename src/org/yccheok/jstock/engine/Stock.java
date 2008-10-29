@@ -236,7 +236,10 @@ public class Stock {
         Second("Second Board"),                 // 2nd
         CallWarrant("Call Warrant"),            // ??
         Mesdaq("Mesdaq"),                       // MESDAQ
-        Unknown("Unknown");
+        Unknown("Unknown"),
+        
+        DJI("Dow"),                             // Dow Jones Industrial Average (^DHI)
+        Nasdaq("Nasdaq");                       // NASDAQ COMPOSITE (^IXIC)
         
         private final String name;
 
