@@ -111,5 +111,29 @@ public class Utils {
         }
         
         return isValidPortNumber(port);
-    }    
+    }
+    
+    private static final List<Stock.Board> malaysiaBoards = new ArrayList<Stock.Board>();
+    private static final List<Stock.Board> unitedStateBoards = new ArrayList<Stock.Board>();
+    static
+    {
+        malaysiaBoards.add(Stock.Board.Main);
+        malaysiaBoards.add(Stock.Board.Second);
+        malaysiaBoards.add(Stock.Board.Mesdaq);
+        unitedStateBoards.add(Stock.Board.DJI);
+        unitedStateBoards.add(Stock.Board.Nasdaq);
+    }
+    
+    public static List<Stock.Board> getStockBoards(Market.Country country) {
+        switch(country)
+        {
+            case Malaysia:
+                return java.util.Collections.unmodifiableList(Utils.malaysiaBoards);
+            case UnitedState:
+                return java.util.Collections.unmodifiableList(Utils.unitedStateBoards);
+        }
+        
+        return java.util.Collections.emptyList();
+    }
+    
 }
