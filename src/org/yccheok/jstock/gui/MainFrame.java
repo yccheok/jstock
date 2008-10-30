@@ -71,11 +71,11 @@ public class MainFrame extends javax.swing.JFrame {
         
         this.createSystemTrayIcon();
         
+        this.initStatusBar();        
         this.initUsernameAndPassword();
         this.initTableHeaderToolTips();               
         this.initjComboBox1EditorComponentKeyListerner();
         this.initMyJXStatusBarImageLabelMouseAdapter();
-        this.initStockServerFactories();
         this.initStockCodeAndSymbolDatabase();
         this.initMarketThread();
         this.initRealTimeStockMonitor();  
@@ -1312,7 +1312,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     public java.util.List<StockServerFactory> getStockServerFactory() {
-        return Collections.unmodifiableList(this.stockServerFactories);
+        return Factories.INSTANCE.getStockServerFactories(this.jStockOptions.getCountry());
     }
     
     public java.util.List<Stock> getStocks() {
@@ -1448,6 +1448,7 @@ public class MainFrame extends javax.swing.JFrame {
         
         public void run() {
             final Thread currentThread = Thread.currentThread();
+            final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactory();
             
             while(!currentThread.isInterrupted()) {
                 for (StockServerFactory factory : stockServerFactories) {
@@ -1507,6 +1508,7 @@ public class MainFrame extends javax.swing.JFrame {
         public Boolean doInBackground() {
             Boolean success = false;
             int tries = 0;
+            final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactory();
             
             while(!isCancelled() && !success && runnable) {
                 for (StockServerFactory factory : stockServerFactories) {
@@ -1560,6 +1562,8 @@ public class MainFrame extends javax.swing.JFrame {
     
     private void initRealTimeStockMonitor() {
         realTimeStockMonitor = new RealTimeStockMonitor(4, 20, jStockOptions.getScanningSpeed());
+        
+        final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactory();
         
         for(StockServerFactory factory : stockServerFactories) {
             realTimeStockMonitor.addStockServerFactory(factory);
@@ -1759,6 +1763,8 @@ public class MainFrame extends javax.swing.JFrame {
     private void initStockHistoryMonitor() {
         this.stockHistoryMonitor = new StockHistoryMonitor(4);
         
+        final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactory();
+        
         for(StockServerFactory factory : stockServerFactories) {
             stockHistoryMonitor.addStockServerFactory(factory);
         }
@@ -1780,10 +1786,6 @@ public class MainFrame extends javax.swing.JFrame {
     private void initUsernameAndPassword() {
         username = "";
         password = "";
-    }
-    
-    private void initStockServerFactories() {
-        stockServerFactories.add(CIMBStockServerFactory.getInstance(username, password));
     }
     
     private void initMarketThread() {
@@ -1950,83 +1952,6 @@ public class MainFrame extends javax.swing.JFrame {
         }
     }
     
-    private void spawnTimeServerThread() {
-        log.info("start of spawnTimeServerThread...");
-        
-        final String[] hosts = {
-            "time-a.nist.gov",
-            "time-b.nist.gov",
-            "time-a.timefreq.bldrdoc.gov",
-            "time-b.timefreq.bldrdoc.gov",
-            "time-c.timefreq.bldrdoc.gov",
-            "utcnist.colorado.edu",
-            "time.nist.gov",
-            "time-nw.nist.gov",
-            "nist1.datum.com",
-            "nist1.dc.certifiedtime.com",
-            "nist1.nyc.certifiedtime.com",
-            "nist1.sjc.certifiedtime.com"
-        };
-        
-        Runnable r = new Runnable() {
-            public void run() {
-                boolean success = false;
-                
-                for(String host : hosts) {
-                    TimeTCPClient client = new TimeTCPClient();
-
-                    // We want to timeout if a response takes longer than 60 seconds
-                    client.setDefaultTimeout(10000);
-                    
-                    try {                        
-                        client.connect(host);
-                        java.util.Date serverDate = client.getDate();
-                        client.disconnect(); 
-                        
-                        java.util.Calendar calendar = java.util.GregorianCalendar.getInstance();
-                        calendar.set(2007, 6, 13);
-                        java.util.Date expiredDate = calendar.getTime();
-                        
-                        log.info("Time server  : " + serverDate);
-                        log.info("Expired date : " + expiredDate);
-                        
-                        if(expiredDate.before(serverDate)) {
-                            success = false;
-                            break;
-                        }
-                        else {
-                            success = true;
-                            break;
-                        }
-                    } catch (SocketException ex) {
-                        log.error("", ex);
-                    } catch (IOException ex) {
-                        log.error("", ex);
-                    }              
-                }
-                
-                if(success == false) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            JOptionPane.showMessageDialog(null, "This trial versioned software had expired. \nIt will shutdown in next 10 seconds. \nPlease contact yccheok@yahoo.com to purchase the software.");      
-                        }
-                    });                    
-                    
-                    try {
-                        Thread.sleep(10000);
-                    }
-                    catch(InterruptedException exp) {
-                        log.error("", exp);
-                    }
-                    
-                    System.exit(1);
-                }
-            }
-        };
-        
-        new Thread(r).start();
-    }
-    
     public void displayPopupMessage(final String caption, final String message) {
         if(trayIcon == null) return;
         
@@ -2066,17 +1991,25 @@ public class MainFrame extends javax.swing.JFrame {
         }
     }
     
+    private void initStatusBar()
+    {
+        final String message = "Connecting to stock server to retrieve stock information ...";
+        final ImageIcon icon = getImageIcon("/images/16x16/network-connecting.png");
+        final String iconMessage = "Connecting...";
+        
+        statusBar.setMainMessage(message)
+                .setImageIcon(icon, iconMessage)
+                .setCountryIcon(
+					MainFrame.jStockOptions.getCountry().getIcon(), 
+					MainFrame.jStockOptions.getCountry() + " stock market");
+    }
+    
     private TrayIcon trayIcon;
     
     private static final Log log = LogFactory.getLog(MainFrame.class);
         
-    private MyJXStatusBar statusBar = new MyJXStatusBar(
-            "Connecting to stock server to retrieve stock information ...",
-            getImageIcon("/images/16x16/network-connecting.png"),
-            "Connecting...");
+    private MyJXStatusBar statusBar = new MyJXStatusBar();
 
-    private java.util.List<StockServerFactory> stockServerFactories = new java.util.ArrayList<StockServerFactory>();
-    
     // A set of stock history which we need to display GUI on them, when user request explicitly.
     private java.util.Set<String> stockCodeHistoryGUI = new java.util.HashSet<String>();
     
