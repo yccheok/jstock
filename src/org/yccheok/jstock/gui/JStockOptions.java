@@ -26,6 +26,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import org.yccheok.jstock.portfolio.BrokingFirm;
+import org.yccheok.jstock.engine.Country;
 
 /**
  *
@@ -55,6 +56,7 @@ public class JStockOptions {
         setScanningSpeed(1000);
         setAlertSpeed(5);
         setLookNFeel("");
+        setCountry(Country.Malaysia);
         
         this.setNormalTextForegroundColor(DEFAULT_NORMAL_TEXT_FOREGROUND_COLOR);
         this.setHigherNumericalValueForegroundColor(DEFAULT_HIGHER_NUMERICAL_VALUE_FOREGROUND_COLOR);
@@ -96,6 +98,8 @@ public class JStockOptions {
     
     private double expectedProfitPercentage = 10.0;
     
+    private Country country;
+        
     public boolean isAutoBrokerFeeCalculationEnabled() {
         return this.isAutoBrokerFeeCalculationEnabled;
     }
@@ -108,6 +112,11 @@ public class JStockOptions {
         /* For backward compatible */
         if(brokingFirms == null) {
             brokingFirms = new ArrayList<BrokingFirm>();
+        }
+        
+		/* For backward compatible */
+        if(country == null) {
+            country = Country.Malaysia;
         }
         
         return this;
@@ -310,5 +319,13 @@ public class JStockOptions {
     
     public void setExpectedProfitPercentage(double expectedProfitPercentage) {
         this.expectedProfitPercentage = expectedProfitPercentage;
-    }    
+    }
+
+    public Country getCountry() {
+        return country;
+    }
+
+    public void setCountry(Country country) {
+        this.country = country;
+    }
 }
