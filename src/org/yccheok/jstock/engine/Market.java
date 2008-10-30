@@ -42,11 +42,4 @@ public interface Market {
         Down,
         Unchange;
     }
-    
-    public enum Country
-    {
-        Malaysia,
-        UnitedState,
-        Singapore
-    };
 }
