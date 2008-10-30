@@ -124,7 +124,7 @@ public class Utils {
         unitedStateBoards.add(Stock.Board.Nasdaq);
     }
     
-    public static List<Stock.Board> getStockBoards(Market.Country country) {
+    public static List<Stock.Board> getStockBoards(Country country) {
         switch(country)
         {
             case Malaysia:
