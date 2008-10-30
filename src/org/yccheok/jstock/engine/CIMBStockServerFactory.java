@@ -39,7 +39,7 @@ public class CIMBStockServerFactory implements StockServerFactory {
         marketServer = new CIMBMarketServer();
     }
     
-    public static StockServerFactory getInstance(String usename, String password) {
+    public static StockServerFactory newInstance(String usename, String password) {
         return new CIMBStockServerFactory(usename, password);
     }
     
