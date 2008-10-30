@@ -34,36 +34,49 @@ import org.jdesktop.swingx.plaf.basic.*;
 public class MyJXStatusBar extends JXStatusBar {
     
     /** Creates a new instance of MyJStatusBar */
-    public MyJXStatusBar(String mainMessage, ImageIcon imageIcon, String imageIconToolTipText) {
+    public MyJXStatusBar() {
         super();
         
-        mainLabel = new JLabel(mainMessage);
+        mainLabel = new JLabel();
         progressBar = new JProgressBar();
         progressBar.setStringPainted(false);
-        imageLabel = new JLabel(imageIcon);
-        imageLabel.setToolTipText(imageIconToolTipText);
+        countryLabel = new JLabel();
+        imageLabel = new JLabel();
 
         JXStatusBar.Constraint c1 = new JXStatusBar.Constraint(JXStatusBar.Constraint.ResizeBehavior.FILL);
         JXStatusBar.Constraint c2 = new JXStatusBar.Constraint(100);
         JXStatusBar.Constraint c3 = new JXStatusBar.Constraint(50);
+        JXStatusBar.Constraint c4 = new JXStatusBar.Constraint(50);
         
         this.add(mainLabel, c1);
         this.add(progressBar, c2);
-        this.add(imageLabel, c3);
+        this.add(countryLabel, c3);
+        this.add(imageLabel, c4);
     }
 
-    public void setMainMessage(String mainMessage) {
+    public MyJXStatusBar setMainMessage(String mainMessage) {
         mainLabel.setText(mainMessage);
+        return this;
     }
 
-    public void setImageIcon(ImageIcon imageIcon, String imageIconToolTipText) {
+    public MyJXStatusBar setImageIcon(ImageIcon imageIcon, String imageIconToolTipText) {
         imageLabel.setIcon(imageIcon);
+        imageLabel.setHorizontalAlignment(JLabel.CENTER);
         imageLabel.setToolTipText(imageIconToolTipText);
+        return this;
     }    
+
+    public MyJXStatusBar setCountryIcon(ImageIcon imageIcon, String imageIconToolTipText) {
+        countryLabel.setIcon(imageIcon);
+        countryLabel.setHorizontalAlignment(JLabel.CENTER);
+        countryLabel.setToolTipText(imageIconToolTipText);
+        return this;
+    }
     
-    public void setProgressBar(boolean newValue) {
+    public MyJXStatusBar setProgressBar(boolean newValue) {
         progressBar.setIndeterminate(newValue);
         progressBar.setVisible(newValue);
+        return this;
     }
     
     public JLabel getImageLabel() {
@@ -71,6 +84,7 @@ public class MyJXStatusBar extends JXStatusBar {
     }
     
     private JLabel mainLabel;
+    private JLabel countryLabel;
     private JLabel imageLabel;
     private JProgressBar progressBar;    
 }
