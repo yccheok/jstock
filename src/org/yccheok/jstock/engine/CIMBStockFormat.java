@@ -77,8 +77,8 @@ public class CIMBStockFormat implements StockFormat {
                         
                     String[] stockFields = trimedStockData.split("\\|");
                     
-                    String code;
-                    String symbol;
+                    Code code;
+                    Symbol symbol;
                     String name;
                     Stock.Board board;
                     Stock.Industry industry;
@@ -116,8 +116,8 @@ public class CIMBStockFormat implements StockFormat {
                             if(tmpBoard == null) tmpBoard = Stock.Board.Unknown;
                             if(tmpIndustry == null) tmpIndustry = Stock.Industry.Unknown;
                             
-                            code = stockFields[CODE_TOKEN_INDEX].trim();
-                            symbol = stockFields[SYMBOL_TOKEN_INDEX].trim();
+                            code = Code.newInstance(stockFields[CODE_TOKEN_INDEX].trim());
+                            symbol = Symbol.newInstance(stockFields[SYMBOL_TOKEN_INDEX].trim());
                             name = stockFields[NAME_TOKEN_INDEX].trim();
                             board = tmpBoard;
                             industry = tmpIndustry;
@@ -217,8 +217,8 @@ public class CIMBStockFormat implements StockFormat {
                             if(tmpBoard == null) tmpBoard = Stock.Board.Unknown;
                             if(tmpIndustry == null) tmpIndustry = Stock.Industry.Unknown;
                             
-                            code = stockFields[CODE_TOKEN_INDEX].trim();
-                            symbol = stockFields[SYMBOL_TOKEN_INDEX].trim();
+                            code = Code.newInstance(stockFields[CODE_TOKEN_INDEX].trim());
+                            symbol = Symbol.newInstance(stockFields[SYMBOL_TOKEN_INDEX].trim());
                             name = "";
                             board = tmpBoard;
                             industry = tmpIndustry;
