@@ -121,6 +121,6 @@ public class Transaction extends DefaultMutableTreeTableNode {
     
     @Override
     public String toString() {
-        return contract.getStock().getSymbol();
+        return contract.getStock().getSymbol().toString();
     }
 }
