@@ -29,6 +29,6 @@ package org.yccheok.jstock.engine;
 public interface StockServerFactory {
     
     public StockServer getStockServer();
-    public StockHistoryServer getStockHistoryServer(String code);
+    public StockHistoryServer getStockHistoryServer(Code code);
     public MarketServer getMarketServer();
 }
