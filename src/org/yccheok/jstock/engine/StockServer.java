@@ -27,9 +27,12 @@ package org.yccheok.jstock.engine;
  * @author yccheok
  */
 public interface StockServer {
-    public Stock getStockBySymbol(String symbol) throws StockNotFoundException;
-    public Stock getStockByCode(String code) throws StockNotFoundException;
-    public java.util.List<Stock> getStockBySymbol(java.util.List<String> symbols) throws StockNotFoundException;
-    public java.util.List<Stock> getStockByCode(java.util.List<String> codes) throws StockNotFoundException;
-    public java.util.List<Stock> getAllStock() throws StockNotFoundException;
+    public Stock getStock(Symbol symbol) throws StockNotFoundException;
+    public Stock getStock(Code code) throws StockNotFoundException;
+    
+    // Due to erasure in generic, we are forced to provide two different method
+    // name.
+    public java.util.List<Stock> getStocksBySymbols(java.util.List<Symbol> symbols) throws StockNotFoundException;
+    public java.util.List<Stock> getStocksByCodes(java.util.List<Code> codes) throws StockNotFoundException;
+    public java.util.List<Stock> getAllStocks() throws StockNotFoundException;
 }
