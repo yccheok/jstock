@@ -30,8 +30,8 @@ public class Stock {
     
     /** Creates a new instance of Stock */
     public Stock(
-        String code,
-        String symbol,
+        Code code,
+        Symbol symbol,
         String name,
         Board board,
         Industry industry,
@@ -115,11 +115,11 @@ public class Stock {
         this.calendar = stock.calendar;
     }
     
-    public String getCode() {
+    public Code getCode() {
         return code;
     }
 
-    public String getSymbol() {
+    public Symbol getSymbol() {
         return symbol;
     }
 
@@ -219,6 +219,7 @@ public class Stock {
         return (java.util.Calendar)calendar.clone();        
     }
     
+    @Override
     public String toString() {
         return Stock.class.getName() + "[code=" + code + ",symbol=" + symbol + ",name=" + name + ",board=" + board + ",industry=" + industry +
                 ",openPrice=" + openPrice + ",lastPrice=" + lastPrice + ",highPrice=" + highPrice + ",lowPrice=" + lowPrice +
@@ -247,6 +248,7 @@ public class Stock {
             this.name = name;
         }
         
+        @Override
         public String toString() {
             return name;
         }
@@ -278,13 +280,14 @@ public class Stock {
             this.name = name;
         }
         
+        @Override
         public String toString() {
             return name;
         }
     }
             
-    private final String code;
-    private final String symbol;
+    private final Code code;
+    private final Symbol symbol;
     private final String name;
     private final Board board;
     private final Industry industry;
