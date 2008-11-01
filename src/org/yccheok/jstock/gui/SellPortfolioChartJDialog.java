@@ -10,6 +10,7 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.general.DefaultPieDataset;
+import org.yccheok.jstock.engine.Symbol;
 import org.yccheok.jstock.portfolio.Portfolio;
 import org.yccheok.jstock.portfolio.Transaction;
 import org.yccheok.jstock.portfolio.TransactionSummary;
@@ -101,65 +102,65 @@ public class SellPortfolioChartJDialog extends javax.swing.JDialog {
             if(transactionSummary.getChildCount() <= 0) continue;
             
             Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
-            final String symbol = transaction.getContract().getStock().getSymbol();
+            final Symbol symbol = transaction.getContract().getStock().getSymbol();
             
             /* Should use reflection technology. */
             if(name.equals(cNames[0])) {
-                data.setValue(symbol, portfolioTreeTableModel.getNetGainLossPercentage(transactionSummary));
+                data.setValue(symbol.toString(), portfolioTreeTableModel.getNetGainLossPercentage(transactionSummary));
             }
             if(name.equals(cNames[1])) {
-                data.setValue(symbol, -portfolioTreeTableModel.getNetGainLossPercentage(transactionSummary));
+                data.setValue(symbol.toString(), -portfolioTreeTableModel.getNetGainLossPercentage(transactionSummary));
             }            
             else if(name.equals(cNames[2])) {
-                data.setValue(symbol, portfolioTreeTableModel.getGainLossPercentage(transactionSummary));                
+                data.setValue(symbol.toString(), portfolioTreeTableModel.getGainLossPercentage(transactionSummary));                
             }
             else if(name.equals(cNames[3])) {
-                data.setValue(symbol, -portfolioTreeTableModel.getGainLossPercentage(transactionSummary));                
+                data.setValue(symbol.toString(), -portfolioTreeTableModel.getGainLossPercentage(transactionSummary));                
             }            
             else if(name.equals(cNames[4])) {
-                data.setValue(symbol, portfolioTreeTableModel.getNetGainLossValue(transactionSummary));                
+                data.setValue(symbol.toString(), portfolioTreeTableModel.getNetGainLossValue(transactionSummary));                
             }
             else if(name.equals(cNames[5])) {
-                data.setValue(symbol, -portfolioTreeTableModel.getNetGainLossValue(transactionSummary));                
+                data.setValue(symbol.toString(), -portfolioTreeTableModel.getNetGainLossValue(transactionSummary));                
             }
             else if(name.equals(cNames[6])) {
-                data.setValue(symbol, portfolioTreeTableModel.getGainLossValue(transactionSummary));                
+                data.setValue(symbol.toString(), portfolioTreeTableModel.getGainLossValue(transactionSummary));                
             }
             else if(name.equals(cNames[7])) {
-                data.setValue(symbol, -portfolioTreeTableModel.getGainLossValue(transactionSummary));                
+                data.setValue(symbol.toString(), -portfolioTreeTableModel.getGainLossValue(transactionSummary));                
             }            
             else if(name.equals(cNames[8])) {
-                data.setValue(symbol, transactionSummary.getNetTotal());                
+                data.setValue(symbol.toString(), transactionSummary.getNetTotal());                
             }
             else if(name.equals(cNames[9])) {
-                data.setValue(symbol, transactionSummary.getTotal());                
+                data.setValue(symbol.toString(), transactionSummary.getTotal());                
             }
             else if(name.equals(cNames[10])) {
-                data.setValue(symbol, transactionSummary.getReferenceTotal());                
+                data.setValue(symbol.toString(), transactionSummary.getReferenceTotal());                
             }
             else if(name.equals(cNames[11])) {
-                data.setValue(symbol, portfolioTreeTableModel.getGainLossPrice(transactionSummary));                
+                data.setValue(symbol.toString(), portfolioTreeTableModel.getGainLossPrice(transactionSummary));                
             }
             else if(name.equals(cNames[12])) {
-                data.setValue(symbol, -portfolioTreeTableModel.getGainLossPrice(transactionSummary));                
+                data.setValue(symbol.toString(), -portfolioTreeTableModel.getGainLossPrice(transactionSummary));                
             }            
             else if(name.equals(cNames[13])) {
-                data.setValue(symbol, portfolioTreeTableModel.getSellingPrice(transactionSummary));                
+                data.setValue(symbol.toString(), portfolioTreeTableModel.getSellingPrice(transactionSummary));                
             }
             else if(name.equals(cNames[14])) {
-                data.setValue(symbol, portfolioTreeTableModel.getPurchasePrice(transactionSummary));                
+                data.setValue(symbol.toString(), portfolioTreeTableModel.getPurchasePrice(transactionSummary));                
             }
             else if(name.equals(cNames[15])) {
-                data.setValue(symbol, transactionSummary.getQuantity());                
+                data.setValue(symbol.toString(), transactionSummary.getQuantity());                
             }
             else if(name.equals(cNames[16])) {
-                data.setValue(symbol, transactionSummary.getCalculatedBroker());                
+                data.setValue(symbol.toString(), transactionSummary.getCalculatedBroker());                
             }
             else if(name.equals(cNames[17])) {
-                data.setValue(symbol, transactionSummary.getCalculatedStampDuty());                
+                data.setValue(symbol.toString(), transactionSummary.getCalculatedStampDuty());                
             }
             else if(name.equals(cNames[18])) {
-                data.setValue(symbol, transactionSummary.getCalculatdClearingFee());                
+                data.setValue(symbol.toString(), transactionSummary.getCalculatdClearingFee());                
             }            
         }
         
