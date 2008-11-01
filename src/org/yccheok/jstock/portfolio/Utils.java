@@ -18,6 +18,8 @@
 
 package org.yccheok.jstock.portfolio;
 
+import org.yccheok.jstock.engine.Code;
+
 /**
  *
  * @author Owner
@@ -25,8 +27,8 @@ package org.yccheok.jstock.portfolio;
 public class Utils {
     
     public static boolean isTransactionWithEqualStockCode(Transaction t0, Transaction t1) {
-        final String c0 = t0.getContract().getStock().getCode();
-        final String c1 = t1.getContract().getStock().getCode();
+        final Code c0 = t0.getContract().getStock().getCode();
+        final Code c1 = t1.getContract().getStock().getCode();
         
         return c0.equals(c1);
     }
