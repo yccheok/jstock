@@ -238,7 +238,7 @@ public class Utils {
         return dir.delete();
     }
     
-    public static Stock getEmptyStock(String code, String symbol) {
+    public static Stock getEmptyStock(Code code, Symbol symbol) {
         return new Stock(   code,
                             symbol,
                             "",
