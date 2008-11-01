@@ -23,6 +23,7 @@
 package org.yccheok.jstock.gui;
 
 import com.nexes.wizard.*;
+import org.yccheok.jstock.engine.Code;
 
 /**
  *
@@ -76,7 +77,7 @@ public class WizardDownloadHistoryProgressDescriptor extends WizardPanelDescript
         WizardSelectIndicatorJPanel wizardSelectIndicatorJPanel = (WizardSelectIndicatorJPanel)wizardPanelDescriptor.getPanelComponent();
         
         java.util.List<String> projects = wizardSelectIndicatorJPanel.getSelectedProjects();
-        java.util.List<String> codes = wizardSelectStockJPanel.getSelectedCodes();
+        java.util.List<Code> codes = wizardSelectStockJPanel.getSelectedCodes();
 
         wizardDownloadHistoryProgressJPanel.startDownload(projects, codes);
     }
