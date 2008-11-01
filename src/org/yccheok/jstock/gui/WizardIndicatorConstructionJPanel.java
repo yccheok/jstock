@@ -89,12 +89,12 @@ public class WizardIndicatorConstructionJPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
     
     
-    private class IndicatorConstructingTask extends SwingWorker<java.util.Map<String, java.util.List<OperatorIndicator>>, Integer> {
+    private class IndicatorConstructingTask extends SwingWorker<java.util.Map<Code, java.util.List<OperatorIndicator>>, Integer> {
         private volatile boolean runnable = true;
         private java.util.List<String> projects;
-        private java.util.List<String> codes;
+        private java.util.List<Code> codes;
         
-        public IndicatorConstructingTask(java.util.List<String> projects, java.util.List<String> codes) {
+        public IndicatorConstructingTask(java.util.List<String> projects, java.util.List<Code> codes) {
             this.projects = projects;
             this.codes = codes;            
         }
@@ -103,15 +103,15 @@ public class WizardIndicatorConstructionJPanel extends javax.swing.JPanel {
             runnable = false;
         }
         
-        public java.util.Map<String, java.util.List<OperatorIndicator>> doInBackground() {
+        public java.util.Map<Code, java.util.List<OperatorIndicator>> doInBackground() {
             final MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, WizardIndicatorConstructionJPanel.this);
             final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = m.getStockCodeAndSymbolDatabase();
             final StockHistorySerializer stockHistorySerializer = m.getStockHistorySerializer();
             final IndicatorProjectManager indicatorProjectManager = m.getIndicatorProjectManager();
             
-            java.util.Map<String, java.util.List<OperatorIndicator>> operatorIndicators = new java.util.HashMap<String, java.util.List<OperatorIndicator>>();
+            java.util.Map<Code, java.util.List<OperatorIndicator>> operatorIndicators = new java.util.HashMap<Code, java.util.List<OperatorIndicator>>();
             
-            for(String code : codes) {
+            for(Code code : codes) {
                 operatorIndicators.put(code, new java.util.ArrayList<OperatorIndicator>());
             }
             
@@ -120,7 +120,7 @@ public class WizardIndicatorConstructionJPanel extends javax.swing.JPanel {
             publish(count);
             
             root:
-            for(String code : codes) {
+            for(Code code : codes) {
                 final StockHistoryServer stockHistoryServer = stockHistorySerializer.load(code);
                 
                 if(stockHistoryServer == null) {
@@ -159,6 +159,7 @@ public class WizardIndicatorConstructionJPanel extends javax.swing.JPanel {
             return operatorIndicators;
          }
 
+        @Override
          protected void process(java.util.List<Integer> progresses) {
              for (Integer progress : progresses) {
                  jProgressBar1.setValue(progress);
@@ -167,6 +168,7 @@ public class WizardIndicatorConstructionJPanel extends javax.swing.JPanel {
              }
          }
          
+        @Override
         public void done() {
             try {
                 operatorIndicators = get();
@@ -192,7 +194,7 @@ public class WizardIndicatorConstructionJPanel extends javax.swing.JPanel {
         }
     }
     
-    public void startConstructing(java.util.List<String> projects, java.util.List<String> codes) {
+    public void startConstructing(java.util.List<String> projects, java.util.List<Code> codes) {
         operatorIndicators = null;
         
         if(indicatorConstructingTask != null) {
@@ -237,14 +239,14 @@ public class WizardIndicatorConstructionJPanel extends javax.swing.JPanel {
     }
     
     // Code -> OperatorIndicator List
-    public java.util.Map<String, java.util.List<OperatorIndicator>> getOperatorIndicators() {
+    public java.util.Map<Code, java.util.List<OperatorIndicator>> getOperatorIndicators() {
         return java.util.Collections.unmodifiableMap(operatorIndicators);
     }
     
     private static final Log log = LogFactory.getLog(WizardIndicatorConstructionJPanel.class);
     private IndicatorConstructingTask indicatorConstructingTask;
     private java.beans.PropertyChangeSupport propertyChangeSupport = new java.beans.PropertyChangeSupport(this);
-    private java.util.Map<String, java.util.List<OperatorIndicator>> operatorIndicators;
+    private java.util.Map<Code, java.util.List<OperatorIndicator>> operatorIndicators;
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
