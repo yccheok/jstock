@@ -370,13 +370,13 @@ public class StockJDialog extends javax.swing.JDialog {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
 // TODO add your handling code here:
-        final java.util.List<String> codes = this.buildSelectedCode();
+        final java.util.List<Code> codes = this.buildSelectedCode();
         final MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, StockJDialog.this);
 
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                for(String code : codes) {
-                    String symbol = m.getStockCodeAndSymbolDatabase().codeToSymbol(code);
+                for(Code code : codes) {
+                    Symbol symbol = m.getStockCodeAndSymbolDatabase().codeToSymbol(code);
                     assert(symbol != null);
                     
                     final Stock stock = org.yccheok.jstock.gui.Utils.getEmptyStock(code, symbol);
@@ -416,8 +416,8 @@ public class StockJDialog extends javax.swing.JDialog {
         updateCheckBoxesState();
     }//GEN-LAST:event_jRadioButton2ActionPerformed
     
-    public java.util.List<String> buildSelectedCode() {
-        java.util.List<String> selectedCodes = new java.util.ArrayList<String>();
+    public java.util.List<Code> buildSelectedCode() {
+        java.util.List<Code> selectedCodes = new java.util.ArrayList<Code>();
         
         MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, StockJDialog.this);
         
