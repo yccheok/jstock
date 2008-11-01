@@ -59,6 +59,7 @@ public class SimpleDate implements java.lang.Comparable<SimpleDate> {
         this.date = simpleDate.date;
     }
     
+    @Override
     public int hashCode() {
         int result = 37;
         result = 37 * result + year;
