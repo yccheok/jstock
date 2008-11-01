@@ -27,6 +27,7 @@ import java.awt.event.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.yccheok.jstock.engine.Code;
 
 /**
  *
@@ -57,12 +58,13 @@ public class WizardSelectStockDescriptor extends WizardPanelDescriptor implement
         wizardSelectStockJPanel.updateRadioBoxState();
     }
     
+    @Override
     public void aboutToHidePanel() {
         if(wizardSelectStockJPanel.buildSelectedCode() == false) {
             log.error("Fail to build selected stock");
         }
         
-        java.util.List<String> codes = wizardSelectStockJPanel.getSelectedCodes();
+        java.util.List<Code> codes = wizardSelectStockJPanel.getSelectedCodes();
         final MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, wizardSelectStockJPanel);
 
         /*
