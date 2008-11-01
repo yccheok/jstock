@@ -91,9 +91,9 @@ public class WizardVerifyDatabaseJPanel extends javax.swing.JPanel {
     
     private class VerifyDatabaseTask extends SwingWorker<Integer, Integer> {
         private volatile boolean runnable = true;
-        private java.util.List<String> codes;
+        private java.util.List<Code> codes;
         
-        public VerifyDatabaseTask(java.util.List<String> codes) {
+        public VerifyDatabaseTask(java.util.List<Code> codes) {
             this.codes = codes;            
         }
         
@@ -111,7 +111,7 @@ public class WizardVerifyDatabaseJPanel extends javax.swing.JPanel {
             publish(count);
             
             root:
-            for(String code : codes) {
+            for(Code code : codes) {
                 final StockHistoryServer stockHistoryServer = stockHistorySerializer.load(code);
                     
                 if(stockHistoryServer != null)
@@ -155,7 +155,7 @@ public class WizardVerifyDatabaseJPanel extends javax.swing.JPanel {
         }
     }
     
-    public void startVerify(java.util.List<String> codes) {
+    public void startVerify(java.util.List<Code> codes) {
         if(verifyHistoryTask != null) {
             verifyHistoryTask._stop();
             try {
