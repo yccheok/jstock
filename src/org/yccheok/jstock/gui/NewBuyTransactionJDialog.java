@@ -35,9 +35,11 @@ import net.sf.nachocalendar.CalendarFactory;
 import net.sf.nachocalendar.components.DateField;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.SimpleDate;
 import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.StockCodeAndSymbolDatabase;
+import org.yccheok.jstock.engine.Symbol;
 import org.yccheok.jstock.portfolio.Broker;
 import org.yccheok.jstock.portfolio.BrokingFirm;
 import org.yccheok.jstock.portfolio.ClearingFee;
@@ -325,7 +327,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     public void setTransaction(Transaction transaction) {
-        final String symbol = transaction.getContract().getStock().getSymbol();
+        final Symbol symbol = transaction.getContract().getStock().getSymbol();
         final Date date = transaction.getContract().getDate().getCalendar().getTime();
         final int quantity = transaction.getContract().getQuantity();
         final double price = transaction.getContract().getPrice();
@@ -335,7 +337,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         final double stampDuty = transaction.getCalculatedStampDuty();
         final double netValue = transaction.getNetTotal();
         
-        this.jTextField1.setText(symbol);
+        this.jTextField1.setText(symbol.toString());
         ((DateField)jPanel3).setValue(date);
         this.jSpinner1.setValue(quantity);
         this.jFormattedTextField1.setValue(price);
@@ -353,8 +355,8 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
                         
         final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = m.getStockCodeAndSymbolDatabase();
         
-        final String symbol = jTextField1.getText();
-        final String code = stockCodeAndSymbolDatabase.symbolToCode(symbol);
+        final Symbol symbol = Symbol.newInstance(jTextField1.getText());
+        final Code code = stockCodeAndSymbolDatabase.symbolToCode(symbol);
         final DateField dateField = (DateField)jPanel3;
         
         final Stock stock = Utils.getEmptyStock(code, symbol);
@@ -475,7 +477,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
                 final DateField dateField = (DateField)jPanel3;
                 final Date date = (Date)dateField.getValue();
                 // Stock and date information is not important at this moment.
-                Contract.ContractBuilder builder = new Contract.ContractBuilder(Utils.getEmptyStock(name, name), new SimpleDate(date));        
+                Contract.ContractBuilder builder = new Contract.ContractBuilder(Utils.getEmptyStock(Code.newInstance(name), Symbol.newInstance(name)), new SimpleDate(date));        
                 Contract contract = builder.type(Contract.Type.Buy).quantity(unit).price(price).build();
         
                 final double brokerFee = brokingFirm.brokerCalculate(contract);
@@ -544,8 +546,8 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         this.jComboBox1.setEnabled(enable);
     }
     
-    public void setStockSymbol(String name) {
-        this.jTextField1.setText(name);
+    public void setStockSymbol(Symbol symbol) {
+        this.jTextField1.setText(symbol.toString());
     }
     
     public void setStockSelectionEnabled(boolean flag) {
@@ -590,8 +592,8 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
                         
                         final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = m.getStockCodeAndSymbolDatabase();
                         
-                        String code = stockCodeAndSymbolDatabase.searchStockCode(stock);
-                        String symbol = null;
+                        Code code = stockCodeAndSymbolDatabase.searchStockCode(stock);
+                        Symbol symbol = null;
                             
                         if(code != null) {
                             symbol = stockCodeAndSymbolDatabase.codeToSymbol(code);
@@ -606,7 +608,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
                             }
                         }
                         
-                        NewBuyTransactionJDialog.this.jTextField1.setText(symbol);
+                        NewBuyTransactionJDialog.this.jTextField1.setText(symbol.toString());
                     }   /* if(stock.length() > 0) */
                 }   /* if(KeyEvent.VK_ENTER == e.getKeyCode()) */
                 
