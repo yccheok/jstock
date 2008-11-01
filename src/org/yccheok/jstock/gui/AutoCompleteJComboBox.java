@@ -99,17 +99,28 @@ public class AutoCompleteJComboBox extends JComboBox {
                         if(AutoCompleteJComboBox.this.stockCodeAndSymbolDatabase != null) {
                             final String upperCaseString = string.toUpperCase();
                             
-                            java.util.List<String> list = stockCodeAndSymbolDatabase.searchStockSymbols(upperCaseString);
+                            java.util.List<Symbol> symbols = stockCodeAndSymbolDatabase.searchStockSymbols(upperCaseString);
+                            java.util.List<Code> codes = null;
                             
-                            if(list.size() == 0 && Character.isDigit(string.charAt(0))) {
-                                list = stockCodeAndSymbolDatabase.searchStockCodes(string);
+                            if(symbols.size() == 0 && Character.isDigit(string.charAt(0))) {
+                                codes = stockCodeAndSymbolDatabase.searchStockCodes(string);
                             }
                             
-                            if(list.size() > 0) {
-                                for(String s : list)
-                                    AutoCompleteJComboBox.this.addItem(s);
-                                
-                                AutoCompleteJComboBox.this.showPopup();
+                            if(codes != null) {
+                                if(codes.size() > 0) {
+                                    for(Code c : codes)
+                                        AutoCompleteJComboBox.this.addItem(c.toString());
+
+                                    AutoCompleteJComboBox.this.showPopup();
+                                }                                
+                            }
+                            else {
+                                if(symbols.size() > 0) {
+                                    for(Symbol s : symbols)
+                                        AutoCompleteJComboBox.this.addItem(s.toString());
+
+                                    AutoCompleteJComboBox.this.showPopup();
+                                }
                             }
                         }
                     }
