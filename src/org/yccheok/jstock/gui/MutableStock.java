@@ -39,11 +39,11 @@ public class MutableStock {
         return this.stock;
     }
     
-    public String getCode() {
+    public Code getCode() {
         return stock.getCode();
     }
 
-    public String getSymbol() {
+    public Symbol getSymbol() {
         return stock.getSymbol();
     }
 
