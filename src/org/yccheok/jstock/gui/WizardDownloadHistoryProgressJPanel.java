@@ -90,12 +90,12 @@ public class WizardDownloadHistoryProgressJPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
     
     
-    private class DownloadHistoryTask extends SwingWorker<java.util.Map<String, java.util.List<OperatorIndicator>>, Integer> {
+    private class DownloadHistoryTask extends SwingWorker<java.util.Map<Code, java.util.List<OperatorIndicator>>, Integer> {
         private volatile boolean runnable = true;
-        private java.util.List<String> codes;
+        private java.util.List<Code> codes;
         private java.util.List<String> projects;
         
-        public DownloadHistoryTask(java.util.List<String> projects, java.util.List<String> codes) {
+        public DownloadHistoryTask(java.util.List<String> projects, java.util.List<Code> codes) {
             this.projects = projects;
             this.codes = codes;            
         }
@@ -104,15 +104,15 @@ public class WizardDownloadHistoryProgressJPanel extends javax.swing.JPanel {
             runnable = false;
         }
         
-        public java.util.Map<String, java.util.List<OperatorIndicator>> doInBackground() {
+        public java.util.Map<Code, java.util.List<OperatorIndicator>> doInBackground() {
             final MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, WizardDownloadHistoryProgressJPanel.this);
             final java.util.List<StockServerFactory> stockServerFactories = m.getStockServerFactory();
             final StockHistorySerializer stockHistorySerializer = m.getStockHistorySerializer();            
             final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = m.getStockCodeAndSymbolDatabase();
             final IndicatorProjectManager indicatorProjectManager = m.getIndicatorProjectManager();            
-            final java.util.Map<String, java.util.List<OperatorIndicator>> operatorIndicators = new java.util.HashMap<String, java.util.List<OperatorIndicator>>();
+            final java.util.Map<Code, java.util.List<OperatorIndicator>> operatorIndicators = new java.util.HashMap<Code, java.util.List<OperatorIndicator>>();
             
-            for(String code : codes) {
+            for(Code code : codes) {
                 operatorIndicators.put(code, new java.util.ArrayList<OperatorIndicator>());
             }
             
@@ -137,7 +137,7 @@ public class WizardDownloadHistoryProgressJPanel extends javax.swing.JPanel {
                 }
             }
             
-            for(final String code : codes) {
+            for(final Code code : codes) {
 
                 StockHistoryServer stockHistoryServer = null;
 
@@ -174,15 +174,15 @@ public class WizardDownloadHistoryProgressJPanel extends javax.swing.JPanel {
                         final Stock stock = Utils.getEmptyStock(code, stockCodeAndSymbolDatabase.codeToSymbol(code));                    
 
                         if(operatorIndicator.isStockHistoryServerNeeded()) {
-							if(stockHistoryServer != null)
-							{
+                            if(stockHistoryServer != null)
+                            {
                             	operatorIndicator.setStockHistoryServer(stockHistoryServer);
-							}
-							else
-							{
-								// We need history but we fail to get one. Skip this project.
-								continue;
-							}
+                            }
+                            else
+                            {
+                                // We need history but we fail to get one. Skip this project.
+                                continue;
+                            }
                         }
                         
                         operatorIndicator.setStock(stock);
@@ -234,7 +234,7 @@ public class WizardDownloadHistoryProgressJPanel extends javax.swing.JPanel {
         }
     }
     
-    public void startDownload(java.util.List<String> projects, java.util.List<String> codes) {
+    public void startDownload(java.util.List<String> projects, java.util.List<Code> codes) {
         if(downloadHistoryTask != null) {
             downloadHistoryTask._stop();
             try {
@@ -277,14 +277,14 @@ public class WizardDownloadHistoryProgressJPanel extends javax.swing.JPanel {
     }
     
     // Code -> OperatorIndicator List
-    public java.util.Map<String, java.util.List<OperatorIndicator>> getOperatorIndicators() {
+    public java.util.Map<Code, java.util.List<OperatorIndicator>> getOperatorIndicators() {
         return java.util.Collections.unmodifiableMap(operatorIndicators);
     }
     
     private static final Log log = LogFactory.getLog(WizardDownloadHistoryProgressJPanel.class);
     private DownloadHistoryTask downloadHistoryTask;
     private java.beans.PropertyChangeSupport propertyChangeSupport = new java.beans.PropertyChangeSupport(this);
-    private java.util.Map<String, java.util.List<OperatorIndicator>> operatorIndicators;
+    private java.util.Map<Code, java.util.List<OperatorIndicator>> operatorIndicators = new java.util.HashMap<Code, java.util.List<OperatorIndicator>>();
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
