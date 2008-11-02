@@ -197,8 +197,8 @@ public class StockTableModel extends AbstractTableModelWithMemory {
     // Used to get column by Name in fast way.
     private Map<String, Integer> columnNameMapping = new HashMap<String, Integer>();
     // Used to get row by Stock in fast way.
-    private Map<String, Integer> rowStockCodeMapping = new HashMap<String, Integer>();
+    private Map<Code, Integer> rowStockCodeMapping = new HashMap<Code, Integer>();
     private String[] columnNames =  {"Code",        "Symbol",       "Open",     "Last",        "High",         "Low",      "Vol",          "Chg",      "Chg (%)",      "L.Vol",        "Buy",      "B.Qty",        "Sell",         "S.Qty"};
-    private Class[] columnClasses = {String.class, String.class, Double.class, Double.class, Double.class, Double.class, Integer.class, Double.class, Double.class, Integer.class, Double.class, Integer.class, Double.class, Integer.class};
+    private Class[] columnClasses = {Code.class, Symbol.class, Double.class, Double.class, Double.class, Double.class, Integer.class, Double.class, Double.class, Integer.class, Double.class, Integer.class, Double.class, Integer.class};
     
 }
