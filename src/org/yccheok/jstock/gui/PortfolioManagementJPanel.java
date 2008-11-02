@@ -223,10 +223,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         return result;
     }
     
-    private String getSelectedStockSymbolForNewTransactionJDialog() {
+    private Symbol getSelectedStockSymbolForNewTransactionJDialog() {
         final TreePath[] treePaths = buyTreeTable.getTreeSelectionModel().getSelectionPaths();
 
-        if(treePaths == null) return "";
+        if(treePaths == null) return Symbol.newInstance("");
         
         if(treePaths.length == 1) {
             if(treePaths[0].getLastPathComponent() instanceof TransactionSummary) {
@@ -242,7 +242,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             }
         }        
         
-        return "";
+        return Symbol.newInstance("");
     }
     
     private double getSelectedStockLastPriceForNewTransactionJDialog() {
@@ -256,12 +256,12 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 final TransactionSummary transactionSummary = (TransactionSummary)treePaths[0].getLastPathComponent();
                 assert(transactionSummary.getChildCount() > 0);
                 final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
-                final String code = transaction.getContract().getStock().getCode();
+                final Code code = transaction.getContract().getStock().getCode();
                 return portfolioTreeTableModel.getLastPrice(code);
             }
             else if(treePaths[0].getLastPathComponent() instanceof Transaction) {
                 final Transaction transaction = (Transaction)treePaths[0].getLastPathComponent();
-                final String code = transaction.getContract().getStock().getCode();
+                final Code code = transaction.getContract().getStock().getCode();
                 return portfolioTreeTableModel.getLastPrice(code);
             }
         }        
@@ -272,7 +272,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private void showNewSellTransactionJDialog(Transaction buyTransaction) {
         assert(buyTransaction.getContract().getType() == Contract.Type.Buy);
         
-        final String stockSymbol = buyTransaction.getContract().getStock().getSymbol();
+        final Symbol stockSymbol = buyTransaction.getContract().getStock().getSymbol();
         final int maxSellQuantity = buyTransaction.getQuantity();
         double buyCost = 0.0;
         if(buyTransaction.getQuantity() > 0) {
@@ -345,7 +345,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
     }
     
-    public void showNewBuyTransactionJDialog(String stockSymbol, double lastPrice, boolean JComboBoxEnabled) {
+    public void showNewBuyTransactionJDialog(Symbol stockSymbol, double lastPrice, boolean JComboBoxEnabled) {
 
         final MainFrame mainFrame = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, PortfolioManagementJPanel.this);
 
@@ -772,7 +772,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private List<Stock> getSelectedStock(JXTreeTable treeTable) {
         final TreePath[] treePaths = treeTable.getTreeSelectionModel().getSelectionPaths();
         List<Stock> stocks = new ArrayList<Stock>();
-        Set<String> s = new HashSet<String>();
+        Set<Code> c = new HashSet<Code>();
         
         if(treePaths == null) {
             return Collections.unmodifiableList(stocks);
@@ -786,22 +786,22 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 assert(transactionSummary.getChildCount() > 0);
                 final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
                 final Stock stock = transaction.getContract().getStock();
-                final String code = stock.getCode();
+                final Code code = stock.getCode();
                 
-                if(s.contains(code)) continue;
+                if(c.contains(code)) continue;
                 
                 stocks.add(stock);
-                s.add(code);
+                c.add(code);
             }
             else if(lastPathComponent instanceof Transaction) {
                 final Transaction transaction = (Transaction)lastPathComponent;
                 final Stock stock = transaction.getContract().getStock();
-                final String code = stock.getCode();
+                final Code code = stock.getCode();
                 
-                if(s.contains(code)) continue;
+                if(c.contains(code)) continue;
                 
                 stocks.add(stock);
-                s.add(code);
+                c.add(code);
             }                        
         }
         
