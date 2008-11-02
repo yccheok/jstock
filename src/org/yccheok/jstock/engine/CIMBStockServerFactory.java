@@ -48,7 +48,7 @@ public class CIMBStockServerFactory implements StockServerFactory {
         return stockServer;
     }
     
-    public StockHistoryServer getStockHistoryServer(String code)
+    public StockHistoryServer getStockHistoryServer(Code code)
     {
         try {
             return new CIMBStockHistoryServer(username, password, code);
