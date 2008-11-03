@@ -44,7 +44,7 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
         this.delay = delay;
         
         this.stockServerFactories = new java.util.concurrent.CopyOnWriteArrayList<StockServerFactory>();
-        this.stockCodes = new java.util.concurrent.CopyOnWriteArrayList<String>();
+        this.stockCodes = new java.util.concurrent.CopyOnWriteArrayList<Code>();
         this.stockMonitors = new java.util.ArrayList<StockMonitor>();
         
         stockCodesReadWriteLock = new java.util.concurrent.locks.ReentrantReadWriteLock();
@@ -70,7 +70,7 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
     
     // synchronized, to avoid addStockCode and removeStockCode at the same time.
     // This method will start all the monitoring threads automatically.
-    public synchronized boolean addStockCode(String code) {
+    public synchronized boolean addStockCode(Code code) {
         // Lock isn't required here. This is because increase the size of the 
         // list is not going to get IndexOutOfBoundException.
         if(stockCodes.contains(code)) return false;
@@ -86,7 +86,7 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
         return stockCodes.size();
     }
 
-    public synchronized String getStockCode(int index) {
+    public synchronized Code getStockCode(int index) {
         return stockCodes.get(index);
     }
     
@@ -113,7 +113,7 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
     }
     
     // synchronized, to avoid addStockCode and removeStockCode at the same time
-    public synchronized boolean removeStockCode(String code) {
+    public synchronized boolean removeStockCode(Code code) {
         // This is to ensure we are able to get the correct StockCodes size,
         // and able to retrieve Iterator in a safe way without getting 
         // IndexOutOfBoundException.
@@ -252,7 +252,7 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
                 }
                 
                 for(int currIndex = index; thisThread == thread; currIndex += step) {
-                    ListIterator<String> listIterator = null;
+                    ListIterator<Code> listIterator = null;
 
                     // Acquire iterator in a safe way.
                     stockCodesReaderLock.lock();                
@@ -262,7 +262,7 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
                     stockCodesReaderLock.unlock();
 
                     if(listIterator != null) {
-                        List<String> codes = new ArrayList<String>();
+                        List<Code> codes = new ArrayList<Code>();
 
                         for(int i = 0; listIterator.hasNext() && i < numOfStockPerIteration && thisThread == thread; i++) {
                             codes.add(listIterator.next());
@@ -274,7 +274,7 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
                             
                             List<Stock> stocks = null;
                             try {
-                                stocks = stockServer.getStockByCode(codes);                                
+                                stocks = stockServer.getStocksByCodes(codes);                                
                             }
                             catch(StockNotFoundException exp) {
                                 log.error(codes, exp);
@@ -326,7 +326,7 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
     // Number of stock to be monitored per iteration.
     private final int numOfStockPerIteration;
     private java.util.List<StockServerFactory> stockServerFactories;
-    private java.util.List<String> stockCodes;
+    private java.util.List<Code> stockCodes;
     private java.util.List<StockMonitor> stockMonitors;
     private final java.util.concurrent.locks.ReadWriteLock stockCodesReadWriteLock;
     private final java.util.concurrent.locks.Lock stockCodesReaderLock;
