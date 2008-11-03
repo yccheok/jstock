@@ -36,7 +36,7 @@ public class YahooUSStockServerFactory implements StockServerFactory {
     }
 
     @Override
-    public StockHistoryServer getStockHistoryServer(String code) {
+    public StockHistoryServer getStockHistoryServer(Code code) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
