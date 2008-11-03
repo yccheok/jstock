@@ -51,12 +51,12 @@ public class CIMBStockServer implements StockServer {
         this.password = password;        
     }
     
-    public Stock getStockBySymbol(String symbol) throws StockNotFoundException
+    public Stock getStock(Symbol symbol) throws StockNotFoundException
     {
         String _symbol;
 
         try {
-            _symbol = java.net.URLEncoder.encode(symbol, "UTF-8");
+            _symbol = java.net.URLEncoder.encode(symbol.toString(), "UTF-8");
         }
         catch(java.io.UnsupportedEncodingException exp) {
             throw new StockNotFoundException("symbol=" + symbol, exp);
@@ -103,23 +103,23 @@ public class CIMBStockServer implements StockServer {
         return stocks.get(0);
     }
     
-    public Stock getStockByCode(String code) throws StockNotFoundException
+    public Stock getStock(Code code) throws StockNotFoundException
     {
         // The nice CIMB server are able to accept both code and name.
-        return this.getStockBySymbol(code);
+        return this.getStock(Symbol.newInstance(code.toString()));
     }
     
-    public java.util.List<Stock> getStockBySymbol(java.util.List<String> symbols) throws StockNotFoundException
+    public java.util.List<Stock> getStocksBySymbols(java.util.List<Symbol> symbols) throws StockNotFoundException
     {
         throw new java.lang.UnsupportedOperationException();
     }
     
-    public java.util.List<Stock> getStockByCode(java.util.List<String> codes) throws StockNotFoundException
+    public java.util.List<Stock> getStocksByCodes(java.util.List<Code> codes) throws StockNotFoundException
     {
         String _codes;
         StringBuffer _codesBuffer = new StringBuffer();        
         
-        for(String code : codes) {
+        for(Code code : codes) {
             _codesBuffer.append(code);
             _codesBuffer.append("|");
         }
@@ -176,10 +176,10 @@ public class CIMBStockServer implements StockServer {
         return stocks;
     }
     
-    public java.util.List<Stock> getAllStock() throws StockNotFoundException
+    public java.util.List<Stock> getAllStocks() throws StockNotFoundException
     {
         List<Stock> stocks = new ArrayList<Stock>();
-        Set<String> codes = new HashSet<String>();        
+        Set<Code> codes = new HashSet<Code>();        
 
         Thread currentThread = Thread.currentThread();
         
