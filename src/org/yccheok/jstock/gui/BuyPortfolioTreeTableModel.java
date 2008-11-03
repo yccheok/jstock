@@ -22,15 +22,16 @@ import java.text.SimpleDateFormat;
 import org.jdesktop.swingx.treetable.*;
 import org.yccheok.jstock.portfolio.*;
 import javax.swing.tree.TreePath;
+import org.yccheok.jstock.engine.Code;
 
 /**
  *
  * @author Owner
  */
 public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel {
-    private java.util.Map<String, Double> stockLastPrice = new java.util.HashMap<String, Double>();
+    private java.util.Map<Code, Double> stockLastPrice = new java.util.HashMap<Code, Double>();
     
-    public double getLastPrice(String code) {
+    public double getLastPrice(Code code) {
         Object price = stockLastPrice.get(code);
         if(price == null) return 0.0;
                 
@@ -118,7 +119,7 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
     }
     
     private double getCurrentValue(Transaction transaction) {
-        final String code = transaction.getContract().getStock().getCode();
+        final Code code = transaction.getContract().getStock().getCode();
         final Double lastPrice = this.stockLastPrice.get(code);
 
         if(lastPrice == null) return 0.0;
@@ -129,7 +130,7 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
     public double getCurrentValue(TransactionSummary transactionSummary) {
         final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
         
-        final String code = transaction.getContract().getStock().getCode();
+        final Code code = transaction.getContract().getStock().getCode();
         
         final Double lastPrice = this.stockLastPrice.get(code);
 
@@ -139,7 +140,7 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
     }
     
     private double getCurrentPrice(Transaction transaction) {
-        final String code = transaction.getContract().getStock().getCode();
+        final Code code = transaction.getContract().getStock().getCode();
         
         final Double lastPrice = this.stockLastPrice.get(code);
 
@@ -151,7 +152,7 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
     public double getCurrentPrice(TransactionSummary transactionSummary) {
         final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
         
-        final String code = transaction.getContract().getStock().getCode();
+        final Code code = transaction.getContract().getStock().getCode();
 
         final Double lastPrice = this.stockLastPrice.get(code);
 
@@ -238,7 +239,7 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
                     
             assert(transactionSummary.getChildCount() > 0);            
 
-            final String code = ((Transaction)transactionSummary.getChildAt(0)).getContract().getStock().getCode();
+            final Code code = ((Transaction)transactionSummary.getChildAt(0)).getContract().getStock().getCode();
             
             final Double lastPrice = this.stockLastPrice.get(code);
             
