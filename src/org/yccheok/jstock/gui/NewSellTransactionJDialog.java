@@ -33,9 +33,11 @@ import net.sf.nachocalendar.CalendarFactory;
 import net.sf.nachocalendar.components.DateField;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.SimpleDate;
 import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.StockCodeAndSymbolDatabase;
+import org.yccheok.jstock.engine.Symbol;
 import org.yccheok.jstock.portfolio.Broker;
 import org.yccheok.jstock.portfolio.BrokingFirm;
 import org.yccheok.jstock.portfolio.ClearingFee;
@@ -375,7 +377,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     public void setTransaction(Transaction transaction) {
-        final String symbol = transaction.getContract().getStock().getSymbol();
+        final Symbol symbol = transaction.getContract().getStock().getSymbol();
         final Date date = transaction.getContract().getDate().getCalendar().getTime();
         final int quantity = transaction.getContract().getQuantity();
         final double price = transaction.getContract().getPrice();
@@ -386,7 +388,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         final double netValue = transaction.getNetTotal();
         buyCost = transaction.getContract().getReferencePrice();
         
-        this.jTextField1.setText(symbol);
+        this.jTextField1.setText(symbol.toString());
         ((DateField)jPanel3).setValue(date);
         this.jSpinner1.setValue(quantity);
         this.jFormattedTextField1.setValue(price);
@@ -404,10 +406,10 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
                         
         final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = m.getStockCodeAndSymbolDatabase();
         
-        final String symbol = jTextField1.getText();
+        final Symbol symbol = Symbol.newInstance(jTextField1.getText());
         // We want user able to perform sell even though they are not connected to
         // stock server. Luckily, code information are useless at this moment.
-        final String code = stockCodeAndSymbolDatabase == null? "0" : stockCodeAndSymbolDatabase.symbolToCode(symbol);
+        final Code code = stockCodeAndSymbolDatabase == null? Code.newInstance("0") : stockCodeAndSymbolDatabase.symbolToCode(symbol);
         final DateField dateField = (DateField)jPanel3;
         
         final Stock stock = Utils.getEmptyStock(code, symbol);
@@ -510,7 +512,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
                 final DateField dateField = (DateField)jPanel3;
                 final Date date = (Date)dateField.getValue();
                 // Stock and date information is not important at this moment.
-                Contract.ContractBuilder builder = new Contract.ContractBuilder(Utils.getEmptyStock(name, name), new SimpleDate(date));        
+                Contract.ContractBuilder builder = new Contract.ContractBuilder(Utils.getEmptyStock(Code.newInstance(name), Symbol.newInstance(name)), new SimpleDate(date));        
                 Contract contract = builder.type(Contract.Type.Sell).quantity(unit).price(price).build();
         
                 final double brokerFee = brokingFirm.brokerCalculate(contract);
@@ -623,8 +625,8 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         update();
     }
     
-    public void setStockSymbol(String name) {
-        this.jTextField1.setText(name);
+    public void setStockSymbol(Symbol symbol) {
+        this.jTextField1.setText(symbol.toString());
     }
     
     public Transaction getTransaction() {
