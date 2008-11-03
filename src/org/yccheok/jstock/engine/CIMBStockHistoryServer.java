@@ -28,7 +28,6 @@ import java.math.*;
 
 import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.methods.*;
-import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -39,11 +38,11 @@ import org.apache.commons.logging.LogFactory;
 public class CIMBStockHistoryServer implements StockHistoryServer {
     
     /** Creates a new instance of CIMBStockHistoryServer */
-    public CIMBStockHistoryServer(String code) throws StockHistoryNotFoundException {
+    public CIMBStockHistoryServer(Code code) throws StockHistoryNotFoundException {
         this("", "", code);
     }
     
-    public CIMBStockHistoryServer(String username, String password, String code) throws StockHistoryNotFoundException {
+    public CIMBStockHistoryServer(String username, String password, Code code) throws StockHistoryNotFoundException {
         final HttpClient httpClient = new HttpClient();
         
         this.username = username;
@@ -205,8 +204,8 @@ public class CIMBStockHistoryServer implements StockHistoryServer {
                 final double changePricePercentage = _changePricePercentage.round(new MathContext(2)).doubleValue();
 
                 Stock stock = new Stock(
-                        code,
-                        symbol,
+                        Code.newInstance(code),
+                        Symbol.newInstance(symbol),
                         name,
                         board,
                         industry,
@@ -273,7 +272,7 @@ public class CIMBStockHistoryServer implements StockHistoryServer {
     
     private final String username;
     private final String password;
-    private final String code;
+    private final Code code;
     private final java.util.Map<SimpleDate, Stock> historyDatabase;
     private final java.util.List<SimpleDate> simpleDates;
     
