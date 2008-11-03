@@ -73,7 +73,7 @@ public class StockHistorySerializer {
         return true;
     }
     
-    public StockHistoryServer load(String code)
+    public StockHistoryServer load(Code code)
     {
         File xStreamFile = new File(directory + File.separator + code + ".xml");        
 
