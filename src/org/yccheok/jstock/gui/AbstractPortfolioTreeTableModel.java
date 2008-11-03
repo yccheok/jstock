@@ -8,6 +8,7 @@ package org.yccheok.jstock.gui;
 import javax.swing.tree.TreePath;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.jdesktop.swingx.treetable.TreeTableNode;
+import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.portfolio.Portfolio;
 import org.yccheok.jstock.portfolio.Transaction;
 import org.yccheok.jstock.portfolio.TransactionSummary;
@@ -72,7 +73,7 @@ public abstract class AbstractPortfolioTreeTableModel extends DefaultTreeTableMo
         
         final int size = portfolio.getChildCount();
         
-        final String code = transaction.getContract().getStock().getCode();
+        final Code code = transaction.getContract().getStock().getCode();
         
         TransactionSummary transactionSummary = null;
         
@@ -106,7 +107,7 @@ public abstract class AbstractPortfolioTreeTableModel extends DefaultTreeTableMo
         
         final int size = portfolio.getChildCount();
         
-        final String code = transaction.getContract().getStock().getCode();
+        final Code code = transaction.getContract().getStock().getCode();
         
         TransactionSummary transactionSummary = null;
         
