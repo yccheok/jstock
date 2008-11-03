@@ -160,7 +160,7 @@ public class IndicatorPanel extends JPanel implements ChangeListener {
         jButton6 = new javax.swing.JButton();
         jPanel7 = new javax.swing.JPanel();
         jComboBox1 = new AutoCompleteJComboBox();
-        objectInspectorJPanel = new ObjectInspectorJPanel(new MutableStock(Utils.getEmptyStock("", "")));
+        objectInspectorJPanel = new ObjectInspectorJPanel(new MutableStock(Utils.getEmptyStock(Code.newInstance(""), Symbol.newInstance(""))));
 
         setLayout(new java.awt.BorderLayout());
 
@@ -437,7 +437,7 @@ public class IndicatorPanel extends JPanel implements ChangeListener {
         Object o = ((ObjectInspectorJPanel)this.objectInspectorJPanel).getBean();
         MutableStock mutableStock = (MutableStock)o;
         final Stock stock = mutableStock.getStock();
-        String searchedStockCode = stockCodeAndSymbolDatabase.searchStockCode(stock.getCode());
+        Code searchedStockCode = stockCodeAndSymbolDatabase.searchStockCode(stock.getCode().toString());
         
         if(searchedStockCode == null) {
             JOptionPane.showMessageDialog(this, "You need to first select a stock to be simulated.", "Stock needed", JOptionPane.INFORMATION_MESSAGE);
@@ -692,12 +692,11 @@ public class IndicatorPanel extends JPanel implements ChangeListener {
                         
                         final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = m.getStockCodeAndSymbolDatabase();
                         
-                        String code = stockCodeAndSymbolDatabase.searchStockCode(stock);
-                        String symbol = null;
+                        Code code = stockCodeAndSymbolDatabase.searchStockCode(stock);
+                        Symbol symbol = null;
                             
                         if(code != null) {
-                            symbol = stockCodeAndSymbolDatabase.codeToSymbol(code);
-                            
+                            symbol = stockCodeAndSymbolDatabase.codeToSymbol(code);                            
                         }
                         else {
                             symbol = stockCodeAndSymbolDatabase.searchStockSymbol(stock);
@@ -734,10 +733,10 @@ public class IndicatorPanel extends JPanel implements ChangeListener {
     private class StockTask extends SwingWorker<Boolean, Stock> {
         private volatile boolean runnable = true;
         
-        final String code;
-        final String symbol;
+        final Code code;
+        final Symbol symbol;
         
-        public StockTask(String code, String symbol) {
+        public StockTask(Code code, Symbol symbol) {
             this.code = code;
             this.symbol = symbol;
         }
@@ -768,7 +767,7 @@ public class IndicatorPanel extends JPanel implements ChangeListener {
                     StockServer server = factory.getStockServer();
                     
                     try {
-                        s = server.getStockByCode(code);
+                        s = server.getStock(code);
                         success = true;
                         break;
                     }
@@ -845,7 +844,7 @@ public class IndicatorPanel extends JPanel implements ChangeListener {
     }
     
     // Run by worker thread only.
-    private void simulate(final String code) {                
+    private void simulate(final Code code) {                
         MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, IndicatorPanel.this);
 
         // First, check whether there is a need to get history.
