@@ -68,7 +68,7 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
         return factories.get(index);
     }
     
-    public synchronized boolean addStockCode(final String code) {
+    public synchronized boolean addStockCode(final Code code) {
         stockCodesWriterLock.lock();
         
         if(stockCodes.contains(code)) {
@@ -85,7 +85,7 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
     }
     
     public class StockHistoryRunnable implements Runnable {
-        public StockHistoryRunnable(String code) {
+        public StockHistoryRunnable(Code code) {
             this.code = code;
             this.historyServer = null;
         }
@@ -155,7 +155,7 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
             return StockHistoryRunnable.class.getName() + "[code=" + code + "]";
         }
     
-        public String getCode() {
+        public Code getCode() {
             return code;
         }
 
@@ -163,7 +163,7 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
             return historyServer;
         }
         
-        private final String code;
+        private final Code code;
         private StockHistoryServer historyServer;
     }
     
@@ -186,7 +186,7 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
     }
     
     // synchronized, to avoid addStockCode and removeStockCode at the same time
-    public synchronized boolean removeStockCode(String code) {
+    public synchronized boolean removeStockCode(Code code) {
         stockCodesWriterLock.lock();
         
         boolean status = stockCodes.remove(code);
@@ -200,7 +200,7 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
         return status;
     }
     
-    public synchronized StockHistoryServer getStockHistoryServer(String code) {
+    public synchronized StockHistoryServer getStockHistoryServer(Code code) {
         if(histories.containsKey(code))
             return histories.get(code);
         else {
@@ -222,11 +222,11 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
         return null;
     }
 
-    public synchronized int getNumOfStockHistoryServer(String code) {
+    public synchronized int getNumOfStockHistoryServer() {
         return histories.size();
     }
     
-    public synchronized Set<String> getCodes() {
+    public synchronized Set<Code> getCodes() {
         return histories.keySet();
     }
     
@@ -258,13 +258,13 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
         pool = Executors.newFixedThreadPool(nThreads);
     }
     
-    java.util.List<StockServerFactory> factories = new java.util.concurrent.CopyOnWriteArrayList<StockServerFactory>();
+    private java.util.List<StockServerFactory> factories = new java.util.concurrent.CopyOnWriteArrayList<StockServerFactory>();
     // Use internally. To ensure when we "remove" a code, we really remove it, even there is a runnable
     // in the middle of retrieving history information from the server.
-    java.util.List<String> stockCodes = Collections.synchronizedList(new java.util.ArrayList<String>());
+    private java.util.List<Code> stockCodes = Collections.synchronizedList(new java.util.ArrayList<Code>());
     // We need to use concurrent map, due to the fact we need to export out the key set of this map.
     // We need to let the client have a safe way to iterate through the key set.
-    java.util.Map<String, StockHistoryServer> histories = new java.util.concurrent.ConcurrentHashMap<String, StockHistoryServer>();
+    private java.util.Map<Code, StockHistoryServer> histories = new java.util.concurrent.ConcurrentHashMap<Code, StockHistoryServer>();    
     private final java.util.concurrent.locks.ReadWriteLock stockCodesReadWriteLock;
     private final java.util.concurrent.locks.Lock stockCodesReaderLock;
     private final java.util.concurrent.locks.Lock stockCodesWriterLock;
