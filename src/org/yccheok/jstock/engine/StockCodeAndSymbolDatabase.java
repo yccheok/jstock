@@ -32,43 +32,43 @@ public class StockCodeAndSymbolDatabase {
     
     /** Creates a new instance of StockCodeAndSymbolDatabase */
     public StockCodeAndSymbolDatabase(StockServer stockServer) throws StockNotFoundException {
-        symbolToCode = new java.util.HashMap<String, String>();
-        codeToSymbol = new java.util.HashMap<String, String>();
+        symbolToCode = new java.util.HashMap<Symbol, Code>();
+        codeToSymbol = new java.util.HashMap<Code, Symbol>();
         
-        industryToCodes = new java.util.HashMap<Stock.Industry, List<String>>();
-        boardToCodes = new java.util.HashMap<Stock.Board, List<String>>();
-        industryToSymbols = new java.util.HashMap<Stock.Industry, List<String>>();
-        boardToSymbols = new java.util.HashMap<Stock.Board, List<String>>();
+        industryToCodes = new java.util.HashMap<Stock.Industry, List<Code>>();
+        boardToCodes = new java.util.HashMap<Stock.Board, List<Code>>();
+        industryToSymbols = new java.util.HashMap<Stock.Industry, List<Symbol>>();
+        boardToSymbols = new java.util.HashMap<Stock.Board, List<Symbol>>();
             
         for(Stock.Industry industry : Stock.Industry.values()) {
-            industryToCodes.put(industry, new ArrayList<String>());
-            industryToSymbols.put(industry, new ArrayList<String>());
+            industryToCodes.put(industry, new ArrayList<Code>());
+            industryToSymbols.put(industry, new ArrayList<Symbol>());
         }
 
         for(Stock.Board board : Stock.Board.values()) {
-            boardToCodes.put(board, new ArrayList<String>());
-            boardToSymbols.put(board, new ArrayList<String>());
+            boardToCodes.put(board, new ArrayList<Code>());
+            boardToSymbols.put(board, new ArrayList<Symbol>());
         }
         
         List<Stock> stocks = null;
         
         try {
-            stocks = stockServer.getAllStock();
+            stocks = stockServer.getAllStocks();
         }
         catch(StockNotFoundException exp) {
             throw exp;
         }
-        List<String> tmpSymbols = new ArrayList<String>();        
-        List<String> tmpCodes = new ArrayList<String>();
+        List<Symbol> tmpSymbols = new ArrayList<Symbol>();        
+        List<Code> tmpCodes = new ArrayList<Code>();
         
         for(Stock stock : stocks)
         {
-            String symbol = stock.getSymbol();
-            String code = stock.getCode();
+            Symbol symbol = stock.getSymbol();
+            Code code = stock.getCode();
             Stock.Industry industry = stock.getIndustry();
             Stock.Board board = stock.getBoard();
             
-            if(symbol.length() == 0 || code.length() == 0) continue;
+            if(symbol.toString().length() == 0 || code.toString().length() == 0) continue;
              
             symbolToCode.put(symbol, code);
              
@@ -83,70 +83,70 @@ public class StockCodeAndSymbolDatabase {
             tmpCodes.add(code);
         }
         
-        symbolSearchEngine = new TSTStringSearchEngine(tmpSymbols);
-        codeSearchEngine = new TSTStringSearchEngine(tmpCodes);        
+        symbolSearchEngine = new TSTSearchEngine<Symbol>(tmpSymbols);
+        codeSearchEngine = new TSTSearchEngine<Code>(tmpCodes);        
     }
     
-    public List<String> searchStockSymbols(String symbol) {
+    public List<Symbol> searchStockSymbols(String symbol) {
         return symbolSearchEngine.searchAll(symbol);
     }
     
-    public List<String> searchStockCodes(String code) {
+    public List<Code> searchStockCodes(String code) {
         return codeSearchEngine.searchAll(code);
     }
     
-    public String searchStockSymbol(String symbol) {
+    public Symbol searchStockSymbol(String symbol) {
         return symbolSearchEngine.search(symbol);
     }
     
-    public String searchStockCode(String code) {
+    public Code searchStockCode(String code) {
         return codeSearchEngine.search(code);
     }
     
-    public String codeToSymbol(String code) {
+    public Symbol codeToSymbol(Code code) {
         return codeToSymbol.get(code);   
     }
 
-    public String symbolToCode(String symbol) {
+    public Code symbolToCode(Symbol symbol) {
         return symbolToCode.get(symbol);
     }
 
-    public Set<String> getSymbols() {
+    public Set<Symbol> getSymbols() {
         return symbolToCode.keySet();
     }
 
-    public Set<String> getCodes() {
+    public Set<Code> getCodes() {
         return codeToSymbol.keySet();
     }
     
-    public List<String> getCodes(Stock.Industry industry)
+    public List<Code> getCodes(Stock.Industry industry)
     {
         return industryToCodes.get(industry);
     }
 
-    public List<String> getCodes(Stock.Board board)
+    public List<Code> getCodes(Stock.Board board)
     {
         return boardToCodes.get(board);
     }
 
-    public List<String> getSymbols(Stock.Industry industry)
+    public List<Symbol> getSymbols(Stock.Industry industry)
     {
         return industryToSymbols.get(industry);
     }
 
-    public List<String> getSymbols(Stock.Board board)
+    public List<Symbol> getSymbols(Stock.Board board)
     {
         return boardToSymbols.get(board);
     }
     
-    Map<String, String> symbolToCode;
-    Map<String, String> codeToSymbol;
+    Map<Symbol, Code> symbolToCode;
+    Map<Code, Symbol> codeToSymbol;
 
-    Map<Stock.Industry, List<String>> industryToCodes;
-    Map<Stock.Board, List<String>> boardToCodes;
-    Map<Stock.Industry, List<String>> industryToSymbols;
-    Map<Stock.Board, List<String>> boardToSymbols;
+    Map<Stock.Industry, List<Code>> industryToCodes;
+    Map<Stock.Board, List<Code>> boardToCodes;
+    Map<Stock.Industry, List<Symbol>> industryToSymbols;
+    Map<Stock.Board, List<Symbol>> boardToSymbols;
 
-    StringSearchEngine symbolSearchEngine;
-    StringSearchEngine codeSearchEngine;
+    SearchEngine<Symbol> symbolSearchEngine;
+    SearchEngine<Code> codeSearchEngine;
 }
