@@ -136,8 +136,8 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                 removeAllIndicatorsFromTable();
                 alertRecords.clear();
                 
-                final Set<String> codes = operatorIndicators.keySet();
-                for(String code : codes) {
+                final Set<Code> codes = operatorIndicators.keySet();
+                for(Code code : codes) {
                     realTimeStockMonitor.addStockCode(code);
                 }
 
@@ -173,8 +173,8 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         
         operatorIndicators = wizardDownloadHistoryProgressJPanel.getOperatorIndicators();        
         
-        final Set<String> codes = operatorIndicators.keySet();
-        for(String code : codes) {
+        final Set<Code> codes = operatorIndicators.keySet();
+        for(Code code : codes) {
             realTimeStockMonitor.addStockCode(code);
         }
         
@@ -521,7 +521,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             }
             else {
                 /* When performing multiple indicators alert, we will only display once for a same stock. */
-                final String code = indicator.getStock().getCode();
+                final String code = indicator.getStock().getCode().toString();
                 
                 if(alertRecords.contains(code)) return;
                 
@@ -537,7 +537,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                             "last=" + stock.getLastPrice() + " high=" + stock.getHighPrice() + " " +
                             "low=" + stock.getLowPrice() + ") hits " + indicator.toString();
                     
-                    mainFrame.displayPopupMessage(stock.getSymbol(), message);
+                    mainFrame.displayPopupMessage(stock.getSymbol().toString(), message);
                     
                     try {
                         Thread.sleep(jStockOptions.getAlertSpeed() * 1000);
@@ -596,7 +596,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     private Wizard wizard;
     private RealTimeStockMonitor realTimeStockMonitor;
     private org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
-    private java.util.Map<String, java.util.List<OperatorIndicator>> operatorIndicators;
+    private java.util.Map<Code, java.util.List<OperatorIndicator>> operatorIndicators;
 
     private java.util.List<String> alertRecords = new java.util.ArrayList<String>();
     private ExecutorService emailAlertPool = Executors.newFixedThreadPool(1);
