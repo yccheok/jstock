@@ -531,11 +531,11 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
         }
     }
     
-    public java.util.List<String> getSelectedCodes() {
+    public java.util.List<Code> getSelectedCodes() {
         return java.util.Collections.unmodifiableList(selectedCodes);
     }
     
-    private java.util.List<String> selectedCodes = new java.util.ArrayList<String>();
+    private java.util.List<Code> selectedCodes = new java.util.ArrayList<Code>();
     private java.util.Map<String, Stock.Industry> stringToIndustry = new java.util.HashMap<String, Stock.Industry>();
     private java.util.Map<String, Stock.Board> stringToBoard = new java.util.HashMap<String, Stock.Board>();
     
