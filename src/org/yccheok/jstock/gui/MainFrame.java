@@ -22,28 +22,23 @@
 
 package org.yccheok.jstock.gui;
 
-import java.net.SocketException;
-import javax.swing.*;
 import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
-import javax.swing.filechooser.*;
 
 import org.yccheok.jstock.engine.*;
 import com.thoughtworks.xstream.*;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import org.apache.commons.net.TimeTCPClient;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.hssf.usermodel.*;
-import org.apache.poi.hssf.util.*;
 
 import javax.help.*;
 import javax.swing.*;
@@ -540,8 +535,8 @@ public class MainFrame extends javax.swing.JFrame {
             String str;
             while ((str = in.readLine()) != null) {
                 String upperCaseString = str.toUpperCase();
-                String code = null;
-                String symbol = null;
+                Code code = null;
+                Symbol symbol = null;
                 
                 code = this.stockCodeAndSymbolDatabase.searchStockCode(upperCaseString);
                 if(code != null) {
@@ -620,8 +615,8 @@ public class MainFrame extends javax.swing.JFrame {
                         if(str == null) continue;
                         
                         String upperCaseString = str.toUpperCase();
-                        String code = null;
-                        String symbol = null;
+                        Code code = null;
+                        Symbol symbol = null;
 
                         code = this.stockCodeAndSymbolDatabase.searchStockCode(upperCaseString);
                         if(code != null) {
@@ -1048,7 +1043,7 @@ public class MainFrame extends javax.swing.JFrame {
             log.error("", exp);
         }
         
-        this.jStockOptions.setLookNFeel(lafClassName);
+        MainFrame.jStockOptions.setLookNFeel(lafClassName);
         
         java.util.Enumeration<AbstractButton> buttons = this.buttonGroup1.getElements();
         
@@ -1277,13 +1272,14 @@ public class MainFrame extends javax.swing.JFrame {
 
     private KeyAdapter getjComboBox1EditorComponentKeyAdapter() {
         return new KeyAdapter() {
+            @Override
             public void keyReleased(KeyEvent e) {
                 if(KeyEvent.VK_ENTER == e.getKeyCode()) {
                     String stock = MainFrame.this.jComboBox1.getEditor().getItem().toString();
                     
                     if(stock.length() > 0) {
-                        String code = stockCodeAndSymbolDatabase.searchStockCode(stock);
-                        String symbol = null;
+                        Code code = stockCodeAndSymbolDatabase.searchStockCode(stock);
+                        Symbol symbol = null;
                             
                         if(code != null) {
                             symbol = stockCodeAndSymbolDatabase.codeToSymbol(code);
@@ -1844,9 +1840,10 @@ public class MainFrame extends javax.swing.JFrame {
     
     public void update(StockHistoryMonitor monitor, final StockHistoryMonitor.StockHistoryRunnable runnable) {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            @Override
            public void run() {
-               String code = runnable.getCode();
-               String symbol = MainFrame.this.stockCodeAndSymbolDatabase.codeToSymbol(code);
+               Code code = runnable.getCode();
+               Symbol symbol = MainFrame.this.stockCodeAndSymbolDatabase.codeToSymbol(code);
                final boolean shouldShowGUI = MainFrame.this.stockCodeHistoryGUI.remove(code);
                
                if(stockCodeHistoryGUI.size() == 0) {
@@ -2011,7 +2008,7 @@ public class MainFrame extends javax.swing.JFrame {
     private MyJXStatusBar statusBar = new MyJXStatusBar();
 
     // A set of stock history which we need to display GUI on them, when user request explicitly.
-    private java.util.Set<String> stockCodeHistoryGUI = new java.util.HashSet<String>();
+    private java.util.Set<Code> stockCodeHistoryGUI = new java.util.HashSet<Code>();
     
     private volatile StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase;
     private RealTimeStockMonitor realTimeStockMonitor;
