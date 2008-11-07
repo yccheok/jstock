@@ -23,6 +23,7 @@
 package org.yccheok.jstock.gui;
 
 import java.awt.*;
+import java.awt.event.MouseListener;
 import javax.swing.*;
 import org.jdesktop.swingx.*;
 import org.jdesktop.swingx.plaf.basic.*;
@@ -73,14 +74,18 @@ public class MyJXStatusBar extends JXStatusBar {
         return this;
     }
     
+    public void addImageLabelMouseListener(MouseListener l) {
+        imageLabel.addMouseListener(l);
+    }
+
+    public void addCountryLabelMouseListener(MouseListener l) {
+        countryLabel.addMouseListener(l);
+    }
+    
     public MyJXStatusBar setProgressBar(boolean newValue) {
         progressBar.setIndeterminate(newValue);
         progressBar.setVisible(newValue);
         return this;
-    }
-    
-    public JLabel getImageLabel() {
-        return imageLabel;
     }
     
     private JLabel mainLabel;
