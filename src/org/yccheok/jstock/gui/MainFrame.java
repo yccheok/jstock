@@ -57,6 +57,7 @@ public class MainFrame extends javax.swing.JFrame {
         initComponents();
         
         createLookAndFeelMenuItem();
+        createCountryMenuItem();
         
         createStockIndicatorEditor();
         createIndicatorScannerJPanel();
@@ -70,6 +71,7 @@ public class MainFrame extends javax.swing.JFrame {
         this.initUsernameAndPassword();
         this.initTableHeaderToolTips();               
         this.initjComboBox1EditorComponentKeyListerner();
+        this.initMyJXStatusBarCountryLabelMouseAdapter();
         this.initMyJXStatusBarImageLabelMouseAdapter();
         this.initStockCodeAndSymbolDatabase();
         this.initMarketThread();
@@ -88,6 +90,7 @@ public class MainFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc=" Generated Code ">//GEN-BEGIN:initComponents
     private void initComponents() {
         buttonGroup1 = new javax.swing.ButtonGroup();
+        buttonGroup2 = new javax.swing.ButtonGroup();
         jPanel6 = new javax.swing.JPanel();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel8 = new javax.swing.JPanel();
@@ -144,6 +147,7 @@ public class MainFrame extends javax.swing.JFrame {
         jMenu5 = new javax.swing.JMenu();
         jMenuItem4 = new javax.swing.JMenuItem();
         jMenuItem7 = new javax.swing.JMenuItem();
+        jMenu6 = new javax.swing.JMenu();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem6 = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
@@ -467,6 +471,9 @@ public class MainFrame extends javax.swing.JFrame {
         jMenu5.add(jMenuItem7);
 
         jMenuBar2.add(jMenu5);
+
+        jMenu6.setText("Country");
+        jMenuBar2.add(jMenu6);
 
         jMenu1.setText("Options");
         jMenuItem6.setText("Options...");
@@ -1045,8 +1052,6 @@ public class MainFrame extends javax.swing.JFrame {
         
         MainFrame.jStockOptions.setLookNFeel(lafClassName);
         
-        java.util.Enumeration<AbstractButton> buttons = this.buttonGroup1.getElements();
-        
         for (Enumeration<AbstractButton> e = this.buttonGroup1.getElements() ; e.hasMoreElements() ;) {
             AbstractButton button = e.nextElement();
             javax.swing.JRadioButtonMenuItem m = (javax.swing.JRadioButtonMenuItem)button;
@@ -1097,6 +1102,25 @@ public class MainFrame extends javax.swing.JFrame {
         this.jTabbedPane1.setToolTipTextAt(1, "Customize your own stock indicator for alert purpose");
         this.jTabbedPane1.setToolTipTextAt(2, "Scan through the entire KLSE market so that you will be informed what to sell or buy");
         this.jTabbedPane1.setToolTipTextAt(3, "Manage your real time portfolio, which enable you to track buy and sell records");
+    }
+      
+    public void createCountryMenuItem() {
+        final Country[] countries = Country.values();
+
+        for(Country country : countries) {
+            final JMenuItem mi = (JRadioButtonMenuItem) jMenu6.add(new JRadioButtonMenuItem(country.toString(), country.getIcon()));
+            buttonGroup2.add(mi);
+            mi.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    final Country selectedCountry = Country.valueOf(mi.getText());
+                    MainFrame.this.setCountry(selectedCountry);
+                }                
+            });
+            
+            if(jStockOptions.getCountry() == country) {
+                ((JRadioButtonMenuItem) mi).setSelected(true);
+            }
+        }
     }
             
     public void createLookAndFeelMenuItem() {
@@ -1243,6 +1267,42 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel29.setText("" + stock.getSellQuantity());
         jLabel30.setText("" + stock.getSecondSellQuantity());
         jLabel38.setText("" + stock.getThirdSellQuantity());
+    }
+    
+    private void setCountry(Country country) {
+        if(country == null) return;
+        if(jStockOptions.getCountry() == country) return;
+        
+        jStockOptions.setCountry(country);
+        MainFrame.this.statusBar.setCountryIcon(country.getIcon(), country + " stock market");
+        
+        for (Enumeration<AbstractButton> e = this.buttonGroup2.getElements() ; e.hasMoreElements() ;) {
+            AbstractButton button = e.nextElement();
+            javax.swing.JRadioButtonMenuItem m = (javax.swing.JRadioButtonMenuItem)button;
+                        
+            if(m.getText().equals(country.toString())) {
+                m.setSelected(true);
+                break;                   
+            }
+        }
+        
+    }
+    
+    private MouseAdapter getMyJXStatusBarCountryLabelMouseAdapter() {
+        return new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if(e.getClickCount() == 2) {
+                    CountryJDialog countryJDialog = new CountryJDialog(MainFrame.this, true);
+                    countryJDialog.setLocationRelativeTo(MainFrame.this);
+                    countryJDialog.setCountry(jStockOptions.getCountry());
+                    countryJDialog.setVisible(true);
+                    
+                    final Country country = countryJDialog.getCountry();
+                    setCountry(country);
+                }
+            }
+        };
     }
     
     private MouseAdapter getMyJXStatusBarImageLabelMouseAdapter() {
@@ -1537,9 +1597,14 @@ public class MainFrame extends javax.swing.JFrame {
          }     
     }
     
+    private void initMyJXStatusBarCountryLabelMouseAdapter() {
+        final MouseAdapter mouseAdapter = this.getMyJXStatusBarCountryLabelMouseAdapter();
+        this.statusBar.addCountryLabelMouseListener(mouseAdapter);
+    }
+    
     private void initMyJXStatusBarImageLabelMouseAdapter() {
-        MouseAdapter mouseAdapter = this.getMyJXStatusBarImageLabelMouseAdapter();
-        this.statusBar.getImageLabel().addMouseListener(mouseAdapter);
+        final MouseAdapter mouseAdapter = this.getMyJXStatusBarImageLabelMouseAdapter();
+        this.statusBar.addImageLabelMouseListener(mouseAdapter);
     }
     
     private void initjComboBox1EditorComponentKeyListerner() {
@@ -2035,6 +2100,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.ButtonGroup buttonGroup2;
     private javax.swing.JComboBox jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
@@ -2077,6 +2143,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenu jMenu4;
     private javax.swing.JMenu jMenu5;
+    private javax.swing.JMenu jMenu6;
     private javax.swing.JMenuBar jMenuBar2;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
