@@ -24,9 +24,17 @@ import javax.swing.ImageIcon;
  *
  * @author yccheok
  */
-public enum Country {
-    Malaysia("/images/16x16/my.png"),
+public enum Country {    
+    Denmark("/images/16x16/dk.png"),
+    France("/images/16x16/fr.png"),
+    Germany("/images/16x16/de.png"),
+    Italy("/images/16x16/it.png"),
+    Malaysia("/images/16x16/my.png"),    
+    Norway("/images/16x16/no.png"),
+    Spain("/images/16x16/es.png"),            
+    Sweeden("/images/16x16/se.png"),
     Singapore("/images/16x16/sg.png"),
+    UnitedKingdom("/images/16x16/gb.png"),
     UnitedState("/images/16x16/us.png");
             
     Country(String fileName) {
