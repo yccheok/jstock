@@ -1315,7 +1315,7 @@ public class MainFrame extends javax.swing.JFrame {
                     // Make sure no same task is running.
                     if(stockCodeAndSymbolDatabaseTask != null) {
                         if(stockCodeAndSymbolDatabaseTask.isDone() == true) {
-                            final int result = JOptionPane.showConfirmDialog(MainFrame.this, "Perform reconnecting to stock server may take several minutes to several hours (depending on your network connection). Are you sure you want to do so?", "Reconnecting to stock server", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                            final int result = JOptionPane.showConfirmDialog(MainFrame.this, "Perform reconnecting to stock server may take several minutes to several hours (depending on your network connection).\nAre you sure you want to do so?", "Reconnecting to stock server", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
                             if(result == JOptionPane.YES_OPTION)
                             {
                                 initStockCodeAndSymbolDatabase(false);
@@ -1351,6 +1351,7 @@ public class MainFrame extends javax.swing.JFrame {
         return new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
+                
                 if(KeyEvent.VK_ENTER == e.getKeyCode()) {
                     String stock = MainFrame.this.jComboBox1.getEditor().getItem().toString();
                     
@@ -1374,8 +1375,20 @@ public class MainFrame extends javax.swing.JFrame {
                                 realTimeStockMonitor.addStockCode(stockCodeAndSymbolDatabase.symbolToCode(symbol));
                             }
                         }
-                    }   /* if(stock.length() > 0) */
-                }   /* if(KeyEvent.VK_ENTER == e.getKeyCode()) */
+                    }   // if(stock.length() > 0)
+                    else {
+                        if(((AutoCompleteJComboBox)MainFrame.this.jComboBox1).getLastEnteredString().length() > 0)
+                        {
+                            final int result = JOptionPane.showConfirmDialog(MainFrame.this, "Your stock database may be outdated.\nDo you want to perform reconnecting to stock server which may take several minutes to several hours (depending on your network connection)?", "Database outdated", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                            if(result == JOptionPane.YES_OPTION)
+                            {
+                                initStockCodeAndSymbolDatabase(false);
+                            }                            
+                        }
+                    }
+                    
+                }   // if(KeyEvent.VK_ENTER == e.getKeyCode())
+
             }   /* public void keyReleased(KeyEvent e) */
         };
     }
