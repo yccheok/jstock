@@ -139,14 +139,24 @@ public class StockCodeAndSymbolDatabase {
         return boardToSymbols.get(board);
     }
     
-    Map<Symbol, Code> symbolToCode;
-    Map<Code, Symbol> codeToSymbol;
+    private Object readResolve() {
+        List<Symbol> tmpSymbols = new ArrayList<Symbol>(symbolToCode.keySet());
+        List<Code> tmpCodes = new ArrayList<Code>(codeToSymbol.keySet());
+        
+        symbolSearchEngine = new TSTSearchEngine<Symbol>(tmpSymbols);
+        codeSearchEngine = new TSTSearchEngine<Code>(tmpCodes);         
+        
+        return this;
+    }
+    
+    private Map<Symbol, Code> symbolToCode;
+    private Map<Code, Symbol> codeToSymbol;
 
-    Map<Stock.Industry, List<Code>> industryToCodes;
-    Map<Stock.Board, List<Code>> boardToCodes;
-    Map<Stock.Industry, List<Symbol>> industryToSymbols;
-    Map<Stock.Board, List<Symbol>> boardToSymbols;
+    private Map<Stock.Industry, List<Code>> industryToCodes;
+    private Map<Stock.Board, List<Code>> boardToCodes;
+    private Map<Stock.Industry, List<Symbol>> industryToSymbols;
+    private Map<Stock.Board, List<Symbol>> boardToSymbols;
 
-    SearchEngine<Symbol> symbolSearchEngine;
-    SearchEngine<Code> codeSearchEngine;
+    private transient SearchEngine<Symbol> symbolSearchEngine;
+    private transient SearchEngine<Code> codeSearchEngine;
 }
