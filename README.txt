@@ -1,7 +1,13 @@
 =============
 version 1.0.0
 =============
-1. [2211339] Bug fixed. Type Safe Symbol and Code.
+1. [2211339] Bug fixed. Type safe symbol and code.
+
+2. [2235506] Feature added. Refactor config files directories structure according to selected
+   country.
+
+3. [2213089] Feature added. Load stock database from pre-save file. User no longer need to wait
+   for database to download over the network.
 
 =============
 version 0.9.9
