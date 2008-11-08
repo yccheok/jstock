@@ -809,8 +809,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
     
     private void initPortfolio() {
-        try {
-            File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "buyportfolio.xml");
+        final Country country = MainFrame.getJStockOptions().getCountry();
+        
+        try {            
+            File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "buyportfolio.xml");
 
             XStream xStream = new XStream();
             InputStream inputStream = new java.io.FileInputStream(f);
@@ -829,7 +831,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
 
         try {
-            File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "sellportfolio.xml");
+            File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "sellportfolio.xml");
 
             XStream xStream = new XStream();
             InputStream inputStream = new java.io.FileInputStream(f);
@@ -853,12 +855,14 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
     
     public boolean savePortfolio() {
-        if(Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config") == false)
+        final Country country = MainFrame.getJStockOptions().getCountry();
+        
+        if(Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config") == false)
         {
             return false;
         }
         
-        File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "buyportfolio.xml");
+        File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "buyportfolio.xml");
                 
         XStream xStream = new XStream();   
         
@@ -878,7 +882,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             status = false;
         }
            
-        f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "sellportfolio.xml");
+        f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "sellportfolio.xml");
                 
         try {
             OutputStream outputStream = new FileOutputStream(f);
