@@ -73,15 +73,27 @@ public class AutoCompleteJComboBox extends JComboBox {
                     AutoCompleteJComboBox.this.hidePopup();                                        
                     
                     if(KeyEvent.VK_ENTER == e.getKeyCode()) {
-
                         if(AutoCompleteJComboBox.this.getItemCount() > 0) {
                             int index = AutoCompleteJComboBox.this.getSelectedIndex();
-                            if(index == -1)
-                                AutoCompleteJComboBox.this.getEditor().setItem((String)AutoCompleteJComboBox.this.getItemAt(0));
-                            else 
-                                AutoCompleteJComboBox.this.getEditor().setItem((String)AutoCompleteJComboBox.this.getItemAt(index));
+                            if(index == -1) {
+                                lastEnteredString = (String)AutoCompleteJComboBox.this.getItemAt(0);
+                                AutoCompleteJComboBox.this.getEditor().setItem(lastEnteredString);
+                            }
+                            else {
+                                lastEnteredString = (String)AutoCompleteJComboBox.this.getItemAt(index);
+                                AutoCompleteJComboBox.this.getEditor().setItem(lastEnteredString);
+                            }
                         }
                         else {
+                            final Object object = AutoCompleteJComboBox.this.getEditor().getItem();
+                            
+                            if(object instanceof String) {
+                                lastEnteredString = (String)object;
+                            }
+                            else {
+                                lastEnteredString = "";
+                            }
+                            
                             AutoCompleteJComboBox.this.getEditor().setItem(null);
                         }
                         
@@ -139,8 +151,13 @@ public class AutoCompleteJComboBox extends JComboBox {
         };
     }    
     
+    public String getLastEnteredString() {
+        return this.lastEnteredString;
+    }
+    
     private StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase;
     private KeyAdapter keyAdapter;
+    private volatile String lastEnteredString = "";
     
     private static final Log log = LogFactory.getLog(AutoCompleteJComboBox.class);
 }
