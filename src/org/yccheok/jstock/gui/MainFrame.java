@@ -73,12 +73,11 @@ public class MainFrame extends javax.swing.JFrame {
         this.initjComboBox1EditorComponentKeyListerner();
         this.initMyJXStatusBarCountryLabelMouseAdapter();
         this.initMyJXStatusBarImageLabelMouseAdapter();
-        this.initStockCodeAndSymbolDatabase();
+        this.initStockCodeAndSymbolDatabase(true);
         this.initMarketThread();
         this.initRealTimeStockMonitor();  
         this.initRealTimeStocks();
         this.initStockHistoryMonitor();
-        //this.spawnTimeServerThread();
         this.initBrokingFirmLogos();
     }
     
@@ -772,7 +771,7 @@ public class MainFrame extends javax.swing.JFrame {
 // TODO add your handling code here
         OptionsJDialog optionsJDialog = new OptionsJDialog(this, true);
         optionsJDialog.setLocationRelativeTo(this);
-        optionsJDialog.set(this.jStockOptions);
+        optionsJDialog.set(MainFrame.jStockOptions);
         optionsJDialog.setVisible(true);
     }//GEN-LAST:event_jMenuItem6ActionPerformed
 
@@ -1113,7 +1112,7 @@ public class MainFrame extends javax.swing.JFrame {
             mi.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     final Country selectedCountry = Country.valueOf(mi.getText());
-                    MainFrame.this.setCountry(selectedCountry);
+                    MainFrame.this.changeCountry(selectedCountry);
                 }                
             });
             
@@ -1269,12 +1268,14 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel38.setText("" + stock.getThirdSellQuantity());
     }
     
-    private void setCountry(Country country) {
+    private void changeCountry(Country country) {
         if(country == null) return;
         if(jStockOptions.getCountry() == country) return;
-        
+                
         jStockOptions.setCountry(country);
-        MainFrame.this.statusBar.setCountryIcon(country.getIcon(), country + " stock market");
+        MainFrame.this.statusBar.setCountryIcon(country.getIcon(), country.toString());
+        
+        initStockCodeAndSymbolDatabase(true);
         
         for (Enumeration<AbstractButton> e = this.buttonGroup2.getElements() ; e.hasMoreElements() ;) {
             AbstractButton button = e.nextElement();
@@ -1299,7 +1300,7 @@ public class MainFrame extends javax.swing.JFrame {
                     countryJDialog.setVisible(true);
                     
                     final Country country = countryJDialog.getCountry();
-                    setCountry(country);
+                    changeCountry(country);
                 }
             }
         };
@@ -1307,22 +1308,38 @@ public class MainFrame extends javax.swing.JFrame {
     
     private MouseAdapter getMyJXStatusBarImageLabelMouseAdapter() {
         return new MouseAdapter() {
+            @Override
             public void mouseClicked(MouseEvent e) {
                 if(e.getClickCount() == 2) {
-                    if(stockCodeAndSymbolDatabase != null) {
-                        JOptionPane.showMessageDialog(MainFrame.this, "Already connected to KLSE stock server.", "Connected", JOptionPane.INFORMATION_MESSAGE);
-                        
-                        return;
-                    }
+                    
                     // Make sure no same task is running.
                     if(stockCodeAndSymbolDatabaseTask != null) {
-                        if(stockCodeAndSymbolDatabaseTask.isDone() == true)
-                            initStockCodeAndSymbolDatabase();
-                        else
-                            log.info("Another same task is still running");
+                        if(stockCodeAndSymbolDatabaseTask.isDone() == true) {
+                            final int result = JOptionPane.showConfirmDialog(MainFrame.this, "Perform reconnecting to stock server may take several minutes to several hours (depending on your network connection). Are you sure you want to do so?", "Reconnecting to stock server", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                            if(result == JOptionPane.YES_OPTION)
+                            {
+                                initStockCodeAndSymbolDatabase(false);
+                            }
+                        }
+                        else {
+                            final int result = JOptionPane.showConfirmDialog(MainFrame.this, "Do you want to cancel from connecting to stock server?", "Cancel connecting to stock server", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                            
+                            if(result == JOptionPane.YES_OPTION)
+                            {                            
+                                synchronized(stockCodeAndSymbolDatabaseTask)
+                                {
+                                    stockCodeAndSymbolDatabaseTask._stop();
+                                    stockCodeAndSymbolDatabaseTask = null;
+                                }
+                                
+                                statusBar.setMainMessage("Network error");
+                                statusBar.setImageIcon(getImageIcon("/images/16x16/network-error.png"), "Double cliked to try again");
+                                statusBar.setProgressBar(false);                                
+                            }
+                        }
                     }
                     else {
-                        initStockCodeAndSymbolDatabase();
+                        initStockCodeAndSymbolDatabase(true);
                     }
                             
                 }
@@ -1368,7 +1385,11 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     public java.util.List<StockServerFactory> getStockServerFactory() {
-        return Factories.INSTANCE.getStockServerFactories(this.jStockOptions.getCountry());
+        return getStockServerFactory(MainFrame.jStockOptions.getCountry());
+    }
+
+    private java.util.List<StockServerFactory> getStockServerFactory(Country country) {
+        return Factories.INSTANCE.getStockServerFactories(country);
     }
     
     public java.util.List<Stock> getStocks() {
@@ -1529,6 +1550,12 @@ public class MainFrame extends javax.swing.JFrame {
     
     private class StockCodeAndSymbolDatabaseTask extends SwingWorker<Boolean, Void> {
         private volatile boolean runnable = true;
+        private boolean readFromDisk = true;
+        
+        public StockCodeAndSymbolDatabaseTask(boolean readFromDisk)
+        {
+            this.readFromDisk = readFromDisk;
+        }
         
         public void _stop() {
             runnable = false;
@@ -1549,32 +1576,97 @@ public class MainFrame extends javax.swing.JFrame {
                 log.error("", exp);
             }
            
-            if(success) {
-                statusBar.setMainMessage("Connected");
-                statusBar.setImageIcon(getImageIcon("/images/16x16/network-transmit-receive.png"), "Connected");
-                statusBar.setProgressBar(false);                    
-            }
-            else {
-                statusBar.setMainMessage("Network error");
-                statusBar.setImageIcon(getImageIcon("/images/16x16/network-error.png"), "Double cliked to try again");
-                statusBar.setProgressBar(false);
+            // If we are asked to stop explicitly, do not perform any update
+            // on GUI.
+            if(runnable)
+            {
+                if(success) {
+                    statusBar.setMainMessage("Connected");
+                    statusBar.setImageIcon(getImageIcon("/images/16x16/network-transmit-receive.png"), "Connected");
+                    statusBar.setProgressBar(false);                    
+                }
+                else {
+                    statusBar.setMainMessage("Network error");
+                    statusBar.setImageIcon(getImageIcon("/images/16x16/network-error.png"), "Double cliked to try again");
+                    statusBar.setProgressBar(false);
+                }
             }
        }
        
         public Boolean doInBackground() {
+            final Country country = jStockOptions.getCountry();
+            
+            Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database");
+            final File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database" + File.separator + "stockcodeandsymboldatabase.xml");
+            final XStream xStream = new XStream();
+            
+            if(this.readFromDisk)
+            {                                
+                // We try to first load from disk. The information may be outdated,
+                // but it is far more better than letting user to wait for several
+                // hours.            
+                try {
+                    final InputStream inputStream = new java.io.FileInputStream(f);
+                    final StockCodeAndSymbolDatabase tmp = (StockCodeAndSymbolDatabase)xStream.fromXML(inputStream);
+
+                    log.info("Stock code and symbol database loaded from " + f.toString() + " successfully.");            
+                
+                    // Prepare proper synchronization for us to change country.
+                    synchronized(this)
+                    {
+                        if(runnable)
+                        {
+                            stockCodeAndSymbolDatabase = tmp;
+
+                            // Register the auto complete JComboBox with latest database.
+                            ((AutoCompleteJComboBox)jComboBox1).setStockCodeAndSymbolDatabase(stockCodeAndSymbolDatabase);
+                            indicatorPanel.setStockCodeAndSymbolDatabase(stockCodeAndSymbolDatabase);
+                            
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }                
+                }
+                catch(java.io.FileNotFoundException exp) {
+                    log.error("", exp);
+                }
+                catch(com.thoughtworks.xstream.core.BaseException exp) {
+                    log.error("", exp);
+                } 
+            }   // if(this.readFromDisk)
+            
+            // When we fall here, we either fail to read from disk or user
+            // explicitly doesn't allow us to read from disk. Let's perform
+            // networking stuff.
+            //
             Boolean success = false;
-            int tries = 0;
-            final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactory();
+            int tries = 0;            
+            final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactory(country);
+            StockCodeAndSymbolDatabase tmp = null;
             
             while(!isCancelled() && !success && runnable) {
                 for (StockServerFactory factory : stockServerFactories) {
 
                     try {
-                        stockCodeAndSymbolDatabase = new StockCodeAndSymbolDatabase(factory.getStockServer());
-			// Register the auto complete JComboBox with latest database.
-                        ((AutoCompleteJComboBox)jComboBox1).setStockCodeAndSymbolDatabase(stockCodeAndSymbolDatabase);
-                        indicatorPanel.setStockCodeAndSymbolDatabase(stockCodeAndSymbolDatabase);
-                        success = true;
+                        tmp = new StockCodeAndSymbolDatabase(factory.getStockServer());
+                        
+                        // Prepare proper synchronization for us to change country.
+                        synchronized(this)
+                        {
+                            if(runnable)
+                            {
+                                stockCodeAndSymbolDatabase = tmp;
+                                
+                                // Register the auto complete JComboBox with latest database.
+                                ((AutoCompleteJComboBox)jComboBox1).setStockCodeAndSymbolDatabase(stockCodeAndSymbolDatabase);
+                                indicatorPanel.setStockCodeAndSymbolDatabase(stockCodeAndSymbolDatabase);
+                                
+                                success = true;
+                            }
+                        }                        
                         break;
                     }
                     catch(StockNotFoundException exp) {
@@ -1592,7 +1684,22 @@ public class MainFrame extends javax.swing.JFrame {
                 if(tries >= 3) break;
 
             }
-                      
+             
+            if(success == true)
+            {                                
+                try {        
+                    final OutputStream outputStream = new FileOutputStream(f);
+                    // Use local variable instead of member variable, thread safe purpose.
+                    xStream.toXML(tmp, outputStream);  
+                }
+                catch(java.io.FileNotFoundException exp) {
+                    log.error("", exp);
+                }
+                catch(com.thoughtworks.xstream.core.BaseException exp) {
+                    log.error("", exp);
+                }                            
+            }
+            
             return success;
          }     
     }
@@ -1693,7 +1800,8 @@ public class MainFrame extends javax.swing.JFrame {
         java.util.List<Stock> s = null;
         
         try {
-            File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "realtimestock.xml");
+            final Country country = jStockOptions.getCountry();
+            File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "realtimestock.xml");
 
             XStream xStream = new XStream();
             InputStream inputStream = new java.io.FileInputStream(f);
@@ -1740,12 +1848,14 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     private boolean saveRealTimeStocks() {
-        if(Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config") == false)
+        final Country country = jStockOptions.getCountry();
+
+        if(Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config") == false)
         {
             return false;
         }
         
-        File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "realtimestock.xml");
+        File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "realtimestock.xml");
                 
         XStream xStream = new XStream();   
         
@@ -1807,7 +1917,7 @@ public class MainFrame extends javax.swing.JFrame {
         
         try {
             OutputStream outputStream = new FileOutputStream(f);
-            xStream.toXML(this.jStockOptions, outputStream);  
+            xStream.toXML(MainFrame.jStockOptions, outputStream);  
         }
         catch(java.io.FileNotFoundException exp) {
             log.error("", exp);
@@ -1835,7 +1945,8 @@ public class MainFrame extends javax.swing.JFrame {
         // We do not want "yesterday" history record.
         org.yccheok.jstock.gui.Utils.deleteDir(new File(Utils.getUserDataDirectory() + "history"));
         
-        stockHistorySerializer = new StockHistorySerializer(Utils.getUserDataDirectory() + "history");
+        final Country country = jStockOptions.getCountry();
+        stockHistorySerializer = new StockHistorySerializer(Utils.getUserDataDirectory() + country + File.separator + "history");
         
         stockHistoryMonitor.setStockHistorySerializer(stockHistorySerializer);
     }
@@ -1854,11 +1965,22 @@ public class MainFrame extends javax.swing.JFrame {
         this.marketThread.start();
     }
     
-    private void initStockCodeAndSymbolDatabase() {
+    private void initStockCodeAndSymbolDatabase(boolean readFromDisk) {
+        // Stop any on-going activities.
+        if(this.stockCodeAndSymbolDatabaseTask != null)
+        {
+            synchronized(this.stockCodeAndSymbolDatabaseTask)
+            {
+                this.stockCodeAndSymbolDatabaseTask._stop();
+                ((AutoCompleteJComboBox)jComboBox1).setStockCodeAndSymbolDatabase(null);
+                indicatorPanel.setStockCodeAndSymbolDatabase(null);                
+            }
+        }
+        
         statusBar.setMainMessage("Connecting to stock server to retrieve stock information ...");
         statusBar.setImageIcon(getImageIcon("/images/16x16/network-connecting.png"), "Connecting ...");
         statusBar.setProgressBar(true);
-        stockCodeAndSymbolDatabaseTask = new StockCodeAndSymbolDatabaseTask();
+        stockCodeAndSymbolDatabaseTask = new StockCodeAndSymbolDatabaseTask(readFromDisk);
         stockCodeAndSymbolDatabaseTask.execute();
     }
     
@@ -1944,6 +2066,7 @@ public class MainFrame extends javax.swing.JFrame {
     
     private class TableRowPopupListener extends MouseAdapter {
         
+        @Override
         public void mouseClicked(MouseEvent evt) {
             int[] rows = MainFrame.this.jTable1.getSelectedRows();
             
@@ -1961,10 +2084,12 @@ public class MainFrame extends javax.swing.JFrame {
             }
         }
         
+        @Override
         public void mousePressed(MouseEvent e) {
             maybeShowPopup(e);
         }
 
+        @Override
         public void mouseReleased(MouseEvent e) {
             maybeShowPopup(e);
         }
@@ -1995,6 +2120,7 @@ public class MainFrame extends javax.swing.JFrame {
             }
         }
     
+        @Override
         public void mouseMoved(MouseEvent evt) {
             TableColumn col = null;
             JTableHeader header = (JTableHeader)evt.getSource();
@@ -2063,7 +2189,7 @@ public class MainFrame extends javax.swing.JFrame {
                 .setImageIcon(icon, iconMessage)
                 .setCountryIcon(
 					MainFrame.jStockOptions.getCountry().getIcon(), 
-					MainFrame.jStockOptions.getCountry() + " stock market");
+					MainFrame.jStockOptions.getCountry().toString());
     }
     
     private TrayIcon trayIcon;
@@ -2075,12 +2201,13 @@ public class MainFrame extends javax.swing.JFrame {
     // A set of stock history which we need to display GUI on them, when user request explicitly.
     private java.util.Set<Code> stockCodeHistoryGUI = new java.util.HashSet<Code>();
     
-    private volatile StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase;
-    private RealTimeStockMonitor realTimeStockMonitor;
-    private StockHistoryMonitor stockHistoryMonitor;
-    private StockCodeAndSymbolDatabaseTask stockCodeAndSymbolDatabaseTask;
-    private Thread marketThread;
-    private StockHistorySerializer stockHistorySerializer;
+    private volatile StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = null;
+    private RealTimeStockMonitor realTimeStockMonitor = null;
+    private StockHistoryMonitor stockHistoryMonitor = null;
+    private StockCodeAndSymbolDatabaseTask stockCodeAndSymbolDatabaseTask = null;
+    private Thread marketThread = null;
+    private StockHistorySerializer stockHistorySerializer = null;
+    
     /* One and only one. */
     private static JStockOptions jStockOptions;
     
