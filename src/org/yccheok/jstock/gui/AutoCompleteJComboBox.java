@@ -65,6 +65,7 @@ public class AutoCompleteJComboBox extends JComboBox {
     private KeyAdapter getEditorComponentKeyAdapter() {
         
         return new KeyAdapter() {
+            @Override
             public void keyReleased(KeyEvent e) {
                 if(!e.isActionKey()) {
                     String string = AutoCompleteJComboBox.this.getEditor().getItem().toString();
