@@ -235,9 +235,8 @@ public class Stock {
                                                 // The following are naming conventions from CIMB :
         Main("Main Board"),                     // Main
         Second("Second Board"),                 // 2nd
-        CallWarrant("Call Warrant"),            // ??
         Mesdaq("Mesdaq"),                       // MESDAQ
-        Unknown("Unknown"),        
+        CallWarrant("Call Warrant"),            // ??
         DHI("Dow Jones Industrial Average"),    // (^DHI)
         IXIC("NASDAQ COMPOSITE"),               // (^IXIC)        
         DAX("DAX"),                             // (^GDAXI)                
@@ -247,8 +246,9 @@ public class Stock {
         SPMIB("S&P/MIB"),                       // (^SPMIB)
         SMSI("Madrid General"),                 // (^SMSI)
         FTSE("FTSE 100"),                       // (^FTSE)
-     	FCHI("CAC 40");                         // (^FCHI)
-                
+     	FCHI("CAC 40"),                         // (^FCHI)
+        Unknown("Unknown");
+        
         private final String name;
 
         Board(String name) {
