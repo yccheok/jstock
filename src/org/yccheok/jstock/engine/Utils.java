@@ -123,6 +123,17 @@ public class Utils {
     private static final List<Stock.Board> sweedenBoards = new ArrayList<Stock.Board>();
     private static final List<Stock.Board> unitedKingdomBoards = new ArrayList<Stock.Board>();
     private static final List<Stock.Board> unitedStateBoards = new ArrayList<Stock.Board>();
+
+    private static final List<Index> denmarkIndices = new ArrayList<Index>();
+    private static final List<Index> franceIndices = new ArrayList<Index>();
+    private static final List<Index> germanyIndices = new ArrayList<Index>();
+    private static final List<Index> italyIndices = new ArrayList<Index>();
+    private static final List<Index> malaysiaIndices = new ArrayList<Index>();
+    private static final List<Index> norwayIndices = new ArrayList<Index>();
+    private static final List<Index> spainIndices = new ArrayList<Index>();
+    private static final List<Index> sweedenIndices = new ArrayList<Index>();
+    private static final List<Index> unitedKingdomIndices = new ArrayList<Index>();
+    private static final List<Index> unitedStateIndices = new ArrayList<Index>();
     
     static
     {
@@ -140,6 +151,48 @@ public class Utils {
         unitedKingdomBoards.add(Stock.Board.FTSE);
         unitedStateBoards.add(Stock.Board.DHI);        
         unitedStateBoards.add(Stock.Board.IXIC);
+        
+        denmarkIndices.add(Index.OMXC20CO);
+        franceIndices.add(Index.FCHI);        
+        germanyIndices.add(Index.DAX);
+        italyIndices.add(Index.SPMIB);
+        malaysiaIndices.add(Index.KLSE);
+        malaysiaIndices.add(Index.Second);
+        malaysiaIndices.add(Index.Mesdaq);
+        norwayIndices.add(Index.OSEAX);
+        spainIndices.add(Index.SMSI);
+        sweedenIndices.add(Index.OMXSPI);
+        unitedKingdomIndices.add(Index.FTSE);
+        unitedStateIndices.add(Index.DHI);        
+        unitedStateIndices.add(Index.IXIC);        
+    }
+
+    public static List<Index> getStockIndices(Country country) {
+        switch(country)
+        {
+            case Denmark:
+                return java.util.Collections.unmodifiableList(Utils.denmarkIndices);
+            case France:
+                return java.util.Collections.unmodifiableList(Utils.franceIndices);
+            case Germany:
+                return java.util.Collections.unmodifiableList(Utils.germanyIndices);                
+            case Italy:
+                return java.util.Collections.unmodifiableList(Utils.italyIndices);
+            case Malaysia:
+                return java.util.Collections.unmodifiableList(Utils.malaysiaIndices);
+            case Norway:
+                return java.util.Collections.unmodifiableList(Utils.norwayIndices);
+            case Spain:
+                return java.util.Collections.unmodifiableList(Utils.spainIndices);
+            case Sweeden:
+                return java.util.Collections.unmodifiableList(Utils.sweedenIndices);
+            case UnitedKingdom:
+                return java.util.Collections.unmodifiableList(Utils.unitedKingdomIndices);                
+            case UnitedState:
+                return java.util.Collections.unmodifiableList(Utils.unitedStateIndices);
+        }
+        
+        return java.util.Collections.emptyList();
     }
     
     public static List<Stock.Board> getStockBoards(Country country) {
