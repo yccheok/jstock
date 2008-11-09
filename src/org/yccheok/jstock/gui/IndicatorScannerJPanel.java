@@ -343,6 +343,18 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     }
     
     public void initRealTimeStockMonitor(java.util.List<StockServerFactory> stockServerFactories) {
+        if(realTimeStockMonitor != null) {
+            final RealTimeStockMonitor oldRealTimeStockMonitor = realTimeStockMonitor;
+            zombiePool.execute(new Runnable() {
+                public void run() {
+                    log.info("Prepare to shut down " + oldRealTimeStockMonitor + "...");
+                    oldRealTimeStockMonitor.clearStockCodes();
+                    oldRealTimeStockMonitor.stop();
+                    log.info("Shut down " + oldRealTimeStockMonitor + " peacefully.");
+                }
+            });
+        }
+        
         realTimeStockMonitor = new RealTimeStockMonitor(4, 20, MainFrame.getJStockOptions().getScanningSpeed());
         
         for(StockServerFactory factory : stockServerFactories) {
@@ -602,6 +614,8 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     private ExecutorService emailAlertPool = Executors.newFixedThreadPool(1);
     private ExecutorService systemTrayAlertPool = Executors.newFixedThreadPool(1);
     private MainFrame mainFrame;
+    
+    private Executor zombiePool = Executors.newFixedThreadPool(4);
     
     private static final Log log = LogFactory.getLog(IndicatorScannerJPanel.class);
     
