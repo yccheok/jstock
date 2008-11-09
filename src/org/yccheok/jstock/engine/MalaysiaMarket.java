@@ -39,13 +39,13 @@ public class MalaysiaMarket implements Market {
             double value
             ) 
     {
-        indexMap.put(Stock.Board.Main, mainBoardIndex);
-        indexMap.put(Stock.Board.Second, secondBoardIndex);
-        indexMap.put(Stock.Board.Mesdaq, mesdaqIndex);
+        indexMap.put(Index.KLSE, mainBoardIndex);
+        indexMap.put(Index.Second, secondBoardIndex);
+        indexMap.put(Index.Mesdaq, mesdaqIndex);
 
-        changeMap.put(Stock.Board.Main, mainBoardChange);
-        changeMap.put(Stock.Board.Second, secondBoardChange);
-        changeMap.put(Stock.Board.Mesdaq, mesdaqChange);
+        changeMap.put(Index.KLSE, mainBoardChange);
+        changeMap.put(Index.Second, secondBoardChange);
+        changeMap.put(Index.Mesdaq, mesdaqChange);
         
         numMap.put(ChangeType.Up, up);
         numMap.put(ChangeType.Down, down);
@@ -56,15 +56,15 @@ public class MalaysiaMarket implements Market {
     }
     
     @Override
-    public double getIndex(Stock.Board board)
+    public double getIndex(Index index)
     {
-        return indexMap.get(board);
+        return indexMap.get(index);
     }
     
     @Override
-    public double getChange(Stock.Board board)
+    public double getChange(Index index)
     {
-        return changeMap.get(board);
+        return changeMap.get(index);
     }
     
     @Override
@@ -84,8 +84,8 @@ public class MalaysiaMarket implements Market {
         return value;
     }
     
-    private Map<Stock.Board, Double> indexMap = new HashMap<Stock.Board, Double>();
-    private Map<Stock.Board, Double> changeMap = new HashMap<Stock.Board, Double>();
+    private Map<Index, Double> indexMap = new HashMap<Index, Double>();
+    private Map<Index, Double> changeMap = new HashMap<Index, Double>();
     private Map<ChangeType, Integer> numMap = new HashMap<ChangeType, Integer>();
     private long volume;
     private double value;
