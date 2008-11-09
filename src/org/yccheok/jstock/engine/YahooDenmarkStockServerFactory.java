@@ -32,7 +32,7 @@ public class YahooDenmarkStockServerFactory implements StockServerFactory {
 
     @Override
     public StockServer getStockServer() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return yahooStockServer;
     }
 
     @Override
@@ -44,4 +44,6 @@ public class YahooDenmarkStockServerFactory implements StockServerFactory {
     public MarketServer getMarketServer() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+    
+    private final YahooStockServer yahooStockServer = new YahooStockServer(Country.Denmark);
 }
