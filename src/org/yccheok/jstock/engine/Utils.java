@@ -133,6 +133,7 @@ public class Utils {
         malaysiaBoards.add(Stock.Board.Main);
         malaysiaBoards.add(Stock.Board.Second);
         malaysiaBoards.add(Stock.Board.Mesdaq);
+        malaysiaBoards.add(Stock.Board.CallWarrant);
         norwayBoards.add(Stock.Board.OSEAX);
         spainBoards.add(Stock.Board.SMSI);
         sweedenBoards.add(Stock.Board.OMXSPI);
