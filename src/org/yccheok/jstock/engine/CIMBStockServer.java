@@ -26,7 +26,6 @@ import java.io.*;
 import java.util.*;
 import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.methods.*;
-import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -250,7 +249,7 @@ public class CIMBStockServer implements StockServer {
     private final String username;
     private final String password;
     
-    private final String[] servers = new String[] {
+    private static final String[] servers = new String[] {
         "http://n2ntbfd01.itradecimb.com/",
         "http://n2ntbfd02.itradecimb.com/",
         "http://n2ntbfd03.itradecimb.com/",
