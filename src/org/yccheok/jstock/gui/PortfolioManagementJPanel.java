@@ -34,6 +34,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -808,8 +810,11 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         return Collections.unmodifiableList(stocks);
     }
     
-    private void initPortfolio() {
+    public void initPortfolio() {
         final Country country = MainFrame.getJStockOptions().getCountry();
+        
+        boolean sellReadSuccess = false;
+        boolean buyReadSuccess = false;
         
         try {            
             File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "buyportfolio.xml");
@@ -821,6 +826,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             if(obj instanceof BuyPortfolioTreeTableModel) {
                 final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)obj;
                 this.buyTreeTable.setTreeTableModel(portfolioTreeTableModel);
+                buyReadSuccess = true;
             }
         }
         catch(java.io.FileNotFoundException exp) {
@@ -840,6 +846,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             if(obj instanceof SellPortfolioTreeTableModel) {
                 final SellPortfolioTreeTableModel portfolioTreeTableModel = (SellPortfolioTreeTableModel)obj;
                 this.sellTreeTable.setTreeTableModel(portfolioTreeTableModel);
+                sellReadSuccess = true;
             }
         }
         catch(java.io.FileNotFoundException exp) {
@@ -848,6 +855,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         catch(com.thoughtworks.xstream.core.BaseException exp) {
             log.error("", exp);
         }
+        
+        if(buyReadSuccess == false) buyTreeTable.setTreeTableModel(new BuyPortfolioTreeTableModel());
+        if(sellReadSuccess == false) sellTreeTable.setTreeTableModel(new SellPortfolioTreeTableModel());
         
         updateRealTimeStockMonitorAccordingToBuyPortfolioTreeTableModel();
         
@@ -902,6 +912,18 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
     
     public void initRealTimeStockMonitor(java.util.List<StockServerFactory> stockServerFactories) {
+        if(realTimeStockMonitor != null) {
+            final RealTimeStockMonitor oldRealTimeStockMonitor = realTimeStockMonitor;
+            zombiePool.execute(new Runnable() {
+                public void run() {
+                    log.info("Prepare to shut down " + oldRealTimeStockMonitor + "...");
+                    oldRealTimeStockMonitor.clearStockCodes();
+                    oldRealTimeStockMonitor.stop();
+                    log.info("Shut down " + oldRealTimeStockMonitor + " peacefully.");
+                }
+            });
+        }
+        
         realTimeStockMonitor = new RealTimeStockMonitor(4, 20, MainFrame.getJStockOptions().getScanningSpeed());
         
         for(StockServerFactory factory : stockServerFactories) {
@@ -989,6 +1011,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private RealTimeStockMonitor realTimeStockMonitor = null;
     private org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
 
+    private Executor zombiePool = Executors.newFixedThreadPool(4);
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private org.jdesktop.swingx.JXTreeTable buyTreeTable;
     private javax.swing.JButton jButton1;
