@@ -25,15 +25,12 @@ package org.yccheok.jstock.gui;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Set;
 import javax.swing.*;
 import org.yccheok.jstock.engine.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.yccheok.jstock.engine.Stock.Board;
-import org.yccheok.jstock.engine.Stock.Industry;
 
 /**
  *
@@ -541,7 +538,7 @@ public class StockJDialog extends javax.swing.JDialog {
         Collections.sort(sortedIndustries);
         
         int count = 0;
-        for(Industry industry : sortedIndustries) {
+        for(Stock.Industry industry : sortedIndustries) {
             if(count >= industryCheckBoxes.size()) {
                 log.error("You do not have enough check box components (" + industryCheckBoxes.size() + ") to hold industry (" + industries.size() + ")");
                 break;
