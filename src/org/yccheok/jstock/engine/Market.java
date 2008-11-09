@@ -22,15 +22,13 @@
 
 package org.yccheok.jstock.engine;
 
-import java.util.List;
-
 /**
  *
  * @author yccheok
  */
 public interface Market {
-    public double getIndex(Stock.Board board);
-    public double getChange(Stock.Board board);
+    public double getIndex(Index index);
+    public double getChange(Index index);
     public int getNumOfStockChange(ChangeType type);
     public long getVolume();
     public double getValue();
