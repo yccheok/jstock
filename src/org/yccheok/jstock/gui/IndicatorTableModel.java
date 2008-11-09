@@ -210,5 +210,5 @@ public class IndicatorTableModel extends AbstractTableModelWithMemory {
     // Used to get row by Stock in fast way.
     private Map<String, Integer> rowIndicatorMapping = new HashMap<String, Integer>();
     private String[] columnNames =  {"Indicator",   "Code",        "Symbol",       "Open",     "Last",        "High",         "Low",      "Vol",          "Chg",      "Chg (%)",      "L.Vol",        "Buy",      "B.Qty",        "Sell",         "S.Qty",  "M.Capital", "S.Issued"};
-    private Class[] columnClasses = {String.class, String.class, String.class, Double.class, Double.class, Double.class, Double.class, Integer.class, Double.class, Double.class, Integer.class, Double.class, Integer.class, Double.class, Integer.class, Long.class, Long.class};    
+    private Class[] columnClasses = {String.class, Code.class, Symbol.class, Double.class, Double.class, Double.class, Double.class, Integer.class, Double.class, Double.class, Integer.class, Double.class, Integer.class, Double.class, Integer.class, Long.class, Long.class};    
 }
