@@ -918,6 +918,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 public void run() {
                     log.info("Prepare to shut down " + oldRealTimeStockMonitor + "...");
                     oldRealTimeStockMonitor.clearStockCodes();
+                    oldRealTimeStockMonitor.dettachAll();
                     oldRealTimeStockMonitor.stop();
                     log.info("Shut down " + oldRealTimeStockMonitor + " peacefully.");
                 }
