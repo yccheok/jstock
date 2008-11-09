@@ -1219,7 +1219,8 @@ public class MainFrame extends javax.swing.JFrame {
         initRealTimeStockMonitor();
         initRealTimeStocks();
         this.portfolioManagementJPanel.initPortfolio();
-        this.portfolioManagementJPanel.initRealTimeStockMonitor(this.getStockServerFactory());
+        this.indicatorScannerJPanel.stop();
+        this.indicatorScannerJPanel.clear();
         
         for (Enumeration<AbstractButton> e = this.buttonGroup2.getElements() ; e.hasMoreElements() ;) {
             AbstractButton button = e.nextElement();
@@ -1692,6 +1693,7 @@ public class MainFrame extends javax.swing.JFrame {
                 public void run() {
                     log.info("Prepare to shut down " + oldRealTimeStockMonitor + "...");
                     oldRealTimeStockMonitor.clearStockCodes();
+                    oldRealTimeStockMonitor.dettachAll();
                     oldRealTimeStockMonitor.stop();
                     log.info("Shut down " + oldRealTimeStockMonitor + " peacefully.");
                 }
@@ -1909,6 +1911,7 @@ public class MainFrame extends javax.swing.JFrame {
                 public void run() {
                     log.info("Prepare to shut down " + oldStockHistoryMonitor + "...");
                     oldStockHistoryMonitor.clearStockCodes();
+                    oldStockHistoryMonitor.dettachAll();
                     oldStockHistoryMonitor.stop();
                     log.info("Shut down " + oldStockHistoryMonitor + " peacefully.");
                 }
@@ -1966,6 +1969,7 @@ public class MainFrame extends javax.swing.JFrame {
             synchronized(this.stockCodeAndSymbolDatabaseTask)
             {
                 this.stockCodeAndSymbolDatabaseTask._stop();
+                stockCodeAndSymbolDatabase = null;
                 ((AutoCompleteJComboBox)jComboBox1).setStockCodeAndSymbolDatabase(null);
                 indicatorPanel.setStockCodeAndSymbolDatabase(null);                
             }
