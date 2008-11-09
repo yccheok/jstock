@@ -18,23 +18,11 @@
 
 package org.yccheok.jstock.engine;
 
-import org.yccheok.jstock.engine.Stock.Board;
-
 /**
  *
  * @author yccheok
  */
 public class USMarket implements Market {
-
-    @Override
-    public double getIndex(Board board) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public double getChange(Board board) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
 
     @Override
     public int getNumOfStockChange(ChangeType type) {
@@ -54,6 +42,14 @@ public class USMarket implements Market {
     @Override
     public Country getCountry() {
         return Country.UnitedState;
+    }
+
+    public double getIndex(Index index) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public double getChange(Index index) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
 }
