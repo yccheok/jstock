@@ -39,17 +39,7 @@ public class StockCodeAndSymbolDatabase {
         boardToCodes = new java.util.HashMap<Stock.Board, List<Code>>();
         industryToSymbols = new java.util.HashMap<Stock.Industry, List<Symbol>>();
         boardToSymbols = new java.util.HashMap<Stock.Board, List<Symbol>>();
-            
-        for(Stock.Industry industry : Stock.Industry.values()) {
-            industryToCodes.put(industry, new ArrayList<Code>());
-            industryToSymbols.put(industry, new ArrayList<Symbol>());
-        }
 
-        for(Stock.Board board : Stock.Board.values()) {
-            boardToCodes.put(board, new ArrayList<Code>());
-            boardToSymbols.put(board, new ArrayList<Symbol>());
-        }
-        
         List<Stock> stocks = null;
         
         try {
@@ -74,10 +64,33 @@ public class StockCodeAndSymbolDatabase {
              
             codeToSymbol.put(code, symbol);
             
-            industryToCodes.get(industry).add(code);
-            boardToCodes.get(board).add(code);
-            industryToSymbols.get(industry).add(symbol);
-            boardToSymbols.get(board).add(symbol);
+            List<Code> codes = industryToCodes.get(industry);
+            if(codes == null) {
+                codes = new ArrayList<Code>();
+                industryToCodes.put(industry, codes);                
+            }
+            codes.add(code);
+
+            codes = boardToCodes.get(board);
+            if(codes == null) {
+                codes = new ArrayList<Code>();
+                boardToCodes.put(board, codes);                
+            }
+            codes.add(code);
+
+            List<Symbol> symbols = industryToSymbols.get(industry);
+            if(symbols == null) {
+                symbols = new ArrayList<Symbol>();
+                industryToSymbols.put(industry, symbols);                
+            }
+            symbols.add(symbol);
+            
+            symbols = boardToSymbols.get(board);
+            if(symbols == null) {
+                symbols = new ArrayList<Symbol>();
+                boardToSymbols.put(board, symbols);                
+            }
+            symbols.add(symbol);
             
             tmpSymbols.add(symbol);
             tmpCodes.add(code);
@@ -137,6 +150,14 @@ public class StockCodeAndSymbolDatabase {
     public List<Symbol> getSymbols(Stock.Board board)
     {
         return boardToSymbols.get(board);
+    }
+    
+    public Set<Stock.Industry> getIndustries() {
+        return Collections.unmodifiableSet(industryToCodes.keySet());
+    }
+    
+    public Set<Stock.Board> getBoards() {                
+        return Collections.unmodifiableSet(boardToCodes.keySet());
     }
     
     private Object readResolve() {
