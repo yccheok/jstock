@@ -242,7 +242,7 @@ public class Stock {
         DAX("DAX"),                             // (^GDAXI)                
         OMXSPI("Stockholm General"),            // (^OMXSPI)
         OMXC20CO("OMX Copenhagen 20"),          // (OMXC20.CO)
-        OSEAX("OSE All Share	"),             // (^OSEAX)            
+        OSEAX("OSE All Share"),                 // (^OSEAX)            
         SPMIB("S&P/MIB"),                       // (^SPMIB)
         SMSI("Madrid General"),                 // (^SMSI)
         FTSE("FTSE 100"),                       // (^FTSE)
