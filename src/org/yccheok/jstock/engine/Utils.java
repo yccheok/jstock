@@ -113,22 +113,55 @@ public class Utils {
         return isValidPortNumber(port);
     }
     
+    private static final List<Stock.Board> denmarkBoards = new ArrayList<Stock.Board>();
+    private static final List<Stock.Board> franceBoards = new ArrayList<Stock.Board>();
+    private static final List<Stock.Board> germanyBoards = new ArrayList<Stock.Board>();
+    private static final List<Stock.Board> italyBoards = new ArrayList<Stock.Board>();
     private static final List<Stock.Board> malaysiaBoards = new ArrayList<Stock.Board>();
+    private static final List<Stock.Board> norwayBoards = new ArrayList<Stock.Board>();
+    private static final List<Stock.Board> spainBoards = new ArrayList<Stock.Board>();
+    private static final List<Stock.Board> sweedenBoards = new ArrayList<Stock.Board>();
+    private static final List<Stock.Board> unitedKingdomBoards = new ArrayList<Stock.Board>();
     private static final List<Stock.Board> unitedStateBoards = new ArrayList<Stock.Board>();
+    
     static
     {
+        denmarkBoards.add(Stock.Board.OMXC20CO);
+        franceBoards.add(Stock.Board.FCHI);        
+        germanyBoards.add(Stock.Board.DAX);
+        italyBoards.add(Stock.Board.SPMIB);
         malaysiaBoards.add(Stock.Board.Main);
         malaysiaBoards.add(Stock.Board.Second);
         malaysiaBoards.add(Stock.Board.Mesdaq);
-        unitedStateBoards.add(Stock.Board.DJI);
-        unitedStateBoards.add(Stock.Board.Nasdaq);
+        norwayBoards.add(Stock.Board.OSEAX);
+        spainBoards.add(Stock.Board.SMSI);
+        sweedenBoards.add(Stock.Board.OMXSPI);
+        unitedKingdomBoards.add(Stock.Board.FTSE);
+        unitedStateBoards.add(Stock.Board.DHI);        
+        unitedStateBoards.add(Stock.Board.IXIC);
     }
     
     public static List<Stock.Board> getStockBoards(Country country) {
         switch(country)
         {
+            case Denmark:
+                return java.util.Collections.unmodifiableList(Utils.denmarkBoards);
+            case France:
+                return java.util.Collections.unmodifiableList(Utils.franceBoards);
+            case Germany:
+                return java.util.Collections.unmodifiableList(Utils.germanyBoards);                
+            case Italy:
+                return java.util.Collections.unmodifiableList(Utils.italyBoards);
             case Malaysia:
                 return java.util.Collections.unmodifiableList(Utils.malaysiaBoards);
+            case Norway:
+                return java.util.Collections.unmodifiableList(Utils.norwayBoards);
+            case Spain:
+                return java.util.Collections.unmodifiableList(Utils.spainBoards);
+            case Sweeden:
+                return java.util.Collections.unmodifiableList(Utils.sweedenBoards);
+            case UnitedKingdom:
+                return java.util.Collections.unmodifiableList(Utils.unitedKingdomBoards);                
             case UnitedState:
                 return java.util.Collections.unmodifiableList(Utils.unitedStateBoards);
         }
