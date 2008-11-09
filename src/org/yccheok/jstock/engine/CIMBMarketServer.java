@@ -52,7 +52,6 @@ public class CIMBMarketServer implements MarketServer {
     {
         final int numOfServer = servers.length;
         final Thread currentThread = Thread.currentThread();
-        Market market = null;
         
         for(int i = 0; (i < numOfServer) && (!currentThread.isInterrupted()); i++) {
             HttpMethod method = new GetMethod(servers[i] + "rtQuote.dll?GetInitInfo");
