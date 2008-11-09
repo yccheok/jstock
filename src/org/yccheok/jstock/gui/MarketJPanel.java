@@ -19,12 +19,14 @@
 package org.yccheok.jstock.gui;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.JLabel;
 import org.yccheok.jstock.engine.Country;
 import org.yccheok.jstock.engine.Market;
+import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.Stock.Board;
 
 /**
@@ -71,6 +73,8 @@ public class MarketJPanel extends javax.swing.JPanel {
         numberFormat.setMinimumFractionDigits(2);
                 
         for(Board board : boards) {
+            if(ignoreBoards.contains(board)) continue;
+            
             final double index = market.getIndex(board);
             final double change = market.getChange(board);
             final Color color = Utils.getColor(change, 0.0);
@@ -89,6 +93,8 @@ public class MarketJPanel extends javax.swing.JPanel {
     private void initAccordingToCountry(Country country) {
         List<Board> boards = org.yccheok.jstock.engine.Utils.getStockBoards(country);
         for(Board board : boards) {
+            if(ignoreBoards.contains(board)) continue;
+            
             JLabel name = new JLabel(board.toString() + " : ");
             leftPanel.add(name);
             JLabel value = new JLabel();
@@ -150,6 +156,12 @@ public class MarketJPanel extends javax.swing.JPanel {
     
     private Country country = null;
     private Map<String, JLabel> map = new HashMap<String, JLabel>();
+    
+    private static final List<Stock.Board> ignoreBoards = new ArrayList<Stock.Board>();
+    
+    static {
+        ignoreBoards.add(Stock.Board.CallWarrant);
+    }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel leftPanel;
