@@ -237,11 +237,18 @@ public class Stock {
         Second("Second Board"),                 // 2nd
         CallWarrant("Call Warrant"),            // ??
         Mesdaq("Mesdaq"),                       // MESDAQ
-        Unknown("Unknown"),
-        
-        DJI("Dow"),                             // Dow Jones Industrial Average (^DHI)
-        Nasdaq("Nasdaq");                       // NASDAQ COMPOSITE (^IXIC)
-        
+        Unknown("Unknown"),        
+        DHI("Dow Jones Industrial Average"),    // (^DHI)
+        IXIC("NASDAQ COMPOSITE"),               // (^IXIC)        
+        DAX("DAX"),                             // (^GDAXI)                
+        OMXSPI("Stockholm General"),            // (^OMXSPI)
+        OMXC20CO("OMX Copenhagen 20"),          // (OMXC20.CO)
+        OSEAX("OSE All Share	"),             // (^OSEAX)            
+        SPMIB("S&P/MIB"),                       // (^SPMIB)
+        SMSI("Madrid General"),                 // (^SMSI)
+        FTSE("FTSE 100"),                       // (^FTSE)
+     	FCHI("CAC 40");                         // (^FCHI)
+                
         private final String name;
 
         Board(String name) {
