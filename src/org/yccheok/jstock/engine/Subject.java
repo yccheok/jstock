@@ -40,6 +40,10 @@ public class Subject<S, A> {
         observers.remove(observer);
     }
     
+    public void dettachAll() {
+        observers.clear();
+    }
+    
     void notify(S subject, A arg) {
         for (Observer<S, A> obs : observers) {
             obs.update(subject, arg);
