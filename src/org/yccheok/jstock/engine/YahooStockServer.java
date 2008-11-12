@@ -51,11 +51,45 @@ public class YahooStockServer implements StockServer {
     }
     
     public Stock getStock(Symbol symbol) throws StockNotFoundException {
-        throw new UnsupportedOperationException("Not supported yet.");        
+        final StringBuffer stringBuffer = new StringBuffer(YAHOO_CSV_BASED_URL);
+
+        stringBuffer.append(symbol.toString()).append(YAHOO_STOCK_FORMAT);
+        
+        final String location = stringBuffer.toString();
+        
+        for(int retry=0; retry<NUM_OF_RETRY; retry++) {
+            HttpMethod method = new GetMethod(location);                        
+
+            try {
+                Utils.setHttpClientProxyFromSystemProperties(httpClient);
+                httpClient.executeMethod(method);
+                final String responde = method.getResponseBodyAsString();
+                //System.out.println(responde);
+                final List<Stock> stocks = YahooStockFormat.getInstance().parse(responde);
+                
+                if(stocks.size() == 1)
+                    return stocks.get(0);
+            }
+            catch(HttpException exp) {
+                log.error("location=" + location, exp);                
+                continue;
+            }
+            catch(IOException exp) {
+                log.error("location=" + location, exp);
+                continue;
+            }
+            finally {
+                method.releaseConnection();
+            }
+
+            break;
+        }
+        
+        throw new StockNotFoundException("Cannot get symbol=" + symbol);
     }
 
     public Stock getStock(Code code) throws StockNotFoundException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return getStock(Symbol.newInstance(code.toString()));
     }
 
     public List<Stock> getStocksBySymbols(List<Symbol> symbols) throws StockNotFoundException {
@@ -77,8 +111,9 @@ public class YahooStockServer implements StockServer {
             stringBuffer.append(symbols.get(end-1)).append(YAHOO_STOCK_FORMAT);
             
             final String location = stringBuffer.toString();
+            boolean success = false;
             
-            for(int retry=0; retry<3; retry++) {
+            for(int retry=0; retry<NUM_OF_RETRY; retry++) {
                 HttpMethod method = new GetMethod(location);                        
 
                 try {
@@ -86,6 +121,11 @@ public class YahooStockServer implements StockServer {
                     httpClient.executeMethod(method);
                     final String responde = method.getResponseBodyAsString();
                     System.out.println(responde);
+                    
+                    final List<Stock> tmpStocks = YahooStockFormat.getInstance().parse(responde);
+                    if(tmpStocks.size() != MAX_STOCK_PER_ITERATION) continue;
+                    
+                    stocks.addAll(tmpStocks);
                 }
                 catch(HttpException exp) {
                     log.error("location=" + location, exp);                
@@ -99,8 +139,12 @@ public class YahooStockServer implements StockServer {
                     method.releaseConnection();
                 }
                 
+                success = true;
                 break;
             }
+            
+            if(success == false)
+                throw new StockNotFoundException("Inconsistent stock size (" + stocks.size() + ") and symbol size (" + symbols.size() + ")");
         }
         
         final StringBuffer stringBuffer = new StringBuffer(YAHOO_CSV_BASED_URL);
@@ -116,7 +160,7 @@ public class YahooStockServer implements StockServer {
             
        final String location = stringBuffer.toString();
 
-        for(int retry=0; retry<3; retry++) {
+        for(int retry=0; retry<NUM_OF_RETRY; retry++) {
             HttpMethod method = new GetMethod(location);                        
 
             try {
@@ -124,6 +168,11 @@ public class YahooStockServer implements StockServer {
                 httpClient.executeMethod(method);
                 final String responde = method.getResponseBodyAsString();
                 System.out.println(responde);
+                
+                final List<Stock> tmpStocks = YahooStockFormat.getInstance().parse(responde);
+                if(tmpStocks.size() != MAX_STOCK_PER_ITERATION) continue;
+                
+                stocks.addAll(tmpStocks);
             }
             catch(HttpException exp) {
                 log.error("location=" + location, exp);                
@@ -140,11 +189,19 @@ public class YahooStockServer implements StockServer {
             break;
         }
 
+       if(stocks.size() != symbols.size())
+           throw new StockNotFoundException("Inconsistent stock size (" + stocks.size() + ") and symbol size (" + symbols.size() + ")");
+       
         return stocks;
     }
 
     public List<Stock> getStocksByCodes(List<Code> codes) throws StockNotFoundException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        List<Symbol> symbols = new ArrayList<Symbol>();
+        for(Code code : codes) {
+            symbols.add(Symbol.newInstance(code.toString()));
+        }
+        
+        return getStocksBySymbols(symbols);
     }
 
     private Set<Symbol> getSymbols(String responde) {
@@ -254,7 +311,33 @@ public class YahooStockServer implements StockServer {
     // Yahoo server limit.
     private static final int MAX_STOCK_PER_ITERATION = 200;
     private static final String YAHOO_CSV_BASED_URL = "http://finance.yahoo.com/d/quotes.csv?s=";
-    private static final String YAHOO_STOCK_FORMAT = "&f=nxol1hgvc6k2k3b3b6b2a5d1";
+    
+    private static final int NUM_OF_RETRY = 3;
+    
+    // s = Symbol
+    // n = Name
+    // x = Stock Exchange
+    // o = Open     <-- We are no longer using this one. It will not tally with change and change percentage
+    // p = Previous Close
+    // l1 = Last Trade (Price Only)
+    // h = Day's high
+    // g = Day's low
+    // v = Volume
+    // c1 = Change
+    // p2 = Change Percent
+    // k3 = Last Trade Size
+    // b = Bid
+    // b6 = Bid Size    <-- We are no longer using this one. It sometimes give us two data???
+    // a = Ask
+    // a5 = Ask Size    <-- We are no longer using this one. It sometimes give us two data???
+    // d1 = Last Trade Date
+    // t1 = Last Trade Time
+    //
+    // c6k2c1p2c -> Change (Real-time), Change Percent (Real-time), Change, Change in Percent, Change & Percent Change
+    // "+1400.00","N/A - +4.31%",+1400.00,"+4.31%","+1400.00 - +4.31%"
+    //
+    // "MAERSKB.CO","AP MOELLER-MAERS-","Copenhagen",32500.00,33700.00,34200.00,33400.00,660,"+1200.00","N/A - +3.69%",33,33500.00,54,33700.00,96,"11/10/2008","10:53am"
+    private static final String YAHOO_STOCK_FORMAT = "&f=snxpl1hgvc1p2k3bad1t1";
     
     static {
         try {
