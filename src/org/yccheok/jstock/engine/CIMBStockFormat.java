@@ -54,6 +54,9 @@ public class CIMBStockFormat implements StockFormat {
                 Calendar container = new GregorianCalendar();
                 container.setTime(serverDate);
                     
+                // After setTime, container only contains correct time, but not date.
+                // calendar only contains correct date, but not time. Now, let's make calendar
+				// contain both correct date and time,
                 calendar.set(Calendar.HOUR_OF_DAY, container.get(Calendar.HOUR_OF_DAY));
                 calendar.set(Calendar.MINUTE, container.get(Calendar.MINUTE));
                 calendar.set(Calendar.SECOND, container.get(Calendar.SECOND));
