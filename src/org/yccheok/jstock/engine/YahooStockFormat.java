@@ -22,6 +22,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.regex.Pattern;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -41,32 +42,38 @@ public class YahooStockFormat implements StockFormat {
     // l1 = Last Trade (Price Only)
     // h = Day's high
     // g = Day's low
-    // v = Volume
+    // v = Volume           <-- We need to take special care on this, it may give us 1,234. This will
+    //                          make us difficult to parse csv file. The only workaround is to make integer
+    //                          in between two string literal (which will always contains "). By using regular
+    //                          expression, we will manually remove the comma.
     // c1 = Change
     // p2 = Change Percent
-    // k3 = Last Trade Size
-    // b3 = Bid
-    // b6 = Bid Size    <-- We are no longer using this one. It sometimes give us two data???
+    // k3 = Last Trade Size <-- We need to take special care on this, it may give us 1,234...
+    // b = Bid
+    // b6 = Bid Size        <-- We need to take special care on this, it may give us 1,234...
     // a = Ask
-    // a5 = Ask Size    <-- We are no longer using this one. It sometimes give us two data???
+    // a5 = Ask Size        <-- We need to take special care on this, it may give us 1,234...
     // d1 = Last Trade Date
     // t1 = Last Trade Time
     //
     // c6k2c1p2c -> Change (Real-time), Change Percent (Real-time), Change, Change in Percent, Change & Percent Change
     // "+1400.00","N/A - +4.31%",+1400.00,"+4.31%","+1400.00 - +4.31%"
     //
-    // "MAERSKB.CO","AP MOELLER-MAERS-","Copenhagen",32500.00,33700.00,34200.00,33400.00,660,"+1200.00","N/A - +3.69%",33,33500.00,54,33700.00,96,"11/10/2008","10:53am"
+    // "MAERSKB.CO","AP MOELLER-MAERS-","Copenhagen",32500.00,33700.00,34200.00,33400.00,660,"+1200.00","N/A - +3.69%",33,33500.00,54,33700.00,96,"11/10/2008","10:53am"    
     public List<Stock> parse(String source) {
         List<Stock> stocks = new ArrayList<Stock>();
         
         if(source == null) {
             return stocks;
-        }
+        }                         
         
         final String[] strings = source.split("\\r\\n");
         
         for(String string : strings) {
-            String[] fields = string.split(",");
+            final String stringDigitWithoutComma = YahooStockFormat.digitPattern.matcher(string).replaceAll("$1");
+            System.out.println("---> " + stringDigitWithoutComma);
+            
+            String[] fields = stringDigitWithoutComma.split(",");
             final int length = fields.length;
             
             Code code = null;
@@ -101,15 +108,15 @@ public class YahooStockFormat implements StockFormat {
             }
             
             do {
-                if(length < 1) break; code = Code.newInstance(fields[0].replaceAll("\"", "").trim());
+                if(length < 1) break; code = Code.newInstance(quotePattern.matcher(fields[0]).replaceAll("").trim());
                 symbol = Symbol.newInstance(code.toString());
                 
-                if(length < 2) break; name = fields[1].replaceAll("\"", "").trim();
+                if(length < 2) break; name = quotePattern.matcher(fields[1]).replaceAll("").trim();
                 
                 if(length < 3) break;
                 
                 try {
-                    board = Stock.Board.valueOf(fields[2].replaceAll("\"", "").trim());                    
+                    board = Stock.Board.valueOf(quotePattern.matcher(fields[2]).replaceAll("").trim());                    
                 }
                 catch(java.lang.IllegalArgumentException exp) {
                     board = Stock.Board.Unknown;
@@ -129,38 +136,35 @@ public class YahooStockFormat implements StockFormat {
                 if(length < 7) break;                
                 try { lowPrice = Double.parseDouble(fields[6]); } catch(NumberFormatException exp) {}
 
-                if(length < 8) break;               
-                try { volume = Integer.parseInt(fields[7]); } catch(NumberFormatException exp) {}                
-
                 if(length < 9) break;               
-                try { changePrice = Double.parseDouble(fields[8].replaceAll("\"", "").trim()); } catch(NumberFormatException exp) {}                
-
-                if(length < 10) break;
-                String _changePricePercentage = fields[9].replaceAll("\"", "").trim();
-                final String[] tmp = _changePricePercentage.split("\\s+");
-                _changePricePercentage = tmp[tmp.length - 1];                
-                _changePricePercentage = _changePricePercentage.replaceAll("%", "");
-                try { changePricePercentage = Integer.parseInt(_changePricePercentage); } catch(NumberFormatException exp) {}                
+                try { volume = Integer.parseInt(fields[8]); } catch(NumberFormatException exp) {}                
 
                 if(length < 11) break;               
-                try { lastVolume = Integer.parseInt(fields[10]); } catch(NumberFormatException exp) {}
-                
+                try { changePrice = Double.parseDouble(quotePattern.matcher(fields[10]).replaceAll("").trim()); } catch(NumberFormatException exp) {}                
+
                 if(length < 12) break;
-                try { buyPrice = Double.parseDouble(fields[11]); } catch(NumberFormatException exp) {}
+                String _changePricePercentage = quotePattern.matcher(fields[11]).replaceAll("");
+                _changePricePercentage = percentagePattern.matcher(_changePricePercentage).replaceAll("");
+                try { changePricePercentage = Integer.parseInt(_changePricePercentage); } catch(NumberFormatException exp) {}                
 
-                //if(length < 13) break;
-                //try { buyQuantity = Integer.parseInt(fields[12]); } catch(NumberFormatException exp) {}
+                if(length < 14) break;               
+                try { lastVolume = Integer.parseInt(fields[13]); } catch(NumberFormatException exp) {}
                 
-                if(length < 13) break;
-                try { sellPrice = Double.parseDouble(fields[12]); } catch(NumberFormatException exp) {}
+                if(length < 16) break;
+                try { buyPrice = Double.parseDouble(fields[15]); } catch(NumberFormatException exp) {}
 
-                //if(length < 15) break;
-                //try { sellQuantity = Integer.parseInt(fields[14]); } catch(NumberFormatException exp) {}
+                if(length < 18) break;
+                try { buyQuantity = Integer.parseInt(fields[17]); } catch(NumberFormatException exp) {}
                 
-                //if(length < 14)
-                if(length < 15) break;
+                if(length < 20) break;
+                try { sellPrice = Double.parseDouble(fields[19]); } catch(NumberFormatException exp) {}
+
+                if(length < 22) break;
+                try { sellQuantity = Integer.parseInt(fields[21]); } catch(NumberFormatException exp) {}
+                
+                if(length < 25) break;
                 java.text.SimpleDateFormat dateFormat = (java.text.SimpleDateFormat)java.text.DateFormat.getInstance();
-                String data_and_time = fields[13].replaceAll("\"", "").trim() + " " + fields[14].replaceAll("\"", "").trim();
+                String data_and_time = quotePattern.matcher(fields[23]).replaceAll("").trim() + " " + quotePattern.matcher(fields[24]).replaceAll("").trim();
                 dateFormat.applyPattern("MM/dd/yyyy hh:mmaa");
                 java.util.Date serverDate;
                 try {
@@ -168,14 +172,16 @@ public class YahooStockFormat implements StockFormat {
                     calendar = Calendar.getInstance();
                     calendar.setTime(serverDate);
                 } catch (ParseException exp) {
-                    log.error(fields[13] + ", " + fields[14] + ", " + data_and_time, exp);
+                    log.error(fields[23] + ", " + fields[24] + ", " + data_and_time, exp);
                 }
                 
                 break;
             }while(true);
             
-            if(code == null || symbol == null || name == null || board == null || industry == null)
+            if(code == null || symbol == null || name == null || board == null || industry == null) {
+                System.out.println("SHIT SHIT SHIT ---> " + stringDigitWithoutComma);
                 continue;
+            }
             
             if(calendar == null) calendar = Calendar.getInstance();
             
@@ -219,6 +225,11 @@ public class YahooStockFormat implements StockFormat {
     }
     
     private static final StockFormat stockFormat = new YahooStockFormat();
+    // Used to remove the comma within an integer digit. The digit must be located
+    // in between two string. Replaced with $1.
+    private static final Pattern digitPattern = Pattern.compile("(\",)|,(?=[\\d,]+,\")");
+    private static final Pattern quotePattern = Pattern.compile("\"");
+    private static final Pattern percentagePattern = Pattern.compile("%");
     
     private static final Log log = LogFactory.getLog(YahooStockFormat.class);
 }

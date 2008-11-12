@@ -95,6 +95,8 @@ public class YahooStockServer implements StockServer {
     public List<Stock> getStocksBySymbols(List<Symbol> symbols) throws StockNotFoundException {
         List<Stock> stocks = new ArrayList<Stock>();
         
+        if(symbols.size() == 0) return stocks;
+        
         final int time = symbols.size() / MAX_STOCK_PER_ITERATION;
         final int remainder = symbols.size() % MAX_STOCK_PER_ITERATION;
         
@@ -123,7 +125,12 @@ public class YahooStockServer implements StockServer {
                     System.out.println(responde);
                     
                     final List<Stock> tmpStocks = YahooStockFormat.getInstance().parse(responde);
-                    if(tmpStocks.size() != MAX_STOCK_PER_ITERATION) continue;
+                    if(tmpStocks.size() != MAX_STOCK_PER_ITERATION) {
+                        if(retry == (NUM_OF_RETRY-1)) {
+                            throw new StockNotFoundException();
+                        }
+                        continue;
+                    }
                     
                     stocks.addAll(tmpStocks);
                 }
@@ -158,7 +165,7 @@ public class YahooStockServer implements StockServer {
 
         stringBuffer.append(symbols.get(end-1)).append(YAHOO_STOCK_FORMAT);
             
-       final String location = stringBuffer.toString();
+        final String location = stringBuffer.toString();
 
         for(int retry=0; retry<NUM_OF_RETRY; retry++) {
             HttpMethod method = new GetMethod(location);                        
@@ -170,7 +177,13 @@ public class YahooStockServer implements StockServer {
                 System.out.println(responde);
                 
                 final List<Stock> tmpStocks = YahooStockFormat.getInstance().parse(responde);
-                if(tmpStocks.size() != MAX_STOCK_PER_ITERATION) continue;
+                if(tmpStocks.size() != remainder) {
+                    if(retry == (NUM_OF_RETRY-1)) {
+                        throw new StockNotFoundException();
+                    }                    
+                    
+                    continue;
+                }
                 
                 stocks.addAll(tmpStocks);
             }
@@ -289,6 +302,8 @@ public class YahooStockServer implements StockServer {
             }   // for(int retry=0; retry<3; retry++)
         }
         
+        if(symbols.size() == 0) throw new StockNotFoundException();
+        
         final List<Symbol> _symbols = new ArrayList<Symbol>(symbols);
         return getStocksBySymbols(_symbols);
     }
@@ -322,14 +337,17 @@ public class YahooStockServer implements StockServer {
     // l1 = Last Trade (Price Only)
     // h = Day's high
     // g = Day's low
-    // v = Volume
+    // v = Volume           <-- We need to take special care on this, it may give us 1,234. This will
+    //                          make us difficult to parse csv file. The only workaround is to make integer
+    //                          in between two string literal (which will always contains "). By using regular
+    //                          expression, we will manually remove the comma.
     // c1 = Change
     // p2 = Change Percent
-    // k3 = Last Trade Size
+    // k3 = Last Trade Size <-- We need to take special care on this, it may give us 1,234...
     // b = Bid
-    // b6 = Bid Size    <-- We are no longer using this one. It sometimes give us two data???
+    // b6 = Bid Size        <-- We need to take special care on this, it may give us 1,234...
     // a = Ask
-    // a5 = Ask Size    <-- We are no longer using this one. It sometimes give us two data???
+    // a5 = Ask Size        <-- We need to take special care on this, it may give us 1,234...
     // d1 = Last Trade Date
     // t1 = Last Trade Time
     //
@@ -337,7 +355,7 @@ public class YahooStockServer implements StockServer {
     // "+1400.00","N/A - +4.31%",+1400.00,"+4.31%","+1400.00 - +4.31%"
     //
     // "MAERSKB.CO","AP MOELLER-MAERS-","Copenhagen",32500.00,33700.00,34200.00,33400.00,660,"+1200.00","N/A - +3.69%",33,33500.00,54,33700.00,96,"11/10/2008","10:53am"
-    private static final String YAHOO_STOCK_FORMAT = "&f=snxpl1hgvc1p2k3bad1t1";
+    private static final String YAHOO_STOCK_FORMAT = "&f=snxpl1hgnvnc1p2nk3nbnb6nana5nd1t1";
     
     static {
         try {
