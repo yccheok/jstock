@@ -70,7 +70,9 @@ public class YahooStockFormat implements StockFormat {
         final String[] strings = source.split("\\r\\n");
         
         for(String string : strings) {
-            final String stringDigitWithoutComma = YahooStockFormat.digitPattern.matcher(string).replaceAll("$1");
+            final String tmp = YahooStockFormat.digitPattern.matcher(string).replaceAll("$1");
+            // Some string contain comma, remove them as well. If not, we face problem during csv parsing.
+            final String stringDigitWithoutComma = stringCommaPattern.matcher(tmp).replaceAll("$1");
             System.out.println("---> " + stringDigitWithoutComma);
             
             String[] fields = stringDigitWithoutComma.split(",");
@@ -145,7 +147,7 @@ public class YahooStockFormat implements StockFormat {
                 if(length < 12) break;
                 String _changePricePercentage = quotePattern.matcher(fields[11]).replaceAll("");
                 _changePricePercentage = percentagePattern.matcher(_changePricePercentage).replaceAll("");
-                try { changePricePercentage = Integer.parseInt(_changePricePercentage); } catch(NumberFormatException exp) {}                
+                try { changePricePercentage = Double.parseDouble(_changePricePercentage); } catch(NumberFormatException exp) {}                
 
                 if(length < 14) break;               
                 try { lastVolume = Integer.parseInt(fields[13]); } catch(NumberFormatException exp) {}
@@ -228,6 +230,7 @@ public class YahooStockFormat implements StockFormat {
     // Used to remove the comma within an integer digit. The digit must be located
     // in between two string. Replaced with $1.
     private static final Pattern digitPattern = Pattern.compile("(\",)|,(?=[\\d,]+,\")");
+    private static final Pattern stringCommaPattern = Pattern.compile("(\"[^\",]+)(,)(?=[^\",]+\")");
     private static final Pattern quotePattern = Pattern.compile("\"");
     private static final Pattern percentagePattern = Pattern.compile("%");
     
