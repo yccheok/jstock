@@ -104,7 +104,7 @@ public class CIMBMarketServer implements MarketServer {
             }
         }
             
-            return null;
+        return null;
     }
     
     private final HttpClient httpClient;
