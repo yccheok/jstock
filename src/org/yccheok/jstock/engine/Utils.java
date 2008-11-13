@@ -163,7 +163,7 @@ public class Utils {
         spainIndices.add(Index.SMSI);
         sweedenIndices.add(Index.OMXSPI);
         unitedKingdomIndices.add(Index.FTSE);
-        unitedStateIndices.add(Index.DHI);        
+        unitedStateIndices.add(Index.DJI);        
         unitedStateIndices.add(Index.IXIC);        
     }
 
