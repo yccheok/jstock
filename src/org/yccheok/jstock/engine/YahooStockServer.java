@@ -19,6 +19,7 @@
 package org.yccheok.jstock.engine;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -53,7 +54,14 @@ public class YahooStockServer implements StockServer {
     public Stock getStock(Symbol symbol) throws StockNotFoundException {
         final StringBuffer stringBuffer = new StringBuffer(YAHOO_CSV_BASED_URL);
 
-        stringBuffer.append(symbol.toString()).append(YAHOO_STOCK_FORMAT);
+        final String _symbol;
+        try {
+            _symbol = java.net.URLEncoder.encode(symbol.toString(), "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            throw new StockNotFoundException("symbol.toString()=" + symbol.toString(), ex);
+        } 
+        
+        stringBuffer.append(_symbol).append(YAHOO_STOCK_FORMAT);
         
         final String location = stringBuffer.toString();
         
@@ -105,14 +113,25 @@ public class YahooStockServer implements StockServer {
             final int end = start + MAX_STOCK_PER_ITERATION;
             
             final StringBuffer stringBuffer = new StringBuffer(YAHOO_CSV_BASED_URL);
+            final StringBuffer symbolBuffer = new StringBuffer();
             
-            for(int j=start; j<end-1; j++) {
-                stringBuffer.append(symbols.get(j)).append("+");
+            final int endLoop = end - 1;
+            for(int j=start; j<endLoop; j++) {
+                symbolBuffer.append(symbols.get(j)).append("+");
             }
             
-            stringBuffer.append(symbols.get(end-1)).append(YAHOO_STOCK_FORMAT);
+            symbolBuffer.append(symbols.get(end - 1));
+            final String _symbol;
+            try {
+                _symbol = java.net.URLEncoder.encode(symbolBuffer.toString(), "UTF-8");
+            } catch (UnsupportedEncodingException ex) {
+                throw new StockNotFoundException("symbolBuffer.toString()=" + symbolBuffer.toString(), ex);
+            } 
+        
+            stringBuffer.append(_symbol).append(YAHOO_STOCK_FORMAT);
             
             final String location = stringBuffer.toString();
+            
             boolean success = false;
             
             for(int retry=0; retry<NUM_OF_RETRY; retry++) {
@@ -153,20 +172,32 @@ public class YahooStockServer implements StockServer {
             if(success == false)
                 throw new StockNotFoundException("Inconsistent stock size (" + stocks.size() + ") and symbol size (" + symbols.size() + ")");
         }
-        
-        final StringBuffer stringBuffer = new StringBuffer(YAHOO_CSV_BASED_URL);
 
-        final int start = time * MAX_STOCK_PER_ITERATION;
+        final int start = symbols.size() - remainder;        
         final int end = start + remainder;
         
-        for(int i=start; i<end-1; i++) {
-            stringBuffer.append(symbols.get(i)).append("+");
+        final StringBuffer stringBuffer = new StringBuffer(YAHOO_CSV_BASED_URL);
+        final StringBuffer symbolBuffer = new StringBuffer();
+        
+		final int endLoop = end - 1;
+        for(int i=start; i<endLoop; i++) {
+            symbolBuffer.append(symbols.get(i)).append("+");
         }
-
-        stringBuffer.append(symbols.get(end-1)).append(YAHOO_STOCK_FORMAT);
+        symbolBuffer.append(symbols.get(end-1));
+                
+        final String _symbol;
+        try {
+            _symbol = java.net.URLEncoder.encode(symbolBuffer.toString(), "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            throw new StockNotFoundException("symbolBuffer.toString()=" + symbolBuffer.toString(), ex);
+        }
             
+        stringBuffer.append(_symbol).append(YAHOO_STOCK_FORMAT);
+                    
         final String location = stringBuffer.toString();
-
+        
+        System.out.println("LOCATION=" + location);
+        
         for(int retry=0; retry<NUM_OF_RETRY; retry++) {
             HttpMethod method = new GetMethod(location);                        
 
@@ -355,7 +386,7 @@ public class YahooStockServer implements StockServer {
     // "+1400.00","N/A - +4.31%",+1400.00,"+4.31%","+1400.00 - +4.31%"
     //
     // "MAERSKB.CO","AP MOELLER-MAERS-","Copenhagen",32500.00,33700.00,34200.00,33400.00,660,"+1200.00","N/A - +3.69%",33,33500.00,54,33700.00,96,"11/10/2008","10:53am"
-    private static final String YAHOO_STOCK_FORMAT = "&f=snxpl1hgnvnc1p2nk3nbnb6nana5nd1t1";
+    private static final String YAHOO_STOCK_FORMAT = "&f=snxpl1hgsvsc1p2sk3sbsb6sasa5sd1t1";
     
     static {
         try {
