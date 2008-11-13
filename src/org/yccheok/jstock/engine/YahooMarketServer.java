@@ -18,14 +18,119 @@
 
 package org.yccheok.jstock.engine;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  *
  * @author yccheok
  */
 public class YahooMarketServer implements MarketServer {
-
-    public Market getMarket() {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public YahooMarketServer(Country country) {
+        // YahooMarketServer doesn't support Malaysia market at this moment.
+        if(country == Country.Malaysia) {
+            throw new java.lang.IllegalArgumentException("Malaysia market not supported");
+        }
+        
+        this.indicies = Utils.getStockIndices(country);
+        
+        if(this.indicies.size() == 0) {
+            throw new java.lang.IllegalArgumentException("Country=" + country);            
+        }
+        
+        this.country = country;
+        this.stockServer = new YahooStockServer(country);
+        
+        for(Index index : indicies) {
+            symbols.add(index.getSymbol());
+            symbolToIndexMap.put(index.getSymbol(), index);
+        }
     }
+    
+    public Market getMarket() {      
+        try {
+            return new YahooMarket();
+        }
+        catch(StockNotFoundException exp) {
+            log.error("", exp);
+        }
+        
+        return null;
+    }
+    
+    public Country country() {
+        return country;
+    }
+    
+    private final class YahooMarket implements Market {
+        private final Map<Index, Stock> map = new HashMap<Index, Stock>();
+        
+        public YahooMarket() throws StockNotFoundException {   
+            List<Stock> stocks;
+            
+            try {
+                stocks = stockServer.getStocksBySymbols(symbols);
+            } catch (StockNotFoundException ex) {
+                throw ex;
+            }
+        
+            for(Stock stock : stocks) {
+                map.put(symbolToIndexMap.get(stock.getSymbol()), stock);
+            }
+        }
+        
+        public double getIndex(Index index) {
+            final Stock stock = map.get(index);
+            if(stock == null) return 0.0;
+            
+            return stock.getLastPrice();
+        }
 
+        public double getChange(Index index) {
+            final Stock stock = map.get(index);
+            if(stock == null) return 0.0;
+            
+            return stock.getChangePrice();
+        }
+
+        public int getNumOfStockChange(ChangeType type) {
+            return 0;
+        }
+
+        public long getVolume() {
+            long total = 0;
+            
+            for(Stock stock : map.values()) {
+                total += stock.getVolume();
+            }
+            
+            return total;
+        }
+
+        public double getValue() {
+            double total = 0;
+            
+            for(Stock stock : map.values()) {
+                total += stock.getLastPrice();
+            }
+            
+            return total;
+        }
+
+        public Country getCountry() {
+            return country;
+        }        
+    }
+    
+    private static final Log log = LogFactory.getLog(YahooMarketServer.class);
+    
+    private final Country country;
+    private final List<Index> indicies;
+    private final List<Symbol> symbols = new ArrayList<Symbol>();
+    private final StockServer stockServer;
+    private final Map<Symbol, Index> symbolToIndexMap = new HashMap<Symbol, Index>();
 }
