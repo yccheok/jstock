@@ -53,16 +53,16 @@ public enum Factories {
         final List<StockServerFactory> unitedKingdomList = new ArrayList<StockServerFactory>();
         final List<StockServerFactory> unitedStateList = new ArrayList<StockServerFactory>();
         
-        denmarkList.add(YahooDenmarkStockServerFactory.newInstance());
-        franceList.add(YahooFranceStockServerFactory.newInstance());
-        germanyList.add(YahooGermanyStockServerFactory.newInstance());
-        italyList.add(YahooItalyStockServerFactory.newInstance());
+        denmarkList.add(YahooStockServerFactory.newInstance(Country.Denmark));
+        franceList.add(YahooStockServerFactory.newInstance(Country.France));
+        germanyList.add(YahooStockServerFactory.newInstance(Country.Germany));
+        italyList.add(YahooStockServerFactory.newInstance(Country.Italy));
         malaysiaList.add(CIMBStockServerFactory.newInstance("", ""));
-        norwayList.add(YahooNorwayStockServerFactory.newInstance());
-        spainList.add(YahooSpainStockServerFactory.newInstance());
-        sweedenList.add(YahooSweedenStockServerFactory.newInstance());
-        unitedKingdomList.add(YahooUKStockServerFactory.newInstance());
-        unitedStateList.add(YahooUSStockServerFactory.newInstance());
+        norwayList.add(YahooStockServerFactory.newInstance(Country.Norway));
+        spainList.add(YahooStockServerFactory.newInstance(Country.Spain));
+        sweedenList.add(YahooStockServerFactory.newInstance(Country.Sweeden));
+        unitedKingdomList.add(YahooStockServerFactory.newInstance(Country.UnitedKingdom));
+        unitedStateList.add(YahooStockServerFactory.newInstance(Country.UnitedState));
         
         map.put(Country.Denmark, denmarkList);
         map.put(Country.France, franceList);
