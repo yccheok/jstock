@@ -27,8 +27,6 @@ import javax.swing.JLabel;
 import org.yccheok.jstock.engine.Country;
 import org.yccheok.jstock.engine.Index;
 import org.yccheok.jstock.engine.Market;
-import org.yccheok.jstock.engine.Stock;
-import org.yccheok.jstock.engine.Stock.Board;
 
 /**
  *
