@@ -903,15 +903,12 @@ public class MainFrame extends javax.swing.JFrame {
 
         int rows[] = jTable1.getSelectedRows();
 
-        for(int i=0; i<rows.length; i++) {                
+        Arrays.sort(rows);
+
+        for(int i=rows.length-1; i>=0; i--) {                
             int row = rows[i];
 
             if(row < 0) continue;
-
-            for(int j=i+1; j<rows.length; j++) {
-                if(row < rows[j])
-                    rows[j]--;
-            }
 
             final int modelIndex = jTable1.getRowSorter().convertRowIndexToModel(row);
             Stock stock = tableModel.getStock(modelIndex);
