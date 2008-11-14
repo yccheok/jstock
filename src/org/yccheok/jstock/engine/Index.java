@@ -26,7 +26,7 @@ public enum Index {
     KLSE("KLSE", Symbol.newInstance("KLSE")),
     Second("Second Board", Symbol.newInstance("Second")),
     Mesdaq("Mesdaq", Symbol.newInstance("Mesdaq")),
-    DHI("Dow Jones Industrial Average", Symbol.newInstance("^DHI")),
+    DJI("Dow Jones Industrial Average", Symbol.newInstance("^DJI")),
     IXIC("NASDAQ COMPOSITE", Symbol.newInstance("^IXIC")),       
     DAX("DAX", Symbol.newInstance("^GDAXI")),               
     OMXSPI("Stockholm General", Symbol.newInstance("^OMXSPI")),
