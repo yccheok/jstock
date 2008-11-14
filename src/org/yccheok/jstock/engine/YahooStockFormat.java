@@ -67,7 +67,7 @@ public class YahooStockFormat implements StockFormat {
             return stocks;
         }                         
         
-        final String[] strings = source.split("\\r\\n");
+        final String[] strings = source.split("\r\n|\r|\n");
         
         for(String string : strings) {
             final String tmp = YahooStockFormat.digitPattern.matcher(string).replaceAll("$1");
