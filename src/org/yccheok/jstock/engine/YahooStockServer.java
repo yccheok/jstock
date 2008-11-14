@@ -72,7 +72,6 @@ public class YahooStockServer implements StockServer {
                 Utils.setHttpClientProxyFromSystemProperties(httpClient);
                 httpClient.executeMethod(method);
                 final String responde = method.getResponseBodyAsString();
-                //System.out.println(responde);
                 final List<Stock> stocks = YahooStockFormat.getInstance().parse(responde);
                 
                 if(stocks.size() == 1)
@@ -179,7 +178,7 @@ public class YahooStockServer implements StockServer {
         final StringBuffer stringBuffer = new StringBuffer(YAHOO_CSV_BASED_URL);
         final StringBuffer symbolBuffer = new StringBuffer();
         
-		final int endLoop = end - 1;
+        final int endLoop = end - 1;
         for(int i=start; i<endLoop; i++) {
             symbolBuffer.append(symbols.get(i)).append("+");
         }
@@ -292,7 +291,6 @@ public class YahooStockServer implements StockServer {
     }
     
     public List<Stock> getAllStocks() throws StockNotFoundException {
-        List<Stock> stocks = new ArrayList<Stock>();
         List<URL> visited = new ArrayList<URL>();
         
         // Use Set, for safety purpose to avoid duplication.
