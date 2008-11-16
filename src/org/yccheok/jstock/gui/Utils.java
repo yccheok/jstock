@@ -210,7 +210,7 @@ public class Utils {
     }
     
     public static String getUserDataDirectory() {
-        return System.getProperty("user.home") + File.separator + ".jstock" + File.separator;
+        return System.getProperty("user.home") + File.separator + ".jstock" + File.separator + getApplicationVersionString() + File.separator;
     }
     
     public static Color getColor(double price, double referencePrice) {
@@ -272,6 +272,13 @@ public class Utils {
                             Calendar.getInstance()                                        
                             );                
     } 
+    
+    public static String getApplicationVersionString() {
+        return APPLICATION_VERSION_STRING;
+    }
+    
+	// We will use this as directory name. Do not have space or special characters.
+    private static final String APPLICATION_VERSION_STRING = "1.0.0";
     
     private static final Log log = LogFactory.getLog(Utils.class);
 }
