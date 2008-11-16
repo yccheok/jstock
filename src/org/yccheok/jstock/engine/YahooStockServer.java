@@ -39,7 +39,7 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author yccheok
  */
-public class YahooStockServer implements StockServer {
+public class YahooStockServer extends Subject<YahooStockServer, Integer> implements StockServer {
     public YahooStockServer(Country country) {
         this.country = country;
         baseURL = YahooStockServer.servers.get(country);
@@ -51,6 +51,7 @@ public class YahooStockServer implements StockServer {
         httpClient = new HttpClient(new MultiThreadedHttpConnectionManager());
     }
     
+    @Override
     public Stock getStock(Symbol symbol) throws StockNotFoundException {
         final StringBuffer stringBuffer = new StringBuffer(YAHOO_CSV_BASED_URL);
 
@@ -140,7 +141,6 @@ public class YahooStockServer implements StockServer {
                     Utils.setHttpClientProxyFromSystemProperties(httpClient);
                     httpClient.executeMethod(method);
                     final String responde = method.getResponseBodyAsString();
-                    System.out.println(responde);
                     
                     final List<Stock> tmpStocks = YahooStockFormat.getInstance().parse(responde);
                     if(tmpStocks.size() != MAX_STOCK_PER_ITERATION) {
@@ -195,8 +195,6 @@ public class YahooStockServer implements StockServer {
                     
         final String location = stringBuffer.toString();
         
-        System.out.println("LOCATION=" + location);
-        
         for(int retry=0; retry<NUM_OF_RETRY; retry++) {
             HttpMethod method = new GetMethod(location);                        
 
@@ -204,7 +202,6 @@ public class YahooStockServer implements StockServer {
                 Utils.setHttpClientProxyFromSystemProperties(httpClient);
                 httpClient.executeMethod(method);
                 final String responde = method.getResponseBodyAsString();
-                System.out.println(responde);
                 
                 final List<Stock> tmpStocks = YahooStockFormat.getInstance().parse(responde);
                 if(tmpStocks.size() != remainder) {
@@ -329,6 +326,8 @@ public class YahooStockServer implements StockServer {
                 
                 break;
             }   // for(int retry=0; retry<3; retry++)
+            
+            this.notify(this, symbols.size());
         }
         
         if(symbols.size() == 0) throw new StockNotFoundException();
@@ -394,7 +393,7 @@ public class YahooStockServer implements StockServer {
             servers.put(Country.Italy, new URL("http://uk.biz.yahoo.com/p/it/cpi/index.html"));
             servers.put(Country.Norway, new URL("http://uk.biz.yahoo.com/p/no/cpi/index.html"));
             servers.put(Country.Spain, new URL("http://uk.biz.yahoo.com/p/es/cpi/index.html"));
-            servers.put(Country.Sweeden, new URL("http://uk.biz.yahoo.com/p/se/cpi/index.html"));
+            servers.put(Country.Sweden, new URL("http://uk.biz.yahoo.com/p/se/cpi/index.html"));
             servers.put(Country.UnitedKingdom, new URL("http://uk.biz.yahoo.com/p/uk/cpi/index.html"));
             servers.put(Country.UnitedState, new URL("http://uk.biz.yahoo.com/p/us/cpi/index.html"));
         }
@@ -410,7 +409,7 @@ public class YahooStockServer implements StockServer {
         patterns.put(Country.Italy, Pattern.compile("<a\\s+href\\s*=\\s*\"?(\\/p\\/it\\/cpi\\/[^\\s]+\\.html)"));
         patterns.put(Country.Norway, Pattern.compile("<a\\s+href\\s*=\\s*\"?(\\/p\\/no\\/cpi\\/[^\\s]+\\.html)"));
         patterns.put(Country.Spain, Pattern.compile("<a\\s+href\\s*=\\s*\"?(\\/p\\/es\\/cpi\\/[^\\s]+\\.html)"));
-        patterns.put(Country.Sweeden, Pattern.compile("<a\\s+href\\s*=\\s*\"?(\\/p\\/se\\/cpi\\/[^\\s]+\\.html)"));
+        patterns.put(Country.Sweden, Pattern.compile("<a\\s+href\\s*=\\s*\"?(\\/p\\/se\\/cpi\\/[^\\s]+\\.html)"));
         patterns.put(Country.UnitedKingdom, Pattern.compile("<a\\s+href\\s*=\\s*\"?(\\/p\\/uk\\/cpi\\/[^\\s]+\\.html)"));
         patterns.put(Country.UnitedState, Pattern.compile("<a\\s+href\\s*=\\s*\"?(\\/p\\/us\\/cpi\\/[^\\s]+\\.html)"));
     }
