@@ -112,7 +112,7 @@ public class MarketJPanel extends javax.swing.JPanel {
         volume_value.setForeground(new java.awt.Color(153, 102, 0));
         leftPanel.add(volume_value);
 
-        JLabel value = new JLabel("Value (RM) : ");
+        JLabel value = new JLabel("Value ($) : ");
         leftPanel.add(value);
         JLabel value_value = new JLabel();
         value_value.setName("value");
