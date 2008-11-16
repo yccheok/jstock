@@ -118,7 +118,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         final MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, IndicatorScannerJPanel.this);
         
         if(m.getStockCodeAndSymbolDatabase() == null) {
-            javax.swing.JOptionPane.showMessageDialog(this, "We haven't connected to KLSE server.", "Not Connected", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            javax.swing.JOptionPane.showMessageDialog(this, "We haven't connected to stock server.", "Not Connected", javax.swing.JOptionPane.INFORMATION_MESSAGE);
             return;
         }
 
@@ -307,6 +307,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         final ExecutorService oldEmailAlertPool = emailAlertPool;
         
         zombiePool.execute(new Runnable() {
+            @Override
             public void run() {
                 log.info("Prepare to shut down " + oldSystemTrayAlertPool + "...");
                 oldSystemTrayAlertPool.shutdownNow();
@@ -341,14 +342,18 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     }
     
     public void initWizardDialog() {
-        wizard = new Wizard((MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, this));
+        final MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, this);
+        
+        wizard = new Wizard(m);
 
         wizard.getDialog().setTitle("Indicator Scanning Wizard");
 
         WizardPanelDescriptor wizardSelectIndicatorDescriptor = new WizardSelectIndicatorDescriptor();
         wizard.registerWizardPanel(WizardSelectIndicatorDescriptor.IDENTIFIER, wizardSelectIndicatorDescriptor);
         
-        WizardPanelDescriptor wizardSelectStockDescriptor = new WizardSelectStockDescriptor();
+        // Quick hack. WizardSelectStockJPanel has no way to obtain MainFrame, during its construction
+        // stage.
+        WizardPanelDescriptor wizardSelectStockDescriptor = new WizardSelectStockDescriptor(m.getStockCodeAndSymbolDatabase());
         wizard.registerWizardPanel(WizardSelectStockDescriptor.IDENTIFIER, wizardSelectStockDescriptor);
 
         WizardPanelDescriptor wizardSelectHistoryDescriptor = new WizardSelectHistoryDescriptor();
