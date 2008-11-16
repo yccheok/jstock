@@ -33,7 +33,7 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author yccheok
  */
-public class CIMBStockServer implements StockServer {
+public class CIMBStockServer extends Subject<CIMBStockServer, Integer> implements StockServer {
     
     /** Creates a new instance of CIMBStockServer */
     public CIMBStockServer() {
@@ -175,6 +175,7 @@ public class CIMBStockServer implements StockServer {
         return stocks;
     }
     
+    @Override
     public java.util.List<Stock> getAllStocks() throws StockNotFoundException
     {
         List<Stock> stocks = new ArrayList<Stock>();
@@ -211,6 +212,7 @@ public class CIMBStockServer implements StockServer {
                         if(firstTime == false) continue;
 
                         stocks.add(stock);
+                        this.notify(this, stocks.size());
                     }
                 }
                 catch(HttpException exp) {
