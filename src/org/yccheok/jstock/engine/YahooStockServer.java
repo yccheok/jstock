@@ -100,6 +100,7 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
         return getStock(Symbol.newInstance(code.toString()));
     }
 
+    @Override
     public List<Stock> getStocksBySymbols(List<Symbol> symbols) throws StockNotFoundException {
         List<Stock> stocks = new ArrayList<Stock>();
         
