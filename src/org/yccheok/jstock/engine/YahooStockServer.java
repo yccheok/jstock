@@ -100,6 +100,14 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
         return getStock(Symbol.newInstance(code.toString()));
     }
 
+    private boolean isToleranceAllowed(int currSize, int expectedSize) {
+        if(currSize >= expectedSize) return true;
+        if(expectedSize <= 0) return true;
+        
+        double result = 100.0 - ((double)(expectedSize - currSize) / (double)expectedSize * 100.0);
+        return (result >= STABILITY_RATE);
+    }
+    
     @Override
     public List<Stock> getStocksBySymbols(List<Symbol> symbols) throws StockNotFoundException {
         List<Stock> stocks = new ArrayList<Stock>();
@@ -115,19 +123,34 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
             
             final StringBuffer stringBuffer = new StringBuffer(YAHOO_CSV_BASED_URL);
             final StringBuffer symbolBuffer = new StringBuffer();
+            final List<Symbol> expectedSymbols = new ArrayList<Symbol>();
             
             final int endLoop = end - 1;
             for(int j=start; j<endLoop; j++) {
-                symbolBuffer.append(symbols.get(j)).append("+");
+                String symbolString = null;
+                
+                try {
+                    symbolString = java.net.URLEncoder.encode(symbols.get(j).toString(), "UTF-8");
+                } catch (UnsupportedEncodingException ex) {
+                    throw new StockNotFoundException("", ex);
+                }
+                
+                symbolBuffer.append(symbolString).append("+");
+                expectedSymbols.add(symbols.get(j));
             }
             
-            symbolBuffer.append(symbols.get(end - 1));
-            final String _symbol;
+            String symbolString = null;
+
             try {
-                _symbol = java.net.URLEncoder.encode(symbolBuffer.toString(), "UTF-8");
+                symbolString = java.net.URLEncoder.encode(symbols.get(end - 1).toString(), "UTF-8");
             } catch (UnsupportedEncodingException ex) {
-                throw new StockNotFoundException("symbolBuffer.toString()=" + symbolBuffer.toString(), ex);
-            } 
+                throw new StockNotFoundException("", ex);
+            }
+                
+            symbolBuffer.append(symbolString);
+            expectedSymbols.add(symbols.get(end - 1));
+            
+            final String _symbol = symbolBuffer.toString();
         
             stringBuffer.append(_symbol).append(YAHOO_STOCK_FORMAT);
             
@@ -146,10 +169,35 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
                     final List<Stock> tmpStocks = YahooStockFormat.getInstance().parse(responde);
                     if(tmpStocks.size() != MAX_STOCK_PER_ITERATION) {
                         if(retry == (NUM_OF_RETRY-1)) {
-                            throw new StockNotFoundException();
-                        }
+                            // throw new StockNotFoundException();
+                            
+                            assert(expectedSymbols.size() == MAX_STOCK_PER_ITERATION);
+                            
+                            final int currSize = tmpStocks.size();
+                            final int expectedSize = expectedSymbols.size();
+                            
+                            if(this.isToleranceAllowed(currSize, expectedSize)) {
+                                List<Symbol> currSymbols = new ArrayList<Symbol>();
+                                List<Stock> emptyStocks = new ArrayList<Stock>();
+                                
+                                for(Stock stock : tmpStocks) {
+                                    currSymbols.add(stock.getSymbol());
+                                }
+                                
+                                for(Symbol symbol : expectedSymbols) {
+                                    if(currSymbols.contains(symbol) == false) {
+                                        emptyStocks.add(org.yccheok.jstock.gui.Utils.getEmptyStock(Code.newInstance(symbol.toString()), symbol));
+                                    }
+                                }
+                                
+                                tmpStocks.addAll(emptyStocks);
+                            }
+                            else {
+                                throw new StockNotFoundException("Expected stock size=" + expectedSize + ", Current stock size=" + currSize + ", Request=" + location);
+                            }
+                        }   // if(retry == (NUM_OF_RETRY-1))
                         continue;
-                    }
+                    }   // if(tmpStocks.size() != MAX_STOCK_PER_ITERATION)
                     
                     stocks.addAll(tmpStocks);
                 }
@@ -178,19 +226,34 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
         
         final StringBuffer stringBuffer = new StringBuffer(YAHOO_CSV_BASED_URL);
         final StringBuffer symbolBuffer = new StringBuffer();
+        final List<Symbol> expectedSymbols = new ArrayList<Symbol>();
         
         final int endLoop = end - 1;
         for(int i=start; i<endLoop; i++) {
-            symbolBuffer.append(symbols.get(i)).append("+");
-        }
-        symbolBuffer.append(symbols.get(end-1));
+            String symbolString = null;
+
+            try {
+                symbolString = java.net.URLEncoder.encode(symbols.get(i).toString(), "UTF-8");
+            } catch (UnsupportedEncodingException ex) {
+                throw new StockNotFoundException("", ex);
+            }
                 
-        final String _symbol;
-        try {
-            _symbol = java.net.URLEncoder.encode(symbolBuffer.toString(), "UTF-8");
-        } catch (UnsupportedEncodingException ex) {
-            throw new StockNotFoundException("symbolBuffer.toString()=" + symbolBuffer.toString(), ex);
+            symbolBuffer.append(symbolString).append("+");
+            expectedSymbols.add(symbols.get(i));
         }
+        
+        String symbolString = null;
+
+        try {
+            symbolString = java.net.URLEncoder.encode(symbols.get(end-1).toString(), "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            throw new StockNotFoundException("", ex);
+        }
+            
+        symbolBuffer.append(symbolString);
+        expectedSymbols.add(symbols.get(end-1));                
+        
+        final String _symbol = symbolBuffer.toString();
             
         stringBuffer.append(_symbol).append(YAHOO_STOCK_FORMAT);
                     
@@ -207,11 +270,34 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
                 final List<Stock> tmpStocks = YahooStockFormat.getInstance().parse(responde);
                 if(tmpStocks.size() != remainder) {
                     if(retry == (NUM_OF_RETRY-1)) {
-                        throw new StockNotFoundException();
-                    }                    
+                        // throw new StockNotFoundException();
+                        
+                        final int currSize = tmpStocks.size();
+                        final int expectedSize = expectedSymbols.size();
+
+                        if(this.isToleranceAllowed(currSize, expectedSize)) {
+                            List<Symbol> currSymbols = new ArrayList<Symbol>();
+                            List<Stock> emptyStocks = new ArrayList<Stock>();
+
+                            for(Stock stock : tmpStocks) {
+                                currSymbols.add(stock.getSymbol());
+                            }
+
+                            for(Symbol symbol : expectedSymbols) {
+                                if(currSymbols.contains(symbol) == false) {
+                                    emptyStocks.add(org.yccheok.jstock.gui.Utils.getEmptyStock(Code.newInstance(symbol.toString()), symbol));
+                                }
+                            }
+
+                            tmpStocks.addAll(emptyStocks);
+                        }
+                        else {
+                            throw new StockNotFoundException("Expected stock size=" + expectedSize + ", Current stock size=" + currSize + ", Request=" + location);
+                        }                        
+                    }   // if(retry == (NUM_OF_RETRY-1))   
                     
                     continue;
-                }
+                }   // if(tmpStocks.size() != remainder)
                 
                 stocks.addAll(tmpStocks);
             }
@@ -352,11 +438,17 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
     
     private static final Pattern symbolPattern = Pattern.compile("<a\\s+href\\s*=[^>]+s=([^\">]+)\"?>Quote");
     
-    // Yahoo server limit.
-    private static final int MAX_STOCK_PER_ITERATION = 200;
+    // Yahoo server limit is 200. We shorter, to avoid URL from being too long.
+    // Yahoo sometimes does complain URL for being too long.
+    private static final int MAX_STOCK_PER_ITERATION = 180;
     private static final String YAHOO_CSV_BASED_URL = "http://finance.yahoo.com/d/quotes.csv?s=";
     
-    private static final int NUM_OF_RETRY = 3;
+    // Yahoo server's result is not stable. If we request for 100 stocks, it may only
+    // return 99 stocks to us. We allow stability rate in %. Higher rate means more
+    // stable.
+    private static final double STABILITY_RATE = 90.0;
+    
+    private static final int NUM_OF_RETRY = 2;
     
     // s = Symbol
     // n = Name
