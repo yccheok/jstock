@@ -112,17 +112,6 @@ public class Utils {
         
         return isValidPortNumber(port);
     }
-    
-    private static final List<Stock.Board> denmarkBoards = new ArrayList<Stock.Board>();
-    private static final List<Stock.Board> franceBoards = new ArrayList<Stock.Board>();
-    private static final List<Stock.Board> germanyBoards = new ArrayList<Stock.Board>();
-    private static final List<Stock.Board> italyBoards = new ArrayList<Stock.Board>();
-    private static final List<Stock.Board> malaysiaBoards = new ArrayList<Stock.Board>();
-    private static final List<Stock.Board> norwayBoards = new ArrayList<Stock.Board>();
-    private static final List<Stock.Board> spainBoards = new ArrayList<Stock.Board>();
-    private static final List<Stock.Board> swedenBoards = new ArrayList<Stock.Board>();
-    private static final List<Stock.Board> unitedKingdomBoards = new ArrayList<Stock.Board>();
-    private static final List<Stock.Board> unitedStateBoards = new ArrayList<Stock.Board>();
 
     private static final List<Index> denmarkIndices = new ArrayList<Index>();
     private static final List<Index> franceIndices = new ArrayList<Index>();
@@ -136,22 +125,7 @@ public class Utils {
     private static final List<Index> unitedStateIndices = new ArrayList<Index>();
     
     static
-    {
-        denmarkBoards.add(Stock.Board.OMXC20CO);
-        franceBoards.add(Stock.Board.FCHI);        
-        germanyBoards.add(Stock.Board.DAX);
-        italyBoards.add(Stock.Board.SPMIB);
-        malaysiaBoards.add(Stock.Board.Main);
-        malaysiaBoards.add(Stock.Board.Second);
-        malaysiaBoards.add(Stock.Board.Mesdaq);
-        malaysiaBoards.add(Stock.Board.CallWarrant);
-        norwayBoards.add(Stock.Board.OSEAX);
-        spainBoards.add(Stock.Board.SMSI);
-        swedenBoards.add(Stock.Board.OMXSPI);
-        unitedKingdomBoards.add(Stock.Board.FTSE);
-        unitedStateBoards.add(Stock.Board.DHI);        
-        unitedStateBoards.add(Stock.Board.IXIC);
-        
+    {        
         denmarkIndices.add(Index.OMXC20CO);
         franceIndices.add(Index.FCHI);        
         germanyIndices.add(Index.DAX);
@@ -193,34 +167,5 @@ public class Utils {
         }
         
         return java.util.Collections.emptyList();
-    }
-    
-    public static List<Stock.Board> getStockBoards(Country country) {
-        switch(country)
-        {
-            case Denmark:
-                return java.util.Collections.unmodifiableList(Utils.denmarkBoards);
-            case France:
-                return java.util.Collections.unmodifiableList(Utils.franceBoards);
-            case Germany:
-                return java.util.Collections.unmodifiableList(Utils.germanyBoards);                
-            case Italy:
-                return java.util.Collections.unmodifiableList(Utils.italyBoards);
-            case Malaysia:
-                return java.util.Collections.unmodifiableList(Utils.malaysiaBoards);
-            case Norway:
-                return java.util.Collections.unmodifiableList(Utils.norwayBoards);
-            case Spain:
-                return java.util.Collections.unmodifiableList(Utils.spainBoards);
-            case Sweden:
-                return java.util.Collections.unmodifiableList(Utils.swedenBoards);
-            case UnitedKingdom:
-                return java.util.Collections.unmodifiableList(Utils.unitedKingdomBoards);                
-            case UnitedState:
-                return java.util.Collections.unmodifiableList(Utils.unitedStateBoards);
-        }
-        
-        return java.util.Collections.emptyList();
-    }
-    
+    }    
 }
