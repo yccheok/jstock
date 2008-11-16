@@ -68,6 +68,8 @@ public class StockJDialog extends javax.swing.JDialog {
         jCheckBox2 = new javax.swing.JCheckBox();
         jCheckBox3 = new javax.swing.JCheckBox();
         jCheckBox21 = new javax.swing.JCheckBox();
+        jCheckBox4 = new javax.swing.JCheckBox();
+        jCheckBox23 = new javax.swing.JCheckBox();
         jRadioButton4 = new javax.swing.JRadioButton();
         jPanel3 = new javax.swing.JPanel();
         jCheckBox5 = new javax.swing.JCheckBox();
@@ -87,6 +89,7 @@ public class StockJDialog extends javax.swing.JDialog {
         jCheckBox19 = new javax.swing.JCheckBox();
         jCheckBox20 = new javax.swing.JCheckBox();
         jCheckBox22 = new javax.swing.JCheckBox();
+        jCheckBox24 = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Select Stock");
@@ -153,6 +156,14 @@ public class StockJDialog extends javax.swing.JDialog {
         jCheckBox21.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         jCheckBox21.setMargin(new java.awt.Insets(0, 0, 0, 0));
 
+        jCheckBox4.setText("Call warrant");
+        jCheckBox4.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        jCheckBox4.setMargin(new java.awt.Insets(0, 0, 0, 0));
+
+        jCheckBox23.setText("Call warrant");
+        jCheckBox23.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        jCheckBox23.setMargin(new java.awt.Insets(0, 0, 0, 0));
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -163,10 +174,14 @@ public class StockJDialog extends javax.swing.JDialog {
                     .addComponent(jCheckBox1)
                     .addComponent(jCheckBox3))
                 .addGap(61, 61, 61)
-                .addComponent(jCheckBox2)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jCheckBox2)
+                    .addComponent(jCheckBox4))
                 .addGap(48, 48, 48)
-                .addComponent(jCheckBox21)
-                .addGap(49, 49, 49))
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jCheckBox23)
+                    .addComponent(jCheckBox21))
+                .addGap(29, 29, 29))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -176,7 +191,10 @@ public class StockJDialog extends javax.swing.JDialog {
                     .addComponent(jCheckBox2)
                     .addComponent(jCheckBox21))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jCheckBox3)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jCheckBox3)
+                    .addComponent(jCheckBox4)
+                    .addComponent(jCheckBox23))
                 .addContainerGap(15, Short.MAX_VALUE))
         );
 
@@ -262,6 +280,10 @@ public class StockJDialog extends javax.swing.JDialog {
         jCheckBox22.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         jCheckBox22.setMargin(new java.awt.Insets(0, 0, 0, 0));
 
+        jCheckBox24.setText("Unknown");
+        jCheckBox24.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        jCheckBox24.setMargin(new java.awt.Insets(0, 0, 0, 0));
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -277,21 +299,20 @@ public class StockJDialog extends javax.swing.JDialog {
                     .addComponent(jCheckBox19))
                 .addGap(13, 13, 13)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jCheckBox20)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jCheckBox7)
-                            .addComponent(jCheckBox8)
-                            .addComponent(jCheckBox12)
-                            .addComponent(jCheckBox15)
-                            .addComponent(jCheckBox18))
-                        .addGap(14, 14, 14)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jCheckBox22)
-                            .addComponent(jCheckBox16)
-                            .addComponent(jCheckBox13)
-                            .addComponent(jCheckBox10)
-                            .addComponent(jCheckBox9))))
+                    .addComponent(jCheckBox7)
+                    .addComponent(jCheckBox8)
+                    .addComponent(jCheckBox12)
+                    .addComponent(jCheckBox15)
+                    .addComponent(jCheckBox18)
+                    .addComponent(jCheckBox20))
+                .addGap(14, 14, 14)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jCheckBox24)
+                    .addComponent(jCheckBox22)
+                    .addComponent(jCheckBox16)
+                    .addComponent(jCheckBox13)
+                    .addComponent(jCheckBox10)
+                    .addComponent(jCheckBox9))
                 .addContainerGap(41, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
@@ -324,7 +345,8 @@ public class StockJDialog extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jCheckBox20)
-                    .addComponent(jCheckBox19))
+                    .addComponent(jCheckBox19)
+                    .addComponent(jCheckBox24))
                 .addContainerGap(14, Short.MAX_VALUE))
         );
 
@@ -344,7 +366,7 @@ public class StockJDialog extends javax.swing.JDialog {
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 393, Short.MAX_VALUE)
                             .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                .addContainerGap(77, Short.MAX_VALUE))
+                .addContainerGap(20, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -365,7 +387,7 @@ public class StockJDialog extends javax.swing.JDialog {
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
         java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-649)/2, (screenSize.height-405)/2, 649, 405);
+        setBounds((screenSize.width-592)/2, (screenSize.height-403)/2, 592, 403);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -482,6 +504,8 @@ public class StockJDialog extends javax.swing.JDialog {
         boardCheckBoxes.add(jCheckBox2);
         boardCheckBoxes.add(jCheckBox21);
         boardCheckBoxes.add(jCheckBox3);
+        boardCheckBoxes.add(jCheckBox4);
+        boardCheckBoxes.add(jCheckBox23);
         
         for(JCheckBox checkBox : boardCheckBoxes) {
             checkBox.setVisible(false);
@@ -527,6 +551,7 @@ public class StockJDialog extends javax.swing.JDialog {
         industryCheckBoxes.add(jCheckBox22);
         industryCheckBoxes.add(jCheckBox19);
         industryCheckBoxes.add(jCheckBox20);
+        industryCheckBoxes.add(jCheckBox24);
         
         for(JCheckBox checkBox : industryCheckBoxes) {
             checkBox.setVisible(false);
@@ -577,7 +602,10 @@ public class StockJDialog extends javax.swing.JDialog {
     private javax.swing.JCheckBox jCheckBox20;
     private javax.swing.JCheckBox jCheckBox21;
     private javax.swing.JCheckBox jCheckBox22;
+    private javax.swing.JCheckBox jCheckBox23;
+    private javax.swing.JCheckBox jCheckBox24;
     private javax.swing.JCheckBox jCheckBox3;
+    private javax.swing.JCheckBox jCheckBox4;
     private javax.swing.JCheckBox jCheckBox5;
     private javax.swing.JCheckBox jCheckBox6;
     private javax.swing.JCheckBox jCheckBox7;
