@@ -32,7 +32,7 @@ public enum Country {
     Malaysia("/images/16x16/my.png"),    
     Norway("/images/16x16/no.png"),
     Spain("/images/16x16/es.png"),            
-    Sweeden("/images/16x16/se.png"),
+    Sweden("/images/16x16/se.png"),
     UnitedKingdom("/images/16x16/gb.png"),
     UnitedState("/images/16x16/us.png");
             
