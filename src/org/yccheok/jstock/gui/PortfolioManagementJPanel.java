@@ -105,30 +105,30 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jLabel1.setText("Share (RM): ");
+        jLabel1.setText("Share ($): ");
         jPanel3.add(jLabel1);
 
-        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 11));
         jPanel3.add(jLabel2);
 
-        jLabel3.setText("Cash (RM): ");
+        jLabel3.setText("Cash ($): ");
         jPanel3.add(jLabel3);
 
-        jLabel4.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel4.setFont(new java.awt.Font("Tahoma", 1, 11));
         jPanel3.add(jLabel4);
 
         jPanel4.add(jPanel3, java.awt.BorderLayout.WEST);
 
-        jLabel5.setText("Paper Profit (RM): ");
+        jLabel5.setText("Paper Profit ($): ");
         jPanel5.add(jLabel5);
 
-        jLabel6.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel6.setFont(new java.awt.Font("Tahoma", 1, 11));
         jPanel5.add(jLabel6);
 
-        jLabel7.setText("Realized Profit (RM): ");
+        jLabel7.setText("Realized Profit ($): ");
         jPanel5.add(jLabel7);
 
-        jLabel8.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel8.setFont(new java.awt.Font("Tahoma", 1, 11));
         jPanel5.add(jLabel8);
 
         jPanel4.add(jPanel5, java.awt.BorderLayout.EAST);
@@ -190,7 +190,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         });
         jPanel2.add(jButton3);
 
-        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/button_cancel.png"))); // NOI18N
+        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/editdelete.png"))); // NOI18N
         jButton2.setText("Delete");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -354,7 +354,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = mainFrame.getStockCodeAndSymbolDatabase();
         
         if(stockCodeAndSymbolDatabase == null) {
-            javax.swing.JOptionPane.showMessageDialog(this, "We haven't connected to KLSE server.", "Not Connected", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            javax.swing.JOptionPane.showMessageDialog(this, "We haven't connected to stock server.", "Not Connected", javax.swing.JOptionPane.INFORMATION_MESSAGE);
             return;
         }
         
@@ -615,7 +615,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             popup.add(menuItem);
             popup.addSeparator();
             
-            menuItem = new JMenuItem("Delete", this.getImageIcon("/images/16x16/button_cancel.png"));
+            menuItem = new JMenuItem("Delete", this.getImageIcon("/images/16x16/editdelete.png"));
 
             menuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent evt) {
@@ -702,7 +702,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             popup.add(menuItem);
             popup.addSeparator();
             
-            menuItem = new JMenuItem("Delete", this.getImageIcon("/images/16x16/button_cancel.png"));
+            menuItem = new JMenuItem("Delete", this.getImageIcon("/images/16x16/editdelete.png"));
 
             menuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent evt) {
