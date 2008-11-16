@@ -9,7 +9,7 @@
     </Property>
   </Properties>
   <SyntheticProperties>
-    <SyntheticProperty name="formSize" type="java.awt.Dimension" value="-84,-19,0,5,115,114,0,18,106,97,118,97,46,97,119,116,46,68,105,109,101,110,115,105,111,110,65,-114,-39,-41,-84,95,68,20,2,0,2,73,0,6,104,101,105,103,104,116,73,0,5,119,105,100,116,104,120,112,0,0,2,43,0,0,1,-61"/>
+    <SyntheticProperty name="formSize" type="java.awt.Dimension" value="-84,-19,0,5,115,114,0,18,106,97,118,97,46,97,119,116,46,68,105,109,101,110,115,105,111,110,65,-114,-39,-41,-84,95,68,20,2,0,2,73,0,6,104,101,105,103,104,116,73,0,5,119,105,100,116,104,120,112,0,0,1,-104,0,0,1,-6"/>
     <SyntheticProperty name="formSizePolicy" type="int" value="0"/>
     <SyntheticProperty name="generateSize" type="boolean" value="true"/>
     <SyntheticProperty name="generateCenter" type="boolean" value="true"/>
@@ -29,9 +29,21 @@
   <SubComponents>
     <Component class="javax.swing.JLabel" name="jLabel1">
       <Properties>
-        <Property name="horizontalAlignment" type="int" value="0"/>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Tahoma" size="18" style="1"/>
+        </Property>
+        <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="ff" green="0" red="0" type="rgb"/>
+        </Property>
+        <Property name="horizontalAlignment" type="int" value="2"/>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="3" name="/images/192x192/j0424124.gif"/>
+          <Image iconType="3" name="/images/192x192/j0411029.gif"/>
+        </Property>
+        <Property name="text" type="java.lang.String" value="&lt;html&gt;&#xa;JStock - Stock Market Program&#xa;&lt;br&gt;&#xa;&lt;center&gt;&lt;h4&gt;version 1.0.0&lt;/h4&gt;&lt;/center&gt;&#xa;&lt;/html&gt;"/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
+            <EmptyBorder bottom="0" left="5" right="5" top="5"/>
+          </Border>
         </Property>
       </Properties>
       <Constraints>
@@ -69,14 +81,9 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="1" attributes="0">
+              <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="1" attributes="0">
-                      <Component id="jScrollPane2" alignment="0" pref="415" max="32767" attributes="0"/>
-                      <Component id="jLabel4" alignment="0" pref="415" max="32767" attributes="0"/>
-                      <Component id="jLabel3" alignment="0" pref="415" max="32767" attributes="0"/>
-                      <Component id="jLabel2" alignment="0" pref="415" max="32767" attributes="0"/>
-                  </Group>
+                  <Component id="jScrollPane1" pref="470" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
@@ -85,76 +92,29 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jLabel3" min="-2" pref="22" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jScrollPane2" pref="130" max="32767" attributes="0"/>
+                  <Component id="jScrollPane1" pref="120" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Component class="javax.swing.JLabel" name="jLabel2">
-          <Properties>
-            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-              <Font name="Dialog" size="24" style="1"/>
-            </Property>
-            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-              <Color blue="ff" green="0" red="0" type="rgb"/>
-            </Property>
-            <Property name="horizontalAlignment" type="int" value="0"/>
-            <Property name="text" type="java.lang.String" value="JStock"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JLabel" name="jLabel3">
-          <Properties>
-            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-              <Font name="Dialog" size="18" style="1"/>
-            </Property>
-            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-              <Color blue="ff" green="0" red="0" type="rgb"/>
-            </Property>
-            <Property name="horizontalAlignment" type="int" value="0"/>
-            <Property name="text" type="java.lang.String" value="version 0.9.9"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JLabel" name="jLabel4">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="&lt;html&gt;&#xa;JStock is a stock analysis tool which help you to pick stocks in an automated way.&#xa;&lt;br&gt;&#xa;&lt;br&gt;&#xa;Copyright &amp;copy; 2008 Yan Cheng Cheok &lt;a href=&quot;mailto:yccheok@yahoo.com&quot;&gt;yccheok@yahoo.com&lt;/a&gt;&#xa;&lt;br&gt;&#xa;&lt;br&gt;&#xa;Project website : &lt;a href=&quot;http://sourceforge.net/projects/jstock&quot;&gt;http://sourceforge.net/projects/jstock&lt;/a&gt;&#xa;&lt;/html&gt;"/>
-          </Properties>
-        </Component>
-        <Container class="javax.swing.JScrollPane" name="jScrollPane2">
-          <Properties>
-            <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-              <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-                <TitledBorder title="License"/>
-              </Border>
-            </Property>
-            <Property name="horizontalScrollBarPolicy" type="int" value="31"/>
-          </Properties>
+        <Container class="javax.swing.JScrollPane" name="jScrollPane1">
           <AuxValues>
             <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
           </AuxValues>
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
           <SubComponents>
-            <Component class="javax.swing.JTextArea" name="jTextArea2">
+            <Component class="javax.swing.JEditorPane" name="jEditorPane1">
               <Properties>
-                <Property name="columns" type="int" value="20"/>
+                <Property name="contentType" type="java.lang.String" value="text/html"/>
                 <Property name="editable" type="boolean" value="false"/>
-                <Property name="lineWrap" type="boolean" value="true"/>
-                <Property name="rows" type="int" value="5"/>
-                <Property name="text" type="java.lang.String" value="This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.&#xa;&#xa;This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.&#xa;&#xa;You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA."/>
-                <Property name="wrapStyleWord" type="boolean" value="true"/>
-                <Property name="caretPosition" type="int" value="1"/>
+                <Property name="text" type="java.lang.String" value="&lt;html&gt;&#xd;&#xa;  &lt;head&gt;&#xd;&#xa;&#xd;&#xa;  &lt;/head&gt;&#xd;&#xa;  &lt;body&gt;&#xd;&#xa;    &lt;p style=&quot;margin-top: 10; font-size: 9px; font-family: Tahoma;&quot;&gt;&#xd;JStock is a stock analysis tool to help you pick stocks in an automated way.&lt;/p&gt;&#xa;    &lt;p style=&quot;margin-top: 10; font-size: 9px; font-family: Tahoma;&quot;&gt;Copyright &amp;copy; 2008 Yan Cheng Cheok &lt;a href=&quot;mailto:yccheok@yahoo.com&quot;&gt;yccheok@yahoo.com&lt;/a&gt;&lt;/p&gt;&#xa;    &lt;p style=&quot;margin-top: 10; font-size: 9px; font-family: Tahoma;&quot;&gt;Latest update can be downloaded from : &lt;a href=&quot;http://sourceforge.net/projects/jstock&quot;&gt;http://sourceforge.net/projects/jstock&lt;/a&gt;&lt;/p&gt;&#xa;    &lt;p style=&quot;margin-top: 10; font-size: 9px; font-family: Tahoma;&quot;&gt;This free software is licensed under : &lt;a href=&quot;http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt&quot;&gt;GNU General Public License, version 2&lt;/a&gt;&lt;/p&gt;&#xa;  &lt;/body&gt;&#xd;&#xa;&lt;/html&gt;&#xd;&#xa;"/>
               </Properties>
-              <AuxValues>
-                <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="this.jScrollPane2.getVerticalScrollBar().setValue(0);"/>
-              </AuxValues>
+              <Events>
+                <EventHandler event="hyperlinkUpdate" listener="javax.swing.event.HyperlinkListener" parameters="javax.swing.event.HyperlinkEvent" handler="jEditorPane1HyperlinkUpdate"/>
+              </Events>
             </Component>
           </SubComponents>
         </Container>
