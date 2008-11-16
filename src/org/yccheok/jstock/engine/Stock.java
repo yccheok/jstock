@@ -247,6 +247,7 @@ public class Stock {
         SMSI("Madrid General"),                 // (^SMSI)
         FTSE("FTSE 100"),                       // (^FTSE)
      	FCHI("CAC 40"),                         // (^FCHI)
+        UserDefined("User Defined"),
         Unknown("Unknown");
         
         private final String name;
@@ -279,6 +280,7 @@ public class Stock {
         ETF("ETF"),                                 // ETF
         Loans("Loans"),                             // LOANS
         CallWarrant("Call Warrant"),                // CALL-WARR
+        UserDefined("User Defined"),
         Unknown("Unknown");
         
         private final String name;
