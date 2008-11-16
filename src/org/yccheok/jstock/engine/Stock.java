@@ -237,16 +237,35 @@ public class Stock {
         Second("Second Board"),                 // 2nd
         Mesdaq("Mesdaq"),                       // MESDAQ
         CallWarrant("Call Warrant"),            // ??
-        DHI("Dow Jones Industrial Average"),    // (^DHI)
-        IXIC("NASDAQ COMPOSITE"),               // (^IXIC)        
-        DAX("DAX"),                             // (^GDAXI)                
-        OMXSPI("Stockholm General"),            // (^OMXSPI)
-        OMXC20CO("OMX Copenhagen 20"),          // (OMXC20.CO)
-        OSEAX("OSE All Share"),                 // (^OSEAX)            
-        SPMIB("S&P/MIB"),                       // (^SPMIB)
-        SMSI("Madrid General"),                 // (^SMSI)
-        FTSE("FTSE 100"),                       // (^FTSE)
-     	FCHI("CAC 40"),                         // (^FCHI)
+        
+        Copenhagen("Copenhagen"),               // Denmark        
+        Paris("Paris"),                         // France
+        
+        XETRA("XETRA"),                         // Germany
+        Munich("Munich"),
+        Stuttgart("Stuttgart"),
+        Berlin("Berlin"),
+        Hamburg("Hamburg"),
+        Dusseldorf("Dusseldorf"),
+        Frankfurt("Frankfurt"),
+        Hanover("Hanover"),
+        
+        Milan("Milan"),                         // Italy        
+        Oslo("Oslo"),                           // Norway
+        
+        Madrid("Madrid"),                       // Spain
+        MCE("MCE"),
+        
+        Stockholm("Stockholm"),                 // Sweden
+        
+        FSI("FSI"),                             // UK
+        London("London"),
+        
+        NasdaqSC("NasdaqSC"),                   // US
+        DJI("DJI"),
+        NasdaqNM("NasdaqNM"),
+        NYSE("NYSE"),
+        
         UserDefined("User Defined"),
         Unknown("Unknown");
         
