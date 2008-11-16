@@ -32,14 +32,6 @@ public class StockCodeAndSymbolDatabase {
     
     /** Creates a new instance of StockCodeAndSymbolDatabase */
     public StockCodeAndSymbolDatabase(StockServer stockServer) throws StockNotFoundException {
-        symbolToCode = new java.util.HashMap<Symbol, Code>();
-        codeToSymbol = new java.util.HashMap<Code, Symbol>();
-        
-        industryToCodes = new java.util.HashMap<Stock.Industry, List<Code>>();
-        boardToCodes = new java.util.HashMap<Stock.Board, List<Code>>();
-        industryToSymbols = new java.util.HashMap<Stock.Industry, List<Symbol>>();
-        boardToSymbols = new java.util.HashMap<Stock.Board, List<Symbol>>();
-
         List<Stock> stocks = null;
         
         try {
@@ -100,12 +92,40 @@ public class StockCodeAndSymbolDatabase {
         codeSearchEngine = new TSTSearchEngine<Code>(tmpCodes);        
     }
     
+    public StockCodeAndSymbolDatabase(StockCodeAndSymbolDatabase src) {
+        this.symbolToCode.putAll(src.symbolToCode);
+        this.codeToSymbol.putAll(src.codeToSymbol);
+
+        /*
+        this.industryToCodes.putAll(src.industryToCodes);
+        this.boardToCodes.putAll(src.boardToCodes);
+        this.industryToSymbols.putAll(src.industryToSymbols);
+        this.boardToSymbols.putAll(src.boardToSymbols);
+        */
+        deepCopy(this.industryToCodes, src.industryToCodes);
+        deepCopy(this.boardToCodes, src.boardToCodes);
+        deepCopy(this.industryToSymbols, src.industryToSymbols);
+        deepCopy(this.boardToSymbols, src.boardToSymbols);
+        
+        symbolSearchEngine = new TSTSearchEngine<Symbol>(new ArrayList<Symbol>(symbolToCode.keySet()));
+        codeSearchEngine = new TSTSearchEngine<Code>(new ArrayList<Code>(codeToSymbol.keySet()));        
+    }
+        
+    private void deepCopy(Map dest, Map src) {
+        Set set = src.keySet();
+        for(Object o : set) {
+            List srcList = (List)src.get(o);
+            List destList = new ArrayList(srcList);
+            dest.put(o, destList);
+        }
+    }
+    
     public List<Symbol> searchStockSymbols(String symbol) {
-        return symbolSearchEngine.searchAll(symbol);
+        return Collections.unmodifiableList(symbolSearchEngine.searchAll(symbol));
     }
     
     public List<Code> searchStockCodes(String code) {
-        return codeSearchEngine.searchAll(code);
+        return Collections.unmodifiableList(codeSearchEngine.searchAll(code));
     }
     
     public Symbol searchStockSymbol(String symbol) {
@@ -125,31 +145,47 @@ public class StockCodeAndSymbolDatabase {
     }
 
     public Set<Symbol> getSymbols() {
-        return symbolToCode.keySet();
+        return Collections.unmodifiableSet(symbolToCode.keySet());
     }
 
     public Set<Code> getCodes() {
-        return codeToSymbol.keySet();
+        return Collections.unmodifiableSet(codeToSymbol.keySet());
     }
     
     public List<Code> getCodes(Stock.Industry industry)
     {
-        return industryToCodes.get(industry);
+        final List<Code> list = industryToCodes.get(industry);
+        if(list == null) {
+            return Collections.emptyList();
+        }
+        return Collections.unmodifiableList(list);        
     }
 
     public List<Code> getCodes(Stock.Board board)
     {
-        return boardToCodes.get(board);
+        final List<Code> list = boardToCodes.get(board);        
+        if(list == null) {
+            return Collections.emptyList();
+        }
+        return Collections.unmodifiableList(list);        
     }
 
     public List<Symbol> getSymbols(Stock.Industry industry)
     {
-        return industryToSymbols.get(industry);
+        final List<Symbol> list = industryToSymbols.get(industry);
+        if(list == null) {
+            return Collections.emptyList();
+        }
+        return Collections.unmodifiableList(list);
     }
 
     public List<Symbol> getSymbols(Stock.Board board)
     {
-        return boardToSymbols.get(board);
+        final List<Symbol> list = boardToSymbols.get(board);
+        if(list == null) {
+            return Collections.emptyList();
+        }
+        return Collections.unmodifiableList(list);        
     }
     
     public Set<Stock.Industry> getIndustries() {
@@ -169,15 +205,15 @@ public class StockCodeAndSymbolDatabase {
         
         return this;
     }
-    
-    private Map<Symbol, Code> symbolToCode;
-    private Map<Code, Symbol> codeToSymbol;
+        
+    protected Map<Symbol, Code> symbolToCode = new HashMap<Symbol, Code>();
+    protected Map<Code, Symbol> codeToSymbol = new HashMap<Code, Symbol>();
 
-    private Map<Stock.Industry, List<Code>> industryToCodes;
-    private Map<Stock.Board, List<Code>> boardToCodes;
-    private Map<Stock.Industry, List<Symbol>> industryToSymbols;
-    private Map<Stock.Board, List<Symbol>> boardToSymbols;
+    protected Map<Stock.Industry, List<Code>> industryToCodes = new HashMap<Stock.Industry, List<Code>>();
+    protected Map<Stock.Board, List<Code>> boardToCodes = new HashMap<Stock.Board, List<Code>>();
+    protected Map<Stock.Industry, List<Symbol>> industryToSymbols = new HashMap<Stock.Industry, List<Symbol>>();
+    protected Map<Stock.Board, List<Symbol>> boardToSymbols = new HashMap<Stock.Board, List<Symbol>>();
 
-    private transient SearchEngine<Symbol> symbolSearchEngine;
-    private transient SearchEngine<Code> codeSearchEngine;
+    protected transient SearchEngine<Symbol> symbolSearchEngine;
+    protected transient SearchEngine<Code> codeSearchEngine;
 }
