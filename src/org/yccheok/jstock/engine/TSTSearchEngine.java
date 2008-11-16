@@ -48,5 +48,13 @@ public class TSTSearchEngine<E> implements SearchEngine<E> {
         return l.size() > 0 ? l.get(0) : null;
     }
     
+    public void put(String key, E value) {
+        tst.put(key, value);
+    }
+    
+    public void remove(String key) {
+        tst.remove(key);
+    }
+    
     private final TernarySearchTree<E> tst = new TernarySearchTree<E>();
 }
