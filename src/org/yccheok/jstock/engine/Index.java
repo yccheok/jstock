@@ -27,7 +27,7 @@ public enum Index {
     Second("Second Board", Symbol.newInstance("Second")),
     Mesdaq("Mesdaq", Symbol.newInstance("Mesdaq")),
     DJI("Dow Jones Industrial Average", Symbol.newInstance("^DJI")),
-    IXIC("NASDAQ COMPOSITE", Symbol.newInstance("^IXIC")),       
+    IXIC("Nasdaq Composite", Symbol.newInstance("^IXIC")),       
     DAX("DAX", Symbol.newInstance("^GDAXI")),               
     OMXSPI("Stockholm General", Symbol.newInstance("^OMXSPI")),
     OMXC20CO("OMX Copenhagen 20", Symbol.newInstance("OMXC20.CO")),
