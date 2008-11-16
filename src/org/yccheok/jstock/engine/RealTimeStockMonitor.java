@@ -101,12 +101,17 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
         while(stockMonitors.size() > 0) {
             StockMonitor stockMonitor = stockMonitors.remove(stockMonitors.size() - 1);
             stockMonitor._stop();
+            /*
+             * Unlike stop(), no need to explicitly wait for the thread to dead. Let it dead
+             * naturally. However, is it safe to do so?
+             *            
             try {
                 stockMonitor.join();
             }
             catch(java.lang.InterruptedException exp) {
                 log.error("", exp);
-            }            
+            } 
+             */           
         }
         
         return true;
@@ -129,12 +134,18 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
 
             StockMonitor stockMonitor = stockMonitors.remove(stockMonitors.size() - 1);
             stockMonitor._stop();
+            
+            /*
+             * Unlike stop(), no need to explicitly wait for the thread to dead. Let it dead
+             * naturally. However, is it safe to do so?
+             * 
             try {
                 stockMonitor.join();
             }
             catch(java.lang.InterruptedException exp) {
                 log.error("", exp);
             }
+             */
             
             log.info("After removing : current thread size=" + this.stockMonitors.size() + ",numOfMonitorRequired=" + numOfMonitorRequired);
         }
@@ -269,7 +280,7 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
                         }
 
                         for(StockServerFactory factory : stockServerFactories)
-                        {
+                        {                            
                             final StockServer stockServer = factory.getStockServer();
                             
                             List<Stock> stocks = null;
@@ -280,6 +291,10 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
                                 log.error(codes, exp);
                                 // Try with another server.
                                 continue;
+                            }
+                         
+                            if(thisThread != thread) {
+                                break;
                             }
                             
                             // Notify all the interested parties.
