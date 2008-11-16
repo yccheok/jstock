@@ -73,7 +73,6 @@ public class YahooStockFormat implements StockFormat {
             final String tmp = YahooStockFormat.digitPattern.matcher(string).replaceAll("$1");
             // Some string contain comma, remove them as well. If not, we face problem during csv parsing.
             final String stringDigitWithoutComma = stringCommaPattern.matcher(tmp).replaceAll("$1");
-            System.out.println("---> " + stringDigitWithoutComma);
             
             String[] fields = stringDigitWithoutComma.split(",");
             final int length = fields.length;
@@ -104,10 +103,6 @@ public class YahooStockFormat implements StockFormat {
             double thirdSellPrice = 0.0;
             int thirdSellQuantity = 0;
             java.util.Calendar calendar = null;
-            
-            for(int i=0; i<fields.length; i++) {
-                System.out.println(i+"="+fields[i]);
-            }
             
             do {
                 if(length < 1) break; code = Code.newInstance(quotePattern.matcher(fields[0]).replaceAll("").trim());
@@ -181,7 +176,6 @@ public class YahooStockFormat implements StockFormat {
             }while(true);
             
             if(code == null || symbol == null || name == null || board == null || industry == null) {
-                System.out.println("SHIT SHIT SHIT ---> " + stringDigitWithoutComma);
                 continue;
             }
             
