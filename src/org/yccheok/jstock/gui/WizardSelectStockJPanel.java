@@ -23,6 +23,9 @@ package org.yccheok.jstock.gui;
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Set;
 import org.yccheok.jstock.engine.*;
 
 import org.apache.commons.logging.Log;
@@ -35,11 +38,11 @@ import org.apache.commons.logging.LogFactory;
 public class WizardSelectStockJPanel extends javax.swing.JPanel {
     
     /** Creates new form WizardSelectStockJPanel */
-    public WizardSelectStockJPanel() {
+    public WizardSelectStockJPanel(StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase) {
         initComponents();
         
-        initStringToBoard();
-        initStringToIndustry();
+        initBoardCheckBoxes(stockCodeAndSymbolDatabase);
+        initIndustryCheckBoxes(stockCodeAndSymbolDatabase);
         
         updateCheckBoxesState();        
     }
@@ -62,6 +65,8 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
         jCheckBox2 = new javax.swing.JCheckBox();
         jCheckBox3 = new javax.swing.JCheckBox();
         jCheckBox21 = new javax.swing.JCheckBox();
+        jCheckBox4 = new javax.swing.JCheckBox();
+        jCheckBox23 = new javax.swing.JCheckBox();
         jRadioButton3 = new javax.swing.JRadioButton();
         jPanel3 = new javax.swing.JPanel();
         jCheckBox5 = new javax.swing.JCheckBox();
@@ -81,19 +86,20 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
         jCheckBox19 = new javax.swing.JCheckBox();
         jCheckBox20 = new javax.swing.JCheckBox();
         jCheckBox22 = new javax.swing.JCheckBox();
+        jCheckBox24 = new javax.swing.JCheckBox();
         jRadioButton4 = new javax.swing.JRadioButton();
 
         setPreferredSize(new java.awt.Dimension(638, 488));
         setLayout(new java.awt.BorderLayout(5, 5));
 
-        jXHeader1.setDescription("You may select to scan only the stocks which are within your interest. You may select either Main board, Second board, Mesdaq...Or you may select either Plantation, Banking, Consumer industry...Of course, you may also select entire KLSE market. However, scanning the entire KLSE market will slow down the scanning speed.");
+        jXHeader1.setDescription("You may select to scan only the stocks which are within your interest. You may select either Main board, Second board, Mesdaq...Or you may select either Plantation, Banking, Consumer industry...Of course, you may also select entire stock market.");
         jXHeader1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/128x128/find.png"))); // NOI18N
         jXHeader1.setTitle("Select Stock of Interest");
         add(jXHeader1, java.awt.BorderLayout.NORTH);
 
         buttonGroup1.add(jRadioButton1);
         jRadioButton1.setSelected(true);
-        jRadioButton1.setText("Scan the entire KLSE market (Everything including Call warrant, Loans...)");
+        jRadioButton1.setText("Scan the entire stock market (Everything including Call warrant, Loans...)");
         jRadioButton1.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         jRadioButton1.setMargin(new java.awt.Insets(0, 0, 0, 0));
         jRadioButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -130,6 +136,14 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
         jCheckBox21.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         jCheckBox21.setMargin(new java.awt.Insets(0, 0, 0, 0));
 
+        jCheckBox4.setText("Call warrant");
+        jCheckBox4.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        jCheckBox4.setMargin(new java.awt.Insets(0, 0, 0, 0));
+
+        jCheckBox23.setText("Call warrant");
+        jCheckBox23.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        jCheckBox23.setMargin(new java.awt.Insets(0, 0, 0, 0));
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -140,10 +154,14 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
                     .addComponent(jCheckBox1)
                     .addComponent(jCheckBox3))
                 .addGap(61, 61, 61)
-                .addComponent(jCheckBox2)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jCheckBox2)
+                    .addComponent(jCheckBox4))
                 .addGap(48, 48, 48)
-                .addComponent(jCheckBox21)
-                .addGap(49, 49, 49))
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jCheckBox23)
+                    .addComponent(jCheckBox21))
+                .addGap(29, 29, 29))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -153,7 +171,10 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
                     .addComponent(jCheckBox2)
                     .addComponent(jCheckBox21))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jCheckBox3)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jCheckBox3)
+                    .addComponent(jCheckBox4)
+                    .addComponent(jCheckBox23))
                 .addContainerGap(13, Short.MAX_VALUE))
         );
 
@@ -239,6 +260,10 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
         jCheckBox22.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         jCheckBox22.setMargin(new java.awt.Insets(0, 0, 0, 0));
 
+        jCheckBox24.setText("Unknown");
+        jCheckBox24.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        jCheckBox24.setMargin(new java.awt.Insets(0, 0, 0, 0));
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -254,21 +279,20 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
                     .addComponent(jCheckBox19))
                 .addGap(13, 13, 13)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jCheckBox20)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jCheckBox7)
-                            .addComponent(jCheckBox8)
-                            .addComponent(jCheckBox12)
-                            .addComponent(jCheckBox15)
-                            .addComponent(jCheckBox18))
-                        .addGap(14, 14, 14)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jCheckBox22)
-                            .addComponent(jCheckBox16)
-                            .addComponent(jCheckBox13)
-                            .addComponent(jCheckBox10)
-                            .addComponent(jCheckBox9))))
+                    .addComponent(jCheckBox7)
+                    .addComponent(jCheckBox8)
+                    .addComponent(jCheckBox12)
+                    .addComponent(jCheckBox15)
+                    .addComponent(jCheckBox18)
+                    .addComponent(jCheckBox20))
+                .addGap(14, 14, 14)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jCheckBox24)
+                    .addComponent(jCheckBox22)
+                    .addComponent(jCheckBox16)
+                    .addComponent(jCheckBox13)
+                    .addComponent(jCheckBox10)
+                    .addComponent(jCheckBox9))
                 .addContainerGap(87, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
@@ -301,7 +325,8 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jCheckBox20)
-                    .addComponent(jCheckBox19))
+                    .addComponent(jCheckBox19)
+                    .addComponent(jCheckBox24))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -411,6 +436,9 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
                 }
             }            
         }        
+
+        if(jRadioButton4.isSelected())
+            return true;
         
         return false;
     }
@@ -437,9 +465,13 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
         jCheckBox7.addActionListener(actionListener);
         jCheckBox8.addActionListener(actionListener);
         jCheckBox9.addActionListener(actionListener);
+        jCheckBox4.addActionListener(actionListener);
+        jCheckBox23.addActionListener(actionListener);
+        jCheckBox24.addActionListener(actionListener);
         jRadioButton1.addActionListener(actionListener);
         jRadioButton2.addActionListener(actionListener);
         jRadioButton3.addActionListener(actionListener);
+        jRadioButton4.addActionListener(actionListener);
     }
     
     public boolean buildSelectedCode() {
@@ -464,8 +496,7 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
                     
                     if(checkBox.isSelected() == false) continue;
                     
-                    final String lowerString = checkBox.getText().toLowerCase();
-                    final Stock.Board board = stringToBoard.get(lowerString);
+                    final Stock.Board board = this.checkBoxToBoard.get(checkBox);
                                         
                     if(board == null) {
                         log.error("Wrong text in JCheckBox GUI : " + checkBox.getText());
@@ -486,8 +517,7 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
                     
                     if(checkBox.isSelected() == false) continue;
                     
-                    final String lowerString = checkBox.getText().toLowerCase();
-                    final Stock.Industry industry = stringToIndustry.get(lowerString);
+                    final Stock.Industry industry = this.checkBoxToIndustry.get(checkBox);
                     
                     if(industry == null) {
                         log.error("Wrong text in JCheckBox GUI : " + checkBox.getText());
@@ -512,32 +542,91 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
         
         return false;
     }
-
-    private void initStringToBoard() {
-        stringToBoard.clear();
-        
-        Stock.Board[] boards = Stock.Board.values();
-        for(Stock.Board board : boards) {
-            stringToBoard.put(board.toString().toLowerCase(), board);
-        }
-    }
-    
-    private void initStringToIndustry() {
-        stringToIndustry.clear();
-        
-        Stock.Industry[] industries = Stock.Industry.values();
-        for(Stock.Industry industry : industries) {
-            stringToIndustry.put(industry.toString().toLowerCase(), industry);
-        }
-    }
     
     public java.util.List<Code> getSelectedCodes() {
         return java.util.Collections.unmodifiableList(selectedCodes);
     }
     
+    private void initBoardCheckBoxes(StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase) {
+        boardCheckBoxes.add(jCheckBox1);
+        boardCheckBoxes.add(jCheckBox2);
+        boardCheckBoxes.add(jCheckBox21);
+        boardCheckBoxes.add(jCheckBox3);
+        boardCheckBoxes.add(jCheckBox4);
+        boardCheckBoxes.add(jCheckBox23);
+        
+        for(JCheckBox checkBox : boardCheckBoxes) {
+            checkBox.setVisible(false);
+        }
+        
+        Set<Stock.Board> boards = stockCodeAndSymbolDatabase.getBoards();
+        java.util.List<Stock.Board> sortedBoards = new ArrayList<Stock.Board>();
+        sortedBoards.addAll(boards);
+        Collections.sort(sortedBoards);
+        
+        int count = 0;
+        for(Stock.Board board : sortedBoards) {
+            if(count >= boardCheckBoxes.size()) {
+                log.error("You do not have enough check box components (" + boardCheckBoxes.size() + ") to hold board (" + boards.size() + ")");
+                break;
+            }
+            
+            javax.swing.JCheckBox checkBox = boardCheckBoxes.get(count++);
+            checkBox.setText(board.toString());
+            checkBox.setVisible(true);
+            checkBoxToBoard.put(checkBox, board);
+        }        
+    }
+
+    private void initIndustryCheckBoxes(StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase) {
+        industryCheckBoxes.add(jCheckBox5);
+        industryCheckBoxes.add(jCheckBox7);
+        industryCheckBoxes.add(jCheckBox9);
+        industryCheckBoxes.add(jCheckBox6);
+        industryCheckBoxes.add(jCheckBox8);
+        industryCheckBoxes.add(jCheckBox10);
+        industryCheckBoxes.add(jCheckBox11);
+        industryCheckBoxes.add(jCheckBox12);
+        industryCheckBoxes.add(jCheckBox13);
+        industryCheckBoxes.add(jCheckBox14);
+        industryCheckBoxes.add(jCheckBox15);
+        industryCheckBoxes.add(jCheckBox16);
+        industryCheckBoxes.add(jCheckBox17);
+        industryCheckBoxes.add(jCheckBox18);
+        industryCheckBoxes.add(jCheckBox22);
+        industryCheckBoxes.add(jCheckBox19);
+        industryCheckBoxes.add(jCheckBox20);
+        industryCheckBoxes.add(jCheckBox24);
+        
+        for(JCheckBox checkBox : industryCheckBoxes) {
+            checkBox.setVisible(false);
+        }
+        
+        Set<Stock.Industry> industries = stockCodeAndSymbolDatabase.getIndustries();
+        java.util.List<Stock.Industry> sortedIndustries = new ArrayList<Stock.Industry>();
+        sortedIndustries.addAll(industries);
+        Collections.sort(sortedIndustries);
+        
+        int count = 0;
+        for(Stock.Industry industry : sortedIndustries) {
+            if(count >= industryCheckBoxes.size()) {
+                log.error("You do not have enough check box components (" + industryCheckBoxes.size() + ") to hold industry (" + industries.size() + ")");
+                break;
+            }
+            
+            javax.swing.JCheckBox checkBox = industryCheckBoxes.get(count++);
+            checkBox.setText(industry.toString());
+            checkBox.setVisible(true);
+            checkBoxToIndustry.put(checkBox, industry);
+        }
+    }
+    
+    private java.util.List<javax.swing.JCheckBox> boardCheckBoxes = new java.util.ArrayList<javax.swing.JCheckBox>();
+    private java.util.List<javax.swing.JCheckBox> industryCheckBoxes = new java.util.ArrayList<javax.swing.JCheckBox>();
+    private java.util.Map<javax.swing.JCheckBox, Stock.Industry> checkBoxToIndustry = new java.util.HashMap<javax.swing.JCheckBox, Stock.Industry>();
+    private java.util.Map<javax.swing.JCheckBox, Stock.Board> checkBoxToBoard = new java.util.HashMap<javax.swing.JCheckBox, Stock.Board>();
+    
     private java.util.List<Code> selectedCodes = new java.util.ArrayList<Code>();
-    private java.util.Map<String, Stock.Industry> stringToIndustry = new java.util.HashMap<String, Stock.Industry>();
-    private java.util.Map<String, Stock.Board> stringToBoard = new java.util.HashMap<String, Stock.Board>();
     
     private static final Log log = LogFactory.getLog(WizardSelectStockJPanel.class);
     
@@ -558,7 +647,10 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
     private javax.swing.JCheckBox jCheckBox20;
     private javax.swing.JCheckBox jCheckBox21;
     private javax.swing.JCheckBox jCheckBox22;
+    private javax.swing.JCheckBox jCheckBox23;
+    private javax.swing.JCheckBox jCheckBox24;
     private javax.swing.JCheckBox jCheckBox3;
+    private javax.swing.JCheckBox jCheckBox4;
     private javax.swing.JCheckBox jCheckBox5;
     private javax.swing.JCheckBox jCheckBox6;
     private javax.swing.JCheckBox jCheckBox7;
