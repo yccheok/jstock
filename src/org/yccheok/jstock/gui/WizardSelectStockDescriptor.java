@@ -28,6 +28,7 @@ import java.awt.event.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.Code;
+import org.yccheok.jstock.engine.StockCodeAndSymbolDatabase;
 
 /**
  *
@@ -39,8 +40,8 @@ public class WizardSelectStockDescriptor extends WizardPanelDescriptor implement
     
     private WizardSelectStockJPanel wizardSelectStockJPanel;
     
-    public WizardSelectStockDescriptor() {
-        super(IDENTIFIER, new WizardSelectStockJPanel());
+    public WizardSelectStockDescriptor(StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase) {
+        super(IDENTIFIER, new WizardSelectStockJPanel(stockCodeAndSymbolDatabase));
         
         wizardSelectStockJPanel = (WizardSelectStockJPanel)getPanelComponent();
         wizardSelectStockJPanel.installActionListenerToAllComponents(this);
@@ -63,15 +64,6 @@ public class WizardSelectStockDescriptor extends WizardPanelDescriptor implement
         if(wizardSelectStockJPanel.buildSelectedCode() == false) {
             log.error("Fail to build selected stock");
         }
-        
-        java.util.List<Code> codes = wizardSelectStockJPanel.getSelectedCodes();
-        final MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, wizardSelectStockJPanel);
-
-        /*
-        for(String code : codes) {
-            System.out.println(m.getStockCodeAndSymbolDatabase().codeToSymbol(code));
-        }
-        */       
     }
     
     public Object getBackPanelDescriptor() {
