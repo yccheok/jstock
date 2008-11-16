@@ -59,15 +59,18 @@ public class StockTableModel extends AbstractTableModelWithMemory {
         return columnNames.length;
     }
     
+    @Override
     public int getRowCount()
     {
         return tableModel.size();
     }
     
+    @Override
     public String getColumnName(int col) {
         return columnNames[col];
     }
 
+    @Override
     public Class getColumnClass(int c) {
         return columnClasses[c];
     }
