@@ -187,6 +187,11 @@ public class Utils {
         return createDirectoryIfDoesNotExist(path);
     }
     
+    public static boolean isFileOrDirectoryExist(String fileOrDirectory) {
+        java.io.File f = new java.io.File(fileOrDirectory);
+        return f.exists();
+    }
+    
     public static boolean createDirectoryIfDoesNotExist(String directory) {
         java.io.File f = new java.io.File(directory);
         
