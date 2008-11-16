@@ -421,7 +421,7 @@ public class IndicatorPanel extends JPanel implements ChangeListener {
         final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = m.getStockCodeAndSymbolDatabase();
         
         if(stockCodeAndSymbolDatabase == null) {
-            javax.swing.JOptionPane.showMessageDialog(this, "We haven't connected to KLSE server.", "Not Connected", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            javax.swing.JOptionPane.showMessageDialog(this, "We haven't connected to stock server.", "Not Connected", javax.swing.JOptionPane.INFORMATION_MESSAGE);
             return;
         }
         
