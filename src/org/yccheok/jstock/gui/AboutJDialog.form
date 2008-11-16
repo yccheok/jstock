@@ -39,7 +39,9 @@
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
           <Image iconType="3" name="/images/192x192/j0411029.gif"/>
         </Property>
-        <Property name="text" type="java.lang.String" value="&lt;html&gt;&#xa;JStock - Stock Market Program&#xa;&lt;br&gt;&#xa;&lt;center&gt;&lt;h4&gt;version 1.0.0&lt;/h4&gt;&lt;/center&gt;&#xa;&lt;/html&gt;"/>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="getHeaderInfo()" type="code"/>
+        </Property>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
             <EmptyBorder bottom="0" left="5" right="5" top="5"/>

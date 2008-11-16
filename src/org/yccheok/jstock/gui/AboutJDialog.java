@@ -26,8 +26,6 @@ import java.awt.Desktop;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.event.HyperlinkEvent;
 
 /**
@@ -65,7 +63,7 @@ public class AboutJDialog extends javax.swing.JDialog {
         jLabel1.setForeground(new java.awt.Color(0, 0, 255));
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/192x192/j0411029.gif"))); // NOI18N
-        jLabel1.setText("<html>\nJStock - Stock Market Program\n<br>\n<center><h4>version 1.0.0</h4></center>\n</html>");
+        jLabel1.setText(getHeaderInfo());
         jLabel1.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 0, 5));
         getContentPane().add(jLabel1, java.awt.BorderLayout.NORTH);
 
@@ -139,6 +137,11 @@ public class AboutJDialog extends javax.swing.JDialog {
             }
         }
     }//GEN-LAST:event_jEditorPane1HyperlinkUpdate
+    
+    private String getHeaderInfo() {
+        String headerInfo = "<html>JStock - Stock Market Program<br><center><h4>version " + Utils.getApplicationVersionString() + "</h4></center></html>";
+        return headerInfo;
+    }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
