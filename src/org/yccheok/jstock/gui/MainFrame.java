@@ -2311,8 +2311,8 @@ public class MainFrame extends javax.swing.JFrame {
                 ZipEntry zipEntry = null;
 
                 try {
-                    zipInputStream.getNextEntry();
-
+                    zipEntry = zipInputStream.getNextEntry();
+                    
                     if(zipEntry == null) break;
 
                     final String destination = Utils.getUserDataDirectory() + zipEntry.getName();
