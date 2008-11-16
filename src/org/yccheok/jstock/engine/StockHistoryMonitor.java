@@ -240,9 +240,11 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
         final ThreadPoolExecutor threadPoolExecutor = ((ThreadPoolExecutor)pool);
         final int nThreads = threadPoolExecutor.getMaximumPoolSize();
         
-        // Dangerous. Some user, do expect receive callback once they submit code into
+        // Dangerous. Some users, do expect receive callback once they submit tasks into
         // monitor. However, if we are calling shutdownNow, user may not receive any
-        // callback.
+        // callback from those submitted tasks, which haven't started yet. Calling
+        // shutdown() enables submitted tasks have chances to run once.
+        //
         // threadPoolExecutor.shutdownNow();
         threadPoolExecutor.shutdown();
         threadPoolExecutor.purge();
