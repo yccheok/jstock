@@ -22,11 +22,9 @@
 
 package org.yccheok.jstock.gui;
 
-import java.awt.*;
 import java.awt.event.MouseListener;
 import javax.swing.*;
 import org.jdesktop.swingx.*;
-import org.jdesktop.swingx.plaf.basic.*;
 
 /**
  *
