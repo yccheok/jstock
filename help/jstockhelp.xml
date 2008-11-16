@@ -7,15 +7,51 @@
     
     <chapter>    
         <title>Introduction</title>
-        <para>JStock is an utility which provides KLSE (Kuala Lumpur Stock Exchange) real time monitoring. It had been integrated with a powerful highly customized stock indicators, which will help you to answer the following questions :</para>
+        <para>JStock a free stock market program, which supports multiple countries' stock market. The below are a list of JStock's highlighted features :</para>
 
         <para>
             <orderedlist>
-                <listitem><para>What is all the KLSE stocks with 3 years lowest selling price?</para></listitem>
-                <listitem><para>What is all the Main board stocks with today's volume greater than yesterday's volume?</para></listitem>
-                <listitem><para>What is all the Banking industry stocks with today's buying price lesser than 7 days average buying price?</para></listitem>
+                <listitem><para>Multiple countries' stock market. Currently, there are 10 countries supported. They are Denmark, France, Germany, Italy, Malaysia, Norway, Spain, Sweden, United Kingdom and United State.</para></listitem>
+                <listitem><para>Real-Time stock info. You will able to monitor all your favorite stocks movement, within single page.</para></listitem>
+                <listitem><para>Stock indicator editor. You will able to compose your own indicator rule, with simple drag-n-drop graphical blocks. There are no programming required.</para></listitem>
+                <listitem><para>Stock indicator scanner. You will able to perform real-time indicator scanning, to filter out thousands of stocks from the entire stock market. You may also receive email and system tray message alert whenever a stock is being found.</para></listitem>
+                <listitem><para>Portfolio management. You will able to know your most up-to-date net worth, by recording down your buy and sell records.</para></listitem>
             </orderedlist>            
         </para>
+    </chapter>
+
+    <chapter>
+        <title>Multiple Countries' Stock Market</title>
+        <para>In order to select your desired stock market country, you may either click on the menu item.</para>
+        
+        <para>
+            <mediaobject>
+                <imageobject><imagedata fileref="country-menu.png" format="PNG"/></imageobject>
+                <textobject><phrase>Country Menu</phrase></textobject>
+            </mediaobject>        
+        </para>
+        
+        <para>
+            Or you may double click on the country flag icon.
+        </para>               
+        
+        <para>
+            <mediaobject>
+                <imageobject><imagedata fileref="country-icon.png" format="PNG"/></imageobject>
+                <textobject><phrase>Country Icon</phrase></textobject>
+            </mediaobject>        
+        </para>
+
+        <para>
+            A message box will be shown, for you to select your desired country.
+        </para>
+        
+        <para>
+            <mediaobject>
+                <imageobject><imagedata fileref="countries.png" format="PNG"/></imageobject>
+                <textobject><phrase>Country Message Box</phrase></textobject>
+            </mediaobject>        
+        </para>        
     </chapter>
     
     <chapter>
@@ -359,9 +395,60 @@
     </chapter>
     
     <chapter>
+        <title>Portfolio management</title>
+        <para>Here is the overall snapshot on how JStock keeps track your buy and sell record.</para>
+        
+        <para>
+            <mediaobject>
+                <imageobject><imagedata fileref="portfolio.png" format="PNG"/></imageobject>
+                <textobject><phrase>Portfolio</phrase></textobject>
+            </mediaobject>        
+        </para>
+
+        <para>
+            <mediaobject>
+                <imageobject><imagedata fileref="buy.png" format="PNG"/></imageobject>
+                <textobject><phrase>Buy</phrase></textobject>
+            </mediaobject>        
+        </para>
+        
+        <para>
+            <mediaobject>
+                <imageobject><imagedata fileref="sell.png" format="PNG"/></imageobject>
+                <textobject><phrase>Sell</phrase></textobject>
+            </mediaobject>        
+        </para>
+        
+        <para>
+            JStock also keeps track on your most current net-worth, by having real-time monitoring on the current stocks' price.
+        </para>               
+        
+        <para>
+            <mediaobject>
+                <imageobject><imagedata fileref="networth.png" format="PNG"/></imageobject>
+                <textobject><phrase>Net Worth</phrase></textobject>
+            </mediaobject>        
+        </para>
+
+        <para>
+            You may also obtain a summary of your portfolio in graphical chart format.
+        </para>               
+        
+        <para>
+            <mediaobject>
+                <imageobject><imagedata fileref="portfolio-chart.png" format="PNG"/></imageobject>
+                <textobject><phrase>Portfolio Chart</phrase></textobject>
+            </mediaobject>        
+        </para>      
+    </chapter>
+    
+    <chapter>
         <title>Contact</title>
         <para> 
-            Author may be contacted through <email>yccheok@yahoo.com</email>
+            Author Yan Cheng Cheok may be contacted through <email>yccheok@yahoo.com</email>            
+        </para>
+        <para>
+            Latest update can be downloaded from <email>http://sourceforge.net/projects/jstock</email>
         </para>
     </chapter>
 </book>
