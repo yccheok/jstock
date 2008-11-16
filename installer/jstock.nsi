@@ -8,13 +8,13 @@ Name ${PRODUCT_NAME}
 RequestExecutionLevel admin	;Workaround for Vista
 
 ; The file to write
-OutFile "jstock-0.9.9-setup.exe"
+OutFile "jstock-1.0.0-setup.exe"
 LicenseData "gpl.txt"
  
 ; The default installation directory
 InstallDir $PROGRAMFILES\${PRODUCT_NAME}
 ; The text to prompt the user to enter a directory
-DirText "This will install JStock on your computer. Choose a directory"
+DirText "This will install JStock - Stock Market Program on your computer. Choose a directory"
 Page license
 page directory
 Page instfiles
@@ -27,6 +27,7 @@ SetOutPath $INSTDIR
 ; Put file there
 File /r jstock\jstock.jar
 File /r jstock\config
+File /r jstock\database
 File /r jstock\lib
 File chart.ico
 CreateDirectory "$SMPROGRAMS\${PRODUCT_NAME}"
@@ -47,6 +48,7 @@ RMDir /r $PROFILE\.jstock\logos
 RMDir /r $PROFILE\.jstock
 RMDir /r $INSTDIR\lib
 RMDir /r $INSTDIR\config
+RMDir /r $INSTDIR\database
 Delete $INSTDIR\chart.ico
 Delete $INSTDIR\jstock.jar
 Delete $INSTDIR\Uninstall.exe
