@@ -120,7 +120,7 @@ public class Utils {
     private static final List<Stock.Board> malaysiaBoards = new ArrayList<Stock.Board>();
     private static final List<Stock.Board> norwayBoards = new ArrayList<Stock.Board>();
     private static final List<Stock.Board> spainBoards = new ArrayList<Stock.Board>();
-    private static final List<Stock.Board> sweedenBoards = new ArrayList<Stock.Board>();
+    private static final List<Stock.Board> swedenBoards = new ArrayList<Stock.Board>();
     private static final List<Stock.Board> unitedKingdomBoards = new ArrayList<Stock.Board>();
     private static final List<Stock.Board> unitedStateBoards = new ArrayList<Stock.Board>();
 
@@ -131,7 +131,7 @@ public class Utils {
     private static final List<Index> malaysiaIndices = new ArrayList<Index>();
     private static final List<Index> norwayIndices = new ArrayList<Index>();
     private static final List<Index> spainIndices = new ArrayList<Index>();
-    private static final List<Index> sweedenIndices = new ArrayList<Index>();
+    private static final List<Index> swedenIndices = new ArrayList<Index>();
     private static final List<Index> unitedKingdomIndices = new ArrayList<Index>();
     private static final List<Index> unitedStateIndices = new ArrayList<Index>();
     
@@ -147,7 +147,7 @@ public class Utils {
         malaysiaBoards.add(Stock.Board.CallWarrant);
         norwayBoards.add(Stock.Board.OSEAX);
         spainBoards.add(Stock.Board.SMSI);
-        sweedenBoards.add(Stock.Board.OMXSPI);
+        swedenBoards.add(Stock.Board.OMXSPI);
         unitedKingdomBoards.add(Stock.Board.FTSE);
         unitedStateBoards.add(Stock.Board.DHI);        
         unitedStateBoards.add(Stock.Board.IXIC);
@@ -161,7 +161,7 @@ public class Utils {
         malaysiaIndices.add(Index.Mesdaq);
         norwayIndices.add(Index.OSEAX);
         spainIndices.add(Index.SMSI);
-        sweedenIndices.add(Index.OMXSPI);
+        swedenIndices.add(Index.OMXSPI);
         unitedKingdomIndices.add(Index.FTSE);
         unitedStateIndices.add(Index.DJI);        
         unitedStateIndices.add(Index.IXIC);        
@@ -184,8 +184,8 @@ public class Utils {
                 return java.util.Collections.unmodifiableList(Utils.norwayIndices);
             case Spain:
                 return java.util.Collections.unmodifiableList(Utils.spainIndices);
-            case Sweeden:
-                return java.util.Collections.unmodifiableList(Utils.sweedenIndices);
+            case Sweden:
+                return java.util.Collections.unmodifiableList(Utils.swedenIndices);
             case UnitedKingdom:
                 return java.util.Collections.unmodifiableList(Utils.unitedKingdomIndices);                
             case UnitedState:
@@ -212,8 +212,8 @@ public class Utils {
                 return java.util.Collections.unmodifiableList(Utils.norwayBoards);
             case Spain:
                 return java.util.Collections.unmodifiableList(Utils.spainBoards);
-            case Sweeden:
-                return java.util.Collections.unmodifiableList(Utils.sweedenBoards);
+            case Sweden:
+                return java.util.Collections.unmodifiableList(Utils.swedenBoards);
             case UnitedKingdom:
                 return java.util.Collections.unmodifiableList(Utils.unitedKingdomBoards);                
             case UnitedState:
