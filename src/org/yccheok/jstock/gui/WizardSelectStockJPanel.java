@@ -67,6 +67,9 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
         jCheckBox21 = new javax.swing.JCheckBox();
         jCheckBox4 = new javax.swing.JCheckBox();
         jCheckBox23 = new javax.swing.JCheckBox();
+        jCheckBox25 = new javax.swing.JCheckBox();
+        jCheckBox26 = new javax.swing.JCheckBox();
+        jCheckBox27 = new javax.swing.JCheckBox();
         jRadioButton3 = new javax.swing.JRadioButton();
         jPanel3 = new javax.swing.JPanel();
         jCheckBox5 = new javax.swing.JCheckBox();
@@ -144,6 +147,18 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
         jCheckBox23.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         jCheckBox23.setMargin(new java.awt.Insets(0, 0, 0, 0));
 
+        jCheckBox25.setText("Call warrant");
+        jCheckBox25.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        jCheckBox25.setMargin(new java.awt.Insets(0, 0, 0, 0));
+
+        jCheckBox26.setText("Call warrant");
+        jCheckBox26.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        jCheckBox26.setMargin(new java.awt.Insets(0, 0, 0, 0));
+
+        jCheckBox27.setText("Call warrant");
+        jCheckBox27.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        jCheckBox27.setMargin(new java.awt.Insets(0, 0, 0, 0));
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -151,17 +166,24 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jCheckBox1)
-                    .addComponent(jCheckBox3))
-                .addGap(61, 61, 61)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jCheckBox1)
+                            .addComponent(jCheckBox3))
+                        .addGap(49, 49, 49)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jCheckBox4)
+                            .addComponent(jCheckBox2)))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(jCheckBox25)
+                        .addGap(49, 49, 49)
+                        .addComponent(jCheckBox26)))
+                .addGap(40, 40, 40)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jCheckBox2)
-                    .addComponent(jCheckBox4))
-                .addGap(48, 48, 48)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jCheckBox27)
                     .addComponent(jCheckBox23)
                     .addComponent(jCheckBox21))
-                .addGap(29, 29, 29))
+                .addContainerGap(55, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -175,7 +197,12 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
                     .addComponent(jCheckBox3)
                     .addComponent(jCheckBox4)
                     .addComponent(jCheckBox23))
-                .addContainerGap(13, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jCheckBox25)
+                    .addComponent(jCheckBox26)
+                    .addComponent(jCheckBox27))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         buttonGroup1.add(jRadioButton3);
@@ -293,7 +320,7 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
                     .addComponent(jCheckBox13)
                     .addComponent(jCheckBox10)
                     .addComponent(jCheckBox9))
-                .addContainerGap(87, Short.MAX_VALUE))
+                .addContainerGap(47, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -346,17 +373,22 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jRadioButton1)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jRadioButton3)
-                            .addComponent(jRadioButton2))
+                            .addComponent(jRadioButton1)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jRadioButton2)
+                                .addGap(16, 16, 16)
+                                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addContainerGap(41, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jRadioButton3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 439, Short.MAX_VALUE)
-                            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                    .addComponent(jRadioButton4))
-                .addContainerGap(60, Short.MAX_VALUE))
+                        .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(41, 41, 41))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jRadioButton4)
+                        .addContainerGap(392, Short.MAX_VALUE))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -367,13 +399,13 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jRadioButton2)
                     .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(10, 10, 10)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jRadioButton3)
                     .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 16, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jRadioButton4)
-                .addContainerGap())
+                .addContainerGap(13, Short.MAX_VALUE))
         );
 
         add(jPanel1, java.awt.BorderLayout.CENTER);
@@ -419,23 +451,17 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
         if(jRadioButton1.isSelected())
             return true;
         
-        if(jRadioButton2.isSelected()) {
-            for(Component component : jPanel2.getComponents()) {
-                if(component instanceof JCheckBox) {
-                    final JCheckBox checkBox = (JCheckBox)component;
-                    if(checkBox.isSelected()) return true;
-                }
-            }            
+        if(jRadioButton2.isSelected()) {        
+            for(JCheckBox checkBox : boardCheckBoxes) {
+                if(checkBox.isSelected()) return true;
+            }
         }
         
-        if(jRadioButton3.isSelected()) {
-            for(Component component : jPanel3.getComponents()) {
-                if(component instanceof JCheckBox) {
-                    final JCheckBox checkBox = (JCheckBox)component;
-                    if(checkBox.isSelected()) return true;
-                }
-            }            
-        }        
+        if(jRadioButton3.isSelected()) {        
+            for(JCheckBox checkBox : industryCheckBoxes) {
+                if(checkBox.isSelected()) return true;
+            }
+        }
 
         if(jRadioButton4.isSelected())
             return true;
@@ -468,6 +494,9 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
         jCheckBox4.addActionListener(actionListener);
         jCheckBox23.addActionListener(actionListener);
         jCheckBox24.addActionListener(actionListener);
+		jCheckBox25.addActionListener(actionListener);
+		jCheckBox26.addActionListener(actionListener);
+		jCheckBox27.addActionListener(actionListener);
         jRadioButton1.addActionListener(actionListener);
         jRadioButton2.addActionListener(actionListener);
         jRadioButton3.addActionListener(actionListener);
@@ -490,42 +519,34 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
         }
         
         if(jRadioButton2.isSelected()) {            
-            for(Component component : jPanel2.getComponents()) {
-                if(component instanceof JCheckBox) {
-                    final JCheckBox checkBox = (JCheckBox)component;
-                    
-                    if(checkBox.isSelected() == false) continue;
-                    
-                    final Stock.Board board = this.checkBoxToBoard.get(checkBox);
-                                        
-                    if(board == null) {
-                        log.error("Wrong text in JCheckBox GUI : " + checkBox.getText());
-                        continue;
-                    }
-                    
-                    selectedCodes.addAll(m.getStockCodeAndSymbolDatabase().getCodes(board));
-                }                                
+             for(JCheckBox checkBox : boardCheckBoxes) {                    
+                if(checkBox.isSelected() == false) continue;
+
+                final Stock.Board board = this.checkBoxToBoard.get(checkBox);
+
+                if(board == null) {
+                    log.error("Wrong text in JCheckBox GUI : " + checkBox.getText());
+                    continue;
+                }
+
+                selectedCodes.addAll(m.getStockCodeAndSymbolDatabase().getCodes(board));
             } 
                         
             return true;
         }
         
         if(jRadioButton3.isSelected()) {            
-            for(Component component : jPanel3.getComponents()) {
-                if(component instanceof JCheckBox) {
-                    final JCheckBox checkBox = (JCheckBox)component;
-                    
-                    if(checkBox.isSelected() == false) continue;
-                    
-                    final Stock.Industry industry = this.checkBoxToIndustry.get(checkBox);
-                    
-                    if(industry == null) {
-                        log.error("Wrong text in JCheckBox GUI : " + checkBox.getText());
-                        continue;
-                    }
-                    
-                    selectedCodes.addAll(m.getStockCodeAndSymbolDatabase().getCodes(industry));
-                }                                
+             for(JCheckBox checkBox : industryCheckBoxes) {                    
+                if(checkBox.isSelected() == false) continue;
+
+                final Stock.Industry industry = this.checkBoxToIndustry.get(checkBox);
+
+                if(industry == null) {
+                    log.error("Wrong text in JCheckBox GUI : " + checkBox.getText());
+                    continue;
+                }
+
+                selectedCodes.addAll(m.getStockCodeAndSymbolDatabase().getCodes(industry));
             } 
                         
             return true;
@@ -554,6 +575,9 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
         boardCheckBoxes.add(jCheckBox3);
         boardCheckBoxes.add(jCheckBox4);
         boardCheckBoxes.add(jCheckBox23);
+        boardCheckBoxes.add(jCheckBox25);
+        boardCheckBoxes.add(jCheckBox26);
+        boardCheckBoxes.add(jCheckBox27);
         
         for(JCheckBox checkBox : boardCheckBoxes) {
             checkBox.setVisible(false);
@@ -649,6 +673,9 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
     private javax.swing.JCheckBox jCheckBox22;
     private javax.swing.JCheckBox jCheckBox23;
     private javax.swing.JCheckBox jCheckBox24;
+    private javax.swing.JCheckBox jCheckBox25;
+    private javax.swing.JCheckBox jCheckBox26;
+    private javax.swing.JCheckBox jCheckBox27;
     private javax.swing.JCheckBox jCheckBox3;
     private javax.swing.JCheckBox jCheckBox4;
     private javax.swing.JCheckBox jCheckBox5;

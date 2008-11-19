@@ -1,4 +1,10 @@
 =============
+version 1.0.1
+=============
+1. Bug fixed. We support maximum 9 boards (due to large boards in germany market) in all select
+   stocks dialog boxes.
+
+=============
 version 1.0.0
 =============
 1. [1956185] Feature added. 10 countries stock market is being supported.
