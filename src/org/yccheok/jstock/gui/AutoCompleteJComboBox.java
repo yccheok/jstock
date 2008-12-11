@@ -24,6 +24,9 @@ package org.yccheok.jstock.gui;
 
 import javax.swing.*;
 import java.awt.event.*;
+import javax.swing.plaf.ComboBoxUI;
+import javax.swing.plaf.basic.BasicComboPopup;
+import javax.swing.plaf.basic.ComboPopup;
 import org.yccheok.jstock.engine.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -153,6 +156,77 @@ public class AutoCompleteJComboBox extends JComboBox {
     
     public String getLastEnteredString() {
         return this.lastEnteredString;
+    }
+
+    @Override
+    public void setUI(ComboBoxUI ui)
+    {
+        if(ui != null)
+        {
+            Class c = ui.getClass();
+            final String myClass = "org.yccheok.jstock.gui.AutoCompleteJComboBox$My" + c.getSimpleName();
+
+            try {
+                ComboBoxUI myUI = (ComboBoxUI) Class.forName(myClass).newInstance();
+                super.setUI(myUI);
+            } catch (ClassNotFoundException ex) {
+                log.error(null, ex);
+            } catch (InstantiationException ex) {
+                log.error(null, ex);
+            } catch (IllegalAccessException ex) {
+                log.error(null, ex);
+            }
+        }
+        else
+        {
+            super.setUI(ui);
+        }
+    }
+
+    // This is a non-portable method to make combo box horizontal scroll bar.
+    // Whenever there is a new look-n-feel, we need to manually provide the ComboBoxUI.
+    // Any idea on how to make this portable?
+    //
+    protected static class MyWindowsComboBoxUI extends com.sun.java.swing.plaf.windows.WindowsComboBoxUI
+    {
+        @Override
+        protected ComboPopup createPopup()
+        {
+            return new MyComboPopup(comboBox);
+        }
+    }
+    
+    protected static class MyMotifComboBoxUI extends com.sun.java.swing.plaf.motif.MotifComboBoxUI
+    {
+        @Override
+        protected ComboPopup createPopup()
+        {
+            return new MyComboPopup(comboBox);
+        }
+    }
+    
+    protected static class MyMetalComboBoxUI extends javax.swing.plaf.metal.MetalComboBoxUI
+    {
+        @Override
+        protected ComboPopup createPopup()
+        {
+            return new MyComboPopup(comboBox);
+        }
+    }
+
+    private static class MyComboPopup extends BasicComboPopup
+    {
+        public MyComboPopup(JComboBox combo)
+        {
+            super(combo);
+        }
+
+        @Override
+		public JScrollPane createScroller()
+		{
+            return new JScrollPane(list,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+					JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		}
     }
     
     private StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase;
