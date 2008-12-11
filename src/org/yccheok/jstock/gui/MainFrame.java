@@ -83,6 +83,7 @@ public class MainFrame extends javax.swing.JFrame {
         this.initMyJXStatusBarImageLabelMouseAdapter();
         this.initStockCodeAndSymbolDatabase(true);
         this.initMarketThread();
+        this.initLatestNewsTask();
         this.initRealTimeStockMonitor();  
         this.initRealTimeStocks();
         this.initStockHistoryMonitor();
@@ -212,7 +213,7 @@ public class MainFrame extends javax.swing.JFrame {
         jPanel1.add(jLabel1);
 
         jComboBox1.setEditable(true);
-        jComboBox1.setPreferredSize(new java.awt.Dimension(110, 24));
+        jComboBox1.setPreferredSize(new java.awt.Dimension(150, 24));
         this.jComboBox1.getEditor().getEditorComponent().addKeyListener(jComboBox1EditorComponentKeyAdapter);
         jPanel1.add(jComboBox1);
 
@@ -751,7 +752,10 @@ public class MainFrame extends javax.swing.JFrame {
 
         log.info("savePortfolio...");
         this.portfolioManagementJPanel.savePortfolio();
-                
+
+		log.info("latestNewsTask stop...");
+        this.latestNewsTask.cancel(true);
+
         //log.info("stockCodeAndSymbolDatabaseTask stop...");
         //stockCodeAndSymbolDatabaseTask._stop();
                 
@@ -1102,7 +1106,7 @@ public class MainFrame extends javax.swing.JFrame {
             mi.addActionListener(new ChangeLookAndFeelAction(this, lafInfo[i].getClassName()));
             
             if(currentlaf != null) {
-                if(lafInfo[i].getName() == currentlaf.getName())
+                if(lafInfo[i].getClassName().equals(currentlaf.getClass().getName()))
                 {
                     ((JRadioButtonMenuItem) mi).setSelected(true);
                 }
@@ -1484,20 +1488,26 @@ public class MainFrame extends javax.swing.JFrame {
         
         javax.swing.JMenuItem menuItem = new JMenuItem("History...", this.getImageIcon("/images/16x16/strokedocker.png"));
         
-	menuItem.addActionListener(new ActionListener() {
+        menuItem.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent evt) {
-                    int rows[] = jTable1.getSelectedRows();
-                    final StockTableModel tableModel = (StockTableModel)jTable1.getModel();
-                    
-                    for(int row : rows) {                
-                        final int modelIndex = jTable1.getRowSorter().convertRowIndexToModel(row);
-                        Stock stock = tableModel.getStock(modelIndex);
-                        displayHistoryChart(stock);
-                    } 
+                if(MainFrame.this.stockCodeAndSymbolDatabase == null)
+                {
+                    javax.swing.JOptionPane.showMessageDialog(MainFrame.this, "We haven't connected to stock server.", "Not Connected", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                    return;
                 }
-	});
+
+                int rows[] = jTable1.getSelectedRows();
+                final StockTableModel tableModel = (StockTableModel)jTable1.getModel();
+
+                for(int row : rows) {
+                    final int modelIndex = jTable1.getRowSorter().convertRowIndexToModel(row);
+                    Stock stock = tableModel.getStock(modelIndex);
+                    displayHistoryChart(stock);
+                }
+            }
+        });
                 
-	popup.add(menuItem);
+        popup.add(menuItem);
         
         popup.addSeparator();        
         
@@ -1548,6 +1558,7 @@ public class MainFrame extends javax.swing.JFrame {
                     
                     if(market != null) {
                         update(market);
+                        break;
                     }
                 }
                 
@@ -1707,8 +1718,8 @@ public class MainFrame extends javax.swing.JFrame {
                 
                 tries++;
                 
-                // We had tried 3 times, but still failed. Abort.
-                if(tries >= 3) break;
+                // We had tried NUM_OF_RETRY times, but still failed. Abort.
+                if(tries >= NUM_OF_RETRY) break;
 
             }
              
@@ -2065,8 +2076,23 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     private void initUsernameAndPassword() {
-        username = "";
-        password = "";
+    }
+
+    private void initLatestNewsTask()
+    {
+        if(latestNewsTask != null) {
+            final LatestNewsTask oldLatestNewsTask = latestNewsTask;
+            zombiePool.execute(new Runnable() {
+                public void run() {
+                    log.info("Prepare to shut down " + oldLatestNewsTask + "...");
+                    oldLatestNewsTask.cancel(true);
+                    log.info("Shut down " + oldLatestNewsTask + " peacefully.");
+                }
+            });            
+        }
+        
+        latestNewsTask = new LatestNewsTask();
+        latestNewsTask.execute();
     }
     
     private void initMarketThread() {
@@ -2396,6 +2422,46 @@ public class MainFrame extends javax.swing.JFrame {
             }
         }
     }
+
+    private class LatestNewsTask extends SwingWorker<Void, String> {
+        private volatile boolean runnable = true;
+        // Perform update checking every 5 minutes.
+        private static final int DELAY = 60 * 5;
+
+        public void _stop() {
+            runnable = false;
+        }
+
+        @Override
+        protected void done() {
+            System.out.println("latest news task done");
+        }
+
+
+
+        @Override
+        protected void process(java.util.List<String> messages) {
+            if(runnable)
+            {
+            }
+        }
+
+        @Override
+        protected Void doInBackground() {
+            int newsVersion = MainFrame.jStockOptions.getNewsVersion();
+
+            while(!isCancelled() && runnable)
+            {
+                try {
+                    Thread.sleep(DELAY);
+                } catch (InterruptedException ex) {
+                    log.info(null, ex);
+                }
+            }
+
+            return null;
+        }
+    }
     
     private void initStatusBar()
     {
@@ -2423,6 +2489,7 @@ public class MainFrame extends javax.swing.JFrame {
     private RealTimeStockMonitor realTimeStockMonitor = null;
     private StockHistoryMonitor stockHistoryMonitor = null;
     private StockCodeAndSymbolDatabaseTask stockCodeAndSymbolDatabaseTask = null;
+    private LatestNewsTask latestNewsTask = null;
     private Thread marketThread = null;
     private StockHistorySerializer stockHistorySerializer = null;
     
@@ -2432,9 +2499,6 @@ public class MainFrame extends javax.swing.JFrame {
     // As workaround to overcome the bug, when new look n feel being applied during runtime, the original
     // KeyListner for ComboBoxEditor will be removed.
     private final KeyListener jComboBox1EditorComponentKeyAdapter = getjComboBox1EditorComponentKeyAdapter();
-    
-    private String username;
-    private String password;
     
     private IndicatorPanel indicatorPanel;
     private IndicatorScannerJPanel indicatorScannerJPanel;
@@ -2446,7 +2510,9 @@ public class MainFrame extends javax.swing.JFrame {
     private Executor zombiePool = Executors.newFixedThreadPool(4);
     
     private MarketJPanel marketJPanel;
-    
+
+    private static final int NUM_OF_RETRY = 3;
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.ButtonGroup buttonGroup2;
