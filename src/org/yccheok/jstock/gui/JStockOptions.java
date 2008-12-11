@@ -67,7 +67,10 @@ public class JStockOptions {
                 
         this.setEnableColorChange(false);
         this.setAutoUpdateForegroundColor(DEFAULT_AUTO_UPDATE_FOREGROUND_COLOR);
-        this.setAutoUpdateBackgroundColor(DEFAULT_AUTO_UPDATE_BACKGROUND_COLOR);        
+        this.setAutoUpdateBackgroundColor(DEFAULT_AUTO_UPDATE_BACKGROUND_COLOR);
+
+        this.setAutoUpdateNewsEnabled(true);
+        this.setNewsVersion(0);
     }
     
     private boolean singleIndicatorAlert;
@@ -99,7 +102,10 @@ public class JStockOptions {
     private double expectedProfitPercentage = 10.0;
     
     private Country country;
-        
+
+    private boolean isAutoUpdateNewsEnabled;
+    private long newsVersion;
+
     public boolean isAutoBrokerFeeCalculationEnabled() {
         return this.isAutoBrokerFeeCalculationEnabled;
     }
@@ -117,6 +123,11 @@ public class JStockOptions {
 		/* For backward compatible */
         if(country == null) {
             country = Country.Malaysia;
+        }
+        
+        /* For backward compatible */
+        if(newsVersion < 0) {
+            newsVersion = 0;
         }
         
         return this;
@@ -313,6 +324,26 @@ public class JStockOptions {
         this.enableColorChange = enableColorChange;
     }
     
+    public boolean isAutoUpdateNewsEnabled()
+    {
+        return this.isAutoUpdateNewsEnabled;
+    }
+    
+    public void setAutoUpdateNewsEnabled(boolean isAutoUpdateNewsEnabled)
+    {
+        this.isAutoUpdateNewsEnabled = isAutoUpdateNewsEnabled;
+    }
+
+    public void setNewsVersion(long newsVersion)
+    {
+        this.newsVersion = newsVersion;
+    }
+
+    public int getNewsVersion()
+    {
+        return this.newsVersion;
+    }
+
     public double getExpectedProfitPercentage() {
         return expectedProfitPercentage;
     }
