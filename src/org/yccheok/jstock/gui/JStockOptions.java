@@ -339,7 +339,7 @@ public class JStockOptions {
         this.newsVersion = newsVersion;
     }
 
-    public int getNewsVersion()
+    public long getNewsVersion()
     {
         return this.newsVersion;
     }
