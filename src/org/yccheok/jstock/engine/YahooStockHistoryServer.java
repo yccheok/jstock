@@ -150,7 +150,7 @@ public class YahooStockHistoryServer implements StockHistoryServer {
             simpleDates.add(simpleDate);
         }
         
-        return true;
+        return (historyDatabase.size() > 1);
     }
     
     private void buildHistory(Code code) throws StockHistoryNotFoundException
@@ -252,7 +252,7 @@ public class YahooStockHistoryServer implements StockHistoryServer {
     // 2008-11-06,4.57,4.60,4.25,4.25,10717900,4.25
     // 2008-11-05,4.83,4.90,4.62,4.62,9250800,4.62
         
-    private static final int NUM_OF_RETRY = 3;
+    private static final int NUM_OF_RETRY = 2;
     private static final int MAX_HISTORY_YEAR = 10;
     private static final String YAHOO_ICHART_BASED_URL = "http://ichart.yahoo.com/table.csv?s=";
     
