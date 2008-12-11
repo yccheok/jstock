@@ -119,6 +119,7 @@ public class Utils {
     private static final List<Index> italyIndices = new ArrayList<Index>();
     private static final List<Index> malaysiaIndices = new ArrayList<Index>();
     private static final List<Index> norwayIndices = new ArrayList<Index>();
+    private static final List<Index> singaporeIndices = new ArrayList<Index>();
     private static final List<Index> spainIndices = new ArrayList<Index>();
     private static final List<Index> swedenIndices = new ArrayList<Index>();
     private static final List<Index> unitedKingdomIndices = new ArrayList<Index>();
@@ -134,11 +135,58 @@ public class Utils {
         malaysiaIndices.add(Index.Second);
         malaysiaIndices.add(Index.Mesdaq);
         norwayIndices.add(Index.OSEAX);
+        singaporeIndices.add(Index.STI);
         spainIndices.add(Index.SMSI);
         swedenIndices.add(Index.OMXSPI);
         unitedKingdomIndices.add(Index.FTSE);
         unitedStateIndices.add(Index.DJI);        
         unitedStateIndices.add(Index.IXIC);        
+    }
+
+    // Use to provide conversion between different server's database.
+    public static Code toCIMBFormat(Code code, Country country)
+    {
+        if(code == null || country == null)
+        {
+            throw new java.lang.IllegalArgumentException("Method parameters cannot be null in toYahooFormat");
+        }
+
+        Code result = code;
+
+        if(country == Country.Malaysia)
+        {
+            String _code = code.toString();
+            if(_code.endsWith(".KL") == true)
+            {
+                if(_code.length() > ".KL".length())
+                {
+                    result = Code.newInstance(_code.substring(0, _code.length() - ".KL".length()));
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    public static Code toYahooFormat(Code code, Country country)
+    {
+        if(code == null || country == null)
+        {
+            throw new java.lang.IllegalArgumentException("Method parameters cannot be null in toYahooFormat");
+        }
+
+        Code result = code;
+
+        if(country == Country.Malaysia)
+        {
+            String _code = code.toString();
+            if(_code.endsWith(".KL") == false)
+            {
+                result = Code.newInstance(_code + ".KL");
+            }
+        }
+        
+        return result;
     }
 
     public static List<Index> getStockIndices(Country country) {
@@ -156,6 +204,8 @@ public class Utils {
                 return java.util.Collections.unmodifiableList(Utils.malaysiaIndices);
             case Norway:
                 return java.util.Collections.unmodifiableList(Utils.norwayIndices);
+            case Singapore:
+                return java.util.Collections.unmodifiableList(Utils.singaporeIndices);
             case Spain:
                 return java.util.Collections.unmodifiableList(Utils.spainIndices);
             case Sweden:
