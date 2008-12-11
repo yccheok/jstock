@@ -31,6 +31,7 @@ public enum Country {
     Italy("/images/16x16/it.png"),
     Malaysia("/images/16x16/my.png"),    
     Norway("/images/16x16/no.png"),
+    Singapore("/images/16x16/sg.png"),
     Spain("/images/16x16/es.png"),            
     Sweden("/images/16x16/se.png"),
     UnitedKingdom("/images/16x16/gb.png"),
