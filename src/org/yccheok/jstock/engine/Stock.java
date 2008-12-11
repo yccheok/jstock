@@ -237,7 +237,10 @@ public class Stock {
         Second("Second Board"),                 // 2nd
         Mesdaq("Mesdaq"),                       // MESDAQ
         CallWarrant("Call Warrant"),            // ??
-        
+        KualaLumpur("Kuala Lumpur"),
+
+        SES("SES"),                             // Singapore
+
         Copenhagen("Copenhagen"),               // Denmark        
         Paris("Paris"),                         // France
         
