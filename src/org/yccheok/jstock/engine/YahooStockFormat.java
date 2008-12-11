@@ -37,7 +37,7 @@ public class YahooStockFormat implements StockFormat {
     // s = Symbol
     // n = Name
     // x = Stock Exchange
-    // o = Open     <-- We are no longer using this one. It will not tally with change and change percentage
+    // o = Open             <-- We are no longer using this one. It will not tally with change and change percentage
     // p = Previous Close
     // l1 = Last Trade (Price Only)
     // h = Day's high
@@ -105,11 +105,13 @@ public class YahooStockFormat implements StockFormat {
             java.util.Calendar calendar = null;
             
             do {
-                if(length < 1) break; code = Code.newInstance(quotePattern.matcher(fields[0]).replaceAll("").trim());
-                symbol = Symbol.newInstance(code.toString());
+                if(length < 1) break; code = Code.newInstance(quotePattern.matcher(fields[0]).replaceAll("").trim());                
                 
                 if(length < 2) break; name = quotePattern.matcher(fields[1]).replaceAll("").trim();
-                
+           
+				// We use name as symbol, to make it more readable.     
+                symbol = Symbol.newInstance(name.toString().toUpperCase());
+
                 if(length < 3) break;
                 
                 try {
@@ -169,7 +171,8 @@ public class YahooStockFormat implements StockFormat {
                     calendar = Calendar.getInstance();
                     calendar.setTime(serverDate);
                 } catch (ParseException exp) {
-                    log.error(fields[23] + ", " + fields[24] + ", " + data_and_time, exp);
+                    // Most of the time, we just obtain "N/A"
+                    // log.error(fields[23] + ", " + fields[24] + ", " + data_and_time, exp);
                 }
                 
                 break;
