@@ -385,7 +385,7 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
         for(int i=0; i<visited.size(); i++) {
             final String location = visited.get(i).toString();
             
-            for(int retry=0; retry<3; retry++) {
+            for(int retry=0; retry<NUM_OF_RETRY; retry++) {
                 HttpMethod method = new GetMethod(location);                        
 
                 try {
@@ -412,7 +412,7 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
                 }
                 
                 break;
-            }   // for(int retry=0; retry<3; retry++)
+            }   // for(int retry=0; retry<NUM_OF_RETRY; retry++)
             
             this.notify(this, symbols.size());
         }
@@ -453,7 +453,7 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
     // s = Symbol
     // n = Name
     // x = Stock Exchange
-    // o = Open     <-- We are no longer using this one. It will not tally with change and change percentage
+    // o = Open             <-- We are no longer using this one. It will not tally with change and change percentage
     // p = Previous Close
     // l1 = Last Trade (Price Only)
     // h = Day's high
