@@ -276,7 +276,12 @@ public class Utils {
     public static String getApplicationVersionString() {
         return APPLICATION_VERSION_STRING;
     }
-    
+
+    public static String getLatestNewsLocation(int newsVersion)
+    {
+        return "http://jstock.sourceforge.net/" + APPLICATION_VERSION_STRING + "/" + newsVersion + ".txt";
+    }
+
 	// We will use this as directory name. Do not have space or special characters.
     private static final String APPLICATION_VERSION_STRING = "1.0.0";
     
