@@ -105,7 +105,9 @@ public class CIMBStockServer extends Subject<CIMBStockServer, Integer> implement
     public Stock getStock(Code code) throws StockNotFoundException
     {
         // The nice CIMB server are able to accept both code and name.
-        return this.getStock(Symbol.newInstance(code.toString()));
+        final Code newCode = Utils.toCIMBFormat(code, Country.Malaysia);
+
+        return this.getStock(Symbol.newInstance(newCode.toString()));
     }
     
     public java.util.List<Stock> getStocksBySymbols(java.util.List<Symbol> symbols) throws StockNotFoundException
@@ -119,7 +121,8 @@ public class CIMBStockServer extends Subject<CIMBStockServer, Integer> implement
         StringBuffer _codesBuffer = new StringBuffer();        
         
         for(Code code : codes) {
-            _codesBuffer.append(code);
+            final Code newCode = Utils.toCIMBFormat(code, Country.Malaysia);
+            _codesBuffer.append(newCode);
             _codesBuffer.append("|");
         }
         
