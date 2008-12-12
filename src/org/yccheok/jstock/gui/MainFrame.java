@@ -2434,10 +2434,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         @Override
         protected void done() {
-            System.out.println("latest news task done");
         }
-
-
 
         @Override
         protected void process(java.util.List<String> messages) {
@@ -2448,7 +2445,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         @Override
         protected Void doInBackground() {
-            int newsVersion = MainFrame.jStockOptions.getNewsVersion();
+            long newsVersion = MainFrame.jStockOptions.getNewsVersion();
 
             while(!isCancelled() && runnable)
             {
