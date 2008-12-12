@@ -118,8 +118,10 @@ public class CIMBStockFormat implements StockFormat {
                             Stock.Industry tmpIndustry = stringToIndustryMap.get(tmp.substring(2, 4));
                             if(tmpBoard == null) tmpBoard = Stock.Board.Unknown;
                             if(tmpIndustry == null) tmpIndustry = Stock.Industry.Unknown;
-                            
-                            code = Code.newInstance(stockFields[CODE_TOKEN_INDEX].trim());
+
+                            // Yahoo format is our key reference format. This is to avoid problem occur for different
+                            // stock code format found in different stock servers.
+                            code = Utils.toYahooFormat(Code.newInstance(stockFields[CODE_TOKEN_INDEX].trim()), Country.Malaysia);
                             symbol = Symbol.newInstance(stockFields[SYMBOL_TOKEN_INDEX].trim());
                             name = stockFields[NAME_TOKEN_INDEX].trim();
                             board = tmpBoard;
@@ -219,8 +221,10 @@ public class CIMBStockFormat implements StockFormat {
                             Stock.Industry tmpIndustry = stringToIndustryMap.get(tmp.substring(2, 4));
                             if(tmpBoard == null) tmpBoard = Stock.Board.Unknown;
                             if(tmpIndustry == null) tmpIndustry = Stock.Industry.Unknown;
-                            
-                            code = Code.newInstance(stockFields[CODE_TOKEN_INDEX].trim());
+
+                            // Yahoo format is our key reference format. This is to avoid problem occur for different
+                            // stock code format found in different stock servers.
+                            code = Utils.toYahooFormat(Code.newInstance(stockFields[CODE_TOKEN_INDEX].trim()), Country.Malaysia);
                             symbol = Symbol.newInstance(stockFields[SYMBOL_TOKEN_INDEX].trim());
                             name = "";
                             board = tmpBoard;
