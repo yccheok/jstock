@@ -48,7 +48,7 @@ public class CIMBStockHistoryServer implements StockHistoryServer {
         this.username = username;
         this.password = password;
     
-        this.code = code;
+        this.code = Utils.toCIMBFormat(code, Country.Malaysia);
         
         this.historyDatabase = new HashMap<SimpleDate, Stock>();
         
