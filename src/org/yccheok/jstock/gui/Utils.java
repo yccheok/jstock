@@ -277,7 +277,7 @@ public class Utils {
         return APPLICATION_VERSION_STRING;
     }
 
-    public static String getLatestNewsLocation(int newsVersion)
+    public static String getLatestNewsLocation(long newsVersion)
     {
         return "http://jstock.sourceforge.net/" + APPLICATION_VERSION_STRING + "/" + newsVersion + ".txt";
     }
