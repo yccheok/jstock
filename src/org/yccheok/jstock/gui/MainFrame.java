@@ -22,14 +22,13 @@
 
 package org.yccheok.jstock.gui;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 
+import org.apache.commons.httpclient.HttpException;
 import org.yccheok.jstock.engine.*;
 import com.thoughtworks.xstream.*;
 
@@ -45,11 +44,16 @@ import org.apache.poi.hssf.usermodel.*;
 import javax.help.*;
 import javax.swing.*;
 import java.net.URL;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import javax.imageio.ImageIO;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
+import org.apache.commons.httpclient.methods.GetMethod;
 
 /**
  *
@@ -719,6 +723,8 @@ public class MainFrame extends javax.swing.JFrame {
         optionsJDialog.setLocationRelativeTo(this);
         optionsJDialog.set(MainFrame.jStockOptions);
         optionsJDialog.setVisible(true);
+		
+		initLatestNewsTask();
     }//GEN-LAST:event_jMenuItem6ActionPerformed
 
     public static JStockOptions getJStockOptions() {
@@ -754,7 +760,10 @@ public class MainFrame extends javax.swing.JFrame {
         this.portfolioManagementJPanel.savePortfolio();
 
 		log.info("latestNewsTask stop...");
-        this.latestNewsTask.cancel(true);
+        if(this.latestNewsTask != null)
+        {
+            this.latestNewsTask.cancel(true);
+        }
 
         //log.info("stockCodeAndSymbolDatabaseTask stop...");
         //stockCodeAndSymbolDatabaseTask._stop();
@@ -2080,19 +2089,29 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void initLatestNewsTask()
     {
-        if(latestNewsTask != null) {
-            final LatestNewsTask oldLatestNewsTask = latestNewsTask;
-            zombiePool.execute(new Runnable() {
-                public void run() {
-                    log.info("Prepare to shut down " + oldLatestNewsTask + "...");
-                    oldLatestNewsTask.cancel(true);
-                    log.info("Shut down " + oldLatestNewsTask + " peacefully.");
-                }
-            });            
+        if(jStockOptions.isAutoUpdateNewsEnabled() == true)
+        {
+            if(latestNewsTask == null)
+            {
+                latestNewsTask = new LatestNewsTask();
+                latestNewsTask.execute();
+            }
         }
-        
-        latestNewsTask = new LatestNewsTask();
-        latestNewsTask.execute();
+        else
+        {
+            if(latestNewsTask != null) {
+                final LatestNewsTask oldLatestNewsTask = latestNewsTask;
+                zombiePool.execute(new Runnable() {
+                    public void run() {
+                        log.info("Prepare to shut down " + oldLatestNewsTask + "...");
+                        oldLatestNewsTask.cancel(true);
+                        log.info("Shut down " + oldLatestNewsTask + " peacefully.");
+                    }
+                });
+
+                latestNewsTask = null;
+            }
+        }
     }
     
     private void initMarketThread() {
@@ -2424,13 +2443,12 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     private class LatestNewsTask extends SwingWorker<Void, String> {
-        private volatile boolean runnable = true;
-        // Perform update checking every 5 minutes.
-        private static final int DELAY = 60 * 5;
+        // Perform update checking every 3 minutes.
+        private static final int DELAY = 3 * 60;
 
-        public void _stop() {
-            runnable = false;
-        }
+        private volatile CountDownLatch doneSignal;
+
+        private final HttpClient httpClient = new HttpClient(new MultiThreadedHttpConnectionManager());
 
         @Override
         protected void done() {
@@ -2438,22 +2456,74 @@ public class MainFrame extends javax.swing.JFrame {
 
         @Override
         protected void process(java.util.List<String> messages) {
-            if(runnable)
+            boolean show = false;
+
+            for(String message : messages)
             {
+                AutoUpdateNewsJDialog dialog = new AutoUpdateNewsJDialog(MainFrame.this, true);
+                dialog.setNews(message);
+                dialog.setVisible(true);
+                show = true;
+            }
+
+            if(show)
+            {
+                doneSignal.countDown();
             }
         }
 
         @Override
-        protected Void doInBackground() {
-            long newsVersion = MainFrame.jStockOptions.getNewsVersion();
-
-            while(!isCancelled() && runnable)
+        protected Void doInBackground() {            
+            while(!isCancelled())
             {
                 try {
                     Thread.sleep(DELAY);
                 } catch (InterruptedException ex) {
                     log.info(null, ex);
+                    break;
                 }
+
+                final long newsVersion = MainFrame.jStockOptions.getNewsVersion();
+                final String location = Utils.getLatestNewsLocation(newsVersion);
+
+                doneSignal = new CountDownLatch(1);
+
+                HttpMethod method = new GetMethod(location);
+
+                org.yccheok.jstock.engine.Utils.setHttpClientProxyFromSystemProperties(httpClient);
+
+                String responde = null;
+
+                try {
+                    httpClient.executeMethod(method);
+                    responde = method.getResponseBodyAsString();
+                }
+                catch (HttpException ex) {
+                    log.error(null, ex);
+                }
+                catch (IOException ex) {
+                    log.error(null, ex);
+                }
+
+                // If we fail to obtain any update, do not give up. Probably
+                // the author is going to update the latest news soon. Sleep for
+                // a while, and try again.
+                if(responde == null)
+                {                    
+                    continue;
+                }
+
+                publish(responde);
+
+                try {
+                    doneSignal.await();
+                } catch (InterruptedException ex) {
+                    log.info(null, ex);
+                    break;
+                }
+
+                // Try on next latest news.
+                MainFrame.jStockOptions.setNewsVersion(newsVersion + 1);
             }
 
             return null;
