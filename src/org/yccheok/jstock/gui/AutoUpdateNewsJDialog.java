@@ -18,6 +18,8 @@
 
 package org.yccheok.jstock.gui;
 
+import java.awt.Point;
+
 /**
  *
  * @author yccheok
@@ -39,6 +41,9 @@ public class AutoUpdateNewsJDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPanel2 = new javax.swing.JPanel();
+        jPanel3 = new javax.swing.JPanel();
+        jPanel4 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jEditorPane1 = new javax.swing.JEditorPane();
         jXHeader1 = new org.jdesktop.swingx.JXHeader();
@@ -46,24 +51,45 @@ public class AutoUpdateNewsJDialog extends javax.swing.JDialog {
         jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("JStock News");
+        setResizable(false);
         getContentPane().setLayout(new java.awt.BorderLayout(5, 5));
 
+        jPanel2.setLayout(new java.awt.BorderLayout(5, 5));
+        jPanel2.add(jPanel3, java.awt.BorderLayout.LINE_START);
+        jPanel2.add(jPanel4, java.awt.BorderLayout.LINE_END);
+
+        jEditorPane1.setContentType("text/html");
+        jEditorPane1.setEditable(false);
         jScrollPane1.setViewportView(jEditorPane1);
 
-        getContentPane().add(jScrollPane1, java.awt.BorderLayout.CENTER);
+        jPanel2.add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
         jXHeader1.setDescription("Whenever there is a latest news on JStock, you will be automatically informed.");
         jXHeader1.setTitle("JStock News");
-        getContentPane().add(jXHeader1, java.awt.BorderLayout.NORTH);
+        jPanel2.add(jXHeader1, java.awt.BorderLayout.NORTH);
 
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/apply.png"))); // NOI18N
         jButton1.setText("OK");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
         jPanel1.add(jButton1);
 
-        getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
+        jPanel2.add(jPanel1, java.awt.BorderLayout.SOUTH);
 
-        pack();
+        getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
+
+        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        setBounds((screenSize.width-416)/2, (screenSize.height-336)/2, 416, 336);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        this.setVisible(false);
+        this.dispose();
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
     * @param args the command line arguments
@@ -82,10 +108,20 @@ public class AutoUpdateNewsJDialog extends javax.swing.JDialog {
         });
     }
 
+    public void setNews(String news)
+    {
+        jEditorPane1.setText(news);
+        // Make the scroll bar scrolls to the top.
+        jEditorPane1.setCaretPosition(0);
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     javax.swing.JButton jButton1;
     javax.swing.JEditorPane jEditorPane1;
     javax.swing.JPanel jPanel1;
+    javax.swing.JPanel jPanel2;
+    javax.swing.JPanel jPanel3;
+    javax.swing.JPanel jPanel4;
     javax.swing.JScrollPane jScrollPane1;
     org.jdesktop.swingx.JXHeader jXHeader1;
     // End of variables declaration//GEN-END:variables
