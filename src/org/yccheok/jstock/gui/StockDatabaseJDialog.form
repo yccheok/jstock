@@ -15,6 +15,7 @@
   <AuxValues>
     <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_generateFQN" type="java.lang.Boolean" value="true"/>
     <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="false"/>
     <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
     <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="1"/>
@@ -40,12 +41,9 @@
       <SubComponents>
         <Component class="org.jdesktop.swingx.JXHeader" name="jXHeader1">
           <Properties>
-            <Property name="description" type="java.lang.String" value="If you cannot find your stock symbol in the official database downloaded from stock exchange server (i.e. when Sun Microsystem changes their stock symbol from SUNW to JAVA), you may add your stock manually into the user defined database."/>
+            <Property name="description" type="java.lang.String" value="If you cannot find your stock symbol in the official database downloaded from stock exchange server, you may add your stock manually into the user defined database."/>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/images/16x16/idea.png"/>
-            </Property>
-            <Property name="iconPosition" type="org.jdesktop.swingx.JXHeader$IconPosition" editor="org.jdesktop.swingx.JXHeaderBeanInfo$IconPositionPropertyEditor">
-              <SerializedValue value="-84,-19,0,5,126,114,0,41,111,114,103,46,106,100,101,115,107,116,111,112,46,115,119,105,110,103,120,46,74,88,72,101,97,100,101,114,36,73,99,111,110,80,111,115,105,116,105,111,110,0,0,0,0,0,0,0,0,18,0,0,120,114,0,14,106,97,118,97,46,108,97,110,103,46,69,110,117,109,0,0,0,0,0,0,0,0,18,0,0,120,112,116,0,4,76,69,70,84"/>
+              <Image iconType="3" name="/images/32x32/stock-find.png"/>
             </Property>
             <Property name="title" type="java.lang.String" value="Stock Database"/>
             <Property name="toolTipText" type="java.lang.String" value=""/>

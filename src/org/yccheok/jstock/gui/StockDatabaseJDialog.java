@@ -107,9 +107,8 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
 
         jPanel6.setLayout(new java.awt.BorderLayout(5, 5));
 
-        jXHeader1.setDescription("If you cannot find your stock symbol in the official database downloaded from stock exchange server (i.e. when Sun Microsystem changes their stock symbol from SUNW to JAVA), you may add your stock manually into the user defined database.");
-        jXHeader1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/idea.png"))); // NOI18N
-        jXHeader1.setIconPosition(org.jdesktop.swingx.JXHeader.IconPosition.LEFT);
+        jXHeader1.setDescription("If you cannot find your stock symbol in the official database downloaded from stock exchange server, you may add your stock manually into the user defined database.");
+        jXHeader1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/32x32/stock-find.png"))); // NOI18N
         jXHeader1.setTitle("Stock Database");
         jXHeader1.setToolTipText("");
         jPanel6.add(jXHeader1, java.awt.BorderLayout.CENTER);
@@ -142,77 +141,77 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
                     newFilter();
                 }
             });
-        jPanel3.add(jTextField1);
+            jPanel3.add(jTextField1);
 
-        jPanel1.add(jPanel3, java.awt.BorderLayout.NORTH);
+            jPanel1.add(jPanel3, java.awt.BorderLayout.NORTH);
 
-        jPanel4.add(jPanel1);
+            jPanel4.add(jPanel1);
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("User Defined"));
-        jPanel2.setLayout(new java.awt.BorderLayout());
+            jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("User Defined"));
+            jPanel2.setLayout(new java.awt.BorderLayout());
 
-        jTable2.setAutoCreateRowSorter(true);
-        jTable2.setModel(getSymbolTableModel());
-        jTable2.setCellEditor(getSymbolCellEditor());
-        this.jTable2.addMouseListener(new TableRowPopupListener());
-        this.jTable2.setDefaultRenderer(Symbol.class, new StockTableCellRenderer());
-        this.jTable2.setDefaultEditor(Symbol.class, this.getSymbolCellEditor());
-        //this.jTable2.setDefaultEditor(Object.class, this.getSymbolCellEditor());
-        jTable2.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                jTable2KeyPressed(evt);
-            }
-        });
-        jScrollPane2.setViewportView(jTable2);
+            jTable2.setAutoCreateRowSorter(true);
+            jTable2.setModel(getSymbolTableModel());
+            jTable2.setCellEditor(getSymbolCellEditor());
+            this.jTable2.addMouseListener(new TableRowPopupListener());
+            this.jTable2.setDefaultRenderer(Symbol.class, new StockTableCellRenderer());
+            this.jTable2.setDefaultEditor(Symbol.class, this.getSymbolCellEditor());
+            //this.jTable2.setDefaultEditor(Object.class, this.getSymbolCellEditor());
+            jTable2.addKeyListener(new java.awt.event.KeyAdapter() {
+                public void keyPressed(java.awt.event.KeyEvent evt) {
+                    jTable2KeyPressed(evt);
+                }
+            });
+            jScrollPane2.setViewportView(jTable2);
 
-        jPanel2.add(jScrollPane2, java.awt.BorderLayout.CENTER);
+            jPanel2.add(jScrollPane2, java.awt.BorderLayout.CENTER);
 
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/filenew.png"))); // NOI18N
-        jButton1.setText("New");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
-        jPanel5.add(jButton1);
+            jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/filenew.png"))); // NOI18N
+            jButton1.setText("New");
+            jButton1.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    jButton1ActionPerformed(evt);
+                }
+            });
+            jPanel5.add(jButton1);
 
-        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/editdelete.png"))); // NOI18N
-        jButton2.setText("Delete");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
-            }
-        });
-        jPanel5.add(jButton2);
+            jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/editdelete.png"))); // NOI18N
+            jButton2.setText("Delete");
+            jButton2.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    jButton2ActionPerformed(evt);
+                }
+            });
+            jPanel5.add(jButton2);
 
-        jPanel2.add(jPanel5, java.awt.BorderLayout.PAGE_START);
+            jPanel2.add(jPanel5, java.awt.BorderLayout.PAGE_START);
 
-        jPanel4.add(jPanel2);
+            jPanel4.add(jPanel2);
 
-        getContentPane().add(jPanel4, java.awt.BorderLayout.CENTER);
+            getContentPane().add(jPanel4, java.awt.BorderLayout.CENTER);
 
-        jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/apply.png"))); // NOI18N
-        jButton3.setText("OK");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
-            }
-        });
-        jPanel7.add(jButton3);
+            jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/apply.png"))); // NOI18N
+            jButton3.setText("OK");
+            jButton3.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    jButton3ActionPerformed(evt);
+                }
+            });
+            jPanel7.add(jButton3);
 
-        jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/button_cancel.png"))); // NOI18N
-        jButton4.setText("Cancel");
-        jButton4.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton4ActionPerformed(evt);
-            }
-        });
-        jPanel7.add(jButton4);
+            jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/button_cancel.png"))); // NOI18N
+            jButton4.setText("Cancel");
+            jButton4.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    jButton4ActionPerformed(evt);
+                }
+            });
+            jPanel7.add(jButton4);
 
-        getContentPane().add(jPanel7, java.awt.BorderLayout.PAGE_END);
+            getContentPane().add(jPanel7, java.awt.BorderLayout.PAGE_END);
 
-        pack();
-    }// </editor-fold>//GEN-END:initComponents
+            pack();
+        }// </editor-fold>//GEN-END:initComponents
 
     private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseClicked
     // TODO add your handling code here:
@@ -720,23 +719,23 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
     private static final Log log = LogFactory.getLog(StockDatabaseJDialog.class);
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
-    private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel7;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTable jTable1;
-    private javax.swing.JTable jTable2;
-    private javax.swing.JTextField jTextField1;
-    private org.jdesktop.swingx.JXHeader jXHeader1;
+    javax.swing.JButton jButton1;
+    javax.swing.JButton jButton2;
+    javax.swing.JButton jButton3;
+    javax.swing.JButton jButton4;
+    javax.swing.JPanel jPanel1;
+    javax.swing.JPanel jPanel2;
+    javax.swing.JPanel jPanel3;
+    javax.swing.JPanel jPanel4;
+    javax.swing.JPanel jPanel5;
+    javax.swing.JPanel jPanel6;
+    javax.swing.JPanel jPanel7;
+    javax.swing.JScrollPane jScrollPane1;
+    javax.swing.JScrollPane jScrollPane2;
+    javax.swing.JTable jTable1;
+    javax.swing.JTable jTable2;
+    javax.swing.JTextField jTextField1;
+    org.jdesktop.swingx.JXHeader jXHeader1;
     // End of variables declaration//GEN-END:variables
 
 }
