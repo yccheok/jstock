@@ -48,8 +48,6 @@ public class SingaporeYahooStockServer extends Subject<SingaporeYahooStockServer
         if(baseURL == null) {
             throw new java.lang.IllegalArgumentException("Illegal country as argument (" + country +")");
         }
-
-        httpClient = new HttpClient(new MultiThreadedHttpConnectionManager());
     }
 
     @Override
@@ -67,6 +65,8 @@ public class SingaporeYahooStockServer extends Subject<SingaporeYahooStockServer
 
         final String location = stringBuffer.toString();
 
+        final HttpClient httpClient = new HttpClient();
+        
         for(int retry=0; retry<NUM_OF_RETRY; retry++) {
             HttpMethod method = new GetMethod(location);
 
@@ -119,6 +119,8 @@ public class SingaporeYahooStockServer extends Subject<SingaporeYahooStockServer
 
         final int time = symbols.size() / MAX_STOCK_PER_ITERATION;
         final int remainder = symbols.size() % MAX_STOCK_PER_ITERATION;
+
+        final HttpClient httpClient = new HttpClient();
 
         for(int i=0; i<time; i++) {
             final int start = i * MAX_STOCK_PER_ITERATION;
@@ -388,6 +390,8 @@ public class SingaporeYahooStockServer extends Subject<SingaporeYahooStockServer
 
         visited.add(baseURL);
 
+        final HttpClient httpClient = new HttpClient();
+        
         for(int i=0; i<visited.size(); i++) {
             final String location = visited.get(i).toString();
 
@@ -431,7 +435,6 @@ public class SingaporeYahooStockServer extends Subject<SingaporeYahooStockServer
 
     private final Country country;
     private final URL baseURL;
-    private HttpClient httpClient;
 
     private static final Map<Country, URL> servers = new HashMap<Country, URL>();
     private static final Map<Country, Pattern> patterns = new HashMap<Country, Pattern>();
