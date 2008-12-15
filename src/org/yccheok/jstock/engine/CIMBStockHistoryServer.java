@@ -43,8 +43,6 @@ public class CIMBStockHistoryServer implements StockHistoryServer {
     }
     
     public CIMBStockHistoryServer(String username, String password, Code code) throws StockHistoryNotFoundException {
-        final HttpClient httpClient = new HttpClient();
-        
         this.username = username;
         this.password = password;
     
@@ -63,7 +61,9 @@ public class CIMBStockHistoryServer implements StockHistoryServer {
             
             HttpMethod method = new GetMethod(server + "java/jar/data/" + code + ".dat.gz");
             StringBuffer s = new StringBuffer(data.length);
-            
+
+            final HttpClient httpClient = new HttpClient();
+
             try {
                 Utils.setHttpClientProxyFromSystemProperties(httpClient);
                 httpClient.executeMethod(method);
@@ -277,9 +277,12 @@ public class CIMBStockHistoryServer implements StockHistoryServer {
     private final java.util.List<SimpleDate> simpleDates;
     
     private static final int MAX_DAY_DIFFERENCE_AMONG_TODAY_AND_LATEST_HISTORY = 30;
-    
+
+    // Not available since 15 December. Reason unknown. We switch to a much more
+    // robust Yahoo server.
+    //
     private final String[] servers = new String[] {      
-        "http://n2ntbfd02.itradecimb.com/",        
+        // "http://n2ntbfd02.itradecimb.com/",
     };
 
     // Too slow, customer not happy. We will only use one server. May facing
