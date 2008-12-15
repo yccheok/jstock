@@ -66,9 +66,7 @@
     nbproject/build-impl.xml file. 
 
     -->
-    <target name="-pre-jar">        
-        <exec dir="${src.dir}/../help" executable="./jstockhelp.sh">
-        </exec>        
+    <target name="-pre-jar">             
     </target>
 
     <target name="-post-jar">
@@ -96,6 +94,7 @@
             <manifest>
                 <attribute name="Main-Class" value="${main.class}"/>
                 <attribute name="Class-Path" value="${jar.classpath} config/"/>
+                <attribute name="SplashScreen-Image" value="images/splash/jstock2-wording.png"/>
             </manifest>
         </copylibs>
         <echo>To run this application from the command line without Ant, try:</echo>
