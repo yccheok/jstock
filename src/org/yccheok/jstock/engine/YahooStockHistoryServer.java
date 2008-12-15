@@ -184,7 +184,9 @@ public class YahooStockHistoryServer implements StockHistoryServer {
         formatBuffer.append(endMonth).append("&e=").append(endDate).append("&f=").append(endYear).append("&g=d&a=").append(startMonth).append("&b=").append(startDate).append("&c=").append(startYear).append("&ignore=.csv");
         
         final String location = stringBuffer.append(formatBuffer).toString();
-            
+
+        final HttpClient httpClient = new HttpClient();
+        
         boolean success = false;
             
         for(int retry=0; retry<NUM_OF_RETRY; retry++) {
@@ -258,8 +260,6 @@ public class YahooStockHistoryServer implements StockHistoryServer {
     
     private final java.util.Map<SimpleDate, Stock> historyDatabase = new HashMap<SimpleDate, Stock>();
     private final java.util.List<SimpleDate> simpleDates = new ArrayList<SimpleDate>();   
-    
-    private final HttpClient httpClient = new HttpClient(new MultiThreadedHttpConnectionManager());
     
     private final Code code;
     private final Country country;
