@@ -155,8 +155,9 @@ public class MainFrame extends javax.swing.JFrame {
         jMenuItem5 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("JStock - Stock Market Program");
-        setFont(new java.awt.Font("Tahoma", 0, 12));
+        setTitle("JStock - Stock Market Software");
+        setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        setIconImage(getMyIconImage());
         addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 formMouseClicked(evt);
@@ -1143,6 +1144,11 @@ public class MainFrame extends javax.swing.JFrame {
             }            
         };
     }
+
+    private Image getMyIconImage()
+    {
+        return new javax.swing.ImageIcon(getClass().getResource("/images/16x16/chart.png")).getImage();
+    }
     
     private void createSystemTrayIcon() {
         if (SystemTray.isSupported()) {
@@ -1183,7 +1189,7 @@ public class MainFrame extends javax.swing.JFrame {
             defaultItem.addActionListener(exitListener);
             popup.add(defaultItem);
 
-            trayIcon = new TrayIcon(image, "JStock - Stock Market Program", popup);
+            trayIcon = new TrayIcon(image, "JStock - Stock Market Software", popup);
 
             ActionListener actionListener = new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -2443,12 +2449,13 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     private class LatestNewsTask extends SwingWorker<Void, String> {
-        // Perform update checking every 3 minutes.
-        private static final int DELAY = 3 * 60;
+        // Delay first update checking for the 20 seconds
+        private static final int SHORT_DELAY = 20 * 1000;
 
-        private volatile CountDownLatch doneSignal;
+        // Perform update checking every 2 minutes.
+        private static final int DELAY = 2 * 60 * 1000;
 
-        private final HttpClient httpClient = new HttpClient(new MultiThreadedHttpConnectionManager());
+        private volatile CountDownLatch doneSignal;       
 
         @Override
         protected void done() {
@@ -2473,14 +2480,40 @@ public class MainFrame extends javax.swing.JFrame {
         }
 
         @Override
-        protected Void doInBackground() {            
+        protected Void doInBackground() {
+            boolean firstRound = true;
+
             while(!isCancelled())
             {
-                try {
-                    Thread.sleep(DELAY);
-                } catch (InterruptedException ex) {
-                    log.info(null, ex);
+                if(firstRound)
+                {
+                    firstRound = !firstRound;
+
+                    try {
+                        Thread.sleep(SHORT_DELAY);
+                    } catch (InterruptedException ex) {
+                        log.info(null, ex);
+                        break;
+                    }
+                }
+                else
+                {
+                    // Currently, to avoid from letting user having a spam feeling
+                    // on our software, we will not display update information more
+                    // than one time for every program startup.
+                    //
+                    // However, we may display more than one time for every startup
+                    // if user choose to disable-> enable back the auto update option.
+                    //
                     break;
+                    /*
+                    try {
+                        Thread.sleep(DELAY);
+                    } catch (InterruptedException ex) {
+                        log.info(null, ex);
+                        break;
+                    }
+                    */
                 }
 
                 final long newsVersion = MainFrame.jStockOptions.getNewsVersion();
@@ -2489,6 +2522,8 @@ public class MainFrame extends javax.swing.JFrame {
                 doneSignal = new CountDownLatch(1);
 
                 HttpMethod method = new GetMethod(location);
+
+                final HttpClient httpClient = new HttpClient();
 
                 org.yccheok.jstock.engine.Utils.setHttpClientProxyFromSystemProperties(httpClient);
 
@@ -2510,6 +2545,11 @@ public class MainFrame extends javax.swing.JFrame {
                 // a while, and try again.
                 if(responde == null)
                 {                    
+                    continue;
+                }
+
+                if(responde.indexOf(Utils.getJStockUUID()) < 0)
+                {
                     continue;
                 }
 
