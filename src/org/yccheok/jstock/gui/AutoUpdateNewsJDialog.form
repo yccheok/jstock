@@ -76,12 +76,18 @@
                 <Property name="contentType" type="java.lang.String" value="text/html"/>
                 <Property name="editable" type="boolean" value="false"/>
               </Properties>
+              <Events>
+                <EventHandler event="hyperlinkUpdate" listener="javax.swing.event.HyperlinkListener" parameters="javax.swing.event.HyperlinkEvent" handler="jEditorPane1HyperlinkUpdate"/>
+              </Events>
             </Component>
           </SubComponents>
         </Container>
         <Component class="org.jdesktop.swingx.JXHeader" name="jXHeader1">
           <Properties>
-            <Property name="description" type="java.lang.String" value="Whenever there is a latest news on JStock, you will be automatically informed."/>
+            <Property name="description" type="java.lang.String" value="Whenever there is latest news on JStock, you will be automatically informed."/>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/images/32x32/epiphany-download.png"/>
+            </Property>
             <Property name="title" type="java.lang.String" value="JStock News"/>
           </Properties>
           <Constraints>

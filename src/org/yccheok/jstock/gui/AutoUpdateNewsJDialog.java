@@ -18,7 +18,12 @@
 
 package org.yccheok.jstock.gui;
 
+import java.awt.Desktop;
 import java.awt.Point;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import javax.swing.event.HyperlinkEvent;
 
 /**
  *
@@ -61,11 +66,17 @@ public class AutoUpdateNewsJDialog extends javax.swing.JDialog {
 
         jEditorPane1.setContentType("text/html");
         jEditorPane1.setEditable(false);
+        jEditorPane1.addHyperlinkListener(new javax.swing.event.HyperlinkListener() {
+            public void hyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {
+                jEditorPane1HyperlinkUpdate(evt);
+            }
+        });
         jScrollPane1.setViewportView(jEditorPane1);
 
         jPanel2.add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
-        jXHeader1.setDescription("Whenever there is a latest news on JStock, you will be automatically informed.");
+        jXHeader1.setDescription("Whenever there is latest news on JStock, you will be automatically informed.");
+        jXHeader1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/32x32/epiphany-download.png"))); // NOI18N
         jXHeader1.setTitle("JStock News");
         jPanel2.add(jXHeader1, java.awt.BorderLayout.NORTH);
 
@@ -90,6 +101,28 @@ public class AutoUpdateNewsJDialog extends javax.swing.JDialog {
         this.setVisible(false);
         this.dispose();
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jEditorPane1HyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {//GEN-FIRST:event_jEditorPane1HyperlinkUpdate
+        if (HyperlinkEvent.EventType.ACTIVATED.equals(evt.getEventType())) {
+            URL url = evt.getURL();
+
+            if(Desktop.isDesktopSupported())
+            {
+                Desktop desktop = Desktop.getDesktop();
+
+                if(desktop.isSupported(Desktop.Action.BROWSE))
+                {
+                    try {
+                        desktop.browse(url.toURI());
+                    }
+                    catch (URISyntaxException ex) {
+                    }
+                    catch (IOException ex) {
+                    }
+                }
+            }
+        }
+    }//GEN-LAST:event_jEditorPane1HyperlinkUpdate
 
     /**
     * @param args the command line arguments
