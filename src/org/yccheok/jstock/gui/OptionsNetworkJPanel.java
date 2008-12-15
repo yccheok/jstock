@@ -190,7 +190,7 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
         */
         boolean success = false;
         
-        HttpClient httpClient = new HttpClient(new MultiThreadedHttpConnectionManager());
+        HttpClient httpClient = new HttpClient();
         HttpMethod method = new GetMethod("http://www.google.com");
         try {
             org.yccheok.jstock.engine.Utils.setHttpClientProxyFromSystemProperties(httpClient);
