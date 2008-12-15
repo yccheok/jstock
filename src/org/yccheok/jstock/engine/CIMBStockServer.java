@@ -44,8 +44,6 @@ public class CIMBStockServer extends Subject<CIMBStockServer, Integer> implement
     public CIMBStockServer(String username, String password) {
         this.stockFormat = CIMBStockFormat.getInstance();
         
-        httpClient = new HttpClient(new MultiThreadedHttpConnectionManager());
-        
         this.username = username;
         this.password = password;        
     }
@@ -64,7 +62,9 @@ public class CIMBStockServer extends Subject<CIMBStockServer, Integer> implement
         java.util.List<Stock> stocks = null;
 
         Thread currentThread = Thread.currentThread();
-         
+
+        final HttpClient httpClient = new HttpClient();
+        
         for(String server : servers) {            
             if(currentThread.isInterrupted()) throw new StockNotFoundException("Thread has been interrupted");
         
@@ -139,6 +139,8 @@ public class CIMBStockServer extends Subject<CIMBStockServer, Integer> implement
 
         Thread currentThread = Thread.currentThread();
 
+        final HttpClient httpClient = new HttpClient();
+        
         for(String server : servers) {
             if(currentThread.isInterrupted()) throw new StockNotFoundException("Thread has been interrupted");
 
@@ -185,6 +187,8 @@ public class CIMBStockServer extends Subject<CIMBStockServer, Integer> implement
         Set<Code> codes = new HashSet<Code>();        
 
         Thread currentThread = Thread.currentThread();
+
+        final HttpClient httpClient = new HttpClient();
         
         server_label:
         for(String server : servers) {
@@ -250,7 +254,6 @@ public class CIMBStockServer extends Subject<CIMBStockServer, Integer> implement
     }
     
     private final StockFormat stockFormat;
-    private final HttpClient httpClient;
     private final String username;
     private final String password;
     
