@@ -62,8 +62,7 @@ public class AboutJDialog extends javax.swing.JDialog {
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(0, 0, 255));
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/192x192/j0411029.gif"))); // NOI18N
-        jLabel1.setText(getHeaderInfo());
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/splash/jstock2-wording.png"))); // NOI18N
         jLabel1.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 0, 5));
         getContentPane().add(jLabel1, java.awt.BorderLayout.NORTH);
 
@@ -79,7 +78,7 @@ public class AboutJDialog extends javax.swing.JDialog {
 
         jEditorPane1.setContentType("text/html");
         jEditorPane1.setEditable(false);
-        jEditorPane1.setText("<html>\r\n  <head>\r\n\r\n  </head>\r\n  <body>\r\n    <p style=\"margin-top: 10; font-size: 9px; font-family: Tahoma;\">\rJStock is a stock analysis tool to help you pick stocks in an automated way.</p>\n    <p style=\"margin-top: 10; font-size: 9px; font-family: Tahoma;\">Copyright &copy; 2008 Yan Cheng Cheok <a href=\"mailto:yccheok@yahoo.com\">yccheok@yahoo.com</a></p>\n    <p style=\"margin-top: 10; font-size: 9px; font-family: Tahoma;\">Latest update can be downloaded from : <a href=\"http://sourceforge.net/projects/jstock\">http://sourceforge.net/projects/jstock</a></p>\n    <p style=\"margin-top: 10; font-size: 9px; font-family: Tahoma;\">This free software is licensed under : <a href=\"http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt\">GNU General Public License, version 2</a></p>\n  </body>\r\n</html>\r\n");
+        jEditorPane1.setText("<html>\n<head>\n</head>\n    <body>\n        <p style=\"margin-top: 10; font-size: 9px; font-family: Tahoma;\">JStock is a stock analysis tool to help you pick stocks in an automated way.</p>\n        <p style=\"margin-top: 10; font-size: 9px; font-family: Tahoma;\">Copyright &copy; 2008 Yan Cheng Cheok <a href=\"mailto:yccheok@yahoo.com\">yccheok@yahoo.com</a></p>\n        <p style=\"margin-top: 10; font-size: 9px; font-family: Tahoma;\">Special thanks to <a href=\"http://www.iconblock.com/\">IconBlock</a>, for providing graphics design service.</p>\n        <p style=\"margin-top: 10; font-size: 9px; font-family: Tahoma;\">Latest update can be downloaded from : <a href=\"http://sourceforge.net/projects/jstock\">http://sourceforge.net/projects/jstock</a></p>\n        <p style=\"margin-top: 10; font-size: 9px; font-family: Tahoma;\">This free software is licensed under : <a href=\"http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt\">GNU General Public License, version 2</a></p>\n    </body>\n</html>");
         jEditorPane1.addHyperlinkListener(new javax.swing.event.HyperlinkListener() {
             public void hyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {
                 jEditorPane1HyperlinkUpdate(evt);
@@ -93,21 +92,21 @@ public class AboutJDialog extends javax.swing.JDialog {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 470, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 489, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
         java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-506)/2, (screenSize.height-408)/2, 506, 408);
+        setBounds((screenSize.width-525)/2, (screenSize.height-598)/2, 525, 598);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -139,7 +138,7 @@ public class AboutJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jEditorPane1HyperlinkUpdate
     
     private String getHeaderInfo() {
-        String headerInfo = "<html>JStock - Stock Market Program<br><center><h4>version " + Utils.getApplicationVersionString() + "</h4></center></html>";
+        String headerInfo = "<html>JStock - Stock Market Software<br><center><h4>version " + Utils.getApplicationVersionString() + "</h4></center></html>";
         return headerInfo;
     }
     
