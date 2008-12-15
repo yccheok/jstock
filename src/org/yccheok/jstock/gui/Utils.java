@@ -279,11 +279,14 @@ public class Utils {
 
     public static String getLatestNewsLocation(long newsVersion)
     {
-        return "http://jstock.sourceforge.net/" + APPLICATION_VERSION_STRING + "/" + newsVersion + ".txt";
+        return "http://jstock.sourceforge.net/news/" + APPLICATION_VERSION_STRING + "/" + newsVersion + ".html";
     }
 
+    public static String getJStockUUID() {
+        return "fe78440e-e0fe-4efb-881d-264a01be483c";
+    }
 	// We will use this as directory name. Do not have space or special characters.
-    private static final String APPLICATION_VERSION_STRING = "1.0.0";
+    private static final String APPLICATION_VERSION_STRING = "1.0.1";
     
     private static final Log log = LogFactory.getLog(Utils.class);
 }
