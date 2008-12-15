@@ -55,7 +55,7 @@ public class JStockOptions {
         setProxyPort(-1);
         setScanningSpeed(1000);
         setAlertSpeed(5);
-        setLookNFeel("");
+        setLookNFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
         setCountry(Country.Malaysia);
         
         this.setNormalTextForegroundColor(DEFAULT_NORMAL_TEXT_FOREGROUND_COLOR);
