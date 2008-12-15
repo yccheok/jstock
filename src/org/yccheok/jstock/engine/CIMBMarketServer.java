@@ -42,8 +42,6 @@ public class CIMBMarketServer implements MarketServer {
     }
 
     public CIMBMarketServer(String username, String password) {
-        httpClient = new HttpClient(new MultiThreadedHttpConnectionManager());
-        
         this.username = username;
         this.password = password;        
     }
@@ -53,6 +51,8 @@ public class CIMBMarketServer implements MarketServer {
         final int numOfServer = servers.length;
         final Thread currentThread = Thread.currentThread();
         
+        final HttpClient httpClient = new HttpClient();
+
         for(int i = 0; (i < numOfServer) && (!currentThread.isInterrupted()); i++) {
             HttpMethod method = new GetMethod(servers[i] + "rtQuote.dll?GetInitInfo");
 
@@ -107,7 +107,6 @@ public class CIMBMarketServer implements MarketServer {
         return null;
     }
     
-    private final HttpClient httpClient;
     private final String username;
     private final String password;
     
