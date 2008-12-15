@@ -46,9 +46,7 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
         
         if(baseURL == null) {
             throw new java.lang.IllegalArgumentException("Illegal country as argument (" + country +")");
-        }
-        
-        httpClient = new HttpClient(new MultiThreadedHttpConnectionManager());
+        }        
     }
     
     @Override
@@ -65,7 +63,9 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
         stringBuffer.append(_symbol).append(YAHOO_STOCK_FORMAT);
         
         final String location = stringBuffer.toString();
-        
+
+        final HttpClient httpClient = new HttpClient();
+
         for(int retry=0; retry<NUM_OF_RETRY; retry++) {
             HttpMethod method = new GetMethod(location);                        
 
@@ -155,7 +155,9 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
             stringBuffer.append(_symbol).append(YAHOO_STOCK_FORMAT);
             
             final String location = stringBuffer.toString();
-            
+
+            final HttpClient httpClient = new HttpClient();
+
             boolean success = false;
             
             for(int retry=0; retry<NUM_OF_RETRY; retry++) {
@@ -258,7 +260,9 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
         stringBuffer.append(_symbol).append(YAHOO_STOCK_FORMAT);
                     
         final String location = stringBuffer.toString();
-        
+
+        final HttpClient httpClient = new HttpClient();
+
         for(int retry=0; retry<NUM_OF_RETRY; retry++) {
             HttpMethod method = new GetMethod(location);                        
 
@@ -381,7 +385,9 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
         Set<Symbol> symbols = new HashSet<Symbol>();
 
         visited.add(baseURL);
-        
+
+        final HttpClient httpClient = new HttpClient();
+
         for(int i=0; i<visited.size(); i++) {
             final String location = visited.get(i).toString();
             
@@ -430,7 +436,6 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
     
     private final Country country;
     private final URL baseURL;
-    private HttpClient httpClient;
     
     private static final Map<Country, URL> servers = new HashMap<Country, URL>();
     private static final Map<Country, Pattern> patterns = new HashMap<Country, Pattern>();
