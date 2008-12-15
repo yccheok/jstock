@@ -8,13 +8,13 @@ Name ${PRODUCT_NAME}
 RequestExecutionLevel admin	;Workaround for Vista
 
 ; The file to write
-OutFile "jstock-1.0.0-setup.exe"
+OutFile "jstock-1.0.1-setup.exe"
 LicenseData "gpl.txt"
  
 ; The default installation directory
 InstallDir $PROGRAMFILES\${PRODUCT_NAME}
 ; The text to prompt the user to enter a directory
-DirText "This will install JStock - Stock Market Program on your computer. Choose a directory"
+DirText "This will install JStock - Stock Market Software on your computer. Choose a directory"
 Page license
 page directory
 Page instfiles
