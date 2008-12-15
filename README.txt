@@ -4,6 +4,12 @@ version 1.0.1
 1. Bug fixed. We support maximum 9 boards (due to large boards in germany market) in all select
    stocks dialog boxes.
 
+2. A more robust Malaysia stock server from Yahoo! is being introduced. User shall not experience stock server down problem as in previous version.
+
+3. New Singapore stock market is being introduced.
+
+4. JStock is now having its own logo and icon. Special thanks to Iconblock, a small company that specializes in providing professional and personalized design services.(4) Bug fixed in using HttpClient. Every method will has its own HttpClient. This may avoid problem from multiple connections at the same time. 
+
 =============
 version 1.0.0
 =============
