@@ -163,12 +163,14 @@ public class AutoCompleteJComboBox extends JComboBox {
     {
         if(ui != null)
         {
+            // Let's try our own customized UI.
             Class c = ui.getClass();
             final String myClass = "org.yccheok.jstock.gui.AutoCompleteJComboBox$My" + c.getSimpleName();
 
             try {
                 ComboBoxUI myUI = (ComboBoxUI) Class.forName(myClass).newInstance();
                 super.setUI(myUI);
+                return;
             } catch (ClassNotFoundException ex) {
                 log.error(null, ex);
             } catch (InstantiationException ex) {
@@ -177,10 +179,10 @@ public class AutoCompleteJComboBox extends JComboBox {
                 log.error(null, ex);
             }
         }
-        else
-        {
-            super.setUI(ui);
-        }
+
+        // Either null, or we fail to use our own customized UI.
+        // Fall back to default.
+        super.setUI(ui);
     }
 
     // This is a non-portable method to make combo box horizontal scroll bar.
