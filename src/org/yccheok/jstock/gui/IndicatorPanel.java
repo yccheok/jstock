@@ -34,6 +34,8 @@ import org.yccheok.jstock.analysis.*;
 
 import com.thoughtworks.xstream.*;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -843,18 +845,28 @@ public class IndicatorPanel extends JPanel implements ChangeListener {
         // First, check whether there is a need to get history.
         final IndicatorDefaultDrawing indicatorDefaultDrawing = (IndicatorDefaultDrawing)this.view.getDrawing();
         final OperatorIndicator operatorIndicator = indicatorDefaultDrawing.getOperatorIndicator();
-        
+        final Duration historyDuration = operatorIndicator.getNeededStockHistoryDuration();
+
         if(operatorIndicator.isStockHistoryServerNeeded()) {
             m.setStatusBar(true, "Stock history retrieving in progress...");
 
+            // Avoid from using old history monitor. Their duration are not the same.
+            final Duration oldDuration = stockHistoryMonitor.getDuration();
+            if (oldDuration.isContains(historyDuration) == false)
+            {
+                this.initStockHistoryMonitor(m.getStockServerFactory());
+                this.stockHistoryMonitor.setDuration(historyDuration);
+            }
+
             // Action!
-            StockHistoryServer stockHistoryServer = m.getStockHistoryMonitor().getStockHistoryServer(code);
+            StockHistoryServer stockHistoryServer = this.stockHistoryMonitor.getStockHistoryServer(code);
 
             if(stockHistoryServer == null) {
 
                 final java.util.concurrent.CountDownLatch countDownLatch = new java.util.concurrent.CountDownLatch(1);
 
                 org.yccheok.jstock.engine.Observer<StockHistoryMonitor, StockHistoryMonitor.StockHistoryRunnable> observer = new org.yccheok.jstock.engine.Observer<StockHistoryMonitor, StockHistoryMonitor.StockHistoryRunnable>() {
+                    @Override
                     public void update(StockHistoryMonitor monitor, StockHistoryMonitor.StockHistoryRunnable runnable)
                     {
                         if(runnable.getCode().equals(code)) {
@@ -863,9 +875,9 @@ public class IndicatorPanel extends JPanel implements ChangeListener {
                     }
                 };
 
-                m.getStockHistoryMonitor().attach(observer);
+                this.stockHistoryMonitor.attach(observer);
 
-                m.getStockHistoryMonitor().addStockCode(code);            
+                this.stockHistoryMonitor.addStockCode(code);
 
                 try {
                     countDownLatch.await();
@@ -875,9 +887,9 @@ public class IndicatorPanel extends JPanel implements ChangeListener {
                     return;
                 }
 
-                m.getStockHistoryMonitor().dettach(observer);
+                this.stockHistoryMonitor.dettach(observer);
 
-                stockHistoryServer = m.getStockHistoryMonitor().getStockHistoryServer(code);
+                stockHistoryServer = this.stockHistoryMonitor.getStockHistoryServer(code);
             }
 
             if(stockHistoryServer == null) {
@@ -929,11 +941,12 @@ public class IndicatorPanel extends JPanel implements ChangeListener {
         this.jButton6.setEnabled(false);
     }
     
+    @Override
     public void stateChanged(javax.swing.event.ChangeEvent evt) {        
         JTabbedPane pane = (JTabbedPane)evt.getSource();
         if(pane.getSelectedComponent() == this) {
             final MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, IndicatorPanel.this);
-            final String password = m.getJStockOptions().getIndicatorPassword();
+            final String password = Utils.decrypt(m.getJStockOptions().getIndicatorPassword());
             
             boolean status = false;
             
@@ -970,7 +983,8 @@ public class IndicatorPanel extends JPanel implements ChangeListener {
             /* We will not call stop, to avoid GUI from being freezed. But, is it
              * safe to do so?
              */
-            
+
+            // Simulate and stop buttons.
             this.jButton4.setEnabled(true);
             this.jButton6.setEnabled(false);
         }
@@ -1040,7 +1054,42 @@ public class IndicatorPanel extends JPanel implements ChangeListener {
     public IndicatorProjectManager getIndicatorProjectManager() {
         return indicatorProjectManager;
     }
-    
+
+    public void initStockHistoryMonitor(java.util.List<StockServerFactory> stockServerFactories) {
+        if(stockHistoryMonitor != null) {
+            final StockHistoryMonitor oldStockHistoryMonitor = stockHistoryMonitor;
+            zombiePool.execute(new Runnable() {
+                public void run() {
+                    log.info("Prepare to shut down " + oldStockHistoryMonitor + "...");
+                    oldStockHistoryMonitor.clearStockCodes();
+                    oldStockHistoryMonitor.dettachAll();
+                    oldStockHistoryMonitor.stop();
+                    log.info("Shut down " + oldStockHistoryMonitor + " peacefully.");
+                }
+            });
+        }
+
+        this.stockHistoryMonitor = new StockHistoryMonitor(NUM_OF_THREADS_HISTORY_MONITOR);
+
+        for(StockServerFactory factory : stockServerFactories) {
+            stockHistoryMonitor.addStockServerFactory(factory);
+        }
+
+        // No StockHistorySerializer at this moment, either read or write. This is because
+        // (1) Read - If the duration of the history selected in Real-Time panel is shorter than
+        // indicators's, we will be in trouble.
+        // (2) Write - If the duration of the indicator's is shorter than Real-Time panel, we will
+        // be in trouble again.
+        //
+        // Currently, we have no way but disable it.
+    }
+
+    private Executor zombiePool = Executors.newFixedThreadPool(NUM_OF_THREADS_ZOMBIE_POOL);
+    private StockHistoryMonitor stockHistoryMonitor = null;
+
+    private static final int NUM_OF_THREADS_ZOMBIE_POOL = 1;
+    private static final int NUM_OF_THREADS_HISTORY_MONITOR = 1;
+
     private IndicatorProjectManager indicatorProjectManager;
     
     private static final Log log = LogFactory.getLog(IndicatorPanel.class);
