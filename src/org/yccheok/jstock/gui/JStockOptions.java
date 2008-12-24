@@ -41,7 +41,9 @@ public class JStockOptions {
     public static final java.awt.Color DEFAULT_SECOND_ROW_BACKGROUND_COLOR = new java.awt.Color(255, 255, 204);
     public static final java.awt.Color DEFAULT_AUTO_UPDATE_FOREGROUND_COLOR = Color.BLACK;
     public static final java.awt.Color DEFAULT_AUTO_UPDATE_BACKGROUND_COLOR = Color.RED;
-    
+
+    private static final int DEFAULT_HISTORY_DURATION =  10;
+
     /** Creates a new instance of JStockOptions */
     public JStockOptions() {
         setPopupMessage(true);
@@ -71,6 +73,11 @@ public class JStockOptions {
 
         this.setAutoUpdateNewsEnabled(true);
         this.setNewsVersion(0);
+
+        this.setHistoryDuration(DEFAULT_HISTORY_DURATION);
+
+		this.setChatEnabled(false);
+		this.setChatUsername("");
     }
     
     private boolean singleIndicatorAlert;
@@ -106,6 +113,11 @@ public class JStockOptions {
     private boolean isAutoUpdateNewsEnabled;
     private long newsVersion;
 
+    private int historyDuration; /* In years */
+
+    private boolean isChatEnabled = false;
+    private String chatUsername = "";
+
     public boolean isAutoBrokerFeeCalculationEnabled() {
         return this.isAutoBrokerFeeCalculationEnabled;
     }
@@ -128,6 +140,14 @@ public class JStockOptions {
         /* For backward compatible */
         if(newsVersion < 0) {
             newsVersion = 0;
+        }
+
+        if (historyDuration <= 0) {
+            historyDuration = DEFAULT_HISTORY_DURATION;
+        }
+
+        if (getChatUsername() == null) {
+            setChatUsername("");
         }
         
         return this;
@@ -328,10 +348,18 @@ public class JStockOptions {
     {
         return this.isAutoUpdateNewsEnabled;
     }
+
+    public boolean isChatEnabled() {
+        return this.isChatEnabled;
+    }
     
     public void setAutoUpdateNewsEnabled(boolean isAutoUpdateNewsEnabled)
     {
         this.isAutoUpdateNewsEnabled = isAutoUpdateNewsEnabled;
+    }
+
+    public void setChatEnabled(boolean isChatEnabled) {
+        this.isChatEnabled = isChatEnabled;
     }
 
     public void setNewsVersion(long newsVersion)
@@ -358,5 +386,33 @@ public class JStockOptions {
 
     public void setCountry(Country country) {
         this.country = country;
+    }
+
+    /**
+     * @return the historyDuration
+     */
+    public int getHistoryDuration() {
+        return historyDuration;
+    }
+
+    /**
+     * @param historyDuration the historyDuration to set
+     */
+    public void setHistoryDuration(int historyDuration) {
+        this.historyDuration = historyDuration;
+    }
+
+    /**
+     * @return the chatUsername
+     */
+    public String getChatUsername() {
+        return chatUsername;
+    }
+
+    /**
+     * @param chatUsername the chatUsername to set
+     */
+    public void setChatUsername(String chatUsername) {
+        this.chatUsername = chatUsername;
     }
 }
