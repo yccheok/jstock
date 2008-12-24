@@ -272,7 +272,34 @@ public class Utils {
                             Calendar.getInstance()                                        
                             );                
     } 
-    
+
+    public static void deleteAllOldFiles(File dir, int days) {
+        if (dir.isDirectory()) {
+            String[] children = dir.list();
+            for (int i=0; i<children.length; i++) {
+                deleteAllOldFiles(new File(dir, children[i]), days);
+            }
+
+            // Delete empty directory
+            if(dir.list().length == 0)
+            {
+                dir.delete();
+            }
+        } else {
+            final long today = System.currentTimeMillis();
+            final long timeStamp = dir.lastModified();
+
+            final long difMil = today - timeStamp;
+            final long milPerDay = 1000*60*60*24;
+            final long d = difMil / milPerDay;
+
+            if(d >= days)
+            {
+                dir.delete();
+            }
+        }
+    }
+
     public static String getApplicationVersionString() {
         return APPLICATION_VERSION_STRING;
     }
@@ -280,6 +307,26 @@ public class Utils {
     public static String getLatestNewsLocation(long newsVersion)
     {
         return "http://jstock.sourceforge.net/news/" + APPLICATION_VERSION_STRING + "/" + newsVersion + ".html";
+    }
+
+    public static String encrypt(String source)
+    {
+        if (source.length() <= 0)
+            return "";
+
+        org.jasypt.encryption.pbe.PBEStringEncryptor pbeStringEncryptor = new org.jasypt.encryption.pbe.StandardPBEStringEncryptor();
+        pbeStringEncryptor.setPassword(getJStockUUID());
+        return pbeStringEncryptor.encrypt(source);
+    }
+
+    public static String decrypt(String source)
+    {
+        if (source.length() <= 0)
+            return "";
+
+        org.jasypt.encryption.pbe.PBEStringEncryptor pbeStringEncryptor = new org.jasypt.encryption.pbe.StandardPBEStringEncryptor();
+        pbeStringEncryptor.setPassword(getJStockUUID());
+        return pbeStringEncryptor.decrypt(source);
     }
 
     public static String getJStockUUID() {
