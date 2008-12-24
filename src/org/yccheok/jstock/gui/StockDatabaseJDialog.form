@@ -43,7 +43,7 @@
           <Properties>
             <Property name="description" type="java.lang.String" value="If you cannot find your stock symbol in the official database downloaded from stock exchange server, you may add your stock manually into the user defined database."/>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/images/32x32/stock-find.png"/>
+              <Image iconType="3" name="/images/64x64/db_add.png"/>
             </Property>
             <Property name="title" type="java.lang.String" value="Stock Database"/>
             <Property name="toolTipText" type="java.lang.String" value=""/>
@@ -64,10 +64,8 @@
       </Constraints>
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
-        <Property name="columns" type="int" value="5"/>
-        <Property name="horizontalGap" type="int" value="5"/>
+        <Property name="columns" type="int" value="0"/>
         <Property name="rows" type="int" value="1"/>
-        <Property name="verticalGap" type="int" value="5"/>
       </Layout>
       <SubComponents>
         <Container class="javax.swing.JPanel" name="jPanel1">

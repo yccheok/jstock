@@ -108,14 +108,14 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         jPanel6.setLayout(new java.awt.BorderLayout(5, 5));
 
         jXHeader1.setDescription("If you cannot find your stock symbol in the official database downloaded from stock exchange server, you may add your stock manually into the user defined database.");
-        jXHeader1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/32x32/stock-find.png"))); // NOI18N
+        jXHeader1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/64x64/db_add.png"))); // NOI18N
         jXHeader1.setTitle("Stock Database");
         jXHeader1.setToolTipText("");
         jPanel6.add(jXHeader1, java.awt.BorderLayout.CENTER);
 
         getContentPane().add(jPanel6, java.awt.BorderLayout.NORTH);
 
-        jPanel4.setLayout(new java.awt.GridLayout(1, 5, 5, 5));
+        jPanel4.setLayout(new java.awt.GridLayout());
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Stock Exchange Server (Read only)"));
         jPanel1.setLayout(new java.awt.BorderLayout());
