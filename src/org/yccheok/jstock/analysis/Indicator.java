@@ -33,5 +33,7 @@ public interface Indicator {
     public Stock getStock();
     public void setStockHistoryServer(StockHistoryServer stockHistoryServer);
     public boolean isStockHistoryServerNeeded();
+    public Duration getNeededStockHistoryDuration();
+    public boolean isStockHistoryCalculationDone();
     public boolean isTriggered();
 }
