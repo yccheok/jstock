@@ -96,7 +96,7 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
         setLayout(new java.awt.BorderLayout(5, 5));
 
         jXHeader1.setDescription("You may select to scan only the stocks which are within your interest. You may select either Main board, Second board, Mesdaq...Or you may select either Plantation, Banking, Consumer industry...Of course, you may also select entire stock market.");
-        jXHeader1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/128x128/find.png"))); // NOI18N
+        jXHeader1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/64x64/find.png"))); // NOI18N
         jXHeader1.setTitle("Select Stock of Interest");
         add(jXHeader1, java.awt.BorderLayout.NORTH);
 
@@ -405,7 +405,7 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
                     .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jRadioButton4)
-                .addContainerGap(13, Short.MAX_VALUE))
+                .addContainerGap(19, Short.MAX_VALUE))
         );
 
         add(jPanel1, java.awt.BorderLayout.CENTER);
