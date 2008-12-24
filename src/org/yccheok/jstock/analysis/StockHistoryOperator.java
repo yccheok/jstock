@@ -215,7 +215,7 @@ public class StockHistoryOperator extends AbstractOperator {
     public void setEndDate(Date endDate) {
         if(startDate != null && this.endDate != null) {
             if(startDate.after(endDate)) {
-                log.error("endDate " + endDate + " should not after startDate " + startDate);
+                log.error("endDate " + endDate + " should not before startDate " + startDate);
                 // Should we notify some GUIs so that they can pop up warning to warn user?
                 return;
             }
