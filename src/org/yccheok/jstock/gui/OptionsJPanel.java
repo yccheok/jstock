@@ -79,7 +79,7 @@ public class OptionsJPanel extends javax.swing.JPanel implements JStockOptionsOb
     private void show(Component component) {        
         if(component == optionsPasswordJPanel) {
             final MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, this);
-            final String password = m.getJStockOptions().getIndicatorPassword();
+            final String password = Utils.decrypt(m.getJStockOptions().getIndicatorPassword());
             
             if(password.length() > 0) {
                 PasswordInputJDialog passwordInputJDialog = new PasswordInputJDialog(m, true);
@@ -114,16 +114,18 @@ public class OptionsJPanel extends javax.swing.JPanel implements JStockOptionsOb
         optionsColorJPanel = new OptionsColorJPanel();
         optionsBrokerJPanel = new OptionsBrokerJPanel();
         optionsSellAdvisorJPanel = new OptionsSellAdvisorJPanel();
+        optionsChatJPanel = new OptionsChatJPanel();
         optionsUpdateJPanel = new OptionsUpdateJPanel();
 
         // The size of OptionsJPanel, will be determined by the first added panel.
-        addButton("Broker", "/images/32x32/calc.png", optionsBrokerJPanel, jButtonBar1, buttonGroup1);
-        addButton("Color", "/images/32x32/colors.png", optionsColorJPanel, jButtonBar1, buttonGroup1);        
-        addButton("Alert", "/images/32x32/bell.png", optionsAlertJPanel, jButtonBar1, buttonGroup1);
-        addButton("Password", "/images/32x32/encrypted.png", optionsPasswordJPanel, jButtonBar1, buttonGroup1);
-        addButton("Network", "/images/32x32/connect_to_network.png", optionsNetworkJPanel, jButtonBar1, buttonGroup1);
-        addButton("Speed", "/images/32x32/clock.png", optionsSpeedJPanel, jButtonBar1, buttonGroup1);
         addButton("Advisor", "/images/32x32/jabber_protocol.png", optionsSellAdvisorJPanel, jButtonBar1, buttonGroup1);
+        addButton("Alert", "/images/32x32/bell.png", optionsAlertJPanel, jButtonBar1, buttonGroup1);
+        addButton("Broker", "/images/32x32/calc.png", optionsBrokerJPanel, jButtonBar1, buttonGroup1);
+        addButton("Chat", "/images/32x32/ksmiletris.png", optionsChatJPanel, jButtonBar1, buttonGroup1);
+        addButton("Color", "/images/32x32/colors.png", optionsColorJPanel, jButtonBar1, buttonGroup1);
+        addButton("Network", "/images/32x32/connect_to_network.png", optionsNetworkJPanel, jButtonBar1, buttonGroup1);
+        addButton("Password", "/images/32x32/encrypted.png", optionsPasswordJPanel, jButtonBar1, buttonGroup1);
+        addButton("Speed", "/images/32x32/clock.png", optionsSpeedJPanel, jButtonBar1, buttonGroup1);         
         addButton("Update", "/images/32x32/epiphany-download.png", optionsUpdateJPanel, jButtonBar1, buttonGroup1);
     }
 
@@ -135,6 +137,7 @@ public class OptionsJPanel extends javax.swing.JPanel implements JStockOptionsOb
         optionsPasswordJPanel.set(jStockOptions);
         optionsSpeedJPanel.set(jStockOptions);       
         optionsSellAdvisorJPanel.set(jStockOptions);
+        optionsChatJPanel.set(jStockOptions);
         optionsUpdateJPanel.set(jStockOptions);
     }
 
@@ -203,6 +206,15 @@ public class OptionsJPanel extends javax.swing.JPanel implements JStockOptionsOb
             return false;
         }
 
+        if(optionsChatJPanel.apply(jStockOptions) == false)
+        {
+            final JToggleButton button = map.get("Chat");
+
+            button.setSelected(true);
+            button.doClick();
+            return false;
+        }
+
         if(optionsUpdateJPanel.apply(jStockOptions) == false)
         {
             final JToggleButton button = map.get("Update");
@@ -223,6 +235,7 @@ public class OptionsJPanel extends javax.swing.JPanel implements JStockOptionsOb
     private OptionsColorJPanel optionsColorJPanel;
     private OptionsBrokerJPanel optionsBrokerJPanel;
     private OptionsSellAdvisorJPanel optionsSellAdvisorJPanel;
+    private OptionsChatJPanel optionsChatJPanel;
     private OptionsUpdateJPanel optionsUpdateJPanel;
 
     private java.util.Map<String, JToggleButton> map = new java.util.HashMap<String, JToggleButton>();
