@@ -716,7 +716,27 @@ public class MainFrame extends javax.swing.JFrame {
                 this.stockHistoryMonitor.attach(this.stockHistoryMonitorObserver);
                 log.info("Stock history monitor re-attach observer.");
             }             
-        }        
+        }
+        else if (pane.getSelectedComponent() == this.chatJPanel) {
+            if(realTimeStockMonitor != null) {
+
+                // Take note that we will not soft stop indicatorPanel itself, because
+                // we wish to get alert all the time, even we are not visually looking
+                // at that panel.
+                //
+                this.realTimeStockMonitor.softStop();
+                this.portfolioManagementJPanel.softStop();
+                this.realTimeStockMonitor.dettach(this.realTimeStockMonitorObserver);
+                log.info("Stop real time stock monitor and dettach observer.");
+                log.info("Stop portfolio monitor.");
+            }
+            if(stockHistoryMonitor != null) {
+                // No stop. May be time consuming.
+                // this.stockHistoryMonitor.stop();
+                this.stockHistoryMonitor.dettach(this.stockHistoryMonitorObserver);
+                log.info("Stop stock history monitor and dettach observer.");
+            }
+        }
     }//GEN-LAST:event_jTabbedPane1StateChanged
 
 
@@ -1066,7 +1086,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     private void createChatJPanel() {
-        org.yccheok.jstock.chat.ChatJPanel chatJPanel = new org.yccheok.jstock.chat.ChatJPanel();
+        chatJPanel = new org.yccheok.jstock.chat.ChatJPanel();
         jTabbedPane1.addTab("Market Chit Chat", chatJPanel);
     }
     
@@ -2679,7 +2699,8 @@ public class MainFrame extends javax.swing.JFrame {
     private IndicatorPanel indicatorPanel;
     private IndicatorScannerJPanel indicatorScannerJPanel;
     private PortfolioManagementJPanel portfolioManagementJPanel;
-    
+    private org.yccheok.jstock.chat.ChatJPanel chatJPanel;
+
     private org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
     private org.yccheok.jstock.engine.Observer<StockHistoryMonitor, StockHistoryMonitor.StockHistoryRunnable> stockHistoryMonitorObserver = this.getStockHistoryMonitorObserver();
 
