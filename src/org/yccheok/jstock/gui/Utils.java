@@ -332,6 +332,16 @@ public class Utils {
     public static String getJStockUUID() {
         return "fe78440e-e0fe-4efb-881d-264a01be483c";
     }
+
+    public static boolean isWindows() {
+        String windowsString = "Windows";
+        String osName = System.getProperty("os.name");
+
+        if (osName == null) return false;
+
+        return osName.regionMatches(true, 0, windowsString, 0, windowsString.length());
+    }
+    
 	// We will use this as directory name. Do not have space or special characters.
     private static final String APPLICATION_VERSION_STRING = "1.0.1";
     
