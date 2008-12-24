@@ -43,45 +43,53 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
     public StockHistoryMonitor(int nThreads, int databaseSize) {
         pool = Executors.newFixedThreadPool(nThreads);
         
-        stockCodesReadWriteLock = new java.util.concurrent.locks.ReentrantReadWriteLock();
-        stockCodesReaderLock = stockCodesReadWriteLock.readLock();
-        stockCodesWriterLock = stockCodesReadWriteLock.writeLock();        
+        readWriteLock = new java.util.concurrent.locks.ReentrantReadWriteLock();
+        readerLock = readWriteLock.readLock();
+        writerLock = readWriteLock.writeLock();
         
         this.databaseSize = databaseSize;
         
         this.stockHistorySerializer = null;
     }
     
-    public synchronized boolean addStockServerFactory(StockServerFactory factory) {
+    public boolean addStockServerFactory(StockServerFactory factory) {
         return factories.add(factory);
     }
     
-    public synchronized int getNumOfStockServerFactory() {
-        return factories.size();
-    }
-    
-    public synchronized boolean removeStockServerFactory(StockServerFactory factory) {
-        return factories.remove(factory);
-    }
-
-    public synchronized StockServerFactory getStockServerFactory(int index) {
-        return factories.get(index);
-    }
-    
-    public synchronized boolean addStockCode(final Code code) {
-        stockCodesWriterLock.lock();
+    public boolean addStockCode(final Code code) {
+        writerLock.lock();
         
         if(stockCodes.contains(code)) {
-            stockCodesWriterLock.unlock();
+            writerLock.unlock();
             return false;            
         }
         
         boolean status = stockCodes.add(code);
-        stockCodesWriterLock.unlock();
         
         pool.execute(new StockHistoryRunnable(code));
 
+        writerLock.unlock();
+
         return status;
+    }
+
+    /**
+     * @return the duration
+     */
+    public Duration getDuration() {
+        return duration;
+    }
+
+    /**
+     * @param duration the duration to set
+     */
+    public void setDuration(Duration duration) {
+        if (duration == null)
+        {
+            throw new IllegalArgumentException("duration cannot be null");
+        }
+
+        this.duration = duration;
     }
     
     public class StockHistoryRunnable implements Runnable {
@@ -94,15 +102,21 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
             final Thread currentThread = Thread.currentThread();
             
             for(StockServerFactory factory : factories) {
-                StockHistoryServer history = factory.getStockHistoryServer(this.code);
+                StockHistoryServer history = factory.getStockHistoryServer(this.code, duration);
 
                 if(history != null) {
-                    stockCodesReaderLock.lock();
+                    readerLock.lock();
                     
                     // Anyone try to stop us from publishing this history?
                     if(stockCodes.contains(code)) {
                         this.historyServer = history;
-                        
+
+                        // Concurrent access problem may happen here. Two or more threads may read
+                        // and modify histories. Although we can use reader/writer lock to prevent,
+                        // this will increase complexity. Any how, we allow error tolerance here.
+                        // The worst case is that, histories.size() >= StockHistoryMonitor.this.databaseSize.
+                        // But that doesn't really matter.
+                        //
                         if(histories.size() < StockHistoryMonitor.this.databaseSize) {                            
                             histories.put(code, history);
                         }
@@ -116,7 +130,7 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
                         }
                     }
                     
-                    stockCodesReaderLock.unlock();                                        
+                    readerLock.unlock();
                     
                     break;
                 }
@@ -126,11 +140,11 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
             }
             
             if(historyServer == null) {
-                stockCodesWriterLock.lock();
+                writerLock.lock();
         
                 stockCodes.remove(code);
         
-                stockCodesWriterLock.unlock();                
+                writerLock.unlock();
             }
             
             // We need to notify the listener. Whether the history is success or
@@ -138,10 +152,12 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
             StockHistoryMonitor.this.notify(StockHistoryMonitor.this, this);
         }
     
+        @Override
         public int hashCode() {
             return code.hashCode();
         }
 
+        @Override
         public boolean equals(Object o) {
             if(!(o instanceof StockHistoryRunnable))
                 return false;
@@ -167,67 +183,76 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
         private StockHistoryServer historyServer;
     }
     
-    public synchronized void clearStockCodes() {
-        final ThreadPoolExecutor threadPoolExecutor = ((ThreadPoolExecutor)pool);        
-        final int nThreads = threadPoolExecutor.getMaximumPoolSize();        
-        
-        stockCodesWriterLock.lock();
-        
+    public void clearStockCodes() {        
+        writerLock.lock();
+
+        final ThreadPoolExecutor threadPoolExecutor = ((ThreadPoolExecutor)pool);
+        final int nThreads = threadPoolExecutor.getMaximumPoolSize();
+
         stockCodes.clear();
         
-        histories.clear();
-        
-        stockCodesWriterLock.unlock();
+        histories.clear();                
 
         threadPoolExecutor.shutdownNow();  
         
         // pool is not valid any more. Discard it and re-create.
-        pool = Executors.newFixedThreadPool(nThreads);        
+        pool = Executors.newFixedThreadPool(nThreads);
+
+        writerLock.unlock();
     }
     
-    // synchronized, to avoid addStockCode and removeStockCode at the same time
-    public synchronized boolean removeStockCode(Code code) {
-        stockCodesWriterLock.lock();
+    public boolean removeStockCode(Code code) {
+        writerLock.lock();
         
         boolean status = stockCodes.remove(code);
         
-        histories.remove(code);
-        
-        stockCodesWriterLock.unlock();
+        histories.remove(code);                
 
         ((ThreadPoolExecutor)pool).remove(new StockHistoryRunnable(code));
-        
+
+        writerLock.unlock();
+
         return status;
     }
     
-    public synchronized StockHistoryServer getStockHistoryServer(Code code) {
+    public StockHistoryServer getStockHistoryServer(Code code) {
+        readerLock.lock();
+
         if(histories.containsKey(code))
-            return histories.get(code);
+        {
+            final StockHistoryServer stockHistoryServer = histories.get(code);
+
+            readerLock.unlock();
+
+            return stockHistoryServer;
+        }
         else {
             if(StockHistoryMonitor.this.stockHistorySerializer != null) {
                 StockHistoryServer stockHistoryServer = StockHistoryMonitor.this.stockHistorySerializer.load(code);
                 
                 /* So that next time we won't read from the disk. */
                 if(stockHistoryServer != null && (this.databaseSize > histories.size())) {
+                    // Concurrent access problem may happen here. Two or more threads may read
+                    // and modify histories. Although we can use reader/writer lock to prevent,
+                    // this will increase complexity. Any how, we allow error tolerance here.
+                    // The worst case is that, histories.size() >= StockHistoryMonitor.this.databaseSize.
+                    // But that doesn't really matter.
+                    //
                     histories.put(code, stockHistoryServer);
                 }
-                
+
+                readerLock.unlock();
+
                 return stockHistoryServer;
             }
             else {
                 log.error("Fail to retrieve stock history due to uninitialized serialization component.");                
             }
         }
+
+        readerLock.unlock();
         
         return null;
-    }
-
-    public synchronized int getNumOfStockHistoryServer() {
-        return histories.size();
-    }
-    
-    public synchronized Set<Code> getCodes() {
-        return histories.keySet();
     }
     
     public void setStockHistorySerializer(StockHistorySerializer stockHistorySerializer) {
@@ -236,7 +261,9 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
     
     // Never export out stockCodes information. They are being used internally.
     
-    public synchronized void stop() {
+    public void stop() {
+        writerLock.lock();
+
         final ThreadPoolExecutor threadPoolExecutor = ((ThreadPoolExecutor)pool);
         final int nThreads = threadPoolExecutor.getMaximumPoolSize();
         
@@ -248,6 +275,14 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
         // threadPoolExecutor.shutdownNow();
         threadPoolExecutor.shutdown();
         threadPoolExecutor.purge();
+
+        // pool is not valid any more. Discard it and re-create.
+        pool = Executors.newFixedThreadPool(nThreads);
+
+        writerLock.unlock();
+
+        // No unlock after awaitTermination, might cause deadlock.
+        
         // How to wait for infinity?
         try {
             threadPoolExecutor.awaitTermination(100, TimeUnit.DAYS);
@@ -255,9 +290,6 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
         catch(InterruptedException exp) {
             log.error("", exp);
         }
-
-        // pool is not valid any more. Discard it and re-create.
-        pool = Executors.newFixedThreadPool(nThreads);
     }
     
     private java.util.List<StockServerFactory> factories = new java.util.concurrent.CopyOnWriteArrayList<StockServerFactory>();
@@ -267,9 +299,9 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
     // We need to use concurrent map, due to the fact we need to export out the key set of this map.
     // We need to let the client have a safe way to iterate through the key set.
     private java.util.Map<Code, StockHistoryServer> histories = new java.util.concurrent.ConcurrentHashMap<Code, StockHistoryServer>();    
-    private final java.util.concurrent.locks.ReadWriteLock stockCodesReadWriteLock;
-    private final java.util.concurrent.locks.Lock stockCodesReaderLock;
-    private final java.util.concurrent.locks.Lock stockCodesWriterLock;
+    private final java.util.concurrent.locks.ReadWriteLock readWriteLock;
+    private final java.util.concurrent.locks.Lock readerLock;
+    private final java.util.concurrent.locks.Lock writerLock;
     
     private Executor pool;
     
@@ -277,6 +309,11 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
     private final int databaseSize;
     
     private StockHistorySerializer stockHistorySerializer;
-    
+
+    // This one is a mutable member. We just want to make our life easier. We
+    // want to avoid stopping and creating a new StockHistoryMonitor, just
+    // to make change on duration.
+    private volatile Duration duration = Duration.getTodayDurationByYears(10);
+
     private static final Log log = LogFactory.getLog(StockHistoryMonitor.class);     
 }
