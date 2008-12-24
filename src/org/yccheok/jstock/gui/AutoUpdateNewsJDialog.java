@@ -19,7 +19,6 @@
 package org.yccheok.jstock.gui;
 
 import java.awt.Desktop;
-import java.awt.Point;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
