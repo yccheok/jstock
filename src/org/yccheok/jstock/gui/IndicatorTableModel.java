@@ -63,10 +63,12 @@ public class IndicatorTableModel extends AbstractTableModelWithMemory {
         return indicatorInfo.get(columnIndex);        
     }
     
+    @Override
     public String getColumnName(int col) {
         return columnNames[col];
     }
 
+    @Override
     public Class getColumnClass(int c) {
         return columnClasses[c];
     }
