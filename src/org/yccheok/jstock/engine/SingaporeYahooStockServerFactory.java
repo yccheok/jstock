@@ -54,6 +54,17 @@ public class SingaporeYahooStockServerFactory implements StockServerFactory {
     }
 
     @Override
+    public StockHistoryServer getStockHistoryServer(Code code, org.yccheok.jstock.engine.Duration duration) {
+        try {
+            return new SingaporeYahooStockHistoryServer(country, code, duration);
+        }
+        catch(StockHistoryNotFoundException exp) {
+            log.error(null, exp);
+            return null;
+        }
+    }
+
+    @Override
     public MarketServer getMarketServer() {
         return marketServer;
     }
