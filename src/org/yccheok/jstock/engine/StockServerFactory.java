@@ -30,5 +30,6 @@ public interface StockServerFactory {
     
     public StockServer getStockServer();
     public StockHistoryServer getStockHistoryServer(Code code);
+    public StockHistoryServer getStockHistoryServer(Code code, org.yccheok.jstock.engine.Duration duration);
     public MarketServer getMarketServer();
 }
