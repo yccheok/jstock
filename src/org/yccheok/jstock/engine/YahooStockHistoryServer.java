@@ -27,7 +27,6 @@ import java.util.HashMap;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -40,11 +39,22 @@ public class YahooStockHistoryServer implements StockHistoryServer {
 
     public YahooStockHistoryServer(Country country, Code code) throws StockHistoryNotFoundException
     {
-        this.country = country;
-        this.code = code;
-        buildHistory(code);
+        this(country, code, DEFAULT_HISTORY_DURATION);
     }
-    
+
+    public YahooStockHistoryServer(Country country, Code code, Duration duration) throws StockHistoryNotFoundException
+    {
+        if (code == null || duration == null)
+        {
+            throw new IllegalArgumentException("code or duration cannot be null");
+        }
+
+        this.country = country;
+        this.code = Utils.toYahooFormat(code, country);
+        this.duration = duration;
+        buildHistory(this.code);
+    }
+
     private boolean parse(String responde)
     {
         historyDatabase.clear();
@@ -166,20 +176,13 @@ public class YahooStockHistoryServer implements StockHistoryServer {
         
         stringBuffer.append(symbol);
             
-        Calendar endCalendar = Calendar.getInstance();
-        Calendar startCalendar = Calendar.getInstance();
-        // Advance one more day. So that we don't miss out any data.
-        endCalendar.add(Calendar.DAY_OF_MONTH, 1);
-        startCalendar.add(Calendar.YEAR, -MAX_HISTORY_YEAR);
-        startCalendar.add(Calendar.DAY_OF_MONTH, -1);
-        
-        final int endMonth = endCalendar.get(Calendar.MONTH);
-        final int endDate = endCalendar.get(Calendar.DATE);
-        final int endYear = endCalendar.get(Calendar.YEAR);
-        final int startMonth = startCalendar.get(Calendar.MONTH);
-        final int startDate = startCalendar.get(Calendar.DATE);
-        final int startYear = startCalendar.get(Calendar.YEAR);
-        
+        final int endMonth = duration.getEndDate().getMonth();
+        final int endDate = duration.getEndDate().getDate();
+        final int endYear = duration.getEndDate().getYear();
+        final int startMonth = duration.getStartDate().getMonth();
+        final int startDate = duration.getStartDate().getDate();
+        final int startYear = duration.getStartDate().getYear();
+
         StringBuffer formatBuffer = new StringBuffer("&d=");
         formatBuffer.append(endMonth).append("&e=").append(endDate).append("&f=").append(endYear).append("&g=d&a=").append(startMonth).append("&b=").append(startDate).append("&c=").append(startYear).append("&ignore=.csv");
         
@@ -240,6 +243,10 @@ public class YahooStockHistoryServer implements StockHistoryServer {
         return 0;
     }
 
+    public Duration getDuration() {
+        return duration;
+    }
+
     // http://ichart.yahoo.com/table.csv?s=JAVA&d=10&e=14&f=2008&g=d&a=2&b=11&c=1987&ignore=.csv
     // d = end month (0-11)
     // e = end date
@@ -255,7 +262,7 @@ public class YahooStockHistoryServer implements StockHistoryServer {
     // 2008-11-05,4.83,4.90,4.62,4.62,9250800,4.62
         
     private static final int NUM_OF_RETRY = 2;
-    private static final int MAX_HISTORY_YEAR = 10;
+    private static final Duration DEFAULT_HISTORY_DURATION =  Duration.getTodayDurationByYears(10);
     private static final String YAHOO_ICHART_BASED_URL = "http://ichart.yahoo.com/table.csv?s=";
     
     private final java.util.Map<SimpleDate, Stock> historyDatabase = new HashMap<SimpleDate, Stock>();
@@ -263,6 +270,7 @@ public class YahooStockHistoryServer implements StockHistoryServer {
     
     private final Code code;
     private final Country country;
+    private final Duration duration;
     
     private static final Log log = LogFactory.getLog(YahooStockHistoryServer.class);        
 }
