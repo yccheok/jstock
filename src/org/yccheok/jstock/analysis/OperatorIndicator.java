@@ -44,12 +44,17 @@ public class OperatorIndicator implements Indicator {
         this("null");
     }
     
+    @Override
     public String toString() {
         return name;
     }
     
     public void add(Operator operator) {
         operators.add(operator);
+
+		// Whenever there is a new operator being added, we required to
+		// perform history calculation again.
+        stockHistoryCalculationDone = false;
     }
     
     public Operator get(int index) {
@@ -80,6 +85,7 @@ public class OperatorIndicator implements Indicator {
         }
     }
     
+    @Override
     public void setStockHistoryServer(StockHistoryServer stockHistoryServer)
     {
         for(Operator operator : operators) {
@@ -92,7 +98,10 @@ public class OperatorIndicator implements Indicator {
                 ((StockRelativeHistoryOperator)operator).calculate(stockHistoryServer);                
             }
         }
-        
+
+		// Indicate history calculation is done.
+        stockHistoryCalculationDone = true;
+
         sharesIssued = stockHistoryServer.getSharesIssued();
         marketCapital = stockHistoryServer.getMarketCapital();
     }
@@ -166,14 +175,56 @@ public class OperatorIndicator implements Indicator {
         
         return false;
     }
-    
+
+
+    @Override
+    public Duration getNeededStockHistoryDuration() {
+        if (isStockHistoryServerNeeded() == false)
+        {
+			// Returns 0 day duration, if there are no history information needed.
+            return Duration.getTodayDurationByDays(0);
+        }
+
+        Duration duration = Duration.getTodayDurationByDays(0);
+
+        for (Operator operator : operators) {
+            if (operator instanceof StockHistoryOperator) {
+                final StockHistoryOperator stockHistoryOperator = (StockHistoryOperator)operator;
+                Date start = stockHistoryOperator.getStartDate();
+                Date end = stockHistoryOperator.getEndDate();
+                duration = duration.getUnionDuration(new Duration(start, end));
+            }
+            else if (operator instanceof StockRelativeHistoryOperator) {
+                final StockRelativeHistoryOperator stockRelativeHistoryOperator = (StockRelativeHistoryOperator)operator;
+                int days = stockRelativeHistoryOperator.getDay();
+
+                // Sometimes, there are no stock information during holidays. We will double up
+                // the days, so that we really able to obtain n days data.
+                duration = duration.getUnionDuration(Duration.getTodayDurationByDays(days * 2));
+            }
+        }
+
+        return duration;
+    }
+
+    @Override
+    public boolean isStockHistoryCalculationDone() {
+        if (isStockHistoryServerNeeded() == false)
+        {
+            return true;
+        }
+
+        return stockHistoryCalculationDone;
+    }
+
     private List<Operator> operators = new ArrayList<Operator>();
     private String name;
     private Stock stock;
-    
+    private volatile boolean stockHistoryCalculationDone = false;
+
     // So that we are able to convert Stock to StockEx.
     private long sharesIssued = -1;
     private long marketCapital = -1;
     
-    private static final Log log = LogFactory.getLog(OperatorIndicator.class);    
+    private static final Log log = LogFactory.getLog(OperatorIndicator.class);
 }
