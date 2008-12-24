@@ -1012,8 +1012,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private RealTimeStockMonitor realTimeStockMonitor = null;
     private org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
 
-    private Executor zombiePool = Executors.newFixedThreadPool(4);
-    
+    private Executor zombiePool = Executors.newFixedThreadPool(NUM_OF_THREADS_ZOMBIE_POOL);
+
+    private static final int NUM_OF_THREADS_ZOMBIE_POOL = 4;
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private org.jdesktop.swingx.JXTreeTable buyTreeTable;
     private javax.swing.JButton jButton1;
