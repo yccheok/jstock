@@ -72,7 +72,8 @@ public class MainFrame extends javax.swing.JFrame {
         createStockIndicatorEditor();
         createIndicatorScannerJPanel();
         createPortfolioManagementJPanel();
-        
+        createChatJPanel();
+
         createIconsAndToolTipTextForJTabbedPane();
         
         this.createSystemTrayIcon();
@@ -91,6 +92,7 @@ public class MainFrame extends javax.swing.JFrame {
         this.initRealTimeStockMonitor();  
         this.initRealTimeStocks();
         this.initStockHistoryMonitor();
+        this.initOthersStockHistoryMonitor();
         this.initBrokingFirmLogos();
     }
     
@@ -723,9 +725,7 @@ public class MainFrame extends javax.swing.JFrame {
         OptionsJDialog optionsJDialog = new OptionsJDialog(this, true);
         optionsJDialog.setLocationRelativeTo(this);
         optionsJDialog.set(MainFrame.jStockOptions);
-        optionsJDialog.setVisible(true);
-		
-		initLatestNewsTask();
+        optionsJDialog.setVisible(true);		
     }//GEN-LAST:event_jMenuItem6ActionPerformed
 
     public static JStockOptions getJStockOptions() {
@@ -820,7 +820,11 @@ public class MainFrame extends javax.swing.JFrame {
         // user are allowed to minimize window even there is a modal JDialog box
         // We have no solution at current moment.
         //
-        // this.setVisible(false);
+
+        if (Utils.isWindows())
+        {
+            this.setVisible(false);
+        }
     }//GEN-LAST:event_formWindowIconified
 
     private void formWindowDeiconified(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowDeiconified
@@ -982,13 +986,21 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     public void setStatusBar(final boolean progressBar, final String mainMessage) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                statusBar.setProgressBar(progressBar);
-                statusBar.setMainMessage(mainMessage);
-            }
-        });
+        if (SwingUtilities.isEventDispatchThread())
+        {
+            statusBar.setProgressBar(progressBar);
+            statusBar.setMainMessage(mainMessage);
+        }
+        else
+        {
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    statusBar.setProgressBar(progressBar);
+                    statusBar.setMainMessage(mainMessage);
+                }
+            });
+        }
     }
     
     class ChangeLookAndFeelAction extends AbstractAction {
@@ -1052,6 +1064,11 @@ public class MainFrame extends javax.swing.JFrame {
         initjComboBox1EditorComponentKeyListerner();
         this.indicatorPanel.initjComboBox1EditorComponentKeyListerner();
     }
+
+    private void createChatJPanel() {
+        org.yccheok.jstock.chat.ChatJPanel chatJPanel = new org.yccheok.jstock.chat.ChatJPanel();
+        jTabbedPane1.addTab("Market Chit Chat", chatJPanel);
+    }
     
     private void createPortfolioManagementJPanel() {
         portfolioManagementJPanel = new PortfolioManagementJPanel();
@@ -1080,10 +1097,12 @@ public class MainFrame extends javax.swing.JFrame {
         this.jTabbedPane1.setIconAt(1, this.getImageIcon("/images/16x16/color_line.png"));
         this.jTabbedPane1.setIconAt(2, this.getImageIcon("/images/16x16/bell.png"));
         this.jTabbedPane1.setIconAt(3, this.getImageIcon("/images/16x16/calc.png"));
+        this.jTabbedPane1.setIconAt(4, this.getImageIcon("/images/16x16/smile.png"));
         this.jTabbedPane1.setToolTipTextAt(0, "Watch your favorite stock movement in real time");
         this.jTabbedPane1.setToolTipTextAt(1, "Customize your own stock indicator for alert purpose");
         this.jTabbedPane1.setToolTipTextAt(2, "Scan through the entire stock market so that you will be informed what to sell or buy");
         this.jTabbedPane1.setToolTipTextAt(3, "Manage your real time portfolio, which enable you to track buy and sell records");
+        this.jTabbedPane1.setToolTipTextAt(4, "Chit chat with other JStock users regarding the hottest stock market news");
     }
       
     public void createCountryMenuItem() {
@@ -1270,6 +1289,7 @@ public class MainFrame extends javax.swing.JFrame {
         initMarketThread();
         initMarketJPanel();
         initStockHistoryMonitor();
+        initOthersStockHistoryMonitor();
         // Initialize real time monitor must come before initialize real time
         // stocks.
         initRealTimeStockMonitor();
@@ -2052,7 +2072,23 @@ public class MainFrame extends javax.swing.JFrame {
                       
         return true;        
     }
-    
+
+    private void removeOldHistoryData(Country country) {
+        // We do not want "yesterday" history record. We will remove 1 day old files.
+        org.yccheok.jstock.gui.Utils.deleteAllOldFiles(new File(Utils.getUserDataDirectory() + country + File.separator + "history"), 1);
+    }
+
+    private void initOthersStockHistoryMonitor()
+    {
+        final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactory();
+
+        this.indicatorPanel.initStockHistoryMonitor(Collections.unmodifiableList(stockServerFactories));
+        this.indicatorScannerJPanel.initStockHistoryMonitor(Collections.unmodifiableList(stockServerFactories));
+    }
+
+	// Do not combine initOthersStockHistoryMonitor with initStockHistoryMonitor. We need to be able to update
+	// only MainFrame's history monitor, when we change the history duration option. Other's history monitors
+	// are not affected.
     private void initStockHistoryMonitor() {
         if(stockHistoryMonitor != null) {
             final StockHistoryMonitor oldStockHistoryMonitor = stockHistoryMonitor;
@@ -2067,7 +2103,7 @@ public class MainFrame extends javax.swing.JFrame {
             });
         }
         
-        this.stockHistoryMonitor = new StockHistoryMonitor(4);
+        this.stockHistoryMonitor = new StockHistoryMonitor(NUM_OF_THREADS_HISTORY_MONITOR);
         
         final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactory();
         
@@ -2076,24 +2112,22 @@ public class MainFrame extends javax.swing.JFrame {
         }
         
         stockHistoryMonitor.attach(this.stockHistoryMonitorObserver);
-        
-        // We do not want "yesterday" history record.
-        org.yccheok.jstock.gui.Utils.deleteDir(new File(Utils.getUserDataDirectory() + "history"));
-        
+
         final Country country = jStockOptions.getCountry();
+
+        removeOldHistoryData(country);
+
         stockHistorySerializer = new StockHistorySerializer(Utils.getUserDataDirectory() + country + File.separator + "history");
         
         stockHistoryMonitor.setStockHistorySerializer(stockHistorySerializer);
-    }
-    
-    public StockHistoryMonitor getStockHistoryMonitor() {
-        return stockHistoryMonitor;
+
+        stockHistoryMonitor.setDuration(Duration.getTodayDurationByYears(jStockOptions.getHistoryDuration()));
     }
     
     private void initUsernameAndPassword() {
     }
 
-    private void initLatestNewsTask()
+    public void initLatestNewsTask()
     {
         if(jStockOptions.isAutoUpdateNewsEnabled() == true)
         {
@@ -2163,6 +2197,7 @@ public class MainFrame extends javax.swing.JFrame {
         // real time monitor will call this function and, be locked at function
         // updateStockToTable.
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            @Override
            public void run() {
                 for(Stock stock : stocks) {
                     updateStockToTable(stock);
@@ -2300,13 +2335,20 @@ public class MainFrame extends javax.swing.JFrame {
     
     public void displayPopupMessage(final String caption, final String message) {
         if(trayIcon == null) return;
-        
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                trayIcon.displayMessage(caption, message, TrayIcon.MessageType.INFO);
-            }
-        });
+
+        if (SwingUtilities.isEventDispatchThread())
+        {
+            trayIcon.displayMessage(caption, message, TrayIcon.MessageType.INFO);
+        }
+        else
+        {
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    trayIcon.displayMessage(caption, message, TrayIcon.MessageType.INFO);
+                }
+            });
+        }
     }
     
     public StockHistorySerializer getStockHistorySerializer()
@@ -2323,7 +2365,34 @@ public class MainFrame extends javax.swing.JFrame {
         this.realTimeStockMonitor.setDelay(speed);
         indicatorScannerJPanel.updateScanningSpeed(speed);
     }
-    
+
+    public void updateHistoryDuration(Duration historyDuration) {
+        final Duration oldDuration = stockHistoryMonitor.getDuration();
+
+        if (oldDuration.isContains(historyDuration))
+        {
+            this.stockHistoryMonitor.setDuration(historyDuration);
+            return;
+        }
+
+        // The history files that we are going to read, their duration are
+        // too short compared to historyDuration. The easiest way to overcome
+        // this problem is to remove them all.
+        log.info("We are going to remove all history files, due to new duration " + historyDuration + " is not within old duration " + oldDuration);
+
+        Country[] countries = Country.values();
+        for (Country country : countries)
+        {
+            Utils.deleteDir(new File(Utils.getUserDataDirectory() + country + File.separator + "history"), false);
+        }
+
+        // Avoid from using old history monitor. History monitor contains their own memory data.
+        // Since their duration are no longer valid, the memory data are no longer valid too.
+        //
+        this.initStockHistoryMonitor();
+
+    }
+
     public void repaintTable() {
         Component c = jTabbedPane1.getSelectedComponent();
         
@@ -2614,11 +2683,13 @@ public class MainFrame extends javax.swing.JFrame {
     private org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
     private org.yccheok.jstock.engine.Observer<StockHistoryMonitor, StockHistoryMonitor.StockHistoryRunnable> stockHistoryMonitorObserver = this.getStockHistoryMonitorObserver();
 
-    private Executor zombiePool = Executors.newFixedThreadPool(4);
+    private Executor zombiePool = Executors.newFixedThreadPool(NUM_OF_THREADS_ZOMBIE_POOL);
     
     private MarketJPanel marketJPanel;
 
     private static final int NUM_OF_RETRY = 3;
+    private static final int NUM_OF_THREADS_HISTORY_MONITOR = 4;
+    private static final int NUM_OF_THREADS_ZOMBIE_POOL = 4;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
