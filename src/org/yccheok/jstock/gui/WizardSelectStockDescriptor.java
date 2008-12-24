@@ -52,7 +52,7 @@ public class WizardSelectStockDescriptor extends WizardPanelDescriptor implement
     }
     
     public Object getNextPanelDescriptor() {
-         return WizardDownloadHistoryProgressDescriptor.IDENTIFIER;
+         return FINISH;
     }
     
     public void aboutToDisplayPanel() {
@@ -61,9 +61,7 @@ public class WizardSelectStockDescriptor extends WizardPanelDescriptor implement
     
     @Override
     public void aboutToHidePanel() {
-        if(wizardSelectStockJPanel.buildSelectedCode() == false) {
-            log.error("Fail to build selected stock");
-        }
+		// Not sure why. When I click finish button, this function isn't being called.
     }
     
     public Object getBackPanelDescriptor() {
