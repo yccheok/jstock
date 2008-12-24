@@ -96,6 +96,7 @@ public class SimpleDate implements java.lang.Comparable<SimpleDate> {
         return date;
     }
     
+    @Override
     public int compareTo(SimpleDate simpleDate) {
         final int yearDiff = year - simpleDate.year;
         if(yearDiff != 0)
@@ -108,6 +109,7 @@ public class SimpleDate implements java.lang.Comparable<SimpleDate> {
         return date - simpleDate.date;
     }
     
+    @Override
     public String toString() {
         return SimpleDate.class.getName() + "[year=" + year + ",month=" + month + ",date=" + date + "]";
     }
