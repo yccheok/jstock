@@ -235,7 +235,6 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         }   
             
         try {
-// TODO add your handling code here:
             GoogleMail.Send(
                     jTextField2.getText(),
                     new String(jPasswordField1.getPassword()),
@@ -279,8 +278,8 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
     public void set(JStockOptions jStockOptions) {
         jCheckBox1.setSelected(jStockOptions.isPopupMessage());
         jCheckBox2.setSelected(jStockOptions.isSendEmail());
-        jTextField2.setText(jStockOptions.getEmail());
-        jPasswordField1.setText(jStockOptions.getEmailPassword());
+        jTextField2.setText(Utils.decrypt(jStockOptions.getEmail()));
+        jPasswordField1.setText(Utils.decrypt(jStockOptions.getEmailPassword()));
 
         if(jStockOptions.isSingleIndicatorAlert())
             jRadioButton1.setSelected(true);
@@ -307,8 +306,8 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         
         jStockOptions.setPopupMessage(jCheckBox1.isSelected());
         jStockOptions.setSendEmail(jCheckBox2.isSelected());
-        jStockOptions.setEmail(jTextField2.getText());
-        jStockOptions.setEmailPassword(new String(jPasswordField1.getPassword()));
+        jStockOptions.setEmail(Utils.encrypt(jTextField2.getText()));
+        jStockOptions.setEmailPassword(Utils.encrypt(new String(jPasswordField1.getPassword())));
         jStockOptions.setSingleIndicatorAlert(jRadioButton1.isSelected());
         
         return true;
