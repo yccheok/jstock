@@ -122,14 +122,14 @@ public class OptionsPasswordJPanel extends javax.swing.JPanel implements JStockO
         }
         else {
             jCheckBox1.setSelected(true);
-            jPasswordField1.setText(jStockOptions.getIndicatorPassword());
+            jPasswordField1.setText(Utils.decrypt(jStockOptions.getIndicatorPassword()));
         }
     }
 
     public boolean apply(JStockOptions jStockOptions) {
         if(jCheckBox1.isSelected()) {
             if(jPasswordField1.getPassword().length > 0) {
-                jStockOptions.setIndicatorPassword(new String(jPasswordField1.getPassword()));
+                jStockOptions.setIndicatorPassword(Utils.encrypt(new String(jPasswordField1.getPassword())));
                 return true;
             }
         }
