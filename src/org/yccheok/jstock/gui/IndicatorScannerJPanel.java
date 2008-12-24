@@ -115,7 +115,18 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
 // TODO add your handling code here:
-        final MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, IndicatorScannerJPanel.this);
+        if (this.startScanThread != null)
+        {
+            try {
+                this.startScanThread.join();
+            } catch (InterruptedException ex) {
+                log.error(null, ex);
+            }
+
+            this.startScanThread = null;
+        }
+
+        final MainFrame m = getMainFrame();
         
         if(m.getStockCodeAndSymbolDatabase() == null) {
             javax.swing.JOptionPane.showMessageDialog(this, "We haven't connected to stock server.", "Not Connected", javax.swing.JOptionPane.INFORMATION_MESSAGE);
@@ -126,20 +137,18 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         // the table.
         allowIndicatorShown = true;
         
-        if(operatorIndicators != null) {
+        if(operatorIndicators.size() > 0) {
             final int result = JOptionPane.showConfirmDialog(this, "You have previous built indicators, do you want to re-use them?", "Re-use Indicators", JOptionPane.YES_NO_OPTION);
             
             if(result == JOptionPane.YES_OPTION)
             {
-                realTimeStockMonitor.stop();
-                realTimeStockMonitor.clearStockCodes(); 
+                this.initRealTimeStockMonitor(m.getStockServerFactory());
+                this.initStockHistoryMonitor(m.getStockServerFactory());
+
                 removeAllIndicatorsFromTable();
                 alertRecords.clear();
-                
-                final Set<Code> codes = operatorIndicators.keySet();
-                for(Code code : codes) {
-                    realTimeStockMonitor.addStockCode(code);
-                }
+
+                submitOperatorIndicatorToMonitor();
 
                 jButton1.setEnabled(false);
                 jButton2.setEnabled(true);
@@ -155,33 +164,110 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         
         initWizardDialog();
         
-
         int ret = wizard.showModalDialog();
-        
+
         if(ret != Wizard.FINISH_RETURN_CODE)
             return;
-        
-        realTimeStockMonitor.stop();
-        realTimeStockMonitor.clearStockCodes();
-        removeAllIndicatorsFromTable();
-        alertRecords.clear();
-        
-        WizardModel wizardModel = wizard.getModel();
-        
-        WizardPanelDescriptor wizardPanelDescriptor = wizardModel.getPanelDescriptor(WizardDownloadHistoryProgressDescriptor.IDENTIFIER);
-        WizardDownloadHistoryProgressJPanel wizardDownloadHistoryProgressJPanel = (WizardDownloadHistoryProgressJPanel)wizardPanelDescriptor.getPanelComponent();
-        
-        operatorIndicators = wizardDownloadHistoryProgressJPanel.getOperatorIndicators();        
-        
-        final Set<Code> codes = operatorIndicators.keySet();
-        for(Code code : codes) {
-            realTimeStockMonitor.addStockCode(code);
-        }
-        
+
+        final WizardModel wizardModel = wizard.getModel();
+
+        this.startScanThread = getStartScanThread(wizardModel, m);
+        this.startScanThread.start();
+
         jButton1.setEnabled(false);
         jButton2.setEnabled(true);
+
+        m.setStatusBar(true, "Indicator scanner is scanning...");
     }//GEN-LAST:event_jButton1ActionPerformed
-    
+
+    // Time consuming method. It involves file I/O reading (getOperatorIndicator).
+    private void initOperatorIndicators(WizardModel wizardModel)
+    {
+        this.operatorIndicators.clear();
+
+        WizardPanelDescriptor wizardPanelDescriptor0 = wizardModel.getPanelDescriptor(WizardSelectStockDescriptor.IDENTIFIER);
+        WizardSelectStockJPanel wizardSelectStockJPanel = (WizardSelectStockJPanel)wizardPanelDescriptor0.getPanelComponent();
+        WizardPanelDescriptor wizardPanelDescriptor1 = wizardModel.getPanelDescriptor(WizardSelectIndicatorDescriptor.IDENTIFIER);
+        WizardSelectIndicatorJPanel wizardSelectIndicatorJPanel = (WizardSelectIndicatorJPanel)wizardPanelDescriptor1.getPanelComponent();
+
+        final MainFrame m = getMainFrame();
+        final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = m.getStockCodeAndSymbolDatabase();
+        final IndicatorProjectManager indicatorProjectManager = m.getIndicatorProjectManager();
+        java.util.List<String> projects = wizardSelectIndicatorJPanel.getSelectedProjects();
+        java.util.List<Code> codes = wizardSelectStockJPanel.getSelectedCodes();
+
+        for(final Code code : codes) {
+            final java.util.List<OperatorIndicator> result = new java.util.ArrayList<OperatorIndicator>();
+
+            operatorIndicators.put(code, result);
+
+            for(String project : projects) {
+                final OperatorIndicator operatorIndicator = indicatorProjectManager.getOperatorIndicator(project);
+
+                if(operatorIndicator != null) {
+                    final Stock stock = Utils.getEmptyStock(code, stockCodeAndSymbolDatabase.codeToSymbol(code));
+
+                    operatorIndicator.setStock(stock);
+
+                    result.add(operatorIndicator);
+                }
+            }   /* for(String project : projects) */
+        }   /* for(String code : codes) */
+    }
+
+    private void submitOperatorIndicatorToMonitor()
+    {
+        final Set<Code> codes = operatorIndicators.keySet();
+        Duration historyDuration = Duration.getTodayDurationByDays(0);
+
+        for(Code code : codes) {
+            final List<OperatorIndicator> operatorIndicatos = operatorIndicators.get(code);
+
+            for (OperatorIndicator operatorIndicator : operatorIndicatos)
+            {
+                historyDuration = historyDuration.getUnionDuration(operatorIndicator.getNeededStockHistoryDuration());
+            }
+
+            // Dirty way to speed up calculation.
+            // Currently, all codes are having same set of indicators,
+            // and duration is independent of code type.
+            break;
+        }
+
+        // Duration must be initialized, before codes being added.
+        this.stockHistoryMonitor.setDuration(historyDuration);
+
+        for(Code code : codes) {
+            final List<OperatorIndicator> operatorIndicatos = operatorIndicators.get(code);
+
+            boolean done = true;
+            for (OperatorIndicator operatorIndicator : operatorIndicatos)
+            {
+                if (operatorIndicator.isStockHistoryCalculationDone() == false)
+                {
+                    done = false;
+                    
+                    // Early break. We will let history monitor to perform pre-calculation.
+                    break;
+                }
+                else
+                {
+                    operatorIndicator.preCalculate();
+                }
+            }
+
+            if (done)
+            {
+                // Perform real time monitoring, for the code with history information.
+                realTimeStockMonitor.addStockCode(code);
+            }
+            else
+            {
+                this.stockHistoryMonitor.addStockCode(code);
+            }
+        }
+    }
+
     private JPopupMenu getMyTableColumnSelectionPopupMenu(final int mouseXLocation) {
         JPopupMenu popup = new JPopupMenu();
         TableModel tableModel = jTable1.getModel();
@@ -283,26 +369,33 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         header.addMouseMotionListener(tips);        
     }
     
+    @Override
     public void stateChanged(javax.swing.event.ChangeEvent evt) {
-        mainFrame = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, IndicatorScannerJPanel.this);
     }    
     
     public void clear()
     {
-        realTimeStockMonitor.stop();
-        realTimeStockMonitor.clearStockCodes(); 
-        
+        final MainFrame m = getMainFrame();
+        this.initRealTimeStockMonitor(m.getStockServerFactory());
+        this.initStockHistoryMonitor(m.getStockServerFactory());
+
+        this.operatorIndicators.clear();
+
         // Ask help from dirty flag, so that background thread won't have
         // chance to show indicators on the table.
         allowIndicatorShown = false;
         
         removeAllIndicatorsFromTable();
+
+        m.setStatusBar(false, "Connected");
     }
     
     public void stop()
     {
-        realTimeStockMonitor.stop();
-        
+        final MainFrame m = getMainFrame();
+        this.initRealTimeStockMonitor(m.getStockServerFactory());
+        this.initStockHistoryMonitor(m.getStockServerFactory());
+
         final ExecutorService oldSystemTrayAlertPool = systemTrayAlertPool;
         final ExecutorService oldEmailAlertPool = emailAlertPool;
         
@@ -338,16 +431,19 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                 jButton2.setEnabled(false);            
             }
             
-        });        
+        });
+
+        m.setStatusBar(false, "Connected");
     }
     
     public void initWizardDialog() {
-        final MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, this);
+        final MainFrame m = getMainFrame();
         
         wizard = new Wizard(m);
 
         wizard.getDialog().setTitle("Indicator Scanning Wizard");
-
+        wizard.getDialog().setResizable(false);
+        
         WizardPanelDescriptor wizardSelectIndicatorDescriptor = new WizardSelectIndicatorDescriptor();
         wizard.registerWizardPanel(WizardSelectIndicatorDescriptor.IDENTIFIER, wizardSelectIndicatorDescriptor);
         
@@ -355,18 +451,6 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         // stage.
         WizardPanelDescriptor wizardSelectStockDescriptor = new WizardSelectStockDescriptor(m.getStockCodeAndSymbolDatabase());
         wizard.registerWizardPanel(WizardSelectStockDescriptor.IDENTIFIER, wizardSelectStockDescriptor);
-
-        WizardPanelDescriptor wizardSelectHistoryDescriptor = new WizardSelectHistoryDescriptor();
-        wizard.registerWizardPanel(WizardSelectHistoryDescriptor.IDENTIFIER, wizardSelectHistoryDescriptor);
-
-        WizardPanelDescriptor wizardVerifyDatabaseDescriptor = new WizardVerifyDatabaseDescriptor();
-        wizard.registerWizardPanel(WizardVerifyDatabaseDescriptor.IDENTIFIER, wizardVerifyDatabaseDescriptor);
-        
-        WizardPanelDescriptor wizardDownloadHistoryProgressDescriptor = new WizardDownloadHistoryProgressDescriptor();
-        wizard.registerWizardPanel(WizardDownloadHistoryProgressDescriptor.IDENTIFIER, wizardDownloadHistoryProgressDescriptor);
-
-        WizardPanelDescriptor wizardIndicatorConstructionDescriptor = new WizardIndicatorConstructionDescriptor();
-        wizard.registerWizardPanel(WizardIndicatorConstructionDescriptor.IDENTIFIER, wizardIndicatorConstructionDescriptor);
         
         wizard.setCurrentPanel(WizardSelectIndicatorDescriptor.IDENTIFIER); 
  
@@ -377,7 +461,83 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     public void updateScanningSpeed(int speed) {
         this.realTimeStockMonitor.setDelay(speed);
     }
-    
+
+    public void initStockHistoryMonitor(java.util.List<StockServerFactory> stockServerFactories) {
+        if(stockHistoryMonitor != null) {
+            final StockHistoryMonitor oldStockHistoryMonitor = stockHistoryMonitor;
+            zombiePool.execute(new Runnable() {
+                public void run() {
+                    log.info("Prepare to shut down " + oldStockHistoryMonitor + "...");
+                    oldStockHistoryMonitor.clearStockCodes();
+                    oldStockHistoryMonitor.dettachAll();
+                    oldStockHistoryMonitor.stop();
+                    log.info("Shut down " + oldStockHistoryMonitor + " peacefully.");
+                }
+            });
+        }
+
+        this.stockHistoryMonitor = new StockHistoryMonitor(NUM_OF_THREADS_HISTORY_MONITOR);
+
+        for(StockServerFactory factory : stockServerFactories) {
+            stockHistoryMonitor.addStockServerFactory(factory);
+        }
+
+        stockHistoryMonitor.attach(stockHistoryMonitorObserver);
+
+        // No StockHistorySerializer at this moment, either read or write. This is because
+        // (1) Read - If the duration of the history selected in Real-Time panel is shorter than
+        // indicators's, we will be in trouble.
+        // (2) Write - If the duration of the indicator's is shorter than Real-Time panel, we will
+        // be in trouble again.
+        //
+        // Currently, we have no way but disable it.
+    }
+
+    private void update(StockHistoryMonitor monitor, StockHistoryMonitor.StockHistoryRunnable runnable)
+    {
+        final MainFrame m = this.getMainFrame();
+        final Code code = runnable.getCode();
+
+        List<OperatorIndicator> indicators = this.operatorIndicators.get(code);
+        if (indicators == null)
+        {
+            return;
+        }
+
+        final StockHistoryServer stockHistoryServer = runnable.getStockHistoryServer();
+        if (stockHistoryServer == null)
+        {
+            return;
+        }
+
+        Symbol symbol = m.getStockCodeAndSymbolDatabase().codeToSymbol(code);
+
+        m.setStatusBar(true, "Indicator scanner found " + symbol + " history. Perform calculation...");
+
+        for (OperatorIndicator operatorIndicator : indicators)
+        {
+            if (operatorIndicator.isStockHistoryServerNeeded())
+            {
+                operatorIndicator.setStockHistoryServer(stockHistoryServer);
+            }
+
+            operatorIndicator.preCalculate();
+        }
+
+        // Perform real time monitoring, for the code with history information.
+        realTimeStockMonitor.addStockCode(code);
+    }
+
+    private org.yccheok.jstock.engine.Observer<StockHistoryMonitor, StockHistoryMonitor.StockHistoryRunnable> getStockHistoryMonitorObserver() {
+        return new org.yccheok.jstock.engine.Observer<StockHistoryMonitor, StockHistoryMonitor.StockHistoryRunnable>() {
+            @Override
+            public void update(StockHistoryMonitor monitor, StockHistoryMonitor.StockHistoryRunnable runnable)
+            {
+                IndicatorScannerJPanel.this.update(monitor, runnable);
+            }
+        };
+    }
+
     public void initRealTimeStockMonitor(java.util.List<StockServerFactory> stockServerFactories) {
         if(realTimeStockMonitor != null) {
             final RealTimeStockMonitor oldRealTimeStockMonitor = realTimeStockMonitor;
@@ -413,6 +573,13 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     }
     
     public void update(RealTimeStockMonitor monitor, final java.util.List<Stock> stocks) {
+        final MainFrame m = this.getMainFrame();
+
+        if (stocks.size() > 0)
+        {
+            m.setStatusBar(true, "Indicator scanner is scanning " + stocks.get(0).getSymbol() +"...");
+        }
+
         for(Stock stock : stocks) {
             final java.util.List<OperatorIndicator> indicators = operatorIndicators.get(stock.getCode());
             
@@ -529,27 +696,28 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         JPopupMenu popup = new JPopupMenu();
         TableModel tableModel = jTable1.getModel();            
         
-        final MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, IndicatorScannerJPanel.this);
+        final MainFrame m = getMainFrame();
         
         javax.swing.JMenuItem menuItem = new JMenuItem("History...", this.getImageIcon("/images/16x16/strokedocker.png"));
         
-	menuItem.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent evt) {
-                    int rows[] = jTable1.getSelectedRows();
-                    final IndicatorTableModel tableModel = (IndicatorTableModel)jTable1.getModel();
-                    
-                    for(int row : rows) {                
-                        final int modelIndex = jTable1.convertRowIndexToModel(row);
-                        final Indicator indicator = tableModel.getIndicator(modelIndex);
-                        if(indicator != null)
-                            m.displayHistoryChart(indicator.getStock());
-                    } 
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                int rows[] = jTable1.getSelectedRows();
+                final IndicatorTableModel tableModel = (IndicatorTableModel)jTable1.getModel();
+
+                for(int row : rows) {
+                    final int modelIndex = jTable1.convertRowIndexToModel(row);
+                    final Indicator indicator = tableModel.getIndicator(modelIndex);
+                    if(indicator != null)
+                        m.displayHistoryChart(indicator.getStock());
                 }
-	});
-                
-	popup.add(menuItem);
-            
-	popup.add(menuItem);
+            }
+        });
+
+        popup.add(menuItem);
+
+        popup.add(menuItem);
         
         return popup;
     }
@@ -561,8 +729,10 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         return indicator.toString() + indicator.getStock().getCode();
     }
     
-    private void alert(final Indicator indicator) {        
-        final JStockOptions jStockOptions = mainFrame.getJStockOptions();
+    private void alert(final Indicator indicator) {
+        final MainFrame m = getMainFrame();
+
+        final JStockOptions jStockOptions = MainFrame.getJStockOptions();
         
         synchronized(alertRecords) {
             if(jStockOptions.isSingleIndicatorAlert() == true) {
@@ -590,7 +760,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                             "last=" + stock.getLastPrice() + " high=" + stock.getHighPrice() + " " +
                             "low=" + stock.getLowPrice() + ") hits " + indicator.toString();
                     
-                    mainFrame.displayPopupMessage(stock.getSymbol().toString(), message);
+                    m.displayPopupMessage(stock.getSymbol().toString(), message);
                     
                     try {
                         Thread.sleep(jStockOptions.getAlertSpeed() * 1000);
@@ -619,8 +789,9 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                     
                     final String message = title + "\nbrought to you by JStock";
                     
-                    try {                        
-                        GoogleMail.Send(jStockOptions.getEmail(), jStockOptions.getEmailPassword(), jStockOptions.getEmail() + "@gmail.com", message, message);
+                    try {
+                        String email = Utils.decrypt(jStockOptions.getEmail());
+                        GoogleMail.Send(email, Utils.decrypt(jStockOptions.getEmailPassword()), email + "@gmail.com", message, message);
                     } catch (AddressException exp) {
                         log.error("", exp);
                     } catch (MessagingException exp) {
@@ -637,7 +808,17 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             }            
         }
     }
-    
+
+    private MainFrame getMainFrame()
+    {
+        if (mainFrame == null)
+        {
+            mainFrame = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, IndicatorScannerJPanel.this);
+        }
+
+        return mainFrame;
+    }
+
     public void repaintTable() {
         jTable1.repaint();
     }
@@ -645,27 +826,62 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     public void clearTableSelection() {
         jTable1.getSelectionModel().clearSelection();
     }
-    
+
+    private Thread getStartScanThread(final WizardModel wizardModel, final MainFrame mainFrame)
+    {
+        return new Thread(new Runnable() {
+            @Override
+            public void run() {
+                WizardPanelDescriptor wizardPanelDescriptor0 = wizardModel.getPanelDescriptor(WizardSelectStockDescriptor.IDENTIFIER);
+                WizardSelectStockJPanel wizardSelectStockJPanel = (WizardSelectStockJPanel)wizardPanelDescriptor0.getPanelComponent();
+
+                if(wizardSelectStockJPanel.buildSelectedCode() == false) {
+                    // Unlikely.
+                    log.error("Fail to build selected stock");
+                    return;
+                }
+
+                initRealTimeStockMonitor(mainFrame.getStockServerFactory());
+                initStockHistoryMonitor(mainFrame.getStockServerFactory());
+
+                removeAllIndicatorsFromTable();
+                alertRecords.clear();
+
+                initOperatorIndicators(wizardModel);
+                submitOperatorIndicatorToMonitor();
+            }
+        });
+    }
+
     private Wizard wizard;
     private RealTimeStockMonitor realTimeStockMonitor;
     private org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
-    private java.util.Map<Code, java.util.List<OperatorIndicator>> operatorIndicators;
+    private java.util.Map<Code, java.util.List<OperatorIndicator>> operatorIndicators = new java.util.concurrent.ConcurrentHashMap<Code, java.util.List<OperatorIndicator>>();
 
     private java.util.List<String> alertRecords = new java.util.ArrayList<String>();
     private ExecutorService emailAlertPool = Executors.newFixedThreadPool(1);
     private ExecutorService systemTrayAlertPool = Executors.newFixedThreadPool(1);
-    private MainFrame mainFrame;
+    private MainFrame mainFrame = null;
     
-    private Executor zombiePool = Executors.newFixedThreadPool(4);
-    
+    private Executor zombiePool = Executors.newFixedThreadPool(NUM_OF_THREADS_ZOMBIE_POOL);
+
+    private org.yccheok.jstock.engine.Observer<StockHistoryMonitor, StockHistoryMonitor.StockHistoryRunnable> stockHistoryMonitorObserver = this.getStockHistoryMonitorObserver();
+
+    private StockHistoryMonitor stockHistoryMonitor = null;
+
     // Dirty flag to be used with clear method and start button method.
     // Ensure we have an instant way to prevent background thread from showing
     // indicators on the table, after we call clear method. 
 	// This is a dirty way, but it just work :)
     private volatile Boolean allowIndicatorShown = true;
-    
+
+    private Thread startScanThread = null;
+
     private static final Log log = LogFactory.getLog(IndicatorScannerJPanel.class);
-    
+
+    private static final int NUM_OF_THREADS_ZOMBIE_POOL = 4;
+    private static final int NUM_OF_THREADS_HISTORY_MONITOR = 4;
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
