@@ -70,7 +70,12 @@ public class CIMBStockServerFactory implements StockServerFactory {
     public String getPassword() {
         return password;
     }
-    
+
+    @Override
+    public StockHistoryServer getStockHistoryServer(Code code, org.yccheok.jstock.engine.Duration duration) {
+        return getStockHistoryServer(code);
+    }
+
     private final String username;
     private final String password;
     private final StockServer stockServer;
