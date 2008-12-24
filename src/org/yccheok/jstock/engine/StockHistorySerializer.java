@@ -38,13 +38,23 @@ public class StockHistorySerializer {
     
     /** Creates a new instance of StockHistorySerializer */
     public StockHistorySerializer(String directory) {
-        org.yccheok.jstock.gui.Utils.createCompleteDirectoryHierarchyIfDoesNotExist(directory);
-        
-        this.directory = directory;
+        this(directory, true);
     }
-    
+
+    public StockHistorySerializer(String directory, boolean writeEnable)
+    {
+        org.yccheok.jstock.gui.Utils.createCompleteDirectoryHierarchyIfDoesNotExist(directory);
+
+        this.directory = directory;
+
+        this.writeEnable = writeEnable;
+    }
+
     public boolean save(StockHistoryServer stockHistoryServer)
     {
+        if (!writeEnable)
+            return false;
+
         Calendar calendar = null;
         
         if((calendar = stockHistoryServer.getCalendar(0)) == null)
@@ -103,6 +113,7 @@ public class StockHistorySerializer {
         return stockHistoryServer;
     }
     
-    private final String directory;    
+    private final String directory;
+    private final boolean writeEnable;
     private static final Log log = LogFactory.getLog(StockHistorySerializer.class);       
 }
