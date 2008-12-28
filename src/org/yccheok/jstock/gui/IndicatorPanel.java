@@ -1058,7 +1058,7 @@ public class IndicatorPanel extends JPanel implements ChangeListener {
     public void initStockHistoryMonitor(java.util.List<StockServerFactory> stockServerFactories) {
         if(stockHistoryMonitor != null) {
             final StockHistoryMonitor oldStockHistoryMonitor = stockHistoryMonitor;
-            zombiePool.execute(new Runnable() {
+            Utils.getZoombiePool().execute(new Runnable() {
                 public void run() {
                     log.info("Prepare to shut down " + oldStockHistoryMonitor + "...");
                     oldStockHistoryMonitor.clearStockCodes();
@@ -1084,10 +1084,8 @@ public class IndicatorPanel extends JPanel implements ChangeListener {
         // Currently, we have no way but disable it.
     }
 
-    private Executor zombiePool = Executors.newFixedThreadPool(NUM_OF_THREADS_ZOMBIE_POOL);
     private StockHistoryMonitor stockHistoryMonitor = null;
 
-    private static final int NUM_OF_THREADS_ZOMBIE_POOL = 1;
     private static final int NUM_OF_THREADS_HISTORY_MONITOR = 1;
 
     private IndicatorProjectManager indicatorProjectManager;
