@@ -392,6 +392,17 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     
     public void stop()
     {
+        if (this.startScanThread != null)
+        {
+            try {
+                this.startScanThread.join();
+            } catch (InterruptedException ex) {
+                log.error(null, ex);
+            }
+
+            this.startScanThread = null;
+        }
+        
         final MainFrame m = getMainFrame();
         this.initRealTimeStockMonitor(m.getStockServerFactory());
         this.initStockHistoryMonitor(m.getStockServerFactory());
@@ -399,7 +410,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         final ExecutorService oldSystemTrayAlertPool = systemTrayAlertPool;
         final ExecutorService oldEmailAlertPool = emailAlertPool;
         
-        zombiePool.execute(new Runnable() {
+        Utils.getZoombiePool().execute(new Runnable() {
             @Override
             public void run() {
                 log.info("Prepare to shut down " + oldSystemTrayAlertPool + "...");
@@ -465,7 +476,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     public void initStockHistoryMonitor(java.util.List<StockServerFactory> stockServerFactories) {
         if(stockHistoryMonitor != null) {
             final StockHistoryMonitor oldStockHistoryMonitor = stockHistoryMonitor;
-            zombiePool.execute(new Runnable() {
+            Utils.getZoombiePool().execute(new Runnable() {
                 public void run() {
                     log.info("Prepare to shut down " + oldStockHistoryMonitor + "...");
                     oldStockHistoryMonitor.clearStockCodes();
@@ -541,7 +552,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     public void initRealTimeStockMonitor(java.util.List<StockServerFactory> stockServerFactories) {
         if(realTimeStockMonitor != null) {
             final RealTimeStockMonitor oldRealTimeStockMonitor = realTimeStockMonitor;
-            zombiePool.execute(new Runnable() {
+            Utils.getZoombiePool().execute(new Runnable() {
                 public void run() {
                     log.info("Prepare to shut down " + oldRealTimeStockMonitor + "...");
                     oldRealTimeStockMonitor.clearStockCodes();
@@ -863,8 +874,6 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     private ExecutorService systemTrayAlertPool = Executors.newFixedThreadPool(1);
     private MainFrame mainFrame = null;
     
-    private Executor zombiePool = Executors.newFixedThreadPool(NUM_OF_THREADS_ZOMBIE_POOL);
-
     private org.yccheok.jstock.engine.Observer<StockHistoryMonitor, StockHistoryMonitor.StockHistoryRunnable> stockHistoryMonitorObserver = this.getStockHistoryMonitorObserver();
 
     private StockHistoryMonitor stockHistoryMonitor = null;
@@ -879,7 +888,6 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
 
     private static final Log log = LogFactory.getLog(IndicatorScannerJPanel.class);
 
-    private static final int NUM_OF_THREADS_ZOMBIE_POOL = 4;
     private static final int NUM_OF_THREADS_HISTORY_MONITOR = 4;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
