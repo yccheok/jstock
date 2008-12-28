@@ -37,6 +37,8 @@ import java.io.File;
 import java.io.IOException;
 import org.yccheok.jstock.engine.*;
 import java.util.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import javax.swing.ImageIcon;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -309,6 +311,9 @@ public class Utils {
         return "http://jstock.sourceforge.net/news/" + APPLICATION_VERSION_STRING + "/" + newsVersion + ".html";
     }
 
+    // If you try to call this method at different time with same source, the
+    // resultant encrypted string will be different. The best part is, it is still
+    // able to be decrypted back to the original source.
     public static String encrypt(String source)
     {
         if (source.length() <= 0)
@@ -341,9 +346,18 @@ public class Utils {
 
         return osName.regionMatches(true, 0, windowsString, 0, windowsString.length());
     }
-    
+
+    public static Executor getZoombiePool()
+    {
+        return zombiePool;
+    }
+
 	// We will use this as directory name. Do not have space or special characters.
     private static final String APPLICATION_VERSION_STRING = "1.0.1";
-    
+
+    static Executor zombiePool = Executors.newFixedThreadPool(Utils.NUM_OF_THREADS_ZOMBIE_POOL);
+
+    private static final int NUM_OF_THREADS_ZOMBIE_POOL = 4;
+
     private static final Log log = LogFactory.getLog(Utils.class);
 }
