@@ -96,6 +96,7 @@ public class StockJDialog extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Select Stock");
+        setResizable(false);
         getContentPane().setLayout(new java.awt.BorderLayout(5, 5));
 
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/apply.png"))); // NOI18N
