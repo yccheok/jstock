@@ -98,6 +98,7 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
             this.historyServer = null;
         }
         
+        @Override
         public void run() {
             final Thread currentThread = Thread.currentThread();
             
