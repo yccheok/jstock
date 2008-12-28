@@ -118,6 +118,8 @@ public class OptionsChatJPanel extends javax.swing.JPanel implements JStockOptio
 
     @Override
     public boolean apply(JStockOptions jStockOptions) {
+        final MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, this);
+
         if (this.jCheckBox1.isSelected())
         {
             if (this.jTextField1.getText().length() <= 0) {
@@ -126,13 +128,31 @@ public class OptionsChatJPanel extends javax.swing.JPanel implements JStockOptio
                 return false;
             }
 
+            String oldUsername = jStockOptions.getChatUsername();
+            boolean oldFlag = jStockOptions.isChatEnabled();
+
             jStockOptions.setChatEnabled(true);
             jStockOptions.setChatUsername(this.jTextField1.getText());
+
+            if ((oldFlag != jStockOptions.isChatEnabled()) || (oldUsername.equals(jStockOptions.getChatUsername()) == false))
+            {
+                if (m != null)
+                {
+                    // Only restart chatting service, if the username is different.
+                    m.stopChatServiceManager();
+                    m.startChatServiceManager();
+                }
+            }
         }
         else
         {
             jStockOptions.setChatEnabled(false);
+            if(m != null) {
+                m.stopChatServiceManager();
+            }
         }
+
+        m.updateChatJPanelUIAccordingToOptions();
 
         return true;
     }
