@@ -33,9 +33,25 @@ public class SingaporeYahooMarketServer implements MarketServer {
     public SingaporeYahooMarketServer(Country country) {
         if(country != Country.Malaysia && country != Country.Singapore) {
             throw new java.lang.IllegalArgumentException("Only Malaysia and Singapore market are supported");
+        }        
+        
+        // Hack on Malaysia Market! The format among Yahoo and CIMB are difference.
+		if (country == Country.Malaysia)
+		{
+            this.indicies = new ArrayList<Index>();
+            
+        	List<Index> tmp = Utils.getStockIndices(country);        	
+        	for (Index index : tmp) {
+            	if (index.getSymbol().toString().startsWith("^"))
+            	{
+                	indicies.add(index);
+            	}
+        	}
+		}
+        else
+        {
+            this.indicies = Utils.getStockIndices(country);
         }
-
-        this.indicies = Utils.getStockIndices(country);
 
         if(this.indicies.size() == 0) {
             throw new java.lang.IllegalArgumentException("Country=" + country);
