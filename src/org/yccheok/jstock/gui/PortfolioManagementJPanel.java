@@ -914,7 +914,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     public void initRealTimeStockMonitor(java.util.List<StockServerFactory> stockServerFactories) {
         if(realTimeStockMonitor != null) {
             final RealTimeStockMonitor oldRealTimeStockMonitor = realTimeStockMonitor;
-            zombiePool.execute(new Runnable() {
+            Utils.getZoombiePool().execute(new Runnable() {
                 public void run() {
                     log.info("Prepare to shut down " + oldRealTimeStockMonitor + "...");
                     oldRealTimeStockMonitor.clearStockCodes();
@@ -1011,10 +1011,6 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     
     private RealTimeStockMonitor realTimeStockMonitor = null;
     private org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
-
-    private Executor zombiePool = Executors.newFixedThreadPool(NUM_OF_THREADS_ZOMBIE_POOL);
-
-    private static final int NUM_OF_THREADS_ZOMBIE_POOL = 4;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private org.jdesktop.swingx.JXTreeTable buyTreeTable;
