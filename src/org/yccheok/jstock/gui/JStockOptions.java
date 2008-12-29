@@ -78,6 +78,8 @@ public class JStockOptions {
 
 		this.setChatEnabled(false);
 		this.setChatUsername("");
+        this.setChatFlashNotificationEnabled(true);
+        this.setChatSoundNotificationEnabled(true);
     }
     
     private boolean singleIndicatorAlert;
@@ -117,6 +119,8 @@ public class JStockOptions {
 
     private boolean isChatEnabled = false;
     private String chatUsername = "";
+    private boolean isChatSoundNotificationEnabled = true;
+    private boolean isChatFlashNotificationEnabled = true;
 
     public boolean isAutoBrokerFeeCalculationEnabled() {
         return this.isAutoBrokerFeeCalculationEnabled;
@@ -352,6 +356,14 @@ public class JStockOptions {
     public boolean isChatEnabled() {
         return this.isChatEnabled;
     }
+
+    public boolean isChatSoundNotificationEnabled() {
+        return this.isChatSoundNotificationEnabled;
+    }
+
+    public boolean isChatFlashNotificationEnabled() {
+        return this.isChatFlashNotificationEnabled;
+    }
     
     public void setAutoUpdateNewsEnabled(boolean isAutoUpdateNewsEnabled)
     {
@@ -360,6 +372,14 @@ public class JStockOptions {
 
     public void setChatEnabled(boolean isChatEnabled) {
         this.isChatEnabled = isChatEnabled;
+    }
+
+    public void setChatFlashNotificationEnabled(boolean isChatFlashNotificationEnabled) {
+        this.isChatFlashNotificationEnabled = isChatFlashNotificationEnabled;
+    }
+
+    public void setChatSoundNotificationEnabled(boolean isChatSoundNotificationEnabled) {
+        this.isChatSoundNotificationEnabled = isChatSoundNotificationEnabled;
     }
 
     public void setNewsVersion(long newsVersion)
