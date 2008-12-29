@@ -770,14 +770,16 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                     final String message = stock.getSymbol() + " (" + stock.getCode() + " " +
                             "last=" + stock.getLastPrice() + " high=" + stock.getHighPrice() + " " +
                             "low=" + stock.getLowPrice() + ") hits " + indicator.toString();
-                    
-                    m.displayPopupMessage(stock.getSymbol().toString(), message);
-                    
-                    try {
-                        Thread.sleep(jStockOptions.getAlertSpeed() * 1000);
-                    }
-                    catch(InterruptedException exp) {
-                        log.error("", exp);
+
+                    if (jStockOptions.isPopupMessage()) {
+                        m.displayPopupMessage(stock.getSymbol().toString(), message);
+
+                        try {
+                            Thread.sleep(jStockOptions.getAlertSpeed() * 1000);
+                        }
+                        catch(InterruptedException exp) {
+                            log.error("", exp);
+                        }
                     }
                 }
             };
@@ -824,7 +826,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     {
         if (mainFrame == null)
         {
-            mainFrame = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, IndicatorScannerJPanel.this);
+            mainFrame = MainFrame.getMe();
         }
 
         return mainFrame;
