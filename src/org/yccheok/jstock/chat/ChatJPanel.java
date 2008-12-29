@@ -521,7 +521,7 @@ public class ChatJPanel extends javax.swing.JPanel {
     {
         if (mainFrame == null)
         {
-            mainFrame = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, ChatJPanel.this);
+            mainFrame = MainFrame.getMe();
         }
 
         return mainFrame;
