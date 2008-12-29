@@ -525,7 +525,7 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
         
         jStockOptions.setEnableColorChange(jCheckBox1.isSelected());
         
-        MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, this);
+        MainFrame m = MainFrame.getMe();
         if(m != null) {
             m.repaintTable();
         }
