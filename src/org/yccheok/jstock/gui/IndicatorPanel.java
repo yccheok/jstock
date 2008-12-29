@@ -900,7 +900,7 @@ public class IndicatorPanel extends JPanel implements ChangeListener {
                 return;
             }
 
-            if(Thread.interrupted())
+            if(Thread.interrupted() || simulationThread != Thread.currentThread())
                 return;
 
             m.setStatusBar(true, "Stock history information calculation in progress...");
@@ -908,7 +908,7 @@ public class IndicatorPanel extends JPanel implements ChangeListener {
             operatorIndicator.setStockHistoryServer(stockHistoryServer);
         }   /* if(operatorIndicator.isStockHistoryServerNeeded()) { */
         
-        if(Thread.interrupted())
+        if(Thread.interrupted() || simulationThread != Thread.currentThread())
             return;
         
         m.setStatusBar(true, "Real time stock information calculation in progress...");
@@ -919,7 +919,7 @@ public class IndicatorPanel extends JPanel implements ChangeListener {
         
         operatorIndicator.preCalculate();
         
-        if(Thread.interrupted())
+        if(Thread.interrupted() || simulationThread != Thread.currentThread())
             return;
         
         m.setStatusBar(true, "Final calculation...");
@@ -932,7 +932,7 @@ public class IndicatorPanel extends JPanel implements ChangeListener {
    
         long estimatedTime = System.nanoTime() - startTime;
 
-        if(Thread.interrupted())
+        if(Thread.interrupted() || simulationThread != Thread.currentThread())
             return;
         
         m.setStatusBar(false, "Simulation done with time taken " + ((double)estimatedTime / (double)1000000.0) + "ms");
