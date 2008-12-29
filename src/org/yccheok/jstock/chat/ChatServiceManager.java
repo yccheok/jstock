@@ -90,8 +90,6 @@ public class ChatServiceManager {
             while (runnableFlag)
             {
                 try {
-                    XMPPConnection.DEBUG_ENABLED = true;
-
                     State state = State.CONNECTING;
 
                     ChatService.this.notifyStateObserver(state);
