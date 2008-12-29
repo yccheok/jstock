@@ -177,7 +177,7 @@ public class OptionsSpeedJPanel extends javax.swing.JPanel implements JStockOpti
         jStockOptions.setScanningSpeed(speed * 1000);
         jStockOptions.setHistoryDuration(historyDuration);
         
-        MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, this);
+        MainFrame m = MainFrame.getMe();
         if(m != null) {
             m.updateScanningSpeed(jStockOptions.getScanningSpeed());
             m.updateHistoryDuration(Duration.getTodayDurationByYears(historyDuration));
