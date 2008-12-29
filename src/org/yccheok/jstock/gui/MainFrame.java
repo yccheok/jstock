@@ -63,7 +63,9 @@ public class MainFrame extends javax.swing.JFrame {
 
     public MainFrame() {
         initComponents();
-        
+
+        me = this;
+
         createLookAndFeelMenuItem();
         createCountryMenuItem();
         
@@ -2571,6 +2573,10 @@ public class MainFrame extends javax.swing.JFrame {
         this.extractZipFile("database" + File.separator + "database.zip");
     }
 
+    public static MainFrame getMe() {
+        return me;
+    }
+
     private class LatestNewsTask extends SwingWorker<Void, String> {
         // Delay first update checking for the 20 seconds
         private static final int SHORT_DELAY = 20 * 1000;
@@ -2782,7 +2788,8 @@ public class MainFrame extends javax.swing.JFrame {
     
     /* One and only one. */
     private static JStockOptions jStockOptions;
-    
+    private static MainFrame me;
+
     // As workaround to overcome the bug, when new look n feel being applied during runtime, the original
     // KeyListner for ComboBoxEditor will be removed.
     private final KeyListener jComboBox1EditorComponentKeyAdapter = getjComboBox1EditorComponentKeyAdapter();
