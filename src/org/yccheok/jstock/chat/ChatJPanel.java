@@ -28,6 +28,8 @@ import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.Timer;
 import javax.swing.DefaultListModel;
 import javax.swing.JScrollBar;
@@ -398,10 +400,16 @@ public class ChatJPanel extends javax.swing.JPanel {
             if (presence.getType() == Presence.Type.available) {
                 message = Message.newInstance(who, who + " entered the room.", Message.Mode.System);
                 this.addUser(who);
+                if (MainFrame.getJStockOptions().isChatSoundNotificationEnabled()) {
+                    Utils.playSound(Utils.Sound.LOGIN);
+                }
             }
             else {
                 message = Message.newInstance(who, who + " left the room.", Message.Mode.System);
                 this.removeUser(who);
+                if (MainFrame.getJStockOptions().isChatSoundNotificationEnabled()) {
+                    Utils.playSound(Utils.Sound.LOGOUT);
+                }
             }
             
             this.showMessage(message);            
@@ -413,6 +421,19 @@ public class ChatJPanel extends javax.swing.JPanel {
             final String who = whos.length >= 2 ? whos[1] : whos[0];
 
             final Message msg = Message.newInstance(who, message.getBody(), MainFrame.getJStockOptions().getChatUsername().equals(who) ? Message.Mode.Mine : Message.Mode.Other);
+
+            if (msg.mode == Message.Mode.Mine)
+            {
+                if (MainFrame.getJStockOptions().isChatSoundNotificationEnabled()) {
+                    Utils.playSound(Utils.Sound.SEND);
+                }
+            }
+            else
+            {
+                if (MainFrame.getJStockOptions().isChatSoundNotificationEnabled()) {
+                    Utils.playSound(Utils.Sound.RECEIVE);
+                }
+            }
 
             this.showMessage(msg);
         }
@@ -557,7 +578,9 @@ public class ChatJPanel extends javax.swing.JPanel {
 
                 @Override
                 public void run() {
-                    ((DefaultListModel)(jList2.getModel())).addElement(name);
+                    if (((DefaultListModel)(jList2.getModel())).contains(name) == false) {
+                        ((DefaultListModel)(jList2.getModel())).addElement(name);
+                    }
                 }
 
             });
@@ -614,13 +637,43 @@ public class ChatJPanel extends javax.swing.JPanel {
     }
 
     private static class JTextFieldEx extends JTextField implements KeyListener {
+        private static final int MEMORY_SIZE = 100;
+        private static final List<String> memories = new ArrayList<String>();
+        private int read_index  =0;
+        private int write_index  =0;
 
+        public JTextFieldEx() {
+            super();
+            this.addKeyListener(this);
+        }
+        
         @Override
         public void keyTyped(KeyEvent e) {
         }
 
         @Override
         public void keyPressed(KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_UP)
+            {
+                read_index--;                
+                if (read_index < 0) {
+                    read_index = (memories.size() - 1);
+                }
+                this.setText(memories.get(read_index));
+            }
+            else if (e.getKeyCode() == KeyEvent.VK_DOWN)
+            {
+                read_index++;
+                read_index = read_index % memories.size();
+                this.setText(memories.get(read_index));
+            }
+            else if (e.getKeyCode() == KeyEvent.VK_ENTER)
+            {
+                memories.add(write_index, this.getText());
+                read_index = write_index;
+                write_index++;
+                write_index = write_index % MEMORY_SIZE;
+            }
         }
 
         @Override
