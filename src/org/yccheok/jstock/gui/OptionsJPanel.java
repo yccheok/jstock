@@ -78,7 +78,7 @@ public class OptionsJPanel extends javax.swing.JPanel implements JStockOptionsOb
     
     private void show(Component component) {        
         if(component == optionsPasswordJPanel) {
-            final MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, this);
+            final MainFrame m = MainFrame.getMe();
             final String password = Utils.decrypt(m.getJStockOptions().getIndicatorPassword());
             
             if(password.length() > 0) {
