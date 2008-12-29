@@ -44,7 +44,7 @@ public class Subject<S, A> {
         observers.clear();
     }
     
-    void notify(S subject, A arg) {
+    protected void notify(S subject, A arg) {
         for (Observer<S, A> obs : observers) {
             obs.update(subject, arg);
         }
