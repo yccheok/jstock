@@ -58,19 +58,25 @@ public class MalaysiaMarket implements Market {
     @Override
     public double getIndex(Index index)
     {
-        return indexMap.get(index);
+        Double d = indexMap.get(index);
+        if (d == null) return 0.0;
+        return d;
     }
     
     @Override
     public double getChange(Index index)
     {
-        return changeMap.get(index);
+        Double d = changeMap.get(index);
+        if (d == null) return 0.0;
+        return d;
     }
     
     @Override
     public int getNumOfStockChange(ChangeType type)
     {
-        return numMap.get(type);
+        Integer i = numMap.get(type);
+        if (i == null) return 0;
+        return i;
     }
 
     @Override
