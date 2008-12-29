@@ -77,6 +77,7 @@ public class MainFrame extends javax.swing.JFrame {
         this.createSystemTrayIcon();
         
         this.initPreloadDatabase();
+        this.initChatDatas();
         this.initStatusBar(); 
         this.initMarketJPanel();
         this.initUsernameAndPassword();
@@ -731,6 +732,22 @@ public class MainFrame extends javax.swing.JFrame {
                 log.info("Stock history monitor re-attach observer.");
             }
         }
+
+        if (pane.getSelectedComponent() == this.chatJPanel)
+        {
+            if (timer != null)
+            {
+                timer.stop();
+                timer = null;
+            }
+
+            // Ensure at the end, we are using smile icon.
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    MainFrame.this.jTabbedPane1.setIconAt(4, smileIcon);
+                }
+            });
+        }
     }//GEN-LAST:event_jTabbedPane1StateChanged
 
 
@@ -807,6 +824,8 @@ public class MainFrame extends javax.swing.JFrame {
         //realTimeStockMonitor.stop();
         //log.info("stockHistoryMonitor stop...");
         //stockHistoryMonitor.stop();
+
+        this.chatJPanel.stopChatServiceManager();
         
         if(trayIcon != null)
             SystemTray.getSystemTray().remove(trayIcon);
@@ -914,7 +933,6 @@ public class MainFrame extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-
         /* Workaround to solve JXTreeTable look n feel cannot be changed on the fly. */
         initJStockOptions();
         
@@ -2434,13 +2452,13 @@ public class MainFrame extends javax.swing.JFrame {
         jPanel2.add(marketJPanel);
         jPanel2.revalidate();
     }
-    
-    private void initPreloadDatabase() {
+
+    private void extractZipFile(String zipFilePath) {
         InputStream inputStream = null;
         ZipInputStream zipInputStream = null;
-        
+
         try {
-            inputStream = new FileInputStream("database" + File.separator + "database.zip");
+            inputStream = new FileInputStream(zipFilePath);
 
             zipInputStream = new ZipInputStream(inputStream);
             final byte[] data = new byte[1024];
@@ -2450,7 +2468,7 @@ public class MainFrame extends javax.swing.JFrame {
 
                 try {
                     zipEntry = zipInputStream.getNextEntry();
-                    
+
                     if(zipEntry == null) break;
 
                     final String destination = Utils.getUserDataDirectory() + zipEntry.getName();
@@ -2475,8 +2493,8 @@ public class MainFrame extends javax.swing.JFrame {
                                     size = zipInputStream.read(data);
                                 }while(size >= 0);
 
-                                outputStream.close();                    
-                            }                
+                                outputStream.close();
+                            }
                         }
                         catch(IOException exp) {
                             log.error("", exp);
@@ -2524,7 +2542,7 @@ public class MainFrame extends javax.swing.JFrame {
                     log.error("", ex);
                 }
             }
-            
+
             if(inputStream != null) {
                 try {
                     inputStream.close();
@@ -2533,6 +2551,10 @@ public class MainFrame extends javax.swing.JFrame {
                 }
             }
         }
+    }
+
+    private void initPreloadDatabase() {
+        this.extractZipFile("database" + File.separator + "database.zip");
     }
 
     private class LatestNewsTask extends SwingWorker<Void, String> {
@@ -2626,6 +2648,9 @@ public class MainFrame extends javax.swing.JFrame {
                 catch (IOException ex) {
                     log.error(null, ex);
                 }
+                finally {
+                    method.releaseConnection();
+                }
 
                 // If we fail to obtain any update, do not give up. Probably
                 // the author is going to update the latest news soon. Sleep for
@@ -2659,20 +2684,58 @@ public class MainFrame extends javax.swing.JFrame {
 
     public void flashChatTabIfNeeded()
     {
+        if (jStockOptions.isChatFlashNotificationEnabled() == false) {
+            return;
+        }
+
+        if (this.jTabbedPane1.getSelectedComponent() == this.chatJPanel) {
+            return;
+        }
+
+        if (timer != null) {
+            return;
+        }
+
+        timer = new javax.swing.Timer(TIMER_DELAY, this.getTimerActionListener());
+        timer.setInitialDelay(0);
+        timer.start();
     }
 
     public void stopChatServiceManager()
     {
+        this.chatJPanel.stopChatServiceManager();
     }
 
     public void startChatServiceManager()
     {
+        this.chatJPanel.startChatServiceManager();
     }
 
     public void updateChatJPanelUIAccordingToOptions()
     {
+        this.chatJPanel.updateUIAccordingToOptions();
     }
-    
+
+    private void initChatDatas() {
+        this.extractZipFile("chat" + File.separator + "chat.zip");
+    }
+
+    private ActionListener getTimerActionListener() {
+        return new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (MainFrame.this.jTabbedPane1.getIconAt(4) == MainFrame.this.smileIcon)
+                {
+                   MainFrame.this.jTabbedPane1.setIconAt(4, smileGrayIcon);
+                }
+                else
+                {
+                    MainFrame.this.jTabbedPane1.setIconAt(4, smileIcon);
+                }
+            }
+        };
+    }
+
     private void initStatusBar()
     {
         final String message = "Connecting to stock server to retrieve stock information ...";
@@ -2720,6 +2783,8 @@ public class MainFrame extends javax.swing.JFrame {
 
     private final javax.swing.ImageIcon smileIcon = this.getImageIcon("/images/16x16/smile.png");
     private final javax.swing.ImageIcon smileGrayIcon = this.getImageIcon("/images/16x16/smile-gray.png");
+    private javax.swing.Timer timer = null;
+    private static final int TIMER_DELAY = 500;
 
     private Executor zombiePool = Utils.getZoombiePool();
     
