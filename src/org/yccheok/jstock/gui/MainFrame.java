@@ -46,13 +46,11 @@ import javax.swing.*;
 import java.net.URL;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import javax.imageio.ImageIO;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.methods.GetMethod;
 
 /**
@@ -683,10 +681,8 @@ public class MainFrame extends javax.swing.JFrame {
                 log.info("Stop portfolio monitor.");
             }
             if(stockHistoryMonitor != null) {                
-                // No stop. May be time consuming.
-                // this.stockHistoryMonitor.stop();
-                this.stockHistoryMonitor.dettach(this.stockHistoryMonitorObserver);
-                log.info("Stop stock history monitor and dettach observer.");
+                this.stockHistoryMonitor.attach(this.stockHistoryMonitorObserver);
+                log.info("Stock history monitor re-attach observer.");
             }                
         }
         else if(pane.getSelectedComponent() == this.indicatorScannerJPanel) {
@@ -731,10 +727,8 @@ public class MainFrame extends javax.swing.JFrame {
                 log.info("Stop portfolio monitor.");
             }
             if(stockHistoryMonitor != null) {
-                // No stop. May be time consuming.
-                // this.stockHistoryMonitor.stop();
-                this.stockHistoryMonitor.dettach(this.stockHistoryMonitorObserver);
-                log.info("Stop stock history monitor and dettach observer.");
+                this.stockHistoryMonitor.attach(this.stockHistoryMonitorObserver);
+                log.info("Stock history monitor re-attach observer.");
             }
         }
     }//GEN-LAST:event_jTabbedPane1StateChanged
@@ -1088,6 +1082,10 @@ public class MainFrame extends javax.swing.JFrame {
     private void createChatJPanel() {
         chatJPanel = new org.yccheok.jstock.chat.ChatJPanel();
         jTabbedPane1.addTab("Market Chit Chat", chatJPanel);
+        if (jStockOptions.isChatEnabled())
+        {
+            chatJPanel.startChatServiceManager();
+        }
     }
     
     private void createPortfolioManagementJPanel() {
@@ -2658,6 +2656,22 @@ public class MainFrame extends javax.swing.JFrame {
             return null;
         }
     }
+
+    public void flashChatTabIfNeeded()
+    {
+    }
+
+    public void stopChatServiceManager()
+    {
+    }
+
+    public void startChatServiceManager()
+    {
+    }
+
+    public void updateChatJPanelUIAccordingToOptions()
+    {
+    }
     
     private void initStatusBar()
     {
@@ -2704,13 +2718,15 @@ public class MainFrame extends javax.swing.JFrame {
     private org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
     private org.yccheok.jstock.engine.Observer<StockHistoryMonitor, StockHistoryMonitor.StockHistoryRunnable> stockHistoryMonitorObserver = this.getStockHistoryMonitorObserver();
 
-    private Executor zombiePool = Executors.newFixedThreadPool(NUM_OF_THREADS_ZOMBIE_POOL);
+    private final javax.swing.ImageIcon smileIcon = this.getImageIcon("/images/16x16/smile.png");
+    private final javax.swing.ImageIcon smileGrayIcon = this.getImageIcon("/images/16x16/smile-gray.png");
+
+    private Executor zombiePool = Utils.getZoombiePool();
     
     private MarketJPanel marketJPanel;
 
     private static final int NUM_OF_RETRY = 3;
     private static final int NUM_OF_THREADS_HISTORY_MONITOR = 4;
-    private static final int NUM_OF_THREADS_ZOMBIE_POOL = 4;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
