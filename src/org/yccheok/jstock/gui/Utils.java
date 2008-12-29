@@ -355,7 +355,7 @@ public class Utils {
 	// We will use this as directory name. Do not have space or special characters.
     private static final String APPLICATION_VERSION_STRING = "1.0.1";
 
-    static Executor zombiePool = Executors.newFixedThreadPool(Utils.NUM_OF_THREADS_ZOMBIE_POOL);
+    private static Executor zombiePool = Executors.newFixedThreadPool(Utils.NUM_OF_THREADS_ZOMBIE_POOL);
 
     private static final int NUM_OF_THREADS_ZOMBIE_POOL = 4;
 
