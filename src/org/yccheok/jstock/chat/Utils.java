@@ -20,6 +20,7 @@ package org.yccheok.jstock.chat;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.text.Format;
 import java.text.SimpleDateFormat;
@@ -27,9 +28,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -38,6 +42,7 @@ import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.logging.Log;
@@ -60,11 +65,67 @@ public class Utils {
 
     public static String getXMPPServer()
     {
+        final String defaultServer = "jabber.org";
+
         HttpMethod method = new GetMethod("http://jstock.sourceforge.net/server/server.txt");
         final HttpClient httpClient = new HttpClient();
         org.yccheok.jstock.engine.Utils.setHttpClientProxyFromSystemProperties(httpClient);
 
-        return "jabber.org";
+        InputStream stream = null;
+
+        try {
+            httpClient.executeMethod(method);
+            stream = method.getResponseBodyAsStream();
+
+            if (stream == null)
+                return defaultServer;
+
+            Properties properties = new Properties();
+            properties.load(stream);
+
+            final String _id = properties.getProperty("id");
+            if (_id == null) {
+                log.info("UUID not found");
+                return defaultServer;
+            }
+
+            final String id = org.yccheok.jstock.gui.Utils.decrypt(_id);
+            if (id.equals(org.yccheok.jstock.gui.Utils.getJStockUUID()) == false) {
+                log.info("UUID doesn't match");
+                return defaultServer;
+            }
+
+            final String _server = properties.getProperty("server");
+            if (_server == null) {
+                log.info("Server not found");
+                return defaultServer;
+            }
+
+            final String server = org.yccheok.jstock.gui.Utils.decrypt(_server);
+            if (server.length() <= 0) {
+                return defaultServer;
+            }
+
+            log.info("Sourceforge suggests us to use " + server);
+
+            return server;
+        }
+        catch (HttpException ex) {
+            log.error(null, ex);
+        }
+        catch (IOException ex) {
+            log.error(null, ex);
+        }
+        finally {
+            if (stream != null) try {
+                stream.close();
+            } catch (IOException ex) {
+                log.error(null, ex);
+            }
+            method.releaseConnection();
+        }
+
+        return defaultServer;
     }
 
     public static String getEmotesIconsDirectory() {
