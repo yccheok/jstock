@@ -280,7 +280,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         if(buyTransaction.getQuantity() > 0) {
             buyCost = buyTransaction.getNetTotal() / buyTransaction.getQuantity();
         }
-        final MainFrame mainFrame = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, PortfolioManagementJPanel.this);
+        final MainFrame mainFrame = MainFrame.getMe();
         
         NewSellTransactionJDialog newSellTransactionJDialog = new NewSellTransactionJDialog(mainFrame, true);
         newSellTransactionJDialog.setLocationRelativeTo(this);
@@ -314,7 +314,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
     
     private void showEditTransactionJDialog(Transaction transaction) {
-        final MainFrame mainFrame = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, PortfolioManagementJPanel.this);
+        final MainFrame mainFrame = MainFrame.getMe();
 
         if(transaction.getContract().getType() == Contract.Type.Buy) {
             NewBuyTransactionJDialog newTransactionJDialog = new NewBuyTransactionJDialog(mainFrame, true);
@@ -349,7 +349,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     
     public void showNewBuyTransactionJDialog(Symbol stockSymbol, double lastPrice, boolean JComboBoxEnabled) {
 
-        final MainFrame mainFrame = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, PortfolioManagementJPanel.this);
+        final MainFrame mainFrame = MainFrame.getMe();
 
         final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = mainFrame.getStockCodeAndSymbolDatabase();
         
@@ -553,14 +553,14 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
     
     private void showBuyPortfolioChartJDialog() {
-        final MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, this);
+        final MainFrame m = MainFrame.getMe();
         final BuyPortfolioTreeTableModel buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
         BuyPortfolioChartJDialog buyPortfolioChartJDialog = new BuyPortfolioChartJDialog(m, false, buyPortfolioTreeTableModel);
         buyPortfolioChartJDialog.setVisible(true);                                    
     }
     
     private void showSellPortfolioChartJDialog() {
-        final MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, this);
+        final MainFrame m = MainFrame.getMe();
         final SellPortfolioTreeTableModel sellPortfolioTreeTableModel = (SellPortfolioTreeTableModel)sellTreeTable.getTreeTableModel();
         SellPortfolioChartJDialog sellPortfolioChartJDialog = new SellPortfolioChartJDialog(m, false, sellPortfolioTreeTableModel);
         sellPortfolioChartJDialog.setVisible(true);                                    
@@ -598,7 +598,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         popup.add(menuItem);        
         
         if(isOnlyTreeTableRootBeingSelected(sellTreeTable) == false && (sellTreeTable.getSelectedRow() > 0)) {
-            final MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, this);
+            final MainFrame m = MainFrame.getMe();
                                 
             menuItem = new JMenuItem("History...", this.getImageIcon("/images/16x16/strokedocker.png"));
 
@@ -685,7 +685,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         if(isOnlyTreeTableRootBeingSelected(buyTreeTable) == false && (buyTreeTable.getSelectedRow() > 0)) {
             //popup.addSeparator();
             
-            final MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, this);
+            final MainFrame m = MainFrame.getMe();
                                 
             menuItem = new JMenuItem("History...", this.getImageIcon("/images/16x16/strokedocker.png"));
 
