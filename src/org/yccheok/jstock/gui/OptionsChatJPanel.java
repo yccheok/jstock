@@ -174,7 +174,7 @@ public class OptionsChatJPanel extends javax.swing.JPanel implements JStockOptio
 
     @Override
     public boolean apply(JStockOptions jStockOptions) {
-        final MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, this);
+        final MainFrame m = MainFrame.getMe();
 
         if (this.jCheckBox1.isSelected())
         {
