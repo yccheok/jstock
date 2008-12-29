@@ -130,7 +130,7 @@ public class WizardSelectIndicatorJPanel extends javax.swing.JPanel {
         if(this.indicatorProjectManager != null)
             return;
         
-        final MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, WizardSelectIndicatorJPanel.this);        
+        final MainFrame m = MainFrame.getMe();
         
         this.indicatorProjectManager = m.getIndicatorProjectManager();
         
