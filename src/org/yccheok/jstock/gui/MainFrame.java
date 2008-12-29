@@ -1333,7 +1333,12 @@ public class MainFrame extends javax.swing.JFrame {
         this.portfolioManagementJPanel.initPortfolio();
         this.indicatorScannerJPanel.stop();
         this.indicatorScannerJPanel.clear();
-        
+        this.chatJPanel.stopChatServiceManager();
+        if (jStockOptions.isChatEnabled())
+        {
+            this.chatJPanel.startChatServiceManager();
+        }
+
         for (Enumeration<AbstractButton> e = this.buttonGroup2.getElements() ; e.hasMoreElements() ;) {
             AbstractButton button = e.nextElement();
             javax.swing.JRadioButtonMenuItem m = (javax.swing.JRadioButtonMenuItem)button;
@@ -1620,8 +1625,10 @@ public class MainFrame extends javax.swing.JFrame {
         public void run() {
             final Thread currentThread = Thread.currentThread();
             final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactory();
-            
-            while(!currentThread.isInterrupted()) {
+
+            // Do not rely on isInterrupted flag only. The flag can be cleared by 3rd party easily.
+            // Check for current thread as well.
+            while(!currentThread.isInterrupted()  && (marketThread == Thread.currentThread())) {
                 for (StockServerFactory factory : stockServerFactories) {
                     MarketServer server = factory.getMarketServer();
                     
@@ -1637,6 +1644,7 @@ public class MainFrame extends javax.swing.JFrame {
                     Thread.sleep(MainFrame.jStockOptions.getScanningSpeed());
                 }
                 catch(InterruptedException exp) {
+                    log.error(null, exp);
                     break;
                 }
             }
@@ -2194,10 +2202,16 @@ public class MainFrame extends javax.swing.JFrame {
         if(marketThread != null) {
             final Thread oldMarketThread = marketThread;
             zombiePool.execute(new Runnable() {
+                @Override
                 public void run() {
-                    log.info("Prepare to shut down " + oldMarketThread + "...");
+                    log.info("Prepare to shut down market thread " + oldMarketThread + "...");
                     oldMarketThread.interrupt();
-                    log.info("Shut down " + oldMarketThread + " peacefully.");
+                    try {
+                        oldMarketThread.join();
+                    } catch (InterruptedException ex) {
+                        log.error(null, ex);
+                    }
+                    log.info("Shut down market thread " + oldMarketThread + " peacefully.");
                 }
             });            
         }
