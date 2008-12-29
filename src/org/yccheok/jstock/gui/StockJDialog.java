@@ -423,7 +423,7 @@ public class StockJDialog extends javax.swing.JDialog {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
 // TODO add your handling code here:
         final java.util.List<Code> codes = this.buildSelectedCode();
-        final MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, StockJDialog.this);
+        final MainFrame m = MainFrame.getMe();
 
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -471,7 +471,7 @@ public class StockJDialog extends javax.swing.JDialog {
     public java.util.List<Code> buildSelectedCode() {
         java.util.List<Code> selectedCodes = new java.util.ArrayList<Code>();
         
-        MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, StockJDialog.this);
+        MainFrame m = MainFrame.getMe();
         
         if(m.getStockCodeAndSymbolDatabase() == null) {
             log.error("Unable to locate MainFrame");
@@ -521,7 +521,7 @@ public class StockJDialog extends javax.swing.JDialog {
     }
     
     private void initBoardCheckBoxes() {
-        final MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, StockJDialog.this);
+        final MainFrame m = MainFrame.getMe();
         final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = m.getStockCodeAndSymbolDatabase();
         
         boardCheckBoxes.add(jCheckBox1);
@@ -558,7 +558,7 @@ public class StockJDialog extends javax.swing.JDialog {
     }
 
     private void initIndustryCheckBoxes() {
-        final MainFrame m = (MainFrame)javax.swing.SwingUtilities.getAncestorOfClass(MainFrame.class, StockJDialog.this);
+        final MainFrame m = MainFrame.getMe();
         final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = m.getStockCodeAndSymbolDatabase();
         
         industryCheckBoxes.add(jCheckBox5);
