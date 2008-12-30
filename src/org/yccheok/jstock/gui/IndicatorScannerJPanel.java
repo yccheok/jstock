@@ -518,6 +518,8 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         final StockHistoryServer stockHistoryServer = runnable.getStockHistoryServer();
         if (stockHistoryServer == null)
         {
+            // Probably the network is down. Retry infinityly.
+            monitor.addStockCode(code);
             return;
         }
 
