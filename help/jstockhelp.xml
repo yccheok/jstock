@@ -16,6 +16,7 @@
                 <listitem><para>Stock indicator editor. You will able to compose your own indicator rule, with simple drag-n-drop graphical blocks. There are no programming required.</para></listitem>
                 <listitem><para>Stock indicator scanner. You will able to perform real-time indicator scanning, to filter out thousands of stocks from the entire stock market. You may also receive email and system tray message alert whenever a stock is being found.</para></listitem>
                 <listitem><para>Portfolio management. You will able to know your most up-to-date net worth, by recording down your buy and sell records.</para></listitem>
+                <listitem><para>Market chit chat. You may chat with other JStock users on the hottest market news, in an easy and fun way.</para></listitem>
             </orderedlist>            
         </para>
     </chapter>
@@ -384,10 +385,6 @@
                 <textobject><phrase>Stock Indicator Scanner Step 2</phrase></textobject>
             </mediaobject>
             <mediaobject>
-                <imageobject><imagedata fileref="stock-indicator-scanner-step3.png" format="PNG"/></imageobject>
-                <textobject><phrase>Stock Indicator Scanner Step 3</phrase></textobject>
-            </mediaobject>
-            <mediaobject>
                 <imageobject><imagedata fileref="stock-indicator-scanner-step4.png" format="PNG"/></imageobject>
                 <textobject><phrase>Stock Indicator Scanner Step 4</phrase></textobject>
             </mediaobject>
@@ -440,6 +437,157 @@
                 <textobject><phrase>Portfolio Chart</phrase></textobject>
             </mediaobject>        
         </para>      
+    </chapter>
+    
+    <chapter>
+        <title>Market Chit Chat</title>
+        <para> 
+            Here is the options dialog box to enable market chit chat feature. Just simply choose any username you like to start to chat with other JStock users.
+        </para>
+        <para>
+            <mediaobject>
+                <imageobject><imagedata fileref="chat-options.png" format="PNG"/></imageobject>
+                <textobject><phrase>Chat Options</phrase></textobject>
+            </mediaobject>        
+        </para>
+        <para> 
+            The following chat icon will start to blinking, during the process of connecting to chat server.
+        </para>
+        <para>
+            <mediaobject>
+                <imageobject><imagedata fileref="chat-icon.png" format="PNG"/></imageobject>
+                <textobject><phrase>Chat Icon</phrase></textobject>
+            </mediaobject>        
+        </para>
+        <para> 
+            Once you connect to chat server successfully, you will receive the following message from the chat server. Congratulation! You may start to perform chatting now with others.
+        </para>
+        <para>
+            <mediaobject>
+                <imageobject><imagedata fileref="chat-success.png" format="PNG"/></imageobject>
+                <textobject><phrase>Chat Success</phrase></textobject>
+            </mediaobject>        
+        </para>           
+        <para> 
+            The market chit chat tab will blinking, if currently you are not in market chit chat page, and you have received new message from the chat server or other JStock users.
+        </para>
+        <para>
+            <mediaobject>
+                <imageobject><imagedata fileref="chat-tab.png" format="PNG"/></imageobject>
+                <textobject><phrase>Chat Tab</phrase></textobject>
+            </mediaobject>        
+        </para>
+        
+        <para>JStock provides emotional icons as described below.</para>
+  
+        <table frame="topbot"><title>Emotional Icons</title>
+            <tgroup cols="2">
+                <thead>
+                <row><entry>Symbol</entry><entry>Icon</entry></row>
+            </thead>
+            <tbody>
+                <row>
+                    <entry>
+                        <para>:)</para>
+                    </entry>                    
+                    <entry>
+                        <mediaobject>
+                            <imageobject><imagedata fileref="smile.png" format="PNG"/></imageobject>
+                            <textobject><phrase>Smile</phrase></textobject>
+                        </mediaobject>  
+                    </entry>                    
+                </row>
+                <row>
+                    <entry>
+                        <para>:O</para>
+                    </entry>                    
+                    <entry>
+                        <mediaobject>
+                            <imageobject><imagedata fileref="shock.png" format="PNG"/></imageobject>
+                            <textobject><phrase>Shock</phrase></textobject>
+                        </mediaobject>  
+                    </entry>                    
+                </row>
+                <row>
+                    <entry>
+                        <para>:"&gt;</para>
+                    </entry>                    
+                    <entry>
+                        <mediaobject>
+                            <imageobject><imagedata fileref="embarrassed.png" format="PNG"/></imageobject>
+                            <textobject><phrase>Embarrassed</phrase></textobject>
+                        </mediaobject>  
+                    </entry>                    
+                </row>
+                <row>
+                    <entry>
+                        <para>:D</para>
+                    </entry>                    
+                    <entry>
+                        <mediaobject>
+                            <imageobject><imagedata fileref="smile-big.png" format="PNG"/></imageobject>
+                            <textobject><phrase>Smile Big</phrase></textobject>
+                        </mediaobject>  
+                    </entry>                    
+                </row>
+                <row>
+                    <entry>
+                        <para>;)</para>
+                    </entry>                    
+                    <entry>
+                        <mediaobject>
+                            <imageobject><imagedata fileref="wink.png" format="PNG"/></imageobject>
+                            <textobject><phrase>Wink</phrase></textobject>
+                        </mediaobject>  
+                    </entry>                    
+                </row>
+                <row>
+                    <entry>
+                        <para>:((</para>
+                    </entry>                    
+                    <entry>
+                        <mediaobject>
+                            <imageobject><imagedata fileref="crying.png" format="PNG"/></imageobject>
+                            <textobject><phrase>Crying</phrase></textobject>
+                        </mediaobject>  
+                    </entry>                    
+                </row>
+                <row>
+                    <entry>
+                        <para>:(</para>
+                    </entry>                    
+                    <entry>
+                        <mediaobject>
+                            <imageobject><imagedata fileref="sad.png" format="PNG"/></imageobject>
+                            <textobject><phrase>Sad</phrase></textobject>
+                        </mediaobject>  
+                    </entry>                    
+                </row>
+                <row>
+                    <entry>
+                        <para>:P</para>
+                    </entry>                    
+                    <entry>
+                        <mediaobject>
+                            <imageobject><imagedata fileref="tongue.png" format="PNG"/></imageobject>
+                            <textobject><phrase>Tongue</phrase></textobject>
+                        </mediaobject>  
+                    </entry>                    
+                </row>
+                <row>
+                    <entry>
+                        <para>:|</para>
+                    </entry>                    
+                    <entry>
+                        <mediaobject>
+                            <imageobject><imagedata fileref="neutral.png" format="PNG"/></imageobject>
+                            <textobject><phrase>Neutral</phrase></textobject>
+                        </mediaobject>  
+                    </entry>                    
+                </row>                
+            </tbody>
+          </tgroup>
+        </table>
     </chapter>
     
     <chapter>
