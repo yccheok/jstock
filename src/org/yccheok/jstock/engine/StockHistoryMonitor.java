@@ -23,7 +23,6 @@
 package org.yccheok.jstock.engine;
 
 import java.util.concurrent.*;
-import java.util.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -47,7 +46,7 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
         readerLock = readWriteLock.readLock();
         writerLock = readWriteLock.writeLock();
         
-        this.databaseSize = databaseSize;
+        this.DATABASE_SIZE = databaseSize;
         
         this.stockHistorySerializer = null;
     }
@@ -58,7 +57,36 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
     
     public boolean addStockCode(final Code code) {
         writerLock.lock();
-        
+
+        // Should we perform lock downgrading?
+        //
+        /*
+             class CachedData {
+               Object data;
+               volatile boolean cacheValid;
+               ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
+
+               void processCachedData() {
+                 rwl.readLock().lock();
+                 if (!cacheValid) {
+                    // upgrade lock manually
+                    rwl.readLock().unlock();   // must unlock first to obtain writelock
+                    rwl.writeLock().lock();
+                    if (!cacheValid) { // recheck
+                      data = ...
+                      cacheValid = true;
+                    }
+                    // downgrade lock
+                    rwl.readLock().lock();  // reacquire read without giving up write lock
+                    rwl.writeLock().unlock(); // unlock write, still hold read
+                 }
+
+                 use(data);
+                 rwl.readLock().unlock();
+               }
+             }
+         */
+
         if(stockCodes.contains(code)) {
             writerLock.unlock();
             return false;            
@@ -113,15 +141,36 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
                         this.historyServer = history;
 
                         // Concurrent access problem may happen here. Two or more threads may read
-                        // and modify histories. Although we can use reader/writer lock to prevent,
-                        // this will increase complexity. Any how, we allow error tolerance here.
+                        // and modify histories. Although we can use new reader/writer lock pair to prevent,
+                        // this will increase complexity.
+                        //
+                        // Hence, We choose to use "Double-Checked Locking", to avoid expensive of synchronized block.
+                        //
+                        // However, "Double-Checked Locking" is not guarantee to work well. Please refer to
+                        // http://www.ibm.com/developerworks/java/library/j-jtp02244.html
+                        // http://www.ibm.com/developerworks/library/j-jtp03304/
+                        //
+                        // Any how, we allow error tolerance here.
                         // The worst case is that, histories.size() >= StockHistoryMonitor.this.databaseSize.
                         // But that doesn't really matter.
                         //
-                        if(histories.size() < StockHistoryMonitor.this.databaseSize) {                            
-                            histories.put(code, history);
+                        boolean shouldUseSerializer = false;
+
+                        if (histories.size() < StockHistoryMonitor.this.DATABASE_SIZE) {
+                            synchronized (histories) {
+                                if(histories.size() < StockHistoryMonitor.this.DATABASE_SIZE) {
+                                    histories.put(code, history);
+                                }
+                                else {
+                                    shouldUseSerializer = true;
+                                }
+                            }
                         }
                         else {
+                            shouldUseSerializer = true;
+                        }
+                        
+                        if (shouldUseSerializer) {
                             if(StockHistoryMonitor.this.stockHistorySerializer != null) {
                                 StockHistoryMonitor.this.stockHistorySerializer.save(history);
                             }
@@ -232,14 +281,26 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
                 StockHistoryServer stockHistoryServer = StockHistoryMonitor.this.stockHistorySerializer.load(code);
                 
                 /* So that next time we won't read from the disk. */
-                if(stockHistoryServer != null && (this.databaseSize > histories.size())) {
+                if (stockHistoryServer != null && (this.DATABASE_SIZE > histories.size())) {
                     // Concurrent access problem may happen here. Two or more threads may read
-                    // and modify histories. Although we can use reader/writer lock to prevent,
-                    // this will increase complexity. Any how, we allow error tolerance here.
+                    // and modify histories. Although we can use new reader/writer lock pair to prevent,
+                    // this will increase complexity.
+                    //
+                    // Hence, We choose to use "Double-Checked Locking", to avoid expensive of synchronized block.
+                    //
+                    // However, "Double-Checked Locking" is not guarantee to work well. Please refer to
+                    // http://www.ibm.com/developerworks/java/library/j-jtp02244.html
+                    // http://www.ibm.com/developerworks/library/j-jtp03304/
+                    //
+                    // Any how, we allow error tolerance here.
                     // The worst case is that, histories.size() >= StockHistoryMonitor.this.databaseSize.
                     // But that doesn't really matter.
                     //
-                    histories.put(code, stockHistoryServer);
+                    synchronized (histories) {
+                        if(stockHistoryServer != null && (this.DATABASE_SIZE > histories.size())) {
+                            histories.put(code, stockHistoryServer);
+                        }
+                    }
                 }
 
                 readerLock.unlock();
@@ -293,13 +354,9 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
         }
     }
     
-    private java.util.List<StockServerFactory> factories = new java.util.concurrent.CopyOnWriteArrayList<StockServerFactory>();
-    // Use internally. To ensure when we "remove" a code, we really remove it, even there is a runnable
-    // in the middle of retrieving history information from the server.
-    private java.util.List<Code> stockCodes = Collections.synchronizedList(new java.util.ArrayList<Code>());
-    // We need to use concurrent map, due to the fact we need to export out the key set of this map.
-    // We need to let the client have a safe way to iterate through the key set.
-    private java.util.Map<Code, StockHistoryServer> histories = new java.util.concurrent.ConcurrentHashMap<Code, StockHistoryServer>();    
+    private final java.util.List<StockServerFactory> factories = new java.util.concurrent.CopyOnWriteArrayList<StockServerFactory>();
+    private final java.util.List<Code> stockCodes = new java.util.ArrayList<Code>();
+    private final java.util.Map<Code, StockHistoryServer> histories = new java.util.HashMap<Code, StockHistoryServer>();
     private final java.util.concurrent.locks.ReadWriteLock readWriteLock;
     private final java.util.concurrent.locks.Lock readerLock;
     private final java.util.concurrent.locks.Lock writerLock;
@@ -307,7 +364,7 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
     private Executor pool;
     
     // Prevent out of memory problem.
-    private final int databaseSize;
+    private final int DATABASE_SIZE;
     
     private StockHistorySerializer stockHistorySerializer;
 
