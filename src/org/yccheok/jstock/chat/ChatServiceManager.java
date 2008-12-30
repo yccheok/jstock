@@ -64,6 +64,7 @@ public class ChatServiceManager {
 
         public void start()
         {
+            this.runnableFlag = true;
             new Thread(this).start();
         }
 
@@ -85,6 +86,12 @@ public class ChatServiceManager {
         public void run()
         {
             this.me = Thread.currentThread();
+
+            // "new XMPPConnection" takes long duration sometimes. To give user a better experience,
+            // we should inform them that we are currently in connecting state. If not,
+            // they will be wondering why our program is not working now.
+            ChatService.this.notifyStateObserver(State.CONNECTING);
+            
             this.connection = new XMPPConnection(Utils.getXMPPServer());
 
             while (runnableFlag)
