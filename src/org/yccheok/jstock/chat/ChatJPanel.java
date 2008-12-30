@@ -655,17 +655,17 @@ public class ChatJPanel extends javax.swing.JPanel {
         public void keyPressed(KeyEvent e) {
             if (e.getKeyCode() == KeyEvent.VK_UP)
             {
-                read_index--;                
+                this.setText(memories.get(read_index));
+                read_index--;
                 if (read_index < 0) {
                     read_index = (memories.size() - 1);
                 }
-                this.setText(memories.get(read_index));
             }
             else if (e.getKeyCode() == KeyEvent.VK_DOWN)
             {
+                this.setText(memories.get(read_index));
                 read_index++;
                 read_index = read_index % memories.size();
-                this.setText(memories.get(read_index));
             }
             else if (e.getKeyCode() == KeyEvent.VK_ENTER)
             {
