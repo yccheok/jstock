@@ -52,7 +52,15 @@ public class SingaporeYahooStockHistoryServer implements StockHistoryServer {
         this.country = country;
         this.code = Utils.toYahooFormat(code, country);
         this.duration = duration;
-        buildHistory(this.code);
+
+        try {
+            buildHistory(this.code);
+        }
+        catch (java.lang.OutOfMemoryError exp) {
+            // Thrown from method.getResponseBodyAsString
+            log.error(null, exp);
+            throw new StockHistoryNotFoundException("Out of memory", exp);
+        }
     }
 
     private boolean parse(String responde)
