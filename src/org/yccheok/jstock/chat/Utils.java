@@ -18,6 +18,7 @@
 
 package org.yccheok.jstock.chat;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,6 +33,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -46,6 +49,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.Country;
+import org.yccheok.jstock.gui.MainFrame;
 
 /**
  *
@@ -177,7 +181,8 @@ public class Utils {
     }
 
     private static String buildHyperLinkTag(String src) {
-        return src;
+        final Matcher matcher = URLPattern.matcher(src);
+        return matcher.replaceAll("<a href=\"$0\">$0</a>");
     }
 
     private static String escapeHTMLEntities(String src) {
@@ -195,14 +200,18 @@ public class Utils {
         switch(mode)
         {
         case Mine:
-            stringBuffer.append("<span style=\"color:#A9A9A9;font-weight:bold\">");
+            stringBuffer.append("<span style=\"color:#");
+            stringBuffer.append(Utils.toCSSHTML(MainFrame.getJStockOptions().getChatOwnMessageColor()));
+            stringBuffer.append(";font-weight:bold\">");
             stringBuffer.append(who);
             stringBuffer.append(": </span>");
-            stringBuffer.append(buildEmotionalTag(escapeHTMLEntities(buildHyperLinkTag(msg))));
+            stringBuffer.append(buildEmotionalTag(buildHyperLinkTag(escapeHTMLEntities(msg))));
             break;
 
         case Other:
-            stringBuffer.append("<span style=\"color:#6495ED;font-weight: bold\">");
+            stringBuffer.append("<span style=\"color:#");
+            stringBuffer.append(Utils.toCSSHTML(MainFrame.getJStockOptions().getChatOtherMessageColor()));
+            stringBuffer.append(";font-weight:bold\">");
             stringBuffer.append(who);
             stringBuffer.append(": </span>");
             stringBuffer.append(buildEmotionalTag(buildHyperLinkTag(escapeHTMLEntities(msg))));
@@ -212,7 +221,9 @@ public class Utils {
             // Get today's date
             Date date = new Date();
             Format formatter = new SimpleDateFormat("h:mm:ss a");
-            stringBuffer.append("<span style=\"color:#FF0000;font-weight: bold\">");
+            stringBuffer.append("<span style=\"color:#");
+            stringBuffer.append(Utils.toCSSHTML(MainFrame.getJStockOptions().getChatSystemMessageColor()));
+            stringBuffer.append(";font-weight: bold\">");
             stringBuffer.append('(');
             stringBuffer.append(formatter.format(date));
             stringBuffer.append(") ");
@@ -224,6 +235,10 @@ public class Utils {
         stringBuffer.append("</p>");
 
         return stringBuffer.toString();
+    }
+
+    private static String toCSSHTML(Color color) {
+        return Integer.toHexString( color.getRGB() & 0x00ffffff );
     }
 
     public static void playSound(final Sound sound) {
@@ -324,4 +339,6 @@ public class Utils {
     private static Executor soundPool = Executors.newFixedThreadPool(Utils.NUM_OF_THREADS_SOUND_POOL);
     private static final Map<Sound, Clip> sounds = new HashMap<Sound, Clip>();
     private static final int NUM_OF_THREADS_SOUND_POOL = 1;
+    
+    private static final Pattern URLPattern = Pattern.compile("\\b(?:http://|https://|www.|ftp://|file:/|mailto:)\\S+\\b");
 }
