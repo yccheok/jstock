@@ -876,7 +876,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void jTable1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTable1KeyPressed
 // TODO add your handling code here:
-        if(evt.VK_DELETE == evt.getKeyCode()) {
+        if(KeyEvent.VK_DELETE == evt.getKeyCode()) {
             this.deteleSelectedTableRow();
             return;
         }
@@ -2754,6 +2754,14 @@ public class MainFrame extends javax.swing.JFrame {
                 }
             }
         };
+    }
+
+    public boolean isChatLogin() {
+        return this.chatJPanel.isLogin();
+    }
+
+    public boolean changeChatPassword(String newPassword) {
+        return this.chatJPanel.changePassword(newPassword);
     }
 
     private void initStatusBar()
