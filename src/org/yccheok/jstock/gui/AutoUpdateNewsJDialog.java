@@ -20,6 +20,7 @@ package org.yccheok.jstock.gui;
 
 import java.awt.Desktop;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import javax.swing.event.HyperlinkEvent;
@@ -111,6 +112,16 @@ public class AutoUpdateNewsJDialog extends javax.swing.JDialog {
 
                 if(desktop.isSupported(Desktop.Action.BROWSE))
                 {
+                    if (url == null) {
+						// www.yahoo.com considered an invalid URL. Hence, evt.getURL() returns null.
+                        String string = "http://" + evt.getDescription();
+                        try {
+                            url = new URL(string);
+                        } catch (MalformedURLException ex) {
+                            return;
+                        }
+                    }
+
                     try {
                         desktop.browse(url.toURI());
                     }
