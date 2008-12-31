@@ -395,10 +395,6 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
         if(null == color) return;
         
         jPanel12.setBackground(color);
-        
-        final JStockOptions jStockOptions = MainFrame.getJStockOptions();
-        
-        jStockOptions.setAutoUpdateBackgroundColor(jPanel12.getBackground());        
     }//GEN-LAST:event_jPanel12MouseClicked
 
     private void jPanel11MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel11MouseClicked
@@ -410,10 +406,6 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
         if(null == color) return;
         
         jPanel11.setBackground(color);
-        
-        final JStockOptions jStockOptions = MainFrame.getJStockOptions();
-        
-        jStockOptions.setAutoUpdateForegroundColor(jPanel11.getBackground());         
     }//GEN-LAST:event_jPanel11MouseClicked
 
     private void jPanel10MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel10MouseClicked
@@ -423,10 +415,6 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
         if(null == color) return;
         
         jPanel10.setBackground(color);
-        
-        final JStockOptions jStockOptions = MainFrame.getJStockOptions();
-        
-        jStockOptions.setSecondRowBackgroundColor(jPanel10.getBackground());         
     }//GEN-LAST:event_jPanel10MouseClicked
 
     private void jPanel9MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel9MouseClicked
@@ -436,10 +424,6 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
         if(null == color) return;
         
         jPanel9.setBackground(color);
-        
-        final JStockOptions jStockOptions = MainFrame.getJStockOptions();
-        
-        jStockOptions.setFirstRowBackgroundColor(jPanel9.getBackground());          
     }//GEN-LAST:event_jPanel9MouseClicked
 
     private void jPanel8MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel8MouseClicked
@@ -449,10 +433,6 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
         if(null == color) return;
         
         jPanel8.setBackground(color);
-        
-        final JStockOptions jStockOptions = MainFrame.getJStockOptions();
-        
-        jStockOptions.setHigherNumericalValueForegroundColor(jPanel8.getBackground());            
     }//GEN-LAST:event_jPanel8MouseClicked
 
     private void jPanel7MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel7MouseClicked
@@ -462,10 +442,6 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
         if(null == color) return;
         
         jPanel7.setBackground(color);
-        
-        final JStockOptions jStockOptions = MainFrame.getJStockOptions();
-        
-        jStockOptions.setLowerNumericalValueForegroundColor(jPanel7.getBackground());        
     }//GEN-LAST:event_jPanel7MouseClicked
 
     private void jPanel6MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel6MouseClicked
@@ -475,29 +451,24 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
         if(null == color) return;
         
         jPanel6.setBackground(color);
-        
-        final JStockOptions jStockOptions = MainFrame.getJStockOptions();
-        
-        jStockOptions.setNormalTextForegroundColor(jPanel6.getBackground());
     }//GEN-LAST:event_jPanel6MouseClicked
 
     private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
 // TODO add your handling code here:
-        final JStockOptions jStockOptions = MainFrame.getJStockOptions();
-        
-        jPanel6.setBackground(jStockOptions.DEFAULT_NORMAL_TEXT_FOREGROUND_COLOR);
-        jPanel7.setBackground(jStockOptions.DEFAULT_LOWER_NUMERICAL_VALUE_FOREGROUND_COLOR);
-        jPanel8.setBackground(jStockOptions.DEFAULT_HIGHER_NUMERICAL_VALUE_FOREGROUND_COLOR);
+        jPanel6.setBackground(JStockOptions.DEFAULT_NORMAL_TEXT_FOREGROUND_COLOR);
+        jPanel7.setBackground(JStockOptions.DEFAULT_LOWER_NUMERICAL_VALUE_FOREGROUND_COLOR);
+        jPanel8.setBackground(JStockOptions.DEFAULT_HIGHER_NUMERICAL_VALUE_FOREGROUND_COLOR);
 
-        jPanel9.setBackground(jStockOptions.DEFAULT_FIRST_ROW_BACKGROUND_COLOR);
-        jPanel10.setBackground(jStockOptions.DEFAULT_SECOND_ROW_BACKGROUND_COLOR);
+        jPanel9.setBackground(JStockOptions.DEFAULT_FIRST_ROW_BACKGROUND_COLOR);
+        jPanel10.setBackground(JStockOptions.DEFAULT_SECOND_ROW_BACKGROUND_COLOR);
 
-        jPanel11.setBackground(jStockOptions.DEFAULT_AUTO_UPDATE_FOREGROUND_COLOR);
-        jPanel12.setBackground(jStockOptions.DEFAULT_AUTO_UPDATE_BACKGROUND_COLOR); 
+        jPanel11.setBackground(JStockOptions.DEFAULT_AUTO_UPDATE_FOREGROUND_COLOR);
+        jPanel12.setBackground(JStockOptions.DEFAULT_AUTO_UPDATE_BACKGROUND_COLOR);
         
         this.jCheckBox1.setSelected(false);
     }//GEN-LAST:event_jButton8ActionPerformed
 
+    @Override
     public void set(JStockOptions jStockOptions) {        
         jPanel6.setBackground(jStockOptions.getNormalTextForegroundColor());
         jPanel7.setBackground(jStockOptions.getLowerNumericalValueForegroundColor());
@@ -512,6 +483,7 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
         this.jCheckBox1.setSelected(jStockOptions.isEnableColorChange());
     }
 
+    @Override
     public boolean apply(JStockOptions jStockOptions) {
         jStockOptions.setNormalTextForegroundColor(jPanel6.getBackground());
         jStockOptions.setLowerNumericalValueForegroundColor(jPanel7.getBackground());
