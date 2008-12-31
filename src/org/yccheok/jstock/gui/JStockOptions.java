@@ -42,6 +42,10 @@ public class JStockOptions {
     public static final java.awt.Color DEFAULT_AUTO_UPDATE_FOREGROUND_COLOR = Color.BLACK;
     public static final java.awt.Color DEFAULT_AUTO_UPDATE_BACKGROUND_COLOR = Color.RED;
 
+    public static final java.awt.Color DEFAULT_CHAT_SYSTEM_MESSAGE_COLOR = Color.RED;
+    public static final java.awt.Color DEFAULT_CHAT_OWN_MESSAGE_COLOR = new java.awt.Color(169, 169, 169);
+    public static final java.awt.Color DEFAULT_CHAT_OTHER_MESSAGE_COLOR = new java.awt.Color(100, 149, 237);
+
     private static final int DEFAULT_HISTORY_DURATION =  10;
 
     /** Creates a new instance of JStockOptions */
@@ -78,8 +82,13 @@ public class JStockOptions {
 
 		this.setChatEnabled(false);
 		this.setChatUsername("");
+        this.setChatPassword("");
         this.setChatFlashNotificationEnabled(true);
         this.setChatSoundNotificationEnabled(true);
+
+        this.setChatSystemMessageColor(DEFAULT_CHAT_SYSTEM_MESSAGE_COLOR);
+        this.setChatOwnMessageColor(DEFAULT_CHAT_OWN_MESSAGE_COLOR);
+        this.setChatOtherMessageColor(DEFAULT_CHAT_OTHER_MESSAGE_COLOR);
     }
     
     private boolean singleIndicatorAlert;
@@ -119,8 +128,12 @@ public class JStockOptions {
 
     private boolean isChatEnabled = false;
     private String chatUsername = "";
+    private String chatPassword = "";
     private boolean isChatSoundNotificationEnabled = true;
     private boolean isChatFlashNotificationEnabled = true;
+    private Color chatSystemMessageColor;
+    private Color chatOwnMessageColor;
+    private Color chatOtherMessageColor;
 
     public boolean isAutoBrokerFeeCalculationEnabled() {
         return this.isAutoBrokerFeeCalculationEnabled;
@@ -153,7 +166,23 @@ public class JStockOptions {
         if (getChatUsername() == null) {
             setChatUsername("");
         }
-        
+
+        if (getChatPassword() == null) {
+            setChatPassword("");
+        }
+
+        if (this.getChatSystemMessageColor() == null) {
+            this.setChatSystemMessageColor(DEFAULT_CHAT_SYSTEM_MESSAGE_COLOR);
+        }
+
+        if (this.getChatOwnMessageColor() == null) {
+            this.setChatOwnMessageColor(DEFAULT_CHAT_OWN_MESSAGE_COLOR);
+        }
+
+        if (this.getChatOtherMessageColor() == null) {
+            this.setChatOtherMessageColor(DEFAULT_CHAT_OTHER_MESSAGE_COLOR);
+        }
+
         return this;
     }    
     
@@ -434,5 +463,61 @@ public class JStockOptions {
      */
     public void setChatUsername(String chatUsername) {
         this.chatUsername = chatUsername;
+    }
+
+    /**
+     * @return the chatSystemMessageColor
+     */
+    public Color getChatSystemMessageColor() {
+        return chatSystemMessageColor;
+    }
+
+    /**
+     * @param chatSystemMessageColor the chatSystemMessageColor to set
+     */
+    public void setChatSystemMessageColor(Color chatSystemMessageColor) {
+        this.chatSystemMessageColor = chatSystemMessageColor;
+    }
+
+    /**
+     * @return the chatOwnMessageColor
+     */
+    public Color getChatOwnMessageColor() {
+        return chatOwnMessageColor;
+    }
+
+    /**
+     * @param chatOwnMessageColor the chatOwnMessageColor to set
+     */
+    public void setChatOwnMessageColor(Color chatOwnMessageColor) {
+        this.chatOwnMessageColor = chatOwnMessageColor;
+    }
+
+    /**
+     * @return the chatOtherMessageColor
+     */
+    public Color getChatOtherMessageColor() {
+        return chatOtherMessageColor;
+    }
+
+    /**
+     * @param chatOtherMessageColor the chatOtherMessageColor to set
+     */
+    public void setChatOtherMessageColor(Color chatOtherMessageColor) {
+        this.chatOtherMessageColor = chatOtherMessageColor;
+    }
+
+    /**
+     * @return the chatPassword
+     */
+    public String getChatPassword() {
+        return chatPassword;
+    }
+
+    /**
+     * @param chatPassword the chatPassword to set
+     */
+    public void setChatPassword(String chatPassword) {
+        this.chatPassword = chatPassword;
     }
 }
