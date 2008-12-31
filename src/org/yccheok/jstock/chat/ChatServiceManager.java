@@ -52,9 +52,10 @@ public class ChatServiceManager {
     
     private class ChatService implements Runnable
     {
-        public ChatService(String username)
+        public ChatService(String username, String password)
         {
             this.username = username;
+            this.password = password;
             this.connection = null;
 
             readWriteLock = new java.util.concurrent.locks.ReentrantReadWriteLock();
@@ -167,10 +168,6 @@ public class ChatServiceManager {
             connection.disconnect();
             // Shall we?
             connection.removeConnectionListener(connectionListener);
-        }
-
-        public String getUsername() {
-            return username;
         }
 
         private State connected()
@@ -367,11 +364,11 @@ public class ChatServiceManager {
             try {
                 if (use_login_retry)
                 {
-                    accountManager.createAccount(username + this.login_retry, username + this.login_retry);
+                    accountManager.createAccount(username + this.login_retry, password);
                 }
                 else
                 {
-                    accountManager.createAccount(username, username);
+                    accountManager.createAccount(username, password);
                 }
 
                 state = State.ACCOUNT_CREATED;
@@ -437,11 +434,11 @@ public class ChatServiceManager {
 
                 if (use_login_retry)
                 {
-                    connection.login(username + this.login_retry, username + this.login_retry);
+                    connection.login(username + this.login_retry, password);
                 }
                 else
                 {
-                    connection.login(username, username);
+                    connection.login(username, password);
                }
 
                 if (connection.isAuthenticated() && connection.isConnected())
@@ -490,6 +487,44 @@ public class ChatServiceManager {
                 doneSignal.countDown();
         }
 
+        public boolean changePassword(String newPassword) {
+            final XMPPConnection c = this.connection;
+
+            if (c == null) {
+                return false;
+            }
+
+            try {
+                if ((c.isAuthenticated() == false) || (c.isConnected() == false)) {
+                    return false;
+                }
+
+                final AccountManager accountManager = c.getAccountManager();
+
+                if (accountManager == null) {
+                    return false;
+                }
+
+                accountManager.changePassword(newPassword);
+            }
+            catch (Exception ex) {
+                log.error(null, ex);
+                return false;
+            }
+
+            return true;
+        }
+
+        public boolean isLogin() {
+            final XMPPConnection c = this.connection;
+
+            if (c == null) {
+                return false;
+            }
+
+            return c.isAuthenticated() && c.isConnected();
+        }
+
         private final ConnectionListener connectionListener = this.getConnectionListener();
 
         // It is strange that we cannot share addMessageListener and addParticipantListener on a
@@ -500,6 +535,7 @@ public class ChatServiceManager {
         private MultiUserChat muc = null;
         private volatile boolean runnableFlag = true;
         private String username = null;
+        private final String password;
         private XMPPConnection connection = null;
         private boolean use_login_retry = false;
         private int login_retry = -1;
@@ -514,10 +550,11 @@ public class ChatServiceManager {
     public synchronized void start()
     {
         String username = MainFrame.getJStockOptions().getChatUsername();
+        String password = org.yccheok.jstock.gui.Utils.decrypt(MainFrame.getJStockOptions().getChatPassword());
 
         stop();
 
-        chatService = new ChatService(username);
+        chatService = new ChatService(username, password);
         chatService.start();
     }
 
@@ -571,6 +608,26 @@ public class ChatServiceManager {
 
     public void dettachAllStateObserver() {
         stateSubject.dettachAll();
+    }
+
+    public boolean isLogin() {
+        final ChatService c = this.chatService;
+
+        if (c == null) {
+            return false;
+        }
+
+        return c.isLogin();
+    }
+
+    public boolean changePassword(String newPassword) {
+        final ChatService c = this.chatService;
+        
+        if (c == null) {
+            return false;
+        }
+
+        return c.changePassword(newPassword);
     }
 
     private final SubjectEx<ChatServiceManager, ChatServiceManager.State> stateSubject = this.getStateSubject();
