@@ -26,6 +26,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -149,7 +150,7 @@ public class ChatJPanel extends javax.swing.JPanel {
         jLabel1.setDisabledIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/smile-gray.png"))); // NOI18N
         jPanel2.add(jLabel1, java.awt.BorderLayout.WEST);
 
-        jTextField1.setFont(new java.awt.Font("Tahoma", 0, 13)); // NOI18N
+        jTextField1.setFont(new java.awt.Font("Tahoma", 0, 13));
         jTextField1.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(51, 51, 255), 1, true));
         jTextField1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -195,6 +196,16 @@ public class ChatJPanel extends javax.swing.JPanel {
 
                 if(desktop.isSupported(Desktop.Action.BROWSE))
                 {
+                    if (url == null) {
+						// www.yahoo.com considered an invalid URL. Hence, evt.getURL() returns null.
+                        String string = "http://" + evt.getDescription();
+                        try {
+                            url = new URL(string);
+                        } catch (MalformedURLException ex) {
+                            return;
+                        }
+                    }
+
                     try {
                         desktop.browse(url.toURI());
                     }
@@ -713,6 +724,14 @@ public class ChatJPanel extends javax.swing.JPanel {
         }
     }
 
+    public boolean isLogin() {
+        return this.chatServiceManager.isLogin();
+    }
+
+    public boolean changePassword(String newPassword) {
+        return this.chatServiceManager.changePassword(newPassword);
+    }
+    
     private final ChatServiceManager chatServiceManager = new ChatServiceManager();
     private final org.yccheok.jstock.engine.Observer<ChatServiceManager, Packet> chatServiceManagerPacketObserver = this.getChatServiceManagerPacketObserver();
     private final org.yccheok.jstock.engine.Observer<ChatServiceManager, ChatServiceManager.State> chatServiceManagerStateObserver = this.getChatServiceManagerStateObserver();
