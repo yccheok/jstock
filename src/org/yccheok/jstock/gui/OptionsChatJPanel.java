@@ -19,6 +19,7 @@
 package org.yccheok.jstock.gui;
 
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -43,13 +44,29 @@ public class OptionsChatJPanel extends javax.swing.JPanel implements JStockOptio
         jXHeader1 = new org.jdesktop.swingx.JXHeader();
         jPanel1 = new javax.swing.JPanel();
         jCheckBox1 = new javax.swing.JCheckBox();
+        jPanel3 = new javax.swing.JPanel();
+        jCheckBox2 = new javax.swing.JCheckBox();
+        jCheckBox3 = new javax.swing.JCheckBox();
+        jPanel5 = new javax.swing.JPanel();
+        jPanel9 = new javax.swing.JPanel();
+        jButton1 = new javax.swing.JButton();
+        jPanel4 = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
+        jPanel6 = new javax.swing.JPanel();
+        jLabel4 = new javax.swing.JLabel();
+        jPanel7 = new javax.swing.JPanel();
+        jLabel5 = new javax.swing.JLabel();
+        jPanel8 = new javax.swing.JPanel();
+        jPanel10 = new javax.swing.JPanel();
+        jPanel11 = new javax.swing.JPanel();
+        jButton2 = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jTextField1 = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        jPanel3 = new javax.swing.JPanel();
-        jCheckBox2 = new javax.swing.JCheckBox();
-        jCheckBox3 = new javax.swing.JCheckBox();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        jPasswordField1 = new javax.swing.JPasswordField();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -65,42 +82,11 @@ public class OptionsChatJPanel extends javax.swing.JPanel implements JStockOptio
             }
         });
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Account"));
-
-        jLabel1.setText("Username");
-
-        jLabel2.setFont(new java.awt.Font("Dialog", 0, 10)); // NOI18N
-        jLabel2.setText("(Just pick any name you prefer)");
-
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel2)
-                .addContainerGap(39, Short.MAX_VALUE))
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Notification"));
 
-        jCheckBox2.setText("Play sound when there is new message coming in");
+        jCheckBox2.setText("Play sound when there is new message");
 
-        jCheckBox3.setText("Flash the tab when there is new message coming in");
+        jCheckBox3.setText("Flash the tab when there is new message");
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -111,7 +97,7 @@ public class OptionsChatJPanel extends javax.swing.JPanel implements JStockOptio
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jCheckBox2)
                     .addComponent(jCheckBox3))
-                .addContainerGap(91, Short.MAX_VALUE))
+                .addContainerGap(140, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -123,17 +109,219 @@ public class OptionsChatJPanel extends javax.swing.JPanel implements JStockOptio
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Color"));
+        jPanel5.setLayout(new java.awt.BorderLayout());
+
+        jButton1.setText("Reset to Default Color");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        jPanel9.add(jButton1);
+
+        jPanel5.add(jPanel9, java.awt.BorderLayout.SOUTH);
+
+        jLabel3.setText("System Message");
+
+        jPanel6.setBackground(new java.awt.Color(255, 0, 0));
+        jPanel6.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        jPanel6.setPreferredSize(new java.awt.Dimension(24, 24));
+        jPanel6.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jPanel6MouseClicked(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
+        jPanel6.setLayout(jPanel6Layout);
+        jPanel6Layout.setHorizontalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 22, Short.MAX_VALUE)
+        );
+        jPanel6Layout.setVerticalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 22, Short.MAX_VALUE)
+        );
+
+        jLabel4.setText("Own Message");
+
+        jPanel7.setBackground(new java.awt.Color(169, 169, 169));
+        jPanel7.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        jPanel7.setPreferredSize(new java.awt.Dimension(24, 24));
+        jPanel7.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jPanel7MouseClicked(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
+        jPanel7.setLayout(jPanel7Layout);
+        jPanel7Layout.setHorizontalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 22, Short.MAX_VALUE)
+        );
+        jPanel7Layout.setVerticalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 22, Short.MAX_VALUE)
+        );
+
+        jLabel5.setText("Other Users Message");
+
+        jPanel8.setBackground(new java.awt.Color(100, 149, 237));
+        jPanel8.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        jPanel8.setPreferredSize(new java.awt.Dimension(24, 24));
+        jPanel8.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jPanel8MouseClicked(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
+        jPanel8.setLayout(jPanel8Layout);
+        jPanel8Layout.setHorizontalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 22, Short.MAX_VALUE)
+        );
+        jPanel8Layout.setVerticalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 22, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addComponent(jLabel5)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addGap(55, 55, 55)
+                        .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addComponent(jLabel4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(202, Short.MAX_VALUE))
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel3))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel4)
+                    .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel5)
+                    .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanel5.add(jPanel4, java.awt.BorderLayout.CENTER);
+
+        jPanel10.setBorder(javax.swing.BorderFactory.createTitledBorder("Account"));
+        jPanel10.setLayout(new java.awt.BorderLayout());
+
+        jButton2.setText("Change Password...");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+        jPanel11.add(jButton2);
+
+        jPanel10.add(jPanel11, java.awt.BorderLayout.SOUTH);
+
+        jTextField1.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jTextField1KeyTyped(evt);
+            }
+        });
+
+        jLabel1.setText("Username");
+
+        jLabel2.setFont(new java.awt.Font("Dialog", 0, 10)); // NOI18N
+        jLabel2.setText("(Just pick any name you prefer)");
+
+        jLabel6.setText("Password");
+
+        jLabel7.setFont(new java.awt.Font("Dialog", 0, 10)); // NOI18N
+        jLabel7.setText("(Just pick any password you prefer)");
+
+        jPasswordField1.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jPasswordField1KeyTyped(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel1)
+                    .addComponent(jLabel6))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPasswordField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel2)
+                    .addComponent(jLabel7))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanel2Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jPasswordField1, jTextField1});
+
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel6)
+                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jPasswordField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel7)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanel2Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jPasswordField1, jTextField1});
+
+        jPanel10.add(jPanel2, java.awt.BorderLayout.CENTER);
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+            .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jCheckBox1, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jCheckBox1)
+                        .addContainerGap(44, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jPanel10, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 383, Short.MAX_VALUE)
+                            .addComponent(jPanel5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 383, Short.MAX_VALUE)
+                            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(103, 103, 103))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -141,10 +329,12 @@ public class OptionsChatJPanel extends javax.swing.JPanel implements JStockOptio
                 .addContainerGap()
                 .addComponent(jCheckBox1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(19, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         add(jPanel1, java.awt.BorderLayout.CENTER);
@@ -155,20 +345,124 @@ public class OptionsChatJPanel extends javax.swing.JPanel implements JStockOptio
         updateGUIState();
     }//GEN-LAST:event_jCheckBox1ItemStateChanged
 
+    private void jPanel6MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel6MouseClicked
+        // TODO add your handling code here:
+        if (jPanel6.isEnabled() == false) {
+            return;
+        }
+
+        final java.awt.Color color = javax.swing.JColorChooser.showDialog(this, "Choose a color", this.jPanel6.getBackground());
+
+        if(null == color) return;
+
+        jPanel6.setBackground(color);
+	}//GEN-LAST:event_jPanel6MouseClicked
+
+    private void jPanel7MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel7MouseClicked
+        if (jPanel7.isEnabled() == false) {
+            return;
+        }
+        
+        final java.awt.Color color = javax.swing.JColorChooser.showDialog(this, "Choose a color", this.jPanel7.getBackground());
+
+        if(null == color) return;
+
+        jPanel7.setBackground(color);
+    }//GEN-LAST:event_jPanel7MouseClicked
+
+    private void jPanel8MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel8MouseClicked
+        if (jPanel8.isEnabled() == false) {
+            return;
+        }
+
+        final java.awt.Color color = javax.swing.JColorChooser.showDialog(this, "Choose a color", this.jPanel8.getBackground());
+
+        if(null == color) return;
+
+        jPanel8.setBackground(color);
+    }//GEN-LAST:event_jPanel8MouseClicked
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        this.jPanel6.setBackground(JStockOptions.DEFAULT_CHAT_SYSTEM_MESSAGE_COLOR);
+        this.jPanel7.setBackground(JStockOptions.DEFAULT_CHAT_OWN_MESSAGE_COLOR);
+        this.jPanel8.setBackground(JStockOptions.DEFAULT_CHAT_OTHER_MESSAGE_COLOR);
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        ChangeChatPasswordJDialog changeChatPasswordJDialog = new ChangeChatPasswordJDialog(MainFrame.getMe(), true);
+
+        if (changeChatPasswordJDialog.doModal() == false) {
+            return;
+        }
+
+        // In changeChatPasswordJDialog, jStockOptions had been updated to latest password.
+        this.jPasswordField1.setText(Utils.decrypt(MainFrame.getJStockOptions().getChatPassword()));
+
+        MainFrame.getMe().stopChatServiceManager();
+        MainFrame.getMe().startChatServiceManager();
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private boolean shouldjButton2Enabled() {
+        final JStockOptions options = MainFrame.getJStockOptions();
+
+        final String newUsername = jTextField1.getText();
+        final String newPassword = new String(jPasswordField1.getPassword());
+
+        return (
+                jCheckBox1.isSelected() &&
+                newUsername.equals(options.getChatUsername()) &&
+                MainFrame.getMe().isChatLogin() &&
+                newPassword.equals(Utils.decrypt(options.getChatPassword()))
+                );
+    }
+
+    private void jTextField1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField1KeyTyped
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                jButton2.setEnabled(shouldjButton2Enabled());        
+            }
+        });
+    }//GEN-LAST:event_jTextField1KeyTyped
+
+    private void jPasswordField1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jPasswordField1KeyTyped
+        // TODO add your handling code here:
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                jButton2.setEnabled(shouldjButton2Enabled());
+            }
+        });
+    }//GEN-LAST:event_jPasswordField1KeyTyped
+
     private void updateGUIState() {
         jLabel2.setEnabled(jCheckBox1.isSelected());
         jTextField1.setEnabled(jCheckBox1.isSelected());
         jLabel1.setEnabled(jCheckBox1.isSelected());
+        jLabel6.setEnabled(jCheckBox1.isSelected());
+        this.jPasswordField1.setEnabled(jCheckBox1.isSelected());
+        jLabel7.setEnabled(jCheckBox1.isSelected());
+        jButton2.setEnabled(shouldjButton2Enabled());
         jCheckBox2.setEnabled(jCheckBox1.isSelected());
         jCheckBox3.setEnabled(jCheckBox1.isSelected());
+        jLabel3.setEnabled(jCheckBox1.isSelected());
+        jPanel6.setEnabled(jCheckBox1.isSelected());
+        jLabel4.setEnabled(jCheckBox1.isSelected());
+        jPanel7.setEnabled(jCheckBox1.isSelected());
+        jLabel5.setEnabled(jCheckBox1.isSelected());
+        jPanel8.setEnabled(jCheckBox1.isSelected());
+        jButton1.setEnabled(jCheckBox1.isSelected());
     }
 
     @Override
     public void set(JStockOptions jStockOptions) {
         this.jCheckBox1.setSelected(jStockOptions.isChatEnabled());
         this.jTextField1.setText(jStockOptions.getChatUsername());
+        this.jPasswordField1.setText(Utils.decrypt(jStockOptions.getChatPassword()));
         this.jCheckBox2.setSelected(jStockOptions.isChatSoundNotificationEnabled());
         this.jCheckBox3.setSelected(jStockOptions.isChatFlashNotificationEnabled());
+        this.jPanel6.setBackground(jStockOptions.getChatSystemMessageColor());
+        this.jPanel7.setBackground(jStockOptions.getChatOwnMessageColor());
+        this.jPanel8.setBackground(jStockOptions.getChatOtherMessageColor());
         this.updateGUIState();
     }
 
@@ -184,16 +478,30 @@ public class OptionsChatJPanel extends javax.swing.JPanel implements JStockOptio
                 return false;
             }
 
+            final char[] password = this.jPasswordField1.getPassword();
+
+            if (password == null || password.length <= 0) {
+                JOptionPane.showMessageDialog(this, "Password field may not be empty.", "Empty password", JOptionPane.WARNING_MESSAGE);
+                this.jPasswordField1.requestFocus();
+                return false;
+            }
+
+            final String newPasswordString = new String(jPasswordField1.getPassword());
+
             String oldUsername = jStockOptions.getChatUsername();
+            String oldPassword = Utils.decrypt(jStockOptions.getChatPassword());
             boolean oldFlag = jStockOptions.isChatEnabled();
 
             jStockOptions.setChatEnabled(true);
             jStockOptions.setChatUsername(this.jTextField1.getText());
+            jStockOptions.setChatPassword(Utils.encrypt(newPasswordString));
             jStockOptions.setChatSoundNotificationEnabled(this.jCheckBox2.isSelected());
             jStockOptions.setChatFlashNotificationEnabled(this.jCheckBox3.isSelected());
+            jStockOptions.setChatSystemMessageColor(jPanel6.getBackground());
+            jStockOptions.setChatOwnMessageColor(jPanel7.getBackground());
+            jStockOptions.setChatOtherMessageColor(jPanel8.getBackground());
 
-
-            if ((oldFlag != jStockOptions.isChatEnabled()) || (oldUsername.equals(jStockOptions.getChatUsername()) == false))
+            if ((oldFlag != jStockOptions.isChatEnabled()) || (oldUsername.equals(jStockOptions.getChatUsername()) == false) || (oldPassword.equals(newPasswordString) == false))
             {
                 if (m != null)
                 {
@@ -205,10 +513,18 @@ public class OptionsChatJPanel extends javax.swing.JPanel implements JStockOptio
         }
         else
         {
-            jStockOptions.setChatEnabled(false);
             if(m != null) {
                 m.stopChatServiceManager();
             }
+            
+            jStockOptions.setChatEnabled(false);
+            jStockOptions.setChatUsername(this.jTextField1.getText());
+            jStockOptions.setChatPassword(Utils.encrypt(new String(jPasswordField1.getPassword())));
+            jStockOptions.setChatSoundNotificationEnabled(this.jCheckBox2.isSelected());
+            jStockOptions.setChatFlashNotificationEnabled(this.jCheckBox3.isSelected());
+            jStockOptions.setChatSystemMessageColor(jPanel6.getBackground());
+            jStockOptions.setChatOwnMessageColor(jPanel7.getBackground());
+            jStockOptions.setChatOtherMessageColor(jPanel8.getBackground());
         }
 
         m.updateChatJPanelUIAccordingToOptions();
@@ -217,14 +533,30 @@ public class OptionsChatJPanel extends javax.swing.JPanel implements JStockOptio
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JCheckBox jCheckBox2;
     private javax.swing.JCheckBox jCheckBox3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
+    private javax.swing.JPasswordField jPasswordField1;
     private javax.swing.JTextField jTextField1;
     private org.jdesktop.swingx.JXHeader jXHeader1;
     // End of variables declaration//GEN-END:variables
