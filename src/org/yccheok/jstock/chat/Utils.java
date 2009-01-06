@@ -157,24 +157,24 @@ public class Utils {
 
         if (icons.size() == 0) {
             try {
-                icons.put(":\\)", "<img src=\"" + new File(Utils.getEmotesIconsDirectory() + "smile.png").toURI().toURL().toString() + "\"/>");
-                icons.put(":O", "<img src=\"" + new File(Utils.getEmotesIconsDirectory() + "shock.png").toURI().toURL().toString() + "\"/>");
-                icons.put(":\"&gt;", "<img src=\"" + new File(Utils.getEmotesIconsDirectory() + "embarrassed.png").toURI().toURL().toString() + "\"/>");
-                icons.put(":D", "<img src=\"" + new File(Utils.getEmotesIconsDirectory() + "smile-big.png").toURI().toURL().toString() + "\"/>");
-                icons.put(";\\)", "<img src=\"" + new File(Utils.getEmotesIconsDirectory() + "wink.png").toURI().toURL().toString() + "\"/>");
-                icons.put(":\\(\\(", "<img src=\"" + new File(Utils.getEmotesIconsDirectory() + "crying.png").toURI().toURL().toString() + "\"/>");
-                icons.put(":\\(", "<img src=\"" + new File(Utils.getEmotesIconsDirectory() + "sad.png").toURI().toURL().toString() + "\"/>");
-                icons.put(":P", "<img src=\"" + new File(Utils.getEmotesIconsDirectory() + "tongue.png").toURI().toURL().toString() + "\"/>");
-                icons.put(":\\|", "<img src=\"" + new File(Utils.getEmotesIconsDirectory() + "neutral.png").toURI().toURL().toString() + "\"/>");
+                icons.put(Pattern.compile(":\\)", Pattern.CASE_INSENSITIVE), "<img src=\"" + new File(Utils.getEmotesIconsDirectory() + "smile.png").toURI().toURL().toString() + "\"/>");
+                icons.put(Pattern.compile(":O", Pattern.CASE_INSENSITIVE), "<img src=\"" + new File(Utils.getEmotesIconsDirectory() + "shock.png").toURI().toURL().toString() + "\"/>");
+                icons.put(Pattern.compile(":\"&gt;", Pattern.CASE_INSENSITIVE), "<img src=\"" + new File(Utils.getEmotesIconsDirectory() + "embarrassed.png").toURI().toURL().toString() + "\"/>");
+                icons.put(Pattern.compile(":D", Pattern.CASE_INSENSITIVE), "<img src=\"" + new File(Utils.getEmotesIconsDirectory() + "smile-big.png").toURI().toURL().toString() + "\"/>");
+                icons.put(Pattern.compile(";\\)", Pattern.CASE_INSENSITIVE), "<img src=\"" + new File(Utils.getEmotesIconsDirectory() + "wink.png").toURI().toURL().toString() + "\"/>");
+                icons.put(Pattern.compile(":\\(\\(", Pattern.CASE_INSENSITIVE), "<img src=\"" + new File(Utils.getEmotesIconsDirectory() + "crying.png").toURI().toURL().toString() + "\"/>");
+                icons.put(Pattern.compile(":\\(", Pattern.CASE_INSENSITIVE), "<img src=\"" + new File(Utils.getEmotesIconsDirectory() + "sad.png").toURI().toURL().toString() + "\"/>");
+                icons.put(Pattern.compile(":P", Pattern.CASE_INSENSITIVE), "<img src=\"" + new File(Utils.getEmotesIconsDirectory() + "tongue.png").toURI().toURL().toString() + "\"/>");
+                icons.put(Pattern.compile(":\\|", Pattern.CASE_INSENSITIVE), "<img src=\"" + new File(Utils.getEmotesIconsDirectory() + "neutral.png").toURI().toURL().toString() + "\"/>");
             } catch (MalformedURLException ex) {
                 // Unlikely.
                 log.error(null, ex);
             }
         }
 
-        Set<String> symbols = icons.keySet();
-        for (String symbol : symbols) {
-            src = src.replaceAll(symbol, icons.get(symbol));
+        final Set<Pattern> patterns = icons.keySet();
+        for (Pattern pattern : patterns) {
+            src = pattern.matcher(src).replaceAll(icons.get(pattern));
         }
 
         return src;
@@ -334,7 +334,7 @@ public class Utils {
     
     private static final Log log = LogFactory.getLog(Utils.class);
     // Sequence are important. For example, we wish to parse :(( before :(
-    private static final Map<String, String> icons = new LinkedHashMap<String, String>();
+    private static final Map<Pattern, String> icons = new LinkedHashMap<Pattern, String>();
 
     private static Executor soundPool = Executors.newFixedThreadPool(Utils.NUM_OF_THREADS_SOUND_POOL);
     private static final Map<Sound, Clip> sounds = new HashMap<Sound, Clip>();
