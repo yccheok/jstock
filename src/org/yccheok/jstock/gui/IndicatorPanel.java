@@ -304,7 +304,7 @@ public class IndicatorPanel extends JPanel implements ChangeListener {
         
         stop();
         
-        MainFrame m = MainFrame.getMe();
+        MainFrame m = MainFrame.getInstance();
         m.setStatusBar(false, "Simulation stopped");
     }//GEN-LAST:event_jButton6ActionPerformed
 
@@ -412,7 +412,7 @@ public class IndicatorPanel extends JPanel implements ChangeListener {
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
 // TODO add your handling code here:   
-        final MainFrame m = MainFrame.getMe();
+        final MainFrame m = MainFrame.getInstance();
         final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = m.getStockCodeAndSymbolDatabase();
         
         if(stockCodeAndSymbolDatabase == null) {
@@ -681,7 +681,7 @@ public class IndicatorPanel extends JPanel implements ChangeListener {
                     String stock = IndicatorPanel.this.jComboBox1.getEditor().getItem().toString();
                     
                     if(stock.length() > 0) {
-                        MainFrame m = MainFrame.getMe();
+                        MainFrame m = MainFrame.getInstance();
                         
                         if(m == null) return;
                         
@@ -745,7 +745,7 @@ public class IndicatorPanel extends JPanel implements ChangeListener {
             Stock s = null;
             int tries = 0;
             
-            MainFrame m = MainFrame.getMe();
+            MainFrame m = MainFrame.getInstance();
 
             if(m == null) {
                 publish(s);
@@ -789,7 +789,7 @@ public class IndicatorPanel extends JPanel implements ChangeListener {
         @Override
          protected void process(java.util.List<Stock> stocks) {
              for (Stock stock : stocks) {
-                 MainFrame m = MainFrame.getMe();
+                 MainFrame m = MainFrame.getInstance();
                  
                 if(stock != null) {
                     ((ObjectInspectorJPanel)objectInspectorJPanel).setBean(new MutableStock(stock));
@@ -840,7 +840,7 @@ public class IndicatorPanel extends JPanel implements ChangeListener {
     
     // Run by worker thread only.
     private void simulate(final Code code) {                
-        MainFrame m = MainFrame.getMe();
+        MainFrame m = MainFrame.getInstance();
 
         // First, check whether there is a need to get history.
         final IndicatorDefaultDrawing indicatorDefaultDrawing = (IndicatorDefaultDrawing)this.view.getDrawing();
@@ -945,7 +945,7 @@ public class IndicatorPanel extends JPanel implements ChangeListener {
     public void stateChanged(javax.swing.event.ChangeEvent evt) {        
         JTabbedPane pane = (JTabbedPane)evt.getSource();
         if(pane.getSelectedComponent() == this) {
-            final MainFrame m = MainFrame.getMe();
+            final MainFrame m = MainFrame.getInstance();
             final String password = Utils.decrypt(m.getJStockOptions().getIndicatorPassword());
             
             boolean status = false;
