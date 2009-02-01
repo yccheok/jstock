@@ -85,7 +85,7 @@ public class OptionsUpdateJPanel extends javax.swing.JPanel implements JStockOpt
     public void set(JStockOptions jStockOptions) {
         jCheckBox1.setSelected(jStockOptions.isAutoUpdateNewsEnabled());
 
-        MainFrame m = MainFrame.getMe();
+        MainFrame m = MainFrame.getInstance();
         if(m != null) {
             m.initLatestNewsTask();
         }
