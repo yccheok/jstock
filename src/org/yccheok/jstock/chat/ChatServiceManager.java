@@ -256,7 +256,7 @@ public class ChatServiceManager {
             //    return state;
             //}
 
-            final String roomName = Utils.getRoomName(MainFrame.getJStockOptions().getCountry()) + "@" + serviceName;
+            final String roomName = Utils.getRoomName(MainFrame.getInstance().getJStockOptions().getCountry()) + "@" + serviceName;
 
             if (muc != null) {
                 muc.removeMessageListener(messageListener);
@@ -448,7 +448,7 @@ public class ChatServiceManager {
                         use_login_retry = !use_login_retry;
                         username = username + this.login_retry;
                         this.login_retry = -1;
-                        MainFrame.getJStockOptions().setChatUsername(username);
+                        MainFrame.getInstance().getJStockOptions().setChatUsername(username);
                     }
 
                     this.connection.removeConnectionListener(connectionListener);
@@ -549,8 +549,8 @@ public class ChatServiceManager {
 
     public synchronized void start()
     {
-        String username = MainFrame.getJStockOptions().getChatUsername();
-        String password = org.yccheok.jstock.gui.Utils.decrypt(MainFrame.getJStockOptions().getChatPassword());
+        String username = MainFrame.getInstance().getJStockOptions().getChatUsername();
+        String password = org.yccheok.jstock.gui.Utils.decrypt(MainFrame.getInstance().getJStockOptions().getChatPassword());
 
         stop();
 
