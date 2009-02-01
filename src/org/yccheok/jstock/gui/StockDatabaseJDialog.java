@@ -298,7 +298,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
 
     
         private Color getBackgroundColor(int row) {
-            final JStockOptions jStockOptions = MainFrame.getJStockOptions();
+            final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
         
             if(row % 2 == 0) {
                 return jStockOptions.getFirstRowBackgroundColor();
@@ -316,7 +316,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
 
             if(isSelected || hasFocus) return c;
 
-            final JStockOptions jStockOptions = MainFrame.getJStockOptions();        
+            final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
         
             c.setForeground(jStockOptions.getNormalTextForegroundColor());
     

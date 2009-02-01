@@ -24,7 +24,6 @@ package org.yccheok.jstock.gui;
 
 import java.awt.*;
 import javax.swing.*;
-import javax.swing.table.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -41,7 +40,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
     }
     
     private void performCellBlinking(final Component cell, final double value, final double oldValue, final Color finalForegroundColor, final Color finalBackgroundColor) {                
-        final JStockOptions jStockOptions = MainFrame.getJStockOptions();
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
 
         if(value == oldValue) {
             cell.setForeground(finalForegroundColor);
@@ -62,7 +61,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
     }
     
     private Color getBackgroundColor(int row) {
-        final JStockOptions jStockOptions = MainFrame.getJStockOptions();
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
         
         if(row % 2 == 0) {
             return jStockOptions.getFirstRowBackgroundColor();
@@ -72,7 +71,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
     }
     
     private Color getForegroundColor(double value, double ref) {
-        final JStockOptions jStockOptions = MainFrame.getJStockOptions();
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
         
         if(value > ref) {
             return jStockOptions.getHigherNumericalValueForegroundColor();
@@ -88,7 +87,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
                             Component c, JTable table, Object color,
                             boolean isSelected, boolean hasFocus,
                             int row, int column) {        
-        final JStockOptions jStockOptions = MainFrame.getJStockOptions();        
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
         
         AbstractTableModelWithMemory tableModel = (AbstractTableModelWithMemory)table.getModel();
 
@@ -248,7 +247,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
 
         if(isSelected) return c;
 
-        final JStockOptions jStockOptions = MainFrame.getJStockOptions();        
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
         
         if(jStockOptions.isEnableColorChange()) {
             return getTableCellRendererComponentWithCellBlinking(c, table, color, isSelected, hasFocus, row, column);
