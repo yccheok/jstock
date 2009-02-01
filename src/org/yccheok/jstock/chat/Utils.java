@@ -201,7 +201,7 @@ public class Utils {
         {
         case Mine:
             stringBuffer.append("<span style=\"color:#");
-            stringBuffer.append(Utils.toCSSHTML(MainFrame.getJStockOptions().getChatOwnMessageColor()));
+            stringBuffer.append(Utils.toCSSHTML(MainFrame.getInstance().getJStockOptions().getChatOwnMessageColor()));
             stringBuffer.append(";font-weight:bold\">");
             stringBuffer.append(who);
             stringBuffer.append(": </span>");
@@ -210,7 +210,7 @@ public class Utils {
 
         case Other:
             stringBuffer.append("<span style=\"color:#");
-            stringBuffer.append(Utils.toCSSHTML(MainFrame.getJStockOptions().getChatOtherMessageColor()));
+            stringBuffer.append(Utils.toCSSHTML(MainFrame.getInstance().getJStockOptions().getChatOtherMessageColor()));
             stringBuffer.append(";font-weight:bold\">");
             stringBuffer.append(who);
             stringBuffer.append(": </span>");
@@ -222,7 +222,7 @@ public class Utils {
             Date date = new Date();
             Format formatter = new SimpleDateFormat("h:mm:ss a");
             stringBuffer.append("<span style=\"color:#");
-            stringBuffer.append(Utils.toCSSHTML(MainFrame.getJStockOptions().getChatSystemMessageColor()));
+            stringBuffer.append(Utils.toCSSHTML(MainFrame.getInstance().getJStockOptions().getChatSystemMessageColor()));
             stringBuffer.append(";font-weight: bold\">");
             stringBuffer.append('(');
             stringBuffer.append(formatter.format(date));
