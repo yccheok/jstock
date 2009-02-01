@@ -69,7 +69,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
     }
     
     private boolean shouldAutoCalculateBrokerFee() {
-        final JStockOptions jStockOptions = MainFrame.getJStockOptions();
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
         
         return 
                 (jStockOptions.isAutoBrokerFeeCalculationEnabled()) && 
@@ -374,7 +374,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         ClearingFee clearingFee = null;
         
         if(this.shouldAutoCalculateBrokerFee()) {
-            final BrokingFirm brokingFirm = MainFrame.getJStockOptions().getSelectedBrokingFirm();
+            final BrokingFirm brokingFirm = MainFrame.getInstance().getJStockOptions().getSelectedBrokingFirm();
             broker = brokingFirm.getBroker();
             stampDuty = brokingFirm.getStampDuty();
             clearingFee = brokingFirm.getClearingFee();
@@ -468,7 +468,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         
         if(shouldAutoCalculateBrokerFee())
         {
-            final BrokingFirm brokingFirm = MainFrame.getJStockOptions().getSelectedBrokingFirm();
+            final BrokingFirm brokingFirm = MainFrame.getInstance().getJStockOptions().getSelectedBrokingFirm();
             
             SwingUtilities.invokeLater(new Runnable() { public void run() {
                 final String name = jTextField1.getText();

@@ -61,42 +61,76 @@ public class MainFrame extends javax.swing.JFrame {
     
     /** Creates new form MainFrame */
 
-    public MainFrame() {
-        initComponents();
+    // Private constructor is sufficient to suppress unauthorized calls to the constructor
+    private MainFrame()
+    {
+    }
 
-        me = this;
+    private void init() {
+        /* Workaround to solve JXTreeTable look n feel cannot be changed on the fly. */
+        initJStockOptions();
+
+        try {
+            UIManager.setLookAndFeel(getJStockOptions().getLooknFeel());
+        }
+        catch(java.lang.ClassNotFoundException exp) {
+            log.error("", exp);
+        }
+        catch(java.lang.InstantiationException exp) {
+            log.error("", exp);
+        }
+        catch(java.lang.IllegalAccessException exp) {
+            log.error("", exp);
+        }
+        catch(javax.swing.UnsupportedLookAndFeelException exp) {
+            log.error("", exp);
+        }
+
+        initComponents();
 
         createLookAndFeelMenuItem();
         createCountryMenuItem();
-        
+
         createStockIndicatorEditor();
         createIndicatorScannerJPanel();
         createPortfolioManagementJPanel();
         createChatJPanel();
 
         createIconsAndToolTipTextForJTabbedPane();
-        
+
         this.createSystemTrayIcon();
-        
+
         this.initPreloadDatabase();
         this.initChatDatas();
-        this.initStatusBar(); 
+        this.initStatusBar();
         this.initMarketJPanel();
         this.initUsernameAndPassword();
-        this.initTableHeaderToolTips();               
+        this.initTableHeaderToolTips();
         this.initjComboBox1EditorComponentKeyListerner();
         this.initMyJXStatusBarCountryLabelMouseAdapter();
         this.initMyJXStatusBarImageLabelMouseAdapter();
         this.initStockCodeAndSymbolDatabase(true);
         this.initMarketThread();
         this.initLatestNewsTask();
-        this.initRealTimeStockMonitor();  
+        this.initRealTimeStockMonitor();
         this.initRealTimeStocks();
         this.initStockHistoryMonitor();
         this.initOthersStockHistoryMonitor();
         this.initBrokingFirmLogos();
     }
-    
+
+    /**
+     * MainFrameHolder is loaded on the first execution of Singleton.getInstance()
+     * or the first access to MainFrameHolder.INSTANCE, not before.
+     */
+    private static class MainFrameHolder {
+        private final static MainFrame INSTANCE = new MainFrame();
+    }
+
+    public static MainFrame getInstance() {
+        return MainFrameHolder.INSTANCE;
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -757,12 +791,12 @@ public class MainFrame extends javax.swing.JFrame {
 // TODO add your handling code here
         OptionsJDialog optionsJDialog = new OptionsJDialog(this, true);
         optionsJDialog.setLocationRelativeTo(this);
-        optionsJDialog.set(MainFrame.jStockOptions);
+        optionsJDialog.set(jStockOptions);
         optionsJDialog.setVisible(true);		
     }//GEN-LAST:event_jMenuItem6ActionPerformed
 
-    public static JStockOptions getJStockOptions() {
-        return MainFrame.jStockOptions;
+    public JStockOptions getJStockOptions() {
+        return jStockOptions;
     }
     
     /* Dangerous! We didn't perform proper clean up, because we do not want
@@ -934,29 +968,11 @@ public class MainFrame extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Workaround to solve JXTreeTable look n feel cannot be changed on the fly. */
-        initJStockOptions();
-        
-        try {
-            UIManager.setLookAndFeel(MainFrame.getJStockOptions().getLooknFeel());
-        }
-        catch(java.lang.ClassNotFoundException exp) {
-            log.error("", exp);
-        }
-        catch(java.lang.InstantiationException exp) {
-            log.error("", exp);
-        }
-        catch(java.lang.IllegalAccessException exp) {
-            log.error("", exp);
-        }
-        catch(javax.swing.UnsupportedLookAndFeelException exp) {
-            log.error("", exp);
-        }
-        
+    public static void main(String args[]) {        
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                MainFrame mainFrame = new MainFrame();                
+                final MainFrame mainFrame = MainFrame.getInstance();
+                mainFrame.init();
                 mainFrame.setExtendedState(Frame.MAXIMIZED_BOTH);
                 mainFrame.setVisible(true);               
             }
@@ -1057,7 +1073,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
   
     public void setLookAndFeel(String lafClassName) {
-	/* Backward compataible purpose. Old JStockOptions may contain null in this field. */
+        /* Backward compataible purpose. Old JStockOptions may contain null in this field. */
         if(lafClassName == null)
             return;
         
@@ -1078,7 +1094,7 @@ public class MainFrame extends javax.swing.JFrame {
             log.error("", exp);
         }
         
-        MainFrame.jStockOptions.setLookNFeel(lafClassName);
+        this.jStockOptions.setLookNFeel(lafClassName);
         
         for (Enumeration<AbstractButton> e = this.buttonGroup1.getElements() ; e.hasMoreElements() ;) {
             AbstractButton button = e.nextElement();
@@ -1478,7 +1494,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     public java.util.List<StockServerFactory> getStockServerFactory() {
-        return getStockServerFactory(MainFrame.jStockOptions.getCountry());
+        return getStockServerFactory(this.jStockOptions.getCountry());
     }
 
     private java.util.List<StockServerFactory> getStockServerFactory(Country country) {
@@ -1643,7 +1659,7 @@ public class MainFrame extends javax.swing.JFrame {
                 }
                 
                 try {
-                    Thread.sleep(MainFrame.jStockOptions.getScanningSpeed());
+                    Thread.sleep(jStockOptions.getScanningSpeed());
                 }
                 catch(InterruptedException exp) {
                     log.error(null, exp);
@@ -1911,7 +1927,7 @@ public class MainFrame extends javax.swing.JFrame {
         }
     }
     
-    private static void initJStockOptions() {
+    private void initJStockOptions() {
         try {
             File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "options.xml");
 
@@ -2040,7 +2056,7 @@ public class MainFrame extends javax.swing.JFrame {
             return false;
         }
         
-        final int size = MainFrame.jStockOptions.getBrokingFirmSize();
+        final int size = this.jStockOptions.getBrokingFirmSize();
 
         for(int i=0; i<size; i++) {
             final Image image = jStockOptions.getBrokingFirm(i).getLogo();
@@ -2105,7 +2121,7 @@ public class MainFrame extends javax.swing.JFrame {
         
         try {
             OutputStream outputStream = new FileOutputStream(f);
-            xStream.toXML(MainFrame.jStockOptions, outputStream);  
+            xStream.toXML(jStockOptions, outputStream);  
         }
         catch(java.io.FileNotFoundException exp) {
             log.error("", exp);
@@ -2573,10 +2589,6 @@ public class MainFrame extends javax.swing.JFrame {
         this.extractZipFile("database" + File.separator + "database.zip");
     }
 
-    public static MainFrame getMe() {
-        return me;
-    }
-
     private class LatestNewsTask extends SwingWorker<Void, String> {
         // Delay first update checking for the 20 seconds
         private static final int SHORT_DELAY = 20 * 1000;
@@ -2645,7 +2657,7 @@ public class MainFrame extends javax.swing.JFrame {
                     */
                 }
 
-                final long newsVersion = MainFrame.jStockOptions.getNewsVersion();
+                final long newsVersion = jStockOptions.getNewsVersion();
                 final String location = Utils.getLatestNewsLocation(newsVersion);
 
                 doneSignal = new CountDownLatch(1);
@@ -2695,7 +2707,7 @@ public class MainFrame extends javax.swing.JFrame {
                 }
 
                 // Try on next latest news.
-                MainFrame.jStockOptions.setNewsVersion(newsVersion + 1);
+                jStockOptions.setNewsVersion(newsVersion + 1);
             }
 
             return null;
@@ -2773,8 +2785,8 @@ public class MainFrame extends javax.swing.JFrame {
         statusBar.setMainMessage(message)
                 .setImageIcon(icon, iconMessage)
                 .setCountryIcon(
-					MainFrame.jStockOptions.getCountry().getIcon(), 
-					MainFrame.jStockOptions.getCountry().toString());
+					jStockOptions.getCountry().getIcon(), 
+					jStockOptions.getCountry().toString());
     }
     
     private TrayIcon trayIcon;
@@ -2792,11 +2804,8 @@ public class MainFrame extends javax.swing.JFrame {
     private StockCodeAndSymbolDatabaseTask stockCodeAndSymbolDatabaseTask = null;
     private LatestNewsTask latestNewsTask = null;
     private Thread marketThread = null;
-    private StockHistorySerializer stockHistorySerializer = null;
-    
-    /* One and only one. */
-    private static JStockOptions jStockOptions;
-    private static MainFrame me;
+    private StockHistorySerializer stockHistorySerializer = null;        
+    private JStockOptions jStockOptions;
 
     // As workaround to overcome the bug, when new look n feel being applied during runtime, the original
     // KeyListner for ComboBoxEditor will be removed.

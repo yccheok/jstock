@@ -565,7 +565,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             });
         }
         
-        realTimeStockMonitor = new RealTimeStockMonitor(4, 20, MainFrame.getJStockOptions().getScanningSpeed());
+        realTimeStockMonitor = new RealTimeStockMonitor(4, 20, MainFrame.getInstance().getJStockOptions().getScanningSpeed());
         
         for(StockServerFactory factory : stockServerFactories) {
             realTimeStockMonitor.addStockServerFactory(factory);
@@ -598,7 +598,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             
             if(indicators == null) continue;
             
-            final JStockOptions jStockOptions = MainFrame.getJStockOptions();
+            final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
 
             if(jStockOptions.isSingleIndicatorAlert()) {
                 for(OperatorIndicator indicator : indicators) {
@@ -745,7 +745,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     private void alert(final Indicator indicator) {
         final MainFrame m = getMainFrame();
 
-        final JStockOptions jStockOptions = MainFrame.getJStockOptions();
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
         
         synchronized(alertRecords) {
             if(jStockOptions.isSingleIndicatorAlert() == true) {
@@ -828,7 +828,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     {
         if (mainFrame == null)
         {
-            mainFrame = MainFrame.getMe();
+            mainFrame = MainFrame.getInstance();
         }
 
         return mainFrame;

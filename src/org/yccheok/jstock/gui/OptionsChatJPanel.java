@@ -390,21 +390,21 @@ public class OptionsChatJPanel extends javax.swing.JPanel implements JStockOptio
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
-        ChangeChatPasswordJDialog changeChatPasswordJDialog = new ChangeChatPasswordJDialog(MainFrame.getMe(), true);
+        ChangeChatPasswordJDialog changeChatPasswordJDialog = new ChangeChatPasswordJDialog(MainFrame.getInstance(), true);
 
         if (changeChatPasswordJDialog.doModal() == false) {
             return;
         }
 
         // In changeChatPasswordJDialog, jStockOptions had been updated to latest password.
-        this.jPasswordField1.setText(Utils.decrypt(MainFrame.getJStockOptions().getChatPassword()));
+        this.jPasswordField1.setText(Utils.decrypt(MainFrame.getInstance().getJStockOptions().getChatPassword()));
 
-        MainFrame.getMe().stopChatServiceManager();
-        MainFrame.getMe().startChatServiceManager();
+        MainFrame.getInstance().stopChatServiceManager();
+        MainFrame.getInstance().startChatServiceManager();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private boolean shouldjButton2Enabled() {
-        final JStockOptions options = MainFrame.getJStockOptions();
+        final JStockOptions options = MainFrame.getInstance().getJStockOptions();
 
         final String newUsername = jTextField1.getText();
         final String newPassword = new String(jPasswordField1.getPassword());
@@ -412,7 +412,7 @@ public class OptionsChatJPanel extends javax.swing.JPanel implements JStockOptio
         return (
                 jCheckBox1.isSelected() &&
                 newUsername.equals(options.getChatUsername()) &&
-                MainFrame.getMe().isChatLogin() &&
+                MainFrame.getInstance().isChatLogin() &&
                 newPassword.equals(Utils.decrypt(options.getChatPassword()))
                 );
     }
@@ -468,7 +468,7 @@ public class OptionsChatJPanel extends javax.swing.JPanel implements JStockOptio
 
     @Override
     public boolean apply(JStockOptions jStockOptions) {
-        final MainFrame m = MainFrame.getMe();
+        final MainFrame m = MainFrame.getInstance();
 
         if (this.jCheckBox1.isSelected())
         {
