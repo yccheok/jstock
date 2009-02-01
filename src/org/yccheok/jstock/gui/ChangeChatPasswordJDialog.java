@@ -164,7 +164,7 @@ public class ChangeChatPasswordJDialog extends javax.swing.JDialog {
             return;
         }
 
-        if (newPassword.equals(Utils.decrypt(MainFrame.getJStockOptions().getChatPassword())))
+        if (newPassword.equals(Utils.decrypt(MainFrame.getInstance().getJStockOptions().getChatPassword())))
         {
             JOptionPane.showMessageDialog(this, "New password cannot same as old password.", "Re-type password", JOptionPane.WARNING_MESSAGE);
             this.jPasswordField2.requestFocus();
@@ -174,9 +174,9 @@ public class ChangeChatPasswordJDialog extends javax.swing.JDialog {
         this.thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                if (MainFrame.getMe().changeChatPassword(newPassword))
+                if (MainFrame.getInstance().changeChatPassword(newPassword))
                 {
-                    MainFrame.getJStockOptions().setChatPassword(Utils.encrypt(newPassword));
+                    MainFrame.getInstance().getJStockOptions().setChatPassword(Utils.encrypt(newPassword));
                     
                     SwingUtilities.invokeLater(new Runnable() {
 
