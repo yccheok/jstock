@@ -350,17 +350,17 @@ public class ChatJPanel extends javax.swing.JPanel {
     }
 
     private void _updateUIAccordingToOptions() {
-        final JStockOptions jStockOptions = MainFrame.getJStockOptions();
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
         
         if (jStockOptions.isChatEnabled())
         {
             jLabel1.setEnabled(true);
-            jLabel1.setText(MainFrame.getJStockOptions().getChatUsername());
+            jLabel1.setText(MainFrame.getInstance().getJStockOptions().getChatUsername());
         }
         else
         {
             jLabel1.setEnabled(false);
-            jLabel1.setText(MainFrame.getJStockOptions().getChatUsername());
+            jLabel1.setText(MainFrame.getInstance().getJStockOptions().getChatUsername());
             jLabel1.setToolTipText("Not connected");
         }
     }
@@ -411,14 +411,14 @@ public class ChatJPanel extends javax.swing.JPanel {
             if (presence.getType() == Presence.Type.available) {
                 message = Message.newInstance(who, who + " entered the room.", Message.Mode.System);
                 this.addUser(who);
-                if (MainFrame.getJStockOptions().isChatSoundNotificationEnabled()) {
+                if (MainFrame.getInstance().getJStockOptions().isChatSoundNotificationEnabled()) {
                     Utils.playSound(Utils.Sound.LOGIN);
                 }
             }
             else {
                 message = Message.newInstance(who, who + " left the room.", Message.Mode.System);
                 this.removeUser(who);
-                if (MainFrame.getJStockOptions().isChatSoundNotificationEnabled()) {
+                if (MainFrame.getInstance().getJStockOptions().isChatSoundNotificationEnabled()) {
                     Utils.playSound(Utils.Sound.LOGOUT);
                 }
             }
@@ -431,17 +431,17 @@ public class ChatJPanel extends javax.swing.JPanel {
             final String[] whos = message.getFrom().split("/");
             final String who = whos.length >= 2 ? whos[1] : whos[0];
 
-            final Message msg = Message.newInstance(who, message.getBody(), MainFrame.getJStockOptions().getChatUsername().equals(who) ? Message.Mode.Mine : Message.Mode.Other);
+            final Message msg = Message.newInstance(who, message.getBody(), MainFrame.getInstance().getJStockOptions().getChatUsername().equals(who) ? Message.Mode.Mine : Message.Mode.Other);
 
             if (msg.mode == Message.Mode.Mine)
             {
-                if (MainFrame.getJStockOptions().isChatSoundNotificationEnabled()) {
+                if (MainFrame.getInstance().getJStockOptions().isChatSoundNotificationEnabled()) {
                     Utils.playSound(Utils.Sound.SEND);
                 }
             }
             else
             {
-                if (MainFrame.getJStockOptions().isChatSoundNotificationEnabled()) {
+                if (MainFrame.getInstance().getJStockOptions().isChatSoundNotificationEnabled()) {
                     Utils.playSound(Utils.Sound.RECEIVE);
                 }
             }
@@ -486,7 +486,7 @@ public class ChatJPanel extends javax.swing.JPanel {
                 @Override
                 public void run() {
                     jLabel1.setToolTipText("Connected");
-                    jLabel1.setText(MainFrame.getJStockOptions().getChatUsername());                    
+                    jLabel1.setText(MainFrame.getInstance().getJStockOptions().getChatUsername());
                 }
             });
             break;
@@ -521,7 +521,7 @@ public class ChatJPanel extends javax.swing.JPanel {
                 public void run() {
                     jLabel1.setToolTipText("Room created");
                     jLabel1.setIcon(connectedIcon);
-                    ChatJPanel.this.addChannel(Utils.getRoomName(MainFrame.getJStockOptions().getCountry()));
+                    ChatJPanel.this.addChannel(Utils.getRoomName(MainFrame.getInstance().getJStockOptions().getCountry()));
                 }
             });
             break;
@@ -532,7 +532,7 @@ public class ChatJPanel extends javax.swing.JPanel {
     {
         if (mainFrame == null)
         {
-            mainFrame = MainFrame.getMe();
+            mainFrame = MainFrame.getInstance();
         }
 
         return mainFrame;
