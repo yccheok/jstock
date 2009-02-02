@@ -117,6 +117,7 @@ public class MainFrame extends javax.swing.JFrame {
         this.initStockHistoryMonitor();
         this.initOthersStockHistoryMonitor();
         this.initBrokingFirmLogos();
+        this.initGUIOptions();
     }
 
     /**
@@ -814,7 +815,10 @@ public class MainFrame extends javax.swing.JFrame {
 
         log.info("saveJStockOptions...");
         this.saveJStockOptions();
-        
+
+        log.info("saveGUIOptions...");
+        this.saveGUIOptions();
+
         log.info("saveBrokingFirmLogos...");
         this.saveBrokingFirmLogos();
         
@@ -974,7 +978,8 @@ public class MainFrame extends javax.swing.JFrame {
                 final MainFrame mainFrame = MainFrame.getInstance();
                 mainFrame.init();
                 mainFrame.setExtendedState(Frame.MAXIMIZED_BOTH);
-                mainFrame.setVisible(true);               
+                mainFrame.setVisible(true);
+                mainFrame.setLookAndFeel(mainFrame.getJStockOptions().getLooknFeel());
             }
         });
     }
@@ -1926,7 +1931,112 @@ public class MainFrame extends javax.swing.JFrame {
             }
         }
     }
+
+    private void initGUIOptions() {
+        GUIOptions guiOptions = null;
+
+        try {
+            File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "mainframe.xml");
+
+            XStream xStream = new XStream();
+            InputStream inputStream = new java.io.FileInputStream(f);
+            guiOptions = (GUIOptions)xStream.fromXML(inputStream);
+
+            log.info("guiOptions loaded from " + f.toString() + " successfully.");
+        }
+        catch (java.io.FileNotFoundException exp) {
+            log.error("", exp);
+        }
+        catch (com.thoughtworks.xstream.core.BaseException exp) {
+            log.error("", exp);
+        }
+
+        if (guiOptions == null)
+        {
+            return;
+        }
+
+        if (guiOptions.getJTableOptionsSize() <= 0)
+        {
+            return;
+        }
+
+        /* Remove any unwanted columns. */
+        for (int i = 0; i < this.jTable1.getColumnCount(); i++) {
+            final String name = this.jTable1.getColumnName(i);
+
+            if (guiOptions.getJTableOptions(0).contains(name) == false)
+            {
+                JTableUtilities.removeTableColumn(jTable1, name);
+                i--;
+            }
+        }
+
+        final int optionsCount = guiOptions.getJTableOptions(0).getColumnSize();
+        final int tableCount = this.jTable1.getColumnCount();
+
+        /* Sort the columns according to user preference. */
+        for (int i = 0; i < optionsCount; i++) {
+            final String name = guiOptions.getJTableOptions(0).getColumnName(i);
+            int index = -1;
+            for (int j = 0; j < tableCount; j++) {
+                if (jTable1.getColumnName(j).equals(name))
+                {
+                    index = j;
+                    break;
+                }
+            }
+            
+            if (index >= 0)
+            {
+                this.jTable1.moveColumn(index, i);
+            }
+        }
+    }
+
+    private void saveGUIOptions() {
+        _saveGUIOptions();
+        this.indicatorScannerJPanel.saveGUIOptions();
+        this.portfolioManagementJPanel.saveGUIOptions();
+    }
     
+    private boolean _saveGUIOptions() {
+        if(Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config") == false)
+        {
+            return false;
+        }
+        
+        final GUIOptions.JTableOptions jTableOptions = new GUIOptions.JTableOptions();
+        
+        final int count = this.jTable1.getColumnCount();
+        for (int i = 0; i < count; i++) {
+            final String name = this.jTable1.getColumnName(i);
+            jTableOptions.addColumnName(name);
+        }
+        
+        final GUIOptions guiOptions = new GUIOptions();
+        guiOptions.addJTableOptions(jTableOptions);
+        
+        File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "mainframe.xml");
+                
+        XStream xStream = new XStream();   
+        
+        try {
+            OutputStream outputStream = new FileOutputStream(f);
+            xStream.toXML(guiOptions, outputStream);
+        }
+        catch(java.io.FileNotFoundException exp) {
+            log.error("", exp);
+            return false;
+        }
+        catch(com.thoughtworks.xstream.core.BaseException exp) {
+            log.error("", exp);
+            return false;
+        }
+                      
+        return true;
+    }
+
     private void initJStockOptions() {
         try {
             File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "options.xml");
@@ -1934,7 +2044,7 @@ public class MainFrame extends javax.swing.JFrame {
             XStream xStream = new XStream();
             InputStream inputStream = new java.io.FileInputStream(f);
             jStockOptions = (JStockOptions)xStream.fromXML(inputStream);
-            
+
             log.info("jstockOptions loaded from " + f.toString() + " successfully.");            
         }
         catch(java.io.FileNotFoundException exp) {

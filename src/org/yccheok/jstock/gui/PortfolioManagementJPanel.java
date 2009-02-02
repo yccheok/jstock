@@ -34,13 +34,12 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
+import javax.swing.JTable;
 import javax.swing.tree.TreePath;
 import org.apache.commons.logging.*;
 import org.jdesktop.swingx.JXTreeTable;
@@ -59,6 +58,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         initComponents();        
         
         this.initPortfolio();
+        this.initGUIOptions();
     }
     
     /** This method is called from within the constructor to
@@ -958,7 +958,129 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         
         updateWealthHeader();
     }  
-    
+
+    private void initGUIOptions() {
+        GUIOptions guiOptions = null;
+
+        try {
+            File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "portfoliomanagementjpanel.xml");
+
+            XStream xStream = new XStream();
+            InputStream inputStream = new java.io.FileInputStream(f);
+            guiOptions = (GUIOptions)xStream.fromXML(inputStream);
+
+            log.info("guiOptions loaded from " + f.toString() + " successfully.");
+        }
+        catch (java.io.FileNotFoundException exp) {
+            log.error("", exp);
+        }
+        catch (com.thoughtworks.xstream.core.BaseException exp) {
+            log.error("", exp);
+        }
+
+        if (guiOptions == null)
+        {
+            return;
+        }
+
+        if (guiOptions.getJTableOptionsSize() <= 1)
+        {
+            return;
+        }
+
+        final org.jdesktop.swingx.JXTreeTable[] treeTables = {buyTreeTable, sellTreeTable};
+
+        /* Remove any unwanted columns. */
+        for (int tableIndex = 0; tableIndex < treeTables.length; tableIndex++)
+        {
+            final JXTreeTable treeTable = treeTables[tableIndex];
+            final javax.swing.table.JTableHeader jTableHeader = treeTable.getTableHeader();
+            final JTable jTable = jTableHeader.getTable();
+
+            for (int i = 0; i < jTable.getColumnCount(); i++) {
+                final String name = jTable.getColumnName(i);
+
+                if (guiOptions.getJTableOptions(tableIndex).contains(name) == false)
+                {
+                    JTableUtilities.removeTableColumn(jTable, name);
+                    i--;
+                }
+            }
+        }
+
+        for (int tableIndex = 0; tableIndex < treeTables.length; tableIndex++)
+        {
+            final int optionsCount = guiOptions.getJTableOptions(tableIndex).getColumnSize();
+            final JXTreeTable treeTable = treeTables[tableIndex];
+            final javax.swing.table.JTableHeader jTableHeader = treeTable.getTableHeader();
+            final JTable jTable = jTableHeader.getTable();
+            final int tableCount = jTable.getColumnCount();
+
+            /* Sort the columns according to user preference. */
+            for (int i = 0; i < optionsCount; i++) {
+                final String name = guiOptions.getJTableOptions(tableIndex).getColumnName(i);
+                int index = -1;
+                for (int j = 0; j < tableCount; j++) {
+                    if (jTable.getColumnName(j).equals(name))
+                    {
+                        index = j;
+                        break;
+                    }
+                }
+
+                if (index >= 0)
+                {
+                    jTable.moveColumn(index, i);
+                }
+            }
+        }
+    }
+
+    public boolean saveGUIOptions() {
+        if(Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config") == false)
+        {
+            return false;
+        }
+
+        final GUIOptions guiOptions = new GUIOptions();
+
+        final org.jdesktop.swingx.JXTreeTable[] treeTables = {buyTreeTable, sellTreeTable};
+
+        for (org.jdesktop.swingx.JXTreeTable treeTable : treeTables)
+        {
+            final javax.swing.table.JTableHeader jTableHeader = treeTable.getTableHeader();
+            final JTable jTable = jTableHeader.getTable();
+            final GUIOptions.JTableOptions jTableOptions = new GUIOptions.JTableOptions();
+            
+            final int count = jTable.getColumnCount();
+            for (int i = 0; i < count; i++) {
+                final String name = jTable.getColumnName(i);
+                jTableOptions.addColumnName(name);
+            }
+
+            guiOptions.addJTableOptions(jTableOptions);
+        }
+
+        File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "portfoliomanagementjpanel.xml");
+
+        XStream xStream = new XStream();
+
+        try {
+            OutputStream outputStream = new FileOutputStream(f);
+            xStream.toXML(guiOptions, outputStream);
+        }
+        catch(java.io.FileNotFoundException exp) {
+            log.error("", exp);
+            return false;
+        }
+        catch(com.thoughtworks.xstream.core.BaseException exp) {
+            log.error("", exp);
+            return false;
+        }
+
+        return true;
+    }
+
     private void updateWealthHeader() {
         final BuyPortfolioTreeTableModel buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModel)this.buyTreeTable.getTreeTableModel();
         final SellPortfolioTreeTableModel sellPortfolioTreeTableModel = (SellPortfolioTreeTableModel)this.sellTreeTable.getTreeTableModel();

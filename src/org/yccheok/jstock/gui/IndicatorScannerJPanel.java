@@ -26,8 +26,13 @@ import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
 import javax.swing.event.*;
 import com.nexes.wizard.*;
+import com.thoughtworks.xstream.XStream;
 import javax.swing.*;
 import java.awt.event.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import javax.swing.table.*;
 import java.util.*;
 import org.yccheok.jstock.engine.*;
@@ -48,6 +53,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         initComponents();
         
         initTableHeaderToolTips();
+        this.initGUIOptions();
     }
     
     /** This method is called from within the constructor to
@@ -179,6 +185,105 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
 
         m.setStatusBar(true, "Indicator scanner is scanning...");
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void initGUIOptions() {
+        GUIOptions guiOptions = null;
+
+        try {
+            File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "indicatorscannerjpanel.xml");
+
+            XStream xStream = new XStream();
+            InputStream inputStream = new java.io.FileInputStream(f);
+            guiOptions = (GUIOptions)xStream.fromXML(inputStream);
+
+            log.info("guiOptions loaded from " + f.toString() + " successfully.");
+        }
+        catch (java.io.FileNotFoundException exp) {
+            log.error("", exp);
+        }
+        catch (com.thoughtworks.xstream.core.BaseException exp) {
+            log.error("", exp);
+        }
+
+        if (guiOptions == null)
+        {
+            return;
+        }
+
+        if (guiOptions.getJTableOptionsSize() <= 0)
+        {
+            return;
+        }
+
+        /* Remove any unwanted columns. */
+        for (int i = 0; i < this.jTable1.getColumnCount(); i++) {
+            final String name = this.jTable1.getColumnName(i);
+
+            if (guiOptions.getJTableOptions(0).contains(name) == false)
+            {
+                JTableUtilities.removeTableColumn(jTable1, name);
+                i--;
+            }
+        }
+
+        final int optionsCount = guiOptions.getJTableOptions(0).getColumnSize();
+        final int tableCount = this.jTable1.getColumnCount();
+
+        /* Sort the columns according to user preference. */
+        for (int i = 0; i < optionsCount; i++) {
+            final String name = guiOptions.getJTableOptions(0).getColumnName(i);
+            int index = -1;
+            for (int j = 0; j < tableCount; j++) {
+                if (jTable1.getColumnName(j).equals(name))
+                {
+                    index = j;
+                    break;
+                }
+            }
+
+            if (index >= 0)
+            {
+                this.jTable1.moveColumn(index, i);
+            }
+        }
+    }
+
+    public boolean saveGUIOptions() {
+        if(Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config") == false)
+        {
+            return false;
+        }
+
+        final GUIOptions.JTableOptions jTableOptions = new GUIOptions.JTableOptions();
+
+        final int count = this.jTable1.getColumnCount();
+        for (int i = 0; i < count; i++) {
+            final String name = this.jTable1.getColumnName(i);
+            jTableOptions.addColumnName(name);
+        }
+
+        final GUIOptions guiOptions = new GUIOptions();
+        guiOptions.addJTableOptions(jTableOptions);
+
+        File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "indicatorscannerjpanel.xml");
+
+        XStream xStream = new XStream();
+
+        try {
+            OutputStream outputStream = new FileOutputStream(f);
+            xStream.toXML(guiOptions, outputStream);
+        }
+        catch(java.io.FileNotFoundException exp) {
+            log.error("", exp);
+            return false;
+        }
+        catch(com.thoughtworks.xstream.core.BaseException exp) {
+            log.error("", exp);
+            return false;
+        }
+
+        return true;
+    }
 
     // Time consuming method. It involves file I/O reading (getOperatorIndicator).
     private void initOperatorIndicators(WizardModel wizardModel)
@@ -707,7 +812,6 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
 
     private JPopupMenu getMyJTablePopupMenu() {
         JPopupMenu popup = new JPopupMenu();
-        TableModel tableModel = jTable1.getModel();            
         
         final MainFrame m = getMainFrame();
         
@@ -873,7 +977,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     private org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
     private java.util.Map<Code, java.util.List<OperatorIndicator>> operatorIndicators = new java.util.concurrent.ConcurrentHashMap<Code, java.util.List<OperatorIndicator>>();
 
-    private java.util.List<String> alertRecords = new java.util.ArrayList<String>();
+    private final java.util.List<String> alertRecords = new java.util.ArrayList<String>();
     private ExecutorService emailAlertPool = Executors.newFixedThreadPool(1);
     private ExecutorService systemTrayAlertPool = Executors.newFixedThreadPool(1);
     private MainFrame mainFrame = null;
