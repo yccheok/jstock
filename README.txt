@@ -1,3 +1,10 @@
+===========================================
+version 1.0.2 (nightly build number 030209)
+===========================================
+1. Bug fixed on Market Chit Chat. Smile symbol will be case insensitive. :p same as :P
+
+2. [2548085] Real-Time Info can remember Column Position.
+
 =============
 version 1.0.2
 =============
