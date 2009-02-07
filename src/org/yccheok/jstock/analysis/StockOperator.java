@@ -61,11 +61,13 @@ public class StockOperator extends AbstractOperator {
         this.cache = null;
     }
     
+    @Override
     protected Object calculate()
     {
         return this.cache;
     }
     
+    @Override
     public int getNumOfInputConnector() {
         return 0;
     }
