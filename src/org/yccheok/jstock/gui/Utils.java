@@ -42,6 +42,13 @@ import java.util.concurrent.Executors;
 import javax.swing.ImageIcon;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.yccheok.jstock.analysis.Connection;
+import org.yccheok.jstock.analysis.DoubleConstantOperator;
+import org.yccheok.jstock.analysis.EqualityOperator;
+import org.yccheok.jstock.analysis.Indicator;
+import org.yccheok.jstock.analysis.OperatorIndicator;
+import org.yccheok.jstock.analysis.SinkOperator;
+import org.yccheok.jstock.analysis.StockOperator;
 
 /**
  *
@@ -357,6 +364,76 @@ public class Utils {
     public static Executor getZoombiePool()
     {
         return zombiePool;
+    }
+
+    public static Indicator getLastPriceRiseAboveIndicator(double lastPrice)
+    {
+        final StockOperator stockOperator = new StockOperator();
+        stockOperator.setType(StockOperator.Type.LastPrice);
+        final DoubleConstantOperator doubleConstantOperator = new DoubleConstantOperator();
+        doubleConstantOperator.setConstant(lastPrice);
+        final EqualityOperator equalityOperator = new EqualityOperator();
+        equalityOperator.setEquality(EqualityOperator.Equality.GreaterOrEqual);
+        final SinkOperator sinkOperator = new SinkOperator();
+
+        final Connection stockToEqualityConnection = new Connection();
+        final Connection doubleConstantToEqualityConnection = new Connection();
+        final Connection equalityToSinkConnection = new Connection();
+
+        stockOperator.addOutputConnection(stockToEqualityConnection, 0);
+        equalityOperator.addInputConnection(stockToEqualityConnection, 0);
+
+        doubleConstantOperator.addOutputConnection(doubleConstantToEqualityConnection, 0);
+        equalityOperator.addInputConnection(doubleConstantToEqualityConnection, 1);
+
+        equalityOperator.addOutputConnection(equalityToSinkConnection, 0);
+        sinkOperator.addInputConnection(equalityToSinkConnection, 0);
+
+        final OperatorIndicator operatorIndicator = new OperatorIndicator();
+        operatorIndicator.add(stockOperator);
+        operatorIndicator.add(doubleConstantOperator);
+        operatorIndicator.add(equalityOperator);
+        operatorIndicator.add(sinkOperator);
+
+        assert(operatorIndicator.isValid());
+        operatorIndicator.preCalculate();
+
+        return operatorIndicator;
+    }
+
+    public static Indicator getLastPriceFallBelowIndicator(double lastPrice)
+    {
+        final StockOperator stockOperator = new StockOperator();
+        stockOperator.setType(StockOperator.Type.LastPrice);
+        final DoubleConstantOperator doubleConstantOperator = new DoubleConstantOperator();
+        doubleConstantOperator.setConstant(lastPrice);
+        final EqualityOperator equalityOperator = new EqualityOperator();
+        equalityOperator.setEquality(EqualityOperator.Equality.LesserOrEqual);
+        final SinkOperator sinkOperator = new SinkOperator();
+
+        final Connection stockToEqualityConnection = new Connection();
+        final Connection doubleConstantToEqualityConnection = new Connection();
+        final Connection equalityToSinkConnection = new Connection();
+
+        stockOperator.addOutputConnection(stockToEqualityConnection, 0);
+        equalityOperator.addInputConnection(stockToEqualityConnection, 0);
+
+        doubleConstantOperator.addOutputConnection(doubleConstantToEqualityConnection, 0);
+        equalityOperator.addInputConnection(doubleConstantToEqualityConnection, 1);
+
+        equalityOperator.addOutputConnection(equalityToSinkConnection, 0);
+        sinkOperator.addInputConnection(equalityToSinkConnection, 0);
+
+        final OperatorIndicator operatorIndicator = new OperatorIndicator();
+        operatorIndicator.add(stockOperator);
+        operatorIndicator.add(doubleConstantOperator);
+        operatorIndicator.add(equalityOperator);
+        operatorIndicator.add(sinkOperator);
+
+        assert(operatorIndicator.isValid());
+        operatorIndicator.preCalculate();
+        
+        return operatorIndicator;
     }
 
 	// We will use this as directory name. Do not have space or special characters.
