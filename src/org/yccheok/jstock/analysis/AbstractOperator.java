@@ -22,8 +22,6 @@
 
 package org.yccheok.jstock.analysis;
 
-import java.util.*;
-
 /**
  *
  * @author yccheok
@@ -151,6 +149,7 @@ public abstract class AbstractOperator extends AbstractBean implements Operator,
         return true;        
     }
     
+    @Override
     public boolean removeOutputConnection(Connection connection)
     {        
         final int length = outputConnections.length;
