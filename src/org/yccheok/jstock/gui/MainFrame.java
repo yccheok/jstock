@@ -46,12 +46,18 @@ import javax.swing.*;
 import java.net.URL;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import javax.imageio.ImageIO;
+import javax.mail.MessagingException;
+import javax.mail.internet.AddressException;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.yccheok.jstock.analysis.Indicator;
+import org.yccheok.jstock.analysis.OperatorIndicator;
 
 /**
  *
@@ -114,6 +120,7 @@ public class MainFrame extends javax.swing.JFrame {
         this.initLatestNewsTask();
         this.initRealTimeStockMonitor();
         this.initRealTimeStocks();
+        this.initAlertStateManager();
         this.initStockHistoryMonitor();
         this.initOthersStockHistoryMonitor();
         this.initBrokingFirmLogos();
@@ -672,6 +679,7 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     private static class MyFilter extends javax.swing.filechooser.FileFilter {
+        @Override
         public boolean accept(File file) {
             if (file.isDirectory()) {
                 return true;
@@ -681,6 +689,7 @@ public class MainFrame extends javax.swing.JFrame {
             return filename.endsWith(".xls") || filename.endsWith(".txt");
         }
         
+        @Override
         public String getDescription() {
             return "Text file or Microsoft Excel";
         }
@@ -782,6 +791,7 @@ public class MainFrame extends javax.swing.JFrame {
 
             // Ensure at the end, we are using smile icon.
             SwingUtilities.invokeLater(new Runnable() {
+                @Override
                 public void run() {
                     MainFrame.this.jTabbedPane1.setIconAt(4, smileIcon);
                 }
@@ -976,6 +986,7 @@ public class MainFrame extends javax.swing.JFrame {
      */
     public static void main(String args[]) {        
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 final MainFrame mainFrame = MainFrame.getInstance();
                 mainFrame.init();
@@ -995,7 +1006,8 @@ public class MainFrame extends javax.swing.JFrame {
         if(realTimeStockMonitor != null) realTimeStockMonitor.clearStockCodes();
         if(stockHistoryMonitor != null) stockHistoryMonitor.clearStockCodes();
         tableModel.clearAllStocks();     
-        
+        this.initAlertStateManager();
+
         updateBuyerSellerInformation(null);
         
         if(stockCodeHistoryGUI != null) {
@@ -1074,6 +1086,7 @@ public class MainFrame extends javax.swing.JFrame {
             return lafClassName;
         }
         
+        @Override
         public void actionPerformed(ActionEvent e) {
             mainFrame.setLookAndFeel(lafClassName);
         }
@@ -1173,6 +1186,7 @@ public class MainFrame extends javax.swing.JFrame {
             final JMenuItem mi = (JRadioButtonMenuItem) jMenu6.add(new JRadioButtonMenuItem(country.toString(), country.getIcon()));
             buttonGroup2.add(mi);
             mi.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     final Country selectedCountry = Country.valueOf(mi.getText());
                     MainFrame.this.changeCountry(selectedCountry);
@@ -1206,6 +1220,7 @@ public class MainFrame extends javax.swing.JFrame {
   
     private javax.swing.event.TableModelListener getTableModelListener() {
         return new javax.swing.event.TableModelListener() {
+            @Override
            public void tableChanged(javax.swing.event.TableModelEvent e) {
                 int firstRow = e.getFirstRow();
                 int lastRow = e.getLastRow();
@@ -1237,27 +1252,33 @@ public class MainFrame extends javax.swing.JFrame {
 
             MouseListener mouseListener = new MouseListener() {
 
+                @Override
                 public void mouseClicked(MouseEvent e) {
-                    if(e.getButton() == e.BUTTON1) {
+                    if(e.getButton() == MouseEvent.BUTTON1) {
                         MainFrame.this.setVisible(true);
                         MainFrame.this.setState(Frame.NORMAL);
                     }
                 }
 
+                @Override
                 public void mouseEntered(MouseEvent e) {               
                 }
 
+                @Override
                 public void mouseExited(MouseEvent e) {            
                 }
 
+                @Override
                 public void mousePressed(MouseEvent e) {             
                 }
 
+                @Override
                 public void mouseReleased(MouseEvent e) {              
                 }
             };
 
             ActionListener exitListener = new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     MainFrame.this.setVisible(false);
                     MainFrame.this.dispose();
@@ -1272,6 +1293,7 @@ public class MainFrame extends javax.swing.JFrame {
             trayIcon = new TrayIcon(image, "JStock - Stock Market Software", popup);
 
             ActionListener actionListener = new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                 }
             };
@@ -1358,6 +1380,7 @@ public class MainFrame extends javax.swing.JFrame {
         // stocks.
         initRealTimeStockMonitor();
         initRealTimeStocks();
+        initAlertStateManager();
         this.portfolioManagementJPanel.initPortfolio();
         this.indicatorScannerJPanel.stop();
         this.indicatorScannerJPanel.clear();
@@ -1547,7 +1570,103 @@ public class MainFrame extends javax.swing.JFrame {
         StockTableModel tableModel = (StockTableModel)jTable1.getModel();
         tableModel.updateStock(stock);
     }
-    
+
+    private void update(final Indicator indicator, Boolean result)
+    {
+        final boolean flag = result;
+
+        if (flag == false) {
+            return;
+        }
+
+        final StockTableModel stockTableModel = (StockTableModel)MainFrame.this.jTable1.getModel();
+        final Stock stock = indicator.getStock();        
+        final Double price = ((OperatorIndicator)indicator).getName().equalsIgnoreCase("fallbelow") ? stockTableModel.getFallBelow(stock) : stockTableModel.getRiseAbove(stock);
+
+        if(this.jStockOptions.isPopupMessage()) {
+            final Runnable r = new Runnable() {
+                @Override
+                public void run() {                    
+                    String message = "";
+
+                    if (((OperatorIndicator)indicator).getName().equalsIgnoreCase("fallbelow"))
+                    {
+                        message = stock.getSymbol() + " fall below " + price;
+                    }
+                    else
+                    {
+                        message = stock.getSymbol() + " rise above " + price;
+                    }
+
+                    if (jStockOptions.isPopupMessage()) {
+                        displayPopupMessage(stock.getSymbol().toString(), message);
+
+                        try {
+                            Thread.sleep(jStockOptions.getAlertSpeed() * 1000);
+                        }
+                        catch(InterruptedException exp) {
+                            log.error("", exp);
+                        }
+                    }
+                }
+            };
+
+            try {
+                systemTrayAlertPool.submit(r);
+            }
+            catch(java.util.concurrent.RejectedExecutionException exp) {
+                log.error("", exp);
+            }
+        }
+
+        if(jStockOptions.isSendEmail()) {
+            final Runnable r = new Runnable() {
+                @Override
+                public void run() {
+                    String title = "";
+
+                    if (((OperatorIndicator)indicator).getName().equalsIgnoreCase("fallbelow"))
+                    {
+                        title = stock.getSymbol() + " fall below " + price;
+                    }
+                    else
+                    {
+                        title = stock.getSymbol() + " rise above " + price;
+                    }
+
+                    final String message = title + "\nbrought to you by JStock";
+
+                    try {
+                        String email = Utils.decrypt(jStockOptions.getEmail());
+                        GoogleMail.Send(email, Utils.decrypt(jStockOptions.getEmailPassword()), email + "@gmail.com", message, message);
+                    } catch (AddressException exp) {
+                        log.error("", exp);
+                    } catch (MessagingException exp) {
+                        log.error("", exp);
+                    }
+                }
+            };
+
+            try {
+                emailAlertPool.submit(r);
+            }
+            catch(java.util.concurrent.RejectedExecutionException exp) {
+                log.error("", exp);
+            }
+        }
+    }
+
+    private org.yccheok.jstock.engine.Observer<Indicator, Boolean> getAlertStateManagerObserver() {
+        return new org.yccheok.jstock.engine.Observer<Indicator, Boolean>() {
+
+            @Override
+            public void update(Indicator subject, Boolean arg) {
+                MainFrame.this.update(subject, arg);
+            }
+
+        };
+    }
+
     // This is the workaround to overcome Erasure by generics. We are unable to make MainFrame to
     // two observers at the same time.
     private org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> getRealTimeStockMonitorObserver() {
@@ -1593,6 +1712,7 @@ public class MainFrame extends javax.swing.JFrame {
         javax.swing.JMenuItem menuItem = new JMenuItem("History...", this.getImageIcon("/images/16x16/strokedocker.png"));
         
         menuItem.addActionListener(new ActionListener() {
+            @Override
         	public void actionPerformed(ActionEvent evt) {
                 if(MainFrame.this.stockCodeAndSymbolDatabase == null)
                 {
@@ -1619,6 +1739,7 @@ public class MainFrame extends javax.swing.JFrame {
             menuItem = new JMenuItem("Buy...", this.getImageIcon("/images/16x16/inbox.png"));
 
             menuItem.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent evt) {
                     final int row = jTable1.getSelectedRow();
                     final int modelIndex = jTable1.getRowSorter().convertRowIndexToModel(row);
@@ -1636,6 +1757,7 @@ public class MainFrame extends javax.swing.JFrame {
         menuItem = new JMenuItem("Delete", this.getImageIcon("/images/16x16/editdelete.png"));
         
 	menuItem.addActionListener(new ActionListener() {
+            @Override
         	public void actionPerformed(ActionEvent evt) {
                     MainFrame.this.deteleSelectedTableRow();
                 }
@@ -1650,6 +1772,7 @@ public class MainFrame extends javax.swing.JFrame {
         public MarketRunnable() {
         }
         
+        @Override
         public void run() {
             final Thread currentThread = Thread.currentThread();
             final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactory();
@@ -1898,6 +2021,7 @@ public class MainFrame extends javax.swing.JFrame {
         if(realTimeStockMonitor != null) {
             final RealTimeStockMonitor oldRealTimeStockMonitor = realTimeStockMonitor;
             zombiePool.execute(new Runnable() {
+                @Override
                 public void run() {
                     log.info("Prepare to shut down " + oldRealTimeStockMonitor + "...");
                     oldRealTimeStockMonitor.clearStockCodes();
@@ -2106,6 +2230,7 @@ public class MainFrame extends javax.swing.JFrame {
             final java.util.List<Stock> stocks = s;
             
             SwingUtilities.invokeLater(new Runnable() {
+                @Override
                 public void run() {                    
                     for(Stock stock : stocks) {
                         final Stock emptyStock = Utils.getEmptyStock(stock.getCode(), stock.getSymbol());
@@ -2255,6 +2380,11 @@ public class MainFrame extends javax.swing.JFrame {
         org.yccheok.jstock.gui.Utils.deleteAllOldFiles(new File(Utils.getUserDataDirectory() + country + File.separator + "history"), 1);
     }
 
+    private void initAlertStateManager() {
+        alertStateManager.clearState();
+        alertStateManager.attach(alertStateManagerObserver);
+    }
+
     private void initOthersStockHistoryMonitor()
     {
         final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactory();
@@ -2270,6 +2400,7 @@ public class MainFrame extends javax.swing.JFrame {
         if(stockHistoryMonitor != null) {
             final StockHistoryMonitor oldStockHistoryMonitor = stockHistoryMonitor;
             zombiePool.execute(new Runnable() {
+                @Override
                 public void run() {
                     log.info("Prepare to shut down " + oldStockHistoryMonitor + "...");
                     oldStockHistoryMonitor.clearStockCodes();
@@ -2319,6 +2450,7 @@ public class MainFrame extends javax.swing.JFrame {
             if(latestNewsTask != null) {
                 final LatestNewsTask oldLatestNewsTask = latestNewsTask;
                 zombiePool.execute(new Runnable() {
+                    @Override
                     public void run() {
                         log.info("Prepare to shut down " + oldLatestNewsTask + "...");
                         oldLatestNewsTask.cancel(true);
@@ -2391,10 +2523,29 @@ public class MainFrame extends javax.swing.JFrame {
                 }               
            } 
         });
+
+        final StockTableModel stockTableModel = (StockTableModel)jTable1.getModel();
+
+        for (Stock stock : stocks) {
+            final Double fallBelow = stockTableModel.getFallBelow(stock);            
+            if (fallBelow != null) {
+                final Indicator indicator = Utils.getLastPriceFallBelowIndicator(fallBelow);
+                indicator.setStock(stock);
+                alertStateManager.alert(indicator);
+            }
+
+            final Double riseAbove = stockTableModel.getRiseAbove(stock);
+            if (riseAbove != null) {
+                final Indicator indicator = Utils.getLastPriceRiseAboveIndicator(riseAbove);
+                indicator.setStock(stock);
+                alertStateManager.alert(indicator);
+            }
+        }
     }
-    
+
     private void update(final Market market) {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            @Override
            public void run() {
                marketJPanel.update(market);
            }
@@ -2931,8 +3082,13 @@ public class MainFrame extends javax.swing.JFrame {
     private PortfolioManagementJPanel portfolioManagementJPanel;
     private org.yccheok.jstock.chat.ChatJPanel chatJPanel;
 
+    private final AlertStateManager alertStateManager = new AlertStateManager();
+    private ExecutorService emailAlertPool = Executors.newFixedThreadPool(1);
+    private ExecutorService systemTrayAlertPool = Executors.newFixedThreadPool(1);
+
     private org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
     private org.yccheok.jstock.engine.Observer<StockHistoryMonitor, StockHistoryMonitor.StockHistoryRunnable> stockHistoryMonitorObserver = this.getStockHistoryMonitorObserver();
+    private org.yccheok.jstock.engine.Observer<Indicator, Boolean> alertStateManagerObserver = this.getAlertStateManagerObserver();
 
     private final javax.swing.ImageIcon smileIcon = this.getImageIcon("/images/16x16/smile.png");
     private final javax.swing.ImageIcon smileGrayIcon = this.getImageIcon("/images/16x16/smile-gray.png");
