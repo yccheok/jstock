@@ -18,7 +18,9 @@
 
 package org.yccheok.jstock.gui;
 
+import java.util.List;
 import org.yccheok.jstock.analysis.Indicator;
+import org.yccheok.jstock.analysis.OperatorIndicator;
 import org.yccheok.jstock.engine.Subject;
 
 /**
@@ -38,23 +40,168 @@ import org.yccheok.jstock.engine.Subject;
  * (2) There is no alert for the particular stock and indicator at previous tick.
  *
  * AlertStateManager will be used to keep track the alert state, and inform its observer,
- * when a stock should be alerted.
+ * when a stock should be alerted. AlertStateManager will at least perform Indicator.isTriggered.
  *
  * @author yccheok
  */
-public class AlertStateManager extends Subject<AlertStateManager, Indicator> {
-    /* Start from the initial state. */
-    public void init()
+public class AlertStateManager extends Subject<Indicator, Boolean> {
+    private static class Key
     {
+        private final Indicator indicator;
+
+        private Key(Indicator indicator)
+        {
+            this.indicator = indicator;
+        }
+
+        public static Key newInstance(Indicator indicator) {
+            return new Key(indicator);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = 17;
+
+            if (indicator instanceof OperatorIndicator)
+            {
+                result = 31 * result + ((OperatorIndicator)indicator).toString().hashCode();
+            }
+
+            if (indicator.getStock() != null)
+            {
+                result = 31 * result + indicator.getStock().getCode().hashCode();
+            }
+
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if(!(o instanceof Key))
+                return false;
+
+            Boolean result = null;
+
+            if (indicator instanceof OperatorIndicator && ((Key)o).indicator instanceof OperatorIndicator)
+            {
+                final String string0 = ((OperatorIndicator)indicator).toString();
+                final String string1 = ((OperatorIndicator)(((Key)o).indicator)).toString();
+                result = string0.equals(string1);
+            }
+
+            if (indicator.getStock() != null && ((Key)o).indicator.getStock() != null)
+            {
+                final boolean tmp = indicator.getStock().getCode().equals(((Key)o).indicator.getStock().getCode());
+                if (result == null)
+                {
+                    result = tmp;
+                }
+                else
+                {
+                    result = result & tmp;
+                }
+            }
+
+            if (result != null) {
+                return result;
+            }
+
+            return super.equals(o);
+        }
+
+        @Override
+        public String toString() {
+            return "" + indicator;
+        }
     }
 
+    /* Re-start from the initial state. */
+    public void clearState()
+    {
+        alertRecords.clear();
+    }
+
+    /*
+     if writes are very infrequent w/ respect to reads, you could use
+     CopyOnWriteArrayList (it has an addIfAbsent method). similarly, you could
+     improve on your synchronized version by allowing concurrent reads using a
+     ReadWriteLock (again, only a win if writes are fairly infrequent).
+     otherwise, if writes are fairly frequent, your original example is probably
+     your best bet. have you actually profiled your application to see if this
+     is your bottleneck? if not, i highly recommend doing that first before
+     using a more complicated concurrency structure. lastly, are you sure you
+     need a List. you can get "random" access using a Map, and then you could
+     use something like a ConcurrentHashMap.
+    */
     public void alert(Indicator indicator)
     {
+        final Key key = Key.newInstance(indicator);
+        final boolean result = indicator.isTriggered();
+        
+        if (result)
+        {
+            final boolean flag = alertRecords.add(key);
+
+            if (flag)
+            {
+                this.notify(indicator, true);
+            }
+        }
+        else
+        {
+            final boolean flag = alertRecords.remove(key);
+
+            if (flag)
+            {
+                this.notify(indicator, false);
+            }
+        }
     }
 
-    public void dealert(Indicator indicator)
+    public void alert(List<? extends Indicator> indicators)
     {
+        boolean result = true;
+
+        for (Indicator indicator : indicators)
+        {
+            final boolean tmp = indicator.isTriggered();
+            if (!tmp)
+            {
+                result = false;
+                break;
+            }
+        }
+
+
+        if (result)
+        {
+            for (Indicator indicator : indicators)
+            {
+                final Key key = Key.newInstance(indicator);
+
+                final boolean flag = alertRecords.add(key);
+
+                if (flag)
+                {
+                    this.notify(indicator, true);
+                }
+            }
+        }
+        else
+        {
+            for (Indicator indicator : indicators)
+            {
+                final Key key = Key.newInstance(indicator);
+
+                final boolean flag = alertRecords.remove(key);
+
+                if (flag)
+                {
+                    this.notify(indicator, false);
+                }
+            }
+        }
     }
 
-    private final java.util.List<String> alertRecords = new java.util.ArrayList<String>();
+    private final java.util.Set<Key> alertRecords = java.util.Collections.synchronizedSet(new java.util.HashSet<Key>());
 }
