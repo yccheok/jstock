@@ -23,7 +23,6 @@
 package org.yccheok.jstock.gui;
 
 import java.util.*;
-import javax.swing.table.*;
 import org.yccheok.jstock.engine.*;
 
 /**
@@ -31,7 +30,12 @@ import org.yccheok.jstock.engine.*;
  * @author yccheok
  */
 public class StockTableModel extends AbstractTableModelWithMemory {
-    
+    private static class Alert
+    {
+        public Double fallBelow = null;
+        public Double riseAbove = null;
+    }
+
     /** Creates a new instance of StockTableModel */
     public StockTableModel() {
         for(int i = 0; i < columnNames.length; i++) {
@@ -40,6 +44,7 @@ public class StockTableModel extends AbstractTableModelWithMemory {
                 
     }
 
+    @Override
     public Object getOldValueAt(int rowIndex, int columnIndex) {
         List<Object> stockInfo = oldTableModel.get(rowIndex);
         
@@ -48,12 +53,14 @@ public class StockTableModel extends AbstractTableModelWithMemory {
         return stockInfo.get(columnIndex);        
     }
     
+    @Override
     public Object getValueAt(int rowIndex, int columnIndex)
     {
         List<Object> stockInfo = tableModel.get(rowIndex);
         return stockInfo.get(columnIndex);
     }
     
+    @Override
     public int getColumnCount()
     {
         return columnNames.length;
@@ -75,20 +82,44 @@ public class StockTableModel extends AbstractTableModelWithMemory {
         return columnClasses[c];
     }
 
+    @Override
     public boolean isCellEditable(int row, int col) {
-        return false;
+        return ((col == (columnClasses.length - 1)) || (col == (columnClasses.length - 2)));
     }
 
+    @Override
     public void setValueAt(Object value, int row, int col) {
+        if (col == (columnClasses.length - 1))
+        {
+            final Double riseAbove = (Double)value;
+            alerts.get(row).riseAbove = riseAbove;
+            List<Object> oldInfos = oldTableModel.get(row);
+            if (oldInfos != null) oldInfos.set(col, tableModel.get(row).get(col));
+            tableModel.get(row).set(col, riseAbove);
+            fireTableCellUpdated(row, col);
+            return;
+        }
+        else if (col == (columnClasses.length - 2))
+        {
+            final Double fallBelow = (Double)value;
+            alerts.get(row).fallBelow = fallBelow;
+            List<Object> oldInfos = oldTableModel.get(row);
+            if (oldInfos != null) oldInfos.set(col, tableModel.get(row).get(col));
+            tableModel.get(row).set(col, fallBelow);
+            fireTableCellUpdated(row, col);
+            return;
+        }
+        
         throw new java.lang.UnsupportedOperationException();
     }
     
     public void updateStock(Stock stock) {
-        Integer row = rowStockCodeMapping.get(stock.getCode());
-        
+        final Integer row = rowStockCodeMapping.get(stock.getCode());
+        final Alert alert = alerts.get(row);
+
         if(row != null) {
             oldTableModel.set(row, tableModel.get(row));
-            tableModel.set(row, stockToList(stock));            
+            tableModel.set(row, stockToList(stock, alert));
             stocks.set(row, stock);
             this.fireTableRowsUpdated(row, row);            
         }        
@@ -96,11 +127,11 @@ public class StockTableModel extends AbstractTableModelWithMemory {
     
     public void addStock(Stock stock) {
         Integer row = rowStockCodeMapping.get(stock.getCode());
-        
         if(row == null) {
-            tableModel.add(stockToList(stock));
+            tableModel.add(stockToList(stock, new Alert()));
             oldTableModel.add(null);
             stocks.add(stock);
+            alerts.add(new Alert());
             final int rowIndex = tableModel.size() - 1;
             rowStockCodeMapping.put(stock.getCode(), rowIndex);
             fireTableRowsInserted(rowIndex, rowIndex);
@@ -115,6 +146,7 @@ public class StockTableModel extends AbstractTableModelWithMemory {
         tableModel.clear();
         oldTableModel.clear();
         stocks.clear();
+        alerts.clear();
         rowStockCodeMapping.clear();
             
         this.fireTableRowsDeleted(0, size - 1);
@@ -127,6 +159,7 @@ public class StockTableModel extends AbstractTableModelWithMemory {
             tableModel.remove(row);
             oldTableModel.remove(row);
             stocks.remove(row);
+            alerts.remove(row);
             rowStockCodeMapping.remove(stock.getCode());
             
             int size = stocks.size();
@@ -150,7 +183,8 @@ public class StockTableModel extends AbstractTableModelWithMemory {
     public void removeRow(int row) {
         oldTableModel.remove(row);
         List<Object> list = tableModel.remove(row);
-        stocks.remove(row);        
+        stocks.remove(row);
+        alerts.remove(row);
         // 0 is stock code.
         rowStockCodeMapping.remove(list.get(0));
 
@@ -163,7 +197,7 @@ public class StockTableModel extends AbstractTableModelWithMemory {
         this.fireTableRowsDeleted(row, row);
     }
     
-    private List<Object> stockToList(Stock stock) {
+    private List<Object> stockToList(Stock stock, Alert alert) {
         List<Object> list = new ArrayList<Object>();
         list.add(stock.getCode());
         list.add(stock.getSymbol());
@@ -179,10 +213,12 @@ public class StockTableModel extends AbstractTableModelWithMemory {
         list.add(stock.getBuyQuantity());
         list.add(stock.getSellPrice());
         list.add(stock.getSellQuantity());
-        
+        list.add(alert.fallBelow);
+        list.add(alert.riseAbove);
         return list;
     }
     
+    @Override
     public int findColumn(String columnName) {
         return columnNameMapping.get(columnName);
     }
@@ -197,11 +233,12 @@ public class StockTableModel extends AbstractTableModelWithMemory {
     private List<List<Object>> tableModel = new ArrayList<List<Object>>();
     private List<List<Object>> oldTableModel = new ArrayList<List<Object>>();
     private List<Stock> stocks = new ArrayList<Stock>();
+    private List<Alert> alerts = new ArrayList<Alert>();
     // Used to get column by Name in fast way.
     private Map<String, Integer> columnNameMapping = new HashMap<String, Integer>();
     // Used to get row by Stock in fast way.
     private Map<Code, Integer> rowStockCodeMapping = new HashMap<Code, Integer>();
-    private String[] columnNames =  {"Code",        "Symbol",       "Open",     "Last",        "High",         "Low",      "Vol",          "Chg",      "Chg (%)",      "L.Vol",        "Buy",      "B.Qty",        "Sell",         "S.Qty"};
-    private Class[] columnClasses = {Code.class, Symbol.class, Double.class, Double.class, Double.class, Double.class, Integer.class, Double.class, Double.class, Integer.class, Double.class, Integer.class, Double.class, Integer.class};
+    private String[] columnNames =  {"Code",        "Symbol",       "Open",     "Last",        "High",         "Low",      "Vol",          "Chg",      "Chg (%)",      "L.Vol",        "Buy",      "B.Qty",        "Sell",        "S.Qty", "Fall Below", "Rise Above"};
+    private Class[] columnClasses = {Code.class, Symbol.class, Double.class, Double.class, Double.class, Double.class, Integer.class, Double.class, Double.class, Integer.class, Double.class, Integer.class, Double.class, Integer.class, Double.class, Double.class};
     
 }
