@@ -194,7 +194,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("JStock - Stock Market Software");
-        setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        setFont(new java.awt.Font("Tahoma", 0, 12));
         setIconImage(getMyIconImage());
         addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -232,12 +232,14 @@ public class MainFrame extends javax.swing.JFrame {
         jPanel8.setLayout(new java.awt.BorderLayout(5, 5));
 
         jTable1.setAutoCreateRowSorter(true);
-        jTable1.setFont(new java.awt.Font("Tahoma", 1, 12));
+        jTable1.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jTable1.setModel(new StockTableModel());
         jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         this.jTable1.setDefaultRenderer(Number.class, new StockTableCellRenderer());
         this.jTable1.setDefaultRenderer(Double.class, new StockTableCellRenderer());
         this.jTable1.setDefaultRenderer(Object.class, new StockTableCellRenderer());
+
+        this.jTable1.setDefaultEditor(Double.class, new NonNegativeDoubleEditor());
 
         this.jTable1.getModel().addTableModelListener(this.getTableModelListener());
 
@@ -1297,7 +1299,10 @@ public class MainFrame extends javax.swing.JFrame {
         JTableHeader header = jTable1.getTableHeader();
     
         ColumnHeaderToolTips tips = new ColumnHeaderToolTips();
-            
+
+        tips.setToolTip(jTable1.getColumn("Fall Below"), "Alert user when last price fall below or equal to specified value");
+        tips.setToolTip(jTable1.getColumn("Rise Above"), "Alert user when last price rise above or equal to specified value");
+
         header.addMouseMotionListener(tips);        
     }
     
