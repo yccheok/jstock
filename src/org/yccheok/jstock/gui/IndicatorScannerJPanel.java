@@ -41,12 +41,13 @@ import java.util.concurrent.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.yccheok.jstock.analysis.Indicator;
 
 /**
  *
  * @author  yccheok
  */
-public class IndicatorScannerJPanel extends javax.swing.JPanel implements ChangeListener {
+public class IndicatorScannerJPanel extends javax.swing.JPanel implements ChangeListener, org.yccheok.jstock.engine.Observer<Indicator, Boolean> {
     
     /** Creates new form IndicatorScannerJPanel */
     public IndicatorScannerJPanel() {
@@ -54,8 +55,15 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         
         initTableHeaderToolTips();
         this.initGUIOptions();
+        this.initAlertStateManager();
     }
-    
+
+    private void initAlertStateManager()
+    {
+        alertStateManager.clearState();
+        alertStateManager.attach(this);
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -152,7 +160,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                 this.initStockHistoryMonitor(m.getStockServerFactory());
 
                 removeAllIndicatorsFromTable();
-                alertRecords.clear();
+                initAlertStateManager();
 
                 submitOperatorIndicatorToMonitor();
 
@@ -411,6 +419,82 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         }
         
         return popup;
+    }
+
+    @Override
+    public void update(final Indicator indicator, Boolean result) {
+        final boolean flag = result;
+
+        if (flag == false)
+        {
+            removeIndicatorFromTable(indicator);
+            return;
+        }
+
+        addIndicatorToTable(indicator);
+
+        final MainFrame m = MainFrame.getInstance();
+        final JStockOptions jStockOptions = m.getJStockOptions();
+
+        if(jStockOptions.isPopupMessage()) {
+            final Runnable r = new Runnable() {
+                @Override
+                public void run() {
+                    final Stock stock = indicator.getStock();
+                    final String message = stock.getSymbol() + " (" + stock.getCode() + " " +
+                            "last=" + stock.getLastPrice() + " high=" + stock.getHighPrice() + " " +
+                            "low=" + stock.getLowPrice() + ") hits " + indicator.toString();
+
+                    if (jStockOptions.isPopupMessage()) {
+                        m.displayPopupMessage(stock.getSymbol().toString(), message);
+
+                        try {
+                            Thread.sleep(jStockOptions.getAlertSpeed() * 1000);
+                        }
+                        catch(InterruptedException exp) {
+                            log.error("", exp);
+                        }
+                    }
+                }
+            };
+
+            try {
+                systemTrayAlertPool.submit(r);
+            }
+            catch(java.util.concurrent.RejectedExecutionException exp) {
+                log.error("", exp);
+            }
+        }
+
+        if(jStockOptions.isSendEmail()) {
+            final Runnable r = new Runnable() {
+                @Override
+                public void run() {
+                    final Stock stock = indicator.getStock();
+                    final String title = stock.getSymbol() + " (" + stock.getCode() + " " +
+                            "last=" + stock.getLastPrice() + " high=" + stock.getHighPrice() + " " +
+                            "low=" + stock.getLowPrice() + ") hits " + indicator.toString();
+
+                    final String message = title + "\nbrought to you by JStock";
+
+                    try {
+                        String email = Utils.decrypt(jStockOptions.getEmail());
+                        GoogleMail.Send(email, Utils.decrypt(jStockOptions.getEmailPassword()), email + "@gmail.com", message, message);
+                    } catch (AddressException exp) {
+                        log.error("", exp);
+                    } catch (MessagingException exp) {
+                        log.error("", exp);
+                    }
+                }
+            };
+
+            try {
+                emailAlertPool.submit(r);
+            }
+            catch(java.util.concurrent.RejectedExecutionException exp) {
+                log.error("", exp);
+            }
+        }
     }
     
     private class TableColumnSelectionPopupListener extends MouseAdapter {        
@@ -708,40 +792,17 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             if(jStockOptions.isSingleIndicatorAlert()) {
                 for(OperatorIndicator indicator : indicators) {
                     indicator.setStock(stock);
-
-                    if(indicator.isTriggered()) {
-                        addIndicatorToTable(indicator);
-                        alert(indicator);
-                    }
-                    else {
-                        removeIndicatorFromTable(indicator);
-                    }
+                    alertStateManager.alert(indicator);
                 }
             }
             else
             {
                 // Multiple indicators alert.
-                boolean alert = true;
                 for(OperatorIndicator indicator : indicators) {
                     indicator.setStock(stock);
+                }
 
-                    if(indicator.isTriggered() == false) {
-                        alert = false;
-                        break;
-                    }
-                }
-                
-                if(alert) {
-                    for(OperatorIndicator indicator : indicators) {
-                        addIndicatorToTable(indicator);
-                        alert(indicator);
-                    }                    
-                }
-                else {
-                    for(OperatorIndicator indicator : indicators) {
-                        removeIndicatorFromTable(indicator);
-                    }                     
-                }
+                alertStateManager.alert(indicators);
             }
         }                
     }  
@@ -750,6 +811,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     // queue?
     private void addIndicatorToTable(final Indicator indicator) {
         final Runnable r = new Runnable() {
+            @Override
             public void run() {          
                 IndicatorTableModel tableModel = (IndicatorTableModel)jTable1.getModel();
                 
@@ -765,6 +827,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     
     private void removeIndicatorFromTable(final Indicator indicator) {
         final Runnable r = new Runnable() {
+            @Override
             public void run() {          
                 IndicatorTableModel tableModel = (IndicatorTableModel)jTable1.getModel();
                 tableModel.removeIndicator(indicator);
@@ -776,6 +839,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     
     private void removeAllIndicatorsFromTable() {
         final Runnable r = new Runnable() {
+            @Override
             public void run() {          
                 IndicatorTableModel tableModel = (IndicatorTableModel)jTable1.getModel();
                 tableModel.removeAll();
@@ -845,87 +909,13 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         
         return indicator.toString() + indicator.getStock().getCode();
     }
-    
+
     private void alert(final Indicator indicator) {
         final MainFrame m = getMainFrame();
 
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
         
-        synchronized(alertRecords) {
-            if(jStockOptions.isSingleIndicatorAlert() == true) {
-                final String key = getIndicatorKey(indicator);
-                
-                if(alertRecords.contains(key)) return;
-                
-                alertRecords.add(key);
-            }
-            else {
-                /* When performing multiple indicators alert, we will only display once for a same stock. */
-                final String code = indicator.getStock().getCode().toString();
-                
-                if(alertRecords.contains(code)) return;
-                
-                alertRecords.add(code);
-            }      
-        }                 
-        
-        if(jStockOptions.isPopupMessage()) {
-            final Runnable r = new Runnable() {
-                public void run() {
-                    final Stock stock = indicator.getStock();
-                    final String message = stock.getSymbol() + " (" + stock.getCode() + " " +
-                            "last=" + stock.getLastPrice() + " high=" + stock.getHighPrice() + " " +
-                            "low=" + stock.getLowPrice() + ") hits " + indicator.toString();
-
-                    if (jStockOptions.isPopupMessage()) {
-                        m.displayPopupMessage(stock.getSymbol().toString(), message);
-
-                        try {
-                            Thread.sleep(jStockOptions.getAlertSpeed() * 1000);
-                        }
-                        catch(InterruptedException exp) {
-                            log.error("", exp);
-                        }
-                    }
-                }
-            };
-            
-            try {
-                systemTrayAlertPool.submit(r);
-            }
-            catch(java.util.concurrent.RejectedExecutionException exp) {
-                log.error("", exp);
-            }
-        }
-        
-        if(jStockOptions.isSendEmail()) {
-            final Runnable r = new Runnable() {
-                public void run() {
-                    final Stock stock = indicator.getStock();
-                    final String title = stock.getSymbol() + " (" + stock.getCode() + " " +
-                            "last=" + stock.getLastPrice() + " high=" + stock.getHighPrice() + " " +
-                            "low=" + stock.getLowPrice() + ") hits " + indicator.toString();
-                    
-                    final String message = title + "\nbrought to you by JStock";
-                    
-                    try {
-                        String email = Utils.decrypt(jStockOptions.getEmail());
-                        GoogleMail.Send(email, Utils.decrypt(jStockOptions.getEmailPassword()), email + "@gmail.com", message, message);
-                    } catch (AddressException exp) {
-                        log.error("", exp);
-                    } catch (MessagingException exp) {
-                        log.error("", exp);
-                    }
-                }
-            };
-            
-            try {
-                emailAlertPool.submit(r); 
-            }
-            catch(java.util.concurrent.RejectedExecutionException exp) {
-                log.error("", exp);
-            }            
-        }
+        alertStateManager.alert(indicator);
     }
 
     private MainFrame getMainFrame()
@@ -964,7 +954,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                 initStockHistoryMonitor(mainFrame.getStockServerFactory());
 
                 removeAllIndicatorsFromTable();
-                alertRecords.clear();
+                alertStateManager.clearState();
 
                 initOperatorIndicators(wizardModel);
                 submitOperatorIndicatorToMonitor();
@@ -977,7 +967,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     private org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
     private java.util.Map<Code, java.util.List<OperatorIndicator>> operatorIndicators = new java.util.concurrent.ConcurrentHashMap<Code, java.util.List<OperatorIndicator>>();
 
-    private final java.util.List<String> alertRecords = new java.util.ArrayList<String>();
+    private final AlertStateManager alertStateManager = new AlertStateManager();
     private ExecutorService emailAlertPool = Executors.newFixedThreadPool(1);
     private ExecutorService systemTrayAlertPool = Executors.newFixedThreadPool(1);
     private MainFrame mainFrame = null;
