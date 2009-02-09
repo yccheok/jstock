@@ -177,13 +177,13 @@ public class StockTableModel extends AbstractTableModelWithMemory {
     }
 
     public Double getRiseAbove(Stock stock) {
-        Integer row = this.rowStockCodeMapping.get(stock);
+        Integer row = this.rowStockCodeMapping.get(stock.getCode());
         if (row == null) return null;
         return this.alerts.get(row).riseAbove;
     }
 
     public Double getFallBelow(Stock stock) {
-        Integer row = this.rowStockCodeMapping.get(stock);
+        Integer row = this.rowStockCodeMapping.get(stock.getCode());
         if (row == null) return null;
         return this.alerts.get(row).fallBelow;
     }
