@@ -98,7 +98,6 @@ public class OptionsBrokerJPanel extends javax.swing.JPanel implements JStockOpt
         jLabel10 = new javax.swing.JLabel();
         jFormattedTextField9 = getCurrencyJFormattedTextField(0.0);
 
-        setPreferredSize(new java.awt.Dimension(485, 471));
         setLayout(new java.awt.BorderLayout());
 
         jXHeader1.setDescription("Perform auto broker fee, stamp duty and clearing fee calculation, based on your transaction.");
