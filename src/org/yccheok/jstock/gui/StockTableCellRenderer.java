@@ -53,6 +53,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
         }                
         
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 cell.setForeground(finalForegroundColor);
                 cell.setBackground(finalBackgroundColor);
