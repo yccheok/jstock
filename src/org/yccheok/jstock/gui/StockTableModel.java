@@ -175,7 +175,19 @@ public class StockTableModel extends AbstractTableModelWithMemory {
     public Stock getStock(int row) {
         return stocks.get(row);
     }
-    
+
+    public Double getRiseAbove(Stock stock) {
+        Integer row = this.rowStockCodeMapping.get(stock);
+        if (row == null) return null;
+        return this.alerts.get(row).riseAbove;
+    }
+
+    public Double getFallBelow(Stock stock) {
+        Integer row = this.rowStockCodeMapping.get(stock);
+        if (row == null) return null;
+        return this.alerts.get(row).fallBelow;
+    }
+
     public List<Stock> getStocks() {
         return Collections.unmodifiableList(stocks);
     }
