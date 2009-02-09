@@ -37,8 +37,8 @@ public class Symbol {
 
     @Override
     public int hashCode() {
-        int result = 37;
-        result = result * symbol.hashCode();
+        int result = 17;
+        result = 31 * result + symbol.hashCode();
         
         return result;
     }
