@@ -390,6 +390,7 @@ public class Utils {
         sinkOperator.addInputConnection(equalityToSinkConnection, 0);
 
         final OperatorIndicator operatorIndicator = new OperatorIndicator();
+        operatorIndicator.setName("RiseAbove");
         operatorIndicator.add(stockOperator);
         operatorIndicator.add(doubleConstantOperator);
         operatorIndicator.add(equalityOperator);
@@ -425,6 +426,7 @@ public class Utils {
         sinkOperator.addInputConnection(equalityToSinkConnection, 0);
 
         final OperatorIndicator operatorIndicator = new OperatorIndicator();
+        operatorIndicator.setName("FallBelow");
         operatorIndicator.add(stockOperator);
         operatorIndicator.add(doubleConstantOperator);
         operatorIndicator.add(equalityOperator);
