@@ -109,7 +109,11 @@ public class OperatorIndicator implements Indicator {
     public void setName(String name) {
         this.name = name;
     }
-    
+
+    public String getName() {
+        return name;
+    }
+
     public boolean isValid() {
         int numOfSinkOperator = 0;
         SinkOperator sinkOperator = null;
