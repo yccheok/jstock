@@ -37,8 +37,8 @@ public class Code {
 
     @Override
     public int hashCode() {
-        int result = 37;
-        result = result * code.hashCode();
+        int result = 17;
+        result = 31 * result + code.hashCode();
         
         return result;
     }
