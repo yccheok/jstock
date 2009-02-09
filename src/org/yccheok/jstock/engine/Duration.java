@@ -109,9 +109,9 @@ public class Duration {
 
     @Override
     public int hashCode() {
-        int result = 37;
-        result = 37 * result + startDate.hashCode();
-        result = 37 * result + startDate.hashCode();
+        int result = 17;
+        result = 31 * result + startDate.hashCode();
+        result = 31 * result + startDate.hashCode();
 
         return result;
     }
