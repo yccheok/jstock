@@ -19,8 +19,11 @@
 package org.yccheok.jstock.gui;
 
 import java.util.List;
+import java.util.Set;
 import org.yccheok.jstock.analysis.Indicator;
 import org.yccheok.jstock.analysis.OperatorIndicator;
+import org.yccheok.jstock.engine.Code;
+import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.Subject;
 
 /**
@@ -116,9 +119,100 @@ public class AlertStateManager extends Subject<Indicator, Boolean> {
     }
 
     /* Re-start from the initial state. */
-    public void clearState()
+    public synchronized void clearState()
     {
         alertRecords.clear();
+		stockCodeToAlertRecords.clear();
+    }
+
+    /* Re-start a particular stock from the initial state. */
+    public synchronized void clearState(Stock stock)
+    {
+        final Code code = stock.getCode();
+        final java.util.Set<Key> keys = stockCodeToAlertRecords.remove(code);
+        if (keys == null) {
+            return;
+        }
+
+        for (Key key : keys) {
+            this.alertRecords.remove(key);
+        }
+    }
+
+    public synchronized void clearState(Indicator indicator, Stock stock)
+    {
+        final Code code = stock.getCode();
+        final java.util.Set<Key> keys = stockCodeToAlertRecords.get(code);
+
+        if (keys == null) {
+            return;
+        }
+
+        /*
+         * Having FALL_BELOW_INDICATOR and RISE_ABOVE_INDICATOR, is to enable us
+         * to remove a particular indicator from AlertStateManager, without the need
+         * to call time-consuming getLastPriceFallBelowIndicator and
+         * getLastPriceRiseAboveIndicator. In order for indicator to perform
+         * correctly, we need to call indicator's mutable method (setStock).
+         * However, since FALL_BELOW_INDICATOR and RISE_ABOVE_INDICATOR are
+         * sharable variables, we are not allowed to call setStock outside
+         * synchronized block. We need to perfrom a hacking liked workaround
+         * Within syncrhonized block, call getStock (To get old stock), setStock and
+         * restore back old stock.
+         */
+        final Stock oldStock = indicator.getStock();
+        indicator.setStock(stock);
+        final Key key = Key.newInstance(indicator);
+        keys.remove(key);
+        alertRecords.remove(key);
+
+        if (keys.size() <= 0) {
+            stockCodeToAlertRecords.remove(code);
+        }
+
+		// Remember to reset back to old stock.
+        indicator.setStock(oldStock);
+    }
+
+    private synchronized boolean add(Indicator indicator)
+    {
+        assert (indicator.getStock() != null);
+        final Code code = indicator.getStock().getCode();
+        final Key key = Key.newInstance(indicator);
+        final boolean result0 = alertRecords.add(key);
+        if (result0 == false) {
+            return result0;
+        }
+        // result0 == true
+        final Set<Key> keys = stockCodeToAlertRecords.get(code);
+        if (keys != null) {
+            final boolean result1 = keys.add(key);
+            assert(result1);
+            return result1;
+        }
+        final Set<Key> newKeys = new java.util.HashSet<Key>();
+        newKeys.add(key);
+        stockCodeToAlertRecords.put(code, newKeys);
+        return true;
+    }
+
+    private synchronized boolean remove(Indicator indicator)
+    {
+        assert (indicator.getStock() != null);
+        final Code code = indicator.getStock().getCode();
+        final Key key = Key.newInstance(indicator);
+        final boolean result0 = alertRecords.remove(key);
+        if (result0 == false) {
+            return result0;
+        }
+        // result0 == true
+        final Set<Key> keys = stockCodeToAlertRecords.get(code);
+        assert (keys != null);
+        keys.remove(key);
+        if (keys.size() <= 0) {
+            stockCodeToAlertRecords.remove(code);
+        }
+        return true;
     }
 
     /*
@@ -135,12 +229,11 @@ public class AlertStateManager extends Subject<Indicator, Boolean> {
     */
     public void alert(Indicator indicator)
     {
-        final Key key = Key.newInstance(indicator);
         final boolean result = indicator.isTriggered();
         
         if (result)
         {
-            final boolean flag = alertRecords.add(key);
+            final boolean flag = this.add(indicator);
 
             if (flag)
             {
@@ -149,7 +242,7 @@ public class AlertStateManager extends Subject<Indicator, Boolean> {
         }
         else
         {
-            final boolean flag = alertRecords.remove(key);
+            final boolean flag = this.remove(indicator);
 
             if (flag)
             {
@@ -177,9 +270,7 @@ public class AlertStateManager extends Subject<Indicator, Boolean> {
         {
             for (Indicator indicator : indicators)
             {
-                final Key key = Key.newInstance(indicator);
-
-                final boolean flag = alertRecords.add(key);
+                final boolean flag = this.add(indicator);
 
                 if (flag)
                 {
@@ -191,9 +282,7 @@ public class AlertStateManager extends Subject<Indicator, Boolean> {
         {
             for (Indicator indicator : indicators)
             {
-                final Key key = Key.newInstance(indicator);
-
-                final boolean flag = alertRecords.remove(key);
+                final boolean flag = this.remove(indicator);
 
                 if (flag)
                 {
@@ -203,5 +292,6 @@ public class AlertStateManager extends Subject<Indicator, Boolean> {
         }
     }
 
-    private final java.util.Set<Key> alertRecords = java.util.Collections.synchronizedSet(new java.util.HashSet<Key>());
+    private final java.util.Set<Key> alertRecords = new java.util.HashSet<Key>();
+    private final java.util.Map<Code, java.util.Set<Key>> stockCodeToAlertRecords = new java.util.HashMap<Code, java.util.Set<Key>>();
 }
