@@ -30,12 +30,6 @@ import org.yccheok.jstock.engine.*;
  * @author yccheok
  */
 public class StockTableModel extends AbstractTableModelWithMemory {
-    private static class Alert
-    {
-        public Double fallBelow = null;
-        public Double riseAbove = null;
-    }
-
     /** Creates a new instance of StockTableModel */
     public StockTableModel() {
         for(int i = 0; i < columnNames.length; i++) {
@@ -92,7 +86,7 @@ public class StockTableModel extends AbstractTableModelWithMemory {
         if (col == (columnClasses.length - 1))
         {
             final Double riseAbove = (Double)value;
-            alerts.get(row).riseAbove = riseAbove;
+            alerts.set(row, alerts.get(row).setRiseAbove(riseAbove));
             List<Object> oldInfos = oldTableModel.get(row);
             if (oldInfos != null) oldInfos.set(col, tableModel.get(row).get(col));
             tableModel.get(row).set(col, riseAbove);
@@ -102,7 +96,7 @@ public class StockTableModel extends AbstractTableModelWithMemory {
         else if (col == (columnClasses.length - 2))
         {
             final Double fallBelow = (Double)value;
-            alerts.get(row).fallBelow = fallBelow;
+            alerts.set(row, alerts.get(row).setFallBelow(fallBelow));
             List<Object> oldInfos = oldTableModel.get(row);
             if (oldInfos != null) oldInfos.set(col, tableModel.get(row).get(col));
             tableModel.get(row).set(col, fallBelow);
@@ -115,7 +109,7 @@ public class StockTableModel extends AbstractTableModelWithMemory {
     
     public void updateStock(Stock stock) {
         final Integer row = rowStockCodeMapping.get(stock.getCode());
-        final Alert alert = alerts.get(row);
+        final StockAlert alert = alerts.get(row);
 
         if(row != null) {
             oldTableModel.set(row, tableModel.get(row));
@@ -124,18 +118,22 @@ public class StockTableModel extends AbstractTableModelWithMemory {
             this.fireTableRowsUpdated(row, row);            
         }        
     }
-    
-    public void addStock(Stock stock) {
+
+    public void addStock(Stock stock, StockAlert alert) {
         Integer row = rowStockCodeMapping.get(stock.getCode());
         if(row == null) {
-            tableModel.add(stockToList(stock, new Alert()));
+            tableModel.add(stockToList(stock, alert));
             oldTableModel.add(null);
             stocks.add(stock);
-            alerts.add(new Alert());
+            alerts.add(alert);
             final int rowIndex = tableModel.size() - 1;
             rowStockCodeMapping.put(stock.getCode(), rowIndex);
             fireTableRowsInserted(rowIndex, rowIndex);
         }
+    }
+
+    public void addStock(Stock stock) {
+        this.addStock(stock, new StockAlert());
     }
     
     public void clearAllStocks() {
@@ -179,13 +177,17 @@ public class StockTableModel extends AbstractTableModelWithMemory {
     public Double getRiseAbove(Stock stock) {
         Integer row = this.rowStockCodeMapping.get(stock.getCode());
         if (row == null) return null;
-        return this.alerts.get(row).riseAbove;
+        return this.alerts.get(row).getRiseAbove();
     }
 
     public Double getFallBelow(Stock stock) {
         Integer row = this.rowStockCodeMapping.get(stock.getCode());
         if (row == null) return null;
-        return this.alerts.get(row).fallBelow;
+        return this.alerts.get(row).getFallBelow();
+    }
+
+    public List<StockAlert> getAlerts() {
+        return Collections.unmodifiableList(alerts);
     }
 
     public List<Stock> getStocks() {
@@ -209,7 +211,7 @@ public class StockTableModel extends AbstractTableModelWithMemory {
         this.fireTableRowsDeleted(row, row);
     }
     
-    private List<Object> stockToList(Stock stock, Alert alert) {
+    private List<Object> stockToList(Stock stock, StockAlert alert) {
         List<Object> list = new ArrayList<Object>();
         list.add(stock.getCode());
         list.add(stock.getSymbol());
@@ -225,8 +227,8 @@ public class StockTableModel extends AbstractTableModelWithMemory {
         list.add(stock.getBuyQuantity());
         list.add(stock.getSellPrice());
         list.add(stock.getSellQuantity());
-        list.add(alert.fallBelow);
-        list.add(alert.riseAbove);
+        list.add(alert.getFallBelow());
+        list.add(alert.getRiseAbove());
         return list;
     }
     
@@ -245,7 +247,7 @@ public class StockTableModel extends AbstractTableModelWithMemory {
     private List<List<Object>> tableModel = new ArrayList<List<Object>>();
     private List<List<Object>> oldTableModel = new ArrayList<List<Object>>();
     private List<Stock> stocks = new ArrayList<Stock>();
-    private List<Alert> alerts = new ArrayList<Alert>();
+    private List<StockAlert> alerts = new ArrayList<StockAlert>();
     // Used to get column by Name in fast way.
     private Map<String, Integer> columnNameMapping = new HashMap<String, Integer>();
     // Used to get row by Stock in fast way.
