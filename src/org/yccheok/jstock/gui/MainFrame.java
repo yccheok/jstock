@@ -1042,6 +1042,7 @@ public class MainFrame extends javax.swing.JFrame {
             realTimeStockMonitor.removeStockCode(stock.getCode());
             stockHistoryMonitor.removeStockCode(stock.getCode());
             tableModel.removeRow(modelIndex);
+            this.alertStateManager.clearState(stock);
         }            
         
         updateBuyerSellerInformation(null);
@@ -2524,6 +2525,11 @@ public class MainFrame extends javax.swing.JFrame {
            } 
         });
 
+		// No alert is needed. Early return.
+        if ((jStockOptions.isPopupMessage() == false) && (jStockOptions.isSendEmail() == false)) {
+            return;
+        }
+
         final StockTableModel stockTableModel = (StockTableModel)jTable1.getModel();
 
         for (Stock stock : stocks) {
@@ -2533,12 +2539,42 @@ public class MainFrame extends javax.swing.JFrame {
                 indicator.setStock(stock);
                 alertStateManager.alert(indicator);
             }
+            else {
+                /*
+                 * Having FALL_BELOW_INDICATOR and RISE_ABOVE_INDICATOR, is to enable us
+                 * to remove a particular indicator from AlertStateManager, without the need
+                 * to call time-consuming getLastPriceFallBelowIndicator and
+                 * getLastPriceRiseAboveIndicator. In order for indicator to perform
+                 * correctly, we need to call indicator's mutable method (setStock).
+                 * However, since FALL_BELOW_INDICATOR and RISE_ABOVE_INDICATOR are
+                 * sharable variables, we are not allowed to call setStock outside
+                 * synchronized block. We need to perfrom a hacking liked workaround
+                 * Within syncrhonized block, call getStock (To get old stock), setStock and
+                 * restore back old stock.
+                 */
+                alertStateManager.clearState(FALL_BELOW_INDICATOR, stock);
+            }
 
             final Double riseAbove = stockTableModel.getRiseAbove(stock);
             if (riseAbove != null) {
                 final Indicator indicator = Utils.getLastPriceRiseAboveIndicator(riseAbove);
                 indicator.setStock(stock);
                 alertStateManager.alert(indicator);
+            }
+            else {
+                /*
+                 * Having FALL_BELOW_INDICATOR and RISE_ABOVE_INDICATOR, is to enable us
+                 * to remove a particular indicator from AlertStateManager, without the need
+                 * to call time-consuming getLastPriceFallBelowIndicator and
+                 * getLastPriceRiseAboveIndicator. In order for indicator to perform
+                 * correctly, we need to call indicator's mutable method (setStock).
+                 * However, since FALL_BELOW_INDICATOR and RISE_ABOVE_INDICATOR are
+                 * sharable variables, we are not allowed to call setStock outside
+                 * synchronized block. We need to perfrom a hacking liked workaround
+                 * Within syncrhonized block, call getStock (To get old stock), setStock and
+                 * restore back old stock.
+                 */
+                alertStateManager.clearState(RISE_ABOVE_INDICATOR, stock);
             }
         }
     }
@@ -3101,6 +3137,21 @@ public class MainFrame extends javax.swing.JFrame {
 
     private static final int NUM_OF_RETRY = 3;
     private static final int NUM_OF_THREADS_HISTORY_MONITOR = 4;
+
+    /*
+     * Having FALL_BELOW_INDICATOR and RISE_ABOVE_INDICATOR, is to enable us
+     * to remove a particular indicator from AlertStateManager, without the need
+     * to call time-consuming getLastPriceFallBelowIndicator and
+     * getLastPriceRiseAboveIndicator. In order for indicator to perform
+     * correctly, we need to call indicator's mutable method (setStock).
+     * However, since FALL_BELOW_INDICATOR and RISE_ABOVE_INDICATOR are
+     * sharable variables, we are not allowed to call setStock outside
+     * synchronized block. We need to perfrom a hacking liked workaround
+     * Within syncrhonized block, call getStock (To get old stock), setStock and 
+     * restore back old stock.
+     */
+    private static final Indicator FALL_BELOW_INDICATOR = Utils.getLastPriceFallBelowIndicator(0.0);
+    private static final Indicator RISE_ABOVE_INDICATOR = Utils.getLastPriceRiseAboveIndicator(0.0);
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
