@@ -117,6 +117,9 @@ public class Duration {
     }
 
     public boolean equals(Object o) {
+        if (o == this)
+            return true;
+
         if(!(o instanceof Duration))
             return false;
 
