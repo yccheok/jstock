@@ -70,6 +70,9 @@ public class SimpleDate implements java.lang.Comparable<SimpleDate> {
     }
     
     public boolean equals(Object o) {
+        if (o == this)
+            return true;
+
         if(!(o instanceof SimpleDate))
             return false;
         
