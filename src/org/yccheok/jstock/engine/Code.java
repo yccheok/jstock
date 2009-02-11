@@ -45,6 +45,9 @@ public class Code {
     
     @Override
     public boolean equals(Object o) {
+        if (o == this)
+            return true;
+
         if(!(o instanceof Code))
             return false;
         
