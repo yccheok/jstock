@@ -80,36 +80,48 @@ public class AlertStateManager extends Subject<Indicator, Boolean> {
 
         @Override
         public boolean equals(Object o) {
+            if (o == this)
+                return true;
+
             if(!(o instanceof Key))
                 return false;
 
-            Boolean result = null;
+            boolean result = true;
+            final Indicator dest = ((Key)o).indicator;
 
-            if (indicator instanceof OperatorIndicator && ((Key)o).indicator instanceof OperatorIndicator)
+            if (indicator instanceof OperatorIndicator &&  dest instanceof OperatorIndicator)
             {
+                /* Our own special defination for OperatorIndicator's equals. Do
+                 * not embedded this code into OperatorIndicator itself since
+                 * it doesn't make sense from the point of OperatorIndicator view.
+                 */
                 final String string0 = ((OperatorIndicator)indicator).toString();
-                final String string1 = ((OperatorIndicator)(((Key)o).indicator)).toString();
+                final String string1 = ((OperatorIndicator)dest).toString();
                 result = string0.equals(string1);
             }
-
-            if (indicator.getStock() != null && ((Key)o).indicator.getStock() != null)
+            else
             {
-                final boolean tmp = indicator.getStock().getCode().equals(((Key)o).indicator.getStock().getCode());
-                if (result == null)
-                {
-                    result = tmp;
-                }
-                else
-                {
-                    result = result & tmp;
-                }
+                result = indicator != null ? indicator.equals(dest) : indicator == dest;
             }
 
-            if (result != null) {
+            if (result == false) {
                 return result;
             }
 
-            return super.equals(o);
+            if (indicator == null && dest == null) {
+                return true;
+            }
+
+            if (indicator.getStock() != null && dest.getStock() != null)
+            {
+                result = indicator.getStock().getCode().equals(dest.getStock().getCode());
+            }
+            else
+            {
+                result = (indicator.getStock() == dest.getStock());
+            }
+
+            return result;
         }
 
         @Override
