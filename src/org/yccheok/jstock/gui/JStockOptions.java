@@ -41,6 +41,8 @@ public class JStockOptions {
     public static final java.awt.Color DEFAULT_SECOND_ROW_BACKGROUND_COLOR = new java.awt.Color(255, 255, 204);
     public static final java.awt.Color DEFAULT_AUTO_UPDATE_FOREGROUND_COLOR = Color.BLACK;
     public static final java.awt.Color DEFAULT_AUTO_UPDATE_BACKGROUND_COLOR = Color.RED;
+    public static final java.awt.Color DEFAULT_ALERT_FOREGROUND_COLOR = Color.YELLOW;
+    public static final java.awt.Color DEFAULT_ALERT_BACKGROUND_COLOR = Color.BLACK;
 
     public static final java.awt.Color DEFAULT_CHAT_SYSTEM_MESSAGE_COLOR = Color.RED;
     public static final java.awt.Color DEFAULT_CHAT_OWN_MESSAGE_COLOR = new java.awt.Color(169, 169, 169);
@@ -74,6 +76,10 @@ public class JStockOptions {
         this.setEnableColorChange(false);
         this.setAutoUpdateForegroundColor(DEFAULT_AUTO_UPDATE_FOREGROUND_COLOR);
         this.setAutoUpdateBackgroundColor(DEFAULT_AUTO_UPDATE_BACKGROUND_COLOR);
+
+        this.setEnableColorAlert(false);
+        this.setAlertForegroundColor(DEFAULT_ALERT_FOREGROUND_COLOR);
+        this.setAlertBackgroundColor(DEFAULT_ALERT_BACKGROUND_COLOR);
 
         this.setAutoUpdateNewsEnabled(true);
         this.setNewsVersion(0);
@@ -111,8 +117,11 @@ public class JStockOptions {
     private Color secondRowBackgroundColor;
     private Color autoUpdateForegroundColor;
     private Color autoUpdateBackgroundColor;
+    private Color alertForegroundColor;
+    private Color alertBackgroundColor;
     private boolean enableColorChange;
-    
+    private boolean enableColorAlert;
+
     private List<BrokingFirm> brokingFirms = new ArrayList<BrokingFirm>();
     private int selectedBrokingFirmIndex = -1;
     private boolean isAutoBrokerFeeCalculationEnabled = false;
@@ -183,6 +192,14 @@ public class JStockOptions {
             this.setChatOtherMessageColor(DEFAULT_CHAT_OTHER_MESSAGE_COLOR);
         }
 
+        if (this.getAlertForegroundColor() == null) {
+            this.setAlertForegroundColor(DEFAULT_ALERT_FOREGROUND_COLOR);
+        }
+
+        if (this.getAlertBackgroundColor() == null) {
+            this.setAlertBackgroundColor(DEFAULT_ALERT_BACKGROUND_COLOR);    
+        }
+        
         return this;
     }    
     
@@ -519,5 +536,47 @@ public class JStockOptions {
      */
     public void setChatPassword(String chatPassword) {
         this.chatPassword = chatPassword;
+    }
+
+    /**
+     * @return the alertForegroundColor
+     */
+    public Color getAlertForegroundColor() {
+        return alertForegroundColor;
+    }
+
+    /**
+     * @param alertForegroundColor the alertForegroundColor to set
+     */
+    public void setAlertForegroundColor(Color alertForegroundColor) {
+        this.alertForegroundColor = alertForegroundColor;
+    }
+
+    /**
+     * @return the alertBackgroundColor
+     */
+    public Color getAlertBackgroundColor() {
+        return alertBackgroundColor;
+    }
+
+    /**
+     * @param alertBackgroundColor the alertBackgroundColor to set
+     */
+    public void setAlertBackgroundColor(Color alertBackgroundColor) {
+        this.alertBackgroundColor = alertBackgroundColor;
+    }
+
+    /**
+     * @return the enableColorAlert
+     */
+    public boolean isEnableColorAlert() {
+        return enableColorAlert;
+    }
+
+    /**
+     * @param enableColorAlert the enableColorAlert to set
+     */
+    public void setEnableColorAlert(boolean enableColorAlert) {
+        this.enableColorAlert = enableColorAlert;
     }
 }
