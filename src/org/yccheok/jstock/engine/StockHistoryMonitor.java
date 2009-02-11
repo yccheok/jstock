@@ -209,6 +209,9 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
 
         @Override
         public boolean equals(Object o) {
+            if (o == this)
+                return true;
+
             if(!(o instanceof StockHistoryRunnable))
                 return false;
 
