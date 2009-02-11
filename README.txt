@@ -1,3 +1,12 @@
+=============
+version 1.0.3
+=============
+1. [2567295] "Rise Above" and "Fall Below" table column
+
+2. Bug fixed on Market Chit Chat. Smile symbol will be case insensitive. :p same as :P
+
+3. [2548085] Real-Time Info can remember Column Position.
+
 ===========================================
 version 1.0.2 (nightly build number 030209)
 ===========================================
