@@ -1542,13 +1542,20 @@ public class MainFrame extends javax.swing.JFrame {
     
     // Should we synchronized the jTable1, or post the job at GUI event dispatch
     // queue?
-    public void addStockToTable(final Stock stock) {
+    public void addStockToTable(final Stock stock, final StockAlert alert) {
         assert(java.awt.EventQueue.isDispatchThread());
         
         StockTableModel tableModel = (StockTableModel)jTable1.getModel();
+        tableModel.addStock(stock, alert);
+    }
+
+    public void addStockToTable(final Stock stock) {
+        assert(java.awt.EventQueue.isDispatchThread());
+
+        StockTableModel tableModel = (StockTableModel)jTable1.getModel();
         tableModel.addStock(stock);
     }
-    
+
     // Only will return true if the selected stock is the one and only one.
     private boolean isStockBeingSelected(final Stock stock) {
         int[] rows = MainFrame.this.jTable1.getSelectedRows();
@@ -2207,6 +2214,7 @@ public class MainFrame extends javax.swing.JFrame {
     
     private void initRealTimeStocks() {
         java.util.List<Stock> s = null;
+        java.util.List<StockAlert> a = null;
         
         try {
             final Country country = jStockOptions.getCountry();
@@ -2224,20 +2232,52 @@ public class MainFrame extends javax.swing.JFrame {
         catch(com.thoughtworks.xstream.core.BaseException exp) {
             log.error("", exp);
         }        
-        
+
+        try {
+            final Country country = jStockOptions.getCountry();
+            File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "realtimestockalert.xml");
+
+            XStream xStream = new XStream();
+            InputStream inputStream = new java.io.FileInputStream(f);
+            a = (java.util.List<StockAlert>)xStream.fromXML(inputStream);
+
+            log.info("Real time stocks' alert loaded from " + f.toString() + " successfully.");
+        }
+        catch(java.io.FileNotFoundException exp) {
+            log.error("", exp);
+        }
+        catch(com.thoughtworks.xstream.core.BaseException exp) {
+            log.error("", exp);
+        }
+
         clearAllStocks();
         
         if(s != null) {            
             final java.util.List<Stock> stocks = s;
+            final java.util.List<StockAlert> alerts = a;
             
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
-                public void run() {                    
-                    for(Stock stock : stocks) {
-                        final Stock emptyStock = Utils.getEmptyStock(stock.getCode(), stock.getSymbol());
-                        MainFrame.this.addStockToTable(emptyStock);
-                        realTimeStockMonitor.addStockCode(emptyStock.getCode());
-                    }                    
+                public void run() {
+                    if (alerts == null || (alerts.size() != stocks.size()))
+                    {
+                        for(Stock stock : stocks) {
+                            final Stock emptyStock = Utils.getEmptyStock(stock.getCode(), stock.getSymbol());
+                            MainFrame.this.addStockToTable(emptyStock);
+                            realTimeStockMonitor.addStockCode(emptyStock.getCode());
+                        }
+                    }
+                    else
+                    {
+                        final int size = stocks.size();
+                        for(int i = 0; i < size; i++) {
+                            final Stock stock = stocks.get(i);
+                            final StockAlert alert = alerts.get(i);
+                            final Stock emptyStock = Utils.getEmptyStock(stock.getCode(), stock.getSymbol());
+                            MainFrame.this.addStockToTable(emptyStock, alert);
+                            realTimeStockMonitor.addStockCode(emptyStock.getCode());
+                        }
+                    }
                 }
             });
         }
@@ -2267,23 +2307,38 @@ public class MainFrame extends javax.swing.JFrame {
             return false;
         }
         
-        File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "realtimestock.xml");
+        final File f0 = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "realtimestock.xml");
                 
         XStream xStream = new XStream();   
         
         try {
-            OutputStream outputStream = new FileOutputStream(f);
+            OutputStream outputStream = new FileOutputStream(f0);
             xStream.toXML(((StockTableModel)this.jTable1.getModel()).getStocks(), outputStream);  
         }
         catch(java.io.FileNotFoundException exp) {
-            log.error("", exp);
+            log.error(null, exp);
             return false;
         }
         catch(com.thoughtworks.xstream.core.BaseException exp) {
-            log.error("", exp);
+            log.error(null, exp);
             return false;
         }
-                      
+
+        final File f1 = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "realtimestockalert.xml");
+
+        try {
+            OutputStream outputStream = new FileOutputStream(f1);
+            xStream.toXML(((StockTableModel)this.jTable1.getModel()).getAlerts(), outputStream);
+        }
+        catch(java.io.FileNotFoundException exp) {
+            log.error(null, exp);
+            return false;
+        }
+        catch(com.thoughtworks.xstream.core.BaseException exp) {
+            log.error(null, exp);
+            return false;
+        }
+        
         return true;        
     }
     
