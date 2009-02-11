@@ -508,20 +508,43 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
         jPanel11.setBackground(JStockOptions.DEFAULT_AUTO_UPDATE_FOREGROUND_COLOR);
         jPanel12.setBackground(JStockOptions.DEFAULT_AUTO_UPDATE_BACKGROUND_COLOR);
 
+        jPanel16.setBackground(JStockOptions.DEFAULT_ALERT_FOREGROUND_COLOR);
+        jPanel17.setBackground(JStockOptions.DEFAULT_ALERT_BACKGROUND_COLOR);
+
         this.jCheckBox1.setSelected(false);
-}//GEN-LAST:event_jButton8ActionPerformed
+	}//GEN-LAST:event_jButton8ActionPerformed
 
     private void jPanel17MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel17MouseClicked
         // TODO add your handling code here:
-}//GEN-LAST:event_jPanel17MouseClicked
+        if(jPanel17.isEnabled() == false) return;
+
+        final java.awt.Color color = javax.swing.JColorChooser.showDialog(this, "Choose a color", this.jPanel17.getBackground());
+
+        if(null == color) return;
+
+        jPanel17.setBackground(color);
+	}//GEN-LAST:event_jPanel17MouseClicked
 
     private void jPanel16MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel16MouseClicked
         // TODO add your handling code here:
-}//GEN-LAST:event_jPanel16MouseClicked
+        if(jPanel16.isEnabled() == false) return;
+
+        final java.awt.Color color = javax.swing.JColorChooser.showDialog(this, "Choose a color", this.jPanel16.getBackground());
+
+        if(null == color) return;
+
+        jPanel16.setBackground(color);
+	}//GEN-LAST:event_jPanel16MouseClicked
 
     private void jCheckBox2ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jCheckBox2ItemStateChanged
         // TODO add your handling code here:
-}//GEN-LAST:event_jCheckBox2ItemStateChanged
+        final boolean status = jCheckBox2.isSelected();
+
+        jLabel8.setEnabled(status);
+        jLabel9.setEnabled(status);
+        jPanel16.setEnabled(status);
+        jPanel17.setEnabled(status);
+	}//GEN-LAST:event_jCheckBox2ItemStateChanged
 
     private void jPanel12MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel12MouseClicked
         // TODO add your handling code here:
@@ -532,7 +555,7 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
         if(null == color) return;
 
         jPanel12.setBackground(color);
-}//GEN-LAST:event_jPanel12MouseClicked
+	}//GEN-LAST:event_jPanel12MouseClicked
 
     private void jPanel11MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel11MouseClicked
         // TODO add your handling code here:
@@ -543,7 +566,7 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
         if(null == color) return;
 
         jPanel11.setBackground(color);
-}//GEN-LAST:event_jPanel11MouseClicked
+	}//GEN-LAST:event_jPanel11MouseClicked
 
     private void jCheckBox1ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jCheckBox1ItemStateChanged
         // TODO add your handling code here:
@@ -553,7 +576,7 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
         jLabel7.setEnabled(status);
         jPanel11.setEnabled(status);
         jPanel12.setEnabled(status);
-}//GEN-LAST:event_jCheckBox1ItemStateChanged
+	}//GEN-LAST:event_jCheckBox1ItemStateChanged
 
     private void jPanel10MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel10MouseClicked
         // TODO add your handling code here:
@@ -562,7 +585,7 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
         if(null == color) return;
 
         jPanel10.setBackground(color);
-}//GEN-LAST:event_jPanel10MouseClicked
+	}//GEN-LAST:event_jPanel10MouseClicked
 
     private void jPanel9MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel9MouseClicked
         // TODO add your handling code here:
@@ -571,7 +594,7 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
         if(null == color) return;
 
         jPanel9.setBackground(color);
-}//GEN-LAST:event_jPanel9MouseClicked
+    }//GEN-LAST:event_jPanel9MouseClicked
 
     private void jPanel8MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel8MouseClicked
         // TODO add your handling code here:
@@ -580,7 +603,7 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
         if(null == color) return;
 
         jPanel8.setBackground(color);
-}//GEN-LAST:event_jPanel8MouseClicked
+	}//GEN-LAST:event_jPanel8MouseClicked
 
     private void jPanel7MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel7MouseClicked
         // TODO add your handling code here:
@@ -589,7 +612,7 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
         if(null == color) return;
 
         jPanel7.setBackground(color);
-}//GEN-LAST:event_jPanel7MouseClicked
+	}//GEN-LAST:event_jPanel7MouseClicked
 
     private void jPanel6MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel6MouseClicked
         // TODO add your handling code here:
@@ -598,7 +621,7 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
         if(null == color) return;
 
         jPanel6.setBackground(color);
-}//GEN-LAST:event_jPanel6MouseClicked
+	}//GEN-LAST:event_jPanel6MouseClicked
 
     @Override
     public void set(JStockOptions jStockOptions) {        
@@ -611,8 +634,12 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
 
         jPanel11.setBackground(jStockOptions.getAutoUpdateForegroundColor());
         jPanel12.setBackground(jStockOptions.getAutoUpdateBackgroundColor());
+
+        jPanel16.setBackground(jStockOptions.getAlertForegroundColor());
+        jPanel17.setBackground(jStockOptions.getAlertBackgroundColor());
         
         this.jCheckBox1.setSelected(jStockOptions.isEnableColorChange());
+        this.jCheckBox2.setSelected(jStockOptions.isEnableColorAlert());
     }
 
     @Override
@@ -626,8 +653,12 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
 
         jStockOptions.setAutoUpdateForegroundColor(jPanel11.getBackground());        
         jStockOptions.setAutoUpdateBackgroundColor(jPanel12.getBackground());
+
+        jStockOptions.setAlertForegroundColor(jPanel16.getBackground());
+        jStockOptions.setAlertBackgroundColor(jPanel17.getBackground());
         
         jStockOptions.setEnableColorChange(jCheckBox1.isSelected());
+        jStockOptions.setEnableColorAlert(jCheckBox2.isSelected());
         
         MainFrame m = MainFrame.getInstance();
         if(m != null) {
