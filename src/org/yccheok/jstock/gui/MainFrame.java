@@ -1764,14 +1764,14 @@ public class MainFrame extends javax.swing.JFrame {
         
         menuItem = new JMenuItem("Delete", this.getImageIcon("/images/16x16/editdelete.png"));
         
-	menuItem.addActionListener(new ActionListener() {
+        menuItem.addActionListener(new ActionListener() {
             @Override
         	public void actionPerformed(ActionEvent evt) {
                     MainFrame.this.deteleSelectedTableRow();
-                }
-	});
+            }
+        });
             
-	popup.add(menuItem);                
+        popup.add(menuItem);
         
         return popup;
     }
