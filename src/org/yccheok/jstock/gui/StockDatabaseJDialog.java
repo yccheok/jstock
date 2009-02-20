@@ -484,12 +484,11 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         
         public int findCodeOrSymbol(String string) {
             final Symbol symbol = Symbol.newInstance(string);
-            final Code code = Code.newInstance(string);
-            
             final int symbolIndex = symbols.indexOf(symbol);
-            final int codeIndex = codes.indexOf(code);
-            
             if(symbolIndex >= 0) return symbolIndex;
+
+            final Code code = Code.newInstance(string);
+            final int codeIndex = codes.indexOf(code);
             if(codeIndex >= 0) return codeIndex;
             
             return -1;
@@ -597,17 +596,28 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
             boolean isValid = true;
 
             if(modelIndex1 >= 0) {
+                // We only take into consideration of string greater than 0. As
+                // we allow multiple empty lines within a table.
                 if(searchedText.length() > 0) {
-                    if(searchedText.equals(_ftf.getValue().toString()) == false) {
-                        JOptionPane.showMessageDialog(StockDatabaseJDialog.this, searchedText + " is conflicting with stock exchange server database.", "Conflicting", JOptionPane.INFORMATION_MESSAGE);
-                        selectStockExchangeServerDatabaseTable(modelIndex1);
-                        isValid = false;
-                    }
+                    JOptionPane.showMessageDialog(StockDatabaseJDialog.this, searchedText + " is conflicting with stock exchange server database.", "Conflicting", JOptionPane.INFORMATION_MESSAGE);
+                    selectStockExchangeServerDatabaseTable(modelIndex1);
+                    isValid = false;
                 }
             }
-            else if(modelIndex2 >= 0) {
+            
+            if(modelIndex2 >= 0) {
+                // We only take into consideration of string greater than 0. As
+                // we allow multiple empty lines within a table.
                 if(searchedText.length() > 0) {
+                    // Imagine there is an item "123" at the first row of editable table,
+                    // and it is already being added into SymbolTableModel. We will come into this block,
+                    // when we double click on the particular row (which makes it into editable mode), and
+                    // then click on another row (which will invoke stopCellEditing). We do not have intention
+                    // to make any change on current content. Hence, we should do another checking, to ensure
+                    // we only pop up the warning message, if the content is being modified. _ftf.getValue().toString()
+                    // is the value before modification.
                     if(searchedText.equals(_ftf.getValue().toString()) == false) {
+                        // There is modification being done and it is conflicting with SymbolTableModel.
                         JOptionPane.showMessageDialog(StockDatabaseJDialog.this, searchedText + " is conflicting with user defined database.", "Conflicting", JOptionPane.INFORMATION_MESSAGE);
                         selectUserDefinedDatabaseTable(modelIndex2);
                         isValid = false;
