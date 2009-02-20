@@ -767,6 +767,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     // two observers at the same time.
     private org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> getRealTimeStockMonitorObserver() {
         return new org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>>() {
+            @Override
             public void update(RealTimeStockMonitor monitor, java.util.List<Stock> stocks)
             {
                 IndicatorScannerJPanel.this.update(monitor, stocks);
@@ -897,25 +898,8 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         });
 
         popup.add(menuItem);
-
-        popup.add(menuItem);
         
         return popup;
-    }
-    
-    private String getIndicatorKey(Indicator indicator) {
-        // Stock shouldn't be null.
-        assert(indicator.getStock() != null);
-        
-        return indicator.toString() + indicator.getStock().getCode();
-    }
-
-    private void alert(final Indicator indicator) {
-        final MainFrame m = getMainFrame();
-
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
-        
-        alertStateManager.alert(indicator);
     }
 
     private MainFrame getMainFrame()
