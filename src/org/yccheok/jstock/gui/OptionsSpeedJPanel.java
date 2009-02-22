@@ -51,6 +51,7 @@ public class OptionsSpeedJPanel extends javax.swing.JPanel implements JStockOpti
         jLabel1 = new javax.swing.JLabel();
         jComboBox1 = new javax.swing.JComboBox();
         jLabel2 = new javax.swing.JLabel();
+        jComboBox3 = new javax.swing.JComboBox();
         jPanel3 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
         jComboBox2 = new javax.swing.JComboBox();
@@ -65,12 +66,14 @@ public class OptionsSpeedJPanel extends javax.swing.JPanel implements JStockOpti
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Real-time data"));
 
-        jLabel1.setText("Stock scanning speed (second)");
+        jLabel1.setText("Stock scanning speed");
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "1", "5", "10", "20", "30", "40", "50", "60" }));
 
-        jLabel2.setFont(new java.awt.Font("Dialog", 0, 10));
+        jLabel2.setFont(new java.awt.Font("Dialog", 0, 10)); // NOI18N
         jLabel2.setText("(smaller means faster)");
+
+        jComboBox3.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "seconds", "minutes", "hours" }));
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -80,19 +83,23 @@ public class OptionsSpeedJPanel extends javax.swing.JPanel implements JStockOpti
                 .addContainerGap()
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel2)
-                .addContainerGap(37, Short.MAX_VALUE))
+                .addContainerGap(41, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel2)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel2)
+                        .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jLabel1))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(12, Short.MAX_VALUE))
         );
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("History data"));
@@ -112,10 +119,10 @@ public class OptionsSpeedJPanel extends javax.swing.JPanel implements JStockOpti
                 .addContainerGap()
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel4)
-                .addContainerGap(75, Short.MAX_VALUE))
+                .addContainerGap(110, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -145,17 +152,34 @@ public class OptionsSpeedJPanel extends javax.swing.JPanel implements JStockOpti
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(21, Short.MAX_VALUE))
+                .addContainerGap(20, Short.MAX_VALUE))
         );
 
         add(jPanel1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
+    @Override
     public void set(JStockOptions jStockOptions) {
-        jComboBox1.setSelectedItem("" + jStockOptions.getScanningSpeed() / 1000);
+        final int maxSpeed = 60;
+
+        if (jStockOptions.getScanningSpeed() <= (maxSpeed * 1000)) {
+            jComboBox1.setSelectedItem("" + jStockOptions.getScanningSpeed() / 1000);
+            jComboBox3.setSelectedIndex(0); // Seconds.
+        }
+        else if (jStockOptions.getScanningSpeed() <= (maxSpeed * 1000 * 60))  {
+            jComboBox1.setSelectedItem("" + jStockOptions.getScanningSpeed() / (1000 * 60));
+            jComboBox3.setSelectedIndex(1); // Minutes.
+        }
+        else {
+        	assert(jStockOptions.getScanningSpeed() <= (maxSpeed * 1000 * 60 * 60));
+            jComboBox1.setSelectedItem("" + jStockOptions.getScanningSpeed() / (1000 * 60 * 60));
+            jComboBox3.setSelectedIndex(2); // Hours.
+        }
+
         jComboBox2.setSelectedItem("" + jStockOptions.getHistoryDuration());
     }
 
+    @Override
     public boolean apply(JStockOptions jStockOptions) {
         int speed = 1;
         int historyDuration = 1;
@@ -174,7 +198,19 @@ public class OptionsSpeedJPanel extends javax.swing.JPanel implements JStockOpti
             log.error("", exp);
         }
 
-        jStockOptions.setScanningSpeed(speed * 1000);
+        if (jComboBox3.getSelectedIndex() == 0) {
+            /* Seconds. Convert the unit to milliseconds. */
+            jStockOptions.setScanningSpeed(speed * 1000);
+        }
+        else if (jComboBox3.getSelectedIndex() == 0) {
+            /* Minutes. Convert the unit to milliseconds. */
+            jStockOptions.setScanningSpeed(speed * 1000 * 60);
+        }
+        else {
+            /* Hours. Convert the unit to milliseconds. */
+            jStockOptions.setScanningSpeed(speed * 1000 * 60 * 60);
+        }
+
         jStockOptions.setHistoryDuration(historyDuration);
         
         MainFrame m = MainFrame.getInstance();
@@ -191,6 +227,7 @@ public class OptionsSpeedJPanel extends javax.swing.JPanel implements JStockOpti
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox jComboBox1;
     private javax.swing.JComboBox jComboBox2;
+    private javax.swing.JComboBox jComboBox3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
