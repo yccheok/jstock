@@ -30,8 +30,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JFormattedTextField;
@@ -52,7 +50,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.MutableStockCodeAndSymbolDatabase;
-import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.StockCodeAndSymbolDatabase;
 import org.yccheok.jstock.engine.Symbol;
 
