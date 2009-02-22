@@ -37,9 +37,12 @@ public class MutableStockCodeAndSymbolDatabase extends StockCodeAndSymbolDatabas
     }
     
     // Not thread safe.
+    // getUserDefinedSymbol shall return list with non-duplicated symbols. If not,
+    // we shall consider this method as buggy method. Please refer to tracker record :
+    // [ 2617022 ] NPE When Invoking Stock Database Dialog
     public List<Symbol> getUserDefinedSymbol() {
         List<Symbol> symbols = this.industryToSymbols.get(Stock.Industry.UserDefined);
-        if(symbols == null) {
+        if (symbols == null) {
             return Collections.emptyList();
         }
         return new ArrayList<Symbol>(symbols);
@@ -52,6 +55,17 @@ public class MutableStockCodeAndSymbolDatabase extends StockCodeAndSymbolDatabas
         
         final Code code = symbolToCode.get(symbol);
         
+        // We should ensure the symbol which we intend to remove is inside the
+        // database. In our case, the symbols which we wish to remove are coming from
+        // MutableStockCodeAndSymbolDatabase's getUserDefinedSymbol. Although
+        // this ensures code will never be null. Still, without null checking,
+        // our code may break, if getUserDefinedSymbol is returning duplicated List
+        // which is containing duplicated symbols.
+        // Hence, it is better to leave null checking here.
+        if (code == null) {
+            return false;
+        }
+
         final Stock.Industry industry = Stock.Industry.UserDefined;
         final Stock.Board board = Stock.Board.UserDefined;
         
@@ -60,25 +74,25 @@ public class MutableStockCodeAndSymbolDatabase extends StockCodeAndSymbolDatabas
         final List<Symbol> iSymbols = industryToSymbols.get(industry);
         final List<Symbol> bSymbols = boardToSymbols.get(board);
 
-        if(iCodes == null || bCodes == null || iSymbols == null || bSymbols == null) {
+        if (iCodes == null || bCodes == null || iSymbols == null || bSymbols == null) {
             return false;
         }
         
         Code searchedCode = this.codeSearchEngine.search(code.toString());
         Symbol searchedSymbol = this.symbolSearchEngine.search(symbol.toString());
         
-        if(searchedCode == null) return false;
-        if(searchedSymbol == null) return false;
+        if (searchedCode == null) return false;
+        if (searchedSymbol == null) return false;
         
-        if(!searchedCode.equals(code)) {
+        if (!searchedCode.equals(code)) {
             return false;
         }
         
-        if(!searchedSymbol.equals(symbol)) {
+        if (!searchedSymbol.equals(symbol)) {
             return false;
         }  
         
-        if((!(symbolSearchEngine instanceof TSTSearchEngine)) || (!(codeSearchEngine instanceof TSTSearchEngine)))
+        if ((!(symbolSearchEngine instanceof TSTSearchEngine)) || (!(codeSearchEngine instanceof TSTSearchEngine)))
         {
             return false;
         }
@@ -106,34 +120,21 @@ public class MutableStockCodeAndSymbolDatabase extends StockCodeAndSymbolDatabas
     
     // Not thread safe.
     public boolean addUserDefinedSymbol(Symbol symbol) {
-        if(symbol == null) {
+        if (symbol == null) {
             throw new java.lang.IllegalArgumentException("Code or symbol cannot be null");
         }
         
-        if(symbol.toString().length() <= 0) {
+        if (symbol.toString().length() <= 0) {
             throw new java.lang.IllegalArgumentException("Code or symbol length cannot be 0");
         }
-        
+
         final Code code = Code.newInstance(symbol.toString());
-        
-        final Code searchedCode = this.codeSearchEngine.search(code.toString());
-        final Symbol searchedSymbol = this.symbolSearchEngine.search(symbol.toString());
-        
-        // Unique is a must. We do not want information to be overriden.
-        if(searchedCode != null)
-        {        
-            if(searchedCode.equals(code)) {
-                return false;
-            }
+
+        // We need to ensure there is no duplicated code or symbol being added.
+        if (symbolToCode.containsKey(symbol) || codeToSymbol.containsKey(code)) {
+            return false;
         }
 
-        if(searchedSymbol != null)
-        {        
-            if(searchedSymbol.equals(symbol)) {
-                return false;
-            }
-        }
-        
         if((!(symbolSearchEngine instanceof TSTSearchEngine)) || (!(codeSearchEngine instanceof TSTSearchEngine)))
         {
             return false;
@@ -149,28 +150,28 @@ public class MutableStockCodeAndSymbolDatabase extends StockCodeAndSymbolDatabas
         final Stock.Board board = Stock.Board.UserDefined;
         
         List<Code> codes = industryToCodes.get(industry);
-        if(codes == null) {
+        if (codes == null) {
             codes = new ArrayList<Code>();
             industryToCodes.put(industry, codes);                
         }
         codes.add(code);
 
         codes = boardToCodes.get(board);
-        if(codes == null) {
+        if (codes == null) {
             codes = new ArrayList<Code>();
             boardToCodes.put(board, codes);                
         }
         codes.add(code);
 
         List<Symbol> symbols = industryToSymbols.get(industry);
-        if(symbols == null) {
+        if (symbols == null) {
             symbols = new ArrayList<Symbol>();
             industryToSymbols.put(industry, symbols);                
         }
         symbols.add(symbol);
 
         symbols = boardToSymbols.get(board);
-        if(symbols == null) {
+        if (symbols == null) {
             symbols = new ArrayList<Symbol>();
             boardToSymbols.put(board, symbols);                
         }
