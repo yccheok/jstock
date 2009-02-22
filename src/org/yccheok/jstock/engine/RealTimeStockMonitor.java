@@ -247,6 +247,7 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
             notify();
         }    
         
+        @Override
         public void run() {
             final Thread thisThread = Thread.currentThread();
             
