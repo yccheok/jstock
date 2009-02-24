@@ -268,7 +268,10 @@ public class Stock {
         DJI("DJI"),
         NasdaqNM("NasdaqNM"),
         NYSE("NYSE"),
-        
+        Nasdaq("Nasdaq"),
+        AMEX("AMEX"),
+        PinkSheet("Pink Sheet"),
+
         UserDefined("User Defined"),
         Unknown("Unknown");
         
