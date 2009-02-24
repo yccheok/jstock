@@ -3025,11 +3025,11 @@ public class MainFrame extends javax.swing.JFrame {
 
                 org.yccheok.jstock.engine.Utils.setHttpClientProxyFromSystemProperties(httpClient);
 
-                String responde = null;
+                String respond = null;
 
                 try {
                     httpClient.executeMethod(method);
-                    responde = method.getResponseBodyAsString();
+                    respond = method.getResponseBodyAsString();
                 }
                 catch (HttpException ex) {
                     log.error(null, ex);
@@ -3044,17 +3044,17 @@ public class MainFrame extends javax.swing.JFrame {
                 // If we fail to obtain any update, do not give up. Probably
                 // the author is going to update the latest news soon. Sleep for
                 // a while, and try again.
-                if(responde == null)
+                if(respond == null)
                 {                    
                     continue;
                 }
 
-                if(responde.indexOf(Utils.getJStockUUID()) < 0)
+                if(respond.indexOf(Utils.getJStockUUID()) < 0)
                 {
                     continue;
                 }
 
-                publish(responde);
+                publish(respond);
 
                 try {
                     doneSignal.await();
