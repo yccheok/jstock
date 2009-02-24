@@ -23,6 +23,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -72,14 +73,14 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
             try {
                 Utils.setHttpClientProxyFromSystemProperties(httpClient);
                 httpClient.executeMethod(method);
-                final String responde = method.getResponseBodyAsString();
-                final List<Stock> stocks = YahooStockFormat.getInstance().parse(responde);
+                final String respond = method.getResponseBodyAsString();
+                final List<Stock> stocks = YahooStockFormat.getInstance().parse(respond);
                 
                 if(stocks.size() == 1)
                     return stocks.get(0);
             }
             catch(HttpException exp) {
-                log.error("location=" + location, exp);                
+                log.error("location=" + location, exp);
                 continue;
             }
             catch(IOException exp) {
@@ -96,6 +97,7 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
         throw new StockNotFoundException("Cannot get symbol=" + symbol);
     }
 
+    @Override
     public Stock getStock(Code code) throws StockNotFoundException {
         return getStock(Symbol.newInstance(code.toString()));
     }
@@ -166,9 +168,9 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
                 try {
                     Utils.setHttpClientProxyFromSystemProperties(httpClient);
                     httpClient.executeMethod(method);
-                    final String responde = method.getResponseBodyAsString();
+                    final String respond = method.getResponseBodyAsString();
                     
-                    final List<Stock> tmpStocks = YahooStockFormat.getInstance().parse(responde);
+                    final List<Stock> tmpStocks = YahooStockFormat.getInstance().parse(respond);
                     if(tmpStocks.size() != MAX_STOCK_PER_ITERATION) {
                         if(retry == (NUM_OF_RETRY-1)) {
                             // throw new StockNotFoundException();
@@ -269,9 +271,9 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
             try {
                 Utils.setHttpClientProxyFromSystemProperties(httpClient);
                 httpClient.executeMethod(method);
-                final String responde = method.getResponseBodyAsString();
+                final String respond = method.getResponseBodyAsString();
                 
-                final List<Stock> tmpStocks = YahooStockFormat.getInstance().parse(responde);
+                final List<Stock> tmpStocks = YahooStockFormat.getInstance().parse(respond);
                 if(tmpStocks.size() != remainder) {
                     if(retry == (NUM_OF_RETRY-1)) {
                         // throw new StockNotFoundException();
@@ -326,6 +328,7 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
         return stocks;
     }
 
+    @Override
     public List<Stock> getStocksByCodes(List<Code> codes) throws StockNotFoundException {
         List<Symbol> symbols = new ArrayList<Symbol>();
         for(Code code : codes) {
@@ -335,38 +338,103 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
         return getStocksBySymbols(symbols);
     }
 
-    private Set<Symbol> getSymbols(String responde) {
-        Set<Symbol> symbols = new HashSet<Symbol>();
-        
-        final Matcher matcher = symbolPattern.matcher(responde);
-        
-        while(matcher.find()){
-            for(int j=1; j<=matcher.groupCount(); j++ ) {
-                final String string = matcher.group(j);
-                symbols.add(Symbol.newInstance(string));
+    private List<Stock> getStocks(String respond) {
+        List<Stock> stocks = new ArrayList<Stock>();
+        // In order to avoid duplicated stock's code.
+        Set<Code> codes = new HashSet<Code>();
+
+        final Matcher matcher = stockAndBoardPattern.matcher(respond);
+        while (matcher.find()){
+            for (int i = 1; i <= matcher.groupCount(); i += 3) {
+                String c = matcher.group(i);
+                if (c == null) {
+                    continue;
+                }
+
+                String s = matcher.group(i + 1);
+                if (s == null) {
+                    continue;
+                }
+
+                String b = matcher.group(i + 2);
+                if (b == null) {
+                    continue;
+                }
+
+                c = c.trim();
+                s = s.trim();
+                // Enum name is not allowed to have space in between.
+                b = b.trim().replaceAll("\\s+", "");
+
+                final Code code = Code.newInstance(c);
+                final Symbol symbol = Symbol.newInstance(s);
+                Stock.Board board = null;
+
+                if (codes.add(code) == false) {
+                    // The stock with same code had been added previously. We
+                    // do not want any stock with duplicated code.
+                    continue;
+                }
+
+                try {
+                    board = Stock.Board.valueOf(b);
+                }
+                catch(java.lang.IllegalArgumentException exp) {
+                    log.error(null, exp);
+                    board = Stock.Board.Unknown;
+                }
+
+                final Stock stock = new Stock(
+                        code,
+                        symbol,
+                        "",
+                        board,
+                        Stock.Industry.Unknown,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0,
+                        0.0,
+                        0.0,
+                        0,
+                        0.0,
+                        0,
+                        0.0,
+                        0,
+                        0.0,
+                        0,
+                        0.0,
+                        0,
+                        0.0,
+                        0,
+                        0.0,
+                        0,
+                        Calendar.getInstance()
+                        );
+                stocks.add(stock);
             }
         }
-        
-        return symbols;
+
+        return stocks;
     }
     
     // The returned URLs, shouldn't have any duplication with visited,
     // and they are unique. Although is more suitable that we use Set,
     // use List is more convinient for us to iterate.
-    private List<URL> getURLs(String responde, List<URL> visited) {   
+    private List<URL> getURLs(String respond, List<URL> visited) {
         List<URL> urls = new ArrayList<URL>();
+
+        final Matcher matcher = urlPattern.matcher(respond);
         
-        final Pattern pattern = patterns.get(country);
-        final Matcher matcher = pattern.matcher(responde);
-        
-        while(matcher.find()){
-            for(int j=1; j<=matcher.groupCount(); j++ ) {
-                String string = matcher.group(j);
+        while (matcher.find()){
+            for (int j = 1; j <= matcher.groupCount(); j++) {
+                final String string = matcher.group(j);
 
                 try {
                     URL url = new URL(baseURL, string);
                     
-                    if((urls.contains(url) == false) && (visited.contains(url) == false)) {
+                    if ((urls.contains(url) == false) && (visited.contains(url) == false)) {
                         urls.add(url);
                     }
                 } catch (MalformedURLException ex) {
@@ -378,71 +446,133 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
         return urls;
     }
     
+    @Override
     public List<Stock> getAllStocks() throws StockNotFoundException {
         List<URL> visited = new ArrayList<URL>();
         
+        List<Stock> stocks = new ArrayList<Stock>();
+
         // Use Set, for safety purpose to avoid duplication.
-        Set<Symbol> symbols = new HashSet<Symbol>();
+        Set<Code> codes = new HashSet<Code>();
 
         visited.add(baseURL);
 
         final HttpClient httpClient = new HttpClient();
 
-        for(int i=0; i<visited.size(); i++) {
+        for (int i = 0; i < visited.size(); i++) {
             final String location = visited.get(i).toString();
-            
-            for(int retry=0; retry<NUM_OF_RETRY; retry++) {
-                HttpMethod method = new GetMethod(location);                        
+            System.out.println("XXXXX location=" + location);
 
-                try {
-                    Utils.setHttpClientProxyFromSystemProperties(httpClient);
-                    httpClient.executeMethod(method);
-                    final String responde = method.getResponseBodyAsString();
-                    List<URL> urls = getURLs(responde, visited);
-                    Set<Symbol> tmpSymbols = getSymbols(responde);
+            HttpMethod method = new GetMethod(location);
 
-                    // getURLs already ensure URLs are unique.
-                    visited.addAll(urls);
-                    symbols.addAll(tmpSymbols);
+            try {
+                Utils.setHttpClientProxyFromSystemProperties(httpClient);
+                httpClient.executeMethod(method);
+                final String respond = method.getResponseBodyAsString();
+
+                final List<Stock> tmpStocks = getStocks(respond);
+                final List<URL> urls = getURLs(respond, visited);
+
+                for (Stock stock : tmpStocks) {
+                	if (codes.add(stock.getCode())) {
+                		stocks.add(stock);
+                	}
                 }
-                catch(HttpException exp) {
-                    log.error("location=" + location, exp);                
-                    continue;
+
+                for (URL url : urls) {
+                    if (visited.contains(url)) {
+                        continue;
+                    }
+                    visited.add(url);
                 }
-                catch(IOException exp) {
-                    log.error("location=" + location, exp);                
-                    continue;
-                }
-                finally {
-                    method.releaseConnection();
-                }
-                
-                break;
-            }   // for(int retry=0; retry<NUM_OF_RETRY; retry++)
-            
-            this.notify(this, symbols.size());
+
+                notify(this, stocks.size());
+            }
+            catch (HttpException exp) {
+                log.error("location=" + location, exp);
+                continue;
+            }
+            catch (IOException exp) {
+                log.error("location=" + location, exp);
+                continue;
+            }
+            finally {
+                method.releaseConnection();
+            }
         }
-        
-        if(symbols.size() == 0) throw new StockNotFoundException();
-        
-        final List<Symbol> _symbols = new ArrayList<Symbol>(symbols);
-        return getStocksBySymbols(_symbols);
+
+        return stocks;
     }
 
     public static void main(String[] args) throws StockNotFoundException {
-        YahooStockServer server = new YahooStockServer(Country.Denmark);
-        server.getAllStocks();
+        YahooStockServer server0 = new YahooStockServer(Country.Denmark);
+        YahooStockServer server1 = new YahooStockServer(Country.France);
+        YahooStockServer server2 = new YahooStockServer(Country.Germany);
+        YahooStockServer server3 = new YahooStockServer(Country.Italy);
+        YahooStockServer server4 = new YahooStockServer(Country.Norway);
+        YahooStockServer server5 = new YahooStockServer(Country.Spain);
+        YahooStockServer server6 = new YahooStockServer(Country.Sweden);
+        YahooStockServer server7 = new YahooStockServer(Country.UnitedKingdom);
+        YahooStockServer server8 = new YahooStockServer(Country.UnitedState);
+
+        System.out.println("XXXxxxXXXXXXXXXXXXXXXXXXXx Denmark");
+        server0.getAllStocks();
+        System.out.println("XXXxxxXXXXXXXXXXXXXXXXXXXx France");
+        server1.getAllStocks();
+        System.out.println("XXXxxxXXXXXXXXXXXXXXXXXXXx Germany");
+        server2.getAllStocks();
+        System.out.println("XXXxxxXXXXXXXXXXXXXXXXXXXx Italy");
+        server3.getAllStocks();
+        System.out.println("XXXxxxXXXXXXXXXXXXXXXXXXXx Norway");
+        server4.getAllStocks();
+        System.out.println("XXXxxxXXXXXXXXXXXXXXXXXXXx Spain");
+        server5.getAllStocks();
+        System.out.println("XXXxxxXXXXXXXXXXXXXXXXXXXx Sweden");
+        server6.getAllStocks();
+        System.out.println("XXXxxxXXXXXXXXXXXXXXXXXXXx UnitedKingdom");
+        server7.getAllStocks();
+        System.out.println("XXXxxxXXXXXXXXXXXXXXXXXXXx UnitedState");
+        server8.getAllStocks();
     }
     
     private final Country country;
     private final URL baseURL;
     
     private static final Map<Country, URL> servers = new HashMap<Country, URL>();
-    private static final Map<Country, Pattern> patterns = new HashMap<Country, Pattern>();
+    private static final Pattern urlPattern = Pattern.compile("<a\\s+href\\s*=\\s*\"?(/uk/index.php.+?)\"?>", Pattern.CASE_INSENSITIVE);
     private static final Log log = LogFactory.getLog(YahooStockServer.class);
-    
-    private static final Pattern symbolPattern = Pattern.compile("<a\\s+href\\s*=[^>]+s=([^\">]+)\"?>Quote");
-    
+
+    /*
+    <tr>
+    <td nowrap="" class="yfnc_h">
+     <a href="http://uk.finance.yahoo.com/q?s=VWS.CO">Vestas Wind Systems A/S</a>
+    </td>
+    <td nowrap="" align="center" class="yfnc_h">
+     VWS.CO</td>
+    <td nowrap="" align="center" class="yfnc_h">
+     DK0010268606</td>
+    <td nowrap="" align="center" class="yfnc_h">
+     Copenhagen</td>
+    <td nowrap="" align="center" class="yfnc_h">
+     Stock</td>
+    <td nowrap="" align="center" class="yfnc_h">
+     <b>269.50<small>DKK</small> </b> <small>11:50</small></td>
+    <td nowrap="" align="center" class="yfnc_h">
+       <b style="color: rgb(204, 0, 0);"> -4.09%</b> </td>
+    <td nowrap="" align="right" class="yfnc_h">
+     1,373,728</td>
+    <td nowrap="" align="center" class="yfnc_h">
+     <img height="10" border="0" width="10" src="http://us.i1.yimg.com/us.yimg.com/i/us/fi/gr/track_trns_1.gif"/>
+    <a href="http://uk.finedit.yahoo.com/ec?.intl=uk&amp;.src=quote&amp;.portfover=1&amp;.done=http://uk.finance.yahoo.com/&amp;.cancelPage=http://uk.biz.yahoo.com/quote_lookup.html&amp;.sym=VWS.CO&amp;.nm=Vestas+Wind+Systems+A%2FS">Add</a>
+    </td>
+    </tr>
+     */
+    // <a href="http://uk.finance.yahoo.com/q?s=RBS.L">Royal Bank Of Scotland</a>
+    // First group is stock code, second group is stock symbol, 3rd group is board.
+    // Board information is located at the fourth column of the table.
+    // Pattern.DOTALL means for '.', we want to match everything including newline.
+    private static final Pattern stockAndBoardPattern = Pattern.compile("<a\\s+href\\s*=[^>]+s=([^\">]+)\"?>(.+?)</a>.*?</td>.*?<td[^>]*>.*?</td>.*?<td[^>]*>.*?</td>.*?<td[^>]*>(.*?)</td>", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+
     // Yahoo server limit is 200. We shorter, to avoid URL from being too long.
     // Yahoo sometimes does complain URL for being too long.
     private static final int MAX_STOCK_PER_ITERATION = 180;
@@ -484,31 +614,24 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
     private static final String YAHOO_STOCK_FORMAT = "&f=snxpl1hgsvsc1p2sk3sbsb6sasa5sd1t1";
     
     static {
+        // We try to perform search from Yahoo Finance by using the following parameters :
+        // Name or Symbol : **
+        // Type : Stocks
+        // Market : Depends on selected country.
         try {
-            servers.put(Country.Denmark, new URL("http://uk.biz.yahoo.com/p/dk/cpi/index.html"));
-            servers.put(Country.France, new URL("http://uk.biz.yahoo.com/p/fr/cpi/index.html"));
-            servers.put(Country.Germany, new URL("http://uk.biz.yahoo.com/p/de/cpi/index.html"));
-            servers.put(Country.Italy, new URL("http://uk.biz.yahoo.com/p/it/cpi/index.html"));
-            servers.put(Country.Norway, new URL("http://uk.biz.yahoo.com/p/no/cpi/index.html"));
-            servers.put(Country.Spain, new URL("http://uk.biz.yahoo.com/p/es/cpi/index.html"));
-            servers.put(Country.Sweden, new URL("http://uk.biz.yahoo.com/p/se/cpi/index.html"));
-            servers.put(Country.UnitedKingdom, new URL("http://uk.biz.yahoo.com/p/uk/cpi/index.html"));
-            servers.put(Country.UnitedState, new URL("http://uk.biz.yahoo.com/p/us/cpi/index.html"));
+            servers.put(Country.Denmark, new URL("http://uk.finsearch.yahoo.com/uk/index.php?s=uk_sort&nm=**&tp=S&r=CO&sub=Look+Up"));
+            servers.put(Country.France, new URL("http://uk.finsearch.yahoo.com/uk/index.php?s=uk_sort&nm=**&tp=S&r=PA&sub=Look+Up"));
+            servers.put(Country.Germany, new URL("http://uk.finsearch.yahoo.com/uk/index.php?s=uk_sort&nm=**&tp=S&r=GER&sub=Look+Up"));
+            servers.put(Country.Italy, new URL("http://uk.finsearch.yahoo.com/uk/index.php?s=uk_sort&nm=**&tp=S&r=MI&sub=Look+Up"));
+            servers.put(Country.Norway, new URL("http://uk.finsearch.yahoo.com/uk/index.php?s=uk_sort&nm=**&tp=S&r=OL&sub=Look+Up"));
+            servers.put(Country.Spain, new URL("http://uk.finsearch.yahoo.com/uk/index.php?s=uk_sort&nm=**&tp=S&r=ESP&sub=Look+Up"));
+            servers.put(Country.Sweden, new URL("http://uk.finsearch.yahoo.com/uk/index.php?s=uk_sort&nm=**&tp=S&r=ST&sub=Look+Up"));
+            servers.put(Country.UnitedKingdom, new URL("http://uk.finsearch.yahoo.com/uk/index.php?s=uk_sort&nm=**&tp=S&r=L&sub=Look+Up"));
+            servers.put(Country.UnitedState, new URL("http://uk.finsearch.yahoo.com/uk/index.php?s=uk_sort&nm=**&tp=S&r=US&sub=Look+Up"));
         }
         catch(MalformedURLException exp) {
             // Shouldn't happen.
             exp.printStackTrace();
         }
-        
-        // <a href="/p/us/cpi/cpim0.html">
-        patterns.put(Country.Denmark, Pattern.compile("<a\\s+href\\s*=\\s*\"?(\\/p\\/dk\\/cpi\\/[^\\s]+\\.html)"));
-        patterns.put(Country.France, Pattern.compile("<a\\s+href\\s*=\\s*\"?(\\/p\\/fr\\/cpi\\/[^\\s]+\\.html)"));
-        patterns.put(Country.Germany, Pattern.compile("<a\\s+href\\s*=\\s*\"?(\\/p\\/de\\/cpi\\/[^\\s]+\\.html)"));
-        patterns.put(Country.Italy, Pattern.compile("<a\\s+href\\s*=\\s*\"?(\\/p\\/it\\/cpi\\/[^\\s]+\\.html)"));
-        patterns.put(Country.Norway, Pattern.compile("<a\\s+href\\s*=\\s*\"?(\\/p\\/no\\/cpi\\/[^\\s]+\\.html)"));
-        patterns.put(Country.Spain, Pattern.compile("<a\\s+href\\s*=\\s*\"?(\\/p\\/es\\/cpi\\/[^\\s]+\\.html)"));
-        patterns.put(Country.Sweden, Pattern.compile("<a\\s+href\\s*=\\s*\"?(\\/p\\/se\\/cpi\\/[^\\s]+\\.html)"));
-        patterns.put(Country.UnitedKingdom, Pattern.compile("<a\\s+href\\s*=\\s*\"?(\\/p\\/uk\\/cpi\\/[^\\s]+\\.html)"));
-        patterns.put(Country.UnitedState, Pattern.compile("<a\\s+href\\s*=\\s*\"?(\\/p\\/us\\/cpi\\/[^\\s]+\\.html)"));
     }
 }
