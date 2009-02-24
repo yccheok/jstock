@@ -195,7 +195,10 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
         try {
             org.yccheok.jstock.engine.Utils.setHttpClientProxyFromSystemProperties(httpClient);
             httpClient.executeMethod(method);
-            final String responde = method.getResponseBodyAsString();   
+            // We are not interested at the returned string at all. We just want
+            // to know whether there will be any exception being thrown, during
+            // the process of getting respond.
+            method.getResponseBodyAsString();   
             success = true;
         }
         catch(HttpException exp) {
