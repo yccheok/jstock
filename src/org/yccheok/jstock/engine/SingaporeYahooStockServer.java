@@ -73,8 +73,8 @@ public class SingaporeYahooStockServer extends Subject<SingaporeYahooStockServer
             try {
                 Utils.setHttpClientProxyFromSystemProperties(httpClient);
                 httpClient.executeMethod(method);
-                final String responde = method.getResponseBodyAsString();
-                final List<Stock> stocks = YahooStockFormat.getInstance().parse(responde);
+                final String respond = method.getResponseBodyAsString();
+                final List<Stock> stocks = YahooStockFormat.getInstance().parse(respond);
 
                 if(stocks.size() == 1)
                     return stocks.get(0);
@@ -169,9 +169,9 @@ public class SingaporeYahooStockServer extends Subject<SingaporeYahooStockServer
                 try {
                     Utils.setHttpClientProxyFromSystemProperties(httpClient);
                     httpClient.executeMethod(method);
-                    final String responde = method.getResponseBodyAsString();
+                    final String respond = method.getResponseBodyAsString();
 
-                    final List<Stock> tmpStocks = YahooStockFormat.getInstance().parse(responde);
+                    final List<Stock> tmpStocks = YahooStockFormat.getInstance().parse(respond);
                     if(tmpStocks.size() != MAX_STOCK_PER_ITERATION) {
                         if(retry == (NUM_OF_RETRY-1)) {
                             // throw new StockNotFoundException();
@@ -270,9 +270,9 @@ public class SingaporeYahooStockServer extends Subject<SingaporeYahooStockServer
             try {
                 Utils.setHttpClientProxyFromSystemProperties(httpClient);
                 httpClient.executeMethod(method);
-                final String responde = method.getResponseBodyAsString();
+                final String respond = method.getResponseBodyAsString();
 
-                final List<Stock> tmpStocks = YahooStockFormat.getInstance().parse(responde);
+                final List<Stock> tmpStocks = YahooStockFormat.getInstance().parse(respond);
                 if(tmpStocks.size() != remainder) {
                     if(retry == (NUM_OF_RETRY-1)) {
                         // throw new StockNotFoundException();
@@ -341,11 +341,11 @@ public class SingaporeYahooStockServer extends Subject<SingaporeYahooStockServer
     // The returned URLs, shouldn't have any duplication with visited,
     // and they are unique. Although is more suitable that we use Set,
     // use List is more convinient for us to iterate.
-    private List<URL> getURLs(String responde, List<URL> visited) {
+    private List<URL> getURLs(String respond, List<URL> visited) {
         List<URL> urls = new ArrayList<URL>();
 
         final Pattern pattern = patterns.get(country);
-        final Matcher matcher = pattern.matcher(responde);
+        final Matcher matcher = pattern.matcher(respond);
 
         while(matcher.find()){
             for(int j=1; j<=matcher.groupCount(); j++ ) {
@@ -366,10 +366,10 @@ public class SingaporeYahooStockServer extends Subject<SingaporeYahooStockServer
         return urls;
     }
 
-    private Set<Symbol> getSymbols(String responde) {
+    private Set<Symbol> getSymbols(String respond) {
         Set<Symbol> symbols = new HashSet<Symbol>();
 
-        final Matcher matcher = symbolPattern.matcher(responde);
+        final Matcher matcher = symbolPattern.matcher(respond);
 
         while(matcher.find()){
             for(int j=1; j<=matcher.groupCount(); j++ ) {
@@ -401,9 +401,9 @@ public class SingaporeYahooStockServer extends Subject<SingaporeYahooStockServer
                 try {
                     Utils.setHttpClientProxyFromSystemProperties(httpClient);
                     httpClient.executeMethod(method);
-                    final String responde = method.getResponseBodyAsString();
-                    List<URL> urls = getURLs(responde, visited);
-                    Set<Symbol> tmpSymbols = getSymbols(responde);
+                    final String respond = method.getResponseBodyAsString();
+                    List<URL> urls = getURLs(respond, visited);
+                    Set<Symbol> tmpSymbols = getSymbols(respond);
 
                     // getURLs already ensure URLs are unique.
                     visited.addAll(urls);
