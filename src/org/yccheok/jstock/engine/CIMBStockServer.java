@@ -73,9 +73,9 @@ public class CIMBStockServer extends Subject<CIMBStockServer, Integer> implement
             try {
                 Utils.setHttpClientProxyFromSystemProperties(httpClient);
                 httpClient.executeMethod(method);
-                final String responde = method.getResponseBodyAsString();
+                final String respond = method.getResponseBodyAsString();
 
-                stocks = stockFormat.parse(responde);
+                stocks = stockFormat.parse(respond);
 
                 if(stocks.size() != 1) {
                     log.error("Number of stock (" + stocks.size() + ") is not 1");
@@ -151,9 +151,9 @@ public class CIMBStockServer extends Subject<CIMBStockServer, Integer> implement
             try {
                 Utils.setHttpClientProxyFromSystemProperties(httpClient);
                 httpClient.executeMethod(method);
-                final String responde = method.getResponseBodyAsString();
+                final String respond = method.getResponseBodyAsString();
                 
-                stocks = stockFormat.parse(responde);
+                stocks = stockFormat.parse(respond);
 
                 if(stocks.size() != codes.size()) {
                     log.error("Number of stock (" + stocks.size() + ") is not " + codes.size());
@@ -204,9 +204,9 @@ public class CIMBStockServer extends Subject<CIMBStockServer, Integer> implement
                 try {
                     Utils.setHttpClientProxyFromSystemProperties(httpClient);
                     httpClient.executeMethod(method);
-                    final String responde = method.getResponseBodyAsString();
+                    final String respond = method.getResponseBodyAsString();
 
-                    List<Stock> tmpstocks = stockFormat.parse(responde);
+                    List<Stock> tmpstocks = stockFormat.parse(respond);
 
                     if(tmpstocks.size() == 0) {
                         break;
