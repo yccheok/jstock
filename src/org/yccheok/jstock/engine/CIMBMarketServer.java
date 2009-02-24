@@ -59,9 +59,9 @@ public class CIMBMarketServer implements MarketServer {
             try {
                 Utils.setHttpClientProxyFromSystemProperties(httpClient);
                 httpClient.executeMethod(method);
-                final String responde = method.getResponseBodyAsString();
+                final String respond = method.getResponseBodyAsString();
 
-                String infos = Utils.subString(responde, "--_BeginMS_", "--_EndMS_").trim();
+                String infos = Utils.subString(respond, "--_BeginMS_", "--_EndMS_").trim();
         
                 if(infos.length() != 0) {
                     String[] infoFields = infos.split("\\|");    
