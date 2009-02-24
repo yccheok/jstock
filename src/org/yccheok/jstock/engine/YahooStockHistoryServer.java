@@ -62,7 +62,7 @@ public class YahooStockHistoryServer implements StockHistoryServer {
         }
     }
 
-    private boolean parse(String responde)
+    private boolean parse(String respond)
     {
         historyDatabase.clear();
         simpleDates.clear();
@@ -71,7 +71,7 @@ public class YahooStockHistoryServer implements StockHistoryServer {
         dateFormat.applyPattern("yyyy-MM-dd");
         final Calendar calendar = Calendar.getInstance();
 
-        String[] stockDatas = responde.split("\r\n|\r|\n");
+        String[] stockDatas = respond.split("\r\n|\r|\n");
         
 		// There must be at least two lines : header information and history information.
         final int length = stockDatas.length;
@@ -205,9 +205,9 @@ public class YahooStockHistoryServer implements StockHistoryServer {
             try {
                 Utils.setHttpClientProxyFromSystemProperties(httpClient);
                 httpClient.executeMethod(method);
-                final String responde = method.getResponseBodyAsString();
+                final String respond = method.getResponseBodyAsString();
                     
-                success = parse(responde);
+                success = parse(respond);
             }
             catch(HttpException exp) {
                 log.error("location=" + location, exp);                
