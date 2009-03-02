@@ -1104,6 +1104,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         final String _realizedProfitPercentage = numberFormat.format(realizedProfitPercentage);
         
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            @Override
            public void run() {
                 jLabel2.setText(_share);
                 jLabel4.setText(_cash);
