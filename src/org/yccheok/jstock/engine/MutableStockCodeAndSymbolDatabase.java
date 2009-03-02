@@ -41,11 +41,11 @@ public class MutableStockCodeAndSymbolDatabase extends StockCodeAndSymbolDatabas
     // we shall consider this method as buggy method. Please refer to tracker record :
     // [ 2617022 ] NPE When Invoking Stock Database Dialog
     public List<Symbol> getUserDefinedSymbol() {
-        List<Symbol> symbols = this.industryToSymbols.get(Stock.Industry.UserDefined);
-        if (symbols == null) {
+        List<Symbol> _symbols = this.industryToSymbols.get(Stock.Industry.UserDefined);
+        if (_symbols == null) {
             return Collections.emptyList();
         }
-        return new ArrayList<Symbol>(symbols);
+        return new ArrayList<Symbol>(_symbols);
     }
     
     public boolean removeUserDefinedSymbol(Symbol symbol) {        
@@ -76,26 +76,15 @@ public class MutableStockCodeAndSymbolDatabase extends StockCodeAndSymbolDatabas
 
         if (iCodes == null || bCodes == null || iSymbols == null || bSymbols == null) {
             return false;
-        }
-        
-        Code searchedCode = this.codeSearchEngine.search(code.toString());
-        Symbol searchedSymbol = this.symbolSearchEngine.search(symbol.toString());
-        
-        if (searchedCode == null) return false;
-        if (searchedSymbol == null) return false;
-        
-        if (!searchedCode.equals(code)) {
-            return false;
-        }
-        
-        if (!searchedSymbol.equals(symbol)) {
-            return false;
         }  
         
         if ((!(symbolSearchEngine instanceof TSTSearchEngine)) || (!(codeSearchEngine instanceof TSTSearchEngine)))
         {
             return false;
         }
+        
+        symbols.remove(symbol);
+        codes.remove(code);
         
         ((TSTSearchEngine<Symbol>)symbolSearchEngine).remove(symbol.toString());
         ((TSTSearchEngine<Code>)codeSearchEngine).remove(code.toString());
@@ -139,7 +128,10 @@ public class MutableStockCodeAndSymbolDatabase extends StockCodeAndSymbolDatabas
         {
             return false;
         }
-        
+
+        this.symbols.add(symbol);
+        this.codes.add(code);
+
         ((TSTSearchEngine<Symbol>)symbolSearchEngine).put(symbol.toString(), symbol);
         ((TSTSearchEngine<Code>)codeSearchEngine).put(code.toString(), code);
         
@@ -149,33 +141,33 @@ public class MutableStockCodeAndSymbolDatabase extends StockCodeAndSymbolDatabas
         final Stock.Industry industry = Stock.Industry.UserDefined;
         final Stock.Board board = Stock.Board.UserDefined;
         
-        List<Code> codes = industryToCodes.get(industry);
-        if (codes == null) {
-            codes = new ArrayList<Code>();
-            industryToCodes.put(industry, codes);                
+        List<Code> _codes = industryToCodes.get(industry);
+        if (_codes == null) {
+            _codes = new ArrayList<Code>();
+            industryToCodes.put(industry, _codes);
         }
-        codes.add(code);
+        _codes.add(code);
 
-        codes = boardToCodes.get(board);
-        if (codes == null) {
-            codes = new ArrayList<Code>();
-            boardToCodes.put(board, codes);                
+        _codes = boardToCodes.get(board);
+        if (_codes == null) {
+            _codes = new ArrayList<Code>();
+            boardToCodes.put(board, _codes);
         }
-        codes.add(code);
+        _codes.add(code);
 
-        List<Symbol> symbols = industryToSymbols.get(industry);
-        if (symbols == null) {
-            symbols = new ArrayList<Symbol>();
-            industryToSymbols.put(industry, symbols);                
+        List<Symbol> _symbols = industryToSymbols.get(industry);
+        if (_symbols == null) {
+            _symbols = new ArrayList<Symbol>();
+            industryToSymbols.put(industry, _symbols);
         }
-        symbols.add(symbol);
+        _symbols.add(symbol);
 
-        symbols = boardToSymbols.get(board);
-        if (symbols == null) {
-            symbols = new ArrayList<Symbol>();
-            boardToSymbols.put(board, symbols);                
+        _symbols = boardToSymbols.get(board);
+        if (_symbols == null) {
+            _symbols = new ArrayList<Symbol>();
+            boardToSymbols.put(board, _symbols);
         }
-        symbols.add(symbol);
+        _symbols.add(symbol);
         
         return true;
     }    
