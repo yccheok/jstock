@@ -467,7 +467,6 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
 
         for (int i = 0; i < visited.size(); i++) {
             final String location = visited.get(i).toString();
-            System.out.println("XXXXX location=" + location);
 
             HttpMethod method = new GetMethod(location);
 
@@ -550,8 +549,8 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
     // Take note that, we need to avoid this kind of URLs sometimes :
     // <font face="arial" size="-1"><a href="http://uk.finance.yahoo.com/q?s=SCRIA.ST+NCCA.ST+SHBB.ST+ELUXA.ST+LATOA.ST+VOLVA.ST+SCVA.ST+SKFA.ST+SEBC.ST+DV-BTA-1.ST+MTGB.ST+63054.ST+37341.ST+HOLMA.ST+TEL2A.ST+62893.ST+RATOA.ST+585671.ST+">View Quotes for All Above Symbols</a></font>
     // We use "Limiting Repetition" to distinguish them out of normal stock code. We
-    // assume the longest stock code length will <= 128.
-    private static final Pattern stockAndBoardPattern = Pattern.compile("<a\\s+href\\s*=[^>]+s=([^\">]{1,128})\"?>(.+?)</a>.*?</td>.*?<td[^>]*>.*?</td>.*?<td[^>]*>.*?</td>.*?<td[^>]*>(.*?)</td>", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+    // assume the longest stock code length will <= 64.
+    private static final Pattern stockAndBoardPattern = Pattern.compile("<a\\s+href\\s*=[^>]+s=([^\">]{1,64})\"?>(.+?)</a>.*?</td>.*?<td[^>]*>.*?</td>.*?<td[^>]*>.*?</td>.*?<td[^>]*>(.*?)</td>", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
 
     // Yahoo server limit is 200. We shorter, to avoid URL from being too long.
     // Yahoo sometimes does complain URL for being too long.
