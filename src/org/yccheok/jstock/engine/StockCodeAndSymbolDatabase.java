@@ -23,6 +23,7 @@
 package org.yccheok.jstock.engine;
 
 import java.util.*;
+import org.yccheok.jstock.engine.Stock.Industry;
 
 /**
  *
@@ -37,59 +38,57 @@ public class StockCodeAndSymbolDatabase {
         try {
             stocks = stockServer.getAllStocks();
         }
-        catch(StockNotFoundException exp) {
+        catch (StockNotFoundException exp) {
             throw exp;
         }
-        List<Symbol> tmpSymbols = new ArrayList<Symbol>();        
-        List<Code> tmpCodes = new ArrayList<Code>();
         
-        for(Stock stock : stocks)
+        for (Stock stock : stocks)
         {
             Symbol symbol = stock.getSymbol();
             Code code = stock.getCode();
             Stock.Industry industry = stock.getIndustry();
             Stock.Board board = stock.getBoard();
             
-            if(symbol.toString().length() == 0 || code.toString().length() == 0) continue;
-             
+            if (symbol.toString().length() == 0 || code.toString().length() == 0) continue;
+
+            this.codes.add(code);
+            this.symbols.add(symbol);
+
             symbolToCode.put(symbol, code);
              
             codeToSymbol.put(code, symbol);
             
-            List<Code> codes = industryToCodes.get(industry);
-            if(codes == null) {
-                codes = new ArrayList<Code>();
-                industryToCodes.put(industry, codes);                
+            List<Code> _codes = industryToCodes.get(industry);
+            if (_codes == null) {
+                _codes = new ArrayList<Code>();
+                industryToCodes.put(industry, _codes);
             }
-            codes.add(code);
+            _codes.add(code);
 
-            codes = boardToCodes.get(board);
-            if(codes == null) {
-                codes = new ArrayList<Code>();
-                boardToCodes.put(board, codes);                
+            _codes = boardToCodes.get(board);
+            if(_codes == null) {
+                _codes = new ArrayList<Code>();
+                boardToCodes.put(board, _codes);
             }
-            codes.add(code);
+            _codes.add(code);
 
-            List<Symbol> symbols = industryToSymbols.get(industry);
-            if(symbols == null) {
-                symbols = new ArrayList<Symbol>();
-                industryToSymbols.put(industry, symbols);                
+            List<Symbol> _symbols = industryToSymbols.get(industry);
+            if(_symbols == null) {
+                _symbols = new ArrayList<Symbol>();
+                industryToSymbols.put(industry, _symbols);
             }
-            symbols.add(symbol);
+            _symbols.add(symbol);
             
-            symbols = boardToSymbols.get(board);
-            if(symbols == null) {
-                symbols = new ArrayList<Symbol>();
-                boardToSymbols.put(board, symbols);                
+            _symbols = boardToSymbols.get(board);
+            if (_symbols == null) {
+                _symbols = new ArrayList<Symbol>();
+                boardToSymbols.put(board, _symbols);
             }
-            symbols.add(symbol);
-            
-            tmpSymbols.add(symbol);
-            tmpCodes.add(code);
+            _symbols.add(symbol);
         }
         
-        symbolSearchEngine = new TSTSearchEngine<Symbol>(tmpSymbols);
-        codeSearchEngine = new TSTSearchEngine<Code>(tmpCodes);        
+        symbolSearchEngine = new TSTSearchEngine<Symbol>(symbols);
+        codeSearchEngine = new TSTSearchEngine<Code>(codes);
     }
     
     public StockCodeAndSymbolDatabase(StockCodeAndSymbolDatabase src) {
@@ -107,8 +106,11 @@ public class StockCodeAndSymbolDatabase {
         deepCopy(this.industryToSymbols, src.industryToSymbols);
         deepCopy(this.boardToSymbols, src.boardToSymbols);
         
-        symbolSearchEngine = new TSTSearchEngine<Symbol>(new ArrayList<Symbol>(symbolToCode.keySet()));
-        codeSearchEngine = new TSTSearchEngine<Code>(new ArrayList<Code>(codeToSymbol.keySet()));        
+        this.symbols = new ArrayList<Symbol>(src.symbols);
+        this.codes = new ArrayList<Code>(src.codes);
+
+        symbolSearchEngine = new TSTSearchEngine<Symbol>(this.symbols);
+        codeSearchEngine = new TSTSearchEngine<Code>(this.codes);        
     }
         
     private void deepCopy(Map dest, Map src) {
@@ -144,12 +146,20 @@ public class StockCodeAndSymbolDatabase {
         return symbolToCode.get(symbol);
     }
 
-    public Set<Symbol> getSymbols() {
-        return Collections.unmodifiableSet(symbolToCode.keySet());
+    public List<Symbol> getSymbols() {
+        // Do not return Set by Collections.unmodifiableSet(codeToSymbol.keySet())
+        // We need to ensure by applying a single index on the data structures
+        // returned by getCodes and getSymbols, we should able to get code and
+        // symbol which are associated with the same stock.    
+        return Collections.unmodifiableList(symbols);
     }
 
-    public Set<Code> getCodes() {
-        return Collections.unmodifiableSet(codeToSymbol.keySet());
+    public List<Code> getCodes() {
+        // Do not return Set by Collections.unmodifiableSet(codeToSymbol.keySet())
+        // We need to ensure by applying a single index on the data structures
+        // returned by getCodes and getSymbols, we should able to get code and
+        // symbol which are associated with the same stock.
+        return Collections.unmodifiableList(codes);
     }
     
     public List<Code> getCodes(Stock.Industry industry)
@@ -197,15 +207,45 @@ public class StockCodeAndSymbolDatabase {
     }
     
     private Object readResolve() {
-        List<Symbol> tmpSymbols = new ArrayList<Symbol>(symbolToCode.keySet());
-        List<Code> tmpCodes = new ArrayList<Code>(codeToSymbol.keySet());
-        
-        symbolSearchEngine = new TSTSearchEngine<Symbol>(tmpSymbols);
-        codeSearchEngine = new TSTSearchEngine<Code>(tmpCodes);         
-        
+        /* For backward compatible */
+        if (symbols == null || symbols.size() <= 0) {
+        	if (symbols == null) {
+            	symbols = new ArrayList<Symbol>();
+            }
+
+            // During iteration for symbols and codes, we must use key set from
+            // same data structure (either industryToCodes or industryToSymbols).
+            // We need to ensure by applying a single index on the data structures
+            // returned by getCodes and getSymbols, we should able to get code and
+            // symbol which are associated with the same stock.
+            //
+            // Hence, do not use industryToSymbols.keySet.
+            for (Industry industry : industryToCodes.keySet())
+            {
+
+                symbols.addAll(industryToSymbols.get(industry));
+            }
+        }
+
+		/* For backward compatible */
+        if (codes == null || codes.size() <= 0) {
+        	if (codes == null) {
+            	codes = new ArrayList<Code>();
+            }
+            
+            // See the above comment on why we need to use industryToCodes.keySet.
+            for (Industry industry : industryToCodes.keySet())
+            {
+                codes.addAll(industryToCodes.get(industry));
+            }
+        }
+
+        symbolSearchEngine = new TSTSearchEngine<Symbol>(symbols);
+        codeSearchEngine = new TSTSearchEngine<Code>(codes);
+
         return this;
     }
-        
+
     protected Map<Symbol, Code> symbolToCode = new HashMap<Symbol, Code>();
     protected Map<Code, Symbol> codeToSymbol = new HashMap<Code, Symbol>();
 
@@ -213,6 +253,9 @@ public class StockCodeAndSymbolDatabase {
     protected Map<Stock.Board, List<Code>> boardToCodes = new HashMap<Stock.Board, List<Code>>();
     protected Map<Stock.Industry, List<Symbol>> industryToSymbols = new HashMap<Stock.Industry, List<Symbol>>();
     protected Map<Stock.Board, List<Symbol>> boardToSymbols = new HashMap<Stock.Board, List<Symbol>>();
+
+    protected List<Symbol> symbols = new ArrayList<Symbol>();
+    protected List<Code> codes = new ArrayList<Code>();
 
     protected transient SearchEngine<Symbol> symbolSearchEngine;
     protected transient SearchEngine<Code> codeSearchEngine;
