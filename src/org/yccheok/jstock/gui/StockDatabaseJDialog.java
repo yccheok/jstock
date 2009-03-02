@@ -570,6 +570,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         }
 
         //Override to invoke setValue on the formatted text field.
+        @Override
         public Component getTableCellEditorComponent(JTable table,
                 Object value, boolean isSelected,
                 int row, int column) {
