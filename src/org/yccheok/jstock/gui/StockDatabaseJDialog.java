@@ -90,6 +90,9 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jPanel7 = new javax.swing.JPanel();
+        jPanel8 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jPanel9 = new javax.swing.JPanel();
         jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
 
@@ -112,7 +115,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
 
         getContentPane().add(jPanel6, java.awt.BorderLayout.NORTH);
 
-        jPanel4.setLayout(new java.awt.GridLayout());
+        jPanel4.setLayout(new java.awt.GridLayout(1, 0));
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Stock Exchange Server (Read only)"));
         jPanel1.setLayout(new java.awt.BorderLayout());
@@ -187,6 +190,14 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
 
             getContentPane().add(jPanel4, java.awt.BorderLayout.CENTER);
 
+            jPanel7.setLayout(new java.awt.BorderLayout());
+
+            jLabel1.setForeground(new java.awt.Color(0, 0, 255));
+            jLabel1.setText("There are total " + mutableStockCodeAndSymbolDatabase.getCodes().size() + " stock(s)");
+            jPanel8.add(jLabel1);
+
+            jPanel7.add(jPanel8, java.awt.BorderLayout.NORTH);
+
             jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/apply.png"))); // NOI18N
             jButton3.setText("OK");
             jButton3.addActionListener(new java.awt.event.ActionListener() {
@@ -194,7 +205,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
                     jButton3ActionPerformed(evt);
                 }
             });
-            jPanel7.add(jButton3);
+            jPanel9.add(jButton3);
 
             jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/button_cancel.png"))); // NOI18N
             jButton4.setText("Cancel");
@@ -203,7 +214,9 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
                     jButton4ActionPerformed(evt);
                 }
             });
-            jPanel7.add(jButton4);
+            jPanel9.add(jButton4);
+
+            jPanel7.add(jPanel9, java.awt.BorderLayout.CENTER);
 
             getContentPane().add(jPanel7, java.awt.BorderLayout.PAGE_END);
 
@@ -374,14 +387,14 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         
         javax.swing.JMenuItem menuItem = new JMenuItem("New", new javax.swing.ImageIcon(getClass().getResource("/images/16x16/filenew.png")));
         
-	menuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                addNewSymbol();
-            }
-	});
-                
-	popup.add(menuItem);                
+        menuItem.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    addNewSymbol();
+                }
+        });
+
+        popup.add(menuItem);
         
         if(jTable2.getSelectedRowCount() >= 1) {
             popup.addSeparator();
@@ -442,8 +455,8 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
                 database.removeUserDefinedSymbol(symbol);
             }
             
-            symbols = Collections.unmodifiableList(new ArrayList<Symbol>(database.getSymbols()));
-            codes = Collections.unmodifiableList(new ArrayList<Code>(database.getCodes()));
+            symbols = database.getSymbols();
+            codes = database.getCodes();
         }
         
         @Override
@@ -461,9 +474,9 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
             switch(columnIndex)
             {
                 case 0:
-                    return symbols.get(rowIndex);
-                case 1:
                     return codes.get(rowIndex);
+                case 1:
+                    return symbols.get(rowIndex);
             }
             
             return null;
@@ -730,6 +743,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
     javax.swing.JButton jButton2;
     javax.swing.JButton jButton3;
     javax.swing.JButton jButton4;
+    javax.swing.JLabel jLabel1;
     javax.swing.JPanel jPanel1;
     javax.swing.JPanel jPanel2;
     javax.swing.JPanel jPanel3;
@@ -737,6 +751,8 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
     javax.swing.JPanel jPanel5;
     javax.swing.JPanel jPanel6;
     javax.swing.JPanel jPanel7;
+    javax.swing.JPanel jPanel8;
+    javax.swing.JPanel jPanel9;
     javax.swing.JScrollPane jScrollPane1;
     javax.swing.JScrollPane jScrollPane2;
     javax.swing.JTable jTable1;
