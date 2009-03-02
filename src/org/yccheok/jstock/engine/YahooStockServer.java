@@ -33,6 +33,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.methods.*;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -363,6 +364,11 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
 
                 c = c.trim();
                 s = s.trim();
+
+                // Change Parken Sport &amp; Entertainment A/S to
+                // Parken Sport & Entertainment A/S
+                s = StringEscapeUtils.unescapeHtml(s);
+
                 // Enum name is not allowed to have space in between.
                 b = b.trim().replaceAll("\\s+", "");
 
@@ -503,37 +509,6 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
 
         return stocks;
     }
-
-    public static void main(String[] args) throws StockNotFoundException {
-        YahooStockServer server0 = new YahooStockServer(Country.Denmark);
-        YahooStockServer server1 = new YahooStockServer(Country.France);
-        YahooStockServer server2 = new YahooStockServer(Country.Germany);
-        YahooStockServer server3 = new YahooStockServer(Country.Italy);
-        YahooStockServer server4 = new YahooStockServer(Country.Norway);
-        YahooStockServer server5 = new YahooStockServer(Country.Spain);
-        YahooStockServer server6 = new YahooStockServer(Country.Sweden);
-        YahooStockServer server7 = new YahooStockServer(Country.UnitedKingdom);
-        YahooStockServer server8 = new YahooStockServer(Country.UnitedState);
-
-        System.out.println("XXXxxxXXXXXXXXXXXXXXXXXXXx Denmark");
-        server0.getAllStocks();
-        System.out.println("XXXxxxXXXXXXXXXXXXXXXXXXXx France");
-        server1.getAllStocks();
-        System.out.println("XXXxxxXXXXXXXXXXXXXXXXXXXx Germany");
-        server2.getAllStocks();
-        System.out.println("XXXxxxXXXXXXXXXXXXXXXXXXXx Italy");
-        server3.getAllStocks();
-        System.out.println("XXXxxxXXXXXXXXXXXXXXXXXXXx Norway");
-        server4.getAllStocks();
-        System.out.println("XXXxxxXXXXXXXXXXXXXXXXXXXx Spain");
-        server5.getAllStocks();
-        System.out.println("XXXxxxXXXXXXXXXXXXXXXXXXXx Sweden");
-        server6.getAllStocks();
-        System.out.println("XXXxxxXXXXXXXXXXXXXXXXXXXx UnitedKingdom");
-        server7.getAllStocks();
-        System.out.println("XXXxxxXXXXXXXXXXXXXXXXXXXx UnitedState");
-        server8.getAllStocks();
-    }
     
     private final Country country;
     private final URL baseURL;
@@ -571,7 +546,12 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
     // First group is stock code, second group is stock symbol, 3rd group is board.
     // Board information is located at the fourth column of the table.
     // Pattern.DOTALL means for '.', we want to match everything including newline.
-    private static final Pattern stockAndBoardPattern = Pattern.compile("<a\\s+href\\s*=[^>]+s=([^\">]+)\"?>(.+?)</a>.*?</td>.*?<td[^>]*>.*?</td>.*?<td[^>]*>.*?</td>.*?<td[^>]*>(.*?)</td>", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+    //
+    // Take note that, we need to avoid this kind of URLs sometimes :
+    // <font face="arial" size="-1"><a href="http://uk.finance.yahoo.com/q?s=SCRIA.ST+NCCA.ST+SHBB.ST+ELUXA.ST+LATOA.ST+VOLVA.ST+SCVA.ST+SKFA.ST+SEBC.ST+DV-BTA-1.ST+MTGB.ST+63054.ST+37341.ST+HOLMA.ST+TEL2A.ST+62893.ST+RATOA.ST+585671.ST+">View Quotes for All Above Symbols</a></font>
+    // We use "Limiting Repetition" to distinguish them out of normal stock code. We
+    // assume the longest stock code length will <= 128.
+    private static final Pattern stockAndBoardPattern = Pattern.compile("<a\\s+href\\s*=[^>]+s=([^\">]{1,128})\"?>(.+?)</a>.*?</td>.*?<td[^>]*>.*?</td>.*?<td[^>]*>.*?</td>.*?<td[^>]*>(.*?)</td>", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
 
     // Yahoo server limit is 200. We shorter, to avoid URL from being too long.
     // Yahoo sometimes does complain URL for being too long.
