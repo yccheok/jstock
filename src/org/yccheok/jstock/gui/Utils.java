@@ -57,7 +57,7 @@ import org.yccheok.jstock.analysis.StockOperator;
 public class Utils {
     
     /** Creates a new instance of Utils */
-    public Utils() {
+    private Utils() {
     }
     
     public static java.awt.Image getScaledImage(Image image, int maxWidth, int maxHeight) {
