@@ -244,21 +244,23 @@ public class Stock {
         Copenhagen("Copenhagen"),               // Denmark        
         Paris("Paris"),                         // France
         
-        XETRA("XETRA"),                         // Germany
+        Xetra("Xetra"),                         // Germany
         Munich("Munich"),
         Stuttgart("Stuttgart"),
         Berlin("Berlin"),
         Hamburg("Hamburg"),
         Dusseldorf("Dusseldorf"),
         Frankfurt("Frankfurt"),
-        Hanover("Hanover"),
+        Hannover("Hannover"),
         
-        Milan("Milan"),                         // Italy        
+        Milan("Milan"),                         // Italy
+
         Oslo("Oslo"),                           // Norway
         
         Madrid("Madrid"),                       // Spain
         MCE("MCE"),
-        
+        MercadoContinuo("Mercado Continuo"),
+
         Stockholm("Stockholm"),                 // Sweden
         
         FSI("FSI"),                             // UK
