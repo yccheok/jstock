@@ -1371,7 +1371,22 @@ public class MainFrame extends javax.swing.JFrame {
         
         jStockOptions.setCountry(country);
         MainFrame.this.statusBar.setCountryIcon(country.getIcon(), country.toString());
-        
+
+        // Here is the dirty trick here. We let our the 'child' panels perform
+        // cleanup/ initialization first before initStockCodeAndSymbolDatabase.
+        // This is because all child panels and stock symbol database task do
+        // interact with status bar. However, We are only most interest in stock symbol
+        // database, as it will be the most busy. Hence, we let the stock symbol
+        // database to be the last, so that its interaction will overwrite the others.
+        this.portfolioManagementJPanel.initPortfolio();
+        this.indicatorScannerJPanel.stop();
+        this.indicatorScannerJPanel.clear();
+        this.chatJPanel.stopChatServiceManager();
+        if (jStockOptions.isChatEnabled())
+        {
+            this.chatJPanel.startChatServiceManager();
+        }
+
         initStockCodeAndSymbolDatabase(true);
         initMarketThread();
         initMarketJPanel();
@@ -1382,15 +1397,7 @@ public class MainFrame extends javax.swing.JFrame {
         initRealTimeStockMonitor();
         initRealTimeStocks();
         initAlertStateManager();
-        this.portfolioManagementJPanel.initPortfolio();
-        this.indicatorScannerJPanel.stop();
-        this.indicatorScannerJPanel.clear();
-        this.chatJPanel.stopChatServiceManager();
-        if (jStockOptions.isChatEnabled())
-        {
-            this.chatJPanel.startChatServiceManager();
-        }
-
+        
         for (Enumeration<AbstractButton> e = this.buttonGroup2.getElements() ; e.hasMoreElements() ;) {
             AbstractButton button = e.nextElement();
             javax.swing.JRadioButtonMenuItem m = (javax.swing.JRadioButtonMenuItem)button;
@@ -2553,10 +2560,13 @@ public class MainFrame extends javax.swing.JFrame {
                 indicatorPanel.setStockCodeAndSymbolDatabase(null);                
             }
         }
-        
-        statusBar.setMainMessage("Connecting to stock server to retrieve stock information ...");
+
+        this.setStatusBar(true, "Connecting to stock server to retrieve stock information ...");
         statusBar.setImageIcon(getImageIcon("/images/16x16/network-connecting.png"), "Connecting ...");
-        statusBar.setProgressBar(true);
+
+        // We may hold a large database previously. Invoke garbage collector to perform cleanup.
+        System.gc();
+        
         stockCodeAndSymbolDatabaseTask = new StockCodeAndSymbolDatabaseTask(readFromDisk);
         stockCodeAndSymbolDatabaseTask.execute();
     }
