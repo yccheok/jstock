@@ -56,6 +56,9 @@ import org.yccheok.jstock.gui.MainFrame;
  * @author yccheok
  */
 public class Utils {
+    private Utils() {
+    }
+
     public enum Sound
     {
         ALERT,
@@ -185,6 +188,7 @@ public class Utils {
         return matcher.replaceAll("<a href=\"$0\">$0</a>");
     }
 
+    // We should make use of StringEscapeUtils utility methods from apache common.
     private static String escapeHTMLEntities(String src) {
         return src.replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
     }
