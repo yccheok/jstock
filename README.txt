@@ -1,4 +1,18 @@
 =============
+version 1.0.4
+=============
+1. Bug fixed on Stock Database Dialog. The displayed stock and symbol is now associated with
+   the same stock.
+   
+2. Bug fixed on Malaysia stock market. 5148.KL is being included into database.
+
+3. [2503260] Bug fixed. Get all stocks from a country is slow and buggy. Denmark, France, Germany, 
+   Italy, Norway, Spain, Sweden, UnitedKingdom and UnitedState stock market information are now 
+   accurate. All their database are most update to date by using Yahoo search engine.
+   
+4. [2567297] Feature added. Having seconds/ minutes/ hour selection for scanning speed.
+
+=============
 version 1.0.3
 =============
 1. [2567295] "Rise Above" and "Fall Below" table column
@@ -109,7 +123,8 @@ version 0.9.5
 =============
 1. Bug fixed on stock scanning speed.
 
-2. [1851625] Bug fixed on indicator scanning. We will only download history only when there is a need.
+2. [1851625] Bug fixed on indicator scanning. We will only download history only when there is a 
+   need.
 
 =============
 version 0.9.4
