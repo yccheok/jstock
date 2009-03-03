@@ -2645,6 +2645,11 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     private void update(final Market market) {
+        // We are only interested in current selected country.
+        if (market.getCountry() != this.jStockOptions.getCountry()) {
+            return;
+        }
+
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             @Override
            public void run() {
