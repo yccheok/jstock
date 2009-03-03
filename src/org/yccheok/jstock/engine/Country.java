@@ -28,6 +28,7 @@ public enum Country {
     Denmark("/images/16x16/dk.png"),
     France("/images/16x16/fr.png"),
     Germany("/images/16x16/de.png"),
+    India("/images/16x16/in.png"),
     Italy("/images/16x16/it.png"),
     Malaysia("/images/16x16/my.png"),    
     Norway("/images/16x16/no.png"),
