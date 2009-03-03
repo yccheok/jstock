@@ -31,7 +31,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class SingaporeYahooMarketServer implements MarketServer {
     public SingaporeYahooMarketServer(Country country) {
-        if(country != Country.Malaysia && country != Country.Singapore) {
+        if (country != Country.Malaysia && country != Country.Singapore) {
             throw new java.lang.IllegalArgumentException("Only Malaysia and Singapore market are supported");
         }        
         
@@ -42,7 +42,7 @@ public class SingaporeYahooMarketServer implements MarketServer {
             
         	List<Index> tmp = Utils.getStockIndices(country);        	
         	for (Index index : tmp) {
-            	if (index.getSymbol().toString().startsWith("^"))
+            	if (index.getCode().toString().startsWith("^"))
             	{
                 	indicies.add(index);
             	}
@@ -53,24 +53,25 @@ public class SingaporeYahooMarketServer implements MarketServer {
             this.indicies = Utils.getStockIndices(country);
         }
 
-        if(this.indicies.size() == 0) {
+        if (this.indicies.size() == 0) {
             throw new java.lang.IllegalArgumentException("Country=" + country);
         }
 
         this.country = country;
         this.stockServer = new SingaporeYahooStockServer(country);
 
-        for(Index index : indicies) {
-            symbols.add(index.getSymbol());
-            symbolToIndexMap.put(index.getSymbol(), index);
+        for (Index index : indicies) {
+            codes.add(index.getCode());
+            codeToIndexMap.put(index.getCode(), index);
         }
     }
 
+    @Override
     public Market getMarket() {
         try {
             return new SingaporeYahooMarket();
         }
-        catch(StockNotFoundException exp) {
+        catch (StockNotFoundException exp) {
             log.error("", exp);
         }
 
@@ -88,54 +89,60 @@ public class SingaporeYahooMarketServer implements MarketServer {
             List<Stock> stocks;
 
             try {
-                stocks = stockServer.getStocksBySymbols(symbols);
+                stocks = stockServer.getStocksByCodes(codes);
             } catch (StockNotFoundException ex) {
                 throw ex;
             }
 
-            for(Stock stock : stocks) {
-                map.put(symbolToIndexMap.get(stock.getSymbol()), stock);
+            for (Stock stock : stocks) {
+                map.put(codeToIndexMap.get(stock.getCode()), stock);
             }
         }
 
+        @Override
         public double getIndex(Index index) {
             final Stock stock = map.get(index);
-            if(stock == null) return 0.0;
+            if (stock == null) return 0.0;
 
             return stock.getLastPrice();
         }
 
+        @Override
         public double getChange(Index index) {
             final Stock stock = map.get(index);
-            if(stock == null) return 0.0;
+            if (stock == null) return 0.0;
 
             return stock.getChangePrice();
         }
 
+        @Override
         public int getNumOfStockChange(ChangeType type) {
             return 0;
         }
 
+        @Override
         public long getVolume() {
             long total = 0;
 
-            for(Stock stock : map.values()) {
+            for (Stock stock : map.values()) {
                 total += stock.getVolume();
             }
 
             return total;
         }
 
+        @Override
         public double getValue() {
             double total = 0;
 
-            for(Stock stock : map.values()) {
+            for (Stock stock : map.values()) {
                 total += stock.getLastPrice();
             }
 
             return total;
         }
 
+        @Override
         public Country getCountry() {
             return country;
         }
@@ -145,7 +152,7 @@ public class SingaporeYahooMarketServer implements MarketServer {
 
     private final Country country;
     private final List<Index> indicies;
-    private final List<Symbol> symbols = new ArrayList<Symbol>();
+    private final List<Code> codes = new ArrayList<Code>();
     private final StockServer stockServer;
-    private final Map<Symbol, Index> symbolToIndexMap = new HashMap<Symbol, Index>();
+    private final Map<Code, Index> codeToIndexMap = new HashMap<Code, Index>();
 }
