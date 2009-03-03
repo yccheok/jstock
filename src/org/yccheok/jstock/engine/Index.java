@@ -23,28 +23,30 @@ package org.yccheok.jstock.engine;
  * @author yccheok
  */
 public enum Index {
-    KLSE("KLSE", Symbol.newInstance("^KLSE")),
-    Second("Second Board", Symbol.newInstance("Second")),
-    Mesdaq("Mesdaq", Symbol.newInstance("Mesdaq")),
-    STI("Straits Times Index", Symbol.newInstance("^STI")),
-    DJI("Dow Jones Industrial Average", Symbol.newInstance("^DJI")),
-    IXIC("Nasdaq Composite", Symbol.newInstance("^IXIC")),       
-    DAX("DAX", Symbol.newInstance("^GDAXI")),               
-    OMXSPI("Stockholm General", Symbol.newInstance("^OMXSPI")),
-    OMXC20CO("OMX Copenhagen 20", Symbol.newInstance("OMXC20.CO")),
-    OSEAX("OSE All Share", Symbol.newInstance("^OSEAX")),           
-    SPMIB("S&P/MIB", Symbol.newInstance("^SPMIB")),
-    SMSI("Madrid General", Symbol.newInstance("^SMSI")),
-    FTSE("FTSE 100", Symbol.newInstance("^FTSE")),
-    FCHI("CAC 40", Symbol.newInstance("^FCHI"));
-        
-    Index(String name, Symbol symbol) {
+    KLSE("KLSE", Code.newInstance("^KLSE")),
+    Second("Second Board", Code.newInstance("Second")),
+    Mesdaq("Mesdaq", Code.newInstance("Mesdaq")),
+    STI("Straits Times Index", Code.newInstance("^STI")),
+    DJI("Dow Jones Industrial Average", Code.newInstance("^DJI")),
+    IXIC("Nasdaq Composite", Code.newInstance("^IXIC")),
+    DAX("DAX", Code.newInstance("^GDAXI")),
+    OMXSPI("Stockholm General", Code.newInstance("^OMXSPI")),
+    OMXC20CO("OMX Copenhagen 20", Code.newInstance("OMXC20.CO")),
+    OSEAX("OSE All Share", Code.newInstance("^OSEAX")),
+    SPMIB("S&P/MIB", Code.newInstance("^SPMIB")),
+    SMSI("Madrid General", Code.newInstance("^SMSI")),
+    FTSE("FTSE 100", Code.newInstance("^FTSE")),
+    FCHI("CAC 40", Code.newInstance("^FCHI")),
+    BSESN("BSE SENSEX", Code.newInstance("^BSESN")),
+    NSEI("S&P CNX NIFTY", Code.newInstance("^NSEI"));
+
+    Index(String name, Code code) {
         this.name = name;
-        this.symbol = symbol;
+        this.code = code;
     }
     
-    public Symbol getSymbol() {
-        return symbol;
+    public Code getCode() {
+        return code;
     }
     
     @Override
@@ -53,5 +55,5 @@ public enum Index {
     }
         
     private String name;
-    private Symbol symbol;
+    private Code code;
 }
