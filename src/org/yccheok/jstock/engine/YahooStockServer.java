@@ -344,6 +344,13 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
         // In order to avoid duplicated stock's code.
         Set<Code> codes = new HashSet<Code>();
 
+        // A hacking way to prevent
+        // <a href="http://uk.finance.yahoo.com/q?s=SCRIA.ST+NCCA.ST+SHBB.ST+ELUXA.ST+LATOA.ST+VOLVA.ST+SCVA.ST+SKFA.ST+SEBC.ST+DV-BTA-1.ST+MTGB.ST+63054.ST+37341.ST+HOLMA.ST+TEL2A.ST+62893.ST+RATOA.ST+585671.ST+">View Quotes for All Above Symbols</a>
+        // going into our database. Although we had placed some restriction on the
+        // symbol maximum length, it may be some exceptional case sometimes.
+        // For example : <a href="http://uk.finance.yahoo.com/q?s=SCRIA.ST+NCCA.ST+">View Quotes for All Above Symbols</a>
+        final Pattern nonSymbolPattern = Pattern.compile(Pattern.quote("View Quotes for All Above Symbols"), Pattern.CASE_INSENSITIVE);
+
         final Matcher matcher = stockAndBoardPattern.matcher(respond);
         while (matcher.find()){
             for (int i = 1; i <= matcher.groupCount(); i += 3) {
@@ -369,6 +376,10 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
                 // Parken Sport & Entertainment A/S
                 s = StringEscapeUtils.unescapeHtml(s);
 
+                if (nonSymbolPattern.matcher(s).find()) {
+                    continue;
+                }
+                
                 // Enum name is not allowed to have space in between.
                 b = b.trim().replaceAll("\\s+", "");
 
@@ -601,6 +612,7 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
             servers.put(Country.Denmark, new URL("http://uk.finsearch.yahoo.com/uk/index.php?s=uk_sort&nm=**&tp=S&r=CO&sub=Look+Up"));
             servers.put(Country.France, new URL("http://uk.finsearch.yahoo.com/uk/index.php?s=uk_sort&nm=**&tp=S&r=PA&sub=Look+Up"));
             servers.put(Country.Germany, new URL("http://uk.finsearch.yahoo.com/uk/index.php?s=uk_sort&nm=**&tp=S&r=GER&sub=Look+Up"));
+            servers.put(Country.India, new URL("http://uk.finsearch.yahoo.com/uk/index.php?s=uk_sort&nm=**&tp=S&r=IN&sub=Look+Up"));
             servers.put(Country.Italy, new URL("http://uk.finsearch.yahoo.com/uk/index.php?s=uk_sort&nm=**&tp=S&r=MI&sub=Look+Up"));
             servers.put(Country.Norway, new URL("http://uk.finsearch.yahoo.com/uk/index.php?s=uk_sort&nm=**&tp=S&r=OL&sub=Look+Up"));
             servers.put(Country.Spain, new URL("http://uk.finsearch.yahoo.com/uk/index.php?s=uk_sort&nm=**&tp=S&r=ESP&sub=Look+Up"));
