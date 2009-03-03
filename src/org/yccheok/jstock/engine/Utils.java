@@ -116,6 +116,7 @@ public class Utils {
     private static final List<Index> denmarkIndices = new ArrayList<Index>();
     private static final List<Index> franceIndices = new ArrayList<Index>();
     private static final List<Index> germanyIndices = new ArrayList<Index>();
+    private static final List<Index> indiaIndices = new ArrayList<Index>();
     private static final List<Index> italyIndices = new ArrayList<Index>();
     private static final List<Index> malaysiaIndices = new ArrayList<Index>();
     private static final List<Index> norwayIndices = new ArrayList<Index>();
@@ -128,8 +129,10 @@ public class Utils {
     static
     {        
         denmarkIndices.add(Index.OMXC20CO);
-        franceIndices.add(Index.FCHI);        
+        franceIndices.add(Index.FCHI);  
         germanyIndices.add(Index.DAX);
+        indiaIndices.add(Index.BSESN);
+        indiaIndices.add(Index.NSEI);
         italyIndices.add(Index.SPMIB);
         malaysiaIndices.add(Index.KLSE);
         malaysiaIndices.add(Index.Second);
@@ -190,14 +193,16 @@ public class Utils {
     }
 
     public static List<Index> getStockIndices(Country country) {
-        switch(country)
+        switch (country)
         {
             case Denmark:
                 return java.util.Collections.unmodifiableList(Utils.denmarkIndices);
             case France:
                 return java.util.Collections.unmodifiableList(Utils.franceIndices);
             case Germany:
-                return java.util.Collections.unmodifiableList(Utils.germanyIndices);                
+                return java.util.Collections.unmodifiableList(Utils.germanyIndices);
+            case India:
+                return java.util.Collections.unmodifiableList(Utils.indiaIndices);
             case Italy:
                 return java.util.Collections.unmodifiableList(Utils.italyIndices);
             case Malaysia:
