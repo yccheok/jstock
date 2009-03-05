@@ -40,6 +40,7 @@ import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import javax.swing.ImageIcon;
+import javax.swing.UIManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.analysis.Connection;
@@ -436,6 +437,24 @@ public class Utils {
         operatorIndicator.preCalculate();
         
         return operatorIndicator;
+    }
+
+    public static void setDefaultLookAndFeel() {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        }
+        catch (java.lang.ClassNotFoundException exp) {
+            log.error(null, exp);
+        }
+        catch (java.lang.InstantiationException exp) {
+            log.error(null, exp);
+        }
+        catch (java.lang.IllegalAccessException exp) {
+            log.error(null, exp);
+        }
+        catch (javax.swing.UnsupportedLookAndFeelException exp) {
+            log.error(null, exp);
+        }
     }
 
 	// We will use this as directory name. Do not have space or special characters.
