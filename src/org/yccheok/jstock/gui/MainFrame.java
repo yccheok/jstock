@@ -984,7 +984,9 @@ public class MainFrame extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {        
+    public static void main(String args[]) {
+        Utils.setDefaultLookAndFeel();
+
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -992,7 +994,14 @@ public class MainFrame extends javax.swing.JFrame {
                 mainFrame.init();
                 mainFrame.setExtendedState(Frame.MAXIMIZED_BOTH);
                 mainFrame.setVisible(true);
-                mainFrame.setLookAndFeel(mainFrame.getJStockOptions().getLooknFeel());
+
+                final LookAndFeel lnf = UIManager.getLookAndFeel();
+                // User choose not to use default native look and feel. Let's make user happy by giving
+                // what they want.
+                if (false == lnf.getClass().getName().equals(mainFrame.getJStockOptions().getLooknFeel())) {
+                    log.info("User prefer not to use native " + lnf.getClass().getName());
+                    mainFrame.setLookAndFeel(mainFrame.getJStockOptions().getLooknFeel());
+                }
             }
         });
     }
