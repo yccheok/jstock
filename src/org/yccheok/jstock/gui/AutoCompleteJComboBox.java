@@ -112,31 +112,26 @@ public class AutoCompleteJComboBox extends JComboBox {
                     AutoCompleteJComboBox.this.removeAllItems();
                     
                     if(string.length() > 0) {
-                        if(AutoCompleteJComboBox.this.stockCodeAndSymbolDatabase != null) {
-                            final String upperCaseString = string.toUpperCase();
-                            
-                            java.util.List<Symbol> symbols = stockCodeAndSymbolDatabase.searchStockSymbols(upperCaseString);
-                            java.util.List<Code> codes = null;
-                            
-                            if(symbols.size() == 0 && Character.isDigit(string.charAt(0))) {
-                                codes = stockCodeAndSymbolDatabase.searchStockCodes(string);
+                        if(AutoCompleteJComboBox.this.stockCodeAndSymbolDatabase != null) {                            
+                            java.util.List<Symbol> symbols = stockCodeAndSymbolDatabase.searchStockSymbols(string);
+                            java.util.List<Code> codes = codes = stockCodeAndSymbolDatabase.searchStockCodes(string);
+
+                            boolean shouldShowPopup = false;
+
+                            // Symbol comes first, which is more readable. However, there is a possibility
+                            // that most of the users prefer stock code comes first.
+                            for(Symbol s : symbols) {
+                                AutoCompleteJComboBox.this.addItem(s.toString());
+                                shouldShowPopup = true;
                             }
                             
-                            if(codes != null) {
-                                if(codes.size() > 0) {
-                                    for(Code c : codes)
-                                        AutoCompleteJComboBox.this.addItem(c.toString());
-
-                                    AutoCompleteJComboBox.this.showPopup();
-                                }                                
+                            for(Code c : codes) {
+                                AutoCompleteJComboBox.this.addItem(c.toString());
+                                shouldShowPopup = true;
                             }
-                            else {
-                                if(symbols.size() > 0) {
-                                    for(Symbol s : symbols)
-                                        AutoCompleteJComboBox.this.addItem(s.toString());
 
-                                    AutoCompleteJComboBox.this.showPopup();
-                                }
+                            if (shouldShowPopup) {
+                                AutoCompleteJComboBox.this.showPopup();
                             }
                         }
                     }
@@ -215,7 +210,7 @@ public class AutoCompleteJComboBox extends JComboBox {
             return new MyComboPopup(comboBox);
         }
     }
-
+    
     private static class MyComboPopup extends BasicComboPopup
     {
         public MyComboPopup(JComboBox combo)
