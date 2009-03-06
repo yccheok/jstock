@@ -535,7 +535,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
                 public void actionPerformed(ActionEvent e) {
                     final CodeSymbolTableModel model1 = (CodeSymbolTableModel)(StockDatabaseJDialog.this.jTable1.getModel());
                     final SymbolTableModel model2 = (SymbolTableModel)(StockDatabaseJDialog.this.jTable2.getModel());
-                    final String searchedText = ftf.getText().toUpperCase();
+                    final String searchedText = ftf.getText();
                     
                     final int modelIndex1 = model1.findCodeOrSymbol(searchedText);
                     final int modelIndex2 = model2.findSymbol(searchedText);
@@ -603,7 +603,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
             JFormattedTextField _ftf = (JFormattedTextField)getComponent();
             final CodeSymbolTableModel model1 = (CodeSymbolTableModel)(StockDatabaseJDialog.this.jTable1.getModel());
             final SymbolTableModel model2 = (SymbolTableModel)(StockDatabaseJDialog.this.jTable2.getModel());
-            final String searchedText = _ftf.getText().toUpperCase();
+            final String searchedText = _ftf.getText();
             final int modelIndex1 = model1.findCodeOrSymbol(searchedText);
             final int modelIndex2 = model2.findSymbol(searchedText);
             boolean isValid = true;
