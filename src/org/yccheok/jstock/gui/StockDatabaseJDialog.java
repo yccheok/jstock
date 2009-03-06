@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JFormattedTextField;
@@ -433,7 +434,8 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         
         //If current expression doesn't parse, don't update.
         try {
-            rf = RowFilter.regexFilter("^" + jTextField1.getText().toUpperCase());
+            // (?i) is for case insensitive.
+            rf = RowFilter.regexFilter("^(?i)" + Pattern.quote(jTextField1.getText()));
         } catch (java.util.regex.PatternSyntaxException e) {
             return;
         }
