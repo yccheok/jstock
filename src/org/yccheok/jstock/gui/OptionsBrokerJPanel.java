@@ -45,7 +45,6 @@ public class OptionsBrokerJPanel extends javax.swing.JPanel implements JStockOpt
     /** Creates new form OptionsBrokerJPanel */
     public OptionsBrokerJPanel() {
         initComponents();
-        this.updateGUIState();
     }
     
     private JFormattedTextField getCurrencyJFormattedTextField(double minimum) {
@@ -384,6 +383,7 @@ public class OptionsBrokerJPanel extends javax.swing.JPanel implements JStockOpt
             defaultListModel.addElement(brokingFirm.getName());  
             this.jList1.setSelectedIndex(defaultListModel.size() - 1);
         }
+        this.updateGUIState();
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jCheckBox1ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jCheckBox1ItemStateChanged
@@ -505,39 +505,47 @@ public class OptionsBrokerJPanel extends javax.swing.JPanel implements JStockOpt
             else
                 this.jList1.clearSelection();
         }
+
+        this.updateGUIState();
     }//GEN-LAST:event_jButton2ActionPerformed
     
     private void updateGUIState() {
-        final boolean state = jCheckBox1.isSelected();
-        jButton1.setEnabled(state);
-        jButton2.setEnabled(state);
-        jButton3.setEnabled(state);
-        jFormattedTextField1.setEnabled(state);
-        jFormattedTextField2.setEnabled(state);
-        jFormattedTextField3.setEnabled(state);
-        jFormattedTextField4.setEnabled(state);
-        jFormattedTextField5.setEnabled(state);
-        jFormattedTextField6.setEnabled(state);
-        jFormattedTextField7.setEnabled(state);
-        jFormattedTextField8.setEnabled(state);
-        jFormattedTextField9.setEnabled(state);
-        jLabel1.setEnabled(state);
-        jLabel10.setEnabled(state);
-        jLabel2.setEnabled(state);
-        jLabel3.setEnabled(state);
-        jLabel4.setEnabled(state);
-        jLabel5.setEnabled(state);
-        jLabel6.setEnabled(state);
-        jLabel7.setEnabled(state);
-        jLabel8.setEnabled(state);
-        jLabel9.setEnabled(state);
-        jList1.setEnabled(state);
-        jPanel2.setEnabled(state);
-        jPanel3.setEnabled(state);
-        jPanel4.setEnabled(state);
-        jPanel5.setEnabled(state);
-        jPanel6.setEnabled(state);
-        jScrollPane1.setEnabled(state);        
+        final boolean state0 = jCheckBox1.isSelected();
+        // Only allow selection when user had selected a broker firm.
+        final boolean state1 = jCheckBox1.isSelected() && (jList1.getSelectedIndex() >= 0);
+
+        jButton1.setEnabled(state0);
+        jButton2.setEnabled(state0);
+        jButton3.setEnabled(state0);
+        jLabel1.setEnabled(state0);
+        jList1.setEnabled(state0);
+        jPanel2.setEnabled(state0);
+        jPanel6.setEnabled(state0);
+
+        jFormattedTextField1.setEnabled(state1);
+        jFormattedTextField2.setEnabled(state1);
+        jFormattedTextField3.setEnabled(state1);
+        jFormattedTextField4.setEnabled(state1);
+        jFormattedTextField5.setEnabled(state1);
+        jFormattedTextField6.setEnabled(state1);
+        jFormattedTextField7.setEnabled(state1);
+        jFormattedTextField8.setEnabled(state1);
+        jFormattedTextField9.setEnabled(state1);
+        
+        jLabel10.setEnabled(state1);
+        jLabel2.setEnabled(state1);
+        jLabel3.setEnabled(state1);
+        jLabel4.setEnabled(state1);
+        jLabel5.setEnabled(state1);
+        jLabel6.setEnabled(state1);
+        jLabel7.setEnabled(state1);
+        jLabel8.setEnabled(state1);
+        jLabel9.setEnabled(state1);
+        jPanel3.setEnabled(state1);
+        jPanel4.setEnabled(state1);
+        jPanel5.setEnabled(state1);
+        jPanel6.setEnabled(state1);
+        jScrollPane1.setEnabled(state1);
     }
     
     private void setLogo(Image logo) {
@@ -566,6 +574,8 @@ public class OptionsBrokerJPanel extends javax.swing.JPanel implements JStockOpt
         if(jStockOptions.getSelectedBrokingFirmIndex() >= 0) {
             this.jList1.setSelectedIndex(jStockOptions.getSelectedBrokingFirmIndex());
         }
+
+        this.updateGUIState();
     }
 
     public boolean apply(JStockOptions jStockOptions) {
