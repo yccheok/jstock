@@ -57,8 +57,10 @@ public class TernarySearchTree<E> {
      * Removes value indexed by key. Also removes all nodes that are rendered unnecessary by the removal of this data.
      * @param key A string that indexes the object to be removed from the tree.
      */
-    public void remove(String key) {
+    public E remove(String key) {
+        TSTNode<E> node = getNode(key);
         deleteNode(getNode(key));
+        return (node != null ? node.data : null);
     }
 
     /**
