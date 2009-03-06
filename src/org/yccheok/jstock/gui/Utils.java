@@ -458,7 +458,7 @@ public class Utils {
     }
 
 	// We will use this as directory name. Do not have space or special characters.
-    private static final String APPLICATION_VERSION_STRING = "1.0.3";
+    private static final String APPLICATION_VERSION_STRING = "1.0.4";
 
     private static Executor zombiePool = Executors.newFixedThreadPool(Utils.NUM_OF_THREADS_ZOMBIE_POOL);
 
