@@ -134,12 +134,12 @@ public class CIMBStockHistoryServer implements StockHistoryServer {
     private HistoryDatabaseResult getHistoryDatabase(String source) {
         String[] stockDatas = source.split("\\r\\n");
         
-	// There must be at least two lines : header information and history information.
+        // There must be at least two lines : header information and history information.
         if(stockDatas.length <= 1) return null;
         
         String[] fields = stockDatas[0].split("\\|");
 
-	// Header information as below :        
+        // Header information as below :
         // 1295|PBBANK|PUBLIC BANK BHD|Active|KLCI,Emas|Main|FINANCE|0100|3492545323|33179180569
         
         if(fields.length < 10) return null;
