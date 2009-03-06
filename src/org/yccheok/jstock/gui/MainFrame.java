@@ -538,16 +538,15 @@ public class MainFrame extends javax.swing.JFrame {
             BufferedReader in = new BufferedReader(new FileReader(file));
             String str;
             while ((str = in.readLine()) != null) {
-                String upperCaseString = str.toUpperCase();
                 Code code = null;
                 Symbol symbol = null;
                 
-                code = this.stockCodeAndSymbolDatabase.searchStockCode(upperCaseString);
+                code = this.stockCodeAndSymbolDatabase.searchStockCode(str);
                 if(code != null) {
                     symbol = this.stockCodeAndSymbolDatabase.codeToSymbol(code);
                 }
                 else {
-                    symbol = this.stockCodeAndSymbolDatabase.searchStockSymbol(upperCaseString);
+                    symbol = this.stockCodeAndSymbolDatabase.searchStockSymbol(str);
                     
                     if(symbol != null) {
                         code = this.stockCodeAndSymbolDatabase.symbolToCode(symbol);
@@ -618,16 +617,15 @@ public class MainFrame extends javax.swing.JFrame {
 
                         if(str == null) continue;
                         
-                        String upperCaseString = str.toUpperCase();
                         Code code = null;
                         Symbol symbol = null;
 
-                        code = this.stockCodeAndSymbolDatabase.searchStockCode(upperCaseString);
+                        code = this.stockCodeAndSymbolDatabase.searchStockCode(str);
                         if(code != null) {
                             symbol = this.stockCodeAndSymbolDatabase.codeToSymbol(code);
                         }
                         else {
-                            symbol = this.stockCodeAndSymbolDatabase.searchStockSymbol(upperCaseString);
+                            symbol = this.stockCodeAndSymbolDatabase.searchStockSymbol(str);
 
                             if(symbol != null) {
                                 code = this.stockCodeAndSymbolDatabase.symbolToCode(symbol);
