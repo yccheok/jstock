@@ -86,8 +86,8 @@ public class MutableStockCodeAndSymbolDatabase extends StockCodeAndSymbolDatabas
         symbols.remove(symbol);
         codes.remove(code);
         
-        ((TSTSearchEngine<Symbol>)symbolSearchEngine).remove(symbol.toString());
-        ((TSTSearchEngine<Code>)codeSearchEngine).remove(code.toString());
+        ((TSTSearchEngine<Symbol>)symbolSearchEngine).remove(symbol);
+        ((TSTSearchEngine<Code>)codeSearchEngine).remove(code);
         
         symbolToCode.remove(symbol);
         codeToSymbol.remove(code);
@@ -132,8 +132,8 @@ public class MutableStockCodeAndSymbolDatabase extends StockCodeAndSymbolDatabas
         this.symbols.add(symbol);
         this.codes.add(code);
 
-        ((TSTSearchEngine<Symbol>)symbolSearchEngine).put(symbol.toString(), symbol);
-        ((TSTSearchEngine<Code>)codeSearchEngine).put(code.toString(), code);
+        ((TSTSearchEngine<Symbol>)symbolSearchEngine).put(symbol);
+        ((TSTSearchEngine<Code>)codeSearchEngine).put(code);
         
         symbolToCode.put(symbol, code);
         codeToSymbol.put(code, symbol);
