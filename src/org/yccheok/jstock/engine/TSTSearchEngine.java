@@ -32,29 +32,66 @@ public class TSTSearchEngine<E> implements SearchEngine<E> {
     
     /** Creates a new instance of TSTSearchEngine */
     public TSTSearchEngine(List<E> sources) {
-        for(E source : sources) {
-            tst.put(source.toString(), source);
+        for (E source : sources) {
+            put(source);
         }
+    }
+
+    public TSTSearchEngine() {
     }
     
     @Override
     public List<E> searchAll(String prefix) {
-        return tst.matchPrefix(prefix);
+        final String mapKey = prefix.toUpperCase();
+        List<String> keys = tst.matchPrefix(mapKey);
+        List<E> list = new ArrayList<E>();
+        for (String key : keys) {
+            // map.get(key) must be non-null.
+            list.addAll(map.get(key));
+        }
+        return list;
     }
 
     @Override
     public E search(String prefix) {
-        List<E> l = tst.matchPrefix(prefix, 1);
-        return l.size() > 0 ? l.get(0) : null;
+        final String mapKey = prefix.toUpperCase();
+        List<String> keys = tst.matchPrefix(mapKey);
+        if (keys.size() > 0) {
+            final String key = keys.get(0);
+            // key must be non-null.
+            List<E> l = map.get(key);
+            return l.size() > 0 ? l.get(0) : null;
+        }
+        return null;
     }
     
-    public void put(String key, E value) {
-        tst.put(key, value);
+    public void put(E value) {
+        final String mapKey = value.toString().toUpperCase();
+        tst.put(mapKey, mapKey);
+
+        List<E> list = map.get(mapKey);
+        if (list == null) {
+            list = new ArrayList<E>();
+            map.put(mapKey, list);
+        }
+        list.add(value);
     }
     
-    public void remove(String key) {
-        tst.remove(key);
+    public void remove(E value) {
+        final String mapKey = value.toString().toUpperCase();
+        final String key = tst.remove(mapKey);
+        if (key != null) {
+            map.remove(key);
+        }
     }
     
-    private final TernarySearchTree<E> tst = new TernarySearchTree<E>();
+    private final TernarySearchTree<String> tst = new TernarySearchTree<String>();
+    // We need to have this map, so that we are able to retrieve E value
+    // in a case insensitive way. This is just a pseudo way for us to
+    // achieve this purpose. We should really build this case insensitive
+    // capability into TernarySearchTree itself. Once TernarySearchTree
+    // has the capability to handle case insensitive, it should be holding
+    // E value instead of String (String will be used as the key to access
+    // map).
+    private final Map<String, List<E>> map = new HashMap<String, List<E>>();
 }
