@@ -60,6 +60,7 @@ public class YahooStockFormat implements StockFormat {
     // "+1400.00","N/A - +4.31%",+1400.00,"+4.31%","+1400.00 - +4.31%"
     //
     // "MAERSKB.CO","AP MOELLER-MAERS-","Copenhagen",32500.00,33700.00,34200.00,33400.00,660,"+1200.00","N/A - +3.69%",33,33500.00,54,33700.00,96,"11/10/2008","10:53am"    
+    @Override
     public List<Stock> parse(String source) {
         List<Stock> stocks = new ArrayList<Stock>();
         

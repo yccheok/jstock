@@ -371,8 +371,8 @@ public class SingaporeYahooStockServer extends Subject<SingaporeYahooStockServer
 
         final Matcher matcher = symbolPattern.matcher(respond);
 
-        while(matcher.find()){
-            for(int j=1; j<=matcher.groupCount(); j++ ) {
+        while (matcher.find()){
+            for (int j = 1; j <= matcher.groupCount(); j++ ) {
                 final String string = matcher.group(j);
                 symbols.add(Symbol.newInstance(string));
             }
