@@ -5,16 +5,20 @@ version 1.0.4
 
 2. [2567292] Feature added. India Stock Market Support.
 
-2. [2503260] Bug fixed. Get all stocks from a country is slow and buggy. Denmark, France, Germany, 
+3. [2580597] Testing to be done on Ubuntu Linux.
+
+4. [2503260] Bug fixed. Get all stocks from a country is slow and buggy. Denmark, France, Germany, 
    Italy, Norway, Spain, Sweden, UnitedKingdom and UnitedState stock market information are now 
    accurate. All their database are most update to date by using Yahoo search engine.
 
-3. [2617125] Bug fixed. Market Index Display Wrong.
+5. [2617125] Bug fixed. Market Index Display Wrong.
 
-4. Bug fixed on Stock Database Dialog. The displayed stock and symbol is now associated with
+6. Feature added. Case insensitive auto drop down combo box.
+
+7. Bug fixed on Stock Database Dialog. The displayed stock and symbol is now associated with
    the same stock.
    
-5. Bug fixed on Malaysia stock market. 5148.KL is being included into database.
+8. Bug fixed on Malaysia stock market. 5148.KL is being included into database.
 
 
 =============
