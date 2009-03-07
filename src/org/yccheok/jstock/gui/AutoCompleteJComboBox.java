@@ -113,18 +113,17 @@ public class AutoCompleteJComboBox extends JComboBox {
                     
                     if(string.length() > 0) {
                         if(AutoCompleteJComboBox.this.stockCodeAndSymbolDatabase != null) {                            
-                            java.util.List<Symbol> symbols = stockCodeAndSymbolDatabase.searchStockSymbols(string);
                             java.util.List<Code> codes = codes = stockCodeAndSymbolDatabase.searchStockCodes(string);
 
                             boolean shouldShowPopup = false;
 
-                            // Symbol comes first, which is more readable. However, there is a possibility
-                            // that most of the users prefer stock code comes first.
-                            for(Symbol s : symbols) {
-                                AutoCompleteJComboBox.this.addItem(s.toString());
-                                shouldShowPopup = true;
-                            }
-                            
+                            // Here is our user friendly rule.
+                            // (1) User will first like to search for their prefer stock by code. Hence, we only list
+                            // out stock code to them. No more, no less.
+                            // (2) If we cannot find any stock based on user given stock code, we will search by using
+                            // stock symbol.
+                            // (3) Do not search using both code and symbol at the same time. There are too much information,
+                            // which will make user unhappy.
                             for(Code c : codes) {
                                 AutoCompleteJComboBox.this.addItem(c.toString());
                                 shouldShowPopup = true;
@@ -132,6 +131,18 @@ public class AutoCompleteJComboBox extends JComboBox {
 
                             if (shouldShowPopup) {
                                 AutoCompleteJComboBox.this.showPopup();
+                            }
+                            else {
+                                java.util.List<Symbol> symbols = stockCodeAndSymbolDatabase.searchStockSymbols(string);
+
+                                for(Symbol s : symbols) {
+                                    AutoCompleteJComboBox.this.addItem(s.toString());
+                                    shouldShowPopup = true;
+                                }
+
+								if (shouldShowPopup) {
+                                	AutoCompleteJComboBox.this.showPopup();
+								}                                
                             }
                         }
                     }
