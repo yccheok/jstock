@@ -524,6 +524,7 @@ public class MainFrame extends javax.swing.JFrame {
         }
         
         StockJDialog stockJDialog = new StockJDialog(this, true);
+        stockJDialog.setLocationRelativeTo(this);
         stockJDialog.setVisible(true);
     }//GEN-LAST:event_jMenuItem4ActionPerformed
 
@@ -2389,16 +2390,24 @@ public class MainFrame extends javax.swing.JFrame {
     private boolean saveStockCodeAndSymbolDatabase() {
         final Country country = jStockOptions.getCountry();
             
-        if(Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database") == false)
+        if (Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database") == false)
         {
             return false;
         }
         
-        if(stockCodeAndSymbolDatabase == null)
+        if (stockCodeAndSymbolDatabase == null)
         {
-            return true;
+            return false;
         }
-        
+
+        // This could happen when OutOfMemoryException happen while fetching stock database information
+        // from the server.
+        if (stockCodeAndSymbolDatabase.getCodes().size() <= 0)
+        {
+            log.info("Database was corrupted.");
+            return false;
+        }
+
         final File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database" + File.separator + "stockcodeandsymboldatabase.xml");
                 
         XStream xStream = new XStream();   
