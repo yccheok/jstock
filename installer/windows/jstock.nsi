@@ -25,14 +25,14 @@ Call DetectJRE
 ; Set output path to the installation directory.
 SetOutPath $INSTDIR
 ; Put file there
-File /r jstock\jstock.jar
+File /r jstock\jstock.exe
 File /r jstock\config
 File /r jstock\database
 File /r jstock\chat
 File /r jstock\lib
 File chart.ico
 CreateDirectory "$SMPROGRAMS\${PRODUCT_NAME}"
-CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\${PRODUCT_NAME}.lnk" "$INSTDIR\jstock.jar" "" "$INSTDIR\chart.ico"
+CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\${PRODUCT_NAME}.lnk" "$INSTDIR\jstock.exe" "" "$INSTDIR\chart.ico"
 CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\Uninstall ${PRODUCT_NAME}.lnk" "$INSTDIR\Uninstall.exe" 
 WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}" "DisplayName" "${PRODUCT_NAME} (remove only)"
 WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}" "UninstallString" "$INSTDIR\Uninstall.exe"
@@ -53,7 +53,7 @@ RMDir /r $INSTDIR\config
 RMDir /r $INSTDIR\database
 RMDir /r $INSTDIR\chat
 Delete $INSTDIR\chart.ico
-Delete $INSTDIR\jstock.jar
+Delete $INSTDIR\jstock.exe
 Delete $INSTDIR\Uninstall.exe
 Delete "$SMPROGRAMS\${PRODUCT_NAME}\Uninstall ${PRODUCT_NAME}.lnk"
 Delete "$SMPROGRAMS\${PRODUCT_NAME}\${PRODUCT_NAME}.lnk"
