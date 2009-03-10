@@ -113,34 +113,56 @@ public class Utils {
         return isValidPortNumber(port);
     }
 
+    private static final List<Index> australiaIndices = new ArrayList<Index>();
+    private static final List<Index> austriaIndices = new ArrayList<Index>();
+    private static final List<Index> belgiumIndices = new ArrayList<Index>();
+    private static final List<Index> canadaIndices = new ArrayList<Index>();
     private static final List<Index> denmarkIndices = new ArrayList<Index>();
     private static final List<Index> franceIndices = new ArrayList<Index>();
     private static final List<Index> germanyIndices = new ArrayList<Index>();
+    private static final List<Index> hongkongIndices = new ArrayList<Index>();
     private static final List<Index> indiaIndices = new ArrayList<Index>();
+    private static final List<Index> indonesiaIndices = new ArrayList<Index>();
     private static final List<Index> italyIndices = new ArrayList<Index>();
+    private static final List<Index> koreaIndices = new ArrayList<Index>();
     private static final List<Index> malaysiaIndices = new ArrayList<Index>();
+    private static final List<Index> netherlandsIndices = new ArrayList<Index>();
     private static final List<Index> norwayIndices = new ArrayList<Index>();
+    private static final List<Index> portugalIndices = new ArrayList<Index>();
     private static final List<Index> singaporeIndices = new ArrayList<Index>();
     private static final List<Index> spainIndices = new ArrayList<Index>();
     private static final List<Index> swedenIndices = new ArrayList<Index>();
+    private static final List<Index> switzerlandIndices = new ArrayList<Index>();
+    private static final List<Index> taiwanIndices = new ArrayList<Index>();
     private static final List<Index> unitedKingdomIndices = new ArrayList<Index>();
     private static final List<Index> unitedStateIndices = new ArrayList<Index>();
     
     static
-    {        
+    {
+        austriaIndices.add(Index.ATX);
+        australiaIndices.add(Index.AORD);
+        belgiumIndices.add(Index.BFX);
+        canadaIndices.add(Index.GSPTSE);
         denmarkIndices.add(Index.OMXC20CO);
         franceIndices.add(Index.FCHI);  
         germanyIndices.add(Index.DAX);
+        hongkongIndices.add(Index.HSI);
         indiaIndices.add(Index.BSESN);
         indiaIndices.add(Index.NSEI);
+        indonesiaIndices.add(Index.JKSE);
         italyIndices.add(Index.SPMIB);
+        koreaIndices.add(Index.KS11);
         malaysiaIndices.add(Index.KLSE);
         malaysiaIndices.add(Index.Second);
         malaysiaIndices.add(Index.Mesdaq);
+        netherlandsIndices.add(Index.AEX);
         norwayIndices.add(Index.OSEAX);
+        portugalIndices.add(Index.PSI20);
         singaporeIndices.add(Index.STI);
         spainIndices.add(Index.SMSI);
         swedenIndices.add(Index.OMXSPI);
+        switzerlandIndices.add(Index.SSMI);
+        taiwanIndices.add(Index.TWII);
         unitedKingdomIndices.add(Index.FTSE);
         unitedStateIndices.add(Index.DJI);        
         unitedStateIndices.add(Index.IXIC);        
@@ -195,26 +217,48 @@ public class Utils {
     public static List<Index> getStockIndices(Country country) {
         switch (country)
         {
+            case Australia:
+                return java.util.Collections.unmodifiableList(Utils.australiaIndices);
+            case Austria:
+                return java.util.Collections.unmodifiableList(Utils.austriaIndices);
+            case Belgium:
+                return java.util.Collections.unmodifiableList(Utils.belgiumIndices);
+            case Canada:
+                return java.util.Collections.unmodifiableList(Utils.canadaIndices);
             case Denmark:
                 return java.util.Collections.unmodifiableList(Utils.denmarkIndices);
             case France:
                 return java.util.Collections.unmodifiableList(Utils.franceIndices);
             case Germany:
                 return java.util.Collections.unmodifiableList(Utils.germanyIndices);
+            case HongKong:
+                return java.util.Collections.unmodifiableList(Utils.hongkongIndices);
             case India:
                 return java.util.Collections.unmodifiableList(Utils.indiaIndices);
+            case Indonesia:
+                return java.util.Collections.unmodifiableList(Utils.indonesiaIndices);
             case Italy:
                 return java.util.Collections.unmodifiableList(Utils.italyIndices);
+            case Korea:
+                return java.util.Collections.unmodifiableList(Utils.koreaIndices);
             case Malaysia:
                 return java.util.Collections.unmodifiableList(Utils.malaysiaIndices);
+            case Netherlands:
+                return java.util.Collections.unmodifiableList(Utils.netherlandsIndices);
             case Norway:
                 return java.util.Collections.unmodifiableList(Utils.norwayIndices);
+            case Portugal:
+                return java.util.Collections.unmodifiableList(Utils.portugalIndices);
             case Singapore:
                 return java.util.Collections.unmodifiableList(Utils.singaporeIndices);
             case Spain:
                 return java.util.Collections.unmodifiableList(Utils.spainIndices);
             case Sweden:
                 return java.util.Collections.unmodifiableList(Utils.swedenIndices);
+            case Switzerland:
+                return java.util.Collections.unmodifiableList(Utils.switzerlandIndices);
+            case Taiwan:
+                return java.util.Collections.unmodifiableList(Utils.taiwanIndices);
             case UnitedKingdom:
                 return java.util.Collections.unmodifiableList(Utils.unitedKingdomIndices);                
             case UnitedState:
