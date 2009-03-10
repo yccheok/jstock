@@ -486,6 +486,10 @@ public class SingaporeYahooStockServer extends Subject<SingaporeYahooStockServer
         try {
             servers.put(Country.Malaysia, new URL("http://sg.biz.yahoo.com/il/my/1"));
             servers.put(Country.Singapore, new URL("http://sg.biz.yahoo.com/il/si/1"));
+            servers.put(Country.HongKong, new URL("http://sg.biz.yahoo.com/il/hk/1"));
+            servers.put(Country.Indonesia, new URL("http://sg.biz.yahoo.com/il/jk/1"));
+            servers.put(Country.Korea, new URL("http://sg.biz.yahoo.com/il/ks/1"));
+            servers.put(Country.Taiwan, new URL("http://sg.biz.yahoo.com/il/tw/1"));
         }
         catch(MalformedURLException exp) {
             // Shouldn't happen.
@@ -495,5 +499,9 @@ public class SingaporeYahooStockServer extends Subject<SingaporeYahooStockServer
         // <a href="/il/my/l">
         patterns.put(Country.Malaysia, Pattern.compile("<a\\s+href\\s*=\\s*\"?(\\/il\\/my\\/[^\\s\">]+)"));
         patterns.put(Country.Singapore, Pattern.compile("<a\\s+href\\s*=\\s*\"?(\\/il\\/si\\/[^\\s\">]+)"));
+        patterns.put(Country.HongKong, Pattern.compile("<a\\s+href\\s*=\\s*\"?(\\/il\\/hk\\/[^\\s\">]+)"));
+        patterns.put(Country.Indonesia, Pattern.compile("<a\\s+href\\s*=\\s*\"?(\\/il\\/jk\\/[^\\s\">]+)"));
+        patterns.put(Country.Korea, Pattern.compile("<a\\s+href\\s*=\\s*\"?(\\/il\\/ks\\/[^\\s\">]+)"));
+        patterns.put(Country.Taiwan, Pattern.compile("<a\\s+href\\s*=\\s*\"?(\\/il\\/tw\\/[^\\s\">]+)"));
     }
 }
