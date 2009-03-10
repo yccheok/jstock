@@ -1,3 +1,19 @@
+==============
+version 1.0.4a
+==============
+1. Added 11 new countires. We have now total 23 countries stock market.
+   - Australia
+   - Austria
+   - Belgium
+   - Canada
+   - HongKong
+   - Indonesia
+   - Korea
+   - Netherlands
+   - Portugal
+   - Switzerland
+   - Taiwan
+
 =============
 version 1.0.4
 =============
