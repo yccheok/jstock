@@ -31,8 +31,10 @@ import org.apache.commons.logging.LogFactory;
  */
 public class SingaporeYahooMarketServer implements MarketServer {
     public SingaporeYahooMarketServer(Country country) {
-        if (country != Country.Malaysia && country != Country.Singapore) {
-            throw new java.lang.IllegalArgumentException("Only Malaysia and Singapore market are supported");
+        if (    country != Country.Malaysia && country != Country.Singapore &&
+                country != Country.HongKong && country != Country.Taiwan &&
+                country != Country.Korea && country != Country.Indonesia) {
+            throw new java.lang.IllegalArgumentException("Only Malaysia/ Singapore/ HongKong/ Taiwan/ Korea/ Indonesia markets are supported");
         }        
         
         // Hack on Malaysia Market! The format among Yahoo and CIMB are difference.
