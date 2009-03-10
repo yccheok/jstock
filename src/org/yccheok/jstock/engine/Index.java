@@ -38,7 +38,18 @@ public enum Index {
     FTSE("FTSE 100", Code.newInstance("^FTSE")),
     FCHI("CAC 40", Code.newInstance("^FCHI")),
     BSESN("BSE SENSEX", Code.newInstance("^BSESN")),
-    NSEI("S&P CNX NIFTY", Code.newInstance("^NSEI"));
+    NSEI("S&P CNX NIFTY", Code.newInstance("^NSEI")),
+    AORD("All Ordinaries", Code.newInstance("^AORD")),
+    ATX("ATX", Code.newInstance("^ATX")),
+    BFX("BEL-20", Code.newInstance("^BFX")),
+    GSPTSE("S&P TSX Composite", Code.newInstance("^GSPTSE")),
+    HSI("Hang Seng", Code.newInstance("^HSI")),
+    JKSE("Jakarta Composite", Code.newInstance("^JKSE")),
+    KS11("Seoul Composite", Code.newInstance("^KS11")),
+    AEX("AEX", Code.newInstance("^AEX")),
+    PSI20("PSI 20", Code.newInstance("^PSI20")),
+    TWII("TSEC weighted index", Code.newInstance("^TWII")),
+    SSMI("Swiss Market", Code.newInstance("^SSMI"));
 
     Index(String name, Code code) {
         this.name = name;
