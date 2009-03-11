@@ -392,11 +392,17 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
                     // do not want any stock with duplicated code.
                     continue;
                 }
+                
+                // Since '-' character is not allowed in enum, we need some sort
+                // of hacking.
+                if (b.equals("Virt-X")) {
+                    b = "Virt_X";
+                }
 
                 try {
                     board = Stock.Board.valueOf(b);
                 }
-                catch(java.lang.IllegalArgumentException exp) {
+                catch (java.lang.IllegalArgumentException exp) {
                     log.error(null, exp);
                     board = Stock.Board.Unknown;
                 }
@@ -609,14 +615,21 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
         // Type : Stocks
         // Market : Depends on selected country.
         try {
+            servers.put(Country.Australia, new URL("http://uk.finsearch.yahoo.com/uk/index.php?s=uk_sort&nm=**&tp=S&r=AX&sub=Look+Up"));
+            servers.put(Country.Austria, new URL("http://uk.finsearch.yahoo.com/uk/index.php?s=uk_sort&nm=**&tp=S&r=VI&sub=Look+Up"));
+            servers.put(Country.Belgium, new URL("http://uk.finsearch.yahoo.com/uk/index.php?s=uk_sort&nm=**&tp=S&r=BR&sub=Look+Up"));
+            servers.put(Country.Canada, new URL("http://uk.finsearch.yahoo.com/uk/index.php?s=uk_sort&nm=**&tp=S&r=TO&sub=Look+Up"));
             servers.put(Country.Denmark, new URL("http://uk.finsearch.yahoo.com/uk/index.php?s=uk_sort&nm=**&tp=S&r=CO&sub=Look+Up"));
             servers.put(Country.France, new URL("http://uk.finsearch.yahoo.com/uk/index.php?s=uk_sort&nm=**&tp=S&r=PA&sub=Look+Up"));
             servers.put(Country.Germany, new URL("http://uk.finsearch.yahoo.com/uk/index.php?s=uk_sort&nm=**&tp=S&r=GER&sub=Look+Up"));
             servers.put(Country.India, new URL("http://uk.finsearch.yahoo.com/uk/index.php?s=uk_sort&nm=**&tp=S&r=IN&sub=Look+Up"));
             servers.put(Country.Italy, new URL("http://uk.finsearch.yahoo.com/uk/index.php?s=uk_sort&nm=**&tp=S&r=MI&sub=Look+Up"));
+            servers.put(Country.Netherlands, new URL("http://uk.finsearch.yahoo.com/uk/index.php?s=uk_sort&nm=**&tp=S&r=AS&sub=Look+Up"));
             servers.put(Country.Norway, new URL("http://uk.finsearch.yahoo.com/uk/index.php?s=uk_sort&nm=**&tp=S&r=OL&sub=Look+Up"));
+            servers.put(Country.Portugal, new URL("http://uk.finsearch.yahoo.com/uk/index.php?s=uk_sort&nm=**&tp=S&r=LI&sub=Look+Up"));
             servers.put(Country.Spain, new URL("http://uk.finsearch.yahoo.com/uk/index.php?s=uk_sort&nm=**&tp=S&r=ESP&sub=Look+Up"));
             servers.put(Country.Sweden, new URL("http://uk.finsearch.yahoo.com/uk/index.php?s=uk_sort&nm=**&tp=S&r=ST&sub=Look+Up"));
+            servers.put(Country.Switzerland, new URL("http://uk.finsearch.yahoo.com/uk/index.php?s=uk_sort&nm=**&tp=S&r=SWI&sub=Look+Up"));
             servers.put(Country.UnitedKingdom, new URL("http://uk.finsearch.yahoo.com/uk/index.php?s=uk_sort&nm=**&tp=S&r=L&sub=Look+Up"));
             servers.put(Country.UnitedState, new URL("http://uk.finsearch.yahoo.com/uk/index.php?s=uk_sort&nm=**&tp=S&r=US&sub=Look+Up"));
         }
