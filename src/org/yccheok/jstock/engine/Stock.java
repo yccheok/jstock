@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * Copyright (C) 2007 Cheok YanCheng <yccheok@yahoo.com>
+ * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
  */
 
 package org.yccheok.jstock.engine;
@@ -238,13 +238,11 @@ public class Stock {
         Mesdaq("Mesdaq"),                       // MESDAQ
         CallWarrant("Call Warrant"),            // ??
         KualaLumpur("Kuala Lumpur"),
-
         SES("SES"),                             // Singapore
-
         Copenhagen("Copenhagen"),               // Denmark        
         Paris("Paris"),                         // France
-        
         Xetra("Xetra"),                         // Germany
+        XETRA("XETRA"),
         Munich("Munich"),
         Stuttgart("Stuttgart"),
         Berlin("Berlin"),
@@ -252,20 +250,14 @@ public class Stock {
         Dusseldorf("Dusseldorf"),
         Frankfurt("Frankfurt"),
         Hannover("Hannover"),
-        
         Milan("Milan"),                         // Italy
-
         Oslo("Oslo"),                           // Norway
-        
         Madrid("Madrid"),                       // Spain
         MCE("MCE"),
         MercadoContinuo("Mercado Continuo"),
-
         Stockholm("Stockholm"),                 // Sweden
-        
         FSI("FSI"),                             // UK
         London("London"),
-        
         NasdaqSC("NasdaqSC"),                   // US
         DJI("DJI"),
         NasdaqNM("NasdaqNM"),
@@ -273,7 +265,24 @@ public class Stock {
         Nasdaq("Nasdaq"),
         AMEX("AMEX"),
         PinkSheet("Pink Sheet"),
-
+        Sydney("Sydney"),                       // Australia
+        ASX("ASX"),
+        Vienna("Vienna"),                       // Austria
+        Brussels("Brussels"),                   // Belgium
+        Toronto("Toronto"),                     // Canada
+        HKSE("HKSE"),                           // Hong Kong
+        Jakarta("Jakarta"),                     // Indonesia
+        KSE("KSE"),                             // Korea
+        KOSDAQ("KOSDAQ"),
+        Amsterdam("Amsterdam"),                 // Netherlands
+        ENX("ENX"),                             // Portugal
+        Lisbon("Lisbon"),
+        VTX("VTX"),                             // Switzerland
+        Virt_X("Virt-X"),
+        Switzerland("Switzerland"),
+        Taiwan("Taiwan"),                       // Taiwan
+        Bombay("Bombay"),                       // India
+        NSE("NSE"),
         UserDefined("User Defined"),
         Unknown("Unknown");
         
