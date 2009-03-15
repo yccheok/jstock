@@ -25,6 +25,8 @@ package org.yccheok.jstock.gui;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.httpclient.Credentials;
+import org.apache.commons.httpclient.NTCredentials;
 import org.yccheok.jstock.portfolio.BrokingFirm;
 import org.yccheok.jstock.engine.Country;
 
@@ -144,6 +146,14 @@ public class JStockOptions {
     private Color chatOwnMessageColor;
     private Color chatOtherMessageColor;
 
+    // We want to avoid from having too frequent credentials creation during
+    // runtime. We will immediately contruct credentials, once we load the
+    // JStockOptions from disk.
+    private transient Credentials credentials = null;
+    private String NTLMPassword = "";
+    private String NTLMUserName = "";
+    private boolean isNTLMEnabled = false;
+
     public boolean isAutoBrokerFeeCalculationEnabled() {
         return this.isAutoBrokerFeeCalculationEnabled;
     }
@@ -199,7 +209,17 @@ public class JStockOptions {
         if (this.getAlertBackgroundColor() == null) {
             this.setAlertBackgroundColor(DEFAULT_ALERT_BACKGROUND_COLOR);    
         }
-        
+
+        if (this.NTLMUserName == null) {
+            this.NTLMUserName = "";
+        }
+
+        if (this.NTLMPassword == null) {
+            this.NTLMPassword = "";
+        }
+
+        setCredentials(new NTCredentials(this.NTLMUserName, Utils.decrypt(this.NTLMPassword), "", ""));
+
         return this;
     }    
     
@@ -578,5 +598,65 @@ public class JStockOptions {
      */
     public void setEnableColorAlert(boolean enableColorAlert) {
         this.enableColorAlert = enableColorAlert;
+    }
+
+    /**
+     * @return the NTLMPassword
+     */
+    public String getNTLMPassword() {
+        return NTLMPassword;
+    }
+
+    /**
+     * @param NTLMPassword the NTLMPassword to set
+     */
+    public void setNTLMPassword(String NTLMPassword) {
+        this.NTLMPassword = NTLMPassword;
+        // Update credentials as well.
+        setCredentials(new NTCredentials(this.NTLMUserName, Utils.decrypt(this.NTLMPassword), "", ""));
+    }
+
+    /**
+     * @return the NTLMUserName
+     */
+    public String getNTLMUserName() {
+        return NTLMUserName;
+    }
+
+    /**
+     * @param NTLMUserName the NTLMUserName to set
+     */
+    public void setNTLMUserName(String NTLMUserName) {
+        this.NTLMUserName = NTLMUserName;
+        // Update credentials as well.
+        setCredentials(new NTCredentials(this.NTLMUserName, Utils.decrypt(this.NTLMPassword), "", ""));
+    }
+
+    /**
+     * @return the isNTLMEnabled
+     */
+    public boolean isNTLMEnabled() {
+        return isNTLMEnabled;
+    }
+
+    /**
+     * @param isNTLMEnabled the isNTLMEnabled to set
+     */
+    public void setIsNTLMEnabled(boolean isNTLMEnabled) {
+        this.isNTLMEnabled = isNTLMEnabled;
+    }
+
+    /**
+     * @return the credentials
+     */
+    public Credentials getCredentials() {
+        return credentials;
+    }
+
+    /**
+     * @param credentials the credentials to set
+     */
+    public void setCredentials(Credentials credentials) {
+        this.credentials = credentials;
     }
 }
