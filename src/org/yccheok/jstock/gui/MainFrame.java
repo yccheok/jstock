@@ -3055,6 +3055,7 @@ public class MainFrame extends javax.swing.JFrame {
                 final HttpClient httpClient = new HttpClient();
 
                 org.yccheok.jstock.engine.Utils.setHttpClientProxyFromSystemProperties(httpClient);
+                org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
 
                 String respond = null;
 
