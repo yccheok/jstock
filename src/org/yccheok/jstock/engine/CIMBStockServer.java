@@ -72,6 +72,8 @@ public class CIMBStockServer extends Subject<CIMBStockServer, Integer> implement
             
             try {
                 Utils.setHttpClientProxyFromSystemProperties(httpClient);
+                org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
+
                 httpClient.executeMethod(method);
                 final String respond = method.getResponseBodyAsString();
 
@@ -150,6 +152,7 @@ public class CIMBStockServer extends Subject<CIMBStockServer, Integer> implement
 
             try {
                 Utils.setHttpClientProxyFromSystemProperties(httpClient);
+                org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
                 httpClient.executeMethod(method);
                 final String respond = method.getResponseBodyAsString();
                 
@@ -203,6 +206,7 @@ public class CIMBStockServer extends Subject<CIMBStockServer, Integer> implement
 
                 try {
                     Utils.setHttpClientProxyFromSystemProperties(httpClient);
+                    org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
                     httpClient.executeMethod(method);
                     final String respond = method.getResponseBodyAsString();
 
