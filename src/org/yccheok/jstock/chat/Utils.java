@@ -75,6 +75,7 @@ public class Utils {
         HttpMethod method = new GetMethod("http://jstock.sourceforge.net/server/server.txt");
         final HttpClient httpClient = new HttpClient();
         org.yccheok.jstock.engine.Utils.setHttpClientProxyFromSystemProperties(httpClient);
+        org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
 
         InputStream stream = null;
 

@@ -72,6 +72,7 @@ public class SingaporeYahooStockServer extends Subject<SingaporeYahooStockServer
 
             try {
                 Utils.setHttpClientProxyFromSystemProperties(httpClient);
+                org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
                 httpClient.executeMethod(method);
                 final String respond = method.getResponseBodyAsString();
                 final List<Stock> stocks = YahooStockFormat.getInstance().parse(respond);
@@ -168,6 +169,7 @@ public class SingaporeYahooStockServer extends Subject<SingaporeYahooStockServer
 
                 try {
                     Utils.setHttpClientProxyFromSystemProperties(httpClient);
+                    org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
                     httpClient.executeMethod(method);
                     final String respond = method.getResponseBodyAsString();
 
@@ -269,6 +271,7 @@ public class SingaporeYahooStockServer extends Subject<SingaporeYahooStockServer
 
             try {
                 Utils.setHttpClientProxyFromSystemProperties(httpClient);
+                org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
                 httpClient.executeMethod(method);
                 final String respond = method.getResponseBodyAsString();
 
@@ -400,6 +403,7 @@ public class SingaporeYahooStockServer extends Subject<SingaporeYahooStockServer
 
                 try {
                     Utils.setHttpClientProxyFromSystemProperties(httpClient);
+                    org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
                     httpClient.executeMethod(method);
                     final String respond = method.getResponseBodyAsString();
                     List<URL> urls = getURLs(respond, visited);
