@@ -34,12 +34,12 @@ public class Utils {
     /** Creates a new instance of Utils */
     private Utils() {
     }
-    
+
     public static void setHttpClientProxyFromSystemProperties(HttpClient httpClient) {
         final String httpproxyHost = System.getProperties().getProperty("http.proxyHost");
         final String httpproxyPort = System.getProperties().getProperty("http.proxyPort");
         
-        if(null == httpproxyHost || null == httpproxyPort) {
+        if (null == httpproxyHost || null == httpproxyPort) {
             HostConfiguration hostConfiguration = httpClient.getHostConfiguration();
             hostConfiguration.setProxyHost(null);
         }
@@ -48,10 +48,10 @@ public class Utils {
             try {
                 port = Integer.parseInt(httpproxyPort);
             }
-            catch(NumberFormatException exp) {
+            catch (NumberFormatException exp) {
             }     
             
-            if(isValidPortNumber(port)) {
+            if (isValidPortNumber(port)) {
                 HostConfiguration hostConfiguration = httpClient.getHostConfiguration();
                 hostConfiguration.setProxy(httpproxyHost, port);                
             }
