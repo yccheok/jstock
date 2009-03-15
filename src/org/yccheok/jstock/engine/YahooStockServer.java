@@ -73,6 +73,7 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
 
             try {
                 Utils.setHttpClientProxyFromSystemProperties(httpClient);
+                org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
                 httpClient.executeMethod(method);
                 final String respond = method.getResponseBodyAsString();
                 final List<Stock> stocks = YahooStockFormat.getInstance().parse(respond);
@@ -168,6 +169,7 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
 
                 try {
                     Utils.setHttpClientProxyFromSystemProperties(httpClient);
+                    org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
                     httpClient.executeMethod(method);
                     final String respond = method.getResponseBodyAsString();
                     
@@ -271,6 +273,7 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
 
             try {
                 Utils.setHttpClientProxyFromSystemProperties(httpClient);
+                org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
                 httpClient.executeMethod(method);
                 final String respond = method.getResponseBodyAsString();
                 
@@ -489,6 +492,7 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
 
             try {
                 Utils.setHttpClientProxyFromSystemProperties(httpClient);
+                org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
                 httpClient.executeMethod(method);
                 final String respond = method.getResponseBodyAsString();
 

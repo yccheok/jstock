@@ -41,6 +41,8 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import javax.swing.ImageIcon;
 import javax.swing.UIManager;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.analysis.Connection;
@@ -454,6 +456,20 @@ public class Utils {
         }
         catch (javax.swing.UnsupportedLookAndFeelException exp) {
             log.error(null, exp);
+        }
+    }
+
+    // We prefer to have this method in gui package instead of engine. This is because it requires
+    // access to JStockOptions.
+    public static void setHttpClientProxyCredentialsFromJStockOptions(HttpClient httpClient) {
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        if (jStockOptions.isNTLMEnabled() == false) {
+            httpClient.getState().clearCredentials();
+        }
+        else {
+            httpClient.getState().setProxyCredentials(AuthScope.ANY, jStockOptions.getCredentials());
+            // Do we really need this?
+            httpClient.getState().setCredentials(AuthScope.ANY, jStockOptions.getCredentials());
         }
     }
 
