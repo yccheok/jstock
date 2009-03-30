@@ -184,6 +184,7 @@ public class MainFrame extends javax.swing.JFrame {
         jMenuBar2 = new javax.swing.JMenuBar();
         jMenu3 = new javax.swing.JMenu();
         jMenuItem2 = new javax.swing.JMenuItem();
+        jMenuItem9 = new javax.swing.JMenuItem();
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenu5 = new javax.swing.JMenu();
         jMenuItem4 = new javax.swing.JMenuItem();
@@ -239,7 +240,7 @@ public class MainFrame extends javax.swing.JFrame {
         jPanel8.setLayout(new java.awt.BorderLayout(5, 5));
 
         jTable1.setAutoCreateRowSorter(true);
-        jTable1.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jTable1.setFont(new java.awt.Font("Tahoma", 1, 12));
         jTable1.setModel(new StockTableModel());
         jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         this.jTable1.setDefaultRenderer(Number.class, new StockTableCellRenderer());
@@ -427,6 +428,14 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
         jMenu3.add(jMenuItem2);
+
+        jMenuItem9.setText("Save As...");
+        jMenuItem9.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem9ActionPerformed(evt);
+            }
+        });
+        jMenu3.add(jMenuItem9);
 
         jMenuItem1.setText("Exit");
         jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
@@ -979,7 +988,43 @@ public class MainFrame extends javax.swing.JFrame {
         	saveStockCodeAndSymbolDatabase();        
     	}
 	}//GEN-LAST:event_jMenuItem8ActionPerformed
-    
+
+    private void jMenuItem9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem9ActionPerformed
+        // TODO add your handling code here:
+        // BUGGY CODE!!!
+        saveAsExcelFile(new File("c:\\test.xls"));
+    }//GEN-LAST:event_jMenuItem9ActionPerformed
+
+    private void saveAsExcelFile(File file) {
+        // BUGGY CODE!!!
+        HSSFWorkbook wb = new HSSFWorkbook();
+        HSSFSheet sheet = wb.createSheet("JStock");
+
+        HSSFRow row = sheet.createRow((short)0);
+        row.createCell(0).setCellValue("Code0");
+        row.createCell(1).setCellValue("Code1");
+
+        FileOutputStream fileOut = null;
+        try {
+            fileOut = new FileOutputStream(file);
+            wb.write(fileOut);
+        } catch (FileNotFoundException ex) {
+            log.error(null, ex);
+        }
+        catch (IOException ex) {
+            log.error(null, ex);
+        }
+        finally {
+            if (fileOut != null) {
+                try {
+                    fileOut.close();
+                } catch (IOException ex) {
+                    log.error(null, ex);
+                }
+            }
+        }
+    }
+
     /**
      * @param args the command line arguments
      */
@@ -3282,6 +3327,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem6;
     private javax.swing.JMenuItem jMenuItem7;
     private javax.swing.JMenuItem jMenuItem8;
+    private javax.swing.JMenuItem jMenuItem9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel2;
