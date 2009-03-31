@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * Copyright (C) 2007 Cheok YanCheng <yccheok@yahoo.com>
+ * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
  */
 
 package org.yccheok.jstock.gui;
@@ -996,13 +996,32 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem9ActionPerformed
 
     private void saveAsExcelFile(File file) {
-        // BUGGY CODE!!!
-        HSSFWorkbook wb = new HSSFWorkbook();
-        HSSFSheet sheet = wb.createSheet("JStock");
+        final HSSFWorkbook wb = new HSSFWorkbook();
+        final HSSFSheet sheet = wb.createSheet("Real-Time Info");
 
-        HSSFRow row = sheet.createRow((short)0);
-        row.createCell(0).setCellValue("Code0");
-        row.createCell(1).setCellValue("Code1");
+        final TableModel tableModel = jTable1.getModel();
+        final int columnCount = tableModel.getColumnCount();
+
+        // First row. Print out table header.
+        {
+            final HSSFRow row = sheet.createRow(0);
+
+            for (int i = 0; i < columnCount; i++) {
+                row.createCell(i).setCellValue(new HSSFRichTextString(tableModel.getColumnName(i)));
+            }
+        }
+
+        final int rowCount = tableModel.getRowCount();
+        for (int i = 0; i < rowCount; i++) {
+            final HSSFRow row = sheet.createRow(i + 1);
+            for (int j = 0; j < columnCount; j++) {
+                final Object object = tableModel.getValueAt(i, j);
+                if (object != null) {
+                    final HSSFCell cell = row.createCell(j);
+                    POIUtils.invokeSetCellValue(cell, object);
+                }
+            }
+        }
 
         FileOutputStream fileOut = null;
         try {
