@@ -463,13 +463,11 @@ public class Utils {
     // access to JStockOptions.
     public static void setHttpClientProxyCredentialsFromJStockOptions(HttpClient httpClient) {
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
-        if (jStockOptions.isNTLMEnabled() == false) {
+        if (jStockOptions.isProxyAuthEnabled() == false) {
             httpClient.getState().clearCredentials();
         }
         else {
             httpClient.getState().setProxyCredentials(AuthScope.ANY, jStockOptions.getCredentials());
-            // Do we really need this?
-            httpClient.getState().setCredentials(AuthScope.ANY, jStockOptions.getCredentials());
         }
     }
 

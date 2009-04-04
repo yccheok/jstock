@@ -150,9 +150,10 @@ public class JStockOptions {
     // runtime. We will immediately contruct credentials, once we load the
     // JStockOptions from disk.
     private transient Credentials credentials = null;
-    private String NTLMPassword = "";
-    private String NTLMUserName = "";
-    private boolean isNTLMEnabled = false;
+    private String proxyAuthPassword = "";
+    private String proxyAuthUserName = "";
+    private String proxyAuthDomain = "";
+    private boolean isProxyAuthEnabled = false;
 
     public boolean isAutoBrokerFeeCalculationEnabled() {
         return this.isAutoBrokerFeeCalculationEnabled;
@@ -210,15 +211,19 @@ public class JStockOptions {
             this.setAlertBackgroundColor(DEFAULT_ALERT_BACKGROUND_COLOR);    
         }
 
-        if (this.NTLMUserName == null) {
-            this.NTLMUserName = "";
+        if (this.proxyAuthUserName == null) {
+            this.proxyAuthUserName = "";
         }
 
-        if (this.NTLMPassword == null) {
-            this.NTLMPassword = "";
+        if (this.proxyAuthPassword == null) {
+            this.proxyAuthPassword = "";
         }
 
-        setCredentials(new NTCredentials(this.NTLMUserName, Utils.decrypt(this.NTLMPassword), "", ""));
+        if (this.proxyAuthDomain == null) {
+            this.proxyAuthDomain = "";
+        }
+        
+        setCredentials(new NTCredentials(this.proxyAuthUserName, Utils.decrypt(this.proxyAuthPassword), "", this.proxyAuthDomain));
 
         return this;
     }    
@@ -601,49 +606,65 @@ public class JStockOptions {
     }
 
     /**
-     * @return the NTLMPassword
+     * @return the proxyAuthPassword
      */
-    public String getNTLMPassword() {
-        return NTLMPassword;
+    public String getProxyAuthPassword() {
+        return proxyAuthPassword;
+    }
+
+     /**
+     * @return the proxyAuthDomain
+     */
+    public String getProxyAuthDomain() {
+        return proxyAuthDomain;
     }
 
     /**
-     * @param NTLMPassword the NTLMPassword to set
+     * @param proxyAuthDomain the proxyAuthDomain to set
      */
-    public void setNTLMPassword(String NTLMPassword) {
-        this.NTLMPassword = NTLMPassword;
+    public void setProxyAuthDomain(String proxyAuthDomain) {
+        this.proxyAuthDomain = proxyAuthDomain;
         // Update credentials as well.
-        setCredentials(new NTCredentials(this.NTLMUserName, Utils.decrypt(this.NTLMPassword), "", ""));
+        setCredentials(new NTCredentials(this.proxyAuthUserName, Utils.decrypt(this.proxyAuthPassword), "", this.proxyAuthDomain));
     }
 
     /**
-     * @return the NTLMUserName
+     * @param proxyAuthPassword the proxyAuthPassword to set
      */
-    public String getNTLMUserName() {
-        return NTLMUserName;
-    }
-
-    /**
-     * @param NTLMUserName the NTLMUserName to set
-     */
-    public void setNTLMUserName(String NTLMUserName) {
-        this.NTLMUserName = NTLMUserName;
+    public void setProxyAuthPassword(String proxyAuthPassword) {
+        this.proxyAuthPassword = proxyAuthPassword;
         // Update credentials as well.
-        setCredentials(new NTCredentials(this.NTLMUserName, Utils.decrypt(this.NTLMPassword), "", ""));
+        setCredentials(new NTCredentials(this.proxyAuthUserName, Utils.decrypt(this.proxyAuthPassword), "", this.proxyAuthDomain));
     }
 
     /**
-     * @return the isNTLMEnabled
+     * @return the proxyAuthUserName
      */
-    public boolean isNTLMEnabled() {
-        return isNTLMEnabled;
+    public String getProxyAuthUserName() {
+        return proxyAuthUserName;
     }
 
     /**
-     * @param isNTLMEnabled the isNTLMEnabled to set
+     * @param proxyAuthUserName the proxyAuthUserName to set
      */
-    public void setIsNTLMEnabled(boolean isNTLMEnabled) {
-        this.isNTLMEnabled = isNTLMEnabled;
+    public void setProxyAuthUserName(String proxyAuthUserName) {
+        this.proxyAuthUserName = proxyAuthUserName;
+        // Update credentials as well.
+        setCredentials(new NTCredentials(this.proxyAuthUserName, Utils.decrypt(this.proxyAuthPassword), "", this.proxyAuthDomain));
+    }
+
+    /**
+     * @return the isProxyAuthEnabled
+     */
+    public boolean isProxyAuthEnabled() {
+        return isProxyAuthEnabled;
+    }
+
+    /**
+     * @param isProxyAuthEnabled the isProxyAuthEnabled to set
+     */
+    public void setIsProxyAuthEnabled(boolean isProxyAuthEnabled) {
+        this.isProxyAuthEnabled = isProxyAuthEnabled;
     }
 
     /**
