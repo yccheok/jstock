@@ -53,8 +53,10 @@ import java.util.zip.ZipInputStream;
 import javax.imageio.ImageIO;
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
+import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.yccheok.jstock.analysis.Indicator;
 import org.yccheok.jstock.analysis.OperatorIndicator;
@@ -3118,12 +3120,37 @@ public class MainFrame extends javax.swing.JFrame {
 
                 final HttpClient httpClient = new HttpClient();
 
-                org.yccheok.jstock.engine.Utils.setHttpClientProxyFromSystemProperties(httpClient);
-                org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
-
                 String respond = null;
 
                 try {
+                    org.yccheok.jstock.engine.Utils.setHttpClientProxyFromSystemProperties(httpClient);
+                    org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
+                    final org.yccheok.jstock.gui.JStockOptions jStockOptions = org.yccheok.jstock.gui.MainFrame.getInstance().getJStockOptions();
+                    if (jStockOptions.isProxyAuthEnabled()) {
+                        method.setFollowRedirects(false);
+                        httpClient.executeMethod(method);
+
+                        int statuscode = method.getStatusCode();
+                        if ((statuscode == HttpStatus.SC_MOVED_TEMPORARILY) ||
+                            (statuscode == HttpStatus.SC_MOVED_PERMANENTLY) ||
+                            (statuscode == HttpStatus.SC_SEE_OTHER) ||
+                            (statuscode == HttpStatus.SC_TEMPORARY_REDIRECT)) {
+                            //Make new Request with new URL
+                            Header header = method.getResponseHeader("location");
+                            HttpMethod RedirectMethod = new GetMethod(header.getValue());
+                            httpClient.executeMethod(RedirectMethod);
+                            respond = RedirectMethod.getResponseBodyAsString();
+                        }
+                        else {
+                            respond = method.getResponseBodyAsString();
+                        } // if statuscode = Redirect
+
+                    }
+                    else {
+                        httpClient.executeMethod(method);
+                        respond = method.getResponseBodyAsString();
+                    } //  if jStockOptions.isProxyAuthEnabled()
+
                     httpClient.executeMethod(method);
                     respond = method.getResponseBodyAsString();
                 }
