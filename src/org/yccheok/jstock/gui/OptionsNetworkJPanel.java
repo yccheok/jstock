@@ -153,9 +153,9 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("NT LAN Manager (NTLM)"));
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Proxy Authentication"));
 
-        jCheckBox1.setText("Enable NTLM");
+        jCheckBox1.setText("Enable proxy authentication");
         jCheckBox1.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 jCheckBox1ItemStateChanged(evt);
@@ -239,13 +239,13 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
 // TODO add your handling code here:
         final String httpproxyHost = System.getProperties().getProperty("http.proxyHost");
         final String httpproxyPort = System.getProperties().getProperty("http.proxyPort");
-        final String oldNTMLUsername = MainFrame.getInstance().getJStockOptions().getNTLMUserName();
-        final String oldNTMLPassword = MainFrame.getInstance().getJStockOptions().getNTLMPassword();
-        final String newNTMLUsername = jTextField1.getText() != null ? jTextField1.getText() : "";
-        final String newNTMLPassword = Utils.encrypt(new String(jPasswordField1.getPassword()));
+        final String oldProxyAuthUsername = MainFrame.getInstance().getJStockOptions().getProxyAuthUserName();
+        final String oldProxyAuthPassword = MainFrame.getInstance().getJStockOptions().getProxyAuthPassword();
+        final String newProxyAuthUsername = jTextField2.getText() != null ? jTextField2.getText() : "";
+        final String newProxyAuthPassword = Utils.encrypt(new String(jPasswordField1.getPassword()));
         
-        MainFrame.getInstance().getJStockOptions().setNTLMUserName(newNTMLUsername);
-        MainFrame.getInstance().getJStockOptions().setNTLMPassword(newNTMLPassword);
+        MainFrame.getInstance().getJStockOptions().setProxyAuthUserName(newProxyAuthUsername);
+        MainFrame.getInstance().getJStockOptions().setProxyAuthPassword(newProxyAuthPassword);
 
         if ((jTextField1.getText().length() > 0) && org.yccheok.jstock.engine.Utils.isValidPortNumber(jFormattedTextField1.getText())) {
             System.getProperties().put("http.proxyHost", jTextField1.getText());            
@@ -281,13 +281,12 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
         HttpClient httpClient = new HttpClient();
         HttpMethod method = new GetMethod("http://www.google.com");
         try {
-            org.yccheok.jstock.engine.Utils.setHttpClientProxyFromSystemProperties(httpClient);
-            org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
-            httpClient.executeMethod(method);
             // We are not interested at the returned string at all. We just want
             // to know whether there will be any exception being thrown, during
             // the process of getting respond.
-            method.getResponseBodyAsString();   
+            org.yccheok.jstock.engine.Utils.setHttpClientProxyFromSystemProperties(httpClient);
+            org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
+			org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(httpClient, method);
             success = true;
         }
         catch (HttpException exp) {
@@ -333,8 +332,8 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
             JOptionPane.showMessageDialog(this, "Wrong proxy server or port. Unable connect to internet.", "Internet down", JOptionPane.WARNING_MESSAGE);
 
         // Restore.
-        MainFrame.getInstance().getJStockOptions().setNTLMUserName(oldNTMLUsername);
-        MainFrame.getInstance().getJStockOptions().setNTLMPassword(oldNTMLPassword);
+        MainFrame.getInstance().getJStockOptions().setProxyAuthUserName(oldProxyAuthUsername);
+        MainFrame.getInstance().getJStockOptions().setProxyAuthPassword(oldProxyAuthPassword);
 
         if (httpproxyHost != null) {
             System.getProperties().put("http.proxyHost", httpproxyHost);
@@ -366,9 +365,9 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
         else
             jFormattedTextField1.setText("");
 
-        this.jCheckBox1.setSelected(jStockOptions.isNTLMEnabled());
-        this.jTextField2.setText(jStockOptions.getNTLMUserName());
-        this.jPasswordField1.setText(Utils.decrypt(jStockOptions.getNTLMPassword()));
+        this.jCheckBox1.setSelected(jStockOptions.isProxyAuthEnabled());
+        this.jTextField2.setText(jStockOptions.getProxyAuthUserName());
+        this.jPasswordField1.setText(Utils.decrypt(jStockOptions.getProxyAuthPassword()));
         updateGUIState();
     }
 
@@ -397,9 +396,9 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
         
         jStockOptions.setProxyPort(port);
 
-        jStockOptions.setIsNTLMEnabled(this.jCheckBox1.isSelected());
-        jStockOptions.setNTLMUserName(jTextField2.getText());
-        jStockOptions.setNTLMPassword(Utils.encrypt(new String(jPasswordField1.getPassword())));
+        jStockOptions.setIsProxyAuthEnabled(this.jCheckBox1.isSelected());
+        jStockOptions.setProxyAuthUserName(jTextField2.getText());
+        jStockOptions.setProxyAuthPassword(Utils.encrypt(new String(jPasswordField1.getPassword())));
         return true;
     }
 
