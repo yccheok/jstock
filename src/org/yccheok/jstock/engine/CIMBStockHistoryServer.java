@@ -67,8 +67,7 @@ public class CIMBStockHistoryServer implements StockHistoryServer {
             try {
                 Utils.setHttpClientProxyFromSystemProperties(httpClient);
                 org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
-                httpClient.executeMethod(method);
-                InputStream inputStream = method.getResponseBodyAsStream();
+				final InputStream inputStream = org.yccheok.jstock.gui.Utils.getResponseBodyAsStreamBasedOnProxyAuthOption(httpClient, method);
                 java.util.zip.GZIPInputStream gZipInputStream = new java.util.zip.GZIPInputStream(inputStream);
                 
                 int n = 0;
