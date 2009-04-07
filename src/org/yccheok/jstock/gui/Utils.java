@@ -35,14 +35,19 @@ import java.awt.image.ColorModel;
 import java.awt.image.PixelGrabber;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import org.yccheok.jstock.engine.*;
 import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import javax.swing.ImageIcon;
 import javax.swing.UIManager;
+import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.auth.AuthScope;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.analysis.Connection;
@@ -457,6 +462,68 @@ public class Utils {
         catch (javax.swing.UnsupportedLookAndFeelException exp) {
             log.error(null, exp);
         }
+    }
+
+    // We prefer to have this method in gui package instead of engine. This is because it requires
+    // access to JStockOptions.
+    public static String getResponseBodyAsStringBasedOnProxyAuthOption(HttpClient httpClient, HttpMethod method) throws IOException {
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final String respond;
+        if (jStockOptions.isProxyAuthEnabled()) {
+            method.setFollowRedirects(false);
+            httpClient.executeMethod(method);
+
+            int statuscode = method.getStatusCode();
+            if ((statuscode == HttpStatus.SC_MOVED_TEMPORARILY) ||
+                (statuscode == HttpStatus.SC_MOVED_PERMANENTLY) ||
+                (statuscode == HttpStatus.SC_SEE_OTHER) ||
+                (statuscode == HttpStatus.SC_TEMPORARY_REDIRECT)) {
+                //Make new Request with new URL
+                Header header = method.getResponseHeader("location");
+                HttpMethod RedirectMethod = new GetMethod(header.getValue());
+                httpClient.executeMethod(RedirectMethod);
+                respond = RedirectMethod.getResponseBodyAsString();
+            }
+            else {
+                respond = method.getResponseBodyAsString();
+            } // if statuscode = Redirect
+        }
+        else {
+            httpClient.executeMethod(method);
+            respond = method.getResponseBodyAsString();
+        } //  if jStockOptions.isProxyAuthEnabled()
+
+        return respond;
+    }
+
+    public static InputStream getResponseBodyAsStreamBasedOnProxyAuthOption(HttpClient httpClient, HttpMethod method) throws IOException {
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final InputStream respond;
+        if (jStockOptions.isProxyAuthEnabled()) {
+            method.setFollowRedirects(false);
+            httpClient.executeMethod(method);
+
+            int statuscode = method.getStatusCode();
+            if ((statuscode == HttpStatus.SC_MOVED_TEMPORARILY) ||
+                (statuscode == HttpStatus.SC_MOVED_PERMANENTLY) ||
+                (statuscode == HttpStatus.SC_SEE_OTHER) ||
+                (statuscode == HttpStatus.SC_TEMPORARY_REDIRECT)) {
+                //Make new Request with new URL
+                Header header = method.getResponseHeader("location");
+                HttpMethod RedirectMethod = new GetMethod(header.getValue());
+                httpClient.executeMethod(RedirectMethod);
+                respond = RedirectMethod.getResponseBodyAsStream();
+            }
+            else {
+                respond = method.getResponseBodyAsStream();
+            } // if statuscode = Redirect
+        }
+        else {
+            httpClient.executeMethod(method);
+            respond = method.getResponseBodyAsStream();
+        } //  if jStockOptions.isProxyAuthEnabled()
+
+        return respond;
     }
 
     // We prefer to have this method in gui package instead of engine. This is because it requires
