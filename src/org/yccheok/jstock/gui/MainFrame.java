@@ -1022,7 +1022,7 @@ public class MainFrame extends javax.swing.JFrame {
 
             // Ensure the saved file is in correct extension. If user provide correct
             // file extension explicitly, leave it as is. If not, mutate the filename.
-            final String extension = Utils.getExtension(file);
+            final String extension = Utils.getFileExtension(file);
             if (extension.equals("csv") == false && extension.equals("xls") == false) {
                 if (chooser.getFileFilter() == csvFilter) {
                     try {
@@ -1051,11 +1051,11 @@ public class MainFrame extends javax.swing.JFrame {
                 }
             }
 
-            if (Utils.getExtension(file).equals("csv")) {
+            if (Utils.getFileExtension(file).equals("csv")) {
                 saveAsCSVFile(file);
                 jStockOptions.setLastSavedFileNameExtensionDescription(csvFilter.getDescription());
             }
-            else if (Utils.getExtension(file).equals("xls")) {
+            else if (Utils.getFileExtension(file).equals("xls")) {
                 saveAsExcelFile(file);
                 jStockOptions.setLastSavedFileNameExtensionDescription(xlsFilter.getDescription());
             }

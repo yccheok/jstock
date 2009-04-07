@@ -538,6 +538,26 @@ public class Utils {
         }
     }
 
+    /*
+     * Get the extension of a file.
+     */
+    public static String getFileExtension(String s) {
+        String ext = "";
+        int i = s.lastIndexOf('.');
+
+        if (i > 0 &&  i < s.length() - 1) {
+            ext = s.substring(i+1).toLowerCase();
+        }
+        return ext;
+    }
+
+    /*
+     * Get the extension of a file.
+     */
+    public static String getFileExtension(File f) {
+        return getFileExtension(f.getName());
+    }
+
 	// We will use this as directory name. Do not have space or special characters.
     private static final String APPLICATION_VERSION_STRING = "1.0.4";
 
