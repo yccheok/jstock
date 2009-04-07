@@ -22,6 +22,7 @@
 
 package org.yccheok.jstock.gui;
 
+import au.com.bytecode.opencsv.CSVWriter;
 import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -53,10 +54,9 @@ import java.util.zip.ZipInputStream;
 import javax.imageio.ImageIO;
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
-import org.apache.commons.httpclient.Header;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.yccheok.jstock.analysis.Indicator;
 import org.yccheok.jstock.analysis.OperatorIndicator;
@@ -993,9 +993,132 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void jMenuItem9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem9ActionPerformed
         // TODO add your handling code here:
-        // BUGGY CODE!!!
-        saveAsExcelFile(new File("c:\\test.xls"));
+        final JFileChooser chooser = new JFileChooser(jStockOptions.getLastFileIODirectory());
+        final FileNameExtensionFilter csvFilter = new FileNameExtensionFilter("CSV Documents (*.csv)", "csv");
+        final FileNameExtensionFilter xlsFilter = new FileNameExtensionFilter("Microsoft Excel (*.xls)", "xls");
+        chooser.setAcceptAllFileFilterUsed(false);
+        chooser.addChoosableFileFilter(csvFilter);
+        chooser.addChoosableFileFilter(xlsFilter);
+
+        java.util.Map<String, FileNameExtensionFilter> map = new HashMap<String, FileNameExtensionFilter>();
+        map.put(csvFilter.getDescription(), csvFilter);
+        map.put(xlsFilter.getDescription(), xlsFilter);
+
+        final FileNameExtensionFilter filter = map.get(this.getJStockOptions().getLastSavedFileNameExtensionDescription());
+        if (filter != null) {
+            chooser.setFileFilter(filter);
+        }
+        
+        while (true) {
+            final int returnVal = chooser.showSaveDialog(this);
+            if (returnVal != JFileChooser.APPROVE_OPTION) {
+                return;
+            }
+
+            File file = chooser.getSelectedFile();
+            if (file == null) {
+                return;
+            }
+
+            // Ensure the saved file is in correct extension. If user provide correct
+            // file extension explicitly, leave it as is. If not, mutate the filename.
+            final String extension = Utils.getExtension(file);
+            if (extension.equals("csv") == false && extension.equals("xls") == false) {
+                if (chooser.getFileFilter() == csvFilter) {
+                    try {
+                        file = new File(file.getCanonicalPath() + ".csv");
+                    } catch (IOException ex) {
+                        log.error(null, ex);
+                    }
+                }
+                else if (chooser.getFileFilter() == xlsFilter) {
+                    try {
+                        file = new File(file.getCanonicalPath() + ".xls");
+                    } catch (IOException ex) {
+                        log.error(null, ex);
+                    }
+                }
+                else {
+                    // Impossible.
+                    return;
+                }
+            }
+
+            if (file.exists()) {
+                final int result = javax.swing.JOptionPane.showConfirmDialog(this, "Replace old " + file.getName() + "?", "Replace?", javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
+                if (result != javax.swing.JOptionPane.YES_OPTION) {
+                    continue;
+                }
+            }
+
+            if (Utils.getExtension(file).equals("csv")) {
+                saveAsCSVFile(file);
+                jStockOptions.setLastSavedFileNameExtensionDescription(csvFilter.getDescription());
+            }
+            else if (Utils.getExtension(file).equals("xls")) {
+                saveAsExcelFile(file);
+                jStockOptions.setLastSavedFileNameExtensionDescription(xlsFilter.getDescription());
+            }
+            else {
+                // Impossible.
+                return;
+            }
+            
+            final String parent = chooser.getSelectedFile().getParent();
+            if (parent != null) {
+                jStockOptions.setLastFileIODirectory(parent);
+            }
+
+            break;
+        }
     }//GEN-LAST:event_jMenuItem9ActionPerformed
+
+    private void saveAsCSVFile(File file) {
+        java.io.Writer writer = null;
+        try {
+            writer = new java.io.FileWriter(file);
+        } catch (IOException ex) {
+            log.error(null, ex);
+            return;
+        }
+        final CSVWriter csvwriter = new CSVWriter(writer);
+
+        final TableModel tableModel = jTable1.getModel();
+        final int columnCount = tableModel.getColumnCount();
+        String[] datas = new String[columnCount];
+
+        // First row. Print out table header.
+        for (int i = 0; i < columnCount; i++) {
+            datas[i] = tableModel.getColumnName(i);
+        }
+
+        csvwriter.writeNext(datas);
+
+        final int rowCount = tableModel.getRowCount();
+        for (int i = 0; i < rowCount; i++) {
+            for (int j = 0; j < columnCount; j++) {
+                final Object object = tableModel.getValueAt(i, j);
+                String value = "";
+                if (object != null) {
+                    value = object.toString();
+                }
+
+                datas[j] = value;
+            }
+
+            csvwriter.writeNext(datas);
+        }
+        try {
+            csvwriter.close();
+        } catch (IOException ex) {
+            log.error(null, ex);
+        }
+        try {
+            writer.close();
+        } catch (IOException ex) {
+            log.error(null, ex);
+        }
+    }
 
     private void saveAsExcelFile(File file) {
         final HSSFWorkbook wb = new HSSFWorkbook();
