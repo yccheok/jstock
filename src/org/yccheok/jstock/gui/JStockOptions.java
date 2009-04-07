@@ -152,7 +152,6 @@ public class JStockOptions {
     private transient Credentials credentials = null;
     private String proxyAuthPassword = "";
     private String proxyAuthUserName = "";
-    private String proxyAuthDomain = "";
     private boolean isProxyAuthEnabled = false;
 
     public boolean isAutoBrokerFeeCalculationEnabled() {
@@ -218,12 +217,8 @@ public class JStockOptions {
         if (this.proxyAuthPassword == null) {
             this.proxyAuthPassword = "";
         }
-
-        if (this.proxyAuthDomain == null) {
-            this.proxyAuthDomain = "";
-        }
         
-        setCredentials(new NTCredentials(this.proxyAuthUserName, Utils.decrypt(this.proxyAuthPassword), "", this.proxyAuthDomain));
+        setCredentials(new NTCredentials(this.proxyAuthUserName, Utils.decrypt(this.proxyAuthPassword), "", ""));
 
         return this;
     }    
@@ -612,29 +607,13 @@ public class JStockOptions {
         return proxyAuthPassword;
     }
 
-     /**
-     * @return the proxyAuthDomain
-     */
-    public String getProxyAuthDomain() {
-        return proxyAuthDomain;
-    }
-
-    /**
-     * @param proxyAuthDomain the proxyAuthDomain to set
-     */
-    public void setProxyAuthDomain(String proxyAuthDomain) {
-        this.proxyAuthDomain = proxyAuthDomain;
-        // Update credentials as well.
-        setCredentials(new NTCredentials(this.proxyAuthUserName, Utils.decrypt(this.proxyAuthPassword), "", this.proxyAuthDomain));
-    }
-
     /**
      * @param proxyAuthPassword the proxyAuthPassword to set
      */
     public void setProxyAuthPassword(String proxyAuthPassword) {
         this.proxyAuthPassword = proxyAuthPassword;
         // Update credentials as well.
-        setCredentials(new NTCredentials(this.proxyAuthUserName, Utils.decrypt(this.proxyAuthPassword), "", this.proxyAuthDomain));
+        setCredentials(new NTCredentials(this.proxyAuthUserName, Utils.decrypt(this.proxyAuthPassword), "", ""));
     }
 
     /**
@@ -650,7 +629,7 @@ public class JStockOptions {
     public void setProxyAuthUserName(String proxyAuthUserName) {
         this.proxyAuthUserName = proxyAuthUserName;
         // Update credentials as well.
-        setCredentials(new NTCredentials(this.proxyAuthUserName, Utils.decrypt(this.proxyAuthPassword), "", this.proxyAuthDomain));
+        setCredentials(new NTCredentials(this.proxyAuthUserName, Utils.decrypt(this.proxyAuthPassword), "", ""));
     }
 
     /**
