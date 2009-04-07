@@ -73,8 +73,8 @@ public class SingaporeYahooStockServer extends Subject<SingaporeYahooStockServer
             try {
                 Utils.setHttpClientProxyFromSystemProperties(httpClient);
                 org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
-                httpClient.executeMethod(method);
-                final String respond = method.getResponseBodyAsString();
+				final String respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(httpClient, method);
+
                 final List<Stock> stocks = YahooStockFormat.getInstance().parse(respond);
 
                 if(stocks.size() == 1)
@@ -170,8 +170,7 @@ public class SingaporeYahooStockServer extends Subject<SingaporeYahooStockServer
                 try {
                     Utils.setHttpClientProxyFromSystemProperties(httpClient);
                     org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
-                    httpClient.executeMethod(method);
-                    final String respond = method.getResponseBodyAsString();
+					final String respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(httpClient, method);
 
                     final List<Stock> tmpStocks = YahooStockFormat.getInstance().parse(respond);
                     if(tmpStocks.size() != MAX_STOCK_PER_ITERATION) {
@@ -272,8 +271,7 @@ public class SingaporeYahooStockServer extends Subject<SingaporeYahooStockServer
             try {
                 Utils.setHttpClientProxyFromSystemProperties(httpClient);
                 org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
-                httpClient.executeMethod(method);
-                final String respond = method.getResponseBodyAsString();
+				final String respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(httpClient, method);
 
                 final List<Stock> tmpStocks = YahooStockFormat.getInstance().parse(respond);
                 if(tmpStocks.size() != remainder) {
@@ -404,8 +402,7 @@ public class SingaporeYahooStockServer extends Subject<SingaporeYahooStockServer
                 try {
                     Utils.setHttpClientProxyFromSystemProperties(httpClient);
                     org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
-                    httpClient.executeMethod(method);
-                    final String respond = method.getResponseBodyAsString();
+					final String respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(httpClient, method);
                     List<URL> urls = getURLs(respond, visited);
                     Set<Symbol> tmpSymbols = getSymbols(respond);
 
