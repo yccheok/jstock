@@ -80,8 +80,7 @@ public class Utils {
         InputStream stream = null;
 
         try {
-            httpClient.executeMethod(method);
-            stream = method.getResponseBodyAsStream();
+            stream = org.yccheok.jstock.gui.Utils.getResponseBodyAsStreamBasedOnProxyAuthOption(httpClient, method);
 
             if (stream == null)
                 return defaultServer;
