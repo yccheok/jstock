@@ -205,8 +205,7 @@ public class YahooStockHistoryServer implements StockHistoryServer {
             try {
                 Utils.setHttpClientProxyFromSystemProperties(httpClient);
                 org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
-                httpClient.executeMethod(method);
-                final String respond = method.getResponseBodyAsString();
+                final String respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(httpClient, method);
                     
                 success = parse(respond);
             }
