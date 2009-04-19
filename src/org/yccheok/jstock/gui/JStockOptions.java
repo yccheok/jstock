@@ -154,6 +154,10 @@ public class JStockOptions {
     private String proxyAuthUserName = "";
     private boolean isProxyAuthEnabled = false;
 
+    // Remember where we save/open the last file.
+    private String lastFileIODirectory = System.getProperty("user.home");
+    private String lastFileNameExtensionDescription = "CSV Documents (*.csv)";
+
     public boolean isAutoBrokerFeeCalculationEnabled() {
         return this.isAutoBrokerFeeCalculationEnabled;
     }
@@ -219,6 +223,14 @@ public class JStockOptions {
         }
         
         setCredentials(new NTCredentials(this.proxyAuthUserName, Utils.decrypt(this.proxyAuthPassword), "", ""));
+
+        if (this.getLastFileIODirectory() == null) {
+            this.setLastFileIODirectory("");
+        }
+
+        if (this.getLastSavedFileNameExtensionDescription() == null) {
+            this.setLastFileNameExtensionDescription("CSV Documents (*.csv)");
+        }
 
         return this;
     }    
@@ -658,5 +670,33 @@ public class JStockOptions {
      */
     public void setCredentials(Credentials credentials) {
         this.credentials = credentials;
+    }
+
+    /**
+     * @return the lastFileIODirectory
+     */
+    public String getLastFileIODirectory() {
+        return lastFileIODirectory;
+    }
+
+    /**
+     * @param lastFileIODirectory the lastFileIODirectory to set
+     */
+    public void setLastFileIODirectory(String lastFileIODirectory) {
+        this.lastFileIODirectory = lastFileIODirectory;
+    }
+
+    /**
+     * @return the lastFileNameExtensionDescription
+     */
+    public String getLastSavedFileNameExtensionDescription() {
+        return lastFileNameExtensionDescription;
+    }
+
+    /**
+     * @param lastFileNameExtensionDescription the lastFileNameExtensionDescription to set
+     */
+    public void setLastFileNameExtensionDescription(String lastFileNameExtensionDescription) {
+        this.lastFileNameExtensionDescription = lastFileNameExtensionDescription;
     }
 }
