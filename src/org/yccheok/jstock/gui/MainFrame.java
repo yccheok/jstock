@@ -544,7 +544,7 @@ public class MainFrame extends javax.swing.JFrame {
         this.clearAllStocks();
     }//GEN-LAST:event_jMenuItem7ActionPerformed
 
-    private void loadFromTextFile(File file) {
+    private void openAsCSVFile(File file) {
         /* Text file */
         try {
             BufferedReader in = new BufferedReader(new FileReader(file));
@@ -578,85 +578,81 @@ public class MainFrame extends javax.swing.JFrame {
         }         
     }
     
-    private void loadFromExcelFile(File file) {
+    private void openAsExcelFile(File file) {
         try
         {
             POIFSFileSystem fs = new POIFSFileSystem(new FileInputStream(file));
-
             HSSFWorkbook wb = new HSSFWorkbook(fs);
 
             for(int k = 0; k < wb.getNumberOfSheets(); k++)
             {
                 HSSFSheet sheet = wb.getSheetAt(k);
-                
                 final int startRow = sheet.getFirstRowNum();
                 final int endRow = sheet.getLastRowNum();
-                final int rows  = sheet.getPhysicalNumberOfRows();
-                
-                for (int r = startRow; r < endRow; r++)
-                {
-                    HSSFRow row   = sheet.getRow(r);
-                    if(row == null) continue;
+				int codeColumn = -1;
+				int symbolColumn = -1;
 
+				if (startRow < 0)
+				{
+					continue;
+				}
+
+				// Find out the correct value for codeColumn and symbolColumn.
+				{
+					final HSSFRow row   = sheet.getRow(startRow);
+					if(row == null) continue;
                     final int startCell = row.getFirstCellNum();
-                    final int endCell = row.getLastCellNum();                    
-                    int     cells = row.getPhysicalNumberOfCells();
-               
+                    final int endCell = row.getLastCellNum();                   
+                    if (startCell < 0) {
+                        continue;
+                    }
                     for (int c = startCell; c < endCell; c++)
                     {
-                        
-                        HSSFCell cell  = row.getCell((short)c);
+                        final HSSFCell cell  = row.getCell(c);
                         if(cell == null) continue;
-                        
-                        String   str = null;
+                        final String cellStr = (cell.getCellType() == HSSFCell.CELL_TYPE_STRING) ? cell.getRichStringCellValue().getString() : null;
 
-                        switch (cell.getCellType())
-                        {
-
-                            case HSSFCell.CELL_TYPE_FORMULA :
-                                break;
-
-                            case HSSFCell.CELL_TYPE_NUMERIC :
-                                str = "" + (int)cell.getNumericCellValue();
-                                break;
-
-                            case HSSFCell.CELL_TYPE_STRING :
-                                str = cell.getRichStringCellValue().getString();
-                                break;
-
-                            default :
+                        if(cellStr == null) continue;
+                        if (cellStr.equalsIgnoreCase("code")) {
+                            codeColumn = c;
+                        }
+                        else if (cellStr.equalsIgnoreCase("symbol")) {
+                            symbolColumn = c;
                         }
 
-                        if(str == null) continue;
-                        
-                        Code code = null;
-                        Symbol symbol = null;
-
-                        code = this.stockCodeAndSymbolDatabase.searchStockCode(str);
-                        if(code != null) {
-                            symbol = this.stockCodeAndSymbolDatabase.codeToSymbol(code);
+                        if (codeColumn != -1 && symbolColumn != -1) {
+                            break;
                         }
-                        else {
-                            symbol = this.stockCodeAndSymbolDatabase.searchStockSymbol(str);
+                	}   /* for (int c = startCell; c < endCell; c++) */
+				}
+                if (codeColumn == -1 || symbolColumn == -1) {
+                    break;
+                }
+				
+                for (int r = startRow + 1; r < endRow; r++)
+                {
+                    final HSSFRow row   = sheet.getRow(r);
+                    if(row == null) continue;
 
-                            if(symbol != null) {
-                                code = this.stockCodeAndSymbolDatabase.symbolToCode(symbol);
-                            }
-                        }
+                    final HSSFCell codeCell  = row.getCell(codeColumn);
+                    final HSSFCell symbolCell  = row.getCell(symbolColumn);
+                    if(codeCell == null || symbolCell == null) continue;
+                    
+                    final String codeStr = (codeCell.getCellType() == HSSFCell.CELL_TYPE_STRING) ? codeCell.getRichStringCellValue().getString() : null;
+                    final String symbolStr = (symbolCell.getCellType() == HSSFCell.CELL_TYPE_STRING) ? symbolCell.getRichStringCellValue().getString() : null;
 
-                        if(code != null && symbol != null) {
-                            final Stock stock = Utils.getEmptyStock(code, symbol);
-                            this.addStockToTable(stock);
-                            realTimeStockMonitor.addStockCode(code);
-                        }                        
-                    }   /* for (short c = 0; c < cells; c++) */
+                    if(codeStr != null && symbolStr != null) {
+                        final Stock stock = Utils.getEmptyStock(Code.newInstance(codeStr), Symbol.newInstance(symbolStr));
+                        this.addStockToTable(stock);
+                        realTimeStockMonitor.addStockCode(Code.newInstance(codeStr));
+                    }
                 }   /* for (int r = 0; r < rows; r++) */
             }   /* for(int k = 0; k < wb.getNumberOfSheets(); k++) */
         }
         catch (Exception exp)
         {
             log.error("", exp);
-        }        
+        }
     }
     
     public RealTimeStockMonitor getRealTimeStockMonitor() {
@@ -664,46 +660,47 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
-// TODO add your handling code here:
-        if(getStockCodeAndSymbolDatabase() == null) {
-            javax.swing.JOptionPane.showMessageDialog(this, "We haven't connected to stock server.", "Not Connected", javax.swing.JOptionPane.INFORMATION_MESSAGE);
-            return;
+    // TODO add your handling code here:
+        final JFileChooser chooser = new JFileChooser(jStockOptions.getLastFileIODirectory());
+        final FileNameExtensionFilter csvFilter = new FileNameExtensionFilter("CSV Documents (*.csv)", "csv");
+        final FileNameExtensionFilter xlsFilter = new FileNameExtensionFilter("Microsoft Excel (*.xls)", "xls");
+        chooser.setAcceptAllFileFilterUsed(false);
+        chooser.addChoosableFileFilter(csvFilter);
+        chooser.addChoosableFileFilter(xlsFilter);
+
+        java.util.Map<String, FileNameExtensionFilter> map = new HashMap<String, FileNameExtensionFilter>();
+        map.put(csvFilter.getDescription(), csvFilter);
+        map.put(xlsFilter.getDescription(), xlsFilter);
+
+        final FileNameExtensionFilter filter = map.get(this.getJStockOptions().getLastSavedFileNameExtensionDescription());
+        if (filter != null) {
+            chooser.setFileFilter(filter);
         }
         
-        JFileChooser fc = new JFileChooser();
-        fc.setAcceptAllFileFilterUsed(false);
-        fc.addChoosableFileFilter(new MyFilter());
-        int returnVal = fc.showOpenDialog(this);
+        int returnVal = chooser.showOpenDialog(this);
 
         if (returnVal != JFileChooser.APPROVE_OPTION) {
             return;            
         }
         
-        File file = fc.getSelectedFile();
+        File file = chooser.getSelectedFile();
         if(file.getName().endsWith(".xls")) {
-            loadFromExcelFile(file);
+            openAsExcelFile(file);
+            jStockOptions.setLastFileNameExtensionDescription(xlsFilter.getDescription());
         }
-        else if(file.getName().endsWith(".txt")) {
-            loadFromTextFile(file);
-        }                       
-    }//GEN-LAST:event_jMenuItem2ActionPerformed
+        else if(file.getName().endsWith(".csv")) {
+            //openAsCSVFile(file);
+            jStockOptions.setLastFileNameExtensionDescription(csvFilter.getDescription());
+        }
+        else {
+            // Impossible.
+        }
 
-    private static class MyFilter extends javax.swing.filechooser.FileFilter {
-        @Override
-        public boolean accept(File file) {
-            if (file.isDirectory()) {
-                return true;
-            }       
-            
-            String filename = file.getName();
-            return filename.endsWith(".xls") || filename.endsWith(".txt");
+        final String parent = chooser.getSelectedFile().getParent();
+        if (parent != null) {
+            jStockOptions.setLastFileIODirectory(parent);
         }
-        
-        @Override
-        public String getDescription() {
-            return "Text file or Microsoft Excel";
-        }
-    }
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
     
     // Policy : Each pane should have their own real time stock monitoring.
     //
@@ -1053,11 +1050,11 @@ public class MainFrame extends javax.swing.JFrame {
 
             if (Utils.getFileExtension(file).equals("csv")) {
                 saveAsCSVFile(file);
-                jStockOptions.setLastSavedFileNameExtensionDescription(csvFilter.getDescription());
+                jStockOptions.setLastFileNameExtensionDescription(csvFilter.getDescription());
             }
             else if (Utils.getFileExtension(file).equals("xls")) {
                 saveAsExcelFile(file);
-                jStockOptions.setLastSavedFileNameExtensionDescription(xlsFilter.getDescription());
+                jStockOptions.setLastFileNameExtensionDescription(xlsFilter.getDescription());
             }
             else {
                 // Impossible.
