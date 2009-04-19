@@ -39,16 +39,33 @@ public class POIUtils {
     public static void invokeSetCellValue(HSSFCell cell, Object value) {
         Method method = findMethodToInvoke(value);
         if (method == null) {
+            // Cannot find any matching method. But we do not want to convert Integer
+            // to String. Convert Integer to Double to try first.
+            if (value.getClass().equals(Integer.class))
+            {
+                final Double doubleInteger = new Double(((Integer)value).doubleValue());
+                Method method2 = findMethodToInvoke(doubleInteger);
+                if (method2 != null) {
+                    try {
+                        method2.invoke(cell, doubleInteger);
+                    } catch (Exception e) {
+                        log.error(null, e);
+                    }
+
+                    return;
+                }
+            }
+            
             // Cannot find any matching method. Convert to String and try again.
             final String string = value.toString();
 
-            Method method2 = findMethodToInvoke(string);
-            if (method2 == null) {
+            Method method3 = findMethodToInvoke(string);
+            if (method3 == null) {
                 throw new RuntimeException("Nothing found for " + value.getClass());
             }
 
             try {
-                method2.invoke(cell, string);
+                method3.invoke(cell, string);
             } catch (Exception e) {
                 log.error(null, e);
             }
