@@ -22,6 +22,7 @@
 
 package org.yccheok.jstock.gui;
 
+import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 import javax.swing.table.*;
 import java.awt.*;
@@ -545,43 +546,98 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem7ActionPerformed
 
     private void openAsCSVFile(File file) {
-        /* Text file */
+        java.io.Reader reader = null;
         try {
-            BufferedReader in = new BufferedReader(new FileReader(file));
-            String str;
-            while ((str = in.readLine()) != null) {
-                Code code = null;
-                Symbol symbol = null;
-                
-                code = this.stockCodeAndSymbolDatabase.searchStockCode(str);
-                if(code != null) {
-                    symbol = this.stockCodeAndSymbolDatabase.codeToSymbol(code);
-                }
-                else {
-                    symbol = this.stockCodeAndSymbolDatabase.searchStockSymbol(str);
-                    
-                    if(symbol != null) {
-                        code = this.stockCodeAndSymbolDatabase.symbolToCode(symbol);
+            reader = new java.io.FileReader(file);
+        } catch (IOException ex) {
+            log.error(null, ex);
+            return;
+        }
+        final CSVReader csvreader = new CSVReader(reader);
+
+        try {
+            int codeColumn = -1;
+            int symbolColumn = -1;
+            int fallBelowColumn = -1;
+            int riseAboveColumn = -1;
+
+            String [] nextLine;
+            if ((nextLine = csvreader.readNext()) != null) {
+                int i = 0;
+                for (String item : nextLine) {
+                    if (item.equalsIgnoreCase("code")) {
+                        codeColumn = i;
                     }
+                    else if (item.equalsIgnoreCase("symbol")) {
+                        symbolColumn = i;
+                    }
+                    else if (item.equalsIgnoreCase("fall below")) {
+                        fallBelowColumn = i;
+                    }
+                    else if (item.equalsIgnoreCase("rise above")) {
+                        riseAboveColumn = i;
+                    }
+                    i++;
                 }
-                
-                if(code != null && symbol != null) {
-                    final Stock stock = Utils.getEmptyStock(code, symbol);
-                    this.addStockToTable(stock);
-                    realTimeStockMonitor.addStockCode(code);
+            }   /* if ((nextLine = csvreader.readNext()) != null) */
+
+            if (codeColumn == -1 || symbolColumn == -1 || fallBelowColumn == -1 || riseAboveColumn == -1) {
+                return;
+            }
+
+            final int maxIndex = Math.max(riseAboveColumn, Math.max(fallBelowColumn, Math.max(codeColumn, symbolColumn)));
+            while ((nextLine = csvreader.readNext()) != null) {
+                if (nextLine.length <= maxIndex) {
+                    continue;
+                }
+
+                final String symbolStr = nextLine[symbolColumn];
+                final String codeStr = nextLine[codeColumn];
+                final String fallBelowStr = nextLine[fallBelowColumn];
+                final String riseAboveStr = nextLine[riseAboveColumn];
+                Double fallBelowDouble = null;
+                Double riseAboveDouble = null;
+                try {
+                    fallBelowDouble = Double.parseDouble(fallBelowStr);
+                }
+                catch (NumberFormatException exp) {}
+                try {
+                    riseAboveDouble = Double.parseDouble(riseAboveStr);
+                }
+                catch (NumberFormatException exp) {}
+
+                if(codeStr != null && symbolStr != null) {
+                    final Stock stock = Utils.getEmptyStock(Code.newInstance(codeStr), Symbol.newInstance(symbolStr));
+                    final StockAlert stockAlert = new StockAlert().setFallBelow(fallBelowDouble).setRiseAbove(riseAboveDouble);
+                    this.addStockToTable(stock, stockAlert);
+                    realTimeStockMonitor.addStockCode(Code.newInstance(codeStr));
                 }
             }
-            
-            in.close();
-        } catch (IOException e) {
-            log.error("", e);
-        }         
+        }
+        catch (IOException ex) {
+            log.error(null, ex);
+        }
+        finally {
+            try {
+                csvreader.close();
+            } catch (IOException ex) {
+                log.error(null, ex);
+            }
+            try {
+                reader.close();
+            } catch (IOException ex) {
+                log.error(null, ex);
+            }
+        }
     }
     
     private void openAsExcelFile(File file) {
+        FileInputStream fileInputStream = null;
+
         try
         {
-            POIFSFileSystem fs = new POIFSFileSystem(new FileInputStream(file));
+            fileInputStream = new FileInputStream(file);
+            POIFSFileSystem fs = new POIFSFileSystem(fileInputStream);
             HSSFWorkbook wb = new HSSFWorkbook(fs);
 
             for(int k = 0; k < wb.getNumberOfSheets(); k++)
@@ -591,6 +647,8 @@ public class MainFrame extends javax.swing.JFrame {
                 final int endRow = sheet.getLastRowNum();
 				int codeColumn = -1;
 				int symbolColumn = -1;
+                int fallBelowColumn = -1;
+                int riseAboveColumn = -1;
 
 				if (startRow < 0)
 				{
@@ -619,39 +677,61 @@ public class MainFrame extends javax.swing.JFrame {
                         else if (cellStr.equalsIgnoreCase("symbol")) {
                             symbolColumn = c;
                         }
+                        else if (cellStr.equalsIgnoreCase("fall below")) {
+                            fallBelowColumn = c;
+                        }
+                        else if (cellStr.equalsIgnoreCase("rise above")) {
+                            riseAboveColumn = c;
+                        }
 
-                        if (codeColumn != -1 && symbolColumn != -1) {
+                        if (codeColumn != -1 && symbolColumn != -1 && fallBelowColumn != -1 && riseAboveColumn != -1) {
                             break;
                         }
                 	}   /* for (int c = startCell; c < endCell; c++) */
 				}
-                if (codeColumn == -1 || symbolColumn == -1) {
-                    break;
+                if (codeColumn == -1 || symbolColumn == -1 || fallBelowColumn == -1 || riseAboveColumn == -1) {
+                    continue;
                 }
 				
-                for (int r = startRow + 1; r < endRow; r++)
+                for (int r = startRow + 1; r <= endRow; r++)
                 {
                     final HSSFRow row   = sheet.getRow(r);
                     if(row == null) continue;
 
                     final HSSFCell codeCell  = row.getCell(codeColumn);
                     final HSSFCell symbolCell  = row.getCell(symbolColumn);
+                    final HSSFCell fallBelowCell  = row.getCell(fallBelowColumn);
+                    final HSSFCell riseAboveCell  = row.getCell(riseAboveColumn);
                     if(codeCell == null || symbolCell == null) continue;
-                    
+                    // fallBelowCell and riseAboveCell are allowed to be null.
+
                     final String codeStr = (codeCell.getCellType() == HSSFCell.CELL_TYPE_STRING) ? codeCell.getRichStringCellValue().getString() : null;
                     final String symbolStr = (symbolCell.getCellType() == HSSFCell.CELL_TYPE_STRING) ? symbolCell.getRichStringCellValue().getString() : null;
+                    final Double fallBelowDouble = fallBelowCell != null ? ((fallBelowCell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC) ? fallBelowCell.getNumericCellValue() : null) : null;
+                    final Double riseAboveDouble = riseAboveCell != null ? ((riseAboveCell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC) ? riseAboveCell.getNumericCellValue() : null) : null;
 
                     if(codeStr != null && symbolStr != null) {
                         final Stock stock = Utils.getEmptyStock(Code.newInstance(codeStr), Symbol.newInstance(symbolStr));
-                        this.addStockToTable(stock);
+                        final StockAlert stockAlert = new StockAlert().setFallBelow(fallBelowDouble).setRiseAbove(riseAboveDouble);
+                        this.addStockToTable(stock, stockAlert);
                         realTimeStockMonitor.addStockCode(Code.newInstance(codeStr));
                     }
                 }   /* for (int r = 0; r < rows; r++) */
             }   /* for(int k = 0; k < wb.getNumberOfSheets(); k++) */
         }
-        catch (Exception exp)
+        catch (Exception ex)
         {
-            log.error("", exp);
+            log.error(null, ex);
+        }
+        finally
+        {
+            if (fileInputStream != null) {
+                try {
+                    fileInputStream.close();
+                } catch (IOException ex) {
+                    log.error(null, ex);
+                }
+            }
         }
     }
     
@@ -689,7 +769,7 @@ public class MainFrame extends javax.swing.JFrame {
             jStockOptions.setLastFileNameExtensionDescription(xlsFilter.getDescription());
         }
         else if(file.getName().endsWith(".csv")) {
-            //openAsCSVFile(file);
+            openAsCSVFile(file);
             jStockOptions.setLastFileNameExtensionDescription(csvFilter.getDescription());
         }
         else {
@@ -1741,7 +1821,7 @@ public class MainFrame extends javax.swing.JFrame {
         return tableModel.getStocks();
     }
     
-    // Should we synchronized the jTable1, or post the job at GUI event dispatch
+    // Should we synchronized the jTable1, or post the job to GUI event dispatch
     // queue?
     public void addStockToTable(final Stock stock, final StockAlert alert) {
         assert(java.awt.EventQueue.isDispatchThread());
