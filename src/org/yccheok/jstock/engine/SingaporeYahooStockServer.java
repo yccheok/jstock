@@ -455,6 +455,43 @@ public class SingaporeYahooStockServer extends Subject<SingaporeYahooStockServer
 
     private static final int NUM_OF_RETRY = 2;
 
+    // Update on 19 March 2009 : We cannot assume certain parameters will always
+    // be float. They may become integer too. For example, in the case of Korea
+    // Stock Market, Previous Close is in integer. We shall apply string quote
+    // protection method too on them.
+    //
+    // Here are the index since 19 March 2009 :
+	// (0) Symbol
+	// (1) Name
+	// (2) Stock Exchange
+	// (3) Symbol
+	// (4) Previous Close
+	// (5) Symbol
+	// (6) Last Trade
+	// (7) Symbol
+	// (8) Day's high
+	// (9) Symbol
+	// (10) Day's low
+	// (11) Symbol
+	// (12) Volume
+	// (13) Symbol
+	// (14) Change
+	// (15) Symbol
+	// (16) Change Percent
+	// (17) Symbol
+	// (18) Last Trade Size
+	// (19) Symbol
+	// (20) Bid
+	// (21) Symbol
+	// (22) Bid Size
+	// (23) Symbol
+	// (24) Ask
+	// (25) Symbol
+	// (26) Ask Size
+	// (27) Symbol
+	// (28) Last Trade Date
+	// (29) Last Trade Time.
+    //
     // s = Symbol
     // n = Name
     // x = Stock Exchange
@@ -481,7 +518,7 @@ public class SingaporeYahooStockServer extends Subject<SingaporeYahooStockServer
     // "+1400.00","N/A - +4.31%",+1400.00,"+4.31%","+1400.00 - +4.31%"
     //
     // "MAERSKB.CO","AP MOELLER-MAERS-","Copenhagen",32500.00,33700.00,34200.00,33400.00,660,"+1200.00","N/A - +3.69%",33,33500.00,54,33700.00,96,"11/10/2008","10:53am"
-    private static final String YAHOO_STOCK_FORMAT = "&f=snxpl1hgsvsc1p2sk3sbsb6sasa5sd1t1";
+    private static final String YAHOO_STOCK_FORMAT = "&f=snxspsl1shsgsvsc1sp2sk3sbsb6sasa5sd1t1";
 
     static {
         try {
