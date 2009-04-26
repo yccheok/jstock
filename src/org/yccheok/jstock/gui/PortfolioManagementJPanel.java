@@ -289,7 +289,18 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         newSellTransactionJDialog.setSellQuantity(maxSellQuantity);
         
         newSellTransactionJDialog.setBuyCost(buyCost);
-        newSellTransactionJDialog.setPrice(newSellTransactionJDialog.suggestBestSellingPrice());
+
+        // Get the highest sell price.
+        final double currentPrice = getSelectedStockLastPriceForNewTransactionJDialog();
+        final double bestSellingPrice = newSellTransactionJDialog.suggestBestSellingPrice();
+
+        if (currentPrice > bestSellingPrice) {
+            newSellTransactionJDialog.setPrice(currentPrice);
+        }
+        else {
+            newSellTransactionJDialog.setPrice(bestSellingPrice);
+        }
+
         newSellTransactionJDialog.setVisible(true);
         
         final Transaction newSellTransaction = newSellTransactionJDialog.getTransaction();
