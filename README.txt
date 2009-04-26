@@ -7,6 +7,8 @@ version 1.0.4b
 
 3. [2687975] Bug fixed. Wrong Information Displayed For Korea Market.
 
+4. [2767249] Bug fixed. Current price Is 0 when there is no transaction on that day.
+
 ==============
 version 1.0.4a
 ==============
