@@ -1,4 +1,11 @@
 ==============
+version 1.0.4b
+==============
+1. [2686577] Feature added. Proxy Auth Support. Contributed by 
+
+2. [2722273] Feature added. Read/ Write on Excel/ CSV File Format.
+
+==============
 version 1.0.4a
 ==============
 1. Added 11 new countires. We have now total 23 countries stock market.
