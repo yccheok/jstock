@@ -1,9 +1,11 @@
 ==============
 version 1.0.4b
 ==============
-1. [2686577] Feature added. Proxy Auth Support. Contributed by 
+1. [2686577] Feature added. Proxy Auth Support. Contributed by gransi.
 
 2. [2722273] Feature added. Read/ Write on Excel/ CSV File Format.
+
+3. [2687975] Bug fixed. Wrong Information Displayed For Korea Market.
 
 ==============
 version 1.0.4a
