@@ -22,10 +22,11 @@
 
 package org.yccheok.jstock.analysis;
 
-import java.math.*;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import java.math.BigDecimal;
+import java.math.MathContext;
 
 /**
  *
@@ -133,13 +134,11 @@ public class ArithmeticOperator extends AbstractOperator {
             BigDecimal d0 = new BigDecimal(object0.toString());
             BigDecimal d1 = new BigDecimal(object1.toString());
             
-            BigDecimal result = null;
-            
             final double d1Value = d1.doubleValue();
             if(d1Value != 0.0) {
-                result = d0.divide(d1, MathContext.DECIMAL64);
+                BigDecimal result = d0.divide(d1, MathContext.DECIMAL64);
+                return result.doubleValue();
             }
-            return result.doubleValue();
         }
         catch(NumberFormatException exp) {
             log.error("", exp);
