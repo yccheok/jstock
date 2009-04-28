@@ -80,7 +80,7 @@ public class AboutJDialog extends javax.swing.JDialog {
 
         jEditorPane1.setContentType("text/html");
         jEditorPane1.setEditable(false);
-        jEditorPane1.setText("<html>\n<head>\n</head>\n    <body>\n        <p style=\"margin-top: 10; font-size: 9px; font-family: Tahoma;\">JStock is a stock analysis tool to help you pick stocks in an automated way.</p>\n        <p style=\"margin-top: 10; font-size: 9px; font-family: Tahoma;\">Copyright &copy; 2009 Yan Cheng Cheok <a href=\"mailto:yccheok@yahoo.com\">yccheok@yahoo.com</a></p>\n        <p style=\"margin-top: 10; font-size: 9px; font-family: Tahoma;\">Special thanks to <a href=\"http://www.iconblock.com/\">IconBlock</a>, for providing graphics design service.</p>\n        <p style=\"margin-top: 10; font-size: 9px; font-family: Tahoma;\">Chatting feature emotional icons and sounds are from GPLed software <a href=\"http://pidgin.im\">Pidgin 2.4.0</a></p>\n        <p style=\"margin-top: 10; font-size: 9px; font-family: Tahoma;\">Latest update can be downloaded from : <a href=\"http://jstock.sourceforge.net\">http://jstock.sourceforge.net</a></p>\n        <p style=\"margin-top: 10; font-size: 9px; font-family: Tahoma;\">This free software is licensed under : <a href=\"http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt\">GNU General Public License, version 2</a></p>\n    </body>\n</html>");
+        jEditorPane1.setText("<html>\n<head>\n</head>\n    <body>\n        <p style=\"margin-top: 10; font-size: 9px; font-family: Tahoma;\">JStock is a stock analysis tool to help you pick stocks in an automated way.</p>\n        <p style=\"margin-top: 10; font-size: 9px; font-family: Tahoma;\">Copyright &copy; 2009 Yan Cheng Cheok <a href=\"mailto:yccheok@yahoo.com\">yccheok@yahoo.com</a></p>\n        <p style=\"margin-top: 10; font-size: 9px; font-family: Tahoma;\">Code contributed by Peter Gransdorfer, Carlo de Wolf.</p>\n        <p style=\"margin-top: 10; font-size: 9px; font-family: Tahoma;\">Graphics designed by <a href=\"http://www.iconblock.com/\">IconBlock</a>.</p>\n        <p style=\"margin-top: 10; font-size: 9px; font-family: Tahoma;\">Chatting feature emotional icons and sounds are from GPLed software <a href=\"http://pidgin.im\">Pidgin 2.4.0</a></p>\n        <p style=\"margin-top: 10; font-size: 9px; font-family: Tahoma;\">Latest update can be downloaded from : <a href=\"http://jstock.sourceforge.net\">http://jstock.sourceforge.net</a></p>\n        <p style=\"margin-top: 10; font-size: 9px; font-family: Tahoma;\">This free software is licensed under : <a href=\"http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt\">GNU General Public License, version 2</a></p>\n    </body>\n</html>");
         jEditorPane1.addHyperlinkListener(new javax.swing.event.HyperlinkListener() {
             public void hyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {
                 jEditorPane1HyperlinkUpdate(evt);
@@ -101,14 +101,14 @@ public class AboutJDialog extends javax.swing.JDialog {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 180, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 186, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
         java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-525)/2, (screenSize.height-636)/2, 525, 636);
+        setBounds((screenSize.width-525)/2, (screenSize.height-642)/2, 525, 642);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
