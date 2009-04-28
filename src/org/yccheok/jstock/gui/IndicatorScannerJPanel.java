@@ -223,38 +223,9 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             return;
         }
 
-        /* Remove any unwanted columns. */
-        for (int i = 0; i < this.jTable1.getColumnCount(); i++) {
-            final String name = this.jTable1.getColumnName(i);
-
-            if (guiOptions.getJTableOptions(0).contains(name) == false)
-            {
-                JTableUtilities.removeTableColumn(jTable1, name);
-                i--;
-            }
-        }
-
-        final int optionsCount = guiOptions.getJTableOptions(0).getColumnSize();
-        final int tableCount = this.jTable1.getColumnCount();
-
-        /* Sort the columns according to user preference. */
-        for (int i = 0; i < optionsCount; i++) {
-            final String name = guiOptions.getJTableOptions(0).getColumnName(i);
-            int index = -1;
-            for (int j = 0; j < tableCount; j++) {
-                if (jTable1.getColumnName(j).equals(name))
-                {
-                    index = j;
-                    break;
-                }
-            }
-
-            if (index >= 0)
-            {
-                this.jTable1.moveColumn(index, i);
-            }
-        }
-    }
+        /* Set Table Settings */
+        JTableUtilities.setJTableOptions(jTable1,guiOptions.getJTableOptions(0));
+	}
 
     public boolean saveGUIOptions() {
         if(Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config") == false)
@@ -267,7 +238,8 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         final int count = this.jTable1.getColumnCount();
         for (int i = 0; i < count; i++) {
             final String name = this.jTable1.getColumnName(i);
-            jTableOptions.addColumnName(name);
+            final TableColumn column = jTable1.getColumnModel().getColumn(i);
+            jTableOptions.addColumnOption(GUIOptions.JTableOptions.ColumnOption.newInstance(name, column.getWidth()));
         }
 
         final GUIOptions guiOptions = new GUIOptions();

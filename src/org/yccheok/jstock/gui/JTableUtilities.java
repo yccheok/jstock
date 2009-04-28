@@ -144,7 +144,44 @@ public class JTableUtilities {
 
     }
 
-    
+    public static void setJTableOptions(JTable jTable, GUIOptions.JTableOptions jTableOptions)
+    {
+    	// Remove unwanted column. MUST BE DONE FIRST!
+        for (int i = 0; i < jTable.getColumnCount(); i++) {
+        	final String name = jTable.getColumnName(i);
+
+      		/* Remove any unwanted columns. */
+        	if (jTableOptions.contains(name) == false)
+        	{
+            	removeTableColumn(jTable, name);
+            	i--;
+        	}
+        }
+        
+        final int optionsCount = jTableOptions.getColumnSize();
+        final int tableCount = jTable.getColumnCount();
+
+        /* Sort the columns according to user preference. */
+        for (int i = 0; i < optionsCount; i++) {
+            final String name = jTableOptions.getColumnName(i);
+            int index = -1;
+            for (int j = 0; j < tableCount; j++) {
+                if (jTable.getColumnName(j).equals(name))
+                {
+                    /* Restore width. */
+                    jTable.getColumn(name).setPreferredWidth(jTableOptions.getColumnWidth(i));
+
+                    index = j;
+                    break;
+                }
+            }
+
+            if (index >= 0)
+            {
+                jTable.moveColumn(index, i);
+            }
+        }      
+    }
 
     public static void removeTableColumn(JTable jTable, Object identifier) {
 

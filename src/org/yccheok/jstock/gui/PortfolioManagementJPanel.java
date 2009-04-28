@@ -40,6 +40,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
 import javax.swing.JTable;
+import javax.swing.table.*;
 import javax.swing.tree.TreePath;
 import org.apache.commons.logging.*;
 import org.jdesktop.swingx.JXTreeTable;
@@ -1001,51 +1002,14 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         final org.jdesktop.swingx.JXTreeTable[] treeTables = {buyTreeTable, sellTreeTable};
 
-        /* Remove any unwanted columns. */
-        for (int tableIndex = 0; tableIndex < treeTables.length; tableIndex++)
-        {
+        /* Set Table Settings */
+        for (int tableIndex = 0; tableIndex < treeTables.length; tableIndex++) {
             final JXTreeTable treeTable = treeTables[tableIndex];
             final javax.swing.table.JTableHeader jTableHeader = treeTable.getTableHeader();
             final JTable jTable = jTableHeader.getTable();
-
-            for (int i = 0; i < jTable.getColumnCount(); i++) {
-                final String name = jTable.getColumnName(i);
-
-                if (guiOptions.getJTableOptions(tableIndex).contains(name) == false)
-                {
-                    JTableUtilities.removeTableColumn(jTable, name);
-                    i--;
-                }
-            }
-        }
-
-        for (int tableIndex = 0; tableIndex < treeTables.length; tableIndex++)
-        {
-            final int optionsCount = guiOptions.getJTableOptions(tableIndex).getColumnSize();
-            final JXTreeTable treeTable = treeTables[tableIndex];
-            final javax.swing.table.JTableHeader jTableHeader = treeTable.getTableHeader();
-            final JTable jTable = jTableHeader.getTable();
-            final int tableCount = jTable.getColumnCount();
-
-            /* Sort the columns according to user preference. */
-            for (int i = 0; i < optionsCount; i++) {
-                final String name = guiOptions.getJTableOptions(tableIndex).getColumnName(i);
-                int index = -1;
-                for (int j = 0; j < tableCount; j++) {
-                    if (jTable.getColumnName(j).equals(name))
-                    {
-                        index = j;
-                        break;
-                    }
-                }
-
-                if (index >= 0)
-                {
-                    jTable.moveColumn(index, i);
-                }
-            }
-        }
-    }
+            JTableUtilities.setJTableOptions(jTable, guiOptions.getJTableOptions(tableIndex));
+		}
+	}
 
     public boolean saveGUIOptions() {
         if(Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config") == false)
@@ -1066,7 +1030,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             final int count = jTable.getColumnCount();
             for (int i = 0; i < count; i++) {
                 final String name = jTable.getColumnName(i);
-                jTableOptions.addColumnName(name);
+                final TableColumn column = jTable.getColumnModel().getColumn(i);
+                jTableOptions.addColumnOption(GUIOptions.JTableOptions.ColumnOption.newInstance(name, column.getWidth()));
             }
 
             guiOptions.addJTableOptions(jTableOptions);
