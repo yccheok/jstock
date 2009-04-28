@@ -5,9 +5,13 @@ version 1.0.4b
 
 2. [2722273] Feature added. Read/ Write on Excel/ CSV File Format.
 
-3. [2687975] Bug fixed. Wrong Information Displayed For Korea Market.
+3. [2725384] Remember The Width of Table Column. Contributed by gransi.
 
-4. [2767249] Bug fixed. Current price Is 0 when there is no transaction on that day.
+4. [2687975] Bug fixed. Wrong Information Displayed For Korea Market.
+
+5. [2767249] Bug fixed. Current price Is 0 when there is no transaction on that day.
+
+6. [2737316] Bug fixed. NPE in ArithmeticOperator.division. Contributed by wolfc.
 
 ==============
 version 1.0.4a
