@@ -30,32 +30,83 @@ public class GUIOptions {
 
     public static class JTableOptions
     {
-        private final List<String> columnNames = new ArrayList<String>();
+		public static class ColumnOption {
+			private String columnName;
+			private final int columnWidth;
+
+			private ColumnOption(String columnName, int columnWidth) {
+				this.columnName = columnName;
+				this.columnWidth = columnWidth;
+			}
+
+			public static ColumnOption newInstance(String columnName, int columnWidth) {
+				return new ColumnOption(columnName, columnWidth);
+			}
+
+			public String getColumnName() {
+				return columnName;
+			}
+
+			public int getColumnWidth() {
+				return columnWidth;
+			}
+
+            // hashCode and equals, only perform computation on columnName.
+            @Override
+            public int hashCode() {
+                int result = 17;
+                if (null != columnName) {
+                    result = 31 * result + columnName.hashCode();
+                }
+                return result;
+            }
+
+            @Override
+            public boolean equals(Object o) {
+                if (o == this)
+                    return true;
+
+                if(!(o instanceof ColumnOption))
+                    return false;
+
+                if (this.columnName == null) {
+                    return null == ((ColumnOption)o).columnName;
+                }
+
+                return this.columnName.equals(((ColumnOption)o).columnName);
+            }
+		}
+		
+        private final List<ColumnOption> columnOptions = new ArrayList<ColumnOption>();
 
         public int getColumnSize()
         {
-            return columnNames.size();
+            return columnOptions.size();
         }
 
         public String getColumnName(int index)
         {
-            return columnNames.get(index);
+            return columnOptions.get(index).getColumnName();
         }
 
         public boolean contains(String name)
         {
-            return columnNames.contains(name);
+            // Create a dummy ColumnOption for comparison purpose.
+            return columnOptions.contains(ColumnOption.newInstance(name, 0));
         }
 
-        public boolean addColumnName(String name)
+        public int getColumnWidth(int index)
         {
+			return columnOptions.get(index).getColumnWidth();
+        }
+
+        public boolean addColumnOption(ColumnOption option) {
             /* We do not allow duplication. */
-            if (columnNames.contains(name))
+            if (columnOptions.contains(option))
             {
                 return false;
             }
-
-            columnNames.add(name);
+            columnOptions.add(option);
             return true;
         }
     }
@@ -87,7 +138,13 @@ public class GUIOptions {
         }
 
         @Override
-        public boolean addColumnName(String name)
+        public int getColumnWidth(int index)
+        {
+            return jTableOptions.getColumnWidth(index);
+        }
+
+        @Override
+        public boolean addColumnOption(ColumnOption option)
         {
             throw new java.lang.UnsupportedOperationException();
         }
