@@ -59,8 +59,10 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.jfree.chart.ChartPanel;
 import org.yccheok.jstock.analysis.Indicator;
 import org.yccheok.jstock.analysis.OperatorIndicator;
+import org.yccheok.jstock.gui.dynamicchart.DynamicChart;
 
 /**
  *
@@ -124,6 +126,7 @@ public class MainFrame extends javax.swing.JFrame {
         this.initRealTimeStockMonitor();
         this.initRealTimeStocks();
         this.initAlertStateManager();
+        this.initDynamicCharts();
         this.initStockHistoryMonitor();
         this.initOthersStockHistoryMonitor();
         this.initBrokingFirmLogos();
@@ -161,6 +164,7 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jComboBox1 = new AutoCompleteJComboBox();
         jPanel10 = new javax.swing.JPanel();
+        jPanel3 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         jLabel27 = new org.yccheok.jstock.gui.GradientJLabel(new Color(111, 148, 182), new Color(184, 207, 229), (float)0.9);
         jLabel21 = new org.yccheok.jstock.gui.GradientJLabel(new Color(111, 148, 182), new Color(184, 207, 229), (float)0.9);
@@ -275,10 +279,17 @@ public class MainFrame extends javax.swing.JFrame {
 
         jPanel8.add(jPanel1, java.awt.BorderLayout.NORTH);
 
-        jPanel10.setLayout(new java.awt.BorderLayout());
+        jPanel10.setPreferredSize(new java.awt.Dimension(328, 170));
+        jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 10, 5));
+
+        jPanel3.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel3.setPreferredSize(new java.awt.Dimension(160, 160));
+        jPanel3.setBorder(new org.jdesktop.swingx.border.DropShadowBorder(true));
+        jPanel3.setLayout(new java.awt.BorderLayout());
+        jPanel10.add(jPanel3);
+        jPanel3.add(EMPTY_DYNAMIC_CHART.getChartPanel(), java.awt.BorderLayout.CENTER);
 
         jPanel7.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel7.setBorder(new org.jdesktop.swingx.border.DropShadowBorder());
         jPanel7.setBorder(new org.jdesktop.swingx.border.DropShadowBorder(true));
         jPanel7.setLayout(new java.awt.GridLayout(3, 7, 2, 2));
 
@@ -406,7 +417,7 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel38.setOpaque(true);
         jPanel7.add(jLabel38);
 
-        jPanel10.add(jPanel7, java.awt.BorderLayout.WEST);
+        jPanel10.add(jPanel7);
 
         jPanel8.add(jPanel10, java.awt.BorderLayout.SOUTH);
 
@@ -1009,7 +1020,30 @@ public class MainFrame extends javax.swing.JFrame {
         this.indicatorScannerJPanel.clearTableSelection();
         this.portfolioManagementJPanel.clearTableSelection();
         updateBuyerSellerInformation(null);
+        updateDynamicChart(null);
     }//GEN-LAST:event_formMouseClicked
+
+    private void updateDynamicChart(Stock stock) {
+        assert(java.awt.EventQueue.isDispatchThread());
+
+        DynamicChart dynamicChart = stock != null ? this.dynamicCharts.get(stock.getCode()) : MainFrame.EMPTY_DYNAMIC_CHART;
+        if (dynamicChart == null) {
+            dynamicChart = MainFrame.EMPTY_DYNAMIC_CHART;
+        }
+
+        if (java.util.Arrays.asList(jPanel3.getComponents()).contains(dynamicChart.getChartPanel()))
+        {
+            return;
+        }
+
+        this.jPanel3.removeAll();
+        this.jPanel3.add(dynamicChart.getChartPanel(), java.awt.BorderLayout.CENTER);
+        this.jPanel3.validate();
+
+        // Not sure why. validate itself is not enough to perform update. We
+        // must call repaint as well.
+        dynamicChart.getChartPanel().repaint();
+    }
 
     private void jTable1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTable1KeyPressed
 // TODO add your handling code here:
@@ -1028,9 +1062,11 @@ public class MainFrame extends javax.swing.JFrame {
                 int modelIndex = jTable1.convertRowIndexToModel(row);
                 Stock stock = tableModel.getStock(modelIndex);
                 updateBuyerSellerInformation(stock);
+                this.updateDynamicChart(stock);
             }
             else {
             	updateBuyerSellerInformation(null);
+                this.updateDynamicChart(null);
             }
             
             return;
@@ -1283,7 +1319,8 @@ public class MainFrame extends javax.swing.JFrame {
         this.initAlertStateManager();
 
         updateBuyerSellerInformation(null);
-        
+        this.updateDynamicChart(null);
+
         if(stockCodeHistoryGUI != null) {
             if(stockCodeHistoryGUI.size() == 0) {
                 if(this.stockCodeAndSymbolDatabase != null) {
@@ -1320,7 +1357,8 @@ public class MainFrame extends javax.swing.JFrame {
         }            
         
         updateBuyerSellerInformation(null);
-        
+        this.updateDynamicChart(null);
+
         if(stockCodeHistoryGUI.size() == 0) {
             if(this.stockCodeAndSymbolDatabase != null) {
                 statusBar.setProgressBar(false);
@@ -1604,6 +1642,8 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     private void updateBuyerSellerInformation(Stock stock) {
+        assert(java.awt.EventQueue.isDispatchThread());
+
         if(stock == null) {
             jLabel24.setText("");
             jLabel33.setText("");
@@ -1671,7 +1711,8 @@ public class MainFrame extends javax.swing.JFrame {
         initRealTimeStockMonitor();
         initRealTimeStocks();
         initAlertStateManager();
-        
+        initDynamicCharts();
+
         for (Enumeration<AbstractButton> e = this.buttonGroup2.getElements() ; e.hasMoreElements() ;) {
             AbstractButton button = e.nextElement();
             javax.swing.JRadioButtonMenuItem m = (javax.swing.JRadioButtonMenuItem)button;
@@ -2833,16 +2874,68 @@ public class MainFrame extends javax.swing.JFrame {
         // updateStockToTable.
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             @Override
-           public void run() {
+            public void run() {
                 for(Stock stock : stocks) {
                     updateStockToTable(stock);
-                    
                     if(isStockBeingSelected(stock)) {
                         MainFrame.this.updateBuyerSellerInformation(stock);
+                        MainFrame.this.updateDynamicChart(stock);
                     }
                 }               
-           } 
+            }
         });
+
+        // Dynamic charting. Intraday trader might love this.
+        for (Stock stock : stocks) {
+            final Code code = stock.getCode();
+            DynamicChart dynamicChart = this.dynamicCharts.get(code);
+            if (dynamicChart == null) {
+                // Not found. Try to create a new dynamic chart.
+                if (this.dynamicCharts.size() <= MainFrame.MAX_DYNAMIC_CHART_SIZE) {
+                    dynamicChart = new DynamicChart();
+                    this.dynamicCharts.put(code, dynamicChart);
+                }
+                else {
+                    // Full already. Shall we remove?
+                    if (this.isStockBeingSelected(stock)) {
+                        Set<Code> codes = this.dynamicCharts.keySet();
+                        for (Code c : codes) {
+                            // Random remove. We do not care who is being removed.
+                            this.dynamicCharts.remove(c);
+                            if (this.dynamicCharts.size() <= MainFrame.MAX_DYNAMIC_CHART_SIZE) {
+                                // Remove success.
+                                break;
+                            }
+                        }
+                        dynamicChart = new DynamicChart();
+                        this.dynamicCharts.put(code, dynamicChart);
+                    }
+                }
+            }   /* if (dynamicChart == null) */
+
+            // Still null?
+            if (dynamicChart == null) {
+                // This usually indicate that dynamic chart list is full, and
+                // no one is selecting this particular stock.
+                continue;
+            }
+
+            if (this.isStockBeingSelected(stock)) {
+                dynamicChart.addPriceObservation(stock.getCalendar().getTime(), stock.getLastPrice());
+                final Stock s = stock;
+                javax.swing.SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        MainFrame.this.updateDynamicChart(s);
+                    }
+                });
+            }
+            else {
+                // Although no one is watching at us, we still need to perform notification.
+                // Weird?
+                dynamicChart.addPriceObservation(stock.getCalendar().getTime(), stock.getLastPrice());
+            }
+        }   /* for (Stock stock : stocks) */
 
 		// No alert is needed. Early return.
         if ((jStockOptions.isPopupMessage() == false) && (jStockOptions.isSendEmail() == false)) {
@@ -2964,9 +3057,11 @@ public class MainFrame extends javax.swing.JFrame {
                 int modelIndex = jTable1.convertRowIndexToModel(row);
                 Stock stock = tableModel.getStock(modelIndex);
                 updateBuyerSellerInformation(stock);
+                updateDynamicChart(stock);
             }
             else {
                 updateBuyerSellerInformation(null);
+                updateDynamicChart(null);
                 
             }
         }
@@ -3401,6 +3496,11 @@ public class MainFrame extends javax.swing.JFrame {
         return this.chatJPanel.changePassword(newPassword);
     }
 
+    private void initDynamicCharts()
+    {
+        dynamicCharts.clear();
+    }
+
     private void initStatusBar()
     {
         final String message = "Connecting to stock server to retrieve stock information ...";
@@ -3457,6 +3557,14 @@ public class MainFrame extends javax.swing.JFrame {
     private Executor zombiePool = Utils.getZoombiePool();
     
     private MarketJPanel marketJPanel;
+
+    // Use ConcurrentHashMap, enable us able to read and write using different
+    // threads.
+    private java.util.Map<Code, DynamicChart> dynamicCharts = new java.util.concurrent.ConcurrentHashMap<Code, DynamicChart>();
+    // We have 720 (6 * 60 * 2) points per chart, based on 10 seconds per points, with maximum 2 hours.
+    // By having maximum 10 charts, we shall not face any memory problem.
+    private static final int MAX_DYNAMIC_CHART_SIZE = 10;
+    private static final DynamicChart EMPTY_DYNAMIC_CHART = new DynamicChart();
 
     private static final int NUM_OF_RETRY = 3;
     private static final int NUM_OF_THREADS_HISTORY_MONITOR = 4;
@@ -3522,6 +3630,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
