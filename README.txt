@@ -1,4 +1,11 @@
 ==============
+version 1.0.4c
+==============
+1. [2604585] Feature added. If you are a daily trader, we understand that your need in monitoring 
+   stock price movement in seconds precision. Hence, JStock is providing intraday stock price 
+   snapshot. The stock price will be captured in every 10 seconds in daily basics, lasted for 2 hours.
+
+==============
 version 1.0.4b
 ==============
 1. [2686577] Feature added. Proxy Auth Support. Contributed by gransi.
