@@ -21,11 +21,13 @@ package org.yccheok.jstock.gui.dynamicchart;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import javax.swing.JDialog;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.labels.StandardXYToolTipGenerator;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
@@ -61,8 +63,7 @@ public class DynamicChart {
             true,
             false
         );
-        // Due to limited spacing, we remove legend.
-        freeChart.removeLegend();
+        
         freeChart.setAntiAlias(true);
         while (freeChart.getSubtitleCount() > 0)
         {
@@ -92,7 +93,45 @@ public class DynamicChart {
         return chartPanel;
     }
 
-    private void addPriceObservation(Date date, double y) {
+    public void showNewJDialog(java.awt.Frame parent, String title) {
+        TimeSeriesCollection dataset = new TimeSeriesCollection();
+        dataset.addSeries(this.price);
+
+        JFreeChart freeChart = ChartFactory.createTimeSeriesChart(
+            title,
+            "Date",
+            "Price",
+            dataset,
+            true,
+            true,
+            false
+        );
+
+        freeChart.setAntiAlias(true);
+
+        XYPlot plot = freeChart.getXYPlot();
+        NumberAxis rangeAxis1 = (NumberAxis) plot.getRangeAxis();
+        DecimalFormat format = new DecimalFormat("00.00");
+        rangeAxis1.setNumberFormatOverride(format);
+        
+        XYItemRenderer renderer1 = plot.getRenderer();
+        renderer1.setToolTipGenerator(
+            new StandardXYToolTipGenerator(
+                StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT,
+                new SimpleDateFormat("h:mm:ss a"), new DecimalFormat("0.00")
+            )
+        );
+
+        ChartPanel _chartPanel = new ChartPanel(freeChart, true, true, true, true, true);
+        JDialog dialog = new JDialog(parent, title, false);
+        dialog.getContentPane().add(_chartPanel, java.awt.BorderLayout.CENTER);
+        dialog.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        final java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        dialog.setBounds((screenSize.width-750) >> 1, (screenSize.height-600) >> 1, 750, 600);
+        dialog.setVisible(true);
+    }
+
+    public void addPriceObservation(Date date, double y) {
         // There must be at least an item in price. If not, ArrayIndexOutOfBoundsException
         // will be thrown, when getNextTimePeriod is being called.
         final int count = this.price.getItemCount();
@@ -108,7 +147,7 @@ public class DynamicChart {
         Second second = new Second(date);
 
         try {
-            this.price.add(second, y, notify);
+            this.price.add(second, y);
         }
         catch (SeriesException exp) {
             log.error(null, exp);
