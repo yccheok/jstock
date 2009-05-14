@@ -59,7 +59,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.jfree.chart.ChartPanel;
 import org.yccheok.jstock.analysis.Indicator;
 import org.yccheok.jstock.analysis.OperatorIndicator;
 import org.yccheok.jstock.gui.dynamicchart.DynamicChart;
@@ -283,10 +282,11 @@ public class MainFrame extends javax.swing.JFrame {
         jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 10, 5));
 
         jPanel3.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel3.setPreferredSize(new java.awt.Dimension(160, 160));
+        jPanel3.setPreferredSize(new java.awt.Dimension(170, 160));
         jPanel3.setBorder(new org.jdesktop.swingx.border.DropShadowBorder(true));
         jPanel3.setLayout(new java.awt.BorderLayout());
         jPanel10.add(jPanel3);
+        EMPTY_DYNAMIC_CHART.getChartPanel().addMouseListener(dynamicChartMouseAdapter);
         jPanel3.add(EMPTY_DYNAMIC_CHART.getChartPanel(), java.awt.BorderLayout.CENTER);
 
         jPanel7.setBackground(new java.awt.Color(255, 255, 255));
@@ -1043,6 +1043,8 @@ public class MainFrame extends javax.swing.JFrame {
         // Not sure why. validate itself is not enough to perform update. We
         // must call repaint as well.
         dynamicChart.getChartPanel().repaint();
+        dynamicChart.getChartPanel().removeMouseListener(dynamicChartMouseAdapter);
+        dynamicChart.getChartPanel().addMouseListener(dynamicChartMouseAdapter);
     }
 
     private void jTable1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTable1KeyPressed
@@ -1896,6 +1898,21 @@ public class MainFrame extends javax.swing.JFrame {
         return false;
     }
     
+    // Return one and only one selected stock. Otherwise null.
+    private Stock getSelectedStock() {
+        int[] rows = MainFrame.this.jTable1.getSelectedRows();
+
+        if(rows.length == 1) {
+            int row = rows[0];
+
+            StockTableModel tableModel = (StockTableModel)jTable1.getModel();
+            int modelIndex = jTable1.convertRowIndexToModel(row);
+            return tableModel.getStock(modelIndex);
+        }
+
+        return null;
+    }
+
     private void updateStockToTable(final Stock stock) {
         StockTableModel tableModel = (StockTableModel)jTable1.getModel();
         tableModel.updateStock(stock);
@@ -3513,7 +3530,54 @@ public class MainFrame extends javax.swing.JFrame {
 					jStockOptions.getCountry().getIcon(), 
 					jStockOptions.getCountry().toString());
     }
-    
+
+    private MouseAdapter getDynamicChartMouseAdapter() {
+        return new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                System.out.println(e.getClickCount());
+                
+                if (e.getClickCount() >= 2) {
+                    final Stock stock = getSelectedStock();
+                    System.out.println(stock);
+                    if (stock == null) {
+                        return;
+                    }
+
+                    final DynamicChart dynamicChart = MainFrame.this.dynamicCharts.get(stock.getCode());
+                    if (dynamicChart == null) {
+                        return;
+                    }
+
+                    final Symbol symbol = MainFrame.this.getStockCodeAndSymbolDatabase().codeToSymbol(stock.getCode());
+                    dynamicChart.showNewJDialog(MainFrame.this, symbol + " Intraday Movement");
+                }
+            }
+            // Shall we provide visualize mouse move over effect, so that user
+            // knows this is a clickable component?
+            /*
+            private final LineBorder lineBorder = new LineBorder(Color.WHITE);
+            private Border oldBorder = null;
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                JPanel jPanel = (JPanel)e.getComponent();
+                Border old = jPanel.getBorder();
+                if (old != lineBorder) {
+                    oldBorder = old;
+                }
+                jPanel.setBorder(lineBorder);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                JPanel jPanel = (JPanel)e.getComponent();
+                jPanel.setBorder(oldBorder);
+            }
+            */
+        };
+    }
+
     private TrayIcon trayIcon;
     
     private static final Log log = LogFactory.getLog(MainFrame.class);
@@ -3565,7 +3629,8 @@ public class MainFrame extends javax.swing.JFrame {
     // By having maximum 10 charts, we shall not face any memory problem.
     private static final int MAX_DYNAMIC_CHART_SIZE = 10;
     private static final DynamicChart EMPTY_DYNAMIC_CHART = new DynamicChart();
-
+    private final MouseAdapter dynamicChartMouseAdapter = getDynamicChartMouseAdapter();
+    
     private static final int NUM_OF_RETRY = 3;
     private static final int NUM_OF_THREADS_HISTORY_MONITOR = 4;
 
