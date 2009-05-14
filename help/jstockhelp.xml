@@ -13,6 +13,7 @@
             <orderedlist>
                 <listitem><para>Multiple countries' stock market. Currently, there are 23 countries supported. They are Australia, Austria, Belgium, Canada, Denmark, France, Germany, Hong Kong, India, Indonesia, Italy, Korea, Malaysia, Netherlands, Norway, Portugal, Singapore, Spain, Sweden, Switzerland, Taiwan, United Kingdom and United State.</para></listitem>
                 <listitem><para>Real-Time stock info. You will able to monitor all your favorite stocks movement, within single page.</para></listitem>
+                <listitem><para>Intraday stock price snapshot. You will able to monitor stock price movement in seconds precision.</para></listitem>                
                 <listitem><para>Stock indicator editor. You will able to compose your own indicator rule, with simple drag-n-drop graphical blocks. There are no programming required.</para></listitem>
                 <listitem><para>Stock indicator scanner. You will able to perform real-time indicator scanning, to filter out thousands of stocks from the entire stock market. You may also receive email and system tray message alert whenever a stock is being found.</para></listitem>
                 <listitem><para>Portfolio management. You will able to know your most up-to-date net worth, by recording down your buy and sell records.</para></listitem>
@@ -121,6 +122,29 @@
             </mediaobject>        
         </para>
         
+    </chapter>    
+    
+    <chapter>
+        <title>Intraday Stock Price Snapshot</title>
+        <para>If you are a daily trader, we understand that your need in monitoring stock price movement in seconds precision. Hence, JStock is providing intraday stock price movement snapshot. The stock price will be captured in every 10 seconds, lasted for 2 hours.</para>
+        
+        <para>
+            <mediaobject>
+                <imageobject><imagedata fileref="intraday.png" format="PNG"/></imageobject>
+                <textobject><phrase>Intraday Stock Price Snapshot</phrase></textobject>
+            </mediaobject>        
+        </para>
+        
+        <para>
+            To take detailed view on intraday stock price snapshot, you may double click on the snapshot, an intraday chart will be shown up.
+        </para>
+        
+        <para>
+            <mediaobject>
+                <imageobject><imagedata fileref="intraday-chart.png" format="PNG"/></imageobject>
+                <textobject><phrase>Intraday Chart</phrase></textobject>
+            </mediaobject>        
+        </para>        
     </chapter>
     
     <chapter>
@@ -596,7 +620,7 @@
             Author Yan Cheng Cheok may be contacted through <email>yccheok@yahoo.com</email>            
         </para>
         <para>
-            Latest update can be downloaded from <email>http://sourceforge.net/projects/jstock</email>
+            Latest update can be downloaded from <email>http://jstock.sourceforge.net</email>
         </para>
     </chapter>
 </book>
