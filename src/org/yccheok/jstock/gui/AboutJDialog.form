@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<Form version="1.3" maxVersion="1.3" type="org.netbeans.modules.form.forminfo.JDialogFormInfo">
+<Form version="1.5" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JDialogFormInfo">
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="2"/>
     <Property name="title" type="java.lang.String" value="About JStock"/>
@@ -10,7 +10,7 @@
     <Property name="resizable" type="boolean" value="false"/>
   </Properties>
   <SyntheticProperties>
-    <SyntheticProperty name="formSize" type="java.awt.Dimension" value="-84,-19,0,5,115,114,0,18,106,97,118,97,46,97,119,116,46,68,105,109,101,110,115,105,111,110,65,-114,-39,-41,-84,95,68,20,2,0,2,73,0,6,104,101,105,103,104,116,73,0,5,119,105,100,116,104,120,112,0,0,2,-126,0,0,2,13"/>
+    <SyntheticProperty name="formSize" type="java.awt.Dimension" value="-84,-19,0,5,115,114,0,18,106,97,118,97,46,97,119,116,46,68,105,109,101,110,115,105,111,110,65,-114,-39,-41,-84,95,68,20,2,0,2,73,0,6,104,101,105,103,104,116,73,0,5,119,105,100,116,104,120,112,0,0,2,0,0,0,2,13"/>
     <SyntheticProperty name="formSizePolicy" type="int" value="0"/>
     <SyntheticProperty name="generateSize" type="boolean" value="true"/>
     <SyntheticProperty name="generateCenter" type="boolean" value="true"/>
@@ -29,30 +29,6 @@
 
   <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
   <SubComponents>
-    <Component class="javax.swing.JLabel" name="jLabel1">
-      <Properties>
-        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-          <Font name="Tahoma" size="18" style="1"/>
-        </Property>
-        <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-          <Color blue="ff" green="0" red="0" type="rgb"/>
-        </Property>
-        <Property name="horizontalAlignment" type="int" value="2"/>
-        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="3" name="/images/splash/jstock2-wording.png"/>
-        </Property>
-        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-          <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
-            <EmptyBorder bottom="0" left="5" right="5" top="5"/>
-          </Border>
-        </Property>
-      </Properties>
-      <Constraints>
-        <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
-          <BorderConstraints direction="North"/>
-        </Constraint>
-      </Constraints>
-    </Component>
     <Container class="javax.swing.JPanel" name="jPanel1">
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
@@ -72,51 +48,166 @@
         </Component>
       </SubComponents>
     </Container>
-    <Container class="javax.swing.JPanel" name="jPanel2">
+    <Container class="javax.swing.JTabbedPane" name="jTabbedPane1">
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
-          <BorderConstraints direction="Center"/>
+          <BorderConstraints direction="First"/>
         </Constraint>
       </Constraints>
 
-      <Layout>
-        <DimensionLayout dim="0">
-          <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="0" attributes="0">
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jScrollPane1" pref="489" max="32767" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
-              </Group>
-          </Group>
-        </DimensionLayout>
-        <DimensionLayout dim="1">
-          <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="0" attributes="0">
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jScrollPane1" pref="186" max="32767" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
-              </Group>
-          </Group>
-        </DimensionLayout>
-      </Layout>
+      <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
       <SubComponents>
-        <Container class="javax.swing.JScrollPane" name="jScrollPane1">
-          <AuxValues>
-            <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
-          </AuxValues>
+        <Container class="javax.swing.JPanel" name="jPanel3">
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+              <JTabbedPaneConstraints tabName="General">
+                <Property name="tabTitle" type="java.lang.String" value="General"/>
+              </JTabbedPaneConstraints>
+            </Constraint>
+          </Constraints>
 
-          <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout">
+            <Property name="horizontalGap" type="int" value="2"/>
+            <Property name="verticalGap" type="int" value="2"/>
+          </Layout>
           <SubComponents>
-            <Component class="javax.swing.JEditorPane" name="jEditorPane1">
+            <Component class="javax.swing.JLabel" name="jLabel1">
               <Properties>
-                <Property name="contentType" type="java.lang.String" value="text/html"/>
-                <Property name="editable" type="boolean" value="false"/>
-                <Property name="text" type="java.lang.String" value="&lt;html&gt;&#xa;&lt;head&gt;&#xa;&lt;/head&gt;&#xa;    &lt;body&gt;&#xa;        &lt;p style=&quot;margin-top: 10; font-size: 9px; font-family: Tahoma;&quot;&gt;JStock is a stock analysis tool to help you pick stocks in an automated way.&lt;/p&gt;&#xa;        &lt;p style=&quot;margin-top: 10; font-size: 9px; font-family: Tahoma;&quot;&gt;Copyright &amp;copy; 2009 Yan Cheng Cheok &lt;a href=&quot;mailto:yccheok@yahoo.com&quot;&gt;yccheok@yahoo.com&lt;/a&gt;&lt;/p&gt;&#xa;        &lt;p style=&quot;margin-top: 10; font-size: 9px; font-family: Tahoma;&quot;&gt;Code contributed by Peter Gransdorfer, Carlo de Wolf.&lt;/p&gt;&#xa;        &lt;p style=&quot;margin-top: 10; font-size: 9px; font-family: Tahoma;&quot;&gt;Graphics designed by &lt;a href=&quot;http://www.iconblock.com/&quot;&gt;IconBlock&lt;/a&gt;.&lt;/p&gt;&#xa;        &lt;p style=&quot;margin-top: 10; font-size: 9px; font-family: Tahoma;&quot;&gt;Chatting feature emotional icons and sounds are from GPLed software &lt;a href=&quot;http://pidgin.im&quot;&gt;Pidgin 2.4.0&lt;/a&gt;&lt;/p&gt;&#xa;        &lt;p style=&quot;margin-top: 10; font-size: 9px; font-family: Tahoma;&quot;&gt;Latest update can be downloaded from : &lt;a href=&quot;http://jstock.sourceforge.net&quot;&gt;http://jstock.sourceforge.net&lt;/a&gt;&lt;/p&gt;&#xa;        &lt;p style=&quot;margin-top: 10; font-size: 9px; font-family: Tahoma;&quot;&gt;This free software is licensed under : &lt;a href=&quot;http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt&quot;&gt;GNU General Public License, version 2&lt;/a&gt;&lt;/p&gt;&#xa;    &lt;/body&gt;&#xa;&lt;/html&gt;"/>
+                <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                  <Color blue="ff" green="0" red="0" type="rgb"/>
+                </Property>
+                <Property name="horizontalAlignment" type="int" value="2"/>
+                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/images/splash/jstock2-wording.png"/>
+                </Property>
+                <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+                  <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
+                    <EmptyBorder bottom="0" left="5" right="5" top="5"/>
+                  </Border>
+                </Property>
               </Properties>
-              <Events>
-                <EventHandler event="hyperlinkUpdate" listener="javax.swing.event.HyperlinkListener" parameters="javax.swing.event.HyperlinkEvent" handler="jEditorPane1HyperlinkUpdate"/>
-              </Events>
+              <Constraints>
+                <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+                  <BorderConstraints direction="Center"/>
+                </Constraint>
+              </Constraints>
             </Component>
+            <Container class="javax.swing.JPanel" name="jPanel2">
+              <Constraints>
+                <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+                  <BorderConstraints direction="South"/>
+                </Constraint>
+              </Constraints>
+
+              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout"/>
+              <SubComponents>
+                <Container class="javax.swing.JScrollPane" name="jScrollPane3">
+                  <Properties>
+                    <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+                      <Border info="null"/>
+                    </Property>
+                  </Properties>
+                  <AuxValues>
+                    <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
+                  </AuxValues>
+
+                  <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+                  <SubComponents>
+                    <Component class="javax.swing.JEditorPane" name="jEditorPane2">
+                      <Properties>
+                        <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                          <Color blue="f0" green="f0" red="f0" type="rgb"/>
+                        </Property>
+                        <Property name="contentType" type="java.lang.String" value="text/html"/>
+                        <Property name="editable" type="boolean" value="false"/>
+                        <Property name="text" type="java.lang.String" value="&lt;html&gt;&#xa;&lt;head&gt;&#xa;&lt;/head&gt;&#xa;    &lt;body&gt;&#xa;        &lt;p style=&quot;margin-top: 0; font-size: 9px; font-family: Tahoma;&quot;&gt;Lastest update can be downloaded from &lt;a href=&quot;http://jstock.sourceforge.net&quot;&gt;http://jstock.sourceforge.net&lt;/a&gt;&lt;/p&gt;&#xa;    &lt;/body&gt;&#xa;&lt;/html&gt;"/>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="hyperlinkUpdate" listener="javax.swing.event.HyperlinkListener" parameters="javax.swing.event.HyperlinkEvent" handler="jEditorPane1HyperlinkUpdate"/>
+                      </Events>
+                    </Component>
+                  </SubComponents>
+                </Container>
+              </SubComponents>
+            </Container>
+          </SubComponents>
+        </Container>
+        <Container class="javax.swing.JPanel" name="jPanel4">
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+              <JTabbedPaneConstraints tabName="Credits">
+                <Property name="tabTitle" type="java.lang.String" value="Credits"/>
+              </JTabbedPaneConstraints>
+            </Constraint>
+          </Constraints>
+
+          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+          <SubComponents>
+            <Container class="javax.swing.JScrollPane" name="jScrollPane1">
+              <AuxValues>
+                <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
+              </AuxValues>
+              <Constraints>
+                <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+                  <BorderConstraints direction="Center"/>
+                </Constraint>
+              </Constraints>
+
+              <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+              <SubComponents>
+                <Component class="javax.swing.JEditorPane" name="jEditorPane1">
+                  <Properties>
+                    <Property name="contentType" type="java.lang.String" value="text/html"/>
+                    <Property name="editable" type="boolean" value="false"/>
+                    <Property name="text" type="java.lang.String" value="&lt;html&gt;&#xa;&lt;head&gt;&#xa;&lt;/head&gt;&#xa;    &lt;body&gt;&#xa;        &lt;p style=&quot;margin-top: 10; font-size: 9px; font-family: Tahoma;&quot;&gt;&lt;u&gt;Team Members of JStock Open Source Project :&lt;/u&gt;&lt;/p&gt;&#xa;        &lt;br&gt;&#xa;        &lt;p style=&quot;margin-top: 10; font-size: 9px; font-family: Tahoma;&quot;&gt;&lt;b&gt;Yan Cheng Cheok&lt;/b&gt;, &lt;a href=&quot;mailto:yccheok@yahoo.com&quot;&gt;yccheok@yahoo.com&lt;/a&gt;, Project admin and lead programmer.&lt;/p&gt;&#xa;        &lt;p style=&quot;margin-top: 10; font-size: 9px; font-family: Tahoma;&quot;&gt;&lt;b&gt;&lt;a href=&quot;http://www.iconblock.com/&quot;&gt;The IconBlock Ltd&lt;/a&gt;&lt;/b&gt;, Interface and icon design.&lt;/p&gt;&#xa;        &lt;p style=&quot;margin-top: 10; font-size: 9px; font-family: Tahoma;&quot;&gt;&lt;b&gt;Peter Gransdorfer&lt;/b&gt;, Programmer.&lt;/p&gt;&#xa;        &lt;p style=&quot;margin-top: 10; font-size: 9px; font-family: Tahoma;&quot;&gt;&lt;b&gt;Karl Heinz Putz&lt;/b&gt;, Mac packager.&lt;/p&gt;&#xa;        &lt;p style=&quot;margin-top: 10; font-size: 9px; font-family: Tahoma;&quot;&gt;&lt;b&gt;Carlo de Wolf&lt;/b&gt;, Code contributor.&lt;/p&gt;&#xa;        &lt;br&gt;&#xa;        &lt;br&gt;&#xa;        &lt;br&gt;&#xa;        &lt;br&gt;&#xa;        &lt;br&gt;&#xa;        &lt;hr&gt;&#xa;        &lt;p style=&quot;margin-top: 10; font-size: 8px; font-family: Tahoma;&quot;&gt;Wish to see your name being mentioned here? Feel free to visit &lt;a href=&quot;http://sourceforge.net/projects/jstock&quot;&gt;http://sourceforge.net/projects/jstock&lt;/a&gt; to see how you can contribute to JStock Open Source Project.&lt;/p&gt;&#xa;    &lt;/body&gt;&#xa;&lt;/html&gt;"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="hyperlinkUpdate" listener="javax.swing.event.HyperlinkListener" parameters="javax.swing.event.HyperlinkEvent" handler="jEditorPane1HyperlinkUpdate"/>
+                  </Events>
+                </Component>
+              </SubComponents>
+            </Container>
+          </SubComponents>
+        </Container>
+        <Container class="javax.swing.JPanel" name="jPanel5">
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+              <JTabbedPaneConstraints tabName="License">
+                <Property name="tabTitle" type="java.lang.String" value="License"/>
+              </JTabbedPaneConstraints>
+            </Constraint>
+          </Constraints>
+
+          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+          <SubComponents>
+            <Container class="javax.swing.JScrollPane" name="jScrollPane2">
+              <AuxValues>
+                <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
+              </AuxValues>
+              <Constraints>
+                <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+                  <BorderConstraints direction="Center"/>
+                </Constraint>
+              </Constraints>
+
+              <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+              <SubComponents>
+                <Component class="javax.swing.JTextArea" name="jTextArea1">
+                  <Properties>
+                    <Property name="columns" type="int" value="20"/>
+                    <Property name="editable" type="boolean" value="false"/>
+                    <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                      <Font name="Monospaced" size="12" style="0"/>
+                    </Property>
+                    <Property name="rows" type="int" value="5"/>
+                    <Property name="text" type="java.lang.String" value="&#x9;&#x9;    GNU GENERAL PUBLIC LICENSE&#xa;&#x9;&#x9;       Version 2, June 1991&#xa;&#xa; Copyright (C) 1989, 1991 Free Software Foundation, Inc.,&#xa; 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA&#xa; Everyone is permitted to copy and distribute verbatim copies&#xa; of this license document, but changing it is not allowed.&#xa;&#xa;&#x9;&#x9;&#x9;    Preamble&#xa;&#xa;  The licenses for most software are designed to take away your&#xa;freedom to share and change it.  By contrast, the GNU General Public&#xa;License is intended to guarantee your freedom to share and change free&#xa;software--to make sure the software is free for all its users.  This&#xa;General Public License applies to most of the Free Software&#xa;Foundation&apos;s software and to any other program whose authors commit to&#xa;using it.  (Some other Free Software Foundation software is covered by&#xa;the GNU Lesser General Public License instead.)  You can apply it to&#xa;your programs, too.&#xa;&#xa;  When we speak of free software, we are referring to freedom, not&#xa;price.  Our General Public Licenses are designed to make sure that you&#xa;have the freedom to distribute copies of free software (and charge for&#xa;this service if you wish), that you receive source code or can get it&#xa;if you want it, that you can change the software or use pieces of it&#xa;in new free programs; and that you know you can do these things.&#xa;&#xa;  To protect your rights, we need to make restrictions that forbid&#xa;anyone to deny you these rights or to ask you to surrender the rights.&#xa;These restrictions translate to certain responsibilities for you if you&#xa;distribute copies of the software, or if you modify it.&#xa;&#xa;  For example, if you distribute copies of such a program, whether&#xa;gratis or for a fee, you must give the recipients all the rights that&#xa;you have.  You must make sure that they, too, receive or can get the&#xa;source code.  And you must show them these terms so they know their&#xa;rights.&#xa;&#xa;  We protect your rights with two steps: (1) copyright the software, and&#xa;(2) offer you this license which gives you legal permission to copy,&#xa;distribute and/or modify the software.&#xa;&#xa;  Also, for each author&apos;s protection and ours, we want to make certain&#xa;that everyone understands that there is no warranty for this free&#xa;software.  If the software is modified by someone else and passed on, we&#xa;want its recipients to know that what they have is not the original, so&#xa;that any problems introduced by others will not reflect on the original&#xa;authors&apos; reputations.&#xa;&#xa;  Finally, any free program is threatened constantly by software&#xa;patents.  We wish to avoid the danger that redistributors of a free&#xa;program will individually obtain patent licenses, in effect making the&#xa;program proprietary.  To prevent this, we have made it clear that any&#xa;patent must be licensed for everyone&apos;s free use or not licensed at all.&#xa;&#xa;  The precise terms and conditions for copying, distribution and&#xa;modification follow.&#xa;&#xa;&#x9;&#x9;    GNU GENERAL PUBLIC LICENSE&#xa;   TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION&#xa;&#xa;  0. This License applies to any program or other work which contains&#xa;a notice placed by the copyright holder saying it may be distributed&#xa;under the terms of this General Public License.  The &quot;Program&quot;, below,&#xa;refers to any such program or work, and a &quot;work based on the Program&quot;&#xa;means either the Program or any derivative work under copyright law:&#xa;that is to say, a work containing the Program or a portion of it,&#xa;either verbatim or with modifications and/or translated into another&#xa;language.  (Hereinafter, translation is included without limitation in&#xa;the term &quot;modification&quot;.)  Each licensee is addressed as &quot;you&quot;.&#xa;&#xa;Activities other than copying, distribution and modification are not&#xa;covered by this License; they are outside its scope.  The act of&#xa;running the Program is not restricted, and the output from the Program&#xa;is covered only if its contents constitute a work based on the&#xa;Program (independent of having been made by running the Program).&#xa;Whether that is true depends on what the Program does.&#xa;&#xa;  1. You may copy and distribute verbatim copies of the Program&apos;s&#xa;source code as you receive it, in any medium, provided that you&#xa;conspicuously and appropriately publish on each copy an appropriate&#xa;copyright notice and disclaimer of warranty; keep intact all the&#xa;notices that refer to this License and to the absence of any warranty;&#xa;and give any other recipients of the Program a copy of this License&#xa;along with the Program.&#xa;&#xa;You may charge a fee for the physical act of transferring a copy, and&#xa;you may at your option offer warranty protection in exchange for a fee.&#xa;&#xa;  2. You may modify your copy or copies of the Program or any portion&#xa;of it, thus forming a work based on the Program, and copy and&#xa;distribute such modifications or work under the terms of Section 1&#xa;above, provided that you also meet all of these conditions:&#xa;&#xa;    a) You must cause the modified files to carry prominent notices&#xa;    stating that you changed the files and the date of any change.&#xa;&#xa;    b) You must cause any work that you distribute or publish, that in&#xa;    whole or in part contains or is derived from the Program or any&#xa;    part thereof, to be licensed as a whole at no charge to all third&#xa;    parties under the terms of this License.&#xa;&#xa;    c) If the modified program normally reads commands interactively&#xa;    when run, you must cause it, when started running for such&#xa;    interactive use in the most ordinary way, to print or display an&#xa;    announcement including an appropriate copyright notice and a&#xa;    notice that there is no warranty (or else, saying that you provide&#xa;    a warranty) and that users may redistribute the program under&#xa;    these conditions, and telling the user how to view a copy of this&#xa;    License.  (Exception: if the Program itself is interactive but&#xa;    does not normally print such an announcement, your work based on&#xa;    the Program is not required to print an announcement.)&#xa;&#xa;These requirements apply to the modified work as a whole.  If&#xa;identifiable sections of that work are not derived from the Program,&#xa;and can be reasonably considered independent and separate works in&#xa;themselves, then this License, and its terms, do not apply to those&#xa;sections when you distribute them as separate works.  But when you&#xa;distribute the same sections as part of a whole which is a work based&#xa;on the Program, the distribution of the whole must be on the terms of&#xa;this License, whose permissions for other licensees extend to the&#xa;entire whole, and thus to each and every part regardless of who wrote it.&#xa;&#xa;Thus, it is not the intent of this section to claim rights or contest&#xa;your rights to work written entirely by you; rather, the intent is to&#xa;exercise the right to control the distribution of derivative or&#xa;collective works based on the Program.&#xa;&#xa;In addition, mere aggregation of another work not based on the Program&#xa;with the Program (or with a work based on the Program) on a volume of&#xa;a storage or distribution medium does not bring the other work under&#xa;the scope of this License.&#xa;&#xa;  3. You may copy and distribute the Program (or a work based on it,&#xa;under Section 2) in object code or executable form under the terms of&#xa;Sections 1 and 2 above provided that you also do one of the following:&#xa;&#xa;    a) Accompany it with the complete corresponding machine-readable&#xa;    source code, which must be distributed under the terms of Sections&#xa;    1 and 2 above on a medium customarily used for software interchange; or,&#xa;&#xa;    b) Accompany it with a written offer, valid for at least three&#xa;    years, to give any third party, for a charge no more than your&#xa;    cost of physically performing source distribution, a complete&#xa;    machine-readable copy of the corresponding source code, to be&#xa;    distributed under the terms of Sections 1 and 2 above on a medium&#xa;    customarily used for software interchange; or,&#xa;&#xa;    c) Accompany it with the information you received as to the offer&#xa;    to distribute corresponding source code.  (This alternative is&#xa;    allowed only for noncommercial distribution and only if you&#xa;    received the program in object code or executable form with such&#xa;    an offer, in accord with Subsection b above.)&#xa;&#xa;The source code for a work means the preferred form of the work for&#xa;making modifications to it.  For an executable work, complete source&#xa;code means all the source code for all modules it contains, plus any&#xa;associated interface definition files, plus the scripts used to&#xa;control compilation and installation of the executable.  However, as a&#xa;special exception, the source code distributed need not include&#xa;anything that is normally distributed (in either source or binary&#xa;form) with the major components (compiler, kernel, and so on) of the&#xa;operating system on which the executable runs, unless that component&#xa;itself accompanies the executable.&#xa;&#xa;If distribution of executable or object code is made by offering&#xa;access to copy from a designated place, then offering equivalent&#xa;access to copy the source code from the same place counts as&#xa;distribution of the source code, even though third parties are not&#xa;compelled to copy the source along with the object code.&#xa;&#xa;  4. You may not copy, modify, sublicense, or distribute the Program&#xa;except as expressly provided under this License.  Any attempt&#xa;otherwise to copy, modify, sublicense or distribute the Program is&#xa;void, and will automatically terminate your rights under this License.&#xa;However, parties who have received copies, or rights, from you under&#xa;this License will not have their licenses terminated so long as such&#xa;parties remain in full compliance.&#xa;&#xa;  5. You are not required to accept this License, since you have not&#xa;signed it.  However, nothing else grants you permission to modify or&#xa;distribute the Program or its derivative works.  These actions are&#xa;prohibited by law if you do not accept this License.  Therefore, by&#xa;modifying or distributing the Program (or any work based on the&#xa;Program), you indicate your acceptance of this License to do so, and&#xa;all its terms and conditions for copying, distributing or modifying&#xa;the Program or works based on it.&#xa;&#xa;  6. Each time you redistribute the Program (or any work based on the&#xa;Program), the recipient automatically receives a license from the&#xa;original licensor to copy, distribute or modify the Program subject to&#xa;these terms and conditions.  You may not impose any further&#xa;restrictions on the recipients&apos; exercise of the rights granted herein.&#xa;You are not responsible for enforcing compliance by third parties to&#xa;this License.&#xa;&#xa;  7. If, as a consequence of a court judgment or allegation of patent&#xa;infringement or for any other reason (not limited to patent issues),&#xa;conditions are imposed on you (whether by court order, agreement or&#xa;otherwise) that contradict the conditions of this License, they do not&#xa;excuse you from the conditions of this License.  If you cannot&#xa;distribute so as to satisfy simultaneously your obligations under this&#xa;License and any other pertinent obligations, then as a consequence you&#xa;may not distribute the Program at all.  For example, if a patent&#xa;license would not permit royalty-free redistribution of the Program by&#xa;all those who receive copies directly or indirectly through you, then&#xa;the only way you could satisfy both it and this License would be to&#xa;refrain entirely from distribution of the Program.&#xa;&#xa;If any portion of this section is held invalid or unenforceable under&#xa;any particular circumstance, the balance of the section is intended to&#xa;apply and the section as a whole is intended to apply in other&#xa;circumstances.&#xa;&#xa;It is not the purpose of this section to induce you to infringe any&#xa;patents or other property right claims or to contest validity of any&#xa;such claims; this section has the sole purpose of protecting the&#xa;integrity of the free software distribution system, which is&#xa;implemented by public license practices.  Many people have made&#xa;generous contributions to the wide range of software distributed&#xa;through that system in reliance on consistent application of that&#xa;system; it is up to the author/donor to decide if he or she is willing&#xa;to distribute software through any other system and a licensee cannot&#xa;impose that choice.&#xa;&#xa;This section is intended to make thoroughly clear what is believed to&#xa;be a consequence of the rest of this License.&#xa;&#xa;  8. If the distribution and/or use of the Program is restricted in&#xa;certain countries either by patents or by copyrighted interfaces, the&#xa;original copyright holder who places the Program under this License&#xa;may add an explicit geographical distribution limitation excluding&#xa;those countries, so that distribution is permitted only in or among&#xa;countries not thus excluded.  In such case, this License incorporates&#xa;the limitation as if written in the body of this License.&#xa;&#xa;  9. The Free Software Foundation may publish revised and/or new versions&#xa;of the General Public License from time to time.  Such new versions will&#xa;be similar in spirit to the present version, but may differ in detail to&#xa;address new problems or concerns.&#xa;&#xa;Each version is given a distinguishing version number.  If the Program&#xa;specifies a version number of this License which applies to it and &quot;any&#xa;later version&quot;, you have the option of following the terms and conditions&#xa;either of that version or of any later version published by the Free&#xa;Software Foundation.  If the Program does not specify a version number of&#xa;this License, you may choose any version ever published by the Free Software&#xa;Foundation.&#xa;&#xa;  10. If you wish to incorporate parts of the Program into other free&#xa;programs whose distribution conditions are different, write to the author&#xa;to ask for permission.  For software which is copyrighted by the Free&#xa;Software Foundation, write to the Free Software Foundation; we sometimes&#xa;make exceptions for this.  Our decision will be guided by the two goals&#xa;of preserving the free status of all derivatives of our free software and&#xa;of promoting the sharing and reuse of software generally.&#xa;&#xa;&#x9;&#x9;&#x9;    NO WARRANTY&#xa;&#xa;  11. BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY&#xa;FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW.  EXCEPT WHEN&#xa;OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES&#xa;PROVIDE THE PROGRAM &quot;AS IS&quot; WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED&#xa;OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF&#xa;MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.  THE ENTIRE RISK AS&#xa;TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU.  SHOULD THE&#xa;PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING,&#xa;REPAIR OR CORRECTION.&#xa;&#xa;  12. IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING&#xa;WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR&#xa;REDISTRIBUTE THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES,&#xa;INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING&#xa;OUT OF THE USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED&#xa;TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY&#xa;YOU OR THIRD PARTIES OR A FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER&#xa;PROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE&#xa;POSSIBILITY OF SUCH DAMAGES.&#xa;&#xa;&#x9;&#x9;     END OF TERMS AND CONDITIONS&#xa;&#xa;&#x9;    How to Apply These Terms to Your New Programs&#xa;&#xa;  If you develop a new program, and you want it to be of the greatest&#xa;possible use to the public, the best way to achieve this is to make it&#xa;free software which everyone can redistribute and change under these terms.&#xa;&#xa;  To do so, attach the following notices to the program.  It is safest&#xa;to attach them to the start of each source file to most effectively&#xa;convey the exclusion of warranty; and each file should have at least&#xa;the &quot;copyright&quot; line and a pointer to where the full notice is found.&#xa;&#xa;    &lt;one line to give the program&apos;s name and a brief idea of what it does.&gt;&#xa;    Copyright (C) &lt;year&gt;  &lt;name of author&gt;&#xa;&#xa;    This program is free software; you can redistribute it and/or modify&#xa;    it under the terms of the GNU General Public License as published by&#xa;    the Free Software Foundation; either version 2 of the License, or&#xa;    (at your option) any later version.&#xa;&#xa;    This program is distributed in the hope that it will be useful,&#xa;    but WITHOUT ANY WARRANTY; without even the implied warranty of&#xa;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the&#xa;    GNU General Public License for more details.&#xa;&#xa;    You should have received a copy of the GNU General Public License along&#xa;    with this program; if not, write to the Free Software Foundation, Inc.,&#xa;    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.&#xa;&#xa;Also add information on how to contact you by electronic and paper mail.&#xa;&#xa;If the program is interactive, make it output a short notice like this&#xa;when it starts in an interactive mode:&#xa;&#xa;    Gnomovision version 69, Copyright (C) year name of author&#xa;    Gnomovision comes with ABSOLUTELY NO WARRANTY; for details type `show w&apos;.&#xa;    This is free software, and you are welcome to redistribute it&#xa;    under certain conditions; type `show c&apos; for details.&#xa;&#xa;The hypothetical commands `show w&apos; and `show c&apos; should show the appropriate&#xa;parts of the General Public License.  Of course, the commands you use may&#xa;be called something other than `show w&apos; and `show c&apos;; they could even be&#xa;mouse-clicks or menu items--whatever suits your program.&#xa;&#xa;You should also get your employer (if you work as a programmer) or your&#xa;school, if any, to sign a &quot;copyright disclaimer&quot; for the program, if&#xa;necessary.  Here is a sample; alter the names:&#xa;&#xa;  Yoyodyne, Inc., hereby disclaims all copyright interest in the program&#xa;  `Gnomovision&apos; (which makes passes at compilers) written by James Hacker.&#xa;&#xa;  &lt;signature of Ty Coon&gt;, 1 April 1989&#xa;  Ty Coon, President of Vice&#xa;&#xa;This General Public License does not permit incorporating your program into&#xa;proprietary programs.  If your program is a subroutine library, you may&#xa;consider it more useful to permit linking proprietary applications with the&#xa;library.  If this is what you want to do, use the GNU Lesser General&#xa;Public License instead of this License.&#xa;"/>
+                  </Properties>
+                  <AuxValues>
+                    <AuxValue name="JavaCodeGenerator_allCodePost" type="java.lang.String" value="jTextArea1.setCaretPosition(0);"/>
+                  </AuxValues>
+                </Component>
+              </SubComponents>
+            </Container>
           </SubComponents>
         </Container>
       </SubComponents>
