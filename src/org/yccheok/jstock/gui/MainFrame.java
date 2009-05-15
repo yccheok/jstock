@@ -3535,11 +3535,8 @@ public class MainFrame extends javax.swing.JFrame {
         return new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                System.out.println(e.getClickCount());
-                
                 if (e.getClickCount() >= 2) {
                     final Stock stock = getSelectedStock();
-                    System.out.println(stock);
                     if (stock == null) {
                         return;
                     }
