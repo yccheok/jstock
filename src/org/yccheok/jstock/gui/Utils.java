@@ -44,6 +44,7 @@ import javax.swing.ImageIcon;
 import javax.swing.UIManager;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.auth.AuthScope;
@@ -63,7 +64,6 @@ import org.yccheok.jstock.analysis.StockOperator;
  * @author yccheok
  */
 public class Utils {
-    
     /** Creates a new instance of Utils */
     private Utils() {
     }
@@ -558,8 +558,83 @@ public class Utils {
         return getFileExtension(f.getName());
     }
 
+    public static ApplicationInfo getLatestApplicationInfo()
+    {
+        HttpMethod method = new GetMethod("http://jstock.sourceforge.net/version/version.txt");
+        final HttpClient httpClient = new HttpClient();
+        org.yccheok.jstock.engine.Utils.setHttpClientProxyFromSystemProperties(httpClient);
+        org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
+
+        InputStream stream = null;
+
+        try {
+            stream = org.yccheok.jstock.gui.Utils.getResponseBodyAsStreamBasedOnProxyAuthOption(httpClient, method);
+
+            if (stream == null)
+                return null;
+
+            Properties properties = new Properties();
+            properties.load(stream);
+
+            final String applicationVersionID = properties.getProperty("applicationVersionID");
+            final String windowsDownloadLink = properties.getProperty("windowsDownloadLink");
+            final String linuxDownloadLink = properties.getProperty("linuxDownloadLink");
+            final String macDownloadLink = properties.getProperty("macDownloadLink");
+            final String solarisDownloadLink = properties.getProperty("solarisDownloadLink");
+            if (applicationVersionID == null || windowsDownloadLink == null || linuxDownloadLink == null || macDownloadLink == null || solarisDownloadLink == null) {
+                return null;
+            }
+
+            return new ApplicationInfo(Integer.parseInt(applicationVersionID), windowsDownloadLink, linuxDownloadLink, macDownloadLink, solarisDownloadLink);
+        }
+        catch (HttpException ex) {
+            log.error(null, ex);
+        }
+        catch (IOException ex) {
+            log.error(null, ex);
+        }
+        catch (NumberFormatException exp) {
+          	log.error(null, exp);
+        }
+        finally {
+            if (stream != null) try {
+                stream.close();
+            } catch (IOException ex) {
+                log.error(null, ex);
+            }
+            method.releaseConnection();
+        }
+
+        return null;
+    }
+
+    public static int getApplicationVersionID() {
+        return Utils.APPLICATION_VERSION_ID;
+    }
+
+    public static class ApplicationInfo
+    {
+        public final int applicationVersionID;
+        public final String windowsDownloadLink;
+        public final String linuxDownloadLink;
+        public final String macDownloadLink;
+        public final String solarisDownloadLink;
+
+        public ApplicationInfo(int applicationVersionID, String windowsDownloadLink, String linuxDownloadLink, String macDownloadLink, String solarisDownloadLink) {
+            this.applicationVersionID = applicationVersionID;
+            this.windowsDownloadLink = windowsDownloadLink;
+            this.linuxDownloadLink = linuxDownloadLink;
+            this.macDownloadLink = macDownloadLink;
+            this.solarisDownloadLink = solarisDownloadLink;
+        }
+    }
+
 	// We will use this as directory name. Do not have space or special characters.
     private static final String APPLICATION_VERSION_STRING = "1.0.4";
+
+    // For About box comparision on latest version purpose.
+    // 1.0.4d
+    private static final int APPLICATION_VERSION_ID = 1043;
 
     private static Executor zombiePool = Executors.newFixedThreadPool(Utils.NUM_OF_THREADS_ZOMBIE_POOL);
 
