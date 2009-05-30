@@ -1,16 +1,37 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <Form version="1.5" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JDialogFormInfo">
+  <NonVisualComponents>
+    <Container class="javax.swing.JPanel" name="jPanel2">
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="busyComponent = new JBusyComponent&lt;JPanel&gt;(jPanel2);&#xd;&#xa;busyComponent.setBusy(true);&#xd;&#xa;checkForUpdateThread.start();"/>
+      </AuxValues>
+
+      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout"/>
+      <SubComponents>
+        <Component class="javax.swing.JEditorPane" name="jEditorPane2">
+          <Properties>
+            <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="f0" green="f0" red="f0" type="rgb"/>
+            </Property>
+            <Property name="contentType" type="java.lang.String" value="text/html"/>
+            <Property name="editable" type="boolean" value="false"/>
+            <Property name="text" type="java.lang.String" value="&lt;html&gt;&#xa;&lt;head&gt;&#xa;&lt;/head&gt;&#xa;    &lt;body&gt;&#xa;        &lt;p style=&quot;margin-top: 0; font-size: 9px; font-family: Tahoma;&quot;&gt;&lt;b&gt;Checking for updates...&lt;/b&gt;&lt;/p&gt;&#xa;    &lt;/body&gt;&#xa;&lt;/html&gt;"/>
+          </Properties>
+          <Events>
+            <EventHandler event="hyperlinkUpdate" listener="javax.swing.event.HyperlinkListener" parameters="javax.swing.event.HyperlinkEvent" handler="jEditorPane1HyperlinkUpdate"/>
+          </Events>
+        </Component>
+      </SubComponents>
+    </Container>
+  </NonVisualComponents>
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="2"/>
     <Property name="title" type="java.lang.String" value="About JStock"/>
-    <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-      <Color blue="ff" green="ff" id="white" palette="1" red="ff" type="palette"/>
-    </Property>
     <Property name="resizable" type="boolean" value="false"/>
   </Properties>
   <SyntheticProperties>
-    <SyntheticProperty name="formSize" type="java.awt.Dimension" value="-84,-19,0,5,115,114,0,18,106,97,118,97,46,97,119,116,46,68,105,109,101,110,115,105,111,110,65,-114,-39,-41,-84,95,68,20,2,0,2,73,0,6,104,101,105,103,104,116,73,0,5,119,105,100,116,104,120,112,0,0,2,0,0,0,2,13"/>
+    <SyntheticProperty name="formSize" type="java.awt.Dimension" value="-84,-19,0,5,115,114,0,18,106,97,118,97,46,97,119,116,46,68,105,109,101,110,115,105,111,110,65,-114,-39,-41,-84,95,68,20,2,0,2,73,0,6,104,101,105,103,104,116,73,0,5,119,105,100,116,104,120,112,0,0,2,22,0,0,2,13"/>
     <SyntheticProperty name="formSizePolicy" type="int" value="0"/>
     <SyntheticProperty name="generateSize" type="boolean" value="true"/>
     <SyntheticProperty name="generateCenter" type="boolean" value="true"/>
@@ -57,7 +78,7 @@
       </Events>
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
-          <BorderConstraints direction="First"/>
+          <BorderConstraints direction="Center"/>
         </Constraint>
       </Constraints>
 
@@ -98,35 +119,33 @@
                 </Constraint>
               </Constraints>
             </Component>
-            <Container class="javax.swing.JPanel" name="jPanel2">
+            <Container class="javax.swing.JPanel" name="jPanel9">
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_AddingCodePre" type="java.lang.String" value="jPanel9.add(busyComponent);"/>
+              </AuxValues>
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
                   <BorderConstraints direction="South"/>
                 </Constraint>
               </Constraints>
 
-              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout"/>
+              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
+                <Property name="columns" type="int" value="0"/>
+                <Property name="rows" type="int" value="2"/>
+              </Layout>
               <SubComponents>
-                <Container class="javax.swing.JScrollPane" name="jScrollPane3">
-                  <Properties>
-                    <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-                      <Border info="null"/>
-                    </Property>
-                  </Properties>
-                  <AuxValues>
-                    <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
-                  </AuxValues>
+                <Container class="javax.swing.JPanel" name="jPanel10">
 
-                  <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+                  <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout"/>
                   <SubComponents>
-                    <Component class="javax.swing.JEditorPane" name="jEditorPane2">
+                    <Component class="javax.swing.JEditorPane" name="jEditorPane3">
                       <Properties>
                         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                           <Color blue="f0" green="f0" red="f0" type="rgb"/>
                         </Property>
                         <Property name="contentType" type="java.lang.String" value="text/html"/>
                         <Property name="editable" type="boolean" value="false"/>
-                        <Property name="text" type="java.lang.String" value="&lt;html&gt;&#xa;&lt;head&gt;&#xa;&lt;/head&gt;&#xa;    &lt;body&gt;&#xa;        &lt;p style=&quot;margin-top: 0; font-size: 9px; font-family: Tahoma;&quot;&gt;Lastest update can be downloaded from &lt;a href=&quot;http://jstock.sourceforge.net&quot;&gt;http://jstock.sourceforge.net&lt;/a&gt;&lt;/p&gt;&#xa;    &lt;/body&gt;&#xa;&lt;/html&gt;"/>
+                        <Property name="text" type="java.lang.String" value="&lt;html&gt;&#xd;&#xa;  &lt;head&gt;&#xd;&#xa;&#xd;&#xa;  &lt;/head&gt;&#xd;&#xa;  &lt;body&gt;&#xd;&#xa;        &lt;p style=&quot;margin-top: 0; font-size: 9px; font-family: Tahoma;&quot;&gt;Homepage : &lt;a href=&quot;http://jstock.sourceforge.net&quot;&gt;http://jstock.sourceforge.net&lt;/a&gt;&lt;/p&gt;&#xa;  &lt;/body&gt;&#xd;&#xa;&lt;/html&gt;&#xd;&#xa;"/>
                       </Properties>
                       <Events>
                         <EventHandler event="hyperlinkUpdate" listener="javax.swing.event.HyperlinkListener" parameters="javax.swing.event.HyperlinkEvent" handler="jEditorPane1HyperlinkUpdate"/>
@@ -170,11 +189,14 @@
                   <Properties>
                     <Property name="contentType" type="java.lang.String" value="text/html"/>
                     <Property name="editable" type="boolean" value="false"/>
-                    <Property name="text" type="java.lang.String" value="&lt;html&gt;&#xa;&lt;head&gt;&#xa;&lt;/head&gt;&#xa;    &lt;body&gt;&#xa;        &lt;p style=&quot;margin-top: 10; font-size: 9px; font-family: Tahoma;&quot;&gt;&lt;u&gt;Team Members of JStock Open Source Project :&lt;/u&gt;&lt;/p&gt;&#xa;        &lt;br&gt;&#xa;        &lt;p style=&quot;margin-top: 10; font-size: 9px; font-family: Tahoma;&quot;&gt;&lt;b&gt;Yan Cheng Cheok&lt;/b&gt;, &lt;a href=&quot;mailto:yccheok@yahoo.com&quot;&gt;yccheok@yahoo.com&lt;/a&gt;, Project admin and lead programmer.&lt;/p&gt;&#xa;        &lt;p style=&quot;margin-top: 10; font-size: 9px; font-family: Tahoma;&quot;&gt;&lt;b&gt;&lt;a href=&quot;http://www.iconblock.com/&quot;&gt;The IconBlock Ltd&lt;/a&gt;&lt;/b&gt;, Interface and icon design.&lt;/p&gt;&#xa;        &lt;p style=&quot;margin-top: 10; font-size: 9px; font-family: Tahoma;&quot;&gt;&lt;b&gt;Peter Gransdorfer&lt;/b&gt;, Programmer.&lt;/p&gt;&#xa;        &lt;p style=&quot;margin-top: 10; font-size: 9px; font-family: Tahoma;&quot;&gt;&lt;b&gt;Karl Heinz Putz&lt;/b&gt;, Mac packager.&lt;/p&gt;&#xa;        &lt;p style=&quot;margin-top: 10; font-size: 9px; font-family: Tahoma;&quot;&gt;&lt;b&gt;Carlo de Wolf&lt;/b&gt;, Code contributor.&lt;/p&gt;&#xa;        &lt;br&gt;&#xa;        &lt;br&gt;&#xa;        &lt;br&gt;&#xa;        &lt;br&gt;&#xa;        &lt;br&gt;&#xa;        &lt;hr&gt;&#xa;        &lt;p style=&quot;margin-top: 10; font-size: 8px; font-family: Tahoma;&quot;&gt;Wish to see your name being mentioned here? Feel free to visit &lt;a href=&quot;http://sourceforge.net/projects/jstock&quot;&gt;http://sourceforge.net/projects/jstock&lt;/a&gt; to see how you can contribute to JStock Open Source Project.&lt;/p&gt;&#xa;    &lt;/body&gt;&#xa;&lt;/html&gt;"/>
+                    <Property name="text" type="java.lang.String" value="&lt;html&gt;&#xa;&lt;head&gt;&#xa;&lt;/head&gt;&#xa;    &lt;body&gt;&#xa;        &lt;p style=&quot;margin-top: 10; font-size: 9px; font-family: Tahoma;&quot;&gt;&lt;u&gt;Team Members of JStock Open Source Project :&lt;/u&gt;&lt;/p&gt;&#xa;        &lt;br&gt;&#xa;        &lt;p style=&quot;margin-top: 10; font-size: 9px; font-family: Tahoma;&quot;&gt;&lt;b&gt;Yan Cheng Cheok&lt;/b&gt;, &lt;a href=&quot;mailto:yccheok@yahoo.com&quot;&gt;yccheok@yahoo.com&lt;/a&gt;, Project admin and lead programmer.&lt;/p&gt;&#xa;        &lt;p style=&quot;margin-top: 10; font-size: 9px; font-family: Tahoma;&quot;&gt;&lt;b&gt;&lt;a href=&quot;http://www.iconblock.com/&quot;&gt;The IconBlock Ltd&lt;/a&gt;&lt;/b&gt;, Interface and icon design.&lt;/p&gt;&#xa;        &lt;p style=&quot;margin-top: 10; font-size: 9px; font-family: Tahoma;&quot;&gt;&lt;b&gt;Peter Gransdorfer&lt;/b&gt;, Programmer.&lt;/p&gt;&#xa;        &lt;p style=&quot;margin-top: 10; font-size: 9px; font-family: Tahoma;&quot;&gt;&lt;b&gt;Karl Heinz Putz&lt;/b&gt;, Mac packager.&lt;/p&gt;&#xa;        &lt;p style=&quot;margin-top: 10; font-size: 9px; font-family: Tahoma;&quot;&gt;&lt;b&gt;Carlo de Wolf&lt;/b&gt;, Code contributor.&lt;/p&gt;&#xa;        &lt;br&gt;&#xa;        &lt;br&gt;&#xa;        &lt;p style=&quot;margin-top: 10; font-size: 9px; font-family: Tahoma;&quot;&gt;&lt;u&gt;Used Libraries :&lt;/u&gt;&lt;/p&gt;&#xa;        &lt;p style=&quot;margin-top: 10; font-size: 9px; font-family: Tahoma;&quot;&gt;&#xa;        &lt;a href=&quot;http://commons.apache.org/logging/&quot;&gt;Apache Common Logging&lt;/a&gt; - Logging.&lt;br&gt;&#xa;        &lt;a href=&quot;http://hc.apache.org/httpclient-3.x/&quot;&gt;Apache HttpClient&lt;/a&gt; - Http communication.&lt;br&gt;&#xa;        &lt;a href=&quot;http://poi.apache.org/&quot;&gt;Apache POI&lt;/a&gt; - Excel file format.&lt;br&gt;&#xa;        &lt;a href=&quot;http://jstock.sourceforge.net/blobsallad/&quot;&gt;blobsallad&lt;/a&gt; - Java ported blob sallad by Yan Cheng Cheok. Original JavaScript version written by Bj&#xf6;rn Lindberg&lt;br&gt;&#xa;        &lt;a href=&quot;http://www.jfree.org/jfreechart/&quot;&gt;JFreeChart&lt;/a&gt; - Charting.&lt;br&gt;&#xa;        &lt;a href=&quot;https://sourceforge.net/projects/jhotdraw/&quot;&gt;JHotDraw&lt;/a&gt; - Indicator editor drawing.&lt;br&gt;&#xa;        &lt;a href=&quot;http://www.l2fprod.com/&quot;&gt;L2fProd&lt;/a&gt; - Flashy looking GUI.&lt;br&gt;&#xa;        &lt;a href=&quot;http://www.igniterealtime.org/projects/smack/index.jsp&quot;&gt;Jasypt&lt;/a&gt; - Encryption.&lt;br&gt;&#xa;        &lt;a href=&quot;http://nachocalendar.sourceforge.net/&quot;&gt;NachoCalendar&lt;/a&gt; - Calendar GUI component.&lt;br&gt;&#xa;        &lt;a href=&quot;http://opencsv.sourceforge.net/&quot;&gt;opencsv&lt;/a&gt; - CSV file format.&lt;br&gt;&#xa;        &lt;a href=&quot;http://www.igniterealtime.org/projects/smack/index.jsp&quot;&gt;Smack&lt;/a&gt; - XMPP messaging.&lt;br&gt;&#xa;        &lt;a href=&quot;https://swingx.dev.java.net/&quot;&gt;SwingX&lt;/a&gt; - Flashy looking GUI.&lt;br&gt;&#xa;        &lt;a href=&quot;http://xstream.codehaus.org/&quot;&gt;XStream&lt;/a&gt; - Serialization.&lt;br&gt;&#xa;        &lt;/p&gt;&#xa;        &lt;br&gt;&#xa;        &lt;br&gt;&#xa;        &lt;hr&gt;&#xa;        &lt;p style=&quot;margin-top: 10; font-size: 8px; font-family: Tahoma;&quot;&gt;Wish to see your name being mentioned here? Feel free to visit &lt;a href=&quot;http://sourceforge.net/projects/jstock&quot;&gt;http://sourceforge.net/projects/jstock&lt;/a&gt; to see how you can contribute to JStock Open Source Project.&lt;/p&gt;&#xa;    &lt;/body&gt;&#xa;&lt;/html&gt;"/>
                   </Properties>
                   <Events>
                     <EventHandler event="hyperlinkUpdate" listener="javax.swing.event.HyperlinkListener" parameters="javax.swing.event.HyperlinkEvent" handler="jEditorPane1HyperlinkUpdate"/>
                   </Events>
+                  <AuxValues>
+                    <AuxValue name="JavaCodeGenerator_allCodePost" type="java.lang.String" value="jEditorPane1.setCaretPosition(0);"/>
+                  </AuxValues>
                 </Component>
               </SubComponents>
             </Container>
