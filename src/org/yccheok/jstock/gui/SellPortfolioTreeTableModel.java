@@ -41,7 +41,7 @@ public class SellPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel
     // Types of the columns.
     private static final Class[]  cTypes = { 
         TreeTableModel.class,
-	org.yccheok.jstock.engine.SimpleDate.class,
+        org.yccheok.jstock.engine.SimpleDate.class,
         Integer.class,
         Double.class,
         Double.class,
