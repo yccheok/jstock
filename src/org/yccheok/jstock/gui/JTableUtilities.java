@@ -184,7 +184,6 @@ public class JTableUtilities {
     }
 
     public static void removeTableColumn(JTable jTable, Object identifier) {
-
         jTable.removeColumn(jTable.getColumn(identifier));
 
     }
