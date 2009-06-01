@@ -80,6 +80,7 @@ public class TableColumnSelectionPopupListener extends MouseAdapter {
             javax.swing.JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(name, isVisible);
                         
             menuItem.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent evt) {
                     String name = evt.getActionCommand();
                     JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem)evt.getSource();
