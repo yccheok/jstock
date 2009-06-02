@@ -93,7 +93,7 @@
                 <Property name="autoResizeMode" type="int" value="0"/>
               </Properties>
               <AuxValues>
-                <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="this.jTable1.setDefaultRenderer(Number.class, new StockTableCellRenderer());&#xa;this.jTable1.setDefaultRenderer(Double.class, new StockTableCellRenderer());&#xa;this.jTable1.setDefaultRenderer(Object.class, new StockTableCellRenderer());&#xa;        &#xa;this.jTable1.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener());&#xa;this.jTable1.addMouseListener(new TableRowPopupListener());"/>
+                <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="this.jTable1.setDefaultRenderer(Number.class, new StockTableCellRenderer());&#xa;this.jTable1.setDefaultRenderer(Double.class, new StockTableCellRenderer());&#xa;this.jTable1.setDefaultRenderer(Object.class, new StockTableCellRenderer());&#xa;        &#xa;this.jTable1.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(2));&#xa;this.jTable1.addMouseListener(new TableRowPopupListener());"/>
               </AuxValues>
             </Component>
           </SubComponents>
