@@ -1,4 +1,11 @@
 ==============
+version 1.0.4d
+==============
+1. [2787608] Feature added. A better About Box with auto update detector, credit, license and blobsallad.
+
+2. [2797839] Feature added. Note field in portfolio, for user to add note on every transactions.
+
+==============
 version 1.0.4c
 ==============
 1. [2604585] Feature added. If you are a daily trader, we understand that your need in monitoring 
