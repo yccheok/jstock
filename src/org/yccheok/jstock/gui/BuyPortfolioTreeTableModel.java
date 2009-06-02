@@ -58,7 +58,8 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
         "Stamp Duty",  
         "Net Purchase Value",
         "Net Gain/Loss Value",
-        "Net Gain/Loss %"
+        "Net Gain/Loss %",
+        "Comment"
     };
 
     // Types of the columns.
@@ -78,7 +79,8 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
         Double.class,
         Double.class,
         Double.class,
-        Double.class
+        Double.class,
+        String.class
     };
     
     public boolean updateStockLastPrice(org.yccheok.jstock.engine.Stock stock) {
@@ -331,7 +333,10 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
                     
                 case 15:
                     return this.getNetGainLossPercentage(portfolio);
-                                             
+
+                case 16:
+                    return portfolio.getComment();
+
                 default:
                     return null;
             }
@@ -387,7 +392,9 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
                     
                 case 15:
                     return this.getNetGainLossPercentage(transactionSummary);                    
-                    
+
+                case 16:
+                    return transactionSummary.getComment();
             }
         }
         
@@ -443,11 +450,13 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
                     
                 case 15:
                     return this.getNetGainLossPercentage(transaction);                    
-                    
+
+                case 16:
+                    return transaction.getComment();
             }
         }
         
-	return null; 
+		return null; 
     }
 
     @Override
