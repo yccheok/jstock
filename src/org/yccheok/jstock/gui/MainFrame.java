@@ -130,6 +130,9 @@ public class MainFrame extends javax.swing.JFrame {
         this.initOthersStockHistoryMonitor();
         this.initBrokingFirmLogos();
         this.initGUIOptions();
+
+        // Turn to the last viewed page.
+        this.jTabbedPane1.setSelectedIndex(this.getJStockOptions().getLastSelectedPageIndex());
     }
 
     /**
@@ -924,6 +927,8 @@ public class MainFrame extends javax.swing.JFrame {
         //this.indicatorPanel.stop();
 
         log.info("saveJStockOptions...");
+        // Save the last viewed page.
+        this.getJStockOptions().setLastSelectedPageIndex(this.jTabbedPane1.getSelectedIndex());
         this.saveJStockOptions();
 
         log.info("saveGUIOptions...");
