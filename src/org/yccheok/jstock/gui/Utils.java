@@ -612,6 +612,11 @@ public class Utils {
         return Utils.APPLICATION_VERSION_ID;
     }
 
+    public static String toHTML(String plainText) {
+        plainText = plainText.replace(System.getProperty("line.separator"), "<br>");
+        return "<html><head></head><body>" + plainText + "</body></html>";
+    }
+
     public static class ApplicationInfo
     {
         public final int applicationVersionID;
