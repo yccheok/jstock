@@ -113,7 +113,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         this.jTable1.setDefaultRenderer(Double.class, new StockTableCellRenderer());
         this.jTable1.setDefaultRenderer(Object.class, new StockTableCellRenderer());
 
-        this.jTable1.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener());
+        this.jTable1.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(2));
         this.jTable1.addMouseListener(new TableRowPopupListener());
         jScrollPane1.setViewportView(jTable1);
 
@@ -353,46 +353,6 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         }
     }
 
-    private JPopupMenu getMyTableColumnSelectionPopupMenu(final int mouseXLocation) {
-        JPopupMenu popup = new JPopupMenu();
-        TableModel tableModel = jTable1.getModel();
-        final int col = tableModel.getColumnCount();
-        
-        for(int i=2; i<col; i++) {
-            String name = tableModel.getColumnName(i);            
-            
-            boolean isVisible = true;
-            
-            try {
-                TableColumn tableColumn = jTable1.getColumn(name);
-            }
-            catch(java.lang.IllegalArgumentException exp) {
-                isVisible = false;
-            }
-            
-            javax.swing.JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(name, isVisible);
-                        
-            menuItem.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent evt) {
-                    String name = evt.getActionCommand();
-                    JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem)evt.getSource();
-                    if(menuItem.isSelected() == false) {
-                        JTableUtilities.removeTableColumn(jTable1, name);
-                    }
-                    else {
-                        TableColumnModel colModel = jTable1.getColumnModel();
-                        int vColIndex = colModel.getColumnIndexAtX(mouseXLocation);
-                        JTableUtilities.insertTableColumnFromModel(jTable1, name, vColIndex);
-                    }
-                }
-            });
-            
-            popup.add(menuItem);            
-        }
-        
-        return popup;
-    }
-
     @Override
     public void update(final Indicator indicator, Boolean result) {
         final boolean flag = result;
@@ -468,22 +428,6 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             }
         }
     }
-    
-    private class TableColumnSelectionPopupListener extends MouseAdapter {        
-        public void mousePressed(MouseEvent e) {
-            maybeShowPopup(e);
-        }
-
-        public void mouseReleased(MouseEvent e) {
-            maybeShowPopup(e);
-        }
-
-        private void maybeShowPopup(MouseEvent e) {
-            if (e.isPopupTrigger()) {
-                getMyTableColumnSelectionPopupMenu(e.getX()).show(e.getComponent(), e.getX(), e.getY());
-            }
-        }
-    }    
 
     private static class ColumnHeaderToolTips extends MouseMotionAdapter {
 
