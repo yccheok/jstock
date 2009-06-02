@@ -320,7 +320,6 @@ public class AboutJDialog extends javax.swing.JDialog {
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
         // TODO add your handling code here:
-        System.out.println("Closed");
         controller.stop();
     }//GEN-LAST:event_formWindowClosed
 
