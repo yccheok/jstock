@@ -35,7 +35,8 @@ public class SellPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel
         "Stamp Duty",  
         "Net Selling Value",
         "Net Gain/Loss Value",
-        "Net Gain/Loss %"
+        "Net Gain/Loss %",
+        "Comment"
     };
     
     // Types of the columns.
@@ -55,7 +56,8 @@ public class SellPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel
         Double.class,
         Double.class,
         Double.class,
-        Double.class
+        Double.class,
+        String.class
     };
     
     @Override
@@ -208,7 +210,10 @@ public class SellPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel
                     
                 case 15:
                     return getNetGainLossPercentage(portfolio);
-                                             
+
+                case 16:
+                    return portfolio.getComment();
+
                 default:
                     return null;
             }
@@ -264,7 +269,9 @@ public class SellPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel
                     
                 case 15:
                     return getNetGainLossPercentage(transactionSummary);                    
-                    
+
+                case 16:
+                    return transactionSummary.getComment();
             }
         }
         
@@ -320,11 +327,13 @@ public class SellPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel
                     
                 case 15:
                     return getNetGainLossPercentage(transaction);                    
-                    
+
+                case 16:
+                    return transaction.getComment();
             }
         }
         
-	return null; 
+		return null; 
     }
     
     @Override
