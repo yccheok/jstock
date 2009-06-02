@@ -25,7 +25,7 @@ import org.yccheok.jstock.engine.*;
  *
  * @author Owner
  */
-public class Transaction extends DefaultMutableTreeTableNode {
+public class Transaction extends DefaultMutableTreeTableNode implements Commentable {
     public Transaction(Contract contract, Broker broker, StampDuty stampDuty, ClearingFee clearingFee)
     {
         this.contract = contract;
@@ -123,4 +123,24 @@ public class Transaction extends DefaultMutableTreeTableNode {
     public String toString() {
         return contract.getStock().getSymbol().toString();
     }
+
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public String getComment() {
+        return this.comment;
+    }
+
+    private Object readResolve() {
+        /* For backward compatible */
+        if(comment == null) {
+            comment = "";
+        }
+
+        return this;
+    }
+
+    private String comment = "";
 }

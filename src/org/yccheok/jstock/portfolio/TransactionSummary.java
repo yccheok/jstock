@@ -24,7 +24,7 @@ import org.jdesktop.swingx.treetable.*;
  *
  * @author Owner
  */
-public class TransactionSummary extends DefaultMutableTreeTableNode {
+public class TransactionSummary extends DefaultMutableTreeTableNode implements Commentable {
 
     public int getQuantity() {
         int result = 0;
@@ -174,4 +174,24 @@ public class TransactionSummary extends DefaultMutableTreeTableNode {
         
         return "";
     }
+
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public String getComment() {
+        return this.comment;
+    }
+
+    private Object readResolve() {
+        /* For backward compatible */
+        if(comment == null) {
+            comment = "";
+        }
+
+        return this;
+    }
+
+    private String comment = "";
 }
