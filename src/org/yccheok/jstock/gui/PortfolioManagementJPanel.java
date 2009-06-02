@@ -21,6 +21,7 @@
 package org.yccheok.jstock.gui;
 
 import com.thoughtworks.xstream.XStream;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -44,9 +45,12 @@ import javax.swing.table.*;
 import javax.swing.tree.TreePath;
 import org.apache.commons.logging.*;
 import org.jdesktop.swingx.JXTreeTable;
+import org.jdesktop.swingx.table.TableColumnExt;
 import org.yccheok.jstock.portfolio.*;
 import org.yccheok.jstock.engine.*;
 import org.jdesktop.swingx.treetable.*;
+import org.yccheok.jstock.gui.portfolio.CommentJDialog;
+import org.yccheok.jstock.gui.portfolio.ToolTipHighlighter;
 
 /**
  *
@@ -85,8 +89,26 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         jSplitPane1 = new javax.swing.JSplitPane();
         jScrollPane1 = new javax.swing.JScrollPane();
         buyTreeTable = new org.jdesktop.swingx.JXTreeTable(new BuyPortfolioTreeTableModel());
+        // We need to have a hack way, to have "Comment" in the model, but not visible to user.
+        // So that our ToolTipHighlighter can work correctly.
+        // setVisible should be called after JXTreeTable has been constructed. This is to avoid
+        // initGUIOptions from calling JTable.removeColumn
+        // ToolTipHighlighter will not work correctly if we tend to hide column view by removeColumn.
+        // We need to hide the view by using TableColumnExt.setVisible.
+        // Why? Don't ask me. Ask SwingX team.
+        ((TableColumnExt)buyTreeTable.getColumn("Comment")).setVisible(false);
+        ;
         jScrollPane2 = new javax.swing.JScrollPane();
         sellTreeTable = new org.jdesktop.swingx.JXTreeTable(new SellPortfolioTreeTableModel());
+
+        // We need to have a hack way, to have "Comment" in the model, but not visible to user.
+        // So that our ToolTipHighlighter can work correctly.
+        // setVisible should be called after JXTreeTable has been constructed. This is to avoid
+        // initGUIOptions from calling JTable.removeColumn
+        // ToolTipHighlighter will not work correctly if we tend to hide column view by removeColumn.
+        // We need to hide the view by using TableColumnExt.setVisible.
+        // Why? Don't ask me. Ask SwingX team.
+        ((TableColumnExt)sellTreeTable.getColumn("Comment")).setVisible(false);
         jPanel2 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
@@ -143,8 +165,14 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         buyTreeTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         buyTreeTable.setRootVisible(true);
-        buyTreeTable.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(1));
+        // We need to have a hack way, to have "Comment" in the model, but not visible to user.
+        // So that our ToolTipHighlighter can work correctly.
+        buyTreeTable.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(1, new String[]{"Comment"}));
         buyTreeTable.addMouseListener(new BuyTableRowPopupListener());
+
+        org.jdesktop.swingx.decorator.Highlighter highlighter0 = org.jdesktop.swingx.decorator.HighlighterFactory.createSimpleStriping(new Color(245, 245, 220));
+        buyTreeTable.addHighlighter(highlighter0);
+        buyTreeTable.addHighlighter(new ToolTipHighlighter());
         buyTreeTable.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
             public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
                 buyTreeTableValueChanged(evt);
@@ -158,8 +186,14 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         sellTreeTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         sellTreeTable.setRootVisible(true);
-        sellTreeTable.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(1));
+        // We need to have a hack way, to have "Comment" in the model, but not visible to user.
+        // So that our ToolTipHighlighter can work correctly.
+        sellTreeTable.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(1, new String[]{"Comment"}));
         sellTreeTable.addMouseListener(new SellTableRowPopupListener());
+
+        org.jdesktop.swingx.decorator.Highlighter highlighter1 = org.jdesktop.swingx.decorator.HighlighterFactory.createSimpleStriping(new Color(245, 245, 220));
+        sellTreeTable.addHighlighter(highlighter1);
+        sellTreeTable.addHighlighter(new ToolTipHighlighter());
         sellTreeTable.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
             public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
                 sellTreeTableValueChanged(evt);
@@ -225,7 +259,23 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         return result;
     }
-    
+
+    private Commentable getSelectedCommentable() {
+        final TreePath[] treePaths = buyTreeTable.getTreeSelectionModel().getSelectionPaths();
+
+        if(treePaths == null) {
+            return null;
+        }
+
+        if(treePaths.length == 1) {
+            if(treePaths[0].getLastPathComponent() instanceof Commentable) {
+                return (Commentable)treePaths[0].getLastPathComponent();
+            }
+        }
+
+        return null;
+    }
+
     private Symbol getSelectedStockSymbolForNewTransactionJDialog() {
         final TreePath[] treePaths = buyTreeTable.getTreeSelectionModel().getSelectionPaths();
 
@@ -448,11 +498,12 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private void sellTreeTableValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_sellTreeTableValueChanged
         // TODO add your handling code here:
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    if(sellTreeTable.getSelectedRowCount() > 0) {
-                        buyTreeTable.clearSelection();
-                    }
-                }        
+            @Override
+            public void run() {
+                if(sellTreeTable.getSelectedRowCount() > 0) {
+                    buyTreeTable.clearSelection();
+                }
+            }
         });
     }//GEN-LAST:event_sellTreeTableValueChanged
 
@@ -500,6 +551,18 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         
         return (portfolioTreeTableModel.getRoot() == o);
     }
+
+    private void showCommentJDialog(Commentable commentable) {
+        if (commentable == null) {
+            // Nothing to be shown.
+            return;
+        }
+
+        final MainFrame mainFrame = MainFrame.getInstance();
+        CommentJDialog commentJDialog = new CommentJDialog(mainFrame, true, commentable);
+        commentJDialog.setLocationRelativeTo(this);
+        commentJDialog.setVisible(true);
+    }
         
     private class BuyTableRowPopupListener extends MouseAdapter {
         
@@ -532,6 +595,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
     private class SellTableRowPopupListener extends MouseAdapter {
         
+        @Override
         public void mouseClicked(MouseEvent evt) {
             if(evt.getClickCount() == 2) {
                 final Transaction transaction = getSelectedTransaction(sellTreeTable);
@@ -589,19 +653,38 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             menuItem = new JMenuItem("Edit...", this.getImageIcon("/images/16x16/edit.png"));
 
             menuItem.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent evt) {
                     PortfolioManagementJPanel.this.showEditTransactionJDialog(transaction);
                 }
             });            
 
             popup.add(menuItem);
+        }
+
+        final Commentable commentable = getSelectedCommentable();
+        if (commentable != null) {
+            menuItem = new JMenuItem("Note...", this.getImageIcon("/images/16x16/edit.png"));
+
+            menuItem.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent evt) {
+                    PortfolioManagementJPanel.this.showCommentJDialog(commentable);
+                }
+            });
+
+            popup.add(menuItem);
 
             popup.addSeparator();
         }
-        
-       menuItem = new JMenuItem("Summary...", this.getImageIcon("/images/16x16/chart.png"));
+        else if (transaction != null) {
+            popup.addSeparator();
+        }
+
+        menuItem = new JMenuItem("Summary...", this.getImageIcon("/images/16x16/chart.png"));
         
         menuItem.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent evt) {
                 PortfolioManagementJPanel.this.showSellPortfolioChartJDialog();
             }
@@ -615,13 +698,14 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             menuItem = new JMenuItem("History...", this.getImageIcon("/images/16x16/strokedocker.png"));
 
             menuItem.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent evt) {
-                        List<Stock> stocks = getSelectedStock(sellTreeTable);
+                @Override
+                public void actionPerformed(ActionEvent evt) {
+                    List<Stock> stocks = getSelectedStock(sellTreeTable);
 
-                        for(Stock stock : stocks) {
-                            m.displayHistoryChart(stock);
-                        }
+                    for(Stock stock : stocks) {
+                        m.displayHistoryChart(stock);
                     }
+                }
             });
                         
             popup.add(menuItem);
@@ -630,9 +714,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             menuItem = new JMenuItem("Delete", this.getImageIcon("/images/16x16/editdelete.png"));
 
             menuItem.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent evt) {
-                        PortfolioManagementJPanel.this.deteleSelectedTreeTableRow();
-                    }
+                @Override
+                public void actionPerformed(ActionEvent evt) {
+                    PortfolioManagementJPanel.this.deteleSelectedTreeTableRow();
+                }
             });
 
             popup.add(menuItem);
@@ -647,6 +732,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         JMenuItem menuItem = new JMenuItem("Buy...", this.getImageIcon("/images/16x16/inbox.png"));
 
         menuItem.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent evt) {
                 PortfolioManagementJPanel.this.showNewBuyTransactionJDialog(getSelectedStockSymbolForNewTransactionJDialog(), getSelectedStockLastPriceForNewTransactionJDialog(), true);
             }
@@ -660,6 +746,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             menuItem = new JMenuItem("Sell...", this.getImageIcon("/images/16x16/outbox.png"));
             
             menuItem.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent evt) {
                     PortfolioManagementJPanel.this.showNewSellTransactionJDialog(transaction);
                 }
@@ -674,19 +761,39 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             menuItem = new JMenuItem("Edit...", this.getImageIcon("/images/16x16/edit.png"));
             
             menuItem.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent evt) {
                     PortfolioManagementJPanel.this.showEditTransactionJDialog(transaction);
                 }
             });            
             
             popup.add(menuItem);
-            
-            popup.addSeparator();    
         }       
-        
+
+        final Commentable commentable = getSelectedCommentable();
+        if (commentable != null) {
+            menuItem = new JMenuItem("Note...", this.getImageIcon("/images/16x16/edit.png"));
+
+            menuItem.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent evt) {
+                    PortfolioManagementJPanel.this.showCommentJDialog(commentable);
+                }
+            });
+
+            popup.add(menuItem);
+
+            popup.addSeparator();
+        }
+        else if (transaction != null) {
+            popup.addSeparator();
+        }
+
+
         menuItem = new JMenuItem("Summary...", this.getImageIcon("/images/16x16/chart.png"));
         
         menuItem.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent evt) {
                 PortfolioManagementJPanel.this.showBuyPortfolioChartJDialog();
             }
@@ -702,13 +809,14 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             menuItem = new JMenuItem("History...", this.getImageIcon("/images/16x16/strokedocker.png"));
 
             menuItem.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent evt) {
-                        List<Stock> stocks = getSelectedStock(buyTreeTable);
+                @Override
+                public void actionPerformed(ActionEvent evt) {
+                    List<Stock> stocks = getSelectedStock(buyTreeTable);
 
-                        for(Stock stock : stocks) {
-                            m.displayHistoryChart(stock);
-                        }
+                    for(Stock stock : stocks) {
+                        m.displayHistoryChart(stock);
                     }
+                }
             });
                         
             popup.add(menuItem);
@@ -717,9 +825,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             menuItem = new JMenuItem("Delete", this.getImageIcon("/images/16x16/editdelete.png"));
 
             menuItem.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent evt) {
-                        PortfolioManagementJPanel.this.deteleSelectedTreeTableRow();
-                    }
+                @Override
+                public void actionPerformed(ActionEvent evt) {
+                    PortfolioManagementJPanel.this.deteleSelectedTreeTableRow();
+                }
             });
 
             popup.add(menuItem);
@@ -870,6 +979,16 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         
         if(buyReadSuccess == false) buyTreeTable.setTreeTableModel(new BuyPortfolioTreeTableModel());
         if(sellReadSuccess == false) sellTreeTable.setTreeTableModel(new SellPortfolioTreeTableModel());
+
+        // We need to have a hack way, to have "Comment" in the model, but not visible to user.
+        // So that our ToolTipHighlighter can work correctly.
+        // setVisible should be called after JXTreeTable has been constructed. This is to avoid
+        // initGUIOptions from calling JTable.removeColumn
+        // ToolTipHighlighter will not work correctly if we tend to hide column view by removeColumn.
+        // We need to hide the view by using TableColumnExt.setVisible.
+        // Why? Don't ask me. Ask SwingX team.
+        ((TableColumnExt)buyTreeTable.getColumn("Comment")).setVisible(false);
+        ((TableColumnExt)sellTreeTable.getColumn("Comment")).setVisible(false);
         
         updateRealTimeStockMonitorAccordingToBuyPortfolioTreeTableModel();
         
@@ -927,6 +1046,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         if(realTimeStockMonitor != null) {
             final RealTimeStockMonitor oldRealTimeStockMonitor = realTimeStockMonitor;
             Utils.getZoombiePool().execute(new Runnable() {
+                @Override
                 public void run() {
                     log.info("Prepare to shut down " + oldRealTimeStockMonitor + "...");
                     oldRealTimeStockMonitor.clearStockCodes();
@@ -952,6 +1072,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     // two observers at the same time.
     private org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> getRealTimeStockMonitorObserver() {
         return new org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>>() {
+            @Override
             public void update(RealTimeStockMonitor monitor, java.util.List<Stock> stocks)
             {
                 PortfolioManagementJPanel.this.update(monitor, stocks);
@@ -1081,7 +1202,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             @Override
-           public void run() {
+            public void run() {
                 jLabel2.setText(_share);
                 jLabel4.setText(_cash);
                 jLabel6.setText(_paperProfit + " (" + _paperProfitPercentage + "%)");
