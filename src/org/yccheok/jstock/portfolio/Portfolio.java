@@ -24,8 +24,8 @@ import org.jdesktop.swingx.treetable.*;
  *
  * @author Owner
  */
-public class Portfolio extends DefaultMutableTreeTableNode {
-            
+public class Portfolio extends DefaultMutableTreeTableNode implements Commentable {
+
     public double getNetTotal() {
         double result = 0.0;
         
@@ -132,4 +132,25 @@ public class Portfolio extends DefaultMutableTreeTableNode {
     public String toString() {
         return "Portfolio";
     }
+
+    @Override
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    @Override
+    public String getComment() {
+        return this.comment;
+    }
+
+    private Object readResolve() {
+        /* For backward compatible */
+        if(comment == null) {
+            comment = "";
+        }
+
+        return this;
+    }
+
+    private String comment = "";
 }
