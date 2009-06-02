@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.List;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
@@ -35,14 +36,23 @@ import javax.swing.table.TableModel;
  * @author Owner
  */
 public class TableColumnSelectionPopupListener extends MouseAdapter {
-    public TableColumnSelectionPopupListener(int menuStartIndex) {
+    private final List<String> columnNamesToBeIgnored;
+
+    public TableColumnSelectionPopupListener(int menuStartIndex, String[] columnNamesToBeIgnored) {
         this.menuStartIndex = menuStartIndex;
+        this.columnNamesToBeIgnored = java.util.Arrays.asList(columnNamesToBeIgnored);
+    }
+
+    public TableColumnSelectionPopupListener(int menuStartIndex) {
+        this(menuStartIndex, new String[]{});
     }
     
+    @Override
     public void mousePressed(MouseEvent e) {
         maybeShowPopup(e);
     }
 
+    @Override
     public void mouseReleased(MouseEvent e) {
         maybeShowPopup(e);
     }
@@ -65,9 +75,14 @@ public class TableColumnSelectionPopupListener extends MouseAdapter {
         TableModel tableModel = jTable1.getModel();
         final int col = tableModel.getColumnCount();
         
-        for(int i=2; i<col; i++) {
+        for (int i = this.menuStartIndex; i < col; i++) {
             String name = tableModel.getColumnName(i);            
             
+            // Do not display the menu with name which is ignored by user.
+            if (columnNamesToBeIgnored.contains(name)) {
+                continue;
+            }
+
             boolean isVisible = true;
             
             try {
