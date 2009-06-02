@@ -158,6 +158,9 @@ public class JStockOptions {
     private String lastFileIODirectory = System.getProperty("user.home");
     private String lastFileNameExtensionDescription = "CSV Documents (*.csv)";
 
+    // Remember the last view page.
+    private int lastSelectedPageIndex = 0;
+
     public boolean isAutoBrokerFeeCalculationEnabled() {
         return this.isAutoBrokerFeeCalculationEnabled;
     }
@@ -168,17 +171,22 @@ public class JStockOptions {
     
     private Object readResolve() {
         /* For backward compatible */
-        if(brokingFirms == null) {
+        if (lastSelectedPageIndex < 0) {
+            lastSelectedPageIndex = 0;
+        }
+
+        /* For backward compatible */
+        if (brokingFirms == null) {
             brokingFirms = new ArrayList<BrokingFirm>();
         }
         
 		/* For backward compatible */
-        if(country == null) {
+        if (country == null) {
             country = Country.Malaysia;
         }
         
         /* For backward compatible */
-        if(newsVersion < 0) {
+        if (newsVersion < 0) {
             newsVersion = 0;
         }
 
@@ -698,5 +706,19 @@ public class JStockOptions {
      */
     public void setLastFileNameExtensionDescription(String lastFileNameExtensionDescription) {
         this.lastFileNameExtensionDescription = lastFileNameExtensionDescription;
+    }
+
+    /**
+     * @return the lastSelectedPageIndex
+     */
+    public int getLastSelectedPageIndex() {
+        return lastSelectedPageIndex;
+    }
+
+    /**
+     * @param lastSelectedPageIndex the lastSelectedPageIndex to set
+     */
+    public void setLastSelectedPageIndex(int lastSelectedPageIndex) {
+        this.lastSelectedPageIndex = lastSelectedPageIndex;
     }
 }
