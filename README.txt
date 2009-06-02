@@ -5,6 +5,8 @@ version 1.0.4d
 
 2. [2797839] Feature added. Note field in portfolio, for user to add note on every transactions.
 
+3. [2787627] Feature added. Remember when is the last view page.
+
 ==============
 version 1.0.4c
 ==============
