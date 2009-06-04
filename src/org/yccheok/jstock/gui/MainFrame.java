@@ -2096,8 +2096,22 @@ public class MainFrame extends javax.swing.JFrame {
                     final int row = jTable1.getSelectedRow();
                     final int modelIndex = jTable1.getRowSorter().convertRowIndexToModel(row);
                     final Stock stock = ((StockTableModel)tableModel).getStock(modelIndex);
-                    
-                    portfolioManagementJPanel.showNewBuyTransactionJDialog(stock.getSymbol(), stock.getLastPrice(), false);
+
+                    // We have a real nasty bug here. We retrieve stock information through stock code.
+                    // When we receive stock information, we update all its particular information, including stock
+                    // symbol. Here is the catch, the latest updated stock symbol (stock.getSymbol), may not be the
+                    // same as stock symbol found in stock database. If we pass the stock symbol which is not found
+                    // in stock database to portfolio, something can go wrong. This is because portfolio rely heavily
+                    // on symbol <-> code conversion. Hence, instead of using stock.getSymbol, we prefer to get the
+                    // symbol out from stock database. This marks the close of the following reported bugs :
+                    //
+                    // [2800598] buyportfolio.xml file not updated with code symbol
+                    // [2790218] User unabe to add new buy transaction in Spain
+                    //
+                    final Symbol symbol = MainFrame.this.stockCodeAndSymbolDatabase.codeToSymbol(stock.getCode());
+                    assert(symbol != null);
+                    // Say no to : portfolioManagementJPanel.showNewBuyTransactionJDialog(stock.getSymbol(), stock.getLastPrice(), false);
+                    portfolioManagementJPanel.showNewBuyTransactionJDialog(symbol, stock.getLastPrice(), false);
                 }
             });  
             
