@@ -260,8 +260,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         return result;
     }
 
-    private Commentable getSelectedCommentable() {
-        final TreePath[] treePaths = buyTreeTable.getTreeSelectionModel().getSelectionPaths();
+    private Commentable getSelectedCommentable(JXTreeTable treeTable) {
+        final TreePath[] treePaths = treeTable.getTreeSelectionModel().getSelectionPaths();
 
         if(treePaths == null) {
             return null;
@@ -340,6 +340,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         newSellTransactionJDialog.setSellQuantity(maxSellQuantity);
         
         newSellTransactionJDialog.setBuyCost(buyCost);
+        newSellTransactionJDialog.setBuyDate(buyTransaction.getContract().getDate());
 
         // Get the highest sell price.
         final double currentPrice = getSelectedStockLastPriceForNewTransactionJDialog();
@@ -662,9 +663,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             popup.add(menuItem);
         }
 
-        final Commentable commentable = getSelectedCommentable();
+        final Commentable commentable = getSelectedCommentable(this.sellTreeTable);
         if (commentable != null) {
-            menuItem = new JMenuItem("Note...", this.getImageIcon("/images/16x16/edit.png"));
+            menuItem = new JMenuItem("Note...", this.getImageIcon("/images/16x16/sticky.png"));
 
             menuItem.addActionListener(new ActionListener() {
                 @Override
@@ -770,9 +771,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             popup.add(menuItem);
         }       
 
-        final Commentable commentable = getSelectedCommentable();
+        final Commentable commentable = getSelectedCommentable(this.buyTreeTable);
         if (commentable != null) {
-            menuItem = new JMenuItem("Note...", this.getImageIcon("/images/16x16/edit.png"));
+            menuItem = new JMenuItem("Note...", this.getImageIcon("/images/16x16/sticky.png"));
 
             menuItem.addActionListener(new ActionListener() {
                 @Override
