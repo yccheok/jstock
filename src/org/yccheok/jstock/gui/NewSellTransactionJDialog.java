@@ -71,6 +71,11 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         update();
     }
 
+    public void setBuyDate(SimpleDate buyDate) {
+        this.buyDate = buyDate;
+        // No need update, as buy date is not being shown in GUI.
+    }
+
     public void setMaxSellQuantity(int maxSellQuantity) {
         SpinnerNumberModel spinnerNumberModel = (SpinnerNumberModel)jSpinner1.getModel();
         spinnerNumberModel.setMaximum(maxSellQuantity);
@@ -386,7 +391,9 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         final double clearingFee = transaction.getCalculatdClearingFee();
         final double stampDuty = transaction.getCalculatedStampDuty();
         final double netValue = transaction.getNetTotal();
-        buyCost = transaction.getContract().getReferencePrice();
+        this.buyCost = transaction.getContract().getReferencePrice();
+        this.buyDate = transaction.getContract().getReferenceDate();
+        this.transactionComment = transaction.getComment();
         
         this.jTextField1.setText(symbol.toString());
         ((DateField)jPanel3).setValue(date);
@@ -420,7 +427,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         
         Contract.ContractBuilder builder = new Contract.ContractBuilder(stock, date);
         
-        Contract contract = builder.type(type).quantity(unit).price(price).referencePrice(buyCost).build();
+        Contract contract = builder.type(type).quantity(unit).price(price).referencePrice(buyCost).referenceDate(buyDate).build();
         
         Broker broker = null;
         StampDuty stampDuty = null;
@@ -444,6 +451,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         }
         
         Transaction t = new Transaction(contract, broker, stampDuty, clearingFee);
+        t.setComment(transactionComment);
 
         return t;
     }
@@ -659,7 +667,9 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
     
     /* Cost per unit. */
     private double buyCost = 0.0;
-    
+    private SimpleDate buyDate = new SimpleDate();
+    private String transactionComment = "";
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
