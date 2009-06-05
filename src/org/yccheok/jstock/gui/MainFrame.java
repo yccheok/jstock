@@ -62,6 +62,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.yccheok.jstock.analysis.Indicator;
 import org.yccheok.jstock.analysis.OperatorIndicator;
 import org.yccheok.jstock.gui.dynamicchart.DynamicChart;
+import org.yccheok.jstock.gui.table.NonNegativeDoubleEditor;
 
 /**
  *
