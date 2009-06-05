@@ -74,6 +74,10 @@ public class DepositSummary {
         return total;
     }
 
+    public void add(int index, Deposit deposit) {
+        deposits.add(index, deposit);
+    }
+
     private double total = 0.0;
     private volatile boolean needEvaluation = false;
     private List<Deposit> deposits = new ArrayList<Deposit>();
