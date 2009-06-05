@@ -119,7 +119,7 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
         // JTableCustomizer.setEditorForRow(jTable1, 1);
         // Do not use JTableCustomizer. We need to have our own implementation to decide 
         // row background color.
-        JTableUtilities.setEditorForRow(jTable1, 0);
+        JTableUtilities.setDateEditorForRow(jTable1, 0);
         jTable1.setAutoCreateRowSorter(true);
         jTable1.addMouseListener(new TableRowPopupListener());
         jTable1.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
