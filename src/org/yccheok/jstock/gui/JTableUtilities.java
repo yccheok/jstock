@@ -48,9 +48,12 @@ package org.yccheok.jstock.gui;
 
 import java.awt.*;
 
+import java.text.DateFormat;
 import javax.swing.*;
 
 import javax.swing.table.*;
+import net.sf.nachocalendar.table.DateFieldTableEditor;
+import org.yccheok.jstock.gui.table.DateRendererDecoratorEx;
 
 
 
@@ -299,6 +302,26 @@ public class JTableUtilities {
     
         // Scroll the area into view
         viewport.scrollRectToVisible(rect);
+    }
+
+    /** Sets the editor/renderer for Date objects to provided JTable, for the specified column.
+     * @param table JTable to set up
+     * @param row Column to apply
+     */
+    public static void setDateEditorForRow(JTable table, int row) {
+        DateFormat format = DateFormat.getDateInstance(DateFormat.SHORT);
+        setDateEditorForRow(table, row, format);
+    }
+
+    /** Sets the editor/renderer for Date objects to provided JTable, for the specified column.
+     * @param table JTable to set up
+     * @param row Column to apply
+     * @param format Format to use
+     */
+    private static void setDateEditorForRow(JTable table, int row, DateFormat format) {
+        TableColumn column = table.getColumnModel().getColumn(row);
+        column.setCellEditor(new DateFieldTableEditor());
+        column.setCellRenderer(new DateRendererDecoratorEx(column.getCellRenderer(), format));
     }
 }
 
