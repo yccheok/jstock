@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * Copyright (C) 2008 Cheok YanCheng <yccheok@yahoo.com>
+ * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
  */
 
 package org.yccheok.jstock.gui;
@@ -50,6 +50,7 @@ import org.yccheok.jstock.portfolio.*;
 import org.yccheok.jstock.engine.*;
 import org.jdesktop.swingx.treetable.*;
 import org.yccheok.jstock.gui.portfolio.CommentJDialog;
+import org.yccheok.jstock.gui.portfolio.DepositSummaryJDialog;
 import org.yccheok.jstock.gui.portfolio.ToolTipHighlighter;
 
 /**
@@ -112,7 +113,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         jPanel2 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
+        jButton5 = new javax.swing.JButton();
 
         addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -225,14 +227,18 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         });
         jPanel2.add(jButton3);
 
-        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/editdelete.png"))); // NOI18N
-        jButton2.setText("Delete");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/money.png"))); // NOI18N
+        jButton4.setText("Deposit...");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                jButton4ActionPerformed(evt);
             }
         });
-        jPanel2.add(jButton2);
+        jPanel2.add(jButton4);
+
+        jButton5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/money2.png"))); // NOI18N
+        jButton5.setText("Dividend...");
+        jPanel2.add(jButton5);
 
         add(jPanel2, java.awt.BorderLayout.SOUTH);
     }// </editor-fold>//GEN-END:initComponents
@@ -258,6 +264,20 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
 
         return result;
+    }
+
+    private String getSelectedFirstColumnString(JXTreeTable treeTable) {
+        final TreePath[] treePaths = treeTable.getTreeSelectionModel().getSelectionPaths();
+
+        if(treePaths == null) {
+            return null;
+        }
+
+        if(treePaths.length == 1) {
+            return treePaths[0].getLastPathComponent().toString();
+        }
+
+        return null;
     }
 
     private Commentable getSelectedCommentable(JXTreeTable treeTable) {
@@ -480,11 +500,6 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         updateWealthHeader();
     }
     
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
-        deteleSelectedTreeTableRow();
-    }//GEN-LAST:event_jButton2ActionPerformed
-
     private void buyTreeTableValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_buyTreeTableValueChanged
         // TODO add your handling code here:
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -524,6 +539,11 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         
         this.showNewSellTransactionJDialog(transaction);
     }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        // TODO add your handling code here:
+        showDepositSummaryJDialog();
+    }//GEN-LAST:event_jButton4ActionPerformed
     
     // Will return null, if more than one buyTransaction being selected, or no
     // buyTransaction being selected.
@@ -553,7 +573,20 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         return (portfolioTreeTableModel.getRoot() == o);
     }
 
-    private void showCommentJDialog(Commentable commentable) {
+    private void showDepositSummaryJDialog() {
+        final MainFrame mainFrame = MainFrame.getInstance();
+        DepositSummaryJDialog depositSummaryJDialog = new DepositSummaryJDialog(mainFrame, true, this.depositSummary);
+        depositSummaryJDialog.setLocationRelativeTo(this);
+        depositSummaryJDialog.setVisible(true);
+
+        final DepositSummary _depositSummary = depositSummaryJDialog.getDepositSummary();
+        if (_depositSummary != null) {
+            this.depositSummary = _depositSummary;
+            updateWealthHeader();
+        }
+    }
+    
+    private void showCommentJDialog(Commentable commentable, String title) {
         if (commentable == null) {
             // Nothing to be shown.
             return;
@@ -561,6 +594,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         final MainFrame mainFrame = MainFrame.getInstance();
         CommentJDialog commentJDialog = new CommentJDialog(mainFrame, true, commentable);
+        commentJDialog.setTitle(title);
         commentJDialog.setLocationRelativeTo(this);
         commentJDialog.setVisible(true);
     }
@@ -649,6 +683,29 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         JPopupMenu popup = new JPopupMenu();
 
         JMenuItem menuItem = null;
+
+        menuItem = new JMenuItem("Deposit...", this.getImageIcon("/images/16x16/money.png"));
+
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                showDepositSummaryJDialog();
+            }
+        });
+
+        popup.add(menuItem);
+
+        menuItem = new JMenuItem("Dividend...", this.getImageIcon("/images/16x16/money2.png"));
+
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+            }
+        });
+
+        popup.add(menuItem);
+
+        popup.addSeparator();
         
         if(transaction != null) {
             menuItem = new JMenuItem("Edit...", this.getImageIcon("/images/16x16/edit.png"));
@@ -664,13 +721,15 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
 
         final Commentable commentable = getSelectedCommentable(this.sellTreeTable);
-        if (commentable != null) {
+        final String tmp = getSelectedFirstColumnString(this.sellTreeTable);
+        if (commentable != null && tmp != null) {
             menuItem = new JMenuItem("Note...", this.getImageIcon("/images/16x16/sticky.png"));
 
             menuItem.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent evt) {
-                    PortfolioManagementJPanel.this.showCommentJDialog(commentable);
+                    final String title = "Note for " + tmp;
+                    PortfolioManagementJPanel.this.showCommentJDialog(commentable, title);
                 }
             });
 
@@ -681,6 +740,16 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         else if (transaction != null) {
             popup.addSeparator();
         }
+
+        menuItem = new JMenuItem("Cash Graph...", this.getImageIcon("/images/16x16/graph.png"));
+
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+            }
+        });
+
+        popup.add(menuItem);
 
         menuItem = new JMenuItem("Summary...", this.getImageIcon("/images/16x16/chart.png"));
         
@@ -755,7 +824,30 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             
             popup.add(menuItem);  
         }       
-        
+
+        popup.addSeparator();
+
+        menuItem = new JMenuItem("Deposit...", this.getImageIcon("/images/16x16/money.png"));
+
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                showDepositSummaryJDialog();
+            }
+        });
+
+        popup.add(menuItem);
+
+        menuItem = new JMenuItem("Dividend...", this.getImageIcon("/images/16x16/money2.png"));
+
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+            }
+        });
+
+        popup.add(menuItem);
+
         popup.addSeparator();
                 
         if(transaction != null) {
@@ -772,13 +864,15 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }       
 
         final Commentable commentable = getSelectedCommentable(this.buyTreeTable);
-        if (commentable != null) {
+        final String tmp = getSelectedFirstColumnString(this.buyTreeTable);
+        if (commentable != null && tmp != null) {
             menuItem = new JMenuItem("Note...", this.getImageIcon("/images/16x16/sticky.png"));
 
             menuItem.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent evt) {
-                    PortfolioManagementJPanel.this.showCommentJDialog(commentable);
+                    final String title = "Note for " + tmp;
+                    PortfolioManagementJPanel.this.showCommentJDialog(commentable, title);
                 }
             });
 
@@ -790,7 +884,16 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             popup.addSeparator();
         }
 
+        menuItem = new JMenuItem("Cash Graph...", this.getImageIcon("/images/16x16/graph.png"));
 
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+            }
+        });
+
+        popup.add(menuItem);
+        
         menuItem = new JMenuItem("Summary...", this.getImageIcon("/images/16x16/chart.png"));
         
         menuItem.addActionListener(new ActionListener() {
@@ -990,7 +1093,32 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         // Why? Don't ask me. Ask SwingX team.
         ((TableColumnExt)buyTreeTable.getColumn("Comment")).setVisible(false);
         ((TableColumnExt)sellTreeTable.getColumn("Comment")).setVisible(false);
-        
+
+        boolean depositSummaryReadSuccess = false;
+        try {
+            File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "depositsummary.xml");
+
+            XStream xStream = new XStream();
+            InputStream inputStream = new java.io.FileInputStream(f);
+            final Object obj = xStream.fromXML(inputStream);
+
+            if(obj instanceof DepositSummary) {
+                this.depositSummary = (DepositSummary)obj;
+            }
+
+            depositSummaryReadSuccess = true;
+        }
+        catch (java.io.FileNotFoundException exp) {
+            log.error(null, exp);
+        }
+        catch (com.thoughtworks.xstream.core.BaseException exp) {
+            log.error(null, exp);
+        }
+
+        if (false == depositSummaryReadSuccess) {
+            this.depositSummary = new DepositSummary();
+        }
+
         updateRealTimeStockMonitorAccordingToBuyPortfolioTreeTableModel();
         
         updateWealthHeader();
@@ -1015,12 +1143,12 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
             xStream.toXML(portfolioTreeTableModel, outputStream);  
         }
-        catch(java.io.FileNotFoundException exp) {
-            log.error("", exp);
+        catch (java.io.FileNotFoundException exp) {
+            log.error(null, exp);
             status = false;
         }
-        catch(com.thoughtworks.xstream.core.BaseException exp) {
-            log.error("", exp);
+        catch (com.thoughtworks.xstream.core.BaseException exp) {
+            log.error(null, exp);
             status = false;
         }
            
@@ -1031,15 +1159,30 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             final SellPortfolioTreeTableModel portfolioTreeTableModel = (SellPortfolioTreeTableModel)sellTreeTable.getTreeTableModel();
             xStream.toXML(portfolioTreeTableModel, outputStream);  
         }
-        catch(java.io.FileNotFoundException exp) {
-            log.error("", exp);
+        catch (java.io.FileNotFoundException exp) {
+            log.error(null, exp);
             status = false;
         }
-        catch(com.thoughtworks.xstream.core.BaseException exp) {
-            log.error("", exp);
+        catch (com.thoughtworks.xstream.core.BaseException exp) {
+            log.error(null, exp);
             status = false;
         }
-        
+
+        f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "depositsummary.xml");
+
+        try {
+            OutputStream outputStream = new FileOutputStream(f);
+            xStream.toXML(this.depositSummary, outputStream);
+        }
+        catch (java.io.FileNotFoundException exp) {
+            log.error(null, exp);
+            status = false;
+        }
+        catch (com.thoughtworks.xstream.core.BaseException exp) {
+            log.error(null, exp);
+            status = false;
+        }
+
         return status;
     }
     
@@ -1184,7 +1327,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         final SellPortfolioTreeTableModel sellPortfolioTreeTableModel = (SellPortfolioTreeTableModel)this.sellTreeTable.getTreeTableModel();
         
         final double share = buyPortfolioTreeTableModel.getCurrentValue();
-        final double cash = sellPortfolioTreeTableModel.getNetSellingValue();
+        final double cash = sellPortfolioTreeTableModel.getNetSellingValue() + this.depositSummary.getTotal();
         final double paperProfit = buyPortfolioTreeTableModel.getNetGainLossValue();
         final double paperProfitPercentage = buyPortfolioTreeTableModel.getNetGainLossPercentage();
         final double realizedProfit = sellPortfolioTreeTableModel.getNetGainLossValue();
@@ -1229,6 +1372,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
     
     private static final Log log = LogFactory.getLog(PortfolioManagementJPanel.class);
+
+    // Data structure.
+    private DepositSummary depositSummary = new DepositSummary();
     
     private RealTimeStockMonitor realTimeStockMonitor = null;
     private org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
@@ -1236,8 +1382,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private org.jdesktop.swingx.JXTreeTable buyTreeTable;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
