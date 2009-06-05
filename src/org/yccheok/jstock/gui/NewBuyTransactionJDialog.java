@@ -336,7 +336,8 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         final double clearingFee = transaction.getCalculatdClearingFee();
         final double stampDuty = transaction.getCalculatedStampDuty();
         final double netValue = transaction.getNetTotal();
-        
+
+        this.transactionComment = transaction.getComment();
         this.jTextField1.setText(symbol.toString());
         ((DateField)jPanel3).setValue(date);
         this.jSpinner1.setValue(quantity);
@@ -391,6 +392,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         }
         
         Transaction t = new Transaction(contract, broker, stampDuty, clearingFee);
+        t.setComment(transactionComment);
 
         return t;
     }
@@ -621,7 +623,8 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
     private final KeyListener jComboBox1EditorComponentKeyAdapter = getjComboBox1EditorComponentKeyAdapter();
     
     private Transaction transaction = null;
-    
+    private String transactionComment = "";
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
