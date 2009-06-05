@@ -39,7 +39,11 @@ public class SimpleDate implements java.lang.Comparable<SimpleDate> {
         this.month = month;
         this.date = date;
     }
-    
+
+    public SimpleDate() {
+        this(Calendar.getInstance());
+    }
+
     public SimpleDate(java.util.Calendar calendar) {        
         this(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DATE));
     }
@@ -69,6 +73,7 @@ public class SimpleDate implements java.lang.Comparable<SimpleDate> {
         return result;
     }
     
+    @Override
     public boolean equals(Object o) {
         if (o == this)
             return true;
