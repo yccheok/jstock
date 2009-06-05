@@ -79,15 +79,21 @@ public class DepositSummaryTableModel extends AbstractTableModel {
     @Override
     public void setValueAt(Object value, int row, int col) {
         switch(col) {
-            case 0:
-                depositSummary.get(row).setDate(new SimpleDate((java.util.Date)value));
+            case 0: {
+                Deposit newDeposit = depositSummary.get(row).setDate(new SimpleDate((java.util.Date)value));
+                depositSummary.remove(row);
+                depositSummary.add(row, newDeposit);
                 fireTableCellUpdated(row, col);
                 break;
+            }
 
-            case 1:
-                depositSummary.get(row).setAmount((Double)value);
+            case 1: {
+                Deposit newDeposit = depositSummary.get(row).setAmount((Double)value);
+                depositSummary.remove(row);
+                depositSummary.add(row, newDeposit);
                 fireTableCellUpdated(row, col);
                 break;
+            }
         }
     }
 
