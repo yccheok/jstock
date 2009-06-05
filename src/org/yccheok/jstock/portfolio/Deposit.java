@@ -57,8 +57,10 @@ public class Deposit implements Commentable {
     /**
      * @param amount the amount to set
      */
-    public void setAmount(double amount) {
-        this.amount = amount;
+    public Deposit setAmount(double amount) {
+        Deposit d = new Deposit(amount, this.date);
+        d.setComment(this.comment);
+        return d;
     }
 
     /**
@@ -71,8 +73,10 @@ public class Deposit implements Commentable {
     /**
      * @param date the date to set
      */
-    public void setDate(SimpleDate date) {
-        this.date = date;
+    public Deposit setDate(SimpleDate date) {
+        Deposit d = new Deposit(this.amount, date);
+        d.setComment(this.comment);
+        return d;
     }
 
     private double amount;
