@@ -176,10 +176,12 @@ public class TransactionSummary extends DefaultMutableTreeTableNode implements C
     }
 
 
+    @Override
     public void setComment(String comment) {
         this.comment = comment;
     }
 
+    @Override
     public String getComment() {
         return this.comment;
     }
