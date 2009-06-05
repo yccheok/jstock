@@ -109,10 +109,10 @@ public class StockTableModel extends AbstractTableModelWithMemory {
     
     public void updateStock(Stock stock) {
         final Integer row = rowStockCodeMapping.get(stock.getCode());
-        final StockAlert alert = alerts.get(row);
 
         if(row != null) {
             oldTableModel.set(row, tableModel.get(row));
+            final StockAlert alert = alerts.get(row);
             tableModel.set(row, stockToList(stock, alert));
             stocks.set(row, stock);
             this.fireTableRowsUpdated(row, row);            
