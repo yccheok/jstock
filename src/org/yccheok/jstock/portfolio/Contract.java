@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * Copyright (C) 2008 Cheok YanCheng <yccheok@yahoo.com>
+ * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
  */
 
 package org.yccheok.jstock.portfolio;
@@ -35,7 +35,8 @@ public class Contract {
         private int quantity = 0;
         private double price = 0.0;
         private double referencePrice = 0.0;
-        
+        private SimpleDate referenceDate = new SimpleDate();
+
         public ContractBuilder(Stock stock, SimpleDate date) {
             this.stock = stock;
             this.date = date;
@@ -60,7 +61,13 @@ public class Contract {
             this.referencePrice = val;
             return this;
         }
-        
+
+        public ContractBuilder referenceDate(SimpleDate date) {
+            this.referenceDate = date;
+            return this;
+        }
+
+        @Override
         public Contract build() {
             return new Contract(this);
         }
@@ -98,6 +105,10 @@ public class Contract {
     public double getReferenceTotal() {
         return referenceTotal;
     }
+
+    public SimpleDate getReferenceDate() {
+        return this.referenceDate;
+    }
     
     public enum Type
     {
@@ -116,6 +127,7 @@ public class Contract {
         
         this.total = price * quantity;
         this.referenceTotal = referencePrice * quantity;
+        this.referenceDate = builder.referenceDate;
     }
     
     public Contract setQuantity(int quantity) {
@@ -132,8 +144,20 @@ public class Contract {
         referencePrice = contract.referencePrice;
         total = contract.total;
         referenceTotal = contract.referenceTotal;
+        referenceDate = contract.referenceDate;
     }
-    
+
+    private Object readResolve() {
+        /* For backward compatible. */
+        if(referenceDate == null) {
+            /* May yield incorrect logic. */
+            /* Make buy date same as sell date. */
+            referenceDate = date;
+        }
+
+        return this;
+    }
+
     private final Stock stock;
     private final SimpleDate date;
     private final Type type;
@@ -144,4 +168,7 @@ public class Contract {
     // Reference price for the contract. Only for selling type contract usage.
     // It means cost for owning a stock.
     private final double referenceTotal;
+    // private final SimpleDate referenceDate;
+    // Unalbe to make this as final, as we need backward compatible with xstream's readResolve
+    private SimpleDate referenceDate;
 }
