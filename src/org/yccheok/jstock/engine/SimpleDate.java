@@ -91,7 +91,11 @@ public class SimpleDate implements java.lang.Comparable<SimpleDate> {
         calendar.set(year, month, date, 0, 0, 0);
         return calendar;
     }
-    
+
+    public Date getTime() {
+        return this.getCalendar().getTime();
+    }
+
     public int getYear() {
         return year;
     }
