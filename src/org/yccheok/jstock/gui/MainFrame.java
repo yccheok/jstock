@@ -32,7 +32,6 @@ import java.util.*;
 
 import org.apache.commons.httpclient.HttpException;
 import org.yccheok.jstock.engine.*;
-import com.thoughtworks.xstream.*;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
