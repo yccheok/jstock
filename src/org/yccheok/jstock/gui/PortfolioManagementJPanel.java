@@ -1113,44 +1113,22 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         boolean sellReadSuccess = false;
         boolean buyReadSuccess = false;
         
-        try {            
-            File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "buyportfolio.xml");
-
-            XStream xStream = new XStream();
-            InputStream inputStream = new java.io.FileInputStream(f);
-            final Object obj = xStream.fromXML(inputStream);
-            
-            if(obj instanceof BuyPortfolioTreeTableModel) {
-                final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)obj;
-                this.buyTreeTable.setTreeTableModel(portfolioTreeTableModel);
+        {
+            final File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "buyportfolio.xml");
+            final BuyPortfolioTreeTableModel buyPortfolioTreeTableModel = Utils.fromXML(BuyPortfolioTreeTableModel.class, f);
+            if (buyPortfolioTreeTableModel != null) {
+                this.buyTreeTable.setTreeTableModel(buyPortfolioTreeTableModel);
                 buyReadSuccess = true;
             }
         }
-        catch(java.io.FileNotFoundException exp) {
-            log.error("", exp);
-        }
-        catch(com.thoughtworks.xstream.core.BaseException exp) {
-            log.error("", exp);
-        }
 
-        try {
-            File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "sellportfolio.xml");
-
-            XStream xStream = new XStream();
-            InputStream inputStream = new java.io.FileInputStream(f);
-            final Object obj = xStream.fromXML(inputStream);
-            
-            if(obj instanceof SellPortfolioTreeTableModel) {
-                final SellPortfolioTreeTableModel portfolioTreeTableModel = (SellPortfolioTreeTableModel)obj;
-                this.sellTreeTable.setTreeTableModel(portfolioTreeTableModel);
+        {
+            final File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "sellportfolio.xml");
+            final SellPortfolioTreeTableModel sellPortfolioTreeTableModel = Utils.fromXML(SellPortfolioTreeTableModel.class, f);
+            if (sellPortfolioTreeTableModel != null) {
+                this.sellTreeTable.setTreeTableModel(sellPortfolioTreeTableModel);
                 sellReadSuccess = true;
             }
-        }
-        catch(java.io.FileNotFoundException exp) {
-            log.error("", exp);
-        }
-        catch(com.thoughtworks.xstream.core.BaseException exp) {
-            log.error("", exp);
         }
         
         if(buyReadSuccess == false) buyTreeTable.setTreeTableModel(new BuyPortfolioTreeTableModel());
@@ -1167,24 +1145,12 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         ((TableColumnExt)sellTreeTable.getColumn("Comment")).setVisible(false);
 
         boolean depositSummaryReadSuccess = false;
-        try {
-            File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "depositsummary.xml");
-
-            XStream xStream = new XStream();
-            InputStream inputStream = new java.io.FileInputStream(f);
-            final Object obj = xStream.fromXML(inputStream);
-
-            if(obj instanceof DepositSummary) {
-                this.depositSummary = (DepositSummary)obj;
+        {
+            final File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "depositsummary.xml");
+            this.depositSummary = Utils.fromXML(DepositSummary.class, f);
+            if (this.depositSummary != null) {
+                depositSummaryReadSuccess = true;
             }
-
-            depositSummaryReadSuccess = true;
-        }
-        catch (java.io.FileNotFoundException exp) {
-            log.error(null, exp);
-        }
-        catch (com.thoughtworks.xstream.core.BaseException exp) {
-            log.error(null, exp);
         }
 
         if (false == depositSummaryReadSuccess) {
@@ -1192,24 +1158,12 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
 
         boolean dividendSummaryReadSuccess = false;
-        try {
+        {
             File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "dividendsummary.xml");
-
-            XStream xStream = new XStream();
-            InputStream inputStream = new java.io.FileInputStream(f);
-            final Object obj = xStream.fromXML(inputStream);
-
-            if(obj instanceof DividendSummary) {
-                this.dividendSummary = (DividendSummary)obj;
+            this.dividendSummary = Utils.fromXML(DividendSummary.class, f);
+            if (this.dividendSummary != null) {
+                dividendSummaryReadSuccess = true;
             }
-
-            dividendSummaryReadSuccess = true;
-        }
-        catch (java.io.FileNotFoundException exp) {
-            log.error(null, exp);
-        }
-        catch (com.thoughtworks.xstream.core.BaseException exp) {
-            log.error(null, exp);
         }
 
         if (false == dividendSummaryReadSuccess) {
@@ -1307,23 +1261,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }  
 
     private void initGUIOptions() {
-        GUIOptions guiOptions = null;
-
-        try {
-            File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "portfoliomanagementjpanel.xml");
-
-            XStream xStream = new XStream();
-            InputStream inputStream = new java.io.FileInputStream(f);
-            guiOptions = (GUIOptions)xStream.fromXML(inputStream);
-
-            log.info("guiOptions loaded from " + f.toString() + " successfully.");
-        }
-        catch (java.io.FileNotFoundException exp) {
-            log.error("", exp);
-        }
-        catch (com.thoughtworks.xstream.core.BaseException exp) {
-            log.error("", exp);
-        }
+        File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "portfoliomanagementjpanel.xml");
+        GUIOptions guiOptions = Utils.fromXML(GUIOptions.class, f);
 
         if (guiOptions == null)
         {
@@ -1373,37 +1312,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
 
         File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "portfoliomanagementjpanel.xml");
-
-        XStream xStream = new XStream();
-
-        OutputStream outputStream = null;
-
-        try {
-            outputStream = new FileOutputStream(f);
-            xStream.toXML(guiOptions, outputStream);
-        }
-        catch(java.io.FileNotFoundException exp) {
-            log.error("", exp);
-            return false;
-        }
-        catch(com.thoughtworks.xstream.core.BaseException exp) {
-            log.error("", exp);
-            return false;
-        }
-        finally {
-            if (outputStream != null) {
-                try {
-                    outputStream.close();
-                    outputStream = null;
-                }
-                catch (java.io.IOException exp) {
-                    log.error(null, exp);
-                    return false;
-                }
-            }
-        }
-
-        return true;
+        return org.yccheok.jstock.gui.Utils.toXML(guiOptions, f);
     }
 
     private void updateWealthHeader() {
