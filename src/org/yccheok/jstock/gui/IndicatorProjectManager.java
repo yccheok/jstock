@@ -25,7 +25,6 @@ package org.yccheok.jstock.gui;
 import java.util.*;
 import java.io.*;
 
-import com.thoughtworks.xstream.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
