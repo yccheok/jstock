@@ -27,7 +27,6 @@ import java.util.*;
 import java.io.*;
 import org.yccheok.jstock.analysis.*;
 
-import com.thoughtworks.xstream.*;
 
 /**
  *
