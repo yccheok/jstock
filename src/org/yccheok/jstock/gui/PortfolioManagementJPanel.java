@@ -51,6 +51,7 @@ import org.yccheok.jstock.engine.*;
 import org.jdesktop.swingx.treetable.*;
 import org.yccheok.jstock.gui.portfolio.CommentJDialog;
 import org.yccheok.jstock.gui.portfolio.DepositSummaryJDialog;
+import org.yccheok.jstock.gui.portfolio.DividendSummaryJDialog;
 import org.yccheok.jstock.gui.portfolio.ToolTipHighlighter;
 
 /**
@@ -238,6 +239,11 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         jButton5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/money2.png"))); // NOI18N
         jButton5.setText("Dividend...");
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
         jPanel2.add(jButton5);
 
         add(jPanel2, java.awt.BorderLayout.SOUTH);
@@ -544,6 +550,11 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         // TODO add your handling code here:
         showDepositSummaryJDialog();
     }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        // TODO add your handling code here:
+        showDividendSummaryJDialog();
+    }//GEN-LAST:event_jButton5ActionPerformed
     
     // Will return null, if more than one buyTransaction being selected, or no
     // buyTransaction being selected.
@@ -571,6 +582,19 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         final AbstractPortfolioTreeTableModel portfolioTreeTableModel = (AbstractPortfolioTreeTableModel)treeTable.getTreeTableModel();
         
         return (portfolioTreeTableModel.getRoot() == o);
+    }
+
+    private void showDividendSummaryJDialog() {
+        final MainFrame mainFrame = MainFrame.getInstance();
+        DividendSummaryJDialog dividendSummaryJDialog = new DividendSummaryJDialog(mainFrame, true, this.dividendSummary, this);
+        dividendSummaryJDialog.setLocationRelativeTo(this);
+        dividendSummaryJDialog.setVisible(true);
+
+        final DividendSummary _dividendSummary = dividendSummaryJDialog.getDividendSummary();
+        if (_dividendSummary != null) {
+            this.dividendSummary = _dividendSummary;
+            updateWealthHeader();
+        }
     }
 
     private void showDepositSummaryJDialog() {
@@ -700,6 +724,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
+                showDividendSummaryJDialog();
             }
         });
 
@@ -843,6 +868,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
+                showDividendSummaryJDialog();
             }
         });
 
@@ -963,6 +989,52 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
         portfolioTreeTableModel.addTransaction(transaction);
         this.realTimeStockMonitor.addStockCode(transaction.getContract().getStock().getCode());
+    }
+
+    public List<Stock> getStocksFromPortfolios() {
+        final BuyPortfolioTreeTableModel buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
+        final SellPortfolioTreeTableModel sellPortfolioTreeTableModel = (SellPortfolioTreeTableModel)sellTreeTable.getTreeTableModel();
+        final Portfolio buyPortfolio = (Portfolio) buyPortfolioTreeTableModel.getRoot();
+        final Portfolio sellPortfolio = (Portfolio) sellPortfolioTreeTableModel.getRoot();
+
+        List<Code> codes = new ArrayList<Code>();
+        List<Stock> stocks = new ArrayList<Stock>();
+
+        final int count = buyPortfolio.getChildCount();
+        TransactionSummary transactionSummary = null;
+        for (int i = 0; i < count; i++) {
+            transactionSummary = (TransactionSummary)buyPortfolio.getChildAt(i);
+
+            assert(transactionSummary.getChildCount() > 0);
+
+            Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
+
+            Stock stock = transaction.getContract().getStock();
+
+            if (codes.contains(stock.getCode()) == false) {
+                codes.add(stock.getCode());
+                stocks.add(stock);
+            }
+        }
+
+        final int count2 = sellPortfolio.getChildCount();
+        transactionSummary = null;
+        for (int i = 0; i < count2; i++) {
+            transactionSummary = (TransactionSummary)sellPortfolio.getChildAt(i);
+
+            assert(transactionSummary.getChildCount() > 0);
+
+            Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
+
+            Stock stock = transaction.getContract().getStock();
+
+            if (codes.contains(stock.getCode()) == false) {
+                codes.add(stock.getCode());
+                stocks.add(stock);
+            }
+        }
+
+        return stocks;
     }
 
     private void addSellTransaction(Transaction transaction) {
@@ -1119,6 +1191,31 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             this.depositSummary = new DepositSummary();
         }
 
+        boolean dividendSummaryReadSuccess = false;
+        try {
+            File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "dividendsummary.xml");
+
+            XStream xStream = new XStream();
+            InputStream inputStream = new java.io.FileInputStream(f);
+            final Object obj = xStream.fromXML(inputStream);
+
+            if(obj instanceof DividendSummary) {
+                this.dividendSummary = (DividendSummary)obj;
+            }
+
+            dividendSummaryReadSuccess = true;
+        }
+        catch (java.io.FileNotFoundException exp) {
+            log.error(null, exp);
+        }
+        catch (com.thoughtworks.xstream.core.BaseException exp) {
+            log.error(null, exp);
+        }
+
+        if (false == dividendSummaryReadSuccess) {
+            this.dividendSummary = new DividendSummary();
+        }
+
         updateRealTimeStockMonitorAccordingToBuyPortfolioTreeTableModel();
         
         updateWealthHeader();
@@ -1130,56 +1227,29 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         if(Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config") == false)
         {
             return false;
-        }
-        
-        File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "buyportfolio.xml");
-                
-        XStream xStream = new XStream();   
+        }        
         
         boolean status = true;
-        
-        try {
-            OutputStream outputStream = new FileOutputStream(f);
-            final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
-            xStream.toXML(portfolioTreeTableModel, outputStream);  
-        }
-        catch (java.io.FileNotFoundException exp) {
-            log.error(null, exp);
-            status = false;
-        }
-        catch (com.thoughtworks.xstream.core.BaseException exp) {
-            log.error(null, exp);
-            status = false;
-        }
-           
-        f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "sellportfolio.xml");
-                
-        try {
-            OutputStream outputStream = new FileOutputStream(f);
-            final SellPortfolioTreeTableModel portfolioTreeTableModel = (SellPortfolioTreeTableModel)sellTreeTable.getTreeTableModel();
-            xStream.toXML(portfolioTreeTableModel, outputStream);  
-        }
-        catch (java.io.FileNotFoundException exp) {
-            log.error(null, exp);
-            status = false;
-        }
-        catch (com.thoughtworks.xstream.core.BaseException exp) {
-            log.error(null, exp);
+
+        String filePath = org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "buyportfolio.xml";
+        final BuyPortfolioTreeTableModel buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
+        if (org.yccheok.jstock.gui.Utils.toXML(buyPortfolioTreeTableModel, filePath) == false) {
             status = false;
         }
 
-        f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "depositsummary.xml");
-
-        try {
-            OutputStream outputStream = new FileOutputStream(f);
-            xStream.toXML(this.depositSummary, outputStream);
-        }
-        catch (java.io.FileNotFoundException exp) {
-            log.error(null, exp);
+        filePath = org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "sellportfolio.xml";
+        final SellPortfolioTreeTableModel sellPortfolioTreeTableModel = (SellPortfolioTreeTableModel)sellTreeTable.getTreeTableModel();
+        if (org.yccheok.jstock.gui.Utils.toXML(sellPortfolioTreeTableModel, filePath) == false) {
             status = false;
         }
-        catch (com.thoughtworks.xstream.core.BaseException exp) {
-            log.error(null, exp);
+
+        filePath = org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "depositsummary.xml";
+        if (org.yccheok.jstock.gui.Utils.toXML(this.depositSummary, filePath) == false) {
+            status = false;
+        }
+
+        filePath = org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "dividendsummary.xml";
+        if (org.yccheok.jstock.gui.Utils.toXML(this.dividendSummary, filePath) == false) {
             status = false;
         }
 
@@ -1306,8 +1376,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         XStream xStream = new XStream();
 
+        OutputStream outputStream = null;
+
         try {
-            OutputStream outputStream = new FileOutputStream(f);
+            outputStream = new FileOutputStream(f);
             xStream.toXML(guiOptions, outputStream);
         }
         catch(java.io.FileNotFoundException exp) {
@@ -1318,6 +1390,18 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             log.error("", exp);
             return false;
         }
+        finally {
+            if (outputStream != null) {
+                try {
+                    outputStream.close();
+                    outputStream = null;
+                }
+                catch (java.io.IOException exp) {
+                    log.error(null, exp);
+                    return false;
+                }
+            }
+        }
 
         return true;
     }
@@ -1327,7 +1411,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         final SellPortfolioTreeTableModel sellPortfolioTreeTableModel = (SellPortfolioTreeTableModel)this.sellTreeTable.getTreeTableModel();
         
         final double share = buyPortfolioTreeTableModel.getCurrentValue();
-        final double cash = sellPortfolioTreeTableModel.getNetSellingValue() + this.depositSummary.getTotal();
+        final double cash = sellPortfolioTreeTableModel.getNetSellingValue() + this.depositSummary.getTotal() + this.dividendSummary.getTotal();
         final double paperProfit = buyPortfolioTreeTableModel.getNetGainLossValue();
         final double paperProfitPercentage = buyPortfolioTreeTableModel.getNetGainLossPercentage();
         final double realizedProfit = sellPortfolioTreeTableModel.getNetGainLossValue();
@@ -1375,7 +1459,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
     // Data structure.
     private DepositSummary depositSummary = new DepositSummary();
-    
+    private DividendSummary dividendSummary = new DividendSummary();
+
     private RealTimeStockMonitor realTimeStockMonitor = null;
     private org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
 
