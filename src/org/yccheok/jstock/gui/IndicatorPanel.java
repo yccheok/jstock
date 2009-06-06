@@ -15,7 +15,6 @@
 package org.yccheok.jstock.gui;
 
 import java.util.concurrent.ExecutionException;
-import org.jhotdraw.undo.*;
 import org.jhotdraw.util.*;
 
 import java.io.*;
@@ -23,7 +22,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
-import javax.swing.event.*;
 import org.jhotdraw.app.action.*;
 import org.jhotdraw.draw.*;
 import org.jhotdraw.draw.action.*;
@@ -32,10 +30,7 @@ import javax.swing.event.*;
 import org.yccheok.jstock.engine.*;
 import org.yccheok.jstock.analysis.*;
 
-import com.thoughtworks.xstream.*;
 
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
