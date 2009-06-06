@@ -120,35 +120,7 @@ public class IndicatorProjectManager {
         // ********************************************
         org.yccheok.jstock.analysis.OperatorIndicator operatorIndicator = getOperatorIndicator(newProject);
         operatorIndicator.setName(newProject);
-        XStream xStream = new XStream();                
-        
-        OutputStream outputStream = null;
-        
-        try {
-            outputStream = new FileOutputStream(new File(this.getOperatorIndicatorFilename(newProject)));
-            xStream.toXML(operatorIndicator, outputStream);            
-        }
-        catch(com.thoughtworks.xstream.core.BaseException exp) {
-            log.error("", exp);
-            return false;
-        }
-        catch(java.io.FileNotFoundException exp) {            
-            log.error("", exp);
-            return false;
-        }
-        finally {
-            if(outputStream != null) {
-                try {
-                    outputStream.close();
-                }
-                catch(java.io.IOException exp) {
-                    log.error("", exp);
-                    return false;
-                }
-            }
-        }
-        
-        return true;
+        return Utils.toXML(operatorIndicator, this.getOperatorIndicatorFilename(newProject));
     }
     
     public IndicatorDefaultDrawing getIndicatorDefaultDrawing(String project) {
@@ -171,22 +143,7 @@ public class IndicatorProjectManager {
         if(projects.contains(project) == false) return null;
         
         File operatorIndicatorFile = new File(getOperatorIndicatorFilename(project));
-        
-        XStream xStream = new XStream();
-        
-        try {
-            InputStream inputStream = new java.io.FileInputStream(operatorIndicatorFile);            
-            org.yccheok.jstock.analysis.OperatorIndicator operatorIndicator = (org.yccheok.jstock.analysis.OperatorIndicator)xStream.fromXML(inputStream);
-            return operatorIndicator;
-        }
-        catch(java.io.FileNotFoundException exp) {
-            log.error("", exp);
-        }
-        catch(com.thoughtworks.xstream.core.BaseException exp) {
-            log.error("", exp);
-        }        
-        
-        return null;
+        return Utils.fromXML(org.yccheok.jstock.analysis.OperatorIndicator.class, operatorIndicatorFile);
     }
     
     public boolean contains(String project) {
