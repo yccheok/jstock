@@ -650,7 +650,7 @@ public class Utils {
         return null;
     }
 
-    public static boolean toXML(String filePath, Object object) {
+    public static boolean toXML(Object object, String filePath) {
         XStream xStream = new XStream();
         OutputStream outputStream = null;
 
