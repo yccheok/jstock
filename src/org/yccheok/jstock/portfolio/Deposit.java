@@ -79,7 +79,7 @@ public class Deposit implements Commentable {
         return d;
     }
 
-    private double amount;
-    private SimpleDate date;
+    private final double amount;
+    private final SimpleDate date;
     private String comment = "";
 }
