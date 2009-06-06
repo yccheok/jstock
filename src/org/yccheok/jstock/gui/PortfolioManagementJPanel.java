@@ -680,14 +680,14 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private void showBuyPortfolioChartJDialog() {
         final MainFrame m = MainFrame.getInstance();
         final BuyPortfolioTreeTableModel buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
-        BuyPortfolioChartJDialog buyPortfolioChartJDialog = new BuyPortfolioChartJDialog(m, false, buyPortfolioTreeTableModel);
+        BuyPortfolioChartJDialog buyPortfolioChartJDialog = new BuyPortfolioChartJDialog(m, false, buyPortfolioTreeTableModel, this.dividendSummary);
         buyPortfolioChartJDialog.setVisible(true);                                    
     }
     
     private void showSellPortfolioChartJDialog() {
         final MainFrame m = MainFrame.getInstance();
         final SellPortfolioTreeTableModel sellPortfolioTreeTableModel = (SellPortfolioTreeTableModel)sellTreeTable.getTreeTableModel();
-        SellPortfolioChartJDialog sellPortfolioChartJDialog = new SellPortfolioChartJDialog(m, false, sellPortfolioTreeTableModel);
+        SellPortfolioChartJDialog sellPortfolioChartJDialog = new SellPortfolioChartJDialog(m, false, sellPortfolioTreeTableModel, this.dividendSummary);
         sellPortfolioChartJDialog.setVisible(true);                                    
     }
     
