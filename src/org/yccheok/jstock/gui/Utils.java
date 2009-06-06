@@ -17,11 +17,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * Copyright (C) 2007 Cheok YanCheng <yccheok@yahoo.com>
+ * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
  */
 
 package org.yccheok.jstock.gui;
 
+import com.thoughtworks.xstream.XStream;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.GraphicsConfiguration;
@@ -34,8 +35,10 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.PixelGrabber;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import org.yccheok.jstock.engine.*;
 import java.util.*;
 import java.util.concurrent.Executor;
@@ -615,6 +618,68 @@ public class Utils {
     public static String toHTML(String plainText) {
         plainText = plainText.replace(System.getProperty("line.separator"), "<br>");
         return "<html><head></head><body>" + plainText + "</body></html>";
+    }
+
+    public static <A> A fromXML(String filePath) {
+        XStream xStream = new XStream();
+        InputStream inputStream = null;
+
+        try {
+            inputStream = new java.io.FileInputStream(filePath);
+            return (A)xStream.fromXML(inputStream);
+        }
+        catch (java.io.FileNotFoundException exp) {
+            log.error(null, exp);
+        }
+        catch (com.thoughtworks.xstream.core.BaseException exp) {
+            log.error(null, exp);
+        }
+        finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                    inputStream = null;
+                }
+                catch (java.io.IOException exp) {
+                    log.error(null, exp);
+                    return null;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public static boolean toXML(String filePath, Object object) {
+        XStream xStream = new XStream();
+        OutputStream outputStream = null;
+
+        try {
+            outputStream = new FileOutputStream(new File(filePath));
+            xStream.toXML(object, outputStream);
+        }
+        catch (com.thoughtworks.xstream.core.BaseException exp) {
+            log.error(null, exp);
+            return false;
+        }
+        catch (java.io.FileNotFoundException exp) {
+            log.error(null, exp);
+            return false;
+        }
+        finally {
+            if (outputStream != null) {
+                try {
+                    outputStream.close();
+                    outputStream = null;
+                }
+                catch (java.io.IOException exp) {
+                    log.error(null, exp);
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     public static class ApplicationInfo
