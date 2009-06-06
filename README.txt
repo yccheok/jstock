@@ -7,6 +7,8 @@ version 1.0.4d
 
 3. [2787627] Feature added. Remember when is the last view page.
 
+4. Bug fixed. Previously, when CIMB server failed, there are no chance for us to fall into Yahoo server.
+
 ==============
 version 1.0.4c
 ==============
