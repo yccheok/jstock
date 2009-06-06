@@ -327,7 +327,8 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     public void setTransaction(Transaction transaction) {
-        final Symbol symbol = transaction.getContract().getStock().getSymbol();
+        this.stock = transaction.getContract().getStock();
+        final Symbol symbol = stock.getSymbol();
         final Date date = transaction.getContract().getDate().getCalendar().getTime();
         final int quantity = transaction.getContract().getQuantity();
         final double price = transaction.getContract().getPrice();
@@ -350,23 +351,14 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
     }
     
     private Transaction generateTransaction() {
-        MainFrame m = (MainFrame)NewBuyTransactionJDialog.this.getParent();
-                        
-        if(m == null) return null;
-                        
-        final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = m.getStockCodeAndSymbolDatabase();
-        
-        final Symbol symbol = Symbol.newInstance(jTextField1.getText());
-        final Code code = stockCodeAndSymbolDatabase.symbolToCode(symbol);
         final DateField dateField = (DateField)jPanel3;
         
-        final Stock stock = Utils.getEmptyStock(code, symbol);
         final SimpleDate date = new SimpleDate((Date)dateField.getValue());
         final Contract.Type type = Contract.Type.Buy;
         final int unit = ((java.lang.Integer)this.jSpinner1.getValue());
         final double price = ((Double)this.jFormattedTextField1.getValue());
         
-        Contract.ContractBuilder builder = new Contract.ContractBuilder(stock, date);
+        Contract.ContractBuilder builder = new Contract.ContractBuilder(this.stock, date);
         
         Contract contract = builder.type(type).quantity(unit).price(price).build();
         
@@ -548,8 +540,10 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         this.jComboBox1.setEnabled(enable);
     }
     
-    public void setStockSymbol(Symbol symbol) {
+    public void setStock(Stock stock) {
+        Symbol symbol = stock.getSymbol();
         this.jTextField1.setText(symbol.toString());
+        this.stock = stock;
     }
     
     public void setStockSelectionEnabled(boolean flag) {
@@ -585,16 +579,16 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
             public void keyReleased(KeyEvent e) {
                 if(KeyEvent.VK_ENTER == e.getKeyCode()) {
 
-                    String stock = NewBuyTransactionJDialog.this.jComboBox1.getEditor().getItem().toString();
+                    String s = NewBuyTransactionJDialog.this.jComboBox1.getEditor().getItem().toString();
                     
-                    if(stock.length() > 0) {
+                    if(s.length() > 0) {
                         MainFrame m = (MainFrame)NewBuyTransactionJDialog.this.getParent();
                         
                         if(m == null) return;
                         
                         final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = m.getStockCodeAndSymbolDatabase();
                         
-                        Code code = stockCodeAndSymbolDatabase.searchStockCode(stock);
+                        Code code = stockCodeAndSymbolDatabase.searchStockCode(s);
                         Symbol symbol = null;
                             
                         if(code != null) {
@@ -602,14 +596,15 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
                             
                         }
                         else {
-                            symbol = stockCodeAndSymbolDatabase.searchStockSymbol(stock);
+                            symbol = stockCodeAndSymbolDatabase.searchStockSymbol(s);
                                 
                             if(symbol != null) {                                   
                                 code = stockCodeAndSymbolDatabase.symbolToCode(symbol);
 
                             }
                         }
-                        
+
+                        NewBuyTransactionJDialog.this.stock = Utils.getEmptyStock(code, symbol);
                         NewBuyTransactionJDialog.this.jTextField1.setText(symbol.toString());
                     }   /* if(stock.length() > 0) */
                 }   /* if(KeyEvent.VK_ENTER == e.getKeyCode()) */
@@ -624,6 +619,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
     
     private Transaction transaction = null;
     private String transactionComment = "";
+    private Stock stock = null;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
