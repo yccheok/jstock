@@ -620,13 +620,16 @@ public class Utils {
         return "<html><head></head><body>" + plainText + "</body></html>";
     }
 
-    public static <A> A fromXML(String filePath) {
+    public static <A> A fromXML(Class c, File file) {
         XStream xStream = new XStream();
         InputStream inputStream = null;
 
         try {
-            inputStream = new java.io.FileInputStream(filePath);
-            return (A)xStream.fromXML(inputStream);
+            inputStream = new java.io.FileInputStream(file);
+            Object object = xStream.fromXML(inputStream);
+            if (c.isInstance(object)) {
+                return (A)object;
+            }
         }
         catch (java.io.FileNotFoundException exp) {
             log.error(null, exp);
@@ -648,6 +651,10 @@ public class Utils {
         }
 
         return null;
+    }
+
+    public static <A> A fromXML(Class c, String filePath) {
+        return (A)fromXML(c, new File(filePath));
     }
 
     public static boolean toXML(Object object, File file) {
