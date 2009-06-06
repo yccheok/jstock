@@ -67,27 +67,14 @@ public class IndicatorDefaultDrawing extends org.jhotdraw.draw.DefaultDrawing {
      */
     public void write(String projectName, String jHotDrawFilename, String operatorIndicatorFilename) throws IOException {
         File jHotdrawFile = new File(jHotDrawFilename);
-        File xStreamFile = new File(operatorIndicatorFilename);
         
         OperatorIndicator operatorIndicator = getOperatorIndicator();
         operatorIndicator.setName(projectName);
         
         OutputFormat outputFormat = this.getOutputFormats().get(0);
         outputFormat.write(jHotdrawFile, this);
-                
-        XStream xStream = new XStream();        
-        OutputStream outputStream = new FileOutputStream(xStreamFile);
-        
-        try {
-            xStream.toXML(operatorIndicator, outputStream);            
-        }
-        catch(com.thoughtworks.xstream.core.BaseException exp) {
-            throw new IOException(exp);
-        }
-        finally {
-            if(outputStream != null)
-                outputStream.close();
-        }        
+
+        org.yccheok.jstock.gui.Utils.toXML(operatorIndicator, operatorIndicatorFilename);
     }
     
     /**
