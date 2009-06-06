@@ -107,7 +107,7 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.PAGE_END);
 
-        jPanel2.setLayout(new java.awt.BorderLayout());
+        jPanel2.setLayout(new java.awt.BorderLayout(2, 2));
 
         jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
@@ -221,7 +221,13 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jTable1PropertyChange
 
     private void addNewDeposit() {
-        ((DepositSummaryTableModel)this.jTable1.getModel()).addNewDeposit();
+        final int modelIndex = ((DepositSummaryTableModel)this.jTable1.getModel()).addNewDeposit();
+
+        clearAllTablesSelection();
+
+        final int selectedViewIndex = jTable1.getRowSorter().convertRowIndexToView(modelIndex);
+        jTable1.getSelectionModel().setSelectionInterval(selectedViewIndex, selectedViewIndex);
+        JTableUtilities.scrollToVisible(jTable1, selectedViewIndex, 0);
     }
 
     private void deleteSelectedDeposit() {
