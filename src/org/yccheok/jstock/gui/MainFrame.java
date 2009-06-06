@@ -2457,25 +2457,15 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     private void initJStockOptions() {
-        try {
-            File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "options.xml");
-
-            XStream xStream = new XStream();
-            InputStream inputStream = new java.io.FileInputStream(f);
-            jStockOptions = (JStockOptions)xStream.fromXML(inputStream);
-
-            log.info("jstockOptions loaded from " + f.toString() + " successfully.");            
-        }
-        catch(java.io.FileNotFoundException exp) {
-            log.error("", exp);
-        }
-        catch(com.thoughtworks.xstream.core.BaseException exp) {
-            log.error("", exp);
-        }        
+        final File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "options.xml");
+        jStockOptions = Utils.fromXML(JStockOptions.class, f);
         
-        if(jStockOptions == null)
+        if(jStockOptions == null) {
             jStockOptions = new JStockOptions();
-        
+        }
+        else {
+            log.info("jstockOptions loaded from " + f.toString() + " successfully.");
+        }
         /* Hard core fix. */
         if(jStockOptions.getScanningSpeed() == 0) {
             jStockOptions.setScanningSpeed(1000);
@@ -2495,41 +2485,17 @@ public class MainFrame extends javax.swing.JFrame {
     }   
     
     private void initRealTimeStocks() {
-        java.util.List<Stock> s = null;
-        java.util.List<StockAlert> a = null;
-        
-        try {
-            final Country country = jStockOptions.getCountry();
-            File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "realtimestock.xml");
-
-            XStream xStream = new XStream();
-            InputStream inputStream = new java.io.FileInputStream(f);
-            s = (java.util.List<Stock>)xStream.fromXML(inputStream);
-            
-            log.info("Real time stocks loaded from " + f.toString() + " successfully.");            
+        final Country country = jStockOptions.getCountry();
+        final File f0 = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "realtimestock.xml");
+        java.util.List<Stock> s = Utils.fromXML(java.util.List.class, f0);
+        if (s != null) {
+            log.info("Real time stocks loaded from " + f0.toString() + " successfully.");
         }
-        catch(java.io.FileNotFoundException exp) {
-            log.error("", exp);
-        }
-        catch(com.thoughtworks.xstream.core.BaseException exp) {
-            log.error("", exp);
-        }        
-
-        try {
-            final Country country = jStockOptions.getCountry();
-            File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "realtimestockalert.xml");
-
-            XStream xStream = new XStream();
-            InputStream inputStream = new java.io.FileInputStream(f);
-            a = (java.util.List<StockAlert>)xStream.fromXML(inputStream);
-
-            log.info("Real time stocks' alert loaded from " + f.toString() + " successfully.");
-        }
-        catch(java.io.FileNotFoundException exp) {
-            log.error("", exp);
-        }
-        catch(com.thoughtworks.xstream.core.BaseException exp) {
-            log.error("", exp);
+       
+        File f1 = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "realtimestockalert.xml");
+        java.util.List<StockAlert> a = Utils.fromXML(java.util.List.class, f1);
+        if (a != null) {
+            log.info("Real time stocks' alert loaded from " + f1.toString() + " successfully.");
         }
 
         clearAllStocks();
@@ -2590,38 +2556,13 @@ public class MainFrame extends javax.swing.JFrame {
         }
         
         final File f0 = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "realtimestock.xml");
-                
-        XStream xStream = new XStream();   
-        
-        try {
-            OutputStream outputStream = new FileOutputStream(f0);
-            xStream.toXML(((StockTableModel)this.jTable1.getModel()).getStocks(), outputStream);  
-        }
-        catch(java.io.FileNotFoundException exp) {
-            log.error(null, exp);
-            return false;
-        }
-        catch(com.thoughtworks.xstream.core.BaseException exp) {
-            log.error(null, exp);
-            return false;
+        final boolean status0 = Utils.toXML(((StockTableModel)this.jTable1.getModel()).getStocks(), f0);
+        if (status0 == false) {
+            return status0;
         }
 
         final File f1 = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "realtimestockalert.xml");
-
-        try {
-            OutputStream outputStream = new FileOutputStream(f1);
-            xStream.toXML(((StockTableModel)this.jTable1.getModel()).getAlerts(), outputStream);
-        }
-        catch(java.io.FileNotFoundException exp) {
-            log.error(null, exp);
-            return false;
-        }
-        catch(com.thoughtworks.xstream.core.BaseException exp) {
-            log.error(null, exp);
-            return false;
-        }
-        
-        return true;        
+        return Utils.toXML(((StockTableModel)this.jTable1.getModel()).getAlerts(), f1);
     }
     
     private boolean saveBrokingFirmLogos() {
@@ -2676,23 +2617,7 @@ public class MainFrame extends javax.swing.JFrame {
         }
 
         final File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database" + File.separator + "stockcodeandsymboldatabase.xml");
-                
-        XStream xStream = new XStream();   
-        
-        try {
-            OutputStream outputStream = new FileOutputStream(f);
-            xStream.toXML(this.stockCodeAndSymbolDatabase, outputStream);  
-        }
-        catch(java.io.FileNotFoundException exp) {
-            log.error("", exp);
-            return false;
-        }
-        catch(com.thoughtworks.xstream.core.BaseException exp) {
-            log.error("", exp);
-            return false;
-        }
-                      
-        return true;        
+        return Utils.toXML(this.stockCodeAndSymbolDatabase, f);
     }
     
     private boolean saveJStockOptions() {
@@ -2702,23 +2627,7 @@ public class MainFrame extends javax.swing.JFrame {
         }
         
         File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "options.xml");
-                
-        XStream xStream = new XStream();   
-        
-        try {
-            OutputStream outputStream = new FileOutputStream(f);
-            xStream.toXML(jStockOptions, outputStream);  
-        }
-        catch(java.io.FileNotFoundException exp) {
-            log.error("", exp);
-            return false;
-        }
-        catch(com.thoughtworks.xstream.core.BaseException exp) {
-            log.error("", exp);
-            return false;
-        }
-                      
-        return true;        
+        return org.yccheok.jstock.gui.Utils.toXML(jStockOptions, f);
     }
 
     private void removeOldHistoryData(Country country) {
