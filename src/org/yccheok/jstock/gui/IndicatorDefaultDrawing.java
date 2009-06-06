@@ -86,25 +86,13 @@ public class IndicatorDefaultDrawing extends org.jhotdraw.draw.DefaultDrawing {
         
         InputFormat inputFormat = this.getInputFormats().get(0);
         inputFormat.read(jHotdrawFile, this);
-        
-        XStream xStream = new XStream();
-        InputStream inputStream = new java.io.FileInputStream(xStreamFile);
-        
-        OperatorIndicator operatorIndicator = null;
-        
-        try {
-            operatorIndicator = (OperatorIndicator)xStream.fromXML(inputStream);
-        }
-        catch(com.thoughtworks.xstream.core.BaseException exp) {
-            throw new IOException(exp);
-        }
-        finally {
-            if(inputStream != null)
-                inputStream.close();
+
+        OperatorIndicator operatorIndicator = org.yccheok.jstock.gui.Utils.fromXML(OperatorIndicator.class, xStreamFile);
+        if (operatorIndicator == null) {
+            throw new IOException();
         }
         
         List<Figure> figures = this.getFigures();
-        final int size = figures.size();
         int counter = 0;
         for(Figure f : figures) {
             if(f instanceof OperatorFigure) {
