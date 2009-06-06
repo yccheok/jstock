@@ -2225,11 +2225,10 @@ public class MainFrame extends javax.swing.JFrame {
             {                                
                 // We try to first load from disk. The information may be outdated,
                 // but it is far more better than letting user to wait for several
-                // hours.            
-                try {
-                    final InputStream inputStream = new java.io.FileInputStream(f);
-                    final StockCodeAndSymbolDatabase tmp = (StockCodeAndSymbolDatabase)xStream.fromXML(inputStream);
-
+                // hours.
+                final StockCodeAndSymbolDatabase tmp = org.yccheok.jstock.gui.Utils.fromXML(StockCodeAndSymbolDatabase.class, f);
+                
+                if (tmp != null) {
                     log.info("Stock code and symbol database loaded from " + f.toString() + " successfully.");            
                 
                     // Prepare proper synchronization for us to change country.
@@ -2251,12 +2250,6 @@ public class MainFrame extends javax.swing.JFrame {
                         }
                     }                
                 }
-                catch(java.io.FileNotFoundException exp) {
-                    log.error("", exp);
-                }
-                catch(com.thoughtworks.xstream.core.BaseException exp) {
-                    log.error("", exp);
-                } 
             }   // if(this.readFromDisk)
             
             // When we fall here, we either fail to read from disk or user
