@@ -234,7 +234,11 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
     public double getCurrentValue() {
         return this.getCurrentValue((Portfolio)getRoot());        
     }
-    
+
+    public double getNetPurchaseValue() {
+        return ((Portfolio)getRoot()).getNetTotal();
+    }
+
     private double getCurrentValue(Portfolio portfolio) {
         final int count = portfolio.getChildCount();
         
