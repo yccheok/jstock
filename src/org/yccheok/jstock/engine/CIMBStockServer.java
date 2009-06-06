@@ -111,11 +111,13 @@ public class CIMBStockServer extends Subject<CIMBStockServer, Integer> implement
         return this.getStock(Symbol.newInstance(newCode.toString()));
     }
     
+    @Override
     public java.util.List<Stock> getStocksBySymbols(java.util.List<Symbol> symbols) throws StockNotFoundException
     {
         throw new java.lang.UnsupportedOperationException();
     }
     
+    @Override
     public java.util.List<Stock> getStocksByCodes(java.util.List<Code> codes) throws StockNotFoundException
     {
         String _codes;
@@ -157,10 +159,38 @@ public class CIMBStockServer extends Subject<CIMBStockServer, Integer> implement
                 
                 stocks = stockFormat.parse(respond);
 
-                if(stocks.size() != codes.size()) {
-                    log.error("Number of stock (" + stocks.size() + ") is not " + codes.size());
-                    continue;                    
-                }            
+                //if(stocks.size() != codes.size()) {
+                //    log.error("Number of stock (" + stocks.size() + ") is not " + codes.size());
+                //    continue;
+                //}
+                // For CIMB server, if we pass one good code and one bad code to it. It will only return
+                // stock of the good code. Hence, we can easily faill into case stocks.size() != codes.size()
+                // Hence, it is must more preferable that we create our own empty stock for those bad code.
+                if (stocks.size() != codes.size()) {
+                    if (stocks.size() <= 0) {
+                        // All bad codes. Retry.
+                        log.error("Number of stock (" + stocks.size() + ") is not " + codes.size());
+                        continue;
+                    }
+
+                    for (Code code : codes) {
+                        if (stocks.size() >= codes.size()) {
+                            break;
+                        }
+
+                        boolean found = false;
+                        for (Stock stock : stocks) {
+                            if (stock.getCode().equals(code)) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (found != true) {
+                        	// Create fake stock if we haven't do so.
+                            stocks.add(org.yccheok.jstock.gui.Utils.getEmptyStock(code, Symbol.newInstance(code.toString())));
+                        }
+                    }   /* for (Code code : codes) */
+                }   /* if (stocks.size() != codes.size()) */
             }
             catch(HttpException exp) {
                 log.error("", exp);
@@ -176,8 +206,11 @@ public class CIMBStockServer extends Subject<CIMBStockServer, Integer> implement
             
             break;
         }
+
+        // Is it necessary to perform null check?
+        if (stocks == null) throw new StockNotFoundException("Cannot get codes=" + codes);
         
-        if(stocks == null) throw new StockNotFoundException("Cannot get codes=" + codes);
+        if (stocks.size() != codes.size()) throw new StockNotFoundException("Number of stock (" + stocks.size() + ") is not " + codes.size());
         
         return stocks;
     }
