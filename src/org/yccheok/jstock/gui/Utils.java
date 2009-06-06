@@ -650,12 +650,12 @@ public class Utils {
         return null;
     }
 
-    public static boolean toXML(Object object, String filePath) {
+    public static boolean toXML(Object object, File file) {
         XStream xStream = new XStream();
         OutputStream outputStream = null;
 
         try {
-            outputStream = new FileOutputStream(new File(filePath));
+            outputStream = new FileOutputStream(file);
             xStream.toXML(object, outputStream);
         }
         catch (com.thoughtworks.xstream.core.BaseException exp) {
@@ -680,6 +680,10 @@ public class Utils {
         }
 
         return true;
+    }
+
+    public static boolean toXML(Object object, String filePath) {
+        return toXML(object, new File(filePath));
     }
 
     public static class ApplicationInfo

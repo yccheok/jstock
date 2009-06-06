@@ -2220,7 +2220,6 @@ public class MainFrame extends javax.swing.JFrame {
             
             Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database");
             final File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database" + File.separator + "stockcodeandsymboldatabase.xml");
-            final XStream xStream = new XStream();
             
             if(this.readFromDisk)
             {                                
@@ -2321,18 +2320,8 @@ public class MainFrame extends javax.swing.JFrame {
             }
              
             if(success == true)
-            {                                
-                try {        
-                    final OutputStream outputStream = new FileOutputStream(f);
-                    // Use local variable instead of member variable, thread safe purpose.
-                    xStream.toXML(tmp, outputStream);  
-                }
-                catch(java.io.FileNotFoundException exp) {
-                    log.error("", exp);
-                }
-                catch(com.thoughtworks.xstream.core.BaseException exp) {
-                    log.error("", exp);
-                }                            
+            {
+                org.yccheok.jstock.gui.Utils.toXML(tmp, f);
             }
             
             return success;
