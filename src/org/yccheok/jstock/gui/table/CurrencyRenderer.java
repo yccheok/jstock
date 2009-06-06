@@ -33,7 +33,7 @@ import org.yccheok.jstock.gui.portfolio.DepositSummaryTableModel;
  *
  * @author yancheng
  */
-public class CurrencyRenderer extends DefaultTableCellRenderer {
+public class CurrencyRenderer extends GenericRenderer {
     private NumberFormat format = null;
 
     public CurrencyRenderer() { 
@@ -46,47 +46,5 @@ public class CurrencyRenderer extends DefaultTableCellRenderer {
             format = java.text.NumberFormat.getCurrencyInstance();
         }
         setText((value == null) ? "" : format.format(value));
-    }
-
-    private Color getBackgroundColor(int row) {
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
-
-        if(row % 2 == 0) {
-            return jStockOptions.getFirstRowBackgroundColor();
-        }
-
-        return jStockOptions.getSecondRowBackgroundColor();
-    }
-
-    @Override
-    public Component getTableCellRendererComponent(
-                            JTable table, Object value,
-                            boolean isSelected, boolean hasFocus,
-                            int row, int column) {
-        Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-
-        TableModel tableModel = table.getModel();
-        if (tableModel instanceof DepositSummaryTableModel)
-        {
-            DepositSummaryTableModel depositSummaryTableModel = (DepositSummaryTableModel)tableModel;
-            int index = table.convertRowIndexToModel(row);
-            String comment = depositSummaryTableModel.getDeposit(index).getComment();
-            if (comment.length() > 0) {
-                ((JComponent) c).setToolTipText(org.yccheok.jstock.gui.Utils.toHTML(comment));
-            }
-            else {
-                ((JComponent) c).setToolTipText(null);
-            }
-        }
-
-        if(isSelected || hasFocus) return c;
-
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
-
-        c.setForeground(jStockOptions.getNormalTextForegroundColor());
-
-        c.setBackground(getBackgroundColor(row));
-
-        return c;
     }
 }
