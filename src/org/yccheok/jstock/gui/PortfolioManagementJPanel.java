@@ -45,6 +45,7 @@ import org.jdesktop.swingx.table.TableColumnExt;
 import org.yccheok.jstock.portfolio.*;
 import org.yccheok.jstock.engine.*;
 import org.jdesktop.swingx.treetable.*;
+import org.yccheok.jstock.gui.portfolio.CashFlowChartJDialog;
 import org.yccheok.jstock.gui.portfolio.CommentJDialog;
 import org.yccheok.jstock.gui.portfolio.DepositSummaryJDialog;
 import org.yccheok.jstock.gui.portfolio.DividendSummaryJDialog;
@@ -683,7 +684,13 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         BuyPortfolioChartJDialog buyPortfolioChartJDialog = new BuyPortfolioChartJDialog(m, false, buyPortfolioTreeTableModel, this.dividendSummary);
         buyPortfolioChartJDialog.setVisible(true);                                    
     }
-    
+
+    private void showChashFlowChartJDialog() {
+        final MainFrame m = MainFrame.getInstance();
+        CashFlowChartJDialog cashFlowChartJDialog = new CashFlowChartJDialog(m, false);
+        cashFlowChartJDialog.setVisible(true);
+    }
+
     private void showSellPortfolioChartJDialog() {
         final MainFrame m = MainFrame.getInstance();
         final SellPortfolioTreeTableModel sellPortfolioTreeTableModel = (SellPortfolioTreeTableModel)sellTreeTable.getTreeTableModel();
@@ -761,6 +768,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
+                showChashFlowChartJDialog();
             }
         });
 
@@ -912,6 +920,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
+                showChashFlowChartJDialog();
             }
         });
 
