@@ -67,32 +67,8 @@ public class StockHistorySerializer {
     
     public StockHistoryServer load(Code code)
     {
-        File xStreamFile = new File(directory + File.separator + code + ".xml");        
-
-        XStream xStream = new XStream();
-        
-        StockHistoryServer stockHistoryServer = null;
-        
-        try {
-            InputStream inputStream = new java.io.FileInputStream(xStreamFile);
-            stockHistoryServer = (StockHistoryServer)xStream.fromXML(inputStream);        
-
-            inputStream.close();
-        }
-        catch(FileNotFoundException exp) {
-            log.error("", exp);
-            return null;
-        }
-        catch(IOException exp) {
-            log.error("", exp);
-            return null;
-        }
-        catch(com.thoughtworks.xstream.core.BaseException exp) {
-            log.error("", exp);
-            return null;
-        }
-        
-        return stockHistoryServer;
+        File xStreamFile = new File(directory + File.separator + code + ".xml");
+        return org.yccheok.jstock.gui.Utils.fromXML(StockHistoryServer.class, xStreamFile);
     }
     
     private final String directory;
