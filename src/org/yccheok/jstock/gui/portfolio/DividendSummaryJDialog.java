@@ -79,6 +79,8 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Dividend Payout");
+        setIconImage(null);
+        setResizable(false);
         addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 formMouseClicked(evt);
@@ -110,7 +112,7 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_END);
 
-        jPanel1.setLayout(new java.awt.BorderLayout());
+        jPanel1.setLayout(new java.awt.BorderLayout(2, 2));
 
         jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/filenew.png"))); // NOI18N
         jButton3.setText("New");
@@ -192,11 +194,11 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        for (int i = 0; i < dividendSummary.size(); i++) {
-            Dividend dividend = dividendSummary.get(i);
+        for (int i = 0; i < this.dividendSummary.size(); i++) {
+            Dividend dividend = this.dividendSummary.get(i);
             // How about stock checking?
             if (dividend.getAmount() <= 0.0 || dividend.getStock().getCode().toString().length() <= 0) {
-                dividendSummary.remove(dividend);
+                this.dividendSummary.remove(dividend);
                 i--;
             }
         }
@@ -252,8 +254,21 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
         }
     }
 
-    private void addNewDividend() {
-        ((DividendSummaryTableModel)this.jTable1.getModel()).addNewDividend();
+    public int addNewDividend(Stock stock) {
+        final int modelIndex = addNewDividend();
+        ((DividendSummaryTableModel)jTable1.getModel()).setValueAt(stock, modelIndex, 1);
+        return modelIndex;
+    }
+
+    private int addNewDividend() {
+        final int modelIndex = ((DividendSummaryTableModel)this.jTable1.getModel()).addNewDividend();
+
+        clearAllTablesSelection();
+
+        final int selectedViewIndex = jTable1.getRowSorter().convertRowIndexToView(modelIndex);
+        jTable1.getSelectionModel().setSelectionInterval(selectedViewIndex, selectedViewIndex);
+        JTableUtilities.scrollToVisible(jTable1, selectedViewIndex, 0);
+        return modelIndex;
     }
 
     private void deleteSelectedDividend() {
