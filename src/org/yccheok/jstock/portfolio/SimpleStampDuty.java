@@ -37,6 +37,7 @@ public class SimpleStampDuty implements StampDuty {
         this.rate = simpleStampDuty.getRate();
     }
     
+    @Override
     public double calculate(Contract contract) {
         if(fraction <= 0.0) return 0.0;
         
