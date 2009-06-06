@@ -991,21 +991,12 @@ public class IndicatorPanel extends JPanel implements ChangeListener {
     }
     
     public void initIndicatorProjectManager() {
-        try {
-            File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "indicator" + File.separator + "project.xml");
-
-            XStream xStream = new XStream();
-            InputStream inputStream = new java.io.FileInputStream(f);
-            indicatorProjectManager = (IndicatorProjectManager)xStream.fromXML(inputStream);
-            
-            log.info("indicatorProjectManager loaded from " + f.toString() + " successfully.");            
+        File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "indicator" + File.separator + "project.xml");
+        indicatorProjectManager = org.yccheok.jstock.gui.Utils.fromXML(IndicatorProjectManager.class, f);
+        if (indicatorProjectManager != null) {
+            log.info("indicatorProjectManager loaded from " + f.toString() + " successfully.");
         }
-        catch(java.io.FileNotFoundException exp) {
-            log.error("", exp);
-            indicatorProjectManager = new IndicatorProjectManager(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "indicator");
-        }
-        catch(com.thoughtworks.xstream.core.BaseException exp) {
-            log.error("", exp);
+        else {
             indicatorProjectManager = new IndicatorProjectManager(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "indicator");
         }
                         
@@ -1032,23 +1023,7 @@ public class IndicatorPanel extends JPanel implements ChangeListener {
     
     public boolean saveIndicatorProjectManager() {
         File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "indicator" + File.separator + "project.xml");
-                
-        XStream xStream = new XStream();   
-        
-        try {
-            OutputStream outputStream = new FileOutputStream(f);
-            xStream.toXML(indicatorProjectManager, outputStream);  
-        }
-        catch(java.io.FileNotFoundException exp) {
-            log.error("", exp);
-            return false;
-        }
-        catch(com.thoughtworks.xstream.core.BaseException exp) {
-            log.error("", exp);
-            return false;
-        }
-                      
-        return true;
+        return Utils.toXML(indicatorProjectManager, f);
     }
     
     public IndicatorProjectManager getIndicatorProjectManager() {
