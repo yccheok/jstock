@@ -24,7 +24,9 @@ package org.yccheok.jstock.gui;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import javax.swing.JFormattedTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.text.NumberFormatter;
@@ -36,7 +38,6 @@ import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.SimpleDate;
 import org.yccheok.jstock.engine.Stock;
-import org.yccheok.jstock.engine.StockCodeAndSymbolDatabase;
 import org.yccheok.jstock.engine.Symbol;
 import org.yccheok.jstock.portfolio.Broker;
 import org.yccheok.jstock.portfolio.BrokingFirm;
@@ -66,26 +67,11 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         }
     }
 
-    public void setBuyCost(double buyCost) {
-        this.buyCost = buyCost;
-        update();
-    }
-
-    public void setBuyDate(SimpleDate buyDate) {
-        this.buyDate = buyDate;
-        // No need update, as buy date is not being shown in GUI.
-    }
-
-    public void setMaxSellQuantity(int maxSellQuantity) {
+    private void setMaxSellQuantity(int maxSellQuantity) {
         SpinnerNumberModel spinnerNumberModel = (SpinnerNumberModel)jSpinner1.getModel();
         spinnerNumberModel.setMaximum(maxSellQuantity);
     }
 
-    public void setSellQuantity(int sellQuantity) {
-        jSpinner1.getModel().setValue(sellQuantity);
-        update();
-    }
-    
     private boolean shouldAutoCalculateBrokerFee() {
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
         
@@ -376,13 +362,70 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
-        this.transaction = null;
+        resultSellTransactions.clear();
         this.setVisible(false);
         this.dispose();
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    public void setTransaction(Transaction transaction) {
-        final Symbol symbol = transaction.getContract().getStock().getSymbol();
+    public void setBuyTransactions(List<Transaction> transactions) {
+        // Ensure we only perform batch update.
+        if (this.sellTransaction != null) {
+            throw new java.lang.UnsupportedOperationException("You cannot sell transaction and edit transaction at the same time");
+        }
+
+        buyTransactions.clear();
+        buyTransactions.addAll(transactions);
+        isBatchUpdate = buyTransactions.size() > 1;
+        if (isBatchUpdate) {
+            // Batch edit. Disable the quantity.
+            this.jSpinner1.setEnabled(false);
+        }
+
+        final Stock _stock = transactions.get(0).getContract().getStock();
+        final Symbol symbol = _stock.getSymbol();
+        final Date date = java.util.Calendar.getInstance().getTime();
+        int quantity = 0;
+        this.buyValue = 0.0;
+        for (Transaction transaction : transactions) {
+            quantity += transaction.getQuantity();
+            this.buyValue += transaction.getNetTotal();
+        }
+        MainFrame mainFrame = MainFrame.getInstance();
+        double price = mainFrame.getPortfolioManagementJPanel().getStockLastPrice(_stock);
+        double value = price * quantity;
+
+        this.jTextField1.setText(symbol.toString());
+        ((DateField)jPanel3).setValue(date);
+        this.jSpinner1.setValue(quantity);
+        this.jFormattedTextField1.setValue(price);
+        this.jFormattedTextField2.setValue(value);
+
+        // Limit maximum sell quantity.
+        setMaxSellQuantity(quantity);
+
+        this.stock = _stock;
+        this.type = Contract.Type.Sell;
+        this.buyPrice = this.buyValue / quantity;
+
+        update();
+    }
+
+    public void setSellTransaction(Transaction transaction) {
+        assert(transaction.getContract().getType() == Contract.Type.Sell);
+
+        // Ensure we only edit.
+        if (this.buyTransactions.size() > 0) {
+            throw new java.lang.UnsupportedOperationException("You cannot sell transaction and edit transaction at the same time");
+        }
+
+        if (transaction.getContract().getType() != Contract.Type.Sell) {
+            throw new java.lang.UnsupportedOperationException("You can only edit sell transaction");
+        }
+
+        this.sellTransaction = transaction;
+
+        final Stock _stock = transaction.getContract().getStock();
+        final Symbol symbol = _stock.getSymbol();
         final Date date = transaction.getContract().getDate().getCalendar().getTime();
         final int quantity = transaction.getContract().getQuantity();
         final double price = transaction.getContract().getPrice();
@@ -391,9 +434,6 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         final double clearingFee = transaction.getCalculatdClearingFee();
         final double stampDuty = transaction.getCalculatedStampDuty();
         final double netValue = transaction.getNetTotal();
-        this.buyCost = transaction.getContract().getReferencePrice();
-        this.buyDate = transaction.getContract().getReferenceDate();
-        this.transactionComment = transaction.getComment();
         
         this.jTextField1.setText(symbol.toString());
         ((DateField)jPanel3).setValue(date);
@@ -404,56 +444,96 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         this.jFormattedTextField5.setValue(clearingFee);
         this.jFormattedTextField7.setValue(stampDuty);
         this.jFormattedTextField6.setValue(netValue);
+
+        this.stock = transaction.getContract().getStock();
+        this.type = Contract.Type.Sell;
+        this.buyPrice = transaction.getContract().getReferencePrice();
+
+        update();
     }
     
-    private Transaction generateTransaction() {
-        MainFrame m = (MainFrame)NewSellTransactionJDialog.this.getParent();
-                        
-        if(m == null) return null;
-                        
-        final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = m.getStockCodeAndSymbolDatabase();
-        
-        final Symbol symbol = Symbol.newInstance(jTextField1.getText());
-        // We want user able to perform sell even though they are not connected to
-        // stock server. Luckily, code information are useless at this moment.
-        final Code code = stockCodeAndSymbolDatabase == null? Code.newInstance("0") : stockCodeAndSymbolDatabase.symbolToCode(symbol);
-        final DateField dateField = (DateField)jPanel3;
-        
-        final Stock stock = Utils.getEmptyStock(code, symbol);
-        final SimpleDate date = new SimpleDate((Date)dateField.getValue());
-        final Contract.Type type = Contract.Type.Sell;
-        final int unit = ((java.lang.Integer)this.jSpinner1.getValue());
-        final double price = ((Double)this.jFormattedTextField1.getValue());
-        
-        Contract.ContractBuilder builder = new Contract.ContractBuilder(stock, date);
-        
-        Contract contract = builder.type(type).quantity(unit).price(price).referencePrice(buyCost).referenceDate(buyDate).build();
-        
-        Broker broker = null;
-        StampDuty stampDuty = null;
-        ClearingFee clearingFee = null;
-        
-        if(this.shouldAutoCalculateBrokerFee()) {
-            final BrokingFirm brokingFirm = MainFrame.getInstance().getJStockOptions().getSelectedBrokingFirm();
-            broker = brokingFirm.getBroker();
-            stampDuty = brokingFirm.getStampDuty();
-            clearingFee = brokingFirm.getClearingFee();
+    private List<Transaction> generateTransactions() {
+        if (this.sellTransaction != null && this.buyTransactions.size() > 0) {
+            throw new java.lang.UnsupportedOperationException("You cannot sell transaction and edit transaction at the same time");
+        }
+
+        final List<Transaction> transactions = new ArrayList<Transaction>();
+
+        if (this.sellTransaction != null)
+        {
+            final DateField dateField = (DateField)jPanel3;
+            final SimpleDate date = new SimpleDate((Date)dateField.getValue());
+            final int unit = ((java.lang.Integer)this.jSpinner1.getValue());
+            final double price = ((Double)this.jFormattedTextField1.getValue());
+            Contract.ContractBuilder builder = new Contract.ContractBuilder(stock, date);
+            final Contract contract = builder.type(type).quantity(unit).price(price).referencePrice(this.sellTransaction.getContract().getReferencePrice()).referenceDate(this.sellTransaction.getContract().getReferenceDate()).build();
+
+            Broker broker = null;
+            StampDuty stampDuty = null;
+            ClearingFee clearingFee = null;
+
+            if (this.shouldAutoCalculateBrokerFee()) {
+                final BrokingFirm brokingFirm = MainFrame.getInstance().getJStockOptions().getSelectedBrokingFirm();
+                broker = brokingFirm.getBroker();
+                stampDuty = brokingFirm.getStampDuty();
+                clearingFee = brokingFirm.getClearingFee();
+            }
+            else {
+                final double brokerFeeValue = (Double)this.jFormattedTextField4.getValue();
+                final double clearingFeeValue = (Double)this.jFormattedTextField5.getValue();
+                final double stampDutyValue = (Double)jFormattedTextField7.getValue();
+
+                broker = new SimpleBroker("SimpleBroker", Double.MAX_VALUE, brokerFeeValue, 0);
+                /* We are limit to ourselves, that the fraction calculation, is based on contract's total. */
+                stampDuty = new SimpleStampDuty("SimpleStampDuty", Double.MAX_VALUE, contract.getTotal(), stampDutyValue);
+                clearingFee = new SimpleClearingFee("SimpleClearingfee", Double.MAX_VALUE, clearingFeeValue, 0);
+            }
+
+            Transaction t = new Transaction(contract, broker, stampDuty, clearingFee);
+            t.setComment(this.sellTransaction.getComment());
+            transactions.add(t);
         }
         else {
-            final double brokerFeeValue = (Double)this.jFormattedTextField4.getValue();
-            final double clearingFeeValue = (Double)this.jFormattedTextField5.getValue();
-            final double stampDutyValue = (Double)jFormattedTextField7.getValue();
-            
-            broker = new SimpleBroker("SimpleBroker", Double.MAX_VALUE, brokerFeeValue, 0);
-            /* We are limit to ourselves, that the fraction calculation, is based on contract's total. */
-            stampDuty = new SimpleStampDuty("SimpleStampDuty", Double.MAX_VALUE, contract.getTotal(), stampDutyValue);
-            clearingFee = new SimpleClearingFee("SimpleClearingfee", Double.MAX_VALUE, clearingFeeValue, 0);
-        }
-        
-        Transaction t = new Transaction(contract, broker, stampDuty, clearingFee);
-        t.setComment(transactionComment);
+            final DateField dateField = (DateField)jPanel3;
+            final SimpleDate date = new SimpleDate((Date)dateField.getValue());
+            final int unit = ((java.lang.Integer)this.jSpinner1.getValue());
+            final double price = ((Double)this.jFormattedTextField1.getValue());
 
-        return t;
+            for (Transaction transaction : this.buyTransactions) {
+                Contract.ContractBuilder builder = new Contract.ContractBuilder(stock, date);
+                final Contract contract = builder.type(type).quantity(this.isBatchUpdate ? transaction.getQuantity() : unit).price(price).referencePrice(transaction.getNetTotal() / (double)transaction.getQuantity()).referenceDate(transaction.getDate()).build();
+
+                Broker broker = null;
+                StampDuty stampDuty = null;
+                ClearingFee clearingFee = null;
+
+                // For batch update. Don't use auto calculation. This is because when we display to client,
+                // we calculated the auto based on lump sum. However, when we want to write to individual contract,
+                // we can no longer using the auto calculation since the lump sum is not same anymore.
+                if (this.shouldAutoCalculateBrokerFee() && !this.isBatchUpdate) {
+                    final BrokingFirm brokingFirm = MainFrame.getInstance().getJStockOptions().getSelectedBrokingFirm();
+                    broker = brokingFirm.getBroker();
+                    stampDuty = brokingFirm.getStampDuty();
+                    clearingFee = brokingFirm.getClearingFee();
+                }
+                else {
+                    final double brokerFeeValue = (Double)this.jFormattedTextField4.getValue();
+                    final double clearingFeeValue = (Double)this.jFormattedTextField5.getValue();
+                    final double stampDutyValue = (Double)jFormattedTextField7.getValue();
+
+                    broker = new SimpleBroker("SimpleBroker", Double.MAX_VALUE, brokerFeeValue / unit * (double)transaction.getQuantity(), 0);
+                    /* We are limit to ourselves, that the fraction calculation, is based on contract's total. */
+                    stampDuty = new SimpleStampDuty("SimpleStampDuty", Double.MAX_VALUE, contract.getTotal(), stampDutyValue / unit * (double)transaction.getQuantity());
+                    clearingFee = new SimpleClearingFee("SimpleClearingfee", Double.MAX_VALUE, clearingFeeValue / unit * (double)transaction.getQuantity(), 0);
+                }
+
+                Transaction t = new Transaction(contract, broker, stampDuty, clearingFee);
+                t.setComment(transaction.getComment());
+                transactions.add(t);
+            }
+        }
+
+        return transactions;
     }
     
     private boolean isValidInput() {
@@ -498,7 +578,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         }
         
         commitEdit();
-        this.transaction = generateTransaction();
+        this.resultSellTransactions = generateTransactions();
         this.setVisible(false);
         this.dispose();
     }//GEN-LAST:event_jButton1ActionPerformed
@@ -508,63 +588,63 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         // double rounding issue. We force the current value to
         // follow the formatter text field's.
         commitEdit();
-        
-        if(shouldAutoCalculateBrokerFee())
+
+        if (shouldAutoCalculateBrokerFee())
         {
             final BrokingFirm brokingFirm = MainFrame.getInstance().getJStockOptions().getSelectedBrokingFirm();
-            
-            SwingUtilities.invokeLater(new Runnable() { public void run() {
+
+            SwingUtilities.invokeLater(new Runnable() {@Override public void run() {
                 final String name = jTextField1.getText();
                 final int unit = (Integer)jSpinner1.getValue();
                 final double price = (Double)jFormattedTextField1.getValue();
                 final DateField dateField = (DateField)jPanel3;
                 final Date date = (Date)dateField.getValue();
                 // Stock and date information is not important at this moment.
-                Contract.ContractBuilder builder = new Contract.ContractBuilder(Utils.getEmptyStock(Code.newInstance(name), Symbol.newInstance(name)), new SimpleDate(date));        
+                Contract.ContractBuilder builder = new Contract.ContractBuilder(Utils.getEmptyStock(Code.newInstance(name), Symbol.newInstance(name)), new SimpleDate(date));
                 Contract contract = builder.type(Contract.Type.Sell).quantity(unit).price(price).build();
-        
+
                 final double brokerFee = brokingFirm.brokerCalculate(contract);
                 final double clearingFee = brokingFirm.clearingFeeCalculate(contract);
                 final double stampDuty = brokingFirm.stampDutyCalculate(contract);
                 jFormattedTextField4.setValue(brokerFee);
                 jFormattedTextField5.setValue(clearingFee);
                 jFormattedTextField7.setValue(stampDuty);
-                
+
                 final double sellValue = price * (double)unit;
-                final double buyValue = buyCost * (double)unit;
+                final double buyValue = isBatchUpdate ? NewSellTransactionJDialog.this.buyValue : (buyPrice * (double)unit);
                 final double totalCost = buyValue + brokerFee + clearingFee + stampDuty;
                 final double netProfit = sellValue - totalCost;
                 final double netProfitPercentage = (totalCost == 0.0) ? 0.0 : netProfit / totalCost * 100.0;
-                
-                jFormattedTextField2.setValue(sellValue);     
+
+                jFormattedTextField2.setValue(sellValue);
                 jFormattedTextField3.setValue(buyValue);
                 jFormattedTextField6.setValue(netProfitPercentage);
                 jFormattedTextField6.setForeground(Utils.getColor(netProfitPercentage, 0.0));
                 jFormattedTextField8.setValue(netProfit);
-                jFormattedTextField8.setForeground(Utils.getColor(netProfit, 0.0));                
+                jFormattedTextField8.setForeground(Utils.getColor(netProfit, 0.0));
             }});
         }
         else {
-            SwingUtilities.invokeLater(new Runnable() { public void run() {
+            SwingUtilities.invokeLater(new Runnable() {@Override public void run() {
                 final int unit = (Integer)jSpinner1.getValue();
                 final double price = (Double)jFormattedTextField1.getValue();
                 final double brokerFee = (Double)jFormattedTextField4.getValue();
                 final double clearingFee = (Double)jFormattedTextField5.getValue();
                 final double stampDuty = (Double)jFormattedTextField7.getValue();
-                
+
                 final double sellValue = price * (double)unit;
-                final double buyValue = buyCost * (double)unit;
+                final double buyValue = isBatchUpdate ? NewSellTransactionJDialog.this.buyValue : (buyPrice * (double)unit);
                 final double totalCost = buyValue + brokerFee + clearingFee + stampDuty;
                 final double netProfit = sellValue - totalCost;
                 final double netProfitPercentage = (totalCost == 0.0) ? 0.0 : netProfit / totalCost * 100.0;
-                
-                jFormattedTextField2.setValue(sellValue);     
+
+                jFormattedTextField2.setValue(sellValue);
                 jFormattedTextField3.setValue(buyValue);
                 jFormattedTextField6.setValue(netProfitPercentage);
                 jFormattedTextField6.setForeground(Utils.getColor(netProfitPercentage, 0.0));
                 jFormattedTextField8.setValue(netProfit);
-                jFormattedTextField8.setForeground(Utils.getColor(netProfit, 0.0));                
-            }});            
+                jFormattedTextField8.setForeground(Utils.getColor(netProfit, 0.0));
+            }});
         }
     }
     
@@ -592,6 +672,11 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         // TODO add your handling code here:
         update();
     }//GEN-LAST:event_jFormattedTextField7FocusLost
+
+    private void setPrice(double price) {
+        this.jFormattedTextField1.setValue(price);
+        update();
+    }
 
 	private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
 		// TODO add your handling code here:
@@ -627,18 +712,9 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         
         return field;
     }
-
-    public void setPrice(double price) { 
-        this.jFormattedTextField1.setValue(price);
-        update();
-    }
     
-    public void setStockSymbol(Symbol symbol) {
-        this.jTextField1.setText(symbol.toString());
-    }
-    
-    public Transaction getTransaction() {
-        return this.transaction;
+    public List<Transaction> getTransactions() {
+        return this.resultSellTransactions;
     }
 
     public double suggestBestSellingPrice() {
@@ -652,24 +728,38 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         final double clearingFee = (Double)jFormattedTextField5.getValue();
         final double stampDuty = (Double)jFormattedTextField7.getValue();
                 
-        final double buyValue = buyCost * (double)unit;
-        final double totalCost = buyValue + brokerFee + clearingFee + stampDuty;
+        final double _buyValue = isBatchUpdate ? this.buyValue : (buyPrice * (double)unit);
+        final double totalCost = _buyValue + brokerFee + clearingFee + stampDuty;
         
         final double bestSellingValue = (1.0 + expectedProfitPercentage / 100.0) * totalCost;
         final double bestPrice = bestSellingValue / (double)unit;
-        
-        return bestPrice;
+
+        MainFrame mainFrame = MainFrame.getInstance();
+        double currentPrice = mainFrame.getPortfolioManagementJPanel().getStockLastPrice(stock);
+
+        return bestPrice > currentPrice ? bestPrice : currentPrice;
     }
     
     private static final Log log = LogFactory.getLog(NewSellTransactionJDialog.class);
-        
-    private Transaction transaction = null;
-    
-    /* Cost per unit. */
-    private double buyCost = 0.0;
-    private SimpleDate buyDate = new SimpleDate();
-    private String transactionComment = "";
 
+    /* For edit purpose on sell transaction */
+    private Transaction sellTransaction = null;
+    /* For single selling, batch selling purpose. */
+    private List<Transaction> buyTransactions = new ArrayList<Transaction>();
+    private List<Transaction> resultSellTransactions = new ArrayList<Transaction>();
+
+    private Stock stock;                // immutable.
+    // private SimpleDate date;         // mutable
+    private Contract.Type type;         // immutable
+    // private int quantity;            // mutable for edit. immutable for batch update.
+    // private double price;            // mutable
+    private double buyPrice;            // immutable
+
+    private boolean isBatchUpdate = false;
+    // Only valid for batch update. This is to avoid we cannot get back the original x value.
+    // y = x / quantity;
+    // But we cannot ensure y * quantity will get back x, due to floating point characteristic
+    private double buyValue = 0.0;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
