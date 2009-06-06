@@ -139,11 +139,11 @@ public class ChartJDialog extends javax.swing.JDialog {
         String selected = ((javax.swing.JComboBox)evt.getSource()).getSelectedItem().toString();
         
         if(selected.equals("Price Volume")) {            
-            final JFreeChart freeChart = this.createChart(stockHistoryServer);
+            final JFreeChart freeChart = ChartJDialog.createChart(stockHistoryServer);
             chartPanel.setChart(freeChart);
         }
         else if(selected.equals("Candlestick")) {
-            final JFreeChart freeChart = this.createCandlestickChart(stockHistoryServer);
+            final JFreeChart freeChart = ChartJDialog.createCandlestickChart(stockHistoryServer);
             chartPanel.setChart(freeChart);
         }
     }//GEN-LAST:event_jComboBox1ActionPerformed
