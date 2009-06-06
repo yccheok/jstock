@@ -36,6 +36,7 @@ public class CIMBStockFormat implements StockFormat {
     private CIMBStockFormat() {
     }
        
+    @Override
     public java.util.List<Stock> parse(String source)
     {
         java.util.List<Stock> stocks = new java.util.ArrayList<Stock>();
