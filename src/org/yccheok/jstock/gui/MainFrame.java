@@ -2411,23 +2411,8 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     private void initGUIOptions() {
-        GUIOptions guiOptions = null;
-
-        try {
-            File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "mainframe.xml");
-
-            XStream xStream = new XStream();
-            InputStream inputStream = new java.io.FileInputStream(f);
-            guiOptions = (GUIOptions)xStream.fromXML(inputStream);
-
-            log.info("guiOptions loaded from " + f.toString() + " successfully.");
-        }
-        catch (java.io.FileNotFoundException exp) {
-            log.error("", exp);
-        }
-        catch (com.thoughtworks.xstream.core.BaseException exp) {
-            log.error("", exp);
-        }
+        final File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "mainframe.xml");
+        GUIOptions guiOptions = Utils.fromXML(GUIOptions.class, f);
 
         if (guiOptions == null)
         {
@@ -2468,23 +2453,7 @@ public class MainFrame extends javax.swing.JFrame {
         guiOptions.addJTableOptions(jTableOptions);
         
         File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "mainframe.xml");
-                
-        XStream xStream = new XStream();   
-        
-        try {
-            OutputStream outputStream = new FileOutputStream(f);
-            xStream.toXML(guiOptions, outputStream);
-        }
-        catch(java.io.FileNotFoundException exp) {
-            log.error("", exp);
-            return false;
-        }
-        catch(com.thoughtworks.xstream.core.BaseException exp) {
-            log.error("", exp);
-            return false;
-        }
-                      
-        return true;
+        return Utils.toXML(guiOptions, f);
     }
 
     private void initJStockOptions() {
