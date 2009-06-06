@@ -18,6 +18,40 @@
 
 package org.yccheok.jstock.gui.portfolio;
 
+import java.awt.Dimension;
+import java.io.File;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.annotations.XYAnnotation;
+import org.jfree.chart.annotations.XYImageAnnotation;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.labels.CustomXYToolTipGenerator;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.data.time.Day;
+import org.jfree.data.time.TimeSeries;
+import org.jfree.data.time.TimeSeriesCollection;
+import org.jfree.data.xy.XYDataset;
+import org.yccheok.jstock.engine.SimpleDate;
+import org.yccheok.jstock.gui.PortfolioManagementJPanel;
+import org.yccheok.jstock.portfolio.Activities;
+import org.yccheok.jstock.portfolio.Activity;
+import org.yccheok.jstock.portfolio.ActivitySummary;
+import org.yccheok.jstock.portfolio.Contract;
+import org.yccheok.jstock.portfolio.Deposit;
+import org.yccheok.jstock.portfolio.DepositSummary;
+import org.yccheok.jstock.portfolio.Dividend;
+import org.yccheok.jstock.portfolio.DividendSummary;
+import org.yccheok.jstock.portfolio.Transaction;
+import org.yccheok.jstock.portfolio.TransactionSummary;
+
 /**
  *
  * @author yccheok
@@ -25,9 +59,18 @@ package org.yccheok.jstock.gui.portfolio;
 public class CashFlowChartJDialog extends javax.swing.JDialog {
 
     /** Creates new form CashFlowChartJDialog */
-    public CashFlowChartJDialog(java.awt.Frame parent, boolean modal) {
+    public CashFlowChartJDialog(java.awt.Frame parent, boolean modal, PortfolioManagementJPanel portfolioManagementJPanel) {
         super(parent, modal);
         initComponents();
+
+        this.portfolioManagementJPanel = portfolioManagementJPanel;
+        initActivitySummary(portfolioManagementJPanel);
+
+        final JFreeChart freeChart = createChart();
+        chartPanel = new ChartPanel(freeChart, true, true, true, true, true);
+        getContentPane().add(chartPanel, java.awt.BorderLayout.CENTER);
+
+        loadDimension();
     }
 
     /** This method is called from within the constructor to
@@ -39,42 +82,167 @@ public class CashFlowChartJDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPanel1 = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
+
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Cash Flow Chart");
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 734, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 564, Short.MAX_VALUE)
-        );
-
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-750)/2, (screenSize.height-600)/2, 750, 600);
-    }// </editor-fold>//GEN-END:initComponents
-
-    /**
-    * @param args the command line arguments
-    */
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                CashFlowChartJDialog dialog = new CashFlowChartJDialog(new javax.swing.JFrame(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
             }
         });
+        getContentPane().setLayout(new java.awt.BorderLayout(5, 5));
+        getContentPane().add(jPanel1, java.awt.BorderLayout.EAST);
+        getContentPane().add(jPanel2, java.awt.BorderLayout.SOUTH);
+
+        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        setBounds((screenSize.width-978)/2, (screenSize.height-456)/2, 978, 456);
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        // TODO add your handling code here:
+        this.saveDimension();;
+    }//GEN-LAST:event_formWindowClosing
+
+    private void saveDimension() {
+        org.yccheok.jstock.gui.Utils.toXML(this.getSize(), org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "cashflowchartjdialog.xml");
     }
 
+    private void loadDimension() {
+        Dimension dimension = org.yccheok.jstock.gui.Utils.fromXML(Dimension.class, org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "cashflowchartjdialog.xml");
+        if (dimension != null) {
+            java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+            setBounds((screenSize.width-(int)dimension.getWidth())/2, (screenSize.height-(int)dimension.getHeight())/2, (int)dimension.getWidth(), (int)dimension.getHeight());
+        }
+    }
+
+    private XYDataset createDataset() {
+        TimeSeries series = new TimeSeries("Cash", Day.class);
+        final ArrayList<String> toolTips = new ArrayList<String>();
+        final java.text.NumberFormat numberFormat = java.text.NumberFormat.getInstance();
+        numberFormat.setMaximumFractionDigits(2);
+        numberFormat.setMinimumFractionDigits(2);
+        
+        double amount = 0.0;
+        for (int i = 0, count = activitySummary.size(); i < count; i++) {
+            final Activities activities = activitySummary.get(i);
+            amount = amount + activities.getNetAmount();
+            final SimpleDate date = activities.getDate();
+            final Date d = date.getTime();
+            toolTips.add("<html>Cash: (" + dateFormat.format(d) + ", " + numberFormat.format(amount) + ")<br>" + activities.toSummary() + "</html>");
+            series.add(new Day(d), amount);
+        }
+
+        ttg.addToolTipSeries(toolTips);
+        return new TimeSeriesCollection(series);
+    }
+
+    // Can we do it, before we add data set? So that we can done it in one pass.
+    private void initAnnotation(XYPlot plot) {
+        double amount = 0.0;
+        for (int i = 0, count = activitySummary.size(); i < count; i++) {
+            final Activities activities = activitySummary.get(i);
+            amount = amount + activities.getNetAmount();
+            final SimpleDate date = activities.getDate();
+            final Date d = date.getTime();
+            final Day day = new Day(d);
+            final long milliSecond = day.getFirstMillisecond();
+
+            List<Activity.Type> types = activities.getTypes();
+            int c = 1;
+            for (Activity.Type type : types) {
+                XYAnnotation xyannotation = new XYImageAnnotation(milliSecond, amount - c * 16 - 5, type.getIcon().getImage());
+                c++;
+                plot.addAnnotation(xyannotation);
+            }
+
+        }
+    }
+
+    private JFreeChart createChart() {
+
+        XYDataset priceData = createDataset();
+
+        final String title = "Cash Flow";
+        JFreeChart chart = ChartFactory.createTimeSeriesChart(
+            title,
+            "Date",
+            "Cash",
+            priceData,
+            true,       // create legend?
+            true,       // generate tooltips?
+            false       // generate URLs?
+        );
+        
+        XYPlot plot = chart.getXYPlot();
+        // Ugly looking :(
+        //initAnnotation(plot);
+
+        NumberAxis rangeAxis1 = (NumberAxis) plot.getRangeAxis();
+        rangeAxis1.setNumberFormatOverride(currencyFormat);
+        XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer();
+        renderer.setShapesVisible(true);
+        renderer.setShapesFilled(true);
+
+        XYItemRenderer renderer1 = plot.getRenderer();
+        renderer1.setToolTipGenerator(ttg);
+
+        return chart;
+    }
+
+    private void initActivitySummary(PortfolioManagementJPanel portfolioManagementJPanel) {
+        final List<TransactionSummary> transactionSummaries = portfolioManagementJPanel.getTransactionSummariesFromPortfolios();
+        final DepositSummary depositSummary = portfolioManagementJPanel.getDepositSummary();
+        final DividendSummary dividendSummary = portfolioManagementJPanel.getDividendSummary();
+
+        for (TransactionSummary transactionSummary : transactionSummaries) {
+            final int count = transactionSummary.getChildCount();
+            for (int i = 0; i < count; i++) {
+                final Transaction transaction = (Transaction)transactionSummary.getChildAt(i);
+                final Contract contract = transaction.getContract();
+                Contract.Type type = contract.getType();
+                if (type == Contract.Type.Buy) {
+                    activitySummary.add(contract.getDate(), contract.getStock().getSymbol().toString(), Activity.Type.Buy, transaction.getNetTotal());
+                }
+                else if (type == Contract.Type.Sell) {
+                    activitySummary.add(contract.getReferenceDate(), contract.getStock().getSymbol().toString(), Activity.Type.Buy, transaction.getReferenceTotal());
+                    activitySummary.add(contract.getDate(), contract.getStock().getSymbol().toString(), Activity.Type.Sell, transaction.getNetTotal());
+                }
+                else {
+                    throw new java.lang.UnsupportedOperationException("Unsupported contract type " + type);
+                }
+            }
+        }
+
+        for (int i = 0, count = depositSummary.size(); i < count; i++) {
+            final Deposit deposit = depositSummary.get(i);
+            activitySummary.add(deposit.getDate(), "", Activity.Type.Deposit, deposit.getAmount());
+        }
+
+        for (int i = 0, count = dividendSummary.size(); i < count; i++) {
+            final Dividend dividend = dividendSummary.get(i);
+            activitySummary.add(dividend.getDate(), dividend.getStock().getSymbol().toString(), Activity.Type.Dividend, dividend.getAmount());
+        }
+    }
+
+    private static final NumberFormat currencyFormat = java.text.NumberFormat.getCurrencyInstance();
+    static {
+        // 0 decimal place, to save up some display area.
+        currencyFormat.setMaximumFractionDigits(0);
+        currencyFormat.setMinimumFractionDigits(0);
+    }
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("d-MMM-yyyy");
+    private final ChartPanel chartPanel;
+    private final PortfolioManagementJPanel portfolioManagementJPanel;
+    private final ActivitySummary activitySummary = new ActivitySummary();
+    private final CustomXYToolTipGenerator ttg = new CustomXYToolTipGenerator();
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     // End of variables declaration//GEN-END:variables
+
+
 
 }
