@@ -217,7 +217,6 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
 
     private void jTable1PropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jTable1PropertyChange
         // TODO add your handling code here:
-        System.out.println("changed!");
         this.jLabel1.setText(this.getDepositSummaryText());
     }//GEN-LAST:event_jTable1PropertyChange
 
