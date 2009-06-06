@@ -20,6 +20,7 @@ package org.yccheok.jstock.gui.portfolio;
 
 import javax.swing.table.AbstractTableModel;
 import org.yccheok.jstock.engine.SimpleDate;
+import org.yccheok.jstock.portfolio.Commentable;
 import org.yccheok.jstock.portfolio.Deposit;
 import org.yccheok.jstock.portfolio.DepositSummary;
 
@@ -27,7 +28,7 @@ import org.yccheok.jstock.portfolio.DepositSummary;
  *
  * @author yccheok
  */
-public class DepositSummaryTableModel extends AbstractTableModel {
+public class DepositSummaryTableModel extends AbstractTableModel implements CommentableContainer {
 
     public DepositSummaryTableModel(DepositSummary depositSummary) {
         this.depositSummary = depositSummary;
@@ -113,6 +114,11 @@ public class DepositSummaryTableModel extends AbstractTableModel {
         return depositSummary.get(index);
     }
 
+    @Override
+    public Commentable getCommentable(int index) {
+        return depositSummary.get(index);
+    }
+    
     private String[] columnNames =  { "Date", "Cash" };
     private Class[] columnClasses = { java.util.Date.class, Double.class };
     private final DepositSummary depositSummary;
