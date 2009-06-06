@@ -1464,7 +1464,11 @@ public class MainFrame extends javax.swing.JFrame {
             chatJPanel.startChatServiceManager();
         }
     }
-    
+
+    public PortfolioManagementJPanel getPortfolioManagementJPanel() {
+        return this.portfolioManagementJPanel;
+    }
+
     private void createPortfolioManagementJPanel() {
         portfolioManagementJPanel = new PortfolioManagementJPanel();
         
@@ -2109,10 +2113,8 @@ public class MainFrame extends javax.swing.JFrame {
                     // [2800598] buyportfolio.xml file not updated with code symbol
                     // [2790218] User unabe to add new buy transaction in Spain
                     //
-                    final Symbol symbol = MainFrame.this.stockCodeAndSymbolDatabase.codeToSymbol(stock.getCode());
-                    assert(symbol != null);
                     // Say no to : portfolioManagementJPanel.showNewBuyTransactionJDialog(stock.getSymbol(), stock.getLastPrice(), false);
-                    portfolioManagementJPanel.showNewBuyTransactionJDialog(symbol, stock.getLastPrice(), false);
+                    portfolioManagementJPanel.showNewBuyTransactionJDialog(stock, stock.getLastPrice(), false);
                 }
             });  
             
