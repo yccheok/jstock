@@ -6,11 +6,16 @@
 
 package org.yccheok.jstock.gui;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.general.DefaultPieDataset;
+import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.Symbol;
+import org.yccheok.jstock.portfolio.Dividend;
+import org.yccheok.jstock.portfolio.DividendSummary;
 import org.yccheok.jstock.portfolio.Portfolio;
 import org.yccheok.jstock.portfolio.Transaction;
 import org.yccheok.jstock.portfolio.TransactionSummary;
@@ -30,6 +35,7 @@ public class SellPortfolioChartJDialog extends javax.swing.JDialog {
         "Net Loss Value",
         "Gain Value",
         "Loss Value",
+        "Dividend",
         "Net Selling Value",
         "Selling Value", 
         "Purchase Value",
@@ -44,8 +50,12 @@ public class SellPortfolioChartJDialog extends javax.swing.JDialog {
     };
     
     /** Creates new form SellPortfolioChartJDialog */
-    public SellPortfolioChartJDialog(java.awt.Frame parent, boolean modal, SellPortfolioTreeTableModel portfolioTreeTableModel) {
+    public SellPortfolioChartJDialog(java.awt.Frame parent, boolean modal, SellPortfolioTreeTableModel portfolioTreeTableModel, DividendSummary dividendSummary) {
         super(parent, "Sell Summary", modal);
+
+        this.dividendSummary = dividendSummary;
+        this.initCodeToTotalDividend(dividendSummary);
+
         initComponents();
         
         this.portfolioTreeTableModel = portfolioTreeTableModel;
@@ -56,7 +66,24 @@ public class SellPortfolioChartJDialog extends javax.swing.JDialog {
         
         getContentPane().add(chartPanel, java.awt.BorderLayout.CENTER);        
     }
-    
+
+    private void initCodeToTotalDividend(DividendSummary dividendSummary)
+    {
+        final int size = dividendSummary.size();
+        for (int i = 0; i < size; i++) {
+            Dividend dividend = dividendSummary.get(i);
+            Code code = dividend.getStock().getCode();
+            Double value = this.codeToTotalDividend.get(code);
+            if (value != null) {
+                double total = value + dividend.getAmount();
+                this.codeToTotalDividend.put(code, total);
+            }
+            else {
+                this.codeToTotalDividend.put(code, dividend.getAmount());
+            }
+        }
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -96,14 +123,15 @@ public class SellPortfolioChartJDialog extends javax.swing.JDialog {
         final int count = portfolio.getChildCount();
         DefaultPieDataset data = new DefaultPieDataset();
 
-        for(int i=0; i<count; i++) {
+        for(int i = 0; i < count; i++) {
             TransactionSummary transactionSummary = (TransactionSummary)portfolio.getChildAt(i);
             
             if(transactionSummary.getChildCount() <= 0) continue;
             
             Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
             final Symbol symbol = transaction.getContract().getStock().getSymbol();
-            
+            final Code code = transaction.getContract().getStock().getCode();
+
             /* Should use reflection technology. */
             if(name.equals(cNames[0])) {
                 data.setValue(symbol.toString(), portfolioTreeTableModel.getNetGainLossPercentage(transactionSummary));
@@ -130,36 +158,44 @@ public class SellPortfolioChartJDialog extends javax.swing.JDialog {
                 data.setValue(symbol.toString(), -portfolioTreeTableModel.getGainLossValue(transactionSummary));                
             }            
             else if(name.equals(cNames[8])) {
-                data.setValue(symbol.toString(), transactionSummary.getNetTotal());                
+                Double value = this.codeToTotalDividend.get(code);
+                if (value != null) {
+                    if (value.doubleValue() > 0.0) {
+                        data.setValue(symbol.toString(), this.codeToTotalDividend.get(code));
+                    }
+                }
             }
             else if(name.equals(cNames[9])) {
-                data.setValue(symbol.toString(), transactionSummary.getTotal());                
+                data.setValue(symbol.toString(), transactionSummary.getNetTotal());                
             }
             else if(name.equals(cNames[10])) {
-                data.setValue(symbol.toString(), transactionSummary.getReferenceTotal());                
+                data.setValue(symbol.toString(), transactionSummary.getTotal());                
             }
             else if(name.equals(cNames[11])) {
-                data.setValue(symbol.toString(), portfolioTreeTableModel.getGainLossPrice(transactionSummary));                
+                data.setValue(symbol.toString(), transactionSummary.getReferenceTotal());                
             }
             else if(name.equals(cNames[12])) {
+                data.setValue(symbol.toString(), portfolioTreeTableModel.getGainLossPrice(transactionSummary));                
+            }
+            else if(name.equals(cNames[13])) {
                 data.setValue(symbol.toString(), -portfolioTreeTableModel.getGainLossPrice(transactionSummary));                
             }            
-            else if(name.equals(cNames[13])) {
+            else if(name.equals(cNames[14])) {
                 data.setValue(symbol.toString(), portfolioTreeTableModel.getSellingPrice(transactionSummary));                
             }
-            else if(name.equals(cNames[14])) {
+            else if(name.equals(cNames[15])) {
                 data.setValue(symbol.toString(), portfolioTreeTableModel.getPurchasePrice(transactionSummary));                
             }
-            else if(name.equals(cNames[15])) {
+            else if(name.equals(cNames[16])) {
                 data.setValue(symbol.toString(), transactionSummary.getQuantity());                
             }
-            else if(name.equals(cNames[16])) {
+            else if(name.equals(cNames[17])) {
                 data.setValue(symbol.toString(), transactionSummary.getCalculatedBroker());                
             }
-            else if(name.equals(cNames[17])) {
+            else if(name.equals(cNames[18])) {
                 data.setValue(symbol.toString(), transactionSummary.getCalculatedStampDuty());                
             }
-            else if(name.equals(cNames[18])) {
+            else if(name.equals(cNames[19])) {
                 data.setValue(symbol.toString(), transactionSummary.getCalculatdClearingFee());                
             }            
         }
@@ -178,7 +214,9 @@ public class SellPortfolioChartJDialog extends javax.swing.JDialog {
     
     private SellPortfolioTreeTableModel portfolioTreeTableModel;
     private ChartPanel chartPanel;
-    
+    private DividendSummary dividendSummary;
+    private Map<Code, Double> codeToTotalDividend = new HashMap<Code, Double>();
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox jComboBox1;
     private javax.swing.JPanel jPanel1;
