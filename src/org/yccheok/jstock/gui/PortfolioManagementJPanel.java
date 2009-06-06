@@ -572,7 +572,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
     private void showDividendSummaryJDialog() {
         final MainFrame mainFrame = MainFrame.getInstance();
-        DividendSummaryJDialog dividendSummaryJDialog = new DividendSummaryJDialog(mainFrame, true, this.dividendSummary, this);
+        DividendSummaryJDialog dividendSummaryJDialog = new DividendSummaryJDialog(mainFrame, true, this.getDividendSummary(), this);
         dividendSummaryJDialog.setLocationRelativeTo(this);
 
         List<Stock> stocks = this.getSelectedStocks();
@@ -590,7 +590,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
     private void showDepositSummaryJDialog() {
         final MainFrame mainFrame = MainFrame.getInstance();
-        DepositSummaryJDialog depositSummaryJDialog = new DepositSummaryJDialog(mainFrame, true, this.depositSummary);
+        DepositSummaryJDialog depositSummaryJDialog = new DepositSummaryJDialog(mainFrame, true, this.getDepositSummary());
         depositSummaryJDialog.setLocationRelativeTo(this);
         depositSummaryJDialog.setVisible(true);
 
@@ -612,6 +612,20 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         commentJDialog.setTitle(title);
         commentJDialog.setLocationRelativeTo(this);
         commentJDialog.setVisible(true);
+    }
+
+    /**
+     * @return the depositSummary
+     */
+    public DepositSummary getDepositSummary() {
+        return depositSummary;
+    }
+
+    /**
+     * @return the dividendSummary
+     */
+    public DividendSummary getDividendSummary() {
+        return dividendSummary;
     }
         
     private class BuyTableRowPopupListener extends MouseAdapter {
@@ -681,20 +695,20 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private void showBuyPortfolioChartJDialog() {
         final MainFrame m = MainFrame.getInstance();
         final BuyPortfolioTreeTableModel buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
-        BuyPortfolioChartJDialog buyPortfolioChartJDialog = new BuyPortfolioChartJDialog(m, false, buyPortfolioTreeTableModel, this.dividendSummary);
+        BuyPortfolioChartJDialog buyPortfolioChartJDialog = new BuyPortfolioChartJDialog(m, false, buyPortfolioTreeTableModel, this.getDividendSummary());
         buyPortfolioChartJDialog.setVisible(true);                                    
     }
 
     private void showChashFlowChartJDialog() {
         final MainFrame m = MainFrame.getInstance();
-        CashFlowChartJDialog cashFlowChartJDialog = new CashFlowChartJDialog(m, false);
+        CashFlowChartJDialog cashFlowChartJDialog = new CashFlowChartJDialog(m, false, this);
         cashFlowChartJDialog.setVisible(true);
     }
 
     private void showSellPortfolioChartJDialog() {
         final MainFrame m = MainFrame.getInstance();
         final SellPortfolioTreeTableModel sellPortfolioTreeTableModel = (SellPortfolioTreeTableModel)sellTreeTable.getTreeTableModel();
-        SellPortfolioChartJDialog sellPortfolioChartJDialog = new SellPortfolioChartJDialog(m, false, sellPortfolioTreeTableModel, this.dividendSummary);
+        SellPortfolioChartJDialog sellPortfolioChartJDialog = new SellPortfolioChartJDialog(m, false, sellPortfolioTreeTableModel, this.getDividendSummary());
         sellPortfolioChartJDialog.setVisible(true);                                    
     }
     
@@ -763,7 +777,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             popup.addSeparator();
         }
 
-        menuItem = new JMenuItem("Cash Graph...", this.getImageIcon("/images/16x16/graph.png"));
+        menuItem = new JMenuItem("Cash Chart...", this.getImageIcon("/images/16x16/graph.png"));
 
         menuItem.addActionListener(new ActionListener() {
             @Override
@@ -915,7 +929,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             popup.addSeparator();
         }
 
-        menuItem = new JMenuItem("Cash Graph...", this.getImageIcon("/images/16x16/graph.png"));
+        menuItem = new JMenuItem("Cash Chart...", this.getImageIcon("/images/16x16/graph.png"));
 
         menuItem.addActionListener(new ActionListener() {
             @Override
@@ -995,6 +1009,24 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
         portfolioTreeTableModel.addTransaction(transaction);
         this.realTimeStockMonitor.addStockCode(transaction.getContract().getStock().getCode());
+    }
+
+    public List<TransactionSummary> getTransactionSummariesFromPortfolios() {
+        final BuyPortfolioTreeTableModel buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
+        final SellPortfolioTreeTableModel sellPortfolioTreeTableModel = (SellPortfolioTreeTableModel)sellTreeTable.getTreeTableModel();
+        final Portfolio buyPortfolio = (Portfolio) buyPortfolioTreeTableModel.getRoot();
+        final Portfolio sellPortfolio = (Portfolio) sellPortfolioTreeTableModel.getRoot();
+        List<TransactionSummary> summaries = new ArrayList<TransactionSummary>();
+
+        for (int i = 0, count = buyPortfolio.getChildCount(); i < count; i++) {
+            summaries.add((TransactionSummary)buyPortfolio.getChildAt(i));
+        }
+        
+        for (int i = 0, count = sellPortfolio.getChildCount(); i < count; i++) {
+            summaries.add((TransactionSummary)sellPortfolio.getChildAt(i));
+        }
+
+        return summaries;
     }
 
     public List<Stock> getStocksFromPortfolios() {
@@ -1154,7 +1186,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         {
             final File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "depositsummary.xml");
             this.depositSummary = Utils.fromXML(DepositSummary.class, f);
-            if (this.depositSummary != null) {
+            if (this.getDepositSummary() != null) {
                 depositSummaryReadSuccess = true;
             }
         }
@@ -1167,7 +1199,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         {
             File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "dividendsummary.xml");
             this.dividendSummary = Utils.fromXML(DividendSummary.class, f);
-            if (this.dividendSummary != null) {
+            if (this.getDividendSummary() != null) {
                 dividendSummaryReadSuccess = true;
             }
         }
@@ -1204,12 +1236,12 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
 
         filePath = org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "depositsummary.xml";
-        if (org.yccheok.jstock.gui.Utils.toXML(this.depositSummary, filePath) == false) {
+        if (org.yccheok.jstock.gui.Utils.toXML(this.getDepositSummary(), filePath) == false) {
             status = false;
         }
 
         filePath = org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "dividendsummary.xml";
-        if (org.yccheok.jstock.gui.Utils.toXML(this.dividendSummary, filePath) == false) {
+        if (org.yccheok.jstock.gui.Utils.toXML(this.getDividendSummary(), filePath) == false) {
             status = false;
         }
 
@@ -1326,7 +1358,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         final SellPortfolioTreeTableModel sellPortfolioTreeTableModel = (SellPortfolioTreeTableModel)this.sellTreeTable.getTreeTableModel();
         
         final double share = buyPortfolioTreeTableModel.getCurrentValue();
-        final double cash = sellPortfolioTreeTableModel.getNetSellingValue() - buyPortfolioTreeTableModel.getNetPurchaseValue() + this.depositSummary.getTotal() + this.dividendSummary.getTotal();
+        final double cash = sellPortfolioTreeTableModel.getNetSellingValue() - ((Portfolio)sellPortfolioTreeTableModel.getRoot()).getReferenceTotal() - buyPortfolioTreeTableModel.getNetPurchaseValue() + this.getDepositSummary().getTotal() + this.getDividendSummary().getTotal();
         final double paperProfit = buyPortfolioTreeTableModel.getNetGainLossValue();
         final double paperProfitPercentage = buyPortfolioTreeTableModel.getNetGainLossPercentage();
         final double realizedProfit = sellPortfolioTreeTableModel.getNetGainLossValue();
