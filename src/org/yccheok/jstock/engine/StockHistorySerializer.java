@@ -61,26 +61,8 @@ public class StockHistorySerializer {
             return false;
         
         Stock stock = stockHistoryServer.getStock(calendar);
-        
-        File xStreamFile = new File(directory + File.separator + stock.getCode() + ".xml");        
-        
-        XStream xStream = new XStream();
-        
-        try {
-            OutputStream outputStream = new FileOutputStream(xStreamFile);
-            xStream.toXML(stockHistoryServer, outputStream);
-            outputStream.close();        
-        }
-        catch(FileNotFoundException exp) {
-            log.error("", exp);
-            return false;
-        }
-        catch(IOException exp) {
-            log.error("", exp);
-            return false;
-        }
-        
-        return true;
+
+        return org.yccheok.jstock.gui.Utils.toXML(stockHistoryServer, directory + File.separator + stock.getCode() + ".xml");
     }
     
     public StockHistoryServer load(Code code)
