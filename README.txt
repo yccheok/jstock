@@ -7,7 +7,19 @@ version 1.0.4d
 
 3. [2787627] Feature added. Remember when is the last view page.
 
-4. Bug fixed. Previously, when CIMB server failed, there are no chance for us to fall into Yahoo server.
+4. [2801063] Feature added. Cash Flow Management.
+
+5. [2797839] Feature added. note field.
+
+6. [2787627] Feature added. Remember when is the last view page.
+
+7. Feature added. Able to perform batch sell transaction.
+
+8. [2800598] Bug fixed. buyportfolio.xml file not updated with code symbol
+
+9. [2790218] Bug fixed. User unable to add new buy transaction in Spain.
+
+10. Bug fixed. Previously, when CIMB server failed, there are no chance for us to fall into Yahoo server.
 
 ==============
 version 1.0.4c
