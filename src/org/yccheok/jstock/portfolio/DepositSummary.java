@@ -25,60 +25,40 @@ import java.util.List;
  *
  * @author yccheok
  */
-public class DepositSummary {
+public class DepositSummary extends AbstractSummary<Deposit> {
     public DepositSummary() {
     }
 
     public DepositSummary(DepositSummary depositSummary) {
-        for (Deposit deposit : depositSummary.deposits) {
-            this.deposits.add(new Deposit(deposit));
+        final int size = depositSummary.size();
+        for (int i = 0; i < size; i++) {
+            this.add(new Deposit(depositSummary.get(i)));
         }
-        this.needEvaluation = depositSummary.needEvaluation;
-        this.total = depositSummary.total;
     }
 
-    public boolean add(Deposit deposit) {
-        this.needEvaluation = true;
-        return deposits.add(deposit);
-
-    }
-
-    public Deposit remove(int index) {
-        this.needEvaluation = true;
-        return deposits.remove(index);
-    }
-
-    public boolean remove(Deposit deposit) {
-        this.needEvaluation = true;
-        return deposits.remove(deposit);
-    }
-
-    public int size() {
-        return deposits.size();
-    }
-
-    public Deposit get(int index) {
-        return deposits.get(index);
-    }
-
-    // Can we have lazy evaluation?
     public double getTotal() {
-        if (this.needEvaluation) {
-            double tmp = 0.0;
-            for (Deposit deposit : deposits) {
-                tmp += deposit.getAmount();
-            }
-            total = tmp;
-            this.needEvaluation = false;
+        double tmp = 0.0;
+        final int size = size();
+        for (int i = 0; i < size; i++) {
+            tmp += this.get(i).getAmount();
         }
-        return total;
+        return tmp;
     }
+    
+    @Override
+    protected Object readResolve() {
+        super.readResolve();
 
-    public void add(int index, Deposit deposit) {
-        deposits.add(index, deposit);
+        /* For backward compatible */
+        for (Deposit deposit : deposits) {
+            this.add(deposit);
+        }
+        return this;
     }
-
-    private double total = 0.0;
-    private volatile boolean needEvaluation = false;
-    private List<Deposit> deposits = new ArrayList<Deposit>();
+    
+    /* total shall be removed. It is still here and marked as transient, for xstream backward compatible purpose. */
+    private transient double total = 0.0;
+    /* needEvaluation shall be removed. It is still here and marked as transient, for xstream backward compatible purpose. */
+    private transient volatile boolean needEvaluation = false;
+    private List<Deposit> deposits = new ArrayList<Deposit>();    
 }

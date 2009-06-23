@@ -40,7 +40,6 @@ public class ActivitySummary {
             activitiesMap.put(date, activities);
         }
 
-        simpleDates = null;
         return activities.add(activity);
     }
 
@@ -49,13 +48,10 @@ public class ActivitySummary {
     }
 
     public Activities get(int index) {
-        if (simpleDates == null) {
-            Set<SimpleDate> key = activitiesMap.keySet();
-            simpleDates = new ArrayList<SimpleDate>(key);
-            java.util.Collections.sort(simpleDates);
-        }
-
-        SimpleDate simpleDate = simpleDates.get(index);
+        final Set<SimpleDate> key = activitiesMap.keySet();
+        final List<SimpleDate> _simpleDates = new ArrayList<SimpleDate>(key);
+        java.util.Collections.sort(_simpleDates);
+        final SimpleDate simpleDate = _simpleDates.get(index);
         return activitiesMap.get(simpleDate);
     }
 
@@ -63,6 +59,8 @@ public class ActivitySummary {
         return activitiesMap.values();
     }
 
-    private List<SimpleDate> simpleDates = new ArrayList<SimpleDate>();
+   	/* simpleDates shall be removed. It is still here and marked as transient, for xstream backward compatible purpose. */
+    private transient List<SimpleDate> simpleDates = new ArrayList<SimpleDate>();
+    
     private final Map<SimpleDate, Activities> activitiesMap = new HashMap<SimpleDate, Activities>();
 }

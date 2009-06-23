@@ -26,70 +26,52 @@ import org.yccheok.jstock.engine.Stock;
  *
  * @author yccheok
  */
-public class DividendSummary {
+public class DividendSummary extends AbstractSummary<Dividend> {
     public DividendSummary() {
     }
 
     public DividendSummary(DividendSummary dividendSummary) {
-        for (Dividend dividend : dividendSummary.dividends) {
-            this.dividends.add(new Dividend(dividend));
+        final int size = dividendSummary.size();
+        for (int i = 0; i < size; i++) {
+            this.add(new Dividend(dividendSummary.get(i)));
         }
-        this.needEvaluation = dividendSummary.needEvaluation;
-        this.total = dividendSummary.total;
     }
 
-    public boolean add(Dividend dividend) {
-        this.needEvaluation = true;
-        return dividends.add(dividend);
-
-    }
-
-    public Dividend remove(int index) {
-        this.needEvaluation = true;
-        return dividends.remove(index);
-    }
-
-    public boolean remove(Dividend dividend) {
-        this.needEvaluation = true;
-        return dividends.remove(dividend);
-    }
-
-    public int size() {
-        return dividends.size();
-    }
-
-    public Dividend get(int index) {
-        return dividends.get(index);
-    }
-
-    // Can we have lazy evaluation?
     public double getTotal() {
-        if (this.needEvaluation) {
-            double tmp = 0.0;
-            for (Dividend dividend : dividends) {
-                tmp += dividend.getAmount();
-            }
-            total = tmp;
-            this.needEvaluation = false;
+        double tmp = 0.0;
+        final int size = size();
+        for (int i = 0; i < size; i++) {
+            tmp += this.get(i).getAmount();
         }
-        return total;
+        return tmp;
     }
 
     public double getTotal(Stock stock) {
         double tmp = 0.0;
-        for (Dividend dividend : dividends) {
-            if (stock.getCode().equals(dividend.getStock().getCode())) {
-                tmp = tmp + dividend.getAmount();
+        final int size = size();
+        for (int i = 0; i < size; i++) {
+            final Dividend dividend = this.get(i);
+            if (dividend.getStock().getCode().equals(stock.getCode())) {
+                tmp += dividend.getAmount();
             }
         }
         return tmp;
     }
-    
-    public void add(int index, Dividend dividend) {
-        dividends.add(index, dividend);
-    }
 
-    private double total = 0.0;
-    private volatile boolean needEvaluation = false;
+    @Override
+    protected Object readResolve() {
+        super.readResolve();
+
+        /* For backward compatible */
+        for (Dividend dividen : dividends) {
+            this.add(dividen);
+        }
+        return this;
+    }
+    
+    /* total shall be removed. It is still here and marked as transient, for xstream backward compatible purpose. */
+    private transient double total = 0.0;
+    /* needEvaluation shall be removed. It is still here and marked as transient, for xstream backward compatible purpose. */
+    private transient volatile boolean needEvaluation = false;
     private List<Dividend> dividends = new ArrayList<Dividend>();
 }
