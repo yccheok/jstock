@@ -62,7 +62,6 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         initComponents();        
         
         this.initPortfolio();
-        this.initGUIOptions();
     }
     
     /** This method is called from within the constructor to
@@ -1211,6 +1210,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         updateRealTimeStockMonitorAccordingToBuyPortfolioTreeTableModel();
         
         updateWealthHeader();
+
+        // Give user preferred GUI look. We do it here, because the entire table model is being changed.
+        this.initGUIOptions();
     }
     
     public boolean savePortfolio() {
