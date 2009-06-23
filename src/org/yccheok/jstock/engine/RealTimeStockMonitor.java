@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * Copyright (C) 2007 Cheok YanCheng <yccheok@yahoo.com>
+ * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
  */
 
 package org.yccheok.jstock.engine;
@@ -253,71 +253,87 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
             
             /* Will advance by numOfStockPerIteration * maxThread */            
             final int step = numOfStockPerIteration * maxThread;
-            
-            while(thisThread == thread) {
+
+
+            while (thisThread == thread) {
+                // Fail safe. So that middle in the code, if there is a unexpected exception being thrown, our thread
+                // still remain alive. Take note that, entering exception block for each loop is expensive. Hence, we have double
+                // loop strategy.
                 try {
-                    softWait();
-                }
-                catch(InterruptedException exp) {
-                    log.error("", exp);
-                    break;
-                }
-                
-                for(int currIndex = index; thisThread == thread; currIndex += step) {
-                    ListIterator<Code> listIterator = null;
-
-                    // Acquire iterator in a safe way.
-                    stockCodesReaderLock.lock();                
-                    final int stockCodesSize = stockCodes.size();
-                    if(currIndex < stockCodesSize)
-                        listIterator = stockCodes.listIterator(currIndex);
-                    stockCodesReaderLock.unlock();
-
-                    if(listIterator != null) {
-                        List<Code> codes = new ArrayList<Code>();
-
-                        for(int i = 0; listIterator.hasNext() && i < numOfStockPerIteration && thisThread == thread; i++) {
-                            codes.add(listIterator.next());
+                    while (thisThread == thread) {
+                        try {
+                            softWait();
+                        }
+                        catch (InterruptedException exp) {
+                            log.error(null, exp);
+                            /* Exit the primary fail safe loop. */
+                            thread = null;
+                            break;
                         }
 
-                        for(StockServerFactory factory : stockServerFactories)
-                        {                            
-                            final StockServer stockServer = factory.getStockServer();
-                            
-                            List<Stock> stocks = null;
-                            try {
-                                stocks = stockServer.getStocksByCodes(codes);                                
+                        for (int currIndex = index; thisThread == thread; currIndex += step) {
+                            ListIterator<Code> listIterator = null;
+
+                            // Acquire iterator in a safe way.
+                            stockCodesReaderLock.lock();
+                            final int stockCodesSize = stockCodes.size();
+                            if(currIndex < stockCodesSize) {
+                                listIterator = stockCodes.listIterator(currIndex);
                             }
-                            catch(StockNotFoundException exp) {
-                                log.error(codes, exp);
-                                // Try with another server.
-                                continue;
-                            }
-                         
-                            if(thisThread != thread) {
+                            stockCodesReaderLock.unlock();
+
+                            if (listIterator != null) {
+                                List<Code> codes = new ArrayList<Code>();
+
+                                for (int i = 0; listIterator.hasNext() && i < numOfStockPerIteration && thisThread == thread; i++) {
+                                    codes.add(listIterator.next());
+                                }
+
+                                for (StockServerFactory factory : stockServerFactories)
+                                {
+                                    final StockServer stockServer = factory.getStockServer();
+
+                                    List<Stock> stocks = null;
+                                    try {
+                                        stocks = stockServer.getStocksByCodes(codes);
+                                    }
+                                    catch (StockNotFoundException exp) {
+                                        log.error(codes, exp);
+                                        // Try with another server.
+                                        continue;
+                                    }
+
+                                    if (thisThread != thread) {
+                                        break;
+                                    }
+
+                                    // Notify all the interested parties.
+                                    RealTimeStockMonitor.this.notify(RealTimeStockMonitor.this, stocks);
+
+                                    break;
+                                }   // for
+
+                            }   // if (listIterator != null)
+                            else {
                                 break;
                             }
-                            
-                            // Notify all the interested parties.
-                            RealTimeStockMonitor.this.notify(RealTimeStockMonitor.this, stocks);
-                            
-                            break;
-                        }   // for                    
+                        }   // for (int currIndex = index; thisThread == thread; curIndex += step)
 
-                    }   // if(listIterator != null)
-                    else {
-                        break;
-                    }
-                }   // for(int currIndex = index; thisThread == thread; curIndex += step)
-                
-                try {
-                    Thread.sleep(delay);
+                        try {
+                            Thread.sleep(delay);
+                        }
+                        catch(java.lang.InterruptedException exp) {
+                            log.error("index=" + index, exp);
+                            /* Exit the primary fail safe loop. */
+                            thread = null;                            
+                            break;
+                        }
+                    }   /*  while (thisThread == thread) */
                 }
-                catch(java.lang.InterruptedException exp) {
-                    log.error("index=" + index, exp);
-                    break;
-                }
-            }
+                catch (Exception exp) {
+                    log.error("Our thread just recover from unexpected error", exp);
+                }	/* try */
+            }	/* while (thisThread == thread) */
         }
         
         public void _stop() {
