@@ -1,9 +1,27 @@
 ==============
+version 1.0.4e
+==============                                                                      
+1. Re-factor on ActivitySummary, DepositSummary and DividendSummary. In order 
+   to achieve backward compatible, we start to use xstream 1.3.1. Previous 
+   version doesn't work well with 'transient'. If we remove previous fields 
+   in new class, it still can goes wrong although we mark the fields as 
+   transient.
+
+2. Bug fixed. Update user preferred GUI look when changing country.
+
+3. [2804310] Bug fixed. Lazy evaluation x work in DividendSummary 
+   DepositSummary.
+   
+4. [2803284] Bug fixed. NPE In RealTimeStockMonitor. (Partial fixed)
+   
+==============
 version 1.0.4d
 ==============
-1. [2787608] Feature added. A better About Box with auto update detector, credit, license and blobsallad.
+1. [2787608] Feature added. A better About Box with auto update detector , 
+   credit, license and blobsallad.
 
-2. [2797839] Feature added. Note field in portfolio, for user to add note on every transactions.
+2. [2797839] Feature added. Note field in portfolio, for user to add note on 
+   every transactions.
 
 3. [2787627] Feature added. Remember when is the last view page.
 
@@ -19,14 +37,16 @@ version 1.0.4d
 
 9. [2790218] Bug fixed. User unable to add new buy transaction in Spain.
 
-10. Bug fixed. Previously, when CIMB server failed, there are no chance for us to fall into Yahoo server.
+10. Bug fixed. Previously, when CIMB server failed, there are no chance for 
+   us to fall into Yahoo server.
 
 ==============
 version 1.0.4c
 ==============
-1. [2604585] Feature added. If you are a daily trader, we understand that your need in monitoring 
-   stock price movement in seconds precision. Hence, JStock is providing intraday stock price 
-   snapshot. The stock price will be captured in every 10 seconds in daily basics, lasted for 2 hours.
+1. [2604585] Feature added. If you are a daily trader, we understand that 
+   your need in monitoring stock price movement in seconds precision. Hence, 
+   JStock is providing intraday stock price snapshot. The stock price will be
+   captured in every 10 seconds in daily basics, lasted for 2 hours.
 
 ==============
 version 1.0.4b
@@ -39,9 +59,11 @@ version 1.0.4b
 
 4. [2687975] Bug fixed. Wrong Information Displayed For Korea Market.
 
-5. [2767249] Bug fixed. Current price Is 0 when there is no transaction on that day.
+5. [2767249] Bug fixed. Current price Is 0 when there is no transaction on 
+   that day.
 
-6. [2737316] Bug fixed. NPE in ArithmeticOperator.division. Contributed by wolfc.
+6. [2737316] Bug fixed. NPE in ArithmeticOperator.division. Contributed by 
+   wolfc.
 
 ==============
 version 1.0.4a
@@ -62,24 +84,27 @@ version 1.0.4a
 =============
 version 1.0.4
 =============
-1. [2567297] Feature added. Having seconds/ minutes/ hour selection for scanning speed.
+1. [2567297] Feature added. Having seconds/ minutes/ hour selection for 
+   scanning speed.
 
 2. [2567292] Feature added. India Stock Market Support.
 
 3. [2580597] Testing to be done on Ubuntu Linux.
 
-4. [2503260] Bug fixed. Get all stocks from a country is slow and buggy. Denmark, France, Germany, 
-   Italy, Norway, Spain, Sweden, UnitedKingdom and UnitedState stock market information are now 
-   accurate. All their database are most update to date by using Yahoo search engine.
+4. [2503260] Bug fixed. Get all stocks from a country is slow and buggy. 
+   Denmark, France, Germany, Italy, Norway, Spain, Sweden, UnitedKingdom and 
+   UnitedState stock market information are now accurate. All their database 
+   are most update to date by using Yahoo search engine.
 
 5. [2617125] Bug fixed. Market Index Display Wrong.
 
 6. Feature added. Case insensitive auto drop down combo box.
 
-7. Bug fixed on Stock Database Dialog. The displayed stock and symbol is now associated with
-   the same stock.
+7. Bug fixed on Stock Database Dialog. The displayed stock and symbol is now 
+   associated with the same stock.
    
-8. Bug fixed on Malaysia stock market. 5148.KL is being included into database.
+8. Bug fixed on Malaysia stock market. 5148.KL is being included into 
+   database.
 
 
 =============
@@ -87,22 +112,25 @@ version 1.0.3
 =============
 1. [2567295] "Rise Above" and "Fall Below" table column
 
-2. Bug fixed on Market Chit Chat. Smile symbol will be case insensitive. :p same as :P
+2. Bug fixed on Market Chit Chat. Smile symbol will be case insensitive. :p 
+   same as :P
 
 3. [2548085] Real-Time Info can remember Column Position.
 
 ===========================================
 version 1.0.2 (nightly build number 030209)
 ===========================================
-1. Bug fixed on Market Chit Chat. Smile symbol will be case insensitive. :p same as :P
+1. Bug fixed on Market Chit Chat. Smile symbol will be case insensitive. 
+   :p same as :P
 
 2. [2548085] Real-Time Info can remember Column Position.
 
 =============
 version 1.0.2
 =============
-1. [2391797] Bug fixed. We provide a much more user friendly mechanism, in database download process
-   during indicator scanning. The entire indicator scanning process had been speed up by :-
+1. [2391797] Bug fixed. We provide a much more user friendly mechanism, in 
+   database download process during indicator scanning. The entire indicator 
+   scanning process had been speed up by :-
    (a) Several threads performing history download simultaneously.
    (b) Real time stock scanning and history download run simultaneously.
 
@@ -113,19 +141,20 @@ version 1.0.2
 =============
 version 1.0.1
 =============
-1. Bug fixed. We support maximum 9 boards (due to large boards in Germany market) in all select
-   stocks dialog boxes.
+1. Bug fixed. We support maximum 9 boards (due to large boards in Germany 
+   market) in all select stocks dialog boxes.
 
-2. A more robust Malaysia stock server from Yahoo! is being introduced. User shall not experience 
-   stock server down problem as in previous version.
+2. A more robust Malaysia stock server from Yahoo! is being introduced. User 
+   shall not experience stock server down problem as in previous version.
 
 3. New Singapore stock market is being introduced.
 
-4. JStock is now having its own logo and icon. Special thanks to Iconblock, a small company that 
-   specializes in providing professional and personalized design services.
+4. JStock is now having its own logo and icon. Special thanks to Iconblock, a 
+   small company that specializes in providing professional and personalized 
+   design services.
 
-5. Bug fixed in using HttpClient. Every method will has its own HttpClient. This may avoid problem 
-   from multiple connections at the same time. 
+5. Bug fixed in using HttpClient. Every method will has its own HttpClient. 
+   This may avoid problem from multiple connections at the same time. 
 
 =============
 version 1.0.0
@@ -134,22 +163,23 @@ version 1.0.0
 
 2. [2211339] Bug fixed. Type safe symbol and code.
 
-3. [2235506] Feature added. Refactor config files directories structure according to selected
-   country.
+3. [2235506] Feature added. Refactor config files directories structure 
+   according to selected country.
 
-4. [2213089] Feature added. Load stock database from pre-save file. User no longer need to wait
-   for database to download over the network.
+4. [2213089] Feature added. Load stock database from pre-save file. User no 
+   longer need to wait for database to download over the network.
    
-5. [2219098] Feature added. Dynamic WizardSelectStockJPanel. All GUIs will be generated according to
-   selected country.
+5. [2219098] Feature added. Dynamic WizardSelectStockJPanel. All GUIs will be
+   generated according to selected country.
 
-6. [2219038] Feature added. Dynamic Market Information Header. All GUIs will be generated according 
-   to selected country.
+6. [2219038] Feature added. Dynamic Market Information Header. All GUIs will 
+   be generated according to selected country.
    
 =============
 version 0.9.9
 =============
-1. [1955258] Bug fixed. Vista compataible, by revising user data storing directory location. 
+1. [1955258] Bug fixed. Vista compataible, by revising user data storing 
+   directory location. 
 
 2. Bug fixed from avoiding getting "yesterday" history information.
 
@@ -164,9 +194,11 @@ version 0.9.8
 
 2. Enable user to edit a transaction.
 
-3. Bug fixed when having manual broker fee/ stamp duty/ clearing fee calculation.
+3. Bug fixed when having manual broker fee/ stamp duty/ clearing fee 
+   calculation.
 
-4. Bug fixed. Have a workaround, to enable pie-chart able to display loss (-ve) value.
+4. Bug fixed. Have a workaround, to enable pie-chart able to display loss 
+   (-ve) value.
 
 =============
 version 0.9.7
@@ -176,11 +208,12 @@ version 0.9.7
 =============
 version 0.9.6
 =============
-1. Bug fixed on getStockBySymbol(String symbol). We forget to break after successl. 
-   This cause Indicator Editor Panel takes a long time to retrieve a real time sample data.
+1. Bug fixed on getStockBySymbol(String symbol). We forget to break after 
+   successl. This cause Indicator Editor Panel takes a long time to retrieve 
+   a real time sample data.
 
-2. Bug fixed on IndicatorPanel. Avoid from calling stop when state change. This is to avoid
-   GUI from being freezed.
+2. Bug fixed on IndicatorPanel. Avoid from calling stop when state change. 
+   This is to avoid GUI from being freezed.
 
 3. Apply soft start/ soft stop in MainFrame, to avoid GUI from being freezed.
 
@@ -193,8 +226,8 @@ version 0.9.5
 =============
 1. Bug fixed on stock scanning speed.
 
-2. [1851625] Bug fixed on indicator scanning. We will only download history only when there is a 
-   need.
+2. [1851625] Bug fixed on indicator scanning. We will only download history 
+   only when there is a need.
 
 =============
 version 0.9.4
@@ -234,9 +267,9 @@ v0-02
     * Avoid saving history to disk, by directly stream the history output to 
     indicator constructing.
 
-    * Only use a single CIMB history server, to avoid extensive server pooling 
-    if the history data cannot be found. However, we will be facing inaccurate
-    data risk.
+    * Only use a single CIMB history server, to avoid extensive server 
+    pooling if the history data cannot be found. However, we will be facing 
+    inaccurate data risk.
 
 2.  User may choose to display a single stock although there is multiple 
     indicators being triggered.
