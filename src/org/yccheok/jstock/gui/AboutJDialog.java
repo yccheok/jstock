@@ -83,6 +83,12 @@ public class AboutJDialog extends javax.swing.JDialog {
     // WILL BE ONLY CALLED ONCE!
     private void updateCheckForUpdateStatus(final String string)
     {
+		// 2818878 : ClassCastException in AboutBox
+		// To avoid the following exception. Not sure why this happen.
+		// 
+		// Exception in thread "Thread-10" java.lang.ClassCastException:
+		// javax.swing.text.PlainDocument cannot be cast to javax.swing.text.html.HTMLDocument
+        jEditorPane2.setContentType("text/html");
         jEditorPane2.setText("<html><head></head><body></body></html>");
         HTMLDocument htmlDocument = (HTMLDocument)jEditorPane2.getDocument();
 
@@ -320,6 +326,10 @@ public class AboutJDialog extends javax.swing.JDialog {
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
         // TODO add your handling code here:
+        if (busyComponent != null) {
+            // Stop the busy indicator thread.
+            busyComponent.setBusy(false);
+        }
         controller.stop();
     }//GEN-LAST:event_formWindowClosed
 
