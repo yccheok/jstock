@@ -83,12 +83,6 @@ public class AboutJDialog extends javax.swing.JDialog {
     // WILL BE ONLY CALLED ONCE!
     private void updateCheckForUpdateStatus(final String string)
     {
-		// 2818878 : ClassCastException in AboutBox
-		// To avoid the following exception. Not sure why this happen.
-		// 
-		// Exception in thread "Thread-10" java.lang.ClassCastException:
-		// javax.swing.text.PlainDocument cannot be cast to javax.swing.text.html.HTMLDocument
-        jEditorPane2.setContentType("text/html");
         jEditorPane2.setText("<html><head></head><body></body></html>");
         HTMLDocument htmlDocument = (HTMLDocument)jEditorPane2.getDocument();
 
