@@ -15,7 +15,7 @@
                 <listitem><para>Real-Time stock info. You will able to monitor all your favorite stocks movement, within single page.</para></listitem>
                 <listitem><para>Intraday stock price snapshot. You will able to monitor stock price movement in seconds precision.</para></listitem>                
                 <listitem><para>Stock indicator editor. You will able to compose your own indicator rule, with simple drag-n-drop graphical blocks. There are no programming required.</para></listitem>
-                <listitem><para>Stock indicator scanner. You will able to perform real-time indicator scanning, to filter out thousands of stocks from the entire stock market. You may also receive email and system tray message alert whenever a stock is being found.</para></listitem>
+                <listitem><para>Stock indicator scanner. You will able to perform real-time indicator scanning, to filter out thousands of stocks from the entire stock market. You may also receive SMS, email and system tray message alert whenever a stock is being found.</para></listitem>
                 <listitem><para>Portfolio management. You will able to know your most up-to-date net worth, by recording down your buy and sell records.</para></listitem>
                 <listitem><para>Market chit chat. You may chat with other JStock users on the hottest market news, in an easy and fun way.</para></listitem>
             </orderedlist>            
