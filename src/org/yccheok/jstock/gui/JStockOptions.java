@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * Copyright (C) 2007 Cheok YanCheng <yccheok@yahoo.com>
+ * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
  */
 
 package org.yccheok.jstock.gui;
@@ -58,6 +58,9 @@ public class JStockOptions {
         setSendEmail(false);
         setEmail("");
         setEmailPassword("");
+        setSMSEnabled(false);
+        setGoogleCalendarUsername("");
+        setGoogleCalendarPassword("");
         setPasswordProtectedIndicator(false);
         setSingleIndicatorAlert(true);
         setIndicatorPassword("");
@@ -104,6 +107,9 @@ public class JStockOptions {
     private boolean sendEmail;
     private String email;
     private String emailPassword;
+    private String googleCalendarUsername;
+    private String googleCalendarPassword;
+    private boolean SMSEnabled;
     private boolean passwordProtectedIndicator;
     private String indicatorPassword;
     private String proxyServer;
@@ -238,6 +244,16 @@ public class JStockOptions {
 
         if (this.getLastSavedFileNameExtensionDescription() == null) {
             this.setLastFileNameExtensionDescription("CSV Documents (*.csv)");
+        }
+
+        if (this.getGoogleCalendarUsername() == null) {
+            this.setGoogleCalendarUsername("");
+            this.setSMSEnabled(false);
+        }
+
+        if (this.getGoogleCalendarPassword() == null) {
+            setGoogleCalendarPassword("");
+            this.setSMSEnabled(false);
         }
 
         return this;
@@ -720,5 +736,47 @@ public class JStockOptions {
      */
     public void setLastSelectedPageIndex(int lastSelectedPageIndex) {
         this.lastSelectedPageIndex = lastSelectedPageIndex;
+    }
+
+    /**
+     * @return the googleCalendarUsername
+     */
+    public String getGoogleCalendarUsername() {
+        return googleCalendarUsername;
+    }
+
+    /**
+     * @param googleCalendarUsername the googleCalendarUsername to set
+     */
+    public void setGoogleCalendarUsername(String googleCalendarUsername) {
+        this.googleCalendarUsername = googleCalendarUsername;
+    }
+
+    /**
+     * @return the googleCalendarPassword
+     */
+    public String getGoogleCalendarPassword() {
+        return googleCalendarPassword;
+    }
+
+    /**
+     * @param googleCalendarPassword the googleCalendarPassword to set
+     */
+    public void setGoogleCalendarPassword(String googleCalendarPassword) {
+        this.googleCalendarPassword = googleCalendarPassword;
+    }
+
+    /**
+     * @return the SMSEnabled
+     */
+    public boolean isSMSEnabled() {
+        return SMSEnabled;
+    }
+
+    /**
+     * @param SMSEnabled the SMSEnabled to set
+     */
+    public void setSMSEnabled(boolean SMSEnabled) {
+        this.SMSEnabled = SMSEnabled;
     }
 }
