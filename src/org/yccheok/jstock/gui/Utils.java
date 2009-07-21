@@ -73,14 +73,12 @@ public class Utils {
     }
 
     public static java.util.Date getNTPDate() {
-        // The list is obtained from Windows Vista, Internet Time Server List itself.
-        // The complete server list can be obtained from http://tf.nist.gov/tf-cgi/servers.cgi
-        String[] hosts = {"time.nist.gov", "time-nw.nist.gov", "time-a.nist.gov", "time-b.nist.gov"};
+        List<String> hosts = getNTPServers();
 
         for (String host : hosts) {
             TimeTCPClient client = new TimeTCPClient();
-            // We want to timeout if a response takes longer than 10 seconds
-            client.setDefaultTimeout(10000);
+            // We want to timeout if a response takes longer than 5 seconds
+            client.setDefaultTimeout(5000);
             try {
                 client.connect(host);
                 java.util.Date ntpDate = client.getDate();
@@ -91,13 +89,94 @@ public class Utils {
                 }
             }
             catch (java.net.SocketException exp) {
-                log.error(null, exp);
+                log.error(host, exp);
             }
             catch (java.io.IOException exp) {
-                log.error(null, exp);
+                log.error(host, exp);
             }
         }
         return null;
+    }
+
+    private static List<String> getNTPServers()
+    {
+        // The list is obtained from Windows Vista, Internet Time Server List itself.
+        // The complete server list can be obtained from http://tf.nist.gov/tf-cgi/servers.cgi
+        final List<String> defaultServer = java.util.Arrays.asList("time-a.nist.gov", "time-b.nist.gov", "time-nw.nist.gov");
+        List<String> servers = Utils.NTPServers;
+        if (servers != null) {
+			// We already have the server list.
+            return servers;
+        }
+
+        HttpMethod method = new GetMethod("http://jstock.sourceforge.net/server/ntpserver.txt");
+        final HttpClient httpClient = new HttpClient();
+        org.yccheok.jstock.engine.Utils.setHttpClientProxyFromSystemProperties(httpClient);
+        org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
+
+        InputStream stream = null;
+
+        try {
+            stream = org.yccheok.jstock.gui.Utils.getResponseBodyAsStreamBasedOnProxyAuthOption(httpClient, method);
+
+            if (stream == null) {
+				// Use default servers, so that we need not to ask for server list again next time.
+                Utils.NTPServers = defaultServer;
+                return defaultServer;
+            }
+
+            Properties properties = new Properties();
+            properties.load(stream);
+
+            final String _id = properties.getProperty("id");
+            if (_id == null) {
+                log.info("UUID not found");
+				// Use default servers, so that we need not to ask for server list again next time.
+                Utils.NTPServers = defaultServer;
+                return defaultServer;
+            }
+
+            final String id = org.yccheok.jstock.gui.Utils.decrypt(_id);
+            if (id.equals(org.yccheok.jstock.gui.Utils.getJStockUUID()) == false) {
+                log.info("UUID doesn't match");
+				// Use default servers, so that we need not to ask for server list again next time.
+                Utils.NTPServers = defaultServer;
+                return defaultServer;
+            }
+
+            final String server = properties.getProperty("server");
+            if (server == null) {
+                log.info("Server not found");
+				// Use default servers, so that we need not to ask for server list again next time.
+                Utils.NTPServers = defaultServer;
+                return defaultServer;
+            }
+
+            String[] s = server.split(",");
+            if (s.length > 0) {
+                List<String> me = java.util.Arrays.asList(s);
+				// Save it! So that we need not to ask for server list again next time.
+                Utils.NTPServers = me;
+                return me;
+            }
+        }
+        catch (HttpException ex) {
+            log.error(null, ex);
+        }
+        catch (IOException ex) {
+            log.error(null, ex);
+        }
+        finally {
+            if (stream != null) try {
+                stream.close();
+            } catch (IOException ex) {
+                log.error(null, ex);
+            }
+            method.releaseConnection();
+        }
+		// Use default servers, so that we need not to ask for server list again next time.
+        Utils.NTPServers = defaultServer;
+        return defaultServer;
     }
 
     public static java.awt.Image getScaledImage(Image image, int maxWidth, int maxHeight) {
@@ -373,8 +452,9 @@ public class Utils {
 
     public static String decrypt(String source)
     {
-        if (source.length() <= 0)
+        if (source.length() <= 0) {
             return "";
+        }
 
         org.jasypt.encryption.pbe.PBEStringEncryptor pbeStringEncryptor = new org.jasypt.encryption.pbe.StandardPBEStringEncryptor();
         pbeStringEncryptor.setPassword(getJStockUUID());
@@ -738,6 +818,8 @@ public class Utils {
             this.solarisDownloadLink = solarisDownloadLink;
         }
     }
+
+    private static volatile List<String> NTPServers = null;
 
 	// We will use this as directory name. Do not have space or special characters.
     private static final String APPLICATION_VERSION_STRING = "1.0.4";
