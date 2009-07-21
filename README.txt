@@ -1,4 +1,9 @@
 ==============
+version 1.0.4f
+==============
+1. SMS feature.
+
+==============
 version 1.0.4e
 ==============                                                                      
 1. Re-factor on ActivitySummary, DepositSummary and DividendSummary. In order 
