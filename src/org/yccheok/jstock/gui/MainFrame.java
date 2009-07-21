@@ -1941,6 +1941,7 @@ public class MainFrame extends javax.swing.JFrame {
         final StockTableModel stockTableModel = (StockTableModel)MainFrame.this.jTable1.getModel();
         final Stock stock = indicator.getStock();        
         final Double price = ((OperatorIndicator)indicator).getName().equalsIgnoreCase("fallbelow") ? stockTableModel.getFallBelow(stock) : stockTableModel.getRiseAbove(stock);
+		final double lastPrice = stock.getLastPrice();
 
         if(this.jStockOptions.isPopupMessage()) {
             final Runnable r = new Runnable() {
@@ -1950,11 +1951,11 @@ public class MainFrame extends javax.swing.JFrame {
 
                     if (((OperatorIndicator)indicator).getName().equalsIgnoreCase("fallbelow"))
                     {
-                        message = stock.getSymbol() + " fall below " + price;
+                        message = stock.getSymbol() + " (" + lastPrice + ") fall below " + price;
                     }
                     else
                     {
-                        message = stock.getSymbol() + " rise above " + price;
+                        message = stock.getSymbol() + " (" + lastPrice + ") rise above " + price;
                     }
 
                     if (jStockOptions.isPopupMessage()) {
@@ -1986,18 +1987,18 @@ public class MainFrame extends javax.swing.JFrame {
 
                     if (((OperatorIndicator)indicator).getName().equalsIgnoreCase("fallbelow"))
                     {
-                        title = stock.getSymbol() + " fall below " + price;
+                        title = stock.getSymbol() + " (" + lastPrice + ") fall below " + price;
                     }
                     else
                     {
-                        title = stock.getSymbol() + " rise above " + price;
+                        title = stock.getSymbol() + " (" + lastPrice + ") rise above " + price;
                     }
 
-                    final String message = title + "\nbrought to you by JStock";
+                    final String message = title + "\n(JStock)";
 
                     try {
                         String email = Utils.decrypt(jStockOptions.getEmail());
-                        GoogleMail.Send(email, Utils.decrypt(jStockOptions.getEmailPassword()), email + "@gmail.com", message, message);
+                        GoogleMail.Send(email, Utils.decrypt(jStockOptions.getEmailPassword()), email + "@gmail.com", title, message);
                     } catch (AddressException exp) {
                         log.error("", exp);
                     } catch (MessagingException exp) {
@@ -2011,6 +2012,34 @@ public class MainFrame extends javax.swing.JFrame {
             }
             catch(java.util.concurrent.RejectedExecutionException exp) {
                 log.error("", exp);
+            }
+        }
+
+        if(jStockOptions.isSMSEnabled()) {
+            final Runnable r = new Runnable() {
+                @Override
+                public void run() {
+                    String message = "";
+					
+                    if (((OperatorIndicator)indicator).getName().equalsIgnoreCase("fallbelow"))
+                    {
+                        message = stock.getSymbol() + " (" + lastPrice + ") fall below " + price;
+                    }
+                    else
+                    {
+                        message = stock.getSymbol() + " (" + lastPrice + ") rise above " + price;
+                    }
+
+                    final String username = Utils.decrypt(jStockOptions.getGoogleCalendarUsername());
+                    GoogleCalendar.SMS(username, Utils.decrypt(jStockOptions.getGoogleCalendarPassword()), message);
+                }
+            };
+
+            try {
+                smsAlertPool.submit(r);
+            }
+            catch(java.util.concurrent.RejectedExecutionException exp) {
+                log.error(null, exp);
             }
         }
     }
@@ -3488,6 +3517,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private final AlertStateManager alertStateManager = new AlertStateManager();
     private ExecutorService emailAlertPool = Executors.newFixedThreadPool(1);
+    private ExecutorService smsAlertPool = Executors.newFixedThreadPool(1);
     private ExecutorService systemTrayAlertPool = Executors.newFixedThreadPool(1);
 
     private org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();

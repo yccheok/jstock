@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * Copyright (C) 2007 Cheok YanCheng <yccheok@yahoo.com>
+ * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
  */
 
 package org.yccheok.jstock.gui;
@@ -333,14 +333,13 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         final MainFrame m = MainFrame.getInstance();
         final JStockOptions jStockOptions = m.getJStockOptions();
 
-        if(jStockOptions.isPopupMessage()) {
+        if (jStockOptions.isPopupMessage()) {
             final Runnable r = new Runnable() {
                 @Override
                 public void run() {
                     final Stock stock = indicator.getStock();
-                    final String message = stock.getSymbol() + " (" + stock.getCode() + " " +
-                            "last=" + stock.getLastPrice() + " high=" + stock.getHighPrice() + " " +
-                            "low=" + stock.getLowPrice() + ") hits " + indicator.toString();
+					final double price = stock.getLastPrice();
+                    final String message = stock.getSymbol() + " (" + price + ") hits " + indicator.toString();
 
                     if (jStockOptions.isPopupMessage()) {
                         m.displayPopupMessage(stock.getSymbol().toString(), message);
@@ -363,20 +362,19 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             }
         }
 
-        if(jStockOptions.isSendEmail()) {
+        if (jStockOptions.isSendEmail()) {
             final Runnable r = new Runnable() {
                 @Override
                 public void run() {
                     final Stock stock = indicator.getStock();
-                    final String title = stock.getSymbol() + " (" + stock.getCode() + " " +
-                            "last=" + stock.getLastPrice() + " high=" + stock.getHighPrice() + " " +
-                            "low=" + stock.getLowPrice() + ") hits " + indicator.toString();
+					final double price = stock.getLastPrice();
+                    final String title = stock.getSymbol() + " (" + price + ") hits " + indicator.toString();
 
-                    final String message = title + "\nbrought to you by JStock";
+                    final String message = title + "\n(JStock)";
 
                     try {
                         String email = Utils.decrypt(jStockOptions.getEmail());
-                        GoogleMail.Send(email, Utils.decrypt(jStockOptions.getEmailPassword()), email + "@gmail.com", message, message);
+                        GoogleMail.Send(email, Utils.decrypt(jStockOptions.getEmailPassword()), email + "@gmail.com", title, message);
                     } catch (AddressException exp) {
                         log.error("", exp);
                     } catch (MessagingException exp) {
@@ -390,6 +388,27 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             }
             catch(java.util.concurrent.RejectedExecutionException exp) {
                 log.error("", exp);
+            }
+        }
+
+        if(jStockOptions.isSMSEnabled()) {
+            final Runnable r = new Runnable() {
+                @Override
+                public void run() {
+                    final Stock stock = indicator.getStock();
+					final double price = stock.getLastPrice();
+                    final String message = stock.getSymbol() + " (" + price + ") hits " + indicator.toString();
+
+                    final String username = Utils.decrypt(jStockOptions.getGoogleCalendarUsername());
+                    GoogleCalendar.SMS(username, Utils.decrypt(jStockOptions.getGoogleCalendarPassword()), message);
+                }
+            };
+
+            try {
+                smsAlertPool.submit(r);
+            }
+            catch(java.util.concurrent.RejectedExecutionException exp) {
+                log.error(null, exp);
             }
         }
     }
@@ -479,7 +498,8 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
 
         final ExecutorService oldSystemTrayAlertPool = systemTrayAlertPool;
         final ExecutorService oldEmailAlertPool = emailAlertPool;
-        
+        final ExecutorService oldSMSAlertPool = smsAlertPool;
+
         Utils.getZoombiePool().execute(new Runnable() {
             @Override
             public void run() {
@@ -488,7 +508,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                 try {            
                     oldSystemTrayAlertPool.awaitTermination(100, TimeUnit.DAYS);
                 } catch (InterruptedException exp) {
-                    log.error("", exp);
+                    log.error(null, exp);
                 }
                 log.info("Shut down " + oldSystemTrayAlertPool + " peacefully.");
                 
@@ -497,13 +517,23 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                 try {            
                     oldEmailAlertPool.awaitTermination(100, TimeUnit.DAYS);
                 } catch (InterruptedException exp) {
-                    log.error("", exp);
+                    log.error(null, exp);
                 }
-                log.info("Shut down " + oldEmailAlertPool + " peacefully.");                
+                log.info("Shut down " + oldEmailAlertPool + " peacefully.");
+
+                log.info("Prepare to shut down " + oldSMSAlertPool + "...");
+                oldSMSAlertPool.shutdownNow();
+                try {
+                    oldSMSAlertPool.awaitTermination(100, TimeUnit.DAYS);
+                } catch (InterruptedException exp) {
+                    log.error(null, exp);
+                }
+                log.info("Shut down " + oldSMSAlertPool + " peacefully.");
             }
         }); 
         
         emailAlertPool = Executors.newFixedThreadPool(1);
+        smsAlertPool = Executors.newFixedThreadPool(1);
         systemTrayAlertPool = Executors.newFixedThreadPool(1);        
         
         SwingUtilities.invokeLater(new Runnable() {
@@ -834,6 +864,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
 
     private final AlertStateManager alertStateManager = new AlertStateManager();
     private ExecutorService emailAlertPool = Executors.newFixedThreadPool(1);
+    private ExecutorService smsAlertPool = Executors.newFixedThreadPool(1);
     private ExecutorService systemTrayAlertPool = Executors.newFixedThreadPool(1);
     private MainFrame mainFrame = null;
     
