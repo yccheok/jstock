@@ -54,6 +54,7 @@ import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.net.TimeTCPClient;
 import org.yccheok.jstock.analysis.Connection;
 import org.yccheok.jstock.analysis.DoubleConstantOperator;
 import org.yccheok.jstock.analysis.EqualityOperator;
@@ -70,7 +71,35 @@ public class Utils {
     /** Creates a new instance of Utils */
     private Utils() {
     }
-    
+
+    public static java.util.Date getNTPDate() {
+        // The list is obtained from Windows Vista, Internet Time Server List itself.
+        // The complete server list can be obtained from http://tf.nist.gov/tf-cgi/servers.cgi
+        String[] hosts = {"time.nist.gov", "time-nw.nist.gov", "time-a.nist.gov", "time-b.nist.gov"};
+
+        for (String host : hosts) {
+            TimeTCPClient client = new TimeTCPClient();
+            // We want to timeout if a response takes longer than 10 seconds
+            client.setDefaultTimeout(10000);
+            try {
+                client.connect(host);
+                java.util.Date ntpDate = client.getDate();
+                client.disconnect();
+                // Just to be extra caution.
+                if (ntpDate != null) {
+                    return ntpDate;
+                }
+            }
+            catch (java.net.SocketException exp) {
+                log.error(null, exp);
+            }
+            catch (java.io.IOException exp) {
+                log.error(null, exp);
+            }
+        }
+        return null;
+    }
+
     public static java.awt.Image getScaledImage(Image image, int maxWidth, int maxHeight) {
         // This code ensures that all the pixels in the image are loaded
         image = new ImageIcon(image).getImage();
