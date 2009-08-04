@@ -202,11 +202,14 @@ public class Utils {
 
         Code result = code;
 
-        if(country == Country.Malaysia)
+        if (country == Country.Malaysia)
         {
             String _code = code.toString();
-            if(_code.endsWith(".KL") == false)
+            // Index's code start with ^. We will not intrude index's code.
+            if(_code.startsWith("^") == false && _code.endsWith(".KL") == false)
             {
+				// This is not index's code, and it does not end with .KL.
+                // Let's intrude it!
                 result = Code.newInstance(_code + ".KL");
             }
         }
