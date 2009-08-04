@@ -1,8 +1,8 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
-JStock 1.0.4 - 2009-08-04
-  Displaying history for index (#2831881 )
+JStock 1.0.4g - 2009-08-04
+  Displaying history for index (#2831881)
   Bugfix: Not able to connect to KLSE data (#2831804)
   Bugfix: Fall Below and Rise Above false alarm (#2826327)
   
