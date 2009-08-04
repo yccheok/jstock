@@ -186,6 +186,7 @@ public class MarketJPanel extends javax.swing.JPanel {
     
     static {
         ignoreIndices.add(Index.Mesdaq);
+        ignoreIndices.add(Index.Second);
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
