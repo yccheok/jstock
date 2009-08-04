@@ -1940,6 +1940,14 @@ public class MainFrame extends javax.swing.JFrame {
         final Double price = ((OperatorIndicator)indicator).getName().equalsIgnoreCase("fallbelow") ? stockTableModel.getFallBelow(stock) : stockTableModel.getRiseAbove(stock);
 		final double lastPrice = stock.getLastPrice();
 
+        // Using lastPrice = 0 to compare against fall below and rise above
+        // target price is meaningless. In normal condition, no stock price
+        // shall fall until 0. When we get last price is 0, most probably
+        // market is not opened yet.
+        if (lastPrice <= 0.0) {
+            return;
+        }
+
         if(this.jStockOptions.isPopupMessage()) {
             final Runnable r = new Runnable() {
                 @Override
@@ -1974,7 +1982,7 @@ public class MainFrame extends javax.swing.JFrame {
             catch(java.util.concurrent.RejectedExecutionException exp) {
                 log.error("", exp);
             }
-        }
+        }   /* if(this.jStockOptions.isPopupMessage()) */
 
         if(jStockOptions.isSendEmail()) {
             final Runnable r = new Runnable() {
@@ -2010,7 +2018,7 @@ public class MainFrame extends javax.swing.JFrame {
             catch(java.util.concurrent.RejectedExecutionException exp) {
                 log.error("", exp);
             }
-        }
+        }   /* if(jStockOptions.isSendEmail()) */
 
         if(jStockOptions.isSMSEnabled()) {
             final Runnable r = new Runnable() {
@@ -2038,7 +2046,7 @@ public class MainFrame extends javax.swing.JFrame {
             catch(java.util.concurrent.RejectedExecutionException exp) {
                 log.error(null, exp);
             }
-        }
+        }   /* if(jStockOptions.isSMSEnabled()) */
     }
 
     private org.yccheok.jstock.engine.Observer<Indicator, Boolean> getAlertStateManagerObserver() {
