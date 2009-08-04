@@ -1,0 +1,293 @@
+This file summarizes changes in JStock releases.
+Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
+
+JStock 1.0.4 - 2009-08-04
+  Displaying history for index (#2831881 )
+  Bugfix: Not able to connect to KLSE data (#2831804)
+  Bugfix: Fall Below and Rise Above false alarm (#2826327)
+  
+==============
+version 1.0.4f
+==============
+1. SMS feature.
+
+==============
+version 1.0.4e
+==============                                                                      
+1. Re-factor on ActivitySummary, DepositSummary and DividendSummary. In order 
+   to achieve backward compatible, we start to use xstream 1.3.1. Previous 
+   version doesn't work well with 'transient'. If we remove previous fields 
+   in new class, it still can goes wrong although we mark the fields as 
+   transient.
+
+2. Bug fixed. Update user preferred GUI look when changing country.
+
+3. [2804310] Bug fixed. Lazy evaluation x work in DividendSummary 
+   DepositSummary.
+   
+4. [2803284] Bug fixed. NPE In RealTimeStockMonitor. (Partial fixed)
+   
+==============
+version 1.0.4d
+==============
+1. [2787608] Feature added. A better About Box with auto update detector , 
+   credit, license and blobsallad.
+
+2. [2797839] Feature added. Note field in portfolio, for user to add note on 
+   every transactions.
+
+3. [2787627] Feature added. Remember when is the last view page.
+
+4. [2801063] Feature added. Cash Flow Management.
+
+5. [2797839] Feature added. note field.
+
+6. [2787627] Feature added. Remember when is the last view page.
+
+7. Feature added. Able to perform batch sell transaction.
+
+8. [2800598] Bug fixed. buyportfolio.xml file not updated with code symbol
+
+9. [2790218] Bug fixed. User unable to add new buy transaction in Spain.
+
+10. Bug fixed. Previously, when CIMB server failed, there are no chance for 
+   us to fall into Yahoo server.
+
+==============
+version 1.0.4c
+==============
+1. [2604585] Feature added. If you are a daily trader, we understand that 
+   your need in monitoring stock price movement in seconds precision. Hence, 
+   JStock is providing intraday stock price snapshot. The stock price will be
+   captured in every 10 seconds in daily basics, lasted for 2 hours.
+
+==============
+version 1.0.4b
+==============
+1. [2686577] Feature added. Proxy Auth Support. Contributed by gransi.
+
+2. [2722273] Feature added. Read/ Write on Excel/ CSV File Format.
+
+3. [2725384] Remember The Width of Table Column. Contributed by gransi.
+
+4. [2687975] Bug fixed. Wrong Information Displayed For Korea Market.
+
+5. [2767249] Bug fixed. Current price Is 0 when there is no transaction on 
+   that day.
+
+6. [2737316] Bug fixed. NPE in ArithmeticOperator.division. Contributed by 
+   wolfc.
+
+==============
+version 1.0.4a
+==============
+1. Added 11 new countires. We have now total 23 countries stock market.
+   - Australia
+   - Austria
+   - Belgium
+   - Canada
+   - HongKong
+   - Indonesia
+   - Korea
+   - Netherlands
+   - Portugal
+   - Switzerland
+   - Taiwan
+
+=============
+version 1.0.4
+=============
+1. [2567297] Feature added. Having seconds/ minutes/ hour selection for 
+   scanning speed.
+
+2. [2567292] Feature added. India Stock Market Support.
+
+3. [2580597] Testing to be done on Ubuntu Linux.
+
+4. [2503260] Bug fixed. Get all stocks from a country is slow and buggy. 
+   Denmark, France, Germany, Italy, Norway, Spain, Sweden, UnitedKingdom and 
+   UnitedState stock market information are now accurate. All their database 
+   are most update to date by using Yahoo search engine.
+
+5. [2617125] Bug fixed. Market Index Display Wrong.
+
+6. Feature added. Case insensitive auto drop down combo box.
+
+7. Bug fixed on Stock Database Dialog. The displayed stock and symbol is now 
+   associated with the same stock.
+   
+8. Bug fixed on Malaysia stock market. 5148.KL is being included into 
+   database.
+
+
+=============
+version 1.0.3
+=============
+1. [2567295] "Rise Above" and "Fall Below" table column
+
+2. Bug fixed on Market Chit Chat. Smile symbol will be case insensitive. :p 
+   same as :P
+
+3. [2548085] Real-Time Info can remember Column Position.
+
+===========================================
+version 1.0.2 (nightly build number 030209)
+===========================================
+1. Bug fixed on Market Chit Chat. Smile symbol will be case insensitive. 
+   :p same as :P
+
+2. [2548085] Real-Time Info can remember Column Position.
+
+=============
+version 1.0.2
+=============
+1. [2391797] Bug fixed. We provide a much more user friendly mechanism, in 
+   database download process during indicator scanning. The entire indicator 
+   scanning process had been speed up by :-
+   (a) Several threads performing history download simultaneously.
+   (b) Real time stock scanning and history download run simultaneously.
+
+2. [2417893] Feature added. Market Chit Chat feature being added.
+   
+3. User is able to choose the duration of history information.
+
+=============
+version 1.0.1
+=============
+1. Bug fixed. We support maximum 9 boards (due to large boards in Germany 
+   market) in all select stocks dialog boxes.
+
+2. A more robust Malaysia stock server from Yahoo! is being introduced. User 
+   shall not experience stock server down problem as in previous version.
+
+3. New Singapore stock market is being introduced.
+
+4. JStock is now having its own logo and icon. Special thanks to Iconblock, a 
+   small company that specializes in providing professional and personalized 
+   design services.
+
+5. Bug fixed in using HttpClient. Every method will has its own HttpClient. 
+   This may avoid problem from multiple connections at the same time. 
+
+=============
+version 1.0.0
+=============
+1. [1956185] Feature added. 10 countries stock market is being supported.
+
+2. [2211339] Bug fixed. Type safe symbol and code.
+
+3. [2235506] Feature added. Refactor config files directories structure 
+   according to selected country.
+
+4. [2213089] Feature added. Load stock database from pre-save file. User no 
+   longer need to wait for database to download over the network.
+   
+5. [2219098] Feature added. Dynamic WizardSelectStockJPanel. All GUIs will be
+   generated according to selected country.
+
+6. [2219038] Feature added. Dynamic Market Information Header. All GUIs will 
+   be generated according to selected country.
+   
+=============
+version 0.9.9
+=============
+1. [1955258] Bug fixed. Vista compataible, by revising user data storing 
+   directory location. 
+
+2. Bug fixed from avoiding getting "yesterday" history information.
+
+3. Bug fixed during removing transaction.
+
+4. Fully support sell transaction, including sell advisor feature.
+
+=============
+version 0.9.8
+=============
+1. Bug fixed when having non-terminating division result : 1/3
+
+2. Enable user to edit a transaction.
+
+3. Bug fixed when having manual broker fee/ stamp duty/ clearing fee 
+   calculation.
+
+4. Bug fixed. Have a workaround, to enable pie-chart able to display loss 
+   (-ve) value.
+
+=============
+version 0.9.7
+=============
+1. Support auto broker fee, stamp duty, clearing fee calculation.
+
+=============
+version 0.9.6
+=============
+1. Bug fixed on getStockBySymbol(String symbol). We forget to break after 
+   successl. This cause Indicator Editor Panel takes a long time to retrieve 
+   a real time sample data.
+
+2. Bug fixed on IndicatorPanel. Avoid from calling stop when state change. 
+   This is to avoid GUI from being freezed.
+
+3. Apply soft start/ soft stop in MainFrame, to avoid GUI from being freezed.
+
+4. Bug fixed. Forget to update GUI state.
+
+5. Porfolio feature by using tree table from SwingLabs.
+
+=============
+version 0.9.5
+=============
+1. Bug fixed on stock scanning speed.
+
+2. [1851625] Bug fixed on indicator scanning. We will only download history 
+   only when there is a need.
+
+=============
+version 0.9.4
+=============
+1. Added Market Capital and Shares Issued, in Indicator Scanner.
+
+2. Bug fixed. Click on empty area, should clear indicator table selection.
+
+=============
+version 0.9.3
+=============
+1. [ 1830911 ] Bug fixed : Uninstall doesn't remove shortcut.
+
+2. Support color customization.
+
+3. Bug fixed on second sell quantity.
+
+4. Option object as static.
+
+=============
+version 0.9.2
+=============
+1.  Fix email feature, which is caused by changes in GMAIL SMTP service.
+
+2.  [ 1776936 ] Load all the entire market stocks into the Real-Time Monitor.
+
+=============
+version 0.9.1
+=============
+1.  Initial release to the public.
+
+=====
+v0-02
+=====
+1.  Improve speed of indicators constructing by
+
+    * Avoid saving history to disk, by directly stream the history output to 
+    indicator constructing.
+
+    * Only use a single CIMB history server, to avoid extensive server 
+    pooling if the history data cannot be found. However, we will be facing 
+    inaccurate data risk.
+
+2.  User may choose to display a single stock although there is multiple 
+    indicators being triggered.
+    
+=====
+v0-01
+=====
+1.  Initial creation.
