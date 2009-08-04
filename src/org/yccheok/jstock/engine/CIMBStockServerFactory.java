@@ -43,11 +43,13 @@ public class CIMBStockServerFactory implements StockServerFactory {
         return new CIMBStockServerFactory(usename, password);
     }
     
+    @Override
     public StockServer getStockServer()
     {        
         return stockServer;
     }
     
+    @Override
     public StockHistoryServer getStockHistoryServer(Code code)
     {
         try {
