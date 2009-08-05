@@ -52,8 +52,9 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
         stockCodesWriterLock = stockCodesReadWriteLock.writeLock();        
     }
     
-    public synchronized boolean addStockServerFactory(StockServerFactory factory) {
-        return stockServerFactories.add(factory);
+    public synchronized boolean setStockServerFactories(java.util.List<StockServerFactory> factories) {
+        stockServerFactories.clear();
+        return stockServerFactories.addAll(factories);
     }
 
     public synchronized StockServerFactory getStockServerFactory(int index) {
