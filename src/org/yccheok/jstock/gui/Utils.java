@@ -1,23 +1,20 @@
 /*
- * Utils.java
- *
- * Created on May 26, 2007, 9:37 AM
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.yccheok.jstock.gui;
@@ -98,18 +95,10 @@ public class Utils {
         return null;
     }
 
-    private static List<String> getNTPServers()
-    {
-        // The list is obtained from Windows Vista, Internet Time Server List itself.
-        // The complete server list can be obtained from http://tf.nist.gov/tf-cgi/servers.cgi
-        final List<String> defaultServer = java.util.Arrays.asList("time-a.nist.gov", "time-b.nist.gov", "time-nw.nist.gov");
-        List<String> servers = Utils.NTPServers;
-        if (servers != null) {
-			// We already have the server list.
-            return servers;
-        }
-
-        HttpMethod method = new GetMethod("http://jstock.sourceforge.net/server/ntpserver.txt");
+    // A value obtained from server, to ensure all JStock's users are getting
+    // same value for same key.
+    public static String getUUIDValue(String url, String key) {
+        HttpMethod method = new GetMethod(url);
         final HttpClient httpClient = new HttpClient();
         org.yccheok.jstock.engine.Utils.setHttpClientProxyFromSystemProperties(httpClient);
         org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
@@ -120,9 +109,7 @@ public class Utils {
             stream = org.yccheok.jstock.gui.Utils.getResponseBodyAsStreamBasedOnProxyAuthOption(httpClient, method);
 
             if (stream == null) {
-				// Use default servers, so that we need not to ask for server list again next time.
-                Utils.NTPServers = defaultServer;
-                return defaultServer;
+                return null;
             }
 
             Properties properties = new Properties();
@@ -131,34 +118,21 @@ public class Utils {
             final String _id = properties.getProperty("id");
             if (_id == null) {
                 log.info("UUID not found");
-				// Use default servers, so that we need not to ask for server list again next time.
-                Utils.NTPServers = defaultServer;
-                return defaultServer;
+                return null;
             }
 
             final String id = org.yccheok.jstock.gui.Utils.decrypt(_id);
             if (id.equals(org.yccheok.jstock.gui.Utils.getJStockUUID()) == false) {
                 log.info("UUID doesn't match");
-				// Use default servers, so that we need not to ask for server list again next time.
-                Utils.NTPServers = defaultServer;
-                return defaultServer;
+                return null;
             }
 
-            final String server = properties.getProperty("server");
-            if (server == null) {
-                log.info("Server not found");
-				// Use default servers, so that we need not to ask for server list again next time.
-                Utils.NTPServers = defaultServer;
-                return defaultServer;
+            final String value = properties.getProperty(key);
+            if (value == null) {
+                log.info("Value not found");
+                return null;
             }
-
-            String[] s = server.split(",");
-            if (s.length > 0) {
-                List<String> me = java.util.Arrays.asList(s);
-				// Save it! So that we need not to ask for server list again next time.
-                Utils.NTPServers = me;
-                return me;
-            }
+            return value;
         }
         catch (HttpException ex) {
             log.error(null, ex);
@@ -174,6 +148,31 @@ public class Utils {
             }
             method.releaseConnection();
         }
+        return null;
+    }
+
+    private static List<String> getNTPServers()
+    {
+        // The list is obtained from Windows Vista, Internet Time Server List itself.
+        // The complete server list can be obtained from http://tf.nist.gov/tf-cgi/servers.cgi
+        final List<String> defaultServer = java.util.Collections.unmodifiableList(java.util.Arrays.asList("time-a.nist.gov", "time-b.nist.gov", "time-nw.nist.gov"));
+        List<String> servers = Utils.NTPServers;
+        if (servers != null) {
+			// We already have the server list.
+            return servers;
+        }
+
+        final String server = getUUIDValue("http://jstock.sourceforge.net/server/ntpserver.txt", "server");
+        if (server != null) {
+            String[] s = server.split(",");
+            if (s.length > 0) {
+                List<String> me = java.util.Collections.unmodifiableList(java.util.Arrays.asList(s));
+				// Save it! So that we need not to ask for server list again next time.
+                Utils.NTPServers = me;
+                return me;
+            }
+        }
+        
 		// Use default servers, so that we need not to ask for server list again next time.
         Utils.NTPServers = defaultServer;
         return defaultServer;
@@ -800,6 +799,10 @@ public class Utils {
 
     public static boolean toXML(Object object, String filePath) {
         return toXML(object, new File(filePath));
+    }
+
+    public static String getExtraDataDirectory() {
+        return org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "extra" + File.separator;
     }
 
     public static class ApplicationInfo
