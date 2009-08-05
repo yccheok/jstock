@@ -1,23 +1,20 @@
 /*
- * CIMBStockHistoryServer.java
- *
- * Created on April 22, 2007, 1:20 AM
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- * Copyright (C) 2007 Cheok YanCheng <yccheok@yahoo.com>
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.yccheok.jstock.engine;
@@ -45,21 +42,27 @@ public class CIMBStockHistoryServer implements StockHistoryServer {
     public CIMBStockHistoryServer(String username, String password, Code code) throws StockHistoryNotFoundException {
         this.username = username;
         this.password = password;
-    
+
+        initServers();
+        // this.servers = Utils.getCIMBHistoryServers();
+
         this.code = Utils.toCIMBFormat(code, Country.Malaysia);
-        
+        // Later, use this.code instead of code in the rest of the function code.
+
         this.historyDatabase = new HashMap<SimpleDate, Stock>();
         
         byte data[] = new byte[1024];
         
         Thread currentThread = Thread.currentThread();
-        
-        for(String server : servers) {
-            if(currentThread.isInterrupted()) {
+
+        int index = 0;
+
+        for (String server : servers) {
+            if (currentThread.isInterrupted()) {
                 throw new StockHistoryNotFoundException("Thread has been interrupted");
             }
             
-            HttpMethod method = new GetMethod(server + "java/jar/data/" + code + ".dat.gz");
+            HttpMethod method = new GetMethod(server + "java/jar/data/" + this.code + ".dat.gz");
             StringBuffer s = new StringBuffer(data.length);
 
             final HttpClient httpClient = new HttpClient();
@@ -81,37 +84,50 @@ public class CIMBStockHistoryServer implements StockHistoryServer {
                 
                 HistoryDatabaseResult historyDatebaseResult = this.getHistoryDatabase(s.toString());    
                 
-                if(historyDatebaseResult != null) {
+                if (historyDatebaseResult != null) {
                     historyDatabase.putAll(historyDatebaseResult.database);
                     SimpleDate latestDate = historyDatebaseResult.lastestDate;
                     
                     // Should we stop here?
                     long days = Utils.getDifferenceInDays(latestDate.getCalendar(), Calendar.getInstance());
-                    
+
                     // As long as the history is less than or equal to MAX_DAY_DIFFERENCE_AMONG_TODAY_AND_LATEST_HISTORY,
                     // we will not continue to search for the history.
                     if(days <= MAX_DAY_DIFFERENCE_AMONG_TODAY_AND_LATEST_HISTORY) {
+                        // Sort the best server.
+                        if (bestServerAlreadySorted == false) {
+                            synchronized(servers) {
+                                if (bestServerAlreadySorted == false) {
+                                    bestServerAlreadySorted = true;
+                                    String tmp = servers.get(0);
+                                    servers.set(0, servers.get(index));
+                                    servers.set(index, tmp);
+                                }
+                            }
+                        }
+
                         break;
                     }
-                }
+                }   /* if (historyDatebaseResult != null) */
             }
             catch(HttpException exp) {
-                log.error("code=" + code, exp);
+                log.error("code = " + this.code, exp);
                 // Continue to try other servers.
                 continue;
             }
             catch(IOException exp) {
-                log.error("code=" + code, exp);
+                log.error("code = " + this.code, exp);
                 // Continue to try other servers.
                 continue;
             }
             finally {
                 method.releaseConnection();
+                index++;
             }
         }
         
         if(historyDatabase.size() == 0) {
-            throw new StockHistoryNotFoundException("code=" + code);
+            throw new StockHistoryNotFoundException("code = " + this.code);
         }
         else {
             simpleDates = new ArrayList<SimpleDate>(this.historyDatabase.keySet());
@@ -253,23 +269,42 @@ public class CIMBStockHistoryServer implements StockHistoryServer {
         return new HistoryDatabaseResult(map, latestDate);
     }
     
+    @Override
     public Stock getStock(java.util.Calendar calendar)
     {
         SimpleDate simpleDate = new SimpleDate(calendar);
         return historyDatabase.get(simpleDate);        
     }
     
+    @Override
     public java.util.Calendar getCalendar(int index)
     {
         SimpleDate simpleDate = simpleDates.get(index);
         return simpleDate.getCalendar();
     }
     
+    @Override
     public int getNumOfCalendar()
     {
         return simpleDates.size();
     }
-    
+
+    private static void initServers() {
+        // Already initialized. Return early.
+        if (CIMBStockHistoryServer.servers != null) {
+            return;
+        }
+
+        synchronized(lock) {
+            // Already initialized. Return early.
+            if (CIMBStockHistoryServer.servers != null) {
+                return;
+            }
+
+            CIMBStockHistoryServer.servers = Utils.getCIMBHistoryServers();
+        }
+    }
+
     private final String username;
     private final String password;
     private final Code code;
@@ -278,40 +313,30 @@ public class CIMBStockHistoryServer implements StockHistoryServer {
     
     private static final int MAX_DAY_DIFFERENCE_AMONG_TODAY_AND_LATEST_HISTORY = 30;
 
-    // Not available since 15 December. Reason unknown. We switch to a much more
-    // robust Yahoo server.
-    //
-    private final String[] servers = new String[] {      
-        // "http://n2ntbfd02.itradecimb.com/",
-    };
+    // Make it as static. Unlike CIMBStockServer and CIMBMarketServer,
+    // a new instance will be created for every stock. Hence, it is more
+    // efficient if servers is persistance across class. To avoid from lossing
+    // previous sorted information.
+    private volatile static List<String> servers;
+    private static final Object lock = new Object();
 
-    // Too slow, customer not happy. We will only use one server. May facing
-    // risk getting inaccurate data.
-    /*
-    private final String[] servers = new String[] {
-        "http://n2ntbfd01.itradecimb.com/",        
-        "http://n2ntbfd02.itradecimb.com/",        
-        "http://n2ntbfd03.itradecimb.com/",
-        "http://n2ntbfd04.itradecimb.com/",
-        "http://n2ntbfd05.itradecimb.com/",
-        "http://n2ntbfd06.itradecimb.com/",
-        "http://n2ntbfd07.itradecimb.com/",
-        "http://n2ntbfd08.itradecimb.com/",
-        "http://n2ntbfd09.itradecimb.com/",
-        "http://n2ntbfd10.itradecimb.com/"
-    };
-    */
+    // We had already discover the best server. Please take note that,
+    // synchronized is required during best server sorting. Hence, we will
+    // use this flag to help us only perform sorting once.
+    private volatile boolean bestServerAlreadySorted = false;
     
+    @Override
     public long getSharesIssued()
     {
         return sharesIssued;
     }
     
+    @Override
     public long getMarketCapital()
     {
         return marketCapital;
     }
-    
+
     private static final java.util.Map<String, Stock.Board> stringToBoardMap = new HashMap<String, Stock.Board>();
     private static final java.util.Map<String, Stock.Industry> stringToIndustryMap = new HashMap<String, Stock.Industry>();
     private long sharesIssued = 0;
