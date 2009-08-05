@@ -1,19 +1,20 @@
 /*
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- * Copyright (C) 2008 Yan Cheng Cheok <yccheok@yahoo.com>
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.yccheok.jstock.chat;
@@ -71,66 +72,20 @@ public class Utils {
     public static String getXMPPServer()
     {
         final String defaultServer = "jabber.org";
+        final String _server = org.yccheok.jstock.gui.Utils.getUUIDValue("http://jstock.sourceforge.net/server/server.txt", "server");
 
-        HttpMethod method = new GetMethod("http://jstock.sourceforge.net/server/server.txt");
-        final HttpClient httpClient = new HttpClient();
-        org.yccheok.jstock.engine.Utils.setHttpClientProxyFromSystemProperties(httpClient);
-        org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
-
-        InputStream stream = null;
-
-        try {
-            stream = org.yccheok.jstock.gui.Utils.getResponseBodyAsStreamBasedOnProxyAuthOption(httpClient, method);
-
-            if (stream == null)
-                return defaultServer;
-
-            Properties properties = new Properties();
-            properties.load(stream);
-
-            final String _id = properties.getProperty("id");
-            if (_id == null) {
-                log.info("UUID not found");
-                return defaultServer;
-            }
-
-            final String id = org.yccheok.jstock.gui.Utils.decrypt(_id);
-            if (id.equals(org.yccheok.jstock.gui.Utils.getJStockUUID()) == false) {
-                log.info("UUID doesn't match");
-                return defaultServer;
-            }
-
-            final String _server = properties.getProperty("server");
-            if (_server == null) {
-                log.info("Server not found");
-                return defaultServer;
-            }
-
-            final String server = org.yccheok.jstock.gui.Utils.decrypt(_server);
-            if (server.length() <= 0) {
-                return defaultServer;
-            }
-
-            log.info("Sourceforge suggests us to use " + server);
-
-            return server;
-        }
-        catch (HttpException ex) {
-            log.error(null, ex);
-        }
-        catch (IOException ex) {
-            log.error(null, ex);
-        }
-        finally {
-            if (stream != null) try {
-                stream.close();
-            } catch (IOException ex) {
-                log.error(null, ex);
-            }
-            method.releaseConnection();
+        if (_server == null) {
+            log.info("Server not found");
+            return defaultServer;
         }
 
-        return defaultServer;
+        final String server = org.yccheok.jstock.gui.Utils.decrypt(_server);
+        if (server.length() <= 0) {
+            return defaultServer;
+        }
+
+		log.info("Sourceforge suggests us to use " + server);
+		return server;
     }
 
     public static String getEmotesIconsDirectory() {
