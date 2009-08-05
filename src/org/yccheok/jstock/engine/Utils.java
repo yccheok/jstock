@@ -54,69 +54,69 @@ public class Utils {
         List<String> servers = Utils.CIMBMarketServers;
         if (servers != null) {
 			// We already have the server list.
-            return new CopyOnWriteArrayList(servers);
+            return new CopyOnWriteArrayList<String>(servers);
         }
 
         final String server = org.yccheok.jstock.gui.Utils.getUUIDValue("http://jstock.sourceforge.net/server/cimbmarketservers.txt", "server");
         if (server != null) {
             String[] s = server.split(",");
             if (s.length > 0) {
-                List<String> me = new CopyOnWriteArrayList(java.util.Arrays.asList(s));
+                List<String> me = new CopyOnWriteArrayList<String>(java.util.Arrays.asList(s));
 				// Save it! So that we need not to ask for server list again next time.
                 Utils.CIMBMarketServers = me;
-                return new CopyOnWriteArrayList(me);
+                return new CopyOnWriteArrayList<String>(me);
             }
         }
-        servers = new CopyOnWriteArrayList(java.util.Arrays.asList(DEFAULT_SERVERS));
+        servers = new CopyOnWriteArrayList<String>(java.util.Arrays.asList(DEFAULT_SERVERS));
         // Save it! So that we need not to ask for server list again next time.
         Utils.CIMBMarketServers = servers;
-        return new CopyOnWriteArrayList(servers);
+        return new CopyOnWriteArrayList<String>(servers);
     }
 
-    public static List getCIMBStockServers() {
+    public static List<String> getCIMBStockServers() {
         List<String> servers = Utils.CIMBStockServers;
         if (servers != null) {
 			// We already have the server list.
-            return new CopyOnWriteArrayList(servers);
+            return new CopyOnWriteArrayList<String>(servers);
         }
 
         final String server = org.yccheok.jstock.gui.Utils.getUUIDValue("http://jstock.sourceforge.net/server/cimbstockservers.txt", "server");
         if (server != null) {
             String[] s = server.split(",");
             if (s.length > 0) {
-                List<String> me = new CopyOnWriteArrayList(java.util.Arrays.asList(s));
+                List<String> me = new CopyOnWriteArrayList<String>(java.util.Arrays.asList(s));
 				// Save it! So that we need not to ask for server list again next time.
                 Utils.CIMBStockServers = me;
-                return new CopyOnWriteArrayList(me);
+                return new CopyOnWriteArrayList<String>(me);
             }
         }
-        servers = new CopyOnWriteArrayList(java.util.Arrays.asList(DEFAULT_SERVERS));
+        servers = new CopyOnWriteArrayList<String>(java.util.Arrays.asList(DEFAULT_SERVERS));
         // Save it! So that we need not to ask for server list again next time.
         Utils.CIMBStockServers = servers;
-        return new CopyOnWriteArrayList(servers);
+        return new CopyOnWriteArrayList<String>(servers);
     }
 
-    public static List getCIMBHistoryServers() {
+    public static List<String> getCIMBHistoryServers() {
         List<String> servers = Utils.CIMBHistoryServers;
         if (servers != null) {
 			// We already have the server list.
-            return new CopyOnWriteArrayList(servers);
+            return new CopyOnWriteArrayList<String>(servers);
         }
 
         final String server = org.yccheok.jstock.gui.Utils.getUUIDValue("http://jstock.sourceforge.net/server/cimbhistoryservers.txt", "server");
         if (server != null) {
             String[] s = server.split(",");
             if (s.length > 0) {
-                List<String> me = new CopyOnWriteArrayList(java.util.Arrays.asList(s));
+                List<String> me = new CopyOnWriteArrayList<String>(java.util.Arrays.asList(s));
 				// Save it! So that we need not to ask for server list again next time.
                 Utils.CIMBHistoryServers = me;
-                return new CopyOnWriteArrayList(me);
+                return new CopyOnWriteArrayList<String>(me);
             }
         }
-        servers = new CopyOnWriteArrayList(java.util.Arrays.asList(DEFAULT_SERVERS));
+        servers = new CopyOnWriteArrayList<String>(java.util.Arrays.asList(DEFAULT_SERVERS));
         // Save it! So that we need not to ask for server list again next time.
         Utils.CIMBHistoryServers = servers;
-        return new CopyOnWriteArrayList(servers);
+        return new CopyOnWriteArrayList<String>(servers);
     }
 
     public static void setHttpClientProxyFromSystemProperties(HttpClient httpClient) {
