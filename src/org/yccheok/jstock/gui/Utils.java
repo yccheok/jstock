@@ -828,8 +828,8 @@ public class Utils {
     private static final String APPLICATION_VERSION_STRING = "1.0.4";
 
     // For About box comparision on latest version purpose.
-    // 1.0.4g
-    private static final int APPLICATION_VERSION_ID = 1046;
+    // 1.0.4h
+    private static final int APPLICATION_VERSION_ID = 1047;
 
     private static Executor zombiePool = Executors.newFixedThreadPool(Utils.NUM_OF_THREADS_ZOMBIE_POOL);
 
