@@ -1,30 +1,29 @@
 /*
- * JStockOptions.java
- *
- * Created on June 19, 2007, 11:00 PM
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.yccheok.jstock.gui;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.NTCredentials;
 import org.yccheok.jstock.portfolio.BrokingFirm;
@@ -164,6 +163,8 @@ public class JStockOptions {
     private String lastFileIODirectory = System.getProperty("user.home");
     private String lastFileNameExtensionDescription = "CSV Documents (*.csv)";
 
+    private Map<Country, Class> primaryStockServerFactoryClasses = new HashMap<Country, Class>();
+
     // Remember the last view page.
     private int lastSelectedPageIndex = 0;
 
@@ -254,6 +255,10 @@ public class JStockOptions {
         if (this.getGoogleCalendarPassword() == null) {
             setGoogleCalendarPassword("");
             this.setSMSEnabled(false);
+        }
+
+        if (this.primaryStockServerFactoryClasses == null) {
+            primaryStockServerFactoryClasses = new HashMap<Country, Class>();
         }
 
         return this;
@@ -778,5 +783,13 @@ public class JStockOptions {
      */
     public void setSMSEnabled(boolean SMSEnabled) {
         this.SMSEnabled = SMSEnabled;
+    }
+
+    public Class addPrimaryStockServerFactoryClass(Country country, Class c) {
+        return primaryStockServerFactoryClasses.put(country, c);
+    }
+
+    public Class getPrimaryStockServerFactoryClass(Country country) {
+        return primaryStockServerFactoryClasses.get(country);
     }
 }
