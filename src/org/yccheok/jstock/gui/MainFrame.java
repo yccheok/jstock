@@ -1861,11 +1861,11 @@ public class MainFrame extends javax.swing.JFrame {
         return stockCodeAndSymbolDatabase;
     }
     
-    public java.util.List<StockServerFactory> getStockServerFactory() {
-        return getStockServerFactory(this.jStockOptions.getCountry());
+    public java.util.List<StockServerFactory> getStockServerFactories() {
+        return getStockServerFactories(this.jStockOptions.getCountry());
     }
 
-    private java.util.List<StockServerFactory> getStockServerFactory(Country country) {
+    private java.util.List<StockServerFactory> getStockServerFactories(Country country) {
         return Factories.INSTANCE.getStockServerFactories(country);
     }
     
@@ -2181,7 +2181,7 @@ public class MainFrame extends javax.swing.JFrame {
         @Override
         public void run() {
             final Thread currentThread = Thread.currentThread();
-            final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactory();
+            final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactories();
 
             // Do not rely on isInterrupted flag only. The flag can be cleared by 3rd party easily.
             // Check for current thread as well.
@@ -2297,7 +2297,7 @@ public class MainFrame extends javax.swing.JFrame {
             //
             Boolean success = false;
             int tries = 0;            
-            final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactory(country);
+            final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactories(country);
             StockCodeAndSymbolDatabase tmp = null;
             
             while(!isCancelled() && !success && runnable) {
@@ -2406,7 +2406,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     private void initRealTimeStockMonitor() {
-        if(realTimeStockMonitor != null) {
+        if (realTimeStockMonitor != null) {
             final RealTimeStockMonitor oldRealTimeStockMonitor = realTimeStockMonitor;
             zombiePool.execute(new Runnable() {
                 @Override
@@ -2422,12 +2422,9 @@ public class MainFrame extends javax.swing.JFrame {
         
         realTimeStockMonitor = new RealTimeStockMonitor(4, 20, jStockOptions.getScanningSpeed());
         
-        final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactory();
-        
-        for (StockServerFactory factory : stockServerFactories) {
-            realTimeStockMonitor.addStockServerFactory(factory);
-        }
-        
+        final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactories();
+        realTimeStockMonitor.setStockServerFactories(stockServerFactories);
+
         realTimeStockMonitor.attach(this.realTimeStockMonitorObserver);
         
         this.indicatorScannerJPanel.initRealTimeStockMonitor(Collections.unmodifiableList(stockServerFactories));
@@ -2521,8 +2518,33 @@ public class MainFrame extends javax.swing.JFrame {
             System.getProperties().remove("http.proxyHost");
             System.getProperties().remove("http.proxyPort");
         }
+
+        for (Country country : Country.values()) {
+            final Class c = jStockOptions.getPrimaryStockServerFactoryClass(country);
+            if (c == null) {
+                continue;
+            }
+            Factories.INSTANCE.updatePrimaryStockServerFactory(country, c);
+        }
     }   
-    
+
+    public void updatePrimaryStockServerFactory(Country country, Class c) {
+        // Same. Nothing to be updated.
+        if (c == jStockOptions.getPrimaryStockServerFactoryClass(country)) {
+            return;
+        }
+
+        jStockOptions.addPrimaryStockServerFactoryClass(country, c);
+        Factories.INSTANCE.updatePrimaryStockServerFactory(country, c);
+
+        realTimeStockMonitor.setStockServerFactories(this.getStockServerFactories());
+        stockHistoryMonitor.setStockServerFactories(this.getStockServerFactories());
+
+        this.indicatorScannerJPanel.updatePrimaryStockServerFactory(Collections.unmodifiableList(this.getStockServerFactories()));
+        this.portfolioManagementJPanel.updatePrimaryStockServerFactory(Collections.unmodifiableList(this.getStockServerFactories()));
+        this.indicatorPanel.updatePrimaryStockServerFactory(Collections.unmodifiableList(this.getStockServerFactories()));
+    }
+
     private void initRealTimeStocks() {
         final Country country = jStockOptions.getCountry();
         final File f0 = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "realtimestock.xml");
@@ -2681,7 +2703,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void initOthersStockHistoryMonitor()
     {
-        final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactory();
+        final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactories();
 
         this.indicatorPanel.initStockHistoryMonitor(Collections.unmodifiableList(stockServerFactories));
         this.indicatorScannerJPanel.initStockHistoryMonitor(Collections.unmodifiableList(stockServerFactories));
@@ -2707,11 +2729,8 @@ public class MainFrame extends javax.swing.JFrame {
         
         this.stockHistoryMonitor = new StockHistoryMonitor(NUM_OF_THREADS_HISTORY_MONITOR);
         
-        final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactory();
-        
-        for (StockServerFactory factory : stockServerFactories) {
-            stockHistoryMonitor.addStockServerFactory(factory);
-        }
+        final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactories();
+        stockHistoryMonitor.setStockServerFactories(stockServerFactories);
         
         stockHistoryMonitor.attach(this.stockHistoryMonitorObserver);
 
