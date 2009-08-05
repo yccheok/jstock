@@ -1,6 +1,10 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.4h - 2009-08-06
+  Select multiple servers when one of the server goes down (#2832887)
+  Bugfix: Unable to set stock scanning speed to minute (#2832423)
+  
 JStock 1.0.4g - 2009-08-04
   Displaying history for index (#2831881)
   Bugfix: Not able to connect to KLSE data (#2831804)
