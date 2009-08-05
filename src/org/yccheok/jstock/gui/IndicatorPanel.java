@@ -749,7 +749,7 @@ public class IndicatorPanel extends JPanel implements ChangeListener {
             
             m.setStatusBar(true, "Stock sample data retrieving in progress...");
             
-            java.util.List<StockServerFactory> stockServerFactories = m.getStockServerFactory();
+            java.util.List<StockServerFactory> stockServerFactories = m.getStockServerFactories();
             
             while(!isCancelled() && !success && runnable) {
                 for (StockServerFactory factory : stockServerFactories) {
@@ -849,7 +849,7 @@ public class IndicatorPanel extends JPanel implements ChangeListener {
             final Duration oldDuration = stockHistoryMonitor.getDuration();
             if (oldDuration.isContains(historyDuration) == false)
             {
-                this.initStockHistoryMonitor(m.getStockServerFactory());
+                this.initStockHistoryMonitor(m.getStockServerFactories());
                 this.stockHistoryMonitor.setDuration(historyDuration);
             }
 
@@ -1025,6 +1025,12 @@ public class IndicatorPanel extends JPanel implements ChangeListener {
         return indicatorProjectManager;
     }
 
+    public void updatePrimaryStockServerFactory(java.util.List<StockServerFactory> stockServerFactories) {
+        if (stockHistoryMonitor != null) {
+            stockHistoryMonitor.setStockServerFactories(stockServerFactories);
+        }
+    }
+
     public void initStockHistoryMonitor(java.util.List<StockServerFactory> stockServerFactories) {
         if (stockHistoryMonitor != null) {
             final StockHistoryMonitor oldStockHistoryMonitor = stockHistoryMonitor;
@@ -1041,10 +1047,7 @@ public class IndicatorPanel extends JPanel implements ChangeListener {
         }
 
         this.stockHistoryMonitor = new StockHistoryMonitor(NUM_OF_THREADS_HISTORY_MONITOR);
-
-        for(StockServerFactory factory : stockServerFactories) {
-            stockHistoryMonitor.addStockServerFactory(factory);
-        }
+        stockHistoryMonitor.setStockServerFactories(stockServerFactories);
 
         // No StockHistorySerializer at this moment, either read or write. This is because
         // (1) Read - If the duration of the history selected in Real-Time panel is shorter than
