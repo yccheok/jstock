@@ -109,6 +109,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         this.initPreloadDatabase();
         this.initChatDatas();
+        this.initExtraDatas();
         this.initStatusBar();
         this.initMarketJPanel();
         this.initUsernameAndPassword();
@@ -2184,7 +2185,7 @@ public class MainFrame extends javax.swing.JFrame {
 
             // Do not rely on isInterrupted flag only. The flag can be cleared by 3rd party easily.
             // Check for current thread as well.
-            while(!currentThread.isInterrupted()  && (marketThread == Thread.currentThread())) {
+            while (!currentThread.isInterrupted()  && (marketThread == Thread.currentThread())) {
                 for (StockServerFactory factory : stockServerFactories) {
                     MarketServer server = factory.getMarketServer();
                     
@@ -2423,7 +2424,7 @@ public class MainFrame extends javax.swing.JFrame {
         
         final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactory();
         
-        for(StockServerFactory factory : stockServerFactories) {
+        for (StockServerFactory factory : stockServerFactories) {
             realTimeStockMonitor.addStockServerFactory(factory);
         }
         
@@ -2708,7 +2709,7 @@ public class MainFrame extends javax.swing.JFrame {
         
         final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactory();
         
-        for(StockServerFactory factory : stockServerFactories) {
+        for (StockServerFactory factory : stockServerFactories) {
             stockHistoryMonitor.addStockServerFactory(factory);
         }
         
@@ -3405,6 +3406,16 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void initChatDatas() {
         this.extractZipFile("chat" + File.separator + "chat.zip");
+    }
+
+    // Unlike a JButton, setIcon() does not add an icon to the text label. 
+    // Rather, in a radio button, the method is used to customize the icons used
+    // to depict its state. However, by using the HTML capabilities in a label, 
+    // it is possible to add an icon to the label without affecting the 
+    // state-depicting icons.
+    // We need to have image files being extracted outside executable jar file.
+    private void initExtraDatas() {
+        this.extractZipFile("extra" + File.separator + "extra.zip");
     }
 
     private ActionListener getTimerActionListener() {
