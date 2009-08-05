@@ -31,6 +31,7 @@ import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.methods.*;
 import java.io.*;
 import java.text.*;
+import java.util.Enumeration;
 import javax.swing.text.*;
 import org.yccheok.jstock.engine.Country;
 import org.yccheok.jstock.engine.Factories;
@@ -45,18 +46,22 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
     /** Creates new form OptionsNetworkJPanel */
     public OptionsNetworkJPanel() {
         initComponents();
-        initJRadioButtons();
     }
 
-    private void initJRadioButtons() {
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+    private void initJRadioButtons(JStockOptions jStockOptions) {
         final Country country = jStockOptions.getCountry();
-        final java.util.List<StockServerFactory> stockServerFactories = Factories.INSTANCE.getStockServerFactories(country);
+        final java.util.List<StockServerFactory> stockServerFactories = MainFrame.getInstance().getStockServerFactories();
         final JLabel label = new JLabel();
 
         boolean selected = false;
+        StockServerFactoryJRadioButton first = null;
+
         for (StockServerFactory stockServerFactory : stockServerFactories) {
             final StockServerFactoryJRadioButton stockServerJRadioButton = new StockServerFactoryJRadioButton(stockServerFactory);
+            if (first == null) {
+                first = stockServerJRadioButton;
+            }
+
             stockServerJRadioButton.addActionListener(new ActionListener() {
 
                 @Override
@@ -66,8 +71,9 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
                 }
                 
             });
-            if (selected == false) {
-                selected = !selected;
+
+            if (stockServerFactory.getClass() == jStockOptions.getPrimaryStockServerFactoryClass(country)) {
+                selected = true;
                 stockServerJRadioButton.setSelected(true);
                 final String text = StockServerFactoryJRadioButton.toReadableText(stockServerJRadioButton.getStockServerFactory()) + " is being used as primary server";
                 label.setText(text);
@@ -76,6 +82,14 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
             jPanel5.add(stockServerJRadioButton);
         }
 
+        if (selected == false) {
+            if (first != null) {
+                first.setSelected(true);
+                final String text = StockServerFactoryJRadioButton.toReadableText(first.getStockServerFactory()) + " is being used as primary server";
+                label.setText(text);
+            }
+        }
+        
         jPanel5.add(label);
     }
 
@@ -427,6 +441,8 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
         this.jCheckBox1.setSelected(jStockOptions.isProxyAuthEnabled());
         this.jTextField2.setText(jStockOptions.getProxyAuthUserName());
         this.jPasswordField1.setText(Utils.decrypt(jStockOptions.getProxyAuthPassword()));
+        initJRadioButtons(jStockOptions);
+
         updateGUIState();
     }
 
@@ -458,7 +474,26 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
         jStockOptions.setIsProxyAuthEnabled(this.jCheckBox1.isSelected());
         jStockOptions.setProxyAuthUserName(jTextField2.getText());
         jStockOptions.setProxyAuthPassword(Utils.encrypt(new String(jPasswordField1.getPassword())));
+
+        JRadioButton tmp = getSelection(this.buttonGroup1);
+        // Impossible. Just to be paranoid.
+        if (tmp != null) {
+            StockServerFactoryJRadioButton button = ((StockServerFactoryJRadioButton)tmp);
+            MainFrame.getInstance().updatePrimaryStockServerFactory(jStockOptions.getCountry(), button.getStockServerFactory().getClass());
+        }
+
         return true;
+    }
+
+    // This method returns the selected radio button in a button group
+    private JRadioButton getSelection(ButtonGroup group) {
+        for (Enumeration e=group.getElements(); e.hasMoreElements(); ) {
+            JRadioButton b = (JRadioButton)e.nextElement();
+            if (b.getModel() == group.getSelection()) {
+                return b;
+            }
+        }
+        return null;
     }
 
     private void updateGUIState() {
