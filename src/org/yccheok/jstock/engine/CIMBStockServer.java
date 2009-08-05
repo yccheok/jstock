@@ -1,23 +1,20 @@
 /*
- * CIMBStockServer.java
- *
- * Created on April 20, 2007, 12:15 AM
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- * Copyright (C) 2007 Cheok YanCheng <yccheok@yahoo.com>
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.yccheok.jstock.engine;
@@ -48,8 +45,11 @@ public class CIMBStockServer extends Subject<CIMBStockServer, Integer> implement
         this.password = password;        
     }
     
+    @Override
     public Stock getStock(Symbol symbol) throws StockNotFoundException
     {
+        initServers();
+
         String _symbol;
 
         try {
@@ -64,9 +64,13 @@ public class CIMBStockServer extends Subject<CIMBStockServer, Integer> implement
         Thread currentThread = Thread.currentThread();
 
         final HttpClient httpClient = new HttpClient();
-        
-        for(String server : servers) {            
-            if(currentThread.isInterrupted()) throw new StockNotFoundException("Thread has been interrupted");
+
+        int index = 0;
+
+        for (String server : servers) {
+            if (currentThread.isInterrupted()) {
+				throw new StockNotFoundException("Thread has been interrupted");
+			}
         
             HttpMethod method = new GetMethod(server + "rtQuote.dll?GetStockGeneral&Key=" + _symbol);                        
             
@@ -78,21 +82,34 @@ public class CIMBStockServer extends Subject<CIMBStockServer, Integer> implement
 
                 stocks = stockFormat.parse(respond);
 
-                if(stocks.size() != 1) {
+                if (stocks.size() != 1) {
                     log.error("Number of stock (" + stocks.size() + ") is not 1");
                     continue;
                 }
+
+               // Sort the best server.
+                if (bestServerAlreadySorted == false) {
+                    synchronized(servers) {
+                        if (bestServerAlreadySorted == false) {
+                            bestServerAlreadySorted = true;
+                            String tmp = servers.get(0);
+                            servers.set(0, servers.get(index));
+                            servers.set(index, tmp);
+                        }
+                    }
+                }
             }
-            catch(HttpException exp) {
+            catch (HttpException exp) {
                 log.error("symbol=" + symbol, exp);
                 continue;
             }
-            catch(IOException exp) {
+            catch (IOException exp) {
                 log.error("symbol=" + symbol, exp);
                 continue;
             }
             finally {
                 method.releaseConnection();
+                index++;
             }
             
             break;
@@ -103,6 +120,7 @@ public class CIMBStockServer extends Subject<CIMBStockServer, Integer> implement
         return stocks.get(0);
     }
     
+    @Override
     public Stock getStock(Code code) throws StockNotFoundException
     {
         // The nice CIMB server are able to accept both code and name.
@@ -120,10 +138,12 @@ public class CIMBStockServer extends Subject<CIMBStockServer, Integer> implement
     @Override
     public java.util.List<Stock> getStocksByCodes(java.util.List<Code> codes) throws StockNotFoundException
     {
+        initServers();
+
         String _codes;
         StringBuffer _codesBuffer = new StringBuffer();        
         
-        for(Code code : codes) {
+        for (Code code : codes) {
             final Code newCode = Utils.toCIMBFormat(code, Country.Malaysia);
             _codesBuffer.append(newCode);
             _codesBuffer.append("|");
@@ -143,9 +163,13 @@ public class CIMBStockServer extends Subject<CIMBStockServer, Integer> implement
         Thread currentThread = Thread.currentThread();
 
         final HttpClient httpClient = new HttpClient();
-        
-        for(String server : servers) {
-            if(currentThread.isInterrupted()) throw new StockNotFoundException("Thread has been interrupted");
+
+        int index = 0;
+
+        for (String server : servers) {
+            if (currentThread.isInterrupted()) {
+                throw new StockNotFoundException("Thread has been interrupted");
+            }
 
             /* ascending order */
             HttpMethod method = new GetMethod(server + "rtQuote.dll?GetStockInfoSortByCode&StockList=" + _codes + "&SortDesc=0");
@@ -191,6 +215,18 @@ public class CIMBStockServer extends Subject<CIMBStockServer, Integer> implement
                         }
                     }   /* for (Code code : codes) */
                 }   /* if (stocks.size() != codes.size()) */
+
+               // Sort the best server.
+                if (bestServerAlreadySorted == false) {
+                    synchronized(servers) {
+                        if (bestServerAlreadySorted == false) {
+                            bestServerAlreadySorted = true;
+                            String tmp = servers.get(0);
+                            servers.set(0, servers.get(index));
+                            servers.set(index, tmp);
+                        }
+                    }
+                }
             }
             catch(HttpException exp) {
                 log.error("", exp);
@@ -202,6 +238,7 @@ public class CIMBStockServer extends Subject<CIMBStockServer, Integer> implement
             }
             finally {
                 method.releaseConnection();
+                index++;
             }
             
             break;
@@ -218,6 +255,8 @@ public class CIMBStockServer extends Subject<CIMBStockServer, Integer> implement
     @Override
     public java.util.List<Stock> getAllStocks() throws StockNotFoundException
     {
+        initServers();
+
         List<Stock> stocks = new ArrayList<Stock>();
         Set<Code> codes = new HashSet<Code>();        
 
@@ -226,11 +265,13 @@ public class CIMBStockServer extends Subject<CIMBStockServer, Integer> implement
         final HttpClient httpClient = new HttpClient();
         
         server_label:
-        for(String server : servers) {
+        for (String server : servers) {
             int from = 0, to = 80;
             final int increase = 70;
             
-            if(currentThread.isInterrupted()) throw new StockNotFoundException("Thread has been interrupted");
+            if (currentThread.isInterrupted()) {
+				throw new StockNotFoundException("Thread has been interrupted");
+			}
             
             do {
 
@@ -286,25 +327,40 @@ public class CIMBStockServer extends Subject<CIMBStockServer, Integer> implement
     }
     
     public int getNumOfServer() {
-        return servers.length;
+        initServers();
+        return servers.size();
     }
-    
+
+    private void initServers() {
+        // Already initialized. Return early.
+        if (this.servers != null) {
+            return;
+        }
+
+        synchronized(this) {
+            // Already initialized. Return early.
+            if (this.servers != null) {
+                return;
+            }
+
+            this.servers = Utils.getCIMBStockServers();
+        }
+    }
+
     private final StockFormat stockFormat;
     private final String username;
     private final String password;
-    
-    private static final String[] servers = new String[] {
-        "http://n2ntbfd01.itradecimb.com/",
-        "http://n2ntbfd02.itradecimb.com/",
-        "http://n2ntbfd03.itradecimb.com/",
-        "http://n2ntbfd04.itradecimb.com/",
-        "http://n2ntbfd05.itradecimb.com/",
-        "http://n2ntbfd06.itradecimb.com/",
-        "http://n2ntbfd07.itradecimb.com/",
-        "http://n2ntbfd08.itradecimb.com/",
-        "http://n2ntbfd09.itradecimb.com/",
-        "http://n2ntbfd10.itradecimb.com/"
-    };
+
+    // Do not initialize servers in constructor. Initialization will be time
+    // consuming since we need to connect to sourceforge to retrieve server
+    // information. If most of the time taken up in constructor, our GUI will
+    // be slow to show up.
+    // Only initialize it when we need it.
+    private List<String> servers;
+    // We had already discover the best server. Please take note that,
+    // synchronized is required during best server sorting. Hence, we will
+    // use this flag to help us only perform sorting once.
+    private volatile boolean bestServerAlreadySorted = false;
     
     private static final Log log = LogFactory.getLog(CIMBStockServer.class);
 }
