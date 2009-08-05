@@ -51,8 +51,9 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
         this.stockHistorySerializer = null;
     }
     
-    public boolean addStockServerFactory(StockServerFactory factory) {
-        return factories.add(factory);
+    public boolean setStockServerFactories(java.util.List<StockServerFactory> factories) {
+        this.factories.clear();
+        return this.factories.addAll(factories);
     }
     
     public boolean addStockCode(final Code code) {
