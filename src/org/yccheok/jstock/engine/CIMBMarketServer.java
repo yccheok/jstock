@@ -24,6 +24,7 @@ package org.yccheok.jstock.engine;
 
 import java.io.*;
 
+import java.util.List;
 import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.methods.*;
 import org.apache.commons.logging.Log;
@@ -43,18 +44,21 @@ public class CIMBMarketServer implements MarketServer {
 
     public CIMBMarketServer(String username, String password) {
         this.username = username;
-        this.password = password;        
+        this.password = password;
     }
     
+    @Override
     public Market getMarket()
     {
-        final int numOfServer = servers.length;
+        initServers();
+
+        final int numOfServer = servers.size();
         final Thread currentThread = Thread.currentThread();
         
         final HttpClient httpClient = new HttpClient();
 
-        for(int i = 0; (i < numOfServer) && (!currentThread.isInterrupted()); i++) {
-            HttpMethod method = new GetMethod(servers[i] + "rtQuote.dll?GetInitInfo");
+        for (int i = 0; (i < numOfServer) && (!currentThread.isInterrupted()); i++) {
+            HttpMethod method = new GetMethod(servers.get(i) + "rtQuote.dll?GetInitInfo");
 
             try {
                 Utils.setHttpClientProxyFromSystemProperties(httpClient);
@@ -81,8 +85,23 @@ public class CIMBMarketServer implements MarketServer {
                         long volume = Long.parseLong(infoFields[VOLUME_TOKEN_INDEX]);
                         double value = Double.parseDouble(infoFields[VALUE_TOKEN_INDEX]);
                         
-                        return new MalaysiaMarket(mainBoardIndex, mainBoardChange, secondBoardIndex, secondBoardChange, 
+                        // Sometimes, CIMB just returns 0.
+                        if (volume != 0) {
+                            // Sort the best server.
+                            if (bestServerAlreadySorted == false) {
+                                synchronized(servers) {
+                                    if (bestServerAlreadySorted == false) {
+                                        bestServerAlreadySorted = true;
+                                        String tmp = servers.get(0);
+                                        servers.set(0, servers.get(i));
+                                        servers.set(i, tmp);
+                                    }
+                                }
+                            }
+
+                            return new MalaysiaMarket(mainBoardIndex, mainBoardChange, secondBoardIndex, secondBoardChange,
                                 mesdaqIndex, mesdaqChange, up, down, unchange, volume, value);
+                        }
                     }
                     catch(NumberFormatException exp) {
                         log.error("", exp);
@@ -106,22 +125,36 @@ public class CIMBMarketServer implements MarketServer {
             
         return null;
     }
-    
+
+    private void initServers() {
+        // Already initialized. Return early.
+        if (this.servers != null) {
+            return;
+        }
+
+        synchronized(this) {
+            // Already initialized. Return early.
+            if (this.servers != null) {
+                return;
+            }
+
+            this.servers = Utils.getCIMBMarketServers();
+        }
+    }
+
     private final String username;
     private final String password;
-    
-    private final String[] servers = new String[] {
-        "http://n2ntbfd01.itradecimb.com/",
-        "http://n2ntbfd02.itradecimb.com/",
-        "http://n2ntbfd03.itradecimb.com/",
-        "http://n2ntbfd04.itradecimb.com/",
-        "http://n2ntbfd05.itradecimb.com/",
-        "http://n2ntbfd06.itradecimb.com/",
-        "http://n2ntbfd07.itradecimb.com/",
-        "http://n2ntbfd08.itradecimb.com/",
-        "http://n2ntbfd09.itradecimb.com/",
-        "http://n2ntbfd10.itradecimb.com/"
-    };
+
+    // Do not initialize servers in constructor. Initialization will be time
+    // consuming since we need to connect to sourceforge to retrieve server
+    // information. If most of the time taken up in constructor, our GUI will
+    // be slow to show up.
+    // Only initialize it when we need it.
+    private List<String> servers;
+    // We had already discover the best server. Please take note that,
+    // synchronized is required during best server sorting. Hence, we will
+    // use this flag to help us only perform sorting once.
+    private volatile boolean bestServerAlreadySorted = false;
 
     private static final int UP_TOKEN_INDEX = 0;   
     private static final int DOWN_TOKEN_INDEX = 1;
