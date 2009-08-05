@@ -8,7 +8,7 @@ Name ${PRODUCT_NAME}
 RequestExecutionLevel admin	;Workaround for Vista
 
 ; The file to write
-OutFile "jstock-1.0.4g-setup.exe"
+OutFile "jstock-1.0.4h-setup.exe"
 LicenseData "gpl-2.0.txt"
  
 ; The default installation directory
@@ -30,6 +30,8 @@ File /r jstock\config
 File /r jstock\database
 File /r jstock\chat
 File /r jstock\lib
+File /r jstock\doc
+File /r jstock\extra
 File chart.ico
 CreateDirectory "$SMPROGRAMS\${PRODUCT_NAME}"
 CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\${PRODUCT_NAME}.lnk" "$INSTDIR\jstock.exe" "" "$INSTDIR\chart.ico"
@@ -47,11 +49,14 @@ RMDir /r $PROFILE\.jstock\config
 RMDir /r $PROFILE\.jstock\history
 RMDir /r $PROFILE\.jstock\logos
 RMDir /r $PROFILE\.jstock\chat
+RMDir /r $PROFILE\.jstock\extra
 RMDir /r $PROFILE\.jstock
 RMDir /r $INSTDIR\lib
 RMDir /r $INSTDIR\config
 RMDir /r $INSTDIR\database
 RMDir /r $INSTDIR\chat
+RMDir /r $INSTDIR\extra
+RMDir /r $INSTDIR\doc
 Delete $INSTDIR\chart.ico
 Delete $INSTDIR\jstock.exe
 Delete $INSTDIR\Uninstall.exe
