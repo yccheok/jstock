@@ -22,6 +22,8 @@
 
 package org.yccheok.jstock.gui;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import javax.swing.*;
@@ -30,6 +32,9 @@ import org.apache.commons.httpclient.methods.*;
 import java.io.*;
 import java.text.*;
 import javax.swing.text.*;
+import org.yccheok.jstock.engine.Country;
+import org.yccheok.jstock.engine.Factories;
+import org.yccheok.jstock.engine.StockServerFactory;
 
 /**
  *
@@ -40,8 +45,40 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
     /** Creates new form OptionsNetworkJPanel */
     public OptionsNetworkJPanel() {
         initComponents();
+        initJRadioButtons();
     }
-    
+
+    private void initJRadioButtons() {
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final Country country = jStockOptions.getCountry();
+        final java.util.List<StockServerFactory> stockServerFactories = Factories.INSTANCE.getStockServerFactories(country);
+        final JLabel label = new JLabel();
+
+        boolean selected = false;
+        for (StockServerFactory stockServerFactory : stockServerFactories) {
+            final StockServerFactoryJRadioButton stockServerJRadioButton = new StockServerFactoryJRadioButton(stockServerFactory);
+            stockServerJRadioButton.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    final String text = StockServerFactoryJRadioButton.toReadableText(stockServerJRadioButton.getStockServerFactory()) + " is being used as primary server";
+                    label.setText(text);
+                }
+                
+            });
+            if (selected == false) {
+                selected = !selected;
+                stockServerJRadioButton.setSelected(true);
+                final String text = StockServerFactoryJRadioButton.toReadableText(stockServerJRadioButton.getStockServerFactory()) + " is being used as primary server";
+                label.setText(text);
+            }
+            this.buttonGroup1.add(stockServerJRadioButton);
+            jPanel5.add(stockServerJRadioButton);
+        }
+
+        jPanel5.add(label);
+    }
+
     private JFormattedTextField getPortNumberJFormattedTextField() {
         DecimalFormat df = new DecimalFormat("#####");
         NumberFormatter nf = new NumberFormatter(df) {
@@ -74,6 +111,7 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        buttonGroup1 = new javax.swing.ButtonGroup();
         jXHeader1 = new org.jdesktop.swingx.JXHeader();
         jPanel1 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
@@ -90,6 +128,8 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jPasswordField1 = new javax.swing.JPasswordField();
+        jPanel4 = new javax.swing.JPanel();
+        jPanel5 = new javax.swing.JPanel();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -153,9 +193,9 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Proxy Authentication"));
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("NT LAN Manager (NTLM)"));
 
-        jCheckBox1.setText("Enable proxy authentication");
+        jCheckBox1.setText("Enable NTLM");
         jCheckBox1.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 jCheckBox1ItemStateChanged(evt);
@@ -202,21 +242,38 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Stock Server"));
+
+        jPanel5.setLayout(new java.awt.GridLayout(3, 1, 5, 5));
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, 447, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
-                            .addContainerGap()
-                            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                            .addContainerGap()
-                            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(jPanel4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(182, 182, 182)
+                        .addGap(172, 172, 172)
                         .addComponent(jButton1)))
                 .addContainerGap())
         );
@@ -224,12 +281,14 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
+                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jButton1)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(41, Short.MAX_VALUE))
         );
 
         add(jPanel1, java.awt.BorderLayout.CENTER);
@@ -411,6 +470,7 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
     private static final Log log = LogFactory.getLog(OptionsNetworkJPanel.class);
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JButton jButton1;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JFormattedTextField jFormattedTextField1;
@@ -423,6 +483,8 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
     private javax.swing.JPasswordField jPasswordField1;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
