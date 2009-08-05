@@ -30,7 +30,7 @@ File /r jstock\config
 File /r jstock\database
 File /r jstock\chat
 File /r jstock\lib
-File /r jstock\doc
+File /r jstock\docs
 File /r jstock\extra
 File chart.ico
 CreateDirectory "$SMPROGRAMS\${PRODUCT_NAME}"
