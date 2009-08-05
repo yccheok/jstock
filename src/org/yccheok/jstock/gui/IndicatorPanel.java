@@ -1026,9 +1026,10 @@ public class IndicatorPanel extends JPanel implements ChangeListener {
     }
 
     public void initStockHistoryMonitor(java.util.List<StockServerFactory> stockServerFactories) {
-        if(stockHistoryMonitor != null) {
+        if (stockHistoryMonitor != null) {
             final StockHistoryMonitor oldStockHistoryMonitor = stockHistoryMonitor;
             Utils.getZoombiePool().execute(new Runnable() {
+                @Override
                 public void run() {
                     log.info("Prepare to shut down " + oldStockHistoryMonitor + "...");
                     oldStockHistoryMonitor.clearStockCodes();

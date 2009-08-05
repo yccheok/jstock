@@ -574,9 +574,10 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     }
 
     public void initStockHistoryMonitor(java.util.List<StockServerFactory> stockServerFactories) {
-        if(stockHistoryMonitor != null) {
+        if (stockHistoryMonitor != null) {
             final StockHistoryMonitor oldStockHistoryMonitor = stockHistoryMonitor;
             Utils.getZoombiePool().execute(new Runnable() {
+                @Override
                 public void run() {
                     log.info("Prepare to shut down " + oldStockHistoryMonitor + "...");
                     oldStockHistoryMonitor.clearStockCodes();
@@ -652,9 +653,10 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     }
 
     public void initRealTimeStockMonitor(java.util.List<StockServerFactory> stockServerFactories) {
-        if(realTimeStockMonitor != null) {
+        if (realTimeStockMonitor != null) {
             final RealTimeStockMonitor oldRealTimeStockMonitor = realTimeStockMonitor;
             Utils.getZoombiePool().execute(new Runnable() {
+                @Override
                 public void run() {
                     log.info("Prepare to shut down " + oldRealTimeStockMonitor + "...");
                     oldRealTimeStockMonitor.clearStockCodes();
@@ -667,7 +669,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         
         realTimeStockMonitor = new RealTimeStockMonitor(4, 20, MainFrame.getInstance().getJStockOptions().getScanningSpeed());
         
-        for(StockServerFactory factory : stockServerFactories) {
+        for (StockServerFactory factory : stockServerFactories) {
             realTimeStockMonitor.addStockServerFactory(factory);
         }
         
