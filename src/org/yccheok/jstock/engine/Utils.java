@@ -1,28 +1,26 @@
 /*
- * Utils.java
- *
- * Created on April 27, 2007, 12:31 AM
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- * Copyright (C) 2007 Cheok YanCheng <yccheok@yahoo.com>
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.yccheok.jstock.engine;
 
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.commons.httpclient.*;
 
 /**
@@ -33,6 +31,92 @@ public class Utils {
     
     /** Creates a new instance of Utils */
     private Utils() {
+    }
+
+    // Use Copy On Write ArrayList, so that we can perform sorting.
+    private static volatile List<String> CIMBMarketServers = null;
+    private static volatile List<String> CIMBStockServers = null;
+    private static volatile List<String> CIMBHistoryServers = null;
+    private static final String[] DEFAULT_SERVERS = new String[] {
+        "http://n2ntbfd01.itradecimb.com/",
+        "http://n2ntbfd02.itradecimb.com/",
+        "http://n2ntbfd03.itradecimb.com/",
+        "http://n2ntbfd04.itradecimb.com/",
+        "http://n2ntbfd05.itradecimb.com/",
+        "http://n2ntbfd06.itradecimb.com/",
+        "http://n2ntbfd07.itradecimb.com/",
+        "http://n2ntbfd08.itradecimb.com/",
+        "http://n2ntbfd09.itradecimb.com/",
+        "http://n2ntbfd10.itradecimb.com/"
+    };
+
+    public static List<String> getCIMBMarketServers() {
+        List<String> servers = Utils.CIMBMarketServers;
+        if (servers != null) {
+			// We already have the server list.
+            return new CopyOnWriteArrayList(servers);
+        }
+
+        final String server = org.yccheok.jstock.gui.Utils.getUUIDValue("http://jstock.sourceforge.net/server/cimbmarketservers.txt", "server");
+        if (server != null) {
+            String[] s = server.split(",");
+            if (s.length > 0) {
+                List<String> me = new CopyOnWriteArrayList(java.util.Arrays.asList(s));
+				// Save it! So that we need not to ask for server list again next time.
+                Utils.CIMBMarketServers = me;
+                return new CopyOnWriteArrayList(me);
+            }
+        }
+        servers = new CopyOnWriteArrayList(java.util.Arrays.asList(DEFAULT_SERVERS));
+        // Save it! So that we need not to ask for server list again next time.
+        Utils.CIMBMarketServers = servers;
+        return new CopyOnWriteArrayList(servers);
+    }
+
+    public static List getCIMBStockServers() {
+        List<String> servers = Utils.CIMBStockServers;
+        if (servers != null) {
+			// We already have the server list.
+            return new CopyOnWriteArrayList(servers);
+        }
+
+        final String server = org.yccheok.jstock.gui.Utils.getUUIDValue("http://jstock.sourceforge.net/server/cimbstockservers.txt", "server");
+        if (server != null) {
+            String[] s = server.split(",");
+            if (s.length > 0) {
+                List<String> me = new CopyOnWriteArrayList(java.util.Arrays.asList(s));
+				// Save it! So that we need not to ask for server list again next time.
+                Utils.CIMBStockServers = me;
+                return new CopyOnWriteArrayList(me);
+            }
+        }
+        servers = new CopyOnWriteArrayList(java.util.Arrays.asList(DEFAULT_SERVERS));
+        // Save it! So that we need not to ask for server list again next time.
+        Utils.CIMBStockServers = servers;
+        return new CopyOnWriteArrayList(servers);
+    }
+
+    public static List getCIMBHistoryServers() {
+        List<String> servers = Utils.CIMBHistoryServers;
+        if (servers != null) {
+			// We already have the server list.
+            return new CopyOnWriteArrayList(servers);
+        }
+
+        final String server = org.yccheok.jstock.gui.Utils.getUUIDValue("http://jstock.sourceforge.net/server/cimbhistoryservers.txt", "server");
+        if (server != null) {
+            String[] s = server.split(",");
+            if (s.length > 0) {
+                List<String> me = new CopyOnWriteArrayList(java.util.Arrays.asList(s));
+				// Save it! So that we need not to ask for server list again next time.
+                Utils.CIMBHistoryServers = me;
+                return new CopyOnWriteArrayList(me);
+            }
+        }
+        servers = new CopyOnWriteArrayList(java.util.Arrays.asList(DEFAULT_SERVERS));
+        // Save it! So that we need not to ask for server list again next time.
+        Utils.CIMBHistoryServers = servers;
+        return new CopyOnWriteArrayList(servers);
     }
 
     public static void setHttpClientProxyFromSystemProperties(HttpClient httpClient) {
