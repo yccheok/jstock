@@ -1,23 +1,20 @@
 /*
- * IndicatorScannerJPanel.java
- *
- * Created on June 15, 2007, 9:58 PM
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.yccheok.jstock.gui;
@@ -152,8 +149,8 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             
             if(result == JOptionPane.YES_OPTION)
             {
-                this.initRealTimeStockMonitor(m.getStockServerFactory());
-                this.initStockHistoryMonitor(m.getStockServerFactory());
+                this.initRealTimeStockMonitor(m.getStockServerFactories());
+                this.initStockHistoryMonitor(m.getStockServerFactories());
 
                 removeAllIndicatorsFromTable();
                 initAlertStateManager();
@@ -465,8 +462,8 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     public void clear()
     {
         final MainFrame m = getMainFrame();
-        this.initRealTimeStockMonitor(m.getStockServerFactory());
-        this.initStockHistoryMonitor(m.getStockServerFactory());
+        this.initRealTimeStockMonitor(m.getStockServerFactories());
+        this.initStockHistoryMonitor(m.getStockServerFactories());
 
         this.operatorIndicators.clear();
 
@@ -493,8 +490,8 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         }
         
         final MainFrame m = getMainFrame();
-        this.initRealTimeStockMonitor(m.getStockServerFactory());
-        this.initStockHistoryMonitor(m.getStockServerFactory());
+        this.initRealTimeStockMonitor(m.getStockServerFactories());
+        this.initStockHistoryMonitor(m.getStockServerFactories());
 
         final ExecutorService oldSystemTrayAlertPool = systemTrayAlertPool;
         final ExecutorService oldEmailAlertPool = emailAlertPool;
@@ -589,10 +586,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         }
 
         this.stockHistoryMonitor = new StockHistoryMonitor(NUM_OF_THREADS_HISTORY_MONITOR);
-
-        for(StockServerFactory factory : stockServerFactories) {
-            stockHistoryMonitor.addStockServerFactory(factory);
-        }
+        stockHistoryMonitor.setStockServerFactories(stockServerFactories);
 
         stockHistoryMonitor.attach(stockHistoryMonitorObserver);
 
@@ -652,6 +646,16 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         };
     }
 
+    public void updatePrimaryStockServerFactory(java.util.List<StockServerFactory> stockServerFactories) {
+        if (realTimeStockMonitor != null) {
+            realTimeStockMonitor.setStockServerFactories(stockServerFactories);
+        }
+
+        if (stockHistoryMonitor != null) {
+            stockHistoryMonitor.setStockServerFactories(stockServerFactories);
+        }
+    }
+
     public void initRealTimeStockMonitor(java.util.List<StockServerFactory> stockServerFactories) {
         if (realTimeStockMonitor != null) {
             final RealTimeStockMonitor oldRealTimeStockMonitor = realTimeStockMonitor;
@@ -668,10 +672,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         }
         
         realTimeStockMonitor = new RealTimeStockMonitor(4, 20, MainFrame.getInstance().getJStockOptions().getScanningSpeed());
-        
-        for (StockServerFactory factory : stockServerFactories) {
-            realTimeStockMonitor.addStockServerFactory(factory);
-        }
+        realTimeStockMonitor.setStockServerFactories(stockServerFactories);
         
         realTimeStockMonitor.attach(this.realTimeStockMonitorObserver);
     }
@@ -847,8 +848,8 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                     return;
                 }
 
-                initRealTimeStockMonitor(mainFrame.getStockServerFactory());
-                initStockHistoryMonitor(mainFrame.getStockServerFactory());
+                initRealTimeStockMonitor(mainFrame.getStockServerFactories());
+                initStockHistoryMonitor(mainFrame.getStockServerFactories());
 
                 removeAllIndicatorsFromTable();
                 alertStateManager.clearState();
