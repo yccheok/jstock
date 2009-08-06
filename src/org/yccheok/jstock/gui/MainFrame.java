@@ -2954,9 +2954,9 @@ public class MainFrame extends javax.swing.JFrame {
 
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             @Override
-           public void run() {
+            public void run() {
                marketJPanel.update(market);
-           }
+            }
         });
     }
     
