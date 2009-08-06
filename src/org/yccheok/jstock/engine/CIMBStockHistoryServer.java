@@ -57,12 +57,19 @@ public class CIMBStockHistoryServer implements StockHistoryServer {
 
         int index = 0;
 
+        String encodedCode;
+        try {
+            encodedCode = java.net.URLEncoder.encode(this.code.toString(), "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            throw new StockHistoryNotFoundException(this.code.toString(), ex);
+        }
+
         for (String server : servers) {
             if (currentThread.isInterrupted()) {
                 throw new StockHistoryNotFoundException("Thread has been interrupted");
             }
             
-            HttpMethod method = new GetMethod(server + "java/jar/data/" + this.code + ".dat.gz");
+            HttpMethod method = new GetMethod(server + "java/jar/data/" + encodedCode + ".dat.gz");
             StringBuffer s = new StringBuffer(data.length);
 
             final HttpClient httpClient = new HttpClient();
