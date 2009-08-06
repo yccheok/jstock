@@ -76,9 +76,11 @@ public class MarketJPanel extends javax.swing.JPanel {
         numberFormat.setMaximumFractionDigits(2);
         numberFormat.setMinimumFractionDigits(2);
 
-        for(Index index : indices) {
-            if(ignoreIndices.contains(index)) continue;
-            
+        for (Index index : indices) {
+            if (ignoreIndices.contains(index)) {
+				continue;
+        	}
+
             final double _index = market.getIndex(index);
             final double change = market.getChange(index);
             final Color color = Utils.getColor(change, 0.0);
