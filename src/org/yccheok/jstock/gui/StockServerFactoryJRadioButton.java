@@ -37,13 +37,14 @@ public class StockServerFactoryJRadioButton extends JRadioButton {
     public StockServerFactoryJRadioButton(StockServerFactory stockServerFactory) {
         this.stockServerFactory = stockServerFactory;
         this.setStatus(Status.Busy);
+        this.setToolTipText("Checking for server health...");
         initSwingWorker();
     }
 
     public static String toReadableText(StockServerFactory stockServerFactory) {
         Class c = stockServerFactory.getClass();
         if (c == org.yccheok.jstock.engine.CIMBStockServerFactory.class) {
-            return "CIMB Stock Server";
+            return "Local Bank Stock Server";
         }
         else if (c == org.yccheok.jstock.engine.SingaporeYahooStockServerFactory.class) {
             return "Singapore Yahoo Stock Server";
@@ -56,7 +57,9 @@ public class StockServerFactoryJRadioButton extends JRadioButton {
 
     // It is possible that we can avoid from hard coding?
     // MSFT and PBBANK were choosen, because they are the best stock in the town.
-    private boolean isServerInGoodHealth() {
+    private Health getServerHealth() {
+        final Health health = new Health();
+
         /* Test For Stock */
         Class c = stockServerFactory.getStockServer().getClass();
 
@@ -75,47 +78,74 @@ public class StockServerFactoryJRadioButton extends JRadioButton {
         }
         try {
             stockServerFactory.getStockServer().getStock(code);
+            health.stock = true;
         } catch (StockNotFoundException ex) {
             log.error(null, ex);
-            return false;
         }
 
         /* Test For History */
-        if (null == stockServerFactory.getStockHistoryServer(code))
+        if (null != stockServerFactory.getStockHistoryServer(code))
         {
-            return false;
+            health.history = true;
         }
 
         /* Test for Market */
-        if (null == stockServerFactory.getMarketServer())
+        if (null != stockServerFactory.getMarketServer().getMarket())
         {
-            return false;
+            health.market = true;
         }
         
-        return true;
+        return health;
+    }
+
+    private String toHTML(Health health) {
+        String html = "<html><body>";
+        if (health == null || health.market == false) {
+            html += "Index : <b>Failed</b><br/>";
+        }
+        else {
+            html += "Index : <b>Success</b><br/>";
+        }
+        if (health == null || health.stock == false) {
+            html += "Stock : <b>Failed</b><br/>";
+        }
+        else {
+            html += "Stock : <b>Success</b><br/>";
+        }
+        if (health == null || health.history == false) {
+            html += "History : <b>Failed</b><br/>";
+        }
+        else {
+            html += "History : <b>Success</b><br/>";
+        }
+        html += "</body></html>";
+        return html;
     }
 
     private void initSwingWorker() {
-        SwingWorker worker = new SwingWorker<Status, Void>() {
+        SwingWorker worker = new SwingWorker<Health, Void>() {
             @Override
-            public Status doInBackground() {
-                if (isServerInGoodHealth()) {
-                    return Status.Connected;
-                }
-                return Status.NotConnected;
+            public Health doInBackground() {
+                return getServerHealth();
             }
 
             @Override
             public void done() {
-                Status status = Status.NotConnected;
+                Health health = null;
                 try {
-                    status = get();
+                    health = get();
                 } catch (InterruptedException ex) {
                     log.error(null, ex);
                 } catch (ExecutionException ex) {
                     log.error(null, ex);
                 }
-                StockServerFactoryJRadioButton.this.setStatus(status);
+                if (health == null || health.isGood() == false) {
+                    StockServerFactoryJRadioButton.this.setStatus(Status.Failed);
+                }
+                else {
+                    StockServerFactoryJRadioButton.this.setStatus(Status.Success);
+                }
+                StockServerFactoryJRadioButton.this.setToolTipText(toHTML(health));
             }
         };
 
@@ -149,28 +179,32 @@ public class StockServerFactoryJRadioButton extends JRadioButton {
             + "</td></tr></table></html>";
 
         this.setText(label);
-        this.setToolTipText(status.getInfo());
     }
 
-    public enum Status {
-        Busy(Utils.getExtraDataDirectory() + "spinner.gif", "Checking for stock server health..."),
-        Connected(Utils.getExtraDataDirectory() + "network-transmit-receive.png", "This server is in good health"),
-        NotConnected(Utils.getExtraDataDirectory() + "network-error.png", "This server is in bad health. Try again later");
+    private static class Health {
+        public boolean market = false;
+        public boolean history = false;
+        public boolean stock = false;
 
-        Status(String fileName, String info) {
+        // All good, only considered as good.
+        public boolean isGood() {
+            return market && history && stock;
+        }
+    }
+
+    private enum Status {
+        Busy(Utils.getExtraDataDirectory() + "spinner.gif"),
+        Success(Utils.getExtraDataDirectory() + "network-transmit-receive.png"),
+        Failed(Utils.getExtraDataDirectory() + "network-error.png");
+
+        Status(String fileName) {
             this.fileName = fileName;
-            this.info = info;
         }
 
         public String getFileName() {
             return fileName;
         }
 
-        public String getInfo() {
-            return info;
-        }
-
-        private final String info;
         private final String fileName;
     }
 
