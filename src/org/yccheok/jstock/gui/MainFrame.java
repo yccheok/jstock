@@ -2181,11 +2181,11 @@ public class MainFrame extends javax.swing.JFrame {
         @Override
         public void run() {
             final Thread currentThread = Thread.currentThread();
-            final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactories();
 
             // Do not rely on isInterrupted flag only. The flag can be cleared by 3rd party easily.
             // Check for current thread as well.
             while (!currentThread.isInterrupted()  && (marketThread == Thread.currentThread())) {
+				final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactories();
                 for (StockServerFactory factory : stockServerFactories) {
                     MarketServer server = factory.getMarketServer();
                     
