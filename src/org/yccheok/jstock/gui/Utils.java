@@ -592,8 +592,22 @@ public class Utils {
                 //Make new Request with new URL
                 Header header = method.getResponseHeader("location");
                 HttpMethod RedirectMethod = new GetMethod(header.getValue());
-                httpClient.executeMethod(RedirectMethod);
-                respond = RedirectMethod.getResponseBodyAsString();
+				// Do RedirectMethod within try-catch-finally, so that we can have a
+				// exception free way to release RedirectMethod connection.
+				// #2836422
+                try {
+                    httpClient.executeMethod(RedirectMethod);
+                    respond = RedirectMethod.getResponseBodyAsString();
+                }
+                catch (HttpException exp) {
+                    throw exp;
+                }
+                catch (IOException exp) {
+                    throw exp;
+                }
+                finally {
+                    RedirectMethod.releaseConnection();
+                }
             }
             else {
                 respond = method.getResponseBodyAsString();
