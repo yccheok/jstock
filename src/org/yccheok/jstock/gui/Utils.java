@@ -47,6 +47,7 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.logging.Log;
@@ -98,57 +99,43 @@ public class Utils {
     // A value obtained from server, to ensure all JStock's users are getting
     // same value for same key.
     public static String getUUIDValue(String url, String key) {
-        HttpMethod method = new GetMethod(url);
-        final HttpClient httpClient = new HttpClient();
-        org.yccheok.jstock.engine.Utils.setHttpClientProxyFromSystemProperties(httpClient);
-        org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
+        final InputStream stream = org.yccheok.jstock.gui.Utils.getResponseBodyAsStreamBasedOnProxyAuthOption(url);
 
-        InputStream stream = null;
+        if (stream == null) {
+            return null;
+        }
 
+        Properties properties = new Properties();
         try {
-            stream = org.yccheok.jstock.gui.Utils.getResponseBodyAsStreamBasedOnProxyAuthOption(httpClient, method);
-
-            if (stream == null) {
-                return null;
-            }
-
-            Properties properties = new Properties();
             properties.load(stream);
-
-            final String _id = properties.getProperty("id");
-            if (_id == null) {
-                log.info("UUID not found");
-                return null;
-            }
-
-            final String id = org.yccheok.jstock.gui.Utils.decrypt(_id);
-            if (id.equals(org.yccheok.jstock.gui.Utils.getJStockUUID()) == false) {
-                log.info("UUID doesn't match");
-                return null;
-            }
-
-            final String value = properties.getProperty(key);
-            if (value == null) {
-                log.info("Value not found");
-                return null;
-            }
-            return value;
-        }
-        catch (HttpException ex) {
-            log.error(null, ex);
-        }
-        catch (IOException ex) {
-            log.error(null, ex);
+        } catch (IOException exp) {
+            log.error(null, exp);
         }
         finally {
-            if (stream != null) try {
+            try {
                 stream.close();
-            } catch (IOException ex) {
-                log.error(null, ex);
+            } catch (IOException exp) {
+                log.error(null, exp);
             }
-            method.releaseConnection();
         }
-        return null;
+        final String _id = properties.getProperty("id");
+        if (_id == null) {
+            log.info("UUID not found");
+            return null;
+        }
+
+        final String id = org.yccheok.jstock.gui.Utils.decrypt(_id);
+        if (id.equals(org.yccheok.jstock.gui.Utils.getJStockUUID()) == false) {
+            log.info("UUID doesn't match");
+            return null;
+        }
+
+        final String value = properties.getProperty(key);
+        if (value == null) {
+            log.info("Value not found");
+            return null;
+        }
+        return value;
     }
 
     private static List<String> getNTPServers()
@@ -577,97 +564,142 @@ public class Utils {
 
     // We prefer to have this method in gui package instead of engine. This is because it requires
     // access to JStockOptions.
-    public static String getResponseBodyAsStringBasedOnProxyAuthOption(HttpClient httpClient, HttpMethod method) throws IOException {
+    // Returns null if fail.
+    public static String getResponseBodyAsStringBasedOnProxyAuthOption(String request) {
+        final HttpMethod method = new GetMethod(request);
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
         final String respond;
-        if (jStockOptions.isProxyAuthEnabled()) {
-            method.setFollowRedirects(false);
-            httpClient.executeMethod(method);
+        try {
+            if (jStockOptions.isProxyAuthEnabled()) {
+                method.setFollowRedirects(false);
+                httpClient.executeMethod(method);
 
-            int statuscode = method.getStatusCode();
-            if ((statuscode == HttpStatus.SC_MOVED_TEMPORARILY) ||
-                (statuscode == HttpStatus.SC_MOVED_PERMANENTLY) ||
-                (statuscode == HttpStatus.SC_SEE_OTHER) ||
-                (statuscode == HttpStatus.SC_TEMPORARY_REDIRECT)) {
-                //Make new Request with new URL
-                Header header = method.getResponseHeader("location");
-                HttpMethod RedirectMethod = new GetMethod(header.getValue());
-				// Do RedirectMethod within try-catch-finally, so that we can have a
-				// exception free way to release RedirectMethod connection.
-				// #2836422
-                try {
-                    httpClient.executeMethod(RedirectMethod);
-                    respond = RedirectMethod.getResponseBodyAsString();
+                int statuscode = method.getStatusCode();
+                if ((statuscode == HttpStatus.SC_MOVED_TEMPORARILY) ||
+                    (statuscode == HttpStatus.SC_MOVED_PERMANENTLY) ||
+                    (statuscode == HttpStatus.SC_SEE_OTHER) ||
+                    (statuscode == HttpStatus.SC_TEMPORARY_REDIRECT)) {
+                    //Make new Request with new URL
+                    Header header = method.getResponseHeader("location");
+                    HttpMethod RedirectMethod = new GetMethod(header.getValue());
+                    // I assume it is OK to release method for twice. (The second
+                    // release will happen in finally block). We shouldn't have an
+                    // unreleased method, before executing another new method.
+                    method.releaseConnection();
+                    // Do RedirectMethod within try-catch-finally, so that we can have a
+                    // exception free way to release RedirectMethod connection.
+                    // #2836422
+                    try {
+                        httpClient.executeMethod(RedirectMethod);
+                        respond = RedirectMethod.getResponseBodyAsString();
+                    }
+                    catch (HttpException exp) {
+                        log.error(null, exp);
+                        return null;
+                    }
+                    catch (IOException exp) {
+                        log.error(null, exp);
+                        return null;
+                    }
+                    finally {
+                        RedirectMethod.releaseConnection();
+                    }
                 }
-                catch (HttpException exp) {
-                    throw exp;
-                }
-                catch (IOException exp) {
-                    throw exp;
-                }
-                finally {
-                    RedirectMethod.releaseConnection();
-                }
+                else {
+                    respond = method.getResponseBodyAsString();
+                } // if statuscode = Redirect
             }
             else {
+                httpClient.executeMethod(method);
                 respond = method.getResponseBodyAsString();
-            } // if statuscode = Redirect
+            } //  if jStockOptions.isProxyAuthEnabled()
         }
-        else {
-            httpClient.executeMethod(method);
-            respond = method.getResponseBodyAsString();
-        } //  if jStockOptions.isProxyAuthEnabled()
-
+        catch (HttpException exp) {
+            log.error(null, exp);
+            return null;
+        }
+        catch (IOException exp) {
+            log.error(null, exp);
+            return null;
+        }
+        finally {
+            method.releaseConnection();
+        }
         return respond;
     }
 
-    public static InputStream getResponseBodyAsStreamBasedOnProxyAuthOption(HttpClient httpClient, HttpMethod method) throws IOException {
+    public static InputStream getResponseBodyAsStreamBasedOnProxyAuthOption(String request) {
+        org.yccheok.jstock.engine.Utils.setHttpClientProxyFromSystemProperties(httpClient);
+        org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
+
+        final HttpMethod method = new GetMethod(request);
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
         final InputStream respond;
-        if (jStockOptions.isProxyAuthEnabled()) {
-            method.setFollowRedirects(false);
-            httpClient.executeMethod(method);
+        try {
+            if (jStockOptions.isProxyAuthEnabled()) {
+                method.setFollowRedirects(false);
+                httpClient.executeMethod(method);
 
-            int statuscode = method.getStatusCode();
-            if ((statuscode == HttpStatus.SC_MOVED_TEMPORARILY) ||
-                (statuscode == HttpStatus.SC_MOVED_PERMANENTLY) ||
-                (statuscode == HttpStatus.SC_SEE_OTHER) ||
-                (statuscode == HttpStatus.SC_TEMPORARY_REDIRECT)) {
-                //Make new Request with new URL
-                Header header = method.getResponseHeader("location");
-                HttpMethod RedirectMethod = new GetMethod(header.getValue());
-				// Do RedirectMethod within try-catch-finally, so that we can have a
-				// exception free way to release RedirectMethod connection.
-				// #2836422
-                try {
-                    httpClient.executeMethod(RedirectMethod);
-                    respond = RedirectMethod.getResponseBodyAsStream();
+                int statuscode = method.getStatusCode();
+                if ((statuscode == HttpStatus.SC_MOVED_TEMPORARILY) ||
+                    (statuscode == HttpStatus.SC_MOVED_PERMANENTLY) ||
+                    (statuscode == HttpStatus.SC_SEE_OTHER) ||
+                    (statuscode == HttpStatus.SC_TEMPORARY_REDIRECT)) {
+                    //Make new Request with new URL
+                    Header header = method.getResponseHeader("location");
+                    HttpMethod RedirectMethod = new GetMethod(header.getValue());
+                    // I assume it is OK to release method for twice. (The second
+                    // release will happen in finally block). We shouldn't have an
+                    // unreleased method, before executing another new method.
+                    method.releaseConnection();
+                    // Do RedirectMethod within try-catch-finally, so that we can have a
+                    // exception free way to release RedirectMethod connection.
+                    // #2836422
+                    try {
+                        httpClient.executeMethod(RedirectMethod);
+                        respond = RedirectMethod.getResponseBodyAsStream();
+                    }
+                    catch (HttpException exp) {
+                        log.error(null, exp);
+                        return null;
+                    }
+                    catch (IOException exp) {
+                        log.error(null, exp);
+                        return null;
+                    }
+                    finally {
+                        RedirectMethod.releaseConnection();
+                    }
                 }
-                catch (HttpException exp) {
-                    throw exp;
-                }
-                catch (IOException exp) {
-                    throw exp;
-                }
-                finally {
-                    RedirectMethod.releaseConnection();
-                }
+                else {
+                    respond = method.getResponseBodyAsStream();
+                } // if statuscode = Redirect
             }
             else {
+                httpClient.executeMethod(method);
                 respond = method.getResponseBodyAsStream();
-            } // if statuscode = Redirect
+            } //  if jStockOptions.isProxyAuthEnabled()
         }
-        else {
-            httpClient.executeMethod(method);
-            respond = method.getResponseBodyAsStream();
-        } //  if jStockOptions.isProxyAuthEnabled()
-
+        catch (HttpException exp) {
+            log.error(null, exp);
+            return null;
+        }
+        catch (IOException exp) {
+            log.error(null, exp);
+            return null;
+        }
+        finally {
+            method.releaseConnection();
+        }
         return respond;
     }
 
     // We prefer to have this method in gui package instead of engine. This is because it requires
     // access to JStockOptions.
     public static void setHttpClientProxyCredentialsFromJStockOptions(HttpClient httpClient) {
+        org.yccheok.jstock.engine.Utils.setHttpClientProxyFromSystemProperties(httpClient);
+        org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
+
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
         if (jStockOptions.isProxyAuthEnabled() == false) {
             httpClient.getState().clearCredentials();
@@ -699,52 +731,49 @@ public class Utils {
 
     public static ApplicationInfo getLatestApplicationInfo()
     {
-        HttpMethod method = new GetMethod("http://jstock.sourceforge.net/version/version.txt");
-        final HttpClient httpClient = new HttpClient();
+        final String request = "http://jstock.sourceforge.net/version/version.txt";
         org.yccheok.jstock.engine.Utils.setHttpClientProxyFromSystemProperties(httpClient);
         org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
 
-        InputStream stream = null;
+        final InputStream stream = org.yccheok.jstock.gui.Utils.getResponseBodyAsStreamBasedOnProxyAuthOption(httpClient, request);
 
+        if (stream == null) {
+            return null;
+        }
+
+        Properties properties = new Properties();
         try {
-            stream = org.yccheok.jstock.gui.Utils.getResponseBodyAsStreamBasedOnProxyAuthOption(httpClient, method);
-
-            if (stream == null)
-                return null;
-
-            Properties properties = new Properties();
             properties.load(stream);
-
-            final String applicationVersionID = properties.getProperty("applicationVersionID");
-            final String windowsDownloadLink = properties.getProperty("windowsDownloadLink");
-            final String linuxDownloadLink = properties.getProperty("linuxDownloadLink");
-            final String macDownloadLink = properties.getProperty("macDownloadLink");
-            final String solarisDownloadLink = properties.getProperty("solarisDownloadLink");
-            if (applicationVersionID == null || windowsDownloadLink == null || linuxDownloadLink == null || macDownloadLink == null || solarisDownloadLink == null) {
-                return null;
-            }
-
-            return new ApplicationInfo(Integer.parseInt(applicationVersionID), windowsDownloadLink, linuxDownloadLink, macDownloadLink, solarisDownloadLink);
-        }
-        catch (HttpException ex) {
-            log.error(null, ex);
-        }
-        catch (IOException ex) {
-            log.error(null, ex);
-        }
-        catch (NumberFormatException exp) {
-          	log.error(null, exp);
+        } catch (IOException exp) {
+            log.error(null, exp);
+            return null;
         }
         finally {
-            if (stream != null) try {
+            try {
                 stream.close();
-            } catch (IOException ex) {
-                log.error(null, ex);
+            } catch (IOException exp) {
+                log.error(null, exp);
             }
-            method.releaseConnection();
         }
 
-        return null;
+        final String applicationVersionID = properties.getProperty("applicationVersionID");
+        final String windowsDownloadLink = properties.getProperty("windowsDownloadLink");
+        final String linuxDownloadLink = properties.getProperty("linuxDownloadLink");
+        final String macDownloadLink = properties.getProperty("macDownloadLink");
+        final String solarisDownloadLink = properties.getProperty("solarisDownloadLink");
+        if (applicationVersionID == null || windowsDownloadLink == null || linuxDownloadLink == null || macDownloadLink == null || solarisDownloadLink == null) {
+            return null;
+        }
+
+		final int version;
+       	try {
+            version = Integer.parseInt(applicationVersionID);
+        }
+        catch (NumberFormatException exp) {
+            log.error(null, exp);
+			return null;
+        }
+		return new ApplicationInfo(version, windowsDownloadLink, linuxDownloadLink, macDownloadLink, solarisDownloadLink);
     }
 
     public static int getApplicationVersionID() {
@@ -862,6 +891,8 @@ public class Utils {
     private static Executor zombiePool = Executors.newFixedThreadPool(Utils.NUM_OF_THREADS_ZOMBIE_POOL);
 
     private static final int NUM_OF_THREADS_ZOMBIE_POOL = 4;
+
+    private static final HttpClient httpClient = new HttpClient(new MultiThreadedHttpConnectionManager());
 
     private static final Log log = LogFactory.getLog(Utils.class);
 }
