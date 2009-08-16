@@ -1,32 +1,26 @@
 /*
- * CIMBMarketServer.java
- *
- * Created on May 6, 2007, 4:15 AM
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- * Copyright (C) 2007 Cheok YanCheng <yccheok@yahoo.com>
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.yccheok.jstock.engine;
 
-import java.io.*;
 
 import java.util.List;
-import org.apache.commons.httpclient.*;
-import org.apache.commons.httpclient.methods.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -53,75 +47,59 @@ public class CIMBMarketServer implements MarketServer {
         initServers();
 
         final int numOfServer = servers.size();
-        final Thread currentThread = Thread.currentThread();
-        
-        final HttpClient httpClient = new HttpClient();
+        final Thread currentThread = Thread.currentThread();                
 
         for (int i = 0; (i < numOfServer) && (!currentThread.isInterrupted()); i++) {
-            HttpMethod method = new GetMethod(servers.get(i) + "rtQuote.dll?GetInitInfo");
+            final String request = servers.get(i) + "rtQuote.dll?GetInitInfo";
 
-            try {
-                Utils.setHttpClientProxyFromSystemProperties(httpClient);
-                org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
-				final String respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(httpClient, method);
+            final String respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(request);
+            if (respond == null) {
+                continue;
+            }
+            String infos = Utils.subString(respond, "--_BeginMS_", "--_EndMS_").trim();
 
-                String infos = Utils.subString(respond, "--_BeginMS_", "--_EndMS_").trim();
-        
-                if(infos.length() != 0) {
-                    String[] infoFields = infos.split("\\|");    
-                        
-                    try {
-                        double mainBoardIndex = Double.parseDouble(infoFields[MAIN_BOARD_INDEX_TOKEN_INDEX]);
-                        double mainBoardChange = Double.parseDouble(infoFields[MAIN_BOARD_CHANGE_TOKEN_INDEX]);
-                        double secondBoardIndex = Double.parseDouble(infoFields[SECOND_BOARD_INDEX_TOKEN_INDEX]);
-                        double secondBoardChange = Double.parseDouble(infoFields[SECOND_BOARD_CHANGE_TOKEN_INDEX]);
-                        // double mesdaqIndex = Double.parseDouble(infoFields[MESDAQ_INDEX_TOKEN_INDEX]);
-                        // double mesdaqChange = Double.parseDouble(infoFields[MESDAQ_INDEX_CHANGE_INDEX]);              
-                        double mesdaqIndex = 0.0;
-                        double mesdaqChange = 0.0;                        
-                        int up = Integer.parseInt(infoFields[UP_TOKEN_INDEX]);
-                        int down = Integer.parseInt(infoFields[DOWN_TOKEN_INDEX]);
-                        int unchange = Integer.parseInt(infoFields[UNCHANGE_TOKEN_INDEX]);
-                        long volume = Long.parseLong(infoFields[VOLUME_TOKEN_INDEX]);
-                        double value = Double.parseDouble(infoFields[VALUE_TOKEN_INDEX]);
-                        
-                        // Sometimes, CIMB just returns 0.
-                        if (volume != 0) {
-                            // Sort the best server.
-                            if (bestServerAlreadySorted == false) {
-                                synchronized(servers) {
-                                    if (bestServerAlreadySorted == false) {
-                                        bestServerAlreadySorted = true;
-                                        String tmp = servers.get(0);
-                                        servers.set(0, servers.get(i));
-                                        servers.set(i, tmp);
-                                    }
+            if (infos.length() != 0) {
+                String[] infoFields = infos.split("\\|");
+
+                try {
+                    double mainBoardIndex = Double.parseDouble(infoFields[MAIN_BOARD_INDEX_TOKEN_INDEX]);
+                    double mainBoardChange = Double.parseDouble(infoFields[MAIN_BOARD_CHANGE_TOKEN_INDEX]);
+                    double secondBoardIndex = Double.parseDouble(infoFields[SECOND_BOARD_INDEX_TOKEN_INDEX]);
+                    double secondBoardChange = Double.parseDouble(infoFields[SECOND_BOARD_CHANGE_TOKEN_INDEX]);
+                    // double mesdaqIndex = Double.parseDouble(infoFields[MESDAQ_INDEX_TOKEN_INDEX]);
+                    // double mesdaqChange = Double.parseDouble(infoFields[MESDAQ_INDEX_CHANGE_INDEX]);
+                    double mesdaqIndex = 0.0;
+                    double mesdaqChange = 0.0;
+                    int up = Integer.parseInt(infoFields[UP_TOKEN_INDEX]);
+                    int down = Integer.parseInt(infoFields[DOWN_TOKEN_INDEX]);
+                    int unchange = Integer.parseInt(infoFields[UNCHANGE_TOKEN_INDEX]);
+                    long volume = Long.parseLong(infoFields[VOLUME_TOKEN_INDEX]);
+                    double value = Double.parseDouble(infoFields[VALUE_TOKEN_INDEX]);
+
+                    // Sometimes, CIMB just returns 0.
+                    if (volume != 0) {
+                        // Sort the best server.
+                        if (bestServerAlreadySorted == false) {
+                            synchronized(servers) {
+                                if (bestServerAlreadySorted == false) {
+                                    bestServerAlreadySorted = true;
+                                    String tmp = servers.get(0);
+                                    servers.set(0, servers.get(i));
+                                    servers.set(i, tmp);
                                 }
                             }
-
-                            return new MalaysiaMarket(mainBoardIndex, mainBoardChange, secondBoardIndex, secondBoardChange,
-                                mesdaqIndex, mesdaqChange, up, down, unchange, volume, value);
                         }
-                    }
-                    catch(NumberFormatException exp) {
-                        log.error("", exp);
-                        continue;
+
+                        return new MalaysiaMarket(mainBoardIndex, mainBoardChange, secondBoardIndex, secondBoardChange,
+                            mesdaqIndex, mesdaqChange, up, down, unchange, volume, value);
                     }
                 }
-            
-            }
-            catch(HttpException exp) {
-                log.error("", exp);
-                continue;
-            }
-            catch(IOException exp) {
-                log.error("", exp);
-                continue;
-            }
-            finally {
-                method.releaseConnection();
-            }
-        }
+                catch(NumberFormatException exp) {
+                    log.error("", exp);
+                    continue;
+                }
+            }   // if (infos.length() != 0)
+        }   // for
             
         return null;
     }
@@ -167,6 +145,6 @@ public class CIMBMarketServer implements MarketServer {
     private static final int SECOND_BOARD_CHANGE_TOKEN_INDEX = 9; 
     private static final int VOLUME_TOKEN_INDEX = 10; 
     private static final int VALUE_TOKEN_INDEX = 11;
-    
+
     private static final Log log = LogFactory.getLog(CIMBMarketServer.class);    
 }
