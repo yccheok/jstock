@@ -19,10 +19,7 @@
 
 package org.yccheok.jstock.engine;
 
-import java.io.*;
 import java.util.*;
-import org.apache.commons.httpclient.*;
-import org.apache.commons.httpclient.methods.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -63,59 +60,47 @@ public class CIMBStockServer extends Subject<CIMBStockServer, Integer> implement
 
         Thread currentThread = Thread.currentThread();
 
-        final HttpClient httpClient = new HttpClient();
-
-        int index = 0;
+        int index = -1;
 
         for (String server : servers) {
+            index++;
+
             if (currentThread.isInterrupted()) {
 				throw new StockNotFoundException("Thread has been interrupted");
 			}
         
-            HttpMethod method = new GetMethod(server + "rtQuote.dll?GetStockGeneral&Key=" + _symbol);                        
+            final String request = server + "rtQuote.dll?GetStockGeneral&Key=" + _symbol;
             
-            try {
-                Utils.setHttpClientProxyFromSystemProperties(httpClient);
-                org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
+            final String respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(request);
 
-				final String respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(httpClient, method);
+            if (respond == null) {
+                continue;
+            }
+            stocks = stockFormat.parse(respond);
 
-                stocks = stockFormat.parse(respond);
+            if (stocks.size() != 1) {
+                log.error("Number of stock (" + stocks.size() + ") is not 1");
+                continue;
+            }
 
-                if (stocks.size() != 1) {
-                    log.error("Number of stock (" + stocks.size() + ") is not 1");
-                    continue;
-                }
-
-               // Sort the best server.
-                if (bestServerAlreadySorted == false) {
-                    synchronized(servers) {
-                        if (bestServerAlreadySorted == false) {
-                            bestServerAlreadySorted = true;
-                            String tmp = servers.get(0);
-                            servers.set(0, servers.get(index));
-                            servers.set(index, tmp);
-                        }
+           // Sort the best server.
+            if (bestServerAlreadySorted == false) {
+                synchronized(servers) {
+                    if (bestServerAlreadySorted == false) {
+                        bestServerAlreadySorted = true;
+                        String tmp = servers.get(0);
+                        servers.set(0, servers.get(index));
+                        servers.set(index, tmp);
                     }
                 }
-            }
-            catch (HttpException exp) {
-                log.error("symbol=" + symbol, exp);
-                continue;
-            }
-            catch (IOException exp) {
-                log.error("symbol=" + symbol, exp);
-                continue;
-            }
-            finally {
-                method.releaseConnection();
-                index++;
             }
             
             break;
         }
         
-        if(stocks == null) throw new StockNotFoundException("Cannot get symbol=" + symbol);
+        if (stocks == null) {
+            throw new StockNotFoundException("Cannot get symbol=" + symbol);
+        }
         
         return stocks.get(0);
     }
@@ -162,83 +147,70 @@ public class CIMBStockServer extends Subject<CIMBStockServer, Integer> implement
 
         Thread currentThread = Thread.currentThread();
 
-        final HttpClient httpClient = new HttpClient();
-
-        int index = 0;
+        int index = -1;
 
         for (String server : servers) {
+            index++;
+            
             if (currentThread.isInterrupted()) {
                 throw new StockNotFoundException("Thread has been interrupted");
             }
 
             /* ascending order */
-            HttpMethod method = new GetMethod(server + "rtQuote.dll?GetStockInfoSortByCode&StockList=" + _codes + "&SortDesc=0");
+            final String request = server + "rtQuote.dll?GetStockInfoSortByCode&StockList=" + _codes + "&SortDesc=0";
             // method.getParams().setParameter("http.socket.timeout", new Integer(5000));
 
-            try {
-                Utils.setHttpClientProxyFromSystemProperties(httpClient);
-                org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
-				final String respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(httpClient, method);
+            final String respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(request);
 
-                
-                stocks = stockFormat.parse(respond);
+            if (respond == null) {
+                continue;
+            }
 
-                //if(stocks.size() != codes.size()) {
-                //    log.error("Number of stock (" + stocks.size() + ") is not " + codes.size());
-                //    continue;
-                //}
-                // For CIMB server, if we pass one good code and one bad code to it. It will only return
-                // stock of the good code. Hence, we can easily faill into case stocks.size() != codes.size()
-                // Hence, it is must more preferable that we create our own empty stock for those bad code.
-                if (stocks.size() != codes.size()) {
-                    if (stocks.size() <= 0) {
-                        // All bad codes. Retry.
-                        log.error("Number of stock (" + stocks.size() + ") is not " + codes.size());
-                        continue;
+            stocks = stockFormat.parse(respond);
+
+            //if(stocks.size() != codes.size()) {
+            //    log.error("Number of stock (" + stocks.size() + ") is not " + codes.size());
+            //    continue;
+            //}
+            // For CIMB server, if we pass one good code and one bad code to it. It will only return
+            // stock of the good code. Hence, we can easily faill into case stocks.size() != codes.size()
+            // Hence, it is must more preferable that we create our own empty stock for those bad code.
+            if (stocks.size() != codes.size()) {
+                if (stocks.size() <= 0) {
+                    // All bad codes. Retry.
+                    log.error("Number of stock (" + stocks.size() + ") is not " + codes.size());
+                    continue;
+                }
+
+                for (Code code : codes) {
+                    if (stocks.size() >= codes.size()) {
+                        break;
                     }
 
-                    for (Code code : codes) {
-                        if (stocks.size() >= codes.size()) {
+                    boolean found = false;
+                    for (Stock stock : stocks) {
+                        if (stock.getCode().equals(code)) {
+                            found = true;
                             break;
                         }
+                    }
+                    if (found != true) {
+                        // Create fake stock if we haven't do so.
+                        stocks.add(org.yccheok.jstock.gui.Utils.getEmptyStock(code, Symbol.newInstance(code.toString())));
+                    }
+                }   /* for (Code code : codes) */
+            }   /* if (stocks.size() != codes.size()) */
 
-                        boolean found = false;
-                        for (Stock stock : stocks) {
-                            if (stock.getCode().equals(code)) {
-                                found = true;
-                                break;
-                            }
-                        }
-                        if (found != true) {
-                        	// Create fake stock if we haven't do so.
-                            stocks.add(org.yccheok.jstock.gui.Utils.getEmptyStock(code, Symbol.newInstance(code.toString())));
-                        }
-                    }   /* for (Code code : codes) */
-                }   /* if (stocks.size() != codes.size()) */
-
-               // Sort the best server.
-                if (bestServerAlreadySorted == false) {
-                    synchronized(servers) {
-                        if (bestServerAlreadySorted == false) {
-                            bestServerAlreadySorted = true;
-                            String tmp = servers.get(0);
-                            servers.set(0, servers.get(index));
-                            servers.set(index, tmp);
-                        }
+           // Sort the best server.
+            if (bestServerAlreadySorted == false) {
+                synchronized(servers) {
+                    if (bestServerAlreadySorted == false) {
+                        bestServerAlreadySorted = true;
+                        String tmp = servers.get(0);
+                        servers.set(0, servers.get(index));
+                        servers.set(index, tmp);
                     }
                 }
-            }
-            catch(HttpException exp) {
-                log.error("", exp);
-                continue;
-            }
-            catch(IOException exp) {
-                log.error("", exp);
-                continue;
-            }
-            finally {
-                method.releaseConnection();
-                index++;
             }
             
             break;
@@ -261,8 +233,6 @@ public class CIMBStockServer extends Subject<CIMBStockServer, Integer> implement
         Set<Code> codes = new HashSet<Code>();        
 
         Thread currentThread = Thread.currentThread();
-
-        final HttpClient httpClient = new HttpClient();
         
         server_label:
         for (String server : servers) {
@@ -274,52 +244,39 @@ public class CIMBStockServer extends Subject<CIMBStockServer, Integer> implement
 			}
             
             do {
+                final String request = server + "rtQuote.dll?GetStockSortByCode&From=" + from + "&To=" + to;
 
-                HttpMethod method = new GetMethod(server + "rtQuote.dll?GetStockSortByCode&From=" + from + "&To=" + to);
+                final String respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(request);
 
-                try {
-                    Utils.setHttpClientProxyFromSystemProperties(httpClient);
-                    org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
-					final String respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(httpClient, method);
-
-
-                    List<Stock> tmpstocks = stockFormat.parse(respond);
-
-                    if(tmpstocks.size() == 0) {
-                        break;
-                    }
-
-                    for(Stock stock : tmpstocks) {
-
-                        boolean firstTime = codes.add(stock.getCode());
-
-                        if(firstTime == false) continue;
-
-                        stocks.add(stock);
-                        this.notify(this, stocks.size());
-                    }
-                }
-                catch(HttpException exp) {
-                    log.error("", exp);
+                if (respond == null) {
                     continue server_label;
                 }
-                catch(IOException exp) {
-                    log.error("", exp);
-                    continue server_label;
+
+                List<Stock> tmpstocks = stockFormat.parse(respond);
+
+                if (tmpstocks.size() == 0) {
+                    break;
                 }
-                finally {
-                    method.releaseConnection();
+
+                for (Stock stock : tmpstocks) {
+
+                    boolean firstTime = codes.add(stock.getCode());
+
+                    if(firstTime == false) continue;
+
+                    stocks.add(stock);
+                    this.notify(this, stocks.size());
                 }
 
                 from = from + increase;
                 to = to + increase;
 
-            }while(true);
+            } while(true);
             
             break;
         }
         
-        if(stocks.size() == 0) {
+        if (stocks.size() == 0) {
             throw new StockNotFoundException("Empty data from server");
         }
         
@@ -361,6 +318,6 @@ public class CIMBStockServer extends Subject<CIMBStockServer, Integer> implement
     // synchronized is required during best server sorting. Hence, we will
     // use this flag to help us only perform sorting once.
     private volatile boolean bestServerAlreadySorted = false;
-    
+
     private static final Log log = LogFactory.getLog(CIMBStockServer.class);
 }
