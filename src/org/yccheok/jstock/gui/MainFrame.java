@@ -27,7 +27,6 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 
-import org.apache.commons.httpclient.HttpException;
 import org.yccheok.jstock.engine.*;
 
 import java.awt.image.BufferedImage;
@@ -52,9 +51,6 @@ import javax.imageio.ImageIO;
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.yccheok.jstock.analysis.Indicator;
 import org.yccheok.jstock.analysis.OperatorIndicator;
 import org.yccheok.jstock.gui.dynamicchart.DynamicChart;
@@ -3338,36 +3334,17 @@ public class MainFrame extends javax.swing.JFrame {
 
                 doneSignal = new CountDownLatch(1);
 
-                HttpMethod method = new GetMethod(location);
-
-                final HttpClient httpClient = new HttpClient();
-
-                String respond = null;
-
-                try {
-                    org.yccheok.jstock.engine.Utils.setHttpClientProxyFromSystemProperties(httpClient);
-                    org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
-                    respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(httpClient, method);
-                }
-                catch (HttpException ex) {
-                    log.error(null, ex);
-                }
-                catch (IOException ex) {
-                    log.error(null, ex);
-                }
-                finally {
-                    method.releaseConnection();
-                }
+                final String respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(location);
 
                 // If we fail to obtain any update, do not give up. Probably
                 // the author is going to update the latest news soon. Sleep for
                 // a while, and try again.
-                if(respond == null)
+                if (respond == null)
                 {                    
                     continue;
                 }
 
-                if(respond.indexOf(Utils.getJStockUUID()) < 0)
+                if (respond.indexOf(Utils.getJStockUUID()) < 0)
                 {
                     continue;
                 }
