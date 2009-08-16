@@ -19,7 +19,6 @@
 
 package org.yccheok.jstock.engine;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -32,8 +31,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.commons.httpclient.*;
-import org.apache.commons.httpclient.methods.*;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -67,30 +64,15 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
         
         final String location = stringBuffer.toString();
 
-        final HttpClient httpClient = new HttpClient();
-
-        for(int retry=0; retry<NUM_OF_RETRY; retry++) {
-            HttpMethod method = new GetMethod(location);                        
-
-            try {
-                Utils.setHttpClientProxyFromSystemProperties(httpClient);
-                org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
-				final String respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(httpClient, method);
-                final List<Stock> stocks = YahooStockFormat.getInstance().parse(respond);
+        for (int retry = 0; retry < NUM_OF_RETRY; retry++) {
+            final String respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(location);
+            if (respond == null) {
+                continue;
+            }
+            final List<Stock> stocks = YahooStockFormat.getInstance().parse(respond);
                 
-                if(stocks.size() == 1)
-                    return stocks.get(0);
-            }
-            catch(HttpException exp) {
-                log.error("location=" + location, exp);
-                continue;
-            }
-            catch(IOException exp) {
-                log.error("location=" + location, exp);
-                continue;
-            }
-            finally {
-                method.releaseConnection();
+            if (stocks.size() == 1) {
+                return stocks.get(0);
             }
 
             break;
@@ -160,71 +142,57 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
             
             final String location = stringBuffer.toString();
 
-            final HttpClient httpClient = new HttpClient();
-
             boolean success = false;
             
-            for(int retry=0; retry<NUM_OF_RETRY; retry++) {
-                HttpMethod method = new GetMethod(location);                        
+            for (int retry = 0; retry < NUM_OF_RETRY; retry++) {
+                final String respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(location);
 
-                try {
-                    Utils.setHttpClientProxyFromSystemProperties(httpClient);
-                    org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
-					final String respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(httpClient, method);
-                    
-                    final List<Stock> tmpStocks = YahooStockFormat.getInstance().parse(respond);
-                    if(tmpStocks.size() != MAX_STOCK_PER_ITERATION) {
-                        if(retry == (NUM_OF_RETRY-1)) {
-                            // throw new StockNotFoundException();
-                            
-                            assert(expectedSymbols.size() == MAX_STOCK_PER_ITERATION);
-                            
-                            final int currSize = tmpStocks.size();
-                            final int expectedSize = expectedSymbols.size();
-                            
-                            if(this.isToleranceAllowed(currSize, expectedSize)) {
-                                List<Symbol> currSymbols = new ArrayList<Symbol>();
-                                List<Stock> emptyStocks = new ArrayList<Stock>();
-                                
-                                for(Stock stock : tmpStocks) {
-                                    currSymbols.add(stock.getSymbol());
-                                }
-                                
-                                for(Symbol symbol : expectedSymbols) {
-                                    if(currSymbols.contains(symbol) == false) {
-                                        emptyStocks.add(org.yccheok.jstock.gui.Utils.getEmptyStock(Code.newInstance(symbol.toString()), symbol));
-                                    }
-                                }
-                                
-                                tmpStocks.addAll(emptyStocks);
-                            }
-                            else {
-                                throw new StockNotFoundException("Expected stock size=" + expectedSize + ", Current stock size=" + currSize + ", Request=" + location);
-                            }
-                        }   // if(retry == (NUM_OF_RETRY-1))
-                        continue;
-                    }   // if(tmpStocks.size() != MAX_STOCK_PER_ITERATION)
-                    
-                    stocks.addAll(tmpStocks);
-                }
-                catch (HttpException exp) {
-                    log.error("location = " + location, exp);
+                if (respond == null) {
                     continue;
                 }
-                catch (IOException exp) {
-                    log.error("location = " + location, exp);
+
+                final List<Stock> tmpStocks = YahooStockFormat.getInstance().parse(respond);
+                if (tmpStocks.size() != MAX_STOCK_PER_ITERATION) {
+                    if(retry == (NUM_OF_RETRY-1)) {
+                        // throw new StockNotFoundException();
+
+                        assert(expectedSymbols.size() == MAX_STOCK_PER_ITERATION);
+
+                        final int currSize = tmpStocks.size();
+                        final int expectedSize = expectedSymbols.size();
+
+                        if (this.isToleranceAllowed(currSize, expectedSize)) {
+                            List<Symbol> currSymbols = new ArrayList<Symbol>();
+                            List<Stock> emptyStocks = new ArrayList<Stock>();
+
+                            for(Stock stock : tmpStocks) {
+                                currSymbols.add(stock.getSymbol());
+                            }
+
+                            for(Symbol symbol : expectedSymbols) {
+                                if(currSymbols.contains(symbol) == false) {
+                                    emptyStocks.add(org.yccheok.jstock.gui.Utils.getEmptyStock(Code.newInstance(symbol.toString()), symbol));
+                                }
+                            }
+
+                            tmpStocks.addAll(emptyStocks);
+                        }
+                        else {
+                            throw new StockNotFoundException("Expected stock size=" + expectedSize + ", Current stock size=" + currSize + ", Request=" + location);
+                        }
+                    }   // if(retry == (NUM_OF_RETRY-1))
                     continue;
-                }
-                finally {
-                    method.releaseConnection();
-                }
+                }   // if(tmpStocks.size() != MAX_STOCK_PER_ITERATION)
+
+                stocks.addAll(tmpStocks);
                 
                 success = true;
                 break;
             }
             
-            if(success == false)
+            if (success == false) {
                 throw new StockNotFoundException("Inconsistent stock size (" + stocks.size() + ") and symbol size (" + symbols.size() + ")");
+            }
         }
 
         final int start = symbols.size() - remainder;        
@@ -235,7 +203,7 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
         final List<Symbol> expectedSymbols = new ArrayList<Symbol>();
         
         final int endLoop = end - 1;
-        for(int i=start; i<endLoop; i++) {
+        for (int i = start; i < endLoop; i++) {
             String symbolString = null;
 
             try {
@@ -265,68 +233,54 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
                     
         final String location = stringBuffer.toString();
 
-        final HttpClient httpClient = new HttpClient();
+        for (int retry = 0; retry < NUM_OF_RETRY; retry++) {
+            final String respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(location);
 
-        for(int retry=0; retry<NUM_OF_RETRY; retry++) {
-            HttpMethod method = new GetMethod(location);                        
+            if (respond == null) {
+                continue;
+            }
 
-            try {
-                Utils.setHttpClientProxyFromSystemProperties(httpClient);
-                org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
-				final String respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(httpClient, method);
-				
-                final List<Stock> tmpStocks = YahooStockFormat.getInstance().parse(respond);
-                if(tmpStocks.size() != remainder) {
-                    if(retry == (NUM_OF_RETRY-1)) {
-                        // throw new StockNotFoundException();
-                        
-                        final int currSize = tmpStocks.size();
-                        final int expectedSize = expectedSymbols.size();
+            final List<Stock> tmpStocks = YahooStockFormat.getInstance().parse(respond);
+            if(tmpStocks.size() != remainder) {
+                if(retry == (NUM_OF_RETRY-1)) {
+                    // throw new StockNotFoundException();
 
-                        if(this.isToleranceAllowed(currSize, expectedSize)) {
-                            List<Symbol> currSymbols = new ArrayList<Symbol>();
-                            List<Stock> emptyStocks = new ArrayList<Stock>();
+                    final int currSize = tmpStocks.size();
+                    final int expectedSize = expectedSymbols.size();
 
-                            for(Stock stock : tmpStocks) {
-                                currSymbols.add(stock.getSymbol());
-                            }
+                    if(this.isToleranceAllowed(currSize, expectedSize)) {
+                        List<Symbol> currSymbols = new ArrayList<Symbol>();
+                        List<Stock> emptyStocks = new ArrayList<Stock>();
 
-                            for(Symbol symbol : expectedSymbols) {
-                                if(currSymbols.contains(symbol) == false) {
-                                    emptyStocks.add(org.yccheok.jstock.gui.Utils.getEmptyStock(Code.newInstance(symbol.toString()), symbol));
-                                }
-                            }
-
-                            tmpStocks.addAll(emptyStocks);
+                        for(Stock stock : tmpStocks) {
+                            currSymbols.add(stock.getSymbol());
                         }
-                        else {
-                            throw new StockNotFoundException("Expected stock size=" + expectedSize + ", Current stock size=" + currSize + ", Request=" + location);
-                        }                        
-                    }   // if(retry == (NUM_OF_RETRY-1))   
-                    
-                    continue;
-                }   // if(tmpStocks.size() != remainder)
-                
-                stocks.addAll(tmpStocks);
-            }
-            catch(HttpException exp) {
-                log.error("location=" + location, exp);                
+
+                        for(Symbol symbol : expectedSymbols) {
+                            if(currSymbols.contains(symbol) == false) {
+                                emptyStocks.add(org.yccheok.jstock.gui.Utils.getEmptyStock(Code.newInstance(symbol.toString()), symbol));
+                            }
+                        }
+
+                        tmpStocks.addAll(emptyStocks);
+                    }
+                    else {
+                        throw new StockNotFoundException("Expected stock size=" + expectedSize + ", Current stock size=" + currSize + ", Request=" + location);
+                    }
+                }   // if(retry == (NUM_OF_RETRY-1))
+
                 continue;
-            }
-            catch(IOException exp) {
-                log.error("location=" + location, exp);
-                continue;
-            }
-            finally {
-                method.releaseConnection();
-            }
+            }   // if(tmpStocks.size() != remainder)
+
+            stocks.addAll(tmpStocks);
 
             break;
         }
 
-       if(stocks.size() != symbols.size())
+        if (stocks.size() != symbols.size()) {
            throw new StockNotFoundException("Inconsistent stock size (" + stocks.size() + ") and symbol size (" + symbols.size() + ")");
-       
+        }
+
         return stocks;
     }
 
@@ -481,47 +435,32 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
 
         visited.add(baseURL);
 
-        final HttpClient httpClient = new HttpClient();
-
         for (int i = 0; i < visited.size(); i++) {
             final String location = visited.get(i).toString();
 
-            HttpMethod method = new GetMethod(location);
+            final String respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(location);
 
-            try {
-                Utils.setHttpClientProxyFromSystemProperties(httpClient);
-                org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
-				final String respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(httpClient, method);
-
-                final List<Stock> tmpStocks = getStocks(respond);
-                final List<URL> urls = getURLs(respond, visited);
-
-                for (Stock stock : tmpStocks) {
-                	if (codes.add(stock.getCode())) {
-                		stocks.add(stock);
-                	}
-                }
-
-                for (URL url : urls) {
-                    if (visited.contains(url)) {
-                        continue;
-                    }
-                    visited.add(url);
-                }
-
-                notify(this, stocks.size());
-            }
-            catch (HttpException exp) {
-                log.error("location=" + location, exp);
+            if (respond == null) {
                 continue;
             }
-            catch (IOException exp) {
-                log.error("location=" + location, exp);
-                continue;
+
+            final List<Stock> tmpStocks = getStocks(respond);
+            final List<URL> urls = getURLs(respond, visited);
+
+            for (Stock stock : tmpStocks) {
+                if (codes.add(stock.getCode())) {
+                    stocks.add(stock);
+                }
             }
-            finally {
-                method.releaseConnection();
+
+            for (URL url : urls) {
+                if (visited.contains(url)) {
+                    continue;
+                }
+                visited.add(url);
             }
+
+            notify(this, stocks.size());
         }
 
         return stocks;
