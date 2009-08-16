@@ -171,7 +171,7 @@ public class CIMBStockHistoryServer implements StockHistoryServer {
         
         if(fields.length < 10) return null;
         
-        final String code = fields[0];
+        final String _code = fields[0];
         final String symbol = fields[1];
         final String name = fields[2];
         final Stock.Board board = stringToBoardMap.get(fields[5]) != null ? stringToBoardMap.get(fields[5]) : Stock.Board.Unknown;
@@ -231,7 +231,7 @@ public class CIMBStockHistoryServer implements StockHistoryServer {
                 final double changePricePercentage = _changePricePercentage.round(new MathContext(2)).doubleValue();
 
                 Stock stock = new Stock(
-                        Code.newInstance(code),
+                        Code.newInstance(_code),
                         Symbol.newInstance(symbol),
                         name,
                         board,
