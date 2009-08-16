@@ -700,9 +700,6 @@ public class Utils {
     // We prefer to have this method in gui package instead of engine. This is because it requires
     // access to JStockOptions.
     private static void setHttpClientProxyCredentialsFromJStockOptions(HttpClient httpClient) {
-        org.yccheok.jstock.engine.Utils.setHttpClientProxyFromSystemProperties(httpClient);
-        org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
-
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
         if (jStockOptions.isProxyAuthEnabled() == false) {
             httpClient.getState().clearCredentials();
