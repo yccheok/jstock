@@ -27,14 +27,10 @@ import java.awt.event.ActionListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import javax.swing.*;
-import org.apache.commons.httpclient.*;
-import org.apache.commons.httpclient.methods.*;
-import java.io.*;
 import java.text.*;
 import java.util.Enumeration;
 import javax.swing.text.*;
 import org.yccheok.jstock.engine.Country;
-import org.yccheok.jstock.engine.Factories;
 import org.yccheok.jstock.engine.StockServerFactory;
 
 /**
@@ -309,7 +305,7 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
     }// </editor-fold>//GEN-END:initComponents
     
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-// TODO add your handling code here:
+        // TODO add your handling code here:
         final String httpproxyHost = System.getProperties().getProperty("http.proxyHost");
         final String httpproxyPort = System.getProperties().getProperty("http.proxyPort");
         final String oldProxyAuthUsername = MainFrame.getInstance().getJStockOptions().getProxyAuthUserName();
@@ -329,80 +325,11 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
             System.getProperties().remove("http.proxyPort");
         }
         
-        /*
-        try {
-            java.net.InetAddress address = java.net.InetAddress.getByName("google.com");
-            if(address.isReachable(5000) == false)
-            {
-                JOptionPane.showMessageDialog(this, "Wrong proxy server or port. Unable connect to internet.", "Internet down", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-        }
-        catch(java.net.UnknownHostException exp) {
-            log.error("", exp);
-            JOptionPane.showMessageDialog(this, "Wrong proxy server or port. Unable connect to internet.", "Internet down", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-        catch (IOException exp) {
-            log.error("", exp);
-            JOptionPane.showMessageDialog(this, "Wrong proxy server or port. Unable connect to internet.", "Internet down", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-        */
-        boolean success = false;
-        
-        HttpClient httpClient = new HttpClient();
-        HttpMethod method = new GetMethod("http://www.google.com");
-        try {
-            // We are not interested at the returned string at all. We just want
-            // to know whether there will be any exception being thrown, during
-            // the process of getting respond.
-            org.yccheok.jstock.engine.Utils.setHttpClientProxyFromSystemProperties(httpClient);
-            org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
-			org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(httpClient, method);
-            success = true;
-        }
-        catch (HttpException exp) {
-            log.error("", exp);
-            JOptionPane.showMessageDialog(this, "Wrong proxy server or port. Unable connect to internet.", "Internet down", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-        catch (IOException exp) {
-            log.error("", exp);
-            JOptionPane.showMessageDialog(this, "Wrong proxy server or port. Unable connect to internet.", "Internet down", JOptionPane.WARNING_MESSAGE);
-            return;
-
-        }
-        finally {
-            method.releaseConnection();
-        }
-                
-        /*
-        try
-        {
-            URL url = new URL("http://www.google.com");
-            URLConnection connection = url.openConnection();
-            connection.setConnectTimeout(5000);
-            
-            BufferedReader dis = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            
-            String tmpLine = tmpLine = dis.readLine();
-            
-            dis.close();
-            
-            success = true;
-        } catch (MalformedURLException me) {
-            log.error("", me);            
-           
-        } catch (IOException ioe) {
-            log.error("", ioe);            
-        }
-        */
-        
-        if (success)
-            JOptionPane.showMessageDialog(this, "Correct proxy server and port. Internet connection success.", "Connection success", JOptionPane.INFORMATION_MESSAGE);
-        else
-            JOptionPane.showMessageDialog(this, "Wrong proxy server or port. Unable connect to internet.", "Internet down", JOptionPane.WARNING_MESSAGE);
+        final String request = "http://www.google.com";
+        // We are not interested at the returned content at all. We just want
+        // to know whether there will be any exception being thrown, during
+        // the process of getting respond.
+        final boolean success = (null != org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(request));
 
         // Restore.
         MainFrame.getInstance().getJStockOptions().setProxyAuthUserName(oldProxyAuthUsername);
@@ -419,7 +346,14 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
             System.getProperties().put("http.proxyPort", httpproxyPort);
         }
         else {
-            System.getProperties().remove("http.proxyPort");        
+            System.getProperties().remove("http.proxyPort");
+        }
+        
+        if (success) {
+            JOptionPane.showMessageDialog(this, "Correct proxy server and port. Internet connection success.", "Connection success", JOptionPane.INFORMATION_MESSAGE);
+        }
+        else {
+            JOptionPane.showMessageDialog(this, "Wrong proxy server or port. Unable connect to internet.", "Internet down", JOptionPane.WARNING_MESSAGE);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 

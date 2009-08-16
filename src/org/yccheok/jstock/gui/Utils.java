@@ -566,9 +566,12 @@ public class Utils {
     // access to JStockOptions.
     // Returns null if fail.
     public static String getResponseBodyAsStringBasedOnProxyAuthOption(String request) {
+        org.yccheok.jstock.engine.Utils.setHttpClientProxyFromSystemProperties(httpClient);
+        org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
+
         final HttpMethod method = new GetMethod(request);
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
-        final String respond;
+        String respond = null;
         try {
             if (jStockOptions.isProxyAuthEnabled()) {
                 method.setFollowRedirects(false);
@@ -634,7 +637,7 @@ public class Utils {
 
         final HttpMethod method = new GetMethod(request);
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
-        final InputStream respond;
+        InputStream respond = null;
         try {
             if (jStockOptions.isProxyAuthEnabled()) {
                 method.setFollowRedirects(false);
@@ -696,7 +699,7 @@ public class Utils {
 
     // We prefer to have this method in gui package instead of engine. This is because it requires
     // access to JStockOptions.
-    public static void setHttpClientProxyCredentialsFromJStockOptions(HttpClient httpClient) {
+    private static void setHttpClientProxyCredentialsFromJStockOptions(HttpClient httpClient) {
         org.yccheok.jstock.engine.Utils.setHttpClientProxyFromSystemProperties(httpClient);
         org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
 
@@ -732,10 +735,8 @@ public class Utils {
     public static ApplicationInfo getLatestApplicationInfo()
     {
         final String request = "http://jstock.sourceforge.net/version/version.txt";
-        org.yccheok.jstock.engine.Utils.setHttpClientProxyFromSystemProperties(httpClient);
-        org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
 
-        final InputStream stream = org.yccheok.jstock.gui.Utils.getResponseBodyAsStreamBasedOnProxyAuthOption(httpClient, request);
+        final InputStream stream = org.yccheok.jstock.gui.Utils.getResponseBodyAsStreamBasedOnProxyAuthOption(request);
 
         if (stream == null) {
             return null;
