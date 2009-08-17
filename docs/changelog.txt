@@ -1,6 +1,10 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.4i - 2009-08-18
+  Bugfix: JStock uses up all network resource (#2836422)
+  Bugfix: Stock Indicator Scanner freeze during scanning (#2839065)
+
 JStock 1.0.4h-bugfix - 2009-08-07
   Bugfix: Switching among servers has no effect on market index (#2833030)
   Bugfix: java.lang.IllegalArgumentException for KLCI index (#2833029)

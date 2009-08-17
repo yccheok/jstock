@@ -301,8 +301,8 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             final int fallBelowIndex = tableModel.findColumn("Fall Below");
 
             final double lastPrice = (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), tableModel.findColumn("Last"));
-            final Double riseAbove = riseAboveIndex >= 0 ? (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), riseAbove) : null;
-            final Double fallBelow = fallBelowIndex >= 0 ? (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), fallBelow) : null;
+            final Double riseAbove = riseAboveIndex >= 0 ? (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), riseAboveIndex) : null;
+            final Double fallBelow = fallBelowIndex >= 0 ? (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), fallBelowIndex) : null;
 
             if (riseAbove != null) {
                 if (lastPrice >= riseAbove) {

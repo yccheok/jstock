@@ -31,8 +31,6 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.html.HTMLDocument;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.divxdede.swing.busy.JBusyComponent;
@@ -83,31 +81,7 @@ public class AboutJDialog extends javax.swing.JDialog {
     // WILL BE ONLY CALLED ONCE!
     private void updateCheckForUpdateStatus(final String string)
     {
-        jEditorPane2.setText("<html><head></head><body></body></html>");
-        HTMLDocument htmlDocument = (HTMLDocument)jEditorPane2.getDocument();
-
-        javax.swing.text.Element html = htmlDocument.getRootElements()[0];
-        javax.swing.text.Element body = null;
-        final int count = html.getElementCount();
-
-        for (int i = 0; i < count; i++) {
-            javax.swing.text.Element tmp = html.getElement(i);
-            if (tmp.getName().equalsIgnoreCase("body"))
-            {
-                body = tmp;
-                break;
-            }
-        }
-
-        if (body == null) return;
-
-        try {
-            htmlDocument.insertAfterStart(body, string);
-        } catch (BadLocationException ex) {
-            log.error(null, ex);
-        } catch (IOException ex) {
-            log.error(null, ex);
-        }
+        jEditorPane2.setText("<html><head></head><body>" + string + "</body></html>");
 
         SwingUtilities.invokeLater(new Runnable() {
             @Override
