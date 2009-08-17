@@ -1,23 +1,20 @@
 /*
- * StockTableCellRender.java
- *
- * Created on May 1, 2007, 5:43 PM
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- * Copyright (C) 2007 Cheok YanCheng <yccheok@yahoo.com>
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.yccheok.jstock.gui;
@@ -114,9 +111,11 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
         boolean alert = false;
 
         if (jStockOptions.isEnableColorAlert()) {
+            final int riseAboveIndex = tableModel.findColumn("Rise Above");
+            final int fallBelowIndex = tableModel.findColumn("Fall Below");
             final double lastPrice = (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), tableModel.findColumn("Last"));
-            final Double riseAbove = (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), tableModel.findColumn("Rise Above"));
-            final Double fallBelow = (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), tableModel.findColumn("Fall Below"));
+            final Double riseAbove = riseAboveIndex >= 0 ? (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), riseAboveIndex) : null;
+            final Double fallBelow = fallBelowIndex >= 0 ? (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), fallBelowIndex) : null;
 
             if (riseAbove != null) {
                 if (lastPrice >= riseAbove) {
@@ -298,9 +297,12 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
         boolean alert = false;
 
         if (jStockOptions.isEnableColorAlert()) {
+            final int riseAboveIndex = tableModel.findColumn("Rise Above");
+            final int fallBelowIndex = tableModel.findColumn("Fall Below");
+
             final double lastPrice = (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), tableModel.findColumn("Last"));
-            final Double riseAbove = (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), tableModel.findColumn("Rise Above"));
-            final Double fallBelow = (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), tableModel.findColumn("Fall Below"));
+            final Double riseAbove = riseAboveIndex >= 0 ? (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), riseAbove) : null;
+            final Double fallBelow = fallBelowIndex >= 0 ? (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), fallBelow) : null;
 
             if (riseAbove != null) {
                 if (lastPrice >= riseAbove) {
