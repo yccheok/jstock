@@ -99,24 +99,32 @@ public class Utils {
     // A value obtained from server, to ensure all JStock's users are getting
     // same value for same key.
     public static String getUUIDValue(String url, String key) {
-        final InputStream stream = org.yccheok.jstock.gui.Utils.getResponseBodyAsStreamBasedOnProxyAuthOption(url);
+        final org.yccheok.jstock.gui.Utils.InputStreamAndMethod inputStreamAndMethod = org.yccheok.jstock.gui.Utils.getResponseBodyAsStreamBasedOnProxyAuthOption(url);
 
-        if (stream == null) {
+        if (inputStreamAndMethod.inputStream == null) {
+            inputStreamAndMethod.method.releaseConnection();
             return null;
         }
 
         Properties properties = new Properties();
         try {
-            properties.load(stream);
-        } catch (IOException exp) {
+            properties.load(inputStreamAndMethod.inputStream);
+        }
+        catch (IOException exp) {
             log.error(null, exp);
+			return null;
+        }
+        catch (IllegalArgumentException exp) {
+            log.error(null, exp);
+			return null;
         }
         finally {
             try {
-                stream.close();
+                inputStreamAndMethod.inputStream.close();
             } catch (IOException exp) {
                 log.error(null, exp);
             }
+            inputStreamAndMethod.method.releaseConnection();
         }
         final String _id = properties.getProperty("id");
         if (_id == null) {
@@ -631,13 +639,33 @@ public class Utils {
         return respond;
     }
 
-    public static InputStream getResponseBodyAsStreamBasedOnProxyAuthOption(String request) {
+    public static class InputStreamAndMethod {
+        public final InputStream inputStream;
+        public final HttpMethod method;
+        public InputStreamAndMethod(InputStream inputStream, HttpMethod method) {
+            this.inputStream = inputStream;
+            this.method = method;
+        }
+    }
+
+    // Unlike getResponseBodyAsStringBasedOnProxyAuthOption, method must be closed
+    // explicitly by caller. If not, the returned input stream will not be valid.
+    // The returned InputStreamAndMethod and InputStreamAndMethod.method will always be non-null.
+    //
+    // InputStreamAndMethod.inputStream will be null if we fail to get any respond.
+    //
+    // We must always remember to close InputStreamAndMethod.method, after finish
+    // reading InputStreamAndMethod.inputStream.
+    public static InputStreamAndMethod getResponseBodyAsStreamBasedOnProxyAuthOption(String request) {
         org.yccheok.jstock.engine.Utils.setHttpClientProxyFromSystemProperties(httpClient);
         org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
 
-        final HttpMethod method = new GetMethod(request);
+		final GetMethod method = new GetMethod(request);
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        InputStreamAndMethod inputStreamAndMethod = null;
         InputStream respond = null;
+        HttpMethod methodToClosed = method;
+
         try {
             if (jStockOptions.isProxyAuthEnabled()) {
                 method.setFollowRedirects(false);
@@ -650,51 +678,45 @@ public class Utils {
                     (statuscode == HttpStatus.SC_TEMPORARY_REDIRECT)) {
                     //Make new Request with new URL
                     Header header = method.getResponseHeader("location");
-                    HttpMethod RedirectMethod = new GetMethod(header.getValue());
-                    // I assume it is OK to release method for twice. (The second
-                    // release will happen in finally block). We shouldn't have an
-                    // unreleased method, before executing another new method.
+                    GetMethod RedirectMethod = new GetMethod(header.getValue());
+                    methodToClosed = RedirectMethod;
                     method.releaseConnection();
                     // Do RedirectMethod within try-catch-finally, so that we can have a
                     // exception free way to release RedirectMethod connection.
-                    // #2836422
+                    // #2836422                    
                     try {
                         httpClient.executeMethod(RedirectMethod);
                         respond = RedirectMethod.getResponseBodyAsStream();
                     }
                     catch (HttpException exp) {
                         log.error(null, exp);
-                        return null;
                     }
                     catch (IOException exp) {
                         log.error(null, exp);
-                        return null;
-                    }
-                    finally {
-                        RedirectMethod.releaseConnection();
                     }
                 }
                 else {
+                    methodToClosed = method;
                     respond = method.getResponseBodyAsStream();
                 } // if statuscode = Redirect
             }
             else {
+                methodToClosed = method;
                 httpClient.executeMethod(method);
                 respond = method.getResponseBodyAsStream();
             } //  if jStockOptions.isProxyAuthEnabled()
         }
         catch (HttpException exp) {
             log.error(null, exp);
-            return null;
         }
         catch (IOException exp) {
             log.error(null, exp);
-            return null;
         }
         finally {
-            method.releaseConnection();
+            inputStreamAndMethod = new InputStreamAndMethod(respond, methodToClosed);
         }
-        return respond;
+
+        return inputStreamAndMethod;
     }
 
     // We prefer to have this method in gui package instead of engine. This is because it requires
@@ -733,25 +755,33 @@ public class Utils {
     {
         final String request = "http://jstock.sourceforge.net/version/version.txt";
 
-        final InputStream stream = org.yccheok.jstock.gui.Utils.getResponseBodyAsStreamBasedOnProxyAuthOption(request);
+        final org.yccheok.jstock.gui.Utils.InputStreamAndMethod inputStreamAndMethod = org.yccheok.jstock.gui.Utils.getResponseBodyAsStreamBasedOnProxyAuthOption(request);
 
-        if (stream == null) {
+        if (inputStreamAndMethod.inputStream == null) {
+            inputStreamAndMethod.method.releaseConnection();
             return null;
         }
 
         Properties properties = new Properties();
         try {
-            properties.load(stream);
-        } catch (IOException exp) {
+            properties.load(inputStreamAndMethod.inputStream);
+        }
+        catch (IOException exp) {
             log.error(null, exp);
             return null;
         }
+        catch (IllegalArgumentException exp) {
+            log.error(null, exp);
+            return null;
+
+        }
         finally {
             try {
-                stream.close();
+                inputStreamAndMethod.inputStream.close();
             } catch (IOException exp) {
                 log.error(null, exp);
             }
+            inputStreamAndMethod.method.releaseConnection();
         }
 
         final String applicationVersionID = properties.getProperty("applicationVersionID");
@@ -890,7 +920,14 @@ public class Utils {
 
     private static final int NUM_OF_THREADS_ZOMBIE_POOL = 4;
 
-    private static final HttpClient httpClient = new HttpClient(new MultiThreadedHttpConnectionManager());
+    private static final HttpClient httpClient;
 
+    static {
+        MultiThreadedHttpConnectionManager multiThreadedHttpConnectionManager = new MultiThreadedHttpConnectionManager();
+        multiThreadedHttpConnectionManager.getParams().setMaxTotalConnections(128);
+        multiThreadedHttpConnectionManager.getParams().setDefaultMaxConnectionsPerHost(128);
+        httpClient = new HttpClient(multiThreadedHttpConnectionManager);
+        multiThreadedHttpConnectionManager.getParams().setMaxConnectionsPerHost(httpClient.getHostConfiguration(), 128);
+    }
     private static final Log log = LogFactory.getLog(Utils.class);
 }
