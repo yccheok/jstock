@@ -72,13 +72,14 @@ public class CIMBStockHistoryServer implements StockHistoryServer {
             final String request = server + "java/jar/data/" + encodedCode + ".dat.gz";
             StringBuffer s = new StringBuffer(data.length);
 
-            final InputStream inputStream = org.yccheok.jstock.gui.Utils.getResponseBodyAsStreamBasedOnProxyAuthOption(request);
-            if (inputStream == null) {
+            final org.yccheok.jstock.gui.Utils.InputStreamAndMethod inputStreamAndMethod = org.yccheok.jstock.gui.Utils.getResponseBodyAsStreamBasedOnProxyAuthOption(request);
+            if (inputStreamAndMethod.inputStream == null) {
+                inputStreamAndMethod.method.releaseConnection();
                 continue;
             }
             java.util.zip.GZIPInputStream gZipInputStream = null;            
             try {
-                gZipInputStream = new java.util.zip.GZIPInputStream(inputStream);
+                gZipInputStream = new java.util.zip.GZIPInputStream(inputStreamAndMethod.inputStream);
 				int n = 0;
                 while((n = gZipInputStream.read(data, 0, data.length)) != -1) {
                     s.append(new String(data, 0, n));
@@ -88,7 +89,7 @@ public class CIMBStockHistoryServer implements StockHistoryServer {
                 log.error(null, exp);
                 continue;
             }
-            finally {
+            finally {                
 				// Do not do anything if fail to clean up. Just ignore the
 				// exception.
                 if (gZipInputStream != null) {
@@ -99,13 +100,15 @@ public class CIMBStockHistoryServer implements StockHistoryServer {
                     }
                 }
 
-                if (inputStream != null) {
+                if (inputStreamAndMethod.inputStream != null) {
                     try {
-                        inputStream.close();
+                        inputStreamAndMethod.inputStream.close();
                     } catch (IOException exp) {
                         log.error(null, exp);
                     }
                 }
+                
+                inputStreamAndMethod.method.releaseConnection();
             }
 
             HistoryDatabaseResult historyDatebaseResult = this.getHistoryDatabase(s.toString());
