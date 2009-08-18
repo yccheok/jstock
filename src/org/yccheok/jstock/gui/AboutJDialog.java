@@ -1,23 +1,20 @@
 /*
- * AboutJDialog.java
- *
- * Created on July 5, 2007, 1:01 AM
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.yccheok.jstock.gui;
@@ -27,13 +24,11 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.divxdede.swing.busy.JBusyComponent;
 import org.yccheok.blobsallad.Controller;
 
 /**
@@ -81,23 +76,28 @@ public class AboutJDialog extends javax.swing.JDialog {
     // WILL BE ONLY CALLED ONCE!
     private void updateCheckForUpdateStatus(final String string)
     {
-        jEditorPane2.setText("<html><head></head><body>" + string + "</body></html>");
+        if (javax.swing.SwingUtilities.isEventDispatchThread()) {
+            jEditorPane2.setText("<html><head></head><body>" + string + "</body></html>");
+        }
+        else {
+            SwingUtilities.invokeLater(new Runnable() {
 
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                // Must be called within GUI event dispatch thread.
-                // This is to reduce chance of having flicking displayed window.
-                // I am not sure why this happen.
-                busyComponent.setBusy(false);
-            }
-        });
+                @Override
+                public void run() {
+                    jEditorPane2.setText("<html><head></head><body>" + string + "</body></html>");
+                }
+
+            });
+        }
     }
 
     /** Creates new form AboutJDialog */
     public AboutJDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        updateCheckForUpdateStatus("<p style=\"margin-top: 0; font-size: 9px; font-family: Tahoma;\"><b>Checking for updates... </b><img src=\"" + Utils.toHTMLFileSrcFormat(Utils.getExtraDataDirectory() + "spinner.gif") + "\"/></p>");
+
+        checkForUpdateThread.start();
    }
     
     /** This method is called from within the constructor to
@@ -108,11 +108,6 @@ public class AboutJDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel2 = new javax.swing.JPanel();
-        busyComponent = new JBusyComponent<JPanel>(jPanel2);
-        busyComponent.setBusy(true);
-        checkForUpdateThread.start();
-        jEditorPane2 = new javax.swing.JEditorPane();
         jPanel1 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         jTabbedPane1 = new javax.swing.JTabbedPane();
@@ -121,6 +116,8 @@ public class AboutJDialog extends javax.swing.JDialog {
         jPanel9 = new javax.swing.JPanel();
         jPanel10 = new javax.swing.JPanel();
         jEditorPane3 = new javax.swing.JEditorPane();
+        jPanel2 = new javax.swing.JPanel();
+        jEditorPane2 = new javax.swing.JEditorPane();
         jPanel4 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jEditorPane1 = new javax.swing.JEditorPane();
@@ -132,17 +129,6 @@ public class AboutJDialog extends javax.swing.JDialog {
         jPanel8 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-
-        jEditorPane2.setBackground(new java.awt.Color(240, 240, 240));
-        jEditorPane2.setContentType("text/html");
-        jEditorPane2.setEditable(false);
-        jEditorPane2.setText("<html>\n<head>\n</head>\n    <body>\n        <p style=\"margin-top: 0; font-size: 9px; font-family: Tahoma;\"><b>Checking for updates...</b></p>\n    </body>\n</html>");
-        jEditorPane2.addHyperlinkListener(new javax.swing.event.HyperlinkListener() {
-            public void hyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {
-                jEditorPane1HyperlinkUpdate(evt);
-            }
-        });
-        jPanel2.add(jEditorPane2);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("About JStock");
@@ -182,7 +168,7 @@ public class AboutJDialog extends javax.swing.JDialog {
         jEditorPane3.setBackground(new java.awt.Color(240, 240, 240));
         jEditorPane3.setContentType("text/html");
         jEditorPane3.setEditable(false);
-        jEditorPane3.setText("<html>\r\n  <head>\r\n\r\n  </head>\r\n  <body>\r\n        <p style=\"margin-top: 0; font-size: 9px; font-family: Tahoma;\">Homepage : <a href=\"http://jstock.sourceforge.net\">http://jstock.sourceforge.net</a></p>\n  </body>\r\n</html>\r\n");
+        jEditorPane3.setText("<html>\r\n  <head>\r\n\r\n  </head>\r\n  <body>\r\n        <p style=\"margin-top: 0; font-size: 9px; font-family: Tahoma;\">Homepage : <a href=\"http://jstock.sourceforge.net/?utm_source=jstock&utm_medium=about_box_link\">http://jstock.sourceforge.net</a></p>\n  </body>\r\n</html>\r\n");
         jEditorPane3.addHyperlinkListener(new javax.swing.event.HyperlinkListener() {
             public void hyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {
                 jEditorPane1HyperlinkUpdate(evt);
@@ -192,7 +178,19 @@ public class AboutJDialog extends javax.swing.JDialog {
 
         jPanel9.add(jPanel10);
 
-        jPanel9.add(busyComponent);
+        jEditorPane2.setBackground(new java.awt.Color(240, 240, 240));
+        jEditorPane2.setContentType("text/html");
+        jEditorPane2.setEditable(false);
+        jEditorPane2.setText("<html>\n<head>\n</head>\n    <body>\n        <p style=\"margin-top: 0; font-size: 9px; font-family: Tahoma;\"><b>Checking for updates...</b></p>\n    </body>\n</html>");
+        jEditorPane2.addHyperlinkListener(new javax.swing.event.HyperlinkListener() {
+            public void hyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {
+                jEditorPane1HyperlinkUpdate(evt);
+            }
+        });
+        jPanel2.add(jEditorPane2);
+
+        jPanel9.add(jPanel2);
+
         jPanel3.add(jPanel9, java.awt.BorderLayout.SOUTH);
 
         jTabbedPane1.addTab("General", jPanel3);
@@ -203,7 +201,7 @@ public class AboutJDialog extends javax.swing.JDialog {
 
         jEditorPane1.setContentType("text/html");
         jEditorPane1.setEditable(false);
-        jEditorPane1.setText("<html>\n<head>\n</head>\n    <body>\n        <p style=\"margin-top: 10; font-size: 9px; font-family: Tahoma;\"><u>Team Members of JStock Open Source Project :</u></p>\n        <p style=\"margin-top: 10; font-size: 9px; font-family: Tahoma;\"><b>Yan Cheng Cheok</b>, <a href=\"mailto:yccheok@yahoo.com\">yccheok@yahoo.com</a>, Original developer, project admin.</p>\n        <p style=\"margin-top: 10; font-size: 9px; font-family: Tahoma;\"><b><a href=\"http://www.iconblock.com/\">The IconBlock Ltd</a></b>, Graphic Designer.</p>\n        <p style=\"margin-top: 10; font-size: 9px; font-family: Tahoma;\"><b>Peter Gransdorfer</b>, Developer.</p>\n        <p style=\"margin-top: 10; font-size: 9px; font-family: Tahoma;\"><b>Shuwn Yuan Tee</b>, Web Designer.</p>\n        <p style=\"margin-top: 10; font-size: 9px; font-family: Tahoma;\"><b>Karl Heinz Putz</b>, Mac packager.</p>\n        <br>\n        <br>\n        <p style=\"margin-top: 10; font-size: 9px; font-family: Tahoma;\"><u>Used Libraries :</u></p>\n        <p style=\"margin-top: 10; font-size: 9px; font-family: Tahoma;\">\n        <a href=\"http://commons.apache.org/logging/\">Apache Common Logging</a> - Logging.<br>\n        <a href=\"http://hc.apache.org/httpclient-3.x/\">Apache HttpClient</a> - Http communication.<br>\n        <a href=\"http://poi.apache.org/\">Apache POI</a> - Excel file format.<br>\n        <a href=\"http://jstock.sourceforge.net/blobsallad/\">blobsallad</a> - Java ported blob sallad by Yan Cheng Cheok. Original JavaScript version written by Björn Lindberg.<br>\n        <a href=\"http://code.google.com/p/jbusycomponent/\">jbusycomponent</a> - Swing component with busy state.<br>\n        <a href=\"http://www.jfree.org/jfreechart/\">JFreeChart</a> - Charting.<br>\n        <a href=\"https://sourceforge.net/projects/jhotdraw/\">JHotDraw</a> - Indicator editor drawing.<br>\n        <a href=\"http://www.l2fprod.com/\">L2fProd</a> - Flashy looking GUI.<br>\n        <a href=\"http://www.jasypt.org/\">Jasypt</a> - Encryption.<br>\n        <a href=\"http://nachocalendar.sourceforge.net/\">NachoCalendar</a> - Calendar GUI component.<br>\n        <a href=\"http://opencsv.sourceforge.net/\">opencsv</a> - CSV file format.<br>\n        <a href=\"http://www.igniterealtime.org/projects/smack/index.jsp\">Smack</a> - XMPP messaging.<br>\n        <a href=\"https://swingx.dev.java.net/\">SwingX</a> - Flashy looking GUI.<br>\n        <a href=\"http://xstream.codehaus.org/\">XStream</a> - Serialization.<br>\n        </p>\n        <br>\n        <br>\n        <hr>\n        <p style=\"margin-top: 10; font-size: 8px; font-family: Tahoma;\">Wish to see your name being mentioned here? Feel free to visit <a href=\"http://sourceforge.net/projects/jstock\">http://sourceforge.net/projects/jstock</a> to see how you can contribute to JStock Open Source Project.</p>\n    </body>\n</html>");
+        jEditorPane1.setText("<html>\n<head>\n</head>\n    <body>\n        <p style=\"margin-top: 10; font-size: 9px; font-family: Tahoma;\"><u>Team Members of JStock Open Source Project :</u></p>\n        <p style=\"margin-top: 10; font-size: 9px; font-family: Tahoma;\"><b>Yan Cheng Cheok</b>, <a href=\"mailto:yccheok@yahoo.com\">yccheok@yahoo.com</a>, Original developer, project admin.</p>\n        <p style=\"margin-top: 10; font-size: 9px; font-family: Tahoma;\"><b><a href=\"http://www.iconblock.com/\">The IconBlock Ltd</a></b>, Graphic Designer.</p>\n        <p style=\"margin-top: 10; font-size: 9px; font-family: Tahoma;\"><b>Peter Gransdorfer</b>, Developer.</p>\n        <p style=\"margin-top: 10; font-size: 9px; font-family: Tahoma;\"><b> Nanne Baars</b>, Developer.</p>\n        <p style=\"margin-top: 10; font-size: 9px; font-family: Tahoma;\"><b>Shuwn Yuan Tee</b>, Web Designer.</p>\n        <p style=\"margin-top: 10; font-size: 9px; font-family: Tahoma;\"><b>Karl Heinz Putz</b>, Mac packager.</p>\n        <br>\n        <br>\n        <p style=\"margin-top: 10; font-size: 9px; font-family: Tahoma;\"><u>Used Libraries :</u></p>\n        <p style=\"margin-top: 10; font-size: 9px; font-family: Tahoma;\">\n        <a href=\"http://commons.apache.org/logging/\">Apache Common Logging</a> - Logging.<br>\n        <a href=\"http://hc.apache.org/httpclient-3.x/\">Apache HttpClient</a> - Http communication.<br>\n        <a href=\"http://poi.apache.org/\">Apache POI</a> - Excel file format.<br>\n        <a href=\"http://jstock.sourceforge.net/blobsallad/\">blobsallad</a> - Java ported blob sallad by Yan Cheng Cheok. Original JavaScript version written by Björn Lindberg.<br>\n        <a href=\"http://www.jfree.org/jfreechart/\">JFreeChart</a> - Charting.<br>\n        <a href=\"https://sourceforge.net/projects/jhotdraw/\">JHotDraw</a> - Indicator editor drawing.<br>\n        <a href=\"http://www.l2fprod.com/\">L2fProd</a> - Flashy looking GUI.<br>\n        <a href=\"http://www.jasypt.org/\">Jasypt</a> - Encryption.<br>\n        <a href=\"http://nachocalendar.sourceforge.net/\">NachoCalendar</a> - Calendar GUI component.<br>\n        <a href=\"http://opencsv.sourceforge.net/\">opencsv</a> - CSV file format.<br>\n        <a href=\"http://www.igniterealtime.org/projects/smack/index.jsp\">Smack</a> - XMPP messaging.<br>\n        <a href=\"https://swingx.dev.java.net/\">SwingX</a> - Flashy looking GUI.<br>\n        <a href=\"http://xstream.codehaus.org/\">XStream</a> - Serialization.<br>\n        </p>\n        <br>\n        <br>\n        <hr>\n        <p style=\"margin-top: 10; font-size: 8px; font-family: Tahoma;\">Wish to see your name being mentioned here? Feel free to visit <a href=\"http://sourceforge.net/projects/jstock\">http://sourceforge.net/projects/jstock</a> to see how you can contribute to JStock Open Source Project.</p>\n    </body>\n</html>");
         jEditorPane1.addHyperlinkListener(new javax.swing.event.HyperlinkListener() {
             public void hyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {
                 jEditorPane1HyperlinkUpdate(evt);
@@ -294,10 +292,6 @@ public class AboutJDialog extends javax.swing.JDialog {
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
         // TODO add your handling code here:
-        if (busyComponent != null) {
-            // Stop the busy indicator thread.
-            busyComponent.setBusy(false);
-        }
         controller.stop();
     }//GEN-LAST:event_formWindowClosed
 
@@ -311,7 +305,6 @@ public class AboutJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jTabbedPane1StateChanged
 
     private Controller controller = new Controller();
-    private JBusyComponent<JPanel> busyComponent = null;
 
     private static final Log log = LogFactory.getLog(AboutJDialog.class);
 
