@@ -30,6 +30,8 @@ import java.net.Proxy;
 import java.net.ProxySelector;
 import java.net.SocketAddress;
 import java.util.List;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * I am responsible for detecting and selecting a proxy.
@@ -77,12 +79,17 @@ public class ProxyDetector {
             System.setProperty(PROXY_PROPERTY, "true");
             return ProxySelector.getDefault().select(new java.net.URI("http://www.google.com"));
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            // As ProxyDetector is the initial code being executed in main,
+            // we cannot afford any failure. This will make our entire JStock
+            // application crash.
+            // throw new RuntimeException(e);
+            log.error(null, e);
         } finally {
             if (valuePropertyBefore != null) {
                 System.setProperty(PROXY_PROPERTY, valuePropertyBefore);
             }
         }
+        return java.util.Collections.EMPTY_LIST;
     }
 
     /**
@@ -152,4 +159,6 @@ public class ProxyDetector {
         }
         return -1;
     }
+
+    private static final Log log = LogFactory.getLog(ProxyDetector.class);
 }
