@@ -165,10 +165,10 @@ public class StockServerFactoryJRadioButton extends JRadioButton {
 
         // Define an HTML fragment with an icon on the left and text on the right.
         // The elements are embedded in a 3-column table.
-        String label = "<html><table cellpadding=0><tr><td><img src=file:"
+        String label = "<html><table cellpadding=0><tr><td><img src=\""
             // The location of the icon
             + status.getFileName()
-            + "/></td><td width="
+            + "\"/></td><td width="
 
             // The gap, in pixels, between icon and text
             + 3
@@ -193,9 +193,9 @@ public class StockServerFactoryJRadioButton extends JRadioButton {
     }
 
     private enum Status {
-        Busy(Utils.getExtraDataDirectory() + "spinner.gif"),
-        Success(Utils.getExtraDataDirectory() + "network-transmit-receive.png"),
-        Failed(Utils.getExtraDataDirectory() + "network-error.png");
+        Busy(Utils.toHTMLFileSrcFormat(Utils.getExtraDataDirectory() + "spinner.gif")),
+        Success(Utils.toHTMLFileSrcFormat(Utils.getExtraDataDirectory() + "network-transmit-receive.png")),
+        Failed(Utils.toHTMLFileSrcFormat(Utils.getExtraDataDirectory() + "network-error.png"));
 
         Status(String fileName) {
             this.fileName = fileName;
