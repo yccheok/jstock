@@ -51,10 +51,12 @@ import javax.imageio.ImageIO;
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.yccheok.jstock.analysis.Indicator;
 import org.yccheok.jstock.analysis.OperatorIndicator;
 import org.yccheok.jstock.gui.dynamicchart.DynamicChart;
 import org.yccheok.jstock.gui.table.NonNegativeDoubleEditor;
+import org.yccheok.jstock.network.ProxyDetector;
 
 /**
  *
@@ -976,8 +978,12 @@ public class MainFrame extends javax.swing.JFrame {
 
         this.chatJPanel.stopChatServiceManager();
         
-        if(trayIcon != null)
+        if (trayIcon != null) {
             SystemTray.getSystemTray().remove(trayIcon);
+        }
+
+        // Clean up all network resources.
+        MultiThreadedHttpConnectionManager.shutdownAll();
         
         log.info("Widnow is closed.");
         
@@ -1287,6 +1293,12 @@ public class MainFrame extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
+        // As ProxyDetector is affected by system properties
+        // http.proxyHost, we are forced to initialized ProxyDetector right here,
+        // before we manually change the system properties according to
+        // JStockOptions.
+        ProxyDetector.getInstance();
+
         Utils.setDefaultLookAndFeel();
 
         java.awt.EventQueue.invokeLater(new Runnable() {
