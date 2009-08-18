@@ -1,23 +1,20 @@
 /*
- * OptionsJPanel.java
- *
- * Created on June 19, 2007, 2:16 AM
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- * Copyright (C) 2007 Cheok YanCheng <yccheok@yahoo.com>
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.yccheok.jstock.gui;
@@ -58,6 +55,7 @@ public class OptionsJPanel extends javax.swing.JPanel implements JStockOptionsOb
     
     private void addButton(String title, String iconUrl, final Component component, JButtonBar bar, ButtonGroup group) {
         Action action = new AbstractAction( title, new ImageIcon(OptionsJPanel.class.getResource(iconUrl))) {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 show(component);
             }
@@ -129,6 +127,7 @@ public class OptionsJPanel extends javax.swing.JPanel implements JStockOptionsOb
         addButton("Update", "/images/32x32/epiphany-download.png", optionsUpdateJPanel, jButtonBar1, buttonGroup1);
     }
 
+    @Override
     public void set(JStockOptions jStockOptions) {
         optionsBrokerJPanel.set(jStockOptions);
         optionsColorJPanel.set(jStockOptions);
@@ -141,6 +140,12 @@ public class OptionsJPanel extends javax.swing.JPanel implements JStockOptionsOb
         optionsUpdateJPanel.set(jStockOptions);
     }
 
+    public void cancel() {
+        optionsNetworkJPanel.cancel();
+        optionsAlertJPanel.cancel();
+    }
+
+    @Override
     public boolean apply(JStockOptions jStockOptions) {
         /* FIXME : We should make use of JStockOptionsObserver interface. */
         if(optionsBrokerJPanel.apply(jStockOptions) == false)

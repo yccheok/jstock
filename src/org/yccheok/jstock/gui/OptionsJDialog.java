@@ -1,23 +1,20 @@
 /*
- * OptionsJDialog.java
- *
- * Created on June 19, 2007, 10:42 PM
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- * Copyright (C) 2007 Cheok YanCheng <yccheok@yahoo.com>
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.yccheok.jstock.gui;
@@ -49,6 +46,11 @@ public class OptionsJDialog extends javax.swing.JDialog implements JStockOptions
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("JStock Options");
         setResizable(false);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                formWindowClosed(evt);
+            }
+        });
 
         optionsJPanel = new OptionsJPanel();
         getContentPane().add(optionsJPanel, java.awt.BorderLayout.CENTER);
@@ -91,11 +93,18 @@ public class OptionsJDialog extends javax.swing.JDialog implements JStockOptions
         this.dispose();        
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
+        // TODO add your handling code here:
+        optionsJPanel.cancel();
+    }//GEN-LAST:event_formWindowClosed
+
+    @Override
     public void set(JStockOptions jStockOptions) {
         optionsJPanel.set(jStockOptions);
         this.jStockOptions = jStockOptions;
     }
 
+    @Override
     public boolean apply(JStockOptions jStockOptions) {
         return optionsJPanel.apply(jStockOptions);
     }
