@@ -36,6 +36,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import org.yccheok.jstock.engine.*;
 import java.util.*;
 import java.util.concurrent.Executor;
@@ -888,6 +889,16 @@ public class Utils {
 
     public static String getExtraDataDirectory() {
         return org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "extra" + File.separator;
+    }
+
+    public static String toHTMLFileSrcFormat(String fileName) {
+        try {
+            return new File(fileName).toURI().toURL().toString();
+        } catch (MalformedURLException ex) {
+            log.error(null, ex);
+        }
+		// http://www.exampledepot.com/egs/javax.swing/checkbox_AddIcon.html
+        return "file:" + fileName;
     }
 
     public static class ApplicationInfo
