@@ -3,8 +3,8 @@ Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
 JStock 1.0.4i - 2009-08-18
   Feature: Use SwingWorker to perform connection, email, sms checking (#2839440)
-  Feature: Auto detect proxy server (#1771740). Patched by nb76.
-  Feature: Google Analytics Campaign. (#2839391)
+  Feature: Auto detect proxy server (#1771740). Patched by nb76
+  Feature: Google Analytics Campaign (#2839391)
   Bugfix : JStock uses up all network resource (#2836422)
   Bugfix : Stock Indicator Scanner freeze during scanning (#2839065)
   Bugfix : Unable to display image icon during server health checking (#2839362)
