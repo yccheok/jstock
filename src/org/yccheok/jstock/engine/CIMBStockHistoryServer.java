@@ -1,4 +1,4 @@
-/*
+/* test
  * JStock - Free Stock Market Software
  * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
  *
@@ -23,6 +23,8 @@ import java.io.*;
 import java.util.*;
 import java.math.*;
 
+import org.apache.commons.httpclient.*;
+import org.apache.commons.httpclient.methods.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -53,6 +55,8 @@ public class CIMBStockHistoryServer implements StockHistoryServer {
         
         Thread currentThread = Thread.currentThread();
 
+        int index = 0;
+
         String encodedCode;
         try {
             encodedCode = java.net.URLEncoder.encode(this.code.toString(), "UTF-8");
@@ -60,85 +64,74 @@ public class CIMBStockHistoryServer implements StockHistoryServer {
             throw new StockHistoryNotFoundException(this.code.toString(), ex);
         }
 
-        int index = -1;
-
         for (String server : servers) {
-            index++;
-            
             if (currentThread.isInterrupted()) {
                 throw new StockHistoryNotFoundException("Thread has been interrupted");
             }
             
-            final String request = server + "java/jar/data/" + encodedCode + ".dat.gz";
+            HttpMethod method = new GetMethod(server + "java/jar/data/" + encodedCode + ".dat.gz");
             StringBuffer s = new StringBuffer(data.length);
 
-            final org.yccheok.jstock.gui.Utils.InputStreamAndMethod inputStreamAndMethod = org.yccheok.jstock.gui.Utils.getResponseBodyAsStreamBasedOnProxyAuthOption(request);
-            if (inputStreamAndMethod.inputStream == null) {
-                inputStreamAndMethod.method.releaseConnection();
-                continue;
-            }
-            java.util.zip.GZIPInputStream gZipInputStream = null;            
+            final HttpClient httpClient = new HttpClient();
+
             try {
-                gZipInputStream = new java.util.zip.GZIPInputStream(inputStreamAndMethod.inputStream);
-				int n = 0;
+                Utils.setHttpClientProxyFromSystemProperties(httpClient);
+                org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
+				final InputStream inputStream = org.yccheok.jstock.gui.Utils.getResponseBodyAsStreamBasedOnProxyAuthOption(httpClient, method);
+                java.util.zip.GZIPInputStream gZipInputStream = new java.util.zip.GZIPInputStream(inputStream);
+                
+                int n = 0;
+                
                 while((n = gZipInputStream.read(data, 0, data.length)) != -1) {
                     s.append(new String(data, 0, n));
                 }
-            }
-            catch (java.io.IOException exp) {
-                log.error(null, exp);
-                continue;
-            }
-            finally {                
-				// Do not do anything if fail to clean up. Just ignore the
-				// exception.
-                if (gZipInputStream != null) {
-                    try {
-                        gZipInputStream.close();
-                    } catch (IOException exp) {
-                        log.error(null, exp);
-                    }
-                }
-
-                if (inputStreamAndMethod.inputStream != null) {
-                    try {
-                        inputStreamAndMethod.inputStream.close();
-                    } catch (IOException exp) {
-                        log.error(null, exp);
-                    }
-                }
                 
-                inputStreamAndMethod.method.releaseConnection();
-            }
+                gZipInputStream.close();
+                inputStream.close();
+                
+                HistoryDatabaseResult historyDatebaseResult = this.getHistoryDatabase(s.toString());    
+                
+                if (historyDatebaseResult != null) {
+                    historyDatabase.putAll(historyDatebaseResult.database);
+                    SimpleDate latestDate = historyDatebaseResult.lastestDate;
+                    
+                    // Should we stop here?
+                    long days = Utils.getDifferenceInDays(latestDate.getCalendar(), Calendar.getInstance());
 
-            HistoryDatabaseResult historyDatebaseResult = this.getHistoryDatabase(s.toString());
-
-            if (historyDatebaseResult != null) {
-                historyDatabase.putAll(historyDatebaseResult.database);
-                SimpleDate latestDate = historyDatebaseResult.lastestDate;
-
-                // Should we stop here?
-                long days = Utils.getDifferenceInDays(latestDate.getCalendar(), Calendar.getInstance());
-
-                // As long as the history is less than or equal to MAX_DAY_DIFFERENCE_AMONG_TODAY_AND_LATEST_HISTORY,
-                // we will not continue to search for the history.
-                if(days <= MAX_DAY_DIFFERENCE_AMONG_TODAY_AND_LATEST_HISTORY) {
-                    // Sort the best server.
-                    if (bestServerAlreadySorted == false) {
-                        synchronized(servers) {
-                            if (bestServerAlreadySorted == false) {
-                                bestServerAlreadySorted = true;
-                                String tmp = servers.get(0);
-                                servers.set(0, servers.get(index));
-                                servers.set(index, tmp);
+                    // As long as the history is less than or equal to MAX_DAY_DIFFERENCE_AMONG_TODAY_AND_LATEST_HISTORY,
+                    // we will not continue to search for the history.
+                    if(days <= MAX_DAY_DIFFERENCE_AMONG_TODAY_AND_LATEST_HISTORY) {
+                        // Sort the best server.
+                        if (bestServerAlreadySorted == false) {
+                            synchronized(servers) {
+                                if (bestServerAlreadySorted == false) {
+                                    bestServerAlreadySorted = true;
+                                    String tmp = servers.get(0);
+                                    servers.set(0, servers.get(index));
+                                    servers.set(index, tmp);
+                                }
                             }
                         }
-                    }
 
-                    break;
-                }
-            }   /* if (historyDatebaseResult != null) */
-        }   /*  for (String server : servers) */
+                        break;
+                    }
+                }   /* if (historyDatebaseResult != null) */
+            }
+            catch(HttpException exp) {
+                log.error("code = " + this.code, exp);
+                // Continue to try other servers.
+                continue;
+            }
+            catch(IOException exp) {
+                log.error("code = " + this.code, exp);
+                // Continue to try other servers.
+                continue;
+            }
+            finally {
+                method.releaseConnection();
+                index++;
+            }
+        }
         
         if(historyDatabase.size() == 0) {
             throw new StockHistoryNotFoundException("code = " + this.code);
@@ -174,7 +167,7 @@ public class CIMBStockHistoryServer implements StockHistoryServer {
         
         if(fields.length < 10) return null;
         
-        final String _code = fields[0];
+        final String code = fields[0];
         final String symbol = fields[1];
         final String name = fields[2];
         final Stock.Board board = stringToBoardMap.get(fields[5]) != null ? stringToBoardMap.get(fields[5]) : Stock.Board.Unknown;
@@ -234,7 +227,7 @@ public class CIMBStockHistoryServer implements StockHistoryServer {
                 final double changePricePercentage = _changePricePercentage.round(new MathContext(2)).doubleValue();
 
                 Stock stock = new Stock(
-                        Code.newInstance(_code),
+                        Code.newInstance(code),
                         Symbol.newInstance(symbol),
                         name,
                         board,
@@ -380,6 +373,6 @@ public class CIMBStockHistoryServer implements StockHistoryServer {
         stringToIndustryMap.put("LOANS", Stock.Industry.Loans);
         stringToIndustryMap.put("CALL-WARR", Stock.Industry.CallWarrant);
     }
-
+    
     private static final Log log = LogFactory.getLog(CIMBStockServer.class);
 }
