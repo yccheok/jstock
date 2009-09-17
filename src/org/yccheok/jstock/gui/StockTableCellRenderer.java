@@ -21,9 +21,8 @@ package org.yccheok.jstock.gui;
 
 import java.awt.*;
 import javax.swing.*;
+import org.yccheok.jstock.internationalization.GUIBundle;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  *
@@ -107,13 +106,13 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
         
         AbstractTableModelWithMemory tableModel = (AbstractTableModelWithMemory)table.getModel();
 
-        final double openPrice = (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), tableModel.findColumn("Open"));
+        final double openPrice = (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), tableModel.findColumn(OPEN));
         boolean alert = false;
 
         if (jStockOptions.isEnableColorAlert()) {
-            final int riseAboveIndex = tableModel.findColumn("Rise Above");
-            final int fallBelowIndex = tableModel.findColumn("Fall Below");
-            final double lastPrice = (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), tableModel.findColumn("Last"));
+            final int riseAboveIndex = tableModel.findColumn(RISE_ABOVE);
+            final int fallBelowIndex = tableModel.findColumn(FALL_BELOW);
+            final double lastPrice = (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), tableModel.findColumn(LAST));
             final Double riseAbove = riseAboveIndex >= 0 ? (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), riseAboveIndex) : null;
             final Double fallBelow = fallBelowIndex >= 0 ? (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), fallBelowIndex) : null;
 
@@ -130,10 +129,10 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             }
         }
 
-        if(table.getColumnName(column).equalsIgnoreCase("buy"))
+        if(table.getColumnName(column).equalsIgnoreCase(BUY))
         {
             final int modelRow = table.convertRowIndexToModel(row);
-            final int modelCol = tableModel.findColumn("Buy"); 
+            final int modelCol = tableModel.findColumn(BUY);
             
             final double buyPrice = (Double)tableModel.getValueAt(modelRow, modelCol);
 
@@ -142,10 +141,10 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             this.performCellBlinking(c, buyPrice, oldBuyPrice, this.getForegroundColor(buyPrice, openPrice, alert), getBackgroundColor(row, alert));
             return c;
         }                         
-        else if(table.getColumnName(column).equalsIgnoreCase("sell"))
+        else if(table.getColumnName(column).equalsIgnoreCase(SELL))
         {
             final int modelRow = table.convertRowIndexToModel(row);
-            final int modelCol = tableModel.findColumn("Sell"); 
+            final int modelCol = tableModel.findColumn(SELL);
             
             final double sellPrice = (Double)tableModel.getValueAt(modelRow, modelCol);
 
@@ -154,10 +153,10 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             this.performCellBlinking(c, sellPrice, oldSellPrice, this.getForegroundColor(sellPrice, openPrice, alert), getBackgroundColor(row, alert));
             return c;
         } 
-        else if(table.getColumnName(column).equalsIgnoreCase("last"))
+        else if(table.getColumnName(column).equalsIgnoreCase(LAST))
         {
             final int modelRow = table.convertRowIndexToModel(row);
-            final int modelCol = tableModel.findColumn("Last"); 
+            final int modelCol = tableModel.findColumn(LAST);
             
             final double lastPrice = (Double)tableModel.getValueAt(modelRow, modelCol);
 
@@ -166,10 +165,10 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             this.performCellBlinking(c, lastPrice, oldLastPrice, this.getForegroundColor(lastPrice, openPrice, alert), getBackgroundColor(row, alert));
             return c;          
         }      
-        else if(table.getColumnName(column).equalsIgnoreCase("low"))
+        else if(table.getColumnName(column).equalsIgnoreCase(LOW))
         {
             final int modelRow = table.convertRowIndexToModel(row);
-            final int modelCol = tableModel.findColumn("Low"); 
+            final int modelCol = tableModel.findColumn(LOW);
             
             final double lowPrice = (Double)tableModel.getValueAt(modelRow, modelCol);
 
@@ -178,10 +177,10 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             this.performCellBlinking(c, lowPrice, oldLowPrice, this.getForegroundColor(lowPrice, openPrice, alert), getBackgroundColor(row, alert));
             return c;
         } 
-        else if(table.getColumnName(column).equalsIgnoreCase("high"))
+        else if(table.getColumnName(column).equalsIgnoreCase(HIGH))
         {
             final int modelRow = table.convertRowIndexToModel(row);
-            final int modelCol = tableModel.findColumn("High"); 
+            final int modelCol = tableModel.findColumn(HIGH);
             
             final double highPrice = (Double)tableModel.getValueAt(modelRow, modelCol);
 
@@ -190,10 +189,10 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             this.performCellBlinking(c, highPrice, oldHighPrice, this.getForegroundColor(highPrice, openPrice, alert), getBackgroundColor(row, alert));
             return c;
         }
-        else if(table.getColumnName(column).equalsIgnoreCase("chg"))
+        else if(table.getColumnName(column).equalsIgnoreCase(CHG))
         {
             final int modelRow = table.convertRowIndexToModel(row);
-            final int modelCol = tableModel.findColumn("Chg"); 
+            final int modelCol = tableModel.findColumn(CHG);
             
             final double changePrice = (Double)tableModel.getValueAt(modelRow, modelCol);
 
@@ -202,10 +201,10 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             this.performCellBlinking(c, changePrice, oldChangePrice, this.getForegroundColor(changePrice, 0.0, alert), getBackgroundColor(row, alert));
             return c;
         }
-        else if(table.getColumnName(column).equalsIgnoreCase("chg (%)"))
+        else if(table.getColumnName(column).equalsIgnoreCase(CHG_PERCENTAGE))
         {
             final int modelRow = table.convertRowIndexToModel(row);
-            final int modelCol = tableModel.findColumn("Chg (%)"); 
+            final int modelCol = tableModel.findColumn(CHG_PERCENTAGE);
             
             final double changePricePercentage = (Double)tableModel.getValueAt(modelRow, modelCol);
 
@@ -214,10 +213,10 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             this.performCellBlinking(c, changePricePercentage, oldChangePricePercentage, this.getForegroundColor(changePricePercentage, 0.0, alert), getBackgroundColor(row, alert));
             return c;
         }
-        else if(table.getColumnName(column).equalsIgnoreCase("vol"))
+        else if(table.getColumnName(column).equalsIgnoreCase(VOL))
         {
             final int modelRow = table.convertRowIndexToModel(row);
-            final int modelCol = tableModel.findColumn("Vol"); 
+            final int modelCol = tableModel.findColumn(VOL);
             
             final int volume = (Integer)tableModel.getValueAt(modelRow, modelCol);
 
@@ -226,10 +225,10 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             this.performCellBlinking(c, volume, oldVolume, getNormalTextForegroundColor(alert), getBackgroundColor(row, alert));
             return c;
         }
-        else if(table.getColumnName(column).equalsIgnoreCase("l.vol"))
+        else if(table.getColumnName(column).equalsIgnoreCase(LVOL))
         {
             final int modelRow = table.convertRowIndexToModel(row);
-            final int modelCol = tableModel.findColumn("L.Vol"); 
+            final int modelCol = tableModel.findColumn(LVOL);
             
             final int lastVolume = (Integer)tableModel.getValueAt(modelRow, modelCol);
 
@@ -238,10 +237,10 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             this.performCellBlinking(c, lastVolume, oldLastVolume, getNormalTextForegroundColor(alert), getBackgroundColor(row, alert));
             return c;
         }
-        else if(table.getColumnName(column).equalsIgnoreCase("b.qty"))
+        else if(table.getColumnName(column).equalsIgnoreCase(BQTY))
         {
             final int modelRow = table.convertRowIndexToModel(row);
-            final int modelCol = tableModel.findColumn("B.Qty"); 
+            final int modelCol = tableModel.findColumn(BQTY);
             
             final int buyQuantity = (Integer)tableModel.getValueAt(modelRow, modelCol);
 
@@ -250,10 +249,10 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             this.performCellBlinking(c, buyQuantity, oldBuyQuantity, getNormalTextForegroundColor(alert), getBackgroundColor(row, alert));
             return c;
         } 
-        else if(table.getColumnName(column).equalsIgnoreCase("s.qty"))
+        else if(table.getColumnName(column).equalsIgnoreCase(SQTY))
         {
             final int modelRow = table.convertRowIndexToModel(row);
-            final int modelCol = tableModel.findColumn("S.Qty"); 
+            final int modelCol = tableModel.findColumn(SQTY);
             
             final int sellQuantity = (Integer)tableModel.getValueAt(modelRow, modelCol);
 
@@ -262,7 +261,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             this.performCellBlinking(c, sellQuantity, oldSellQuantity, getNormalTextForegroundColor(alert), getBackgroundColor(row, alert));
             return c;
         }      
-        else if(table.getColumnName(column).equalsIgnoreCase("indicator"))
+        else if(table.getColumnName(column).equalsIgnoreCase(INDICATOR))
         {
             c.setForeground(Color.BLUE);
         }
@@ -292,15 +291,15 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
         
         AbstractTableModelWithMemory tableModel = (AbstractTableModelWithMemory)table.getModel();
 
-        double openPrice = (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), tableModel.findColumn("Open"));       
+        double openPrice = (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), tableModel.findColumn(OPEN));
 
         boolean alert = false;
 
         if (jStockOptions.isEnableColorAlert()) {
-            final int riseAboveIndex = tableModel.findColumn("Rise Above");
-            final int fallBelowIndex = tableModel.findColumn("Fall Below");
+            final int riseAboveIndex = tableModel.findColumn(RISE_ABOVE);
+            final int fallBelowIndex = tableModel.findColumn(FALL_BELOW);
 
-            final double lastPrice = (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), tableModel.findColumn("Last"));
+            final double lastPrice = (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), tableModel.findColumn(LAST));
             final Double riseAbove = riseAboveIndex >= 0 ? (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), riseAboveIndex) : null;
             final Double fallBelow = fallBelowIndex >= 0 ? (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), fallBelowIndex) : null;
 
@@ -317,70 +316,70 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             }
         }
 
-        if(table.getColumnName(column).equalsIgnoreCase("buy"))
+        if(table.getColumnName(column).equalsIgnoreCase(BUY))
         {
             final int modelRow = table.convertRowIndexToModel(row);
-            final int modelCol = tableModel.findColumn("Buy"); 
+            final int modelCol = tableModel.findColumn(BUY);
             
             final double buyPrice = (Double)tableModel.getValueAt(modelRow, modelCol);
 
             c.setForeground(this.getForegroundColor(buyPrice, openPrice, alert));
         }                         
-        else if(table.getColumnName(column).equalsIgnoreCase("sell"))
+        else if(table.getColumnName(column).equalsIgnoreCase(SELL))
         {
             final int modelRow = table.convertRowIndexToModel(row);
-            final int modelCol = tableModel.findColumn("Sell"); 
+            final int modelCol = tableModel.findColumn(SELL);
             
             final double sellPrice = (Double)tableModel.getValueAt(modelRow, modelCol);
 
             c.setForeground(this.getForegroundColor(sellPrice, openPrice, alert));
         } 
-        else if(table.getColumnName(column).equalsIgnoreCase("last"))
+        else if(table.getColumnName(column).equalsIgnoreCase(LAST))
         {
             final int modelRow = table.convertRowIndexToModel(row);
-            final int modelCol = tableModel.findColumn("Last"); 
+            final int modelCol = tableModel.findColumn(LAST);
             
             final double lastPrice = (Double)tableModel.getValueAt(modelRow, modelCol);
             
             c.setForeground(this.getForegroundColor(lastPrice, openPrice, alert));
         }      
-        else if(table.getColumnName(column).equalsIgnoreCase("low"))
+        else if(table.getColumnName(column).equalsIgnoreCase(LOW))
         {
             final int modelRow = table.convertRowIndexToModel(row);
-            final int modelCol = tableModel.findColumn("Low"); 
+            final int modelCol = tableModel.findColumn(LOW);
             
             final double lowPrice = (Double)tableModel.getValueAt(modelRow, modelCol);
 
             c.setForeground(this.getForegroundColor(lowPrice, openPrice, alert));
         } 
-        else if(table.getColumnName(column).equalsIgnoreCase("high"))
+        else if(table.getColumnName(column).equalsIgnoreCase(HIGH))
         {
             final int modelRow = table.convertRowIndexToModel(row);
-            final int modelCol = tableModel.findColumn("High"); 
+            final int modelCol = tableModel.findColumn(HIGH);
             
             final double highPrice = (Double)tableModel.getValueAt(modelRow, modelCol);
 
             c.setForeground(this.getForegroundColor(highPrice, openPrice, alert));
         }
-        else if(table.getColumnName(column).equalsIgnoreCase("chg"))
+        else if(table.getColumnName(column).equalsIgnoreCase(CHG))
         {
             final int modelRow = table.convertRowIndexToModel(row);
-            final int modelCol = tableModel.findColumn("Chg"); 
+            final int modelCol = tableModel.findColumn(CHG);
             
             final double changePrice = (Double)tableModel.getValueAt(modelRow, modelCol);
 
             c.setForeground(this.getForegroundColor(changePrice, 0.0, alert));
         }
-        else if(table.getColumnName(column).equalsIgnoreCase("chg (%)"))
+        else if(table.getColumnName(column).equalsIgnoreCase(CHG_PERCENTAGE))
         {
             final int modelRow = table.convertRowIndexToModel(row);
-            final int modelCol = tableModel.findColumn("Chg (%)"); 
+            final int modelCol = tableModel.findColumn(CHG_PERCENTAGE);
             
             final double changePricePercentage = (Double)tableModel.getValueAt(modelRow, modelCol);
 
             c.setForeground(this.getForegroundColor(changePricePercentage, 0.0, alert));
         }
-        else if(table.getColumnName(column).equalsIgnoreCase("indicator"))
+        else if(table.getColumnName(column).equalsIgnoreCase(INDICATOR))
         {
             c.setForeground(Color.BLUE);
         }
@@ -393,5 +392,37 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
         return c;
     } 
     
-    private static final Log log = LogFactory.getLog(StockTableCellRenderer.class);    
+    private static final String OPEN;
+    private static final String RISE_ABOVE;
+    private static final String FALL_BELOW;
+    private static final String LAST;
+    private static final String BUY;
+    private static final String SELL;
+    private static final String LOW;
+    private static final String HIGH;
+    private static final String CHG;
+    private static final String CHG_PERCENTAGE;
+    private static final String VOL;
+    private static final String LVOL;
+    private static final String BQTY;
+    private static final String SQTY;
+    private static final String INDICATOR;
+
+    static {
+        OPEN = GUIBundle.getString("MainFrame_Open");
+        RISE_ABOVE = GUIBundle.getString("MainFrame_RiseAbove");
+        FALL_BELOW = GUIBundle.getString("MainFrame_FallBelow");
+        LAST = GUIBundle.getString("MainFrame_Last");
+        BUY = GUIBundle.getString("MainFrame_Buy");
+        SELL = GUIBundle.getString("MainFrame_Sell");
+        LOW = GUIBundle.getString("MainFrame_Low");
+        HIGH = GUIBundle.getString("MainFrame_High");
+        CHG = GUIBundle.getString("MainFrame_Chg");
+        CHG_PERCENTAGE = GUIBundle.getString("MainFrame_ChgPercentage");
+        VOL = GUIBundle.getString("MainFrame_Vol");
+        LVOL = GUIBundle.getString("MainFrame_LVol");
+        BQTY = GUIBundle.getString("MainFrame_BQty");
+        SQTY = GUIBundle.getString("MainFrame_SQty");
+        INDICATOR = GUIBundle.getString("IndicatorScannerJPanel_Indicator");
+    }
 }
