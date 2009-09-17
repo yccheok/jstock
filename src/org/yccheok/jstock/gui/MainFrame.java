@@ -190,6 +190,7 @@ public class MainFrame extends javax.swing.JFrame {
         jMenu3 = new javax.swing.JMenu();
         jMenuItem2 = new javax.swing.JMenuItem();
         jMenuItem9 = new javax.swing.JMenuItem();
+        jSeparator2 = new javax.swing.JSeparator();
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenu5 = new javax.swing.JMenu();
         jMenuItem4 = new javax.swing.JMenuItem();
@@ -434,6 +435,7 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
+        jMenuItem2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/project_open.png"))); // NOI18N
         jMenuItem2.setText("Open...");
         jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -442,6 +444,7 @@ public class MainFrame extends javax.swing.JFrame {
         });
         jMenu3.add(jMenuItem2);
 
+        jMenuItem9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/filesave.png"))); // NOI18N
         jMenuItem9.setText("Save As...");
         jMenuItem9.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -449,6 +452,7 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
         jMenu3.add(jMenuItem9);
+        jMenu3.add(jSeparator2);
 
         jMenuItem1.setText("Exit");
         jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
@@ -744,7 +748,7 @@ public class MainFrame extends javax.swing.JFrame {
             }
         }
     }
-    
+
     public RealTimeStockMonitor getRealTimeStockMonitor() {
         return realTimeStockMonitor;
     }
@@ -908,7 +912,13 @@ public class MainFrame extends javax.swing.JFrame {
     public JStockOptions getJStockOptions() {
         return jStockOptions;
     }
-    
+
+    // windowClosing
+    // Invoked when the user attempts to close the window from the window's system menu.
+    //
+    // windowClosed
+    // Invoked when a window has been closed as the result of calling dispose on the window.
+    //
     /* Dangerous! We didn't perform proper clean up, because we do not want
      * to give user perspective that our system is slow. But, is it safe
      * to do so?
@@ -1075,7 +1085,7 @@ public class MainFrame extends javax.swing.JFrame {
             	updateBuyerSellerInformation(null);
                 this.updateDynamicChart(null);
             }
-            
+
             return;
         }
     }//GEN-LAST:event_jTable1KeyPressed
@@ -1138,8 +1148,8 @@ public class MainFrame extends javax.swing.JFrame {
             File file = chooser.getSelectedFile();
             if (file == null) {
                 return;
-            }
-
+        }
+        
             // Ensure the saved file is in correct extension. If user provide correct
             // file extension explicitly, leave it as is. If not, mutate the filename.
             final String extension = Utils.getFileExtension(file);
@@ -1183,11 +1193,11 @@ public class MainFrame extends javax.swing.JFrame {
                 // Impossible.
                 return;
             }
-            
+
             final String parent = chooser.getSelectedFile().getParent();
             if (parent != null) {
                 jStockOptions.setLastFileIODirectory(parent);
-            }
+                    }
 
             break;
         }
@@ -1199,8 +1209,8 @@ public class MainFrame extends javax.swing.JFrame {
             writer = new java.io.FileWriter(file);
         } catch (IOException ex) {
             log.error(null, ex);
-            return;
-        }
+                    return;
+                }
         final CSVWriter csvwriter = new CSVWriter(writer);
 
         final TableModel tableModel = jTable1.getModel();
@@ -1227,18 +1237,18 @@ public class MainFrame extends javax.swing.JFrame {
             }
 
             csvwriter.writeNext(datas);
-        }
+            }
         try {
             csvwriter.close();
         } catch (IOException ex) {
             log.error(null, ex);
-        }
+            }
         try {
             writer.close();
         } catch (IOException ex) {
             log.error(null, ex);
+            }
         }
-    }
 
     private void saveAsExcelFile(File file) {
         final HSSFWorkbook wb = new HSSFWorkbook();
@@ -1269,24 +1279,24 @@ public class MainFrame extends javax.swing.JFrame {
         }
 
         FileOutputStream fileOut = null;
-        try {
+            try {
             fileOut = new FileOutputStream(file);
             wb.write(fileOut);
         } catch (FileNotFoundException ex) {
             log.error(null, ex);
-        }
+                }
         catch (IOException ex) {
             log.error(null, ex);
-        }
+            }
         finally {
             if (fileOut != null) {
-                try {
+        try {
                     fileOut.close();
                 } catch (IOException ex) {
                     log.error(null, ex);
-                }
-            }
         }
+        }
+            }
     }
 
     /**
@@ -3637,6 +3647,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel8;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JSeparator jSeparator2;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTable jTable1;
     // End of variables declaration//GEN-END:variables
