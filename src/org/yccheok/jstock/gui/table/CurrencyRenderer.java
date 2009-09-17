@@ -18,16 +18,7 @@
 
 package org.yccheok.jstock.gui.table;
 
-import java.awt.Color;
-import java.awt.Component;
 import java.text.NumberFormat;
-import javax.swing.JComponent;
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableModel;
-import org.yccheok.jstock.gui.JStockOptions;
-import org.yccheok.jstock.gui.MainFrame;
-import org.yccheok.jstock.gui.portfolio.DepositSummaryTableModel;
 
 /**
  *
