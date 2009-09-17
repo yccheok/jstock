@@ -11,7 +11,7 @@ import org.yccheok.jstock.portfolio.Contract;
 import org.yccheok.jstock.portfolio.Portfolio;
 import org.yccheok.jstock.portfolio.Transaction;
 import org.yccheok.jstock.portfolio.TransactionSummary;
-
+import org.yccheok.jstock.internationalization.GUIBundle;
 /**
  *
  * @author yccheok
@@ -19,28 +19,33 @@ import org.yccheok.jstock.portfolio.TransactionSummary;
 public class SellPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel {
     
     // Names of the columns.
-    private static final String[]  cNames = {
-        "Stock", 
-        "Date",
-        "Units",
-        "Selling Price",
-        "Purchase Price",        
-        "Selling Value", 
-        "Purchase Value",
-        "Gain/Loss Price",
-        "Gain/Loss Value",
-        "Gain/Loss %",
-        "Broker", 
-        "Clearing Fee",        
-        "Stamp Duty",  
-        "Net Selling Value",
-        "Net Gain/Loss Value",
-        "Net Gain/Loss %",
-        "Comment"
-    };
-    
+    private static final String[] cNames;
+
+    static {
+        final String[] tmp = {
+            GUIBundle.getString("PortfolioManagementJPanel_Stock"),
+            GUIBundle.getString("PortfolioManagementJPanel_Date"),
+            GUIBundle.getString("PortfolioManagementJPanel_Units"),
+            GUIBundle.getString("PortfolioManagementJPanel_SellingPrice"),
+            GUIBundle.getString("PortfolioManagementJPanel_PurchasePrice"),
+            GUIBundle.getString("PortfolioManagementJPanel_SellingValue"),
+            GUIBundle.getString("PortfolioManagementJPanel_PurchaseValue"),
+            GUIBundle.getString("PortfolioManagementJPanel_GainLossPrice"),
+            GUIBundle.getString("PortfolioManagementJPanel_GainLossValue"),
+            GUIBundle.getString("PortfolioManagementJPanel_GainLossPercentage"),
+            GUIBundle.getString("PortfolioManagementJPanel_Broker"),
+            GUIBundle.getString("PortfolioManagementJPanel_ClearingFee"),
+            GUIBundle.getString("PortfolioManagementJPanel_StampDuty"),
+            GUIBundle.getString("PortfolioManagementJPanel_NetSellingValue"),
+            GUIBundle.getString("PortfolioManagementJPanel_NetGainLossValue"),
+            GUIBundle.getString("PortfolioManagementJPanel_NetGainLossPercentage"),
+            GUIBundle.getString("PortfolioManagementJPanel_Comment")
+        };
+        cNames = tmp;
+    }
+
     // Types of the columns.
-    private static final Class[]  cTypes = { 
+    private static final Class[] cTypes = {
         TreeTableModel.class,
         org.yccheok.jstock.engine.SimpleDate.class,
         Integer.class,
@@ -173,7 +178,7 @@ public class SellPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel
     
     @Override
     public Object getValueAt(Object node, int column) {
-        if(node instanceof Portfolio) {
+        if (node instanceof Portfolio) {
             final Portfolio portfolio = (Portfolio)node;
             
             switch(column) {
@@ -219,10 +224,10 @@ public class SellPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel
             }
         }
    
-        if(node instanceof TransactionSummary) {
+        if (node instanceof TransactionSummary) {
             final TransactionSummary transactionSummary = (TransactionSummary)node;
             
-            if(transactionSummary.getChildCount() <= 0) return null;
+            if (transactionSummary.getChildCount() <= 0) return null;
             
             switch(column) {
                 case 0:
@@ -275,7 +280,7 @@ public class SellPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel
             }
         }
         
-        if(node instanceof Transaction) {
+        if (node instanceof Transaction) {
             final Transaction transaction = (Transaction)node;
             
             switch(column) {
@@ -333,7 +338,7 @@ public class SellPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel
             }
         }
         
-		return null; 
+        return null;
     }
     
     @Override
