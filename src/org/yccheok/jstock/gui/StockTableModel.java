@@ -24,6 +24,7 @@ package org.yccheok.jstock.gui;
 
 import java.util.*;
 import org.yccheok.jstock.engine.*;
+import org.yccheok.jstock.internationalization.GUIBundle;
 
 /**
  *
@@ -32,7 +33,7 @@ import org.yccheok.jstock.engine.*;
 public class StockTableModel extends AbstractTableModelWithMemory {
     /** Creates a new instance of StockTableModel */
     public StockTableModel() {
-        for(int i = 0; i < columnNames.length; i++) {
+        for (int i = 0; i < columnNames.length; i++) {
             columnNameMapping.put(columnNames[i], i);
         }
                 
@@ -110,7 +111,7 @@ public class StockTableModel extends AbstractTableModelWithMemory {
     public void updateStock(Stock stock) {
         final Integer row = rowStockCodeMapping.get(stock.getCode());
 
-        if(row != null) {
+        if (row != null) {
             oldTableModel.set(row, tableModel.get(row));
             final StockAlert alert = alerts.get(row);
             tableModel.set(row, stockToList(stock, alert));
@@ -121,7 +122,7 @@ public class StockTableModel extends AbstractTableModelWithMemory {
 
     public void addStock(Stock stock, StockAlert alert) {
         Integer row = rowStockCodeMapping.get(stock.getCode());
-        if(row == null) {
+        if (row == null) {
             tableModel.add(stockToList(stock, alert));
             oldTableModel.add(null);
             stocks.add(stock);
@@ -139,7 +140,7 @@ public class StockTableModel extends AbstractTableModelWithMemory {
     public void clearAllStocks() {
         final int size = stocks.size();
         
-        if(size == 0) return;
+        if (size == 0) return;
         
         tableModel.clear();
         oldTableModel.clear();
@@ -148,26 +149,6 @@ public class StockTableModel extends AbstractTableModelWithMemory {
         rowStockCodeMapping.clear();
             
         this.fireTableRowsDeleted(0, size - 1);
-    }
-    
-    public void removeStock(Stock stock) {
-        Integer row = rowStockCodeMapping.get(stock.getCode());
-        
-        if(row != null) {
-            tableModel.remove(row);
-            oldTableModel.remove(row);
-            stocks.remove(row);
-            alerts.remove(row);
-            rowStockCodeMapping.remove(stock.getCode());
-            
-            int size = stocks.size();
-            for(int i=row; i<size; i++) {
-                Stock s = stocks.get(i);
-                rowStockCodeMapping.put(s.getCode(), i);
-            }
-            
-            this.fireTableRowsDeleted(row, row);
-        }
     }
     
     public Stock getStock(int row) {
@@ -200,10 +181,10 @@ public class StockTableModel extends AbstractTableModelWithMemory {
         stocks.remove(row);
         alerts.remove(row);
         // 0 is stock code.
-        rowStockCodeMapping.remove(list.get(0));
+        rowStockCodeMapping.remove((Code)list.get(0));
 
         int size = stocks.size();
-        for(int i=row; i<size; i++) {
+        for (int i = row; i < size; i++) {
             Stock s = stocks.get(i);
             rowStockCodeMapping.put(s.getCode(), i);
         }
@@ -239,7 +220,7 @@ public class StockTableModel extends AbstractTableModelWithMemory {
 
     public int findRow(Stock stock) {
         Integer row = rowStockCodeMapping.get(stock.getCode());
-        if(row != null) return row;
+        if (row != null) return row;
         
         return -1;
     }
@@ -252,7 +233,45 @@ public class StockTableModel extends AbstractTableModelWithMemory {
     private Map<String, Integer> columnNameMapping = new HashMap<String, Integer>();
     // Used to get row by Stock in fast way.
     private Map<Code, Integer> rowStockCodeMapping = new HashMap<Code, Integer>();
-    private String[] columnNames =  {"Code",        "Symbol",       "Open",     "Last",        "High",         "Low",      "Vol",          "Chg",      "Chg (%)",      "L.Vol",        "Buy",      "B.Qty",        "Sell",        "S.Qty", "Fall Below", "Rise Above"};
-    private Class[] columnClasses = {Code.class, Symbol.class, Double.class, Double.class, Double.class, Double.class, Integer.class, Double.class, Double.class, Integer.class, Double.class, Integer.class, Double.class, Integer.class, Double.class, Double.class};
-    
+    private static final String[] columnNames;
+    private static final Class[] columnClasses = {
+        Code.class,
+        Symbol.class,
+        Double.class,
+        Double.class,
+        Double.class,
+        Double.class,
+        Integer.class,
+        Double.class,
+        Double.class,
+        Integer.class,
+        Double.class,
+        Integer.class,
+        Double.class,
+        Integer.class,
+        Double.class,
+        Double.class
+    };
+
+    static {
+        final String[] tmp = {
+            GUIBundle.getString("MainFrame_Code"),
+            GUIBundle.getString("MainFrame_Symbol"),
+            GUIBundle.getString("MainFrame_Open"),
+            GUIBundle.getString("MainFrame_Last"),
+            GUIBundle.getString("MainFrame_High"),
+            GUIBundle.getString("MainFrame_Low"),
+            GUIBundle.getString("MainFrame_Vol"),
+            GUIBundle.getString("MainFrame_Chg"),
+            GUIBundle.getString("MainFrame_ChgPercentage"),
+            GUIBundle.getString("MainFrame_LVol"),
+            GUIBundle.getString("MainFrame_Buy"),
+            GUIBundle.getString("MainFrame_BQty"),
+            GUIBundle.getString("MainFrame_Sell"),
+            GUIBundle.getString("MainFrame_SQty"),
+            GUIBundle.getString("MainFrame_FallBelow"),
+            GUIBundle.getString("MainFrame_RiseAbove")
+        };
+        columnNames = tmp;
+    }    
 }
