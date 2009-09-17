@@ -23,6 +23,7 @@ import org.jdesktop.swingx.treetable.*;
 import org.yccheok.jstock.portfolio.*;
 import javax.swing.tree.TreePath;
 import org.yccheok.jstock.engine.Code;
+import org.yccheok.jstock.internationalization.GUIBundle;
 
 /**
  *
@@ -42,25 +43,30 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
     }
     
     // Names of the columns.
-    private static final String[]  cNames = {
-        "Stock", 
-        "Date",
-        "Units",
-        "Purchase Price",
-        "Current Price",        
-        "Purchase Value", 
-        "Current Value",
-        "Gain/Loss Price",
-        "Gain/Loss Value",
-        "Gain/Loss %",
-        "Broker", 
-        "Clearing Fee",        
-        "Stamp Duty",  
-        "Net Purchase Value",
-        "Net Gain/Loss Value",
-        "Net Gain/Loss %",
-        "Comment"
-    };
+    private static final String[]  cNames;
+
+    static {
+        final String[] tmp = {
+            GUIBundle.getString("PortfolioManagementJPanel_Stock"),
+            GUIBundle.getString("PortfolioManagementJPanel_Date"),
+            GUIBundle.getString("PortfolioManagementJPanel_Units"),
+            GUIBundle.getString("PortfolioManagementJPanel_PurchasePrice"),
+            GUIBundle.getString("PortfolioManagementJPanel_CurrentPrice"),
+            GUIBundle.getString("PortfolioManagementJPanel_PurchaseValue"),
+            GUIBundle.getString("PortfolioManagementJPanel_CurrentValue"),
+            GUIBundle.getString("PortfolioManagementJPanel_GainLossPrice"),
+            GUIBundle.getString("PortfolioManagementJPanel_GainLossValue"),
+            GUIBundle.getString("PortfolioManagementJPanel_GainLossPercentage"),
+            GUIBundle.getString("PortfolioManagementJPanel_Broker"),
+            GUIBundle.getString("PortfolioManagementJPanel_ClearingFee"),
+            GUIBundle.getString("PortfolioManagementJPanel_StampDuty"),
+            GUIBundle.getString("PortfolioManagementJPanel_NetPurchaseValue"),
+            GUIBundle.getString("PortfolioManagementJPanel_NetGainLossValue"),
+            GUIBundle.getString("PortfolioManagementJPanel_NetGainLossPercentage"),
+            GUIBundle.getString("PortfolioManagementJPanel_Comment")
+        };
+        cNames = tmp;
+    }
 
     // Types of the columns.
     private static final Class[]  cTypes = { 
