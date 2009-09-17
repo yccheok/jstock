@@ -23,6 +23,7 @@ import java.util.*;
 import javax.swing.table.*;
 import org.yccheok.jstock.engine.*;
 import org.yccheok.jstock.analysis.*;
+import org.yccheok.jstock.internationalization.GUIBundle;
 
 /**
  *
@@ -100,19 +101,20 @@ public class IndicatorTableModel extends AbstractTableModelWithMemory {
     public void removeIndicator(Indicator indicator) {
         Integer row = rowIndicatorMapping.get(getIndicatorKey(indicator));
         
-        if(row != null) {
-            tableModel.remove(row);
-            oldTableModel.remove(row);
-            indicators.remove(row);
+        if (row != null) {
+            int int_row = row;
+            tableModel.remove(int_row);
+            oldTableModel.remove(int_row);
+            indicators.remove(int_row);
             rowIndicatorMapping.remove(getIndicatorKey(indicator));
             
             int size = indicators.size();
-            for(int i=row; i<size; i++) {
+            for (int i = int_row; i < size; i++) {
                 Indicator otherIndicator = indicators.get(i);
                 rowIndicatorMapping.put(getIndicatorKey(otherIndicator), i);
             }
             
-            this.fireTableRowsDeleted(row, row);
+            this.fireTableRowsDeleted(int_row, int_row);
         }
     }
     
@@ -213,6 +215,47 @@ public class IndicatorTableModel extends AbstractTableModelWithMemory {
     private Map<String, Integer> columnNameMapping = new HashMap<String, Integer>();
     // Used to get row by Stock in fast way.
     private Map<String, Integer> rowIndicatorMapping = new HashMap<String, Integer>();
-    private String[] columnNames =  {"Indicator",   "Code",        "Symbol",       "Open",     "Last",        "High",         "Low",      "Vol",          "Chg",      "Chg (%)",      "L.Vol",        "Buy",      "B.Qty",        "Sell",         "S.Qty",  "M.Capital", "S.Issued"};
-    private Class[] columnClasses = {String.class, Code.class, Symbol.class, Double.class, Double.class, Double.class, Double.class, Integer.class, Double.class, Double.class, Integer.class, Double.class, Integer.class, Double.class, Integer.class, Long.class, Long.class};    
+    private static final String[] columnNames;
+    private static final Class[] columnClasses = {
+        String.class,
+        Code.class,
+        Symbol.class,
+        Double.class,
+        Double.class,
+        Double.class,
+        Double.class,
+        Integer.class,
+        Double.class,
+        Double.class,
+        Integer.class,
+        Double.class,
+        Integer.class,
+        Double.class,
+        Integer.class,
+        Long.class,
+        Long.class
+    };
+
+    static {
+        final String[] tmp = {
+            GUIBundle.getString("IndicatorScannerJPanel_Indicator"),
+            GUIBundle.getString("MainFrame_Code"),
+            GUIBundle.getString("MainFrame_Symbol"),
+            GUIBundle.getString("MainFrame_Open"),
+            GUIBundle.getString("MainFrame_Last"),
+            GUIBundle.getString("MainFrame_High"),
+            GUIBundle.getString("MainFrame_Low"),
+            GUIBundle.getString("MainFrame_Vol"),
+            GUIBundle.getString("MainFrame_Chg"),
+            GUIBundle.getString("MainFrame_ChgPercentage"),
+            GUIBundle.getString("MainFrame_LVol"),
+            GUIBundle.getString("MainFrame_Buy"),
+            GUIBundle.getString("MainFrame_BQty"),
+            GUIBundle.getString("MainFrame_Sell"),
+            GUIBundle.getString("MainFrame_SQty"),
+            GUIBundle.getString("IndicatorScannerJPanel_MCapital"),
+            GUIBundle.getString("IndicatorScannerJPanel_SIssued")
+        };
+        columnNames = tmp;
+    }
 }
