@@ -30,7 +30,7 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.text.*;
 import org.yccheok.jstock.engine.Country;
 import org.yccheok.jstock.engine.StockServerFactory;
-import org.yccheok.jstock.internationalization.JStockBundle;
+import org.yccheok.jstock.internationalization.MessagesBundle;
 import org.yccheok.jstock.network.ProxyDetector;
 
 /**
@@ -133,10 +133,10 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
                 OptionsNetworkJPanel.this.updateGUIState();
 
                 if (status == null || status == false) {
-                    JOptionPane.showMessageDialog(OptionsNetworkJPanel.this, JStockBundle.getString("warning_message_wrong_proxy_or_port"), JStockBundle.getString("warning_title_wrong_proxy_or_port"), JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(OptionsNetworkJPanel.this, MessagesBundle.getString("warning_message_wrong_proxy_or_port"), MessagesBundle.getString("warning_title_wrong_proxy_or_port"), JOptionPane.WARNING_MESSAGE);
                 }
                 else {
-                    JOptionPane.showMessageDialog(OptionsNetworkJPanel.this, JStockBundle.getString("info_message_correct_proxy_and_port"), JStockBundle.getString("info_title_correct_proxy_and_port"), JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(OptionsNetworkJPanel.this, MessagesBundle.getString("info_message_correct_proxy_and_port"), MessagesBundle.getString("info_title_correct_proxy_and_port"), JOptionPane.INFORMATION_MESSAGE);
                 }
             }
         };
@@ -458,13 +458,13 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
         ProxyDetector detector = ProxyDetector.getInstance();
 
         if ( detector.directConnectionAvailable() ) {
-            JOptionPane.showMessageDialog(this, JStockBundle.getString("info_message_no_proxy_necessary"), JStockBundle.getString("info_title_no_proxy_necessary"), JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, MessagesBundle.getString("info_message_no_proxy_necessary"), MessagesBundle.getString("info_title_no_proxy_necessary"), JOptionPane.INFORMATION_MESSAGE);
             this.jTextField1.setText(null);
             this.jFormattedTextField1.setText(null);
         }
         else {
             if ( !detector.proxyDetected() ) {
-                JOptionPane.showMessageDialog(this, JStockBundle.getString("error_message_no_proxy_found"), JStockBundle.getString("error_title_no_proxy_found"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, MessagesBundle.getString("error_message_no_proxy_found"), MessagesBundle.getString("error_title_no_proxy_found"), JOptionPane.ERROR_MESSAGE);
             }
             else {
                 this.jTextField1.setText(detector.getHostname());

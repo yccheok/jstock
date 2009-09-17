@@ -32,7 +32,7 @@ import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.yccheok.jstock.internationalization.JStockBundle;
+import org.yccheok.jstock.internationalization.MessagesBundle;
 
 /**
  *
@@ -419,14 +419,14 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         if (jTextField3.getText().length() == 0)
         {
-            JOptionPane.showMessageDialog(this, JStockBundle.getString("warning_message_sms_username_cannot_be_empty"), JStockBundle.getString("warning_title_sms_username_cannot_be_empty"), JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_sms_username_cannot_be_empty"), MessagesBundle.getString("warning_title_sms_username_cannot_be_empty"), JOptionPane.WARNING_MESSAGE);
             jTextField3.requestFocus();
             return;
         }
 
         if (jPasswordField2.getPassword().length == 0)
         {
-            JOptionPane.showMessageDialog(this, JStockBundle.getString("warning_message_sms_password_cannot_be_empty"), JStockBundle.getString("warning_title_sms_password_cannot_be_empty"), JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_sms_password_cannot_be_empty"), MessagesBundle.getString("warning_title_sms_password_cannot_be_empty"), JOptionPane.WARNING_MESSAGE);
             jPasswordField2.requestFocus();
             return;
         }
@@ -551,8 +551,8 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
                             jTextField2.getText(),
                             new String(jPasswordField1.getPassword()),
                             jTextField2.getText() + "@gmail.com",
-                            JStockBundle.getString("info_message_congratulation_email_alert_system_is_working"),
-                            JStockBundle.getString("info_message_congratulation_email_alert_system_is_working")
+                            MessagesBundle.getString("info_message_congratulation_email_alert_system_is_working"),
+                            MessagesBundle.getString("info_message_congratulation_email_alert_system_is_working")
                           );
                 } catch (AddressException ex) {
                     log.error(null, ex);
@@ -592,11 +592,11 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
 
                 if (status == null || status == false)
                 {
-                    JOptionPane.showMessageDialog(OptionsAlertJPanel.this, JStockBundle.getString("error_message_error_in_sending_email"), JStockBundle.getString("error_title_error_in_sending_email"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(OptionsAlertJPanel.this, MessagesBundle.getString("error_message_error_in_sending_email"), MessagesBundle.getString("error_title_error_in_sending_email"), JOptionPane.ERROR_MESSAGE);
                 }
                 else
                 {
-                    JOptionPane.showMessageDialog(OptionsAlertJPanel.this, JStockBundle.getString("info_message_email_alert_system_is_working"), JStockBundle.getString("info_title_email_alert_system_is_working"), JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(OptionsAlertJPanel.this, MessagesBundle.getString("info_message_email_alert_system_is_working"), MessagesBundle.getString("info_title_email_alert_system_is_working"), JOptionPane.INFORMATION_MESSAGE);
                 }
             }
         };
@@ -610,7 +610,7 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
             public Boolean doInBackground() {
                 final String username = jTextField3.getText();
                 final String password = new String(jPasswordField2.getPassword());
-                final boolean status = GoogleCalendar.SMS(username, password, JStockBundle.getString("info_message_congratulation_sms_alert_system_is_working"));
+                final boolean status = GoogleCalendar.SMS(username, password, MessagesBundle.getString("info_message_congratulation_sms_alert_system_is_working"));
                 return status;
             }
 
@@ -641,11 +641,11 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
 
                 if (status == null || status == false)
                 {
-                    JOptionPane.showMessageDialog(OptionsAlertJPanel.this, JStockBundle.getString("error_message_error_in_sending_sms"), JStockBundle.getString("error_title_error_in_sending_sms"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(OptionsAlertJPanel.this, MessagesBundle.getString("error_message_error_in_sending_sms"), MessagesBundle.getString("error_title_error_in_sending_sms"), JOptionPane.ERROR_MESSAGE);
                 }
                 else
                 {
-                    JOptionPane.showMessageDialog(OptionsAlertJPanel.this, JStockBundle.getString("info_message_sms_alert_system_is_working"), JStockBundle.getString("info_title_sms_alert_system_is_working"), JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(OptionsAlertJPanel.this, MessagesBundle.getString("info_message_sms_alert_system_is_working"), MessagesBundle.getString("info_title_sms_alert_system_is_working"), JOptionPane.INFORMATION_MESSAGE);
                 }
             }
         };
