@@ -20,6 +20,7 @@ package org.yccheok.jstock.gui.portfolio;
 
 import javax.swing.table.AbstractTableModel;
 import org.yccheok.jstock.engine.SimpleDate;
+import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.portfolio.Commentable;
 import org.yccheok.jstock.portfolio.Deposit;
 import org.yccheok.jstock.portfolio.DepositSummary;
@@ -119,7 +120,18 @@ public class DepositSummaryTableModel extends AbstractTableModel implements Comm
         return depositSummary.get(index);
     }
     
-    private String[] columnNames =  { "Date", "Cash" };
-    private Class[] columnClasses = { java.util.Date.class, Double.class };
+    private static final String[] columnNames;
+    private static final Class[] columnClasses = {
+        java.util.Date.class,
+        Double.class
+    };
     private final DepositSummary depositSummary;
+
+    static {
+        final String[] tmp = {
+            GUIBundle.getString("PortfolioManagementJPanel_Date"),
+            GUIBundle.getString("PortfolioManagementJPanel_Cash")
+        };
+        columnNames = tmp;
+    }
 }

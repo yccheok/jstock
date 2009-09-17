@@ -23,6 +23,7 @@ import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.SimpleDate;
 import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.Symbol;
+import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.portfolio.Commentable;
 import org.yccheok.jstock.portfolio.Dividend;
 import org.yccheok.jstock.portfolio.DividendSummary;
@@ -133,7 +134,20 @@ public class DividendSummaryTableModel extends AbstractTableModel implements Com
         return dividendSummary.get(index);
     }
 
-    private String[] columnNames =  { "Date", "Stock", "Dividend" };
-    private Class[] columnClasses = { java.util.Date.class, Stock.class, Double.class };
+    private static final String[] columnNames;
+    private static final Class[] columnClasses = {
+        java.util.Date.class,
+        Stock.class,
+        Double.class
+    };
     private final DividendSummary dividendSummary;
+
+    static {
+        final String[] tmp = {
+            GUIBundle.getString("PortfolioManagementJPanel_Date"),
+            GUIBundle.getString("PortfolioManagementJPanel_Stock"),
+            GUIBundle.getString("PortfolioManagementJPanel_Dividend")
+        };
+        columnNames = tmp;
+    }
 }
