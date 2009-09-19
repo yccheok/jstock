@@ -1169,9 +1169,6 @@ public class MainFrame extends javax.swing.JFrame {
                     else if (this.jTabbedPane1.getSelectedComponent() == this.indicatorScannerJPanel) {
                         status = this.indicatorScannerJPanel.saveAsCSVFile(file);
                     }
-                    //else if (this.jTabbedPane1.getSelectedComponent() == this.portfolioManagementJPanel) {
-                    //    assert(false);
-                    //}
                     else {
                         assert(false);
                     }
@@ -1192,6 +1189,17 @@ public class MainFrame extends javax.swing.JFrame {
             }
         }
         else if (this.jTabbedPane1.getSelectedComponent() == this.portfolioManagementJPanel) {
+            final Utils.FileEx fileEx = Utils.promptSavePortfolioCSVAndExcelJFileChooser(suggestedFileName);
+            if (fileEx != null) {
+                if (Utils.getFileExtension(fileEx.file).equals("csv"))
+                {
+                    this.portfolioManagementJPanel.saveAsCSVFile(fileEx);
+                }
+                else if (Utils.getFileExtension(fileEx.file).equals("xls"))
+                {
+                    saveAsExcelFile(fileEx.file);
+                }
+            }
         }
         else {
             assert(false);
