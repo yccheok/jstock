@@ -35,6 +35,7 @@ import java.util.concurrent.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.analysis.Indicator;
+import org.yccheok.jstock.internationalization.GUIBundle;
 
 /**
  *
@@ -847,6 +848,18 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             return false;
         }
         return statements.saveAsCSVFile(file);
+    }
+
+    public boolean saveAsExcelFile(File file) {
+        final TableModel tableModel = jTable1.getModel();
+        // Unexpected result may happen while scanning is running, as table
+        // model will be mutated during the middle of writting. Currently, we
+        // do not have solution.
+        final org.yccheok.jstock.file.Statements statements = org.yccheok.jstock.file.Statements.newInstanceFromTableModel(tableModel);
+        if (statements == null) {
+            return false;
+        }
+        return statements.saveAsExcelFile(file, GUIBundle.getString("IndicatorScannerJPanel_Title"));
     }
 
     private Thread getStartScanThread(final WizardModel wizardModel, final MainFrame mainFrame)
