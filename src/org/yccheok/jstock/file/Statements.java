@@ -21,6 +21,8 @@ package org.yccheok.jstock.file;
 
 import au.com.bytecode.opencsv.CSVWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -29,9 +31,15 @@ import java.util.List;
 import javax.swing.table.TableModel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRichTextString;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.jdesktop.swingx.treetable.TreeTableModel;
 import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.gui.AbstractPortfolioTreeTableModel;
+import org.yccheok.jstock.gui.POIUtils;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.portfolio.Portfolio;
 import org.yccheok.jstock.portfolio.Transaction;
@@ -173,10 +181,10 @@ public class Statements {
         final int rowCount = statements.size();
         for (int i = 0; i < rowCount; i++) {
             for (int j = 0; j < columnCount; j++) {
+                // Value shouldn't be null, as we prevent atom with null value.
                 final String value = statements.get(i).getAtom(j).getValue();
                 datas[j] = value;
             }
-
             csvwriter.writeNext(datas);
         }
         try {
@@ -192,6 +200,53 @@ public class Statements {
         return true;
     }
 
+    public boolean saveAsExcelFile(File file, String title) {
+        final HSSFWorkbook wb = new HSSFWorkbook();
+        final HSSFSheet sheet = wb.createSheet(title);
+        // statements.size() can never be 0.
+        final int columnCount = statements.get(0).size();
+        // First row. Print out table header.
+        {
+            final HSSFRow row = sheet.createRow(0);
+            for (int i = 0; i < columnCount; i++) {
+                row.createCell(i).setCellValue(new HSSFRichTextString(statements.get(0).getAtom(i).getType()));
+            }
+        }
+
+        final int rowCount = statements.size();
+        for (int i = 0; i < rowCount; i++) {
+            final HSSFRow row = sheet.createRow(i + 1);
+            for (int j = 0; j < columnCount; j++) {
+                // Value shouldn't be null, as we prevent atom with null value.
+                final String value = statements.get(i).getAtom(j).getValue();
+                final HSSFCell cell = row.createCell(j);
+                POIUtils.invokeSetCellValue(cell, value);
+            }
+        }
+        boolean status = false;
+        FileOutputStream fileOut = null;
+        try {
+            fileOut = new FileOutputStream(file);
+            wb.write(fileOut);
+            status = true;
+        } catch (FileNotFoundException ex) {
+            log.error(null, ex);
+        }
+        catch (IOException ex) {
+            log.error(null, ex);
+        }
+        finally {
+            if (fileOut != null) {
+                try {
+                    fileOut.close();
+                } catch (IOException ex) {
+                    log.error(null, ex);
+                }
+            }
+        }
+        return status;
+    }
+    
     public Statement.Type getType() {
         // statements.size() can never be 0.
         return statements.get(0).getType();

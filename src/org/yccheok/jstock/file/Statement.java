@@ -46,7 +46,6 @@ public class Statement {
         this.atoms = new ArrayList<Atom>(atoms);
         this.type = this.whatType(atoms);
         for (Atom atom : atoms) {
-            System.out.println("Type=" + atom.getType() + " Value=" + atom.getValue());
             final Object oldObject = typeToValue.put(atom.getType(), atom.getValue());
             if (null != oldObject)
             {

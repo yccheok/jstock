@@ -1159,10 +1159,9 @@ public class MainFrame extends javax.swing.JFrame {
         if (this.jTabbedPane1.getSelectedComponent() == this.jPanel8 || this.jTabbedPane1.getSelectedComponent() == this.indicatorScannerJPanel) {
             final File file = Utils.promptSaveCSVAndExcelJFileChooser(suggestedFileName);
             if (file != null) {
+                boolean status = false;
                 if (Utils.getFileExtension(file).equals("csv"))
                 {
-                    boolean status = false;
-
                     if (this.jTabbedPane1.getSelectedComponent() == this.jPanel8) {
                         status = this.saveAsCSVFile(file);
                     }
@@ -1172,19 +1171,26 @@ public class MainFrame extends javax.swing.JFrame {
                     else {
                         assert(false);
                     }
-
-                    if (false == status)
-                    {
-                        final MessageFormat formatter = new MessageFormat("");
-                        // formatter.setLocale(currentLocale);
-                        formatter.applyPattern(MessagesBundle.getString("error_message_nothing_to_be_saved_template"));
-                        final String output = formatter.format(new Object[]{file.getName()});
-                        JOptionPane.showMessageDialog(this, output, MessagesBundle.getString("error_title_nothing_to_be_saved"), JOptionPane.ERROR_MESSAGE);
-                    }
                 }
                 else if (Utils.getFileExtension(file).equals("xls"))
                 {
-                    saveAsExcelFile(file);
+                    if (this.jTabbedPane1.getSelectedComponent() == this.jPanel8) {
+                        status = this.saveAsExcelFile(file);
+                    }
+                    else if (this.jTabbedPane1.getSelectedComponent() == this.indicatorScannerJPanel) {
+                        status = this.indicatorScannerJPanel.saveAsExcelFile(file);
+                    }
+                    else {
+                        assert(false);
+                    }
+                }
+                if (false == status)
+                {
+                    final MessageFormat formatter = new MessageFormat("");
+                    // formatter.setLocale(currentLocale);
+                    formatter.applyPattern(MessagesBundle.getString("error_message_nothing_to_be_saved_template"));
+                    final String output = formatter.format(new Object[]{file.getName()});
+                    JOptionPane.showMessageDialog(this, output, MessagesBundle.getString("error_title_nothing_to_be_saved"), JOptionPane.ERROR_MESSAGE);
                 }
             }
         }
@@ -1215,53 +1221,13 @@ public class MainFrame extends javax.swing.JFrame {
         return statements.saveAsCSVFile(file);
     }
 
-    private void saveAsExcelFile(File file) {
-        final HSSFWorkbook wb = new HSSFWorkbook();
-        final HSSFSheet sheet = wb.createSheet(GUIBundle.getString("MainFrame_Title"));
-
+    private boolean saveAsExcelFile(File file) {
         final TableModel tableModel = jTable1.getModel();
-        final int columnCount = tableModel.getColumnCount();
-
-        // First row. Print out table header.
-        {
-            final HSSFRow row = sheet.createRow(0);
-
-            for (int i = 0; i < columnCount; i++) {
-                row.createCell(i).setCellValue(new HSSFRichTextString(tableModel.getColumnName(i)));
-            }
+        final org.yccheok.jstock.file.Statements statements = org.yccheok.jstock.file.Statements.newInstanceFromTableModel(tableModel);
+        if (statements == null) {
+            return false;
         }
-
-        final int rowCount = tableModel.getRowCount();
-        for (int i = 0; i < rowCount; i++) {
-            final HSSFRow row = sheet.createRow(i + 1);
-            for (int j = 0; j < columnCount; j++) {
-                final Object object = tableModel.getValueAt(i, j);
-                if (object != null) {
-                    final HSSFCell cell = row.createCell(j);
-                    POIUtils.invokeSetCellValue(cell, object);
-                }
-            }
-        }
-
-        FileOutputStream fileOut = null;
-            try {
-            fileOut = new FileOutputStream(file);
-            wb.write(fileOut);
-        } catch (FileNotFoundException ex) {
-            log.error(null, ex);
-                }
-        catch (IOException ex) {
-            log.error(null, ex);
-            }
-        finally {
-            if (fileOut != null) {
-        try {
-                    fileOut.close();
-                } catch (IOException ex) {
-                    log.error(null, ex);
-        }
-        }
-            }
+        return statements.saveAsExcelFile(file, GUIBundle.getString("MainFrame_Title"));
     }
 
     /**
