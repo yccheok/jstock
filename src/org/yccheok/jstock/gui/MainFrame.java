@@ -20,7 +20,6 @@
 package org.yccheok.jstock.gui;
 
 import au.com.bytecode.opencsv.CSVReader;
-import au.com.bytecode.opencsv.CSVWriter;
 import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -41,6 +40,7 @@ import org.apache.poi.hssf.usermodel.*;
 import javax.help.*;
 import javax.swing.*;
 import java.net.URL;
+import java.text.MessageFormat;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
@@ -51,11 +51,12 @@ import javax.imageio.ImageIO;
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.yccheok.jstock.analysis.Indicator;
 import org.yccheok.jstock.analysis.OperatorIndicator;
 import org.yccheok.jstock.gui.dynamicchart.DynamicChart;
 import org.yccheok.jstock.gui.table.NonNegativeDoubleEditor;
+import org.yccheok.jstock.internationalization.GUIBundle;
+import org.yccheok.jstock.internationalization.MessagesBundle;
 import org.yccheok.jstock.network.ProxyDetector;
 
 /**
@@ -421,7 +422,8 @@ public class MainFrame extends javax.swing.JFrame {
 
         jPanel8.add(jPanel10, java.awt.BorderLayout.SOUTH);
 
-        jTabbedPane1.addTab("Real-Time Info", jPanel8);
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
+        jTabbedPane1.addTab(bundle.getString("MainFrame_Title"), jPanel8); // NOI18N
 
         getContentPane().add(jTabbedPane1, java.awt.BorderLayout.CENTER);
 
@@ -429,11 +431,6 @@ public class MainFrame extends javax.swing.JFrame {
         getContentPane().add(jPanel2, java.awt.BorderLayout.NORTH);
 
         jMenu3.setText("File");
-        jMenu3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenu3ActionPerformed(evt);
-            }
-        });
 
         jMenuItem2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/project_open.png"))); // NOI18N
         jMenuItem2.setText("Open...");
@@ -804,7 +801,10 @@ public class MainFrame extends javax.swing.JFrame {
     private void jTabbedPane1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jTabbedPane1StateChanged
 // TODO add your handling code here:
         JTabbedPane pane = (JTabbedPane)evt.getSource();
-        if(pane.getSelectedComponent() == this.jPanel8) {  
+        if (pane.getSelectedComponent() == this.jPanel8) {
+            this.jMenuItem2.setEnabled(true);   // Load
+            this.jMenuItem9.setEnabled(true);   // Save
+
             if(realTimeStockMonitor != null) {  
                 this.realTimeStockMonitor.softStart();
                 this.portfolioManagementJPanel.softStop();
@@ -817,7 +817,10 @@ public class MainFrame extends javax.swing.JFrame {
                 log.info("Stock history monitor re-attach observer.");
             }            
         }
-        else if(pane.getSelectedComponent() == this.indicatorPanel) {
+        else if (pane.getSelectedComponent() == this.indicatorPanel) {
+            this.jMenuItem2.setEnabled(false);  // Load
+            this.jMenuItem9.setEnabled(false);  // Save
+
             if(realTimeStockMonitor != null) {                
 
                 // Take note that we will not soft stop indicatorPanel itself, because
@@ -836,6 +839,9 @@ public class MainFrame extends javax.swing.JFrame {
             }                
         }
         else if(pane.getSelectedComponent() == this.indicatorScannerJPanel) {
+            this.jMenuItem2.setEnabled(false);  // Load
+            this.jMenuItem9.setEnabled(true);   // Save
+
             if(realTimeStockMonitor != null) {
                 this.realTimeStockMonitor.softStop();
                 this.portfolioManagementJPanel.softStop();
@@ -850,6 +856,9 @@ public class MainFrame extends javax.swing.JFrame {
             }             
         }
         else if(pane.getSelectedComponent() == this.portfolioManagementJPanel) {
+            this.jMenuItem2.setEnabled(true);   // Load
+            this.jMenuItem9.setEnabled(true);   // Save
+
             if(realTimeStockMonitor != null) {                
                 this.realTimeStockMonitor.softStop();
                 this.portfolioManagementJPanel.softStart();
@@ -864,6 +873,9 @@ public class MainFrame extends javax.swing.JFrame {
             }             
         }
         else if (pane.getSelectedComponent() == this.chatJPanel) {
+            this.jMenuItem2.setEnabled(false);  // Save
+            this.jMenuItem9.setEnabled(false);  // Load
+
             if(realTimeStockMonitor != null) {
 
                 // Take note that we will not soft stop indicatorPanel itself, because
@@ -924,79 +936,90 @@ public class MainFrame extends javax.swing.JFrame {
      * to do so?
      */
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
-        log.info("Widnow is closed...");
-        
-        //log.info("stop indicator scanner panel...");
-        //this.indicatorScannerJPanel.stop();
-        
-        //log.info("stop indicator panel...");
-        //this.indicatorPanel.stop();
+        try {
+            log.info("Widnow is closed...");
 
-        log.info("saveJStockOptions...");
-        // Save the last viewed page.
-        this.getJStockOptions().setLastSelectedPageIndex(this.jTabbedPane1.getSelectedIndex());
-        this.saveJStockOptions();
+            //log.info("stop indicator scanner panel...");
+            //this.indicatorScannerJPanel.stop();
 
-        log.info("saveGUIOptions...");
-        this.saveGUIOptions();
+            //log.info("stop indicator panel...");
+            //this.indicatorPanel.stop();
 
-        log.info("saveBrokingFirmLogos...");
-        this.saveBrokingFirmLogos();
-        
-        log.info("saveRealTimeStocks...");
-        this.saveRealTimeStocks();
-        
-        log.info("saveIndicatorProjectManager...");
-        this.indicatorPanel.saveIndicatorProjectManager();
+            log.info("saveJStockOptions...");
+            // Save the last viewed page.
+            this.getJStockOptions().setLastSelectedPageIndex(this.jTabbedPane1.getSelectedIndex());
+            this.saveJStockOptions();
 
-        log.info("savePortfolio...");
-        this.portfolioManagementJPanel.savePortfolio();
+            log.info("saveGUIOptions...");
+            this.saveGUIOptions();
 
-		log.info("latestNewsTask stop...");
-        if(this.latestNewsTask != null)
-        {
-            this.latestNewsTask.cancel(true);
+            log.info("saveBrokingFirmLogos...");
+            this.saveBrokingFirmLogos();
+
+            log.info("saveRealTimeStocks...");
+            this.saveRealTimeStocks();
+
+            log.info("saveIndicatorProjectManager...");
+            this.indicatorPanel.saveIndicatorProjectManager();
+
+            log.info("savePortfolio...");
+            this.portfolioManagementJPanel.savePortfolio();
+
+                    log.info("latestNewsTask stop...");
+            if(this.latestNewsTask != null)
+            {
+                this.latestNewsTask.cancel(true);
+            }
+
+            //log.info("stockCodeAndSymbolDatabaseTask stop...");
+            //stockCodeAndSymbolDatabaseTask._stop();
+
+            //try {
+            //    stockCodeAndSymbolDatabaseTask.get();
+            //}
+            //catch(InterruptedException exp) {
+            //    log.error("", exp);
+            //}
+            //catch(java.util.concurrent.ExecutionException exp) {
+            //    log.error("", exp);
+            //}
+
+            //log.info("marketThread stop...");
+            //marketThread.interrupt();
+
+            //try {
+            //    marketThread.join();
+            //}
+            //catch(InterruptedException exp) {
+            //    log.error("", exp);
+            //}
+
+            //log.info("realTimeStockMonitor stop...");
+            //realTimeStockMonitor.stop();
+            //log.info("stockHistoryMonitor stop...");
+            //stockHistoryMonitor.stop();
+
+            this.chatJPanel.stopChatServiceManager();
+
+            if (trayIcon != null) {
+                SystemTray.getSystemTray().remove(trayIcon);
+            }
+
+            // We suppose to call shutdownAll to clean up all network resources.
+            // However, that will cause Exception in other threads if they are still using httpclient.
+            // Exception in thread "Thread-4" java.lang.IllegalStateException: Connection factory has been shutdown.
+            //
+            // MultiThreadedHttpConnectionManager.shutdownAll();
+
+            log.info("Widnow is closed.");
+        }
+        catch (Exception exp) {
+            log.error("Unexpected error while trying to quit application", exp);
         }
 
-        //log.info("stockCodeAndSymbolDatabaseTask stop...");
-        //stockCodeAndSymbolDatabaseTask._stop();
-                
-        //try {
-        //    stockCodeAndSymbolDatabaseTask.get();
-        //}
-        //catch(InterruptedException exp) {
-        //    log.error("", exp);
-        //}
-        //catch(java.util.concurrent.ExecutionException exp) {
-        //    log.error("", exp);
-        //}
-        
-        //log.info("marketThread stop...");
-        //marketThread.interrupt();
-        
-        //try {
-        //    marketThread.join();
-        //}
-        //catch(InterruptedException exp) {
-        //    log.error("", exp);
-        //}
-        
-        //log.info("realTimeStockMonitor stop...");
-        //realTimeStockMonitor.stop();
-        //log.info("stockHistoryMonitor stop...");
-        //stockHistoryMonitor.stop();
-
-        this.chatJPanel.stopChatServiceManager();
-        
-        if (trayIcon != null) {
-            SystemTray.getSystemTray().remove(trayIcon);
-        }
-
-        // Clean up all network resources.
-        MultiThreadedHttpConnectionManager.shutdownAll();
-        
-        log.info("Widnow is closed.");
-        
+        // All the above operations are done within try block, to ensure
+        // System.exit(0) will always be called.
+        //
         // Final clean up.
         System.exit(0);
     }//GEN-LAST:event_formWindowClosed
@@ -1095,10 +1118,6 @@ public class MainFrame extends javax.swing.JFrame {
         log.info("Widnow is closing.");     
     }//GEN-LAST:event_formWindowClosing
 
-    private void jMenu3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenu3ActionPerformed
-// TODO add your handling code here:
-    }//GEN-LAST:event_jMenu3ActionPerformed
-
 	private void jMenuItem8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem8ActionPerformed
 	// TODO add your handling code here:
     	if(this.stockCodeAndSymbolDatabase == null) {
@@ -1122,137 +1141,75 @@ public class MainFrame extends javax.swing.JFrame {
 	}//GEN-LAST:event_jMenuItem8ActionPerformed
 
     private void jMenuItem9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem9ActionPerformed
-        // TODO add your handling code here:
-        final JFileChooser chooser = new JFileChooser(jStockOptions.getLastFileIODirectory());
-        final FileNameExtensionFilter csvFilter = new FileNameExtensionFilter("CSV Documents (*.csv)", "csv");
-        final FileNameExtensionFilter xlsFilter = new FileNameExtensionFilter("Microsoft Excel (*.xls)", "xls");
-        chooser.setAcceptAllFileFilterUsed(false);
-        chooser.addChoosableFileFilter(csvFilter);
-        chooser.addChoosableFileFilter(xlsFilter);
+        String suggestedFileName = "";
 
-        java.util.Map<String, FileNameExtensionFilter> map = new HashMap<String, FileNameExtensionFilter>();
-        map.put(csvFilter.getDescription(), csvFilter);
-        map.put(xlsFilter.getDescription(), xlsFilter);
-
-        final FileNameExtensionFilter filter = map.get(this.getJStockOptions().getLastSavedFileNameExtensionDescription());
-        if (filter != null) {
-            chooser.setFileFilter(filter);
+        if (this.jTabbedPane1.getSelectedComponent() == this.jPanel8) {
+            suggestedFileName = GUIBundle.getString("MainFrame_Title");
         }
-        
-        while (true) {
-            final int returnVal = chooser.showSaveDialog(this);
-            if (returnVal != JFileChooser.APPROVE_OPTION) {
-                return;
-            }
-
-            File file = chooser.getSelectedFile();
-            if (file == null) {
-                return;
+        else if (this.jTabbedPane1.getSelectedComponent() == this.indicatorScannerJPanel) {
+            suggestedFileName = GUIBundle.getString("IndicatorScannerJPanel_Title");
         }
-        
-            // Ensure the saved file is in correct extension. If user provide correct
-            // file extension explicitly, leave it as is. If not, mutate the filename.
-            final String extension = Utils.getFileExtension(file);
-            if (extension.equals("csv") == false && extension.equals("xls") == false) {
-                if (chooser.getFileFilter() == csvFilter) {
-                    try {
-                        file = new File(file.getCanonicalPath() + ".csv");
-                    } catch (IOException ex) {
-                        log.error(null, ex);
+        else if (this.jTabbedPane1.getSelectedComponent() == this.portfolioManagementJPanel) {
+            suggestedFileName = GUIBundle.getString("PortfolioManagementJPanel_Title");
+        }
+        else {
+            assert(false);
+        }
+
+        if (this.jTabbedPane1.getSelectedComponent() == this.jPanel8 || this.jTabbedPane1.getSelectedComponent() == this.indicatorScannerJPanel) {
+            final File file = Utils.promptSaveCSVAndExcelJFileChooser(suggestedFileName);
+            if (file != null) {
+                if (Utils.getFileExtension(file).equals("csv"))
+                {
+                    boolean status = false;
+
+                    if (this.jTabbedPane1.getSelectedComponent() == this.jPanel8) {
+                        status = this.saveAsCSVFile(file);
                     }
-                }
-                else if (chooser.getFileFilter() == xlsFilter) {
-                    try {
-                        file = new File(file.getCanonicalPath() + ".xls");
-                    } catch (IOException ex) {
-                        log.error(null, ex);
+                    else if (this.jTabbedPane1.getSelectedComponent() == this.indicatorScannerJPanel) {
+                        status = this.indicatorScannerJPanel.saveAsCSVFile(file);
                     }
-                }
-                else {
-                    // Impossible.
-                    return;
-                }
-            }
-
-            if (file.exists()) {
-                final int result = javax.swing.JOptionPane.showConfirmDialog(this, "Replace old " + file.getName() + "?", "Replace?", javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
-                if (result != javax.swing.JOptionPane.YES_OPTION) {
-                    continue;
-                }
-            }
-
-            if (Utils.getFileExtension(file).equals("csv")) {
-                saveAsCSVFile(file);
-                jStockOptions.setLastFileNameExtensionDescription(csvFilter.getDescription());
-            }
-            else if (Utils.getFileExtension(file).equals("xls")) {
-                saveAsExcelFile(file);
-                jStockOptions.setLastFileNameExtensionDescription(xlsFilter.getDescription());
-            }
-            else {
-                // Impossible.
-                return;
-            }
-
-            final String parent = chooser.getSelectedFile().getParent();
-            if (parent != null) {
-                jStockOptions.setLastFileIODirectory(parent);
+                    //else if (this.jTabbedPane1.getSelectedComponent() == this.portfolioManagementJPanel) {
+                    //    assert(false);
+                    //}
+                    else {
+                        assert(false);
                     }
 
-            break;
+                    if (false == status)
+                    {
+                        final MessageFormat formatter = new MessageFormat("");
+                        // formatter.setLocale(currentLocale);
+                        formatter.applyPattern(MessagesBundle.getString("error_message_nothing_to_be_saved_template"));
+                        final String output = formatter.format(new Object[]{file.getName()});
+                        JOptionPane.showMessageDialog(this, output, MessagesBundle.getString("error_title_nothing_to_be_saved"), JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+                else if (Utils.getFileExtension(file).equals("xls"))
+                {
+                    saveAsExcelFile(file);
+                }
+            }
+        }
+        else if (this.jTabbedPane1.getSelectedComponent() == this.portfolioManagementJPanel) {
+        }
+        else {
+            assert(false);
         }
     }//GEN-LAST:event_jMenuItem9ActionPerformed
 
-    private void saveAsCSVFile(File file) {
-        java.io.Writer writer = null;
-        try {
-            writer = new java.io.FileWriter(file);
-        } catch (IOException ex) {
-            log.error(null, ex);
-                    return;
-                }
-        final CSVWriter csvwriter = new CSVWriter(writer);
-
+    private boolean saveAsCSVFile(File file) {
         final TableModel tableModel = jTable1.getModel();
-        final int columnCount = tableModel.getColumnCount();
-        String[] datas = new String[columnCount];
-
-        // First row. Print out table header.
-        for (int i = 0; i < columnCount; i++) {
-            datas[i] = tableModel.getColumnName(i);
+        final org.yccheok.jstock.file.Statements statements = org.yccheok.jstock.file.Statements.newInstanceFromTableModel(tableModel);
+        if (statements == null) {
+            return false;
         }
-
-        csvwriter.writeNext(datas);
-
-        final int rowCount = tableModel.getRowCount();
-        for (int i = 0; i < rowCount; i++) {
-            for (int j = 0; j < columnCount; j++) {
-                final Object object = tableModel.getValueAt(i, j);
-                String value = "";
-                if (object != null) {
-                    value = object.toString();
-                }
-
-                datas[j] = value;
-            }
-
-            csvwriter.writeNext(datas);
-            }
-        try {
-            csvwriter.close();
-        } catch (IOException ex) {
-            log.error(null, ex);
-            }
-        try {
-            writer.close();
-        } catch (IOException ex) {
-            log.error(null, ex);
-            }
-        }
+        return statements.saveAsCSVFile(file);
+    }
 
     private void saveAsExcelFile(File file) {
         final HSSFWorkbook wb = new HSSFWorkbook();
-        final HSSFSheet sheet = wb.createSheet("Real-Time Info");
+        final HSSFSheet sheet = wb.createSheet(GUIBundle.getString("MainFrame_Title"));
 
         final TableModel tableModel = jTable1.getModel();
         final int columnCount = tableModel.getColumnCount();
@@ -1485,9 +1442,8 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     private void createPortfolioManagementJPanel() {
-        portfolioManagementJPanel = new PortfolioManagementJPanel();
-        
-        jTabbedPane1.addTab("Portfolio Management", portfolioManagementJPanel);
+        portfolioManagementJPanel = new PortfolioManagementJPanel();        
+        jTabbedPane1.addTab(GUIBundle.getString("PortfolioManagementJPanel_Title"), portfolioManagementJPanel);
     }
     
     private void createStockIndicatorEditor() {
@@ -1500,7 +1456,7 @@ public class MainFrame extends javax.swing.JFrame {
     private void createIndicatorScannerJPanel() {
         this.indicatorScannerJPanel = new IndicatorScannerJPanel(); 
                 
-        jTabbedPane1.addTab("Stock Indicator Scanner", indicatorScannerJPanel);
+        jTabbedPane1.addTab(GUIBundle.getString("IndicatorScannerJPanel_Title"), indicatorScannerJPanel);
         jTabbedPane1.addChangeListener(indicatorScannerJPanel);
     }
     
