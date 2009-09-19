@@ -31,6 +31,8 @@ import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.PixelGrabber;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -42,8 +44,10 @@ import org.yccheok.jstock.engine.*;
 import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
+import javax.swing.JRadioButton;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.apache.commons.httpclient.Header;
@@ -903,6 +907,129 @@ public class Utils {
         }
         // http://www.exampledepot.com/egs/javax.swing/checkbox_AddIcon.html
         return "file:" + fileName;
+    }
+
+   public static class FileEx {
+       public final File file;
+       public final org.yccheok.jstock.file.Statement.Type type;
+       public FileEx(File file, org.yccheok.jstock.file.Statement.Type type) {
+           this.file = file;
+           this.type = type;
+       }
+   }
+
+    // Calling to this method will affect state of JStockOptions.
+    // Returns null if no file being selected.
+    public static FileEx promptSavePortfolioCSVAndExcelJFileChooser(String suggestedFileName) {
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JFileChooser chooser = new JFileChooser(jStockOptions.getLastFileIODirectory());
+        final FileNameExtensionFilter csvFilter = new FileNameExtensionFilter("CSV Documents (*.csv)", "csv");
+        final FileNameExtensionFilter xlsFilter = new FileNameExtensionFilter("Microsoft Excel (*.xls)", "xls");
+        chooser.setAcceptAllFileFilterUsed(false);
+        chooser.addChoosableFileFilter(csvFilter);
+        chooser.addChoosableFileFilter(xlsFilter);
+        chooser.setSelectedFile(new File(suggestedFileName));
+
+        final org.yccheok.jstock.gui.file.PortfolioSelectionJPanel portfolioSelectionJPanel = new org.yccheok.jstock.gui.file.PortfolioSelectionJPanel();
+        chooser.setAccessory(portfolioSelectionJPanel);
+        chooser.addPropertyChangeListener(JFileChooser.FILE_FILTER_CHANGED_PROPERTY, new PropertyChangeListener() {
+
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                final boolean flag = ((FileNameExtensionFilter)evt.getNewValue()).equals(csvFilter);
+                portfolioSelectionJPanel.setEnabled(flag);
+            }
+            
+        });
+
+        final java.util.Map<String, FileNameExtensionFilter> map = new HashMap<String, FileNameExtensionFilter>();
+        map.put(csvFilter.getDescription(), csvFilter);
+        map.put(xlsFilter.getDescription(), xlsFilter);
+
+        final FileNameExtensionFilter filter = map.get(jStockOptions.getLastSavedFileNameExtensionDescription());
+        if (filter != null) {
+            chooser.setFileFilter(filter);
+        }
+
+        // Only enable portfolioSelectionJPanel, if CSV is being selected.
+        portfolioSelectionJPanel.setEnabled(chooser.getFileFilter().equals(csvFilter));
+
+        while (true) {
+            final int returnVal = chooser.showSaveDialog(MainFrame.getInstance());
+            if (returnVal != JFileChooser.APPROVE_OPTION) {
+                return null;
+            }
+
+            File file = chooser.getSelectedFile();
+            if (file == null) {
+                return null;
+            }
+
+            // Ensure the saved file is in correct extension. If user provide correct
+            // file extension explicitly, leave it as is. If not, mutate the filename.
+            final String extension = Utils.getFileExtension(file);
+            if (extension.equals("csv") == false && extension.equals("xls") == false) {
+                if (chooser.getFileFilter() == csvFilter) {
+                    try {
+                        file = new File(file.getCanonicalPath() + ".csv");
+                    } catch (IOException ex) {
+                        log.error(null, ex);
+                    }
+                }
+                else if (chooser.getFileFilter() == xlsFilter) {
+                    try {
+                        file = new File(file.getCanonicalPath() + ".xls");
+                    } catch (IOException ex) {
+                        log.error(null, ex);
+                    }
+                }
+                else {
+                    // Impossible.
+                    return null;
+                }
+            }
+
+            if (file.exists()) {
+                final MessageFormat formatter = new MessageFormat("");
+                // formatter.setLocale(currentLocale);
+                formatter.applyPattern(MessagesBundle.getString("question_message_replace_old_template"));
+                final String output = formatter.format(new Object[]{file.getName()});
+
+                final int result = javax.swing.JOptionPane.showConfirmDialog(MainFrame.getInstance(), output, MessagesBundle.getString("question_title_replace_old"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
+                if (result != javax.swing.JOptionPane.YES_OPTION) {
+                    continue;
+                }
+            }
+
+            final String parent = chooser.getSelectedFile().getParent();
+            if (parent != null) {
+                jStockOptions.setLastFileIODirectory(parent);
+            }
+
+            if (Utils.getFileExtension(file).equals("csv")) {
+                jStockOptions.setLastFileNameExtensionDescription(csvFilter.getDescription());                
+            }
+            else if (Utils.getFileExtension(file).equals("xls")) {
+                jStockOptions.setLastFileNameExtensionDescription(xlsFilter.getDescription());                
+            }
+            else {
+                // Impossible.
+                return null;
+            }
+            
+            return new FileEx(file, portfolioSelectionJPanel.getType());
+        }
+    }
+
+    // This method returns the selected radio button in a button group
+    public static JRadioButton getSelection(ButtonGroup group) {
+        for (Enumeration e = group.getElements(); e.hasMoreElements(); ) {
+            JRadioButton b = (JRadioButton)e.nextElement();
+            if (b.getModel() == group.getSelection()) {
+                return b;
+            }
+        }
+        return null;
     }
 
     // Calling to this method will affect state of JStockOptions.
