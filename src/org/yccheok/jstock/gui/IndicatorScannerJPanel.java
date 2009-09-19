@@ -766,13 +766,16 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     
     private class TableRowPopupListener extends MouseAdapter {
         
+        @Override
         public void mouseClicked(MouseEvent evt) {
         }
         
+        @Override
         public void mousePressed(MouseEvent e) {
             maybeShowPopup(e);
         }
 
+        @Override
         public void mouseReleased(MouseEvent e) {
             maybeShowPopup(e);
         }
@@ -832,6 +835,18 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     
     public void clearTableSelection() {
         jTable1.getSelectionModel().clearSelection();
+    }
+
+    public boolean saveAsCSVFile(File file) {
+        final TableModel tableModel = jTable1.getModel();
+        // Unexpected result may happen while scanning is running, as table
+        // model will be mutated during the middle of writting. Currently, we
+        // do not have solution.
+        final org.yccheok.jstock.file.Statements statements = org.yccheok.jstock.file.Statements.newInstanceFromTableModel(tableModel);
+        if (statements == null) {
+            return false;
+        }
+        return statements.saveAsCSVFile(file);
     }
 
     private Thread getStartScanThread(final WizardModel wizardModel, final MainFrame mainFrame)
