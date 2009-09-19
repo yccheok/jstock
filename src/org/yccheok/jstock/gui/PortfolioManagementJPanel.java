@@ -47,7 +47,9 @@ import org.jdesktop.swingx.treetable.*;
 import org.yccheok.jstock.gui.portfolio.CashFlowChartJDialog;
 import org.yccheok.jstock.gui.portfolio.CommentJDialog;
 import org.yccheok.jstock.gui.portfolio.DepositSummaryJDialog;
+import org.yccheok.jstock.gui.portfolio.DepositSummaryTableModel;
 import org.yccheok.jstock.gui.portfolio.DividendSummaryJDialog;
+import org.yccheok.jstock.gui.portfolio.DividendSummaryTableModel;
 import org.yccheok.jstock.gui.portfolio.ToolTipHighlighter;
 
 /**
@@ -1355,6 +1357,26 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "portfoliomanagementjpanel.xml");
         return org.yccheok.jstock.gui.Utils.toXML(guiOptions, f);
+    }
+
+    public boolean saveAsCSVFile(Utils.FileEx fileEx) {
+        org.yccheok.jstock.file.Statements statements = null;
+        if (fileEx.type == org.yccheok.jstock.file.Statement.Type.PortfolioManagementBuy) {
+            statements = org.yccheok.jstock.file.Statements.newInstanceFromAbstractPortfolioTreeTableModel((BuyPortfolioTreeTableModel)this.buyTreeTable.getTreeTableModel());
+        }
+        else if (fileEx.type == org.yccheok.jstock.file.Statement.Type.PortfolioManagementSell) {
+            statements = org.yccheok.jstock.file.Statements.newInstanceFromAbstractPortfolioTreeTableModel((SellPortfolioTreeTableModel)this.sellTreeTable.getTreeTableModel());
+        }
+        else if (fileEx.type == org.yccheok.jstock.file.Statement.Type.PortfolioManagementDividend) {
+            statements = org.yccheok.jstock.file.Statements.newInstanceFromTableModel(new DividendSummaryTableModel(this.dividendSummary));
+        }
+        else if (fileEx.type == org.yccheok.jstock.file.Statement.Type.PortfolioManagementDeposit) {
+            statements = org.yccheok.jstock.file.Statements.newInstanceFromTableModel(new DepositSummaryTableModel(this.depositSummary));
+        }
+        if (statements == null) {
+            return false;
+        }
+        return statements.saveAsCSVFile(fileEx.file);
     }
 
     private void updateWealthHeader() {
