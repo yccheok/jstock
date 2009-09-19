@@ -18,7 +18,7 @@
 
 package org.yccheok.jstock.gui;
 
-import java.text.SimpleDateFormat;
+import java.text.DateFormat;
 import org.jdesktop.swingx.treetable.*;
 import org.yccheok.jstock.portfolio.*;
 import javax.swing.tree.TreePath;
@@ -416,8 +416,8 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
                     return (transaction).getContract().getStock().getSymbol();
 
                 case 1:
-                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yy");
-                    return simpleDateFormat.format(transaction.getContract().getDate().getCalendar().getTime());
+                    DateFormat dateFormat = DateFormat.getDateInstance();
+                    return dateFormat.format(transaction.getContract().getDate().getCalendar().getTime());
                     
                 case 2:
                     return transaction.getQuantity();
