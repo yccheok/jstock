@@ -518,7 +518,7 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
         jStockOptions.setProxyAuthUserName(jTextField2.getText());
         jStockOptions.setProxyAuthPassword(Utils.encrypt(new String(jPasswordField1.getPassword())));
 
-        JRadioButton tmp = getSelection(this.buttonGroup1);
+        JRadioButton tmp = org.yccheok.jstock.gui.Utils.getSelection(this.buttonGroup1);
         // Impossible. Just to be paranoid.
         if (tmp != null) {
             StockServerFactoryJRadioButton button = ((StockServerFactoryJRadioButton)tmp);
@@ -526,17 +526,6 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
         }
 
         return true;
-    }
-
-    // This method returns the selected radio button in a button group
-    private JRadioButton getSelection(ButtonGroup group) {
-        for (Enumeration e=group.getElements(); e.hasMoreElements(); ) {
-            JRadioButton b = (JRadioButton)e.nextElement();
-            if (b.getModel() == group.getSelection()) {
-                return b;
-            }
-        }
-        return null;
     }
 
     public void cancel() {
