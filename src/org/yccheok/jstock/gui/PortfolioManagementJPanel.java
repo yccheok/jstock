@@ -26,10 +26,13 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.text.DateFormat;
 import java.text.MessageFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -64,7 +67,7 @@ import org.yccheok.jstock.internationalization.MessagesBundle;
  * @author  Owner
  */
 public class PortfolioManagementJPanel extends javax.swing.JPanel {
-    
+   
     /** Creates new form PortfoliioJPanel */
     public PortfolioManagementJPanel() {
         initComponents();        
@@ -332,6 +335,75 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     // Assume success.
                     return true;
                 }
+            }
+            final DateFormat dateFormat = DateFormat.getDateInstance();
+            final int size = statements.size();
+            switch(statements.getType()) {
+                case PortfolioManagementBuy:
+                    break;
+                case PortfolioManagementSell:
+                    break;
+                case PortfolioManagementDeposit:
+                    final List<Deposit> deposits = new ArrayList<Deposit>();
+
+                    for (int i = 0; i < size; i++) {
+                        Date date = null;
+                        Double cash = null;
+                        final Statement statement = statements.get(i);
+                        final Object object0 = statement.getValue(GUIBundle.getString("PortfolioManagementJPanel_Date"));
+                        assert(object0 != null);
+                        try {
+                            date = dateFormat.parse((String)object0);
+                        }
+                        catch (ParseException exp) {
+                            log.error(null, exp);
+                        }
+                        // Shall we continue to ignore, or shall we just return false to
+                        // flag an error?
+                        if (date == null) {
+                            continue;
+                        }
+                        final Object object1 = statement.getValue(GUIBundle.getString("PortfolioManagementJPanel_Cash"));
+                        assert(object0 != null);
+                        try {
+                            cash = Double.parseDouble((String)object1);
+                        }
+                        catch (NumberFormatException exp) {
+                            log.error(null, exp);
+                        }
+                        // Shall we continue to ignore, or shall we just return false to
+                        // flag an error?
+                        if (cash == null) {
+                            continue;
+                        }
+                        Deposit deposit = new Deposit(cash, new SimpleDate(date));
+                        deposits.add(deposit);
+                    }
+
+                    if (deposits.size() <= 0) {
+                        return false;
+                    }
+
+                    if (this.depositSummary.size() > 0) {
+                        final MessageFormat formatter = new MessageFormat("");
+                        // formatter.setLocale(currentLocale);
+                        formatter.applyPattern(MessagesBundle.getString("question_message_load_file_for_cash_deposit_template"));
+                        final String output = formatter.format(new Object[]{file.getName()});
+                        final int result = javax.swing.JOptionPane.showConfirmDialog(MainFrame.getInstance(), output, MessagesBundle.getString("question_title_load_file_for_cash_deposit"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
+                        if (result != javax.swing.JOptionPane.YES_OPTION) {
+                            // Assume success.
+                            return true;
+                        }
+                        this.depositSummary = new DepositSummary();
+                    }
+
+                    for (Deposit deposit : deposits) {
+                        depositSummary.add(deposit);
+                    }
+
+                    this.updateWealthHeader();
+                    break;
+                case PortfolioManagementDividend:
             }
         }
         else if (statements.getType() == Statement.Type.RealtimeInfo) {
@@ -1403,7 +1475,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         statementsEx0 = new org.yccheok.jstock.file.Statements.StatementsEx(org.yccheok.jstock.file.Statements.newInstanceFromAbstractPortfolioTreeTableModel((BuyPortfolioTreeTableModel)this.buyTreeTable.getTreeTableModel()), GUIBundle.getString("PortfolioManagementJPanel_BuyPortfolio"));
         statementsEx1 = new org.yccheok.jstock.file.Statements.StatementsEx(org.yccheok.jstock.file.Statements.newInstanceFromAbstractPortfolioTreeTableModel((SellPortfolioTreeTableModel)this.sellTreeTable.getTreeTableModel()), GUIBundle.getString("PortfolioManagementJPanel_SellPortfolio"));
         statementsEx2 = new org.yccheok.jstock.file.Statements.StatementsEx(org.yccheok.jstock.file.Statements.newInstanceFromTableModel(new DividendSummaryTableModel(this.dividendSummary)), GUIBundle.getString("PortfolioManagementJPanel_DividendPortfolio"));
-        statementsEx3 = new org.yccheok.jstock.file.Statements.StatementsEx(org.yccheok.jstock.file.Statements.newInstanceFromTableModel(new DepositSummaryTableModel(this.depositSummary)), GUIBundle.getString("PortfolioManagementJPanel_CashPortfolio"));
+        statementsEx3 = new org.yccheok.jstock.file.Statements.StatementsEx(org.yccheok.jstock.file.Statements.newInstanceFromTableModel(new DepositSummaryTableModel(this.depositSummary)), GUIBundle.getString("PortfolioManagementJPanel_CashDepositPortfolio"));
         List<org.yccheok.jstock.file.Statements.StatementsEx> statementsExs = Arrays.asList(statementsEx0, statementsEx1, statementsEx2, statementsEx3);
         return Statements.saveAsExcelFile(file, statementsExs);
     }
