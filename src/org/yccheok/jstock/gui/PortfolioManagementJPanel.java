@@ -20,11 +20,13 @@
 package org.yccheok.jstock.gui;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -45,6 +47,7 @@ import org.jdesktop.swingx.table.TableColumnExt;
 import org.yccheok.jstock.portfolio.*;
 import org.yccheok.jstock.engine.*;
 import org.jdesktop.swingx.treetable.*;
+import org.yccheok.jstock.file.Statement;
 import org.yccheok.jstock.file.Statements;
 import org.yccheok.jstock.gui.portfolio.CashFlowChartJDialog;
 import org.yccheok.jstock.gui.portfolio.CommentJDialog;
@@ -54,6 +57,7 @@ import org.yccheok.jstock.gui.portfolio.DividendSummaryJDialog;
 import org.yccheok.jstock.gui.portfolio.DividendSummaryTableModel;
 import org.yccheok.jstock.gui.portfolio.ToolTipHighlighter;
 import org.yccheok.jstock.internationalization.GUIBundle;
+import org.yccheok.jstock.internationalization.MessagesBundle;
 
 /**
  *
@@ -306,6 +310,38 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
 
         return null;
+    }
+
+    public boolean openAsCSVFile(File file) {
+        Statements statements = Statements.newInstanceFromCSVFile(file);
+        if (statements == null) {
+            return false;
+        }
+        final Component selectedComponent = MainFrame.getInstance().getSelectedComponent();
+        if (statements.getType() == Statement.Type.PortfolioManagementBuy || statements.getType() == Statement.Type.PortfolioManagementSell || statements.getType() == Statement.Type.PortfolioManagementDeposit || statements.getType() == Statement.Type.PortfolioManagementDividend) {
+            if (selectedComponent != this) {
+                // User will feel suprise if we try to quitely load something
+                // not within their visible range. Give them a choice so that they
+                // won't feel suprise.
+                final MessageFormat formatter = new MessageFormat("");
+                // formatter.setLocale(currentLocale);
+                formatter.applyPattern(MessagesBundle.getString("question_message_load_file_for_portfolio_management_template"));
+                final String output = formatter.format(new Object[]{file.getName()});
+                final int result = javax.swing.JOptionPane.showConfirmDialog(MainFrame.getInstance(), output, MessagesBundle.getString("question_title_load_file_for_portfolio_management"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
+                if (result != javax.swing.JOptionPane.YES_OPTION) {
+                    // Assume success.
+                    return true;
+                }
+            }
+        }
+        else if (statements.getType() == Statement.Type.RealtimeInfo) {
+            /* Open using other tabs. */
+            return MainFrame.getInstance().openAsCSVFile(file);
+        }
+        else {
+            return false;
+        }
+        return true;
     }
 
     private List<Stock> getSelectedStocks() {
