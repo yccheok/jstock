@@ -19,6 +19,7 @@
 
 package org.yccheok.jstock.file;
 
+import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -50,12 +51,99 @@ import org.yccheok.jstock.portfolio.TransactionSummary;
  * @author yccheok
  */
 public class Statements {
+    public static class StatementsEx {
+		// Possible null for statements.
+        public final Statements statements;
+        public final String title;
+        public StatementsEx(Statements statements, String title) {
+            this.statements = statements;
+            this.title = title;
+        }
+    }
     /**
      * Prevent client from constructing Statements other than static factory
      * method.
      */
     private Statements() {}
 
+    /**
+     * Construct Statements based on given CSV File.
+     *
+     * @param key Given CSV File
+     * @return the constructed Statements. null if fail
+     */
+    public static Statements newInstanceFromCSVFile(File file) {
+        java.io.Reader reader = null;
+        try {
+            reader = new java.io.FileReader(file);
+        } catch (IOException ex) {
+            log.error(null, ex);
+            return null;
+        }
+        final CSVReader csvreader = new CSVReader(reader);
+        final List<String> types = new ArrayList<String>();
+        final Statements s = new Statements();
+        try {
+            String [] nextLine;
+            if ((nextLine = csvreader.readNext()) != null) {
+                for (String item : nextLine) {
+                    types.add(item);
+                }
+            }   /* if ((nextLine = csvreader.readNext()) != null) */
+
+            if (types.size() == 0) {
+                return null;
+            }
+
+            while ((nextLine = csvreader.readNext()) != null) {
+                // Shall we continue to ignore, or shall we just return null to
+                // flag an error?
+                if (nextLine.length != types.size()) {
+                    // Give a warning message.
+                    log.error("Incorrect CSV format. There should be exactly " + types.size() + " item(s)");
+                    continue;
+                }
+
+                int i = 0;
+                final List<Atom> atoms = new ArrayList<Atom>();
+                for (String value : nextLine) {
+                    final String type = types.get(i++);
+                    final Atom atom = new Atom(value, type);
+                    atoms.add(atom);
+                }
+                final Statement statement = new Statement(atoms);
+                if (s.statements.size() != 0) {
+                    if (s.statements.get(0).getType() != statement.getType()) {
+                        // Doesn't not match. Return null to indicate we fail to
+                        // construct Statements from TableModel.
+                        return null;
+                    }
+                }
+                s.statements.add(statement);
+            }
+        }
+        catch (IOException ex) {
+            log.error(null, ex);
+        }
+        finally {
+            try {
+                csvreader.close();
+            } catch (IOException ex) {
+                log.error(null, ex);
+            }
+            try {
+                reader.close();
+            } catch (IOException ex) {
+                log.error(null, ex);
+            }
+        }
+        if (s.statements.size() == 0) {
+            // No statement being found. Returns null.
+            return null;
+        }
+        return s;
+    }
+    
     /**
      * Construct Statements based on given TableModel.
      *
@@ -86,7 +174,7 @@ public class Statements {
                 else {
                     // For fall below and rise above, null value is permitted.
                     // Use empty string to represent null value.
-                    atoms.add(new Atom(object != null ? object.toString() : "", type));
+                    atoms.add(new Atom(object != null ? object : "", type));
                 }
             }
             final Statement statement = new Statement(atoms);
@@ -106,6 +194,12 @@ public class Statements {
         return s;
     }
 
+    /**
+     * Construct Statements based on given AbstractPortfolioTreeTableModel.
+     *
+     * @param key Given AbstractPortfolioTreeTableModel
+     * @return the constructed Statements. null if fail
+     */
     public static Statements newInstanceFromAbstractPortfolioTreeTableModel(AbstractPortfolioTreeTableModel abstractPortfolioTreeTableModel) {
         final int column = abstractPortfolioTreeTableModel.getColumnCount();
         final Portfolio portfolio = (Portfolio)abstractPortfolioTreeTableModel.getRoot();
@@ -137,7 +231,7 @@ public class Statements {
                     else {
                         // For fall below and rise above, null value is permitted.
                         // Use empty string to represent null value.
-                        atoms.add(new Atom(object != null ? object.toString() : "", type));
+                        atoms.add(new Atom(object != null ? object : "", type));
                     }
                 }
                 final Statement statement = new Statement(atoms);
@@ -182,7 +276,7 @@ public class Statements {
         for (int i = 0; i < rowCount; i++) {
             for (int j = 0; j < columnCount; j++) {
                 // Value shouldn't be null, as we prevent atom with null value.
-                final String value = statements.get(i).getAtom(j).getValue();
+                final String value = statements.get(i).getAtom(j).getValue().toString();
                 datas[j] = value;
             }
             csvwriter.writeNext(datas);
@@ -218,7 +312,7 @@ public class Statements {
             final HSSFRow row = sheet.createRow(i + 1);
             for (int j = 0; j < columnCount; j++) {
                 // Value shouldn't be null, as we prevent atom with null value.
-                final String value = statements.get(i).getAtom(j).getValue();
+                final Object value = statements.get(i).getAtom(j).getValue();
                 final HSSFCell cell = row.createCell(j);
                 POIUtils.invokeSetCellValue(cell, value);
             }
@@ -246,7 +340,66 @@ public class Statements {
         }
         return status;
     }
-    
+
+    public static boolean saveAsExcelFile(File file, List<StatementsEx> statementsExs) {
+        final HSSFWorkbook wb = new HSSFWorkbook();
+        boolean needToWrite = false;
+        for (StatementsEx statementsEx : statementsExs) {
+            final String title = statementsEx.title;
+            final Statements statements = statementsEx.statements;
+            if (statements == null) {
+                continue;
+            }
+            needToWrite = true;
+            final HSSFSheet sheet = wb.createSheet(title);
+            // statements.size() can never be 0.
+            final int columnCount = statements.get(0).size();
+            // First row. Print out table header.
+            {
+                final HSSFRow row = sheet.createRow(0);
+                for (int i = 0; i < columnCount; i++) {
+                    row.createCell(i).setCellValue(new HSSFRichTextString(statements.get(0).getAtom(i).getType()));
+                }
+            }
+
+            final int rowCount = statements.size();
+            for (int i = 0; i < rowCount; i++) {
+                final HSSFRow row = sheet.createRow(i + 1);
+                for (int j = 0; j < columnCount; j++) {
+                    // Value shouldn't be null, as we prevent atom with null value.
+                    final Object value = statements.get(i).getAtom(j).getValue();
+                    final HSSFCell cell = row.createCell(j);
+                    POIUtils.invokeSetCellValue(cell, value);
+                }
+            }
+        }
+        if (needToWrite == false) {
+            return needToWrite;
+        }
+        boolean status = false;
+        FileOutputStream fileOut = null;
+        try {
+            fileOut = new FileOutputStream(file);
+            wb.write(fileOut);
+            status = true;
+        } catch (FileNotFoundException ex) {
+            log.error(null, ex);
+        }
+        catch (IOException ex) {
+            log.error(null, ex);
+        }
+        finally {
+            if (fileOut != null) {
+                try {
+                    fileOut.close();
+                } catch (IOException ex) {
+                    log.error(null, ex);
+                }
+            }
+        }
+        return status;
+    }
+
     public Statement.Type getType() {
         // statements.size() can never be 0.
         return statements.get(0).getType();
@@ -256,7 +409,7 @@ public class Statements {
         return statements.size();
     }
     
-    public Statement getStatement(int index) {
+    public Statement get(int index) {
         return statements.get(index);
     }
     
