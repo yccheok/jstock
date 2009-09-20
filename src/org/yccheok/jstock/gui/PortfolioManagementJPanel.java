@@ -26,6 +26,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -44,6 +45,7 @@ import org.jdesktop.swingx.table.TableColumnExt;
 import org.yccheok.jstock.portfolio.*;
 import org.yccheok.jstock.engine.*;
 import org.jdesktop.swingx.treetable.*;
+import org.yccheok.jstock.file.Statements;
 import org.yccheok.jstock.gui.portfolio.CashFlowChartJDialog;
 import org.yccheok.jstock.gui.portfolio.CommentJDialog;
 import org.yccheok.jstock.gui.portfolio.DepositSummaryJDialog;
@@ -51,6 +53,7 @@ import org.yccheok.jstock.gui.portfolio.DepositSummaryTableModel;
 import org.yccheok.jstock.gui.portfolio.DividendSummaryJDialog;
 import org.yccheok.jstock.gui.portfolio.DividendSummaryTableModel;
 import org.yccheok.jstock.gui.portfolio.ToolTipHighlighter;
+import org.yccheok.jstock.internationalization.GUIBundle;
 
 /**
  *
@@ -1357,6 +1360,16 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "portfoliomanagementjpanel.xml");
         return org.yccheok.jstock.gui.Utils.toXML(guiOptions, f);
+    }
+
+    public boolean saveAsExcelFile(File file) {
+        org.yccheok.jstock.file.Statements.StatementsEx statementsEx0, statementsEx1, statementsEx2, statementsEx3;
+        statementsEx0 = new org.yccheok.jstock.file.Statements.StatementsEx(org.yccheok.jstock.file.Statements.newInstanceFromAbstractPortfolioTreeTableModel((BuyPortfolioTreeTableModel)this.buyTreeTable.getTreeTableModel()), GUIBundle.getString("PortfolioManagementJPanel_BuyPortfolio"));
+        statementsEx1 = new org.yccheok.jstock.file.Statements.StatementsEx(org.yccheok.jstock.file.Statements.newInstanceFromAbstractPortfolioTreeTableModel((SellPortfolioTreeTableModel)this.sellTreeTable.getTreeTableModel()), GUIBundle.getString("PortfolioManagementJPanel_SellPortfolio"));
+        statementsEx2 = new org.yccheok.jstock.file.Statements.StatementsEx(org.yccheok.jstock.file.Statements.newInstanceFromTableModel(new DividendSummaryTableModel(this.dividendSummary)), GUIBundle.getString("PortfolioManagementJPanel_DividendPortfolio"));
+        statementsEx3 = new org.yccheok.jstock.file.Statements.StatementsEx(org.yccheok.jstock.file.Statements.newInstanceFromTableModel(new DepositSummaryTableModel(this.depositSummary)), GUIBundle.getString("PortfolioManagementJPanel_CashPortfolio"));
+        List<org.yccheok.jstock.file.Statements.StatementsEx> statementsExs = Arrays.asList(statementsEx0, statementsEx1, statementsEx2, statementsEx3);
+        return Statements.saveAsExcelFile(file, statementsExs);
     }
 
     public boolean saveAsCSVFile(Utils.FileEx fileEx) {
