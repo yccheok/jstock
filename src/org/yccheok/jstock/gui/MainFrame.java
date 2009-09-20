@@ -557,19 +557,22 @@ public class MainFrame extends javax.swing.JFrame {
         this.clearAllStocks();
     }//GEN-LAST:event_jMenuItem7ActionPerformed
 
-    private boolean openAsCSVFile(File file) {
+    public boolean openAsCSVFile(File file) {
         Statements statements = Statements.newInstanceFromCSVFile(file);
         if (statements == null) {
             return false;
         }
         
         if (statements.getType() == Statement.Type.RealtimeInfo) {
-            if (this.jTabbedPane1.getSelectedComponent() != this.jPanel8) {
+            if (this.getSelectedComponent() != this.jPanel8) {
+                // User will feel suprise if we try to quitely load something
+                // not within their visible range. Give them a choice so that they
+                // won't feel suprise.
                 final MessageFormat formatter = new MessageFormat("");
                 // formatter.setLocale(currentLocale);
                 formatter.applyPattern(MessagesBundle.getString("question_message_load_file_for_real_time_info_template"));
                 final String output = formatter.format(new Object[]{file.getName()});
-                final int result = javax.swing.JOptionPane.showConfirmDialog(MainFrame.getInstance(), output, MessagesBundle.getString("question_title_replace_old"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
+                final int result = javax.swing.JOptionPane.showConfirmDialog(MainFrame.getInstance(), output, MessagesBundle.getString("question_title_load_file_for_real_time_info"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
                 if (result != javax.swing.JOptionPane.YES_OPTION) {
                     // Assume success.
                     return true;
@@ -607,6 +610,7 @@ public class MainFrame extends javax.swing.JFrame {
         }
         else if (statements.getType() == Statement.Type.PortfolioManagementBuy || statements.getType() == Statement.Type.PortfolioManagementSell || statements.getType() == Statement.Type.PortfolioManagementDeposit || statements.getType() == Statement.Type.PortfolioManagementDividend) {
             /* Open using other tabs. */
+            return this.portfolioManagementJPanel.openAsCSVFile(file);
         }
         else {
             return false;
@@ -730,13 +734,19 @@ public class MainFrame extends javax.swing.JFrame {
         }
         boolean status = true;
         if(Utils.getFileExtension(file).equals("xls")) {
-            if (this.jTabbedPane1.getSelectedComponent() == this.jPanel8) {
+            if (this.getSelectedComponent() == this.jPanel8) {
                 this.openAsExcelFile(file);
             }
         }
         else if(Utils.getFileExtension(file).equals("csv")) {
-            if (this.jTabbedPane1.getSelectedComponent() == this.jPanel8) {
+            if (this.getSelectedComponent() == this.jPanel8) {
                 status = this.openAsCSVFile(file);
+            }
+            else if (this.getSelectedComponent() == this.portfolioManagementJPanel) {
+                status = this.portfolioManagementJPanel.openAsCSVFile(file);
+            }
+            else {
+                assert(false);
             }
         }
         else {
@@ -1102,13 +1112,13 @@ public class MainFrame extends javax.swing.JFrame {
     private void jMenuItem9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem9ActionPerformed
         String suggestedFileName = "";
 
-        if (this.jTabbedPane1.getSelectedComponent() == this.jPanel8) {
+        if (this.getSelectedComponent() == this.jPanel8) {
             suggestedFileName = GUIBundle.getString("MainFrame_Title");
         }
-        else if (this.jTabbedPane1.getSelectedComponent() == this.indicatorScannerJPanel) {
+        else if (this.getSelectedComponent() == this.indicatorScannerJPanel) {
             suggestedFileName = GUIBundle.getString("IndicatorScannerJPanel_Title");
         }
-        else if (this.jTabbedPane1.getSelectedComponent() == this.portfolioManagementJPanel) {
+        else if (this.getSelectedComponent() == this.portfolioManagementJPanel) {
             suggestedFileName = GUIBundle.getString("PortfolioManagementJPanel_Title");
         }
         else {
@@ -1117,15 +1127,15 @@ public class MainFrame extends javax.swing.JFrame {
 
         boolean status = true;
         File file = null;
-        if (this.jTabbedPane1.getSelectedComponent() == this.jPanel8 || this.jTabbedPane1.getSelectedComponent() == this.indicatorScannerJPanel) {
+        if (this.getSelectedComponent() == this.jPanel8 || this.getSelectedComponent() == this.indicatorScannerJPanel) {
             file = Utils.promptSaveCSVAndExcelJFileChooser(suggestedFileName);
             if (file != null) {                
                 if (Utils.getFileExtension(file).equals("csv"))
                 {
-                    if (this.jTabbedPane1.getSelectedComponent() == this.jPanel8) {
+                    if (this.getSelectedComponent() == this.jPanel8) {
                         status = this.saveAsCSVFile(file);
                     }
-                    else if (this.jTabbedPane1.getSelectedComponent() == this.indicatorScannerJPanel) {
+                    else if (this.getSelectedComponent() == this.indicatorScannerJPanel) {
                         status = this.indicatorScannerJPanel.saveAsCSVFile(file);
                     }
                     else {
@@ -1134,10 +1144,10 @@ public class MainFrame extends javax.swing.JFrame {
                 }
                 else if (Utils.getFileExtension(file).equals("xls"))
                 {
-                    if (this.jTabbedPane1.getSelectedComponent() == this.jPanel8) {
+                    if (this.getSelectedComponent() == this.jPanel8) {
                         status = this.saveAsExcelFile(file);
                     }
-                    else if (this.jTabbedPane1.getSelectedComponent() == this.indicatorScannerJPanel) {
+                    else if (this.getSelectedComponent() == this.indicatorScannerJPanel) {
                         status = this.indicatorScannerJPanel.saveAsExcelFile(file);
                     }
                     else {
@@ -1146,7 +1156,7 @@ public class MainFrame extends javax.swing.JFrame {
                 }
             }
         }
-        else if (this.jTabbedPane1.getSelectedComponent() == this.portfolioManagementJPanel) {
+        else if (this.getSelectedComponent() == this.portfolioManagementJPanel) {
             final Utils.FileEx fileEx = Utils.promptSavePortfolioCSVAndExcelJFileChooser(suggestedFileName);
             if (fileEx != null) {
                 file = fileEx.file;
@@ -3051,7 +3061,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     public void repaintTable() {
-        Component c = jTabbedPane1.getSelectedComponent();
+        Component c = getSelectedComponent();
         
         if(c instanceof IndicatorScannerJPanel) {
             indicatorScannerJPanel.repaintTable();
@@ -3283,13 +3293,17 @@ public class MainFrame extends javax.swing.JFrame {
         }
     }
 
+    public Component getSelectedComponent() {
+        return this.jTabbedPane1.getSelectedComponent();
+    }
+
     public void flashChatTabIfNeeded()
     {
         if (jStockOptions.isChatFlashNotificationEnabled() == false) {
             return;
         }
 
-        if (this.jTabbedPane1.getSelectedComponent() == this.chatJPanel) {
+        if (this.getSelectedComponent() == this.chatJPanel) {
             return;
         }
 
