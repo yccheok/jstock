@@ -49,7 +49,6 @@ import java.util.zip.ZipInputStream;
 import javax.imageio.ImageIO;
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import org.yccheok.jstock.analysis.Indicator;
 import org.yccheok.jstock.analysis.OperatorIndicator;
 import org.yccheok.jstock.file.Statement;
@@ -65,7 +64,7 @@ import org.yccheok.jstock.network.ProxyDetector;
  * @author  doraemon
  */
 public class MainFrame extends javax.swing.JFrame {
- 
+    
     /** Creates new form MainFrame */
 
     // Private constructor is sufficient to suppress unauthorized calls to the constructor
