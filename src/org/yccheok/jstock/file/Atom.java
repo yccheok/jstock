@@ -27,7 +27,7 @@ public class Atom {
     /**
      * @return the value
      */
-    public String getValue() {
+    public Object getValue() {
         return value;
     }
 
@@ -38,7 +38,7 @@ public class Atom {
         return type;
     }
 
-    public Atom(String value, String type) {
+    public Atom(Object value, String type) {
         if (value == null || type == null) {
             throw new IllegalArgumentException("Method arguments cannot be null");
         }
@@ -67,6 +67,6 @@ public class Atom {
         return hash;
     }
 
-    private final String value;
+    private final Object value;
     private final String type;
 }
