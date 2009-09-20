@@ -19,7 +19,6 @@
 
 package org.yccheok.jstock.gui;
 
-import au.com.bytecode.opencsv.CSVReader;
 import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -53,6 +52,8 @@ import javax.mail.internet.AddressException;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.yccheok.jstock.analysis.Indicator;
 import org.yccheok.jstock.analysis.OperatorIndicator;
+import org.yccheok.jstock.file.Statement;
+import org.yccheok.jstock.file.Statements;
 import org.yccheok.jstock.gui.dynamicchart.DynamicChart;
 import org.yccheok.jstock.gui.table.NonNegativeDoubleEditor;
 import org.yccheok.jstock.internationalization.GUIBundle;
@@ -64,7 +65,7 @@ import org.yccheok.jstock.network.ProxyDetector;
  * @author  doraemon
  */
 public class MainFrame extends javax.swing.JFrame {
-    
+ 
     /** Creates new form MainFrame */
 
     // Private constructor is sufficient to suppress unauthorized calls to the constructor
@@ -556,68 +557,47 @@ public class MainFrame extends javax.swing.JFrame {
         this.clearAllStocks();
     }//GEN-LAST:event_jMenuItem7ActionPerformed
 
-    private void openAsCSVFile(File file) {
-        java.io.Reader reader = null;
-        try {
-            reader = new java.io.FileReader(file);
-        } catch (IOException ex) {
-            log.error(null, ex);
-            return;
+    private boolean openAsCSVFile(File file) {
+        Statements statements = Statements.newInstanceFromCSVFile(file);
+        if (statements == null) {
+            return false;
         }
-        final CSVReader csvreader = new CSVReader(reader);
-
-        try {
-            int codeColumn = -1;
-            int symbolColumn = -1;
-            int fallBelowColumn = -1;
-            int riseAboveColumn = -1;
-
-            String [] nextLine;
-            if ((nextLine = csvreader.readNext()) != null) {
-                int i = 0;
-                for (String item : nextLine) {
-                    if (item.equalsIgnoreCase("code")) {
-                        codeColumn = i;
-                    }
-                    else if (item.equalsIgnoreCase("symbol")) {
-                        symbolColumn = i;
-                    }
-                    else if (item.equalsIgnoreCase("fall below")) {
-                        fallBelowColumn = i;
-                    }
-                    else if (item.equalsIgnoreCase("rise above")) {
-                        riseAboveColumn = i;
-                    }
-                    i++;
+        
+        if (statements.getType() == Statement.Type.RealtimeInfo) {
+            if (this.jTabbedPane1.getSelectedComponent() != this.jPanel8) {
+                final MessageFormat formatter = new MessageFormat("");
+                // formatter.setLocale(currentLocale);
+                formatter.applyPattern(MessagesBundle.getString("question_message_load_file_for_real_time_info_template"));
+                final String output = formatter.format(new Object[]{file.getName()});
+                final int result = javax.swing.JOptionPane.showConfirmDialog(MainFrame.getInstance(), output, MessagesBundle.getString("question_title_replace_old"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
+                if (result != javax.swing.JOptionPane.YES_OPTION) {
+                    // Assume success.
+                    return true;
                 }
-            }   /* if ((nextLine = csvreader.readNext()) != null) */
-
-            if (codeColumn == -1 || symbolColumn == -1 || fallBelowColumn == -1 || riseAboveColumn == -1) {
-                return;
             }
 
-            final int maxIndex = Math.max(riseAboveColumn, Math.max(fallBelowColumn, Math.max(codeColumn, symbolColumn)));
-            while ((nextLine = csvreader.readNext()) != null) {
-                if (nextLine.length <= maxIndex) {
-                    continue;
-                }
-
-                final String symbolStr = nextLine[symbolColumn];
-                final String codeStr = nextLine[codeColumn];
-                final String fallBelowStr = nextLine[fallBelowColumn];
-                final String riseAboveStr = nextLine[riseAboveColumn];
+            final int size = statements.size();
+            for (int i = 0; i < size; i++) {
+                final org.yccheok.jstock.file.Statement statement = statements.get(i);
+                final String codeStr = (String)statement.getValue(GUIBundle.getString("MainFrame_Code"));
+                final String symbolStr = (String)statement.getValue(GUIBundle.getString("MainFrame_Symbol"));
+                final String fallBelowStr = (String)statement.getValue(GUIBundle.getString("MainFrame_FallBelow"));
+                final String riseAboveStr = (String)statement.getValue(GUIBundle.getString("MainFrame_RiseAbove"));
                 Double fallBelowDouble = null;
                 Double riseAboveDouble = null;
                 try {
                     fallBelowDouble = Double.parseDouble(fallBelowStr);
                 }
-                catch (NumberFormatException exp) {}
+                catch (NumberFormatException exp) {
+                    log.error(null, exp);
+                }
                 try {
                     riseAboveDouble = Double.parseDouble(riseAboveStr);
                 }
-                catch (NumberFormatException exp) {}
-
-                if(codeStr != null && symbolStr != null) {
+                catch (NumberFormatException exp) {
+                    log.error(null, exp);
+                }
+                if (codeStr.length() > 0 && symbolStr.length() > 0) {
                     final Stock stock = Utils.getEmptyStock(Code.newInstance(codeStr), Symbol.newInstance(symbolStr));
                     final StockAlert stockAlert = new StockAlert().setFallBelow(fallBelowDouble).setRiseAbove(riseAboveDouble);
                     this.addStockToTable(stock, stockAlert);
@@ -625,21 +605,13 @@ public class MainFrame extends javax.swing.JFrame {
                 }
             }
         }
-        catch (IOException ex) {
-            log.error(null, ex);
+        else if (statements.getType() == Statement.Type.PortfolioManagementBuy || statements.getType() == Statement.Type.PortfolioManagementSell || statements.getType() == Statement.Type.PortfolioManagementDeposit || statements.getType() == Statement.Type.PortfolioManagementDividend) {
+            /* Open using other tabs. */
         }
-        finally {
-            try {
-                csvreader.close();
-            } catch (IOException ex) {
-                log.error(null, ex);
-            }
-            try {
-                reader.close();
-            } catch (IOException ex) {
-                log.error(null, ex);
-            }
+        else {
+            return false;
         }
+        return true;
     }
     
     private void openAsExcelFile(File file) {
@@ -752,44 +724,31 @@ public class MainFrame extends javax.swing.JFrame {
     
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
     // TODO add your handling code here:
-        final JFileChooser chooser = new JFileChooser(jStockOptions.getLastFileIODirectory());
-        final FileNameExtensionFilter csvFilter = new FileNameExtensionFilter("CSV Documents (*.csv)", "csv");
-        final FileNameExtensionFilter xlsFilter = new FileNameExtensionFilter("Microsoft Excel (*.xls)", "xls");
-        chooser.setAcceptAllFileFilterUsed(false);
-        chooser.addChoosableFileFilter(csvFilter);
-        chooser.addChoosableFileFilter(xlsFilter);
-
-        java.util.Map<String, FileNameExtensionFilter> map = new HashMap<String, FileNameExtensionFilter>();
-        map.put(csvFilter.getDescription(), csvFilter);
-        map.put(xlsFilter.getDescription(), xlsFilter);
-
-        final FileNameExtensionFilter filter = map.get(this.getJStockOptions().getLastSavedFileNameExtensionDescription());
-        if (filter != null) {
-            chooser.setFileFilter(filter);
+        final File file = Utils.promptOpenCSVAndExcelJFileChooser();
+        if (file == null) {
+            return;
         }
-        
-        int returnVal = chooser.showOpenDialog(this);
-
-        if (returnVal != JFileChooser.APPROVE_OPTION) {
-            return;            
+        boolean status = true;
+        if(Utils.getFileExtension(file).equals("xls")) {
+            if (this.jTabbedPane1.getSelectedComponent() == this.jPanel8) {
+                this.openAsExcelFile(file);
+            }
         }
-        
-        File file = chooser.getSelectedFile();
-        if(file.getName().endsWith(".xls")) {
-            openAsExcelFile(file);
-            jStockOptions.setLastFileNameExtensionDescription(xlsFilter.getDescription());
-        }
-        else if(file.getName().endsWith(".csv")) {
-            openAsCSVFile(file);
-            jStockOptions.setLastFileNameExtensionDescription(csvFilter.getDescription());
+        else if(Utils.getFileExtension(file).equals("csv")) {
+            if (this.jTabbedPane1.getSelectedComponent() == this.jPanel8) {
+                status = this.openAsCSVFile(file);
+            }
         }
         else {
-            // Impossible.
+            assert(false);
         }
 
-        final String parent = chooser.getSelectedFile().getParent();
-        if (parent != null) {
-            jStockOptions.setLastFileIODirectory(parent);
+        if (false == status) {
+            final MessageFormat formatter = new MessageFormat("");
+            // formatter.setLocale(currentLocale);
+            formatter.applyPattern(MessagesBundle.getString("error_message_bad_file_format_template"));
+            final String output = formatter.format(new Object[]{file.getName()});
+            JOptionPane.showMessageDialog(this, output, MessagesBundle.getString("error_title_bad_file_format"), JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_jMenuItem2ActionPerformed
     
@@ -1156,10 +1115,11 @@ public class MainFrame extends javax.swing.JFrame {
             assert(false);
         }
 
+        boolean status = true;
+        File file = null;
         if (this.jTabbedPane1.getSelectedComponent() == this.jPanel8 || this.jTabbedPane1.getSelectedComponent() == this.indicatorScannerJPanel) {
-            final File file = Utils.promptSaveCSVAndExcelJFileChooser(suggestedFileName);
-            if (file != null) {
-                boolean status = false;
+            file = Utils.promptSaveCSVAndExcelJFileChooser(suggestedFileName);
+            if (file != null) {                
                 if (Utils.getFileExtension(file).equals("csv"))
                 {
                     if (this.jTabbedPane1.getSelectedComponent() == this.jPanel8) {
@@ -1184,31 +1144,35 @@ public class MainFrame extends javax.swing.JFrame {
                         assert(false);
                     }
                 }
-                if (false == status)
-                {
-                    final MessageFormat formatter = new MessageFormat("");
-                    // formatter.setLocale(currentLocale);
-                    formatter.applyPattern(MessagesBundle.getString("error_message_nothing_to_be_saved_template"));
-                    final String output = formatter.format(new Object[]{file.getName()});
-                    JOptionPane.showMessageDialog(this, output, MessagesBundle.getString("error_title_nothing_to_be_saved"), JOptionPane.ERROR_MESSAGE);
-                }
             }
         }
         else if (this.jTabbedPane1.getSelectedComponent() == this.portfolioManagementJPanel) {
             final Utils.FileEx fileEx = Utils.promptSavePortfolioCSVAndExcelJFileChooser(suggestedFileName);
             if (fileEx != null) {
+                file = fileEx.file;
                 if (Utils.getFileExtension(fileEx.file).equals("csv"))
                 {
-                    this.portfolioManagementJPanel.saveAsCSVFile(fileEx);
+                    status = this.portfolioManagementJPanel.saveAsCSVFile(fileEx);
                 }
                 else if (Utils.getFileExtension(fileEx.file).equals("xls"))
                 {
-                    saveAsExcelFile(fileEx.file);
+                    status = this.portfolioManagementJPanel.saveAsExcelFile(fileEx.file);
                 }
             }
         }
         else {
             assert(false);
+        }
+        if (false == status)
+        {
+			// file will never become null, if status had been changed from true
+			// to false.
+			assert(file != null);
+            final MessageFormat formatter = new MessageFormat("");
+            // formatter.setLocale(currentLocale);
+            formatter.applyPattern(MessagesBundle.getString("error_message_nothing_to_be_saved_template"));
+            final String output = formatter.format(new Object[]{file.getName()});
+            JOptionPane.showMessageDialog(this, output, MessagesBundle.getString("error_title_nothing_to_be_saved"), JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_jMenuItem9ActionPerformed
 
