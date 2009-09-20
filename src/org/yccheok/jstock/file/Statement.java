@@ -55,7 +55,7 @@ public class Statement {
         }
     }
 
-    public String getValue(String type) {
+    public Object getValue(String type) {
         return typeToValue.get(type);
     }
 
@@ -195,6 +195,6 @@ public class Statement {
 
     private final Type type;
     private final List<Atom> atoms;
-    private final Map<String, String> typeToValue = new HashMap<String, String>();
+    private final Map<String, Object> typeToValue = new HashMap<String, Object>();
     private static final Log log = LogFactory.getLog(Statement.class);
 }
