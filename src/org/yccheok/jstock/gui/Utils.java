@@ -1034,6 +1034,56 @@ public class Utils {
 
     // Calling to this method will affect state of JStockOptions.
     // Returns null if no file being selected.
+    public static File promptOpenCSVAndExcelJFileChooser() {
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JFileChooser chooser = new JFileChooser(jStockOptions.getLastFileIODirectory());
+        final FileNameExtensionFilter csvFilter = new FileNameExtensionFilter("CSV Documents (*.csv)", "csv");
+        final FileNameExtensionFilter xlsFilter = new FileNameExtensionFilter("Microsoft Excel (*.xls)", "xls");
+        chooser.setAcceptAllFileFilterUsed(false);
+        chooser.addChoosableFileFilter(csvFilter);
+        chooser.addChoosableFileFilter(xlsFilter);
+
+        java.util.Map<String, FileNameExtensionFilter> map = new HashMap<String, FileNameExtensionFilter>();
+        map.put(csvFilter.getDescription(), csvFilter);
+        map.put(xlsFilter.getDescription(), xlsFilter);
+
+        final FileNameExtensionFilter filter = map.get(jStockOptions.getLastSavedFileNameExtensionDescription());
+        if (filter != null) {
+            chooser.setFileFilter(filter);
+        }
+
+        int returnVal = chooser.showOpenDialog(MainFrame.getInstance());
+
+        if (returnVal != JFileChooser.APPROVE_OPTION) {
+            return null;
+        }
+
+        File file = chooser.getSelectedFile();
+        if (file == null || !file.exists()) {
+            return null;
+        }
+
+        final String parent = chooser.getSelectedFile().getParent();
+        if (parent != null) {
+            jStockOptions.setLastFileIODirectory(parent);
+        }
+
+        if (Utils.getFileExtension(file).equals("csv")) {
+            jStockOptions.setLastFileNameExtensionDescription(csvFilter.getDescription());
+            return file;
+        }
+        else if (Utils.getFileExtension(file).equals("xls")) {
+            jStockOptions.setLastFileNameExtensionDescription(xlsFilter.getDescription());
+            return file;
+        }
+        else {
+            // Impossible.
+            return null;
+        }
+    }
+
+    // Calling to this method will affect state of JStockOptions.
+    // Returns null if no file being selected.
     public static File promptSaveCSVAndExcelJFileChooser(String suggestedFileName) {
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
         final JFileChooser chooser = new JFileChooser(jStockOptions.getLastFileIODirectory());
