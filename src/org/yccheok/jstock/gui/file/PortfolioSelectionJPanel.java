@@ -26,6 +26,8 @@
 package org.yccheok.jstock.gui.file;
 
 import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.JRadioButton;
 import org.yccheok.jstock.gui.Utils;
 import org.yccheok.jstock.internationalization.GUIBundle;
@@ -108,6 +110,27 @@ public class PortfolioSelectionJPanel extends javax.swing.JPanel {
             components[i].setEnabled(enabled);
         }
     }
+    
+    public String getSuggestedFileName() {
+        final JRadioButton button = Utils.getSelection(buttonGroup1);
+        /* Impossible. Just to be paranoid. */
+        if (button == null) {
+            return GUIBundle.getString("PortfolioSelectionJPanel_SaveBuySuggestedFileName");
+        }
+        if (button.getText().equals(GUIBundle.getString("PortfolioSelectionJPanel_SaveBuy"))) {
+            return GUIBundle.getString("PortfolioSelectionJPanel_SaveBuySuggestedFileName");
+        }
+        else if (button.getText().equals(GUIBundle.getString("PortfolioSelectionJPanel_SaveSell"))) {
+            return GUIBundle.getString("PortfolioSelectionJPanel_SaveSellSuggestedFileName");
+        }
+        else if (button.getText().equals(GUIBundle.getString("PortfolioSelectionJPanel_SaveCash"))) {
+            return GUIBundle.getString("PortfolioSelectionJPanel_SaveCashSuggestedFileName");
+        }
+        else if (button.getText().equals(GUIBundle.getString("PortfolioSelectionJPanel_SaveDividend"))) {
+            return GUIBundle.getString("PortfolioSelectionJPanel_SaveDividendSuggestedFileName");
+        }
+        return GUIBundle.getString("PortfolioSelectionJPanel_SaveBuySuggestedFileName");
+    }
 
     public org.yccheok.jstock.file.Statement.Type getType() {
         final JRadioButton button = Utils.getSelection(buttonGroup1);
@@ -127,9 +150,16 @@ public class PortfolioSelectionJPanel extends javax.swing.JPanel {
         else if (button.getText().equals(GUIBundle.getString("PortfolioSelectionJPanel_SaveDividend"))) {
             return org.yccheok.jstock.file.Statement.Type.PortfolioManagementDividend;
         }
-        return org.yccheok.jstock.file.Statement.Type.PortfolioManagementBuy;
-        
+        return org.yccheok.jstock.file.Statement.Type.PortfolioManagementBuy;        
     }
+
+    public void addJRadioButtonsActionListener(ActionListener actionListener) {
+        jRadioButton1.addActionListener(actionListener);
+        jRadioButton2.addActionListener(actionListener);
+        jRadioButton3.addActionListener(actionListener);
+        jRadioButton4.addActionListener(actionListener);
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JRadioButton jRadioButton1;

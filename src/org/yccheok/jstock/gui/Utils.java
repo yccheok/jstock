@@ -28,6 +28,8 @@ import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
 import java.awt.Image;
 import java.awt.Transparency;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.PixelGrabber;
@@ -920,15 +922,14 @@ public class Utils {
 
     // Calling to this method will affect state of JStockOptions.
     // Returns null if no file being selected.
-    public static FileEx promptSavePortfolioCSVAndExcelJFileChooser(String suggestedFileName) {
+    public static FileEx promptSavePortfolioCSVAndExcelJFileChooser(final String suggestedFileName) {
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
         final JFileChooser chooser = new JFileChooser(jStockOptions.getLastFileIODirectory());
         final FileNameExtensionFilter csvFilter = new FileNameExtensionFilter("CSV Documents (*.csv)", "csv");
         final FileNameExtensionFilter xlsFilter = new FileNameExtensionFilter("Microsoft Excel (*.xls)", "xls");
         chooser.setAcceptAllFileFilterUsed(false);
         chooser.addChoosableFileFilter(csvFilter);
-        chooser.addChoosableFileFilter(xlsFilter);
-        chooser.setSelectedFile(new File(suggestedFileName));
+        chooser.addChoosableFileFilter(xlsFilter);        
 
         final org.yccheok.jstock.gui.file.PortfolioSelectionJPanel portfolioSelectionJPanel = new org.yccheok.jstock.gui.file.PortfolioSelectionJPanel();
         chooser.setAccessory(portfolioSelectionJPanel);
@@ -938,10 +939,18 @@ public class Utils {
             public void propertyChange(PropertyChangeEvent evt) {
                 final boolean flag = ((FileNameExtensionFilter)evt.getNewValue()).equals(csvFilter);
                 portfolioSelectionJPanel.setEnabled(flag);
+                chooser.setSelectedFile(chooser.getFileFilter().getDescription().equals(csvFilter.getDescription()) ? new File(portfolioSelectionJPanel.getSuggestedFileName()) : new File(suggestedFileName));
             }
             
         });
+        portfolioSelectionJPanel.addJRadioButtonsActionListener(new ActionListener() {
 
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                chooser.setSelectedFile(new File(portfolioSelectionJPanel.getSuggestedFileName()));
+            }
+
+        });
         final java.util.Map<String, FileNameExtensionFilter> map = new HashMap<String, FileNameExtensionFilter>();
         map.put(csvFilter.getDescription(), csvFilter);
         map.put(xlsFilter.getDescription(), xlsFilter);
@@ -952,7 +961,8 @@ public class Utils {
         }
 
         // Only enable portfolioSelectionJPanel, if CSV is being selected.
-        portfolioSelectionJPanel.setEnabled(chooser.getFileFilter().equals(csvFilter));
+        portfolioSelectionJPanel.setEnabled(chooser.getFileFilter().getDescription().equals(csvFilter.getDescription()));
+        chooser.setSelectedFile(chooser.getFileFilter().getDescription().equals(csvFilter.getDescription()) ? new File(portfolioSelectionJPanel.getSuggestedFileName()) : new File(suggestedFileName));
 
         while (true) {
             final int returnVal = chooser.showSaveDialog(MainFrame.getInstance());
@@ -969,14 +979,14 @@ public class Utils {
             // file extension explicitly, leave it as is. If not, mutate the filename.
             final String extension = Utils.getFileExtension(file);
             if (extension.equals("csv") == false && extension.equals("xls") == false) {
-                if (chooser.getFileFilter() == csvFilter) {
+                if (chooser.getFileFilter().getDescription().equals(csvFilter.getDescription())) {
                     try {
                         file = new File(file.getCanonicalPath() + ".csv");
                     } catch (IOException ex) {
                         log.error(null, ex);
                     }
                 }
-                else if (chooser.getFileFilter() == xlsFilter) {
+                else if (chooser.getFileFilter().getDescription().equals(xlsFilter.getDescription())) {
                     try {
                         file = new File(file.getCanonicalPath() + ".xls");
                     } catch (IOException ex) {
@@ -1118,14 +1128,14 @@ public class Utils {
             // file extension explicitly, leave it as is. If not, mutate the filename.
             final String extension = Utils.getFileExtension(file);
             if (extension.equals("csv") == false && extension.equals("xls") == false) {
-                if (chooser.getFileFilter() == csvFilter) {
+                if (chooser.getFileFilter().getDescription().equals(csvFilter.getDescription())) {
                     try {
                         file = new File(file.getCanonicalPath() + ".csv");
                     } catch (IOException ex) {
                         log.error(null, ex);
                     }
                 }
-                else if (chooser.getFileFilter() == xlsFilter) {
+                else if (chooser.getFileFilter().getDescription().equals(xlsFilter.getDescription())) {
                     try {
                         file = new File(file.getCanonicalPath() + ".xls");
                     } catch (IOException ex) {
