@@ -344,6 +344,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 case PortfolioManagementSell:
                     break;
                 case PortfolioManagementDeposit:
+                {
                     final List<Deposit> deposits = new ArrayList<Deposit>();
 
                     for (int i = 0; i < size; i++) {
@@ -376,7 +377,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                         if (cash == null) {
                             continue;
                         }
-                        Deposit deposit = new Deposit(cash, new SimpleDate(date));
+                        final Deposit deposit = new Deposit(cash, new SimpleDate(date));
                         deposits.add(deposit);
                     }
 
@@ -400,11 +401,84 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     for (Deposit deposit : deposits) {
                         depositSummary.add(deposit);
                     }
+                }
+                break;
 
-                    this.updateWealthHeader();
-                    break;
                 case PortfolioManagementDividend:
+                {
+                    final List<Dividend> dividends = new ArrayList<Dividend>();
+
+                    for (int i = 0; i < size; i++) {
+                        Date date = null;
+                        Stock stock = null;
+                        Double dividend = null;
+                        final Statement statement = statements.get(i);
+                        final Object object0 = statement.getValue(GUIBundle.getString("PortfolioManagementJPanel_Date"));
+                        assert(object0 != null);
+                        try {
+                            date = dateFormat.parse((String)object0);
+                        }
+                        catch (ParseException exp) {
+                            log.error(null, exp);
+                        }
+                        // Shall we continue to ignore, or shall we just return false to
+                        // flag an error?
+                        if (date == null) {
+                            continue;
+                        }
+                        final Object object1 = statement.getValue(GUIBundle.getString("PortfolioManagementJPanel_Dividend"));
+                        assert(object1 != null);
+                        try {
+                            dividend = Double.parseDouble((String)object1);
+                        }
+                        catch (NumberFormatException exp) {
+                            log.error(null, exp);
+                        }
+                        // Shall we continue to ignore, or shall we just return false to
+                        // flag an error?
+                        if (dividend == null) {
+                            continue;
+                        }
+                        final String codeStr = (String)statement.getValue(GUIBundle.getString("MainFrame_Code"));
+                        final String symbolStr = (String)statement.getValue(GUIBundle.getString("MainFrame_Symbol"));
+                        if (codeStr.length() > 0 && symbolStr.length() > 0) {
+                            stock = Utils.getEmptyStock(Code.newInstance(codeStr), Symbol.newInstance(symbolStr));
+                        }
+                        else {
+                            // stock is null.
+                            continue;
+                        }
+                        final Dividend d = new Dividend(stock, dividend, new SimpleDate(date));
+                        dividends.add(d);
+                    }
+
+                    if (dividends.size() <= 0) {
+                        return false;
+                    }
+
+                    if (this.dividendSummary.size() > 0) {
+                        final MessageFormat formatter = new MessageFormat("");
+                        // formatter.setLocale(currentLocale);
+                        formatter.applyPattern(MessagesBundle.getString("question_message_load_file_for_dividend_template"));
+                        final String output = formatter.format(new Object[]{file.getName()});
+                        final int result = javax.swing.JOptionPane.showConfirmDialog(MainFrame.getInstance(), output, MessagesBundle.getString("question_title_load_file_for_dividend"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
+                        if (result != javax.swing.JOptionPane.YES_OPTION) {
+                            // Assume success.
+                            return true;
+                        }
+                        this.dividendSummary = new DividendSummary();
+                    }
+
+                    for (Dividend dividend : dividends) {
+                        dividendSummary.add(dividend);
+                    }
+                }
+                break;
+
+                default:
+                    assert(false);
             }
+            this.updateWealthHeader();
         }
         else if (statements.getType() == Statement.Type.RealtimeInfo) {
             /* Open using other tabs. */
