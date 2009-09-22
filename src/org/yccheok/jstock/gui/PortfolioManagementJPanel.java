@@ -314,27 +314,40 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         return null;
     }
 
+    public boolean openAsExcelFile(File file) {
+        final java.util.List<Statements> statementsList = Statements.newInstanceFromExcelFile(file);
+        boolean status = true;
+        for (Statements statements : statementsList) {
+            status = status & this.openAsStatements(statements, file);
+        }
+        return status;
+    }
+
     public boolean openAsCSVFile(File file) {
-        Statements statements = Statements.newInstanceFromCSVFile(file);
+        final Statements statements = Statements.newInstanceFromCSVFile(file);
+        return this.openAsStatements(statements, file);
+    }
+
+    public boolean openAsStatements(Statements statements, File file) {
         if (statements == null) {
             return false;
         }
         final Component selectedComponent = MainFrame.getInstance().getSelectedComponent();
         if (statements.getType() == Statement.Type.PortfolioManagementBuy || statements.getType() == Statement.Type.PortfolioManagementSell || statements.getType() == Statement.Type.PortfolioManagementDeposit || statements.getType() == Statement.Type.PortfolioManagementDividend) {
-            if (selectedComponent != this) {
-                // User will feel suprise if we try to quitely load something
-                // not within their visible range. Give them a choice so that they
-                // won't feel suprise.
-                final MessageFormat formatter = new MessageFormat("");
-                // formatter.setLocale(currentLocale);
-                formatter.applyPattern(MessagesBundle.getString("question_message_load_file_for_portfolio_management_template"));
-                final String output = formatter.format(new Object[]{file.getName()});
-                final int result = javax.swing.JOptionPane.showConfirmDialog(MainFrame.getInstance(), output, MessagesBundle.getString("question_title_load_file_for_portfolio_management"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
-                if (result != javax.swing.JOptionPane.YES_OPTION) {
-                    // Assume success.
-                    return true;
-                }
-            }
+            //if (selectedComponent != this) {
+            //    // User will feel suprise if we try to quitely load something
+            //    // not within their visible range. Give them a choice so that they
+            //    // won't feel suprise.
+            //    final MessageFormat formatter = new MessageFormat("");
+            //    // formatter.setLocale(currentLocale);
+            //    formatter.applyPattern(MessagesBundle.getString("question_message_load_file_for_portfolio_management_template"));
+            //    final String output = formatter.format(new Object[]{file.getName()});
+            //    final int result = javax.swing.JOptionPane.showConfirmDialog(MainFrame.getInstance(), output, MessagesBundle.getString("question_title_load_file_for_portfolio_management"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
+            //    if (result != javax.swing.JOptionPane.YES_OPTION) {
+            //        // Assume success.
+            //        return true;
+            //    }
+            //}
             final DateFormat dateFormat = DateFormat.getDateInstance();
             final int size = statements.size();
             switch(statements.getType()) {
@@ -363,7 +376,6 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                             // stock is null.
                             continue;
                         }
-                        
                         Date date = null;
                         try {
                             date = dateFormat.parse((String)_date);
@@ -383,7 +395,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                         Double clearingFee = null;
                         Double stampDuty = null;
                         try {
-                            units = Integer.parseInt((String)_units);
+                            // Excel file always return double. For example, 100.0
+                            units = (int)(Double.parseDouble((String)_units));
+
                             purchasePrice = Double.parseDouble((String)_purchasePrice);
                             broker = Double.parseDouble((String)_broker);
                             clearingFee = Double.parseDouble((String)_clearingFee);
@@ -484,7 +498,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                         Double clearingFee = null;
                         Double stampDuty = null;
                         try {
-                            units = Integer.parseInt((String)_units);
+                            // Excel file always return double. For example, 100.0
+                            units = (int)(Double.parseDouble((String)_units));
+                            
                             purchasePrice = Double.parseDouble((String)_purchasePrice);
                             sellingPrice = Double.parseDouble((String)_sellingPrice);
                             broker = Double.parseDouble((String)_broker);
@@ -680,7 +696,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
         else if (statements.getType() == Statement.Type.RealtimeInfo) {
             /* Open using other tabs. */
-            return MainFrame.getInstance().openAsCSVFile(file);
+            return MainFrame.getInstance().openAsStatements(statements, file);
         }
         else {
             return false;
