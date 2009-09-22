@@ -56,6 +56,9 @@ public class StockEditor extends DefaultCellEditor {
     @Override
     public Object getCellEditorValue() {
         int index = comboBox.getSelectedIndex();
+        if (index >= stocks.size() || index < 0) {
+            return null;
+        }
         return stocks.get(index);
     }
 
