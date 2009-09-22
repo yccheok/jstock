@@ -114,28 +114,29 @@ public class Statement {
                 return Type.PortfolioManagementBuy;
             }
         }
-        else if (atoms.size() == 18) {
+        else if (atoms.size() == 19) {
             /* Wow! Beware, Stock will being translated into Code and Symbol */
             // GUIBundle.getString("PortfolioManagementJPanel_Stock")
             if (
             atoms.get(0).getType().equals(GUIBundle.getString("MainFrame_Code")) &&
             atoms.get(1).getType().equals(GUIBundle.getString("MainFrame_Symbol")) &&
-            atoms.get(2).getType().equals(GUIBundle.getString("PortfolioManagementJPanel_Date")) &&
-            atoms.get(3).getType().equals(GUIBundle.getString("PortfolioManagementJPanel_Units")) &&
-            atoms.get(4).getType().equals(GUIBundle.getString("PortfolioManagementJPanel_SellingPrice")) &&
-            atoms.get(5).getType().equals(GUIBundle.getString("PortfolioManagementJPanel_PurchasePrice")) &&
-            atoms.get(6).getType().equals(GUIBundle.getString("PortfolioManagementJPanel_SellingValue")) &&
-            atoms.get(7).getType().equals(GUIBundle.getString("PortfolioManagementJPanel_PurchaseValue")) &&
-            atoms.get(8).getType().equals(GUIBundle.getString("PortfolioManagementJPanel_GainLossPrice")) &&
-            atoms.get(9).getType().equals(GUIBundle.getString("PortfolioManagementJPanel_GainLossValue")) &&
-            atoms.get(10).getType().equals(GUIBundle.getString("PortfolioManagementJPanel_GainLossPercentage")) &&
-            atoms.get(11).getType().equals(GUIBundle.getString("PortfolioManagementJPanel_Broker")) &&
-            atoms.get(12).getType().equals(GUIBundle.getString("PortfolioManagementJPanel_ClearingFee")) &&
-            atoms.get(13).getType().equals(GUIBundle.getString("PortfolioManagementJPanel_StampDuty")) &&
-            atoms.get(14).getType().equals(GUIBundle.getString("PortfolioManagementJPanel_NetSellingValue")) &&
-            atoms.get(15).getType().equals(GUIBundle.getString("PortfolioManagementJPanel_NetGainLossValue")) &&
-            atoms.get(16).getType().equals(GUIBundle.getString("PortfolioManagementJPanel_NetGainLossPercentage")) &&
-            atoms.get(17).getType().equals(GUIBundle.getString("PortfolioManagementJPanel_Comment"))
+            atoms.get(2).getType().equals(GUIBundle.getString("PortfolioManagementJPanel_ReferenceDate")) &&
+            atoms.get(3).getType().equals(GUIBundle.getString("PortfolioManagementJPanel_Date")) &&
+            atoms.get(4).getType().equals(GUIBundle.getString("PortfolioManagementJPanel_Units")) &&
+            atoms.get(5).getType().equals(GUIBundle.getString("PortfolioManagementJPanel_SellingPrice")) &&
+            atoms.get(6).getType().equals(GUIBundle.getString("PortfolioManagementJPanel_PurchasePrice")) &&
+            atoms.get(7).getType().equals(GUIBundle.getString("PortfolioManagementJPanel_SellingValue")) &&
+            atoms.get(8).getType().equals(GUIBundle.getString("PortfolioManagementJPanel_PurchaseValue")) &&
+            atoms.get(9).getType().equals(GUIBundle.getString("PortfolioManagementJPanel_GainLossPrice")) &&
+            atoms.get(10).getType().equals(GUIBundle.getString("PortfolioManagementJPanel_GainLossValue")) &&
+            atoms.get(11).getType().equals(GUIBundle.getString("PortfolioManagementJPanel_GainLossPercentage")) &&
+            atoms.get(12).getType().equals(GUIBundle.getString("PortfolioManagementJPanel_Broker")) &&
+            atoms.get(13).getType().equals(GUIBundle.getString("PortfolioManagementJPanel_ClearingFee")) &&
+            atoms.get(14).getType().equals(GUIBundle.getString("PortfolioManagementJPanel_StampDuty")) &&
+            atoms.get(15).getType().equals(GUIBundle.getString("PortfolioManagementJPanel_NetSellingValue")) &&
+            atoms.get(16).getType().equals(GUIBundle.getString("PortfolioManagementJPanel_NetGainLossValue")) &&
+            atoms.get(17).getType().equals(GUIBundle.getString("PortfolioManagementJPanel_NetGainLossPercentage")) &&
+            atoms.get(18).getType().equals(GUIBundle.getString("PortfolioManagementJPanel_Comment"))
             ) {
                 return Type.PortfolioManagementSell;
             }
