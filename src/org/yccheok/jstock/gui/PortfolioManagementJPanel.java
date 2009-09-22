@@ -105,8 +105,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         // ToolTipHighlighter will not work correctly if we tend to hide column view by removeColumn.
         // We need to hide the view by using TableColumnExt.setVisible.
         // Why? Don't ask me. Ask SwingX team.
-        ((TableColumnExt)buyTreeTable.getColumn("Comment")).setVisible(false);
-        ;
+        ((TableColumnExt)buyTreeTable.getColumn(GUIBundle.getString("PortfolioManagementJPanel_Comment"))).setVisible(false);
         jScrollPane2 = new javax.swing.JScrollPane();
         sellTreeTable = new org.jdesktop.swingx.JXTreeTable(new SellPortfolioTreeTableModel());
 
@@ -117,7 +116,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         // ToolTipHighlighter will not work correctly if we tend to hide column view by removeColumn.
         // We need to hide the view by using TableColumnExt.setVisible.
         // Why? Don't ask me. Ask SwingX team.
-        ((TableColumnExt)sellTreeTable.getColumn("Comment")).setVisible(false);
+        ((TableColumnExt)sellTreeTable.getColumn(GUIBundle.getString("PortfolioManagementJPanel_Comment"))).setVisible(false);
         jPanel2 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
@@ -177,7 +176,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         buyTreeTable.setRootVisible(true);
         // We need to have a hack way, to have "Comment" in the model, but not visible to user.
         // So that our ToolTipHighlighter can work correctly.
-        buyTreeTable.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(1, new String[]{"Comment"}));
+        buyTreeTable.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(1, new String[]{GUIBundle.getString("PortfolioManagementJPanel_Comment")}));
         buyTreeTable.addMouseListener(new BuyTableRowPopupListener());
 
         org.jdesktop.swingx.decorator.Highlighter highlighter0 = org.jdesktop.swingx.decorator.HighlighterFactory.createSimpleStriping(new Color(245, 245, 220));
@@ -198,7 +197,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         sellTreeTable.setRootVisible(true);
         // We need to have a hack way, to have "Comment" in the model, but not visible to user.
         // So that our ToolTipHighlighter can work correctly.
-        sellTreeTable.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(1, new String[]{"Comment"}));
+        sellTreeTable.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(1, new String[]{GUIBundle.getString("PortfolioManagementJPanel_Comment")}));
         sellTreeTable.addMouseListener(new SellTableRowPopupListener());
 
         org.jdesktop.swingx.decorator.Highlighter highlighter1 = org.jdesktop.swingx.decorator.HighlighterFactory.createSimpleStriping(new Color(245, 245, 220));
@@ -340,9 +339,203 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             final int size = statements.size();
             switch(statements.getType()) {
                 case PortfolioManagementBuy:
-                    break;
+                {
+                    final List<Transaction> transactions = new ArrayList<Transaction>();
+
+                    for (int i = 0; i < size; i++) {
+                        final Statement statement = statements.get(i);
+                        final String _code = (String)statement.getValue(GUIBundle.getString("MainFrame_Code"));
+                        final String _symbol = (String)statement.getValue(GUIBundle.getString("MainFrame_Symbol"));
+                        final String _date = (String)statement.getValue(GUIBundle.getString("PortfolioManagementJPanel_Date"));
+                        final String _units = (String)statement.getValue(GUIBundle.getString("PortfolioManagementJPanel_Units"));
+                        final String _purchasePrice = (String)statement.getValue(GUIBundle.getString("PortfolioManagementJPanel_PurchasePrice"));
+                        final String _broker = (String)statement.getValue(GUIBundle.getString("PortfolioManagementJPanel_Broker"));
+                        final String _clearingFee = (String)statement.getValue(GUIBundle.getString("PortfolioManagementJPanel_ClearingFee"));
+                        final String _stampDuty = (String)statement.getValue(GUIBundle.getString("PortfolioManagementJPanel_StampDuty"));
+                        final String _comment = (String)statement.getValue(GUIBundle.getString("PortfolioManagementJPanel_Comment"));
+
+                        Stock stock = null;
+                        if (_code.length() > 0 && _symbol.length() > 0) {
+                            stock = Utils.getEmptyStock(Code.newInstance(_code), Symbol.newInstance(_symbol));
+                        }
+                        else {
+                            log.error("Unexpected empty stock. Ignore");
+                            // stock is null.
+                            continue;
+                        }
+                        
+                        Date date = null;
+                        try {
+                            date = dateFormat.parse((String)_date);
+                        }
+                        catch (ParseException exp) {
+                            log.error(null, exp);
+                        }
+
+                        if (date == null) {
+                            log.error("Unexpected wrong date. Ignore");
+                            continue;
+                        }
+
+                        Integer units = null;
+                        Double purchasePrice = null;
+                        Double broker = null;
+                        Double clearingFee = null;
+                        Double stampDuty = null;
+                        try {
+                            units = Integer.parseInt((String)_units);
+                            purchasePrice = Double.parseDouble((String)_purchasePrice);
+                            broker = Double.parseDouble((String)_broker);
+                            clearingFee = Double.parseDouble((String)_clearingFee);
+                            stampDuty = Double.parseDouble((String)_stampDuty);
+                        }
+                        catch (NumberFormatException exp) {
+                            log.error(null, exp);
+                        }
+                        // Shall we continue to ignore, or shall we just return false to
+                        // flag an error?
+                        if (units == null) {
+                            log.error("Unexpected wrong units. Ignore");
+                            continue;
+                        }
+                        if (purchasePrice == null || broker == null || clearingFee == null || stampDuty == null) {
+                            log.error("Unexpected wrong purchasePrice/broker/clearingFee/stampDuty. Ignore");
+                            continue;
+                        }
+
+                        final SimpleDate simpleDate = new SimpleDate(date);
+                        final Contract.Type type = Contract.Type.Buy;
+                        final Contract.ContractBuilder builder = new Contract.ContractBuilder(stock, simpleDate);
+                        final Contract contract = builder.type(type).quantity(units).price(purchasePrice).build();
+                        final Transaction t = new Transaction(contract, org.yccheok.jstock.portfolio.Utils.getDummyBroker(broker), org.yccheok.jstock.portfolio.Utils.getDummyStampDuty(contract, stampDuty), org.yccheok.jstock.portfolio.Utils.getDummyClearingFee(clearingFee));
+                        t.setComment(_comment);
+                        transactions.add(t);
+                    }
+
+                    if (transactions.size() <= 0) {
+                        return false;
+                    }
+
+                    if (this.getBuyTransactionSize() > 0) {
+                        final MessageFormat formatter = new MessageFormat("");
+                        // formatter.setLocale(currentLocale);
+                        formatter.applyPattern(MessagesBundle.getString("question_message_load_file_for_buy_portfolio_template"));
+                        final String output = formatter.format(new Object[]{file.getName()});
+                        final int result = javax.swing.JOptionPane.showConfirmDialog(MainFrame.getInstance(), output, MessagesBundle.getString("question_title_load_file_for_buy_portfolio"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
+                        if (result != javax.swing.JOptionPane.YES_OPTION) {
+                            // Assume success.
+                            return true;
+                        }
+                    }
+                    this.buyTreeTable.setTreeTableModel(new BuyPortfolioTreeTableModel());
+                    for (Transaction transaction : transactions) {
+                        this.addBuyTransaction(transaction);
+                    }
+                    updateRealTimeStockMonitorAccordingToBuyPortfolioTreeTableModel();
+                }
+                break;
+
                 case PortfolioManagementSell:
-                    break;
+                {
+                    final List<Transaction> transactions = new ArrayList<Transaction>();
+
+                    for (int i = 0; i < size; i++) {
+                        final Statement statement = statements.get(i);
+                        final String _code = (String)statement.getValue(GUIBundle.getString("MainFrame_Code"));
+                        final String _symbol = (String)statement.getValue(GUIBundle.getString("MainFrame_Symbol"));
+                        final String _referenceDate = (String)statement.getValue(GUIBundle.getString("PortfolioManagementJPanel_ReferenceDate"));
+                        final String _date = (String)statement.getValue(GUIBundle.getString("PortfolioManagementJPanel_Date"));
+                        final String _units = (String)statement.getValue(GUIBundle.getString("PortfolioManagementJPanel_Units"));
+                        final String _sellingPrice =  (String)statement.getValue(GUIBundle.getString("PortfolioManagementJPanel_SellingPrice"));
+                        final String _purchasePrice = (String)statement.getValue(GUIBundle.getString("PortfolioManagementJPanel_PurchasePrice"));
+                        final String _broker = (String)statement.getValue(GUIBundle.getString("PortfolioManagementJPanel_Broker"));
+                        final String _clearingFee = (String)statement.getValue(GUIBundle.getString("PortfolioManagementJPanel_ClearingFee"));
+                        final String _stampDuty = (String)statement.getValue(GUIBundle.getString("PortfolioManagementJPanel_StampDuty"));
+                        final String _comment = (String)statement.getValue(GUIBundle.getString("PortfolioManagementJPanel_Comment"));
+
+                        Stock stock = null;
+                        if (_code.length() > 0 && _symbol.length() > 0) {
+                            stock = Utils.getEmptyStock(Code.newInstance(_code), Symbol.newInstance(_symbol));
+                        }
+                        else {
+                            log.error("Unexpected empty stock. Ignore");
+                            // stock is null.
+                            continue;
+                        }
+
+                        Date date = null;
+                        Date referenceDate = null;
+                        try {
+                            date = dateFormat.parse((String)_date);
+                            referenceDate = dateFormat.parse((String)_referenceDate);
+                        }
+                        catch (ParseException exp) {
+                            log.error(null, exp);
+                        }
+
+                        if (date == null || referenceDate == null) {
+                            log.error("Unexpected wrong date/referenceDate. Ignore");
+                            continue;
+                        }
+                        Integer units = null;
+                        Double purchasePrice = null;
+                        Double sellingPrice = null;
+                        Double broker = null;
+                        Double clearingFee = null;
+                        Double stampDuty = null;
+                        try {
+                            units = Integer.parseInt((String)_units);
+                            purchasePrice = Double.parseDouble((String)_purchasePrice);
+                            sellingPrice = Double.parseDouble((String)_sellingPrice);
+                            broker = Double.parseDouble((String)_broker);
+                            clearingFee = Double.parseDouble((String)_clearingFee);
+                            stampDuty = Double.parseDouble((String)_stampDuty);
+                        }
+                        catch (NumberFormatException exp) {
+                            log.error(null, exp);
+                        }
+                        // Shall we continue to ignore, or shall we just return false to
+                        // flag an error?
+                        if (units == null) {
+                            log.error("Unexpected wrong units. Ignore");
+                            continue;
+                        }
+                        if (purchasePrice == null || broker == null || clearingFee == null || stampDuty == null || sellingPrice == null) {
+                            log.error("Unexpected wrong purchasePrice/broker/clearingFee/stampDuty/sellingPrice. Ignore");
+                            continue;
+                        }
+                        
+                        final SimpleDate simpleDate = new SimpleDate(date);
+                        final SimpleDate simpleReferenceDate = new SimpleDate(referenceDate);
+                        final Contract.Type type = Contract.Type.Sell;
+                        final Contract.ContractBuilder builder = new Contract.ContractBuilder(stock, simpleDate);
+                        final Contract contract = builder.type(type).quantity(units).price(sellingPrice).referencePrice(purchasePrice).referenceDate(simpleReferenceDate).build();
+                        final Transaction t = new Transaction(contract, org.yccheok.jstock.portfolio.Utils.getDummyBroker(broker), org.yccheok.jstock.portfolio.Utils.getDummyStampDuty(contract, stampDuty), org.yccheok.jstock.portfolio.Utils.getDummyClearingFee(clearingFee));
+                        t.setComment(_comment);
+                        transactions.add(t);
+                    }
+                    if (transactions.size() <= 0) {
+                        return false;
+                    }
+
+                    if (this.getSellTransactionSize() > 0) {
+                        final MessageFormat formatter = new MessageFormat("");
+                        // formatter.setLocale(currentLocale);
+                        formatter.applyPattern(MessagesBundle.getString("question_message_load_file_for_sell_portfolio_template"));
+                        final String output = formatter.format(new Object[]{file.getName()});
+                        final int result = javax.swing.JOptionPane.showConfirmDialog(MainFrame.getInstance(), output, MessagesBundle.getString("question_title_load_file_for_sell_portfolio"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
+                        if (result != javax.swing.JOptionPane.YES_OPTION) {
+                            // Assume success.
+                            return true;
+                        }
+                    }
+                    this.sellTreeTable.setTreeTableModel(new SellPortfolioTreeTableModel());
+                    for (Transaction transaction : transactions) {
+                        this.addSellTransaction(transaction);
+                    }
+                }
+                break;
+
                 case PortfolioManagementDeposit:
                 {
                     final List<Deposit> deposits = new ArrayList<Deposit>();
@@ -362,10 +555,11 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                         // Shall we continue to ignore, or shall we just return false to
                         // flag an error?
                         if (date == null) {
+                            log.error("Unexpected wrong date. Ignore");
                             continue;
                         }
                         final Object object1 = statement.getValue(GUIBundle.getString("PortfolioManagementJPanel_Cash"));
-                        assert(object0 != null);
+                        assert(object1 != null);
                         try {
                             cash = Double.parseDouble((String)object1);
                         }
@@ -375,6 +569,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                         // Shall we continue to ignore, or shall we just return false to
                         // flag an error?
                         if (cash == null) {
+                            log.error("Unexpected wrong cash. Ignore");
                             continue;
                         }
                         final Deposit deposit = new Deposit(cash, new SimpleDate(date));
@@ -424,6 +619,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                         // Shall we continue to ignore, or shall we just return false to
                         // flag an error?
                         if (date == null) {
+                            log.error("Unexpected wrong date. Ignore");
                             continue;
                         }
                         final Object object1 = statement.getValue(GUIBundle.getString("PortfolioManagementJPanel_Dividend"));
@@ -437,6 +633,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                         // Shall we continue to ignore, or shall we just return false to
                         // flag an error?
                         if (dividend == null) {
+                            log.error("Unexpected wrong dividend. Ignore");
                             continue;
                         }
                         final String codeStr = (String)statement.getValue(GUIBundle.getString("MainFrame_Code"));
@@ -445,6 +642,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                             stock = Utils.getEmptyStock(Code.newInstance(codeStr), Symbol.newInstance(symbolStr));
                         }
                         else {
+                            log.error("Unexpected wrong stock. Ignore");
                             // stock is null.
                             continue;
                         }
@@ -1187,7 +1385,17 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
         portfolioTreeTableModel.editTransaction(newTransaction, oldTransaction);        
     }
-    
+
+    private int getBuyTransactionSize() {
+        final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
+        return portfolioTreeTableModel.getTransactionSize();
+    }
+
+    private int getSellTransactionSize() {
+        final SellPortfolioTreeTableModel portfolioTreeTableModel = (SellPortfolioTreeTableModel)sellTreeTable.getTreeTableModel();
+        return portfolioTreeTableModel.getTransactionSize();
+    }
+
     private void addBuyTransaction(Transaction transaction) {
         assert(transaction.getContract().getType() == Contract.Type.Buy);
         
@@ -1268,7 +1476,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
     
     private void updateRealTimeStockMonitorAccordingToBuyPortfolioTreeTableModel() {
-        if(this.realTimeStockMonitor == null) return;
+        if (this.realTimeStockMonitor == null) return;
         
         final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
                 
@@ -1481,7 +1689,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
  
         for(Stock stock : stocks) {
-            if(false == portfolioTreeTableModel.updateStockLastPrice(stock)) {
+            if (false == portfolioTreeTableModel.updateStockLastPrice(stock)) {
                 this.realTimeStockMonitor.removeStockCode(stock.getCode());
             }
         }  
