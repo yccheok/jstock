@@ -483,10 +483,10 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
                 final double clearingFeeValue = (Double)this.jFormattedTextField5.getValue();
                 final double stampDutyValue = (Double)jFormattedTextField7.getValue();
 
-                broker = new SimpleBroker("SimpleBroker", Double.MAX_VALUE, brokerFeeValue, 0);
+                broker = org.yccheok.jstock.portfolio.Utils.getDummyBroker(brokerFeeValue);
                 /* We are limit to ourselves, that the fraction calculation, is based on contract's total. */
-                stampDuty = new SimpleStampDuty("SimpleStampDuty", Double.MAX_VALUE, contract.getTotal(), stampDutyValue);
-                clearingFee = new SimpleClearingFee("SimpleClearingfee", Double.MAX_VALUE, clearingFeeValue, 0);
+                stampDuty = org.yccheok.jstock.portfolio.Utils.getDummyStampDuty(contract, stampDutyValue);
+                clearingFee = org.yccheok.jstock.portfolio.Utils.getDummyClearingFee(clearingFeeValue);
             }
 
             Transaction t = new Transaction(contract, broker, stampDuty, clearingFee);
@@ -521,10 +521,10 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
                     final double clearingFeeValue = (Double)this.jFormattedTextField5.getValue();
                     final double stampDutyValue = (Double)jFormattedTextField7.getValue();
 
-                    broker = new SimpleBroker("SimpleBroker", Double.MAX_VALUE, brokerFeeValue / unit * (double)transaction.getQuantity(), 0);
+                    broker = org.yccheok.jstock.portfolio.Utils.getDummyBroker(brokerFeeValue / unit * (double)transaction.getQuantity());
                     /* We are limit to ourselves, that the fraction calculation, is based on contract's total. */
-                    stampDuty = new SimpleStampDuty("SimpleStampDuty", Double.MAX_VALUE, contract.getTotal(), stampDutyValue / unit * (double)transaction.getQuantity());
-                    clearingFee = new SimpleClearingFee("SimpleClearingfee", Double.MAX_VALUE, clearingFeeValue / unit * (double)transaction.getQuantity(), 0);
+                    stampDuty = org.yccheok.jstock.portfolio.Utils.getDummyStampDuty(contract, stampDutyValue / unit * (double)transaction.getQuantity());
+                    clearingFee = org.yccheok.jstock.portfolio.Utils.getDummyClearingFee(clearingFeeValue / unit * (double)transaction.getQuantity());
                 }
 
                 Transaction t = new Transaction(contract, broker, stampDuty, clearingFee);
