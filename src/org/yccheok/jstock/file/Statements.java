@@ -38,9 +38,11 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.jdesktop.swingx.treetable.TreeTableModel;
+import org.yccheok.jstock.engine.SimpleDate;
 import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.gui.AbstractPortfolioTreeTableModel;
 import org.yccheok.jstock.gui.POIUtils;
+import org.yccheok.jstock.gui.SellPortfolioTreeTableModel;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.portfolio.Portfolio;
 import org.yccheok.jstock.portfolio.Transaction;
@@ -223,6 +225,12 @@ public class Statements {
                         // Code first. Follow by symbol.
                         atoms.add(new Atom(stock.getCode().toString(), GUIBundle.getString("MainFrame_Code")));
                         atoms.add(new Atom(stock.getSymbol().toString(), GUIBundle.getString("MainFrame_Symbol")));
+						// OK. I know. This breaks generalization.
+                        if (abstractPortfolioTreeTableModel instanceof SellPortfolioTreeTableModel) {
+                            final SimpleDate simpleDate = transaction.getContract().getReferenceDate();
+                            DateFormat dateFormat = DateFormat.getDateInstance();
+                            atoms.add(new Atom(object != null ? dateFormat.format(simpleDate.getTime().getTime()) : "", GUIBundle.getString("PortfolioManagementJPanel_ReferenceDate")));
+                        }
                     }
                     else if (abstractPortfolioTreeTableModel.getColumnClass(k).equals(Date.class)) {
                         DateFormat dateFormat = DateFormat.getDateInstance();
