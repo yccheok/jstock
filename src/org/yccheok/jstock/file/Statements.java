@@ -22,6 +22,7 @@ package org.yccheok.jstock.file;
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -32,11 +33,13 @@ import java.util.List;
 import javax.swing.table.TableModel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.poi.hssf.record.formula.functions.Cell;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRichTextString;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.jdesktop.swingx.treetable.TreeTableModel;
 import org.yccheok.jstock.engine.SimpleDate;
 import org.yccheok.jstock.engine.Stock;
@@ -67,6 +70,136 @@ public class Statements {
      * method.
      */
     private Statements() {}
+
+    /**
+     * Construct Statements based on given Excel File.
+     *
+     * @param key Given Excel File
+     * @return the List of constructed Statements. Empty list if fail.
+     */
+    public static List<Statements> newInstanceFromExcelFile(File file) {
+        FileInputStream fileInputStream = null;
+        final List<Statements> statementsList = new ArrayList<Statements>();
+        try
+        {
+            fileInputStream = new FileInputStream(file);
+            final POIFSFileSystem fs = new POIFSFileSystem(fileInputStream);
+            final HSSFWorkbook wb = new HSSFWorkbook(fs);
+            final int numberOfSheets = wb.getNumberOfSheets();
+            for (int k = 0; k < numberOfSheets; k++)
+            {
+                final HSSFSheet sheet = wb.getSheetAt(k);
+                final int startRow = sheet.getFirstRowNum();
+                final int endRow = sheet.getLastRowNum();
+				// If there are 3 rows, endRow will be 2.
+				// We must have at least 2 rows. (endRow = 1)
+                if (startRow != 0 || endRow <= startRow)
+                {
+                    continue;
+                }
+
+                final HSSFRow row = sheet.getRow(startRow);
+                if (row == null) {
+                    continue;
+                }
+
+                final int startCell = row.getFirstCellNum();
+                final int endCell = row.getLastCellNum();
+				// If there are 2 cols, endCell will be 2.
+				// We must have at least 1 col. (endCell = 1)
+                if (startCell != 0 || endCell <= startCell) {
+                    continue;
+                }
+
+                final List<String> types = new ArrayList<String>();
+                for (int i = startCell; i < endCell; i++) {
+                    final HSSFCell cell = row.getCell(i);
+                    if (cell == null) {
+                        continue;
+                    }
+
+					// Exception may be thrown here, as cell may be numerical value.
+                    final String type = cell.getRichStringCellValue().getString();
+                    if (type != null) {
+                        types.add(type);
+                    }
+                }
+
+                if (types.size() == 0) {
+                    continue;
+                }
+
+                if (types.size() != (endCell - startCell))
+                {
+                    continue;
+                }
+
+                final Statements s = new Statements();
+                for (int i = startRow + 1; i <= endRow; i++) {
+                    final HSSFRow r = sheet.getRow(i);
+                    if (r == null) {
+                        continue;
+                    }
+                    final List<Atom> atoms = new ArrayList<Atom>();
+                    for (int j = startCell; j < endCell; j++) {
+                        final HSSFCell cell = r.getCell(j);
+                        if (cell == null) {
+                            continue;
+                        }
+                        String value = "";
+                        if (cell.getCellType() == HSSFCell.CELL_TYPE_STRING) {
+                            final HSSFRichTextString richString = cell.getRichStringCellValue();
+                            if (richString != null) {
+                                value = richString.getString();
+                            }
+                            else {
+                                value = "";
+                            }
+                        }
+                        else if (cell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC) {
+                            value = "" + cell.getNumericCellValue();
+                        }
+                        else {
+                        }
+                        
+                        if (null == value) {
+                            continue;
+                        }
+                        atoms.add(new Atom(value, types.get(j - startCell)));
+                    }
+                    final Statement statement = new Statement(atoms);
+                    if (s.statements.size() != 0) {
+                        if (s.statements.get(0).getType() != statement.getType()) {
+							// Give up.
+                            s.statements.clear();
+                            break;
+                        }
+                    }
+                    s.statements.add(statement);
+                }   // for (int i = startRow + 1; i <= endRow; i++)
+
+                if (s.statements.size() > 0) {
+                    statementsList.add(s);
+                }
+
+            }   /* for(int k = 0; k < numberOfSheets; k++) */
+        }
+        catch (Exception ex)
+        {
+            log.error(null, ex);
+        }
+        finally
+        {
+            if (fileInputStream != null) {
+                try {
+                    fileInputStream.close();
+                } catch (IOException ex) {
+                    log.error(null, ex);
+                }
+            }
+        }
+        return statementsList;
+    }
 
     /**
      * Construct Statements based on given CSV File.
