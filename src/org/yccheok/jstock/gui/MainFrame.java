@@ -33,8 +33,6 @@ import java.io.IOException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.poi.hssf.usermodel.*;
 
 import javax.help.*;
 import javax.swing.*;
@@ -556,28 +554,31 @@ public class MainFrame extends javax.swing.JFrame {
         this.clearAllStocks();
     }//GEN-LAST:event_jMenuItem7ActionPerformed
 
-    public boolean openAsCSVFile(File file) {
-        Statements statements = Statements.newInstanceFromCSVFile(file);
+    private boolean openAsCSVFile(File file) {
+        final Statements statements = Statements.newInstanceFromCSVFile(file);
+        return this.openAsStatements(statements, file);
+    }
+
+    public boolean openAsStatements(Statements statements, File file) {
         if (statements == null) {
             return false;
         }
         
         if (statements.getType() == Statement.Type.RealtimeInfo) {
-            if (this.getSelectedComponent() != this.jPanel8) {
-                // User will feel suprise if we try to quitely load something
-                // not within their visible range. Give them a choice so that they
-                // won't feel suprise.
-                final MessageFormat formatter = new MessageFormat("");
-                // formatter.setLocale(currentLocale);
-                formatter.applyPattern(MessagesBundle.getString("question_message_load_file_for_real_time_info_template"));
-                final String output = formatter.format(new Object[]{file.getName()});
-                final int result = javax.swing.JOptionPane.showConfirmDialog(MainFrame.getInstance(), output, MessagesBundle.getString("question_title_load_file_for_real_time_info"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
-                if (result != javax.swing.JOptionPane.YES_OPTION) {
-                    // Assume success.
-                    return true;
-                }
-            }
-
+            //if (this.getSelectedComponent() != this.jPanel8) {
+            //    // User will feel suprise if we try to quitely load something
+            //    // not within their visible range. Give them a choice so that they
+            //    // won't feel suprise.
+            //    final MessageFormat formatter = new MessageFormat("");
+            //    // formatter.setLocale(currentLocale);
+            //    formatter.applyPattern(MessagesBundle.getString("question_message_load_file_for_real_time_info_template"));
+            //    final String output = formatter.format(new Object[]{file.getName()});
+            //    final int result = javax.swing.JOptionPane.showConfirmDialog(MainFrame.getInstance(), output, MessagesBundle.getString("question_title_load_file_for_real_time_info"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
+            //    if (result != javax.swing.JOptionPane.YES_OPTION) {
+            //        // Assume success.
+            //        return true;
+            //    }
+            //}
             final int size = statements.size();
             for (int i = 0; i < size; i++) {
                 final org.yccheok.jstock.file.Statement statement = statements.get(i);
@@ -587,17 +588,21 @@ public class MainFrame extends javax.swing.JFrame {
                 final String riseAboveStr = (String)statement.getValue(GUIBundle.getString("MainFrame_RiseAbove"));
                 Double fallBelowDouble = null;
                 Double riseAboveDouble = null;
-                try {
-                    fallBelowDouble = Double.parseDouble(fallBelowStr);
+                if (fallBelowStr.length() > 0) {
+                    try {
+                        fallBelowDouble = Double.parseDouble(fallBelowStr);
+                    }
+                    catch (NumberFormatException exp) {
+                        log.error(null, exp);
+                    }
                 }
-                catch (NumberFormatException exp) {
-                    log.error(null, exp);
-                }
-                try {
-                    riseAboveDouble = Double.parseDouble(riseAboveStr);
-                }
-                catch (NumberFormatException exp) {
-                    log.error(null, exp);
+                if (riseAboveStr.length() > 0) {
+                    try {
+                        riseAboveDouble = Double.parseDouble(riseAboveStr);
+                    }
+                    catch (NumberFormatException exp) {
+                        log.error(null, exp);
+                    }
                 }
                 if (codeStr.length() > 0 && symbolStr.length() > 0) {
                     final Stock stock = Utils.getEmptyStock(Code.newInstance(codeStr), Symbol.newInstance(symbolStr));
@@ -609,7 +614,7 @@ public class MainFrame extends javax.swing.JFrame {
         }
         else if (statements.getType() == Statement.Type.PortfolioManagementBuy || statements.getType() == Statement.Type.PortfolioManagementSell || statements.getType() == Statement.Type.PortfolioManagementDeposit || statements.getType() == Statement.Type.PortfolioManagementDividend) {
             /* Open using other tabs. */
-            return this.portfolioManagementJPanel.openAsCSVFile(file);
+            return this.portfolioManagementJPanel.openAsStatements(statements, file);
         }
         else {
             return false;
@@ -617,108 +622,13 @@ public class MainFrame extends javax.swing.JFrame {
         return true;
     }
     
-    private void openAsExcelFile(File file) {
-        FileInputStream fileInputStream = null;
-
-        try
-        {
-            fileInputStream = new FileInputStream(file);
-            POIFSFileSystem fs = new POIFSFileSystem(fileInputStream);
-            HSSFWorkbook wb = new HSSFWorkbook(fs);
-
-            for(int k = 0; k < wb.getNumberOfSheets(); k++)
-            {
-                HSSFSheet sheet = wb.getSheetAt(k);
-                final int startRow = sheet.getFirstRowNum();
-                final int endRow = sheet.getLastRowNum();
-				int codeColumn = -1;
-				int symbolColumn = -1;
-                int fallBelowColumn = -1;
-                int riseAboveColumn = -1;
-
-				if (startRow < 0)
-				{
-					continue;
-				}
-
-				// Find out the correct value for codeColumn and symbolColumn.
-				{
-					final HSSFRow row   = sheet.getRow(startRow);
-					if(row == null) continue;
-                    final int startCell = row.getFirstCellNum();
-                    final int endCell = row.getLastCellNum();                   
-                    if (startCell < 0) {
-                        continue;
-                    }
-                    for (int c = startCell; c < endCell; c++)
-                    {
-                        final HSSFCell cell  = row.getCell(c);
-                        if(cell == null) continue;
-                        final String cellStr = (cell.getCellType() == HSSFCell.CELL_TYPE_STRING) ? cell.getRichStringCellValue().getString() : null;
-
-                        if(cellStr == null) continue;
-                        if (cellStr.equalsIgnoreCase("code")) {
-                            codeColumn = c;
-                        }
-                        else if (cellStr.equalsIgnoreCase("symbol")) {
-                            symbolColumn = c;
-                        }
-                        else if (cellStr.equalsIgnoreCase("fall below")) {
-                            fallBelowColumn = c;
-                        }
-                        else if (cellStr.equalsIgnoreCase("rise above")) {
-                            riseAboveColumn = c;
-                        }
-
-                        if (codeColumn != -1 && symbolColumn != -1 && fallBelowColumn != -1 && riseAboveColumn != -1) {
-                            break;
-                        }
-                	}   /* for (int c = startCell; c < endCell; c++) */
-				}
-                if (codeColumn == -1 || symbolColumn == -1 || fallBelowColumn == -1 || riseAboveColumn == -1) {
-                    continue;
-                }
-				
-                for (int r = startRow + 1; r <= endRow; r++)
-                {
-                    final HSSFRow row   = sheet.getRow(r);
-                    if(row == null) continue;
-
-                    final HSSFCell codeCell  = row.getCell(codeColumn);
-                    final HSSFCell symbolCell  = row.getCell(symbolColumn);
-                    final HSSFCell fallBelowCell  = row.getCell(fallBelowColumn);
-                    final HSSFCell riseAboveCell  = row.getCell(riseAboveColumn);
-                    if(codeCell == null || symbolCell == null) continue;
-                    // fallBelowCell and riseAboveCell are allowed to be null.
-
-                    final String codeStr = (codeCell.getCellType() == HSSFCell.CELL_TYPE_STRING) ? codeCell.getRichStringCellValue().getString() : null;
-                    final String symbolStr = (symbolCell.getCellType() == HSSFCell.CELL_TYPE_STRING) ? symbolCell.getRichStringCellValue().getString() : null;
-                    final Double fallBelowDouble = fallBelowCell != null ? ((fallBelowCell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC) ? fallBelowCell.getNumericCellValue() : null) : null;
-                    final Double riseAboveDouble = riseAboveCell != null ? ((riseAboveCell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC) ? riseAboveCell.getNumericCellValue() : null) : null;
-
-                    if(codeStr != null && symbolStr != null) {
-                        final Stock stock = Utils.getEmptyStock(Code.newInstance(codeStr), Symbol.newInstance(symbolStr));
-                        final StockAlert stockAlert = new StockAlert().setFallBelow(fallBelowDouble).setRiseAbove(riseAboveDouble);
-                        this.addStockToTable(stock, stockAlert);
-                        realTimeStockMonitor.addStockCode(Code.newInstance(codeStr));
-                    }
-                }   /* for (int r = 0; r < rows; r++) */
-            }   /* for(int k = 0; k < wb.getNumberOfSheets(); k++) */
+    private boolean openAsExcelFile(File file) {
+        final java.util.List<Statements> statementsList = Statements.newInstanceFromExcelFile(file);
+        boolean status = statementsList.size() > 0;
+        for (Statements statements : statementsList) {
+            status = status & this.openAsStatements(statements, file);
         }
-        catch (Exception ex)
-        {
-            log.error(null, ex);
-        }
-        finally
-        {
-            if (fileInputStream != null) {
-                try {
-                    fileInputStream.close();
-                } catch (IOException ex) {
-                    log.error(null, ex);
-                }
-            }
-        }
+        return status;
     }
 
     public RealTimeStockMonitor getRealTimeStockMonitor() {
@@ -732,9 +642,15 @@ public class MainFrame extends javax.swing.JFrame {
             return;
         }
         boolean status = true;
-        if(Utils.getFileExtension(file).equals("xls")) {
+        if (Utils.getFileExtension(file).equals("xls")) {
             if (this.getSelectedComponent() == this.jPanel8) {
-                this.openAsExcelFile(file);
+                status = this.openAsExcelFile(file);
+            }
+            else if (this.getSelectedComponent() == this.portfolioManagementJPanel) {
+                status = this.portfolioManagementJPanel.openAsExcelFile(file);
+            }
+            else {
+                assert(false);
             }
         }
         else if(Utils.getFileExtension(file).equals("csv")) {
