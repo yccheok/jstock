@@ -41,6 +41,10 @@ public abstract class AbstractPortfolioTreeTableModel extends DefaultTreeTableMo
     public abstract Object getValueAt(Object node, int column);
 
     public abstract boolean isValidTransaction(Transaction transaction);
+
+    public int getTransactionSize() {
+        return ((Portfolio)getRoot()).getChildCount();
+    }
     
     // Please take note that, after we edit with newTransaction, the resultant
     // transaction will not equal to newTransaction. We just copy it by value.
