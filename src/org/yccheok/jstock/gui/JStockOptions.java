@@ -108,9 +108,9 @@ public class JStockOptions {
     private String googleCalendarPassword;
     private boolean SMSEnabled;
     @Deprecated
-    private volatile boolean passwordProtectedIndicator;
+    private transient boolean passwordProtectedIndicator;
     @Deprecated
-    private volatile String indicatorPassword;
+    private transient String indicatorPassword;
     private String proxyServer;
     private int proxyPort;
     private int scanningSpeed;  /* In second. */
@@ -167,6 +167,9 @@ public class JStockOptions {
 
     // Remember the last view page.
     private int lastSelectedPageIndex = 0;
+
+    // Use -1 to indicate unlimited SMS per day.
+    private int maxSMSPerDay = -1;
 
     private String portfolioName = "My Portfolio";
     
@@ -265,6 +268,10 @@ public class JStockOptions {
 
         if (this.portfolioName == null) {
             this.portfolioName = "My Portfolio";
+        }
+
+        if (this.maxSMSPerDay <= 0) {
+            maxSMSPerDay = -1;
         }
         
         return this;
@@ -795,5 +802,19 @@ public class JStockOptions {
      */
     public void setPortfolioName(String portfolioName) {
         this.portfolioName = portfolioName;
+    }
+
+    /**
+     * @return the maxSMSPerDay
+     */
+    public int getMaxSMSPerDay() {
+        return maxSMSPerDay;
+    }
+
+    /**
+     * @param maxSMSPerDay the maxSMSPerDay to set
+     */
+    public void setMaxSMSPerDay(int maxSMSPerDay) {
+        this.maxSMSPerDay = maxSMSPerDay;
     }
 }

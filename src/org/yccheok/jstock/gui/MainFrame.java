@@ -19,6 +19,8 @@
 
 package org.yccheok.jstock.gui;
 
+import org.yccheok.jstock.alert.GoogleMail;
+import org.yccheok.jstock.alert.GoogleCalendar;
 import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -47,6 +49,7 @@ import java.util.zip.ZipInputStream;
 import javax.imageio.ImageIO;
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
+import org.yccheok.jstock.alert.SMSLimiter;
 import org.yccheok.jstock.analysis.Indicator;
 import org.yccheok.jstock.analysis.OperatorIndicator;
 import org.yccheok.jstock.file.Statement;
@@ -1931,7 +1934,12 @@ public class MainFrame extends javax.swing.JFrame {
                     }
 
                     final String username = Utils.decrypt(jStockOptions.getGoogleCalendarUsername());
-                    GoogleCalendar.SMS(username, Utils.decrypt(jStockOptions.getGoogleCalendarPassword()), message);
+                    if (SMSLimiter.INSTANCE.isSMSAllowed()) {
+                        final boolean status = GoogleCalendar.SMS(username, Utils.decrypt(jStockOptions.getGoogleCalendarPassword()), message);
+                        if (status) {
+                            SMSLimiter.INSTANCE.inc();
+                        }
+                    }
                 }
             };
 
