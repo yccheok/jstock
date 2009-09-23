@@ -52,6 +52,7 @@ import org.yccheok.jstock.analysis.OperatorIndicator;
 import org.yccheok.jstock.file.Statement;
 import org.yccheok.jstock.file.Statements;
 import org.yccheok.jstock.gui.dynamicchart.DynamicChart;
+import org.yccheok.jstock.gui.portfolio.PortfolioJDialog;
 import org.yccheok.jstock.gui.table.NonNegativeDoubleEditor;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.internationalization.MessagesBundle;
@@ -152,6 +153,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
         buttonGroup2 = new javax.swing.ButtonGroup();
+        buttonGroup3 = new javax.swing.ButtonGroup();
         jPanel6 = new javax.swing.JPanel();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel8 = new javax.swing.JPanel();
@@ -197,6 +199,7 @@ public class MainFrame extends javax.swing.JFrame {
         jMenu6 = new javax.swing.JMenu();
         jMenu7 = new javax.swing.JMenu();
         jMenuItem8 = new javax.swing.JMenuItem();
+        jMenu8 = new javax.swing.JMenu();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem6 = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
@@ -493,6 +496,18 @@ public class MainFrame extends javax.swing.JFrame {
         jMenu7.add(jMenuItem8);
 
         jMenuBar2.add(jMenu7);
+
+        jMenu8.setText("Portfolio");
+        jMenu8.addMenuListener(new javax.swing.event.MenuListener() {
+            public void menuCanceled(javax.swing.event.MenuEvent evt) {
+            }
+            public void menuDeselected(javax.swing.event.MenuEvent evt) {
+            }
+            public void menuSelected(javax.swing.event.MenuEvent evt) {
+                jMenu8MenuSelected(evt);
+            }
+        });
+        jMenuBar2.add(jMenu8);
 
         jMenu1.setText("Options");
 
@@ -1101,6 +1116,51 @@ public class MainFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jMenuItem9ActionPerformed
 
+    private void jMenu8MenuSelected(javax.swing.event.MenuEvent evt) {//GEN-FIRST:event_jMenu8MenuSelected
+        // TODO add your handling code here:
+        this.jMenu8.removeAll();
+        final java.util.List<String> portfolioNames = org.yccheok.jstock.portfolio.Utils.getPortfolioNames();
+        final String currentPortfolioName = this.getJStockOptions().getPortfolioName();
+        for (String portfolioName : portfolioNames) {
+            final JMenuItem mi = (JRadioButtonMenuItem) jMenu8.add(new JRadioButtonMenuItem(portfolioName));
+            buttonGroup3.add(mi);
+            mi.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    final String s = ((JRadioButtonMenuItem)e.getSource()).getText();
+                    if (false == s.equals(currentPortfolioName)) {
+						// Save current portfolio.
+                        MainFrame.this.portfolioManagementJPanel.savePortfolio();
+						// And switch to new portfolio.
+                        MainFrame.this.getJStockOptions().setPortfolioName(s);
+                        MainFrame.this.portfolioManagementJPanel.initPortfolio();
+                    }
+                }
+
+            });
+            mi.setSelected(portfolioName.equals(currentPortfolioName));
+        }
+
+        jMenu8.addSeparator();
+        final JMenuItem mi = new JMenuItem(GUIBundle.getString("MainFrame_MultiplePortolio"));
+        mi.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                multiplePortfolios();
+            }
+
+        });
+        jMenu8.add(mi);
+    }//GEN-LAST:event_jMenu8MenuSelected
+
+    private void multiplePortfolios() {
+        PortfolioJDialog portfolioJDialog = new PortfolioJDialog(this, true);
+        portfolioJDialog.setLocationRelativeTo(this);
+        portfolioJDialog.setVisible(true);
+    }
+
     private boolean saveAsCSVFile(File file) {
         final TableModel tableModel = jTable1.getModel();
         final org.yccheok.jstock.file.Statements statements = org.yccheok.jstock.file.Statements.newInstanceFromTableModel(tableModel);
@@ -1127,8 +1187,8 @@ public class MainFrame extends javax.swing.JFrame {
         // http.proxyHost, we are forced to initialized ProxyDetector right here,
         // before we manually change the system properties according to
         // JStockOptions.
-        ProxyDetector.getInstance();
-
+        ProxyDetector.getInstance();      
+        
         Utils.setDefaultLookAndFeel();
 
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -3421,6 +3481,7 @@ public class MainFrame extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.ButtonGroup buttonGroup2;
+    private javax.swing.ButtonGroup buttonGroup3;
     private javax.swing.JComboBox jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel18;
@@ -3451,6 +3512,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu5;
     private javax.swing.JMenu jMenu6;
     private javax.swing.JMenu jMenu7;
+    private javax.swing.JMenu jMenu8;
     private javax.swing.JMenuBar jMenuBar2;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
