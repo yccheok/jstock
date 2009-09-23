@@ -60,9 +60,7 @@ public class JStockOptions {
         setSMSEnabled(false);
         setGoogleCalendarUsername("");
         setGoogleCalendarPassword("");
-        setPasswordProtectedIndicator(false);
         setSingleIndicatorAlert(true);
-        setIndicatorPassword("");
         setProxyServer("");
         setProxyPort(-1);
         setScanningSpeed(1000);
@@ -109,8 +107,10 @@ public class JStockOptions {
     private String googleCalendarUsername;
     private String googleCalendarPassword;
     private boolean SMSEnabled;
-    private boolean passwordProtectedIndicator;
-    private String indicatorPassword;
+    @Deprecated
+    private volatile boolean passwordProtectedIndicator;
+    @Deprecated
+    private volatile String indicatorPassword;
     private String proxyServer;
     private int proxyPort;
     private int scanningSpeed;  /* In second. */
@@ -347,22 +347,6 @@ public class JStockOptions {
 
     public void setEmailPassword(String emailPassword) {
         this.emailPassword = emailPassword;
-    }
-
-    public boolean isPasswordProtectedIndicator() {
-        return passwordProtectedIndicator;
-    }
-
-    public void setPasswordProtectedIndicator(boolean passwordProtectedIndicator) {
-        this.passwordProtectedIndicator = passwordProtectedIndicator;
-    }
-
-    public String getIndicatorPassword() {
-        return indicatorPassword;
-    }
-
-    public void setIndicatorPassword(String indicatorPassword) {
-        this.indicatorPassword = indicatorPassword;
     }
 
     public String getProxyServer() {
