@@ -19,6 +19,8 @@
 
 package org.yccheok.jstock.gui;
 
+import org.yccheok.jstock.alert.GoogleMail;
+import org.yccheok.jstock.alert.GoogleCalendar;
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
 import javax.swing.event.*;
@@ -34,6 +36,7 @@ import java.util.concurrent.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.yccheok.jstock.alert.SMSLimiter;
 import org.yccheok.jstock.analysis.Indicator;
 import org.yccheok.jstock.internationalization.GUIBundle;
 
@@ -144,31 +147,6 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         // Reset dirty flag, to allow background thread to show indicator on
         // the table.
         allowIndicatorShown = true;
-        
-        if(operatorIndicators.size() > 0) {
-            final int result = JOptionPane.showConfirmDialog(this, "You have previous built indicators, do you want to re-use them?", "Re-use Indicators", JOptionPane.YES_NO_OPTION);
-            
-            if(result == JOptionPane.YES_OPTION)
-            {
-                this.initRealTimeStockMonitor(m.getStockServerFactories());
-                this.initStockHistoryMonitor(m.getStockServerFactories());
-
-                removeAllIndicatorsFromTable();
-                initAlertStateManager();
-
-                submitOperatorIndicatorToMonitor();
-
-                jButton1.setEnabled(false);
-                jButton2.setEnabled(true);
-                
-                return;
-            }
-            /*
-            else if(result == JOptionPane.CLOSED_OPTION) {
-                return;
-            }
-            */
-        }
         
         initWizardDialog();
         
@@ -398,7 +376,12 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                     final String message = stock.getSymbol() + " (" + price + ") hits " + indicator.toString();
 
                     final String username = Utils.decrypt(jStockOptions.getGoogleCalendarUsername());
-                    GoogleCalendar.SMS(username, Utils.decrypt(jStockOptions.getGoogleCalendarPassword()), message);
+                    if (SMSLimiter.INSTANCE.isSMSAllowed()) {
+                        final boolean status = GoogleCalendar.SMS(username, Utils.decrypt(jStockOptions.getGoogleCalendarPassword()), message);
+                        if (status) {
+                            SMSLimiter.INSTANCE.inc();
+                        }
+                    }
                 }
             };
 
