@@ -1370,15 +1370,12 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     private void createStockIndicatorEditor() {
-        indicatorPanel = new IndicatorPanel(); 
-                
+        indicatorPanel = new IndicatorPanel();                
         jTabbedPane1.addTab("Stock Indicator Editor", indicatorPanel);
-        jTabbedPane1.addChangeListener(indicatorPanel);
     }
 
     private void createIndicatorScannerJPanel() {
-        this.indicatorScannerJPanel = new IndicatorScannerJPanel(); 
-                
+        this.indicatorScannerJPanel = new IndicatorScannerJPanel();                
         jTabbedPane1.addTab(GUIBundle.getString("IndicatorScannerJPanel_Title"), indicatorScannerJPanel);
         jTabbedPane1.addChangeListener(indicatorScannerJPanel);
     }
