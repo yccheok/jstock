@@ -26,7 +26,6 @@ import org.jhotdraw.app.action.*;
 import org.jhotdraw.draw.*;
 import org.jhotdraw.draw.action.*;
 import org.jhotdraw.gui.*;
-import javax.swing.event.*;
 import org.yccheok.jstock.engine.*;
 import org.yccheok.jstock.analysis.*;
 
@@ -40,7 +39,7 @@ import org.apache.commons.logging.LogFactory;
  * @author Werner Randelshofer
  * @version 1.0 2006-07-15 Created.
  */
-public class IndicatorPanel extends JPanel implements ChangeListener {
+public class IndicatorPanel extends JPanel {
     private DrawingEditor editor;
     
     /** Creates new instance. */
@@ -934,55 +933,6 @@ public class IndicatorPanel extends JPanel implements ChangeListener {
 
         this.jButton4.setEnabled(true);
         this.jButton6.setEnabled(false);
-    }
-    
-    @Override
-    public void stateChanged(javax.swing.event.ChangeEvent evt) {        
-        JTabbedPane pane = (JTabbedPane)evt.getSource();
-        if(pane.getSelectedComponent() == this) {
-            final MainFrame m = MainFrame.getInstance();
-            final String password = Utils.decrypt(m.getJStockOptions().getIndicatorPassword());
-            
-            boolean status = false;
-            
-            if(password.length() > 0 && (passwordSuccessOnce == false)) {
-                PasswordInputJDialog passwordInputJDialog = new PasswordInputJDialog(m, true);
-                if(passwordInputJDialog.doModal())
-                {
-                    if(passwordInputJDialog.isPasswordMatch(password) == false) {
-                        JOptionPane.showMessageDialog(this, "Password not match. You are not allowed to use indicator editor.", "Wrong password", JOptionPane.WARNING_MESSAGE);
-                        status = false;
-                    }
-                    else {
-                        passwordSuccessOnce = true;
-                        status = true;
-                    }
-                }
-                else {
-                    // Cancel
-                    status = false;
-                }
-            }
-            else
-            {
-                status = true;
-            }
-            
-            jList1.setEnabled(status);
-            jButton1.setEnabled(status);
-            jButton5.setEnabled(status);
-            jButton2.setEnabled(status);
-            jButton3.setEnabled(status);
-        }
-        else {
-            /* We will not call stop, to avoid GUI from being freezed. But, is it
-             * safe to do so?
-             */
-
-            // Simulate and stop buttons.
-            this.jButton4.setEnabled(true);
-            this.jButton6.setEnabled(false);
-        }
     }
     
     public void initIndicatorProjectManager() {
