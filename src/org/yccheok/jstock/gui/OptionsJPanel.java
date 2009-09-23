@@ -74,27 +74,7 @@ public class OptionsJPanel extends javax.swing.JPanel implements JStockOptionsOb
         }
     }    
     
-    private void show(Component component) {        
-        if(component == optionsPasswordJPanel) {
-            final MainFrame m = MainFrame.getInstance();
-            final String password = Utils.decrypt(m.getJStockOptions().getIndicatorPassword());
-            
-            if(password.length() > 0) {
-                PasswordInputJDialog passwordInputJDialog = new PasswordInputJDialog(m, true);
-                if(passwordInputJDialog.doModal())
-                {
-                    if(passwordInputJDialog.isPasswordMatch(password) == false) {
-                        JOptionPane.showMessageDialog(this, "Password not match. You are not allow to modify indicator password option.", "Wrong password", JOptionPane.WARNING_MESSAGE);
-                        return;
-                    }
-                }
-                else {
-                    // Cancel
-                    return;
-                }
-            }
-        }
-
+    private void show(Component component) {
         if (currentComponent != null) {
             remove(currentComponent);
         }
@@ -106,7 +86,7 @@ public class OptionsJPanel extends javax.swing.JPanel implements JStockOptionsOb
     
     private void initOptionsJPanels() {
         optionsAlertJPanel = new OptionsAlertJPanel();
-        optionsPasswordJPanel = new OptionsPasswordJPanel();
+        optionsIndicatorJPanel = new OptionsIndicatorJPanel();
         optionsNetworkJPanel = new OptionsNetworkJPanel();
         optionsSpeedJPanel = new OptionsSpeedJPanel();
         optionsColorJPanel = new OptionsColorJPanel();
@@ -122,7 +102,7 @@ public class OptionsJPanel extends javax.swing.JPanel implements JStockOptionsOb
         addButton("Chat", "/images/32x32/ksmiletris.png", optionsChatJPanel, jButtonBar1, buttonGroup1);
         addButton("Color", "/images/32x32/colors.png", optionsColorJPanel, jButtonBar1, buttonGroup1);
         addButton("Network", "/images/32x32/connect_to_network.png", optionsNetworkJPanel, jButtonBar1, buttonGroup1);
-        addButton("Password", "/images/32x32/encrypted.png", optionsPasswordJPanel, jButtonBar1, buttonGroup1);
+        addButton("Indicator", "/images/32x32/find.png", optionsIndicatorJPanel, jButtonBar1, buttonGroup1);
         addButton("Speed", "/images/32x32/clock.png", optionsSpeedJPanel, jButtonBar1, buttonGroup1);         
         addButton("Update", "/images/32x32/epiphany-download.png", optionsUpdateJPanel, jButtonBar1, buttonGroup1);
     }
@@ -133,7 +113,7 @@ public class OptionsJPanel extends javax.swing.JPanel implements JStockOptionsOb
         optionsColorJPanel.set(jStockOptions);
         optionsAlertJPanel.set(jStockOptions);
         optionsNetworkJPanel.set(jStockOptions);
-        optionsPasswordJPanel.set(jStockOptions);
+        optionsIndicatorJPanel.set(jStockOptions);
         optionsSpeedJPanel.set(jStockOptions);       
         optionsSellAdvisorJPanel.set(jStockOptions);
         optionsChatJPanel.set(jStockOptions);
@@ -175,9 +155,9 @@ public class OptionsJPanel extends javax.swing.JPanel implements JStockOptionsOb
             return false;
         }
 
-        if(optionsPasswordJPanel.apply(jStockOptions) == false)
+        if (optionsIndicatorJPanel.apply(jStockOptions) == false)
         {
-            final JToggleButton button = map.get("Password");
+            final JToggleButton button = map.get("Indicator");
             
             button.setSelected(true);
             button.doClick();
@@ -235,7 +215,7 @@ public class OptionsJPanel extends javax.swing.JPanel implements JStockOptionsOb
     private Component currentComponent;
     private OptionsAlertJPanel optionsAlertJPanel;
     private OptionsNetworkJPanel optionsNetworkJPanel;
-    private OptionsPasswordJPanel optionsPasswordJPanel;
+    private OptionsIndicatorJPanel optionsIndicatorJPanel;
     private OptionsSpeedJPanel optionsSpeedJPanel;
     private OptionsColorJPanel optionsColorJPanel;
     private OptionsBrokerJPanel optionsBrokerJPanel;
