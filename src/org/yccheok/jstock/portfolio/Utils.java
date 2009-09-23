@@ -18,7 +18,15 @@
 
 package org.yccheok.jstock.portfolio;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.yccheok.jstock.engine.Code;
+import org.yccheok.jstock.gui.BuyPortfolioTreeTableModel;
+import org.yccheok.jstock.gui.JStockOptions;
+import org.yccheok.jstock.gui.MainFrame;
+import org.yccheok.jstock.gui.SellPortfolioTreeTableModel;
 
 /**
  *
@@ -43,5 +51,69 @@ public class Utils {
 
     public static StampDuty getDummyStampDuty(Contract contract, double stampDuty) {
         return new SimpleStampDuty("SimpleStampDuty", Double.MAX_VALUE, contract.getTotal(), stampDuty);
+    }
+
+    public static String getPortfolioDirectory(String name) {
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        return org.yccheok.jstock.gui.Utils.getUserDataDirectory() + jStockOptions.getCountry() + File.separator + "portfolios" + File.separator + name + File.separator;
+    }
+
+    public static boolean createEmptyPortfolio(String name) {
+        final String directory = getPortfolioDirectory(name);
+        if (false == org.yccheok.jstock.gui.Utils.createCompleteDirectoryHierarchyIfDoesNotExist(directory)) {
+            return false;
+        }
+
+		// Do not allow to create empty portfolio, if the desired location already
+		// contain portfolio files.
+        if (new File(directory + "buyportfolio.xml").exists() || new File(directory + "depositsummary.xml").exists() ||
+            new File(directory + "sellportfolio.xml").exists() || new File(directory + "dividendsummary.xml").exists()) {
+            return false;
+        }
+        
+        final BuyPortfolioTreeTableModel buyPortfolioTreeTableModel = new BuyPortfolioTreeTableModel();
+        final SellPortfolioTreeTableModel sellPortfolioTreeTableModel = new SellPortfolioTreeTableModel();
+        final DepositSummary depositSummary = new DepositSummary();
+        final DividendSummary dividendSummary = new DividendSummary();
+
+        return
+        org.yccheok.jstock.gui.Utils.toXML(buyPortfolioTreeTableModel, directory + "buyportfolio.xml") &&
+        org.yccheok.jstock.gui.Utils.toXML(sellPortfolioTreeTableModel, directory + "sellportfolio.xml") &&
+        org.yccheok.jstock.gui.Utils.toXML(depositSummary, directory + "depositsummary.xml") &&
+        org.yccheok.jstock.gui.Utils.toXML(dividendSummary, directory + "dividendsummary.xml");
+    }
+
+	// Get current active portfolio directory.
+    public static String getPortfoliosDirectory() {
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        return getPortfolioDirectory(jStockOptions.getPortfolioName());
+    }
+
+    private static boolean isPortfolioDirectory(File file) {
+        if (false == file.isDirectory()) {
+            return false;
+        }
+        String[] files = file.list();
+        List<String> list = Arrays.asList(files);
+        return list.contains("buyportfolio.xml") && list.contains("sellportfolio.xml") && list.contains("depositsummary.xml") && list.contains("dividendsummary.xml");
+    }
+
+    public static List<String> getPortfolioNames() {
+        List<String> portfolioNames = new ArrayList<String>();
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final File file = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + jStockOptions.getCountry() + File.separator + "portfolios" + File.separator);
+        File[] children = file.listFiles();
+        if (children == null) {
+            // Either dir does not exist or is not a directory
+            return portfolioNames;
+        } else {
+			// Only seek for 1st level directory.
+            for (File child : children) {
+                if (isPortfolioDirectory(child)) {
+                    portfolioNames.add(child.getName());
+                }
+            }
+        }
+        return portfolioNames;
     }
 }
