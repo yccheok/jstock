@@ -90,8 +90,8 @@ public class JStockOptions {
 
         this.setHistoryDuration(DEFAULT_HISTORY_DURATION);
 
-		this.setChatEnabled(false);
-		this.setChatUsername("");
+        this.setChatEnabled(false);
+        this.setChatUsername("");
         this.setChatPassword("");
         this.setChatFlashNotificationEnabled(true);
         this.setChatSoundNotificationEnabled(true);
@@ -134,7 +134,7 @@ public class JStockOptions {
     private boolean isAutoBrokerFeeCalculationEnabled = false;
     
     private double expectedProfitPercentage = 10.0;
-    
+
     private Country country;
 
     private boolean isAutoUpdateNewsEnabled;
@@ -168,6 +168,8 @@ public class JStockOptions {
     // Remember the last view page.
     private int lastSelectedPageIndex = 0;
 
+    private String portfolioName = "My Portfolio";
+    
     public boolean isAutoBrokerFeeCalculationEnabled() {
         return this.isAutoBrokerFeeCalculationEnabled;
     }
@@ -187,7 +189,7 @@ public class JStockOptions {
             brokingFirms = new ArrayList<BrokingFirm>();
         }
         
-		/* For backward compatible */
+        /* For backward compatible */
         if (country == null) {
             country = Country.Malaysia;
         }
@@ -261,6 +263,10 @@ public class JStockOptions {
             primaryStockServerFactoryClasses = new HashMap<Country, Class>();
         }
 
+        if (this.portfolioName == null) {
+            this.portfolioName = "My Portfolio";
+        }
+        
         return this;
     }    
     
@@ -791,5 +797,19 @@ public class JStockOptions {
 
     public Class getPrimaryStockServerFactoryClass(Country country) {
         return primaryStockServerFactoryClasses.get(country);
+    }
+
+    /**
+     * @return the portfolioName
+     */
+    public String getPortfolioName() {
+        return portfolioName;
+    }
+
+    /**
+     * @param portfolioName the portfolioName to set
+     */
+    public void setPortfolioName(String portfolioName) {
+        this.portfolioName = portfolioName;
     }
 }
