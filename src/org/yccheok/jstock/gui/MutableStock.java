@@ -63,6 +63,10 @@ public class MutableStock {
         return stock.getOpenPrice();
     }
 
+    public double getPrevPrice() {
+        return stock.getPrevPrice();
+    }
+
     public double getLastPrice() {
         return stock.getLastPrice();
     }
@@ -180,6 +184,7 @@ public class MutableStock {
                 stock.getName(),
                 stock.getBoard(),
                 stock.getIndustry(),
+                stock.getPrevPrice(),
                 openPrice,
                 stock.getLastPrice(),
                 stock.getHighPrice(),
@@ -205,6 +210,40 @@ public class MutableStock {
         
         this.stock = s;
     }
+
+    public void setPrevPrice(double prevPrice) {
+        final Stock s = new Stock(
+                stock.getCode(),
+                stock.getSymbol(),
+                stock.getName(),
+                stock.getBoard(),
+                stock.getIndustry(),
+                prevPrice,
+                stock.getOpenPrice(),
+                stock.getLastPrice(),
+                stock.getHighPrice(),
+                stock.getLowPrice(),
+                stock.getVolume(),
+                stock.getChangePrice(),
+                stock.getChangePricePercentage(),
+                stock.getLastVolume(),
+                stock.getBuyPrice(),
+                stock.getBuyQuantity(),
+                stock.getSellPrice(),
+                stock.getSellQuantity(),
+                stock.getSecondBuyPrice(),
+                stock.getSecondBuyQuantity(),
+                stock.getSecondSellPrice(),
+                stock.getSecondSellQuantity(),
+                stock.getThirdBuyPrice(),
+                stock.getThirdBuyQuantity(),
+                stock.getThirdSellPrice(),
+                stock.getThirdSellQuantity(),
+                stock.getCalendar()
+                );
+
+        this.stock = s;
+    }
     
     public void setLastPrice(double lastPrice) {
         final Stock s = new Stock(
@@ -213,6 +252,7 @@ public class MutableStock {
                 stock.getName(),
                 stock.getBoard(),
                 stock.getIndustry(),
+                stock.getPrevPrice(),
                 stock.getOpenPrice(),
                 lastPrice,
                 stock.getHighPrice(),
@@ -246,6 +286,7 @@ public class MutableStock {
                 stock.getName(),
                 stock.getBoard(),
                 stock.getIndustry(),
+                stock.getPrevPrice(),
                 stock.getOpenPrice(),
                 stock.getLastPrice(),
                 highPrice,
@@ -279,6 +320,7 @@ public class MutableStock {
                 stock.getName(),
                 stock.getBoard(),
                 stock.getIndustry(),
+                stock.getPrevPrice(),
                 stock.getOpenPrice(),
                 stock.getLastPrice(),
                 stock.getHighPrice(),
@@ -312,6 +354,7 @@ public class MutableStock {
                 stock.getName(),
                 stock.getBoard(),
                 stock.getIndustry(),
+                stock.getPrevPrice(),
                 stock.getOpenPrice(),
                 stock.getLastPrice(),
                 stock.getHighPrice(),
@@ -345,6 +388,7 @@ public class MutableStock {
                 stock.getName(),
                 stock.getBoard(),
                 stock.getIndustry(),
+                stock.getPrevPrice(),
                 stock.getOpenPrice(),
                 stock.getLastPrice(),
                 stock.getHighPrice(),
@@ -378,6 +422,7 @@ public class MutableStock {
                 stock.getName(),
                 stock.getBoard(),
                 stock.getIndustry(),
+                stock.getPrevPrice(),
                 stock.getOpenPrice(),
                 stock.getLastPrice(),
                 stock.getHighPrice(),
@@ -411,6 +456,7 @@ public class MutableStock {
                 stock.getName(),
                 stock.getBoard(),
                 stock.getIndustry(),
+                stock.getPrevPrice(),
                 stock.getOpenPrice(),
                 stock.getLastPrice(),
                 stock.getHighPrice(),
@@ -444,6 +490,7 @@ public class MutableStock {
                 stock.getName(),
                 stock.getBoard(),
                 stock.getIndustry(),
+                stock.getPrevPrice(),
                 stock.getOpenPrice(),
                 stock.getLastPrice(),
                 stock.getHighPrice(),
@@ -477,6 +524,7 @@ public class MutableStock {
                 stock.getName(),
                 stock.getBoard(),
                 stock.getIndustry(),
+                stock.getPrevPrice(),
                 stock.getOpenPrice(),
                 stock.getLastPrice(),
                 stock.getHighPrice(),
@@ -510,6 +558,7 @@ public class MutableStock {
                 stock.getName(),
                 stock.getBoard(),
                 stock.getIndustry(),
+                stock.getPrevPrice(),
                 stock.getOpenPrice(),
                 stock.getLastPrice(),
                 stock.getHighPrice(),
@@ -543,6 +592,7 @@ public class MutableStock {
                 stock.getName(),
                 stock.getBoard(),
                 stock.getIndustry(),
+                stock.getPrevPrice(),
                 stock.getOpenPrice(),
                 stock.getLastPrice(),
                 stock.getHighPrice(),
@@ -576,6 +626,7 @@ public class MutableStock {
                 stock.getName(),
                 stock.getBoard(),
                 stock.getIndustry(),
+                stock.getPrevPrice(),
                 stock.getOpenPrice(),
                 stock.getLastPrice(),
                 stock.getHighPrice(),
@@ -609,6 +660,7 @@ public class MutableStock {
                 stock.getName(),
                 stock.getBoard(),
                 stock.getIndustry(),
+                stock.getPrevPrice(),
                 stock.getOpenPrice(),
                 stock.getLastPrice(),
                 stock.getHighPrice(),
@@ -642,6 +694,7 @@ public class MutableStock {
                 stock.getName(),
                 stock.getBoard(),
                 stock.getIndustry(),
+                stock.getPrevPrice(),
                 stock.getOpenPrice(),
                 stock.getLastPrice(),
                 stock.getHighPrice(),
@@ -675,6 +728,7 @@ public class MutableStock {
                 stock.getName(),
                 stock.getBoard(),
                 stock.getIndustry(),
+                stock.getPrevPrice(),
                 stock.getOpenPrice(),
                 stock.getLastPrice(),
                 stock.getHighPrice(),
@@ -708,6 +762,7 @@ public class MutableStock {
                 stock.getName(),
                 stock.getBoard(),
                 stock.getIndustry(),
+                stock.getPrevPrice(),
                 stock.getOpenPrice(),
                 stock.getLastPrice(),
                 stock.getHighPrice(),
@@ -741,6 +796,7 @@ public class MutableStock {
                 stock.getName(),
                 stock.getBoard(),
                 stock.getIndustry(),
+                stock.getPrevPrice(),
                 stock.getOpenPrice(),
                 stock.getLastPrice(),
                 stock.getHighPrice(),
@@ -774,6 +830,7 @@ public class MutableStock {
                 stock.getName(),
                 stock.getBoard(),
                 stock.getIndustry(),
+                stock.getPrevPrice(),
                 stock.getOpenPrice(),
                 stock.getLastPrice(),
                 stock.getHighPrice(),
@@ -807,6 +864,7 @@ public class MutableStock {
                 stock.getName(),
                 stock.getBoard(),
                 stock.getIndustry(),
+                stock.getPrevPrice(),
                 stock.getOpenPrice(),
                 stock.getLastPrice(),
                 stock.getHighPrice(),
