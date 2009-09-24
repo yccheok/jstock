@@ -66,6 +66,9 @@ import org.yccheok.jstock.network.ProxyDetector;
  * @author  doraemon
  */
 public class MainFrame extends javax.swing.JFrame {
+
+    // Comment out, to avoid annoying log messages during debugging.
+    //static { System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.NoOpLog"); }
     
     /** Creates new form MainFrame */
 
@@ -583,20 +586,6 @@ public class MainFrame extends javax.swing.JFrame {
         }
         
         if (statements.getType() == Statement.Type.RealtimeInfo) {
-            //if (this.getSelectedComponent() != this.jPanel8) {
-            //    // User will feel suprise if we try to quitely load something
-            //    // not within their visible range. Give them a choice so that they
-            //    // won't feel suprise.
-            //    final MessageFormat formatter = new MessageFormat("");
-            //    // formatter.setLocale(currentLocale);
-            //    formatter.applyPattern(MessagesBundle.getString("question_message_load_file_for_real_time_info_template"));
-            //    final String output = formatter.format(new Object[]{file.getName()});
-            //    final int result = javax.swing.JOptionPane.showConfirmDialog(MainFrame.getInstance(), output, MessagesBundle.getString("question_title_load_file_for_real_time_info"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
-            //    if (result != javax.swing.JOptionPane.YES_OPTION) {
-            //        // Assume success.
-            //        return true;
-            //    }
-            //}
             final int size = statements.size();
             for (int i = 0; i < size; i++) {
                 final org.yccheok.jstock.file.Statement statement = statements.get(i);
@@ -1108,9 +1097,9 @@ public class MainFrame extends javax.swing.JFrame {
         }
         if (false == status)
         {
-			// file will never become null, if status had been changed from true
-			// to false.
-			assert(file != null);
+            // file will never become null, if status had been changed from true
+            // to false.
+            assert(file != null);
             final MessageFormat formatter = new MessageFormat("");
             // formatter.setLocale(currentLocale);
             formatter.applyPattern(MessagesBundle.getString("error_message_nothing_to_be_saved_template"));
@@ -1133,9 +1122,9 @@ public class MainFrame extends javax.swing.JFrame {
                 public void actionPerformed(ActionEvent e) {
                     final String s = ((JRadioButtonMenuItem)e.getSource()).getText();
                     if (false == s.equals(currentPortfolioName)) {
-						// Save current portfolio.
+                        // Save current portfolio.
                         MainFrame.this.portfolioManagementJPanel.savePortfolio();
-						// And switch to new portfolio.
+                        // And switch to new portfolio.
                         MainFrame.this.getJStockOptions().setPortfolioName(s);
                         MainFrame.this.portfolioManagementJPanel.initPortfolio();
                     }
@@ -1566,14 +1555,14 @@ public class MainFrame extends javax.swing.JFrame {
             return;
         }
         
-        final double openPrice = stock.getOpenPrice();
+        final double prevPrice = stock.getPrevPrice();
         
-        jLabel24.setText("" + stock.getThirdBuyPrice()); jLabel24.setForeground(Utils.getColor(stock.getThirdBuyPrice(), openPrice));
-        jLabel33.setText("" + stock.getSecondBuyPrice()); jLabel33.setForeground(Utils.getColor(stock.getSecondBuyPrice(), openPrice));
-        jLabel19.setText("" + stock.getBuyPrice()); jLabel19.setForeground(Utils.getColor(stock.getBuyPrice(), openPrice));
-        jLabel32.setText("" + stock.getSellPrice()); jLabel32.setForeground(Utils.getColor(stock.getSellPrice(), openPrice));
-        jLabel35.setText("" + stock.getSecondSellPrice()); jLabel35.setForeground(Utils.getColor(stock.getSecondSellPrice(), openPrice));
-        jLabel37.setText("" + stock.getThirdSellPrice()); jLabel37.setForeground(Utils.getColor(stock.getThirdSellPrice(), openPrice));
+        jLabel24.setText("" + stock.getThirdBuyPrice()); jLabel24.setForeground(Utils.getColor(stock.getThirdBuyPrice(), prevPrice));
+        jLabel33.setText("" + stock.getSecondBuyPrice()); jLabel33.setForeground(Utils.getColor(stock.getSecondBuyPrice(), prevPrice));
+        jLabel19.setText("" + stock.getBuyPrice()); jLabel19.setForeground(Utils.getColor(stock.getBuyPrice(), prevPrice));
+        jLabel32.setText("" + stock.getSellPrice()); jLabel32.setForeground(Utils.getColor(stock.getSellPrice(), prevPrice));
+        jLabel35.setText("" + stock.getSecondSellPrice()); jLabel35.setForeground(Utils.getColor(stock.getSecondSellPrice(), prevPrice));
+        jLabel37.setText("" + stock.getThirdSellPrice()); jLabel37.setForeground(Utils.getColor(stock.getThirdSellPrice(), prevPrice));
         jLabel25.setText("" + stock.getThirdBuyQuantity());
         jLabel34.setText("" + stock.getSecondBuyQuantity());
         jLabel26.setText("" + stock.getBuyQuantity());
@@ -2364,7 +2353,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         /* Set Table Settings */
         JTableUtilities.setJTableOptions(jTable1, guiOptions.getJTableOptions(0));
-	}
+    }
 
     private void saveGUIOptions() {
         _saveGUIOptions();
