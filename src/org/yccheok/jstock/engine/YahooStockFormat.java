@@ -40,41 +40,44 @@ public class YahooStockFormat implements StockFormat {
     // protection method too on them.
     //
     // Here are the index since 19 March 2009 :
-	// (0) Symbol
-	// (1) Name
-	// (2) Stock Exchange
-	// (3) Symbol
-	// (4) Previous Close
-	// (5) Symbol
-	// (6) Last Trade
-	// (7) Symbol
-	// (8) Day's high
-	// (9) Symbol
-	// (10) Day's low
-	// (11) Symbol
-	// (12) Volume
-	// (13) Symbol
-	// (14) Change
-	// (15) Symbol
-	// (16) Change Percent
-	// (17) Symbol
-	// (18) Last Trade Size
-	// (19) Symbol
-	// (20) Bid
-	// (21) Symbol
-	// (22) Bid Size
-	// (23) Symbol
-	// (24) Ask
-	// (25) Symbol
-	// (26) Ask Size
-	// (27) Symbol
-	// (28) Last Trade Date
-	// (29) Last Trade Time.    
+    // (0) Symbol
+    // (1) Name
+    // (2) Stock Exchange
+    // (3) Symbol
+    // (4) Previous Close
+    // (5) Symbol
+    // (6) Open
+    // (7) Symbol
+    // (8) Last Trade
+    // (9) Symbol
+    // (10) Day's high
+    // (11) Symbol
+    // (12) Day's low
+    // (13) Symbol
+    // (14) Volume
+    // (15) Symbol
+    // (16) Change
+    // (17) Symbol
+    // (18) Change Percent
+    // (19) Symbol
+    // (20) Last Trade Size
+    // (21) Symbol
+    // (22) Bid
+    // (23) Symbol
+    // (24) Bid Size
+    // (25) Symbol
+    // (26) Ask
+    // (27) Symbol
+    // (28) Ask Size
+    // (29) Symbol
+    // (30) Last Trade Date
+    // (31) Last Trade Time.
     //
     // s = Symbol
     // n = Name
     // x = Stock Exchange
-    // o = Open             <-- We are no longer using this one. It will not tally with change and change percentage
+    // o = Open             <-- Although we will keep this value in our stock data structure, we will not show
+    //                          it to clients. As some stock servers unable to retrieve open price.
     // p = Previous Close
     // l1 = Last Trade (Price Only)
     // h = Day's high
@@ -120,6 +123,7 @@ public class YahooStockFormat implements StockFormat {
             String name = null;
             Stock.Board board = null;
             Stock.Industry industry = null;
+            double prevPrice = 0.0;
             double openPrice = 0.0;
             double lastPrice = 0.0;    
             double highPrice = 0.0;  
@@ -162,44 +166,47 @@ public class YahooStockFormat implements StockFormat {
                 industry = Stock.Industry.Unknown;
                 
                 if (length < 5) break;
-                try { openPrice = Double.parseDouble(fields[4]); } catch (NumberFormatException exp) {}
-                
-                if (length < 7) break;
-                try { lastPrice = Double.parseDouble(fields[6]); } catch (NumberFormatException exp) {}
-                
-                if (length < 9) break;
-                try { highPrice = Double.parseDouble(fields[8]); } catch (NumberFormatException exp) {}
+                try { prevPrice = Double.parseDouble(fields[4]); } catch (NumberFormatException exp) {}
 
+                if (length < 7) break;
+                try { openPrice = Double.parseDouble(fields[6]); } catch (NumberFormatException exp) {}
+
+                if (length < 9) break;
+                try { lastPrice = Double.parseDouble(fields[8]); } catch (NumberFormatException exp) {}
+                
                 if (length < 11) break;
-                try { lowPrice = Double.parseDouble(fields[10]); } catch (NumberFormatException exp) {}
+                try { highPrice = Double.parseDouble(fields[10]); } catch (NumberFormatException exp) {}
 
                 if (length < 13) break;
-                try { volume = Integer.parseInt(fields[12]); } catch (NumberFormatException exp) {}                
+                try { lowPrice = Double.parseDouble(fields[12]); } catch (NumberFormatException exp) {}
 
                 if (length < 15) break;
-                try { changePrice = Double.parseDouble(quotePattern.matcher(fields[14]).replaceAll("").trim()); } catch (NumberFormatException exp) {}
+                try { volume = Integer.parseInt(fields[14]); } catch (NumberFormatException exp) {}
 
                 if (length < 17) break;
-                String _changePricePercentage = quotePattern.matcher(fields[16]).replaceAll("");
+                try { changePrice = Double.parseDouble(quotePattern.matcher(fields[16]).replaceAll("").trim()); } catch (NumberFormatException exp) {}
+
+                if (length < 19) break;
+                String _changePricePercentage = quotePattern.matcher(fields[18]).replaceAll("");
                 _changePricePercentage = percentagePattern.matcher(_changePricePercentage).replaceAll("");
                 try { changePricePercentage = Double.parseDouble(_changePricePercentage); } catch (NumberFormatException exp) {}
 
-                if (length < 19) break;
-                try { lastVolume = Integer.parseInt(fields[18]); } catch (NumberFormatException exp) {}
-                
                 if (length < 21) break;
-                try { buyPrice = Double.parseDouble(fields[20]); } catch (NumberFormatException exp) {}
-
+                try { lastVolume = Integer.parseInt(fields[20]); } catch (NumberFormatException exp) {}
+                
                 if (length < 23) break;
-                try { buyQuantity = Integer.parseInt(fields[22]); } catch (NumberFormatException exp) {}
-                
-                if (length < 25) break;
-                try { sellPrice = Double.parseDouble(fields[24]); } catch (NumberFormatException exp) {}
+                try { buyPrice = Double.parseDouble(fields[22]); } catch (NumberFormatException exp) {}
 
-                if (length < 27) break;
-                try { sellQuantity = Integer.parseInt(fields[26]); } catch (NumberFormatException exp) {}
+                if (length < 25) break;
+                try { buyQuantity = Integer.parseInt(fields[24]); } catch (NumberFormatException exp) {}
                 
-                if (length < 30) break;
+                if (length < 27) break;
+                try { sellPrice = Double.parseDouble(fields[26]); } catch (NumberFormatException exp) {}
+
+                if (length < 29) break;
+                try { sellQuantity = Integer.parseInt(fields[28]); } catch (NumberFormatException exp) {}
+                
+                if (length < 32) break;
                 java.text.SimpleDateFormat dateFormat = (java.text.SimpleDateFormat)java.text.DateFormat.getInstance();
                 String data_and_time = quotePattern.matcher(fields[28]).replaceAll("").trim() + " " + quotePattern.matcher(fields[29]).replaceAll("").trim();
                 dateFormat.applyPattern("MM/dd/yyyy hh:mmaa");
@@ -228,6 +235,7 @@ public class YahooStockFormat implements StockFormat {
                     name,
                     board,
                     industry,
+                    prevPrice,
                     openPrice,
                     lastPrice,
                     highPrice,

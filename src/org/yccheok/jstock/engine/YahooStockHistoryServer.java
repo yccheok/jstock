@@ -69,10 +69,10 @@ public class YahooStockHistoryServer implements StockHistoryServer {
 
         String[] stockDatas = respond.split("\r\n|\r|\n");
         
-		// There must be at least two lines : header information and history information.
+        // There must be at least two lines : header information and history information.
         final int length = stockDatas.length;
         
-        if(length <= 1) return false;
+        if (length <= 1) return false;
         
         Symbol symbol = Symbol.newInstance(code.toString());
         String name = symbol.toString();
@@ -91,9 +91,9 @@ public class YahooStockHistoryServer implements StockHistoryServer {
             log.error("", exp);
         }
         
-        double previousPrice = Double.MAX_VALUE;
+        double previousClosePrice = Double.MAX_VALUE;
         
-        for(int i=length-1; i>=0; i--)
+        for (int i = length-1; i >= 0; i--)
         {
             String[] fields = stockDatas[i].split(",");
             
@@ -103,20 +103,22 @@ public class YahooStockHistoryServer implements StockHistoryServer {
             try {                
                 calendar.setTime(dateFormat.parse(fields[0]));
             } catch (ParseException ex) {
-                log.error("", ex);
+                log.error(null, ex);
                 continue;
             }
-            
+
+            double prevPrice = 0.0;
             double openPrice = 0.0;
             double highPrice = 0.0;
             double lowPrice = 0.0;
             double closePrice = 0.0;
             int volume = 0;
             double adjustedClosePrice = 0.0;
-            double changePrice = (previousPrice == Double.MAX_VALUE) ? 0 : closePrice - previousPrice;
-            double changePricePercentage = ((previousPrice == Double.MAX_VALUE) || (previousPrice == 0.0)) ? 0 : changePrice / previousPrice * 100.0;
-            
+            double changePrice = (previousClosePrice == Double.MAX_VALUE) ? 0 : closePrice - previousClosePrice;
+            double changePricePercentage = ((previousClosePrice == Double.MAX_VALUE) || (previousClosePrice == 0.0)) ? 0 : changePrice / previousClosePrice * 100.0;
+
             try {
+                prevPrice = (previousClosePrice == Double.MAX_VALUE) ? 0 : previousClosePrice;
                 openPrice = Double.parseDouble(fields[1]);
                 highPrice = Double.parseDouble(fields[2]);
                 lowPrice = Double.parseDouble(fields[3]);
@@ -125,7 +127,7 @@ public class YahooStockHistoryServer implements StockHistoryServer {
                 adjustedClosePrice = Double.parseDouble(fields[6]);
             }
             catch(NumberFormatException exp) {
-                log.error("", exp);
+                log.error(null, exp);
             }
             
             SimpleDate simpleDate = new SimpleDate(calendar);
@@ -136,8 +138,9 @@ public class YahooStockHistoryServer implements StockHistoryServer {
                     name,
                     board,
                     industry,
+                    prevPrice,
                     openPrice,
-                    closePrice,     // lastPrice,
+                    closePrice, /* Last Price. */
                     highPrice,
                     lowPrice,
                     volume,
@@ -161,6 +164,7 @@ public class YahooStockHistoryServer implements StockHistoryServer {
             
             historyDatabase.put(simpleDate, stock);
             simpleDates.add(simpleDate);
+            previousClosePrice = closePrice;
         }
         
         return (historyDatabase.size() > 1);
@@ -211,23 +215,28 @@ public class YahooStockHistoryServer implements StockHistoryServer {
             throw new StockHistoryNotFoundException("Code=" + code);
     }
     
+    @Override
     public Stock getStock(Calendar calendar) {
         SimpleDate simpleDate = new SimpleDate(calendar);
         return historyDatabase.get(simpleDate);        
     }
 
+    @Override
     public Calendar getCalendar(int index) {
         return simpleDates.get(index).getCalendar();
     }
 
+    @Override
     public int getNumOfCalendar() {
         return simpleDates.size();
     }
 
+    @Override
     public long getSharesIssued() {
         return 0;
     }
 
+    @Override
     public long getMarketCapital() {
         return 0;
     }

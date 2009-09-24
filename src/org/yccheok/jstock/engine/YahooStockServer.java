@@ -372,6 +372,7 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
                         0.0,
                         0.0,
                         0.0,
+                        0.0,
                         0,
                         0.0,
                         0.0,
@@ -527,41 +528,44 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
     // protection method too on them.
     //
     // Here are the index since 19 March 2009 :
-	// (0) Symbol
-	// (1) Name
-	// (2) Stock Exchange
-	// (3) Symbol
-	// (4) Previous Close
-	// (5) Symbol
-	// (6) Last Trade
-	// (7) Symbol
-	// (8) Day's high
-	// (9) Symbol
-	// (10) Day's low
-	// (11) Symbol
-	// (12) Volume
-	// (13) Symbol
-	// (14) Change
-	// (15) Symbol
-	// (16) Change Percent
-	// (17) Symbol
-	// (18) Last Trade Size
-	// (19) Symbol
-	// (20) Bid
-	// (21) Symbol
-	// (22) Bid Size
-	// (23) Symbol
-	// (24) Ask
-	// (25) Symbol
-	// (26) Ask Size
-	// (27) Symbol
-	// (28) Last Trade Date
-	// (29) Last Trade Time.    
+    // (0) Symbol
+    // (1) Name
+    // (2) Stock Exchange
+    // (3) Symbol
+    // (4) Previous Close
+    // (5) Symbol
+    // (6) Open
+    // (7) Symbol
+    // (8) Last Trade
+    // (9) Symbol
+    // (10) Day's high
+    // (11) Symbol
+    // (12) Day's low
+    // (13) Symbol
+    // (14) Volume
+    // (15) Symbol
+    // (16) Change
+    // (17) Symbol
+    // (18) Change Percent
+    // (19) Symbol
+    // (20) Last Trade Size
+    // (21) Symbol
+    // (22) Bid
+    // (23) Symbol
+    // (24) Bid Size
+    // (25) Symbol
+    // (26) Ask
+    // (27) Symbol
+    // (28) Ask Size
+    // (29) Symbol
+    // (30) Last Trade Date
+    // (31) Last Trade Time.
     //
     // s = Symbol
     // n = Name
     // x = Stock Exchange
-    // o = Open             <-- We are no longer using this one. It will not tally with change and change percentage
+    // o = Open             <-- Although we will keep this value in our stock data structure, we will not show
+    //                          it to clients. As some stock servers unable to retrieve open price.
     // p = Previous Close
     // l1 = Last Trade (Price Only)
     // h = Day's high
@@ -584,7 +588,7 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
     // "+1400.00","N/A - +4.31%",+1400.00,"+4.31%","+1400.00 - +4.31%"
     //
     // "MAERSKB.CO","AP MOELLER-MAERS-","Copenhagen",32500.00,33700.00,34200.00,33400.00,660,"+1200.00","N/A - +3.69%",33,33500.00,54,33700.00,96,"11/10/2008","10:53am"
-    private static final String YAHOO_STOCK_FORMAT = "&f=snxspsl1shsgsvsc1sp2sk3sbsb6sasa5sd1t1";
+    private static final String YAHOO_STOCK_FORMAT = "&f=snxspsosl1shsgsvsc1sp2sk3sbsb6sasa5sd1t1";
     
     static {
         // We try to perform search from Yahoo Finance by using the following parameters :
