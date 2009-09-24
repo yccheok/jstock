@@ -96,7 +96,7 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
             stockPrice.put(stock.getCode(), stock.getLastPrice());
         }
         else {
-            stockPrice.put(stock.getCode(), stock.getOpenPrice());
+            stockPrice.put(stock.getCode(), stock.getPrevPrice());
         }
 
         final Portfolio portfolio = (Portfolio)getRoot();
