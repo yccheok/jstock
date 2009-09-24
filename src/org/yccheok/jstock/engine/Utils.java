@@ -37,7 +37,12 @@ public class Utils {
     private static volatile List<String> CIMBMarketServers = null;
     private static volatile List<String> CIMBStockServers = null;
     private static volatile List<String> CIMBHistoryServers = null;
-    private static final String[] DEFAULT_SERVERS = new String[] {
+
+    private static volatile List<String> AsiaEBrokerMarketServers = null;
+    private static volatile List<String> AsiaEBrokerStockServers = null;
+    private static volatile List<String> AsiaEBrokerHistoryServers = null;
+
+    private static final String[] DEFAULT_CIMB_SERVERS = new String[] {
         "http://n2ntbfd01.itradecimb.com/",
         "http://n2ntbfd02.itradecimb.com/",
         "http://n2ntbfd03.itradecimb.com/",
@@ -50,10 +55,16 @@ public class Utils {
         "http://n2ntbfd10.itradecimb.com/"
     };
 
+    private static final String[] DEFAULT_ASIAEBROKER_SERVERS = new String[] {
+        "http://n2ntbfd03.asiaebroker.com:20000",
+        "http://n2ntbfd065.asiaebroker.com:20000",
+        "http://n2ntbfd01.asiaebroker.com:20000"
+    };
+
     public static List<String> getCIMBMarketServers() {
         List<String> servers = Utils.CIMBMarketServers;
         if (servers != null) {
-			// We already have the server list.
+            // We already have the server list.
             return new CopyOnWriteArrayList<String>(servers);
         }
 
@@ -62,12 +73,12 @@ public class Utils {
             String[] s = server.split(",");
             if (s.length > 0) {
                 List<String> me = new CopyOnWriteArrayList<String>(java.util.Arrays.asList(s));
-				// Save it! So that we need not to ask for server list again next time.
+                // Save it! So that we need not to ask for server list again next time.
                 Utils.CIMBMarketServers = me;
                 return new CopyOnWriteArrayList<String>(me);
             }
         }
-        servers = new CopyOnWriteArrayList<String>(java.util.Arrays.asList(DEFAULT_SERVERS));
+        servers = new CopyOnWriteArrayList<String>(java.util.Arrays.asList(DEFAULT_CIMB_SERVERS));
         // Save it! So that we need not to ask for server list again next time.
         Utils.CIMBMarketServers = servers;
         return new CopyOnWriteArrayList<String>(servers);
@@ -90,7 +101,7 @@ public class Utils {
                 return new CopyOnWriteArrayList<String>(me);
             }
         }
-        servers = new CopyOnWriteArrayList<String>(java.util.Arrays.asList(DEFAULT_SERVERS));
+        servers = new CopyOnWriteArrayList<String>(java.util.Arrays.asList(DEFAULT_CIMB_SERVERS));
         // Save it! So that we need not to ask for server list again next time.
         Utils.CIMBStockServers = servers;
         return new CopyOnWriteArrayList<String>(servers);
@@ -113,7 +124,7 @@ public class Utils {
                 return new CopyOnWriteArrayList<String>(me);
             }
         }
-        servers = new CopyOnWriteArrayList<String>(java.util.Arrays.asList(DEFAULT_SERVERS));
+        servers = new CopyOnWriteArrayList<String>(java.util.Arrays.asList(DEFAULT_CIMB_SERVERS));
         // Save it! So that we need not to ask for server list again next time.
         Utils.CIMBHistoryServers = servers;
         return new CopyOnWriteArrayList<String>(servers);
@@ -292,7 +303,7 @@ public class Utils {
             // Index's code start with ^. We will not intrude index's code.
             if(_code.startsWith("^") == false && _code.endsWith(".KL") == false)
             {
-				// This is not index's code, and it does not end with .KL.
+                // This is not index's code, and it does not end with .KL.
                 // Let's intrude it!
                 result = Code.newInstance(_code + ".KL");
             }
