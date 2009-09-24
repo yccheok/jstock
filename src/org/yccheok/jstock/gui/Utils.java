@@ -40,8 +40,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.text.MessageFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.yccheok.jstock.engine.*;
 import java.util.*;
 import java.util.concurrent.Executor;
@@ -60,6 +63,9 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.RequestEntity;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.net.TimeTCPClient;
@@ -580,6 +586,92 @@ public class Utils {
         catch (javax.swing.UnsupportedLookAndFeelException exp) {
             log.error(null, exp);
         }
+    }
+
+    /**
+     * Get response body through non-standard POST method.
+     * Please refer to <url>http://stackoverflow.com/questions/1473255/is-jakarta-httpclient-sutitable-for-the-following-task/1473305#1473305</url>
+     *
+     * @param uri For example, http://n2ntbfd03.asiaebroker.com:20000/%5bvUpJYKw4QvGRMBmhATUxRwv4JrU9aDnwNEuangVyy6OuHxi2YiY=%5dImage?
+     * @param formData For example, [SORT]=0,1,0,10,5,0,KL,0&[FIELD]=33,38,51
+     * @return the response body. null if fail.
+     */
+    public static String getPOSTResponseBodyAsStringBasedOnProxyAuthOption(String uri, String formData) {
+        org.yccheok.jstock.engine.Utils.setHttpClientProxyFromSystemProperties(httpClient);
+        org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
+
+        final PostMethod method = new PostMethod(uri);
+        final RequestEntity entity;
+        try {
+            entity = new StringRequestEntity(formData, "application/x-www-form-urlencoded", "UTF-8");
+        } catch (UnsupportedEncodingException exp) {
+            log.error(null, exp);
+            return null;
+        }
+        method.setRequestEntity(entity);
+        method.setContentChunked(false);
+
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        String respond = null;
+        try {
+            if (jStockOptions.isProxyAuthEnabled()) {
+                /* WARNING : This chunck of code block is not tested! */
+                method.setFollowRedirects(false);
+                httpClient.executeMethod(method);
+
+                int statuscode = method.getStatusCode();
+                if ((statuscode == HttpStatus.SC_MOVED_TEMPORARILY) ||
+                    (statuscode == HttpStatus.SC_MOVED_PERMANENTLY) ||
+                    (statuscode == HttpStatus.SC_SEE_OTHER) ||
+                    (statuscode == HttpStatus.SC_TEMPORARY_REDIRECT)) {
+                    //Make new Request with new URL
+                    Header header = method.getResponseHeader("location");
+                    /* WARNING : Correct method to redirect? Shall we use POST? How about form data? */
+                    HttpMethod RedirectMethod = new GetMethod(header.getValue());
+                    // I assume it is OK to release method for twice. (The second
+                    // release will happen in finally block). We shouldn't have an
+                    // unreleased method, before executing another new method.
+                    method.releaseConnection();
+                    // Do RedirectMethod within try-catch-finally, so that we can have a
+                    // exception free way to release RedirectMethod connection.
+                    // #2836422
+                    try {
+                        httpClient.executeMethod(RedirectMethod);
+                        respond = RedirectMethod.getResponseBodyAsString();
+                    }
+                    catch (HttpException exp) {
+                        log.error(null, exp);
+                        return null;
+                    }
+                    catch (IOException exp) {
+                        log.error(null, exp);
+                        return null;
+                    }
+                    finally {
+                        RedirectMethod.releaseConnection();
+                    }
+                }
+                else {
+                    respond = method.getResponseBodyAsString();
+                } // if statuscode = Redirect
+            }
+            else {
+                httpClient.executeMethod(method);
+                respond = method.getResponseBodyAsString();
+            } //  if jStockOptions.isProxyAuthEnabled()
+        }
+        catch (HttpException exp) {
+            log.error(null, exp);
+            return null;
+        }
+        catch (IOException exp) {
+            log.error(null, exp);
+            return null;
+        }
+        finally {
+            method.releaseConnection();
+        }
+        return respond;
     }
 
     // We prefer to have this method in gui package instead of engine. This is because it requires
