@@ -6,7 +6,7 @@ my %gui_bundle = ();
 my %messages_bundle = ();
 my $init_counter = 0;
 my $process_counter = 0;
-my $dir = "c:/Projects/TRUNK/jstock";
+my $dir = "c:/Projects/TRUNK/jstock/src";
 
 if ($ARGV[0])
 {
@@ -72,7 +72,7 @@ sub process
 		if ($line =~ /GUIBundle\.getString\("([^"]+)"\)/) {
 			my $key = $1;
 			if (not $gui_bundle{$key}) {
-				print "WARNING : key '$key' not found\n";
+				print "WARNING : key '$key' not found ($name $line_number)\n";
 			}
 		}
 		elsif ($line =~ /MessagesBundle\.getString\("([^"]+)"\)/) {
