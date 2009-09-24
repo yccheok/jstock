@@ -85,7 +85,7 @@ public class CIMBStockServer extends Subject<CIMBStockServer, Integer> implement
 
            // Sort the best server.
             if (bestServerAlreadySorted == false) {
-                synchronized(servers) {
+                synchronized(servers_lock) {
                     if (bestServerAlreadySorted == false) {
                         bestServerAlreadySorted = true;
                         String tmp = servers.get(0);
@@ -201,9 +201,9 @@ public class CIMBStockServer extends Subject<CIMBStockServer, Integer> implement
                 }   /* for (Code code : codes) */
             }   /* if (stocks.size() != codes.size()) */
 
-           // Sort the best server.
+            // Sort the best server.
             if (bestServerAlreadySorted == false) {
-                synchronized(servers) {
+                synchronized(servers_lock) {
                     if (bestServerAlreadySorted == false) {
                         bestServerAlreadySorted = true;
                         String tmp = servers.get(0);
@@ -240,8 +240,8 @@ public class CIMBStockServer extends Subject<CIMBStockServer, Integer> implement
             final int increase = 70;
             
             if (currentThread.isInterrupted()) {
-				throw new StockNotFoundException("Thread has been interrupted");
-			}
+                throw new StockNotFoundException("Thread has been interrupted");
+            }
             
             do {
                 final String request = server + "rtQuote.dll?GetStockSortByCode&From=" + from + "&To=" + to;
@@ -294,7 +294,7 @@ public class CIMBStockServer extends Subject<CIMBStockServer, Integer> implement
             return;
         }
 
-        synchronized(this) {
+        synchronized(servers_lock) {
             // Already initialized. Return early.
             if (this.servers != null) {
                 return;
@@ -314,6 +314,8 @@ public class CIMBStockServer extends Subject<CIMBStockServer, Integer> implement
     // be slow to show up.
     // Only initialize it when we need it.
     private List<String> servers;
+    private final Object servers_lock = new Object();
+
     // We had already discover the best server. Please take note that,
     // synchronized is required during best server sorting. Hence, we will
     // use this flag to help us only perform sorting once.
