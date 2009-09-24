@@ -106,7 +106,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
         
         AbstractTableModelWithMemory tableModel = (AbstractTableModelWithMemory)table.getModel();
 
-        final double openPrice = (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), tableModel.findColumn(OPEN));
+        final double prevPrice = (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), tableModel.findColumn(PREV));
         boolean alert = false;
 
         if (jStockOptions.isEnableColorAlert()) {
@@ -138,7 +138,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
 
             final Object o = tableModel.getOldValueAt(modelRow, modelCol);
             final double oldBuyPrice = ((o == null) ? buyPrice : (Double)o);
-            this.performCellBlinking(c, buyPrice, oldBuyPrice, this.getForegroundColor(buyPrice, openPrice, alert), getBackgroundColor(row, alert));
+            this.performCellBlinking(c, buyPrice, oldBuyPrice, this.getForegroundColor(buyPrice, prevPrice, alert), getBackgroundColor(row, alert));
             return c;
         }                         
         else if(table.getColumnName(column).equalsIgnoreCase(SELL))
@@ -150,7 +150,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
 
             final Object o = tableModel.getOldValueAt(modelRow, modelCol);
             final double oldSellPrice = ((o == null) ? sellPrice : (Double)o);
-            this.performCellBlinking(c, sellPrice, oldSellPrice, this.getForegroundColor(sellPrice, openPrice, alert), getBackgroundColor(row, alert));
+            this.performCellBlinking(c, sellPrice, oldSellPrice, this.getForegroundColor(sellPrice, prevPrice, alert), getBackgroundColor(row, alert));
             return c;
         } 
         else if(table.getColumnName(column).equalsIgnoreCase(LAST))
@@ -162,7 +162,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
 
             final Object o = tableModel.getOldValueAt(modelRow, modelCol);
             final double oldLastPrice = ((o == null) ? lastPrice : (Double)o);
-            this.performCellBlinking(c, lastPrice, oldLastPrice, this.getForegroundColor(lastPrice, openPrice, alert), getBackgroundColor(row, alert));
+            this.performCellBlinking(c, lastPrice, oldLastPrice, this.getForegroundColor(lastPrice, prevPrice, alert), getBackgroundColor(row, alert));
             return c;          
         }      
         else if(table.getColumnName(column).equalsIgnoreCase(LOW))
@@ -174,7 +174,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
 
             final Object o = tableModel.getOldValueAt(modelRow, modelCol);
             final double oldLowPrice = ((o == null) ? lowPrice : (Double)o);
-            this.performCellBlinking(c, lowPrice, oldLowPrice, this.getForegroundColor(lowPrice, openPrice, alert), getBackgroundColor(row, alert));
+            this.performCellBlinking(c, lowPrice, oldLowPrice, this.getForegroundColor(lowPrice, prevPrice, alert), getBackgroundColor(row, alert));
             return c;
         } 
         else if(table.getColumnName(column).equalsIgnoreCase(HIGH))
@@ -186,7 +186,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
 
             final Object o = tableModel.getOldValueAt(modelRow, modelCol);
             final double oldHighPrice = ((o == null) ? highPrice : (Double)o);
-            this.performCellBlinking(c, highPrice, oldHighPrice, this.getForegroundColor(highPrice, openPrice, alert), getBackgroundColor(row, alert));
+            this.performCellBlinking(c, highPrice, oldHighPrice, this.getForegroundColor(highPrice, prevPrice, alert), getBackgroundColor(row, alert));
             return c;
         }
         else if(table.getColumnName(column).equalsIgnoreCase(CHG))
@@ -291,7 +291,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
         
         AbstractTableModelWithMemory tableModel = (AbstractTableModelWithMemory)table.getModel();
 
-        double openPrice = (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), tableModel.findColumn(OPEN));
+        double prevPrice = (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), tableModel.findColumn(PREV));
 
         boolean alert = false;
 
@@ -323,7 +323,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             
             final double buyPrice = (Double)tableModel.getValueAt(modelRow, modelCol);
 
-            c.setForeground(this.getForegroundColor(buyPrice, openPrice, alert));
+            c.setForeground(this.getForegroundColor(buyPrice, prevPrice, alert));
         }                         
         else if(table.getColumnName(column).equalsIgnoreCase(SELL))
         {
@@ -332,7 +332,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             
             final double sellPrice = (Double)tableModel.getValueAt(modelRow, modelCol);
 
-            c.setForeground(this.getForegroundColor(sellPrice, openPrice, alert));
+            c.setForeground(this.getForegroundColor(sellPrice, prevPrice, alert));
         } 
         else if(table.getColumnName(column).equalsIgnoreCase(LAST))
         {
@@ -341,7 +341,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             
             final double lastPrice = (Double)tableModel.getValueAt(modelRow, modelCol);
             
-            c.setForeground(this.getForegroundColor(lastPrice, openPrice, alert));
+            c.setForeground(this.getForegroundColor(lastPrice, prevPrice, alert));
         }      
         else if(table.getColumnName(column).equalsIgnoreCase(LOW))
         {
@@ -350,7 +350,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             
             final double lowPrice = (Double)tableModel.getValueAt(modelRow, modelCol);
 
-            c.setForeground(this.getForegroundColor(lowPrice, openPrice, alert));
+            c.setForeground(this.getForegroundColor(lowPrice, prevPrice, alert));
         } 
         else if(table.getColumnName(column).equalsIgnoreCase(HIGH))
         {
@@ -359,7 +359,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             
             final double highPrice = (Double)tableModel.getValueAt(modelRow, modelCol);
 
-            c.setForeground(this.getForegroundColor(highPrice, openPrice, alert));
+            c.setForeground(this.getForegroundColor(highPrice, prevPrice, alert));
         }
         else if(table.getColumnName(column).equalsIgnoreCase(CHG))
         {
@@ -392,7 +392,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
         return c;
     } 
     
-    private static final String OPEN;
+    private static final String PREV;
     private static final String RISE_ABOVE;
     private static final String FALL_BELOW;
     private static final String LAST;
@@ -409,7 +409,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
     private static final String INDICATOR;
 
     static {
-        OPEN = GUIBundle.getString("MainFrame_Open");
+        PREV = GUIBundle.getString("MainFrame_Prev");
         RISE_ABOVE = GUIBundle.getString("MainFrame_RiseAbove");
         FALL_BELOW = GUIBundle.getString("MainFrame_FallBelow");
         LAST = GUIBundle.getString("MainFrame_Last");

@@ -196,7 +196,7 @@ public class StockTableModel extends AbstractTableModelWithMemory {
         List<Object> list = new ArrayList<Object>();
         list.add(stock.getCode());
         list.add(stock.getSymbol());
-        list.add(stock.getOpenPrice());
+        list.add(stock.getPrevPrice());
         list.add(stock.getLastPrice());
         list.add(stock.getHighPrice());
         list.add(stock.getLowPrice());
@@ -257,7 +257,7 @@ public class StockTableModel extends AbstractTableModelWithMemory {
         final String[] tmp = {
             GUIBundle.getString("MainFrame_Code"),
             GUIBundle.getString("MainFrame_Symbol"),
-            GUIBundle.getString("MainFrame_Open"),
+            GUIBundle.getString("MainFrame_Prev"),
             GUIBundle.getString("MainFrame_Last"),
             GUIBundle.getString("MainFrame_High"),
             GUIBundle.getString("MainFrame_Low"),
