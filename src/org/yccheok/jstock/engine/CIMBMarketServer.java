@@ -80,7 +80,7 @@ public class CIMBMarketServer implements MarketServer {
                     if (volume != 0) {
                         // Sort the best server.
                         if (bestServerAlreadySorted == false) {
-                            synchronized(servers) {
+                            synchronized(servers_lock) {
                                 if (bestServerAlreadySorted == false) {
                                     bestServerAlreadySorted = true;
                                     String tmp = servers.get(0);
@@ -110,7 +110,7 @@ public class CIMBMarketServer implements MarketServer {
             return;
         }
 
-        synchronized(this) {
+        synchronized(servers_lock) {
             // Already initialized. Return early.
             if (this.servers != null) {
                 return;
@@ -129,6 +129,8 @@ public class CIMBMarketServer implements MarketServer {
     // be slow to show up.
     // Only initialize it when we need it.
     private List<String> servers;
+    private final Object servers_lock = new Object();
+
     // We had already discover the best server. Please take note that,
     // synchronized is required during best server sorting. Hence, we will
     // use this flag to help us only perform sorting once.
