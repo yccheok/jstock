@@ -1,6 +1,19 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.4j - ???
+  Feature: Multiple portfolios (#2694145)
+  Feature: Able to save/load Portfolio in Excel/CSV format. Able to save 
+           Indicator scan result in Excel/CSV format. (#2797840). Patched by 
+           gransi.
+  Feature: SMS enhancement to reduce the number of sms messages. (#2856559)
+  Feature: CSV for history chart. (#2850571)
+  Bugfix : Treat Prev Price and Open Price as two different things.
+  Bugfix : Remove annoying "You have previous built indicators, do you want to 
+           re-use them?" message box.
+  Bugfix : Remove password indicator protection feature. Replaced with indicator
+           options.
+           
 JStock 1.0.4i - 2009-08-18
   Feature: Use SwingWorker to perform connection, email, sms checking (#2839440)
   Feature: Auto detect proxy server (#1771740). Patched by nb76
