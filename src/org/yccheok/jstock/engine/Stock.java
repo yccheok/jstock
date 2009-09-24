@@ -35,6 +35,7 @@ public class Stock {
         String name,
         Board board,
         Industry industry,
+        double prevPrice,
         double openPrice,
         double lastPrice,
         double highPrice,
@@ -63,6 +64,7 @@ public class Stock {
         this.name = name;
         this.board = board;
         this.industry = industry;
+        this.prevPrice = prevPrice;
         this.openPrice = openPrice;
         this.lastPrice = lastPrice;
         this.highPrice = highPrice;
@@ -92,6 +94,7 @@ public class Stock {
         this.name = stock.name;
         this.board = stock.board;
         this.industry = stock.industry;
+        this.prevPrice = stock.prevPrice;
         this.openPrice = stock.openPrice;
         this.lastPrice = stock.lastPrice;
         this.highPrice = stock.highPrice;
@@ -133,6 +136,10 @@ public class Stock {
     
     public Industry getIndustry() {
         return industry;
+    }
+
+    public double getPrevPrice() {
+        return prevPrice;
     }
 
     public double getOpenPrice() {
@@ -222,7 +229,7 @@ public class Stock {
     @Override
     public String toString() {
         return Stock.class.getName() + "[code=" + code + ",symbol=" + symbol + ",name=" + name + ",board=" + board + ",industry=" + industry +
-                ",openPrice=" + openPrice + ",lastPrice=" + lastPrice + ",highPrice=" + highPrice + ",lowPrice=" + lowPrice +
+                ",prevPrice=" + prevPrice + ",openPrice=" + openPrice + ",lastPrice=" + lastPrice + ",highPrice=" + highPrice + ",lowPrice=" + lowPrice +
                 ",volume=" + volume + ",changePrice=" + changePrice + ",changePricePercentage=" + changePricePercentage + ",lastVolume=" + lastVolume +
                 ",buyPrice=" + buyPrice + ",buyQuantity=" + buyQuantity + ",sellPrice=" + sellPrice + ",sellQuantity" + sellQuantity +
                 ",secondBuyPrice=" + secondBuyPrice + ",secondBuyQuantity=" + secondBuyQuantity + ",secondSellPrice=" + secondSellPrice + ",secondSellQuantity" + secondSellQuantity +
@@ -336,6 +343,7 @@ public class Stock {
     private final String name;
     private final Board board;
     private final Industry industry;
+    private final double prevPrice;
     private final double openPrice;
     private final double lastPrice;    
     private final double highPrice;  
