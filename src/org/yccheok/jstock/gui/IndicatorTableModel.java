@@ -20,7 +20,6 @@
 package org.yccheok.jstock.gui;
 
 import java.util.*;
-import javax.swing.table.*;
 import org.yccheok.jstock.engine.*;
 import org.yccheok.jstock.analysis.*;
 import org.yccheok.jstock.internationalization.GUIBundle;
@@ -127,7 +126,7 @@ public class IndicatorTableModel extends AbstractTableModelWithMemory {
         
         list.add(stock.getCode());
         list.add(stock.getSymbol());
-        list.add(stock.getOpenPrice());
+        list.add(stock.getPrevPrice());
         list.add(stock.getLastPrice());
         list.add(stock.getHighPrice());
         list.add(stock.getLowPrice());
@@ -241,7 +240,7 @@ public class IndicatorTableModel extends AbstractTableModelWithMemory {
             GUIBundle.getString("IndicatorScannerJPanel_Indicator"),
             GUIBundle.getString("MainFrame_Code"),
             GUIBundle.getString("MainFrame_Symbol"),
-            GUIBundle.getString("MainFrame_Open"),
+            GUIBundle.getString("MainFrame_Prev"),
             GUIBundle.getString("MainFrame_Last"),
             GUIBundle.getString("MainFrame_High"),
             GUIBundle.getString("MainFrame_Low"),
