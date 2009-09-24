@@ -151,7 +151,7 @@ public class YahooStockFormat implements StockFormat {
                 
                 if (length < 2) break; name = quotePattern.matcher(fields[1]).replaceAll("").trim();
            
-				// We use name as symbol, to make it more readable.     
+                // We use name as symbol, to make it more readable.
                 symbol = Symbol.newInstance(name.toString());
 
                 if (length < 3) break;
