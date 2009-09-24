@@ -151,19 +151,20 @@ public class JTableUtilities {
     {
     	// Remove unwanted column. MUST BE DONE FIRST!
         for (int i = 0; i < jTable.getColumnCount(); i++) {
-        	final String name = jTable.getColumnName(i);
+            final String name = jTable.getColumnName(i);
 
-      		/* Remove any unwanted columns. */
-        	if (jTableOptions.contains(name) == false)
-        	{
-            	removeTableColumn(jTable, name);
-            	i--;
-        	}
+            /* Remove any unwanted columns. */
+            if (jTableOptions.contains(name) == false)
+            {
+                removeTableColumn(jTable, name);
+                i--;
+            }
         }
-        
+
         final int optionsCount = jTableOptions.getColumnSize();
         final int tableCount = jTable.getColumnCount();
 
+        int target = 0;
         /* Sort the columns according to user preference. */
         for (int i = 0; i < optionsCount; i++) {
             final String name = jTableOptions.getColumnName(i);
@@ -181,7 +182,7 @@ public class JTableUtilities {
 
             if (index >= 0)
             {
-                jTable.moveColumn(index, i);
+                jTable.moveColumn(index, target++);
             }
         }      
     }
