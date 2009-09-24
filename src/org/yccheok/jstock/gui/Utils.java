@@ -129,11 +129,11 @@ public class Utils {
         }
         catch (IOException exp) {
             log.error(null, exp);
-			return null;
+            return null;
         }
         catch (IllegalArgumentException exp) {
             log.error(null, exp);
-			return null;
+            return null;
         }
         finally {
             try {
