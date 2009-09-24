@@ -42,6 +42,7 @@ public class StockHistoryOperator extends AbstractOperator {
     
     public enum Type
     {
+        PrevPrice,
         OpenPrice,
         HighPrice,
         LowPrice,
@@ -93,6 +94,11 @@ public class StockHistoryOperator extends AbstractOperator {
         
         switch(type)
         {
+            case PrevPrice:
+                for(Stock stock : stocks)
+                    values.add(stock.getPrevPrice());
+                break;
+
             case OpenPrice:
                 for(Stock stock : stocks)
                     values.add(stock.getOpenPrice());

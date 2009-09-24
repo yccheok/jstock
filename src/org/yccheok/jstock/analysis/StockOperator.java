@@ -32,6 +32,7 @@ public class StockOperator extends AbstractOperator {
 
     public enum Type
     {
+        PrevPrice,
         OpenPrice,
         LastPrice,
         HighPrice,
@@ -103,6 +104,8 @@ public class StockOperator extends AbstractOperator {
         
         switch(type)
         {
+            case PrevPrice:
+                return new Double(stock.getPrevPrice());
             case OpenPrice:
                 return new Double(stock.getOpenPrice());
             case LastPrice:
