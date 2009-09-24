@@ -28,12 +28,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import javax.swing.table.TableModel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.poi.hssf.record.formula.functions.Cell;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRichTextString;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -43,6 +43,7 @@ import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.jdesktop.swingx.treetable.TreeTableModel;
 import org.yccheok.jstock.engine.SimpleDate;
 import org.yccheok.jstock.engine.Stock;
+import org.yccheok.jstock.engine.StockHistoryServer;
 import org.yccheok.jstock.gui.AbstractPortfolioTreeTableModel;
 import org.yccheok.jstock.gui.POIUtils;
 import org.yccheok.jstock.gui.SellPortfolioTreeTableModel;
@@ -57,7 +58,7 @@ import org.yccheok.jstock.portfolio.TransactionSummary;
  */
 public class Statements {
     public static class StatementsEx {
-		// Possible null for statements.
+        // Possible null for statements.
         public final Statements statements;
         public final String title;
         public StatementsEx(Statements statements, String title) {
@@ -70,6 +71,32 @@ public class Statements {
      * method.
      */
     private Statements() {}
+
+    public static Statements newInstanceFromStockHistoryServer(StockHistoryServer server) {
+        final Statements s = new Statements();
+        final int size = server.getNumOfCalendar();
+        final DateFormat dateFormat = DateFormat.getDateInstance();
+        for (int i = 0; i < size; i++) {
+            final Calendar calendar = server.getCalendar(i);
+            final Stock stock = server.getStock(calendar);
+			assert(calendar != null && stock != null);
+            final List<Atom> atoms = new ArrayList<Atom>();
+            final Atom atom0 = new Atom(dateFormat.format(calendar.getTime()), GUIBundle.getString("StockHistory_Date"));
+            final Atom atom1 = new Atom("" + stock.getOpenPrice(), GUIBundle.getString("StockHistory_Open"));
+            final Atom atom2 = new Atom("" + stock.getHighPrice(), GUIBundle.getString("StockHistory_High"));
+            final Atom atom3 = new Atom("" + stock.getLowPrice(), GUIBundle.getString("StockHistory_Low"));
+            final Atom atom4 = new Atom("" + stock.getLastPrice(), GUIBundle.getString("StockHistory_Close"));
+            final Atom atom5 = new Atom("" + stock.getVolume(), GUIBundle.getString("StockHistory_Volume"));
+            atoms.add(atom0);
+            atoms.add(atom1);
+            atoms.add(atom2);
+            atoms.add(atom3);
+            atoms.add(atom4);
+            atoms.add(atom5);
+            s.statements.add(new Statement(atoms));
+        }
+        return s;
+    }
 
     /**
      * Construct Statements based on given Excel File.
@@ -91,8 +118,8 @@ public class Statements {
                 final HSSFSheet sheet = wb.getSheetAt(k);
                 final int startRow = sheet.getFirstRowNum();
                 final int endRow = sheet.getLastRowNum();
-				// If there are 3 rows, endRow will be 2.
-				// We must have at least 2 rows. (endRow = 1)
+                // If there are 3 rows, endRow will be 2.
+                // We must have at least 2 rows. (endRow = 1)
                 if (startRow != 0 || endRow <= startRow)
                 {
                     continue;
@@ -105,8 +132,8 @@ public class Statements {
 
                 final int startCell = row.getFirstCellNum();
                 final int endCell = row.getLastCellNum();
-				// If there are 2 cols, endCell will be 2.
-				// We must have at least 1 col. (endCell = 1)
+                // If there are 2 cols, endCell will be 2.
+                // We must have at least 1 col. (endCell = 1)
                 if (startCell != 0 || endCell <= startCell) {
                     continue;
                 }
@@ -118,7 +145,7 @@ public class Statements {
                         continue;
                     }
 
-					// Exception may be thrown here, as cell may be numerical value.
+                    // Exception may be thrown here, as cell may be numerical value.
                     final String type = cell.getRichStringCellValue().getString();
                     if (type != null) {
                         types.add(type);
