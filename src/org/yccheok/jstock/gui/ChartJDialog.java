@@ -20,6 +20,7 @@
 
 package org.yccheok.jstock.gui;
 
+import java.io.File;
 import org.yccheok.jstock.engine.*;
 
 import java.util.*;
@@ -38,7 +39,7 @@ import org.jfree.data.time.Day;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.*;
-import org.jfree.date.*;
+import org.yccheok.jstock.file.Statements;
 
 /**
  *
@@ -85,6 +86,9 @@ public class ChartJDialog extends javax.swing.JDialog {
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -130,6 +134,21 @@ public class ChartJDialog extends javax.swing.JDialog {
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.NORTH);
 
+        jMenu1.setText("File");
+
+        jMenuItem1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/filesave.png"))); // NOI18N
+        jMenuItem1.setText("Save As...");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem1);
+
+        jMenuBar1.add(jMenu1);
+
+        setJMenuBar(jMenuBar1);
+
         java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
         setBounds((screenSize.width-750)/2, (screenSize.height-600)/2, 750, 600);
     }// </editor-fold>//GEN-END:initComponents
@@ -147,6 +166,30 @@ public class ChartJDialog extends javax.swing.JDialog {
             chartPanel.setChart(freeChart);
         }
     }//GEN-LAST:event_jComboBox1ActionPerformed
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        // TODO add your handling code here:
+        assert(this.stockHistoryServer.getNumOfCalendar() > 0);
+        final Stock stock = this.stockHistoryServer.getStock(this.stockHistoryServer.getCalendar(0));
+        final File file = Utils.promptSaveCSVAndExcelJFileChooser(stock.getCode().toString());
+
+        if (file != null) {
+            if (Utils.getFileExtension(file).equals("csv"))
+            {
+                final Statements statements = Statements.newInstanceFromStockHistoryServer(stockHistoryServer);
+                statements.saveAsCSVFile(file);
+            }
+            else if (Utils.getFileExtension(file).equals("xls"))
+            {
+                final Statements statements = Statements.newInstanceFromStockHistoryServer(stockHistoryServer);
+                statements.saveAsExcelFile(file, stock.getCode().toString());
+            }
+            else
+            {
+                assert(false);
+            }
+        }
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
     
     private void updateLabels(StockHistoryServer stockHistoryServer) {
         java.text.NumberFormat numberFormat = java.text.NumberFormat.getInstance();
@@ -335,6 +378,9 @@ public class ChartJDialog extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
