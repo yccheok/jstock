@@ -332,22 +332,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         if (statements == null) {
             return false;
         }
-        final Component selectedComponent = MainFrame.getInstance().getSelectedComponent();
         if (statements.getType() == Statement.Type.PortfolioManagementBuy || statements.getType() == Statement.Type.PortfolioManagementSell || statements.getType() == Statement.Type.PortfolioManagementDeposit || statements.getType() == Statement.Type.PortfolioManagementDividend) {
-            //if (selectedComponent != this) {
-            //    // User will feel suprise if we try to quitely load something
-            //    // not within their visible range. Give them a choice so that they
-            //    // won't feel suprise.
-            //    final MessageFormat formatter = new MessageFormat("");
-            //    // formatter.setLocale(currentLocale);
-            //    formatter.applyPattern(MessagesBundle.getString("question_message_load_file_for_portfolio_management_template"));
-            //    final String output = formatter.format(new Object[]{file.getName()});
-            //    final int result = javax.swing.JOptionPane.showConfirmDialog(MainFrame.getInstance(), output, MessagesBundle.getString("question_title_load_file_for_portfolio_management"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
-            //    if (result != javax.swing.JOptionPane.YES_OPTION) {
-            //        // Assume success.
-            //        return true;
-            //    }
-            //}
             final DateFormat dateFormat = DateFormat.getDateInstance();
             final int size = statements.size();
             switch(statements.getType()) {
