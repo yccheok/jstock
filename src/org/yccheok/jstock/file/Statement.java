@@ -39,6 +39,7 @@ public class Statement {
         PortfolioManagementDeposit,
         PortfolioManagementDividend,
         StockIndicatorScanner,
+        StockHistory,
         Unknown
     }
 
@@ -70,7 +71,7 @@ public class Statement {
             if (
             atoms.get(0).getType().equals(GUIBundle.getString("MainFrame_Code")) &&
             atoms.get(1).getType().equals(GUIBundle.getString("MainFrame_Symbol")) &&
-            atoms.get(2).getType().equals(GUIBundle.getString("MainFrame_Open")) &&
+            atoms.get(2).getType().equals(GUIBundle.getString("MainFrame_Prev")) &&
             atoms.get(3).getType().equals(GUIBundle.getString("MainFrame_Last")) &&
             atoms.get(4).getType().equals(GUIBundle.getString("MainFrame_High")) &&
             atoms.get(5).getType().equals(GUIBundle.getString("MainFrame_Low")) &&
@@ -165,7 +166,7 @@ public class Statement {
             atoms.get(0).getType().equals(GUIBundle.getString("IndicatorScannerJPanel_Indicator")) &&
             atoms.get(1).getType().equals(GUIBundle.getString("MainFrame_Code")) &&
             atoms.get(2).getType().equals(GUIBundle.getString("MainFrame_Symbol")) &&
-            atoms.get(3).getType().equals(GUIBundle.getString("MainFrame_Open")) &&
+            atoms.get(3).getType().equals(GUIBundle.getString("MainFrame_Prev")) &&
             atoms.get(4).getType().equals(GUIBundle.getString("MainFrame_Last")) &&
             atoms.get(5).getType().equals(GUIBundle.getString("MainFrame_High")) &&
             atoms.get(6).getType().equals(GUIBundle.getString("MainFrame_Low")) &&
@@ -183,6 +184,20 @@ public class Statement {
                 return Type.StockIndicatorScanner;
             }
         }
+        else if (atoms.size() == 6) {
+            /* Wow! */
+            if (
+            atoms.get(0).getType().equals(GUIBundle.getString("StockHistory_Date")) &&
+            atoms.get(1).getType().equals(GUIBundle.getString("StockHistory_Open")) &&
+            atoms.get(2).getType().equals(GUIBundle.getString("StockHistory_High")) &&
+            atoms.get(3).getType().equals(GUIBundle.getString("StockHistory_Low")) &&
+            atoms.get(4).getType().equals(GUIBundle.getString("StockHistory_Close")) &&
+            atoms.get(5).getType().equals(GUIBundle.getString("StockHistory_Volume"))
+            ) {
+                return Type.StockHistory;
+            }
+        }
+
         return Type.Unknown;
     }
 
