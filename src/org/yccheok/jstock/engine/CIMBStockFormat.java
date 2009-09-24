@@ -86,7 +86,7 @@ public class CIMBStockFormat implements StockFormat {
                     String name;
                     Stock.Board board;
                     Stock.Industry industry;
-                    double openPrice;
+                    double prevPrice;
                     double lastPrice;    
                     double highPrice;  
                     double lowPrice;
@@ -110,7 +110,7 @@ public class CIMBStockFormat implements StockFormat {
                     if(stockFields.length > THIRD_SELL_QUANTITY_TOKEN_INDEX) {
                         try
                         {
-                            // 4065  |PPB|PPB GROUP BHD                           |0101|CONSUMER                                                    |A|Y|MYL4065OO008|N|R|1|7.5|7.75|7.75|7.5|Y|3905|0.25|3.33|1|7.7|1|7.75|68|7.6|196|7.8|750|7.55|20|7.85|165|0901|7.5|7.75|0100|1185499882|0|0|0|1324|2581|38|45|2961230.0|1.0
+                            // 4065|PPB|PPB GROUP BHD|0101|CONSUMER|A|Y|MYL4065OO008|N|R|1|7.5|7.75|7.75|7.5|Y|3905|0.25|3.33|1|7.7|1|7.75|68|7.6|196|7.8|750|7.55|20|7.85|165|0901|7.5|7.75|0100|1185499882|0|0|0|1324|2581|38|45|2961230.0|1.0
                             
                             final String tmp  = stockFields[3];
                             if(tmp.length() < 4) continue;
@@ -129,7 +129,7 @@ public class CIMBStockFormat implements StockFormat {
                             industry = tmpIndustry;
                             
                             // industry = stockFields[INDUSTRY_TOKEN_INDEX].trim();
-                            openPrice = Double.parseDouble(stockFields[OPEN_PRICE_TOKEN_INDEX]);
+                            prevPrice = Double.parseDouble(stockFields[PREV_PRICE_TOKEN_INDEX]);
                             lastPrice = Double.parseDouble(stockFields[LAST_PRICE_TOKEN_INDEX]);
                             highPrice = Double.parseDouble(stockFields[HIGH_PRICE_TOKEN_INDEX]);
                             lowPrice = Double.parseDouble(stockFields[LOW_PRICE_TOKEN_INDEX]);
@@ -156,7 +156,8 @@ public class CIMBStockFormat implements StockFormat {
                                     name,
                                     board,
                                     industry,
-                                    openPrice,
+                                    prevPrice,
+                                    0.0,    /* Sad. I have no idea how to retrieve open price. */
                                     lastPrice,
                                     highPrice,
                                     lowPrice,
@@ -230,7 +231,7 @@ public class CIMBStockFormat implements StockFormat {
                             name = "";
                             board = tmpBoard;
                             industry = tmpIndustry;
-                            openPrice = Double.parseDouble(stockFields[OPEN_PRICE_TOKEN_INDEX - ADJUST_OFFSET]);
+                            prevPrice = Double.parseDouble(stockFields[PREV_PRICE_TOKEN_INDEX - ADJUST_OFFSET]);
                             lastPrice = Double.parseDouble(stockFields[LAST_PRICE_TOKEN_INDEX - ADJUST_OFFSET]);
                             highPrice = Double.parseDouble(stockFields[HIGH_PRICE_TOKEN_INDEX - ADJUST_OFFSET]);
                             lowPrice = Double.parseDouble(stockFields[LOW_PRICE_TOKEN_INDEX - ADJUST_OFFSET]);
@@ -257,7 +258,8 @@ public class CIMBStockFormat implements StockFormat {
                                     name,
                                     board,
                                     industry,
-                                    openPrice,
+                                    prevPrice,
+                                    0.0,    /* Sad. I have no idea how to retrieve open price. */
                                     lastPrice,
                                     highPrice,
                                     lowPrice,
@@ -310,7 +312,7 @@ public class CIMBStockFormat implements StockFormat {
     private static final int NAME_TOKEN_INDEX = 2;    
     private static final int ADJUST_OFFSET = 7;    
     private static final int INDUSTRY_TOKEN_INDEX = 4;   
-    private static final int OPEN_PRICE_TOKEN_INDEX = 11;
+    private static final int PREV_PRICE_TOKEN_INDEX = 11;
     private static final int LAST_PRICE_TOKEN_INDEX = 12;
     private static final int HIGH_PRICE_TOKEN_INDEX = 13;
     private static final int LOW_PRICE_TOKEN_INDEX = 14;
