@@ -174,7 +174,7 @@ public class Utils {
             return servers;
         }
 
-        final String server = getUUIDValue("http://jstock.sourceforge.net/server/ntpserver.txt", "server");
+        final String server = getUUIDValue(org.yccheok.jstock.engine.Utils.getJStockStaticServer() + "servers_information/ntp_server.txt", "server");
         if (server != null) {
             String[] s = server.split(",");
             if (s.length > 0) {
