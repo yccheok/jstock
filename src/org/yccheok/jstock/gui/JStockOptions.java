@@ -84,7 +84,7 @@ public class JStockOptions {
         this.setAlertBackgroundColor(DEFAULT_ALERT_BACKGROUND_COLOR);
 
         this.setAutoUpdateNewsEnabled(true);
-        this.setNewsVersion(0);
+		this.setNewsID("");
 
         this.setHistoryDuration(DEFAULT_HISTORY_DURATION);
 
@@ -138,7 +138,9 @@ public class JStockOptions {
     private Country country;
 
     private boolean isAutoUpdateNewsEnabled;
-    private long newsVersion;
+    @Deprecated
+    private transient long newsVersion;
+    private String newsID;
 
     private int historyDuration; /* In years */
 
@@ -195,11 +197,6 @@ public class JStockOptions {
         /* For backward compatible */
         if (country == null) {
             country = Country.Malaysia;
-        }
-        
-        /* For backward compatible */
-        if (newsVersion < 0) {
-            newsVersion = 0;
         }
 
         if (historyDuration <= 0) {
@@ -273,7 +270,11 @@ public class JStockOptions {
         if (this.maxSMSPerDay <= 0) {
             maxSMSPerDay = -1;
         }
-        
+
+        if (this.getNewsID() == null) {
+            this.setNewsID("");
+        }
+
         return this;
     }    
     
@@ -484,16 +485,6 @@ public class JStockOptions {
 
     public void setChatSoundNotificationEnabled(boolean isChatSoundNotificationEnabled) {
         this.isChatSoundNotificationEnabled = isChatSoundNotificationEnabled;
-    }
-
-    public void setNewsVersion(long newsVersion)
-    {
-        this.newsVersion = newsVersion;
-    }
-
-    public long getNewsVersion()
-    {
-        return this.newsVersion;
     }
 
     public double getExpectedProfitPercentage() {
@@ -816,5 +807,19 @@ public class JStockOptions {
      */
     public void setMaxSMSPerDay(int maxSMSPerDay) {
         this.maxSMSPerDay = maxSMSPerDay;
+    }
+
+    /**
+     * @return the newsID
+     */
+    public String getNewsID() {
+        return newsID;
+    }
+
+    /**
+     * @param newsID the newsID to set
+     */
+    public void setNewsID(String newsID) {
+        this.newsID = newsID;
     }
 }
