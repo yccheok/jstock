@@ -66,7 +66,8 @@ public class Utils {
     public static String getXMPPServer()
     {
         final String defaultServer = "jabber.org";
-        final String _server = org.yccheok.jstock.gui.Utils.getUUIDValue("http://jstock.sourceforge.net/server/server.txt", "server");
+
+        final String _server = org.yccheok.jstock.gui.Utils.getUUIDValue(org.yccheok.jstock.engine.Utils.getJStockStaticServer() + "servers_information/chat_server.txt", "server");
 
         if (_server == null) {
             log.info("Server not found");
@@ -78,7 +79,7 @@ public class Utils {
             return defaultServer;
         }
 
-		log.info("Sourceforge suggests us to use " + server);
+		log.info("Google App Engine suggests us to use " + server);
 		return server;
     }
 
