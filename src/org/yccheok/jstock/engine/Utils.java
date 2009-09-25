@@ -60,6 +60,8 @@ public class Utils {
         "http://n2ntbfd01.asiaebroker.com:20000"
     };
 
+    private static final String JSTOCK_STATIC_SERVER = "http://jstock-static.appspot.com/";
+
     public static List<String> getAsiaEBrokerMarketServers() {
         List<String> servers = Utils.AsiaEBrokerMarketServers;
         if (servers != null) {
@@ -67,7 +69,7 @@ public class Utils {
             return new CopyOnWriteArrayList<String>(servers);
         }
 
-        final String server = org.yccheok.jstock.gui.Utils.getUUIDValue("http://jstock.sourceforge.net/server/asiaebrokermarketservers.txt", "server");
+        final String server = org.yccheok.jstock.gui.Utils.getUUIDValue(getJStockStaticServer() + "servers_information/asiaebroker_market_servers.txt", "server");
         if (server != null) {
             String[] s = server.split(",");
             if (s.length > 0) {
@@ -90,7 +92,7 @@ public class Utils {
             return new CopyOnWriteArrayList<String>(servers);
         }
 
-        final String server = org.yccheok.jstock.gui.Utils.getUUIDValue("http://jstock.sourceforge.net/server/cimbmarketservers.txt", "server");
+        final String server = org.yccheok.jstock.gui.Utils.getUUIDValue(getJStockStaticServer() + "servers_information/cimb_market_servers.txt", "server");
         if (server != null) {
             String[] s = server.split(",");
             if (s.length > 0) {
@@ -113,7 +115,7 @@ public class Utils {
             return new CopyOnWriteArrayList<String>(servers);
         }
 
-        final String server = org.yccheok.jstock.gui.Utils.getUUIDValue("http://jstock.sourceforge.net/server/asiaebrokerstockservers.txt", "server");
+        final String server = org.yccheok.jstock.gui.Utils.getUUIDValue(getJStockStaticServer() + "servers_information/asiaebroker_stock_servers.txt", "server");
         if (server != null) {
             String[] s = server.split(",");
             if (s.length > 0) {
@@ -136,7 +138,7 @@ public class Utils {
             return new CopyOnWriteArrayList<String>(servers);
         }
 
-        final String server = org.yccheok.jstock.gui.Utils.getUUIDValue("http://jstock.sourceforge.net/server/cimbstockservers.txt", "server");
+        final String server = org.yccheok.jstock.gui.Utils.getUUIDValue(getJStockStaticServer() + "servers_information/cimb_stock_servers.txt", "server");
         if (server != null) {
             String[] s = server.split(",");
             if (s.length > 0) {
@@ -159,7 +161,7 @@ public class Utils {
             return new CopyOnWriteArrayList<String>(servers);
         }
 
-        final String server = org.yccheok.jstock.gui.Utils.getUUIDValue("http://jstock.sourceforge.net/server/cimbhistoryservers.txt", "server");
+        final String server = org.yccheok.jstock.gui.Utils.getUUIDValue(getJStockStaticServer() + "servers_information/cimb_history_servers.txt", "server");
         if (server != null) {
             String[] s = server.split(",");
             if (s.length > 0) {
@@ -409,5 +411,9 @@ public class Utils {
         }
         
         return java.util.Collections.emptyList();
-    }    
+    }
+
+    public static String getJStockStaticServer() {
+        return JSTOCK_STATIC_SERVER;
+    }
 }
