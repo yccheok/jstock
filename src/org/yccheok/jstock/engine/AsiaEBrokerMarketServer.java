@@ -158,9 +158,13 @@ public class AsiaEBrokerMarketServer implements MarketServer {
         final AsiaEBrokerMarketBuilder builder = new AsiaEBrokerMarketBuilder();
         boolean summary_ok = false;
         boolean index_ok = false;
+        int summary_sever_index = -1;
+        int index_sever_index = -1;
 
         summary:
         for (String server : servers) {
+            ++summary_sever_index;
+
             if (Thread.currentThread().isInterrupted()) {
                 break;
             }
@@ -181,11 +185,11 @@ public class AsiaEBrokerMarketServer implements MarketServer {
                 long volume = 0;
                 double value = 0.0;
                 try {
-                    up = Integer.parseInt(token_elements[VOLUME_TOKEN_INDEX]);
-                    down = Integer.parseInt(token_elements[VALUE_TOKEN_INDEX]);
-                    unchange = Integer.parseInt(token_elements[UP_TOKEN_INDEX]);
-                    volume = Long.parseLong(token_elements[DOWN_TOKEN_INDEX]);
-                    value = Double.parseDouble(token_elements[UNCHANGED_TOKEN_INDEX]);
+                    up = Integer.parseInt(token_elements[UP_TOKEN_INDEX]);
+                    down = Integer.parseInt(token_elements[DOWN_TOKEN_INDEX]);
+                    unchange = Integer.parseInt(token_elements[UNCHANGED_TOKEN_INDEX]);
+                    volume = Long.parseLong(token_elements[VOLUME_TOKEN_INDEX]);
+                    value = Double.parseDouble(token_elements[VALUE_TOKEN_INDEX]);
                 }
                 catch (NumberFormatException exp) {
                     log.error(null, exp);
@@ -199,6 +203,8 @@ public class AsiaEBrokerMarketServer implements MarketServer {
 
         index:
         for (String server : servers) {
+            ++index_sever_index;
+
             if (Thread.currentThread().isInterrupted()) {
                 break;
             }
@@ -220,7 +226,7 @@ public class AsiaEBrokerMarketServer implements MarketServer {
                 double opening_index = 0;
                 try {
                     current_index = Double.parseDouble(token_elements[CURRENT_INDEX_TOKEN_INDEX]);
-                    opening_index = Integer.parseInt(token_elements[OPENING_INDEX_TOKEN_INDEX]);
+                    opening_index = Double.parseDouble(token_elements[OPENING_INDEX_TOKEN_INDEX]);
                 }
                 catch (NumberFormatException exp) {
                     log.error(null, exp);
@@ -233,6 +239,20 @@ public class AsiaEBrokerMarketServer implements MarketServer {
         }
 
         if (summary_ok && index_ok) {
+            // Sort the best server.
+            if (bestServerAlreadySorted == false) {
+                synchronized(servers_lock) {
+                    if (bestServerAlreadySorted == false) {
+                        bestServerAlreadySorted = true;
+                        assert(summary_sever_index >= 0);
+                        assert(index_sever_index >= 0);
+                        final int best_index = Math.max(summary_sever_index, summary_sever_index);
+                        String tmp = servers.get(0);
+                        servers.set(0, servers.get(best_index));
+                        servers.set(best_index, tmp);
+                    }
+                }
+            }
             return builder.build();
         }
         return null;
@@ -276,5 +296,10 @@ public class AsiaEBrokerMarketServer implements MarketServer {
     // Only initialize it when we need it.
     private List<String> servers;
     private final Object servers_lock = new Object();
+    // We had already discover the best server. Please take note that,
+    // synchronized is required during best server sorting. Hence, we will
+    // use this flag to help us only perform sorting once.
+    private volatile boolean bestServerAlreadySorted = false;
+
     private static final Log log = LogFactory.getLog(AsiaEBrokerMarketServer.class);
 }
