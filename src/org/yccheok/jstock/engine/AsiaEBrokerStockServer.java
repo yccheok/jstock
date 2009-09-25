@@ -126,6 +126,8 @@ public class AsiaEBrokerStockServer implements StockServer {
 
     @Override
     public List<Stock> getAllStocks() throws StockNotFoundException {
+        initServers();
+
         final List<Stock> stocks = new ArrayList<Stock>();
         // Avoid duplication.
         final List<Code> codes = new ArrayList<Code>();
@@ -150,6 +152,9 @@ public class AsiaEBrokerStockServer implements StockServer {
                 codes.add(code);
                 stocks.add(org.yccheok.jstock.gui.Utils.getEmptyStock(code, symbol));
             }
+        }
+        if (stocks.size() == 0) {
+            throw new StockNotFoundException();
         }
         return stocks;
     }
