@@ -163,6 +163,55 @@ public class Utils {
         return value;
     }
 
+    public static Map<String, String> getUUIDValue(String url) {
+        Map<String, String> map = new HashMap<String, String>();
+        final org.yccheok.jstock.gui.Utils.InputStreamAndMethod inputStreamAndMethod = org.yccheok.jstock.gui.Utils.getResponseBodyAsStreamBasedOnProxyAuthOption(url);
+
+        if (inputStreamAndMethod.inputStream == null) {
+            inputStreamAndMethod.method.releaseConnection();
+            return java.util.Collections.EMPTY_MAP;
+        }
+
+        Properties properties = new Properties();
+        try {
+            properties.load(inputStreamAndMethod.inputStream);
+        }
+        catch (IOException exp) {
+            log.error(null, exp);
+            return java.util.Collections.EMPTY_MAP;
+        }
+        catch (IllegalArgumentException exp) {
+            log.error(null, exp);
+            return java.util.Collections.EMPTY_MAP;
+        }
+        finally {
+            try {
+                inputStreamAndMethod.inputStream.close();
+            } catch (IOException exp) {
+                log.error(null, exp);
+            }
+            inputStreamAndMethod.method.releaseConnection();
+        }
+        final String _id = properties.getProperty("id");
+        if (_id == null) {
+            log.info("UUID not found");
+            return java.util.Collections.EMPTY_MAP;
+        }
+
+        final String id = org.yccheok.jstock.gui.Utils.decrypt(_id);
+        if (id.equals(org.yccheok.jstock.gui.Utils.getJStockUUID()) == false) {
+            log.info("UUID doesn't match");
+            return java.util.Collections.EMPTY_MAP;
+        }
+
+        for (Object key : properties.keySet()) {
+            if (key != null) {
+                map.put(key.toString(), properties.getProperty(key.toString()));
+            }
+        }
+        return map;
+    }
+
     private static List<String> getNTPServers()
     {
         // The list is obtained from Windows Vista, Internet Time Server List itself.
@@ -442,11 +491,6 @@ public class Utils {
 
     public static String getApplicationVersionString() {
         return APPLICATION_VERSION_STRING;
-    }
-
-    public static String getLatestNewsLocation(long newsVersion)
-    {
-        return "http://jstock.sourceforge.net/news/" + APPLICATION_VERSION_STRING + "/" + newsVersion + ".html";
     }
 
     // If you try to call this method at different time with same source, the
@@ -857,7 +901,7 @@ public class Utils {
 
     public static ApplicationInfo getLatestApplicationInfo()
     {
-        final String request = "http://jstock.sourceforge.net/version/version.txt";
+        final String request = org.yccheok.jstock.engine.Utils.getJStockStaticServer() + "version_information/index.txt";
 
         final org.yccheok.jstock.gui.Utils.InputStreamAndMethod inputStreamAndMethod = org.yccheok.jstock.gui.Utils.getResponseBodyAsStreamBasedOnProxyAuthOption(request);
 
@@ -897,7 +941,7 @@ public class Utils {
             return null;
         }
 
-		final int version;
+        final int version;
        	try {
             version = Integer.parseInt(applicationVersionID);
         }
