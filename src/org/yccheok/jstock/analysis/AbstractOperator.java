@@ -284,19 +284,19 @@ public abstract class AbstractOperator extends AbstractBean implements Operator,
     }
     
     public String toString() {
-        java.lang.StringBuffer buffer = new StringBuffer();
-        buffer.append(this.getClass().getName() + " [ input = ");
+        final java.lang.StringBuilder builder = new StringBuilder();
+        builder.append(this.getClass().getName() + " [ input = ");
         for(Connector input : inputs) {
-            buffer.append(input.getValue() + " ");
+            builder.append(input.getValue() + " ");
         }
-        buffer.append("] [ output = ");
+        builder.append("] [ output = ");
         for(Connector output : outputs) {
-            buffer.append(output.getValue() + " ");
+            builder.append(output.getValue() + " ");
         }    
-        buffer.append("] [ inputConnectionSize = " + inputConnectionSize + " ]");
-        buffer.append(" [ outputConnectionSize = " + outputConnectionSize + " ]");
+        builder.append("] [ inputConnectionSize = " + inputConnectionSize + " ]");
+        builder.append(" [ outputConnectionSize = " + outputConnectionSize + " ]");
         
-        return buffer.toString();
+        return builder.toString();
     }
     
     // This function is expecting all the input value during that time is valid.

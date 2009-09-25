@@ -148,46 +148,46 @@ public class Utils {
 
     public static String getHTMLAccordingToMessageMode(String who, String msg, ChatJPanel.Message.Mode mode)
     {
-        StringBuffer stringBuffer = new StringBuffer("<p>");
+        final StringBuilder stringBuilder = new StringBuilder("<p>");
 
         switch(mode)
         {
         case Mine:
-            stringBuffer.append("<span style=\"color:#");
-            stringBuffer.append(Utils.toCSSHTML(MainFrame.getInstance().getJStockOptions().getChatOwnMessageColor()));
-            stringBuffer.append(";font-weight:bold\">");
-            stringBuffer.append(who);
-            stringBuffer.append(": </span>");
-            stringBuffer.append(buildEmotionalTag(buildHyperLinkTag(escapeHTMLEntities(msg))));
+            stringBuilder.append("<span style=\"color:#");
+            stringBuilder.append(Utils.toCSSHTML(MainFrame.getInstance().getJStockOptions().getChatOwnMessageColor()));
+            stringBuilder.append(";font-weight:bold\">");
+            stringBuilder.append(who);
+            stringBuilder.append(": </span>");
+            stringBuilder.append(buildEmotionalTag(buildHyperLinkTag(escapeHTMLEntities(msg))));
             break;
 
         case Other:
-            stringBuffer.append("<span style=\"color:#");
-            stringBuffer.append(Utils.toCSSHTML(MainFrame.getInstance().getJStockOptions().getChatOtherMessageColor()));
-            stringBuffer.append(";font-weight:bold\">");
-            stringBuffer.append(who);
-            stringBuffer.append(": </span>");
-            stringBuffer.append(buildEmotionalTag(buildHyperLinkTag(escapeHTMLEntities(msg))));
+            stringBuilder.append("<span style=\"color:#");
+            stringBuilder.append(Utils.toCSSHTML(MainFrame.getInstance().getJStockOptions().getChatOtherMessageColor()));
+            stringBuilder.append(";font-weight:bold\">");
+            stringBuilder.append(who);
+            stringBuilder.append(": </span>");
+            stringBuilder.append(buildEmotionalTag(buildHyperLinkTag(escapeHTMLEntities(msg))));
             break;
 
         case System:
             // Get today's date
             Date date = new Date();
             Format formatter = new SimpleDateFormat("h:mm:ss a");
-            stringBuffer.append("<span style=\"color:#");
-            stringBuffer.append(Utils.toCSSHTML(MainFrame.getInstance().getJStockOptions().getChatSystemMessageColor()));
-            stringBuffer.append(";font-weight: bold\">");
-            stringBuffer.append('(');
-            stringBuffer.append(formatter.format(date));
-            stringBuffer.append(") ");
-            stringBuffer.append(buildEmotionalTag(buildHyperLinkTag(escapeHTMLEntities(msg))));
-            stringBuffer.append("</span>");
+            stringBuilder.append("<span style=\"color:#");
+            stringBuilder.append(Utils.toCSSHTML(MainFrame.getInstance().getJStockOptions().getChatSystemMessageColor()));
+            stringBuilder.append(";font-weight: bold\">");
+            stringBuilder.append('(');
+            stringBuilder.append(formatter.format(date));
+            stringBuilder.append(") ");
+            stringBuilder.append(buildEmotionalTag(buildHyperLinkTag(escapeHTMLEntities(msg))));
+            stringBuilder.append("</span>");
             break;
         }
 
-        stringBuffer.append("</p>");
+        stringBuilder.append("</p>");
 
-        return stringBuffer.toString();
+        return stringBuilder.toString();
     }
 
     private static String toCSSHTML(Color color) {
