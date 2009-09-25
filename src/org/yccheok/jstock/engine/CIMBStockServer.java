@@ -66,8 +66,8 @@ public class CIMBStockServer extends Subject<CIMBStockServer, Integer> implement
             index++;
 
             if (currentThread.isInterrupted()) {
-				throw new StockNotFoundException("Thread has been interrupted");
-			}
+                throw new StockNotFoundException("Thread has been interrupted");
+            }
         
             final String request = server + "rtQuote.dll?GetStockGeneral&Key=" + _symbol;
             
