@@ -172,7 +172,7 @@ public class YahooStockHistoryServer implements StockHistoryServer {
     
     private void buildHistory(Code code) throws StockHistoryNotFoundException
     {
-        final StringBuffer stringBuffer = new StringBuffer(YAHOO_ICHART_BASED_URL);
+        final StringBuilder stringBuilder = new StringBuilder(YAHOO_ICHART_BASED_URL);
 
         final String symbol;
         try {
@@ -181,7 +181,7 @@ public class YahooStockHistoryServer implements StockHistoryServer {
             throw new StockHistoryNotFoundException("code.toString()=" + code.toString(), ex);
         } 
         
-        stringBuffer.append(symbol);
+        stringBuilder.append(symbol);
             
         final int endMonth = duration.getEndDate().getMonth();
         final int endDate = duration.getEndDate().getDate();
@@ -190,10 +190,10 @@ public class YahooStockHistoryServer implements StockHistoryServer {
         final int startDate = duration.getStartDate().getDate();
         final int startYear = duration.getStartDate().getYear();
 
-        StringBuffer formatBuffer = new StringBuffer("&d=");
-        formatBuffer.append(endMonth).append("&e=").append(endDate).append("&f=").append(endYear).append("&g=d&a=").append(startMonth).append("&b=").append(startDate).append("&c=").append(startYear).append("&ignore=.csv");
+        final StringBuilder formatBuilder = new StringBuilder("&d=");
+        formatBuilder.append(endMonth).append("&e=").append(endDate).append("&f=").append(endYear).append("&g=d&a=").append(startMonth).append("&b=").append(startDate).append("&c=").append(startYear).append("&ignore=.csv");
         
-        final String location = stringBuffer.append(formatBuffer).toString();
+        final String location = stringBuilder.append(formatBuilder).toString();
 
         boolean success = false;
             
