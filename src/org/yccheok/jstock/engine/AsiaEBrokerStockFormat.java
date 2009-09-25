@@ -78,7 +78,7 @@ public class AsiaEBrokerStockFormat implements StockFormat {
 
                 java.math.BigDecimal _prevPrice = new java.math.BigDecimal("" + prevPrice);
                 java.math.BigDecimal _lastPrice = new java.math.BigDecimal("" + lastPrice);
-                java.math.BigDecimal _changePrice = _lastPrice.subtract(_prevPrice);
+                java.math.BigDecimal _changePrice = (_lastPrice.compareTo(BigDecimal.ZERO) == 1) ? _lastPrice.subtract(_prevPrice) : BigDecimal.ZERO;
                 final double changePrice = _changePrice.round(new MathContext(2)).doubleValue();
                 BigDecimal _changePricePercentage = (_prevPrice.compareTo(BigDecimal.ZERO) == 1) ? (_changePrice.multiply(new BigDecimal(100.0)).divide(_prevPrice, BigDecimal.ROUND_HALF_UP)) : BigDecimal.ZERO;
                 final double changePricePercentage = _changePricePercentage.round(new MathContext(2)).doubleValue();
