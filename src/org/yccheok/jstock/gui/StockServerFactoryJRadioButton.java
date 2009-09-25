@@ -27,6 +27,7 @@ import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.StockNotFoundException;
 import org.yccheok.jstock.engine.StockServerFactory;
+import org.yccheok.jstock.internationalization.GUIBundle;
 
 /**
  *
@@ -44,13 +45,16 @@ public class StockServerFactoryJRadioButton extends JRadioButton {
     public static String toReadableText(StockServerFactory stockServerFactory) {
         Class c = stockServerFactory.getClass();
         if (c == org.yccheok.jstock.engine.CIMBStockServerFactory.class) {
-            return "Local Bank Stock Server";
+            return GUIBundle.getString("StockServerFactoryJRadioButton_CIMBStockServerFactory");
         }
         else if (c == org.yccheok.jstock.engine.SingaporeYahooStockServerFactory.class) {
-            return "Singapore Yahoo Stock Server";
+            return GUIBundle.getString("StockServerFactoryJRadioButton_SingaporeYahooStockServerFactory");
         }
         else if (c == org.yccheok.jstock.engine.YahooStockServerFactory.class) {
-            return "Yahoo Stock Server";
+            return GUIBundle.getString("StockServerFactoryJRadioButton_YahooStockServerFactory");
+        }
+        else if (c == org.yccheok.jstock.engine.AsiaEBrokerStockServerFactory.class) {
+            return GUIBundle.getString("StockServerFactoryJRadioButton_AsiaEBrokerStockServerFactory");
         }
         return c.getSimpleName();
     }
