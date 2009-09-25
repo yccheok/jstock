@@ -32,6 +32,26 @@ import org.apache.commons.logging.LogFactory;
  * @author yccheok
  */
 public class AsiaEBrokerStockFormat implements StockFormat {
+    private static int toIntegerOr0(String i) {
+        try {
+            return Integer.parseInt(i);
+        }
+        catch (NumberFormatException exp) {
+            log.error(null, exp);
+        }
+        return 0;
+    }
+
+    private static double toDoubleOr0(String d) {
+        try {
+            return Double.parseDouble(d);
+        }
+        catch (NumberFormatException exp) {
+            log.error(null, exp);
+        }
+        return 0.0;
+    }
+
     @Override
     public java.util.List<Stock> parse(String source) {
         List<Stock> stocks = new ArrayList<Stock>();
@@ -40,7 +60,8 @@ public class AsiaEBrokerStockFormat implements StockFormat {
         java.util.Calendar calendar = null;
         for (String token : tokens) {
             String[] token_elements = token.split(",");
-            if (token_elements.length <= MAX_TOKEN_INDEX) {
+            final int token_length = token_elements.length;
+            if (token_length <= MAX_TOKEN_INDEX) {
                 continue;
             }
             try {
@@ -49,11 +70,11 @@ public class AsiaEBrokerStockFormat implements StockFormat {
                 final String name = symbol.toString();
                 final Stock.Board board = Stock.Board.Unknown;
                 final Stock.Industry industry = Stock.Industry.Unknown;
-                final double prevPrice = Double.parseDouble(token_elements[PREV_PRICE_TOKEN_INDEX]);
-                final double lastPrice = Double.parseDouble(token_elements[LAST_PRICE_TOKEN_INDEX]);
-                final double highPrice = Double.parseDouble(token_elements[HIGH_PRICE_TOKEN_INDEX]);
-                final double lowPrice = Double.parseDouble(token_elements[LOW_PRICE_TOKEN_INDEX]);
-                final int volume = Integer.parseInt(token_elements[VOLUME_TOKEN_INDEX]);
+                final double prevPrice = token_length > PREV_PRICE_TOKEN_INDEX ? toDoubleOr0(token_elements[PREV_PRICE_TOKEN_INDEX]) : 0.0;
+                final double lastPrice = token_length > LAST_PRICE_TOKEN_INDEX ? toDoubleOr0(token_elements[LAST_PRICE_TOKEN_INDEX]) : 0.0;
+                final double highPrice = token_length > HIGH_PRICE_TOKEN_INDEX ? toDoubleOr0(token_elements[HIGH_PRICE_TOKEN_INDEX]) : 0.0;
+                final double lowPrice = token_length > LOW_PRICE_TOKEN_INDEX ? toDoubleOr0(token_elements[LOW_PRICE_TOKEN_INDEX]) : 0.0;
+                final int volume = token_length > VOLUME_TOKEN_INDEX ? toIntegerOr0(token_elements[VOLUME_TOKEN_INDEX])/100 : 0;
 
                 java.math.BigDecimal _prevPrice = new java.math.BigDecimal("" + prevPrice);
                 java.math.BigDecimal _lastPrice = new java.math.BigDecimal("" + lastPrice);
@@ -62,19 +83,19 @@ public class AsiaEBrokerStockFormat implements StockFormat {
                 BigDecimal _changePricePercentage = (_prevPrice.compareTo(BigDecimal.ZERO) == 1) ? (_changePrice.multiply(new BigDecimal(100.0)).divide(_prevPrice, BigDecimal.ROUND_HALF_UP)) : BigDecimal.ZERO;
                 final double changePricePercentage = _changePricePercentage.round(new MathContext(2)).doubleValue();
 
-                final int lastVolume = Integer.parseInt(token_elements[LAST_VOLUME_TOKEN_INDEX]);
-                final double buyPrice = Double.parseDouble(token_elements[BUY_PRICE_TOKEN_INDEX]);
-                final int buyQuantity = Integer.parseInt(token_elements[BUY_QUANTITY_TOKEN_INDEX]);
-                double sellPrice = Double.parseDouble(token_elements[SELL_PRICE_TOKEN_INDEX]);
-                int sellQuantity = Integer.parseInt(token_elements[SELL_QUANTITY_TOKEN_INDEX]);
-                double secondBuyPrice = Double.parseDouble(token_elements[SECOND_BUY_PRICE_TOKEN_INDEX]);
-                int secondBuyQuantity = Integer.parseInt(token_elements[SECOND_BUY_QUANTITY_TOKEN_INDEX]);
-                double secondSellPrice = Double.parseDouble(token_elements[SECOND_SELL_PRICE_TOKEN_INDEX]);
-                int secondSellQuantity = Integer.parseInt(token_elements[SECOND_SELL_QUANTITY_TOKEN_INDEX]);
-                double thirdBuyPrice = Double.parseDouble(token_elements[THIRD_BUY_PRICE_TOKEN_INDEX]);
-                int thirdBuyQuantity = Integer.parseInt(token_elements[THIRD_BUY_QUANTITY_TOKEN_INDEX]);
-                double thirdSellPrice = Double.parseDouble(token_elements[THIRD_SELL_PRICE_TOKEN_INDEX]);
-                int thirdSellQuantity = Integer.parseInt(token_elements[THIRD_SELL_QUANTITY_TOKEN_INDEX]);
+                final int lastVolume = token_length > LAST_VOLUME_TOKEN_INDEX ? toIntegerOr0(token_elements[LAST_VOLUME_TOKEN_INDEX])/100 : 0;
+                final double buyPrice = token_length > BUY_PRICE_TOKEN_INDEX ? toDoubleOr0(token_elements[BUY_PRICE_TOKEN_INDEX]) : 0.0;
+                final int buyQuantity = token_length > BUY_QUANTITY_TOKEN_INDEX ? toIntegerOr0(token_elements[BUY_QUANTITY_TOKEN_INDEX])/100 : 0;
+                final double sellPrice = token_length > SELL_PRICE_TOKEN_INDEX ? toDoubleOr0(token_elements[SELL_PRICE_TOKEN_INDEX]) : 0.0;
+                final int sellQuantity = token_length > SELL_QUANTITY_TOKEN_INDEX ? toIntegerOr0(token_elements[SELL_QUANTITY_TOKEN_INDEX])/100 : 0;
+                final double secondBuyPrice = token_length > SECOND_BUY_PRICE_TOKEN_INDEX ? toDoubleOr0(token_elements[SECOND_BUY_PRICE_TOKEN_INDEX]) : 0.0;
+                final int secondBuyQuantity = token_length > SECOND_BUY_QUANTITY_TOKEN_INDEX ? toIntegerOr0(token_elements[SECOND_BUY_QUANTITY_TOKEN_INDEX])/100 : 0;
+                final double secondSellPrice = token_length > SECOND_SELL_PRICE_TOKEN_INDEX ? toDoubleOr0(token_elements[SECOND_SELL_PRICE_TOKEN_INDEX]) : 0.0;
+                final int secondSellQuantity = token_length > SECOND_SELL_QUANTITY_TOKEN_INDEX ? toIntegerOr0(token_elements[SECOND_SELL_QUANTITY_TOKEN_INDEX])/100 : 0;
+                final double thirdBuyPrice = token_length > THIRD_BUY_PRICE_TOKEN_INDEX ? toDoubleOr0(token_elements[THIRD_BUY_PRICE_TOKEN_INDEX]) : 0.0;
+                final int thirdBuyQuantity = token_length > THIRD_BUY_QUANTITY_TOKEN_INDEX ? toIntegerOr0(token_elements[THIRD_BUY_QUANTITY_TOKEN_INDEX])/100 : 0;
+                final double thirdSellPrice = token_length > THIRD_SELL_PRICE_TOKEN_INDEX ? toDoubleOr0(token_elements[THIRD_SELL_PRICE_TOKEN_INDEX]) : 0.0;
+                final int thirdSellQuantity = token_length > THIRD_SELL_QUANTITY_TOKEN_INDEX ? toIntegerOr0(token_elements[THIRD_SELL_QUANTITY_TOKEN_INDEX])/100 : 0;
 
                 if (calendar == null) {
                     calendar = Calendar.getInstance();
@@ -128,8 +149,8 @@ public class AsiaEBrokerStockFormat implements StockFormat {
     private static final int CODE_TOKEN_INDEX = 0;
     private static final int SYMBOL_TOKEN_INDEX = 1;
     private static final int PREV_PRICE_TOKEN_INDEX = 2;
-    private static final int BUY_PRICE_TOKEN_INDEX = 3;
-    private static final int BUY_QUANTITY_TOKEN_INDEX = 4;
+    private static final int BUY_QUANTITY_TOKEN_INDEX = 3;
+    private static final int BUY_PRICE_TOKEN_INDEX = 4;
     private static final int SELL_PRICE_TOKEN_INDEX = 5;
     private static final int SELL_QUANTITY_TOKEN_INDEX = 6;
     private static final int LAST_PRICE_TOKEN_INDEX = 7;
@@ -153,8 +174,14 @@ public class AsiaEBrokerStockFormat implements StockFormat {
     private static final int THIRD_SELL_QUANTITY_TOKEN_INDEX = 25;
     private static final int FOURTH_SELL_QUANTITY_TOKEN_INDEX = 26;
     private static final int FIFTH_SELL_QUANTITY_TOKEN_INDEX = 27;
+
+    // Most of the time, here is the correct format :
+    // 0097.KL,VITROX.KL,0.450,5000,0.45,0.5,20000,0.485,10000,30000,0.485,0.475,0.43,0.4,0.35,0.28,0,0,0,0,10000,15000,9900,5000,0,0,0,0
+    // Sometimes, we will get this format :
+    // 0090.KL,ELSOFT.KL,0.465,20000,0.455,0.6,10000,0.000,0,0,0.000,0.000,0.45,0,0,,0.635,0.66,0.69,,23000,0,0,,20000,20000,20000,
     // Must be the largest value of all index.
-    private static final int MAX_TOKEN_INDEX = 27;
+    //private static final int MAX_TOKEN_INDEX = 27;
+    private static final int MAX_TOKEN_INDEX = Math.max(CODE_TOKEN_INDEX, SYMBOL_TOKEN_INDEX);
 
     private static final Log log = LogFactory.getLog(AsiaEBrokerStockFormat.class);
 }
