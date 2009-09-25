@@ -1377,7 +1377,7 @@ public class MainFrame extends javax.swing.JFrame {
     private void  createIconsAndToolTipTextForJTabbedPane() {
         this.jTabbedPane1.setIconAt(0, this.getImageIcon("/images/16x16/strokedocker.png"));
         this.jTabbedPane1.setIconAt(1, this.getImageIcon("/images/16x16/color_line.png"));
-        this.jTabbedPane1.setIconAt(2, this.getImageIcon("/images/16x16/bell.png"));
+        this.jTabbedPane1.setIconAt(2, this.getImageIcon("/images/16x16/find.png"));
         this.jTabbedPane1.setIconAt(3, this.getImageIcon("/images/16x16/calc.png"));
         this.jTabbedPane1.setIconAt(4, this.getImageIcon("/images/16x16/smile.png"));
         this.jTabbedPane1.setToolTipTextAt(0, "Watch your favorite stock movement in real time");
@@ -3190,72 +3190,42 @@ public class MainFrame extends javax.swing.JFrame {
 
         @Override
         protected Void doInBackground() {
-            boolean firstRound = true;
-
             while(!isCancelled())
             {
-                if(firstRound)
-                {
-                    firstRound = !firstRound;
-
-                    try {
-                        Thread.sleep(SHORT_DELAY);
-                    } catch (InterruptedException ex) {
-                        log.info(null, ex);
-                        break;
-                    }
-                }
-                else
-                {
-                    // Currently, to avoid from letting user having a spam feeling
-                    // on our software, we will not display update information more
-                    // than one time for every program startup.
-                    //
-                    // However, we may display more than one time for every startup
-                    // if user choose to disable-> enable back the auto update option.
-                    //
+                try {
+                    Thread.sleep(SHORT_DELAY);
+                } catch (InterruptedException ex) {
+                    log.info(null, ex);
                     break;
-                    /*
-                    try {
-                        Thread.sleep(DELAY);
-                    } catch (InterruptedException ex) {
-                        log.info(null, ex);
-                        break;
-                    }
-                    */
                 }
-
-                final long newsVersion = jStockOptions.getNewsVersion();
-                final String location = Utils.getLatestNewsLocation(newsVersion);
-
+                final java.util.Map<String, String> map = Utils.getUUIDValue(org.yccheok.jstock.engine.Utils.getJStockStaticServer() + "news_information/index.txt");
+                final String newsID = MainFrame.this.getJStockOptions().getNewsID();
+                if (newsID.equals(map.get("news_id"))) {
+                    // Seen before. Quit.
+                    break;
+                }
+                final String location = map.get("news_url");
+                if (location == null) {
+                    break;
+                }
                 doneSignal = new CountDownLatch(1);
-
                 final String respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(location);
-
-                // If we fail to obtain any update, do not give up. Probably
-                // the author is going to update the latest news soon. Sleep for
-                // a while, and try again.
                 if (respond == null)
                 {                    
-                    continue;
+                    break;
                 }
-
                 if (respond.indexOf(Utils.getJStockUUID()) < 0)
                 {
-                    continue;
+                    break;
                 }
-
                 publish(respond);
-
                 try {
                     doneSignal.await();
                 } catch (InterruptedException ex) {
                     log.info(null, ex);
                     break;
                 }
-
-                // Try on next latest news.
-                jStockOptions.setNewsVersion(newsVersion + 1);
+                jStockOptions.setNewsID(map.get("news_id"));
             }
 
             return null;
