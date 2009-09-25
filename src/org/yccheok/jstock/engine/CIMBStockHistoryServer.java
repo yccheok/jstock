@@ -70,7 +70,7 @@ public class CIMBStockHistoryServer implements StockHistoryServer {
             }
             
             final String request = server + "java/jar/data/" + encodedCode + ".dat.gz";
-            StringBuffer s = new StringBuffer(data.length);
+            final StringBuilder s = new StringBuilder(data.length);
 
             final org.yccheok.jstock.gui.Utils.InputStreamAndMethod inputStreamAndMethod = org.yccheok.jstock.gui.Utils.getResponseBodyAsStreamBasedOnProxyAuthOption(request);
             if (inputStreamAndMethod.inputStream == null) {

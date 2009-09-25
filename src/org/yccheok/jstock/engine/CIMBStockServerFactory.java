@@ -61,6 +61,7 @@ public class CIMBStockServerFactory implements StockServerFactory {
         }
     }
     
+    @Override
     public MarketServer getMarketServer() {
         return marketServer;
     }

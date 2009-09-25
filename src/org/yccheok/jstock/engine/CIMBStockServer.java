@@ -126,15 +126,15 @@ public class CIMBStockServer extends Subject<CIMBStockServer, Integer> implement
         initServers();
 
         String _codes;
-        StringBuffer _codesBuffer = new StringBuffer();        
+        final StringBuilder _codesBuilder = new StringBuilder();
         
         for (Code code : codes) {
             final Code newCode = Utils.toCIMBFormat(code, Country.Malaysia);
-            _codesBuffer.append(newCode);
-            _codesBuffer.append("|");
+            _codesBuilder.append(newCode);
+            _codesBuilder.append("|");
         }
         
-        _codes = _codesBuffer.toString();
+        _codes = _codesBuilder.toString();
         
         try {
             _codes = java.net.URLEncoder.encode(_codes, "UTF-8");
