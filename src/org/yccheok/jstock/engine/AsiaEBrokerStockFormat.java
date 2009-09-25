@@ -66,7 +66,11 @@ public class AsiaEBrokerStockFormat implements StockFormat {
             }
             try {
                 final Code code = Code.newInstance(token_elements[CODE_TOKEN_INDEX].trim());
-                final Symbol symbol = Symbol.newInstance(token_elements[SYMBOL_TOKEN_INDEX].trim());
+                String _symbol = token_elements[SYMBOL_TOKEN_INDEX].trim();
+                if (_symbol.endsWith(".KL") && _symbol.length() > ".KL".length()) {
+                    _symbol = _symbol.substring(0, _symbol.length() - 3);
+                }
+                final Symbol symbol = Symbol.newInstance(_symbol);
                 final String name = symbol.toString();
                 final Stock.Board board = Stock.Board.Unknown;
                 final Stock.Industry industry = Stock.Industry.Unknown;
