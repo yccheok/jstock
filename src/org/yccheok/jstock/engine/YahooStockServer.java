@@ -51,7 +51,7 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
     
     @Override
     public Stock getStock(Symbol symbol) throws StockNotFoundException {
-        final StringBuffer stringBuffer = new StringBuffer(YAHOO_CSV_BASED_URL);
+        final StringBuilder stringBuilder = new StringBuilder(YAHOO_CSV_BASED_URL);
 
         final String _symbol;
         try {
@@ -60,9 +60,9 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
             throw new StockNotFoundException("symbol.toString()=" + symbol.toString(), ex);
         } 
         
-        stringBuffer.append(_symbol).append(YAHOO_STOCK_FORMAT);
+        stringBuilder.append(_symbol).append(YAHOO_STOCK_FORMAT);
         
-        final String location = stringBuffer.toString();
+        final String location = stringBuilder.toString();
 
         for (int retry = 0; retry < NUM_OF_RETRY; retry++) {
             final String respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(location);
@@ -107,8 +107,8 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
             final int start = i * MAX_STOCK_PER_ITERATION;
             final int end = start + MAX_STOCK_PER_ITERATION;
             
-            final StringBuffer stringBuffer = new StringBuffer(YAHOO_CSV_BASED_URL);
-            final StringBuffer symbolBuffer = new StringBuffer();
+            final StringBuilder stringBuilder = new StringBuilder(YAHOO_CSV_BASED_URL);
+            final StringBuilder symbolBuilder = new StringBuilder();
             final List<Symbol> expectedSymbols = new ArrayList<Symbol>();
             
             final int endLoop = end - 1;
@@ -121,7 +121,7 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
                     throw new StockNotFoundException("", ex);
                 }
                 
-                symbolBuffer.append(symbolString).append("+");
+                symbolBuilder.append(symbolString).append("+");
                 expectedSymbols.add(symbols.get(j));
             }
             
@@ -133,14 +133,14 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
                 throw new StockNotFoundException("", ex);
             }
                 
-            symbolBuffer.append(symbolString);
+            symbolBuilder.append(symbolString);
             expectedSymbols.add(symbols.get(end - 1));
             
-            final String _symbol = symbolBuffer.toString();
+            final String _symbol = symbolBuilder.toString();
         
-            stringBuffer.append(_symbol).append(YAHOO_STOCK_FORMAT);
+            stringBuilder.append(_symbol).append(YAHOO_STOCK_FORMAT);
             
-            final String location = stringBuffer.toString();
+            final String location = stringBuilder.toString();
 
             boolean success = false;
             
@@ -198,8 +198,8 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
         final int start = symbols.size() - remainder;        
         final int end = start + remainder;
         
-        final StringBuffer stringBuffer = new StringBuffer(YAHOO_CSV_BASED_URL);
-        final StringBuffer symbolBuffer = new StringBuffer();
+        final StringBuilder stringBuilder = new StringBuilder(YAHOO_CSV_BASED_URL);
+        final StringBuilder symbolBuilder = new StringBuilder();
         final List<Symbol> expectedSymbols = new ArrayList<Symbol>();
         
         final int endLoop = end - 1;
@@ -212,7 +212,7 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
                 throw new StockNotFoundException("", ex);
             }
                 
-            symbolBuffer.append(symbolString).append("+");
+            symbolBuilder.append(symbolString).append("+");
             expectedSymbols.add(symbols.get(i));
         }
         
@@ -224,14 +224,14 @@ public class YahooStockServer extends Subject<YahooStockServer, Integer> impleme
             throw new StockNotFoundException("", ex);
         }
             
-        symbolBuffer.append(symbolString);
+        symbolBuilder.append(symbolString);
         expectedSymbols.add(symbols.get(end-1));                
         
-        final String _symbol = symbolBuffer.toString();
+        final String _symbol = symbolBuilder.toString();
             
-        stringBuffer.append(_symbol).append(YAHOO_STOCK_FORMAT);
+        stringBuilder.append(_symbol).append(YAHOO_STOCK_FORMAT);
                     
-        final String location = stringBuffer.toString();
+        final String location = stringBuilder.toString();
 
         for (int retry = 0; retry < NUM_OF_RETRY; retry++) {
             final String respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(location);
