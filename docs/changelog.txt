@@ -1,8 +1,21 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.5 - 2009-10-22
+  Feature: Added SMA, EMA, RSI, CCI on history charting. Please note that this 
+           feature request ticket shall not be closed yet. As this is an ongoing
+           long term task. (#2602842)
+  Feature: Let user able to view last update news. (#2876930)
+  Feature: Auto download and install indicators from web. (#2880375)
+  Feature: Improve Buy Portolio Dialog Box usability case for
+           https://sourceforge.net/projects/jstock/forums/forum/723855/topic/3337603
+  Feature: Improvement on multiple portfolios. Double click will active selected
+           portfolio.
+  Bugfix:  Real-Time Info page is not updated when user not viewing it. 
+           (#2876894)
+
 JStock 1.0.4j - 2009-09-26
-  Feature: Multiple portfolios (#2694145)
+  Feature: Multiple portfolios. (#2694145)
   Feature: Able to save/load Portfolio in Excel/CSV format. Able to save 
            Indicator scan result in Excel/CSV format. (#2797840). Patched by 
            gransi.
