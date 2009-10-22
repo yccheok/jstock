@@ -201,7 +201,7 @@
                         <para>Real time stock information.</para><para></para>
                         <para>
                             This represents today real time stock information.
-                            You may choose Open Price, Last Price, High Price, Low Price, Volume, Change Price,
+                            You may choose Open Price, Last Price, High Price, Low Price, Typical Price ([High + Low + Last Price] / 3), Volume, Change Price, 
                             Change Price in Percentage, Last Volume, 1st/2nd/3rd Buy Price, 1st/2nd/3rd Buy Quantity, 1st/2nd/3rd Sell Price, 
                             1st/2nd/3rd Sell Quantity.                            
                         </para>
@@ -220,7 +220,7 @@
                         <para>
                             You may specific the stock history information in specific date. 
                             For example, you may specific average stock last price information from 14th June 2005 to 16th December 2006.
-                            You may either choose Maximum, Minimum or Average. You may also choose Open Price, Last Price, High Price, Low Price,
+                            You may either choose Maximum, Minimum, Average (Simple Moving Average), Mean Deviation, RSI (Relative Strength Index), EMA (Exponential Moving Average). You may also choose Open Price, Last Price, High Price, Low Price, Typical Price ([High + Low + Last Price] / 3),
                             and Volume.
                         </para>
                     </entry>
@@ -238,7 +238,7 @@
                         <para>
                             You may specific the stock relative history information in specific date. 
                             For example, you may specific average stock last 14 days price information.
-                            You may either choose Maximum, Minimum or Average. You may also choose Open Price, Last Price, High Price, Low Price,
+                            You may either choose Maximum, Minimum, Average (Simple Moving Average), Mean Deviation, RSI (Relative Strength Index), EMA (Exponential Moving Average). You may also choose Open Price, Last Price, High Price, Low Price, Typical Price ([High + Low + Last Price] / 3),
                             and Volume.
                         </para>
                     </entry>
@@ -382,6 +382,39 @@
             
         </section>
     
+        <section>
+            <title>Installing pre-built indicators</title>
+            <para>Tired of building your own indicators? Use JStock pre-built indicators.</para>
+            <para>
+                Click on the Install button in Stock Indicator Editor.
+                <mediaobject>
+                    <imageobject><imagedata fileref="install-indicators-step1.png" format="PNG"/></imageobject>
+                    <textobject><phrase>Installing Indicators Step 1</phrase></textobject>
+                </mediaobject>                                                
+            </para>	
+			<para>
+                Select Install from JStock server. Then click Next.
+                <mediaobject>
+                    <imageobject><imagedata fileref="install-indicators-step2.png" format="PNG"/></imageobject>
+                    <textobject><phrase>Installing Indicators Step 2</phrase></textobject>
+                </mediaobject>                                                
+            </para>	
+			<para>
+                Choose your desired indicators. Then click Next.
+                <mediaobject>
+                    <imageobject><imagedata fileref="install-indicators-step3.png" format="PNG"/></imageobject>
+                    <textobject><phrase>Installing Indicators Step 3</phrase></textobject>
+                </mediaobject>                                                
+            </para>
+			<para>
+                Finish! :)
+                <mediaobject>
+                    <imageobject><imagedata fileref="install-indicators-step4.png" format="PNG"/></imageobject>
+                    <textobject><phrase>Installing Indicators Step 4</phrase></textobject>
+                </mediaobject>                                                
+            </para>			
+		</section>
+		
     </chapter>
     
     <chapter>
