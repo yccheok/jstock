@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * Copyright (C) 2007 Cheok YanCheng <yccheok@yahoo.com>
+ * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
  */
 
 package org.yccheok.jstock.analysis;
@@ -26,7 +26,7 @@ package org.yccheok.jstock.analysis;
  *
  * @author yccheok
  */
-public abstract class AbstractOperator extends AbstractBean implements Operator, org.jhotdraw.xml.DOMStorable {
+public abstract class AbstractOperator extends AbstractBean implements Operator {
     
     /** Creates a new instance of AbstactOperand */
     public AbstractOperator() {
@@ -37,13 +37,13 @@ public abstract class AbstractOperator extends AbstractBean implements Operator,
         outputConnectionSize = 0;
         inputConnectionSize = 0;
         
-        for(int i = 0; i < getNumOfOutputConnector(); i++) {
-            outputs[i] = new Connector(this);
+        for (int i = 0; i < getNumOfOutputConnector(); i++) {
+            outputs[i] = new Connector(this, i);
             outputConnections[i] = null;
         }
 
-        for(int i = 0; i < getNumOfInputConnector(); i++) {
-            inputs[i] = new Connector(this);
+        for (int i = 0; i < getNumOfInputConnector(); i++) {
+            inputs[i] = new Connector(this, i);
             // We will be interested in all the input event.
             inputs[i].addConnectorValueChangeListener(this);
             inputConnections[i] = null;
@@ -52,9 +52,10 @@ public abstract class AbstractOperator extends AbstractBean implements Operator,
         loopbackflag = false;
     }
     
+    @Override
     public void connectorValueChange(ConnectorEvent evt)
     {
-        if(isInputReady() == false) {
+        if (isInputReady() == false) {
             // The input is not valid. Update the output to relect on this fact.
             for(Connector output : outputs) {
                 Object old = output.getValue();
@@ -70,25 +71,29 @@ public abstract class AbstractOperator extends AbstractBean implements Operator,
         
         // All the inputs are valid. Perform calculation and forward the result
         // to output.
-        for(Connector output : outputs) {
+        for (Connector output : outputs) {
             Object old = output.getValue();
             output.setValue(newValue);
             
-            if(Utils.equals(old, output.getValue()) == false) {
+            if (Utils.equals(old, output.getValue()) == false) {
                 this.firePropertyChange("value", old, output.getValue());
             }
         }
     }
     
+    @Override
     public int getNumOfOutputConnector() { return 1; }
+    @Override
     public int getNumOfOutputConnection() { return outputConnectionSize; }
+    @Override
     public int getNumOfInputConnection() { return inputConnectionSize; }
     
+    @Override
     public boolean addInputConnection(Connection connection, int index) {
-        if(index >= inputConnections.length)
+        if (index >= inputConnections.length)
             return false;
         
-        if(inputConnections[index] != null)
+        if (inputConnections[index] != null)
             return false;
         
         inputConnections[index] = connection;
@@ -100,6 +105,7 @@ public abstract class AbstractOperator extends AbstractBean implements Operator,
         return true;
     }
     
+    @Override
     public boolean removeInputConnection(int index) {
         inputConnections[index].setOutputConnector(null);
         inputConnections[index] = null;
@@ -108,6 +114,7 @@ public abstract class AbstractOperator extends AbstractBean implements Operator,
         return true;
     }
     
+    @Override
     public boolean removeOutputConnection(int index) {
         outputConnections[index].setInputConnector(null);
         outputConnections[index] = null;
@@ -117,6 +124,7 @@ public abstract class AbstractOperator extends AbstractBean implements Operator,
         return true;        
     }
     
+    @Override
     public boolean removeInputConnection(Connection connection) {
         final int length = inputConnections.length;
         
@@ -129,6 +137,7 @@ public abstract class AbstractOperator extends AbstractBean implements Operator,
         return false;
     }
     
+    @Override
     public boolean addOutputConnection(Connection connection, int index)
     {
         if(index >= outputConnections.length)
@@ -155,7 +164,7 @@ public abstract class AbstractOperator extends AbstractBean implements Operator,
         final int length = outputConnections.length;
         
         for(int i = 0; i < length; i++) {
-            if(outputConnections[i] == connection) {
+            if (outputConnections[i] == connection) {
                 return removeOutputConnection(i);
             }
         }
@@ -164,13 +173,14 @@ public abstract class AbstractOperator extends AbstractBean implements Operator,
     }
     
     // Try to put value into input connectors.
+    @Override
     public boolean pull()
     {
         // Avoid loop back connection.
-        if(loopbackflag)
+        if (loopbackflag)
             return false;
         
-        if(inputs.length == 0) {
+        if (inputs.length == 0) {
             outputs[0].setValue(this.calculate());
             return true;
         }
@@ -180,7 +190,7 @@ public abstract class AbstractOperator extends AbstractBean implements Operator,
         boolean status = true;
         
         // First, ensure our input connectors are fill with value.
-        for(int i = 0; i < length; i++) {
+        for (int i = 0; i < length; i++) {
             // No connection. Nothing we can do. Just raise a false flag.
             if(inputConnections[i] == null)  {
                 status = false;
@@ -189,13 +199,13 @@ public abstract class AbstractOperator extends AbstractBean implements Operator,
             
             // We have connection. But no input connector source. Just raise a false
             // flag.
-            if(inputConnections[i].getInputConnector() == null) {
+            if (inputConnections[i].getInputConnector() == null) {
                 status = false;
                 break;              
             }
             
             loopbackflag = true;
-            if( inputConnections[i].getInputConnector().getOperator().pull() == false)
+            if (inputConnections[i].getInputConnector().getOperator().pull() == false)
             {
                 status = false;
                 break;
@@ -207,6 +217,7 @@ public abstract class AbstractOperator extends AbstractBean implements Operator,
         return status;
     }
     
+    @Override
     public void clear()
     {
         for(Connector input : inputs) {
@@ -226,63 +237,7 @@ public abstract class AbstractOperator extends AbstractBean implements Operator,
         return true;
     }
     
-
-    public void write(org.jhotdraw.xml.DOMOutput out) throws java.io.IOException {
-        out.openElement("outputs");
-        for(Connector c : outputs)
-            out.writeObject(c);
-        out.closeElement();        
-        
-        out.openElement("inputs");
-        for(Connector c : inputs)
-            out.writeObject(c);
-        out.closeElement();
-        
-        out.openElement("outputConnections");
-        for(Connection c : outputConnections)
-            out.writeObject(c);
-        out.closeElement();
-        
-        out.openElement("inputConnections");
-        for(Connection c : inputConnections)
-            out.writeObject(c);
-        out.closeElement();
-        
-        out.addAttribute("outputConnectionSize", outputConnectionSize);
-        out.addAttribute("inputConnectionSize", inputConnectionSize);
-        out.addAttribute("loopbackflag", loopbackflag);
-    }
-
-    public void read(org.jhotdraw.xml.DOMInput in) throws java.io.IOException {
-        in.openElement("outputs");
-        outputs = new Connector[in.getElementCount()];
-        for(int i = 0; i < outputs.length; i++)
-            outputs[i] = (Connector)in.readObject(i);
-        in.closeElement();        
-        
-        in.openElement("inputs");
-        inputs = new Connector[in.getElementCount()];
-        for(int i = 0; i < inputs.length; i++)
-            inputs[i] = (Connector)in.readObject(i);
-        in.closeElement();
-        
-        in.openElement("outputConnections");
-        outputConnections = new Connection[in.getElementCount()];
-        for(int i = 0; i < outputConnections.length; i++)
-            outputConnections[i] = (Connection)in.readObject(i);
-        in.closeElement();
-        
-        in.openElement("inputConnections");
-        inputConnections = new Connection[in.getElementCount()];
-        for(int i = 0; i < inputConnections.length; i++)
-            inputConnections[i] = (Connection)in.readObject(i);
-        in.closeElement();
-        
-        outputConnectionSize = in.getAttribute("outputConnectionSize", 0);
-        inputConnectionSize = in.getAttribute("inputConnectionSize", 0);
-        loopbackflag = in.getAttribute("loopbackflag", false);
-    }
-    
+    @Override
     public String toString() {
         final java.lang.StringBuilder builder = new StringBuilder();
         builder.append(this.getClass().getName() + " [ input = ");

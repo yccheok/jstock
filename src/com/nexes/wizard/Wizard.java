@@ -155,7 +155,29 @@ public class Wizard extends WindowAdapter implements PropertyChangeListener {
     public boolean isModal() {
         return wizardDialog.isModal();
     }
-    
+
+    /**
+     * Convienence method that displays a modal wizard dialog and blocks until the dialog
+     * has completed.
+     * @param width the width of the dialog, or -1 for using system default.
+     * @param height the height of the dialog, or -1 for using system default.
+     * @return Indicates how the dialog was closed. Compare this value against the RETURN_CODE
+     * constants at the beginning of the class.
+     */
+    public int showModalDialog(int width, int height) {
+        wizardDialog.setModal(true);
+        wizardDialog.pack();
+
+        // Workaround against problem in new version of swingx-0.9.2
+        wizardDialog.setSize(width < 0 ? wizardDialog.getWidth() : width, height < 0 ? wizardDialog.getHeight() : height);
+
+        // Cheok : Display location should be relative to the owner.
+        wizardDialog.setLocationRelativeTo(this.getOwner());
+        wizardDialog.setVisible(true);
+
+        return returnCode;
+    }
+
     /**
      * Convienence method that displays a modal wizard dialog and blocks until the dialog
      * has completed.
@@ -163,20 +185,13 @@ public class Wizard extends WindowAdapter implements PropertyChangeListener {
      * constants at the beginning of the class.
      */    
     public int showModalDialog() {
-        
-        wizardDialog.setModal(true);
-        wizardDialog.pack();
-        
-        // Workaround against problem in new version of swingx-0.9.2
-        wizardDialog.setSize(680, wizardDialog.getHeight());
-        
-        // Cheok : Display location should be relative to the owner.
-        wizardDialog.setLocationRelativeTo(this.getOwner());
-        wizardDialog.setVisible(true);
-        
-        return returnCode;
+        return showModalDialog(-1, -1);
     }
-    
+
+    public WizardController getController() {
+        return this.wizardController;
+    }
+
     /**
      * Returns the current model of the wizard dialog.
      * @return A WizardModel instance, which serves as the model for the wizard dialog.
@@ -332,6 +347,10 @@ public class Wizard extends WindowAdapter implements PropertyChangeListener {
      * @param code The return code.
      */    
     void close(int code) {
+        WizardPanelDescriptor oldPanelDescriptor = wizardModel.getCurrentPanelDescriptor();
+        if (oldPanelDescriptor != null)
+            oldPanelDescriptor.aboutToHidePanel();
+
         returnCode = code;
         wizardDialog.dispose();
     }
@@ -419,8 +438,9 @@ public class Wizard extends WindowAdapter implements PropertyChangeListener {
      * @param WindowEvent The event passed in from AWT.
      */ 
     
+    @Override
     public void windowClosing(WindowEvent e) {
-        returnCode = CANCEL_RETURN_CODE;
+        close(CANCEL_RETURN_CODE);
     }
     
     

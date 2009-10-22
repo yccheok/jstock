@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * Copyright (C) 2007 Cheok YanCheng <yccheok@yahoo.com>
+ * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
  */
 
 package org.yccheok.jstock.analysis;
@@ -33,6 +33,7 @@ import java.math.MathContext;
  * @author yccheok
  */
 public class ArithmeticOperator extends AbstractOperator {
+
     public enum Arithmetic
     {
         Addition,
@@ -47,6 +48,7 @@ public class ArithmeticOperator extends AbstractOperator {
         arithmetic = Arithmetic.Addition;
     }
         
+    @Override
     protected Object calculate()
     {
         Double result = null;
@@ -153,34 +155,28 @@ public class ArithmeticOperator extends AbstractOperator {
         
         if(old != this.arithmetic) {
             this.firePropertyChange("attribute", old, this.arithmetic);
-        }
-        
+        }        
     }
     
     public Arithmetic getArithmetic() {
         return arithmetic;
     }
     
+    @Override
     public int getNumOfInputConnector() {
         return 2;
     }
     
-    public void write(org.jhotdraw.xml.DOMOutput out) throws java.io.IOException {
-        super.write(out);
-        
-        out.openElement("Arithmetic");
-        out.writeObject(arithmetic);
-        out.closeElement();
+    @Override
+    public Class getInputClass(int index) {
+        return Double.class;
     }
 
-    public void read(org.jhotdraw.xml.DOMInput in) throws java.io.IOException {
-        super.read(in);
-        
-        in.openElement("Arithmetic");
-        arithmetic = (Arithmetic)in.readObject();
-        in.closeElement();
+    @Override
+    public Class getOutputClass(int index) {
+        return Double.class;
     }
-    
+
     private Arithmetic arithmetic;
     private static final Log log = LogFactory.getLog(ArithmeticOperator.class);    
 }
