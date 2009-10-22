@@ -39,7 +39,7 @@ sub init
 		}
 		chomp $line;
 
-		if ($line =~ /(.+)=(.+)/) {
+		if ($line =~ /([^=]+)=(.+)/) {
 			my $key = $1;
 			my $value = $2;
 			if ($hash->{$key}) {
@@ -81,6 +81,12 @@ sub process
 				print "WARNING : key '$key' not found ($name $line_number)\n";
 			}		
 		}
+        elsif ($line =~ /bundle\.getString\("([^"]+)"\)/) {
+            my $key = $1;
+			if (not $messages_bundle{$key} and not $gui_bundle{$key}) {
+				print "WARNING : key '$key' not found ($name $line_number)\n";
+			}            
+        }
 	}
 	close(FILE);
 	$process_counter++;
