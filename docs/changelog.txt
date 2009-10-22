@@ -1,6 +1,10 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.5a - 2009-10-23
+  Bugfix:  Bug fixed for CCI and RSI charting. Stock information will interrupt
+           with each others.
+           
 JStock 1.0.5 - 2009-10-22
   Feature: Added SMA, EMA, RSI, CCI on history charting. Please note that this 
            feature request ticket shall not be closed yet. As this is an ongoing
