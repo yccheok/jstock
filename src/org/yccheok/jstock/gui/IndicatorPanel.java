@@ -1673,12 +1673,6 @@ public class IndicatorPanel extends JPanel {
         }
     }
 
-    public void updatePrimaryStockServerFactory(java.util.List<StockServerFactory> stockServerFactories) {
-        if (stockHistoryMonitor != null) {
-            stockHistoryMonitor.setStockServerFactories(stockServerFactories);
-        }
-    }
-
     public void initStockHistoryMonitor(java.util.List<StockServerFactory> stockServerFactories) {
         if (stockHistoryMonitor != null) {
             final StockHistoryMonitor oldStockHistoryMonitor = stockHistoryMonitor;
