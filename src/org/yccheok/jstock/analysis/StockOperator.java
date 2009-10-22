@@ -17,11 +17,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * Copyright (C) 2007 Cheok YanCheng <yccheok@yahoo.com>
+ * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
  */
 
 package org.yccheok.jstock.analysis;
 
+import org.yccheok.jstock.charting.TechnicalAnalysis;
 import org.yccheok.jstock.engine.*;
 
 /**
@@ -37,6 +38,7 @@ public class StockOperator extends AbstractOperator {
         LastPrice,
         HighPrice,
         LowPrice,
+        TypicalPrice,
         Volume,
         ChangePrice,
         ChagePricePercentage,
@@ -100,7 +102,7 @@ public class StockOperator extends AbstractOperator {
     
     private Object getValue(Stock stock)
     {
-        if(stock == null) return null;
+        if (stock == null) return null;
         
         switch(type)
         {
@@ -114,6 +116,8 @@ public class StockOperator extends AbstractOperator {
                 return new Double(stock.getHighPrice());
             case LowPrice:
                 return new Double(stock.getLowPrice());
+            case TypicalPrice:
+                return new Double(TechnicalAnalysis.getTypicalPrice(stock));
             case Volume:
                 return new Integer(stock.getVolume());
             case ChangePrice:
@@ -151,6 +155,16 @@ public class StockOperator extends AbstractOperator {
         return null;
     }    
     
+    @Override
+    public Class getInputClass(int index) {
+        return null;
+    }
+
+    @Override
+    public Class getOutputClass(int index) {
+        return Double.class;
+    }
+
     private Stock stock;
     private Type type;
     private Object cache;

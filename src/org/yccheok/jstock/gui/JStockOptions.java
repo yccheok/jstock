@@ -84,7 +84,7 @@ public class JStockOptions {
         this.setAlertBackgroundColor(DEFAULT_ALERT_BACKGROUND_COLOR);
 
         this.setAutoUpdateNewsEnabled(true);
-		this.setNewsID("");
+        this.setNewsID("");
 
         this.setHistoryDuration(DEFAULT_HISTORY_DURATION);
 

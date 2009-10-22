@@ -18,13 +18,6 @@
 
 package org.yccheok.jstock.gui;
 
-import java.awt.Desktop;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import javax.swing.event.HyperlinkEvent;
-
 /**
  *
  * @author yccheok
@@ -103,53 +96,8 @@ public class AutoUpdateNewsJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jEditorPane1HyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {//GEN-FIRST:event_jEditorPane1HyperlinkUpdate
-        if (HyperlinkEvent.EventType.ACTIVATED.equals(evt.getEventType())) {
-            URL url = evt.getURL();
-
-            if(Desktop.isDesktopSupported())
-            {
-                Desktop desktop = Desktop.getDesktop();
-
-                if(desktop.isSupported(Desktop.Action.BROWSE))
-                {
-                    if (url == null) {
-						// www.yahoo.com considered an invalid URL. Hence, evt.getURL() returns null.
-                        String string = "http://" + evt.getDescription();
-                        try {
-                            url = new URL(string);
-                        } catch (MalformedURLException ex) {
-                            return;
-                        }
-                    }
-
-                    try {
-                        desktop.browse(url.toURI());
-                    }
-                    catch (URISyntaxException ex) {
-                    }
-                    catch (IOException ex) {
-                    }
-                }
-            }
-        }
+        Utils.launchWebBrowser(evt);
     }//GEN-LAST:event_jEditorPane1HyperlinkUpdate
-
-    /**
-    * @param args the command line arguments
-    */
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                AutoUpdateNewsJDialog dialog = new AutoUpdateNewsJDialog(new javax.swing.JFrame(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
-    }
 
     public void setNews(String news)
     {

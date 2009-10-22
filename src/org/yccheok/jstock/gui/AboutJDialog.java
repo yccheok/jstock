@@ -258,36 +258,7 @@ public class AboutJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jEditorPane1HyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {//GEN-FIRST:event_jEditorPane1HyperlinkUpdate
-        // TODO add your handling code here:
-        if (HyperlinkEvent.EventType.ACTIVATED.equals(evt.getEventType())) {
-            URL url = evt.getURL();
-
-            if(Desktop.isDesktopSupported())
-            {
-                Desktop desktop = Desktop.getDesktop();
-
-                if(desktop.isSupported(Desktop.Action.BROWSE))
-                {
-                    if (url == null) {
-						// www.yahoo.com considered an invalid URL. Hence, evt.getURL() returns null.
-                        String string = "http://" + evt.getDescription();
-                        try {
-                            url = new URL(string);
-                        } catch (MalformedURLException ex) {
-                            return;
-                        }
-                    }
-
-                    try {
-                        desktop.browse(url.toURI());
-                    }
-                    catch (URISyntaxException ex) {
-                    }
-                    catch (IOException ex) {
-                    }
-                }
-            }
-        }
+        Utils.launchWebBrowser(evt);
     }//GEN-LAST:event_jEditorPane1HyperlinkUpdate
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed

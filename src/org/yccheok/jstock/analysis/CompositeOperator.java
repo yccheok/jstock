@@ -1,8 +1,4 @@
 /*
- * LogicalOperatorFigure.java
- *
- * Created on May 26, 2007, 2:03 PM
- *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or (at
@@ -17,25 +13,35 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * Copyright (C) 2007 Cheok YanCheng <yccheok@yahoo.com>
+ * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
  */
 
-package org.yccheok.jstock.gui;
-
-import org.yccheok.jstock.analysis.*;
+package org.yccheok.jstock.analysis;
 
 /**
  *
  * @author yccheok
  */
-public class EqualityOperatorFigure extends OperatorFigure {
-    
-    /** Creates a new instance of StockOperatorFigure */
-    public EqualityOperatorFigure() {
-        super(new EqualityOperator());
-        this.setName("Equality");
-        this.setAttribute(((EqualityOperator)this.getOperator()).getEquality().toString());
-        this.setValue("");        
+public class CompositeOperator extends AbstractOperator {
+
+    @Override
+    protected Object calculate() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
-    
+
+    @Override
+    public int getNumOfInputConnector() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public Class getInputClass(int index) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public Class getOutputClass(int index) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
 }

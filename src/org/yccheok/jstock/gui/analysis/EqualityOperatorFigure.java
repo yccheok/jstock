@@ -1,7 +1,7 @@
 /*
- * StockHistoryOperatorFigure.java
+ * LogicalOperatorFigure.java
  *
- * Created on May 25, 2007, 10:12 PM
+ * Created on May 26, 2007, 2:03 PM
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,10 +17,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * Copyright (C) 2007 Cheok YanCheng <yccheok@yahoo.com>
+ * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
  */
 
-package org.yccheok.jstock.gui;
+package org.yccheok.jstock.gui.analysis;
 
 import org.yccheok.jstock.analysis.*;
 
@@ -28,15 +28,14 @@ import org.yccheok.jstock.analysis.*;
  *
  * @author yccheok
  */
-public class StockHistoryOperatorFigure extends OperatorFigure {
+public class EqualityOperatorFigure extends OperatorFigure {
     
-    /** Creates a new instance of StockHistoryOperatorFigure */
-    public StockHistoryOperatorFigure() {
-        super(new StockHistoryOperator());
-        final StockHistoryOperator stockHistoryOperator = (StockHistoryOperator)getOperator();
-        this.setName("Stock History");
-        this.setAttribute(stockHistoryOperator.getFunction().toString() + " " + stockHistoryOperator.getType().toString());
-        this.setValue("");
+    /** Creates a new instance of StockOperatorFigure */
+    public EqualityOperatorFigure() {
+        super(new EqualityOperator());
+        this.setName("Equality");
+        this.setAttribute(((EqualityOperator)this.getOperator()).getEquality().toString());
+        this.setValue("");        
     }
     
 }

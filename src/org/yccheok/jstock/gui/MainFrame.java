@@ -676,10 +676,7 @@ public class MainFrame extends javax.swing.JFrame {
         }
 
         if (false == status) {
-            final MessageFormat formatter = new MessageFormat("");
-            // formatter.setLocale(currentLocale);
-            formatter.applyPattern(MessagesBundle.getString("error_message_bad_file_format_template"));
-            final String output = formatter.format(new Object[]{file.getName()});
+            final String output = MessageFormat.format(MessagesBundle.getString("error_message_bad_file_format_template"), file.getName());
             JOptionPane.showMessageDialog(this, output, MessagesBundle.getString("error_title_bad_file_format"), JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_jMenuItem2ActionPerformed
@@ -690,98 +687,52 @@ public class MainFrame extends javax.swing.JFrame {
     //          for optimized history retrieving purpose.
     //
     private void jTabbedPane1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jTabbedPane1StateChanged
-// TODO add your handling code here:
+        // TODO add your handling code here:
         JTabbedPane pane = (JTabbedPane)evt.getSource();
+        // MainFrame
         if (pane.getSelectedComponent() == this.jPanel8) {
             this.jMenuItem2.setEnabled(true);   // Load
             this.jMenuItem9.setEnabled(true);   // Save
 
-            if(realTimeStockMonitor != null) {  
-                this.realTimeStockMonitor.softStart();
+            if (this.portfolioManagementJPanel != null) {
                 this.portfolioManagementJPanel.softStop();
-                this.realTimeStockMonitor.attach(this.realTimeStockMonitorObserver);
-                log.info("Start real time stock monitor and re-attach observer.");
                 log.info("Stop portfolio monitor.");
             }
-            if(stockHistoryMonitor != null) {                
-                this.stockHistoryMonitor.attach(this.stockHistoryMonitorObserver);
-                log.info("Stock history monitor re-attach observer.");
-            }            
         }
         else if (pane.getSelectedComponent() == this.indicatorPanel) {
             this.jMenuItem2.setEnabled(false);  // Load
             this.jMenuItem9.setEnabled(false);  // Save
 
-            if(realTimeStockMonitor != null) {                
-
-                // Take note that we will not soft stop indicatorPanel itself, because
-                // we wish to get alert all the time, even we are not visually looking
-                // at that panel.
-                //
-                this.realTimeStockMonitor.softStop();
+            if (this.portfolioManagementJPanel != null) {
                 this.portfolioManagementJPanel.softStop();
-                this.realTimeStockMonitor.dettach(this.realTimeStockMonitorObserver);
-                log.info("Stop real time stock monitor and dettach observer.");
                 log.info("Stop portfolio monitor.");
             }
-            if(stockHistoryMonitor != null) {                
-                this.stockHistoryMonitor.attach(this.stockHistoryMonitorObserver);
-                log.info("Stock history monitor re-attach observer.");
-            }                
         }
         else if(pane.getSelectedComponent() == this.indicatorScannerJPanel) {
             this.jMenuItem2.setEnabled(false);  // Load
             this.jMenuItem9.setEnabled(true);   // Save
 
-            if(realTimeStockMonitor != null) {
-                this.realTimeStockMonitor.softStop();
+            if (this.portfolioManagementJPanel != null) {
                 this.portfolioManagementJPanel.softStop();
-                this.realTimeStockMonitor.dettach(this.realTimeStockMonitorObserver);
-                log.info("Stop real time stock monitor and dettach observer.");
                 log.info("Stop portfolio monitor.");
             }
-            if(stockHistoryMonitor != null) {  
-                /* We need chart history displaying feature, by using help from MainFrame. */
-                this.stockHistoryMonitor.attach(this.stockHistoryMonitorObserver);
-                log.info("Stock history monitor re-attach observer.");
-            }             
         }
         else if(pane.getSelectedComponent() == this.portfolioManagementJPanel) {
             this.jMenuItem2.setEnabled(true);   // Load
             this.jMenuItem9.setEnabled(true);   // Save
 
-            if(realTimeStockMonitor != null) {                
-                this.realTimeStockMonitor.softStop();
+            if (this.portfolioManagementJPanel != null) {
                 this.portfolioManagementJPanel.softStart();
-                this.realTimeStockMonitor.dettach(this.realTimeStockMonitorObserver);
-                log.info("Stop real time stock monitor and dettach observer.");
                 log.info("Start portfolio monitor.");
             }
-            if(stockHistoryMonitor != null) {  
-                /* We need chart history displaying feature, by using help from MainFrame. */
-                this.stockHistoryMonitor.attach(this.stockHistoryMonitorObserver);
-                log.info("Stock history monitor re-attach observer.");
-            }             
         }
         else if (pane.getSelectedComponent() == this.chatJPanel) {
             this.jMenuItem2.setEnabled(false);  // Save
             this.jMenuItem9.setEnabled(false);  // Load
 
-            if(realTimeStockMonitor != null) {
-
-                // Take note that we will not soft stop indicatorPanel itself, because
-                // we wish to get alert all the time, even we are not visually looking
-                // at that panel.
-                //
-                this.realTimeStockMonitor.softStop();
+            if (this.portfolioManagementJPanel != null) {
                 this.portfolioManagementJPanel.softStop();
-                this.realTimeStockMonitor.dettach(this.realTimeStockMonitorObserver);
-                log.info("Stop real time stock monitor and dettach observer.");
                 log.info("Stop portfolio monitor.");
-            }
-            if(stockHistoryMonitor != null) {
-                this.stockHistoryMonitor.attach(this.stockHistoryMonitorObserver);
-                log.info("Stock history monitor re-attach observer.");
             }
         }
 
@@ -851,12 +802,15 @@ public class MainFrame extends javax.swing.JFrame {
             this.saveRealTimeStocks();
 
             log.info("saveIndicatorProjectManager...");
-            this.indicatorPanel.saveIndicatorProjectManager();
+            this.indicatorPanel.saveAlertIndicatorProjectManager();
+
+            log.info("saveModuleProjectManager...");
+            this.indicatorPanel.saveModuleIndicatorProjectManager();
 
             log.info("savePortfolio...");
             this.portfolioManagementJPanel.savePortfolio();
 
-                    log.info("latestNewsTask stop...");
+            log.info("latestNewsTask stop...");
             if(this.latestNewsTask != null)
             {
                 this.latestNewsTask.cancel(true);
@@ -1100,10 +1054,7 @@ public class MainFrame extends javax.swing.JFrame {
             // file will never become null, if status had been changed from true
             // to false.
             assert(file != null);
-            final MessageFormat formatter = new MessageFormat("");
-            // formatter.setLocale(currentLocale);
-            formatter.applyPattern(MessagesBundle.getString("error_message_nothing_to_be_saved_template"));
-            final String output = formatter.format(new Object[]{file.getName()});
+            final String output = MessageFormat.format(MessagesBundle.getString("error_message_nothing_to_be_saved_template"), file.getName());
             JOptionPane.showMessageDialog(this, output, MessagesBundle.getString("error_title_nothing_to_be_saved"), JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_jMenuItem9ActionPerformed
@@ -1122,11 +1073,7 @@ public class MainFrame extends javax.swing.JFrame {
                 public void actionPerformed(ActionEvent e) {
                     final String s = ((JRadioButtonMenuItem)e.getSource()).getText();
                     if (false == s.equals(currentPortfolioName)) {
-                        // Save current portfolio.
-                        MainFrame.this.portfolioManagementJPanel.savePortfolio();
-                        // And switch to new portfolio.
-                        MainFrame.this.getJStockOptions().setPortfolioName(s);
-                        MainFrame.this.portfolioManagementJPanel.initPortfolio();
+                        MainFrame.this.selectActivePortfolio(s);
                     }
                 }
 
@@ -1146,6 +1093,14 @@ public class MainFrame extends javax.swing.JFrame {
         });
         jMenu8.add(mi);
     }//GEN-LAST:event_jMenu8MenuSelected
+
+    public void selectActivePortfolio(String portfolio) {
+        // Save current portfolio.
+        MainFrame.this.portfolioManagementJPanel.savePortfolio();
+        // And switch to new portfolio.
+        MainFrame.this.getJStockOptions().setPortfolioName(portfolio);
+        MainFrame.this.portfolioManagementJPanel.initPortfolio();
+    }
 
     private void multiplePortfolios() {
         PortfolioJDialog portfolioJDialog = new PortfolioJDialog(this, true);
@@ -1175,6 +1130,19 @@ public class MainFrame extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
+        /* This ugly code shall be removed in next few release. */
+        if (false == Utils.migrateFrom104jTo105()) {
+            final int choice = JOptionPane.showConfirmDialog(null,
+                "JStock unable to read previous 1.0.4j portfolio and settings, continue?\n\nPress \"Yes\" to continue, BUT all your data will lost.\n\nOr, Press \"No\", restart your machine and try again.",
+                "JStock unable to read previous 1.0.4j portfolio and settings",
+                JOptionPane.YES_NO_OPTION);
+            log.error("Migration from 1.0.4j to 1.0.5 fail.");
+
+            if (choice != JOptionPane.YES_OPTION) {
+                System.exit(0);
+            }
+        }
+
         // As ProxyDetector is affected by system properties
         // http.proxyHost, we are forced to initialized ProxyDetector right here,
         // before we manually change the system properties according to
@@ -1374,7 +1342,7 @@ public class MainFrame extends javax.swing.JFrame {
     
     // Due to the unknown problem in netbeans IDE, we will add in the tooltip
     // and icon seperately.
-    private void  createIconsAndToolTipTextForJTabbedPane() {
+    private void createIconsAndToolTipTextForJTabbedPane() {
         this.jTabbedPane1.setIconAt(0, this.getImageIcon("/images/16x16/strokedocker.png"));
         this.jTabbedPane1.setIconAt(1, this.getImageIcon("/images/16x16/color_line.png"));
         this.jTabbedPane1.setIconAt(2, this.getImageIcon("/images/16x16/find.png"));
@@ -1825,7 +1793,7 @@ public class MainFrame extends javax.swing.JFrame {
         final StockTableModel stockTableModel = (StockTableModel)MainFrame.this.jTable1.getModel();
         final Stock stock = indicator.getStock();        
         final Double price = ((OperatorIndicator)indicator).getName().equalsIgnoreCase("fallbelow") ? stockTableModel.getFallBelow(stock) : stockTableModel.getRiseAbove(stock);
-		final double lastPrice = stock.getLastPrice();
+	final double lastPrice = stock.getLastPrice();
 
         // Using lastPrice = 0 to compare against fall below and rise above
         // target price is meaningless. In normal condition, no stock price
@@ -2641,9 +2609,9 @@ public class MainFrame extends javax.swing.JFrame {
 
     public void initLatestNewsTask()
     {
-        if(jStockOptions.isAutoUpdateNewsEnabled() == true)
+        if (jStockOptions.isAutoUpdateNewsEnabled() == true)
         {
-            if(latestNewsTask == null)
+            if (latestNewsTask == null)
             {
                 latestNewsTask = new LatestNewsTask();
                 latestNewsTask.execute();
@@ -2651,7 +2619,7 @@ public class MainFrame extends javax.swing.JFrame {
         }
         else
         {
-            if(latestNewsTask != null) {
+            if (latestNewsTask != null) {
                 final LatestNewsTask oldLatestNewsTask = latestNewsTask;
                 zombiePool.execute(new Runnable() {
                     @Override
@@ -2992,9 +2960,9 @@ public class MainFrame extends javax.swing.JFrame {
         return stockHistorySerializer;
     }
     
-    public IndicatorProjectManager getIndicatorProjectManager()
+    public IndicatorProjectManager getAlertIndicatorProjectManager()
     {
-        return this.indicatorPanel.getIndicatorProjectManager();
+        return this.indicatorPanel.getAlertIndicatorProjectManager();
     }
     
     public void updateScanningSpeed(int speed) {
@@ -3161,9 +3129,6 @@ public class MainFrame extends javax.swing.JFrame {
         // Delay first update checking for the 20 seconds
         private static final int SHORT_DELAY = 20 * 1000;
 
-        // Perform update checking every 2 minutes.
-        private static final int DELAY = 2 * 60 * 1000;
-
         private volatile CountDownLatch doneSignal;       
 
         @Override
@@ -3182,7 +3147,7 @@ public class MainFrame extends javax.swing.JFrame {
                 show = true;
             }
 
-            if(show)
+            if (show)
             {
                 doneSignal.countDown();
             }
@@ -3190,7 +3155,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         @Override
         protected Void doInBackground() {
-            while(!isCancelled())
+            while (!isCancelled())
             {
                 try {
                     Thread.sleep(SHORT_DELAY);
@@ -3225,6 +3190,8 @@ public class MainFrame extends javax.swing.JFrame {
                     log.info(null, ex);
                     break;
                 }
+                // Update jStockOptions, will make this while loop break
+                // in next iteration.
                 jStockOptions.setNewsID(map.get("news_id"));
             }
 

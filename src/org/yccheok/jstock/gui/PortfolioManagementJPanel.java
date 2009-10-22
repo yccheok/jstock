@@ -416,10 +416,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     }
 
                     if (this.getBuyTransactionSize() > 0) {
-                        final MessageFormat formatter = new MessageFormat("");
-                        // formatter.setLocale(currentLocale);
-                        formatter.applyPattern(MessagesBundle.getString("question_message_load_file_for_buy_portfolio_template"));
-                        final String output = formatter.format(new Object[]{file.getName()});
+                        final String output = MessageFormat.format(MessagesBundle.getString("question_message_load_file_for_buy_portfolio_template"), file.getName());
                         final int result = javax.swing.JOptionPane.showConfirmDialog(MainFrame.getInstance(), output, MessagesBundle.getString("question_title_load_file_for_buy_portfolio"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
                         if (result != javax.swing.JOptionPane.YES_OPTION) {
                             // Assume success.
@@ -520,10 +517,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     }
 
                     if (this.getSellTransactionSize() > 0) {
-                        final MessageFormat formatter = new MessageFormat("");
-                        // formatter.setLocale(currentLocale);
-                        formatter.applyPattern(MessagesBundle.getString("question_message_load_file_for_sell_portfolio_template"));
-                        final String output = formatter.format(new Object[]{file.getName()});
+                        final String output = MessageFormat.format(MessagesBundle.getString("question_message_load_file_for_sell_portfolio_template"), file.getName());
                         final int result = javax.swing.JOptionPane.showConfirmDialog(MainFrame.getInstance(), output, MessagesBundle.getString("question_title_load_file_for_sell_portfolio"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
                         if (result != javax.swing.JOptionPane.YES_OPTION) {
                             // Assume success.
@@ -582,10 +576,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     }
 
                     if (this.depositSummary.size() > 0) {
-                        final MessageFormat formatter = new MessageFormat("");
-                        // formatter.setLocale(currentLocale);
-                        formatter.applyPattern(MessagesBundle.getString("question_message_load_file_for_cash_deposit_template"));
-                        final String output = formatter.format(new Object[]{file.getName()});
+                        final String output = MessageFormat.format(MessagesBundle.getString("question_message_load_file_for_cash_deposit_template"), file.getName());
                         final int result = javax.swing.JOptionPane.showConfirmDialog(MainFrame.getInstance(), output, MessagesBundle.getString("question_title_load_file_for_cash_deposit"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
                         if (result != javax.swing.JOptionPane.YES_OPTION) {
                             // Assume success.
@@ -656,10 +647,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     }
 
                     if (this.dividendSummary.size() > 0) {
-                        final MessageFormat formatter = new MessageFormat("");
-                        // formatter.setLocale(currentLocale);
-                        formatter.applyPattern(MessagesBundle.getString("question_message_load_file_for_dividend_template"));
-                        final String output = formatter.format(new Object[]{file.getName()});
+                        final String output = MessageFormat.format(MessagesBundle.getString("question_message_load_file_for_dividend_template"), file.getName());
                         final int result = javax.swing.JOptionPane.showConfirmDialog(MainFrame.getInstance(), output, MessagesBundle.getString("question_title_load_file_for_dividend"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
                         if (result != javax.swing.JOptionPane.YES_OPTION) {
                             // Assume success.
@@ -1846,7 +1834,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
     
     public void softStop() {
-        if(realTimeStockMonitor == null) return;
+        if (realTimeStockMonitor == null) {
+            return;
+        }
         
         realTimeStockMonitor.softStop();
     }

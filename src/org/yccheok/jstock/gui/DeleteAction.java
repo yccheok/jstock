@@ -47,7 +47,7 @@ public class DeleteAction extends AbstractSelectedAction {
         super(editor);
         this.prototype = prototype;
         ResourceBundleUtil labels =
-            ResourceBundleUtil.getLAFBundle("org.yccheok.jstock.data.Labels", Locale.getDefault());        
+            ResourceBundleUtil.getBundle("org.yccheok.jstock.data.Labels");        
         labels.configureAction(this, ID);
     }
     

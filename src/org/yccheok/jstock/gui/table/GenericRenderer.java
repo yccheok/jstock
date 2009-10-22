@@ -34,7 +34,7 @@ import org.yccheok.jstock.gui.portfolio.CommentableContainer;
  */
 public class GenericRenderer extends DefaultTableCellRenderer {
 
-    private Color getBackgroundColor(int row) {
+    protected Color getBackgroundColor(int row) {
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
 
         if(row % 2 == 0) {

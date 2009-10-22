@@ -114,8 +114,6 @@ public class YahooStockHistoryServer implements StockHistoryServer {
             double closePrice = 0.0;
             int volume = 0;
             double adjustedClosePrice = 0.0;
-            double changePrice = (previousClosePrice == Double.MAX_VALUE) ? 0 : closePrice - previousClosePrice;
-            double changePricePercentage = ((previousClosePrice == Double.MAX_VALUE) || (previousClosePrice == 0.0)) ? 0 : changePrice / previousClosePrice * 100.0;
 
             try {
                 prevPrice = (previousClosePrice == Double.MAX_VALUE) ? 0 : previousClosePrice;
@@ -129,6 +127,9 @@ public class YahooStockHistoryServer implements StockHistoryServer {
             catch(NumberFormatException exp) {
                 log.error(null, exp);
             }
+
+            double changePrice = (previousClosePrice == Double.MAX_VALUE) ? 0 : closePrice - previousClosePrice;
+            double changePricePercentage = ((previousClosePrice == Double.MAX_VALUE) || (previousClosePrice == 0.0)) ? 0 : changePrice / previousClosePrice * 100.0;
             
             SimpleDate simpleDate = new SimpleDate(calendar);
                         

@@ -89,7 +89,9 @@ public class ProxyDetector {
                 System.setProperty(PROXY_PROPERTY, valuePropertyBefore);
             }
         }
-        return java.util.Collections.EMPTY_LIST;
+
+        // Use emptyList instead of EMPTY_LIST, to avoid compiler warning.
+        return java.util.Collections.emptyList();
     }
 
     /**

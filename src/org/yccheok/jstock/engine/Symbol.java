@@ -28,7 +28,7 @@ public class Symbol {
     }
     
     public static Symbol newInstance(String symbol) {
-        if(symbol == null) {
+        if (symbol == null) {
             throw new java.lang.IllegalArgumentException("symbol cannot be null");
         }
         

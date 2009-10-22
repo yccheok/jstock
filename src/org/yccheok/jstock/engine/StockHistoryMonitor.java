@@ -272,7 +272,7 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
     public StockHistoryServer getStockHistoryServer(Code code) {
         readerLock.lock();
 
-        if(histories.containsKey(code))
+        if (histories.containsKey(code))
         {
             final StockHistoryServer stockHistoryServer = histories.get(code);
 
@@ -281,7 +281,7 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
             return stockHistoryServer;
         }
         else {
-            if(StockHistoryMonitor.this.stockHistorySerializer != null) {
+            if (StockHistoryMonitor.this.stockHistorySerializer != null) {
                 StockHistoryServer stockHistoryServer = StockHistoryMonitor.this.stockHistorySerializer.load(code);
                 
                 /* So that next time we won't read from the disk. */

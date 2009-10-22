@@ -42,7 +42,7 @@ import org.jfree.data.time.TimeSeriesCollection;
  */
 public class DynamicChart {
     /** Creates new form DynamicChart */
-    public DynamicChart() {
+    public DynamicChart() {        
         this.price = new TimeSeries("Price", Second.class);
         // Sets the maximumItemAge attribute, which specifies the maximum age of data items in the series
         // (in terms of the RegularTimePeriod type used by this series). Whenever a new data value is
@@ -62,8 +62,8 @@ public class DynamicChart {
             false,
             true,
             false
-        );
-        
+        );        
+
         freeChart.setAntiAlias(true);
         while (freeChart.getSubtitleCount() > 0)
         {
@@ -84,6 +84,8 @@ public class DynamicChart {
             )
         );
 
+        org.yccheok.jstock.charting.Utils.applyChartTheme(freeChart);
+        
         // Disable zoom.
         chartPanel = new ChartPanel(freeChart, true, true, true, false, true);
         chartPanel.setMouseZoomable(false);
@@ -122,6 +124,8 @@ public class DynamicChart {
             )
         );
 
+        org.yccheok.jstock.charting.Utils.applyChartTheme(freeChart);
+        
         ChartPanel _chartPanel = new ChartPanel(freeChart, true, true, true, true, true);
         JDialog dialog = new JDialog(parent, title, false);
         dialog.getContentPane().add(_chartPanel, java.awt.BorderLayout.CENTER);

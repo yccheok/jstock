@@ -25,9 +25,6 @@ package org.yccheok.jstock.gui;
 import com.nexes.wizard.*;
 import java.awt.event.*;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.StockCodeAndSymbolDatabase;
 
 /**
@@ -44,29 +41,32 @@ public class WizardSelectStockDescriptor extends WizardPanelDescriptor implement
         super(IDENTIFIER, new WizardSelectStockJPanel(stockCodeAndSymbolDatabase));
         
         wizardSelectStockJPanel = (WizardSelectStockJPanel)getPanelComponent();
-        wizardSelectStockJPanel.installActionListenerToAllComponents(this);
+        wizardSelectStockJPanel.addActionListenerForAllComponents(this);
     }
     
+    @Override
     public void actionPerformed(ActionEvent actionEvent) {
-        getWizard().setNextFinishButtonEnabled(wizardSelectStockJPanel.isSelectionValid());
+        getWizard().setNextFinishButtonEnabled(wizardSelectStockJPanel.isNextFinishButtonEnabled());
     }
     
+    @Override
     public Object getNextPanelDescriptor() {
          return FINISH;
     }
     
+    @Override
     public void aboutToDisplayPanel() {
         wizardSelectStockJPanel.updateRadioBoxState();
     }
     
     @Override
     public void aboutToHidePanel() {
-		// Not sure why. When I click finish button, this function isn't being called.
+        // 14/10/09 Update : This function works after Cheok performs hacking on Wizard.java
+        // Not sure why. When I click finish button, this function isn't being called.
     }
     
+    @Override
     public Object getBackPanelDescriptor() {
         return WizardSelectIndicatorDescriptor.IDENTIFIER;
-    }      
-    
-    private static final Log log = LogFactory.getLog(WizardSelectStockJPanel.class);
+    }
 }

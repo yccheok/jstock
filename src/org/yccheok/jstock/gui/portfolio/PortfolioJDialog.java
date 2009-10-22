@@ -132,6 +132,11 @@ public class PortfolioJDialog extends javax.swing.JDialog {
         jList1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jList1.setCellRenderer(getListCellRenderer());
         this.jList1.setModel(new DefaultListModel());
+        jList1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jList1MouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(jList1);
 
         jPanel4.add(jScrollPane1, java.awt.BorderLayout.CENTER);
@@ -222,11 +227,8 @@ public class PortfolioJDialog extends javax.swing.JDialog {
             JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_cannot_delete_current_active_portflio"), MessagesBundle.getString("warning_title_cannot_delete_current_active_portflio"), JOptionPane.WARNING_MESSAGE);
             return;
         }
-        final MessageFormat formatter = new MessageFormat("");
-        // formatter.setLocale(currentLocale);
-        formatter.applyPattern(MessagesBundle.getString("question_message_delete_portfolio_template"));
-        final String output = formatter.format(new Object[]{selectedValue});
-        final int result = javax.swing.JOptionPane.showConfirmDialog(MainFrame.getInstance(), output, MessagesBundle.getString("question_title_delete_portfolio_template"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
+        final String output = MessageFormat.format(MessagesBundle.getString("question_message_delete_template"), selectedValue);
+        final int result = javax.swing.JOptionPane.showConfirmDialog(MainFrame.getInstance(), output, MessagesBundle.getString("question_title_delete"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
         if (result != javax.swing.JOptionPane.YES_OPTION) {
             return;
         }
@@ -284,6 +286,22 @@ public class PortfolioJDialog extends javax.swing.JDialog {
         this.dispose();
     }//GEN-LAST:event_jButton4ActionPerformed
 
+    private void jList1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jList1MouseClicked
+        // TODO add your handling code here:
+        final JList list = (JList)evt.getSource();
+        // Double-click
+        if (evt.getClickCount() == 2) {          
+            // Get item index
+            final int index = list.locationToIndex(evt.getPoint());
+            final String portfolio = list.getModel().getElementAt(index).toString();
+            if (MainFrame.getInstance().getJStockOptions().getPortfolioName().equals(portfolio) == false) {
+                MainFrame.getInstance().selectActivePortfolio(portfolio);
+                // Ensure Bold effect on active portfolio.    
+                this.jList1.repaint();
+            }
+        }
+    }//GEN-LAST:event_jList1MouseClicked
+
     private void init() {
         ((DefaultListModel)(this.jList1.getModel())).clear();
         List<String> names = org.yccheok.jstock.portfolio.Utils.getPortfolioNames();
@@ -292,7 +310,7 @@ public class PortfolioJDialog extends javax.swing.JDialog {
         }
     }
     
-    public ListCellRenderer getListCellRenderer() {
+    private ListCellRenderer getListCellRenderer() {
         return new DefaultListCellRenderer() {
 
             @Override
@@ -308,7 +326,6 @@ public class PortfolioJDialog extends javax.swing.JDialog {
                 }
                 return component;
             }
-
         };
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables

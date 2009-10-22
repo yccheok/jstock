@@ -20,8 +20,9 @@
  * Copyright (C) 2007 Cheok YanCheng <yccheok@yahoo.com>
  */
 
-package org.yccheok.jstock.gui;
+package org.yccheok.jstock.gui.analysis;
 
+import org.yccheok.jstock.gui.*;
 import org.yccheok.jstock.analysis.*;
 
 /**

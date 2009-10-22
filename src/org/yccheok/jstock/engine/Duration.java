@@ -116,6 +116,7 @@ public class Duration {
         return result;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (o == this)
             return true;

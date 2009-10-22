@@ -17,26 +17,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * Copyright (C) 2007 Cheok YanCheng <yccheok@yahoo.com>
+ * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
  */
 
 package org.yccheok.jstock.gui;
 
-import com.l2fprod.common.swing.renderer.*;
-import com.l2fprod.common.beans.editor.*;
-import com.l2fprod.common.propertysheet.*;
-import com.l2fprod.common.propertysheet.Property;
-import com.l2fprod.common.propertysheet.PropertySheet;
-import com.l2fprod.common.propertysheet.PropertySheetPanel;
-import com.l2fprod.common.swing.LookAndFeelTweaks;
 
-import java.beans.*;
-import java.beans.BeanInfo;
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.beans.SimpleBeanInfo;
 
 import java.awt.*;
 
@@ -55,7 +41,7 @@ public class ObjectInspectorJFrame extends javax.swing.JFrame {
         
         this.sheet = this.createPropertySheetPanel(bean);
         
-        this.setTitle("Properties of " + this.sheet.getBean().getClass().getName());
+        this.setTitle(this.sheet.getBean().getClass().getSimpleName());
         this.getContentPane().add(this.sheet, BorderLayout.CENTER);        
     }
     
@@ -71,34 +57,16 @@ public class ObjectInspectorJFrame extends javax.swing.JFrame {
         java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
         setBounds((screenSize.width-265)/2, (screenSize.height-317)/2, 265, 317);
     }// </editor-fold>//GEN-END:initComponents
-
-    private static class PropertyEditorRegistryEx extends PropertyEditorRegistry {
-        // We will try to get the "nearest" super class.        
-        public synchronized PropertyEditor getEditor(Class type) {
-            PropertyEditor editor = super.getEditor(type);
-
-            Class c = type;
-        
-            while(editor == null) {
-                c = c.getSuperclass();
-
-                if(c == null)
-                    return editor;
-
-                editor = super.getEditor(c);
-            }
-
-            return editor;
-        }
-    }
-        
+       
     private ObjectInspectorJPanel createPropertySheetPanel(Object bean) {    
-        return new ObjectInspectorJPanel(bean);
+        final ObjectInspectorJPanel objectInspectorJPanel = new ObjectInspectorJPanel(bean);
+        objectInspectorJPanel.setDescriptionVisible(true);
+        return objectInspectorJPanel;
     }
     
     public void setBean(Object bean) {
         sheet.setBean(bean);
-        this.setTitle("Properties of " + this.sheet.getBean().getClass().getName());
+        this.setTitle(this.sheet.getBean().getClass().getSimpleName());
     }
     
     private final ObjectInspectorJPanel sheet;

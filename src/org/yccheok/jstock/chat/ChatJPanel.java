@@ -187,35 +187,7 @@ public class ChatJPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jEditorPane1HyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {//GEN-FIRST:event_jEditorPane1HyperlinkUpdate
-        if (HyperlinkEvent.EventType.ACTIVATED.equals(evt.getEventType())) {
-            URL url = evt.getURL();
-
-            if(Desktop.isDesktopSupported())
-            {
-                Desktop desktop = Desktop.getDesktop();
-
-                if(desktop.isSupported(Desktop.Action.BROWSE))
-                {
-                    if (url == null) {
-						// www.yahoo.com considered an invalid URL. Hence, evt.getURL() returns null.
-                        String string = "http://" + evt.getDescription();
-                        try {
-                            url = new URL(string);
-                        } catch (MalformedURLException ex) {
-                            return;
-                        }
-                    }
-
-                    try {
-                        desktop.browse(url.toURI());
-                    }
-                    catch (URISyntaxException ex) {
-                    }
-                    catch (IOException ex) {
-                    }
-                }
-            }
-        }
+        org.yccheok.jstock.gui.Utils.launchWebBrowser(evt);
     }//GEN-LAST:event_jEditorPane1HyperlinkUpdate
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown

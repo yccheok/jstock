@@ -67,6 +67,7 @@ public class CashFlowChartJDialog extends javax.swing.JDialog {
         initActivitySummary(portfolioManagementJPanel);
 
         final JFreeChart freeChart = createChart();
+        org.yccheok.jstock.charting.Utils.applyChartTheme(freeChart);
         chartPanel = new ChartPanel(freeChart, true, true, true, true, true);
         getContentPane().add(chartPanel, java.awt.BorderLayout.CENTER);
 

@@ -33,7 +33,16 @@ import org.apache.commons.logging.LogFactory;
  * @author yccheok
  */
 public class OperatorIndicator implements Indicator {
-    
+    public enum Type {
+        AlertIndicator,     // With 1 and only 1 sink operator. The input of sink operator
+                            // must be connected. The output of sink operator must leave
+                            // unconnected.
+        ModuleIndicator,    // Must not contain any sink operator. Must contain 0 to many diode
+                            // operators, with their outputs connected, inputs leave unconnected. Must contain 1 and only
+                            // 1 diode operator, with its input connected, output leave unconnected.
+        InvalidIndicator    // Other of the above is considered as invalid.
+    }
+
     /** Creates a new instance of OperatorIndicator */    
     public OperatorIndicator(String name) {
         this.name = name;
@@ -52,8 +61,8 @@ public class OperatorIndicator implements Indicator {
     public void add(Operator operator) {
         operators.add(operator);
 
-		// Whenever there is a new operator being added, we required to
-		// perform history calculation again.
+        // Whenever there is a new operator being added, we required to
+        // perform history calculation again.
         stockHistoryCalculationDone = false;
     }
     
@@ -65,20 +74,24 @@ public class OperatorIndicator implements Indicator {
         return operators.size();
     }
     
+    @Override
     public Stock getStock() {
+        // Should we allow the possibility to return null stock, or shall we just
+        // return empty stock?
         return stock;
     }
-    
+
+    @Override
     public void setStock(Stock stock)
     {
-        if((sharesIssued == -1) || (marketCapital == -1)) {
+        if ((sharesIssued == -1) || (marketCapital == -1)) {
             this.stock = stock;
         }
         else {
             this.stock = new StockEx(stock, marketCapital, sharesIssued);
         }
         
-        for(Operator operator : operators) {
+        for (Operator operator : operators) {
             if(operator instanceof StockOperator) {
                 ((StockOperator)operator).setStock(stock);
             }
@@ -88,18 +101,18 @@ public class OperatorIndicator implements Indicator {
     @Override
     public void setStockHistoryServer(StockHistoryServer stockHistoryServer)
     {
-        for(Operator operator : operators) {
-            if(operator instanceof StockHistoryOperator) {
+        for (Operator operator : operators) {
+            if (operator instanceof StockHistoryOperator) {
                 /* Time consuming */
                 ((StockHistoryOperator)operator).calculate(stockHistoryServer);
             }
-            else if(operator instanceof StockRelativeHistoryOperator) {
+            else if (operator instanceof StockRelativeHistoryOperator) {
                 /* Time consuming */
                 ((StockRelativeHistoryOperator)operator).calculate(stockHistoryServer);                
             }
         }
 
-		// Indicate history calculation is done.
+        // Indicate history calculation is done.
         stockHistoryCalculationDone = true;
 
         sharesIssued = stockHistoryServer.getSharesIssued();
@@ -113,70 +126,101 @@ public class OperatorIndicator implements Indicator {
     public String getName() {
         return name;
     }
-
-    public boolean isValid() {
+    
+    public Type getType() {
+        // Check whether there is any AlertIndicator.
         int numOfSinkOperator = 0;
         SinkOperator sinkOperator = null;
-        
-        for(Operator operator : operators) {
-            if(operator instanceof SinkOperator) {                                
+        for (Operator operator : operators) {
+            if (operator instanceof SinkOperator) {
                 numOfSinkOperator++;
-                
-                if(numOfSinkOperator != 1) return false;
-                
+                if (numOfSinkOperator != 1) {
+                    return Type.InvalidIndicator;
+                }
                 sinkOperator = (SinkOperator)operator;
             }
         }
+
+        if (numOfSinkOperator == 1) {
+            if (sinkOperator.getNumOfInputConnection() == 1 && sinkOperator.getNumOfOutputConnection() == 0) {
+                return Type.AlertIndicator;
+            }
+            return Type.InvalidIndicator;
+        }
         
-        if(numOfSinkOperator != 1)
-            return false;
-        
-        return (sinkOperator.getNumOfInputConnection() == 1 && sinkOperator.getNumOfOutputConnection() == 0);
+        final List <DiodeOperator> inputDiodeOperators = new ArrayList<DiodeOperator>();
+        final List <DiodeOperator> outputDiodeOperators = new ArrayList<DiodeOperator>();
+
+        for (Operator operator : operators) {
+            if (operator instanceof DiodeOperator) {
+                final DiodeOperator diodeOperator = (DiodeOperator)operator;
+                if (diodeOperator.getNumOfInputConnection() == 1 && diodeOperator.getNumOfOutputConnection() == 0) {
+                    outputDiodeOperators.add(diodeOperator);
+                }
+                else if (diodeOperator.getNumOfInputConnection() == 0 && diodeOperator.getNumOfOutputConnection() == 1) {
+                    inputDiodeOperators.add(diodeOperator);
+                }
+                else {
+                    // Shall I return as Type.InvalidIndicator?
+                }
+            }
+        }
+        if (inputDiodeOperators.size() >= 0 && outputDiodeOperators.size() == 1) {
+            return Type.ModuleIndicator;
+        }
+        return Type.InvalidIndicator;
     }
     
     public void preCalculate() {
-        for(Operator operator : operators) {
+        for (Operator operator : operators) {
             operator.clear();
         }
         
-        for(Operator operator : operators) {
+        for (Operator operator : operators) {
             operator.pull();
         }        
     }
-    
+
+    public boolean isStockNeeded() {
+        for (Operator operator : operators) {
+            if (operator instanceof StockOperator) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
     public boolean isStockHistoryServerNeeded() {
-        for(Operator operator : operators) {
-            if((operator instanceof StockHistoryOperator) || (operator instanceof StockRelativeHistoryOperator)) {
+        for (Operator operator : operators) {
+            if ((operator instanceof StockHistoryOperator) || (operator instanceof StockRelativeHistoryOperator)) {
                 return true;
             }
         }        
-        
         return false;
     }
     
+    @Override
     public boolean isTriggered()
     {        
-        for(Operator operator : operators) {
-            if(operator instanceof StockOperator) {
+        for (Operator operator : operators) {
+            if (operator instanceof StockOperator) {
                 operator.pull();
             }
-        }
-        
-        for(Operator operator : operators) {
+        }        
+        for (Operator operator : operators) {
             if(operator instanceof SinkOperator) {
                 Object value = ((SinkOperator)operator).getValue();
                 
-                if(value instanceof Boolean) {
+                if( value instanceof Boolean) {
                     return ((Boolean)value).booleanValue();
                 }
                 else {
-                    log.error(name + " " + stock.getSymbol() + " Sink operator should return boolean result.");			
+                    log.error("Sink operator should return boolean result.");
                 }
             }
         }
-        
-        log.error(name + " " + stock.getSymbol() + " No sink operator had been found. Invalid indicator.");        
-        
+        // No sink operator found. Just return false.
         return false;
     }
 
@@ -185,7 +229,7 @@ public class OperatorIndicator implements Indicator {
     public Duration getNeededStockHistoryDuration() {
         if (isStockHistoryServerNeeded() == false)
         {
-			// Returns 0 day duration, if there are no history information needed.
+            // Returns 0 day duration, if there are no history information needed.
             return Duration.getTodayDurationByDays(0);
         }
 
@@ -204,11 +248,13 @@ public class OperatorIndicator implements Indicator {
 
                 // Sometimes, there are no stock information during holidays. We will double up
                 // the days, so that we really able to obtain n days data.
-                duration = duration.getUnionDuration(Duration.getTodayDurationByDays(days * 2));
+                // If the simulation runs on Monday, we must a least have 1 last Friday data.
+                duration = duration.getUnionDuration(Duration.getTodayDurationByDays(Math.max(3, days * 2)));
             }
         }
-
-        return duration;
+        
+        /* times 2, for technical analysis usage. */
+        return duration.getUnionDuration(Duration.getTodayDurationByDays((int)duration.getDurationInDays() * 2));
     }
 
     @Override

@@ -70,7 +70,7 @@ public class SingaporeYahooStockHistoryServer implements StockHistoryServer {
 
         String[] stockDatas = respond.split("\r\n|\r|\n");
         
-		// There must be at least two lines : header information and history information.
+        // There must be at least two lines : header information and history information.
         final int length = stockDatas.length;
         
         if(length <= 1) return false;
@@ -107,7 +107,7 @@ public class SingaporeYahooStockHistoryServer implements StockHistoryServer {
                 log.error(null, ex);
                 continue;
             }
-
+            
             double prevPrice = 0.0;
             double openPrice = 0.0;
             double highPrice = 0.0;
@@ -115,8 +115,6 @@ public class SingaporeYahooStockHistoryServer implements StockHistoryServer {
             double closePrice = 0.0;
             int volume = 0;
             double adjustedClosePrice = 0.0;
-            double changePrice = (previousClosePrice == Double.MAX_VALUE) ? 0 : closePrice - previousClosePrice;
-            double changePricePercentage = ((previousClosePrice == Double.MAX_VALUE) || (previousClosePrice == 0.0)) ? 0 : changePrice / previousClosePrice * 100.0;
             
             try {
                 prevPrice = (previousClosePrice == Double.MAX_VALUE) ? 0 : previousClosePrice;
@@ -130,6 +128,9 @@ public class SingaporeYahooStockHistoryServer implements StockHistoryServer {
             catch(NumberFormatException exp) {
                 log.error(null, exp);
             }
+
+            double changePrice = (previousClosePrice == Double.MAX_VALUE) ? 0 : closePrice - previousClosePrice;
+            double changePricePercentage = ((previousClosePrice == Double.MAX_VALUE) || (previousClosePrice == 0.0)) ? 0 : changePrice / previousClosePrice * 100.0;
             
             SimpleDate simpleDate = new SimpleDate(calendar);
                         
@@ -216,23 +217,28 @@ public class SingaporeYahooStockHistoryServer implements StockHistoryServer {
             throw new StockHistoryNotFoundException("Code=" + code);
     }
     
+    @Override
     public Stock getStock(Calendar calendar) {
         SimpleDate simpleDate = new SimpleDate(calendar);
         return historyDatabase.get(simpleDate);        
     }
 
+    @Override
     public Calendar getCalendar(int index) {
         return simpleDates.get(index).getCalendar();
     }
 
+    @Override
     public int getNumOfCalendar() {
         return simpleDates.size();
     }
 
+    @Override
     public long getSharesIssued() {
         return 0;
     }
 
+    @Override
     public long getMarketCapital() {
         return 0;
     }

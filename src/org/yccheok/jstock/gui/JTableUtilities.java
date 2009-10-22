@@ -75,76 +75,52 @@ public class JTableUtilities {
 
     }
 
-
-
+    // Resize table column. User will still able to adjust the width manually.
     public static void makeTableColumnWidthFit(JTable jTable, int col, int margin) {
+        makeTableColumnWidthFit(jTable, col, margin, false);
+    }
 
+    public static void makeTableColumnWidthFit(JTable jTable, int col, int margin, boolean locking) {
         // strategy - get max width for cells in column and
-
         // make that the preferred width
-
         TableColumnModel columnModel = jTable.getColumnModel();
-
         int maxwidth = 0;
 
-        
-
         for (int row=0; row<jTable.getRowCount(); row++) {
-
-            TableCellRenderer rend = jTable.getCellRenderer(row, col); 
-
-            Object value = jTable.getValueAt (row, col); 
-
+            TableCellRenderer rend = jTable.getCellRenderer(row, col);
+            Object value = jTable.getValueAt (row, col);
             Component comp = rend.getTableCellRendererComponent (
-
-                    jTable,
-
-                    value, 
-
-                    false, 
-
-                    false, 
-
-                    row, 
-
-                    col);
-
-            maxwidth = Math.max (comp.getPreferredSize().width + margin, maxwidth); 
-
-        } // for row
-
-        
-
-	TableColumn column = columnModel.getColumn (col);
-
-	TableCellRenderer headerRenderer = column.getHeaderRenderer();
-
-	if (headerRenderer == null)
-
-            headerRenderer = jTable.getTableHeader().getDefaultRenderer();
-
-	Object headerValue = column.getHeaderValue();
-
-	Component headerComp = headerRenderer.getTableCellRendererComponent (
-
                 jTable,
-
-                headerValue,
-
+                value,
                 false,
-
                 false,
-
-                0,
-
+                row,
                 col);
 
-        
+            maxwidth = Math.max (comp.getPreferredSize().width + margin, maxwidth);
+        } // for row
 
-	maxwidth = Math.max (maxwidth, headerComp.getPreferredSize().width + margin);
+        TableColumn column = columnModel.getColumn (col);
+        TableCellRenderer headerRenderer = column.getHeaderRenderer();
+        if (headerRenderer == null) {
+            headerRenderer = jTable.getTableHeader().getDefaultRenderer();
+        }
+        Object headerValue = column.getHeaderValue();
+        Component headerComp = headerRenderer.getTableCellRendererComponent (
+            jTable,
+            headerValue,
+            false,
+            false,
+            0,
+            col);
 
-	column.setPreferredWidth (maxwidth);        
-
+        maxwidth = Math.max (maxwidth, headerComp.getPreferredSize().width + margin);        
+        column.setPreferredWidth (maxwidth);
+        if (locking) {
+            // User will not able to adjust the width manually.
+            column.setMinWidth(maxwidth);
+            column.setMaxWidth(maxwidth);
+        }
     }
 
     public static void setJTableOptions(JTable jTable, GUIOptions.JTableOptions jTableOptions)

@@ -17,10 +17,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * Copyright (C) 2007 Cheok YanCheng <yccheok@yahoo.com>
+ * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
  */
 
-package org.yccheok.jstock.gui;
+package org.yccheok.jstock.gui.analysis;
 
 import org.jhotdraw.draw.*;
 import java.util.*;
@@ -39,6 +39,7 @@ public class OperatorFigureCreationTool extends org.jhotdraw.draw.CreationTool {
         this.prototypeAttributes = attributes;
     }
     
+    @Override
     protected Figure createFigure() {
         Figure f = null;
         

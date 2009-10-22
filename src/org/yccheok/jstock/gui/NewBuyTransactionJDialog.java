@@ -29,6 +29,7 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Date;
 import javax.swing.JFormattedTextField;
+import javax.swing.JOptionPane;
 import javax.swing.text.NumberFormatter;
 import javax.swing.SwingUtilities;
 import net.sf.nachocalendar.CalendarFactory;
@@ -40,6 +41,7 @@ import org.yccheok.jstock.engine.SimpleDate;
 import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.StockCodeAndSymbolDatabase;
 import org.yccheok.jstock.engine.Symbol;
+import org.yccheok.jstock.internationalization.MessagesBundle;
 import org.yccheok.jstock.portfolio.Broker;
 import org.yccheok.jstock.portfolio.BrokingFirm;
 import org.yccheok.jstock.portfolio.ClearingFee;
@@ -393,6 +395,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         if(this.jTextField1.getText().length() <= 0)
         {
             this.jComboBox1.requestFocus();
+            JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_please_type_stock_symbol_and_press_enter"), MessagesBundle.getString("warning_title_please_type_stock_symbol_and_press_enter"), JOptionPane.WARNING_MESSAGE);
             return false;
         }
         
@@ -431,7 +434,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
     
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        if(isValidInput() == false) {
+        if (isValidInput() == false) {
             return;
         }
         

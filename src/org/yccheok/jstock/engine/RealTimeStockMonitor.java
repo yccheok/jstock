@@ -74,7 +74,7 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
     public synchronized boolean addStockCode(Code code) {
         // Lock isn't required here. This is because increase the size of the 
         // list is not going to get IndexOutOfBoundException.
-        if(stockCodes.contains(code)) return false;
+        if (stockCodes.contains(code)) return false;
 
         boolean status = stockCodes.add(code);
 
@@ -172,7 +172,7 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
         
         assert(numOfMonitorRequired <= this.maxThread);
         
-        for(int i=this.stockMonitors.size(); i<numOfMonitorRequired; i++) {
+        for( int i = this.stockMonitors.size(); i < numOfMonitorRequired; i++) {
             log.info("Before adding : current thread size=" + this.stockMonitors.size() + ",numOfMonitorRequired=" + numOfMonitorRequired);
             
             StockMonitor stockMonitor = new StockMonitor(i * numOfStockPerIteration);

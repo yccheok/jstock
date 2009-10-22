@@ -139,7 +139,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
 
         final MainFrame m = getMainFrame();
         
-        if(m.getStockCodeAndSymbolDatabase() == null) {
+        if (m.getStockCodeAndSymbolDatabase() == null) {
             javax.swing.JOptionPane.showMessageDialog(this, "We haven't connected to stock server.", "Not Connected", javax.swing.JOptionPane.INFORMATION_MESSAGE);
             return;
         }
@@ -150,9 +150,9 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         
         initWizardDialog();
         
-        int ret = wizard.showModalDialog();
+        int ret = wizard.showModalDialog(680, -1);
 
-        if(ret != Wizard.FINISH_RETURN_CODE)
+        if (ret != Wizard.FINISH_RETURN_CODE)
             return;
 
         final WizardModel wizardModel = wizard.getModel();
@@ -218,7 +218,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
 
         final MainFrame m = getMainFrame();
         final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = m.getStockCodeAndSymbolDatabase();
-        final IndicatorProjectManager indicatorProjectManager = m.getIndicatorProjectManager();
+        final IndicatorProjectManager alertIndicatorProjectManager = m.getAlertIndicatorProjectManager();
         java.util.List<String> projects = wizardSelectIndicatorJPanel.getSelectedProjects();
         java.util.List<Code> codes = wizardSelectStockJPanel.getSelectedCodes();
 
@@ -228,7 +228,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             operatorIndicators.put(code, result);
 
             for(String project : projects) {
-                final OperatorIndicator operatorIndicator = indicatorProjectManager.getOperatorIndicator(project);
+                final OperatorIndicator operatorIndicator = alertIndicatorProjectManager.getOperatorIndicator(project);
 
                 if(operatorIndicator != null) {
                     final Stock stock = Utils.getEmptyStock(code, stockCodeAndSymbolDatabase.codeToSymbol(code));
@@ -263,7 +263,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         // Duration must be initialized, before codes being added.
         this.stockHistoryMonitor.setDuration(historyDuration);
 
-        for(Code code : codes) {
+        for (Code code : codes) {
             final List<OperatorIndicator> operatorIndicatos = operatorIndicators.get(code);
 
             boolean done = true;
@@ -314,7 +314,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                 @Override
                 public void run() {
                     final Stock stock = indicator.getStock();
-					final double price = stock.getLastPrice();
+                    final double price = stock.getLastPrice();
                     final String message = stock.getSymbol() + " (" + price + ") hits " + indicator.toString();
 
                     if (jStockOptions.isPopupMessage()) {
@@ -528,7 +528,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         m.setStatusBar(false, "Connected");
     }
     
-    public void initWizardDialog() {
+    private void initWizardDialog() {
         final MainFrame m = getMainFrame();
         
         wizard = new Wizard(m);
@@ -714,8 +714,8 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             public void run() {          
                 IndicatorTableModel tableModel = (IndicatorTableModel)jTable1.getModel();
                 
-				// Dirty way to prevent background thread from showing indicators
-				// on the table.
+                // Dirty way to prevent background thread from showing indicators
+                // on the table.
                 if(allowIndicatorShown)
                     tableModel.addIndicator(indicator);
            } 
@@ -853,7 +853,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                 WizardPanelDescriptor wizardPanelDescriptor0 = wizardModel.getPanelDescriptor(WizardSelectStockDescriptor.IDENTIFIER);
                 WizardSelectStockJPanel wizardSelectStockJPanel = (WizardSelectStockJPanel)wizardPanelDescriptor0.getPanelComponent();
 
-                if(wizardSelectStockJPanel.buildSelectedCode() == false) {
+                if (wizardSelectStockJPanel.buildSelectedCode() == false) {
                     // Unlikely.
                     log.error("Fail to build selected stock");
                     return;

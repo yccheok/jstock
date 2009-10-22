@@ -442,11 +442,12 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
         jRadioButton4.setEnabled(stocks.size() > 0);        
     }
     
-    public boolean isSelectionValid() {
-        if(jRadioButton1.isSelected())
+    public boolean isNextFinishButtonEnabled() {
+        if (jRadioButton1.isSelected()) {
             return true;
-        
-        if(jRadioButton2.isSelected()) {        
+        }
+
+        if (jRadioButton2.isSelected()) {
             for(JCheckBox checkBox : boardCheckBoxes) {
                 if(checkBox.isSelected()) return true;
             }
@@ -464,7 +465,7 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
         return false;
     }
     
-    public void installActionListenerToAllComponents(ActionListener actionListener) {
+    public void addActionListenerForAllComponents(ActionListener actionListener) {
         jCheckBox1.addActionListener(actionListener);
         jCheckBox10.addActionListener(actionListener);
         jCheckBox11.addActionListener(actionListener);
@@ -489,9 +490,9 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
         jCheckBox4.addActionListener(actionListener);
         jCheckBox23.addActionListener(actionListener);
         jCheckBox24.addActionListener(actionListener);
-		jCheckBox25.addActionListener(actionListener);
-		jCheckBox26.addActionListener(actionListener);
-		jCheckBox27.addActionListener(actionListener);
+        jCheckBox25.addActionListener(actionListener);
+        jCheckBox26.addActionListener(actionListener);
+        jCheckBox27.addActionListener(actionListener);
         jRadioButton1.addActionListener(actionListener);
         jRadioButton2.addActionListener(actionListener);
         jRadioButton3.addActionListener(actionListener);

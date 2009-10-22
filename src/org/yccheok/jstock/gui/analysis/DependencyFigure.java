@@ -12,13 +12,12 @@
  * JHotDraw.org.
  */
 
-package org.yccheok.jstock.gui;
+package org.yccheok.jstock.gui.analysis;
 
+import org.yccheok.jstock.gui.*;
 import java.awt.*;
-import java.beans.*;
 import static org.jhotdraw.draw.AttributeKeys.*;
 import org.jhotdraw.draw.*;
-import org.jhotdraw.xml.*;
 
 /**
  * DependencyFigure.
@@ -134,45 +133,68 @@ public class DependencyFigure extends LineConnectionFigure {
     }
     
     @Override public boolean canConnect(Connector start, Connector end) {
-        if(start instanceof InputConnector || end instanceof OutputConnector) {
-            /*
-             * If we pop up a message box here, connection and connector figure will
-             * behave incorrectly.
-             *
-            javax.swing.SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    javax.swing.JOptionPane.showMessageDialog(null, "Sorry. You may only connect from input connector to output connector.", "Connection not allowed", javax.swing.JOptionPane.WARNING_MESSAGE);
-                }
-            });
-            */
+        if (start instanceof InputConnector || end instanceof OutputConnector) {
             return false;
         }        
+
+        if (start instanceof IndexedConnector == false || end instanceof IndexedConnector == false) {
+            return false;
+        }
         
         final IndexedConnector indexedStart = (IndexedConnector)start;
         final IndexedConnector indexedEnd = (IndexedConnector)end;
 
-        if(indexedStart.getNumOfConnection() > 0 || indexedEnd.getNumOfConnection() > 0)
-            return false;
+        /*
+        Fix on the following issues : When try to connect an output connector to input
+        connector of a figure A. Then try to move the connection line to figure A's
+        output connector, success. However, we shall not allow output connector to be
+        connected to another output connector.
+        */
+        if (indexedStart.getNumOfConnection() > 0) {
+            if (this.getStartConnector() != indexedStart) {
+                return false;
+            }
+        }
+
+        if (indexedEnd.getNumOfConnection() > 0) {
+            if (this.getEndConnector() != indexedEnd) {
+                return false;
+            }
+        }
         
         Figure startFigure = start.getOwner();
         Figure endFigure = end.getOwner();
         
-        if(((startFigure instanceof OperatorFigure) == false) || ((endFigure instanceof OperatorFigure) == false))
+        if (((startFigure instanceof OperatorFigure) == false) || ((endFigure instanceof OperatorFigure) == false))
         {
             return false;
         }
         
         OperatorFigure startOperatorFigure = (OperatorFigure)startFigure;
         OperatorFigure endOperatorFigure = (OperatorFigure)endFigure;
-        
-        if(false == org.yccheok.jstock.analysis.OperatorConnectionValidator.canConnect(startOperatorFigure.getOperator(), endOperatorFigure.getOperator()))
-        {
-            return false;
-        }
-        
-        return true;
+        final int startIndex = indexedStart.getIndex();
+        final int endIndex = indexedEnd.getIndex();
+        final Class outputClass = startOperatorFigure.getOperator().getOutputClass(startIndex);
+        final Class inputClass = endOperatorFigure.getOperator().getInputClass(endIndex);
+
+        // Ensure there is no casting expection.
+        //      class A {}
+        //      class B extends A {}
+        //      class C extends B {}
+        //      class D {}
+        //      Class a0 = A.class;
+        //      Class c0 = C.class;
+        //      Class d0 = D.class;
+        //
+        //      System.out.println(c0.isAssignableFrom(a0));    // print false.
+        //      System.out.println(a0.isAssignableFrom(c0));    // print true.
+        //
+        //      System.out.println(d0.isAssignableFrom(a0));    // print false.
+        //      System.out.println(a0.isAssignableFrom(d0));    // print false.
+        return (outputClass.isAssignableFrom(inputClass) || inputClass.isAssignableFrom(outputClass));
     }
     
+    @Override
     public int getLayer() {
         return 1;
     }

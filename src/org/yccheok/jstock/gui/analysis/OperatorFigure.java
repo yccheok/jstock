@@ -17,15 +17,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * Copyright (C) 2007 Cheok YanCheng <yccheok@yahoo.com>
+ * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
  */
 
-package org.yccheok.jstock.gui;
+package org.yccheok.jstock.gui.analysis;
 
+import org.yccheok.jstock.gui.*;
 import java.io.IOException;
 import java.awt.geom.*;
-import java.awt.*;
-import java.beans.*;
 import static org.jhotdraw.draw.AttributeKeys.*;
 import java.util.*;
 import org.jhotdraw.draw.*;
@@ -98,7 +97,7 @@ public abstract class OperatorFigure extends GraphicalCompositeFigure implements
         setAttributeEnabled(STROKE_DASHES, false);
         
         ResourceBundleUtil labels =
-                ResourceBundleUtil.getLAFBundle("org.yccheok.jstock.data.Labels");
+                ResourceBundleUtil.getBundle("org.yccheok.jstock.data.Labels");
         
         setName(labels.getString("operatorDefaultName"));
         
@@ -108,27 +107,25 @@ public abstract class OperatorFigure extends GraphicalCompositeFigure implements
     private void createConnectors() {
         connectors = new LinkedList<AbstractConnector>();
         
-        final Operator operator = this.getOperator();
+        final Operator _operator = this.getOperator();
         
-        final int numOfInputConnector = operator.getNumOfInputConnector();
-        final int numOfOutputConnector = operator.getNumOfOutputConnector();        
+        final int numOfInputConnector = _operator.getNumOfInputConnector();
+        final int numOfOutputConnector = _operator.getNumOfOutputConnector();
         final double inputStep = 1.0 / (double)(numOfInputConnector << 1);
         final double outputStep = 1.0 / (double)(numOfOutputConnector << 1);
-        
+
+        // Create input connectors first.
         for(int i = 0; i < numOfInputConnector; i++) {
             connectors.add(new InputConnector(this, new RelativeLocator(0, inputStep + inputStep * (double)i * 2.0), i));
         }
 
+        // Follow by output connectors.
         for(int i = 0; i < numOfOutputConnector; i++) {
             connectors.add(new OutputConnector(this, new RelativeLocator(1, outputStep + outputStep * (double)i * 2.0), i));
-        }
-
-        for (AbstractConnector c : connectors) {
-            // c.setVisible(true);
-        }
-        
+        }        
     }
     
+    @Override
     public Collection<Handle> createHandles(int detailLevel) {
         java.util.List<Handle> handles = new LinkedList<Handle>();
         if (detailLevel == 0) {
@@ -137,19 +134,36 @@ public abstract class OperatorFigure extends GraphicalCompositeFigure implements
             handles.add(new MoveHandle(this, RelativeLocator.southWest()));
             handles.add(new MoveHandle(this, RelativeLocator.southEast()));
             
-            final Operator operator = this.getOperator();
-            
-            final int numOfOutputConnector = operator.getNumOfOutputConnector();        
-            final double outputStep = 1.0 / (double)(numOfOutputConnector << 1);
+            final Operator _operator = this.getOperator();
 
-            for (org.jhotdraw.draw.Connector c : connectors) {
-                handles.add(new ConnectorHandle(c, new DependencyFigure()));
-            }            
+            final int numOfInputConnector = _operator.getNumOfInputConnector();
+            final int numOfOutputConnector = _operator.getNumOfOutputConnector();
+
+            assert((numOfInputConnector + numOfOutputConnector) == connectors.size());
+            // The connectors iteration sequence, is highly dependent on implementation
+            // of createConnectors method.
+            
+            int connectorIndex = 0;
+            for (int index = 0; index < numOfInputConnector; index++, connectorIndex++) {
+                final Class type = _operator.getInputClass(index);
+                final org.jhotdraw.draw.Connector c = connectors.get(connectorIndex);
+                ConnectorHandle connectorHandle = new ConnectorHandle(c, new DependencyFigure());
+                connectorHandle.setToolTipText(type.getSimpleName());
+                handles.add(connectorHandle);
+            }
+            for (int index = 0; index < numOfOutputConnector; index++, connectorIndex++) {
+                final Class type = _operator.getOutputClass(index);
+                final org.jhotdraw.draw.Connector c = connectors.get(connectorIndex);
+                ConnectorHandle connectorHandle = new ConnectorHandle(c, new DependencyFigure());
+                connectorHandle.setToolTipText(type.getSimpleName());
+                handles.add(connectorHandle);
+            }
         }
         return handles;
     }
     
     public void setName(String newValue) {
+        getNameFigure().willChange();
         getNameFigure().setText(newValue);
         getNameFigure().changed();
     }
@@ -157,6 +171,7 @@ public abstract class OperatorFigure extends GraphicalCompositeFigure implements
         return getNameFigure().getText();
     }
     public void setAttribute(String attribute) {
+        getAttributeFigure().willChange();
         getAttributeFigure().setText(attribute);
         getAttributeFigure().changed();
     }
@@ -164,6 +179,7 @@ public abstract class OperatorFigure extends GraphicalCompositeFigure implements
         return getAttributeFigure().getText();
     }
     public void setValue(String value) {
+        getValueFigure().willChange();
         getValueFigure().setText(value);
         getValueFigure().changed();
     }

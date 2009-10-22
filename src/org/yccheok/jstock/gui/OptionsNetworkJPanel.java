@@ -45,7 +45,7 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
     }
 
     private SwingWorker getTestConnectionSwingWorker() {
-        SwingWorker worker = new SwingWorker<Boolean, Void>() {
+        SwingWorker<Boolean, Void> worker = new SwingWorker<Boolean, Void>() {
             @Override
             public Boolean doInBackground() {
                 // Store old proxy server and old proxy auth information.

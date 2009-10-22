@@ -125,14 +125,14 @@ public class WizardSelectIndicatorJPanel extends javax.swing.JPanel {
         return list;
     }
     
-    public void updateIndicatorProjectManager() {
+    public void updateAlertIndicatorProjectManager() {
         /* We only update the indicator project manager once. */
-        if(this.indicatorProjectManager != null)
+        if (this.alertIndicatorProjectManager != null)
             return;
         
         final MainFrame m = MainFrame.getInstance();
         
-        this.indicatorProjectManager = m.getIndicatorProjectManager();
+        this.alertIndicatorProjectManager = m.getAlertIndicatorProjectManager();
         
         SwingUtilities.invokeLater(new Runnable() {
            public void run() {
@@ -140,15 +140,15 @@ public class WizardSelectIndicatorJPanel extends javax.swing.JPanel {
                 final javax.swing.DefaultListModel defaultListModel = (javax.swing.DefaultListModel)listModel;
                 defaultListModel.removeAllElements();
                 
-                final int numOfProject = indicatorProjectManager.getNumOfProject();
+                final int numOfProject = alertIndicatorProjectManager.getNumOfProject();
                 for(int i = 0; i < numOfProject; i++) {
-                    final String project = indicatorProjectManager.getProject(i);
+                    final String project = alertIndicatorProjectManager.getProject(i);
                     
-                    final OperatorIndicator operatorIndicator = indicatorProjectManager.getOperatorIndicator(project);
+                    final OperatorIndicator operatorIndicator = alertIndicatorProjectManager.getOperatorIndicator(project);
                     
-                    // We only accept valid indicator.
-                    if(operatorIndicator != null) {
-                        if(operatorIndicator.isValid())
+                    // We only accept alert typed indicator.
+                    if (operatorIndicator != null) {
+                        if (operatorIndicator.getType() == OperatorIndicator.Type.AlertIndicator)
                             defaultListModel.addElement(project);
                     }
                 }
@@ -156,7 +156,7 @@ public class WizardSelectIndicatorJPanel extends javax.swing.JPanel {
         });        
     }
     
-    private IndicatorProjectManager indicatorProjectManager;
+    private IndicatorProjectManager alertIndicatorProjectManager;
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;

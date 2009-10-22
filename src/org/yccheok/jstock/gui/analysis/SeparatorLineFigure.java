@@ -12,7 +12,7 @@
  * JHotDraw.org.
  */
 
-package org.yccheok.jstock.gui;
+package org.yccheok.jstock.gui.analysis;
 
 import org.jhotdraw.util.*;
 import java.awt.*;

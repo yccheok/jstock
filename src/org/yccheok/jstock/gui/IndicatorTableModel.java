@@ -37,25 +37,29 @@ public class IndicatorTableModel extends AbstractTableModelWithMemory {
         }        
     }
 
+    @Override
     public int getColumnCount()
     {
         return columnNames.length;
     }
     
+    @Override
     public int getRowCount()
     {
         return tableModel.size();
     }
 
+    @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         List<Object> indicatorInfo = tableModel.get(rowIndex);
         return indicatorInfo.get(columnIndex);        
     }
     
+    @Override
     public Object getOldValueAt(int rowIndex, int columnIndex) {
         List<Object> indicatorInfo = oldTableModel.get(rowIndex);
         
-        if(null == indicatorInfo) return null;
+        if (null == indicatorInfo) return null;
         
         return indicatorInfo.get(columnIndex);        
     }
@@ -70,10 +74,12 @@ public class IndicatorTableModel extends AbstractTableModelWithMemory {
         return columnClasses[c];
     }
 
+    @Override
     public boolean isCellEditable(int row, int col) {
         return false;
     }
 
+    @Override
     public void setValueAt(Object value, int row, int col) {
         throw new java.lang.UnsupportedOperationException();
     }
@@ -81,7 +87,7 @@ public class IndicatorTableModel extends AbstractTableModelWithMemory {
     public void addIndicator(Indicator indicator) {
         Integer row = rowIndicatorMapping.get(getIndicatorKey(indicator));
         
-        if(row == null) {
+        if (row == null) {
             tableModel.add(indicatorToList(indicator));
             oldTableModel.add(null);
             indicators.add(indicator);

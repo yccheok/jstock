@@ -21,17 +21,11 @@ package org.yccheok.jstock.gui;
 
 import org.yccheok.jstock.alert.GoogleMail;
 import org.yccheok.jstock.alert.GoogleCalendar;
-import java.awt.Desktop;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.concurrent.ExecutionException;
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
 import javax.swing.*;
 
-import javax.swing.event.HyperlinkEvent;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.internationalization.MessagesBundle;
@@ -368,32 +362,7 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
     }//GEN-LAST:event_jCheckBox2ItemStateChanged
 
     private void jEditorPane3jEditorPane1HyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {//GEN-FIRST:event_jEditorPane3jEditorPane1HyperlinkUpdate
-        // TODO add your handling code here:
-        if (HyperlinkEvent.EventType.ACTIVATED.equals(evt.getEventType())) {
-            URL url = evt.getURL();
-
-            if (Desktop.isDesktopSupported()) {
-                Desktop desktop = Desktop.getDesktop();
-
-                if (desktop.isSupported(Desktop.Action.BROWSE)) {
-                    if (url == null) {
-                        // www.yahoo.com considered an invalid URL. Hence, evt.getURL() returns null.
-                        String string = "http://" + evt.getDescription();
-                        try {
-                            url = new URL(string);
-                        } catch (MalformedURLException ex) {
-                            return;
-                        }
-                    }
-
-                    try {
-                        desktop.browse(url.toURI());
-                    } catch (URISyntaxException ex) {
-                    } catch (IOException ex) {
-                    }
-                }
-            }
-        }
+        Utils.launchWebBrowser(evt);
 }//GEN-LAST:event_jEditorPane3jEditorPane1HyperlinkUpdate
 
     private void jCheckBox3ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jCheckBox3ItemStateChanged
@@ -546,12 +515,12 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
 
                 try {
                     GoogleMail.Send(
-                            jTextField2.getText(),
-                            new String(jPasswordField1.getPassword()),
-                            jTextField2.getText() + "@gmail.com",
-                            MessagesBundle.getString("info_message_congratulation_email_alert_system_is_working"),
-                            MessagesBundle.getString("info_message_congratulation_email_alert_system_is_working")
-                          );
+                        jTextField2.getText(),
+                        new String(jPasswordField1.getPassword()),
+                        jTextField2.getText() + "@gmail.com",
+                        MessagesBundle.getString("info_message_congratulation_email_alert_system_is_working"),
+                        MessagesBundle.getString("info_message_congratulation_email_alert_system_is_working")
+                    );
                 } catch (AddressException ex) {
                     log.error(null, ex);
                     status = false;
@@ -574,6 +543,8 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
                 // test the SwingWorker using the isCancelled method before you
                 // use the get method.
                 if (this.isCancelled()) {
+                    // Cancelled by user explicitly. Do not perform any GUI update.
+                    // No pop-up message.
                     return;
                 }
 
@@ -623,6 +594,8 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
                 // test the SwingWorker using the isCancelled method before you
                 // use the get method.
                 if (this.isCancelled()) {
+                    // Cancelled by user explicitly. Do not perform any GUI update.
+                    // No pop-up message.
                     return;
                 }
 
@@ -633,7 +606,7 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
                     log.error(null, ex);
                 } catch (ExecutionException ex) {
                     log.error(null, ex);
-                }
+                }                
 
                 OptionsAlertJPanel.this.updateGUIState();
 

@@ -123,6 +123,7 @@ public class OptionsJPanel extends javax.swing.JPanel implements JStockOptionsOb
     public void cancel() {
         optionsNetworkJPanel.cancel();
         optionsAlertJPanel.cancel();
+        optionsUpdateJPanel.cancel();
     }
 
     @Override

@@ -22,16 +22,8 @@
 
 package org.yccheok.jstock.gui;
 
-import org.jhotdraw.draw.Drawing;
-import org.jhotdraw.draw.DrawingEditor;
-import org.jhotdraw.draw.DrawingView;
-import org.jhotdraw.draw.FigureSelectionEvent;
-import org.jhotdraw.draw.FigureSelectionListener;
-import javax.swing.*;
-import java.beans.*;
-import javax.swing.undo.*;
+import org.yccheok.jstock.gui.analysis.OperatorFigure;
 import org.jhotdraw.util.*;
-import java.util.*;
 import org.jhotdraw.draw.action.*;
 import org.jhotdraw.draw.*;
 
@@ -55,14 +47,14 @@ public class PropertiesAction extends AbstractSelectedAction {
     public PropertiesAction(DrawingEditor editor, CompositeFigure prototype) {
         super(editor);
         this.prototype = prototype;
-        ResourceBundleUtil labels =
-            ResourceBundleUtil.getLAFBundle("org.yccheok.jstock.data.Labels", Locale.getDefault());        
-        labels.configureAction(this, ID);
+        ResourceBundleUtil _labels =
+			ResourceBundleUtil.getBundle("org.yccheok.jstock.data.Labels");        
+        _labels.configureAction(this, ID);
     }
     
     @Override protected void updateEnabledState() {
-        if(getView() != null) {
-            if(getView().getSelectionCount() == 1) {
+        if (getView() != null) {
+            if (getView().getSelectionCount() == 1) {
                 this.setEnabled(getView().getSelectedFigures().iterator().next() instanceof OperatorFigure);
             }
             else {
@@ -73,16 +65,16 @@ public class PropertiesAction extends AbstractSelectedAction {
     
     public void actionPerformed(java.awt.event.ActionEvent e) {
         java.util.Set<Figure> figures = this.getView().getSelectedFigures();
-        for(Figure figure : figures) {
-            if(figure instanceof OperatorFigure) {
+        for (Figure figure : figures) {
+            if (figure instanceof OperatorFigure) {
                 final OperatorFigure operatorFigure = (OperatorFigure)figure;
-                if(objectInspectorJFrame == null) {
+                if (objectInspectorJFrame == null) {
                     objectInspectorJFrame = new ObjectInspectorJFrame(operatorFigure.getOperator());
                 }
                 else {
                     objectInspectorJFrame.setBean(operatorFigure.getOperator());
                 }
-                
+
                 objectInspectorJFrame.setVisible(true);
                 objectInspectorJFrame.setState(java.awt.Frame.NORMAL);
                 break;

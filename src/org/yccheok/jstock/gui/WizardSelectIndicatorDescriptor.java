@@ -44,22 +44,27 @@ public class WizardSelectIndicatorDescriptor extends WizardPanelDescriptor imple
         getWizard().setNextFinishButtonEnabled(wizardSelectIndicatorJPanel.getSelectedProjects().size() > 0);
     }
     
+    @Override
     public Object getNextPanelDescriptor() {
         return WizardSelectStockDescriptor.IDENTIFIER;
     }
     
+    @Override
     public Object getBackPanelDescriptor() {
         return null;
     }
     
+    @Override
     public void aboutToDisplayPanel() {        
-        wizardSelectIndicatorJPanel.updateIndicatorProjectManager();
+        wizardSelectIndicatorJPanel.updateAlertIndicatorProjectManager();
         getWizard().setNextFinishButtonEnabled(wizardSelectIndicatorJPanel.getSelectedProjects().size() > 0);
     }
    
+    @Override
     public void displayingPanel() {
     }
    
+    @Override
     public void aboutToHidePanel() {
     }
     

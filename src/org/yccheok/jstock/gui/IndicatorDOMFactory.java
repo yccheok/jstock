@@ -13,11 +13,20 @@
  */
 package org.yccheok.jstock.gui;
 
-import java.util.*;
+import org.yccheok.jstock.gui.analysis.StockOperatorFigure;
+import org.yccheok.jstock.gui.analysis.EqualityOperatorFigure;
+import org.yccheok.jstock.gui.analysis.StockHistoryOperatorFigure;
+import org.yccheok.jstock.gui.analysis.LogicalOperatorFigure;
+import org.yccheok.jstock.gui.analysis.StockRelativeHistoryOperatorFigure;
+import org.yccheok.jstock.gui.analysis.DoubleConstantOperatorFigure;
+import org.yccheok.jstock.gui.analysis.SeparatorLineFigure;
+import org.yccheok.jstock.gui.analysis.SinkOperatorFigure;
+import org.yccheok.jstock.gui.analysis.DependencyFigure;
+import org.yccheok.jstock.gui.analysis.ArithmeticOperatorFigure;
 import org.jhotdraw.draw.*;
 import org.jhotdraw.xml.*;
-import org.yccheok.jstock.gui.*;
 import org.yccheok.jstock.analysis.*;
+import org.yccheok.jstock.gui.analysis.DiodeOperatorFigure;
 
 /**
  * PertFactory.
@@ -36,7 +45,8 @@ public class IndicatorDOMFactory extends DefaultDOMFactory {
         { DoubleConstantOperatorFigure.class, "doubleConstantOperatorFigure" },
         { LogicalOperatorFigure.class, "logicalOperatorFigure" },
         { EqualityOperatorFigure.class, "equalityOperatorFigure" },
-        { SinkOperator.class, "sinkOperator" },        
+        { DiodeOperatorFigure.class, "diodeOperatorFigure" },
+        { SinkOperator.class, "sinkOperator" },    
         { org.yccheok.jstock.analysis.Connector.class, "analysis.connector" },
         { org.yccheok.jstock.analysis.Connection.class, "analysis.Connection" },
         { ArithmeticOperator.class, "arithmeticOperator" },

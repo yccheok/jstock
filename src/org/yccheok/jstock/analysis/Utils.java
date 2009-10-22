@@ -24,6 +24,12 @@ package org.yccheok.jstock.analysis;
 
 import java.io.*;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.zip.Adler32;
+import java.util.zip.CheckedInputStream;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  *
@@ -37,16 +43,49 @@ public class Utils {
     
     // Handle null case.
     public static boolean equals(Object oldValue, Object newValue) {
-        if(oldValue == null) {
+        if (oldValue == null) {
             return newValue == null;
         }        
         
         return oldValue.equals(newValue);
     }
+
+    public static long getChecksum(String fileName) {
+        return getChecksum(new File(fileName));
+    }
     
-    
+    public static long getChecksum(File file) {
+        FileInputStream stream = null;
+        CheckedInputStream cis = null;
+        try {
+            // Compute Adler-32 checksum
+            stream = new FileInputStream(file);
+            cis = new CheckedInputStream(stream, new Adler32());
+            byte[] tempBuf = new byte[128];
+            while (cis.read(tempBuf) >= 0) {
+            }
+            long checksum = cis.getChecksum().getValue();
+            return checksum;
+        } catch (IOException ex) {
+            log.error(null, ex);
+        }
+        finally {
+            try {
+                cis.close();
+            } catch (IOException ex) {
+                log.error(null, ex);
+            }
+            try {
+                stream.close();
+            } catch (IOException ex) {
+                log.error(null, ex);
+            }
+        }
+        return 0;
+    }
+
     public static List<String> getFiles(List<String> l, String directory) {
-        if(l == null) {
+        if (l == null) {
             l = new ArrayList<String>();
         }
         
@@ -66,4 +105,6 @@ public class Utils {
         
         return l;
     }
+
+    private static final Log log = LogFactory.getLog(Utils.class);
 }

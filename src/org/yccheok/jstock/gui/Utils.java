@@ -21,6 +21,7 @@ package org.yccheok.jstock.gui;
 
 import com.thoughtworks.xstream.XStream;
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.Graphics;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
@@ -42,9 +43,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.text.MessageFormat;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.yccheok.jstock.engine.*;
 import java.util.*;
 import java.util.concurrent.Executor;
@@ -54,6 +55,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JRadioButton;
 import javax.swing.UIManager;
+import javax.swing.event.HyperlinkEvent;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
@@ -239,6 +241,35 @@ public class Utils {
         return defaultServer;
     }
 
+    public static void launchWebBrowser(javax.swing.event.HyperlinkEvent evt) {
+        if (HyperlinkEvent.EventType.ACTIVATED.equals(evt.getEventType())) {
+            URL url = evt.getURL();
+            if (Desktop.isDesktopSupported())
+            {
+                final Desktop desktop = Desktop.getDesktop();
+                if (desktop.isSupported(Desktop.Action.BROWSE))
+                {
+                    if (url == null) {
+                        // www.yahoo.com considered an invalid URL. Hence, evt.getURL() returns null.
+                        String string = "http://" + evt.getDescription();
+                        try {
+                            url = new URL(string);
+                        } catch (MalformedURLException ex) {
+                            return;
+                        }
+                    }
+                    try {
+                        desktop.browse(url.toURI());
+                    }
+                    catch (URISyntaxException ex) {
+                    }
+                    catch (IOException ex) {
+                    }
+                }
+            }
+        }
+    }
+
     public static java.awt.Image getScaledImage(Image image, int maxWidth, int maxHeight) {
         // This code ensures that all the pixels in the image are loaded
         image = new ImageIcon(image).getImage();
@@ -400,7 +431,36 @@ public class Utils {
     public static String getUserDataDirectory() {
         return System.getProperty("user.home") + File.separator + ".jstock" + File.separator + getApplicationVersionString() + File.separator;
     }
-    
+
+    public static boolean migrateFrom104jTo105() {
+        // File (or directory) with old name
+        final File oldDirectory = new File(System.getProperty("user.home") + File.separator + ".jstock" + File.separator + "1.0.4" + File.separator);
+
+        // File (or directory) with new name
+        final File newDirectory = new File(getUserDataDirectory());
+
+        // Migrate already?
+        if (newDirectory.isDirectory() && newDirectory.exists()) {
+            return true;
+        }
+
+        // No 1.0.4j found?
+        if (oldDirectory.isDirectory() == false || oldDirectory.exists() == false) {
+            return true;
+        }
+
+        // Rename file (or directory)
+        boolean success = oldDirectory.renameTo(newDirectory);
+        if (!success) {
+            return false;
+        }
+
+        // Indicator directory no longer backward compataible.
+        final File indicatorDirectory = new File(getUserDataDirectory() + "indicator" + File.separator);
+        final boolean status = deleteDir(indicatorDirectory, true);
+        return status;
+    }
+
     public static Color getColor(double price, double referencePrice) {
         if(price < referencePrice) {
             return JStockOptions.DEFAULT_LOWER_NUMERICAL_VALUE_FOREGROUND_COLOR;
@@ -572,7 +632,7 @@ public class Utils {
         operatorIndicator.add(equalityOperator);
         operatorIndicator.add(sinkOperator);
 
-        assert(operatorIndicator.isValid());
+        assert(operatorIndicator.getType() == OperatorIndicator.Type.AlertIndicator);
         operatorIndicator.preCalculate();
 
         return operatorIndicator;
@@ -608,7 +668,7 @@ public class Utils {
         operatorIndicator.add(equalityOperator);
         operatorIndicator.add(sinkOperator);
 
-        assert(operatorIndicator.isValid());
+        assert(operatorIndicator.getType() == OperatorIndicator.Type.AlertIndicator);
         operatorIndicator.preCalculate();
         
         return operatorIndicator;
@@ -808,7 +868,7 @@ public class Utils {
         org.yccheok.jstock.engine.Utils.setHttpClientProxyFromSystemProperties(httpClient);
         org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
 
-		final GetMethod method = new GetMethod(request);
+        final GetMethod method = new GetMethod(request);
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
         InputStreamAndMethod inputStreamAndMethod = null;
         InputStream respond = null;
@@ -961,6 +1021,35 @@ public class Utils {
         return "<html><head></head><body>" + plainText + "</body></html>";
     }
 
+    public static <A> A fromXML(Class c, InputStream inputStream) {
+        XStream xStream = new XStream();
+
+        try {
+            Object object = xStream.fromXML(inputStream);
+            if (c.isInstance(object)) {
+                return (A)object;
+            }
+        }
+        catch (Exception exp) {
+            log.error(null, exp);
+        }
+        finally {
+            /* The caller shall close input stream explicitly. */
+            //if (inputStream != null) {
+            //    try {
+            //        inputStream.close();
+            //        inputStream = null;
+            //    }
+            //    catch (java.io.IOException exp) {
+            //        log.error(null, exp);
+            //        return null;
+            //    }
+            //}
+        }
+
+        return null;
+    }
+
     public static <A> A fromXML(Class c, File file) {
         XStream xStream = new XStream();
         InputStream inputStream = null;
@@ -972,10 +1061,7 @@ public class Utils {
                 return (A)object;
             }
         }
-        catch (java.io.FileNotFoundException exp) {
-            log.error(null, exp);
-        }
-        catch (com.thoughtworks.xstream.core.BaseException exp) {
+        catch (Exception exp) {
             log.error(null, exp);
         }
         finally {
@@ -1006,11 +1092,7 @@ public class Utils {
             outputStream = new FileOutputStream(file);
             xStream.toXML(object, outputStream);
         }
-        catch (com.thoughtworks.xstream.core.BaseException exp) {
-            log.error(null, exp);
-            return false;
-        }
-        catch (java.io.FileNotFoundException exp) {
+        catch (Exception exp) {
             log.error(null, exp);
             return false;
         }
@@ -1137,10 +1219,7 @@ public class Utils {
             }
 
             if (file.exists()) {
-                final MessageFormat formatter = new MessageFormat("");
-                // formatter.setLocale(currentLocale);
-                formatter.applyPattern(MessagesBundle.getString("question_message_replace_old_template"));
-                final String output = formatter.format(new Object[]{file.getName()});
+                final String output = MessageFormat.format(MessagesBundle.getString("question_message_replace_old_template"), file.getName());
 
                 final int result = javax.swing.JOptionPane.showConfirmDialog(MainFrame.getInstance(), output, MessagesBundle.getString("question_title_replace_old"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
                 if (result != javax.swing.JOptionPane.YES_OPTION) {
@@ -1179,26 +1258,21 @@ public class Utils {
         return null;
     }
 
-    // Calling to this method will affect state of JStockOptions.
-    // Returns null if no file being selected.
-    public static File promptOpenCSVAndExcelJFileChooser() {
+    private static File promptOpenJFileChooser(FileNameExtensionFilter... fileNameExtensionFilters) {
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
         final JFileChooser chooser = new JFileChooser(jStockOptions.getLastFileIODirectory());
-        final FileNameExtensionFilter csvFilter = new FileNameExtensionFilter("CSV Documents (*.csv)", "csv");
-        final FileNameExtensionFilter xlsFilter = new FileNameExtensionFilter("Microsoft Excel (*.xls)", "xls");
         chooser.setAcceptAllFileFilterUsed(false);
-        chooser.addChoosableFileFilter(csvFilter);
-        chooser.addChoosableFileFilter(xlsFilter);
-
-        java.util.Map<String, FileNameExtensionFilter> map = new HashMap<String, FileNameExtensionFilter>();
-        map.put(csvFilter.getDescription(), csvFilter);
-        map.put(xlsFilter.getDescription(), xlsFilter);
-
+        for (FileNameExtensionFilter fileNameExtensionFilter : fileNameExtensionFilters) {
+            chooser.addChoosableFileFilter(fileNameExtensionFilter);
+        }
+        final java.util.Map<String, FileNameExtensionFilter> map = new HashMap<String, FileNameExtensionFilter>();
+        for (FileNameExtensionFilter fileNameExtensionFilter : fileNameExtensionFilters) {
+            map.put(fileNameExtensionFilter.getDescription(), fileNameExtensionFilter);
+        }
         final FileNameExtensionFilter filter = map.get(jStockOptions.getLastSavedFileNameExtensionDescription());
         if (filter != null) {
             chooser.setFileFilter(filter);
         }
-
         int returnVal = chooser.showOpenDialog(MainFrame.getInstance());
 
         if (returnVal != JFileChooser.APPROVE_OPTION) {
@@ -1209,47 +1283,53 @@ public class Utils {
         if (file == null || !file.exists()) {
             return null;
         }
-
         final String parent = chooser.getSelectedFile().getParent();
         if (parent != null) {
             jStockOptions.setLastFileIODirectory(parent);
         }
-
-        if (Utils.getFileExtension(file).equals("csv")) {
-            jStockOptions.setLastFileNameExtensionDescription(csvFilter.getDescription());
-            return file;
+        final String extension = Utils.getFileExtension(file);
+        for (FileNameExtensionFilter fileNameExtensionFilter : fileNameExtensionFilters) {
+            final String[] extensions = fileNameExtensionFilter.getExtensions();
+            if (extensions.length <= 0) {
+                continue;
+            }
+            if (extension.equals(extensions[0])) {
+                jStockOptions.setLastFileNameExtensionDescription(fileNameExtensionFilter.getDescription());
+                return file;
+            }
         }
-        else if (Utils.getFileExtension(file).equals("xls")) {
-            jStockOptions.setLastFileNameExtensionDescription(xlsFilter.getDescription());
-            return file;
-        }
-        else {
-            // Impossible.
-            return null;
-        }
+        return null;
     }
 
     // Calling to this method will affect state of JStockOptions.
     // Returns null if no file being selected.
-    public static File promptSaveCSVAndExcelJFileChooser(String suggestedFileName) {
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
-        final JFileChooser chooser = new JFileChooser(jStockOptions.getLastFileIODirectory());
+    public static File promptOpenCSVAndExcelJFileChooser() {
         final FileNameExtensionFilter csvFilter = new FileNameExtensionFilter("CSV Documents (*.csv)", "csv");
         final FileNameExtensionFilter xlsFilter = new FileNameExtensionFilter("Microsoft Excel (*.xls)", "xls");
+        return promptOpenJFileChooser(csvFilter, xlsFilter);
+    }
+
+    public static File promptOpenZippedJFileChooser() {
+        final FileNameExtensionFilter zippedFilter = new FileNameExtensionFilter("Zipped Files (*.zip)", "zip");
+        return promptOpenJFileChooser(zippedFilter);
+    }
+
+    private static File promptSaveJFileChooser(String suggestedFileName, FileNameExtensionFilter... fileNameExtensionFilters) {
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JFileChooser chooser = new JFileChooser(jStockOptions.getLastFileIODirectory());
         chooser.setAcceptAllFileFilterUsed(false);
-        chooser.addChoosableFileFilter(csvFilter);
-        chooser.addChoosableFileFilter(xlsFilter);
+        for (FileNameExtensionFilter fileNameExtensionFilter : fileNameExtensionFilters) {
+            chooser.addChoosableFileFilter(fileNameExtensionFilter);
+        }
         chooser.setSelectedFile(new File(suggestedFileName));
-
         final java.util.Map<String, FileNameExtensionFilter> map = new HashMap<String, FileNameExtensionFilter>();
-        map.put(csvFilter.getDescription(), csvFilter);
-        map.put(xlsFilter.getDescription(), xlsFilter);
-
+        for (FileNameExtensionFilter fileNameExtensionFilter : fileNameExtensionFilters) {
+            map.put(fileNameExtensionFilter.getDescription(), fileNameExtensionFilter);
+        }
         final FileNameExtensionFilter filter = map.get(jStockOptions.getLastSavedFileNameExtensionDescription());
         if (filter != null) {
             chooser.setFileFilter(filter);
         }
-
         while (true) {
             final int returnVal = chooser.showSaveDialog(MainFrame.getInstance());
             if (returnVal != JFileChooser.APPROVE_OPTION) {
@@ -1260,36 +1340,44 @@ public class Utils {
             if (file == null) {
                 return null;
             }
-
             // Ensure the saved file is in correct extension. If user provide correct
             // file extension explicitly, leave it as is. If not, mutate the filename.
             final String extension = Utils.getFileExtension(file);
-            if (extension.equals("csv") == false && extension.equals("xls") == false) {
-                if (chooser.getFileFilter().getDescription().equals(csvFilter.getDescription())) {
-                    try {
-                        file = new File(file.getCanonicalPath() + ".csv");
-                    } catch (IOException ex) {
-                        log.error(null, ex);
+            boolean found = false;
+            root:
+            for (FileNameExtensionFilter fileNameExtensionFilter : fileNameExtensionFilters) {
+                String[] extensions = fileNameExtensionFilter.getExtensions();
+                for (String e : extensions) {
+                    if (e.equals(extension)) {
+                        found = true;
+                        break root;
                     }
-                }
-                else if (chooser.getFileFilter().getDescription().equals(xlsFilter.getDescription())) {
-                    try {
-                        file = new File(file.getCanonicalPath() + ".xls");
-                    } catch (IOException ex) {
-                        log.error(null, ex);
-                    }
-                }
-                else {
-                    // Impossible.
-                    return null;
                 }
             }
-
+            if (!found) {
+                for (FileNameExtensionFilter fileNameExtensionFilter : fileNameExtensionFilters) {
+                    String[] extensions = fileNameExtensionFilter.getExtensions();
+                    if (extensions.length <= 0) {
+                        continue;
+                    }
+                    final String e = extensions[0];
+                    if (chooser.getFileFilter().getDescription().equals(fileNameExtensionFilter.getDescription())) {
+                        try {
+                            if (e.startsWith(".")) {
+                                file = new File(file.getCanonicalPath() + e);
+                            }
+                            else {
+                                file = new File(file.getCanonicalPath() + "." + e);
+                            }
+                        } catch (IOException ex) {
+                            log.error(null, ex);
+                        }
+                        break;
+                    }
+                }
+            }
             if (file.exists()) {
-                final MessageFormat formatter = new MessageFormat("");
-                // formatter.setLocale(currentLocale);
-                formatter.applyPattern(MessagesBundle.getString("question_message_replace_old_template"));
-                final String output = formatter.format(new Object[]{file.getName()});
+                final String output = MessageFormat.format(MessagesBundle.getString("question_message_replace_old_template"), file.getName());
 
                 final int result = javax.swing.JOptionPane.showConfirmDialog(MainFrame.getInstance(), output, MessagesBundle.getString("question_title_replace_old"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
                 if (result != javax.swing.JOptionPane.YES_OPTION) {
@@ -1301,20 +1389,32 @@ public class Utils {
             if (parent != null) {
                 jStockOptions.setLastFileIODirectory(parent);
             }
-
-            if (Utils.getFileExtension(file).equals("csv")) {
-                jStockOptions.setLastFileNameExtensionDescription(csvFilter.getDescription());
-                return file;
+            final String e = Utils.getFileExtension(file);
+            for (FileNameExtensionFilter fileNameExtensionFilter : fileNameExtensionFilters) {
+                String[] extensions = fileNameExtensionFilter.getExtensions();
+                if (extensions.length <= 0) {
+                    continue;
+                }
+                if (e.equals(extensions[0])) {
+                    jStockOptions.setLastFileNameExtensionDescription(fileNameExtensionFilter.getDescription());
+                    break;
+                }
             }
-            else if (Utils.getFileExtension(file).equals("xls")) {
-                jStockOptions.setLastFileNameExtensionDescription(xlsFilter.getDescription());
-                return file;
-            }
-            else {
-                // Impossible.
-                return null;
-            }
+            return file;
         }
+    }
+
+    public static File promptSaveZippedJFileChooser(String suggestedFileName) {
+        final FileNameExtensionFilter zippedFilter = new FileNameExtensionFilter("Zipped Files (*.zip)", "zip");
+        return promptSaveJFileChooser(suggestedFileName, zippedFilter);
+    }
+
+    // Calling to this method will affect state of JStockOptions.
+    // Returns null if no file being selected.
+    public static File promptSaveCSVAndExcelJFileChooser(String suggestedFileName) {
+        final FileNameExtensionFilter csvFilter = new FileNameExtensionFilter("CSV Documents (*.csv)", "csv");
+        final FileNameExtensionFilter xlsFilter = new FileNameExtensionFilter("Microsoft Excel (*.xls)", "xls");
+        return promptSaveJFileChooser(suggestedFileName, csvFilter, xlsFilter);
     }
 
     public static class ApplicationInfo
@@ -1337,11 +1437,11 @@ public class Utils {
     private static volatile List<String> NTPServers = null;
 
 	// We will use this as directory name. Do not have space or special characters.
-    private static final String APPLICATION_VERSION_STRING = "1.0.4";
+    private static final String APPLICATION_VERSION_STRING = "1.0.5";
 
     // For About box comparision on latest version purpose.
-    // 1.0.4j
-    private static final int APPLICATION_VERSION_ID = 1049;
+    // 1.0.5
+    private static final int APPLICATION_VERSION_ID = 1050;
 
     private static Executor zombiePool = Executors.newFixedThreadPool(Utils.NUM_OF_THREADS_ZOMBIE_POOL);
 

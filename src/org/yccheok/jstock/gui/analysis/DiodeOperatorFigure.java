@@ -1,8 +1,4 @@
 /*
- * LogicalOperatorFigure.java
- *
- * Created on May 26, 2007, 2:28 PM
- *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or (at
@@ -17,10 +13,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * Copyright (C) 2007 Cheok YanCheng <yccheok@yahoo.com>
+ * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
  */
 
-package org.yccheok.jstock.gui;
+package org.yccheok.jstock.gui.analysis;
 
 import org.yccheok.jstock.analysis.*;
 
@@ -28,14 +24,12 @@ import org.yccheok.jstock.analysis.*;
  *
  * @author yccheok
  */
-public class LogicalOperatorFigure extends OperatorFigure {
-    
-    /** Creates a new instance of LogicalOperatorFigure */
-    public LogicalOperatorFigure() {
-        super(new LogicalOperator());
-        this.setName("Logical");
-        this.setAttribute(((LogicalOperator)this.getOperator()).getLogical().toString());
-        this.setValue("");        
+public class DiodeOperatorFigure extends OperatorFigure {
+    public DiodeOperatorFigure() {
+        super(new DiodeOperator());
+        DiodeOperator operator = (DiodeOperator)getOperator();
+        this.setName("Module");
+        this.setAttribute(operator.getDescription());
+        this.setValue("");
     }
-    
 }

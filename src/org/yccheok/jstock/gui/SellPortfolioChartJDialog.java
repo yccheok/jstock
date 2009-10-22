@@ -73,7 +73,9 @@ public class SellPortfolioChartJDialog extends javax.swing.JDialog {
         this.portfolioTreeTableModel = portfolioTreeTableModel;
         
         final JFreeChart freeChart = createChart(cNames[0]);
-        
+
+        org.yccheok.jstock.charting.Utils.applyChartTheme(freeChart);
+
         chartPanel = new ChartPanel(freeChart, true, true, true, true, true);
         
         getContentPane().add(chartPanel, java.awt.BorderLayout.CENTER);        
@@ -221,6 +223,7 @@ public class SellPortfolioChartJDialog extends javax.swing.JDialog {
         String selected = ((javax.swing.JComboBox)evt.getSource()).getSelectedItem().toString();
         
         final JFreeChart freeChart = this.createChart(selected);
+        org.yccheok.jstock.charting.Utils.applyChartTheme(freeChart);
         chartPanel.setChart(freeChart);
     }//GEN-LAST:event_jComboBox1ActionPerformed
     

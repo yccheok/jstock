@@ -1,7 +1,7 @@
 /*
- * StockRelativeHistoryOperatorFigure.java
+ * ConstantOperatorFigure.java
  *
- * Created on June 18, 2007, 3:05 AM
+ * Created on May 23, 2007, 2:42 AM
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,10 +17,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * Copyright (C) 2007 Cheok YanCheng <yccheok@yahoo.com>
+ * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
  */
 
-package org.yccheok.jstock.gui;
+package org.yccheok.jstock.gui.analysis;
 
 import org.yccheok.jstock.analysis.*;
 
@@ -28,15 +28,12 @@ import org.yccheok.jstock.analysis.*;
  *
  * @author yccheok
  */
-public class StockRelativeHistoryOperatorFigure extends OperatorFigure {
+public class DoubleConstantOperatorFigure extends OperatorFigure {
     
-    /** Creates a new instance of StockHistoryOperatorFigure */
-    public StockRelativeHistoryOperatorFigure() {
-        super(new StockRelativeHistoryOperator());
-        final StockRelativeHistoryOperator stockRelativeHistoryOperator = (StockRelativeHistoryOperator)getOperator();
-        this.setName("Relative Stock History");
-        this.setAttribute(stockRelativeHistoryOperator.getFunction().toString() + " " + stockRelativeHistoryOperator.getType().toString());
-        this.setValue("");
+    public DoubleConstantOperatorFigure() {
+        super(new DoubleConstantOperator());
+        this.setName("Constant");
+        this.setAttribute("");
+        this.setValue(((DoubleConstantOperator)this.getOperator()).getConstant().toString());
     }
-    
 }

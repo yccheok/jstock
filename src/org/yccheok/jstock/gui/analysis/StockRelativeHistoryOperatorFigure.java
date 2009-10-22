@@ -1,7 +1,7 @@
 /*
- * ArithmeticOperatorFigure.java
+ * StockRelativeHistoryOperatorFigure.java
  *
- * Created on May 20, 2007, 12:14 AM
+ * Created on June 18, 2007, 3:05 AM
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,31 +20,24 @@
  * Copyright (C) 2007 Cheok YanCheng <yccheok@yahoo.com>
  */
 
-package org.yccheok.jstock.gui;
+package org.yccheok.jstock.gui.analysis;
 
-import java.io.IOException;
-import java.awt.geom.*;
-import java.beans.*;
-import static org.jhotdraw.draw.AttributeKeys.*;
-import java.util.*;
-import org.jhotdraw.draw.*;
-import org.jhotdraw.geom.*;
-import org.jhotdraw.util.*;
-import org.jhotdraw.xml.*;
 import org.yccheok.jstock.analysis.*;
 
 /**
  *
  * @author yccheok
  */
-public class ArithmeticOperatorFigure extends OperatorFigure {
+public class StockRelativeHistoryOperatorFigure extends OperatorFigure {
     
-    public ArithmeticOperatorFigure() {
-        super(new ArithmeticOperator());
-        ArithmeticOperator operator = (ArithmeticOperator)getOperator();
-        this.setName("Arithmetic");
-        this.setAttribute(operator.getArithmetic().toString());
+    /** Creates a new instance of StockHistoryOperatorFigure */
+    public StockRelativeHistoryOperatorFigure() {
+        super(new StockRelativeHistoryOperator());
+        final StockRelativeHistoryOperator stockRelativeHistoryOperator = (StockRelativeHistoryOperator)getOperator();
+        this.setName("Relative Stock History");
+        final int day = stockRelativeHistoryOperator.getDay();
+        this.setAttribute(day + "d " + stockRelativeHistoryOperator.getFunction().toString() + " " + stockRelativeHistoryOperator.getType().toString());
         this.setValue("");
     }
+    
 }
-
