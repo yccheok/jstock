@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * Copyright (C) 2007 Cheok YanCheng <yccheok@yahoo.com>
+ * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
  */
 
 package org.yccheok.jstock.analysis;
@@ -26,7 +26,7 @@ package org.yccheok.jstock.analysis;
  *
  * @author yccheok
  */
-public class DoubleConstantOperator extends AbstractOperator implements Operator, org.jhotdraw.xml.DOMStorable {
+public class DoubleConstantOperator extends AbstractOperator {
     
     /** Creates a new instance of ConstantOperator */
     public DoubleConstantOperator() {
@@ -55,21 +55,15 @@ public class DoubleConstantOperator extends AbstractOperator implements Operator
     public int getNumOfInputConnector() {
         return 0;
     }
-    
-    public void write(org.jhotdraw.xml.DOMOutput out) throws java.io.IOException {
-        super.write(out);
-        
-        out.openElement("constant");
-        out.writeObject(constant);
-        out.closeElement();
+
+    @Override
+    public Class getInputClass(int index) {
+        return null;
     }
 
-    public void read(org.jhotdraw.xml.DOMInput in) throws java.io.IOException {
-        super.read(in);
-        
-        in.openElement("constant");
-        constant = (Double)in.readObject();
-        in.closeElement();
+    @Override
+    public Class getOutputClass(int index) {
+        return Double.class;
     }
     
     private Double constant;

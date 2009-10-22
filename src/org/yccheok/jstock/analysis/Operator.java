@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * Copyright (C) 2007 Cheok YanCheng <yccheok@yahoo.com>
+ * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
  */
 
 package org.yccheok.jstock.analysis;
@@ -38,6 +38,9 @@ public interface Operator extends ConnectorValueChangeListener {
     public boolean removeOutputConnection(Connection connection);
     public boolean removeInputConnection(int index);
     public boolean removeOutputConnection(int index);
+
+    public Class getInputClass(int index);
+    public Class getOutputClass(int index);
 
     // Try to refresh the input connectors. Once the input connectors
     // are refreshed, ConnectorValueChangeListeners will be triggered. The

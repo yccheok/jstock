@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * Copyright (C) 2007 Cheok YanCheng <yccheok@yahoo.com>
+ * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
  */
 
 package org.yccheok.jstock.analysis;
@@ -26,20 +26,22 @@ package org.yccheok.jstock.analysis;
  *
  * @author yccheok
  */
-public class Connector implements org.jhotdraw.xml.DOMStorable {
+public class Connector {
     
     /* For serialization purpose. */
     public Connector() {
         this.operator = null;
         this.value = null;
-        this.listeners = new java.util.ArrayList<ConnectorValueChangeListener>();        
+        this.listeners = new java.util.ArrayList<ConnectorValueChangeListener>();
+        this.index = -1;
     }
     
     /** Creates a new instance of Connector */
-    public Connector(Operator operator) {
+    public Connector(Operator operator, int index) {
         this.operator = operator;
         this.value = null;
         this.listeners = new java.util.ArrayList<ConnectorValueChangeListener>();
+        this.index = index;
     }
     
     public Object getValue() {
@@ -51,8 +53,8 @@ public class Connector implements org.jhotdraw.xml.DOMStorable {
         this.value = value;
         
         // Special case when the value is null.
-        if(oldValue == null) {
-            if(value != null) {
+        if (oldValue == null) {
+            if (value != null) {
                 ConnectorEvent event = new ConnectorEvent(this);
 
                 for(ConnectorValueChangeListener listerner : listeners)
@@ -85,41 +87,13 @@ public class Connector implements org.jhotdraw.xml.DOMStorable {
     public void removeConnectorValueChangeListener(ConnectorValueChangeListener connectorValueChangeLister) {
         listeners.remove(connectorValueChangeLister);
     }
-    
-    public void write(org.jhotdraw.xml.DOMOutput out) throws java.io.IOException {
-        out.openElement("operator");
-        out.writeObject(operator);
-        out.closeElement();
-        
-        out.openElement("value");
-        out.writeObject(value);
-        out.closeElement();
-        
-        out.openElement("listeners");
-        for(ConnectorValueChangeListener listener : listeners) {
-            out.writeObject(listener);
-        }
-        out.closeElement();
-    }
 
-    public void read(org.jhotdraw.xml.DOMInput in) throws java.io.IOException {
-        in.openElement("operator");
-        operator = (Operator)in.readObject();
-        in.closeElement();
-        
-        in.openElement("value");
-        value = (Object)in.readObject();
-        in.closeElement();  
-        
-        in.openElement("listeners");
-        listeners.clear();        
-        final int size = in.getElementCount();
-        for(int i = 0; i < size; i++)
-            listeners.add((ConnectorValueChangeListener)in.readObject(i));
-        in.closeElement();
+    public int getIndex() {
+        return this.index;
     }
     
-    private Operator operator;
+    private final Operator operator;
     private Object value;
+    private final int index;    // The index associated with the operator.
     private java.util.List<ConnectorValueChangeListener> listeners;
 }
