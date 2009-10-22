@@ -22,9 +22,11 @@
 
 package org.yccheok.jstock.gui;
 
+import org.yccheok.jstock.gui.analysis.OperatorFigure;
 import org.jhotdraw.draw.*;
 import java.util.*;
 import java.io.*;
+import org.jhotdraw.undo.UndoRedoManager;
 import org.yccheok.jstock.analysis.*;
 
 
@@ -33,7 +35,9 @@ import org.yccheok.jstock.analysis.*;
  * @author yccheok
  */
 public class IndicatorDefaultDrawing extends org.jhotdraw.draw.DefaultDrawing {
-    
+    /* Used to detect unsaved changes. */
+    private final UndoRedoManager undoRedoManager = new UndoRedoManager();
+
     /** Creates a new instance of AlertDefaultDrawing */
     public IndicatorDefaultDrawing() {
         DOMStorableInputOutputFormat ioFormat =
@@ -43,15 +47,18 @@ public class IndicatorDefaultDrawing extends org.jhotdraw.draw.DefaultDrawing {
         this.setInputFormats(inputFormats);
         LinkedList<OutputFormat> outputFormats = new LinkedList<OutputFormat>();
         outputFormats.add(ioFormat);
-        this.setOutputFormats(outputFormats);        
+        this.setOutputFormats(outputFormats);
+
+        // To detect unsaved changes.
+        this.addUndoableEditListener(undoRedoManager);
     }
     
     // Return an OperatorIndicator with name "null".
     public OperatorIndicator getOperatorIndicator() {
         OperatorIndicator operatorIndicator = new OperatorIndicator();
 
-        List<Figure> figures = this.getFigures();
-        for(Figure figure : figures) {
+        List<Figure> figures = this.getChildren();
+        for (Figure figure : figures) {
             if(figure instanceof OperatorFigure) {
                 OperatorFigure operatorFigure = (OperatorFigure)figure;
                 operatorIndicator.add(operatorFigure.getOperator());
@@ -74,8 +81,15 @@ public class IndicatorDefaultDrawing extends org.jhotdraw.draw.DefaultDrawing {
         outputFormat.write(jHotdrawFile, this);
 
         org.yccheok.jstock.gui.Utils.toXML(operatorIndicator, operatorIndicatorFilename);
+
+        // To flag no more unsaved changes in this drawing.
+        undoRedoManager.setHasSignificantEdits(false);
     }
-    
+
+    public boolean hasSignificantEdits() {
+        return undoRedoManager.hasSignificantEdits();
+    }
+
     /**
      * Reads the project from the specified file.
      */
@@ -91,10 +105,10 @@ public class IndicatorDefaultDrawing extends org.jhotdraw.draw.DefaultDrawing {
             throw new IOException();
         }
         
-        List<Figure> figures = this.getFigures();
+        List<Figure> figures = this.getChildren();
         int counter = 0;
-        for(Figure f : figures) {
-            if(f instanceof OperatorFigure) {
+        for (Figure f : figures) {
+            if (f instanceof OperatorFigure) {
                 final Operator operator = operatorIndicator.get(counter);
                 OperatorFigure operatorFigure = (OperatorFigure)f;
                 operatorFigure.setOperator(operator);

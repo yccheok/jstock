@@ -1,27 +1,38 @@
 /*
- * @(#)PertPanel.java  1.0  2006-07-15
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
  *
- * Copyright (c) 1996-2006 by the original authors of JHotDraw
- * and all its contributors ("JHotDraw.org")
- * All rights reserved.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This software is the confidential and proprietary information of
- * JHotDraw.org ("Confidential Information"). You shall not disclose
- * such Confidential Information and shall use it only in accordance
- * with the terms of the license agreement you entered into with
- * JHotDraw.org.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.yccheok.jstock.gui;
 
+import com.nexes.wizard.Wizard;
+import com.nexes.wizard.WizardModel;
+import com.nexes.wizard.WizardPanelDescriptor;
+import org.yccheok.jstock.gui.analysis.OperatorFigureCreationTool;
 import java.util.concurrent.ExecutionException;
 import org.jhotdraw.util.*;
 
 import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.text.MessageFormat;
 import java.util.*;
 import javax.swing.*;
+import javax.swing.event.ListSelectionListener;
 import org.jhotdraw.app.action.*;
 import org.jhotdraw.draw.*;
 import org.jhotdraw.draw.action.*;
@@ -32,6 +43,12 @@ import org.yccheok.jstock.analysis.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.yccheok.jstock.gui.analysis.WizardSelectIndicatorDescriptor;
+import org.yccheok.jstock.gui.analysis.WizardDownloadIndicatorDescriptor;
+import org.yccheok.jstock.gui.analysis.WizardSelectInstallIndicatorMethodDescriptor;
+import org.yccheok.jstock.gui.analysis.WizardSelectInstallIndicatorMethodJPanel;
+import org.yccheok.jstock.internationalization.GUIBundle;
+import org.yccheok.jstock.internationalization.MessagesBundle;
 
 /**
  * PertPanel.
@@ -43,8 +60,8 @@ public class IndicatorPanel extends JPanel {
     private DrawingEditor editor;
     
     /** Creates new instance. */
-    public IndicatorPanel() {        
-        ResourceBundleUtil labels = ResourceBundleUtil.getLAFBundle("org.jhotdraw.draw.Labels");
+    public IndicatorPanel() {    
+        ResourceBundleUtil labels = ResourceBundleUtil.getBundle("org.jhotdraw.draw.Labels");
         initComponents();
         editor = new DefaultDrawingEditor();
         editor.add(view);
@@ -57,8 +74,8 @@ public class IndicatorPanel extends JPanel {
         pb.add(new GroupAction(editor));
         pb.add(new UngroupAction(editor));
         pb.addSeparator();
-        pb.add(new MoveToFrontAction(editor));
-        pb.add(new MoveToBackAction(editor));
+        pb.add(new BringToFrontAction(editor));
+        pb.add(new SendToBackAction(editor));
         pb.addSeparator();
         pb.add(new SelectAllAction());
         pb.add(new SelectSameAction(editor));
@@ -95,10 +112,14 @@ public class IndicatorPanel extends JPanel {
         creationToolbar.add(pb);
 
         view.setDrawing(createDrawing());
-        
+
         stockTask = null;
         
         initIndicatorProjectManager();
+        initModuleProjectManager();
+        // Must be done after project managers had been initialized.
+        initListCellRenderer();
+        createToolTipTextForJTabbedPane();
     }
     
     /**
@@ -113,12 +134,15 @@ public class IndicatorPanel extends JPanel {
     public void setDrawing(Drawing d) {
         view.setDrawing(d);
     }
+
     public Drawing getDrawing() {
         return view.getDrawing();
     }
+
     public DrawingView getView() {
         return view;
     }
+
     public DrawingEditor getEditor() {
         return editor;
     }
@@ -133,6 +157,9 @@ public class IndicatorPanel extends JPanel {
         java.awt.GridBagConstraints gridBagConstraints;
 
         toolButtonGroup = new javax.swing.ButtonGroup();
+        jPanel10 = new javax.swing.JPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jList2 = new javax.swing.JList();
         jSplitPane1 = new javax.swing.JSplitPane();
         jPanel4 = new javax.swing.JPanel();
         scrollPane = new javax.swing.JScrollPane();
@@ -141,15 +168,14 @@ public class IndicatorPanel extends JPanel {
         creationToolbar = new javax.swing.JToolBar();
         jSplitPane2 = new javax.swing.JSplitPane();
         jPanel2 = new javax.swing.JPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList();
         jPanel3 = new javax.swing.JPanel();
-        jPanel8 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
-        jPanel9 = new javax.swing.JPanel();
-        jButton3 = new javax.swing.JButton();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
+        jPanel11 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jList1 = new javax.swing.JList();
         jPanel5 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
         jButton4 = new javax.swing.JButton();
@@ -157,6 +183,20 @@ public class IndicatorPanel extends JPanel {
         jPanel7 = new javax.swing.JPanel();
         jComboBox1 = new AutoCompleteJComboBox();
         objectInspectorJPanel = new ObjectInspectorJPanel(new MutableStock(Utils.getEmptyStock(Code.newInstance(""), Symbol.newInstance(""))));
+
+        jPanel10.setLayout(new java.awt.BorderLayout());
+
+        jList2.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        this.jList2.setModel(new DefaultListModel());
+        this.jList2.addMouseListener(new JListPopupListener());
+        jList2.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                jList2ValueChanged(evt);
+            }
+        });
+        jScrollPane2.setViewportView(jList2);
+
+        jPanel10.add(jScrollPane2, java.awt.BorderLayout.CENTER);
 
         setLayout(new java.awt.BorderLayout());
 
@@ -183,15 +223,51 @@ public class IndicatorPanel extends JPanel {
 
         jSplitPane1.setLeftComponent(jPanel4);
 
-        jSplitPane2.setDividerLocation(300);
+        jSplitPane2.setDividerLocation(305);
         jSplitPane2.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+        jSplitPane2.setMinimumSize(new java.awt.Dimension(300, 261));
         jSplitPane2.setPreferredSize(new java.awt.Dimension(150, 368));
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Database"));
         jPanel2.setLayout(new java.awt.BorderLayout(5, 5));
 
+        jPanel3.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 0, 5, 5));
+
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/filenew.png"))); // NOI18N
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
+        jButton1.setText(bundle.getString("New...")); // NOI18N
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        jPanel3.add(jButton1);
+
+        jButton5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/filesave.png"))); // NOI18N
+        jButton5.setText(bundle.getString("Save")); // NOI18N
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
+        jPanel3.add(jButton5);
+
+        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/download.png"))); // NOI18N
+        jButton2.setText(bundle.getString("Install...")); // NOI18N
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+        jPanel3.add(jButton2);
+
+        jPanel2.add(jPanel3, java.awt.BorderLayout.SOUTH);
+
+        jPanel11.setLayout(new java.awt.BorderLayout());
+
         jList1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         this.jList1.setModel(new DefaultListModel());
+        this.jList1.addMouseListener(new JListPopupListener());
         jList1.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
                 jList1ValueChanged(evt);
@@ -199,56 +275,11 @@ public class IndicatorPanel extends JPanel {
         });
         jScrollPane1.setViewportView(jList1);
 
-        jPanel2.add(jScrollPane1, java.awt.BorderLayout.CENTER);
+        jPanel11.add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
-        jPanel3.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 0, 5, 5));
-        jPanel3.setLayout(new java.awt.GridLayout(2, 1));
+        jTabbedPane1.addTab("Alert Indicator", new javax.swing.ImageIcon(getClass().getResource("/images/16x16/bell.png")), jPanel11); // NOI18N
 
-        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
-
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/filenew.png"))); // NOI18N
-        jButton1.setText("New...");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
-        jPanel8.add(jButton1);
-
-        jButton5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/filesave.png"))); // NOI18N
-        jButton5.setText("Save");
-        jButton5.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton5ActionPerformed(evt);
-            }
-        });
-        jPanel8.add(jButton5);
-
-        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/edit.png"))); // NOI18N
-        jButton2.setText("Rename...");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
-            }
-        });
-        jPanel8.add(jButton2);
-
-        jPanel3.add(jPanel8);
-
-        jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
-
-        jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/editdelete.png"))); // NOI18N
-        jButton3.setText("Delete");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
-            }
-        });
-        jPanel9.add(jButton3);
-
-        jPanel3.add(jPanel9);
-
-        jPanel2.add(jPanel3, java.awt.BorderLayout.SOUTH);
+        jPanel2.add(jTabbedPane1, java.awt.BorderLayout.CENTER);
 
         jSplitPane2.setTopComponent(jPanel2);
 
@@ -303,291 +334,937 @@ public class IndicatorPanel extends JPanel {
     }//GEN-LAST:event_jButton6ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-// TODO add your handling code here:
-        final int select = jList1.getSelectedIndex();
-
-        String projectName = null;
-        
-        if(select >= 0 && select < indicatorProjectManager.getNumOfProject()) {
-            projectName = this.indicatorProjectManager.getProject(select);        
-        }
-        
-        // String projectName = (String)this.jList1.getSelectedValue();
-        
-        if(projectName == null) {
-            while(true) {
-                projectName = JOptionPane.showInputDialog(this, "Please enter the new project name you want to save");
-
-                if(projectName == null) return;
-
-                if(projectName.length() == 0) {
-                    JOptionPane.showMessageDialog(this, "You need to specific a project name.", "Project name needed", JOptionPane.INFORMATION_MESSAGE);
-                    continue;
-                }
-
-                if(indicatorProjectManager.contains(projectName)) {
-                    JOptionPane.showMessageDialog(this, "Database already contains similar project name.", "Duplicated project name", JOptionPane.INFORMATION_MESSAGE);
-                    continue;
-                }
-                
-                IndicatorDefaultDrawing drawing = (IndicatorDefaultDrawing)view.getDrawing();
-
-                if(this.indicatorProjectManager.addProject(drawing, projectName))
-                {
-                    if(drawing.getOperatorIndicator().isValid()) {
-                        ((javax.swing.DefaultListModel)this.jList1.getModel()).addElement(projectName);                    
-                        JOptionPane.showMessageDialog(this, projectName + " has been saved successfully.", "Project saved", JOptionPane.INFORMATION_MESSAGE);
-                    }
-                    else {
-                        ((javax.swing.DefaultListModel)this.jList1.getModel()).addElement(projectName + " *");                    
-                        JOptionPane.showMessageDialog(this, projectName + " has been saved successfully. However, " + projectName + " is not valid yet.", "Project saved", JOptionPane.INFORMATION_MESSAGE);
-                    }
-                    
-                    this.jList1.setSelectedIndex(this.jList1.getModel().getSize() - 1);
-                    return;
-                }
-                else
-                {
-                    JOptionPane.showMessageDialog(this, "You have provided an invalid project name.", "Invalid project name", JOptionPane.INFORMATION_MESSAGE);
-                    continue;
-                }
-            }
-        } else {
-            IndicatorDefaultDrawing drawing = (IndicatorDefaultDrawing)view.getDrawing();
-            
-            if(indicatorProjectManager.addProject(drawing, projectName)) {
-                if(drawing.getOperatorIndicator().isValid()) {
-                    ((javax.swing.DefaultListModel)this.jList1.getModel()).setElementAt(projectName, select);                    
-                    JOptionPane.showMessageDialog(this, projectName + " has been saved successfully.", "Project saved", JOptionPane.INFORMATION_MESSAGE);
-                }
-                else {
-                    ((javax.swing.DefaultListModel)this.jList1.getModel()).setElementAt(projectName + " *", select);                    
-                    JOptionPane.showMessageDialog(this, projectName + " has been saved successfully. However, " + projectName + " is not valid yet.", "Project saved", JOptionPane.INFORMATION_MESSAGE);
-                }
-            }
-            else {
-                JOptionPane.showMessageDialog(this, "Unable to save project " + projectName + " due to unknown reason.", "Unable to save project", JOptionPane.ERROR_MESSAGE);
-            }
-        }
+        this.Save(true);
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jList1ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList1ValueChanged
-// TODO add your handling code here:
-        
         // When the user release the mouse button and completes the selection,
         // getValueIsAdjusting() becomes false        
-        if (evt.getValueIsAdjusting()) return;
-        
-        int select = jList1.getSelectedIndex();
-        
-        if(select < 0 || select >= indicatorProjectManager.getNumOfProject()) {
-            this.view.setDrawing(this.createDrawing());
+        if (evt.getValueIsAdjusting()) {
             return;
         }
-        
-        // final String project = (String)this.jList1.getModel().getElementAt(select);
-        String project = this.indicatorProjectManager.getProject(select);
-        
-        IndicatorDefaultDrawing indicatorDefaultDrawing = this.indicatorProjectManager.getIndicatorDefaultDrawing(project);
-        if(indicatorDefaultDrawing != null) {
-            view.setDrawing(indicatorDefaultDrawing);
+
+        final String projectName = (String)this.jList1.getSelectedValue();
+        if (projectName == null) {
+            this.listSelectionEx = null;
+            return;
+        }
+
+        final IndicatorDefaultDrawing indicatorDefaultDrawing = this.alertIndicatorProjectManager.getIndicatorDefaultDrawing(projectName);
+        boolean userCancel = false;
+        if (indicatorDefaultDrawing != null) {
+            if (this.promptToSaveSignificantEdits(this.listSelectionEx)) {
+                this.setDrawing(indicatorDefaultDrawing);
+            }
+            else {
+                userCancel = true;
+            }
         }
         else {
-            if(JOptionPane.showConfirmDialog(this, "Project " + project + " is corrupted. Do you want to remove it?", project + " corrupted", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
-            {
-                jButton3ActionPerformed(null);
+            if (this.promptToSaveSignificantEdits(this.listSelectionEx)) {
+                final String output = MessageFormat.format(MessagesBundle.getString("question_message_corrupted_file_remove_template"), projectName);
+                if(JOptionPane.showConfirmDialog(this, output, MessagesBundle.getString("question_title_corrupted_file_remove"), JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
+                {
+                    // Do not prompt "Are you sure you want to delete..." dialog box.
+                    Delete(false);
+                }
+                else
+                {
+                    this.setDrawing(this.createDrawing());
+                }
             }
-            else
-            {
-                this.view.setDrawing(this.createDrawing());
+            else {
+                userCancel = true;
             }
-        }       
+        }
+
+        if (!userCancel) {
+            // Ensure jList1 and jList2 are mutually exclusive.
+            // This must be done before we assign value to this.listSelectionEx,
+            // as list selection listener of jList2 will overwrite this.listSelectionEx.
+            // Also, clearSelection code cannot be placed before any code which depend
+            // on the correctness of this.listSelectionEx.
+
+            // Ensure jList1 and jList2 are mutually exclusive.
+            //
+            // When cancel is pressed, promptToSaveSignificantEdits has helped us
+            // to determine correct selection. We need not to perform or clear selection
+            // explicitly.
+            this.jList2.clearSelection();
+
+            // Whenever cancel happen, we need to make this.listSelectionEx remains
+            // unchanged.
+            this.listSelectionEx = ListSelectionEx.newInstance(this.jList1, projectName);
+        }
     }//GEN-LAST:event_jList1ValueChanged
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-// TODO add your handling code here:   
         final MainFrame m = MainFrame.getInstance();
-        final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = m.getStockCodeAndSymbolDatabase();
+        // stockCodeAndSymbolDatabase can be null, if we still haven't connected to server.
+        final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = m.getStockCodeAndSymbolDatabase();        
+        final IndicatorDefaultDrawing indicatorDefaultDrawing = (IndicatorDefaultDrawing)this.view.getDrawing();
+        final OperatorIndicator operatorIndicator = indicatorDefaultDrawing.getOperatorIndicator();
         
-        if(stockCodeAndSymbolDatabase == null) {
-            javax.swing.JOptionPane.showMessageDialog(this, "We haven't connected to stock server.", "Not Connected", javax.swing.JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
-        
-        IndicatorDefaultDrawing indicatorDefaultDrawing = (IndicatorDefaultDrawing)this.view.getDrawing();
-        OperatorIndicator operatorIndicator = indicatorDefaultDrawing.getOperatorIndicator();
-        
-        if(operatorIndicator.isValid() == false)
-        {
-            JOptionPane.showMessageDialog(this, "An indicator must has only 1 stock alert output with 1 input connection and 0 output connection.", "Invalid indicator", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
-        
-        Object o = ((ObjectInspectorJPanel)this.objectInspectorJPanel).getBean();
-        MutableStock mutableStock = (MutableStock)o;
-        final Stock stock = mutableStock.getStock();
-        Code searchedStockCode = stockCodeAndSymbolDatabase.searchStockCode(stock.getCode().toString());
-        
-        if(searchedStockCode == null) {
-            JOptionPane.showMessageDialog(this, "You need to first select a stock to be simulated.", "Stock needed", JOptionPane.INFORMATION_MESSAGE);
-            return;            
-        }
-        else {
-            if(searchedStockCode.equals(stock.getCode()) == false) {
-                JOptionPane.showMessageDialog(this, "You need to first select a stock to be simulated.", "Stock needed", JOptionPane.INFORMATION_MESSAGE);
-                return;                
+        Stock stock = null;
+        // Check, if stock information is required.
+        if (operatorIndicator.isStockNeeded() || operatorIndicator.isStockHistoryServerNeeded()) {
+            final Object o = ((ObjectInspectorJPanel)this.objectInspectorJPanel).getBean();
+            final MutableStock mutableStock = (MutableStock)o;
+            stock = mutableStock.getStock();
+            final Code searchedStockCode = stockCodeAndSymbolDatabase.searchStockCode(stock.getCode().toString());
+            if (searchedStockCode == null) {
+                JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_you_need_to_select_a_stock"), MessagesBundle.getString("warning_title_you_need_to_select_a_stock"), JOptionPane.WARNING_MESSAGE);
+                this.jComboBox1.requestFocus();
+                return;            
+            }
+            else {
+                if (searchedStockCode.equals(stock.getCode()) == false) {
+                    JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_you_need_to_select_a_stock"), MessagesBundle.getString("warning_title_you_need_to_select_a_stock"), JOptionPane.WARNING_MESSAGE);
+                    this.jComboBox1.requestFocus();
+                    return;                
+                }
             }
         }
-        
+
         this.jButton4.setEnabled(false);
         this.jButton6.setEnabled(true);
-        
-        if(simulationThread != null) {
+        if (simulationThread != null) {
             simulationThread.interrupt();
             try {
                 simulationThread.join();
             }
-            catch(InterruptedException exp) {
-                log.error("", exp);
+            catch (InterruptedException exp) {
+                log.error(null, exp);
             }
         }
-        
+
+        final Stock tmpStock = stock;
         simulationThread = new Thread(new Runnable() {
+            @Override
             public void run() {
-                IndicatorPanel.this.simulate(stock.getCode());
+                IndicatorPanel.this.simulate(tmpStock);
             }
         });
         
         simulationThread.start();
     }//GEN-LAST:event_jButton4ActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-// TODO add your handling code here:
-
-        final int index = this.jList1.getSelectedIndex();
-        
-        if(index < 0 || index >= indicatorProjectManager.getNumOfProject()) {
-            JOptionPane.showMessageDialog(this, "You must at least select a project in order to delete.", "Select needed", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        } 
-                                
-        indicatorProjectManager.removeProject(indicatorProjectManager.getProject(index));
-        
-        DefaultListModel defaultListModel = (DefaultListModel)this.jList1.getModel();
-        defaultListModel.removeElementAt(index);
-        
-        if((index - 1) < 0) {
-            this.jList1.clearSelection();
-        }
-        else {
-            this.jList1.setSelectedIndex(index - 1);
-        }
-    }//GEN-LAST:event_jButton3ActionPerformed
-
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-// TODO add your handling code here:
-        final int select = jList1.getSelectedIndex();
-        
-        if(select < 0 || select >= indicatorProjectManager.getNumOfProject()) {
-            JOptionPane.showMessageDialog(this, "You must at least select a project in order to rename.", "Select needed", JOptionPane.INFORMATION_MESSAGE);
+    private void New() {
+        if (false == promptToSaveSignificantEdits()) {
             return;
         }
-
-        String oldProjectName = null;
-        oldProjectName = this.indicatorProjectManager.getProject(select);
-
-        if(oldProjectName == null) {
-            JOptionPane.showMessageDialog(this, "You must at least select a project in order to rename.", "Select needed", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }                
-
-        boolean isValid = true;
-        
-        String stringAtList = (String)this.jList1.getSelectedValue();
-        if(stringAtList.equals(oldProjectName) == false)
-        {
-            isValid = false;
+        if (this.jTabbedPane1.getSelectedIndex() == 0) {
+            this.alertIndicatorNew();
         }
-        
-        String newProjectName = null;
-        
-        while(true) {
-            newProjectName = JOptionPane.showInputDialog(this, "Please enter the new project name you wish to rename to", oldProjectName);
-            
-            if(newProjectName == null) return;
-            
-            if(newProjectName.length() == 0) {
-                JOptionPane.showMessageDialog(this, "You need to specific a project name.", "Project name needed", JOptionPane.INFORMATION_MESSAGE);
-                continue;
-            }
-
-            if(indicatorProjectManager.contains(newProjectName)) {
-                JOptionPane.showMessageDialog(this, "Database already contains similar project name.", "Duplicated project name", JOptionPane.INFORMATION_MESSAGE);
-                continue;
-            }
-            
-            if(this.indicatorProjectManager.renameProject(newProjectName, oldProjectName))
-            {
-                final DefaultListModel defaultListModel = (DefaultListModel)this.jList1.getModel();
-                if(isValid)
-                    defaultListModel.setElementAt(newProjectName, select);
-                else
-                    defaultListModel.setElementAt(newProjectName + " *", select);
-                
-                // Update the project.xml as well.
-                IndicatorPanel.this.saveIndicatorProjectManager();
-            }
-            else
-            {
-                JOptionPane.showMessageDialog(this, "Unable to rename project from " + oldProjectName + " to " + newProjectName + " due to unknown reason.", "Unable to rename project", JOptionPane.ERROR_MESSAGE);
-            }
-            
-            break;
+        else if (this.jTabbedPane1.getSelectedIndex() == 1) {
+            this.moduleIndicatorNew();
         }
-        
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-// TODO add your handling code here:
-        String projectName = null;        
-        
-        while(true) {
-            projectName = JOptionPane.showInputDialog(this, "Please enter the new project name");
+    private static class ListSelectionEx {
+        public final JList list;
+        public final String projectName;
+        private ListSelectionEx(JList list, String projectName) {
+            if (list == null || projectName == null) {
+                throw new IllegalArgumentException("Method arguments cannot be null");
+            }
+            this.list = list;
+            this.projectName = projectName;
+        }
 
-            if(projectName == null) return;
+        public static ListSelectionEx newInstance(JList list, String projectName) {
+            return new ListSelectionEx(list, projectName);
+        }
+    }
 
-            if(projectName.length() == 0) {
-                JOptionPane.showMessageDialog(this, "You need to specific a project name.", "Project name needed", JOptionPane.WARNING_MESSAGE);
+    private boolean promptToSaveSignificantEdits(ListSelectionEx _listSelectionEx) {
+        final boolean hasSignificantEdits = ((IndicatorDefaultDrawing)this.view.getDrawing()).hasSignificantEdits();
+        if (false == hasSignificantEdits) {
+            return true;
+        }
+        String output = MessagesBundle.getString("question_message_current_drawing_is_modified_save_it");
+        if (_listSelectionEx != null) {
+            /* There is a previous selected project. */
+            output = MessageFormat.format(MessagesBundle.getString("question_message_current_drawing_is_modified_save_it_template"), _listSelectionEx.projectName);
+        }
+        // We have a unsaved drawing. Prompt user to save it.
+        final int result = javax.swing.JOptionPane.showConfirmDialog(MainFrame.getInstance(), output, MessagesBundle.getString("question_title_current_drawing_is_modified_save_it"), javax.swing.JOptionPane.YES_NO_CANCEL_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
+
+        if (result == JOptionPane.YES_OPTION) {
+            // Do not use this.Save(false). this.Save(false) will only save the
+            // project in current active tab and current selected project.
+            // We just want to save current selected project, regardless current
+            // active tab.
+            // this.Save(false);
+            if (_listSelectionEx != null) {
+                // There is a previous selection.
+                if (this.jList1 == _listSelectionEx.list) {
+                    this._alertIndicatorSave(_listSelectionEx.projectName, false);
+                }
+                else if (this.jList2 == _listSelectionEx.list) {
+                    this._moduleIndicatorSave(_listSelectionEx.projectName, false);
+                }
+            }
+            else {
+                // No choice. We will save to curent active tab, by prompting user
+                // enter his desired project name.
+                if (this.jTabbedPane1.getSelectedIndex() == 0) {
+                    this._alertIndicatorSave(null, false);
+                }
+                else if (this.jTabbedPane1.getSelectedIndex() == 1) {
+                    this._moduleIndicatorSave(null, false);
+                }
+            }
+        }
+
+        if (result == JOptionPane.CANCEL_OPTION) {
+            final ListSelectionListener[] listSelectionListeners1 = this.jList1.getListSelectionListeners();
+            final ListSelectionListener[] listSelectionListeners2 = this.jList2.getListSelectionListeners();
+            try {
+                for (ListSelectionListener listSelectionListener : listSelectionListeners1) {
+                    this.jList1.removeListSelectionListener(listSelectionListener);
+                }
+                for (ListSelectionListener listSelectionListener : listSelectionListeners2) {
+                    this.jList2.removeListSelectionListener(listSelectionListener);
+                }
+                // User chooses cancel. Select back previous project.
+                if (_listSelectionEx != null) {
+                    if (_listSelectionEx.list == this.jList1) {
+                        this.jList1.setSelectedValue(_listSelectionEx.projectName, true);
+                        this.jList2.clearSelection();
+                    }
+                    else {
+                        assert(_listSelectionEx.list == this.jList2);
+                        this.jList2.setSelectedValue(_listSelectionEx.projectName, true);
+                        this.jList1.clearSelection();
+                    }
+                }
+                else {
+                    // User chooses cancel. Clear all the lists, since previously, there are
+                    // no selection at all.
+                    this.jList1.clearSelection();
+                    this.jList2.clearSelection();
+                }
+            }
+            finally {
+                // Do it within finally block, just to be safe.
+                for (ListSelectionListener listSelectionListener : listSelectionListeners1) {
+                    this.jList1.addListSelectionListener(listSelectionListener);
+                }
+                for (ListSelectionListener listSelectionListener : listSelectionListeners2) {
+                    this.jList2.addListSelectionListener(listSelectionListener);
+                }
+            }
+        }
+
+        return result != JOptionPane.CANCEL_OPTION;
+    }
+
+    // Return false, if user selects cancel. Else, return true.
+    private boolean promptToSaveSignificantEdits() {
+        final boolean hasSignificantEdits = ((IndicatorDefaultDrawing)this.view.getDrawing()).hasSignificantEdits();
+        if (false == hasSignificantEdits) {
+            return true;
+        }
+        String output = MessagesBundle.getString("question_message_current_drawing_is_modified_save_it");
+        // Unlike Save, in promptToSaveSignificantEdits, we will try our best to save the selected project,
+        // even it is not within our visible range (The jTabbedPane is not being selected)
+        if (this.jList1.getSelectedValue() != null) {
+            output = MessageFormat.format(MessagesBundle.getString("question_message_current_drawing_is_modified_save_it_template"), this.jList1.getSelectedValue());
+        }
+        else if (this.jList2.getSelectedValue() != null) {
+            output = MessageFormat.format(MessagesBundle.getString("question_message_current_drawing_is_modified_save_it_template"), this.jList2.getSelectedValue());
+        }
+        // We have a unsaved drawing. Prompt user to save it.
+        final int result = javax.swing.JOptionPane.showConfirmDialog(MainFrame.getInstance(), output, MessagesBundle.getString("question_title_current_drawing_is_modified_save_it"), javax.swing.JOptionPane.YES_NO_CANCEL_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
+        if (result == JOptionPane.YES_OPTION) {
+            // Do not use this.Save(false). this.Save(false) will only save the
+            // project in current active tab and current selected project.
+            // We just want to save current selected project, regardless current
+            // active tab.
+            // this.Save(false);
+            if (this.jList1.getSelectedValue() != null) {
+                this.alertIndicatorSave(false);
+            }
+            else if (this.jList2.getSelectedValue() != null) {
+                this.moduleIndicatorSave(false);
+            }
+            else {
+                // No choice. We will save to curent active tab, by prompting user
+                // enter his desired project name.
+                this.Save(false);
+            }
+        }
+        return result != JOptionPane.CANCEL_OPTION;
+    }
+    
+    private void alertIndicatorNew() {
+        String projectName = null;
+
+        while (true) {
+            projectName = JOptionPane.showInputDialog(this, MessagesBundle.getString("info_message_enter_new_alert_indicator_name"));
+
+            if (projectName == null) {
+                return;
+            }
+
+            if (projectName.length() == 0) {
+                JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_you_need_to_specific_alert_indicator_name"), MessagesBundle.getString("warning_title_you_need_to_specific_alert_indicator_name"), JOptionPane.WARNING_MESSAGE);
                 continue;
             }
-            
-            if(indicatorProjectManager.contains(projectName)) {
-                JOptionPane.showMessageDialog(this, "Database already contains " + projectName, "Duplicated project name", JOptionPane.WARNING_MESSAGE);
+
+            if (this.alertIndicatorProjectManager.contains(projectName)) {
+                JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_already_an_alert_indicator_with_same_name"), MessagesBundle.getString("warning_title_already_an_alert_indicator_with_same_name"), JOptionPane.WARNING_MESSAGE);
                 continue;
             }
-            
+
             IndicatorDefaultDrawing newDrawing = (IndicatorDefaultDrawing)createDrawing();
-            if(this.indicatorProjectManager.addProject(newDrawing, projectName))
+            if(this.alertIndicatorProjectManager.addProject(newDrawing, projectName))
             {
-                // New project will always invalid.
-                ((javax.swing.DefaultListModel)this.jList1.getModel()).addElement(projectName + " *");
-                this.jList1.setSelectedIndex(this.jList1.getModel().getSize() - 1);
+                this.syncJListWithIndicatorProjectManager(this.jList1, this.alertIndicatorProjectManager);
+                // Select on the newly created project.
+                this.jList1.setSelectedValue(projectName, true);
                 return;
             }
             else
             {
-                JOptionPane.showMessageDialog(this, "You have provided an invalid project name.", "Invalid project name", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_invalid_alert_indicator_name"), MessagesBundle.getString("warning_title_invalid_alert_indicator_name"), JOptionPane.WARNING_MESSAGE);
                 continue;
             }
         }
+    }
+
+    private void moduleIndicatorNew() {
+        String projectName = null;
+
+        while (true) {
+            projectName = JOptionPane.showInputDialog(this, MessagesBundle.getString("info_message_enter_new_module_indicator_name"));
+
+            if (projectName == null) {
+                return;
+            }
+
+            if (projectName.length() == 0) {
+                JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_you_need_to_specific_module_indicator_name"), MessagesBundle.getString("warning_title_you_need_to_specific_module_indicator_name"), JOptionPane.WARNING_MESSAGE);
+                continue;
+            }
+
+            if (this.moduleIndicatorProjectManager.contains(projectName)) {
+                JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_already_a_module_indicator_with_same_name"), MessagesBundle.getString("warning_title_already_a_module_indicator_with_same_name"), JOptionPane.WARNING_MESSAGE);
+                continue;
+            }
+
+            IndicatorDefaultDrawing newDrawing = (IndicatorDefaultDrawing)createDrawing();
+            if(this.moduleIndicatorProjectManager.addProject(newDrawing, projectName))
+            {
+                this.syncJListWithIndicatorProjectManager(this.jList2, this.moduleIndicatorProjectManager);
+                // Select on the newly created project.
+                this.jList2.setSelectedValue(projectName, true);
+                return;
+            }
+            else
+            {
+                JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_invalid_module_indicator_name"), MessagesBundle.getString("warning_title_invalid_module_indicator_name"), JOptionPane.WARNING_MESSAGE);
+                continue;
+            }
+        }
+    }
+
+    private void Save(boolean selectProjectAfterSave) {
+        if (this.jTabbedPane1.getSelectedIndex() == 0) {
+            this.alertIndicatorSave(selectProjectAfterSave);
+        }
+        else if (this.jTabbedPane1.getSelectedIndex() == 1) {
+            this.moduleIndicatorSave(selectProjectAfterSave);
+        }
+    }
+
+    private void alertIndicatorSave(boolean selectProjectAfterSave) {
+        String projectName = (String)this.jList1.getSelectedValue();
+        _alertIndicatorSave(projectName, selectProjectAfterSave);
+    }
+
+    private void _alertIndicatorSave(String projectName, boolean selectProjectAfterSave) {
+        if (projectName == null) {
+            // No project name selection. Prompt user to enter new project name.
+            while (true) {
+                projectName = JOptionPane.showInputDialog(this, MessagesBundle.getString("info_message_enter_save_alert_indicator_name"));
+
+                if (projectName == null) {
+                    return;
+                }
+
+                if (projectName.length() == 0) {
+                    JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_you_need_to_specific_alert_indicator_name"), MessagesBundle.getString("warning_title_you_need_to_specific_alert_indicator_name"), JOptionPane.WARNING_MESSAGE);
+                    continue;
+                }
+
+                if (alertIndicatorProjectManager.contains(projectName)) {
+                    JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_already_an_alert_indicator_with_same_name"), MessagesBundle.getString("warning_title_already_an_alert_indicator_with_same_name"), JOptionPane.WARNING_MESSAGE);
+                    continue;
+                }
+
+                IndicatorDefaultDrawing drawing = (IndicatorDefaultDrawing)view.getDrawing();
+
+                if (this.alertIndicatorProjectManager.addProject(drawing, projectName))
+                {
+                    this.syncJListWithIndicatorProjectManager(this.jList1, this.alertIndicatorProjectManager);
+                    final String output = MessageFormat.format(MessagesBundle.getString("info_message_file_saved_template"), projectName);
+                    JOptionPane.showMessageDialog(this, output, MessagesBundle.getString("info_title_file_saved"), JOptionPane.INFORMATION_MESSAGE);
+                    if (selectProjectAfterSave) {
+                        this.jList1.setSelectedValue(projectName, true);
+                    }
+                    return;
+                }
+                else
+                {
+                    JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_invalid_alert_indicator_name"), MessagesBundle.getString("warning_title_invalid_alert_indicator_name"), JOptionPane.WARNING_MESSAGE);
+                    continue;
+                }
+            }
+        } else {
+            // projectName is selected by user.
+            final IndicatorDefaultDrawing drawing = (IndicatorDefaultDrawing)view.getDrawing();
+            if (alertIndicatorProjectManager.addProject(drawing, projectName)) {
+                // Just to ensure list cell renderer will be triggered.
+                this.syncJListWithIndicatorProjectManager(this.jList1, this.alertIndicatorProjectManager);
+                final String output = MessageFormat.format(MessagesBundle.getString("info_message_file_saved_template"), projectName);
+                JOptionPane.showMessageDialog(this, output, MessagesBundle.getString("info_title_file_saved"), JOptionPane.INFORMATION_MESSAGE);
+            }
+            else {
+                JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_invalid_alert_indicator_name"), MessagesBundle.getString("warning_title_invalid_alert_indicator_name"), JOptionPane.WARNING_MESSAGE);
+            }
+        }
+    }
+
+    private void moduleIndicatorSave(boolean selectProjectAfterSave) {
+        String projectName = (String)this.jList2.getSelectedValue();
+        this._moduleIndicatorSave(projectName, selectProjectAfterSave);
+    }
+
+    private void _moduleIndicatorSave(String projectName, boolean selectProjectAfterSave) {
+        if (projectName == null) {
+            while (true) {
+                projectName = JOptionPane.showInputDialog(this, MessagesBundle.getString("info_message_enter_save_module_indicator_name"));
+
+                if (projectName == null) {
+                    return;
+                }
+
+                if (projectName.length() == 0) {
+                    JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_you_need_to_specific_module_indicator_name"), MessagesBundle.getString("warning_title_you_need_to_specific_module_indicator_name"), JOptionPane.WARNING_MESSAGE);
+                    continue;
+                }
+
+                if (moduleIndicatorProjectManager.contains(projectName)) {
+                    JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_already_a_module_indicator_with_same_name"), MessagesBundle.getString("warning_title_already_a_module_indicator_with_same_name"), JOptionPane.WARNING_MESSAGE);
+                    continue;
+                }
+
+                IndicatorDefaultDrawing drawing = (IndicatorDefaultDrawing)view.getDrawing();
+
+                if (this.moduleIndicatorProjectManager.addProject(drawing, projectName))
+                {
+                    this.syncJListWithIndicatorProjectManager(this.jList2, this.moduleIndicatorProjectManager);
+                    final String output = MessageFormat.format(MessagesBundle.getString("info_message_file_saved_template"), projectName);
+                    JOptionPane.showMessageDialog(this, output, MessagesBundle.getString("info_title_file_saved"), JOptionPane.INFORMATION_MESSAGE);
+                    if (selectProjectAfterSave) {
+                        this.jList2.setSelectedValue(projectName, true);
+                    }
+                    return;
+                }
+                else
+                {
+                    JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_invalid_module_indicator_name"), MessagesBundle.getString("warning_title_invalid_module_indicator_name"), JOptionPane.WARNING_MESSAGE);
+                    continue;
+                }
+            }
+        } else {
+            // projectName is selected by user.
+            final IndicatorDefaultDrawing drawing = (IndicatorDefaultDrawing)view.getDrawing();
+            if (this.moduleIndicatorProjectManager.addProject(drawing, projectName)) {
+                // Just to ensure list cell renderer will be triggered.
+                this.syncJListWithIndicatorProjectManager(this.jList2, this.moduleIndicatorProjectManager);
+                final String output = MessageFormat.format(MessagesBundle.getString("info_message_file_saved_template"), projectName);
+                JOptionPane.showMessageDialog(this, output, MessagesBundle.getString("info_title_file_saved"), JOptionPane.INFORMATION_MESSAGE);
+            }
+            else {
+                JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_invalid_module_indicator_name"), MessagesBundle.getString("warning_title_invalid_module_indicator_name"), JOptionPane.WARNING_MESSAGE);
+            }
+        }
+    }
+
+    private void Export() {
+        if (false == promptToSaveSignificantEdits()) {
+            return;
+        }
+        if (this.jTabbedPane1.getSelectedIndex() == 0) {
+            this.alertIndicatorExport();
+        }
+        else if (this.jTabbedPane1.getSelectedIndex() == 1) {
+            this.moduleIndicatorExport();
+        }
+    }
+
+    private void alertIndicatorExport() {
+        final String projectName = (String)this.jList1.getSelectedValue();
+        if (projectName == null) {
+            JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_you_must_select_alert_indicator"), MessagesBundle.getString("warning_title_you_must_select_alert_indicator"), JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        final OperatorIndicator operatorIndicator = this.alertIndicatorProjectManager.getOperatorIndicator(projectName);
+        if (operatorIndicator != null && operatorIndicator.getType() != this.alertIndicatorProjectManager.getPreferredOperatorIndicatorType()) {
+            final String output = MessageFormat.format(MessagesBundle.getString("warning_message_you_may_not_export_invalid_indicator"), projectName);
+            JOptionPane.showMessageDialog(this, output, MessagesBundle.getString("warning_title_you_may_not_export_invalid_indicator"), JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        final File file = Utils.promptSaveZippedJFileChooser(projectName);
+        if (file == null) {
+            return;
+        }
+        this.alertIndicatorProjectManager.export(projectName, file);
+    }
+
+    private void moduleIndicatorExport() {
+        final String projectName = (String)this.jList2.getSelectedValue();
+        if (projectName == null) {
+            JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_you_must_select_module_indicator"), MessagesBundle.getString("warning_title_you_must_select_module_indicator"), JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        final OperatorIndicator operatorIndicator = this.moduleIndicatorProjectManager.getOperatorIndicator(projectName);
+        if (operatorIndicator != null && operatorIndicator.getType() != this.moduleIndicatorProjectManager.getPreferredOperatorIndicatorType()) {
+            final String output = MessageFormat.format(MessagesBundle.getString("warning_message_you_may_not_export_invalid_indicator"), projectName);
+            JOptionPane.showMessageDialog(this, output, MessagesBundle.getString("warning_title_you_may_not_export_invalid_indicator"), JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        final File file = Utils.promptSaveZippedJFileChooser(projectName);
+        if (file == null) {
+            return;
+        }
+        this.moduleIndicatorProjectManager.export(projectName, file);
+    }
+
+    private void Delete(boolean confirmationDialog) {
+        if (this.jTabbedPane1.getSelectedIndex() == 0) {
+            this.alertIndicatorDelete(confirmationDialog);
+        }
+        else if (this.jTabbedPane1.getSelectedIndex() == 1) {
+            this.moduleIndicatorDelete(confirmationDialog);
+        }
+    }
+
+    private void alertIndicatorDelete(boolean confirmationDialog) {
+        final String projectName = (String)this.jList1.getSelectedValue();
+        if (projectName == null) {
+            JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_you_must_select_alert_indicator"), MessagesBundle.getString("warning_title_you_must_select_alert_indicator"), JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        if (confirmationDialog) {
+            final String output = MessageFormat.format(MessagesBundle.getString("question_message_delete_template"), projectName);
+            final int result = javax.swing.JOptionPane.showConfirmDialog(MainFrame.getInstance(), output, MessagesBundle.getString("question_title_delete"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
+            if (result != javax.swing.JOptionPane.YES_OPTION) {
+                return;
+            }
+        }
+        this.alertIndicatorProjectManager.removeProject(projectName);
+        this.syncJListWithIndicatorProjectManager(this.jList1, this.alertIndicatorProjectManager);
+        if (this.alertIndicatorProjectManager.getNumOfProject() == 0) {
+            this.setDrawing(this.createDrawing());
+        }
+    }
+
+    private void moduleIndicatorDelete(boolean confirmationDialog) {
+        final String projectName = (String)this.jList2.getSelectedValue();
+        if (projectName == null) {
+            JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_you_must_select_module_indicator"), MessagesBundle.getString("warning_title_you_must_select_module_indicator"), JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        if (confirmationDialog) {
+            final String output = MessageFormat.format(MessagesBundle.getString("question_message_delete_template"), projectName);
+            final int result = javax.swing.JOptionPane.showConfirmDialog(MainFrame.getInstance(), output, MessagesBundle.getString("question_title_delete"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
+            if (result != javax.swing.JOptionPane.YES_OPTION) {
+                return;
+            }
+        }
+        this.moduleIndicatorProjectManager.removeProject(projectName);
+        this.syncJListWithIndicatorProjectManager(this.jList2, this.moduleIndicatorProjectManager);
+        if (this.moduleIndicatorProjectManager.getNumOfProject() == 0) {
+            this.setDrawing(this.createDrawing());
+        }
+    }
+
+    private void Rename() {
+        if (this.jTabbedPane1.getSelectedIndex() == 0) {
+            this.alertIndicatorRename();
+        }
+        else if (this.jTabbedPane1.getSelectedIndex() == 1) {
+            this.moduleIndicatorRename();
+        }
+    }
+
+    private boolean isIndicatorDatabaseVisibleAndSelected() {
+        final int select = this.jList1.getSelectedIndex();
+        return this.jTabbedPane1.getSelectedIndex() == 0 && select >= 0 && select < this.alertIndicatorProjectManager.getNumOfProject();
+    }
+
+    private boolean isModuleDatabaseVisibleAndSelected() {
+        final int select = this.jList2.getSelectedIndex();
+        return this.jTabbedPane1.getSelectedIndex() == 1 && select >= 0 && select < this.moduleIndicatorProjectManager.getNumOfProject();
+    }
+
+    private void alertIndicatorRename() {
+        final String oldProjectName = (String)this.jList1.getSelectedValue();
+        if (oldProjectName == null) {
+            JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_you_must_select_alert_indicator"), MessagesBundle.getString("warning_title_you_must_select_alert_indicator"), JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        assert(this.alertIndicatorProjectManager.contains(oldProjectName));
+
+        String newProjectName = null;
+
+        while (true) {
+            newProjectName = JOptionPane.showInputDialog(this, MessagesBundle.getString("info_message_enter_rename_alert_indicator_name"), oldProjectName);
+
+            if (newProjectName == null) {
+                return;
+            }
+
+            if (newProjectName.length() == 0) {
+                JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_you_need_to_specific_alert_indicator_name"), MessagesBundle.getString("warning_title_you_need_to_specific_alert_indicator_name"), JOptionPane.WARNING_MESSAGE);
+                continue;
+            }
+
+            if (this.alertIndicatorProjectManager.contains(newProjectName)) {
+                JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_already_an_alert_indicator_with_same_name"), MessagesBundle.getString("warning_title_already_an_alert_indicator_with_same_name"), JOptionPane.WARNING_MESSAGE);
+                continue;
+            }
+
+            if (this.alertIndicatorProjectManager.renameProject(newProjectName, oldProjectName))
+            {
+                final DefaultListModel defaultListModel = (DefaultListModel)this.jList1.getModel();
+                defaultListModel.setElementAt(newProjectName, this.jList1.getSelectedIndex());
+                // sync may not work well for rename operation, as the method
+                // may false thought we are deleting oldProjectName, and added
+                // newProjectName. We will then perform wrong selection on the
+                // project.
+                //this.syncJListWithIndicatorProjectManager(this.jList1, this.alertIndicatorProjectManager);
+
+                // Update the project.xml as well.
+                IndicatorPanel.this.saveAlertIndicatorProjectManager();
+            }
+            else
+            {
+                JOptionPane.showMessageDialog(this, MessagesBundle.getString("error_message_unknown_error_during_renaming"), MessagesBundle.getString("error_title_unknown_error_during_renaming"), JOptionPane.ERROR_MESSAGE);
+            }
+
+            break;
+        }
+    }
+
+    private void moduleIndicatorRename() {
+        final String oldProjectName = (String)this.jList2.getSelectedValue();
+        if (oldProjectName == null) {
+            JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_you_must_select_module_indicator"), MessagesBundle.getString("warning_title_you_must_select_module_indicator"), JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        assert(this.moduleIndicatorProjectManager.contains(oldProjectName));
+
+        String newProjectName = null;
+
+        while (true) {
+            newProjectName = JOptionPane.showInputDialog(this, MessagesBundle.getString("info_message_enter_rename_module_indicator_name"), oldProjectName);
+
+            if (newProjectName == null) {
+                return;
+            }
+
+            if (newProjectName.length() == 0) {
+                JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_you_need_to_specific_module_indicator_name"), MessagesBundle.getString("warning_title_you_need_to_specific_module_indicator_name"), JOptionPane.WARNING_MESSAGE);
+                continue;
+            }
+
+            if (this.moduleIndicatorProjectManager.contains(newProjectName)) {
+                JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_already_a_module_indicator_with_same_name"), MessagesBundle.getString("warning_title_already_a_module_indicator_with_same_name"), JOptionPane.WARNING_MESSAGE);
+                continue;
+            }
+
+            if (this.moduleIndicatorProjectManager.renameProject(newProjectName, oldProjectName))
+            {
+                final DefaultListModel defaultListModel = (DefaultListModel)this.jList2.getModel();
+                defaultListModel.setElementAt(newProjectName, this.jList2.getSelectedIndex());
+                // sync may not work well for rename operation, as the method
+                // may false thought we are deleting oldProjectName, and added
+                // newProjectName. We will then perform wrong selection on the
+                // project.
+                //this.syncJListWithIndicatorProjectManager(this.jList2, this.moduleIndicatorProjectManager);
+                // Update the project.xml as well.
+                IndicatorPanel.this.saveModuleIndicatorProjectManager();
+            }
+            else
+            {
+                JOptionPane.showMessageDialog(this, MessagesBundle.getString("error_message_unknown_error_during_renaming"), MessagesBundle.getString("error_title_unknown_error_during_renaming"), JOptionPane.ERROR_MESSAGE);
+            }
+
+            break;
+        }
+    }
+
+    private ImageIcon getImageIcon(String imageIcon) {
+        return new javax.swing.ImageIcon(getClass().getResource(imageIcon));
+    }
+
+    private JPopupMenu getJListPopupMenu() {
+        final JPopupMenu popup = new JPopupMenu();
+        javax.swing.JMenuItem menuItem = new JMenuItem(GUIBundle.getString("New..."), this.getImageIcon("/images/16x16/filenew.png"));
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                New();
+            }
+        });
+        popup.add(menuItem);
+        menuItem = new JMenuItem(GUIBundle.getString("Save"), this.getImageIcon("/images/16x16/filesave.png"));
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                Save(true);
+            }
+        });
+        popup.add(menuItem);
+        popup.addSeparator();
+
+        menuItem = new JMenuItem(GUIBundle.getString("Install..."), this.getImageIcon("/images/16x16/download.png"));
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                Install();
+            }
+        });
+        popup.add(menuItem);
+
+        if (isIndicatorDatabaseVisibleAndSelected() || isModuleDatabaseVisibleAndSelected()) {
+            menuItem = new JMenuItem(GUIBundle.getString("Export..."), this.getImageIcon("/images/16x16/upload.png"));
+            menuItem.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent evt) {
+                    Export();
+                }
+            });
+            popup.add(menuItem);
+            popup.addSeparator();
+            menuItem = new JMenuItem(GUIBundle.getString("Rename..."), this.getImageIcon("/images/16x16/edit.png"));
+            menuItem.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent evt) {
+                    Rename();
+                }
+            });
+            popup.add(menuItem);
+            menuItem = new JMenuItem(GUIBundle.getString("Delete"), this.getImageIcon("/images/16x16/editdelete.png"));
+            menuItem.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent evt) {
+                    Delete(true);
+                }
+            });
+            popup.add(menuItem);
+        }
+        return popup;
+    }
+
+    private class JListPopupListener extends MouseAdapter {
+
+        @Override
+        public void mouseClicked(MouseEvent evt) {
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            maybeShowPopup(e);
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            maybeShowPopup(e);
+        }
+
+        private void maybeShowPopup(MouseEvent e) {
+            if (e.isPopupTrigger()) {
+                getJListPopupMenu().show(e.getComponent(), e.getX(), e.getY());
+            }
+        }
+    }
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+// TODO add your handling code here:
+        this.New();
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jList2ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList2ValueChanged
+        // When the user release the mouse button and completes the selection,
+        // getValueIsAdjusting() becomes false
+       if (evt.getValueIsAdjusting()) {
+            return;
+        }
+
+        String projectName = (String)this.jList2.getSelectedValue();
+        if (projectName == null) {
+            this.listSelectionEx = null;
+            return;
+        }
+
+        IndicatorDefaultDrawing indicatorDefaultDrawing = this.moduleIndicatorProjectManager.getIndicatorDefaultDrawing(projectName);
+        boolean userCancel = false;
+        if (indicatorDefaultDrawing != null) {
+            if (this.promptToSaveSignificantEdits(this.listSelectionEx)) {
+                this.setDrawing(indicatorDefaultDrawing);
+            }
+            else {
+                userCancel = true;
+            }
+        }
+        else {
+            if (this.promptToSaveSignificantEdits(this.listSelectionEx)) {
+                final String output = MessageFormat.format(MessagesBundle.getString("question_message_corrupted_file_remove_template"), projectName);
+                if(JOptionPane.showConfirmDialog(this, output, MessagesBundle.getString("question_title_corrupted_file_remove"), JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
+                {
+                    // Do not prompt "Are you sure you want to delete..." dialog box.
+                    Delete(false);
+                }
+                else
+                {
+                    this.setDrawing(this.createDrawing());
+                }
+            }
+            else {
+                userCancel = true;
+            }
+        }
+
+        if (!userCancel) {
+            // Ensure jList1 and jList2 are mutually exclusive.
+            // This must be done before we assign value to this.listSelectionEx,
+            // as list selection listener of jList1 will overwrite this.listSelectionEx.
+            // Also, clearSelection code cannot be placed before any code which depend
+            // on the correctness of this.listSelectionEx.
+
+            // Ensure jList1 and jList2 are mutually exclusive.
+            //
+            // When cancel is pressed, promptToSaveSignificantEdits has helped us
+            // to determine correct selection. We need not to perform or clear selection
+            // explicitly.
+            this.jList1.clearSelection();
+            // Whenever cancel happen, we need to make this.listSelectionEx remains
+            // unchanged.
+            this.listSelectionEx = ListSelectionEx.newInstance(this.jList2, projectName);
+        }
+    }//GEN-LAST:event_jList2ValueChanged
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        Install();
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void Install() {
+        if (false == promptToSaveSignificantEdits()) {
+            return;
+        }
+        final Wizard wizard = this.getWizardDialog();
+        int ret = wizard.showModalDialog(650, 400);
+        if (ret != Wizard.FINISH_RETURN_CODE) {
+            final JList jList = this.getCurrentActiveJList();
+            // Although cancel button is pressed, possible some indicators had
+            // already installed from JStock server.
+            //
+            // Refresh JList after install from JStock server.
+            this.syncJListWithIndicatorProjectManager(jList, this.getCurrentActiveIndicatorProjectManager());
+            if (jList.getModel().getSize() > 0 && jList.getSelectedIndex() < 0) {
+                jList.setSelectedIndex(0);
+            }
+            return;
+        }
+        final WizardModel wizardModel = wizard.getModel();
+        final WizardPanelDescriptor wizardSelectInstallIndicatorMethodDescriptor = wizardModel.getPanelDescriptor(WizardSelectInstallIndicatorMethodDescriptor.IDENTIFIER);
+        final WizardSelectInstallIndicatorMethodJPanel wizardSelectInstallIndicatorMethodJPanel = (WizardSelectInstallIndicatorMethodJPanel)wizardSelectInstallIndicatorMethodDescriptor.getPanelComponent();
+        if (wizardSelectInstallIndicatorMethodJPanel.isLocalFileSelected()) {
+            final File file = wizardSelectInstallIndicatorMethodJPanel.getSelectedFile();
+            assert(file != null);
+            if (this.jTabbedPane1.getSelectedIndex() == 0) {
+                this.alertIndicatorInstall(file);
+            }
+            else if (this.jTabbedPane1.getSelectedIndex() == 1) {
+                this.moduleIndicatorInstall(file);
+            }
+        }
+        else
+        {
+            final JList jList = this.getCurrentActiveJList();
+            // Refresh JList after install from JStock server.
+            this.syncJListWithIndicatorProjectManager(jList, this.getCurrentActiveIndicatorProjectManager());
+            if (jList.getModel().getSize() > 0 && jList.getSelectedIndex() < 0) {
+                jList.setSelectedIndex(0);
+            }
+        }
+    }
+
+    private void alertIndicatorInstall(File file) {
+        final IndicatorProjectManager.PreInstallStatus preInstallStatus = this.alertIndicatorProjectManager.getPreInstallStatus(file);
+        if (preInstallStatus == IndicatorProjectManager.PreInstallStatus.Collision)
+        {
+            final String output = MessageFormat.format(MessagesBundle.getString("question_message_do_you_want_to_overwrite_template"), IndicatorProjectManager.getProjectName(file));
+            if(JOptionPane.showConfirmDialog(this, output, MessagesBundle.getString("question_title_do_you_want_to_overwrite"), JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION)
+            {
+                return;
+            }
+        }
+        else if (preInstallStatus == IndicatorProjectManager.PreInstallStatus.Unsafe) {
+            JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_invalid_alert_indicator_file"), MessagesBundle.getString("warning_title_invalid_alert_indicator_file"), JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        if (this.alertIndicatorProjectManager.install(file))
+        {
+            this.syncJListWithIndicatorProjectManager(this.jList1, this.alertIndicatorProjectManager);
+            this.jList1.setSelectedValue(IndicatorProjectManager.getProjectName(file), true);
+        }
+        else
+        {
+            JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_invalid_alert_indicator_file"), MessagesBundle.getString("warning_title_invalid_alert_indicator_file"), JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    private void moduleIndicatorInstall(File file) {
+        final IndicatorProjectManager.PreInstallStatus preInstallStatus = this.moduleIndicatorProjectManager.getPreInstallStatus(file);
+        if (preInstallStatus == IndicatorProjectManager.PreInstallStatus.Collision)
+        {
+            final String output = MessageFormat.format(MessagesBundle.getString("question_message_do_you_want_to_overwrite_template"), IndicatorProjectManager.getProjectName(file));
+            if(JOptionPane.showConfirmDialog(this, output, MessagesBundle.getString("question_title_do_you_want_to_overwrite"), JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION)
+            {
+                return;
+            }
+        }
+        else if (preInstallStatus == IndicatorProjectManager.PreInstallStatus.Unsafe) {
+            JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_invalid_module_indicator_file"), MessagesBundle.getString("warning_title_invalid_module_indicator_file"), JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        if (this.moduleIndicatorProjectManager.install(file))
+        {
+            this.syncJListWithIndicatorProjectManager(this.jList2, this.moduleIndicatorProjectManager);
+            this.jList2.setSelectedValue(IndicatorProjectManager.getProjectName(file), true);
+        }
+        else
+        {
+            JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_invalid_module_indicator_file"), MessagesBundle.getString("warning_title_invalid_module_indicator_file"), JOptionPane.WARNING_MESSAGE);
+        }
+    }
 
     private void addCreationButtonsTo(JToolBar tb, final DrawingEditor editor) {
         // AttributeKeys for the entitie sets
         HashMap<AttributeKey,Object> attributes;
         
-        ResourceBundleUtil labels = ResourceBundleUtil.getLAFBundle("org.yccheok.jstock.data.Labels");
-        ResourceBundleUtil drawLabels = ResourceBundleUtil.getLAFBundle("org.jhotdraw.draw.Labels");
+        ResourceBundleUtil labels = ResourceBundleUtil.getBundle("org.yccheok.jstock.data.Labels");
+        ResourceBundleUtil drawLabels = ResourceBundleUtil.getBundle("org.jhotdraw.draw.Labels");
         
         //ToolBarButtonFactory.addSelectionToolTo(tb, editor);
         ButtonFactory.addSelectionToolTo(tb, editor, createDrawingActions(editor), createSelectionActions(editor));
@@ -598,16 +1275,17 @@ public class IndicatorPanel extends JPanel {
         attributes.put(AttributeKeys.STROKE_COLOR, Color.black);
         attributes.put(AttributeKeys.TEXT_COLOR, Color.black);
 
-        ButtonFactory.addToolTo(tb, editor, new OperatorFigureCreationTool("org.yccheok.jstock.gui.LogicalOperatorFigure", attributes), "createLogical", labels);
-        ButtonFactory.addToolTo(tb, editor, new OperatorFigureCreationTool("org.yccheok.jstock.gui.EqualityOperatorFigure", attributes), "createEquality", labels);        
-        ButtonFactory.addToolTo(tb, editor, new OperatorFigureCreationTool("org.yccheok.jstock.gui.ArithmeticOperatorFigure", attributes), "createArithmetic", labels);
-        ButtonFactory.addToolTo(tb, editor, new OperatorFigureCreationTool("org.yccheok.jstock.gui.DoubleConstantOperatorFigure", attributes), "createDoubleConstant", labels);
+        ButtonFactory.addToolTo(tb, editor, new OperatorFigureCreationTool("org.yccheok.jstock.gui.analysis.LogicalOperatorFigure", attributes), "createLogical", labels);
+        ButtonFactory.addToolTo(tb, editor, new OperatorFigureCreationTool("org.yccheok.jstock.gui.analysis.EqualityOperatorFigure", attributes), "createEquality", labels);
+        ButtonFactory.addToolTo(tb, editor, new OperatorFigureCreationTool("org.yccheok.jstock.gui.analysis.ArithmeticOperatorFigure", attributes), "createArithmetic", labels);
+        ButtonFactory.addToolTo(tb, editor, new OperatorFigureCreationTool("org.yccheok.jstock.gui.analysis.DoubleConstantOperatorFigure", attributes), "createDoubleConstant", labels);
         tb.addSeparator();
-        ButtonFactory.addToolTo(tb, editor, new OperatorFigureCreationTool("org.yccheok.jstock.gui.StockRelativeHistoryOperatorFigure", attributes), "createStockRelativeHistory", labels);
-        ButtonFactory.addToolTo(tb, editor, new OperatorFigureCreationTool("org.yccheok.jstock.gui.StockHistoryOperatorFigure", attributes), "createStockHistory", labels);
-        ButtonFactory.addToolTo(tb, editor, new OperatorFigureCreationTool("org.yccheok.jstock.gui.StockOperatorFigure", attributes), "createStock", labels);        
+        ButtonFactory.addToolTo(tb, editor, new OperatorFigureCreationTool("org.yccheok.jstock.gui.analysis.StockRelativeHistoryOperatorFigure", attributes), "createStockRelativeHistory", labels);
+        ButtonFactory.addToolTo(tb, editor, new OperatorFigureCreationTool("org.yccheok.jstock.gui.analysis.StockHistoryOperatorFigure", attributes), "createStockHistory", labels);
+        ButtonFactory.addToolTo(tb, editor, new OperatorFigureCreationTool("org.yccheok.jstock.gui.analysis.StockOperatorFigure", attributes), "createStock", labels);
         tb.addSeparator();
-        ButtonFactory.addToolTo(tb, editor, new OperatorFigureCreationTool("org.yccheok.jstock.gui.SinkOperatorFigure", attributes), "createSink", labels);
+        //ButtonFactory.addToolTo(tb, editor, new OperatorFigureCreationTool("org.yccheok.jstock.gui.analysis.DiodeOperatorFigure", attributes), "createDiode", labels);
+        ButtonFactory.addToolTo(tb, editor, new OperatorFigureCreationTool("org.yccheok.jstock.gui.analysis.SinkOperatorFigure", attributes), "createSink", labels);
         tb.addSeparator();
         
         attributes = new HashMap<AttributeKey,Object>();
@@ -615,7 +1293,7 @@ public class IndicatorPanel extends JPanel {
         attributes.put(AttributeKeys.TEXT_COLOR, Color.black);
         attributes.put(AttributeKeys.FONT_BOLD, true);
         attributes.put(AttributeKeys.FILL_COLOR, new Color(255, 204, 0));
-        ButtonFactory.addToolTo(tb, editor, new TextAreaTool(new TextAreaFigure(), attributes), "createText", drawLabels);
+	ButtonFactory.addToolTo(tb, editor, new TextAreaCreationTool(new TextAreaFigure(), attributes), "edit.createText", drawLabels);
     }
     
     private static Collection<Action> createDrawingActions(DrawingEditor editor) {
@@ -629,25 +1307,6 @@ public class IndicatorPanel extends JPanel {
         a.add(null);
         a.add(new DeleteAction(editor));
         return a;
-    }
-    
-    /**
-     * Writes the project to the specified file.
-     */
-    public void write(String projectName) throws IOException {
-        IndicatorDefaultDrawing drawing = (IndicatorDefaultDrawing)view.getDrawing();
-        // drawing.write(projectName);
-    }
-    
-    /**
-     * Reads the project from the specified file.
-     */
-    public void read(String projectName) throws IOException {
-        final IndicatorDefaultDrawing drawing = (IndicatorDefaultDrawing)createDrawing();
-        // drawing.read(projectName);
-        SwingUtilities.invokeLater(new Runnable() { public void run() {
-            view.setDrawing(drawing);
-        }});
     }
     
     public void setStockCodeAndSymbolDatabase(StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase) {
@@ -670,6 +1329,7 @@ public class IndicatorPanel extends JPanel {
     
     private KeyAdapter getjComboBox1EditorComponentKeyAdapter() {
         return new KeyAdapter() {
+            @Override
             public void keyReleased(KeyEvent e) {
                 if(KeyEvent.VK_ENTER == e.getKeyCode()) {
                     String stock = IndicatorPanel.this.jComboBox1.getEditor().getItem().toString();
@@ -734,6 +1394,7 @@ public class IndicatorPanel extends JPanel {
             runnable = false;
         }
         
+        @Override
         public Boolean doInBackground() {
             Boolean success = false;
             Stock s = null;
@@ -831,9 +1492,16 @@ public class IndicatorPanel extends JPanel {
             log.info("Terminated simulation thread");
         }        
     }
-    
+
+    // Due to the unknown problem in netbeans IDE, we will add in the tooltip
+    // and icon seperately.
+    private void createToolTipTextForJTabbedPane() {
+        this.jTabbedPane1.setToolTipTextAt(0, GUIBundle.getString("IndicatorPanel_AlertIndicatorToolTip"));
+        //this.jTabbedPane1.setToolTipTextAt(1, GUIBundle.getString("IndicatorPanel_ModuleIndicatorToolTip"));
+    }
+
     // Run by worker thread only.
-    private void simulate(final Code code) {                
+    private void simulate(final Stock stock) {
         MainFrame m = MainFrame.getInstance();
 
         // First, check whether there is a need to get history.
@@ -841,8 +1509,10 @@ public class IndicatorPanel extends JPanel {
         final OperatorIndicator operatorIndicator = indicatorDefaultDrawing.getOperatorIndicator();
         final Duration historyDuration = operatorIndicator.getNeededStockHistoryDuration();
 
-        if(operatorIndicator.isStockHistoryServerNeeded()) {
-            m.setStatusBar(true, "Stock history retrieving in progress...");
+        // When stock is null, this means this indicator needs neither stock real-time information
+        // nor stock history information.
+        if (stock != null && operatorIndicator.isStockHistoryServerNeeded()) {
+            m.setStatusBar(true, MessagesBundle.getString("info_message_stock_history_retrieving_in_progress..."));
 
             // Avoid from using old history monitor. Their duration are not the same.
             final Duration oldDuration = stockHistoryMonitor.getDuration();
@@ -853,126 +1523,154 @@ public class IndicatorPanel extends JPanel {
             }
 
             // Action!
-            StockHistoryServer stockHistoryServer = this.stockHistoryMonitor.getStockHistoryServer(code);
+            StockHistoryServer stockHistoryServer = this.stockHistoryMonitor.getStockHistoryServer(stock.getCode());
 
-            if(stockHistoryServer == null) {
-
+            if (stockHistoryServer == null) {
                 final java.util.concurrent.CountDownLatch countDownLatch = new java.util.concurrent.CountDownLatch(1);
-
-                org.yccheok.jstock.engine.Observer<StockHistoryMonitor, StockHistoryMonitor.StockHistoryRunnable> observer = new org.yccheok.jstock.engine.Observer<StockHistoryMonitor, StockHistoryMonitor.StockHistoryRunnable>() {
+                final org.yccheok.jstock.engine.Observer<StockHistoryMonitor, StockHistoryMonitor.StockHistoryRunnable> observer = new org.yccheok.jstock.engine.Observer<StockHistoryMonitor, StockHistoryMonitor.StockHistoryRunnable>() {
                     @Override
                     public void update(StockHistoryMonitor monitor, StockHistoryMonitor.StockHistoryRunnable runnable)
                     {
-                        if(runnable.getCode().equals(code)) {
+                        if(runnable.getCode().equals(stock.getCode())) {
                             countDownLatch.countDown();
                         }
                     }
                 };
 
                 this.stockHistoryMonitor.attach(observer);
-
-                this.stockHistoryMonitor.addStockCode(code);
-
+                this.stockHistoryMonitor.addStockCode(stock.getCode());
                 try {
                     countDownLatch.await();
                 }
-                catch(java.lang.InterruptedException exp) {
-                    log.error("", exp);
+                catch (java.lang.InterruptedException exp) {
+                    log.error(null, exp);
                     return;
                 }
-
                 this.stockHistoryMonitor.dettach(observer);
-
-                stockHistoryServer = this.stockHistoryMonitor.getStockHistoryServer(code);
+                stockHistoryServer = this.stockHistoryMonitor.getStockHistoryServer(stock.getCode());
             }
 
-            if(stockHistoryServer == null) {
+            if (stockHistoryServer == null) {
                 this.jButton4.setEnabled(true);
-                this.jButton6.setEnabled(false);     
-
-                m.setStatusBar(false, "Database not found");            
+                this.jButton6.setEnabled(false);
+                m.setStatusBar(false, MessagesBundle.getString("info_message_history_not_found"));
                 return;
             }
 
-            if(Thread.interrupted() || simulationThread != Thread.currentThread())
+            if (Thread.interrupted() || simulationThread != Thread.currentThread()) {
                 return;
+            }
 
-            m.setStatusBar(true, "Stock history information calculation in progress...");
-
+            m.setStatusBar(true, MessagesBundle.getString("info_message_stock_history_information_calculation_in_progress..."));
             operatorIndicator.setStockHistoryServer(stockHistoryServer);
         }   /* if(operatorIndicator.isStockHistoryServerNeeded()) { */
         
-        if(Thread.interrupted() || simulationThread != Thread.currentThread())
+        if (Thread.interrupted() || simulationThread != Thread.currentThread()) {
             return;
+        }
         
-        m.setStatusBar(true, "Real time stock information calculation in progress...");
-
-        Object o = ((ObjectInspectorJPanel)this.objectInspectorJPanel).getBean();
-        MutableStock mutableStock = (MutableStock)o;
-        Stock stock = mutableStock.getStock();
+        m.setStatusBar(true, MessagesBundle.getString("info_message_real_time_stock_information_calculation_in_progress..."));
         
         operatorIndicator.preCalculate();
         
-        if(Thread.interrupted() || simulationThread != Thread.currentThread())
+        if (Thread.interrupted() || simulationThread != Thread.currentThread()) {
             return;
+        }
         
-        m.setStatusBar(true, "Final calculation...");
+        m.setStatusBar(true, MessagesBundle.getString("info_message_final_calculation..."));
    
         long startTime = System.nanoTime();
-        
-        operatorIndicator.setStock(stock);
+
+        if (stock != null) {
+            operatorIndicator.setStock(stock);
+        }
         
         operatorIndicator.isTriggered();
    
         long estimatedTime = System.nanoTime() - startTime;
 
-        if(Thread.interrupted() || simulationThread != Thread.currentThread())
+        if (Thread.interrupted() || simulationThread != Thread.currentThread()) {
             return;
-        
-        m.setStatusBar(false, "Simulation done with time taken " + ((double)estimatedTime / (double)1000000.0) + "ms");
+        }
+
+        final String output = MessageFormat.format(
+                MessagesBundle.getString("info_message_simulation_done_with_time_taken_template"),
+                ((double)estimatedTime / (double)1000000.0)
+        );
+        m.setStatusBar(false, output);
 
         this.jButton4.setEnabled(true);
         this.jButton6.setEnabled(false);
     }
     
-    public void initIndicatorProjectManager() {
+    private void initIndicatorProjectManager() {
         File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "indicator" + File.separator + "project.xml");
-        indicatorProjectManager = org.yccheok.jstock.gui.Utils.fromXML(IndicatorProjectManager.class, f);
-        if (indicatorProjectManager != null) {
-            log.info("indicatorProjectManager loaded from " + f.toString() + " successfully.");
+        this.alertIndicatorProjectManager = org.yccheok.jstock.gui.Utils.fromXML(IndicatorProjectManager.class, f);
+        if (this.alertIndicatorProjectManager != null) {
+            log.info("alertIndicatorProjectManager loaded from " + f.toString() + " successfully.");
         }
         else {
-            indicatorProjectManager = new IndicatorProjectManager(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "indicator");
-        }
-                        
+            this.alertIndicatorProjectManager = new IndicatorProjectManager(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "indicator", OperatorIndicator.Type.AlertIndicator);
+        }                        
         SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run() {
-                DefaultListModel defaultListModel = (DefaultListModel)jList1.getModel();
-                for(int i = 0; i < indicatorProjectManager.getNumOfProject(); i++) {
-                    OperatorIndicator operatorIndicator = indicatorProjectManager.getOperatorIndicator(indicatorProjectManager.getProject(i));
-                    if(operatorIndicator == null) {
-                        defaultListModel.addElement(indicatorProjectManager.getProject(i) + " *");
-                    }
-                    else {
-                        if(operatorIndicator.isValid() == false) {
-                            defaultListModel.addElement(indicatorProjectManager.getProject(i) + " *");
-                        }
-                        else {
-                            defaultListModel.addElement(indicatorProjectManager.getProject(i));
-                        }
-                    }
+                final DefaultListModel defaultListModel = (DefaultListModel)IndicatorPanel.this.jList1.getModel();
+                defaultListModel.clear();
+                for (int i = 0; i < IndicatorPanel.this.alertIndicatorProjectManager.getNumOfProject(); i++) {
+                    defaultListModel.addElement(IndicatorPanel.this.alertIndicatorProjectManager.getProject(i));
+                }
+                if (IndicatorPanel.this.jList1.getModel().getSize() > 0) {
+                    // Select first element.
+                    IndicatorPanel.this.jList1.setSelectedIndex(0);
                 }
             }
         });
     }
-    
-    public boolean saveIndicatorProjectManager() {
-        File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "indicator" + File.separator + "project.xml");
-        return Utils.toXML(indicatorProjectManager, f);
+
+    private void initModuleProjectManager() {
+        final File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "module" + File.separator + "project.xml");
+        this.moduleIndicatorProjectManager = org.yccheok.jstock.gui.Utils.fromXML(IndicatorProjectManager.class, f);
+        if (this.moduleIndicatorProjectManager != null) {
+            log.info("moduleIndicatorProjectManager loaded from " + f.toString() + " successfully.");
+        }
+        else {
+            this.moduleIndicatorProjectManager = new IndicatorProjectManager(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "module", OperatorIndicator.Type.ModuleIndicator);
+        }
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                final DefaultListModel defaultListModel = (DefaultListModel)jList2.getModel();
+                defaultListModel.clear();
+                for (int i = 0; i < IndicatorPanel.this.moduleIndicatorProjectManager.getNumOfProject(); i++) {
+                    defaultListModel.addElement(IndicatorPanel.this.moduleIndicatorProjectManager.getProject(i));
+                }
+            }
+        });
+    }
+
+    public boolean saveModuleIndicatorProjectManager() {
+        final File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "module" + File.separator + "project.xml");
+        return Utils.toXML(this.moduleIndicatorProjectManager, f);
+    }
+
+    public boolean saveAlertIndicatorProjectManager() {
+        final File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "indicator" + File.separator + "project.xml");
+        return Utils.toXML(this.alertIndicatorProjectManager, f);
     }
     
-    public IndicatorProjectManager getIndicatorProjectManager() {
-        return indicatorProjectManager;
+    public IndicatorProjectManager getAlertIndicatorProjectManager() {
+        return this.alertIndicatorProjectManager;
+    }
+
+    public IndicatorProjectManager getModuleIndicatorProjectManager() {
+        return this.moduleIndicatorProjectManager;
+    }
+
+    public void updatePrimaryStockServerFactory(java.util.List<StockServerFactory> stockServerFactories) {
+        if (stockHistoryMonitor != null) {
+            stockHistoryMonitor.setStockServerFactories(stockServerFactories);
+        }
     }
 
     public void updatePrimaryStockServerFactory(java.util.List<StockServerFactory> stockServerFactories) {
@@ -1008,12 +1706,116 @@ public class IndicatorPanel extends JPanel {
         // Currently, we have no way but disable it.
     }
 
+    private JList getCurrentActiveJList() {
+        if (this.jTabbedPane1.getSelectedIndex() == 0) {
+            return this.jList1;
+        }
+        else {
+            assert(this.jTabbedPane1.getSelectedIndex() == 1);
+            return this.jList2;
+        }
+    }
+
+    private IndicatorProjectManager getCurrentActiveIndicatorProjectManager() {
+        if (this.jTabbedPane1.getSelectedIndex() == 0) {
+            return this.alertIndicatorProjectManager;
+        }
+        else {
+            assert(this.jTabbedPane1.getSelectedIndex() == 1);
+            return this.moduleIndicatorProjectManager;
+        }
+    }
+
+    private Wizard getWizardDialog() {
+        final MainFrame m = MainFrame.getInstance();
+        final Wizard wizard = new Wizard(m);
+        wizard.getDialog().setTitle(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("IndicatorPanel_IndicatorInstallWizard"));
+        wizard.getDialog().setResizable(false);
+        WizardPanelDescriptor wizardSelectInstallIndicatorMethodDescriptor = new WizardSelectInstallIndicatorMethodDescriptor();
+        wizard.registerWizardPanel(WizardSelectInstallIndicatorMethodDescriptor.IDENTIFIER, wizardSelectInstallIndicatorMethodDescriptor);
+        wizard.setCurrentPanel(WizardSelectInstallIndicatorMethodDescriptor.IDENTIFIER);
+        WizardPanelDescriptor wizardSelectIndicatorDescriptor = new WizardSelectIndicatorDescriptor(getCurrentActiveIndicatorProjectManager());
+        wizard.registerWizardPanel(WizardSelectIndicatorDescriptor.IDENTIFIER, wizardSelectIndicatorDescriptor);
+        WizardPanelDescriptor wizardDownloadIndicatorDescriptor = new WizardDownloadIndicatorDescriptor(getCurrentActiveIndicatorProjectManager());
+        wizard.registerWizardPanel(WizardDownloadIndicatorDescriptor.IDENTIFIER, wizardDownloadIndicatorDescriptor);
+        // Center to screen.
+        wizard.getDialog().setLocationRelativeTo(null);
+        wizard.getDialog().setSize(200, 200);
+        return wizard;
+    }
+
+    private void initListCellRenderer() {
+        assert(this.moduleIndicatorProjectManager != null);
+        assert(this.alertIndicatorProjectManager != null);
+        assert(this.jList1 != null);
+        assert(this.jList2 != null);
+        this.jList1.setCellRenderer(getListCellRenderer(alertIndicatorProjectManager));
+        this.jList2.setCellRenderer(getListCellRenderer(moduleIndicatorProjectManager));
+    }
+    
+    private ListCellRenderer getListCellRenderer(final IndicatorProjectManager projectManager) {
+        return new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                Component component = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (component != null && value != null) {
+                    final OperatorIndicator operatorIndicator = projectManager.getOperatorIndicator(value.toString());
+                    if (operatorIndicator != null && operatorIndicator.getType() != projectManager.getPreferredOperatorIndicatorType()) {
+                        component.setFont(new Font(component.getFont().getName(), Font.ITALIC, component.getFont().getSize()));
+                    }
+                }
+                return component;
+            }
+        };
+    }
+
+    private void syncJListWithIndicatorProjectManager(JList jList, IndicatorProjectManager indicatorProjectManager) {
+        final String projectName = (String)jList.getSelectedValue();
+        boolean isProjectNameBeingRemoved = false;
+        int newSelection = -1;
+
+        final ListModel listModel = jList.getModel();
+        for (int i = 0; i < listModel.getSize(); i++) {
+            if (indicatorProjectManager.contains(listModel.getElementAt(i).toString()) == false) {
+                // Remove from JList, as it is not found in indicator project manager.
+                Object removedObject = ((DefaultListModel)listModel).remove(i);
+                if (projectName.equals(removedObject)) {
+                    isProjectNameBeingRemoved = true;
+                    newSelection = i;
+                }
+                i--;
+            }
+        }
+        for (int i = 0; i < indicatorProjectManager.getNumOfProject(); i++) {
+            final String p = indicatorProjectManager.getProject(i);
+            if (((DefaultListModel)listModel).contains(p) == false) {
+                // Add to JList, as it is found in indicator project manager.
+                ((DefaultListModel)listModel).addElement(p);
+            }
+        }
+
+        if (!isProjectNameBeingRemoved) {
+            // Ensure list cell renderer is being triggered.
+            jList.setSelectedValue(projectName, true);
+        }
+        else {
+            if (newSelection >= jList.getModel().getSize()) {
+                // Select last row.
+                jList.setSelectedIndex(jList.getModel().getSize() - 1);
+            }
+            else {
+                jList.setSelectedIndex(newSelection);
+            }
+        }
+    }
+
     private StockHistoryMonitor stockHistoryMonitor = null;
 
     private static final int NUM_OF_THREADS_HISTORY_MONITOR = 1;
 
-    private IndicatorProjectManager indicatorProjectManager;
-    
+    private IndicatorProjectManager alertIndicatorProjectManager;
+    private IndicatorProjectManager moduleIndicatorProjectManager;
+
     private static final Log log = LogFactory.getLog(IndicatorPanel.class);
     
     private StockTask stockTask;
@@ -1023,33 +1825,43 @@ public class IndicatorPanel extends JPanel {
     private final KeyListener jComboBox1EditorComponentKeyAdapter = getjComboBox1EditorComponentKeyAdapter();
     
     private Thread simulationThread;
-    
-    private boolean passwordSuccessOnce = false;
 
     private static final int NUM_OF_RETRY = 3;
+
+    /* Hacking, in order to make when user select another project, we will able
+     * to prompt user to save unsaved drawing.
+     *
+     * It is never easy to perform "Validate JList Before Selection Occur".
+     * When we receive event triggering and perform validation, it is too late
+     * to undo the selection.
+     * That's why hacking comes into place :)
+     */
+    private ListSelectionEx listSelectionEx = null;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToolBar creationToolbar;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
     private javax.swing.JComboBox jComboBox1;
     private javax.swing.JList jList1;
+    private javax.swing.JList jList2;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
-    private javax.swing.JPanel jPanel8;
-    private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JSplitPane jSplitPane2;
+    private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JPanel objectInspectorJPanel;
     private javax.swing.JScrollPane scrollPane;
     private javax.swing.ButtonGroup toolButtonGroup;
