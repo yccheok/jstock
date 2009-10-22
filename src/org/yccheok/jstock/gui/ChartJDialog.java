@@ -1307,11 +1307,11 @@ public class ChartJDialog extends javax.swing.JDialog {
     private final List<TAEx> activeTAExs = new ArrayList<TAEx>();
     private static final int MAX_MAP_SIZE = 20;
 
-    private final static Map<TAEx, XYPlot> price_volume_ta_map = new HashMap<TAEx, XYPlot>();
+    private final Map<TAEx, XYPlot> price_volume_ta_map = new HashMap<TAEx, XYPlot>();
     /* Not sure why. I cannot make priceVolumeChart and candlestickChart sharing the same
      * plot. If not, this will inhibit incorrect zooming behavior.
      */
-    private final static Map<TAEx, XYPlot> candlestick_ta_map = new HashMap<TAEx, XYPlot>();
+    private final Map<TAEx, XYPlot> candlestick_ta_map = new HashMap<TAEx, XYPlot>();
 
     private final XYDataset priceDataset;
     private final IntervalXYDataset volumeDataset;
