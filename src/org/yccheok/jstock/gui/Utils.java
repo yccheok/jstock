@@ -696,7 +696,7 @@ public class Utils {
      * Get response body through non-standard POST method.
      * Please refer to <url>http://stackoverflow.com/questions/1473255/is-jakarta-httpclient-sutitable-for-the-following-task/1473305#1473305</url>
      *
-     * @param uri For example, http://n2ntbfd03.asiaebroker.com:20000/%5bvUpJYKw4QvGRMBmhATUxRwv4JrU9aDnwNEuangVyy6OuHxi2YiY=%5dImage?
+     * @param uri For example, http://X/%5bvUpJYKw4QvGRMBmhATUxRwv4JrU9aDnwNEuangVyy6OuHxi2YiY=%5dImage?
      * @param formData For example, [SORT]=0,1,0,10,5,0,KL,0&[FIELD]=33,38,51
      * @return the response body. null if fail.
      */

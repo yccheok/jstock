@@ -53,8 +53,8 @@ public class StockServerFactoryJRadioButton extends JRadioButton {
         else if (c == org.yccheok.jstock.engine.YahooStockServerFactory.class) {
             return GUIBundle.getString("StockServerFactoryJRadioButton_YahooStockServerFactory");
         }
-        else if (c == org.yccheok.jstock.engine.AsiaEBrokerStockServerFactory.class) {
-            return GUIBundle.getString("StockServerFactoryJRadioButton_AsiaEBrokerStockServerFactory");
+        else if (c == org.yccheok.jstock.engine.XStockServerFactory.class) {
+            return GUIBundle.getString("StockServerFactoryJRadioButton_XStockServerFactory");
         }
         return c.getSimpleName();
     }
@@ -80,7 +80,7 @@ public class StockServerFactoryJRadioButton extends JRadioButton {
         else if (c == org.yccheok.jstock.engine.YahooStockServer.class) {
             code = Code.newInstance("MSFT");
         }
-        else if (c == org.yccheok.jstock.engine.AsiaEBrokerStockServer.class) {
+        else if (c == org.yccheok.jstock.engine.XStockServer.class) {
             code = Code.newInstance("1295.KL");
         }
         try {
