@@ -35,37 +35,85 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
 
         org.jdesktop.swingx.JXHeader jXHeader1 = new org.jdesktop.swingx.JXHeader();
         javax.swing.JPanel jPanel1 = new javax.swing.JPanel();
+        javax.swing.JPanel jPanel2 = new javax.swing.JPanel();
         javax.swing.JLabel jLabel1 = new javax.swing.JLabel();
         jFormattedTextField1 = getPercentageJFormattedTextField();
+        javax.swing.JPanel jPanel3 = new javax.swing.JPanel();
+        jCheckBox1 = new javax.swing.JCheckBox();
 
         setLayout(new java.awt.BorderLayout());
 
-        jXHeader1.setDescription("Provide you advice during your sell transaction, in order to maximize your profit.");
-        jXHeader1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/32x32/jabber_protocol.png"))); // NOI18N
-        jXHeader1.setTitle("Advisor");
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
+        jXHeader1.setDescription(bundle.getString("OptionsSellAdvisorJPanel_Description")); // NOI18N
+        jXHeader1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/32x32/money3.png"))); // NOI18N
+        jXHeader1.setTitle(bundle.getString("OptionsSellAdvisorJPanel_Wealth")); // NOI18N
         add(jXHeader1, java.awt.BorderLayout.NORTH);
 
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsSellAdvisorJPanel_SellAdvisor"))); // NOI18N
+
         jLabel1.setText("Expected profit percentage (%)");
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jFormattedTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(129, Short.MAX_VALUE))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(jFormattedTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsSellAdvisorJPanel_Wealth"))); // NOI18N
+
+        jCheckBox1.setLabel(bundle.getString("OptionsSellAdvisorJPanel_ShowStockValueInDollar")); // NOI18N
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jCheckBox1)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jCheckBox1)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jFormattedTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(174, Short.MAX_VALUE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(jFormattedTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(203, Short.MAX_VALUE))
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(95, Short.MAX_VALUE))
         );
 
         add(jPanel1, java.awt.BorderLayout.CENTER);
@@ -90,21 +138,25 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
         }
     }
     
+    @Override
     public void set(JStockOptions jStockOptions) {
-        jFormattedTextField1.setValue(new Double(jStockOptions.getExpectedProfitPercentage()));
+        this.jFormattedTextField1.setValue(new Double(jStockOptions.getExpectedProfitPercentage()));
+        this.jCheckBox1.setSelected(jStockOptions.isPenceToPoundConversionEnabled());
         commitEdit();
     }
 
     public boolean apply(JStockOptions jStockOptions) {
         commitEdit();
         jStockOptions.setExpectedProfitPercentage((Double)jFormattedTextField1.getValue());
+        jStockOptions.setPenceToPoundConversionEnabled(this.jCheckBox1.isSelected());
         return true;
     }
     
     private static final Log log = LogFactory.getLog(OptionsSellAdvisorJPanel.class);
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    javax.swing.JFormattedTextField jFormattedTextField1;
+    private javax.swing.JCheckBox jCheckBox1;
+    private javax.swing.JFormattedTextField jFormattedTextField1;
     // End of variables declaration//GEN-END:variables
 
 }
