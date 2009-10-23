@@ -315,7 +315,7 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
                     return "Buy";
         
                 case 5:
-                    return portfolio.getTotal();
+                        return portfolio.getTotal();
                     
                 case 6:
                     return getCurrentValue(portfolio);
