@@ -93,7 +93,7 @@ public enum Factories {
         indonesiaList.add(SingaporeYahooStockServerFactory.newInstance(Country.Indonesia));
         italyList.add(YahooStockServerFactory.newInstance(Country.Italy));
         koreaList.add(SingaporeYahooStockServerFactory.newInstance(Country.Korea));
-        malaysiaList.add(AsiaEBrokerStockServerFactory.newInstance());
+        malaysiaList.add(XStockServerFactory.newInstance());
         malaysiaList.add(SingaporeYahooStockServerFactory.newInstance(Country.Malaysia));
         netherlandsList.add(YahooStockServerFactory.newInstance(Country.Netherlands));
         norwayList.add(YahooStockServerFactory.newInstance(Country.Norway));

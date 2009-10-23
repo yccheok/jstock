@@ -38,8 +38,8 @@ public class Utils {
     private static volatile List<String> CIMBStockServers = null;
     private static volatile List<String> CIMBHistoryServers = null;
 
-    private static volatile List<String> AsiaEBrokerMarketServers = null;
-    private static volatile List<String> AsiaEBrokerStockServers = null;
+    private static volatile List<String> XMarketServers = null;
+    private static volatile List<String> XStockServers = null;
 
     private static final String[] DEFAULT_CIMB_SERVERS = new String[] {
         "http://n2ntbfd01.itradecimb.com/",
@@ -54,34 +54,38 @@ public class Utils {
         "http://n2ntbfd10.itradecimb.com/"
     };
 
-    private static final String[] DEFAULT_ASIAEBROKER_SERVERS = new String[] {
-        "http://n2ntbfd03.asiaebroker.com:20000",
-        "http://n2ntbfd065.asiaebroker.com:20000",
-        "http://n2ntbfd01.asiaebroker.com:20000"
+    private static final String[] DEFAULT_X_SERVERS = new String[] {
+        "wLllc3ZJq73EFWMqYiXOf0YzVzRexVbjXSjOn9Yiu0GZOXFfHXwmWag/K23uY9Sr",
+        "Av6N5TreyjHoPuRV5g81WQjW8JWqPrHPbzOC/uYfxNHMgWW3CcyCFJgrjRA+RuHL",
+        "5FyQRFsBGV3fYfc3JFbwwwCV2qEXOsiKxC4vdmF7lC8lZl4k6SuIU32yVp5xCaJk"
     };
 
     private static final String JSTOCK_STATIC_SERVER = "http://jstock-static.appspot.com/";
 
-    public static List<String> getAsiaEBrokerMarketServers() {
-        List<String> servers = Utils.AsiaEBrokerMarketServers;
+    public static List<String> getXMarketServers() {
+        List<String> servers = Utils.XMarketServers;
         if (servers != null) {
             // We already have the server list.
             return new CopyOnWriteArrayList<String>(servers);
         }
 
-        final String server = org.yccheok.jstock.gui.Utils.getUUIDValue(getJStockStaticServer() + "servers_information/asiaebroker_market_servers.txt", "server");
+        final String server = org.yccheok.jstock.gui.Utils.getUUIDValue(getJStockStaticServer() + "servers_information/x_market_servers.txt", "server");
         if (server != null) {
-            String[] s = server.split(",");
+            final String decrypted_server = org.yccheok.jstock.gui.Utils.decrypt(server);
+            String[] s = decrypted_server.split(",");
             if (s.length > 0) {
                 List<String> me = new CopyOnWriteArrayList<String>(java.util.Arrays.asList(s));
                 // Save it! So that we need not to ask for server list again next time.
-                Utils.AsiaEBrokerMarketServers = me;
+                Utils.XMarketServers = me;
                 return new CopyOnWriteArrayList<String>(me);
             }
         }
-        servers = new CopyOnWriteArrayList<String>(java.util.Arrays.asList(DEFAULT_ASIAEBROKER_SERVERS));
+        servers = new CopyOnWriteArrayList<String>(java.util.Arrays.asList(DEFAULT_X_SERVERS));
+        for (int i = 0; i < servers.size(); i++) {
+            servers.set(i, org.yccheok.jstock.gui.Utils.decrypt(servers.get(i)));
+        }
         // Save it! So that we need not to ask for server list again next time.
-        Utils.AsiaEBrokerMarketServers = servers;
+        Utils.XMarketServers = servers;
         return new CopyOnWriteArrayList<String>(servers);
     }
 
@@ -108,26 +112,30 @@ public class Utils {
         return new CopyOnWriteArrayList<String>(servers);
     }
 
-    public static List<String> getAsiaEBrokerStockServers() {
-        List<String> servers = Utils.AsiaEBrokerStockServers;
+    public static List<String> getXStockServers() {
+        List<String> servers = Utils.XStockServers;
         if (servers != null) {
             // We already have the server list.
             return new CopyOnWriteArrayList<String>(servers);
         }
 
-        final String server = org.yccheok.jstock.gui.Utils.getUUIDValue(getJStockStaticServer() + "servers_information/asiaebroker_stock_servers.txt", "server");
+        final String server = org.yccheok.jstock.gui.Utils.getUUIDValue(getJStockStaticServer() + "servers_information/x_stock_servers.txt", "server");
         if (server != null) {
-            String[] s = server.split(",");
+            final String decrypted_server = org.yccheok.jstock.gui.Utils.decrypt(server);
+            String[] s = decrypted_server.split(",");
             if (s.length > 0) {
                 List<String> me = new CopyOnWriteArrayList<String>(java.util.Arrays.asList(s));
                 // Save it! So that we need not to ask for server list again next time.
-                Utils.AsiaEBrokerStockServers = me;
+                Utils.XStockServers = me;
                 return new CopyOnWriteArrayList<String>(me);
             }
         }
-        servers = new CopyOnWriteArrayList<String>(java.util.Arrays.asList(DEFAULT_ASIAEBROKER_SERVERS));
+        servers = new CopyOnWriteArrayList<String>(java.util.Arrays.asList(DEFAULT_X_SERVERS));
+        for (int i = 0; i < servers.size(); i++) {
+            servers.set(i, org.yccheok.jstock.gui.Utils.decrypt(servers.get(i)));
+        }
         // Save it! So that we need not to ask for server list again next time.
-        Utils.AsiaEBrokerStockServers = servers;
+        Utils.XStockServers = servers;
         return new CopyOnWriteArrayList<String>(servers);
     }
 
