@@ -161,6 +161,9 @@ public class JStockOptions {
     private String proxyAuthUserName = "";
     private boolean isProxyAuthEnabled = false;
 
+    /* For UK client. */
+    private boolean penceToPoundConversionEnabled = false;
+
     // Remember where we save/open the last file.
     private String lastFileIODirectory = System.getProperty("user.home");
     private String lastFileNameExtensionDescription = "CSV Documents (*.csv)";
@@ -821,5 +824,19 @@ public class JStockOptions {
      */
     public void setNewsID(String newsID) {
         this.newsID = newsID;
+    }
+
+    /**
+     * @return the penceToPoundConversionEnabled
+     */
+    public boolean isPenceToPoundConversionEnabled() {
+        return penceToPoundConversionEnabled;
+    }
+
+    /**
+     * @param penceToPoundConversionEnabled the penceToPoundConversionEnabled to set
+     */
+    public void setPenceToPoundConversionEnabled(boolean penceToPoundConversionEnabled) {
+        this.penceToPoundConversionEnabled = penceToPoundConversionEnabled;
     }
 }
