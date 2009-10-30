@@ -43,27 +43,27 @@ public class TechnicalAnalysis {
         final TimeSeries series = new TimeSeries(name, Day.class);
         final int num = stockHistoryServer.getNumOfCalendar();
 
-        if (period > num) {
+        final Core core = new Core();
+        final int allocationSize = num - core.emaLookback(period);
+        if (allocationSize <= 0) {
             return series;
         }
-
-        double previous = 0.0;
-        int n = 0;
-        for (int i = 0; i < period; i++) {
-            previous = previous + stockHistoryServer.getStock(stockHistoryServer.getCalendar(i)).getLastPrice();
-            n++;
+        final double[] last = new double[num];
+        // Fill up last array.
+        for (int i = 0; i < num; i++) {
+            last[i] = stockHistoryServer.getStock(stockHistoryServer.getCalendar(i)).getLastPrice();
         }
-        previous = previous / n;
 
-        final double smoothing_factor = 2.0 / (1.0 + period);
+        final double[] output = new double[allocationSize];
+        final MInteger outBegIdx = new MInteger();
+        final MInteger outNbElement = new MInteger();
 
-        for (int i = period; i < num; i++) {
-            final Calendar calendar = stockHistoryServer.getCalendar(i);
-            final double current = stockHistoryServer.getStock(calendar).getLastPrice();
-            final double EMA = ((current - previous) * smoothing_factor) + previous;
-            series.add(new Day(calendar.getTime()), EMA);
-            previous = EMA;
+        core.ema(0, last.length - 1, last, period, outBegIdx, outNbElement, output);
+
+        for (int i = 0; i < outNbElement.value; i++) {
+            series.add(new Day(stockHistoryServer.getCalendar(i + outBegIdx.value).getTime()), output[i]);
         }
+
         return series;
     }
 
@@ -75,34 +75,32 @@ public class TechnicalAnalysis {
         final TimeSeries series = new TimeSeries(name, Day.class);
         final int num = stockHistoryServer.getNumOfCalendar();
 
-        for (int i = period - 1; i < num; i++) {
-            double averageTypicalPrice = 0.0;
-            double meanDevTypicalPrice = 0.0;
-            final Calendar calendar = stockHistoryServer.getCalendar(i);
-            final double typicalPrice = TechnicalAnalysis.getTypicalPrice(stockHistoryServer.getStock(calendar));
-
-            double tmp = 0.0;
-            for (int j = i; j > i - period; j--) {
-                final Calendar c = stockHistoryServer.getCalendar(j);
-                final Stock stock = stockHistoryServer.getStock(c);
-                final double tp = TechnicalAnalysis.getTypicalPrice(stock);
-                tmp = tmp + tp;
-            }            
-            averageTypicalPrice = tmp / period;
-
-            tmp = 0.0;
-            for (int j = i; j > i - period; j--) {
-                final Calendar c = stockHistoryServer.getCalendar(j);
-                final Stock stock = stockHistoryServer.getStock(c);
-                final double tp = TechnicalAnalysis.getTypicalPrice(stock);
-                tmp = tmp + Math.abs(tp - averageTypicalPrice);
-            }
-            meanDevTypicalPrice = tmp / period;
-
-            final double CCI = meanDevTypicalPrice <= 0.0 ? 0.0 : (typicalPrice - averageTypicalPrice) / (0.015 * meanDevTypicalPrice);
-
-            series.add(new Day(calendar.getTime()), CCI);
+        final Core core = new Core();
+        final int allocationSize = num - core.cciLookback(period);
+        if (allocationSize <= 0) {
+            return new TimeSeriesCollection(series);
         }
+
+        final double[] high = new double[num];
+        final double[] low = new double[num];
+        final double[] close = new double[num];
+        // Fill up last array.
+        for (int i = 0; i < num; i++) {
+            high[i] = stockHistoryServer.getStock(stockHistoryServer.getCalendar(i)).getHighPrice();
+            low[i] = stockHistoryServer.getStock(stockHistoryServer.getCalendar(i)).getLowPrice();
+            close[i] = stockHistoryServer.getStock(stockHistoryServer.getCalendar(i)).getLastPrice();
+        }
+
+        final double[] output = new double[allocationSize];
+        final MInteger outBegIdx = new MInteger();
+        final MInteger outNbElement = new MInteger();
+
+        core.cci(0, num - 1, high, low, close, period, outBegIdx, outNbElement, output);
+
+        for (int i = 0; i < outNbElement.value; i++) {
+            series.add(new Day(stockHistoryServer.getCalendar(i + outBegIdx.value).getTime()), output[i]);
+        }
+
         return new TimeSeriesCollection(series);
     }
 
@@ -120,17 +118,17 @@ public class TechnicalAnalysis {
             return new TimeSeriesCollection(series);
         }
 
-        final double[] input = new double[num];
-        // Fill up input array.
+        final double[] last = new double[num];
+        // Fill up last array.
         for (int i = 0; i < num; i++) {
-            input[i] = stockHistoryServer.getStock(stockHistoryServer.getCalendar(i)).getLastPrice();
+            last[i] = stockHistoryServer.getStock(stockHistoryServer.getCalendar(i)).getLastPrice();
         }
 
         final double[] output = new double[allocationSize];
         final MInteger outBegIdx = new MInteger();
         final MInteger outNbElement = new MInteger();
 
-        core.rsi(0, input.length - 1, input, period, outBegIdx, outNbElement, output);
+        core.rsi(0, last.length - 1, last, period, outBegIdx, outNbElement, output);
 
         for (int i = 0; i < outNbElement.value; i++) {
             series.add(new Day(stockHistoryServer.getCalendar(i + outBegIdx.value).getTime()), output[i]);
