@@ -6,7 +6,7 @@ my %gui_bundle = ();
 my %messages_bundle = ();
 my $init_counter = 0;
 my $process_counter = 0;
-my $dir = "c:/Projects/TRUNK/jstock/src";
+my $dir = "c:/Projects/jstock/src";
 
 if ($ARGV[0])
 {
