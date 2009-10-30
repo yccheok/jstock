@@ -1871,7 +1871,7 @@ public class MainFrame extends javax.swing.JFrame {
             }
         }   /* if(this.jStockOptions.isPopupMessage()) */
 
-        if(jStockOptions.isSendEmail()) {
+        if (this.jStockOptions.isSendEmail()) {
             final Runnable r = new Runnable() {
                 @Override
                 public void run() {
@@ -1907,7 +1907,7 @@ public class MainFrame extends javax.swing.JFrame {
             }
         }   /* if(jStockOptions.isSendEmail()) */
 
-        if(jStockOptions.isSMSEnabled()) {
+        if (this.jStockOptions.isSMSEnabled()) {
             final Runnable r = new Runnable() {
                 @Override
                 public void run() {
@@ -2783,8 +2783,8 @@ public class MainFrame extends javax.swing.JFrame {
             }
         }   /* for (Stock stock : stocks) */
 
-		// No alert is needed. Early return.
-        if ((jStockOptions.isPopupMessage() == false) && (jStockOptions.isSendEmail() == false)) {
+        // No alert is needed. Early return.
+        if ((jStockOptions.isSMSEnabled() == false) && (jStockOptions.isPopupMessage() == false) && (jStockOptions.isSendEmail() == false)) {
             return;
         }
 
