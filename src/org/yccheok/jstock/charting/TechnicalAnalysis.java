@@ -20,6 +20,8 @@
 
 package org.yccheok.jstock.charting;
 
+import com.tictactec.ta.lib.Core;
+import com.tictactec.ta.lib.MInteger;
 import java.util.Calendar;
 import org.jfree.data.time.Day;
 import org.jfree.data.time.TimeSeries;
@@ -35,7 +37,7 @@ import org.yccheok.jstock.engine.StockHistoryServer;
 public class TechnicalAnalysis {
     public static TimeSeries createEMA(StockHistoryServer stockHistoryServer, String name, int period) {
         if (period <= 0) {
-            throw new java.lang.IllegalArgumentException("period must be greater than 1");
+            throw new java.lang.IllegalArgumentException("period must be greater than 0");
         }
 
         final TimeSeries series = new TimeSeries(name, Day.class);
@@ -67,7 +69,7 @@ public class TechnicalAnalysis {
 
     public static XYDataset createCCI(StockHistoryServer stockHistoryServer, String name, int period) {
         if (period <= 0) {
-            throw new java.lang.IllegalArgumentException("period must be greater than 1");
+            throw new java.lang.IllegalArgumentException("period must be greater than 0");
         }
 
         final TimeSeries series = new TimeSeries(name, Day.class);
@@ -106,36 +108,34 @@ public class TechnicalAnalysis {
 
     public static XYDataset createRSI(StockHistoryServer stockHistoryServer, String name, int period) {
         if (period <= 0) {
-            throw new java.lang.IllegalArgumentException("period must be greater than 1");
+            throw new java.lang.IllegalArgumentException("period must be greater than 0");
         }
 
         final TimeSeries series = new TimeSeries(name, Day.class);
         final int num = stockHistoryServer.getNumOfCalendar();
 
-        for (int i = period - 1; i < num; i++) {
-            double up = 0.0;
-            double down = 0.0;
-
-            for (int j = i; j > i - period; j--) {
-                final Calendar c = stockHistoryServer.getCalendar(j);
-                final Stock stock = stockHistoryServer.getStock(c);
-                if (stock.getChangePrice() > 0.0) {
-                    up = up + stock.getChangePrice();
-                }
-                else if (stock.getChangePrice() < 0.0) {
-                    down = down + stock.getChangePrice();
-                }
-            }
-
-            // Remove -ve sign.
-            down = Math.abs(down);
-
-            // But, what if up and down are 0.0 during the same time?
-            // If there is no price changes during the period, RSI = 100.
-            final double RS = down == 0.0 ? Double.MAX_VALUE : up / down;
-            final double RSI = 100.0 - (100.0 / (1.0 + RS));
-            series.add(new Day(stockHistoryServer.getCalendar(i).getTime()), RSI);
+        final Core core = new Core();
+        final int allocationSize = num - core.rsiLookback(period);
+        if (allocationSize <= 0) {
+            return new TimeSeriesCollection(series);
         }
+
+        final double[] input = new double[num];
+        // Fill up input array.
+        for (int i = 0; i < num; i++) {
+            input[i] = stockHistoryServer.getStock(stockHistoryServer.getCalendar(i)).getLastPrice();
+        }
+
+        final double[] output = new double[allocationSize];
+        final MInteger outBegIdx = new MInteger();
+        final MInteger outNbElement = new MInteger();
+
+        core.rsi(0, input.length - 1, input, period, outBegIdx, outNbElement, output);
+
+        for (int i = 0; i < outNbElement.value; i++) {
+            series.add(new Day(stockHistoryServer.getCalendar(i + outBegIdx.value).getTime()), output[i]);
+        }
+
         return new TimeSeriesCollection(series);
     }
 
