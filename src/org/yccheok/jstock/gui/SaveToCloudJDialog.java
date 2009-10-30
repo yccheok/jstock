@@ -19,10 +19,32 @@
 
 package org.yccheok.jstock.gui;
 
+import java.awt.Color;
 import java.awt.Cursor;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
+import javax.swing.Icon;
+import javax.swing.JOptionPane;
+import javax.swing.SwingWorker;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.yccheok.jstock.engine.Country;
 import org.yccheok.jstock.gui.analysis.MemoryLogJDialog;
+import org.yccheok.jstock.internationalization.GUIBundle;
+import org.yccheok.jstock.internationalization.MessagesBundle;
 
 /**
  *
@@ -37,6 +59,13 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
         this.jLabel3.setVisible(false);
         this.jLabel4.setVisible(false);
         this.jLabel5.setVisible(false);
+
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        if (jStockOptions.isRememberGoogleAccountEnabled()) {
+            this.jCheckBox1.setSelected(true);
+            this.jTextField1.setText(Utils.decrypt(jStockOptions.getGoogleUsername()));
+            this.jPasswordField1.setText(Utils.decrypt(jStockOptions.getGooglePassword()));
+        }
     }
 
     /** This method is called from within the constructor to
@@ -87,6 +116,11 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
 
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/apply.png"))); // NOI18N
         jButton1.setText(bundle.getString("SaveToCloudJDialog_OK")); // NOI18N
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
         jPanel3.add(jButton1);
 
         jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/button_cancel.png"))); // NOI18N
@@ -134,7 +168,7 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
 
         jLabel2.setText(bundle.getString("SaveToCloudJDialog_Password")); // NOI18N
 
-        jLabel6.setFont(new java.awt.Font("Dialog", 0, 10)); // NOI18N
+        jLabel6.setFont(new java.awt.Font("Dialog", 0, 10));
         jLabel6.setText("(e.g. john@gmail.com)");
 
         jCheckBox1.setText(bundle.getString("SaveToCloudJDialog_KeepMeSignedIn")); // NOI18N
@@ -186,15 +220,26 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
         cancel();
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        // No matter Cancel or OK, once user untick, we will remove account
+        // information.
+        if (this.jCheckBox1.isSelected() == false) {
+            jStockOptions.setRememberGoogleAccountEnabled(false);
+            jStockOptions.setGoogleUsername("");
+            jStockOptions.setGooglePassword("");
+        }
     }//GEN-LAST:event_formWindowClosed
 
     private void cancel() {
-        this.setVisible(false);
-        this.dispose();
+        if (saveToCloudTask != null) {
+            saveToCloudTask.cancel(true);
+            saveToCloudTask = null;
+        }
     }
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        cancel();
+        this.setVisible(false);
+        this.dispose();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jLabel5MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel5MouseClicked
@@ -215,8 +260,394 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
         this.setCursor(Cursor.getDefaultCursor());
     }//GEN-LAST:event_jLabel5MouseExited
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        if (this.jTextField1.getText().length() == 0)
+        {
+            JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_username_cannot_be_empty"), MessagesBundle.getString("warning_title_username_cannot_be_empty"), JOptionPane.WARNING_MESSAGE);
+            this.jTextField1.requestFocus();
+            return;
+        }
+
+        if (this.jPasswordField1.getPassword().length == 0)
+        {
+            JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_password_cannot_be_empty"), MessagesBundle.getString("warning_title_password_cannot_be_empty"), JOptionPane.WARNING_MESSAGE);
+            this.jPasswordField1.requestFocus();
+            return;
+        }
+
+        this.jButton1.setEnabled(false);
+        this.jTextField1.setEnabled(false);
+        this.jPasswordField1.setEnabled(false);
+        this.jCheckBox1.setEnabled(false);
+        this.saveToCloudTask = this.getSaveToCloudTask();
+        this.saveToCloudTask.execute();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private static class Status {
+        public final String message;
+        public final Icon icon;
+        private Status(String message, Icon icon) {
+            if (message == null || icon == null) {
+                throw new IllegalArgumentException("Method arguments cannot be null");
+            }
+            this.message = message;
+            this.icon = icon;
+        }
+        public static Status newInstance(String message, Icon icon) {
+            return new Status(message, icon);
+        }
+    }
+
+    private SwingWorker<Boolean, Status> getSaveToCloudTask() {
+        SwingWorker<Boolean, Status> worker = new SwingWorker<Boolean, Status>() {
+            @Override
+            protected void done() {
+                boolean result = false;
+
+                if (this.isCancelled() == false) {
+                    try {
+                        result = this.get();
+                    } catch (InterruptedException ex) {
+                        log.error(null, ex);
+                    } catch (ExecutionException ex) {
+                        log.error(null, ex);
+                    }
+                }
+
+                jButton1.setEnabled(true);
+                jTextField1.setEnabled(true);
+                jPasswordField1.setEnabled(true);
+                jCheckBox1.setEnabled(true);
+
+                if (result == true) {
+                    final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+                    // Only save account information when cloud operation success.
+                    if (jCheckBox1.isSelected() == true) {
+                        jStockOptions.setRememberGoogleAccountEnabled(true);
+                        jStockOptions.setGoogleUsername(Utils.encrypt(jTextField1.getText()));
+                        jStockOptions.setGooglePassword(Utils.encrypt(new String(jPasswordField1.getPassword())));
+                    }
+                    // Close the dialog once cloud operation success.
+                    setVisible(false);
+                    dispose();
+                }
+            }
+
+            @Override
+            protected void process(java.util.List<Status> statuses) {
+                for (Status status : statuses) {
+                    writeToMemoryLog(status.message);
+                    jLabel3.setText(status.message);
+                    jLabel4.setIcon(status.icon);
+                    jLabel3.setVisible(true);
+                    jLabel4.setVisible(true);
+                    if (status.icon == Icons.ERROR || status.icon == Icons.WARNING) {
+                        jLabel3.setForeground(Color.RED);
+                        jLabel5.setVisible(true);
+                    }
+                    else
+                    {
+                        jLabel3.setForeground(Color.BLUE);
+                        jLabel5.setVisible(false);
+                    }
+                }
+            }
+
+            @Override
+            protected Boolean doInBackground() {
+                if (isCancelled()) {
+                    return false;
+                }
+
+                memoryLog.clear();
+
+                publish(Status.newInstance(GUIBundle.getString("SaveToCloudJDialog_PreparingData..."), Icons.BUSY));
+
+                final File zipFile = getJStockZipFile();
+                
+                if (zipFile) {
+                    publish(Status.newInstance(GUIBundle.getString("SaveToCloudJDialog_PreparingDataFail"), Icons.ERROR));
+                    return false;
+                }
+
+                publish(Status.newInstance(GUIBundle.getString("SaveToCloudJDialog_VerifyGoogleAccount..."), Icons.BUSY));
+
+                return false;
+            }
+        };
+        return worker;
+    }
+
+    private static class FileEx {
+        final File input;       // Source for input disk file.
+        final String output;    // Entry name for output zip file.
+        private FileEx(File input, String output) {
+            this.input = input;
+            this.output = output;
+        }
+        public static FileEx newInstance(File input, String output) {
+            return new FileEx(input, output);
+        }
+    }
+
+    // name can be anything which is found under directory
+    // C:\Users\yccheok\.jstock\1.0.5
+    // For example, "Australia", "config", "chat"...
+    // The returned FileEx list, will only contain files. No directories
+    // will be included.
+    private List<FileEx> getFileEx(List<FileEx> fileExs, String name) {
+        final File dir = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + name);
+
+        if (dir.isDirectory()) {
+            String[] children = dir.list();
+            for (String child : children) {
+                getFileEx(fileExs, name + File.separator + child);
+            }
+        }
+        else {
+            if (name.equalsIgnoreCase("config" + File.separator + "options.xml")) {
+                // Special case. Skip it! We will handle it through insensitiveClone.
+            }
+            else {
+                fileExs.add(FileEx.newInstance(dir, name));
+            }
+        }
+        return fileExs;
+    }
+
+    private File getJStockZipFile() {
+        // Do we really need to know which country database file had
+        // been modified? Can we just don't upload stockcodeandsymboldatabase.xml?
+        // The operation needs around 10++ seconds. Especially when dealing with
+        // large Germany database file. If this doesn't give good user experience,
+        // give up from saving stockcodeandsymboldatabase.xml
+        final List<File> files = getModifiedCountryFiles();
+        final List<FileEx> fileExs = new ArrayList<FileEx>();
+        for (File file : files) {
+            final String filename;
+            try {
+                filename = file.getCanonicalPath();
+            } catch (IOException ex) {
+                log.error(null, ex);
+                continue;
+            }
+            final int index = filename.indexOf(Utils.getApplicationVersionString());
+            if (index < 0) {
+                continue;
+            }
+            final String output = filename.substring(index + Utils.getApplicationVersionString().length() + File.separator.length());
+            fileExs.add(FileEx.newInstance(file, output));
+        }
+
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        // User will sue us, if we store their Google account information in our server.
+        // Let's get a copy of JStockOptions, without any sensitive data.
+        final JStockOptions insensitiveJStockOptions = jStockOptions.insensitiveClone();
+        final File tempJStockOptions;
+        try {
+            tempJStockOptions = File.createTempFile(Utils.getJStockUUID(), ".xml");
+            // Delete temp file when program exits.
+            tempJStockOptions.deleteOnExit();
+            org.yccheok.jstock.gui.Utils.toXML(insensitiveJStockOptions, tempJStockOptions);
+            fileExs.add(FileEx.newInstance(tempJStockOptions, "config" + File.separator + "options.xml"));
+        } catch (IOException ex) {
+            log.error(null, ex);
+        }
+
+        getFileEx(fileExs, "config");
+        getFileEx(fileExs, "indicator");
+        getFileEx(fileExs, "logos");
+        for (Country country : Country.values()) {
+            getFileEx(fileExs, country + File.separator + "portfolios");
+            getFileEx(fileExs, country + File.separator + "config");
+        }
+
+        // Create a buffer for reading the files
+        final byte[] buf = new byte[1024];
+
+        ZipOutputStream out = null;
+        File temp = null;
+        
+        try {
+
+            // Create the ZIP file
+            temp = File.createTempFile(Utils.getJStockUUID(), ".zip");
+            // Delete temp file when program exits.
+            temp.deleteOnExit();
+            out = new ZipOutputStream(new FileOutputStream(temp));
+
+            // Compress the files
+            for (FileEx fileEx : fileExs) {
+                FileInputStream in = null;
+                try {
+                    in = new FileInputStream(fileEx.input);
+                    final String zipEntryName = fileEx.output;
+                    // Add ZIP entry to output stream.
+                    out.putNextEntry(new ZipEntry(zipEntryName));
+
+                    // Transfer bytes from the file to the ZIP file
+                    int len;
+                    while ((len = in.read(buf)) > 0) {
+                        out.write(buf, 0, len);
+                    }
+                }
+                catch (IOException exp) {
+                    log.error(null, exp);
+                    continue;
+                }
+                finally {
+                    // Complete the entry
+                    if (out != null) {
+                        out.closeEntry();
+                    }
+                    if (in != null) {
+                        in.close();
+                    }
+                }
+            }
+        } 
+        catch (IOException exp) {
+            log.error(null, exp);
+        }
+        finally {
+            if (out != null) {
+                try {
+                    // Complete the ZIP file
+                    out.close();
+                } catch (IOException exp) {
+                    log.error(null, exp);
+                }
+            }
+        }
+        return temp;
+    }
+
+    // Oh goody. This is a slooooooooooooooooooow method.
+    private List<File> getModifiedCountryFiles() {
+        final List<File> files = new ArrayList<File>();
+        InputStream inputStream = null;
+        ZipInputStream zipInputStream = null;
+
+        try {
+            inputStream = new FileInputStream("database" + File.separator + "database.zip");
+
+            zipInputStream = new ZipInputStream(inputStream);
+            final byte[] data = new byte[1024];
+
+            while(true) {
+                ZipEntry zipEntry = null;
+
+                try {
+                    zipEntry = zipInputStream.getNextEntry();
+
+                    if (zipEntry == null) break;
+
+                    final String destination = Utils.getUserDataDirectory() + zipEntry.getName();
+
+                    // Ignore if file doesn't exist.
+                    if (Utils.isFileOrDirectoryExist(destination) == false) continue;
+
+                    if (zipEntry.isDirectory())
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        // Write to temp file.
+                        OutputStream out = null;
+                        File temp = null;
+                        try {
+                            // Create temp file.
+                            temp = File.createTempFile(Utils.getJStockUUID(), ".xml");
+                            // Delete temp file when program exits.
+                            temp.deleteOnExit();
+
+                            out = new FileOutputStream(temp);
+
+                            int len;
+                            while ((len = zipInputStream.read(data)) > 0) {
+                                out.write(data, 0, len);
+                            }
+
+                            final long currentChecksum = org.yccheok.jstock.analysis.Utils.getChecksum(destination);
+                            final long originalChecksum = org.yccheok.jstock.analysis.Utils.getChecksum(temp);
+                            if (currentChecksum != originalChecksum) {
+                                // Two files are different. That's mean user had added UserDefined symbol.
+                                files.add(new File(destination));
+                            }
+                        }
+                        catch (IOException ex) {
+                            log.error(null, ex);
+                            continue;
+                        }
+                        finally {
+                            if (out != null) {
+                                try {
+                                    out.close();
+                                } catch (IOException ex) {
+                                    log.error(null, ex);
+                                }
+                            }
+                        }
+                    }   // if(zipEntry.isDirectory())
+                }
+                catch(IOException exp) {
+                    log.error(null, exp);
+                    break;
+                }
+                finally {
+                    if(zipInputStream != null) {
+                        try {
+                            zipInputStream.closeEntry();
+                        }
+                        catch(IOException exp) {
+                            log.error(null, exp);
+                            break;
+                        }
+                    }
+                }
+
+            }   // while(true)
+        }
+        catch(IOException exp) {
+            log.error(null, exp);
+        }
+        finally {
+            if(zipInputStream != null) {
+                try {
+                    zipInputStream.close();
+                } catch (IOException ex) {
+                    log.error(null, ex);
+                }
+            }
+
+            if(inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException ex) {
+                    log.error("", ex);
+                }
+            }
+        }
+        return files;
+    }
+
+    private void writeToMemoryLog(String message) {
+        // http://www.leepoint.net/notes-java/io/10file/sys-indep-newline.html
+        // public static String newline = System.getProperty("line.separator");
+        // When NOT to use the system independent newline characters
+        // JTextArea lines should be separated by a single '\n' character, not the sequence that is used for file line separators in the operating system.
+        // Console output (eg, System.out.println()), works fine with '\n', even on Windows.
+        final String s = dateFormat.format(new Date()) + "\n" + message;
+        this.memoryLog.add(s);
+    }
+
+    private volatile SwingWorker<Boolean, Status> saveToCloudTask = null;
     private final List<String> memoryLog = new ArrayList<String>();
-    
+    private static final DateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy hh:mm:ss a");
+
+    private static final Log log = LogFactory.getLog(LoadFromCloudJDialog.class);
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
