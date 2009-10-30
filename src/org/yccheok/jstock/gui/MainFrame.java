@@ -198,6 +198,9 @@ public class MainFrame extends javax.swing.JFrame {
         jMenuItem2 = new javax.swing.JMenuItem();
         jMenuItem9 = new javax.swing.JMenuItem();
         jSeparator2 = new javax.swing.JSeparator();
+        jMenuItem11 = new javax.swing.JMenuItem();
+        jMenuItem10 = new javax.swing.JMenuItem();
+        jSeparator3 = new javax.swing.JSeparator();
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenu5 = new javax.swing.JMenu();
         jMenuItem4 = new javax.swing.JMenuItem();
@@ -457,6 +460,25 @@ public class MainFrame extends javax.swing.JFrame {
         });
         jMenu3.add(jMenuItem9);
         jMenu3.add(jSeparator2);
+
+        jMenuItem11.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/download_from_cloud.png"))); // NOI18N
+        jMenuItem11.setText(bundle.getString("MainFrame_OpenFromCloud...")); // NOI18N
+        jMenuItem11.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem11ActionPerformed(evt);
+            }
+        });
+        jMenu3.add(jMenuItem11);
+
+        jMenuItem10.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/upload_to_cloud.png"))); // NOI18N
+        jMenuItem10.setText(bundle.getString("MainFrame_SaveToCloud...")); // NOI18N
+        jMenuItem10.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem10ActionPerformed(evt);
+            }
+        });
+        jMenu3.add(jMenuItem10);
+        jMenu3.add(jSeparator3);
 
         jMenuItem1.setText("Exit");
         jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
@@ -1093,6 +1115,16 @@ public class MainFrame extends javax.swing.JFrame {
         });
         jMenu8.add(mi);
     }//GEN-LAST:event_jMenu8MenuSelected
+
+    private void jMenuItem11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem11ActionPerformed
+        final LoadFromCloudJDialog dialog = new LoadFromCloudJDialog(this, true);
+        dialog.setVisible(true);
+    }//GEN-LAST:event_jMenuItem11ActionPerformed
+
+    private void jMenuItem10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem10ActionPerformed
+        final SaveToCloudJDialog dialog = new SaveToCloudJDialog(this, true);
+        dialog.setVisible(true);
+    }//GEN-LAST:event_jMenuItem10ActionPerformed
 
     public void selectActivePortfolio(String portfolio) {
         // Save current portfolio.
@@ -3446,6 +3478,8 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu8;
     private javax.swing.JMenuBar jMenuBar2;
     private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem10;
+    private javax.swing.JMenuItem jMenuItem11;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
@@ -3464,6 +3498,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JSeparator jSeparator3;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTable jTable1;
     // End of variables declaration//GEN-END:variables
