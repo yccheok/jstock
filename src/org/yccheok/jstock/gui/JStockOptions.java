@@ -164,6 +164,10 @@ public class JStockOptions {
     /* For UK client. */
     private boolean penceToPoundConversionEnabled = false;
 
+    private boolean rememberGoogleAccountEnabled = false;
+    private String googleUsername = "";
+    private String googlePassword = "";
+
     // Remember where we save/open the last file.
     private String lastFileIODirectory = System.getProperty("user.home");
     private String lastFileNameExtensionDescription = "CSV Documents (*.csv)";
@@ -186,6 +190,99 @@ public class JStockOptions {
         this.isAutoBrokerFeeCalculationEnabled = isAutoBrokerFeeCalculationEnabled;
     }
     
+    // User may not trust us to store their password in cloud server. To avoid
+    // from getting trouble, we will clone another copy of JStockOptions, which
+    // doesn't contain sensitive data.
+    public JStockOptions insensitiveClone() {
+        final JStockOptions jStockOptions = new JStockOptions();
+
+        jStockOptions.singleIndicatorAlert = this.singleIndicatorAlert;
+        jStockOptions.popupMessage = this.popupMessage;
+        //jStockOptions.sendEmail = this.sendEmail;
+        //jStockOptions.email = this.email;
+        //jStockOptions.emailPassword = this.emailPassword;
+        //jStockOptions.googleCalendarUsername = this.googleCalendarUsername;
+        //jStockOptions.googleCalendarPassword = this.googleCalendarPassword;
+        //jStockOptions.SMSEnabled = this.SMSEnabled;
+
+        // Don't store proxy. Home and office proxy environment are most probably different.
+        //jStockOptions.proxyServer = this.proxyServer;
+        //jStockOptions.proxyPort this.proxyPort;
+        jStockOptions.scanningSpeed = this.scanningSpeed;
+        jStockOptions.alertSpeed = this.alertSpeed;
+        jStockOptions.looknFeel = this.looknFeel;
+
+        jStockOptions.normalTextForegroundColor = this.normalTextForegroundColor;
+        jStockOptions.lowerNumericalValueForegroundColor = this.lowerNumericalValueForegroundColor;
+        jStockOptions.higherNumericalValueForegroundColor = this.higherNumericalValueForegroundColor;
+        jStockOptions.firstRowBackgroundColor = this.firstRowBackgroundColor;
+        jStockOptions.secondRowBackgroundColor = this.secondRowBackgroundColor;
+        jStockOptions.autoUpdateForegroundColor = this.autoUpdateForegroundColor;
+        jStockOptions.autoUpdateBackgroundColor = this.autoUpdateBackgroundColor;
+        jStockOptions.alertForegroundColor = this.alertForegroundColor;
+        jStockOptions.alertBackgroundColor = this.alertBackgroundColor;
+        jStockOptions.enableColorChange = this.enableColorChange;
+        jStockOptions.enableColorAlert = this.enableColorAlert;
+
+        jStockOptions.brokingFirms = this.brokingFirms;
+        jStockOptions.selectedBrokingFirmIndex = this.selectedBrokingFirmIndex;
+        jStockOptions.isAutoBrokerFeeCalculationEnabled = this.isAutoBrokerFeeCalculationEnabled;
+
+        jStockOptions.expectedProfitPercentage = this.expectedProfitPercentage;
+
+        jStockOptions.country = this.country;
+
+        jStockOptions.isAutoUpdateNewsEnabled = this.isAutoUpdateNewsEnabled;
+
+        //jStockOptions.newsID = this.newsID;
+
+        jStockOptions.historyDuration = this.historyDuration;
+
+        //jStockOptions.isChatEnabled = this.isChatEnabled;
+        //jStockOptions.chatUsername = this.chatUsername;
+        //jStockOptions.chatPassword = this.chatPassword;
+        jStockOptions.isChatSoundNotificationEnabled = this.isChatSoundNotificationEnabled;
+        jStockOptions.isChatFlashNotificationEnabled = this.isChatFlashNotificationEnabled;
+        jStockOptions.chatSystemMessageColor = this.chatSystemMessageColor;
+        jStockOptions.chatOwnMessageColor = this.chatOwnMessageColor;
+        jStockOptions.chatOtherMessageColor = this.chatOtherMessageColor;
+
+        // Don't store proxy. Home and office proxy environment are most probably different.
+        //
+        // We want to avoid from having too frequent credentials creation during
+        // runtime. We will immediately contruct credentials, once we load the
+        // JStockOptions from disk.
+        //jStockOptions.credentials = this.credentials;
+        //jStockOptions.proxyAuthPassword = this.proxyAuthPassword;
+        //jStockOptions.proxyAuthUserName = this.proxyAuthUserName;
+        //jStockOptions.isProxyAuthEnabled = this.isProxyAuthEnabled;
+
+        /* For UK client. */
+        jStockOptions.penceToPoundConversionEnabled = this.penceToPoundConversionEnabled;
+
+        //jStockOptions.rememberGoogleAccountEnabled = this.rememberGoogleAccountEnabled;
+        //jStockOptions.googleUsername = this.googleUsername;
+        //jStockOptions.googlePassword = this.googlePassword;
+
+        // Don't save file location. Different machines may have different file location.
+        //
+        // Remember where we save/open the last file.
+        //jStockOptions.lastFileIODirectory = this.lastFileIODirectory;
+        //jStockOptions.lastFileNameExtensionDescription = this.lastFileNameExtensionDescription;
+
+        jStockOptions.primaryStockServerFactoryClasses = this.primaryStockServerFactoryClasses;
+
+        // Remember the last view page.
+        jStockOptions.lastSelectedPageIndex = this.lastSelectedPageIndex;
+
+        // Use -1 to indicate unlimited SMS per day.
+        jStockOptions.maxSMSPerDay = this.maxSMSPerDay;
+
+        jStockOptions.portfolioName = this.portfolioName;
+
+        return jStockOptions;
+    }
+
     private Object readResolve() {
         /* For backward compatible */
         if (lastSelectedPageIndex < 0) {
@@ -241,7 +338,15 @@ public class JStockOptions {
         if (this.proxyAuthPassword == null) {
             this.proxyAuthPassword = "";
         }
-        
+
+        if (this.getGoogleUsername() == null) {
+            this.setGoogleUsername("");
+        }
+
+        if (this.getGooglePassword() == null) {
+            this.setGooglePassword("");
+        }
+    
         setCredentials(new NTCredentials(this.proxyAuthUserName, Utils.decrypt(this.proxyAuthPassword), "", ""));
 
         if (this.getLastFileIODirectory() == null) {
@@ -838,5 +943,47 @@ public class JStockOptions {
      */
     public void setPenceToPoundConversionEnabled(boolean penceToPoundConversionEnabled) {
         this.penceToPoundConversionEnabled = penceToPoundConversionEnabled;
+    }
+
+    /**
+     * @return the rememberGoogleAccountEnabled
+     */
+    public boolean isRememberGoogleAccountEnabled() {
+        return rememberGoogleAccountEnabled;
+    }
+
+    /**
+     * @param rememberGoogleAccountEnabled the rememberGoogleAccountEnabled to set
+     */
+    public void setRememberGoogleAccountEnabled(boolean rememberAccountEnabled) {
+        this.rememberGoogleAccountEnabled = rememberAccountEnabled;
+    }
+
+    /**
+     * @return the googleUsername
+     */
+    public String getGoogleUsername() {
+        return googleUsername;
+    }
+
+    /**
+     * @param googleUsername the googleUsername to set
+     */
+    public void setGoogleUsername(String googleUsername) {
+        this.googleUsername = googleUsername;
+    }
+
+    /**
+     * @return the googlePassword
+     */
+    public String getGooglePassword() {
+        return googlePassword;
+    }
+
+    /**
+     * @param googlePassword the googlePassword to set
+     */
+    public void setGooglePassword(String googlePassword) {
+        this.googlePassword = googlePassword;
     }
 }
