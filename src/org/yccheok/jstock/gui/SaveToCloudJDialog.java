@@ -365,7 +365,7 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
 
                 final File zipFile = getJStockZipFile();
                 
-                if (zipFile) {
+                if (zipFile == null) {
                     publish(Status.newInstance(GUIBundle.getString("SaveToCloudJDialog_PreparingDataFail"), Icons.ERROR));
                     return false;
                 }
