@@ -125,56 +125,9 @@ public class StockRelativeHistoryOperator extends AbstractOperator {
         return sum / size;
     }
 
-    private Double EMACalculation(java.util.List<Double> values, java.util.List<Double> prevValues) {
-        final int size = values.size();
-
-        if (size == 0) {
-            return null;
-        }
-
-        double previous = prevValues.size() == 0 ? values.get(0) : average(prevValues);
-        double smoothing_factor = 2.0 / (1.0 + size);
-
-        for (Double current : values) {
-            final double EMA = ((current - previous) * smoothing_factor) + previous;
-            previous = EMA;
-        }
-
-        return previous;
-    }
-
-    private Double RSICalculation(java.util.List<Double> values, java.util.List<Double> prevValues) {
-        if (values.size() == 0) {
-            return null;
-        }
-        double prevValue = prevValues.size() == 0 ? Double.MAX_VALUE : prevValues.get(0);
-
-        double up = 0.0;
-        double down = 0.0;
-        for (Double v : values) {
-            double change = prevValue == Double.MAX_VALUE ? 0 : v - prevValue;
-            if (change > 0.0) {
-                up = up + change;
-            }
-            else if (change < 0.0) {
-                down = down + change;
-            }
-            prevValue = v;
-        }
-        // Remove -ve sign.
-        down = Math.abs(down);
-
-        // But, what if up and down are 0.0 during the same time?
-        // If there is no price changes during the period, RSI = 100.
-        final double RS = down == 0.0 ? Double.MAX_VALUE : up / down;
-        final double RSI = 100.0 - (100.0 / (1.0 + RS));
-
-        return new Double(RSI);
-    }
-
     public void calculate(StockHistoryServer stockHistoryServer)
     {
-        if (day == 0) {
+        if (day <= 0) {
             Object oldValue = this.value;
             this.value = null;
             if (Utils.equals(oldValue, value) == false) {
@@ -184,36 +137,21 @@ public class StockRelativeHistoryOperator extends AbstractOperator {
         }
 
         java.util.List<Stock> stocks = new java.util.ArrayList<Stock>();
-        /* Will be used for EMA and RSI. */
-        java.util.List<Stock> prevStocks = new java.util.ArrayList<Stock>();
         java.util.List<Double> values = new java.util.ArrayList<Double>();
-        /* Will be used for EMA and RSI. */
-        java.util.List<Double> prevValues = new java.util.ArrayList<Double>();
         
         final int numOfCalendar = stockHistoryServer.getNumOfCalendar();
         /* Fill up stocks. */
-        final int start = (numOfCalendar - day) >= 0 ? numOfCalendar - day : 0;
+        final int start;
+        if (this.function == Function.EMA || function == Function.RSI) {
+            start = (numOfCalendar - (day << 1)) >= 0 ? numOfCalendar - (day << 1) : 0;
+        }
+        else {
+            start = (numOfCalendar - day) >= 0 ? numOfCalendar - day : 0;
+        }
         for (int i = start ; i < numOfCalendar; i++) {
             final Calendar calendar = stockHistoryServer.getCalendar(i);
             final Stock stock = stockHistoryServer.getStock(calendar);
             stocks.add(stock);
-        }
-
-        /* Fill up prevStocks. */
-        if (this.function == Function.RSI || this.function == Function.EMA) {
-            final int requiredSize = this.function == Function.RSI ? 1 : stocks.size();
-            int index = start - 1;
-            while (true) {
-                final Calendar calendar = stockHistoryServer.getCalendar(index);
-                Stock stock = stockHistoryServer.getStock(calendar);
-                if(stock != null) {
-                    prevStocks.add(stock);
-                }
-                if (prevStocks.size() >= requiredSize) {
-                    break;
-                }
-                index--;
-            }
         }
 
         switch(type)
@@ -222,17 +160,11 @@ public class StockRelativeHistoryOperator extends AbstractOperator {
                 for (Stock stock : stocks) {
                     values.add(stock.getPrevPrice());
                 }
-                for (Stock stock : prevStocks) {
-                    prevValues.add(stock.getPrevPrice());
-                }
                 break;
 
             case OpenPrice:
                 for (Stock stock : stocks) {
                     values.add(stock.getOpenPrice());
-                }
-                for (Stock stock : prevStocks) {
-                    prevValues.add(stock.getOpenPrice());
                 }
                 break;
 
@@ -240,17 +172,11 @@ public class StockRelativeHistoryOperator extends AbstractOperator {
                 for (Stock stock : stocks) {
                     values.add(stock.getHighPrice());
                 }
-                for (Stock stock : prevStocks) {
-                    prevValues.add(stock.getHighPrice());
-                }
                 break;
 
             case LowPrice:
                 for (Stock stock : stocks) {
                     values.add(stock.getLowPrice());
-                }
-                for (Stock stock : prevStocks) {
-                    prevValues.add(stock.getLowPrice());
                 }
                 break;
 
@@ -258,17 +184,11 @@ public class StockRelativeHistoryOperator extends AbstractOperator {
                 for (Stock stock : stocks) {
                     values.add(stock.getLastPrice());
                 }
-                for (Stock stock : prevStocks) {
-                    prevValues.add(stock.getLastPrice());
-                }
                 break;
 
             case TypicalPrice:
                 for (Stock stock : stocks) {
                     values.add(TechnicalAnalysis.getTypicalPrice(stock));
-                }
-                for (Stock stock : prevStocks) {
-                    prevValues.add(TechnicalAnalysis.getTypicalPrice(stock));
                 }
                 break;
 
@@ -276,9 +196,6 @@ public class StockRelativeHistoryOperator extends AbstractOperator {
                 // ???
                 for (Stock stock : stocks) {
                     values.add(new Double(stock.getVolume()));
-                }
-                for (Stock stock : prevStocks) {
-                    prevValues.add(new Double(stock.getVolume()));
                 }
                 break;
 
@@ -337,11 +254,11 @@ public class StockRelativeHistoryOperator extends AbstractOperator {
                 break;
 
             case RSI:
-                v = RSICalculation(values, prevValues);
+                v = TechnicalAnalysis.createRSI(values, day);
                 break;
 
             case EMA:
-                v = EMACalculation(values, prevValues);
+                v = TechnicalAnalysis.createEMA(values, day);
                 break;
 
             default:
