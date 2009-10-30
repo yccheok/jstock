@@ -19,10 +19,22 @@
 
 package org.yccheok.jstock.gui;
 
+import java.awt.Color;
 import java.awt.Cursor;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import javax.swing.Icon;
+import javax.swing.JOptionPane;
+import javax.swing.SwingWorker;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.gui.analysis.MemoryLogJDialog;
+import org.yccheok.jstock.internationalization.GUIBundle;
+import org.yccheok.jstock.internationalization.MessagesBundle;
 
 /**
  *
@@ -37,6 +49,13 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
         this.jLabel3.setVisible(false);
         this.jLabel4.setVisible(false);
         this.jLabel5.setVisible(false);
+
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        if (jStockOptions.isRememberGoogleAccountEnabled()) {
+            this.jCheckBox1.setSelected(true);
+            this.jTextField1.setText(Utils.decrypt(jStockOptions.getGoogleUsername()));
+            this.jPasswordField1.setText(Utils.decrypt(jStockOptions.getGooglePassword()));
+        }
     }
 
     /** This method is called from within the constructor to
@@ -69,7 +88,7 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
-        setTitle(bundle.getString("SaveToCloudJDialog_Title")); // NOI18N
+        setTitle(bundle.getString("LoadFromCloudJDialog_Title")); // NOI18N
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosed(java.awt.event.WindowEvent evt) {
@@ -87,6 +106,11 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
 
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/apply.png"))); // NOI18N
         jButton1.setText(bundle.getString("LoadFromCloudJDialog_OK")); // NOI18N
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
         jPanel3.add(jButton1);
 
         jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/button_cancel.png"))); // NOI18N
@@ -134,7 +158,7 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
 
         jLabel2.setText(bundle.getString("SaveToCloudJDialog_Password")); // NOI18N
 
-        jLabel6.setFont(new java.awt.Font("Dialog", 0, 10)); // NOI18N
+        jLabel6.setFont(new java.awt.Font("Dialog", 0, 10));
         jLabel6.setText("(e.g. john@gmail.com)");
 
         jCheckBox1.setText(bundle.getString("LoadFromCloudJDialog_KeepMeSignedIn")); // NOI18N
@@ -186,15 +210,26 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
         cancel();
+        // No matter Cancel or OK, once user untick, we will remove account
+        // information.
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        if (this.jCheckBox1.isSelected() == false) {
+            jStockOptions.setRememberGoogleAccountEnabled(false);
+            jStockOptions.setGoogleUsername("");
+            jStockOptions.setGooglePassword("");
+        }
     }//GEN-LAST:event_formWindowClosed
 
     private void cancel() {
-        this.setVisible(false);
-        this.dispose();
+        if (loadFromCloudTask != null) {
+            loadFromCloudTask.cancel(true);
+            loadFromCloudTask = null;
+        }
     }
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        cancel();
+        this.setVisible(false);
+        this.dispose();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jLabel5MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel5MouseClicked
@@ -215,7 +250,139 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
         this.setCursor(Cursor.getDefaultCursor());
     }//GEN-LAST:event_jLabel5MouseExited
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        if (this.jTextField1.getText().length() == 0)
+        {
+            JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_username_cannot_be_empty"), MessagesBundle.getString("warning_title_username_cannot_be_empty"), JOptionPane.WARNING_MESSAGE);
+            this.jTextField1.requestFocus();
+            return;
+        }
+
+        if (this.jPasswordField1.getPassword().length == 0)
+        {
+            JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_password_cannot_be_empty"), MessagesBundle.getString("warning_title_password_cannot_be_empty"), JOptionPane.WARNING_MESSAGE);
+            this.jPasswordField1.requestFocus();
+            return;
+        }
+
+        this.jButton1.setEnabled(false);
+        this.jTextField1.setEnabled(false);
+        this.jPasswordField1.setEnabled(false);
+        this.jCheckBox1.setEnabled(false);
+        this.loadFromCloudTask = this.getLoadFromCloudTask();
+        this.loadFromCloudTask.execute();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private static class Status {
+        public final String message;
+        public final Icon icon;
+        private Status(String message, Icon icon) {
+            if (message == null || icon == null) {
+                throw new IllegalArgumentException("Method arguments cannot be null");
+            }
+            this.message = message;
+            this.icon = icon;
+        }
+        public static Status newInstance(String message, Icon icon) {
+            return new Status(message, icon);
+        }
+    }
+    
+    private SwingWorker<Boolean, Status> getLoadFromCloudTask() {
+        SwingWorker<Boolean, Status> worker = new SwingWorker<Boolean, Status>() {
+            @Override
+            protected void done() {
+                boolean result = false;
+                
+                if (this.isCancelled() == false) {
+                    try {
+                        result = this.get();
+                    } catch (InterruptedException ex) {
+                        log.error(null, ex);
+                    } catch (ExecutionException ex) {
+                        log.error(null, ex);
+                    }
+                }
+
+                jButton1.setEnabled(true);
+                jTextField1.setEnabled(true);
+                jPasswordField1.setEnabled(true);
+                jCheckBox1.setEnabled(true);
+
+                if (result == true) {
+                    final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+                    // Only save account information when cloud operation success.
+                    if (jCheckBox1.isSelected() == true) {
+                        jStockOptions.setRememberGoogleAccountEnabled(true);
+                        jStockOptions.setGoogleUsername(Utils.encrypt(jTextField1.getText()));
+                        jStockOptions.setGooglePassword(Utils.encrypt(new String(jPasswordField1.getPassword())));
+                    }
+                    // Close the dialog once cloud operation success.
+                    setVisible(false);
+                    dispose();
+                }
+            }
+
+            @Override
+            protected void process(java.util.List<Status> statuses) {
+                for (Status status : statuses) {
+                    writeToMemoryLog(status.message);
+                    jLabel3.setText(status.message);
+                    jLabel4.setIcon(status.icon);
+                    jLabel3.setVisible(true);
+                    jLabel4.setVisible(true);
+                    if (status.icon == Icons.ERROR || status.icon == Icons.WARNING) {
+                        jLabel3.setForeground(Color.RED);
+                        jLabel5.setVisible(true);
+                    }
+                    else
+                    {
+                        jLabel3.setForeground(Color.BLUE);
+                        jLabel5.setVisible(false);
+                    }
+                }
+            }
+
+            @Override
+            protected Boolean doInBackground() {
+                if (isCancelled()) {
+                    return false;
+                }
+
+                memoryLog.clear();
+
+                publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_VerifyGoogleAccount..."), Icons.BUSY));
+
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException ex) {
+                    return false;
+                }
+
+                publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_VerifyGoogleAccountFail"), Icons.ERROR));
+
+                return true;
+            }
+        };
+        return worker;
+    }
+
+    private void writeToMemoryLog(String message) {
+        // http://www.leepoint.net/notes-java/io/10file/sys-indep-newline.html
+        // public static String newline = System.getProperty("line.separator");
+        // When NOT to use the system independent newline characters
+        // JTextArea lines should be separated by a single '\n' character, not the sequence that is used for file line separators in the operating system.
+        // Console output (eg, System.out.println()), works fine with '\n', even on Windows.
+        final String s = dateFormat.format(new Date()) + "\n" + message;
+        this.memoryLog.add(s);
+    }
+
+    private volatile SwingWorker<Boolean, Status> loadFromCloudTask = null;
     private final List<String> memoryLog = new ArrayList<String>();
+    private static final DateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy hh:mm:ss a");
+    
+    private static final Log log = LogFactory.getLog(LoadFromCloudJDialog.class);
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
