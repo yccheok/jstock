@@ -44,8 +44,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 import javax.imageio.ImageIO;
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
@@ -2385,23 +2383,23 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void initJStockOptions() {
         final File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "options.xml");
-        jStockOptions = Utils.fromXML(JStockOptions.class, f);
+        this.jStockOptions = Utils.fromXML(JStockOptions.class, f);
         
-        if(jStockOptions == null) {
+        if (jStockOptions == null) {
             jStockOptions = new JStockOptions();
         }
         else {
             log.info("jstockOptions loaded from " + f.toString() + " successfully.");
         }
         /* Hard core fix. */
-        if(jStockOptions.getScanningSpeed() == 0) {
+        if (jStockOptions.getScanningSpeed() == 0) {
             jStockOptions.setScanningSpeed(1000);
         }
                 
         final String proxyHost = jStockOptions.getProxyServer();
         final int proxyPort = jStockOptions.getProxyPort();
         
-        if((proxyHost.length() > 0) && (org.yccheok.jstock.engine.Utils.isValidPortNumber(proxyPort))) {
+        if ((proxyHost.length() > 0) && (org.yccheok.jstock.engine.Utils.isValidPortNumber(proxyPort))) {
             System.getProperties().put("http.proxyHost", proxyHost);
             System.getProperties().put("http.proxyPort", "" + proxyPort);
         }
@@ -3053,108 +3051,9 @@ public class MainFrame extends javax.swing.JFrame {
         jPanel2.revalidate();
     }
 
-    private void extractZipFile(String zipFilePath) {
-        InputStream inputStream = null;
-        ZipInputStream zipInputStream = null;
-
-        try {
-            inputStream = new FileInputStream(zipFilePath);
-
-            zipInputStream = new ZipInputStream(inputStream);
-            final byte[] data = new byte[1024];
-
-            while(true) {
-                ZipEntry zipEntry = null;
-
-                try {
-                    zipEntry = zipInputStream.getNextEntry();
-
-                    if(zipEntry == null) break;
-
-                    final String destination = Utils.getUserDataDirectory() + zipEntry.getName();
-
-                    if(Utils.isFileOrDirectoryExist(destination)) continue;
-
-                    if(zipEntry.isDirectory())
-                    {
-                        Utils.createCompleteDirectoryHierarchyIfDoesNotExist(destination);
-                    }
-                    else
-                    {
-                        FileOutputStream outputStream = null;
-                        try {
-                            int size = zipInputStream.read(data);
-
-                            if(size > 0) {
-                                outputStream = new FileOutputStream(destination);
-
-                                do {
-                                    outputStream.write(data, 0, size);
-                                    size = zipInputStream.read(data);
-                                }while(size >= 0);
-
-                                outputStream.close();
-                            }
-                        }
-                        catch(IOException exp) {
-                            log.error("", exp);
-                            break;
-                        }
-                        finally {
-                            if(outputStream != null) {
-                                try {
-                                    outputStream.close();
-                                }
-                                catch(IOException exp) {
-                                    log.error("", exp);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-                catch(IOException exp) {
-                    log.error("", exp);
-                    break;
-                }
-                finally {
-                    if(zipInputStream != null) {
-                        try {
-                            zipInputStream.closeEntry();
-                        }
-                        catch(IOException exp) {
-                            log.error("", exp);
-                            break;
-                        }
-                    }
-                }
-
-            }   // while(true)
-        }
-        catch(IOException exp) {
-            log.error("", exp);
-        }
-        finally {
-            if(zipInputStream != null) {
-                try {
-                    zipInputStream.close();
-                } catch (IOException ex) {
-                    log.error("", ex);
-                }
-            }
-
-            if(inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (IOException ex) {
-                    log.error("", ex);
-                }
-            }
-        }
-    }
-
     private void initPreloadDatabase() {
-        this.extractZipFile("database" + File.separator + "database.zip");
+        /* No overwrite. */
+        Utils.extractZipFile("database" + File.separator + "database.zip", false);
     }
 
     private class LatestNewsTask extends SwingWorker<Void, String> {
@@ -3270,7 +3169,8 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     private void initChatDatas() {
-        this.extractZipFile("chat" + File.separator + "chat.zip");
+        /* No overwrite. */
+        Utils.extractZipFile("chat" + File.separator + "chat.zip", false);
     }
 
     // Unlike a JButton, setIcon() does not add an icon to the text label. 
@@ -3280,7 +3180,8 @@ public class MainFrame extends javax.swing.JFrame {
     // state-depicting icons.
     // We need to have image files being extracted outside executable jar file.
     private void initExtraDatas() {
-        this.extractZipFile("extra" + File.separator + "extra.zip");
+        /* No overwrite. */
+        Utils.extractZipFile("extra" + File.separator + "extra.zip", false);
     }
 
     private ActionListener getTimerActionListener() {
