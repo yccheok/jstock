@@ -189,7 +189,94 @@ public class JStockOptions {
     public void setAutoBrokerFeeCalculationEnabled(boolean isAutoBrokerFeeCalculationEnabled) {
         this.isAutoBrokerFeeCalculationEnabled = isAutoBrokerFeeCalculationEnabled;
     }
-    
+
+    public void insensitiveCopy(JStockOptions jStockOptions) {
+        this.singleIndicatorAlert = jStockOptions.singleIndicatorAlert;
+        this.popupMessage = jStockOptions.popupMessage;
+
+        //this.sendEmail = jStockOptions.sendEmail;
+        //this.email = jStockOptions.email;
+        //this.emailPassword = jStockOptions.emailPassword;
+        //this.googleCalendarUsername = jStockOptions.googleCalendarUsername;
+        //this.googleCalendarPassword = jStockOptions.googleCalendarPassword;
+        //this.SMSEnabled = jStockOptions.SMSEnabled;
+
+        // Don't store proxy. Home and office proxy environment are most probably different.
+        //this.proxyServer = jStockOptions.proxyServer;
+        //this.proxyPort = jStockOptions.proxyPort;
+        this.scanningSpeed = jStockOptions.scanningSpeed;
+        this.alertSpeed = jStockOptions.alertSpeed;
+        this.looknFeel = jStockOptions.looknFeel;
+
+        this.normalTextForegroundColor = jStockOptions.normalTextForegroundColor;
+        this.lowerNumericalValueForegroundColor = jStockOptions.lowerNumericalValueForegroundColor;
+        this.higherNumericalValueForegroundColor = jStockOptions.higherNumericalValueForegroundColor;
+        this.firstRowBackgroundColor = jStockOptions.firstRowBackgroundColor;
+        this.secondRowBackgroundColor = jStockOptions.secondRowBackgroundColor;
+        this.autoUpdateForegroundColor = jStockOptions.autoUpdateForegroundColor;
+        this.autoUpdateBackgroundColor = jStockOptions.autoUpdateBackgroundColor;
+        this.alertForegroundColor = jStockOptions.alertForegroundColor;
+        this.alertBackgroundColor = jStockOptions.alertBackgroundColor;
+        this.enableColorChange = jStockOptions.enableColorChange;
+        this.enableColorAlert = jStockOptions.enableColorAlert;
+
+        this.brokingFirms = jStockOptions.brokingFirms;
+        this.selectedBrokingFirmIndex = jStockOptions.selectedBrokingFirmIndex;
+        this.isAutoBrokerFeeCalculationEnabled = jStockOptions.isAutoBrokerFeeCalculationEnabled;
+
+        this.expectedProfitPercentage = jStockOptions.expectedProfitPercentage;
+
+        this.country = jStockOptions.country;
+
+        this.isAutoUpdateNewsEnabled = jStockOptions.isAutoUpdateNewsEnabled;
+
+        //this.newsID = jStockOptions.newsID;
+
+        this.historyDuration = jStockOptions.historyDuration;
+
+        //this.isChatEnabled = jStockOptions.isChatEnabled;
+        //this.chatUsername = jStockOptions.chatUsername;
+        //this.chatPassword = jStockOptions.chatPassword;
+        this.isChatSoundNotificationEnabled = jStockOptions.isChatSoundNotificationEnabled;
+        this.isChatFlashNotificationEnabled = jStockOptions.isChatFlashNotificationEnabled;
+        this.chatSystemMessageColor = jStockOptions.chatSystemMessageColor;
+        this.chatOwnMessageColor = jStockOptions.chatOwnMessageColor;
+        this.chatOtherMessageColor = jStockOptions.chatOtherMessageColor;
+
+        // Don't store proxy. Home and office proxy environment are most probably different.
+        //
+        // We want to avoid from having too frequent credentials creation during
+        // runtime. We will immediately contruct credentials, once we load the
+        // JStockOptions from disk.
+        //this.credentials = jStockOptions.credentials;
+        //this.proxyAuthPassword = jStockOptions.proxyAuthPassword;
+        //this.proxyAuthUserName = jStockOptions.proxyAuthUserName;
+        //this.isProxyAuthEnabled = jStockOptions.isProxyAuthEnabled;
+
+        /* For UK client. */
+        this.penceToPoundConversionEnabled = jStockOptions.penceToPoundConversionEnabled;
+
+        //this.rememberGoogleAccountEnabled = jStockOptions.rememberGoogleAccountEnabled;
+        //this.googleUsername = jStockOptions.googleUsername;
+        //this.googlePassword = jStockOptions.googlePassword;
+
+        // Don't save file location. Different machines may have different file location.
+        //
+        // Remember where we save/open the last file.
+        //this.lastFileIODirectory = jStockOptions.lastFileIODirectory;
+        //this.lastFileNameExtensionDescription = jStockOptions.lastFileNameExtensionDescription;
+
+        this.primaryStockServerFactoryClasses = jStockOptions.primaryStockServerFactoryClasses;
+
+        // Remember the last view page.
+        this.lastSelectedPageIndex = jStockOptions.lastSelectedPageIndex;
+
+        // Use -1 to indicate unlimited SMS per day.
+        this.maxSMSPerDay = jStockOptions.maxSMSPerDay;
+
+        this.portfolioName = jStockOptions.portfolioName;
+    }
+
     // User may not trust us to store their password in cloud server. To avoid
     // from getting trouble, we will clone another copy of JStockOptions, which
     // doesn't contain sensitive data.
