@@ -37,6 +37,8 @@ import java.awt.image.PixelGrabber;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,6 +52,8 @@ import org.yccheok.jstock.engine.*;
 import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
@@ -63,11 +67,16 @@ import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
+import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.apache.commons.httpclient.methods.multipart.FilePart;
+import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
+import org.apache.commons.httpclient.methods.multipart.Part;
+import org.apache.commons.httpclient.methods.multipart.StringPart;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.net.TimeTCPClient;
@@ -113,6 +122,111 @@ public class Utils {
             }
         }
         return null;
+    }
+
+    public static boolean extractZipFile(String zipFilePath, boolean overwrite) {
+        return extractZipFile(new File(zipFilePath), overwrite);
+    }
+
+    public static boolean extractZipFile(File zipFilePath, boolean overwrite) {
+        InputStream inputStream = null;
+        ZipInputStream zipInputStream = null;
+        boolean status = true;
+
+        try {
+            inputStream = new FileInputStream(zipFilePath);
+
+            zipInputStream = new ZipInputStream(inputStream);
+            final byte[] data = new byte[1024];
+
+            while (true) {
+                ZipEntry zipEntry = null;
+                FileOutputStream outputStream = null;
+
+                try {
+                    zipEntry = zipInputStream.getNextEntry();
+
+                    if (zipEntry == null) break;
+
+                    final String destination = Utils.getUserDataDirectory() + zipEntry.getName();
+
+                    if (overwrite == false) {
+                        if (Utils.isFileOrDirectoryExist(destination)) continue;
+                    }
+
+                    if (zipEntry.isDirectory())
+                    {
+                        Utils.createCompleteDirectoryHierarchyIfDoesNotExist(destination);
+                    }
+                    else
+                    {
+                        final File file = new File(destination);
+                        // Ensure directory is there before we write the file.
+                        Utils.createCompleteDirectoryHierarchyIfDoesNotExist(file.getParentFile());
+
+                        int size = zipInputStream.read(data);
+
+                        if (size > 0) {
+                            outputStream = new FileOutputStream(destination);
+
+                            do {
+                                outputStream.write(data, 0, size);
+                                size = zipInputStream.read(data);
+                            } while(size >= 0);
+                        }
+                    }
+                }
+                catch (IOException exp) {
+                    log.error(null, exp);
+                    status = false;
+                    break;
+                }
+                finally {
+                    if (outputStream != null) {
+                        try {
+                            outputStream.close();
+                        }
+                        catch (IOException exp) {
+                            log.error(null, exp);
+                            break;
+                        }
+                    }
+
+                    if (zipInputStream != null) {
+                        try {
+                            zipInputStream.closeEntry();
+                        }
+                        catch (IOException exp) {
+                            log.error(null, exp);
+                            break;
+                        }
+                    }
+                }
+
+            }   // while(true)
+        }
+        catch (IOException exp) {
+            log.error(null, exp);
+            status = false;
+        }
+        finally {
+            if (zipInputStream != null) {
+                try {
+                    zipInputStream.close();
+                } catch (IOException ex) {
+                    log.error(null, ex);
+                }
+            }
+
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException ex) {
+                    log.error(null, ex);
+                }
+            }
+        }
+        return status;
     }
 
     // A value obtained from server, to ensure all JStock's users are getting
@@ -388,9 +502,9 @@ public class Utils {
     }
     
     private static boolean createCompleteDirectoryHierarchyIfDoesNotExist(File f) {
-        if(f == null) return true;
+        if (f == null) return true;
                 
-        if(false == createCompleteDirectoryHierarchyIfDoesNotExist(f.getParentFile())) {
+        if (false == createCompleteDirectoryHierarchyIfDoesNotExist(f.getParentFile())) {
             return false;
         }
         
@@ -399,7 +513,7 @@ public class Utils {
         try {
             path = f.getCanonicalPath();
         } catch (IOException ex) {
-            log.error("", ex);
+            log.error(null, ex);
             return false;
         }
         
@@ -689,6 +803,98 @@ public class Utils {
         }
         catch (javax.swing.UnsupportedLookAndFeelException exp) {
             log.error(null, exp);
+        }
+    }
+
+    public static File loadFromCloud(String username, String password) {
+        final String url = "https://cloudfeature.appspot.com/DownloadServlet";
+        final PostMethod post = new PostMethod(url);
+        InputStream inputStream = null;
+        OutputStream outputStream = null;
+
+        try {
+            org.yccheok.jstock.engine.Utils.setHttpClientProxyFromSystemProperties(httpClient);
+            org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
+
+            NameValuePair[] data = {
+                new NameValuePair("Email", username),
+                new NameValuePair("Passwd", password)
+            };
+            post.setRequestBody(data);          
+            // No ProxyAuth support yet. I do not know how to do so.
+            httpClient.executeMethod(post);
+            final Header header = post.getResponseHeader("Content-Type");
+            if (header == null || header.getValue() == null || false == header.getValue().equalsIgnoreCase("application/octet-stream")) {
+                return null;
+            }
+
+            inputStream = post.getResponseBodyAsStream();
+            final File temp = File.createTempFile(Utils.getJStockUUID(), ".zip");
+            temp.deleteOnExit();
+            outputStream = new FileOutputStream(temp);
+            byte buf[] = new byte[1024];
+            int len;
+            while ((len = inputStream.read(buf)) > 0) {
+                outputStream.write(buf, 0, len);
+            }
+            return temp;
+        }
+        catch (FileNotFoundException ex) {
+            log.error(null, ex);
+            return null;
+        }
+        catch (IOException ex) {
+            log.error(null, ex);
+            return null;
+        }
+        finally {
+            if (outputStream != null) {
+                try {
+                    outputStream.close();
+                } catch (IOException ex) {
+                    log.error(null, ex);
+                }
+            }
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException ex) {
+                    log.error(null, ex);
+                }
+            }
+            post.releaseConnection();
+        }
+    }
+
+    public static boolean saveToCloud(String username, String password, File file) {
+        final String url = "https://cloudfeature.appspot.com/UploadServlet";
+        final PostMethod post = new PostMethod(url);
+
+        try {
+            org.yccheok.jstock.engine.Utils.setHttpClientProxyFromSystemProperties(httpClient);
+            org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
+            Part[] parts = {
+                new StringPart("Email", username),
+                new StringPart("Passwd", password),
+                new FilePart("file", file)
+            };
+            post.setRequestEntity(new MultipartRequestEntity(parts, post.getParams()));
+
+            // No ProxyAuth support yet. I do not know how to do so.
+            httpClient.executeMethod(post);
+            final String respond = post.getResponseBodyAsString();
+            return (respond != null && respond.equals("OK"));
+        } 
+        catch (FileNotFoundException ex) {
+            log.error(null, ex);
+            return false;
+        }
+        catch (IOException ex) {
+            log.error(null, ex);
+            return false;
+        }
+        finally {
+            post.releaseConnection();
         }
     }
 
