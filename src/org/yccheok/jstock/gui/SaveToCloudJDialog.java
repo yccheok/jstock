@@ -372,6 +372,13 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
 
                 publish(Status.newInstance(GUIBundle.getString("SaveToCloudJDialog_VerifyGoogleAccount..."), Icons.BUSY));
 
+                final String username = jTextField1.getText();
+                final String password = new String(jPasswordField1.getPassword());
+                if (false == Utils.saveToCloud(username, password, zipFile)) {
+                    publish(Status.newInstance(GUIBundle.getString("SaveToCloudJDialog_VerifyGoogleAccountFail"), Icons.ERROR));
+                    return false;
+                }
+
                 return false;
             }
         };
@@ -443,9 +450,8 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
         // User will sue us, if we store their Google account information in our server.
         // Let's get a copy of JStockOptions, without any sensitive data.
         final JStockOptions insensitiveJStockOptions = jStockOptions.insensitiveClone();
-        final File tempJStockOptions;
         try {
-            tempJStockOptions = File.createTempFile(Utils.getJStockUUID(), ".xml");
+            final File tempJStockOptions = File.createTempFile(Utils.getJStockUUID(), ".xml");
             // Delete temp file when program exits.
             tempJStockOptions.deleteOnExit();
             org.yccheok.jstock.gui.Utils.toXML(insensitiveJStockOptions, tempJStockOptions);

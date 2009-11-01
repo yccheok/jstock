@@ -21,6 +21,7 @@ package org.yccheok.jstock.gui;
 
 import java.awt.Color;
 import java.awt.Cursor;
+import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -352,17 +353,23 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
 
                 memoryLog.clear();
 
-                publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_VerifyGoogleAccount..."), Icons.BUSY));
+                publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_LoadingFromCloud..."), Icons.BUSY));
 
-                try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException ex) {
+                final String username = jTextField1.getText();
+                final String password = new String(jPasswordField1.getPassword());
+
+                final File file = Utils.loadFromCloud(username, password);
+                if (file == null) {
+                    publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_LoadingFromCloudFail"), Icons.ERROR));
                     return false;
                 }
+                publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_ExtractingData..."), Icons.BUSY));
+                final boolean status = Utils.extractZipFile(file, true);
+                if (false == status) {
+                    publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_ExtractingDataFail"), Icons.ERROR));
+                }
 
-                publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_VerifyGoogleAccountFail"), Icons.ERROR));
-
-                return true;
+                return status;
             }
         };
         return worker;
