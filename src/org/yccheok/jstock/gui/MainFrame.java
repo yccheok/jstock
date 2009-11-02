@@ -1569,6 +1569,74 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel38.setText("" + stock.getThirdSellQuantity());
     }
     
+    /* Save everything to disc, before perform uploading. */
+    public void commitBeforeUploadToCloud() {
+        /* These codes are very similar to clean up code during application
+         * exit.
+         */
+        this.saveJStockOptions();
+        this.saveGUIOptions();
+        this.saveBrokingFirmLogos();
+        this.saveRealTimeStocks();
+        this.indicatorPanel.saveAlertIndicatorProjectManager();
+        this.indicatorPanel.saveModuleIndicatorProjectManager();
+        this.portfolioManagementJPanel.savePortfolio();
+    }
+
+    /* Reload after downloading from cloud. Take note that we must reload
+     * JStockOptions before and outside this method, due to insensitive data
+     * requirement.
+     */
+    public void reloadAfterDownloadFromCloud() {
+        /* These codes are very similar to clean up code during changing country.
+         */
+        MainFrame.this.statusBar.setCountryIcon(jStockOptions.getCountry().getIcon(), jStockOptions.getCountry().toString());
+
+        // Here is the dirty trick here. We let our the 'child' panels perform
+        // cleanup/ initialization first before initStockCodeAndSymbolDatabase.
+        // This is because all child panels and stock symbol database task do
+        // interact with status bar. However, We are only most interest in stock symbol
+        // database, as it will be the most busy. Hence, we let the stock symbol
+        // database to be the last, so that its interaction will overwrite the others.
+        this.portfolioManagementJPanel.initPortfolio();
+        this.indicatorScannerJPanel.stop();
+        this.indicatorScannerJPanel.clear();
+        this.chatJPanel.stopChatServiceManager();
+        if (jStockOptions.isChatEnabled())
+        {
+            this.chatJPanel.startChatServiceManager();
+        }
+
+        this.initStockCodeAndSymbolDatabase(true);
+        this.initMarketThread();
+        this.initMarketJPanel();
+        this.initStockHistoryMonitor();
+        this.initOthersStockHistoryMonitor();
+        // Initialize real time monitor must come before initialize real time
+        // stocks. We need to submit real time stocks to real time stock monitor.
+        // Hence, after we load real time stocks from file, real time stock monitor
+        // must be ready (initialized).
+        this.initRealTimeStockMonitor();
+        this.initRealTimeStocks();
+        this.initAlertStateManager();
+        this.initDynamicCharts();
+
+        for (Enumeration<AbstractButton> e = this.buttonGroup2.getElements() ; e.hasMoreElements() ;) {
+            AbstractButton button = e.nextElement();
+            javax.swing.JRadioButtonMenuItem m = (javax.swing.JRadioButtonMenuItem)button;
+
+            if(m.getText().equals(jStockOptions.getCountry().toString())) {
+                m.setSelected(true);
+                break;
+            }
+        }
+
+        if (null != this.indicatorPanel) {
+            this.indicatorPanel.initIndicatorProjectManager();
+            this.indicatorPanel.initModuleProjectManager();
+        }
+    }
+
     private void changeCountry(Country country) {
         if (country == null) return;
         if (jStockOptions.getCountry() == country) return;
@@ -1597,17 +1665,19 @@ public class MainFrame extends javax.swing.JFrame {
             this.chatJPanel.startChatServiceManager();
         }
 
-        initStockCodeAndSymbolDatabase(true);
-        initMarketThread();
-        initMarketJPanel();
-        initStockHistoryMonitor();
-        initOthersStockHistoryMonitor();
+        this.initStockCodeAndSymbolDatabase(true);
+        this.initMarketThread();
+        this.initMarketJPanel();
+        this.initStockHistoryMonitor();
+        this.initOthersStockHistoryMonitor();
         // Initialize real time monitor must come before initialize real time
-        // stocks.
-        initRealTimeStockMonitor();
-        initRealTimeStocks();
-        initAlertStateManager();
-        initDynamicCharts();
+        // stocks. We need to submit real time stocks to real time stock monitor.
+        // Hence, after we load real time stocks from file, real time stock monitor
+        // must be ready (initialized).
+        this.initRealTimeStockMonitor();
+        this.initRealTimeStocks();
+        this.initAlertStateManager();
+        this.initDynamicCharts();
 
         for (Enumeration<AbstractButton> e = this.buttonGroup2.getElements() ; e.hasMoreElements() ;) {
             AbstractButton button = e.nextElement();
