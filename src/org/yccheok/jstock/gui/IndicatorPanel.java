@@ -1603,7 +1603,7 @@ public class IndicatorPanel extends JPanel {
         this.jButton6.setEnabled(false);
     }
     
-    private void initIndicatorProjectManager() {
+    public void initIndicatorProjectManager() {
         File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "indicator" + File.separator + "project.xml");
         this.alertIndicatorProjectManager = org.yccheok.jstock.gui.Utils.fromXML(IndicatorProjectManager.class, f);
         if (this.alertIndicatorProjectManager != null) {
@@ -1628,7 +1628,7 @@ public class IndicatorPanel extends JPanel {
         });
     }
 
-    private void initModuleProjectManager() {
+    public void initModuleProjectManager() {
         final File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "module" + File.separator + "project.xml");
         this.moduleIndicatorProjectManager = org.yccheok.jstock.gui.Utils.fromXML(IndicatorProjectManager.class, f);
         if (this.moduleIndicatorProjectManager != null) {
