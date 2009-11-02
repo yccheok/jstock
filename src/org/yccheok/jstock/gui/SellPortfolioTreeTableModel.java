@@ -178,6 +178,8 @@ public class SellPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel
     
     @Override
     public Object getValueAt(Object node, int column) {
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+
         if (node instanceof Portfolio) {
             final Portfolio portfolio = (Portfolio)node;
             
@@ -186,15 +188,30 @@ public class SellPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel
                     return "Sell";
         
                 case 5:
-                    return portfolio.getTotal();
-                    
+                    if (jStockOptions.isPenceToPoundConversionEnabled() == false) {
+                        return portfolio.getTotal();
+                    }
+                    else {
+                        return portfolio.getTotal() / 100.0;
+                    }
+
                 case 6:
                     // Total purchase value.
-                    return portfolio.getReferenceTotal();
-                    
+                    if (jStockOptions.isPenceToPoundConversionEnabled() == false) {
+                        return portfolio.getReferenceTotal();
+                    }
+                    else {
+                        return portfolio.getReferenceTotal() / 100.0;
+                    }
+
                 case 8:
-                    return getGainLossValue(portfolio);
-                    
+                    if (jStockOptions.isPenceToPoundConversionEnabled() == false) {
+                        return getGainLossValue(portfolio);
+                    }
+                    else {
+                        return getGainLossValue(portfolio) / 100.0;
+                    }
+
                 case 9:
                     return getGainLossPercentage(portfolio);
     
@@ -208,11 +225,21 @@ public class SellPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel
                     return portfolio.getCalculatedStampDuty();
                     
                 case 13:
-                    return portfolio.getNetTotal();
-                    
+                    if (jStockOptions.isPenceToPoundConversionEnabled() == false) {
+                        return portfolio.getNetTotal();
+                    }
+                    else {
+                        return portfolio.getNetTotal() / 100.0;
+                    }
+
                 case 14:
-                    return getNetGainLossValue(portfolio);
-                    
+                    if (jStockOptions.isPenceToPoundConversionEnabled() == false) {
+                        return getNetGainLossValue(portfolio);
+                    }
+                    else {
+                        return getNetGainLossValue(portfolio) / 100.0;
+                    }
+
                 case 15:
                     return getNetGainLossPercentage(portfolio);
 
@@ -243,16 +270,31 @@ public class SellPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel
                     return getPurchasePrice(transactionSummary);
                     
                 case 5:
-                    return transactionSummary.getTotal();
+                    if (jStockOptions.isPenceToPoundConversionEnabled() == false) {
+                        return transactionSummary.getTotal();
+                    }
+                    else {
+                        return transactionSummary.getTotal() / 100.0;
+                    }
                     
                 case 6:
-                    return transactionSummary.getReferenceTotal();
+                    if (jStockOptions.isPenceToPoundConversionEnabled() == false) {
+                        return transactionSummary.getReferenceTotal();
+                    }
+                    else {
+                        return transactionSummary.getReferenceTotal() / 100.0;
+                    }
                     
                 case 7:
                     return getGainLossPrice(transactionSummary);
                     
                 case 8:
-                    return getGainLossValue(transactionSummary);
+                    if (jStockOptions.isPenceToPoundConversionEnabled() == false) {
+                        return getGainLossValue(transactionSummary);
+                    }
+                    else {
+                        return getGainLossValue(transactionSummary) / 100.0;
+                    }
                     
                 case 9:
                     return getGainLossPercentage(transactionSummary);
@@ -267,10 +309,20 @@ public class SellPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel
                     return transactionSummary.getCalculatedStampDuty();
                     
                 case 13:
-                    return transactionSummary.getNetTotal();
+                    if (jStockOptions.isPenceToPoundConversionEnabled() == false) {
+                        return transactionSummary.getNetTotal();
+                    }
+                    else {
+                        return transactionSummary.getNetTotal() / 100.0;
+                    }
                     
                 case 14:
-                    return getNetGainLossValue(transactionSummary);
+                    if (jStockOptions.isPenceToPoundConversionEnabled() == false) {
+                        return getNetGainLossValue(transactionSummary);
+                    }
+                    else {
+                        return getNetGainLossValue(transactionSummary) / 100.0;
+                    }
                     
                 case 15:
                     return getNetGainLossPercentage(transactionSummary);                    
