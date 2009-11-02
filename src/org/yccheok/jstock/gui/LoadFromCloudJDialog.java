@@ -86,6 +86,7 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
         jPasswordField1 = new javax.swing.JPasswordField();
         jLabel6 = new javax.swing.JLabel();
         jCheckBox1 = new javax.swing.JCheckBox();
+        jLabel7 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
@@ -157,12 +158,27 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
 
         jLabel1.setText(bundle.getString("LoadFromCloudJDialog_Username")); // NOI18N
 
+        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField1ActionPerformed(evt);
+            }
+        });
+
         jLabel2.setText(bundle.getString("SaveToCloudJDialog_Password")); // NOI18N
+
+        jPasswordField1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jPasswordField1ActionPerformed(evt);
+            }
+        });
 
         jLabel6.setFont(new java.awt.Font("Dialog", 0, 10));
         jLabel6.setText("(e.g. john@gmail.com)");
 
         jCheckBox1.setText(bundle.getString("LoadFromCloudJDialog_KeepMeSignedIn")); // NOI18N
+
+        jLabel7.setForeground(new java.awt.Color(255, 0, 0));
+        jLabel7.setText(bundle.getString("LoadFromCloudJDialog_WarningAllYourDataWillBeOverwriteByCloudData")); // NOI18N
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -171,6 +187,7 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jCheckBox1)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel1)
@@ -181,7 +198,7 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
                             .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 171, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel6))
-                    .addComponent(jCheckBox1))
+                    .addComponent(jLabel7))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -196,9 +213,11 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(jPasswordField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel7)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jCheckBox1)
-                .addContainerGap())
+                .addContainerGap(12, Short.MAX_VALUE))
         );
 
         jPanel1.add(jPanel2, java.awt.BorderLayout.CENTER);
@@ -206,7 +225,7 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
         java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-420)/2, (screenSize.height-309)/2, 420, 309);
+        setBounds((screenSize.width-420)/2, (screenSize.height-334)/2, 420, 334);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
@@ -260,6 +279,12 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
             return;
         }
 
+        if (false == org.apache.commons.validator.EmailValidator.getInstance().isValid(this.jTextField1.getText())) {
+            JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_invalid_email_address"), MessagesBundle.getString("warning_title_invalid_email_address"), JOptionPane.WARNING_MESSAGE);
+            this.jTextField1.requestFocus();
+            return;
+        }
+        
         if (this.jPasswordField1.getPassword().length == 0)
         {
             JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_password_cannot_be_empty"), MessagesBundle.getString("warning_title_password_cannot_be_empty"), JOptionPane.WARNING_MESSAGE);
@@ -274,6 +299,15 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
         this.loadFromCloudTask = this.getLoadFromCloudTask();
         this.loadFromCloudTask.execute();
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jPasswordField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jPasswordField1ActionPerformed
+        // TODO add your handling code here:
+        jButton1ActionPerformed(evt);
+    }//GEN-LAST:event_jPasswordField1ActionPerformed
+
+    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+        jButton1ActionPerformed(evt);
+    }//GEN-LAST:event_jTextField1ActionPerformed
 
     private static class Status {
         public final String message;
@@ -312,6 +346,8 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
                 jCheckBox1.setEnabled(true);
 
                 if (result == true) {
+                    JOptionPane.showMessageDialog(LoadFromCloudJDialog.this, GUIBundle.getString("LoadFromCloudJDialog_Success"));
+
                     final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
                     // Only save account information when cloud operation success.
                     if (jCheckBox1.isSelected() == true) {
@@ -369,6 +405,16 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
                     publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_ExtractingDataFail"), Icons.ERROR));
                 }
 
+                final File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "options.xml");
+                final JStockOptions jStockOptions = Utils.fromXML(JStockOptions.class, f);
+                if (jStockOptions != null) {
+                    MainFrame.getInstance().getJStockOptions().insensitiveCopy(jStockOptions);
+                }
+
+                MainFrame.getInstance().reloadAfterDownloadFromCloud();
+
+                publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_Success"), Icons.OK));
+
                 return status;
             }
         };
@@ -401,6 +447,7 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
