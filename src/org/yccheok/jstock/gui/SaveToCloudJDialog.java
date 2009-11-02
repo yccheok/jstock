@@ -95,6 +95,7 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
         jPasswordField1 = new javax.swing.JPasswordField();
         jLabel6 = new javax.swing.JLabel();
         jCheckBox1 = new javax.swing.JCheckBox();
+        jLabel7 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
@@ -166,12 +167,38 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
 
         jLabel1.setText(bundle.getString("SaveToCloudJDialog_Username")); // NOI18N
 
+        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField1ActionPerformed(evt);
+            }
+        });
+
         jLabel2.setText(bundle.getString("SaveToCloudJDialog_Password")); // NOI18N
+
+        jPasswordField1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jPasswordField1ActionPerformed(evt);
+            }
+        });
 
         jLabel6.setFont(new java.awt.Font("Dialog", 0, 10));
         jLabel6.setText("(e.g. john@gmail.com)");
 
         jCheckBox1.setText(bundle.getString("SaveToCloudJDialog_KeepMeSignedIn")); // NOI18N
+
+        jLabel7.setText(bundle.getString("SaveToCloudJDialog_ViewPrivacyInformation")); // NOI18N
+        this.jLabel3.setVisible(false);
+        jLabel7.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel7MouseClicked(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                jLabel7MouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                jLabel7MouseExited(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -180,6 +207,7 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jCheckBox1)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel1)
@@ -190,7 +218,7 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
                             .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 171, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel6))
-                    .addComponent(jCheckBox1))
+                    .addComponent(jLabel7))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -205,9 +233,11 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(jPasswordField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel7)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jCheckBox1)
-                .addContainerGap())
+                .addContainerGap(9, Short.MAX_VALUE))
         );
 
         jPanel1.add(jPanel2, java.awt.BorderLayout.CENTER);
@@ -215,7 +245,7 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
         java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-420)/2, (screenSize.height-309)/2, 420, 309);
+        setBounds((screenSize.width-420)/2, (screenSize.height-331)/2, 420, 331);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
@@ -268,6 +298,12 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
             return;
         }
 
+        if (false == org.apache.commons.validator.EmailValidator.getInstance().isValid(this.jTextField1.getText())) {
+            JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_invalid_email_address"), MessagesBundle.getString("warning_title_invalid_email_address"), JOptionPane.WARNING_MESSAGE);
+            this.jTextField1.requestFocus();
+            return;
+        }
+
         if (this.jPasswordField1.getPassword().length == 0)
         {
             JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_password_cannot_be_empty"), MessagesBundle.getString("warning_title_password_cannot_be_empty"), JOptionPane.WARNING_MESSAGE);
@@ -282,6 +318,29 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
         this.saveToCloudTask = this.getSaveToCloudTask();
         this.saveToCloudTask.execute();
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jLabel7MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel7MouseClicked
+        Utils.launchWebBrowser("http://jstock.sourceforge.net/privacy.html");
+    }//GEN-LAST:event_jLabel7MouseClicked
+
+    private void jLabel7MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel7MouseEntered
+        // TODO add your handling code here:
+        this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+    }//GEN-LAST:event_jLabel7MouseEntered
+
+    private void jLabel7MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel7MouseExited
+        // TODO add your handling code here:
+        this.setCursor(Cursor.getDefaultCursor());
+    }//GEN-LAST:event_jLabel7MouseExited
+
+    private void jPasswordField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jPasswordField1ActionPerformed
+        // TODO add your handling code here:
+        jButton1ActionPerformed(evt);
+    }//GEN-LAST:event_jPasswordField1ActionPerformed
+
+    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+        jButton1ActionPerformed(evt);
+    }//GEN-LAST:event_jTextField1ActionPerformed
 
     private static class Status {
         public final String message;
@@ -320,6 +379,8 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
                 jCheckBox1.setEnabled(true);
 
                 if (result == true) {
+                    JOptionPane.showMessageDialog(SaveToCloudJDialog.this, GUIBundle.getString("SaveToCloudJDialog_Success"));
+                    
                     final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
                     // Only save account information when cloud operation success.
                     if (jCheckBox1.isSelected() == true) {
@@ -363,6 +424,8 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
 
                 publish(Status.newInstance(GUIBundle.getString("SaveToCloudJDialog_PreparingData..."), Icons.BUSY));
 
+                MainFrame.getInstance().commitBeforeUploadToCloud();
+                
                 final File zipFile = getJStockZipFile();
                 
                 if (zipFile == null) {
@@ -379,7 +442,9 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
                     return false;
                 }
 
-                return false;
+                publish(Status.newInstance(GUIBundle.getString("SaveToCloudJDialog_Success"), Icons.OK));
+
+                return true;
             }
         };
         return worker;
@@ -664,6 +729,7 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
