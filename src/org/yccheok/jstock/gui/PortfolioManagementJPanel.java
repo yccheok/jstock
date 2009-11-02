@@ -1794,17 +1794,37 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         final BuyPortfolioTreeTableModel buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModel)this.buyTreeTable.getTreeTableModel();
         final SellPortfolioTreeTableModel sellPortfolioTreeTableModel = (SellPortfolioTreeTableModel)this.sellTreeTable.getTreeTableModel();
         
-        final double share = buyPortfolioTreeTableModel.getCurrentValue();
-        final double cash = sellPortfolioTreeTableModel.getNetSellingValue() - ((Portfolio)sellPortfolioTreeTableModel.getRoot()).getReferenceTotal() - buyPortfolioTreeTableModel.getNetPurchaseValue() + this.getDepositSummary().getTotal() + this.getDividendSummary().getTotal();
-        final double paperProfit = buyPortfolioTreeTableModel.getNetGainLossValue();
+        final double share;
+        final double cash;
+        final double paperProfit;
+        final double realizedProfit;
+        if (false == MainFrame.getInstance().getJStockOptions().isPenceToPoundConversionEnabled()) {
+            share = buyPortfolioTreeTableModel.getCurrentValue();
+            cash = sellPortfolioTreeTableModel.getNetSellingValue() - ((Portfolio)sellPortfolioTreeTableModel.getRoot()).getReferenceTotal() - buyPortfolioTreeTableModel.getNetPurchaseValue() + this.getDepositSummary().getTotal() + this.getDividendSummary().getTotal();
+            paperProfit = buyPortfolioTreeTableModel.getNetGainLossValue();
+            realizedProfit = sellPortfolioTreeTableModel.getNetGainLossValue();
+        }
+        else {
+            share = buyPortfolioTreeTableModel.getCurrentValue() / 100.0;
+            cash = sellPortfolioTreeTableModel.getNetSellingValue() / 100.0 - ((Portfolio)sellPortfolioTreeTableModel.getRoot()).getReferenceTotal() / 100.0 - buyPortfolioTreeTableModel.getNetPurchaseValue() / 100.0 + this.getDepositSummary().getTotal() + this.getDividendSummary().getTotal();
+            paperProfit = buyPortfolioTreeTableModel.getNetGainLossValue() / 100.0;
+            realizedProfit = sellPortfolioTreeTableModel.getNetGainLossValue() / 100.0;
+        }
+
         final double paperProfitPercentage = buyPortfolioTreeTableModel.getNetGainLossPercentage();
-        final double realizedProfit = sellPortfolioTreeTableModel.getNetGainLossValue();
+        
         final double realizedProfitPercentage = sellPortfolioTreeTableModel.getNetGainLossPercentage();
         
         final java.text.NumberFormat numberFormat = java.text.NumberFormat.getInstance();
-        numberFormat.setMaximumFractionDigits(2);
-        numberFormat.setMinimumFractionDigits(2);
-        
+        if (false == MainFrame.getInstance().getJStockOptions().isPenceToPoundConversionEnabled()) {
+            numberFormat.setMaximumFractionDigits(2);
+            numberFormat.setMinimumFractionDigits(2);
+        }
+        else {
+            numberFormat.setMaximumFractionDigits(4);
+            numberFormat.setMinimumFractionDigits(4);
+        }
+
         final String _share = numberFormat.format(share);
         final String _cash = numberFormat.format(cash);
         final String _paperProfit = numberFormat.format(paperProfit);
