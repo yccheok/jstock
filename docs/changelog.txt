@@ -1,10 +1,12 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
-JStock 1.0.5b - 2009-11-xx
-  Bugfix:  SMS Alert doesn't work if System Tray Alert is not enabled. 
-           (#2889592)
-
+JStock 1.0.5b - 2009-11-4
+  Feature: Able to save JStock files into cloud (#2833216)
+  Bugfix:  United Kingdom portfolio issue (#2807941)           
+  Bugfix:  SMS Alert doesn't work if System Tray Alert is not enabled.(#2889592)
+  Bugfix:  RSI is miscalculated. (#2886976)
+  
 JStock 1.0.5a - 2009-10-23
   Bugfix:  Bug fixed for CCI and RSI charting. Stock information will interrupt
            with each others.
