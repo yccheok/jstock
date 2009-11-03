@@ -23,6 +23,7 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.io.File;
 import java.text.DateFormat;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -394,13 +395,37 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
                 final String username = jTextField1.getText();
                 final String password = new String(jPasswordField1.getPassword());
 
-                final File file = Utils.loadFromCloud(username, password);
-                if (file == null) {
+                final Utils.CloudFile cloudFile = Utils.loadFromCloud(username, password);
+                if (cloudFile == null) {
                     publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_LoadingFromCloudFail"), Icons.ERROR));
                     return false;
                 }
+                /* Check for checksum. */
+                if (cloudFile.checksum != org.yccheok.jstock.analysis.Utils.getChecksum(cloudFile.file)) {
+                    publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_CheckingCheckSumFail"), Icons.ERROR));
+                    return false;
+                }
+                /* Check for date. */
+                final long today = new Date().getTime();
+                final long milli_seconds_in_a_day = 1000 * 24 * 60 * 60;
+                if ((today / milli_seconds_in_a_day) != (cloudFile.date / milli_seconds_in_a_day)) {
+                    DateFormat dateFormat = DateFormat.getDateInstance();
+                    final String message = MessageFormat.format(MessagesBundle.getString("question_message_overwrite_your_data_by_cloud_data_at_template"), dateFormat.format(cloudFile.date));
+                    final int result = JOptionPane.showConfirmDialog(LoadFromCloudJDialog.this, message, MessagesBundle.getString("question_title_overwrite_your_data_by_cloud_data_at"), JOptionPane.YES_NO_OPTION);
+                    if (result != JOptionPane.YES_OPTION) {
+                        publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_UserRefuseToOverwriteWithOldData"), Icons.ERROR));
+                        return false;
+                    }
+                }
+                /* Check for version. */
+                if (Utils.isCompatible(cloudFile.version) == false) {
+                    final String message = MessageFormat.format(GUIBundle.getString("LoadFromCloudJDialog_VersionNotCompatible"), cloudFile.version);
+                    publish(Status.newInstance(message, Icons.ERROR));
+                    return false;
+                }
+
                 publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_ExtractingData..."), Icons.BUSY));
-                final boolean status = Utils.extractZipFile(file, true);
+                final boolean status = Utils.extractZipFile(cloudFile.file, true);
                 if (false == status) {
                     publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_ExtractingDataFail"), Icons.ERROR));
                 }

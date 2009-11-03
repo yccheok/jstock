@@ -830,8 +830,25 @@ public class Utils {
         }
     }
 
-    public static File loadFromCloud(String username, String password) {
-        final String url = "https://cloudfeature.appspot.com/DownloadServlet";
+    public static class CloudFile {
+        public final File file;
+        public final long checksum;
+        public final long date;
+        public final int version;
+        private CloudFile(File file, long checksum, long date, int version) {
+            this.file = file;
+            this.checksum = checksum;
+            this.date = date;
+            this.version = version;
+        }
+
+        public static CloudFile newInstance(File file, long checksum, long date, int version) {
+            return new CloudFile(file, checksum, date, version);
+        }
+    }
+
+    public static CloudFile loadFromCloud(String username, String password) {
+        final String url = "https://jstock-cloud.appspot.com/DownloadServlet";
         final PostMethod post = new PostMethod(url);
         InputStream inputStream = null;
         OutputStream outputStream = null;
@@ -852,6 +869,17 @@ public class Utils {
                 return null;
             }
 
+            String _checksum = post.getResponseHeader("jstock-custom-checksum").getValue();
+            String _date = post.getResponseHeader("jstock-custom-date").getValue();
+            String _version = post.getResponseHeader("jstock-custom-version").getValue();
+            if (_checksum == null || _date == null || _version == null) {
+                return null;
+            }
+
+            long checksum = Long.parseLong(_checksum);
+            long date = Long.parseLong(_date);
+            int version = Integer.parseInt(_version);
+
             inputStream = post.getResponseBodyAsStream();
             final File temp = File.createTempFile(Utils.getJStockUUID(), ".zip");
             temp.deleteOnExit();
@@ -861,13 +889,17 @@ public class Utils {
             while ((len = inputStream.read(buf)) > 0) {
                 outputStream.write(buf, 0, len);
             }
-            return temp;
+            return CloudFile.newInstance(temp, checksum, date, version);
         }
         catch (FileNotFoundException ex) {
             log.error(null, ex);
             return null;
         }
         catch (IOException ex) {
+            log.error(null, ex);
+            return null;
+        }
+        catch(NumberFormatException ex) {
             log.error(null, ex);
             return null;
         }
@@ -891,7 +923,7 @@ public class Utils {
     }
 
     public static boolean saveToCloud(String username, String password, File file) {
-        final String url = "https://cloudfeature.appspot.com/UploadServlet";
+        final String url = "https://jstock-cloud.appspot.com/UploadServlet";
         final PostMethod post = new PostMethod(url);
 
         try {
@@ -900,6 +932,9 @@ public class Utils {
             Part[] parts = {
                 new StringPart("Email", username),
                 new StringPart("Passwd", password),
+                new StringPart("Date", new Date().getTime() + ""),
+                new StringPart("Checksum", org.yccheok.jstock.analysis.Utils.getChecksum(file) + ""),
+                new StringPart("Version", org.yccheok.jstock.gui.Utils.getApplicationVersionID() + ""),
                 new FilePart("file", file)
             };
             post.setRequestEntity(new MultipartRequestEntity(parts, post.getParams()));
@@ -920,6 +955,13 @@ public class Utils {
         finally {
             post.releaseConnection();
         }
+    }
+
+    public static boolean isCompatible(int applicationVersionID) {
+        if (applicationVersionID == 1051) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -1671,6 +1713,7 @@ public class Utils {
 
     // For About box comparision on latest version purpose.
     // 1.0.5a
+    // Remember to update isCompatible method.
     private static final int APPLICATION_VERSION_ID = 1051;
 
     private static Executor zombiePool = Executors.newFixedThreadPool(Utils.NUM_OF_THREADS_ZOMBIE_POOL);
