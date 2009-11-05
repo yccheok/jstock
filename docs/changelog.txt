@@ -1,6 +1,9 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.5c - 2009-11-5
+  Bugfix:  Speed optimization on save to cloud process.
+
 JStock 1.0.5b - 2009-11-4
   Feature: Able to save JStock files into cloud (#2833216)
   Bugfix:  United Kingdom portfolio issue (#2807941)           
