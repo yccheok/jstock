@@ -624,6 +624,14 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
                     }
                     else
                     {
+                        final long originalSize = zipEntry.getSize();
+                        final long currentSize = new File(destination).length();
+                        if (originalSize != currentSize) {
+                            // Two files are different. That's mean user had added UserDefined symbol.
+                            files.add(new File(destination));
+                        }
+
+                        /* NOTE : No checksum checking. Too slow.
                         // Write to temp file.
                         OutputStream out = null;
                         File temp = null;
@@ -660,6 +668,7 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
                                 }
                             }
                         }
+                        */
                     }   // if(zipEntry.isDirectory())
                 }
                 catch(IOException exp) {
