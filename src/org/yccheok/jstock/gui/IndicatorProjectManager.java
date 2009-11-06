@@ -341,6 +341,22 @@ public class IndicatorProjectManager {
         if (this.preferredOperatorIndicatorType == null) {
             this.preferredOperatorIndicatorType = OperatorIndicator.Type.AlertIndicator;
         }
+
+        /* When we load IndicatorProjectManager from cloud, we may face the problem
+         * where directory is no longer valid.
+         * This is the hacking way to solve above mentioned problem.
+         */
+        if (this.directory.endsWith("indicator")) {
+            this.directory = org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "indicator";
+        }
+        else if (this.directory.endsWith("module")) {
+            this.directory = org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "module";
+        }
+        else {
+            log.error("Something goes wrong during directory initialization");
+            assert(false);
+        }
+
         return this;
     }
 
@@ -404,5 +420,9 @@ public class IndicatorProjectManager {
     private static final String JHOTDRAW_RESERVE_WORD = "-jhotdraw";
 
     private final List<String> projects = new ArrayList<String>();
-    private final String directory;
+    /* When we load IndicatorProjectManager from cloud, we may face the problem
+     * where directory is no longer valid.
+     * This is the hacking way to solve above mentioned problem.
+     */
+    private String directory;
 }
