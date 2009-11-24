@@ -985,7 +985,7 @@ public class MainFrame extends javax.swing.JFrame {
 
 	private void jMenuItem8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem8ActionPerformed
 	// TODO add your handling code here:
-    	if(this.stockCodeAndSymbolDatabase == null) {
+    	if (this.stockCodeAndSymbolDatabase == null) {
         	JOptionPane.showMessageDialog(this, "There are no database ready yet.", "Database not ready", JOptionPane.INFORMATION_MESSAGE);
         	return;
     	}
@@ -1715,8 +1715,8 @@ public class MainFrame extends javax.swing.JFrame {
                 if(e.getClickCount() == 2) {
                     
                     // Make sure no same task is running.
-                    if(stockCodeAndSymbolDatabaseTask != null) {
-                        if(stockCodeAndSymbolDatabaseTask.isDone() == true) {
+                    if (stockCodeAndSymbolDatabaseTask != null) {
+                        if (stockCodeAndSymbolDatabaseTask.isDone() == true) {
                             final int result = JOptionPane.showConfirmDialog(MainFrame.this, "Perform reconnecting to stock server may take several minutes to several hours (depending on your network connection).\nAre you sure you want to do so?", "Reconnecting to stock server", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
                             if(result == JOptionPane.YES_OPTION)
                             {
@@ -1781,13 +1781,13 @@ public class MainFrame extends javax.swing.JFrame {
                     else {
                         final String lastEnteredString = ((AutoCompleteJComboBox)MainFrame.this.jComboBox1).getLastEnteredString();
                         
-                        if(lastEnteredString.length() < 1) {
+                        if (lastEnteredString.length() < 1) {
                             return;
                         }
                         
-                        if(MainFrame.this.stockCodeAndSymbolDatabaseTask != null)
+                        if (MainFrame.this.stockCodeAndSymbolDatabaseTask != null)
                         {
-                            if(MainFrame.this.stockCodeAndSymbolDatabaseTask.isDone() == false)
+                            if (MainFrame.this.stockCodeAndSymbolDatabaseTask.isDone() == false)
                             {
                                 JOptionPane.showMessageDialog(MainFrame.this, lastEnteredString + " is not found in database\nPlease wait till database finished downloaded.", "Database downloading in progress", JOptionPane.INFORMATION_MESSAGE);
                                 return;
@@ -2067,7 +2067,7 @@ public class MainFrame extends javax.swing.JFrame {
         menuItem.addActionListener(new ActionListener() {
             @Override
         	public void actionPerformed(ActionEvent evt) {
-                if(MainFrame.this.stockCodeAndSymbolDatabase == null)
+                if (MainFrame.this.stockCodeAndSymbolDatabase == null)
                 {
                     javax.swing.JOptionPane.showMessageDialog(MainFrame.this, "We haven't connected to stock server.", "Not Connected", javax.swing.JOptionPane.INFORMATION_MESSAGE);
                     return;
@@ -2076,7 +2076,7 @@ public class MainFrame extends javax.swing.JFrame {
                 int rows[] = jTable1.getSelectedRows();
                 final StockTableModel tableModel = (StockTableModel)jTable1.getModel();
 
-                for(int row : rows) {
+                for (int row : rows) {
                     final int modelIndex = jTable1.getRowSorter().convertRowIndexToModel(row);
                     Stock stock = tableModel.getStock(modelIndex);
                     displayHistoryChart(stock);
@@ -2230,9 +2230,9 @@ public class MainFrame extends javax.swing.JFrame {
                     log.info("Stock code and symbol database loaded from " + f.toString() + " successfully.");            
                 
                     // Prepare proper synchronization for us to change country.
-                    synchronized(this)
+                    synchronized(StockCodeAndSymbolDatabaseTask.this)
                     {
-                        if(runnable)
+                        if (runnable)
                         {
                             stockCodeAndSymbolDatabase = tmp;
 
@@ -2259,7 +2259,7 @@ public class MainFrame extends javax.swing.JFrame {
             final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactories(country);
             StockCodeAndSymbolDatabase tmp = null;
             
-            while(!isCancelled() && !success && runnable) {
+            while (!isCancelled() && !success && runnable) {
                 for (StockServerFactory factory : stockServerFactories) {
 
                     StockServer stockServer = factory.getStockServer();
@@ -2759,7 +2759,7 @@ public class MainFrame extends javax.swing.JFrame {
     
     private void initStockCodeAndSymbolDatabase(boolean readFromDisk) {
         // Stop any on-going activities.
-        if(this.stockCodeAndSymbolDatabaseTask != null)
+        if (this.stockCodeAndSymbolDatabaseTask != null)
         {
             synchronized(this.stockCodeAndSymbolDatabaseTask)
             {
