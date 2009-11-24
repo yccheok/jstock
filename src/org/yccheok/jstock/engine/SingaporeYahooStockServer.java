@@ -100,7 +100,9 @@ public class SingaporeYahooStockServer extends Subject<SingaporeYahooStockServer
     public List<Stock> getStocksBySymbols(List<Symbol> symbols) throws StockNotFoundException {
         List<Stock> stocks = new ArrayList<Stock>();
 
-        if(symbols.size() == 0) return stocks;
+        if (symbols.size() == 0) {
+            return stocks;
+        }
 
         final int time = symbols.size() / MAX_STOCK_PER_ITERATION;
         final int remainder = symbols.size() % MAX_STOCK_PER_ITERATION;
@@ -204,7 +206,7 @@ public class SingaporeYahooStockServer extends Subject<SingaporeYahooStockServer
         final List<Symbol> expectedSymbols = new ArrayList<Symbol>();
 
         final int endLoop = end - 1;
-        for(int i=start; i<endLoop; i++) {
+        for (int i = start; i<endLoop; i++) {
             String symbolString = null;
 
             try {
@@ -236,7 +238,7 @@ public class SingaporeYahooStockServer extends Subject<SingaporeYahooStockServer
 
         for (int retry = 0; retry < NUM_OF_RETRY; retry++) {
             final String respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(location);
-
+            
             if (respond == null) {
                 continue;
             }
@@ -288,7 +290,7 @@ public class SingaporeYahooStockServer extends Subject<SingaporeYahooStockServer
     @Override
     public List<Stock> getStocksByCodes(List<Code> codes) throws StockNotFoundException {
         List<Symbol> symbols = new ArrayList<Symbol>();
-        for(Code code : codes) {
+        for (Code code : codes) {
             final Code newCode = Utils.toYahooFormat(code, country);
             symbols.add(Symbol.newInstance(newCode.toString()));
         }
