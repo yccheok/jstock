@@ -1,23 +1,20 @@
 /*
- * NewBuyTransactionJDialog.java
- *
- * Created on March 30, 2008, 6:31 AM
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- * Copyright (C) 2008 Cheok YanCheng <yccheok@yahoo.com>
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.yccheok.jstock.gui;
@@ -560,8 +557,8 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
     public void initjComboBox1EditorComponentKeyListerner() {
         KeyListener[] listeners = this.jComboBox1.getEditor().getEditorComponent().getKeyListeners();
         
-        for(KeyListener listener : listeners) {
-            if(listener == jComboBox1EditorComponentKeyAdapter) {
+        for (KeyListener listener : listeners) {
+            if (listener == jComboBox1EditorComponentKeyAdapter) {
                 return;
             }
         }
@@ -580,30 +577,31 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         return new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
-                if(KeyEvent.VK_ENTER == e.getKeyCode()) {
+                if (KeyEvent.VK_ENTER == e.getKeyCode()) {
 
                     String s = NewBuyTransactionJDialog.this.jComboBox1.getEditor().getItem().toString();
                     
-                    if(s.length() > 0) {
+                    if (s.length() > 0) {
                         MainFrame m = (MainFrame)NewBuyTransactionJDialog.this.getParent();
                         
-                        if(m == null) return;
+                        if (m == null) return;
                         
                         final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = m.getStockCodeAndSymbolDatabase();
                         
                         Code code = stockCodeAndSymbolDatabase.searchStockCode(s);
                         Symbol symbol = null;
                             
-                        if(code != null) {
-                            symbol = stockCodeAndSymbolDatabase.codeToSymbol(code);
-                            
+                        if (code != null) {
+                            symbol = stockCodeAndSymbolDatabase.codeToSymbol(code);                            
                         }
                         else {
                             symbol = stockCodeAndSymbolDatabase.searchStockSymbol(s);
-                                
-                            if(symbol != null) {                                   
+                            if (symbol != null) {
                                 code = stockCodeAndSymbolDatabase.symbolToCode(symbol);
-
+                                // Shouldn't be null. This is because symbol is obtained directly
+                                // from database. Even later user modifies symbol or code through Database -> Stock Database...,
+                                // it shouldn't have any side effect.
+                                assert(code != null);
                             }
                         }
 
