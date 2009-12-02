@@ -1344,15 +1344,15 @@ public class IndicatorPanel extends JPanel {
                         Code code = stockCodeAndSymbolDatabase.searchStockCode(stock);
                         Symbol symbol = null;
                             
-                        if(code != null) {
+                        if (code != null) {
                             symbol = stockCodeAndSymbolDatabase.codeToSymbol(code);                            
                         }
                         else {
                             symbol = stockCodeAndSymbolDatabase.searchStockSymbol(stock);
                                 
-                            if(symbol != null) {                                   
+                            if (symbol != null) {
                                 code = stockCodeAndSymbolDatabase.symbolToCode(symbol);
-
+                                assert(code != null);
                             }
                         }
                         
