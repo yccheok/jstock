@@ -1235,11 +1235,12 @@ public class MainFrame extends javax.swing.JFrame {
 
         Arrays.sort(rows);
 
-        for(int i=rows.length-1; i>=0; i--) {                
+        for (int i = rows.length-1; i >= 0; i--) {
             int row = rows[i];
 
-            if(row < 0) continue;
-
+            if (row < 0) {
+                continue;
+            }
             final int modelIndex = jTable1.getRowSorter().convertRowIndexToModel(row);
             Stock stock = tableModel.getStock(modelIndex);
             stockCodeHistoryGUI.remove(stock.getCode());
@@ -1252,8 +1253,8 @@ public class MainFrame extends javax.swing.JFrame {
         updateBuyerSellerInformation(null);
         this.updateDynamicChart(null);
 
-        if(stockCodeHistoryGUI.size() == 0) {
-            if(this.stockCodeAndSymbolDatabase != null) {
+        if (stockCodeHistoryGUI.size() == 0) {
+            if (this.stockCodeAndSymbolDatabase != null) {
                 statusBar.setProgressBar(false);
                 statusBar.setMainMessage("Connected");
             }
@@ -1754,14 +1755,14 @@ public class MainFrame extends javax.swing.JFrame {
             @Override
             public void keyReleased(KeyEvent e) {
                 
-                if(KeyEvent.VK_ENTER == e.getKeyCode()) {
+                if (KeyEvent.VK_ENTER == e.getKeyCode()) {
                     String stock = MainFrame.this.jComboBox1.getEditor().getItem().toString();
                     
-                    if(stock.length() > 0) {
+                    if (stock.length() > 0) {
                         Code code = stockCodeAndSymbolDatabase.searchStockCode(stock);
                         Symbol symbol = null;
                             
-                        if(code != null) {
+                        if (code != null) {
                             symbol = stockCodeAndSymbolDatabase.codeToSymbol(code);
                             // First add the empty stock, so that the user will not have wrong perspective that
                             // our system is slow.
@@ -1771,9 +1772,32 @@ public class MainFrame extends javax.swing.JFrame {
                         else {
                             symbol = stockCodeAndSymbolDatabase.searchStockSymbol(stock);
                                 
-                            if(symbol != null) {                                   
+                            if (symbol != null) {
                                 code = stockCodeAndSymbolDatabase.symbolToCode(symbol);
+                                // Shouldn't be null. This is because symbol is obtained directly
+                                // from database. Even later user modifies symbol or code through Database -> Stock Database...,
+                                // it shouldn't have any side effect.
+                                assert(code != null);
                                 addStockToTable(Utils.getEmptyStock(code, symbol));
+                                // We allow user to modify user defined type stock code and symbol.
+                                // 1st rule is, modified code cannot crash with existing stock's code or stock's symbol.
+                                // 2nd rule is, modified symbol cannot crash with existing stock's code or stock's symbol.
+                                //
+                                // Please consider the following senario :
+                                // (1) A stock code "6012.KL" and symbol "MAXIS" already added.
+                                // (2) Users modify "MAXIS" to "MAXIS SDN BHD".
+                                // (3) Users try to add "6012.KL". RealTimeStockMonitor will prevent this from happen,
+                                //     as it detectes there is a duplicated code.
+                                // (4) Users try to add "MAXIS SDN BHD". RealTimeStockMonitor will prevent this from happen,
+                                //     as it detectes there is a duplicated code, regardless the value of symbol.
+                                //
+                                // Please consider another senario :
+                                // (1) A stock code "6012.KL" and symbol "MAXIS" already added.
+                                // (2) Users modify "6012.KL" to "6013.KL".
+                                // (3) Users try to add "6013.KL". RealTimeStockMonitor will allow.
+                                //     At the end, there are two rows with same symbol "MAXIS", but different codes.
+                                // (4) Users try to add "MAXIS". RealTimeStockMonitor will allow.
+                                //     At the end, there are two rows with same symbol "MAXIS", but different codes.
                                 realTimeStockMonitor.addStockCode(stockCodeAndSymbolDatabase.symbolToCode(symbol));
                             }
                         }
