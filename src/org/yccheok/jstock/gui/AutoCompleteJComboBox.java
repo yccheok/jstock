@@ -1,23 +1,20 @@
 /*
- * AutoCompleteJComboBox.java
- *
- * Created on May 29, 2007, 10:37 PM
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- * Copyright (C) 2007 Cheok YanCheng <yccheok@yahoo.com>
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.yccheok.jstock.gui;
@@ -70,13 +67,13 @@ public class AutoCompleteJComboBox extends JComboBox {
         return new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
-                if(!e.isActionKey()) {
+                if (!e.isActionKey()) {
                     String string = AutoCompleteJComboBox.this.getEditor().getItem().toString();
                     
                     AutoCompleteJComboBox.this.hidePopup();                                        
                     
-                    if(KeyEvent.VK_ENTER == e.getKeyCode()) {
-                        if(AutoCompleteJComboBox.this.getItemCount() > 0) {
+                    if (KeyEvent.VK_ENTER == e.getKeyCode()) {
+                        if (AutoCompleteJComboBox.this.getItemCount() > 0) {
                             int index = AutoCompleteJComboBox.this.getSelectedIndex();
                             if(index == -1) {
                                 lastEnteredString = (String)AutoCompleteJComboBox.this.getItemAt(0);
@@ -90,7 +87,7 @@ public class AutoCompleteJComboBox extends JComboBox {
                         else {
                             final Object object = AutoCompleteJComboBox.this.getEditor().getItem();
                             
-                            if(object instanceof String) {
+                            if (object instanceof String) {
                                 lastEnteredString = (String)object;
                             }
                             else {
@@ -111,8 +108,8 @@ public class AutoCompleteJComboBox extends JComboBox {
                     
                     AutoCompleteJComboBox.this.removeAllItems();
                     
-                    if(string.length() > 0) {
-                        if(AutoCompleteJComboBox.this.stockCodeAndSymbolDatabase != null) {                            
+                    if (string.length() > 0) {
+                        if (AutoCompleteJComboBox.this.stockCodeAndSymbolDatabase != null) {
                             java.util.List<Code> codes = codes = stockCodeAndSymbolDatabase.searchStockCodes(string);
 
                             boolean shouldShowPopup = false;
@@ -140,11 +137,11 @@ public class AutoCompleteJComboBox extends JComboBox {
                                     shouldShowPopup = true;
                                 }
 
-								if (shouldShowPopup) {
-                                	AutoCompleteJComboBox.this.showPopup();
-								}                                
-                            }
-                        }
+                                if (shouldShowPopup) {
+                                    AutoCompleteJComboBox.this.showPopup();
+                                }   // if (shouldShowPopup)
+                            }   // if (shouldShowPopup)
+                        }   // if (AutoCompleteJComboBox.this.stockCodeAndSymbolDatabase != null)
                     }
                     
                     AutoCompleteJComboBox.this.getEditor().setItem(string);
