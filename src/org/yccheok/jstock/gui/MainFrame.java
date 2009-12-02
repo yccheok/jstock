@@ -2107,7 +2107,7 @@ public class MainFrame extends javax.swing.JFrame {
                     // symbol out from stock database. This marks the close of the following reported bugs :
                     //
                     // [2800598] buyportfolio.xml file not updated with code symbol
-                    // [2790218] User unabe to add new buy transaction in Spain
+                    // [2790218] User unable to add new buy transaction in Spain
                     //
                     // Say no to : portfolioManagementJPanel.showNewBuyTransactionJDialog(stock.getSymbol(), stock.getLastPrice(), false);
                     portfolioManagementJPanel.showNewBuyTransactionJDialog(stock, stock.getLastPrice(), false);
