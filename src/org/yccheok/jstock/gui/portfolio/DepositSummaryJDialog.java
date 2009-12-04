@@ -81,6 +81,7 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
                 formMouseClicked(evt);
             }
         });
+        getContentPane().setLayout(new java.awt.BorderLayout(5, 5));
 
         jXHeader1.setDescription("Manage your cash deposit information.");
         jXHeader1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/32x32/money.png"))); // NOI18N
@@ -107,7 +108,7 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.PAGE_END);
 
-        jPanel2.setLayout(new java.awt.BorderLayout(2, 2));
+        jPanel2.setLayout(new java.awt.BorderLayout(5, 5));
 
         jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 

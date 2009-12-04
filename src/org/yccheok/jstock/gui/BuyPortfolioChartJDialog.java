@@ -228,10 +228,10 @@ public class BuyPortfolioChartJDialog extends javax.swing.JDialog {
         chartPanel.setChart(freeChart);
     }//GEN-LAST:event_jComboBox1ActionPerformed
     
-    private BuyPortfolioTreeTableModel portfolioTreeTableModel;
-    private ChartPanel chartPanel;
-    private DividendSummary dividendSummary;
-    private Map<Code, Double> codeToTotalDividend = new HashMap<Code, Double>();
+    private final BuyPortfolioTreeTableModel portfolioTreeTableModel;
+    private final ChartPanel chartPanel;
+    private final DividendSummary dividendSummary;
+    private final Map<Code, Double> codeToTotalDividend = new HashMap<Code, Double>();
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox jComboBox1;

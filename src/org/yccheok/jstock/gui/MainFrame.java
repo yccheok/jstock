@@ -2946,32 +2946,32 @@ public class MainFrame extends javax.swing.JFrame {
     public void update(StockHistoryMonitor monitor, final StockHistoryMonitor.StockHistoryRunnable runnable) {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             @Override
-           public void run() {
-               Code code = runnable.getCode();
-               // Possible null if we are trying to get index history.
-               Symbol symbol = MainFrame.this.stockCodeAndSymbolDatabase.codeToSymbol(code);
-               final boolean shouldShowGUI = MainFrame.this.stockCodeHistoryGUI.remove(code);
+            public void run() {
+                Code code = runnable.getCode();
+                // Possible null if we are trying to get index history.
+                Symbol symbol = MainFrame.this.stockCodeAndSymbolDatabase.codeToSymbol(code);
+                final boolean shouldShowGUI = MainFrame.this.stockCodeHistoryGUI.remove(code);
                
-               if(stockCodeHistoryGUI.size() == 0) {
-                   statusBar.setProgressBar(false);
-                   
-                   if(runnable.getStockHistoryServer() != null) {
+                if (stockCodeHistoryGUI.size() == 0) {
+                    statusBar.setProgressBar(false);
+
+                    if (runnable.getStockHistoryServer() != null) {
                         statusBar.setMainMessage((symbol != null ? symbol : code) + " history success.");
-                   }
-                   else {
-                       statusBar.setMainMessage((symbol != null ? symbol : code) + " history failed.");
-                   }
+                    }
+                    else {
+                        statusBar.setMainMessage((symbol != null ? symbol : code) + " history failed.");
+                    }
                 }
                 else {
-                    if(runnable.getStockHistoryServer() != null) {
+                    if (runnable.getStockHistoryServer() != null) {
                         statusBar.setMainMessage((symbol != null ? symbol : code) + " history success. Still waiting for history total " + stockCodeHistoryGUI.size() + " ...");
-                   }
-                   else {
-                       statusBar.setMainMessage((symbol != null ? symbol : code) + " history failed. Still waiting for history total " + stockCodeHistoryGUI.size() + " ...");
-                   }                   
+                    }
+                    else {
+                        statusBar.setMainMessage((symbol != null ? symbol : code) + " history failed. Still waiting for history total " + stockCodeHistoryGUI.size() + " ...");
+                    }
                 }
                
-                if((runnable.getStockHistoryServer() != null) && shouldShowGUI) {
+                if ((runnable.getStockHistoryServer() != null) && shouldShowGUI) {
                     ChartJDialog chartJDialog = new ChartJDialog(MainFrame.this, (symbol != null ? symbol : code) + " (" + code + ")", false, runnable.getStockHistoryServer());
                     chartJDialog.setVisible(true);
                 }

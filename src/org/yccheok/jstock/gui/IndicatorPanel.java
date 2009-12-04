@@ -1356,16 +1356,16 @@ public class IndicatorPanel extends JPanel {
                             }
                         }
                         
-                        if(code != null && symbol != null) {
+                        if (code != null && symbol != null) {
                             if(stockTask != null) {
                                 stockTask._stop();
                                 
                                 try {
                                     stockTask.get();
                                 } catch (InterruptedException exp) {
-                                    log.error("", exp);
+                                    log.error(null, exp);
                                 } catch (ExecutionException exp) {
-                                    log.error("", exp);
+                                    log.error(null, exp);
                                 }                                
                             }
                             

@@ -24,6 +24,7 @@
 
 package org.yccheok.jstock.gui.portfolio;
 
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -73,7 +74,9 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
         jPanel3 = new javax.swing.JPanel();
         jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
+        jPanel4 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
 
@@ -86,6 +89,7 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
                 formMouseClicked(evt);
             }
         });
+        getContentPane().setLayout(new java.awt.BorderLayout(5, 5));
 
         jXHeader1.setDescription("Manage your dividend payout information.");
         jXHeader1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/32x32/money2.png"))); // NOI18N
@@ -112,7 +116,7 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_END);
 
-        jPanel1.setLayout(new java.awt.BorderLayout(2, 2));
+        jPanel1.setLayout(new java.awt.BorderLayout(5, 5));
 
         jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/filenew.png"))); // NOI18N
         jButton3.setText("New");
@@ -136,9 +140,27 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
 
         jLabel1.setForeground(new java.awt.Color(0, 0, 255));
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText(getDividendSummaryText());
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
+        jLabel1.setText(bundle.getString("DividendSummaryJDialog_TotalDividend")); // NOI18N
         jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jPanel1.add(jLabel1, java.awt.BorderLayout.PAGE_END);
+        jPanel4.add(jLabel1);
+
+        jLabel2.setForeground(new java.awt.Color(0, 0, 255));
+        jLabel2.setText(getDividendSummaryText());
+        jLabel2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel2MouseClicked(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                jLabel2MouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                jLabel2MouseExited(evt);
+            }
+        });
+        jPanel4.add(jLabel2);
+
+        jPanel1.add(jPanel4, java.awt.BorderLayout.PAGE_END);
 
         jTable1.setModel(new DividendSummaryTableModel(this.dividendSummary));
         org.yccheok.jstock.gui.table.CurrencyRenderer currencyRenderer = new org.yccheok.jstock.gui.table.CurrencyRenderer();
@@ -189,7 +211,7 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
 
     private void jTable1PropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jTable1PropertyChange
         // TODO add your handling code here:
-        this.jLabel1.setText(this.getDividendSummaryText());
+        this.jLabel2.setText(this.getDividendSummaryText());
     }//GEN-LAST:event_jTable1PropertyChange
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -223,6 +245,28 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
         this.deleteSelectedDividend();
     }//GEN-LAST:event_jButton4ActionPerformed
 
+    private void jLabel2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel2MouseClicked
+        if (this.dividendSummary == null || this.dividendSummary.getTotal() <= 0.0) {
+            return;
+        }
+        final MainFrame m = MainFrame.getInstance();
+        final DividendSummaryBarChartJDialog dividendSummaryBarChartJDialog = new DividendSummaryBarChartJDialog(this, false, this.getDividendSummary());
+        dividendSummaryBarChartJDialog.setVisible(true);
+    }//GEN-LAST:event_jLabel2MouseClicked
+
+    private void jLabel2MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel2MouseEntered
+        if (this.dividendSummary == null || this.dividendSummary.getTotal() <= 0.0) {
+            this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+        }
+        else {
+            this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        }
+    }//GEN-LAST:event_jLabel2MouseEntered
+
+    private void jLabel2MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel2MouseExited
+        this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+    }//GEN-LAST:event_jLabel2MouseExited
+
     public DividendSummary getDividendSummary()
     {
         return this.dividendSummary;
@@ -230,7 +274,7 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
 
     public String getDividendSummaryText() {
         if (dividendSummary != null) {
-            return "Total dividend is " + numberFormat.format(dividendSummary.getTotal());
+            return "<html><a href=\"\">" + numberFormat.format(dividendSummary.getTotal()) + "</a></html>";
         }
         return "";
     }
@@ -294,10 +338,10 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
         javax.swing.JMenuItem menuItem = new JMenuItem("New", new javax.swing.ImageIcon(getClass().getResource("/images/16x16/filenew.png")));
 
         menuItem.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    addNewDividend();
-                }
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                addNewDividend();
+            }
         });
 
         popup.add(menuItem);
@@ -385,9 +429,11 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
     private org.jdesktop.swingx.JXHeader jXHeader1;

@@ -222,12 +222,12 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         java.util.List<String> projects = wizardSelectIndicatorJPanel.getSelectedProjects();
         java.util.List<Code> codes = wizardSelectStockJPanel.getSelectedCodes();
 
-        for(final Code code : codes) {
+        for (final Code code : codes) {
             final java.util.List<OperatorIndicator> result = new java.util.ArrayList<OperatorIndicator>();
 
             operatorIndicators.put(code, result);
 
-            for(String project : projects) {
+            for (String project : projects) {
                 final OperatorIndicator operatorIndicator = alertIndicatorProjectManager.getOperatorIndicator(project);
 
                 if(operatorIndicator != null) {
