@@ -143,6 +143,8 @@ public class DividendSummaryBarChartJDialog extends javax.swing.JDialog {
         jComboBox1 = new javax.swing.JComboBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
+        setTitle(bundle.getString("DividendSummaryBarChartJDialog_DividendByYear")); // NOI18N
 
         jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
