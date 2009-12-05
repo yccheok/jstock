@@ -268,6 +268,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         this.jTable1.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(1));
         this.jTable1.addMouseListener(new TableRowPopupListener());
+        this.jTable1.addKeyListener(new TableKeyEventListener());
         jTable1.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 jTable1KeyPressed(evt);
@@ -918,7 +919,6 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_formWindowDeiconified
 
     private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseClicked
-// TODO add your handling code here:
         this.jTable1.getSelectionModel().clearSelection();
         this.indicatorScannerJPanel.clearTableSelection();
         this.portfolioManagementJPanel.clearTableSelection();
@@ -2112,7 +2112,7 @@ public class MainFrame extends javax.swing.JFrame {
         
         popup.addSeparator();        
         
-        if(jTable1.getSelectedRowCount() == 1) {
+        if (jTable1.getSelectedRowCount() == 1) {
             menuItem = new JMenuItem("Buy...", this.getImageIcon("/images/16x16/inbox.png"));
 
             menuItem.addActionListener(new ActionListener() {
@@ -3362,6 +3362,13 @@ public class MainFrame extends javax.swing.JFrame {
             }
             */
         };
+    }
+
+    private class TableKeyEventListener extends java.awt.event.KeyAdapter {
+        @Override
+        public void keyTyped(java.awt.event.KeyEvent e) {
+            MainFrame.this.jTable1.getSelectionModel().clearSelection();
+        }
     }
 
     private TrayIcon trayIcon;
