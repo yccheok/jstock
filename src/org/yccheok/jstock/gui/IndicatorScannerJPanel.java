@@ -112,6 +112,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
 
         this.jTable1.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(2));
         this.jTable1.addMouseListener(new TableRowPopupListener());
+        this.jTable1.addKeyListener(new TableKeyEventListener());
         jScrollPane1.setViewportView(jTable1);
 
         jPanel2.add(jScrollPane1, java.awt.BorderLayout.CENTER);
@@ -799,7 +800,27 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         });
 
         popup.add(menuItem);
-        
+
+        if (jTable1.getSelectedRowCount() == 1) {
+            popup.addSeparator();
+
+            menuItem = new JMenuItem(GUIBundle.getString("IndicatorScannerJPanel_Buy..."), this.getImageIcon("/images/16x16/inbox.png"));
+
+            menuItem.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent evt) {
+                    final int row = jTable1.getSelectedRow();
+                    final int modelIndex = jTable1.getRowSorter().convertRowIndexToModel(row);
+                    final IndicatorTableModel tableModel = (IndicatorTableModel)jTable1.getModel();
+                    final Indicator indicator = tableModel.getIndicator(modelIndex);
+                    final Stock stock = indicator.getStock();
+                    MainFrame.getInstance().getPortfolioManagementJPanel().showNewBuyTransactionJDialog(stock, stock.getLastPrice(), false);
+                }
+            });
+
+            popup.add(menuItem);
+        }
+
         return popup;
     }
 
@@ -871,6 +892,13 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         });
     }
 
+    private class TableKeyEventListener extends java.awt.event.KeyAdapter {
+        @Override
+        public void keyTyped(java.awt.event.KeyEvent e) {
+            IndicatorScannerJPanel.this.clearTableSelection();
+        }
+    }
+    
     private Wizard wizard;
     private RealTimeStockMonitor realTimeStockMonitor;
     private org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
