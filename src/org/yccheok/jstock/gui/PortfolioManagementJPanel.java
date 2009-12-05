@@ -20,9 +20,10 @@
 package org.yccheok.jstock.gui;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -56,6 +57,7 @@ import org.yccheok.jstock.gui.portfolio.CashFlowChartJDialog;
 import org.yccheok.jstock.gui.portfolio.CommentJDialog;
 import org.yccheok.jstock.gui.portfolio.DepositSummaryJDialog;
 import org.yccheok.jstock.gui.portfolio.DepositSummaryTableModel;
+import org.yccheok.jstock.gui.portfolio.DividendSummaryBarChartJDialog;
 import org.yccheok.jstock.gui.portfolio.DividendSummaryJDialog;
 import org.yccheok.jstock.gui.portfolio.DividendSummaryTableModel;
 import org.yccheok.jstock.gui.portfolio.ToolTipHighlighter;
@@ -178,6 +180,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         // So that our ToolTipHighlighter can work correctly.
         buyTreeTable.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(1, new String[]{GUIBundle.getString("PortfolioManagementJPanel_Comment")}));
         buyTreeTable.addMouseListener(new BuyTableRowPopupListener());
+        buyTreeTable.addKeyListener(new TableKeyEventListener());
 
         org.jdesktop.swingx.decorator.Highlighter highlighter0 = org.jdesktop.swingx.decorator.HighlighterFactory.createSimpleStriping(new Color(245, 245, 220));
         buyTreeTable.addHighlighter(highlighter0);
@@ -199,6 +202,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         // So that our ToolTipHighlighter can work correctly.
         sellTreeTable.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(1, new String[]{GUIBundle.getString("PortfolioManagementJPanel_Comment")}));
         sellTreeTable.addMouseListener(new SellTableRowPopupListener());
+        sellTreeTable.addKeyListener(new TableKeyEventListener());
 
         org.jdesktop.swingx.decorator.Highlighter highlighter1 = org.jdesktop.swingx.decorator.HighlighterFactory.createSimpleStriping(new Color(245, 245, 220));
         sellTreeTable.addHighlighter(highlighter1);
@@ -999,7 +1003,14 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     public DividendSummary getDividendSummary() {
         return dividendSummary;
     }
-        
+
+    private class TableKeyEventListener extends java.awt.event.KeyAdapter {
+        @Override
+        public void keyTyped(java.awt.event.KeyEvent e) {
+            PortfolioManagementJPanel.this.clearTableSelection();
+        }
+    }
+
     private class BuyTableRowPopupListener extends MouseAdapter {
         
         @Override
@@ -1160,7 +1171,18 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         popup.add(menuItem);
 
-        menuItem = new JMenuItem("Summary...", this.getImageIcon("/images/16x16/chart.png"));
+        menuItem = new JMenuItem(GUIBundle.getString("PortfolioManagementJPanel_DividendChart"), this.getImageIcon("/images/16x16/chart.png"));
+
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                PortfolioManagementJPanel.this.showDividendSummaryBarChartJDialog();
+            }
+        });
+
+        popup.add(menuItem);
+
+        menuItem = new JMenuItem("Summary...", this.getImageIcon("/images/16x16/pie_chart.png"));
         
         menuItem.addActionListener(new ActionListener() {
             @Override
@@ -1204,7 +1226,13 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         
         return popup;
     }
-    
+
+    private void showDividendSummaryBarChartJDialog() {
+        final MainFrame m = MainFrame.getInstance();
+        final DividendSummaryBarChartJDialog dividendSummaryBarChartJDialog = new DividendSummaryBarChartJDialog(m, false, this.getDividendSummary());
+        dividendSummaryBarChartJDialog.setVisible(true);
+    }
+
     private JPopupMenu getBuyTreeTablePopupMenu() {                
         JPopupMenu popup = new JPopupMenu();
 
@@ -1311,8 +1339,19 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         });
 
         popup.add(menuItem);
-        
-        menuItem = new JMenuItem("Summary...", this.getImageIcon("/images/16x16/chart.png"));
+
+        menuItem = new JMenuItem(GUIBundle.getString("PortfolioManagementJPanel_DividendChart"), this.getImageIcon("/images/16x16/chart.png"));
+
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                PortfolioManagementJPanel.this.showDividendSummaryBarChartJDialog();
+            }
+        });
+
+        popup.add(menuItem);
+
+        menuItem = new JMenuItem("Summary...", this.getImageIcon("/images/16x16/pie_chart.png"));
         
         menuItem.addActionListener(new ActionListener() {
             @Override
