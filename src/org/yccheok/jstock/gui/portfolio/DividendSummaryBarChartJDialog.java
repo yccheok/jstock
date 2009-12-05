@@ -18,6 +18,7 @@
 
 package org.yccheok.jstock.gui.portfolio;
 
+import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,6 +48,27 @@ public class DividendSummaryBarChartJDialog extends javax.swing.JDialog {
     public DividendSummaryBarChartJDialog(java.awt.Dialog parent, boolean modal, DividendSummary dividendSummary) {
         super(parent, modal);
         initComponents();
+        /* Sequence is important.
+         * (1) Initialize dividendSummary.
+         * (2) Initialize combo box.
+         * (3) Initialize chart.
+         */
+        this.dividendSummary = dividendSummary;
+        this.initJComboBox();
+        final JFreeChart freeChart = this.createBarChart(this.createDataset());
+        chartPanel = new ChartPanel(freeChart, true, true, true, true, true);
+        getContentPane().add(chartPanel, java.awt.BorderLayout.CENTER);
+    }
+
+    /** Creates new form DividendSummaryBarChartJDialog */
+    public DividendSummaryBarChartJDialog(java.awt.Frame parent, boolean modal, DividendSummary dividendSummary) {
+        super(parent, modal);
+        initComponents();
+        /* Sequence is important.
+         * (1) Initialize dividendSummary.
+         * (2) Initialize combo box.
+         * (3) Initialize chart.
+         */
         this.dividendSummary = dividendSummary;
         this.initJComboBox();
         final JFreeChart freeChart = this.createBarChart(this.createDataset());
@@ -110,7 +132,13 @@ public class DividendSummaryBarChartJDialog extends javax.swing.JDialog {
     }
 
     private JFreeChart createBarChart(CategoryDataset dataset) {
-        final String title = this.jComboBox1.getSelectedItem() + " " + org.yccheok.jstock.internationalization.GUIBundle.getString("DividendSummaryBarChartJDialog_DividendByYear");
+        final int size = ((DefaultCategoryDataset)dataset).getColumnCount();
+        double total = 0.0;
+        for (int i = 0; i < size; i++) {
+            total += ((DefaultCategoryDataset)dataset).getValue(0, i).doubleValue();
+        }
+
+        final String title = MessageFormat.format(org.yccheok.jstock.internationalization.GUIBundle.getString("DividendSummaryBarChartJDialog_DividendByYear_template"), this.jComboBox1.getSelectedItem(), currencyFormat.format(total));
         final String domain_label = org.yccheok.jstock.internationalization.GUIBundle.getString("DividendSummaryBarChartJDialog_Year");
         final String range_label = org.yccheok.jstock.internationalization.GUIBundle.getString("DividendSummaryBarChartJDialog_Dividend");
         // create the chart...
@@ -146,7 +174,7 @@ public class DividendSummaryBarChartJDialog extends javax.swing.JDialog {
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
         setTitle(bundle.getString("DividendSummaryBarChartJDialog_DividendByYear")); // NOI18N
 
-        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+        jPanel1.setLayout(new java.awt.BorderLayout(5, 5));
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "All Stock(s)" }));
         jComboBox1.addActionListener(new java.awt.event.ActionListener() {
@@ -154,7 +182,7 @@ public class DividendSummaryBarChartJDialog extends javax.swing.JDialog {
                 jComboBox1ActionPerformed(evt);
             }
         });
-        jPanel1.add(jComboBox1);
+        jPanel1.add(jComboBox1, java.awt.BorderLayout.EAST);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
