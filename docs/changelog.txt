@@ -1,21 +1,23 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
-JStock 1.0.5d - 
+JStock 1.0.5d - 2009-12-07
   Feature: View yearly dividend summary. (#2908966)
-  Feature: Right-click and buy stocks from the Stock Indicator Scanner.
-           (#2891657)
   Feature: Enable user to specific symbol in user defined database (#2909586)
+  Feature: Right-click and buy stocks from the Stock Indicator Scanner.
+           (#2891657)  
   Feature: Pressing ESC, will enable user to deselect table in Real-Time Info, 
            Stock Indicator Scanner and Portfolio Management.
   Feature: Added "JStock Home" menu.
+  Bugfix:  Incorrect Hong Kong Database. (#2909595)
+  Bugfix:  Wrong information for Spain Market database. (#2892990)
   
-JStock 1.0.5c - 2009-11-5
+JStock 1.0.5c - 2009-11-05
   Bugfix:  Speed optimization on save to cloud process.
   Bugfix:  IndicatorProjectManager's directory may become invalid when loaded
            from cloud.
 
-JStock 1.0.5b - 2009-11-4
+JStock 1.0.5b - 2009-11-04
   Feature: Able to save JStock files into cloud. (#2833216)
   Bugfix:  United Kingdom portfolio issue. (#2807941)           
   Bugfix:  SMS Alert doesn't work if System Tray Alert is not enabled.(#2889592)
