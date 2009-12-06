@@ -523,7 +523,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
                 }
             }
             else {
-                StockDatabaseJDialog.this.mutableStockCodeAndSymbolDatabase.removeAllUserDefinedCodeAndSymbol();
+                database.removeAllUserDefinedCodeAndSymbol();
                 symbols = database.getSymbols();
                 codes = database.getCodes();
             }
