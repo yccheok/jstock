@@ -662,7 +662,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
                 public void actionPerformed(ActionEvent e) {
                     final CodeSymbolTableModel model1 = (CodeSymbolTableModel)(StockDatabaseJDialog.this.jTable1.getModel());
                     final CodeSymbolTableModel model2 = (CodeSymbolTableModel)(StockDatabaseJDialog.this.jTable2.getModel());
-                    final String searchedText = ftf.getText();
+                    final String searchedText = ftf.getText().toUpperCase();
                     
                     final int modelIndex1 = model1.findCodeOrSymbol(searchedText);
                     /* Compare Symbol to Symbol, Code to Code. */
@@ -671,7 +671,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
 
                     if (modelIndex1 >= 0) {
                         if (searchedText.length() > 0) {
-                            if (searchedText.equals(ftf.getValue().toString()) == false) {
+                            if (searchedText.equalsIgnoreCase(ftf.getValue().toString()) == false) {
                                 //JOptionPane.showMessageDialog(StockDatabaseJDialog.this, searchedText + " is conflicting with stock exchange server database.", "Conflicting", JOptionPane.INFORMATION_MESSAGE);
                                 isValid = false;
                             }
@@ -679,7 +679,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
                     }
                     if (modelIndex2 >= 0) {
                         if (searchedText.length() > 0) {
-                            if (searchedText.equals(ftf.getValue().toString()) == false) {
+                            if (searchedText.equalsIgnoreCase(ftf.getValue().toString()) == false) {
                                 //JOptionPane.showMessageDialog(StockDatabaseJDialog.this, searchedText + " is conflicting with user defined database.", "Conflicting", JOptionPane.INFORMATION_MESSAGE);
                                 isValid = false;
                             }
@@ -737,7 +737,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
             JFormattedTextField _ftf = (JFormattedTextField)getComponent();
             final CodeSymbolTableModel model1 = (CodeSymbolTableModel)(StockDatabaseJDialog.this.jTable1.getModel());
             final CodeSymbolTableModel model2 = (CodeSymbolTableModel)(StockDatabaseJDialog.this.jTable2.getModel());
-            final String searchedText = _ftf.getText();
+            final String searchedText = _ftf.getText().toUpperCase();
             final int modelIndex1 = model1.findCodeOrSymbol(searchedText);
             final int modelIndex2 = Code.class == MyTableCellEditor.this.c ? model2.findCode(searchedText) : model2.findSymbol(searchedText);
             boolean isValid = true;
@@ -746,6 +746,8 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
                 // We only take into consideration of string greater than 0. As
                 // we allow multiple empty lines within a table.
                 if (searchedText.length() > 0) {
+                    // CHEOK : I also not sure why need not check for (and why need to check for) ???
+                    // searchedText.equalsIgnoreCase(_ftf.getValue().toString())
                     final String message = MessageFormat.format(MessagesBundle.getString("warning_message_duplicated_stock_template"), searchedText);
                     final String title = MessagesBundle.getString("warning_title_duplicated_stock");
                     JOptionPane.showMessageDialog(StockDatabaseJDialog.this, message, title, JOptionPane.INFORMATION_MESSAGE);
@@ -765,7 +767,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
                     // to make any change on current content. Hence, we should do another checking, to ensure
                     // we only pop up the warning message, if the content is being modified. _ftf.getValue().toString()
                     // is the value before modification.
-                    if (searchedText.equals(_ftf.getValue().toString()) == false) {
+                    if (searchedText.equalsIgnoreCase(_ftf.getValue().toString()) == false) {
                         // There is modification being done and it is conflicting with SymbolTableModel.
                         final String message = MessageFormat.format(MessagesBundle.getString("warning_message_duplicated_stock_template"), searchedText);
                         final String title = MessagesBundle.getString("warning_title_duplicated_stock");
