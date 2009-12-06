@@ -334,7 +334,14 @@ public class SingaporeYahooStockServer extends Subject<SingaporeYahooStockServer
         while (matcher.find()){
             for (int j = 1; j <= matcher.groupCount(); j++ ) {
                 final String string = matcher.group(j);
-                symbols.add(Symbol.newInstance(string));
+                // [2909595] Incorrect Hong Kong Database
+                // https://sourceforge.net/tracker/?func=detail&aid=2909595&group_id=202896&atid=983418
+                if (this.country == Country.HongKong && string.length() > "-OL.HK".length() && string.endsWith("-OL.HK")) {
+                    symbols.add(Symbol.newInstance(string.substring(0, string.length() - "-OL.HK".length()) + ".HK"));
+                }
+                else {
+                    symbols.add(Symbol.newInstance(string));
+                }
             }
         }
 
@@ -371,7 +378,9 @@ public class SingaporeYahooStockServer extends Subject<SingaporeYahooStockServer
             this.notify(this, symbols.size());
         }
 
-        if(symbols.size() == 0) throw new StockNotFoundException();
+        if (symbols.size() == 0) {
+            throw new StockNotFoundException();
+        }
 
         final List<Symbol> _symbols = new ArrayList<Symbol>(symbols);
         return getStocksBySymbols(_symbols);
