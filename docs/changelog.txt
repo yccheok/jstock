@@ -5,7 +5,11 @@ JStock 1.0.5d -
   Feature: View yearly dividend summary. (#2908966)
   Feature: Right-click and buy stocks from the Stock Indicator Scanner.
            (#2891657)
-          
+  Feature: Enable user to specific symbol in user defined database (#2909586)
+  Feature: Pressing ESC, will enable user to deselect table in Real-Time Info, 
+           Stock Indicator Scanner and Portfolio Management.
+  Feature: Added "JStock Home" menu.
+  
 JStock 1.0.5c - 2009-11-5
   Bugfix:  Speed optimization on save to cloud process.
   Bugfix:  IndicatorProjectManager's directory may become invalid when loaded

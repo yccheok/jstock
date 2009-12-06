@@ -1,19 +1,20 @@
 /*
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2009 Yan Cheng CHEOK <yccheok@yahoo.com>
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- * Copyright (C) 2008 Yan Cheng Cheok <yccheok@yahoo.com>
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.yccheok.jstock.engine;
@@ -47,13 +48,43 @@ public class MutableStockCodeAndSymbolDatabase extends StockCodeAndSymbolDatabas
         }
         return new ArrayList<Symbol>(_symbols);
     }
-    
-    public boolean removeUserDefinedSymbol(Symbol symbol) {        
-        if(symbol == null) {
+
+    public List<Code> getUserDefinedCode() {
+        List<Code> _codes = this.industryToCodes.get(Stock.Industry.UserDefined);
+        if (_codes == null) {
+            return Collections.emptyList();
+        }
+        return new ArrayList<Code>(_codes);
+    }
+
+    public boolean removeAllUserDefinedCodeAndSymbol() {
+        List<Code> _codes = this.industryToCodes.get(Stock.Industry.UserDefined);
+        if (_codes == null) {
+            return false;
+        }
+        boolean result = true;
+        _codes = new ArrayList<Code>(_codes);
+        for (Code code : _codes) {
+            final Symbol symbol = this.codeToSymbol(code);
+            result &= this.removeUserDefinedCodeAndSymbol(code, symbol);
+        }
+        return result;
+    }
+
+    public boolean removeUserDefinedCodeAndSymbol(Code code, Symbol symbol) {
+        if (symbol == null || code == null) {
             throw new java.lang.IllegalArgumentException("Code or symbol cannot be null");
         }
+
+        if (symbol.toString().length() <= 0 || code.toString().length() <= 0) {
+            throw new java.lang.IllegalArgumentException("Code or symbol length cannot be 0");
+        }
+
+        if (false == this.getCodes(Stock.Industry.UserDefined).contains(code) || false == this.getSymbols(Stock.Industry.UserDefined).contains(symbol)) {
+            return false;
+        }
         
-        final Code code = symbolToCode.get(symbol);
+        final Code _code = symbolToCode.get(symbol);
         
         // We should ensure the symbol which we intend to remove is inside the
         // database. In our case, the symbols which we wish to remove are coming from
@@ -62,7 +93,23 @@ public class MutableStockCodeAndSymbolDatabase extends StockCodeAndSymbolDatabas
         // our code may break, if getUserDefinedSymbol is returning duplicated List
         // which is containing duplicated symbols.
         // Hence, it is better to leave null checking here.
-        if (code == null) {
+        if (_code == null) {
+            return false;
+        }
+
+        // Addtional check.
+        if (_code.equals(code) == false) {
+            return false;
+        }
+
+        final Symbol _symbol = codeToSymbol.get(code);
+
+        if (_symbol == null) {
+            return false;
+        }
+
+        // Addtional check.
+        if (_symbol.equals(symbol) == false) {
             return false;
         }
 
@@ -93,39 +140,44 @@ public class MutableStockCodeAndSymbolDatabase extends StockCodeAndSymbolDatabas
         codeToSymbol.remove(code);
 
         iCodes.remove(code);
-        if(iCodes.size() <= 0) industryToCodes.remove(industry);
+        if (iCodes.size() <= 0) {
+            industryToCodes.remove(industry);
+        }
 
         bCodes.remove(code);
-        if(bCodes.size() <= 0) boardToCodes.remove(board);
+        if (bCodes.size() <= 0) {
+            boardToCodes.remove(board);
+        }
 
         iSymbols.remove(symbol);
-        if(iSymbols.size() <= 0) industryToSymbols.remove(industry);
+        if (iSymbols.size() <= 0) {
+            industryToSymbols.remove(industry);
+        }
 
         bSymbols.remove(symbol);
-        if(bSymbols.size() <= 0) boardToSymbols.remove(board);
+        if (bSymbols.size() <= 0) {
+            boardToSymbols.remove(board);
+        }
         
         return true;        
     }
     
     // Not thread safe.
-    public boolean addUserDefinedSymbol(Symbol symbol) {
-        if (symbol == null) {
+    public boolean addUserDefinedCodeAndSymbol(Code code, Symbol symbol) {
+        if (symbol == null || code == null) {
             throw new java.lang.IllegalArgumentException("Code or symbol cannot be null");
         }
         
-        if (symbol.toString().length() <= 0) {
+        if (symbol.toString().length() <= 0 || code.toString().length() <= 0) {
             throw new java.lang.IllegalArgumentException("Code or symbol length cannot be 0");
         }
-
-        final Code code = Code.newInstance(symbol.toString());
 
         // We need to ensure there is no duplicated code or symbol being added.
         if (symbolToCode.containsKey(symbol) || codeToSymbol.containsKey(code)) {
             return false;
         }
 
-        if((!(symbolSearchEngine instanceof TSTSearchEngine)) || (!(codeSearchEngine instanceof TSTSearchEngine)))
-        {
+        if((!(symbolSearchEngine instanceof TSTSearchEngine)) || (!(codeSearchEngine instanceof TSTSearchEngine))) {
             return false;
         }
 

@@ -1,19 +1,20 @@
 /*
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2009 Yan Cheng CHEOK <yccheok@yahoo.com>
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- * Copyright (C) 2008 Yan Cheng Cheok <yccheok@yahoo.com>
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.yccheok.jstock.gui;
@@ -25,6 +26,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.lang.reflect.Method;
+import java.text.MessageFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,6 +56,7 @@ import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.MutableStockCodeAndSymbolDatabase;
 import org.yccheok.jstock.engine.StockCodeAndSymbolDatabase;
 import org.yccheok.jstock.engine.Symbol;
+import org.yccheok.jstock.internationalization.MessagesBundle;
 
 /**
  *
@@ -122,7 +126,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         jPanel1.setLayout(new java.awt.BorderLayout());
 
         jTable1.setAutoCreateRowSorter(true);
-        jTable1.setModel(getCodeSymbolTableModel());
+        jTable1.setModel(getSystemDefinedCodeSymbolTableModel());
         this.jTable1.setDefaultRenderer(Symbol.class, new StockTableCellRenderer());
         this.jTable1.setDefaultRenderer(Code.class, new StockTableCellRenderer());
         jScrollPane1.setViewportView(jTable1);
@@ -152,11 +156,12 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
             jPanel2.setLayout(new java.awt.BorderLayout());
 
             jTable2.setAutoCreateRowSorter(true);
-            jTable2.setModel(getSymbolTableModel());
-            jTable2.setCellEditor(getSymbolCellEditor());
+            jTable2.setModel(getUserDefinedCodeSymbolTableModel());
             this.jTable2.addMouseListener(new TableRowPopupListener());
+            this.jTable2.setDefaultRenderer(Code.class, new StockTableCellRenderer());
             this.jTable2.setDefaultRenderer(Symbol.class, new StockTableCellRenderer());
-            this.jTable2.setDefaultEditor(Symbol.class, this.getSymbolCellEditor());
+            this.jTable2.setDefaultEditor(Code.class, this.getCellEditor(Code.class));
+            this.jTable2.setDefaultEditor(Symbol.class, this.getCellEditor(Symbol.class));
             //this.jTable2.setDefaultEditor(Object.class, this.getSymbolCellEditor());
             jTable2.addKeyListener(new java.awt.event.KeyAdapter() {
                 public void keyPressed(java.awt.event.KeyEvent evt) {
@@ -235,7 +240,6 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-    // TODO add your handling code here:
         deleteSelectedUserDefinedDatabase();
     }//GEN-LAST:event_jButton2ActionPerformed
 
@@ -258,24 +262,35 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         this.dispose();    
     }//GEN-LAST:event_jButton4ActionPerformed
 
+    /* OK button being pressed. */
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        final SymbolTableModel model = (SymbolTableModel)(jTable2.getModel());
-        List<Symbol> symbols = model.getSymbols();
-    
-        final List<Symbol> oldSymbols = this.mutableStockCodeAndSymbolDatabase.getUserDefinedSymbol();
-        for(Symbol symbol : oldSymbols) {
-            this.mutableStockCodeAndSymbolDatabase.removeUserDefinedSymbol(symbol);
-        }
-        
-        for(Symbol symbol : symbols) {
-            if(symbol.toString().length() <= 0) {
+        final CodeSymbolTableModel model = (CodeSymbolTableModel)(jTable2.getModel());
+        final List<Code> codes = model.getCodes();
+        final List<Symbol> symbols = model.getSymbols();
+        assert(codes.size() == symbols.size());
+
+        /* Shall we check the returned code? */
+        this.mutableStockCodeAndSymbolDatabase.removeAllUserDefinedCodeAndSymbol();
+
+        final int size = codes.size();
+        for (int i = 0; i < size; i++) {
+            final Code code = codes.get(i);
+            Symbol symbol = symbols.get(i);
+
+            if (code.toString().length() <= 0) {
                 continue;
             }
-            
-            this.mutableStockCodeAndSymbolDatabase.addUserDefinedSymbol(symbol);
+            if (symbol.toString().length() <= 0) {
+                /* We allow empty symbol to be entered by user. In 0 length
+                 * symbol case, we will make it same as code.
+                 */
+                symbol = Symbol.newInstance(code.toString());
+            }
+            this.mutableStockCodeAndSymbolDatabase.addUserDefinedCodeAndSymbol(code, symbol);
         }
+
         
-        result = mutableStockCodeAndSymbolDatabase;
+        this.result = this.mutableStockCodeAndSymbolDatabase;
         
         this.setVisible(false);
         this.dispose();    
@@ -311,7 +326,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         private Color getBackgroundColor(int row) {
             final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
         
-            if(row % 2 == 0) {
+            if (row % 2 == 0) {
                 return jStockOptions.getFirstRowBackgroundColor();
             }
         
@@ -325,7 +340,9 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
                                 int row, int column) {
             Component c = super.getTableCellRendererComponent(table, color, isSelected, hasFocus, row, column);
 
-            if(isSelected || hasFocus) return c;
+            if (isSelected || hasFocus) {
+                return c;
+            }
 
             final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
         
@@ -340,17 +357,17 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
     private void deleteSelectedUserDefinedDatabase() {
         int rows[] = jTable2.getSelectedRows();
 
-        final SymbolTableModel symbolTableModel = (SymbolTableModel)(jTable2.getModel());
+        final CodeSymbolTableModel codeSymbolTableModel = (CodeSymbolTableModel)(jTable2.getModel());
         
         Arrays.sort(rows);
 
-        for(int i=rows.length-1; i>=0; i--) {                
+        for (int i = rows.length-1; i >= 0; i--) {
             int row = rows[i];
-
-            if(row < 0) continue;
-
+            if (row < 0) {
+                continue;
+            }
             final int modelIndex = jTable2.getRowSorter().convertRowIndexToModel(row);            
-            symbolTableModel.removeRow(modelIndex);
+            codeSymbolTableModel.removeRow(modelIndex);
         }        
     }
     
@@ -378,8 +395,8 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
     
     private void addNewSymbol()
     {
-        final SymbolTableModel model = (SymbolTableModel)jTable2.getModel();
-        final int selectedModelIndex = model.addNewSymbol();
+        final CodeSymbolTableModel model = (CodeSymbolTableModel)jTable2.getModel();
+        final int selectedModelIndex = model.addNewCodeSymbol();
         selectUserDefinedDatabaseTable(selectedModelIndex);        
     }
     
@@ -415,16 +432,15 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         return popup;
     }
 
-    // For jTable2.
-    private TableModel getSymbolTableModel()
+    private TableModel getUserDefinedCodeSymbolTableModel()
     {
-        return new SymbolTableModel();
+        return new CodeSymbolTableModel(Type.UserDefined);
     }
-    
+
     // For jTable1.
-    private TableModel getCodeSymbolTableModel()
+    private TableModel getSystemDefinedCodeSymbolTableModel()
     {
-        return new CodeSymbolTableModel();
+        return new CodeSymbolTableModel(Type.SystemDefined);
     }
     
     private void newFilter()
@@ -442,28 +458,81 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         ((TableRowSorter<CodeSymbolTableModel>)jTable1.getRowSorter()).setRowFilter(rf);
     }
     
-    private class CodeSymbolTableModel extends AbstractTableModel {
+    /* Use exclusively by CodeSymbolTableModel. */
+    /* Unless I make CodeSymbolTableModel as static class, there is no way for
+     * me to declare enum type inside CodeSymbolTableModel.
+     */
+    private enum Type {
+        UserDefined,
+        SystemDefined
+    }
 
+    private class CodeSymbolTableModel extends AbstractTableModel {
         // For fast access purpose.
+        /* The index for codes, must be associated with index for symbols.
+         */
         private final List<Symbol> symbols;
         private final List<Code> codes;
-        
-        public CodeSymbolTableModel() {
-            final MutableStockCodeAndSymbolDatabase database = new MutableStockCodeAndSymbolDatabase(mutableStockCodeAndSymbolDatabase);
-            
-            List<Symbol> _symbols = database.getUserDefinedSymbol();
+        private final Type type;
 
-            for(Symbol symbol : _symbols) {
-                database.removeUserDefinedSymbol(symbol);
+        public Type getType() {
+            return this.type;
+        }
+
+        public List<Code> getCodes() {
+            return Collections.unmodifiableList(codes);
+        }
+
+        public List<Symbol> getSymbols() {
+            return Collections.unmodifiableList(symbols);
+        }
+
+        @Override
+        public boolean isCellEditable(int rowIndex, int columnIndex) {
+            return !isReadOnly();
+        }
+
+        private boolean isReadOnly() {
+            return this.type != Type.UserDefined;
+        }
+
+        public void removeRow(int index) {
+            if (this.isReadOnly()) {
+                return;
             }
+            this.symbols.remove(index);
+            this.codes.remove(index);
+            this.fireTableRowsDeleted(index, index);
+        }
+
+        public CodeSymbolTableModel(Type type) {
+            this.type = type;
             
-            symbols = database.getSymbols();
-            codes = database.getCodes();
+            final MutableStockCodeAndSymbolDatabase database = new MutableStockCodeAndSymbolDatabase(StockDatabaseJDialog.this.mutableStockCodeAndSymbolDatabase);
+
+            if (this.type == Type.UserDefined) {
+                this.codes = new ArrayList<Code>(StockDatabaseJDialog.this.mutableStockCodeAndSymbolDatabase.getUserDefinedCode());
+                /* No! Never use getUserDefinedSymbol here. The returned symbols'
+                 * index, are not guarantee to match with the index in codes.
+                 */
+                this.symbols = new ArrayList<Symbol>();
+                for (Code code : codes) {
+                    final Symbol symbol = StockDatabaseJDialog.this.mutableStockCodeAndSymbolDatabase.codeToSymbol(code);
+                    assert(null != symbol);
+                    this.symbols.add(symbol);
+                }
+            }
+            else {
+                StockDatabaseJDialog.this.mutableStockCodeAndSymbolDatabase.removeAllUserDefinedCodeAndSymbol();
+                symbols = database.getSymbols();
+                codes = database.getCodes();
+            }
         }
         
         @Override
         public int getRowCount() {
-            return symbols.size();
+            assert(codes.size() == symbols.size());
+            return codes.size();
         }
 
         @Override
@@ -493,32 +562,90 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         public Class getColumnClass(int c) {
             return columnClasses[c];
         }
-        
+
+        @Override
+        public void setValueAt(Object value, int row, int col) {
+            if (this.isReadOnly()) {
+                super.setValueAt(value, row, col);
+                return;
+            }
+            if (value instanceof Symbol) {
+                final Symbol symbol = (Symbol)value;
+                symbols.remove(row);
+                symbols.add(row, symbol);
+            }
+            else if (value instanceof Code) {
+                final Code code = (Code)value;
+                codes.remove(row);
+                codes.add(row, code);
+            }
+            else {
+                assert(false);
+            }
+            fireTableCellUpdated(row, col);
+        }
+
+        public int findSymbol(String string) {
+            final Symbol symbol = Symbol.newInstance(string);
+            final int symbolIndex = symbols.indexOf(symbol);
+            if (symbolIndex >= 0) {
+                return symbolIndex;
+            }
+            return -1;
+        }
+
+        public int findCode(String string) {
+            final Code code = Code.newInstance(string);
+            final int codeIndex = codes.indexOf(code);
+            if (codeIndex >= 0) {
+                return codeIndex;
+            }
+            return -1;
+        }
+
         public int findCodeOrSymbol(String string) {
             final Symbol symbol = Symbol.newInstance(string);
             final int symbolIndex = symbols.indexOf(symbol);
-            if(symbolIndex >= 0) return symbolIndex;
+            if (symbolIndex >= 0) {
+                return symbolIndex;
+            }
 
             final Code code = Code.newInstance(string);
             final int codeIndex = codes.indexOf(code);
-            if(codeIndex >= 0) return codeIndex;
+            if (codeIndex >= 0) {
+                return codeIndex;
+            }
             
             return -1;
         }
-        
+
+        public int addNewCodeSymbol() {
+            final Code code = Code.newInstance("");
+            final Symbol symbol = Symbol.newInstance("");
+            this.codes.add(code);
+            this.symbols.add(symbol);
+
+            final int index = symbols.size() - 1;
+            this.fireTableRowsInserted(index, index);
+
+            return index;
+        }
+
         private final String[] columnNames = {"Code", "Symbol"};
         private final Class[] columnClasses = {Code.class, Symbol.class};
     }
     
-    private TableCellEditor getSymbolCellEditor() {
-        return new MyTableCellEditor();
+    private TableCellEditor getCellEditor(Class c) {
+        return new MyTableCellEditor(c);
     }
             
     private class MyTableCellEditor extends DefaultCellEditor {    
         private JFormattedTextField ftf;
+        private final Class c;
 
-        public MyTableCellEditor() {
+        public MyTableCellEditor(Class c) {
             super(new JFormattedTextField());
+            this.c = c;
             ftf = (JFormattedTextField)getComponent();
 
             ftf.setHorizontalAlignment(JTextField.TRAILING);
@@ -534,35 +661,35 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     final CodeSymbolTableModel model1 = (CodeSymbolTableModel)(StockDatabaseJDialog.this.jTable1.getModel());
-                    final SymbolTableModel model2 = (SymbolTableModel)(StockDatabaseJDialog.this.jTable2.getModel());
+                    final CodeSymbolTableModel model2 = (CodeSymbolTableModel)(StockDatabaseJDialog.this.jTable2.getModel());
                     final String searchedText = ftf.getText();
                     
                     final int modelIndex1 = model1.findCodeOrSymbol(searchedText);
-                    final int modelIndex2 = model2.findSymbol(searchedText);
+                    /* Compare Symbol to Symbol, Code to Code. */
+                    final int modelIndex2 = Code.class == MyTableCellEditor.this.c ? model2.findCode(searchedText) : model2.findSymbol(searchedText);
                     boolean isValid = true;
 
-                    if(modelIndex1 >= 0) {                        
-                        if(searchedText.length() > 0) {
-                            if(searchedText.equals(ftf.getValue().toString()) == false) {
+                    if (modelIndex1 >= 0) {
+                        if (searchedText.length() > 0) {
+                            if (searchedText.equals(ftf.getValue().toString()) == false) {
                                 //JOptionPane.showMessageDialog(StockDatabaseJDialog.this, searchedText + " is conflicting with stock exchange server database.", "Conflicting", JOptionPane.INFORMATION_MESSAGE);
                                 isValid = false;
                             }
                         }
                     }
-                    else if(modelIndex2 >= 0) {
-                        if(searchedText.length() > 0) {
-                            if(searchedText.equals(ftf.getValue().toString()) == false) {
+                    if (modelIndex2 >= 0) {
+                        if (searchedText.length() > 0) {
+                            if (searchedText.equals(ftf.getValue().toString()) == false) {
                                 //JOptionPane.showMessageDialog(StockDatabaseJDialog.this, searchedText + " is conflicting with user defined database.", "Conflicting", JOptionPane.INFORMATION_MESSAGE);
                                 isValid = false;
                             }
                         }
                     }
-
-                    if(isValid) {
+                    if (isValid) {
                         try {
                             ftf.commitEdit();
                         } catch (ParseException ex) {
-                            log.error("", ex);
+                            log.error(null, ex);
                         }
                     }
 
@@ -571,7 +698,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
             });
         }
 
-        //Override to invoke setValue on the formatted text field.
+        // Override to invoke setValue on the formatted text field.
         @Override
         public Component getTableCellEditorComponent(JTable table,
                 Object value, boolean isSelected,
@@ -583,14 +710,21 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
             return _ftf;
         }
 
-        //Override to ensure that the value remains an Integer.
+        // Override to ensure that the value remains an Integer.
         @Override
         public Object getCellEditorValue() {
             JFormattedTextField _ftf = (JFormattedTextField)getComponent();
             Object o = _ftf.getValue();
-            if(o == null) return null;
-
-            return Symbol.newInstance(o.toString().toUpperCase());
+            if (o == null) {
+                return null;
+            }
+            try {
+                Method method = this.c.getMethod("newInstance", String.class);
+                return method.invoke(null, o.toString().toUpperCase());
+            } catch (Exception ex) {
+                log.error(null, ex);
+            }
+            return null;
         }
 
         //Override to check whether the edit is valid,
@@ -602,26 +736,28 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         public boolean stopCellEditing() {
             JFormattedTextField _ftf = (JFormattedTextField)getComponent();
             final CodeSymbolTableModel model1 = (CodeSymbolTableModel)(StockDatabaseJDialog.this.jTable1.getModel());
-            final SymbolTableModel model2 = (SymbolTableModel)(StockDatabaseJDialog.this.jTable2.getModel());
+            final CodeSymbolTableModel model2 = (CodeSymbolTableModel)(StockDatabaseJDialog.this.jTable2.getModel());
             final String searchedText = _ftf.getText();
             final int modelIndex1 = model1.findCodeOrSymbol(searchedText);
-            final int modelIndex2 = model2.findSymbol(searchedText);
+            final int modelIndex2 = Code.class == MyTableCellEditor.this.c ? model2.findCode(searchedText) : model2.findSymbol(searchedText);
             boolean isValid = true;
 
-            if(modelIndex1 >= 0) {
+            if (modelIndex1 >= 0) {
                 // We only take into consideration of string greater than 0. As
                 // we allow multiple empty lines within a table.
-                if(searchedText.length() > 0) {
-                    JOptionPane.showMessageDialog(StockDatabaseJDialog.this, searchedText + " is conflicting with stock exchange server database.", "Conflicting", JOptionPane.INFORMATION_MESSAGE);
+                if (searchedText.length() > 0) {
+                    final String message = MessageFormat.format(MessagesBundle.getString("warning_message_duplicated_stock_template"), searchedText);
+                    final String title = MessagesBundle.getString("warning_title_duplicated_stock");
+                    JOptionPane.showMessageDialog(StockDatabaseJDialog.this, message, title, JOptionPane.INFORMATION_MESSAGE);
                     selectStockExchangeServerDatabaseTable(modelIndex1);
                     isValid = false;
                 }
             }
             
-            if(modelIndex2 >= 0) {
+            if (modelIndex2 >= 0) {
                 // We only take into consideration of string greater than 0. As
                 // we allow multiple empty lines within a table.
-                if(searchedText.length() > 0) {
+                if (searchedText.length() > 0) {
                     // Imagine there is an item "123" at the first row of editable table,
                     // and it is already being added into SymbolTableModel. We will come into this block,
                     // when we double click on the particular row (which makes it into editable mode), and
@@ -629,111 +765,27 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
                     // to make any change on current content. Hence, we should do another checking, to ensure
                     // we only pop up the warning message, if the content is being modified. _ftf.getValue().toString()
                     // is the value before modification.
-                    if(searchedText.equals(_ftf.getValue().toString()) == false) {
+                    if (searchedText.equals(_ftf.getValue().toString()) == false) {
                         // There is modification being done and it is conflicting with SymbolTableModel.
-                        JOptionPane.showMessageDialog(StockDatabaseJDialog.this, searchedText + " is conflicting with user defined database.", "Conflicting", JOptionPane.INFORMATION_MESSAGE);
+                        final String message = MessageFormat.format(MessagesBundle.getString("warning_message_duplicated_stock_template"), searchedText);
+                        final String title = MessagesBundle.getString("warning_title_duplicated_stock");
+                        JOptionPane.showMessageDialog(StockDatabaseJDialog.this, message, title, JOptionPane.INFORMATION_MESSAGE);
                         selectUserDefinedDatabaseTable(modelIndex2);
                         isValid = false;
                     }
                 }
             }
-            
             if (isValid) {
                 try {
                     _ftf.commitEdit();
                 } catch (ParseException ex) {
-                    log.error("", ex);
+                    log.error(null, ex);
                 }
             }                    
 
             return super.stopCellEditing();
         }
 
-    }
-    
-    private class SymbolTableModel extends AbstractTableModel {
-        // For fast access.
-        private final List<Symbol> symbols;
-        
-        public SymbolTableModel() {
-            symbols = new ArrayList<Symbol>(StockDatabaseJDialog.this.mutableStockCodeAndSymbolDatabase.getUserDefinedSymbol());
-        }
-        
-        public List<Symbol> getSymbols() {
-            return Collections.unmodifiableList(symbols);
-        }
-        
-        @Override
-        public boolean isCellEditable(int rowIndex, int columnIndex)
-        {
-            return true;
-        }
-                
-        public void removeRow(int index) {
-            symbols.remove(index);
-            this.fireTableRowsDeleted(index, index);
-        }        
-        
-        @Override
-        public int getRowCount() {
-            return symbols.size();
-        }
-
-        @Override
-        public int getColumnCount() {
-            return columnNames.length;
-        }
-
-        @Override
-        public Object getValueAt(int rowIndex, int columnIndex) {
-            switch(columnIndex)
-            {
-                case 0:
-                    return symbols.get(rowIndex);
-            }
-            
-            return null;
-        }
-
-        @Override
-        public String getColumnName(int col) {
-            return columnNames[col];
-        }
-
-        @Override
-        public Class getColumnClass(int c) {
-            return columnClasses[c];
-        }
-        
-        @Override
-        public void setValueAt(Object value, int row, int col) {
-            Symbol symbol = (Symbol)value;
-            
-            symbols.remove(row);
-            symbols.add(row, symbol);
-            fireTableCellUpdated(row, col);
-        }
-        
-        public int findSymbol(String string) {
-            return symbols.indexOf(Symbol.newInstance(string));
-        }
-        
-        public int addNewSymbol() {
-            Symbol empty = Symbol.newInstance("");
-            
-            //int index = symbols.indexOf(empty);
-            
-            //if(index < 0) {
-                symbols.add(empty);
-                final int index = symbols.size() - 1;
-                this.fireTableRowsInserted(index, index);
-            //}
-            
-            return index;
-        }
-        
-        private final String[] columnNames = {"Code or Symbol"};
-        private final Class[] columnClasses = {Symbol.class};
     }
 
     private MutableStockCodeAndSymbolDatabase mutableStockCodeAndSymbolDatabase = null;
