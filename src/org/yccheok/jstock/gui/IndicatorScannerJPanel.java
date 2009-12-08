@@ -1,21 +1,21 @@
 /*
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2009 Yan Cheng CHEOK <yccheok@yahoo.com>
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- * Copyright (C) 2009 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-
 
 package org.yccheok.jstock.gui;
 
@@ -121,12 +121,13 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-// TODO add your handling code here:
         stop();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-// TODO add your handling code here:
+        /* Hacking way to make startScanThread stop within a very short time. */
+        stop_button_pressed = true;
+
         if (this.startScanThread != null)
         {
             try {
@@ -137,6 +138,8 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
 
             this.startScanThread = null;
         }
+
+        stop_button_pressed = false;
 
         final MainFrame m = getMainFrame();
         
@@ -224,14 +227,17 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         java.util.List<Code> codes = wizardSelectStockJPanel.getSelectedCodes();
 
         for (final Code code : codes) {
+            if (this.stop_button_pressed) {
+                return;
+            }
             final java.util.List<OperatorIndicator> result = new java.util.ArrayList<OperatorIndicator>();
 
-            operatorIndicators.put(code, result);
+            this.operatorIndicators.put(code, result);
 
             for (String project : projects) {
                 final OperatorIndicator operatorIndicator = alertIndicatorProjectManager.getOperatorIndicator(project);
 
-                if(operatorIndicator != null) {
+                if (operatorIndicator != null) {
                     final Stock stock = Utils.getEmptyStock(code, stockCodeAndSymbolDatabase.codeToSymbol(code));
 
                     operatorIndicator.setStock(stock);
@@ -239,64 +245,64 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                     result.add(operatorIndicator);
                 }
             }   /* for(String project : projects) */
+
+            this.submitOperatorIndicatorToMonitor(result);
         }   /* for(String code : codes) */
     }
 
-    private void submitOperatorIndicatorToMonitor()
+    private void submitOperatorIndicatorToMonitor(java.util.List<OperatorIndicator> indicators)
     {
-        final Set<Code> codes = operatorIndicators.keySet();
         Duration historyDuration = Duration.getTodayDurationByDays(0);
 
-        for(Code code : codes) {
-            final List<OperatorIndicator> operatorIndicatos = operatorIndicators.get(code);
-
-            for (OperatorIndicator operatorIndicator : operatorIndicatos)
-            {
-                historyDuration = historyDuration.getUnionDuration(operatorIndicator.getNeededStockHistoryDuration());
-            }
-
-            // Dirty way to speed up calculation.
-            // Currently, all codes are having same set of indicators,
-            // and duration is independent of code type.
-            break;
+        for (OperatorIndicator operatorIndicator : indicators)
+        {
+            historyDuration = historyDuration.getUnionDuration(operatorIndicator.getNeededStockHistoryDuration());
         }
 
         // Duration must be initialized, before codes being added.
         this.stockHistoryMonitor.setDuration(historyDuration);
 
-        for (Code code : codes) {
-            final List<OperatorIndicator> operatorIndicatos = operatorIndicators.get(code);
-
-            boolean done = true;
-            for (OperatorIndicator operatorIndicator : operatorIndicatos)
-            {
-                if (operatorIndicator.isStockHistoryCalculationDone() == false)
-                {
-                    done = false;
-                    
-                    // Early break. We will let history monitor to perform pre-calculation.
-                    break;
-                }
-                else
-                {
-                    operatorIndicator.preCalculate();
-                }
+        boolean done = true;
+        for (OperatorIndicator operatorIndicator : indicators)
+        {
+            /* Hacking way to make startScanThread stop within a very short time. */
+            if (this.stop_button_pressed) {
+                return;
             }
 
-            if (done)
+            if (operatorIndicator.isStockHistoryCalculationDone() == false)
             {
-                // Perform real time monitoring, for the code with history information.
-                realTimeStockMonitor.addStockCode(code);
+                done = false;
+
+                // Early break. We will let history monitor to perform pre-calculation.
+                break;
             }
             else
             {
-                this.stockHistoryMonitor.addStockCode(code);
+                operatorIndicator.preCalculate();
+            }
+        }
+
+        if (indicators.size() > 0) {
+            // All indicator in indicators, will be having same code.
+            if (done)
+            {
+                // Perform real time monitoring, for the code with history information.
+                realTimeStockMonitor.addStockCode(indicators.get(0).getStock().getCode());
+            }
+            else
+            {
+                this.stockHistoryMonitor.addStockCode(indicators.get(0).getStock().getCode());
             }
         }
     }
 
     @Override
     public void update(final Indicator indicator, Boolean result) {
+        if (this.stop_button_pressed) {
+            return;
+        }
+
         final boolean flag = result;
 
         if (flag == false)
@@ -463,6 +469,9 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     
     public void stop()
     {
+        /* Hacking way to make startScanThread stop within a very short time. */
+        stop_button_pressed = true;
+
         if (this.startScanThread != null)
         {
             try {
@@ -586,6 +595,9 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
 
     private void update(StockHistoryMonitor monitor, StockHistoryMonitor.StockHistoryRunnable runnable)
     {
+        if (this.stop_button_pressed) {
+            return;
+        }
         final MainFrame m = this.getMainFrame();
         final Code code = runnable.getCode();
 
@@ -605,7 +617,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
 
         Symbol symbol = m.getStockCodeAndSymbolDatabase().codeToSymbol(code);
 
-        m.setStatusBar(true, "Indicator scanner found " + symbol + " history. Perform calculation...");
+       this.updateStatusBarIfStopButtonIsNotPressed("Indicator scanner found " + symbol + " history. Perform calculation...");
 
         for (OperatorIndicator operatorIndicator : indicators)
         {
@@ -673,19 +685,29 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             }
         };
     }
-    
-    public void update(RealTimeStockMonitor monitor, final java.util.List<Stock> stocks) {
-        final MainFrame m = this.getMainFrame();
 
+    private void updateStatusBarIfStopButtonIsNotPressed(String message) {
+        if (this.stop_button_pressed) {
+            return;
+        }
+        MainFrame.getInstance().setStatusBar(true, message);
+    }
+
+    public void update(RealTimeStockMonitor monitor, final java.util.List<Stock> stocks) {
+        if (this.stop_button_pressed) {
+            return;
+        }
         if (stocks.size() > 0)
         {
-            m.setStatusBar(true, "Indicator scanner is scanning " + stocks.get(0).getSymbol() +"...");
+            updateStatusBarIfStopButtonIsNotPressed("Indicator scanner is scanning " + stocks.get(0).getSymbol() +"...");
         }
 
-        for(Stock stock : stocks) {
-            final java.util.List<OperatorIndicator> indicators = operatorIndicators.get(stock.getCode());
+        for (Stock stock : stocks) {
+            final java.util.List<OperatorIndicator> indicators = this.operatorIndicators.get(stock.getCode());
             
-            if(indicators == null) continue;
+            if (indicators == null) {
+                continue;
+            }
             
             final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
 
@@ -887,7 +909,6 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                 alertStateManager.clearState();
 
                 initOperatorIndicators(wizardModel);
-                submitOperatorIndicatorToMonitor();
             }
         });
     }
@@ -917,8 +938,10 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     // Dirty flag to be used with clear method and start button method.
     // Ensure we have an instant way to prevent background thread from showing
     // indicators on the table, after we call clear method. 
-	// This is a dirty way, but it just work :)
+    // This is a dirty way, but it just work :)
     private volatile Boolean allowIndicatorShown = true;
+
+    private volatile boolean stop_button_pressed = true;
 
     private Thread startScanThread = null;
 

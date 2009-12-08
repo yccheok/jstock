@@ -1652,8 +1652,12 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     private void changeCountry(Country country) {
-        if (country == null) return;
-        if (jStockOptions.getCountry() == country) return;
+        if (country == null) {
+            return;
+        }
+        if (jStockOptions.getCountry() == country) {
+            return;
+        }
 
         /* Save the GUI look. */
         saveGUIOptions();
