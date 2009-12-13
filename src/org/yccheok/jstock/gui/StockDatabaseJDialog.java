@@ -479,7 +479,8 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
     {
         return new CodeSymbolTableModel(Type.SystemDefined);
     }
-    
+
+    @SuppressWarnings("unchecked")
     private void newFilter()
     {
         // I really have no idea what the second parameter is.
@@ -756,6 +757,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
                 return null;
             }
             try {
+                @SuppressWarnings("unchecked")
                 Method method = this.c.getMethod("newInstance", String.class);
                 return method.invoke(null, o.toString().toUpperCase());
             } catch (Exception ex) {

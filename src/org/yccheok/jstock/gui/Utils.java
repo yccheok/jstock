@@ -285,7 +285,7 @@ public class Utils {
 
         if (inputStreamAndMethod.inputStream == null) {
             inputStreamAndMethod.method.releaseConnection();
-            return java.util.Collections.EMPTY_MAP;
+            return java.util.Collections.emptyMap();
         }
 
         Properties properties = new Properties();
@@ -294,11 +294,11 @@ public class Utils {
         }
         catch (IOException exp) {
             log.error(null, exp);
-            return java.util.Collections.EMPTY_MAP;
+            return java.util.Collections.emptyMap();
         }
         catch (IllegalArgumentException exp) {
             log.error(null, exp);
-            return java.util.Collections.EMPTY_MAP;
+            return java.util.Collections.emptyMap();
         }
         finally {
             try {
@@ -311,13 +311,13 @@ public class Utils {
         final String _id = properties.getProperty("id");
         if (_id == null) {
             log.info("UUID not found");
-            return java.util.Collections.EMPTY_MAP;
+            return java.util.Collections.emptyMap();
         }
 
         final String id = org.yccheok.jstock.gui.Utils.decrypt(_id);
         if (id.equals(org.yccheok.jstock.gui.Utils.getJStockUUID()) == false) {
             log.info("UUID doesn't match");
-            return java.util.Collections.EMPTY_MAP;
+            return java.util.Collections.emptyMap();
         }
 
         for (Object key : properties.keySet()) {
@@ -969,7 +969,10 @@ public class Utils {
         }
         else if (applicationVersionID == 1054) {
             return true;
-        }        
+        }
+        else if (applicationVersionID == 1055) {
+            return true;
+        }
         else if (applicationVersionID == APPLICATION_VERSION_ID) {
             return true;
         }        
@@ -1305,6 +1308,7 @@ public class Utils {
         return "<html><head></head><body>" + plainText + "</body></html>";
     }
 
+    @SuppressWarnings("unchecked")
     public static <A> A fromXML(Class c, InputStream inputStream) {
         XStream xStream = new XStream();
 
@@ -1334,6 +1338,7 @@ public class Utils {
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     public static <A> A fromXML(Class c, File file) {
         XStream xStream = new XStream();
         InputStream inputStream = null;
@@ -1364,6 +1369,7 @@ public class Utils {
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     public static <A> A fromXML(Class c, String filePath) {
         return (A)fromXML(c, new File(filePath));
     }
@@ -1724,9 +1730,9 @@ public class Utils {
     private static final String APPLICATION_VERSION_STRING = "1.0.5";
 
     // For About box comparision on latest version purpose.
-    // 1.0.5e
+    // 1.0.5f
     // Remember to update isCompatible method.
-    private static final int APPLICATION_VERSION_ID = 1055;
+    private static final int APPLICATION_VERSION_ID = 1056;
 
     private static Executor zombiePool = Executors.newFixedThreadPool(Utils.NUM_OF_THREADS_ZOMBIE_POOL);
 

@@ -38,7 +38,8 @@ public class OperatorFigureCreationTool extends org.jhotdraw.draw.CreationTool {
         this.prototypeClassName = prototypeClassName;
         this.prototypeAttributes = attributes;
     }
-    
+
+    @SuppressWarnings("unchecked")
     @Override
     protected Figure createFigure() {
         Figure f = null;

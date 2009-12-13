@@ -102,12 +102,13 @@ public abstract class GenericEditor extends DefaultCellEditor {
 	    return super.stopCellEditing();
 	}
 
+    @SuppressWarnings("unchecked")
     @Override
 	public Component getTableCellEditorComponent(JTable table, Object value,
 						 boolean isSelected,
 						 int row, int column) {
 	    this.value = null;
-        ((JComponent)getComponent()).setBorder(new LineBorder(Color.black));
+            ((JComponent)getComponent()).setBorder(new LineBorder(Color.black));
 	    try {
             Class type = table.getColumnClass(column);
             // Since our obligation is to produce a value which is

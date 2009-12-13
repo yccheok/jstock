@@ -215,7 +215,8 @@ public abstract class OperatorFigure extends GraphicalCompositeFigure implements
     private TextFigure getValueFigure() {
         return (TextFigure) ((ListFigure) getChild(2)).getChild(1);
     }
-    
+
+    @SuppressWarnings("unchecked")
     private void applyAttributes(Figure f) {
         Map<AttributeKey,Object> attr = ((AbstractAttributedFigure) getPresentationFigure()).getAttributes();
         for (Map.Entry<AttributeKey, Object> entry : attr.entrySet()) {
@@ -223,6 +224,7 @@ public abstract class OperatorFigure extends GraphicalCompositeFigure implements
         }
     }
     
+    @Override
     public OperatorFigure clone() {
         throw new java.lang.UnsupportedOperationException();
     }

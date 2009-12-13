@@ -126,12 +126,14 @@ public class DependencyFigure extends LineConnectionFigure {
         endOperatorFigure.getOperator().addInputConnection(connection, indexedEnd.getIndex());
     }
     
+    @Override
     public DependencyFigure clone() {
         DependencyFigure that = (DependencyFigure) super.clone();
         
         return that;
     }
-    
+
+    @SuppressWarnings("unchecked")
     @Override public boolean canConnect(Connector start, Connector end) {
         if (start instanceof InputConnector || end instanceof OutputConnector) {
             return false;
