@@ -208,7 +208,7 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
             }
         });
 
-        jLabel6.setFont(new java.awt.Font("Dialog", 0, 10)); // NOI18N
+        jLabel6.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         jLabel6.setText("(e.g. john@gmail.com)");
         jLabel6.setEnabled(false);
 
