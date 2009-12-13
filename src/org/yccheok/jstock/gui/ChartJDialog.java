@@ -62,10 +62,11 @@ import org.yccheok.jstock.internationalization.MessagesBundle;
  */
 public class ChartJDialog extends javax.swing.JDialog {
     private enum TA {
-        MovingAverage,
+        SMA,
         CCI,
         RSI,
-        EMA
+        EMA,
+        MFI
     }
 
     private enum Mode {
@@ -150,6 +151,14 @@ public class ChartJDialog extends javax.swing.JDialog {
         jCheckBoxMenuItem20 = new javax.swing.JCheckBoxMenuItem();
         jSeparator5 = new javax.swing.JSeparator();
         jMenuItem5 = new javax.swing.JMenuItem();
+        jMenu7 = new javax.swing.JMenu();
+        jCheckBoxMenuItem21 = new javax.swing.JCheckBoxMenuItem();
+        jCheckBoxMenuItem22 = new javax.swing.JCheckBoxMenuItem();
+        jCheckBoxMenuItem23 = new javax.swing.JCheckBoxMenuItem();
+        jCheckBoxMenuItem24 = new javax.swing.JCheckBoxMenuItem();
+        jCheckBoxMenuItem25 = new javax.swing.JCheckBoxMenuItem();
+        jSeparator6 = new javax.swing.JSeparator();
+        jMenuItem6 = new javax.swing.JMenuItem();
         jMenu5 = new javax.swing.JMenu();
         jCheckBoxMenuItem6 = new javax.swing.JCheckBoxMenuItem();
         jCheckBoxMenuItem7 = new javax.swing.JCheckBoxMenuItem();
@@ -168,6 +177,8 @@ public class ChartJDialog extends javax.swing.JDialog {
         jMenuItem4 = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JSeparator();
         jMenuItem2 = new javax.swing.JMenuItem();
+        jMenu8 = new javax.swing.JMenu();
+        jMenuItem7 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -337,6 +348,60 @@ public class ChartJDialog extends javax.swing.JDialog {
 
         jMenu2.add(jMenu6);
 
+        jMenu7.setText(bundle.getString("ChartJDialog_MFI")); // NOI18N
+        jMenu7.setToolTipText(bundle.getString("ChartJDialog_MoneyFlowIndex")); // NOI18N
+
+        jCheckBoxMenuItem21.setText(bundle.getString("ChartJDialog_20Days")); // NOI18N
+        jCheckBoxMenuItem21.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCheckBoxMenuItem21ActionPerformed(evt);
+            }
+        });
+        jMenu7.add(jCheckBoxMenuItem21);
+
+        jCheckBoxMenuItem22.setText(bundle.getString("ChartJDialog_30Days")); // NOI18N
+        jCheckBoxMenuItem22.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCheckBoxMenuItem22ActionPerformed(evt);
+            }
+        });
+        jMenu7.add(jCheckBoxMenuItem22);
+
+        jCheckBoxMenuItem23.setText(bundle.getString("ChartJDialog_50Days")); // NOI18N
+        jCheckBoxMenuItem23.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCheckBoxMenuItem23ActionPerformed(evt);
+            }
+        });
+        jMenu7.add(jCheckBoxMenuItem23);
+
+        jCheckBoxMenuItem24.setText(bundle.getString("ChartJDialog_100Days")); // NOI18N
+        jCheckBoxMenuItem24.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCheckBoxMenuItem24ActionPerformed(evt);
+            }
+        });
+        jMenu7.add(jCheckBoxMenuItem24);
+
+        jCheckBoxMenuItem25.setText(bundle.getString("ChartJDialog_200Days")); // NOI18N
+        jCheckBoxMenuItem25.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCheckBoxMenuItem25ActionPerformed(evt);
+            }
+        });
+        jMenu7.add(jCheckBoxMenuItem25);
+        jMenu7.add(jSeparator6);
+
+        jMenuItem6.setText(bundle.getString("ChartJDialog_Custom...")); // NOI18N
+        jMenuItem6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem6ActionPerformed(evt);
+            }
+        });
+        jMenu7.add(jMenuItem6);
+
+        jMenu2.add(jMenu7);
+
         jMenu5.setText(bundle.getString("ChartJDialog_RSI")); // NOI18N
         jMenu5.setToolTipText(bundle.getString("ChartJDialog_RelativeStrengthIndex")); // NOI18N
 
@@ -456,6 +521,18 @@ public class ChartJDialog extends javax.swing.JDialog {
 
         jMenuBar1.add(jMenu2);
 
+        jMenu8.setText(bundle.getString("ChartJDialog_Help")); // NOI18N
+
+        jMenuItem7.setText(bundle.getString("ChartJDialog_TechnicalAnalysisTutorial")); // NOI18N
+        jMenuItem7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem7ActionPerformed(evt);
+            }
+        });
+        jMenu8.add(jMenuItem7);
+
+        jMenuBar1.add(jMenu8);
+
         setJMenuBar(jMenuBar1);
 
         java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
@@ -504,35 +581,35 @@ public class ChartJDialog extends javax.swing.JDialog {
     private void jCheckBoxMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxMenuItem1ActionPerformed
         // TODO add your handling code here:
         final JCheckBoxMenuItem menu = (JCheckBoxMenuItem)evt.getSource();
-        updateMovingAverage(20, menu.isSelected());
+        updateSMA(20, menu.isSelected());
     }//GEN-LAST:event_jCheckBoxMenuItem1ActionPerformed
 
     private void jCheckBoxMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxMenuItem2ActionPerformed
         final JCheckBoxMenuItem menu = (JCheckBoxMenuItem)evt.getSource();
-        updateMovingAverage(30, menu.isSelected());
+        updateSMA(30, menu.isSelected());
     }//GEN-LAST:event_jCheckBoxMenuItem2ActionPerformed
 
     private void jCheckBoxMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxMenuItem3ActionPerformed
         final JCheckBoxMenuItem menu = (JCheckBoxMenuItem)evt.getSource();
-        updateMovingAverage(50, menu.isSelected());
+        updateSMA(50, menu.isSelected());
     }//GEN-LAST:event_jCheckBoxMenuItem3ActionPerformed
 
     private void jCheckBoxMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxMenuItem4ActionPerformed
         final JCheckBoxMenuItem menu = (JCheckBoxMenuItem)evt.getSource();
-        updateMovingAverage(100, menu.isSelected());
+        updateSMA(100, menu.isSelected());
     }//GEN-LAST:event_jCheckBoxMenuItem4ActionPerformed
 
     private void jCheckBoxMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxMenuItem5ActionPerformed
         final JCheckBoxMenuItem menu = (JCheckBoxMenuItem)evt.getSource();
-        updateMovingAverage(200, menu.isSelected());
+        updateSMA(200, menu.isSelected());
     }//GEN-LAST:event_jCheckBoxMenuItem5ActionPerformed
 
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
         // TODO add your handling code here:
         for (int i = 0; i < this.activeTAExs.size(); i++) {
             final TAEx taEx = this.activeTAExs.get(i);
-            if (taEx.ta == TA.MovingAverage) {
-                this.updateMovingAverage((Integer)taEx.parameter, false);
+            if (taEx.ta == TA.SMA) {
+                this.updateSMA((Integer)taEx.parameter, false);
                 i--;
             }
             else if (taEx.ta == TA.RSI) {
@@ -544,7 +621,11 @@ public class ChartJDialog extends javax.swing.JDialog {
                 i--;
             }
             else if (taEx.ta == TA.EMA) {
-                this.updateExponentialMovingAverage((Integer)taEx.parameter, false);
+                this.updateEMA((Integer)taEx.parameter, false);
+                i--;
+            }
+            else if (taEx.ta == TA.MFI) {
+                this.updateMFI((Integer)taEx.parameter, false);
                 i--;
             }
             else {
@@ -574,6 +655,12 @@ public class ChartJDialog extends javax.swing.JDialog {
         this.jCheckBoxMenuItem18.setSelected(false);
         this.jCheckBoxMenuItem19.setSelected(false);
         this.jCheckBoxMenuItem20.setSelected(false);
+
+        this.jCheckBoxMenuItem21.setSelected(false);
+        this.jCheckBoxMenuItem22.setSelected(false);
+        this.jCheckBoxMenuItem23.setSelected(false);
+        this.jCheckBoxMenuItem24.setSelected(false);
+        this.jCheckBoxMenuItem25.setSelected(false);
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
@@ -589,7 +676,7 @@ public class ChartJDialog extends javax.swing.JDialog {
                     JOptionPane.showMessageDialog(this, MessagesBundle.getString("info_message_number_of_days_required"), MessagesBundle.getString("info_title_number_of_days_required"), JOptionPane.WARNING_MESSAGE);
                     continue;
                 }
-                this.updateMovingAverage(days, true);
+                this.updateSMA(days, true);
                 return;
             }
             catch (java.lang.NumberFormatException exp) {
@@ -711,27 +798,27 @@ public class ChartJDialog extends javax.swing.JDialog {
     private void jCheckBoxMenuItem16ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxMenuItem16ActionPerformed
         // TODO add your handling code here:
         final JCheckBoxMenuItem menu = (JCheckBoxMenuItem)evt.getSource();
-        updateExponentialMovingAverage(20, menu.isSelected());
+        updateEMA(20, menu.isSelected());
     }//GEN-LAST:event_jCheckBoxMenuItem16ActionPerformed
 
     private void jCheckBoxMenuItem17ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxMenuItem17ActionPerformed
         final JCheckBoxMenuItem menu = (JCheckBoxMenuItem)evt.getSource();
-        updateExponentialMovingAverage(30, menu.isSelected());
+        updateEMA(30, menu.isSelected());
     }//GEN-LAST:event_jCheckBoxMenuItem17ActionPerformed
 
     private void jCheckBoxMenuItem18ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxMenuItem18ActionPerformed
         final JCheckBoxMenuItem menu = (JCheckBoxMenuItem)evt.getSource();
-        updateExponentialMovingAverage(50, menu.isSelected());
+        updateEMA(50, menu.isSelected());
     }//GEN-LAST:event_jCheckBoxMenuItem18ActionPerformed
 
     private void jCheckBoxMenuItem19ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxMenuItem19ActionPerformed
         final JCheckBoxMenuItem menu = (JCheckBoxMenuItem)evt.getSource();
-        updateExponentialMovingAverage(100, menu.isSelected());
+        updateEMA(100, menu.isSelected());
     }//GEN-LAST:event_jCheckBoxMenuItem19ActionPerformed
 
     private void jCheckBoxMenuItem20ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxMenuItem20ActionPerformed
         final JCheckBoxMenuItem menu = (JCheckBoxMenuItem)evt.getSource();
-        updateExponentialMovingAverage(200, menu.isSelected());
+        updateEMA(200, menu.isSelected());
     }//GEN-LAST:event_jCheckBoxMenuItem20ActionPerformed
 
     private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem5ActionPerformed
@@ -746,7 +833,7 @@ public class ChartJDialog extends javax.swing.JDialog {
                     JOptionPane.showMessageDialog(this, MessagesBundle.getString("info_message_number_of_days_required"), MessagesBundle.getString("info_title_number_of_days_required"), JOptionPane.WARNING_MESSAGE);
                     continue;
                 }
-                this.updateExponentialMovingAverage(days, true);
+                this.updateEMA(days, true);
                 return;
             }
             catch (java.lang.NumberFormatException exp) {
@@ -756,6 +843,58 @@ public class ChartJDialog extends javax.swing.JDialog {
             }
         } while(true);
     }//GEN-LAST:event_jMenuItem5ActionPerformed
+
+    private void jMenuItem7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem7ActionPerformed
+        Utils.launchWebBrowser("http://jstock.sourceforge.net/ma_indicator.html?utm_source=jstock&utm_medium=chart_dialog");
+    }//GEN-LAST:event_jMenuItem7ActionPerformed
+
+    private void jCheckBoxMenuItem21ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxMenuItem21ActionPerformed
+        final JCheckBoxMenuItem menu = (JCheckBoxMenuItem)evt.getSource();
+        this.updateMFI(20, menu.isSelected());
+    }//GEN-LAST:event_jCheckBoxMenuItem21ActionPerformed
+
+    private void jCheckBoxMenuItem22ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxMenuItem22ActionPerformed
+        final JCheckBoxMenuItem menu = (JCheckBoxMenuItem)evt.getSource();
+        this.updateMFI(30, menu.isSelected());
+    }//GEN-LAST:event_jCheckBoxMenuItem22ActionPerformed
+
+    private void jCheckBoxMenuItem23ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxMenuItem23ActionPerformed
+        final JCheckBoxMenuItem menu = (JCheckBoxMenuItem)evt.getSource();
+        this.updateMFI(50, menu.isSelected());
+    }//GEN-LAST:event_jCheckBoxMenuItem23ActionPerformed
+
+    private void jCheckBoxMenuItem24ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxMenuItem24ActionPerformed
+        final JCheckBoxMenuItem menu = (JCheckBoxMenuItem)evt.getSource();
+        this.updateMFI(100, menu.isSelected());
+    }//GEN-LAST:event_jCheckBoxMenuItem24ActionPerformed
+
+    private void jCheckBoxMenuItem25ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxMenuItem25ActionPerformed
+        final JCheckBoxMenuItem menu = (JCheckBoxMenuItem)evt.getSource();
+        this.updateMFI(200, menu.isSelected());
+    }//GEN-LAST:event_jCheckBoxMenuItem25ActionPerformed
+
+    private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem6ActionPerformed
+       do {
+            final String days_string = JOptionPane.showInputDialog(this, MessagesBundle.getString("info_message_please_enter_number_of_days_for_moving_average"));
+            if (days_string == null) {
+                return;
+            }
+            try {
+                final int days = Integer.parseInt(days_string);
+                if (days <= 0) {
+                    JOptionPane.showMessageDialog(this, MessagesBundle.getString("info_message_number_of_days_required"), MessagesBundle.getString("info_title_number_of_days_required"), JOptionPane.WARNING_MESSAGE);
+                    continue;
+                }
+                this.updateMFI(days, true);
+                return;
+            }
+            catch (java.lang.NumberFormatException exp) {
+                log.error(null, exp);
+                JOptionPane.showMessageDialog(this, MessagesBundle.getString("info_message_number_of_days_required"), MessagesBundle.getString("info_title_number_of_days_required"), JOptionPane.WARNING_MESSAGE);
+                continue;
+            }
+        } while(true);
+    }//GEN-LAST:event_jMenuItem6ActionPerformed
     
     private void updateLabels(StockHistoryServer stockHistoryServer) {
         java.text.NumberFormat numberFormat = java.text.NumberFormat.getInstance();
@@ -964,6 +1103,10 @@ public class ChartJDialog extends javax.swing.JDialog {
         return days + "d CCI";
     }
 
+    private String getMFIKey(int days) {
+        return days + "d MFI";
+    }
+
     private void updateCCI(int days, boolean show) {
         /* To simplify our work, we will update candle stick chart as well. */
         if (this.candlestickChart == null) {
@@ -1015,6 +1158,83 @@ public class ChartJDialog extends javax.swing.JDialog {
                 }
             }
     
+            final XYPlot price_volume_ta = price_volume_ta_map.get(taEx);
+            final XYPlot candlestick_ta = candlestick_ta_map.get(taEx);
+
+            if (price_volume_ta != null) cplot0.add(price_volume_ta, 1);    // weight is 1.
+            if (candlestick_ta != null) cplot1.add(candlestick_ta, 1);      // weight is 1.
+            org.yccheok.jstock.charting.Utils.applyChartTheme(this.priceVolumeChart);
+            org.yccheok.jstock.charting.Utils.applyChartTheme(this.candlestickChart);
+        }
+        else {
+            final CombinedDomainXYPlot cplot0 = (CombinedDomainXYPlot)this.priceVolumeChart.getPlot();
+            final CombinedDomainXYPlot cplot1 = (CombinedDomainXYPlot)this.candlestickChart.getPlot();
+            final XYPlot price_volume_ta = price_volume_ta_map.get(taEx);
+            final XYPlot candlestick_ta = candlestick_ta_map.get(taEx);
+
+            if (price_volume_ta != null) cplot0.remove(price_volume_ta);
+            if (candlestick_ta != null) cplot1.remove(candlestick_ta);
+        }
+
+        if (show && this.activeTAExs.contains(taEx) == false) {
+            this.activeTAExs.add(taEx);
+        }
+        else if (!show) {
+            this.activeTAExs.remove(taEx);
+        }
+    }
+
+    private void updateMFI(int days, boolean show) {
+        /* To simplify our work, we will update candle stick chart as well. */
+        if (this.candlestickChart == null) {
+            this.candlestickChart = this.createCandlestickChart(stockHistoryServer);
+        }
+
+        final TAEx taEx = TAEx.newInstance(TA.MFI, new Integer(days));
+
+        if (show) {
+            final CombinedDomainXYPlot cplot0 = (CombinedDomainXYPlot)this.priceVolumeChart.getPlot();
+            final CombinedDomainXYPlot cplot1 = (CombinedDomainXYPlot)this.candlestickChart.getPlot();
+
+            if (price_volume_ta_map.containsKey(taEx) == false) {
+                final XYDataset dataset = org.yccheok.jstock.charting.TechnicalAnalysis.createMFI(this.stockHistoryServer, getMFIKey(days), days);
+                NumberAxis rangeAxis1 = new NumberAxis(GUIBundle.getString("ChartJDialog_MFI"));
+                rangeAxis1.setAutoRangeIncludesZero(false);     // override default
+                rangeAxis1.setLowerMargin(0.40);                // to leave room for volume bars
+                DecimalFormat format = new DecimalFormat("0");
+                rangeAxis1.setNumberFormatOverride(format);
+
+                final ValueAxis timeAxis = new DateAxis(GUIBundle.getString("ChartJDialog_Date"));
+                timeAxis.setLowerMargin(0.02);                  // reduce the default margins
+                timeAxis.setUpperMargin(0.02);
+
+                XYPlot plot = new XYPlot(dataset, timeAxis, rangeAxis1, null);
+
+                XYToolTipGenerator toolTipGenerator = StandardXYToolTipGenerator.getTimeSeriesInstance();
+
+                XYItemRenderer renderer1 = new XYLineAndShapeRenderer(true, false);
+                renderer1.setBaseToolTipGenerator(toolTipGenerator);
+                renderer1.setToolTipGenerator(
+                    new StandardXYToolTipGenerator(
+                        StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT,
+                        new SimpleDateFormat("d-MMM-yyyy"), new DecimalFormat("0.00")
+                    )
+                );
+                plot.setRenderer(0, renderer1);
+                price_volume_ta_map.put(taEx, plot);
+            }
+
+            if (candlestick_ta_map.containsKey(taEx) == false) {
+                try {
+                    /* Not sure why. I cannot make priceVolumeChart and candlestickChart sharing the same
+                     * plot. If not, this will inhibit incorrect zooming behavior.
+                     */
+                    candlestick_ta_map.put(taEx, (XYPlot)price_volume_ta_map.get(taEx).clone());
+                } catch (CloneNotSupportedException ex) {
+                    log.error(null, ex);
+                }
+            }
+
             final XYPlot price_volume_ta = price_volume_ta_map.get(taEx);
             final XYPlot candlestick_ta = candlestick_ta_map.get(taEx);
 
@@ -1118,7 +1338,7 @@ public class ChartJDialog extends javax.swing.JDialog {
         }
     }
 
-    private void updateExponentialMovingAverage(int days, boolean show) {
+    private void updateEMA(int days, boolean show) {
         /* To simplify our work, we will update candle stick chart as well. */
         if (this.candlestickChart == null) {
             this.candlestickChart = this.createCandlestickChart(stockHistoryServer);
@@ -1188,13 +1408,13 @@ public class ChartJDialog extends javax.swing.JDialog {
         }
     }
 
-    private void updateMovingAverage(int days, boolean show) {
+    private void updateSMA(int days, boolean show) {
         /* To simplify our work, we will update candle stick chart as well. */
         if (this.candlestickChart == null) {
             this.candlestickChart = this.createCandlestickChart(stockHistoryServer);
         }
 
-        final TAEx taEx = TAEx.newInstance(TA.MovingAverage, new Integer(days));
+        final TAEx taEx = TAEx.newInstance(TA.SMA, new Integer(days));
         if (show) {
             TimeSeries timeSeries = null;
             XYDataset dataSet = null;
@@ -1336,6 +1556,11 @@ public class ChartJDialog extends javax.swing.JDialog {
     private javax.swing.JCheckBoxMenuItem jCheckBoxMenuItem19;
     private javax.swing.JCheckBoxMenuItem jCheckBoxMenuItem2;
     private javax.swing.JCheckBoxMenuItem jCheckBoxMenuItem20;
+    private javax.swing.JCheckBoxMenuItem jCheckBoxMenuItem21;
+    private javax.swing.JCheckBoxMenuItem jCheckBoxMenuItem22;
+    private javax.swing.JCheckBoxMenuItem jCheckBoxMenuItem23;
+    private javax.swing.JCheckBoxMenuItem jCheckBoxMenuItem24;
+    private javax.swing.JCheckBoxMenuItem jCheckBoxMenuItem25;
     private javax.swing.JCheckBoxMenuItem jCheckBoxMenuItem3;
     private javax.swing.JCheckBoxMenuItem jCheckBoxMenuItem4;
     private javax.swing.JCheckBoxMenuItem jCheckBoxMenuItem5;
@@ -1358,12 +1583,16 @@ public class ChartJDialog extends javax.swing.JDialog {
     private javax.swing.JMenu jMenu4;
     private javax.swing.JMenu jMenu5;
     private javax.swing.JMenu jMenu6;
+    private javax.swing.JMenu jMenu7;
+    private javax.swing.JMenu jMenu8;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JMenuItem jMenuItem5;
+    private javax.swing.JMenuItem jMenuItem6;
+    private javax.swing.JMenuItem jMenuItem7;
     private javax.swing.JMenuItem jMenuItem9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
@@ -1375,6 +1604,7 @@ public class ChartJDialog extends javax.swing.JDialog {
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JSeparator jSeparator4;
     private javax.swing.JSeparator jSeparator5;
+    private javax.swing.JSeparator jSeparator6;
     // End of variables declaration//GEN-END:variables
     
 }
