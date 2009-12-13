@@ -244,6 +244,19 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
 
                     result.add(operatorIndicator);
                 }
+                try {
+                    /* Some users with low computer spec, complain that their CPUs usage are high.
+                     * My experience is that, 200ms sleep time will be enough to rest their CPUs.
+                     * I am not too sure about 50ms. Let's just wait and see...
+                     * When user runs this Indicator Scanner, he is expecting that he needs to wait.
+                     * So, it doesn't matter that we let him "wait" for extra 50ms seconds every round.
+                     * Some more, he shall feel more happy, to see his computer more responsive.
+                     */
+                    Thread.sleep(50);
+                } catch (InterruptedException ex) {
+                    log.error(null, ex);
+                    break;
+                }
             }   /* for(String project : projects) */
 
             this.submitOperatorIndicatorToMonitor(result);
@@ -474,6 +487,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
 
         if (this.startScanThread != null)
         {
+            this.startScanThread.interrupt();
             try {
                 this.startScanThread.join();
             } catch (InterruptedException ex) {
