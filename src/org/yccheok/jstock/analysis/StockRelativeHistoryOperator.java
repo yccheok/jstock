@@ -39,7 +39,8 @@ public class StockRelativeHistoryOperator extends AbstractOperator {
         Average,
         MeanDeviation,
         RSI,
-        EMA
+        EMA,
+        MFI
     }
     
     public enum Type
@@ -138,11 +139,18 @@ public class StockRelativeHistoryOperator extends AbstractOperator {
 
         java.util.List<Stock> stocks = new java.util.ArrayList<Stock>();
         java.util.List<Double> values = new java.util.ArrayList<Double>();
-        
+
+        // For MFI usage.
+        java.util.List<Double> highs = new java.util.ArrayList<Double>();
+        java.util.List<Double> lows = new java.util.ArrayList<Double>();
+        java.util.List<Double> closes = new java.util.ArrayList<Double>();
+        java.util.List<Integer> volumes = new java.util.ArrayList<Integer>();
+
         final int numOfCalendar = stockHistoryServer.getNumOfCalendar();
         /* Fill up stocks. */
         final int start;
-        if (this.function == Function.EMA || function == Function.RSI) {
+        // I am not sure MFI is depending on previous day data???
+        if (this.function == Function.EMA || function == Function.RSI || this.function == Function.MFI) {
             start = (numOfCalendar - (day << 1)) >= 0 ? numOfCalendar - (day << 1) : 0;
         }
         else {
@@ -154,63 +162,74 @@ public class StockRelativeHistoryOperator extends AbstractOperator {
             stocks.add(stock);
         }
 
-        switch(type)
-        {
-            case PrevPrice:
-                for (Stock stock : stocks) {
-                    values.add(stock.getPrevPrice());
-                }
-                break;
-
-            case OpenPrice:
-                for (Stock stock : stocks) {
-                    values.add(stock.getOpenPrice());
-                }
-                break;
-
-            case HighPrice:
-                for (Stock stock : stocks) {
-                    values.add(stock.getHighPrice());
-                }
-                break;
-
-            case LowPrice:
-                for (Stock stock : stocks) {
-                    values.add(stock.getLowPrice());
-                }
-                break;
-
-            case LastPrice:
-                for (Stock stock : stocks) {
-                    values.add(stock.getLastPrice());
-                }
-                break;
-
-            case TypicalPrice:
-                for (Stock stock : stocks) {
-                    values.add(TechnicalAnalysis.getTypicalPrice(stock));
-                }
-                break;
-
-            case Volume:
-                // ???
-                for (Stock stock : stocks) {
-                    values.add(new Double(stock.getVolume()));
-                }
-                break;
-
-            case MarketCapital:
-                values.add(new Double(stockHistoryServer.getMarketCapital()));
-                break;
-
-            case SharesIssued:
-                values.add(new Double(stockHistoryServer.getSharesIssued()));
-                break;
-
-            default:
-                assert(false);
+        if (this.function == Function.MFI) {
+            for (Stock stock : stocks) {
+                values.add(TechnicalAnalysis.getTypicalPrice(stock));
+                highs.add(stock.getHighPrice());
+                lows.add(stock.getLowPrice());
+                closes.add(stock.getLastPrice());
+                volumes.add(stock.getVolume());
+            }
         }
-        
+        else {
+            switch(type)
+            {
+                case PrevPrice:
+                    for (Stock stock : stocks) {
+                        values.add(stock.getPrevPrice());
+                    }
+                    break;
+
+                case OpenPrice:
+                    for (Stock stock : stocks) {
+                        values.add(stock.getOpenPrice());
+                    }
+                    break;
+
+                case HighPrice:
+                    for (Stock stock : stocks) {
+                        values.add(stock.getHighPrice());
+                    }
+                    break;
+
+                case LowPrice:
+                    for (Stock stock : stocks) {
+                        values.add(stock.getLowPrice());
+                    }
+                    break;
+
+                case LastPrice:
+                    for (Stock stock : stocks) {
+                        values.add(stock.getLastPrice());
+                    }
+                    break;
+
+                case TypicalPrice:
+                    for (Stock stock : stocks) {
+                        values.add(TechnicalAnalysis.getTypicalPrice(stock));
+                    }
+                    break;
+
+                case Volume:
+                    // ???
+                    for (Stock stock : stocks) {
+                        values.add(new Double(stock.getVolume()));
+                    }
+                    break;
+
+                case MarketCapital:
+                    values.add(new Double(stockHistoryServer.getMarketCapital()));
+                    break;
+
+                case SharesIssued:
+                    values.add(new Double(stockHistoryServer.getSharesIssued()));
+                    break;
+
+                default:
+                    assert(false);
+            }
+        }   // if (this.function == Function.MFI)
+
         double v = function == Function.Min ? Double.MAX_VALUE : 0.0;
         final int dataSize = values.size();
         
@@ -261,6 +280,10 @@ public class StockRelativeHistoryOperator extends AbstractOperator {
                 v = TechnicalAnalysis.createEMA(values, day);
                 break;
 
+            case MFI:
+                v = TechnicalAnalysis.createMFI(highs, lows, closes, volumes, day);
+                break;
+                
             default:
                 assert(false);
         }                 

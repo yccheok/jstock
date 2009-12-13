@@ -55,6 +55,40 @@ public class TechnicalAnalysis {
         return output[outNbElement.value - 1];
     }
 
+    public static Double createMFI(java.util.List<Double> highs,
+            java.util.List<Double> lows,
+            java.util.List<Double> closes,
+            java.util.List<Integer> volumes, int period) {
+        if (period <= 0) {
+            throw new java.lang.IllegalArgumentException("period must be greater than 0");
+        }
+        if (highs.size() != lows.size() || highs.size() != closes.size() || highs.size() != volumes.size()) {
+            throw new java.lang.IllegalArgumentException("input list must be same size");
+        }
+
+        final int size = highs.size();
+        final Core core = new Core();
+        final int allocationSize = size - core.mfiLookback(period);
+        if (allocationSize <= 0) {
+            return null;
+        }
+        final double[] output = new double[allocationSize];
+        final MInteger outBegIdx = new MInteger();
+        final MInteger outNbElement = new MInteger();
+        double[] _highs = ArrayUtils.toPrimitive(highs.toArray(new Double[0]));
+        double[] _lows = ArrayUtils.toPrimitive(lows.toArray(new Double[0]));
+        double[] _closes = ArrayUtils.toPrimitive(closes.toArray(new Double[0]));
+        int[] _volumes = ArrayUtils.toPrimitive(volumes.toArray(new Integer[0]));
+
+        double[] dv = new double[_volumes.length];
+        for (int i = 0; i < dv.length; i++) {
+            dv[i] = _volumes[i];
+        }
+        core.mfi(0, _highs.length - 1, _highs, _lows, _closes, dv,  period, outBegIdx, outNbElement, output);
+
+        return output[outNbElement.value - 1];
+    }
+
     public static Double createRSI(java.util.List<Double> values, int period) {
         if (period <= 0) {
             throw new java.lang.IllegalArgumentException("period must be greater than 0");
