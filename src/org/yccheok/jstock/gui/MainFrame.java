@@ -619,28 +619,10 @@ public class MainFrame extends javax.swing.JFrame {
             final int size = statements.size();
             for (int i = 0; i < size; i++) {
                 final org.yccheok.jstock.file.Statement statement = statements.get(i);
-                final String codeStr = (String)statement.getValue(GUIBundle.getString("MainFrame_Code"));
-                final String symbolStr = (String)statement.getValue(GUIBundle.getString("MainFrame_Symbol"));
-                final String fallBelowStr = (String)statement.getValue(GUIBundle.getString("MainFrame_FallBelow"));
-                final String riseAboveStr = (String)statement.getValue(GUIBundle.getString("MainFrame_RiseAbove"));
-                Double fallBelowDouble = null;
-                Double riseAboveDouble = null;
-                if (fallBelowStr.length() > 0) {
-                    try {
-                        fallBelowDouble = Double.parseDouble(fallBelowStr);
-                    }
-                    catch (NumberFormatException exp) {
-                        log.error(null, exp);
-                    }
-                }
-                if (riseAboveStr.length() > 0) {
-                    try {
-                        riseAboveDouble = Double.parseDouble(riseAboveStr);
-                    }
-                    catch (NumberFormatException exp) {
-                        log.error(null, exp);
-                    }
-                }
+                final String codeStr = statement.getValueAsString(GUIBundle.getString("MainFrame_Code"));
+                final String symbolStr = statement.getValueAsString(GUIBundle.getString("MainFrame_Symbol"));
+                final Double fallBelowDouble = statement.getValueAsDouble(GUIBundle.getString("MainFrame_FallBelow"));
+                final Double riseAboveDouble = statement.getValueAsDouble(GUIBundle.getString("MainFrame_RiseAbove"));
                 if (codeStr.length() > 0 && symbolStr.length() > 0) {
                     final Stock stock = Utils.getEmptyStock(Code.newInstance(codeStr), Symbol.newInstance(symbolStr));
                     final StockAlert stockAlert = new StockAlert().setFallBelow(fallBelowDouble).setRiseAbove(riseAboveDouble);
