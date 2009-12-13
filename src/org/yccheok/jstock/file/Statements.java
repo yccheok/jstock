@@ -82,11 +82,11 @@ public class Statements {
 			assert(calendar != null && stock != null);
             final List<Atom> atoms = new ArrayList<Atom>();
             final Atom atom0 = new Atom(dateFormat.format(calendar.getTime()), GUIBundle.getString("StockHistory_Date"));
-            final Atom atom1 = new Atom("" + stock.getOpenPrice(), GUIBundle.getString("StockHistory_Open"));
-            final Atom atom2 = new Atom("" + stock.getHighPrice(), GUIBundle.getString("StockHistory_High"));
-            final Atom atom3 = new Atom("" + stock.getLowPrice(), GUIBundle.getString("StockHistory_Low"));
-            final Atom atom4 = new Atom("" + stock.getLastPrice(), GUIBundle.getString("StockHistory_Close"));
-            final Atom atom5 = new Atom("" + stock.getVolume(), GUIBundle.getString("StockHistory_Volume"));
+            final Atom atom1 = new Atom(new Double(stock.getOpenPrice()), GUIBundle.getString("StockHistory_Open"));
+            final Atom atom2 = new Atom(new Double(stock.getHighPrice()), GUIBundle.getString("StockHistory_High"));
+            final Atom atom3 = new Atom(new Double(stock.getLowPrice()), GUIBundle.getString("StockHistory_Low"));
+            final Atom atom4 = new Atom(new Double(stock.getLastPrice()), GUIBundle.getString("StockHistory_Close"));
+            final Atom atom5 = new Atom(new Integer(stock.getVolume()), GUIBundle.getString("StockHistory_Volume"));
             atoms.add(atom0);
             atoms.add(atom1);
             atoms.add(atom2);
@@ -173,7 +173,7 @@ public class Statements {
                         if (cell == null) {
                             continue;
                         }
-                        String value = "";
+                        Object value = null;
                         if (cell.getCellType() == HSSFCell.CELL_TYPE_STRING) {
                             final HSSFRichTextString richString = cell.getRichStringCellValue();
                             if (richString != null) {
@@ -184,7 +184,13 @@ public class Statements {
                             }
                         }
                         else if (cell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC) {
-                            value = "" + cell.getNumericCellValue();
+                            try {
+                                value = new Double(cell.getNumericCellValue());
+                            }
+                            catch (NumberFormatException ex) {
+                                log.error(null, ex);
+                                value = new Double(0.0);
+                            }
                         }
                         else {
                         }
