@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
+ * Copyright (C) 2009 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -58,6 +58,56 @@ public class Statement {
 
     public Object getValue(String type) {
         return typeToValue.get(type);
+    }
+
+    public String getValueAsString(String type) {
+        Object o = typeToValue.get(type);
+        if (o != null) {
+            return o.toString();
+        }
+        return null;
+    }
+
+    public Double getValueAsDouble(String type) {
+        Object o = typeToValue.get(type);
+        if (o instanceof Double) {
+            return (Double)o;
+        }
+        else if (o instanceof Integer) {
+            Integer i = (Integer)o;
+            Double d = (double)i.intValue();
+            return d;
+        }
+        else if (o != null) {
+            try {
+                return Double.parseDouble(o.toString());
+            }
+            catch (NumberFormatException ex) {
+                log.error(null, ex);
+            }
+        }
+        return null;
+    }
+
+    public Integer getValueAsInteger(String type) {
+        Object o = typeToValue.get(type);
+        if (o instanceof Integer) {
+            return (Integer)o;
+        }
+        else if (o instanceof Double) {
+            Double d = (Double)o;
+            Integer i = (int)d.doubleValue();
+            return i;
+        }
+        else if (o != null) {
+            try {
+                return Integer.parseInt(o.toString());
+            }
+            catch (NumberFormatException ex) {
+                log.error(null, ex);
+            }
+        }
+        return null;
     }
 
     public Type getType() {
