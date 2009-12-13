@@ -344,15 +344,15 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
                     for (int i = 0; i < size; i++) {
                         final Statement statement = statements.get(i);
-                        final String _code = (String)statement.getValue(GUIBundle.getString("MainFrame_Code"));
-                        final String _symbol = (String)statement.getValue(GUIBundle.getString("MainFrame_Symbol"));
-                        final String _date = (String)statement.getValue(GUIBundle.getString("PortfolioManagementJPanel_Date"));
-                        final String _units = (String)statement.getValue(GUIBundle.getString("PortfolioManagementJPanel_Units"));
-                        final String _purchasePrice = (String)statement.getValue(GUIBundle.getString("PortfolioManagementJPanel_PurchasePrice"));
-                        final String _broker = (String)statement.getValue(GUIBundle.getString("PortfolioManagementJPanel_Broker"));
-                        final String _clearingFee = (String)statement.getValue(GUIBundle.getString("PortfolioManagementJPanel_ClearingFee"));
-                        final String _stampDuty = (String)statement.getValue(GUIBundle.getString("PortfolioManagementJPanel_StampDuty"));
-                        final String _comment = (String)statement.getValue(GUIBundle.getString("PortfolioManagementJPanel_Comment"));
+                        final String _code = statement.getValueAsString(GUIBundle.getString("MainFrame_Code"));
+                        final String _symbol = statement.getValueAsString(GUIBundle.getString("MainFrame_Symbol"));
+                        final String _date = statement.getValueAsString(GUIBundle.getString("PortfolioManagementJPanel_Date"));
+                        final Integer units = statement.getValueAsInteger(GUIBundle.getString("PortfolioManagementJPanel_Units"));
+                        final Double purchasePrice = statement.getValueAsDouble(GUIBundle.getString("PortfolioManagementJPanel_PurchasePrice"));
+                        final Double broker = statement.getValueAsDouble(GUIBundle.getString("PortfolioManagementJPanel_Broker"));
+                        final Double clearingFee = statement.getValueAsDouble(GUIBundle.getString("PortfolioManagementJPanel_ClearingFee"));
+                        final Double stampDuty = statement.getValueAsDouble(GUIBundle.getString("PortfolioManagementJPanel_StampDuty"));
+                        final String _comment = statement.getValueAsString(GUIBundle.getString("PortfolioManagementJPanel_Comment"));
 
                         Stock stock = null;
                         if (_code.length() > 0 && _symbol.length() > 0) {
@@ -376,23 +376,6 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                             continue;
                         }
 
-                        Integer units = null;
-                        Double purchasePrice = null;
-                        Double broker = null;
-                        Double clearingFee = null;
-                        Double stampDuty = null;
-                        try {
-                            // Excel file always return double. For example, 100.0
-                            units = (int)(Double.parseDouble((String)_units));
-
-                            purchasePrice = Double.parseDouble((String)_purchasePrice);
-                            broker = Double.parseDouble((String)_broker);
-                            clearingFee = Double.parseDouble((String)_clearingFee);
-                            stampDuty = Double.parseDouble((String)_stampDuty);
-                        }
-                        catch (NumberFormatException exp) {
-                            log.error(null, exp);
-                        }
                         // Shall we continue to ignore, or shall we just return false to
                         // flag an error?
                         if (units == null) {
@@ -439,17 +422,17 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
                     for (int i = 0; i < size; i++) {
                         final Statement statement = statements.get(i);
-                        final String _code = (String)statement.getValue(GUIBundle.getString("MainFrame_Code"));
-                        final String _symbol = (String)statement.getValue(GUIBundle.getString("MainFrame_Symbol"));
-                        final String _referenceDate = (String)statement.getValue(GUIBundle.getString("PortfolioManagementJPanel_ReferenceDate"));
-                        final String _date = (String)statement.getValue(GUIBundle.getString("PortfolioManagementJPanel_Date"));
-                        final String _units = (String)statement.getValue(GUIBundle.getString("PortfolioManagementJPanel_Units"));
-                        final String _sellingPrice =  (String)statement.getValue(GUIBundle.getString("PortfolioManagementJPanel_SellingPrice"));
-                        final String _purchasePrice = (String)statement.getValue(GUIBundle.getString("PortfolioManagementJPanel_PurchasePrice"));
-                        final String _broker = (String)statement.getValue(GUIBundle.getString("PortfolioManagementJPanel_Broker"));
-                        final String _clearingFee = (String)statement.getValue(GUIBundle.getString("PortfolioManagementJPanel_ClearingFee"));
-                        final String _stampDuty = (String)statement.getValue(GUIBundle.getString("PortfolioManagementJPanel_StampDuty"));
-                        final String _comment = (String)statement.getValue(GUIBundle.getString("PortfolioManagementJPanel_Comment"));
+                        final String _code = statement.getValueAsString(GUIBundle.getString("MainFrame_Code"));
+                        final String _symbol = statement.getValueAsString(GUIBundle.getString("MainFrame_Symbol"));
+                        final String _referenceDate = statement.getValueAsString(GUIBundle.getString("PortfolioManagementJPanel_ReferenceDate"));
+                        final String _date = statement.getValueAsString(GUIBundle.getString("PortfolioManagementJPanel_Date"));
+                        final Integer units = statement.getValueAsInteger(GUIBundle.getString("PortfolioManagementJPanel_Units"));
+                        final Double sellingPrice =  statement.getValueAsDouble(GUIBundle.getString("PortfolioManagementJPanel_SellingPrice"));
+                        final Double purchasePrice = statement.getValueAsDouble(GUIBundle.getString("PortfolioManagementJPanel_PurchasePrice"));
+                        final Double broker = statement.getValueAsDouble(GUIBundle.getString("PortfolioManagementJPanel_Broker"));
+                        final Double clearingFee = statement.getValueAsDouble(GUIBundle.getString("PortfolioManagementJPanel_ClearingFee"));
+                        final Double stampDuty = statement.getValueAsDouble(GUIBundle.getString("PortfolioManagementJPanel_StampDuty"));
+                        final String _comment = statement.getValueAsString(GUIBundle.getString("PortfolioManagementJPanel_Comment"));
 
                         Stock stock = null;
                         if (_code.length() > 0 && _symbol.length() > 0) {
@@ -474,25 +457,6 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                         if (date == null || referenceDate == null) {
                             log.error("Unexpected wrong date/referenceDate. Ignore");
                             continue;
-                        }
-                        Integer units = null;
-                        Double purchasePrice = null;
-                        Double sellingPrice = null;
-                        Double broker = null;
-                        Double clearingFee = null;
-                        Double stampDuty = null;
-                        try {
-                            // Excel file always return double. For example, 100.0
-                            units = (int)(Double.parseDouble((String)_units));
-                            
-                            purchasePrice = Double.parseDouble((String)_purchasePrice);
-                            sellingPrice = Double.parseDouble((String)_sellingPrice);
-                            broker = Double.parseDouble((String)_broker);
-                            clearingFee = Double.parseDouble((String)_clearingFee);
-                            stampDuty = Double.parseDouble((String)_stampDuty);
-                        }
-                        catch (NumberFormatException exp) {
-                            log.error(null, exp);
                         }
                         // Shall we continue to ignore, or shall we just return false to
                         // flag an error?
@@ -539,12 +503,11 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
                     for (int i = 0; i < size; i++) {
                         Date date = null;
-                        Double cash = null;
                         final Statement statement = statements.get(i);
-                        final Object object0 = statement.getValue(GUIBundle.getString("PortfolioManagementJPanel_Date"));
+                        final String object0 = statement.getValueAsString(GUIBundle.getString("PortfolioManagementJPanel_Date"));
                         assert(object0 != null);
                         try {
-                            date = dateFormat.parse((String)object0);
+                            date = dateFormat.parse(object0);
                         }
                         catch (ParseException exp) {
                             log.error(null, exp);
@@ -555,14 +518,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                             log.error("Unexpected wrong date. Ignore");
                             continue;
                         }
-                        final Object object1 = statement.getValue(GUIBundle.getString("PortfolioManagementJPanel_Cash"));
-                        assert(object1 != null);
-                        try {
-                            cash = Double.parseDouble((String)object1);
-                        }
-                        catch (NumberFormatException exp) {
-                            log.error(null, exp);
-                        }
+                        final Double cash = statement.getValueAsDouble(GUIBundle.getString("PortfolioManagementJPanel_Cash"));
                         // Shall we continue to ignore, or shall we just return false to
                         // flag an error?
                         if (cash == null) {
@@ -600,9 +556,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     for (int i = 0; i < size; i++) {
                         Date date = null;
                         Stock stock = null;
-                        Double dividend = null;
                         final Statement statement = statements.get(i);
-                        final Object object0 = statement.getValue(GUIBundle.getString("PortfolioManagementJPanel_Date"));
+                        final String object0 = statement.getValueAsString(GUIBundle.getString("PortfolioManagementJPanel_Date"));
                         assert(object0 != null);
                         try {
                             date = dateFormat.parse((String)object0);
@@ -616,22 +571,15 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                             log.error("Unexpected wrong date. Ignore");
                             continue;
                         }
-                        final Object object1 = statement.getValue(GUIBundle.getString("PortfolioManagementJPanel_Dividend"));
-                        assert(object1 != null);
-                        try {
-                            dividend = Double.parseDouble((String)object1);
-                        }
-                        catch (NumberFormatException exp) {
-                            log.error(null, exp);
-                        }
+                        final Double dividend = statement.getValueAsDouble(GUIBundle.getString("PortfolioManagementJPanel_Dividend"));
                         // Shall we continue to ignore, or shall we just return false to
                         // flag an error?
                         if (dividend == null) {
                             log.error("Unexpected wrong dividend. Ignore");
                             continue;
                         }
-                        final String codeStr = (String)statement.getValue(GUIBundle.getString("MainFrame_Code"));
-                        final String symbolStr = (String)statement.getValue(GUIBundle.getString("MainFrame_Symbol"));
+                        final String codeStr = statement.getValueAsString(GUIBundle.getString("MainFrame_Code"));
+                        final String symbolStr = statement.getValueAsString(GUIBundle.getString("MainFrame_Symbol"));
                         if (codeStr.length() > 0 && symbolStr.length() > 0) {
                             stock = Utils.getEmptyStock(Code.newInstance(codeStr), Symbol.newInstance(symbolStr));
                         }
