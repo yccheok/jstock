@@ -21,6 +21,7 @@ package org.yccheok.jstock.gui;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -94,6 +95,9 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         jPanel5 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
+        jPanel10 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
         jPanel7 = new javax.swing.JPanel();
         jPanel8 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
@@ -112,10 +116,10 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
 
         jPanel6.setLayout(new java.awt.BorderLayout(5, 5));
 
-        jXHeader1.setDescription("If you cannot find your stock symbol in the official database downloaded from stock exchange server, you may add your stock manually into the user defined database.");
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
+        jXHeader1.setDescription(bundle.getString("StockDatabaseJDialog_Description")); // NOI18N
         jXHeader1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/64x64/db_add.png"))); // NOI18N
         jXHeader1.setTitle("Stock Database");
-        jXHeader1.setToolTipText("");
         jPanel6.add(jXHeader1, java.awt.BorderLayout.CENTER);
 
         getContentPane().add(jPanel6, java.awt.BorderLayout.NORTH);
@@ -191,6 +195,27 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
             jPanel5.add(jButton2);
 
             jPanel2.add(jPanel5, java.awt.BorderLayout.PAGE_START);
+
+            jLabel2.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+            jLabel2.setText(bundle.getString("StockDatabaseJDialog_NeedHelpVisit")); // NOI18N
+            jPanel10.add(jLabel2);
+
+            jLabel3.setFont(new java.awt.Font("Tahoma", 0, 10));
+            jLabel3.setText("<html><a href=\"http://jstock.sourceforge.net/faq.html?utm_source=jstock&utm_medium=database_dialog#database\">JStock FAQ</a></html>");
+            jLabel3.addMouseListener(new java.awt.event.MouseAdapter() {
+                public void mouseClicked(java.awt.event.MouseEvent evt) {
+                    jLabel3MouseClicked(evt);
+                }
+                public void mouseEntered(java.awt.event.MouseEvent evt) {
+                    jLabel3MouseEntered(evt);
+                }
+                public void mouseExited(java.awt.event.MouseEvent evt) {
+                    jLabel3MouseExited(evt);
+                }
+            });
+            jPanel10.add(jLabel3);
+
+            jPanel2.add(jPanel10, java.awt.BorderLayout.PAGE_END);
 
             jPanel4.add(jPanel2);
 
@@ -295,6 +320,18 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         this.setVisible(false);
         this.dispose();    
     }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jLabel3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel3MouseClicked
+        Utils.launchWebBrowser("http://jstock.sourceforge.net/faq.html?utm_source=jstock&utm_medium=database_dialog#database");
+    }//GEN-LAST:event_jLabel3MouseClicked
+
+    private void jLabel3MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel3MouseEntered
+        this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+    }//GEN-LAST:event_jLabel3MouseEntered
+
+    private void jLabel3MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel3MouseExited
+        this.setCursor(Cursor.getDefaultCursor());
+    }//GEN-LAST:event_jLabel3MouseExited
     
     private class TableRowPopupListener extends MouseAdapter {
         
@@ -801,7 +838,10 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
     javax.swing.JButton jButton3;
     javax.swing.JButton jButton4;
     javax.swing.JLabel jLabel1;
+    javax.swing.JLabel jLabel2;
+    javax.swing.JLabel jLabel3;
     javax.swing.JPanel jPanel1;
+    javax.swing.JPanel jPanel10;
     javax.swing.JPanel jPanel2;
     javax.swing.JPanel jPanel3;
     javax.swing.JPanel jPanel4;
