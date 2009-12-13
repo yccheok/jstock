@@ -42,6 +42,7 @@ public class Utils {
         chartTheme.setPlotOutlinePaint(Color.LIGHT_GRAY);
 
         if (chart.getPlot() instanceof CombinedDomainXYPlot) {
+            @SuppressWarnings("unchecked")
             List<Plot> plots = ((CombinedDomainXYPlot)chart.getPlot()).getSubplots();
             for (Plot plot : plots) {
                 final int domainAxisCount = ((XYPlot)plot).getDomainAxisCount();

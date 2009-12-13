@@ -112,11 +112,12 @@ public class StockCodeAndSymbolDatabase {
         symbolSearchEngine = new TSTSearchEngine<Symbol>(this.symbols);
         codeSearchEngine = new TSTSearchEngine<Code>(this.codes);        
     }
-        
+    
+    @SuppressWarnings("unchecked")
     private void deepCopy(Map dest, Map src) {
         Set set = src.keySet();
         for(Object o : set) {
-            List srcList = (List)src.get(o);
+            List srcList = (List)src.get(o);            
             List destList = new ArrayList(srcList);
             dest.put(o, destList);
         }

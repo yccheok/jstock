@@ -1,6 +1,13 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.5f - 2009-12-13
+  Feature: Added Money Flow Index indicator, to detect whether there is a lot or
+           little interest in a trade.
+  Bugfix:  Use adjustedClosePrice intead of closePrice in history information.
+  Bugfix:  Reduce CPU usage, during indicator scanning process.
+  Bugfix:  Save stock history in Excel with correct column format.
+  
 JStock 1.0.5e - 2009-12-09
   Bugfix:  Speed improvement in Stock Indicator Scanner.
   
