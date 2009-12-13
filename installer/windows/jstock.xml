@@ -22,12 +22,12 @@
     <maxHeapSize>512</maxHeapSize>
   </jre>
   <versionInfo>
-    <fileVersion>1.0.5.5</fileVersion>
-    <txtFileVersion>1.0.5.5</txtFileVersion>
+    <fileVersion>1.0.5.6</fileVersion>
+    <txtFileVersion>1.0.5.6</txtFileVersion>
     <fileDescription>JStock - Stock Market Software</fileDescription>
     <copyright>Yan Cheng Cheok &lt;yccheok@yahoo.com&gt;</copyright>
-    <productVersion>1.0.5.5</productVersion>
-    <txtProductVersion>1.0.5.5</txtProductVersion>
+    <productVersion>1.0.5.6</productVersion>
+    <txtProductVersion>1.0.5.6</txtProductVersion>
     <productName>JStock - Stock Market Software</productName>
     <companyName>Yan Cheng Cheok &lt;yccheok@yahoo.com&gt;</companyName>
     <internalName>jstock</internalName>
