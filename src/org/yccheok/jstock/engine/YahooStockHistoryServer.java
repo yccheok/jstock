@@ -111,7 +111,7 @@ public class YahooStockHistoryServer implements StockHistoryServer {
             double openPrice = 0.0;
             double highPrice = 0.0;
             double lowPrice = 0.0;
-            double closePrice = 0.0;
+            //double closePrice = 0.0;
             int volume = 0;
             double adjustedClosePrice = 0.0;
 
@@ -120,7 +120,7 @@ public class YahooStockHistoryServer implements StockHistoryServer {
                 openPrice = Double.parseDouble(fields[1]);
                 highPrice = Double.parseDouble(fields[2]);
                 lowPrice = Double.parseDouble(fields[3]);
-                closePrice = Double.parseDouble(fields[4]);
+                //closePrice = Double.parseDouble(fields[4]);
                 volume = Integer.parseInt(fields[5]);
                 adjustedClosePrice = Double.parseDouble(fields[6]);
             }
@@ -128,7 +128,7 @@ public class YahooStockHistoryServer implements StockHistoryServer {
                 log.error(null, exp);
             }
 
-            double changePrice = (previousClosePrice == Double.MAX_VALUE) ? 0 : closePrice - previousClosePrice;
+            double changePrice = (previousClosePrice == Double.MAX_VALUE) ? 0 : adjustedClosePrice - previousClosePrice;
             double changePricePercentage = ((previousClosePrice == Double.MAX_VALUE) || (previousClosePrice == 0.0)) ? 0 : changePrice / previousClosePrice * 100.0;
             
             SimpleDate simpleDate = new SimpleDate(calendar);
@@ -141,7 +141,7 @@ public class YahooStockHistoryServer implements StockHistoryServer {
                     industry,
                     prevPrice,
                     openPrice,
-                    closePrice, /* Last Price. */
+                    adjustedClosePrice, /* Last Price. */
                     highPrice,
                     lowPrice,
                     volume,
@@ -165,7 +165,7 @@ public class YahooStockHistoryServer implements StockHistoryServer {
             
             historyDatabase.put(simpleDate, stock);
             simpleDates.add(simpleDate);
-            previousClosePrice = closePrice;
+            previousClosePrice = adjustedClosePrice;
         }
         
         return (historyDatabase.size() > 1);
