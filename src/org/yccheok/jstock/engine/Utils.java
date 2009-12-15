@@ -266,6 +266,7 @@ public class Utils {
     private static final List<Index> australiaIndices = new ArrayList<Index>();
     private static final List<Index> austriaIndices = new ArrayList<Index>();
     private static final List<Index> belgiumIndices = new ArrayList<Index>();
+    private static final List<Index> brazilIndices = new ArrayList<Index>();
     private static final List<Index> canadaIndices = new ArrayList<Index>();
     private static final List<Index> denmarkIndices = new ArrayList<Index>();
     private static final List<Index> franceIndices = new ArrayList<Index>();
@@ -292,6 +293,7 @@ public class Utils {
         austriaIndices.add(Index.ATX);
         australiaIndices.add(Index.AORD);
         belgiumIndices.add(Index.BFX);
+        brazilIndices.add(Index.BVSP);
         canadaIndices.add(Index.GSPTSE);
         denmarkIndices.add(Index.OMXC20CO);
         franceIndices.add(Index.FCHI);  
@@ -376,6 +378,8 @@ public class Utils {
                 return java.util.Collections.unmodifiableList(Utils.austriaIndices);
             case Belgium:
                 return java.util.Collections.unmodifiableList(Utils.belgiumIndices);
+            case Brazil:
+                return java.util.Collections.unmodifiableList(Utils.brazilIndices);
             case Canada:
                 return java.util.Collections.unmodifiableList(Utils.canadaIndices);
             case Denmark:

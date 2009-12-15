@@ -28,6 +28,7 @@ public enum Country {
     Australia("/images/16x16/au.png"),
     Austria("/images/16x16/at.png"),
     Belgium("/images/16x16/be.png"),
+    Brazil("/images/16x16/br.png"),
     Canada("/images/16x16/ca.png"),
     Denmark("/images/16x16/dk.png"),
     France("/images/16x16/fr.png"),

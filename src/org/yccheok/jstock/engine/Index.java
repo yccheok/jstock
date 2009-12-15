@@ -49,7 +49,8 @@ public enum Index {
     AEX("AEX", Code.newInstance("^AEX")),
     PSI20("PSI 20", Code.newInstance("^PSI20")),
     TWII("TSEC weighted index", Code.newInstance("^TWII")),
-    SSMI("Swiss Market", Code.newInstance("^SSMI"));
+    SSMI("Swiss Market", Code.newInstance("^SSMI")),
+    BVSP("Bovespa", Code.newInstance("^BVSP"));
 
     Index(String name, Code code) {
         this.name = name;
