@@ -1,19 +1,20 @@
 /*
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2009 Yan Cheng CHEOK <yccheok@yahoo.com>
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- * Copyright (C) 2008 Yan Cheng Cheok <yccheok@yahoo.com>
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.yccheok.jstock.engine;
@@ -150,7 +151,7 @@ public class YahooStockFormat implements StockFormat {
                 if (length < 1) break; code = Code.newInstance(quotePattern.matcher(fields[0]).replaceAll("").trim());
                 
                 if (length < 2) break; name = quotePattern.matcher(fields[1]).replaceAll("").trim();
-           
+
                 // We use name as symbol, to make it more readable.
                 symbol = Symbol.newInstance(name.toString());
 
@@ -285,6 +286,4 @@ public class YahooStockFormat implements StockFormat {
     private static final Pattern stringCommaPattern = Pattern.compile("(\",\")|,(?=[^\"[,]]*\",\")");
     private static final Pattern quotePattern = Pattern.compile("\"");
     private static final Pattern percentagePattern = Pattern.compile("%");
-    
-    private static final Log log = LogFactory.getLog(YahooStockFormat.class);
 }
