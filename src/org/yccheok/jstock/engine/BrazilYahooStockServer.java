@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -321,9 +322,9 @@ public class BrazilYahooStockServer extends Subject<BrazilYahooStockServer, Inte
 
         while (matcher.find()){
             for (int j = 1; j <= matcher.groupCount(); j++) {
-				//modify "/q/cp?s=%5EBVSP&amp;c=1" => "/q/cp?s=%5EBVSP&c=1"
-                final String string = matcher.group(j).replaceAll("&amp;", "&");
-
+                // Not sure why. Modify "/q/cp?s=%5EBVSP&amp;c=1" => "/q/cp?s=%5EBVSP&c=1"
+                final String tmp = matcher.group(j);
+                final String string = StringEscapeUtils.unescapeHtml(tmp);
                 try {
                     URL url = new URL(baseURL, string);
 
@@ -331,7 +332,7 @@ public class BrazilYahooStockServer extends Subject<BrazilYahooStockServer, Inte
                         urls.add(url);
                     }
                 } catch (MalformedURLException ex) {
-                    log.error("", ex);
+                    log.error(null, ex);
                 }
             }
         }
