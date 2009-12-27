@@ -347,7 +347,7 @@ public class Utils {
 
     public static Code toYahooFormat(Code code, Country country)
     {
-        if(code == null || country == null)
+        if (code == null || country == null)
         {
             throw new java.lang.IllegalArgumentException("Method parameters cannot be null in toYahooFormat");
         }
