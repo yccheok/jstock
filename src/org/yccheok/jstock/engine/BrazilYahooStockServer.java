@@ -321,7 +321,8 @@ public class BrazilYahooStockServer extends Subject<BrazilYahooStockServer, Inte
 
         while (matcher.find()){
             for (int j = 1; j <= matcher.groupCount(); j++) {
-                final String string = matcher.group(j);
+				//modify "/q/cp?s=%5EBVSP&amp;c=1" => "/q/cp?s=%5EBVSP&c=1"
+                final String string = matcher.group(j).replaceAll("&amp;", "&");
 
                 try {
                     URL url = new URL(baseURL, string);
@@ -479,7 +480,7 @@ public class BrazilYahooStockServer extends Subject<BrazilYahooStockServer, Inte
     static {
         // We try to perform search from Yahoo Finance by using the following parameters :
         try {
-            servers.put(Country.Brazil, new URL("http://br.finance.yahoo.com/q/cp?s=%5EBVSP&amp;c=0"));
+            servers.put(Country.Brazil, new URL("http://br.finance.yahoo.com/q/cp?s=%5EBVSP&c=0"));
         }
         catch(MalformedURLException exp) {
             // Shouldn't happen.
