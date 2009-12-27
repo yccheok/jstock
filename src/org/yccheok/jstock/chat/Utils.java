@@ -140,7 +140,7 @@ public class Utils {
 
     // We should make use of StringEscapeUtils utility methods from apache common.
     private static String escapeHTMLEntities(String src) {
-        return src.replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
+        return src.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
     }
 
     public static String getJEditorPaneEmptyHeader() {
