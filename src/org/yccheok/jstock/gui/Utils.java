@@ -54,6 +54,12 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineEvent;
+import javax.sound.sampled.LineListener;
+import javax.sound.sampled.LineListener;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
@@ -1589,6 +1595,30 @@ public class Utils {
             }
         }
         return null;
+    }
+
+    public static void playAlertSound() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Clip clip = AudioSystem.getClip();
+                    clip.addLineListener(new LineListener() {
+                        @Override
+                        public void update(LineEvent event) {
+                            if (event.getType() == LineEvent.Type.STOP) {
+                                event.getLine().close();
+                            }
+                        }
+                    });
+                    AudioInputStream inputStream = AudioSystem.getAudioInputStream(Utils.class.getResourceAsStream("/sounds/doorbell.wav"));
+                    clip.open(inputStream);
+                    clip.start();
+                } catch (Exception e) {
+                   log.error(null, e);
+                }
+            }
+        }).start();
     }
 
     // Calling to this method will affect state of JStockOptions.
