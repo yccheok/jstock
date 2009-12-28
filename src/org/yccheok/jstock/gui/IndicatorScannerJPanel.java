@@ -834,8 +834,9 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
 
         private void maybeShowPopup(MouseEvent e) {
             if (e.isPopupTrigger()) {
-                if(jTable1.getSelectedColumn() != -1)
+                if (jTable1.getSelectedColumn() != -1) {
                     getMyJTablePopupMenu().show(e.getComponent(), e.getX(), e.getY());
+                }
             }
         }
     }
@@ -857,11 +858,32 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                 int rows[] = jTable1.getSelectedRows();
                 final IndicatorTableModel tableModel = (IndicatorTableModel)jTable1.getModel();
 
-                for(int row : rows) {
+                for (int row : rows) {
                     final int modelIndex = jTable1.convertRowIndexToModel(row);
                     final Indicator indicator = tableModel.getIndicator(modelIndex);
-                    if(indicator != null)
+                    if (indicator != null) {
                         m.displayHistoryChart(indicator.getStock());
+                    }
+                }
+            }
+        });
+
+        popup.add(menuItem);
+
+        menuItem = new JMenuItem(GUIBundle.getString("IndicatorScannerJPanel_AddToRealTimeInfo"), this.getImageIcon("/images/16x16/add.png"));
+        
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                int rows[] = jTable1.getSelectedRows();
+                final IndicatorTableModel tableModel = (IndicatorTableModel)jTable1.getModel();
+
+                for (int row : rows) {
+                    final int modelIndex = jTable1.convertRowIndexToModel(row);
+                    final Indicator indicator = tableModel.getIndicator(modelIndex);
+                    if (indicator != null) {
+                        m.addStockToTable(indicator.getStock());
+                    }
                 }
             }
         });
