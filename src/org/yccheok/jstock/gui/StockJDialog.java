@@ -533,7 +533,7 @@ public class StockJDialog extends javax.swing.JDialog {
         boardCheckBoxes.add(jCheckBox26);
         boardCheckBoxes.add(jCheckBox27);
         
-        for(JCheckBox checkBox : boardCheckBoxes) {
+        for (JCheckBox checkBox : boardCheckBoxes) {
             checkBox.setVisible(false);
         }
         
@@ -543,8 +543,8 @@ public class StockJDialog extends javax.swing.JDialog {
         Collections.sort(sortedBoards);
         
         int count = 0;
-        for(Stock.Board board : sortedBoards) {
-            if(count >= boardCheckBoxes.size()) {
+        for (Stock.Board board : sortedBoards) {
+            if (count >= boardCheckBoxes.size()) {
                 log.error("You do not have enough check box components (" + boardCheckBoxes.size() + ") to hold board (" + boards.size() + ")");
                 break;
             }
