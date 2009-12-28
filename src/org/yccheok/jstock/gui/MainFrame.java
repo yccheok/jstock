@@ -590,7 +590,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
 // TODO add your handling code here:
-        if(this.getStockCodeAndSymbolDatabase() == null) {
+        if (this.getStockCodeAndSymbolDatabase() == null) {
             javax.swing.JOptionPane.showMessageDialog(this, "We haven't connected to stock server.", "Not Connected", javax.swing.JOptionPane.INFORMATION_MESSAGE);
             return;
         }
@@ -1717,16 +1717,16 @@ public class MainFrame extends javax.swing.JFrame {
                     // Make sure no same task is running.
                     if (stockCodeAndSymbolDatabaseTask != null) {
                         if (stockCodeAndSymbolDatabaseTask.isDone() == true) {
-                            final int result = JOptionPane.showConfirmDialog(MainFrame.this, "Perform reconnecting to stock server may take several minutes to several hours (depending on your network connection).\nAre you sure you want to do so?", "Reconnecting to stock server", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-                            if(result == JOptionPane.YES_OPTION)
+                            final int result = JOptionPane.showConfirmDialog(MainFrame.this, MessagesBundle.getString("question_message_perform_server_reconnecting"), MessagesBundle.getString("question_title_perform_server_reconnecting"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                            if (result == JOptionPane.YES_OPTION)
                             {
                                 initStockCodeAndSymbolDatabase(false);
                             }
                         }
                         else {
-                            final int result = JOptionPane.showConfirmDialog(MainFrame.this, "Do you want to cancel from connecting to stock server?", "Cancel connecting to stock server", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                            final int result = JOptionPane.showConfirmDialog(MainFrame.this, MessagesBundle.getString("question_message_cancel_server_reconnecting"), MessagesBundle.getString("question_title_cancel_server_reconnecting"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
                             
-                            if(result == JOptionPane.YES_OPTION)
+                            if (result == JOptionPane.YES_OPTION)
                             {                            
                                 synchronized(stockCodeAndSymbolDatabaseTask)
                                 {
@@ -1944,11 +1944,16 @@ public class MainFrame extends javax.swing.JFrame {
                     if (jStockOptions.isPopupMessage()) {
                         displayPopupMessage(stock.getSymbol().toString(), message);
 
+                        if (jStockOptions.isSoundEnabled()) {
+                            /* Non-blocking. */
+                            Utils.playAlertSound();
+                        }
+
                         try {
                             Thread.sleep(jStockOptions.getAlertSpeed() * 1000);
                         }
-                        catch(InterruptedException exp) {
-                            log.error("", exp);
+                        catch (InterruptedException exp) {
+                            log.error(null, exp);
                         }
                     }
                 }
@@ -1957,10 +1962,37 @@ public class MainFrame extends javax.swing.JFrame {
             try {
                 systemTrayAlertPool.submit(r);
             }
-            catch(java.util.concurrent.RejectedExecutionException exp) {
-                log.error("", exp);
+            catch (java.util.concurrent.RejectedExecutionException exp) {
+                log.error(null, exp);
             }
         }   /* if(this.jStockOptions.isPopupMessage()) */
+
+        // Sound alert hasn't been submitted to pop up message pool.
+        if (jStockOptions.isPopupMessage() == false && jStockOptions.isSoundEnabled()) {
+            final Runnable r = new Runnable() {
+                @Override
+                public void run() {
+                    if (jStockOptions.isSoundEnabled()) {
+                        /* Non-blocking. */
+                        Utils.playAlertSound();
+
+                        try {
+                            Thread.sleep(jStockOptions.getAlertSpeed() * 1000);
+                        }
+                        catch (InterruptedException exp) {
+                            log.error(null, exp);
+                        }
+                    }
+                }
+            };
+
+            try {
+                systemTrayAlertPool.submit(r);
+            }
+            catch (java.util.concurrent.RejectedExecutionException exp) {
+                log.error(null, exp);
+            }
+        }   /* if(this.jStockOptions.isSoundEnabled()) */
 
         if (this.jStockOptions.isSendEmail()) {
             final Runnable r = new Runnable() {
@@ -2875,7 +2907,7 @@ public class MainFrame extends javax.swing.JFrame {
         }   /* for (Stock stock : stocks) */
 
         // No alert is needed. Early return.
-        if ((jStockOptions.isSMSEnabled() == false) && (jStockOptions.isPopupMessage() == false) && (jStockOptions.isSendEmail() == false)) {
+        if ((jStockOptions.isSMSEnabled() == false) && (jStockOptions.isPopupMessage() == false) && (jStockOptions.isSoundEnabled() == false) && (jStockOptions.isSendEmail() == false)) {
             return;
         }
 
