@@ -1,143 +1,36 @@
 /*
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2009 Yan Cheng CHEOK <yccheok@yahoo.com>
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- * Copyright (C) 2008 Yan Cheng Cheok <yccheok@yahoo.com>
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.yccheok.jstock.engine;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  *
  * @author yccheok
  */
-public class BrazilYahooMarketServer implements MarketServer {
+public class BrazilYahooMarketServer extends AbstractYahooMarketServer {
+
     public BrazilYahooMarketServer(Country country) {
-        // BrazilYahooMarketServer only support Brazil market at this moment.
-        if (country != Country.Brazil) {
-            throw new java.lang.IllegalArgumentException("Only support Brazil market");
-        }
-
-        this.indicies = Utils.getStockIndices(country);
-
-        if (this.indicies.size() == 0) {
-            throw new java.lang.IllegalArgumentException("Country=" + country);
-        }
-
-        this.country = country;
-        this.stockServer = new BrazilYahooStockServer(country);
-
-        for (Index index : indicies) {
-            codes.add(index.getCode());
-            codeToIndexMap.put(index.getCode(), index);
-        }
+        super(country);
     }
 
     @Override
-    public Market getMarket() {
-        try {
-            return new BrazilYahooMarket();
-        }
-        catch (StockNotFoundException exp) {
-            log.error("", exp);
-        }
-
-        return null;
+    protected StockServer getStockServer(Country country) {
+        return new BrazilYahooStockServer(country);
     }
-
-    public Country country() {
-        return country;
-    }
-
-    private final class BrazilYahooMarket implements Market {
-        private final Map<Index, Stock> map = new HashMap<Index, Stock>();
-
-        public BrazilYahooMarket() throws StockNotFoundException {
-            List<Stock> stocks;
-
-            try {
-                stocks = stockServer.getStocksByCodes(codes);
-            } catch (StockNotFoundException ex) {
-                throw ex;
-            }
-
-            for (Stock stock : stocks) {
-                map.put(codeToIndexMap.get(stock.getCode()), stock);
-            }
-        }
-
-        @Override
-        public double getIndex(Index index) {
-            final Stock stock = map.get(index);
-            if (stock == null) return 0.0;
-
-            return stock.getLastPrice();
-        }
-
-        @Override
-        public double getChange(Index index) {
-            final Stock stock = map.get(index);
-            if (stock == null) return 0.0;
-
-            return stock.getChangePrice();
-        }
-
-        @Override
-        public int getNumOfStockChange(ChangeType type) {
-            return 0;
-        }
-
-        @Override
-        public long getVolume() {
-            long total = 0;
-
-            for (Stock stock : map.values()) {
-                total += stock.getVolume();
-            }
-
-            return total;
-        }
-
-        @Override
-        public double getValue() {
-            double total = 0;
-
-            for (Stock stock : map.values()) {
-                total += stock.getLastPrice();
-            }
-
-            return total;
-        }
-
-        @Override
-        public Country getCountry() {
-            return country;
-        }
-    }
-
-    private static final Log log = LogFactory.getLog(BrazilYahooMarketServer.class);
-
-    private final Country country;
-    private final List<Index> indicies;
-    private final List<Code> codes = new ArrayList<Code>();
-    private final StockServer stockServer;
-    private final Map<Code, Index> codeToIndexMap = new HashMap<Code, Index>();
 }
