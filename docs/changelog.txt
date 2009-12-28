@@ -1,6 +1,16 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.5g - 2009-12-29
+  Feature: Support Brazil stock market. Contributed by sytee. (#2875071)
+  Feature: Able to play sound for alert. (#2902067)
+  Feature: Able to add indicator scanner result into real-time info tab.
+  Bugfix:  IndicatorProjectManager's directory may become invalid when loaded
+           from cloud. This bug is fixed in 1.0.5c. But is being remove 
+           accidentally after that.
+  Bugfix:  Avoid using adjustedClosePrice from Yahoo, due to badly constructed
+           charting look.
+           
 JStock 1.0.5f - 2009-12-13
   Feature: Added Money Flow Index indicator, to detect whether there is a lot or
            little interest in a trade.
