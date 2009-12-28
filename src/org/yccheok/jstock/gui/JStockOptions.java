@@ -67,7 +67,8 @@ public class JStockOptions {
         setAlertSpeed(5);
         setLookNFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
         setCountry(Country.Malaysia);
-        
+        setSoundEnabled(false);
+
         this.setNormalTextForegroundColor(DEFAULT_NORMAL_TEXT_FOREGROUND_COLOR);
         this.setHigherNumericalValueForegroundColor(DEFAULT_HIGHER_NUMERICAL_VALUE_FOREGROUND_COLOR);
         this.setLowerNumericalValueForegroundColor(DEFAULT_LOWER_NUMERICAL_VALUE_FOREGROUND_COLOR);
@@ -98,7 +99,8 @@ public class JStockOptions {
         this.setChatOwnMessageColor(DEFAULT_CHAT_OWN_MESSAGE_COLOR);
         this.setChatOtherMessageColor(DEFAULT_CHAT_OTHER_MESSAGE_COLOR);
     }
-    
+
+    private boolean soundEnabled;
     private boolean singleIndicatorAlert;
     private boolean popupMessage;
     private boolean sendEmail;
@@ -1072,5 +1074,19 @@ public class JStockOptions {
      */
     public void setGooglePassword(String googlePassword) {
         this.googlePassword = googlePassword;
+    }
+
+    /**
+     * @return the soundEnabled
+     */
+    public boolean isSoundEnabled() {
+        return soundEnabled;
+    }
+
+    /**
+     * @param soundEnabled the soundEnabled to set
+     */
+    public void setSoundEnabled(boolean soundEnabled) {
+        this.soundEnabled = soundEnabled;
     }
 }
