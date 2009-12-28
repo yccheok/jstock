@@ -340,11 +340,15 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                     if (jStockOptions.isPopupMessage()) {
                         m.displayPopupMessage(stock.getSymbol().toString(), message);
 
+                        if (jStockOptions.isSoundEnabled()) {
+                            /* Non-blocking. */
+                            Utils.playAlertSound();
+                        }
                         try {
                             Thread.sleep(jStockOptions.getAlertSpeed() * 1000);
                         }
-                        catch(InterruptedException exp) {
-                            log.error("", exp);
+                        catch (InterruptedException exp) {
+                            log.error(null, exp);
                         }
                     }
                 }
@@ -353,10 +357,37 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             try {
                 systemTrayAlertPool.submit(r);
             }
-            catch(java.util.concurrent.RejectedExecutionException exp) {
-                log.error("", exp);
+            catch (java.util.concurrent.RejectedExecutionException exp) {
+                log.error(null, exp);
             }
-        }
+        }   /* if (jStockOptions.isPopupMessage()) */
+
+        // Sound alert hasn't been submitted to pop up message pool.
+        if (jStockOptions.isPopupMessage() == false && jStockOptions.isSoundEnabled()) {
+            final Runnable r = new Runnable() {
+                @Override
+                public void run() {
+                    if (jStockOptions.isSoundEnabled()) {
+                        /* Non-blocking. */
+                        Utils.playAlertSound();
+
+                        try {
+                            Thread.sleep(jStockOptions.getAlertSpeed() * 1000);
+                        }
+                        catch (InterruptedException exp) {
+                            log.error(null, exp);
+                        }
+                    }
+                }
+            };
+
+            try {
+                systemTrayAlertPool.submit(r);
+            }
+            catch (java.util.concurrent.RejectedExecutionException exp) {
+                log.error(null, exp);
+            }
+        }   /* if (this.jStockOptions.isSoundEnabled()) */
 
         if (jStockOptions.isSendEmail()) {
             final Runnable r = new Runnable() {
