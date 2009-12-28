@@ -99,7 +99,9 @@ public class MarketJPanel extends javax.swing.JPanel {
     private void initAccordingToCountry(Country country) {
         List<Index> indices = org.yccheok.jstock.engine.Utils.getStockIndices(country);
         for (final Index index : indices) {
-            if(ignoreIndices.contains(index)) continue;
+            if (ignoreIndices.contains(index)) {
+                continue;
+            }
 
             JLabel name = new JLabel(index.toString() + " : ");
             leftPanel.add(name);
