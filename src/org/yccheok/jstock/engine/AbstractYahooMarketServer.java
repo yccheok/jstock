@@ -43,16 +43,19 @@ public abstract class AbstractYahooMarketServer implements MarketServer {
 
     public AbstractYahooMarketServer(Country country) {
         this.country = country;
-        this.stockServer = getStockServer(country);
-        this.indicies = Utils.getStockIndices(country);
+        this.stockServer = getStockServer(country);       
         /* Hack on Malaysia Market! The format among Yahoo and CIMB are difference. */
         if (country == Country.Malaysia) {
-            for (int i = 0; i < indicies.size(); i++) {
-                if (indicies.get(i).getCode().toString().startsWith("^") == false) {
-                    indicies.remove(i);
-                    i--;
+            final List<Index> tmp = new ArrayList<Index>();
+            for (Index index : Utils.getStockIndices(country)) {
+                if (index.getCode().toString().startsWith("^")) {
+                    tmp.add(index);
                 }
             }
+            this.indicies = java.util.Collections.unmodifiableList(tmp);
+        }
+        else {
+            this.indicies = Utils.getStockIndices(country);
         }
         if (this.indicies.size() == 0) {
             throw new java.lang.IllegalArgumentException(country.toString());
