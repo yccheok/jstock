@@ -96,8 +96,9 @@ public abstract class AbstractYahooStockHistoryServer implements StockHistorySer
 
         double previousClosePrice = Double.MAX_VALUE;
 
-        for (int i = length - 1; i >= 0; i--)
+        for (int i = length - 1; i > 0; i--)
         {
+            // Use > instead of >=, to avoid header information (Date,Open,High,Low,Close,Volume,Adj Close)
             String[] fields = stockDatas[i].split(",");
 
             // Date,Open,High,Low,Close,Volume,Adj Close
