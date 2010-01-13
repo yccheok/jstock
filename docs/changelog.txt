@@ -1,6 +1,10 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.5h - ????-??-??
+  Bugfix:  Unparseable date: "Date" (#2830487)
+  Bugfix:  Cannot enter email password (#2924737)
+  
 JStock 1.0.5g - 2009-12-29
   Feature: Support Brazil stock market. Contributed by sytee. (#2875071)
   Feature: Able to play sound for alert. (#2902067)
