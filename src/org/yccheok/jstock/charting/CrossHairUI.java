@@ -185,12 +185,15 @@ public class CrossHairUI extends AbstractLayerUI {
         this.processEvent(e, layer);
     }
 
-    private void processEvent(MouseEvent e, JXLayer layer) {
+    private void processTimeSeriesCollectionEvent(MouseEvent e, JXLayer layer) {
         final Component component = e.getComponent();
         final ChartPanel chartPanel = (ChartPanel)component;
         final JFreeChart chart = chartPanel.getChart();
         final CombinedDomainXYPlot cplot = (CombinedDomainXYPlot) chart.getPlot();
         final XYPlot plot = (XYPlot) cplot.getSubplots().get(0);
+        final TimeSeriesCollection timeSeriesCollection = (TimeSeriesCollection)plot.getDataset();
+        final TimeSeries timeSeries = timeSeriesCollection.getSeries(0);
+
         final Point mousePoint = SwingUtilities.convertPoint(e.getComponent(), e.getPoint(), layer);
         // I also not sure why. This is what are being done in Mouse Listener Demo 4.
         final Point2D mousePoint2 = chartPanel.translateScreenToJava2D(mousePoint);
@@ -201,10 +204,8 @@ public class CrossHairUI extends AbstractLayerUI {
         final RectangleEdge rangeAxisEdge = plot.getRangeAxisEdge();
         double coordinateX = domainAxis.java2DToValue(mousePoint2.getX(), plotArea,
                 domainAxisEdge);
-        double coordinateY = rangeAxis.java2DToValue(mousePoint2.getY(), plotArea,
-                rangeAxisEdge);
-        final TimeSeriesCollection timeSeriesCollection = (TimeSeriesCollection)plot.getDataset();
-        final TimeSeries timeSeries = timeSeriesCollection.getSeries(0);
+        //double coordinateY = rangeAxis.java2DToValue(mousePoint2.getY(), plotArea,
+        //        rangeAxisEdge);
 
         int low = 0;
         int high = timeSeries.getItemCount() - 1;
@@ -213,22 +214,21 @@ public class CrossHairUI extends AbstractLayerUI {
         long bestDistance = Long.MAX_VALUE;
         int bestMid = 0;
 
-	while (low <= high) {
-	    int mid = (low + high) >>> 1;
+        while (low <= high) {
+            int mid = (low + high) >>> 1;
 
             final TimeSeriesDataItem timeSeriesDataItem = timeSeries.getDataItem(mid);
             final Day day = (Day)timeSeriesDataItem.getPeriod();
-            // ???
-            final long target = (day.getFirstMillisecond() + day.getLastMillisecond()) >>> 1;
+            final long target = day.getFirstMillisecond();
             final long cmp = target - time;
 
-	    if (cmp < 0) {
-		low = mid + 1;
+            if (cmp < 0) {
+                low = mid + 1;
             }
-	    else if (cmp > 0) {
-		high = mid - 1;
+            else if (cmp > 0) {
+                high = mid - 1;
             }
-	    else {
+            else {
                 bestDistance = 0;
                 bestMid = mid;
                 break;
@@ -239,11 +239,27 @@ public class CrossHairUI extends AbstractLayerUI {
                 bestDistance = abs_cmp;
                 bestMid = mid;
             }
-	}
+        }
 
-        System.out.println("BEST = " + timeSeries.getDataItem(bestMid).getPeriod());
+        final TimeSeriesDataItem timeSeriesDataItem = timeSeries.getDataItem(bestMid);
+        final double xValue = timeSeriesDataItem.getPeriod().getFirstMillisecond();
+        final double yValue = timeSeriesDataItem.getValue().doubleValue();
+        final double xJava2D = domainAxis.valueToJava2D(xValue, plotArea, domainAxisEdge);
+        final double yJava2D = rangeAxis.valueToJava2D(yValue, plotArea, rangeAxisEdge);
+        System.out.println(xJava2D + " " + yJava2D + " (" + xValue + " " + yValue + ")");
 
         setDirty(true);
+    }
+
+    private void processEvent(MouseEvent e, JXLayer layer) {
+        final Component component = e.getComponent();
+        final ChartPanel chartPanel = (ChartPanel)component;
+        final JFreeChart chart = chartPanel.getChart();
+        final CombinedDomainXYPlot cplot = (CombinedDomainXYPlot) chart.getPlot();
+        final XYPlot plot = (XYPlot) cplot.getSubplots().get(0);
+        if (plot.getDataset() instanceof TimeSeriesCollection) {
+            this.processTimeSeriesCollectionEvent(e, layer);
+        }
     }
 
     /**
