@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
+ * Copyright (C) 2010 Yan Cheng Cheok <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,6 +51,7 @@ import org.jfree.data.time.MovingAverage;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.*;
+import org.yccheok.jstock.charting.CrossHairUI;
 import org.yccheok.jstock.charting.TechnicalAnalysis;
 import org.yccheok.jstock.file.Statements;
 import org.yccheok.jstock.internationalization.GUIBundle;
@@ -105,8 +106,12 @@ public class ChartJDialog extends javax.swing.JDialog {
         this.priceVolumeChart = this.createPriceVolumeChart(stockHistoryServer);
         
         this.chartPanel = new ChartPanel(this.priceVolumeChart, true, true, true, true, true);
-        
-        getContentPane().add(this.chartPanel, java.awt.BorderLayout.CENTER);
+
+        final org.jdesktop.jxlayer.JXLayer<ChartPanel> layer = new org.jdesktop.jxlayer.JXLayer<ChartPanel>(this.chartPanel);
+        CrossHairUI ui = new CrossHairUI();
+        layer.setUI(ui);
+
+        getContentPane().add(layer, java.awt.BorderLayout.CENTER);
     }
     
     /** This method is called from within the constructor to
@@ -933,6 +938,7 @@ public class ChartJDialog extends javax.swing.JDialog {
         rangeAxis1.setNumberFormatOverride(format);
 
         XYPlot plot = new XYPlot(this.priceDataset, timeAxis, rangeAxis1, null);
+
         XYToolTipGenerator toolTipGenerator = StandardXYToolTipGenerator.getTimeSeriesInstance();
 
         XYItemRenderer renderer1 = new XYLineAndShapeRenderer(true, false);
@@ -950,6 +956,7 @@ public class ChartJDialog extends javax.swing.JDialog {
         plot.setRangeAxis(1, rangeAxis2);
         plot.setDataset(1, this.volumeDataset);
         plot.mapDatasetToRangeAxis(1, 1);
+
         XYBarRenderer renderer2 = new XYBarRenderer(0.20);
         renderer2.setToolTipGenerator(
             new StandardXYToolTipGenerator(
@@ -962,9 +969,10 @@ public class ChartJDialog extends javax.swing.JDialog {
         CombinedDomainXYPlot cplot = new CombinedDomainXYPlot(timeAxis);
         cplot.add(plot, 3);
         cplot.setGap(8.0);
+
         JFreeChart chart = new JFreeChart(title, JFreeChart.DEFAULT_TITLE_FONT, cplot, true);
         org.yccheok.jstock.charting.Utils.applyChartTheme(chart);
-
+        
         return chart;
     }
 

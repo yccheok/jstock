@@ -24,15 +24,9 @@ package org.yccheok.jstock.charting;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics2D;
-import java.awt.MultipleGradientPaint;
-import java.awt.Paint;
 import java.awt.Point;
-import java.awt.RadialGradientPaint;
 import java.awt.RenderingHints;
-import java.awt.Shape;
 import java.awt.event.MouseEvent;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 
 import java.awt.geom.Rectangle2D;
@@ -57,47 +51,7 @@ import org.jfree.ui.RectangleEdge;
  */
 public class CrossHairUI extends AbstractLayerUI {
 
-    private int radius = 80;
-
-    private double magnifyingFactor = 4.0;
-
     private Point2D point = new Point2D.Double();
-
-    /**
-     * Returns the magnifying scale factor.
-     *
-     * @return The magnifying scale factor.
-     */
-    public double getMagnifyingFactor() {
-        return this.magnifyingFactor;
-    }
-
-    /**
-     * Sets the magnifying scale factor.
-     *
-     * @param factor  the new scale factor.
-     */
-    public void setMagnifyingFactor(double factor) {
-        this.magnifyingFactor = factor;
-    }
-
-    /**
-     * Returns the radius of the magnifying glass, in Java2D units.
-     *
-     * @return The radius.
-     */
-    public int getRadius() {
-        return this.radius;
-    }
-
-    /**
-     * Sets the radius of the magnifying glass.
-     *
-     * @param radius  the new radius (in Java2D units).
-     */
-    public void setRadius(int radius) {
-        this.radius = radius;
-    }
 
     /**
      * Returns the current location of the magnifying glass.
@@ -126,38 +80,13 @@ public class CrossHairUI extends AbstractLayerUI {
     @Override
     protected void paintLayer(Graphics2D g2, JXLayer layer) {
         super.paintLayer(g2, layer);
-        Point2D _point = getPoint();
-        double scale = getMagnifyingFactor();
-        double baseRadius = getRadius();
-        double scaledRadius = (baseRadius / scale);
-        double strokeAdjust = 0.5;
-        double drawSize = 2 * (baseRadius + strokeAdjust);
-        double clipSize = 2 * scaledRadius;
-        Ellipse2D drawGlass = new Ellipse2D.Double(-strokeAdjust,
-                -strokeAdjust, drawSize, drawSize);
-        Ellipse2D clipGlass = new Ellipse2D.Double(0, 0, clipSize, clipSize);
-        g2.setRenderingHint(RenderingHints.KEY_RENDERING,
-                RenderingHints.VALUE_RENDER_QUALITY);
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION,
-                RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
-        g2.translate(_point.getX() - baseRadius, _point.getY() - baseRadius);
-                Color oldColor = g2.getColor();
-        g2.setPaint(createPaint(drawGlass, false));
-        g2.fill(drawGlass);
-        g2.setColor(oldColor);
-        g2.draw(drawGlass);
-        AffineTransform oldTransform = g2.getTransform();
-        Shape oldClip = g2.getClip();
-        g2.scale(scale, scale);
-        g2.clip(clipGlass);
-        g2.translate(scaledRadius - _point.getX(), scaledRadius - _point.getY());
-        layer.paint(g2);
-        g2.setTransform(oldTransform);
-        g2.setClip(oldClip);
-        g2.setPaint(createPaint(drawGlass, true));
-        g2.fill(drawGlass);
+        final Point2D _point = getPoint();
+        final int radius = 8;
+        final Object oldValueAntiAlias = g2.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setColor(new Color(85, 85, 255));
+        g2.fillOval((int)(_point.getX() - (radius >> 1) + 0.5), (int)(_point.getY() - (radius >> 1) + 0.5), radius, radius);
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, oldValueAntiAlias);
     }
 
     /**
@@ -248,10 +177,16 @@ public class CrossHairUI extends AbstractLayerUI {
         final double yJava2D = rangeAxis.valueToJava2D(yValue, plotArea, rangeAxisEdge);
         System.out.println(xJava2D + " " + yJava2D + " (" + xValue + " " + yValue + ")");
 
+        this.setPoint(new Point2D.Double(xJava2D, yJava2D));
+
         setDirty(true);
     }
 
     private void processEvent(MouseEvent e, JXLayer layer) {
+        if (MouseEvent.MOUSE_DRAGGED == e.getID()) {
+            return;
+        }
+        
         final Component component = e.getComponent();
         final ChartPanel chartPanel = (ChartPanel)component;
         final JFreeChart chart = chartPanel.getChart();
@@ -261,30 +196,5 @@ public class CrossHairUI extends AbstractLayerUI {
             this.processTimeSeriesCollectionEvent(e, layer);
         }
     }
-
-    /**
-     * A utility method to create the paint for the glass.
-     *
-     * @param glass  the glass shape.
-     * @param transparent  transparent?
-     *
-     * @return The paint.
-     */
-    private Paint createPaint(Ellipse2D glass, boolean transparent) {
-        Point2D center = new Point2D.Double(glass.getCenterX(),
-                glass.getCenterY());
-        float _radius = (float) (glass.getCenterX() - glass.getX());
-        Point2D focus = new Point2D.Double(center.getX() - 0.5 * _radius,
-                center.getY() - 0.5 * _radius);
-        Color[] colors = new Color[] {
-                transparent ? new Color(255, 255, 255, 128) : Color.WHITE,
-                transparent ? new Color(0, 255, 255, 32) : Color.CYAN };
-        float[] fractions = new float[] { 0f, 1f };
-        RadialGradientPaint paint = new RadialGradientPaint(center, _radius,
-                focus, fractions, colors,
-                MultipleGradientPaint.CycleMethod.NO_CYCLE);
-        return paint;
-    }
-
 }
 
