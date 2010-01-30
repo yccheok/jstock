@@ -21,8 +21,10 @@
 
 package org.yccheok.jstock.charting;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Composite;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
@@ -51,7 +53,8 @@ import org.jfree.ui.RectangleEdge;
  */
 public class CrossHairUI extends AbstractLayerUI {
 
-    private Point2D point = new Point2D.Double();
+    private Point2D point = null;
+    private final Color BALL_COLOR = new Color(85, 85, 255);
 
     /**
      * Returns the current location of the magnifying glass.
@@ -68,9 +71,14 @@ public class CrossHairUI extends AbstractLayerUI {
      * @param point  the new location.
      */
     public void setPoint(Point2D point) {
-        this.point.setLocation(point);
+        this.point = point;
     }
 
+     private AlphaComposite makeComposite(float alpha) {
+        int type = AlphaComposite.SRC_OVER;
+        return(AlphaComposite.getInstance(type,alpha));
+      }
+    
     /**
      * Paints the magnifying glass.
      *
@@ -81,11 +89,20 @@ public class CrossHairUI extends AbstractLayerUI {
     protected void paintLayer(Graphics2D g2, JXLayer layer) {
         super.paintLayer(g2, layer);
         final Point2D _point = getPoint();
+
+        if (_point == null) {
+            //g2.clearRect(0, 0, layer.getWidth(), layer.getHeight());
+            return;
+        }
+
         final int radius = 8;
         final Object oldValueAntiAlias = g2.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
+        final Composite oldComposite = g2.getComposite();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.setColor(new Color(85, 85, 255));
+        g2.setColor(BALL_COLOR);
+        //g2.setComposite(makeComposite(0.75f));
         g2.fillOval((int)(_point.getX() - (radius >> 1) + 0.5), (int)(_point.getY() - (radius >> 1) + 0.5), radius, radius);
+        g2.setComposite(oldComposite);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, oldValueAntiAlias);
     }
 
@@ -177,9 +194,11 @@ public class CrossHairUI extends AbstractLayerUI {
         final double yJava2D = rangeAxis.valueToJava2D(yValue, plotArea, rangeAxisEdge);
         System.out.println(xJava2D + " " + yJava2D + " (" + xValue + " " + yValue + ")");
 
-        this.setPoint(new Point2D.Double(xJava2D, yJava2D));
-
-        setDirty(true);
+        final Point2D p = new Point2D.Double(xJava2D, yJava2D);
+        if (plotArea.contains(p)) {
+            this.setPoint(p);
+            setDirty(true);
+        }
     }
 
     private void processEvent(MouseEvent e, JXLayer layer) {
@@ -194,6 +213,10 @@ public class CrossHairUI extends AbstractLayerUI {
         final XYPlot plot = (XYPlot) cplot.getSubplots().get(0);
         if (plot.getDataset() instanceof TimeSeriesCollection) {
             this.processTimeSeriesCollectionEvent(e, layer);
+        }
+        else {
+            this.setPoint(null);
+            this.setDirty(true);
         }
     }
 }
