@@ -108,7 +108,7 @@ public class ChartJDialog extends javax.swing.JDialog {
         this.chartPanel = new ChartPanel(this.priceVolumeChart, true, true, true, true, true);
 
         final org.jdesktop.jxlayer.JXLayer<ChartPanel> layer = new org.jdesktop.jxlayer.JXLayer<ChartPanel>(this.chartPanel);
-        CrossHairUI ui = new CrossHairUI();
+        CrossHairUI ui = new CrossHairUI(stockHistoryServer);
         layer.setUI(ui);
 
         getContentPane().add(layer, java.awt.BorderLayout.CENTER);
