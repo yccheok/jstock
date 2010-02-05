@@ -52,7 +52,7 @@ import org.yccheok.jstock.engine.*;
 import org.jdesktop.swingx.treetable.*;
 import org.yccheok.jstock.file.Statement;
 import org.yccheok.jstock.file.Statements;
-import org.yccheok.jstock.gui.portfolio.CashFlowChartJDialog;
+import org.yccheok.jstock.gui.charting.CashFlowChartJDialog;
 import org.yccheok.jstock.gui.portfolio.CommentJDialog;
 import org.yccheok.jstock.gui.portfolio.DepositSummaryJDialog;
 import org.yccheok.jstock.gui.portfolio.DepositSummaryTableModel;

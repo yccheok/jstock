@@ -18,8 +18,9 @@
  */
 
 
-package org.yccheok.jstock.gui;
+package org.yccheok.jstock.gui.charting;
 
+import org.yccheok.jstock.gui.*;
 import java.io.File;
 import org.yccheok.jstock.engine.*;
 
@@ -51,7 +52,7 @@ import org.jfree.data.time.MovingAverage;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.*;
-import org.yccheok.jstock.charting.CrossHairUI;
+import org.yccheok.jstock.gui.charting.CrossHairUI;
 import org.yccheok.jstock.charting.TechnicalAnalysis;
 import org.yccheok.jstock.file.Statements;
 import org.yccheok.jstock.internationalization.GUIBundle;
@@ -108,7 +109,7 @@ public class ChartJDialog extends javax.swing.JDialog {
         this.chartPanel = new ChartPanel(this.priceVolumeChart, true, true, true, true, true);
 
         final org.jdesktop.jxlayer.JXLayer<ChartPanel> layer = new org.jdesktop.jxlayer.JXLayer<ChartPanel>(this.chartPanel);
-        CrossHairUI ui = new CrossHairUI(stockHistoryServer);
+        CrossHairUI<ChartPanel> ui = new CrossHairUI<ChartPanel>(stockHistoryServer);
         layer.setUI(ui);
 
         getContentPane().add(layer, java.awt.BorderLayout.CENTER);
@@ -563,15 +564,15 @@ public class ChartJDialog extends javax.swing.JDialog {
         // TODO add your handling code here:
         assert(this.stockHistoryServer.getNumOfCalendar() > 0);
         final Stock stock = this.stockHistoryServer.getStock(this.stockHistoryServer.getCalendar(0));
-        final File file = Utils.promptSaveCSVAndExcelJFileChooser(stock.getCode().toString());
+        final File file = org.yccheok.jstock.gui.Utils.promptSaveCSVAndExcelJFileChooser(stock.getCode().toString());
 
         if (file != null) {
-            if (Utils.getFileExtension(file).equals("csv"))
+            if (org.yccheok.jstock.gui.Utils.getFileExtension(file).equals("csv"))
             {
                 final Statements statements = Statements.newInstanceFromStockHistoryServer(stockHistoryServer);
                 statements.saveAsCSVFile(file);
             }
-            else if (Utils.getFileExtension(file).equals("xls"))
+            else if (org.yccheok.jstock.gui.Utils.getFileExtension(file).equals("xls"))
             {
                 final Statements statements = Statements.newInstanceFromStockHistoryServer(stockHistoryServer);
                 statements.saveAsExcelFile(file, stock.getCode().toString());
@@ -850,7 +851,7 @@ public class ChartJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jMenuItem5ActionPerformed
 
     private void jMenuItem7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem7ActionPerformed
-        Utils.launchWebBrowser("http://jstock.sourceforge.net/ma_indicator.html?utm_source=jstock&utm_medium=chart_dialog");
+        org.yccheok.jstock.gui.Utils.launchWebBrowser("http://jstock.sourceforge.net/ma_indicator.html?utm_source=jstock&utm_medium=chart_dialog");
     }//GEN-LAST:event_jMenuItem7ActionPerformed
 
     private void jCheckBoxMenuItem21ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxMenuItem21ActionPerformed

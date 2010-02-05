@@ -19,6 +19,7 @@
 
 package org.yccheok.jstock.gui;
 
+import org.yccheok.jstock.gui.charting.ChartJDialog;
 import org.yccheok.jstock.alert.GoogleMail;
 import org.yccheok.jstock.alert.GoogleCalendar;
 import javax.swing.table.*;
@@ -52,7 +53,7 @@ import org.yccheok.jstock.analysis.Indicator;
 import org.yccheok.jstock.analysis.OperatorIndicator;
 import org.yccheok.jstock.file.Statement;
 import org.yccheok.jstock.file.Statements;
-import org.yccheok.jstock.gui.dynamicchart.DynamicChart;
+import org.yccheok.jstock.gui.charting.DynamicChart;
 import org.yccheok.jstock.gui.portfolio.PortfolioJDialog;
 import org.yccheok.jstock.gui.table.NonNegativeDoubleEditor;
 import org.yccheok.jstock.internationalization.GUIBundle;

@@ -17,7 +17,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package org.yccheok.jstock.gui.portfolio;
+package org.yccheok.jstock.gui.charting;
 
 import java.awt.Dimension;
 import java.io.File;
