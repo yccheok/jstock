@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2009 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,6 +34,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
@@ -137,13 +138,13 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jLabel1.setText("Share ($): ");
+        jLabel1.setText(getShareLabel());
         jPanel3.add(jLabel1);
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 1, 11));
         jPanel3.add(jLabel2);
 
-        jLabel3.setText("Cash ($): ");
+        jLabel3.setText(getCashLabel());
         jPanel3.add(jLabel3);
 
         jLabel4.setFont(new java.awt.Font("Tahoma", 1, 11));
@@ -151,13 +152,13 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         jPanel4.add(jPanel3, java.awt.BorderLayout.WEST);
 
-        jLabel5.setText("Paper Profit ($): ");
+        jLabel5.setText(getPaperProfitLabel());
         jPanel5.add(jLabel5);
 
         jLabel6.setFont(new java.awt.Font("Tahoma", 1, 11));
         jPanel5.add(jLabel6);
 
-        jLabel7.setText("Realized Profit ($): ");
+        jLabel7.setText(getRealizedProfitLabel());
         jPanel5.add(jLabel7);
 
         jLabel8.setFont(new java.awt.Font("Tahoma", 1, 11));
@@ -1681,7 +1682,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     public void update(RealTimeStockMonitor monitor, final java.util.List<Stock> stocks) {
         final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
  
-        for(Stock stock : stocks) {
+        for (Stock stock : stocks) {
             if (false == portfolioTreeTableModel.updateStockLastPrice(stock)) {
                 this.realTimeStockMonitor.removeStockCode(stock.getCode());
             }
@@ -1841,11 +1842,38 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     public void softStop() {
         if (realTimeStockMonitor == null) {
             return;
-        }
-        
+        }        
         realTimeStockMonitor.softStop();
     }
+
+    private String getShareLabel() {
+        return MessageFormat.format(
+            GUIBundle.getString("PortfolioManagementJPanel_ShareLabel"),
+            /*java.util.Currency.getInstance(Locale.getDefault()).getSymbol()*/"$"
+        );
+    }
     
+    private String getCashLabel() {
+        return MessageFormat.format(
+            GUIBundle.getString("PortfolioManagementJPanel_CashLabel"),
+            /*java.util.Currency.getInstance(Locale.getDefault()).getSymbol()*/"$"
+        );
+    }
+    
+    private String getPaperProfitLabel() {
+        return MessageFormat.format(
+            GUIBundle.getString("PortfolioManagementJPanel_PaperProfitLabel"),
+            /*java.util.Currency.getInstance(Locale.getDefault()).getSymbol()*/"$"
+        );
+    }
+    
+    private String getRealizedProfitLabel() {
+        return MessageFormat.format(
+            GUIBundle.getString("PortfolioManagementJPanel_RealizedProfitLabel"),
+            /*java.util.Currency.getInstance(Locale.getDefault()).getSymbol()*/"$"
+        );
+    }
+
     private static final Log log = LogFactory.getLog(PortfolioManagementJPanel.class);
 
     // Data structure.
