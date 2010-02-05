@@ -1,23 +1,20 @@
 /*
- * RealTimeStockMonitor.java
- *
- * Created on April 24, 2007, 9:56 PM
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.yccheok.jstock.engine;
@@ -35,8 +32,8 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
     
     /** Creates a new instance of RealTimeStockMonitor */
     public RealTimeStockMonitor(int maxThread, int numOfStockPerIteration, long delay) {
-        if(maxThread <= 0 || numOfStockPerIteration <= 0 || delay <= 0) {
-            throw new IllegalArgumentException("maxThread=" + maxThread + ",numOfStockPerIteration=" + numOfStockPerIteration + ",delay=" + delay);
+        if (maxThread <= 0 || numOfStockPerIteration <= 0 || delay <= 0) {
+            throw new IllegalArgumentException("maxThread : " + maxThread + ", numOfStockPerIteration : " + numOfStockPerIteration + ", delay : " + delay);
         }
         
         this.maxThread = maxThread;
@@ -74,7 +71,9 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
     public synchronized boolean addStockCode(Code code) {
         // Lock isn't required here. This is because increase the size of the 
         // list is not going to get IndexOutOfBoundException.
-        if (stockCodes.contains(code)) return false;
+        if (stockCodes.contains(code)) {
+            return false;
+        }
 
         boolean status = stockCodes.add(code);
 
@@ -155,13 +154,13 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
     }    
     
     public synchronized void softStart() {
-        for(StockMonitor stockMonitor : stockMonitors) {
+        for (StockMonitor stockMonitor : stockMonitors) {
             stockMonitor.softStart();
         }
     }
 
     public synchronized void softStop() {
-        for(StockMonitor stockMonitor : stockMonitors) {
+        for (StockMonitor stockMonitor : stockMonitors) {
             stockMonitor.softStop();
         }
     }    
@@ -172,7 +171,7 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
         
         assert(numOfMonitorRequired <= this.maxThread);
         
-        for( int i = this.stockMonitors.size(); i < numOfMonitorRequired; i++) {
+        for (int i = this.stockMonitors.size(); i < numOfMonitorRequired; i++) {
             log.info("Before adding : current thread size=" + this.stockMonitors.size() + ",numOfMonitorRequired=" + numOfMonitorRequired);
             
             StockMonitor stockMonitor = new StockMonitor(i * numOfStockPerIteration);
@@ -186,14 +185,14 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
     // Stop all the monitoring thread. Once this had been stopped, all the
     // previous monitoring thread will be removed.
     public synchronized void stop() {
-        for(StockMonitor stockMonitor : stockMonitors) {
+        for (StockMonitor stockMonitor : stockMonitors) {
             stockMonitor._stop();
             
             try {
                 stockMonitor.join();
             }
-            catch(java.lang.InterruptedException exp) {
-                log.error("", exp);
+            catch (java.lang.InterruptedException exp) {
+                log.error(null, exp);
             }            
         }
         
@@ -237,7 +236,7 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
         }
 
         public synchronized void softStart() {
-            if(status == Status.Pause) {
+            if (status == Status.Pause) {
                 status = Status.Resume;
                 notify();
             }
@@ -323,7 +322,7 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
                         try {
                             Thread.sleep(delay);
                         }
-                        catch(java.lang.InterruptedException exp) {
+                        catch (java.lang.InterruptedException exp) {
                             log.error("index=" + index, exp);
                             /* Exit the primary fail safe loop. */
                             thread = null;                            
