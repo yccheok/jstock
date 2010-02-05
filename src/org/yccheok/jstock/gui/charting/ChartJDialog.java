@@ -20,7 +20,6 @@
 
 package org.yccheok.jstock.gui.charting;
 
-import org.yccheok.jstock.gui.*;
 import java.io.File;
 import org.yccheok.jstock.engine.*;
 
@@ -52,7 +51,6 @@ import org.jfree.data.time.MovingAverage;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.*;
-import org.yccheok.jstock.gui.charting.CrossHairUI;
 import org.yccheok.jstock.charting.TechnicalAnalysis;
 import org.yccheok.jstock.file.Statements;
 import org.yccheok.jstock.internationalization.GUIBundle;
@@ -108,11 +106,11 @@ public class ChartJDialog extends javax.swing.JDialog {
         
         this.chartPanel = new ChartPanel(this.priceVolumeChart, true, true, true, true, true);
 
-        final org.jdesktop.jxlayer.JXLayer<ChartPanel> layer = new org.jdesktop.jxlayer.JXLayer<ChartPanel>(this.chartPanel);
-        CrossHairUI<ChartPanel> ui = new CrossHairUI<ChartPanel>(stockHistoryServer);
+        this.layer = new org.jdesktop.jxlayer.JXLayer<ChartPanel>(this.chartPanel);
+        final CrossHairUI<ChartPanel> ui = new CrossHairUI<ChartPanel>(stockHistoryServer);
         layer.setUI(ui);
 
-        getContentPane().add(layer, java.awt.BorderLayout.CENTER);
+        getContentPane().add(this.layer, java.awt.BorderLayout.CENTER);
     }
     
     /** This method is called from within the constructor to
@@ -1549,6 +1547,9 @@ public class ChartJDialog extends javax.swing.JDialog {
     private final OHLCDataset priceOHLCDataset;
     private JFreeChart priceVolumeChart;
     private JFreeChart candlestickChart;
+
+    /* Overlay layer. */
+    private final org.jdesktop.jxlayer.JXLayer<ChartPanel> layer;
 
     private static final Log log = LogFactory.getLog(ChartJDialog.class);
 
