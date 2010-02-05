@@ -56,17 +56,15 @@ import org.jfree.ui.RectangleEdge;
 import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.StockHistoryServer;
 import org.yccheok.jstock.gui.JStockOptions;
+import org.yccheok.jstock.gui.Utils;
 import org.yccheok.jstock.internationalization.GUIBundle;
 
-/**
- * Shows a magnification glass on top of a component.
- */
 public class CrossHairUI<V extends javax.swing.JComponent> extends AbstractLayerUI<V> {
 
     private Point2D point = null;
     private int pointIndex = -1;
     private Rectangle2D plotArea = null;
-    private static final Color COLOR_BALL = new Color(85, 85, 255);
+    private static final Color COLOR_BLUE = new Color(85, 85, 255);
     private static final Color COLOR_BACKGROUND = new Color(255, 255, 153);
     private static final Color COLOR_BORDER = new Color(255, 204, 0);
     private final StockHistoryServer stockHistoryServer;
@@ -86,13 +84,7 @@ public class CrossHairUI<V extends javax.swing.JComponent> extends AbstractLayer
         this.stockHistoryServer = stockHistoryServer;
     }
 
-    private AlphaComposite makeComposite(float alpha) {
-        int type = AlphaComposite.SRC_OVER;
-        return(AlphaComposite.getInstance(type, alpha));
-    }
-
-
-    private void drawInformationBox(Graphics2D g2, JXLayer layer) {
+    private void drawInformationBox(Graphics2D g2, JXLayer<? extends V> layer) {
         final Font oldFont = g2.getFont();
         final Font paramFont = new Font(oldFont.getFontName(), oldFont.getStyle(), oldFont.getSize());
         final FontMetrics paramFontMetrics = g2.getFontMetrics(paramFont);
@@ -148,14 +140,14 @@ public class CrossHairUI<V extends javax.swing.JComponent> extends AbstractLayer
         g2.setColor(COLOR_BORDER);
         g2.drawRoundRect(x, y, width, height, 20, 20);
         g2.setColor(COLOR_BACKGROUND);
-        g2.setComposite(makeComposite(0.75f));
+        g2.setComposite(Utils.makeComposite(0.75f));
         g2.fillRoundRect(x + 1, y + 1, width - 1, height - 1, 20, 20);
         g2.setComposite(oldComposite);
         g2.setColor(oldColor);
                 
         int yy = y + dateFontMetrics.getHeight() + padding;
         g2.setFont(dateFont);
-        g2.setColor(COLOR_BALL);
+        g2.setColor(COLOR_BLUE);
         g2.drawString(dateString,
                 ((width - dateFontMetrics.stringWidth(dateString)) >> 1) + x,
                 yy);
@@ -208,7 +200,7 @@ public class CrossHairUI<V extends javax.swing.JComponent> extends AbstractLayer
         final Color oldColor = g2.getColor();
 
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.setColor(COLOR_BALL);
+        g2.setColor(COLOR_BLUE);
         g2.fillOval((int)(this.point.getX() - (radius >> 1) + 0.5), (int)(this.point.getY() - (radius >> 1) + 0.5), radius, radius);
         g2.setColor(oldColor);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, oldValueAntiAlias);
