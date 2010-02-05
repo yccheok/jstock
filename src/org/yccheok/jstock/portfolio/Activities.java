@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.yccheok.jstock.engine.SimpleDate;
+import org.yccheok.jstock.engine.Stock;
 
 /**
  *
@@ -97,7 +98,8 @@ public class Activities implements java.lang.Comparable<Activities> {
         Map<String, Double> datas = new HashMap<String, Double>();
 
         for (Activity activity : activities) {
-            String key = activity.getWho() + activity.getType();
+            final Stock stock = (Stock)activity.get(Activity.Param.Stock);
+            String key = (stock != null ? stock.getSymbol().toString() : "") + activity.getType();
             Double d = datas.get(key);
             if (d != null) {
                 double total = d.doubleValue() + activity.getAmount();
@@ -113,17 +115,17 @@ public class Activities implements java.lang.Comparable<Activities> {
         final int size = activities.size();
         for (Activity activity : activities) {
             count++;
-
-            final String who = activity.getWho();
+            final Stock stock = (Stock)activity.get(Activity.Param.Stock);
+            final String who = stock != null ? stock.getSymbol().toString() : "";
             final Activity.Type type = activity.getType();
             String key = who + type;
             Double d = datas.get(key);
             /* Must not be null due to first loop. */
             if (who.length() > 1) {
-                message = message + who + " " + type.toString().toLowerCase() + " " + currencyFormat.format(d);
+                message = message + who + " " + type.toString().toLowerCase() + " " + Utils.currencyNumberFormat(d);
             }
             else {
-                message = message + type.toString().toLowerCase() + " " + currencyFormat.format(d);
+                message = message + type.toString().toLowerCase() + " " + Utils.currencyNumberFormat(d);
             }
 
             if (count < size) {
@@ -140,10 +142,9 @@ public class Activities implements java.lang.Comparable<Activities> {
     }
 
     private double netAmount = 0.0;
-    private boolean needEvaluation = true;
+    private volatile boolean needEvaluation = true;
 
     SimpleDateFormat dateFormat = new SimpleDateFormat("d-MMM-yyyy");
-    private static final NumberFormat currencyFormat = java.text.NumberFormat.getCurrencyInstance();
     //static {
     //    currencyFormat.setMaximumFractionDigits(2);
     //    currencyFormat.setMinimumFractionDigits(2);
