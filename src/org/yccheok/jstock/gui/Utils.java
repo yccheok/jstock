@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
+ * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -58,7 +58,6 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineEvent;
-import javax.sound.sampled.LineListener;
 import javax.sound.sampled.LineListener;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
