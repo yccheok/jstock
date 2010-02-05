@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
+ * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ package org.yccheok.jstock.gui;
 
 import java.awt.Color;
 import java.awt.Cursor;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +33,7 @@ import org.yccheok.jstock.engine.Index;
 import org.yccheok.jstock.engine.Market;
 import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.Symbol;
+import org.yccheok.jstock.internationalization.GUIBundle;
 
 /**
  *
@@ -78,8 +80,8 @@ public class MarketJPanel extends javax.swing.JPanel {
 
         for (Index index : indices) {
             if (ignoreIndices.contains(index)) {
-				continue;
-        	}
+                continue;
+            }
 
             final double _index = market.getIndex(index);
             final double change = market.getChange(index);
@@ -87,7 +89,9 @@ public class MarketJPanel extends javax.swing.JPanel {
             
             JLabel label = map.get(index.name());
             
-            if(label == null) continue;
+            if (label == null) {
+                continue;
+            }
             
             label.setText(numberFormat.format(_index) + " (" + numberFormat.format(change) + ")");
             label.setForeground(color);
@@ -142,7 +146,7 @@ public class MarketJPanel extends javax.swing.JPanel {
         volume_value.setForeground(new java.awt.Color(153, 102, 0));
         leftPanel.add(volume_value);
 
-        JLabel value = new JLabel("Value ($) : ");
+        JLabel value = new JLabel(this.getValueLabel());
         leftPanel.add(value);
         JLabel value_value = new JLabel();
         value_value.setName("value");
@@ -178,7 +182,14 @@ public class MarketJPanel extends javax.swing.JPanel {
         unchanged_value.setForeground(new java.awt.Color(0, 0, 0));
         rightPanel.add(unchanged_value);      
     }
-    
+
+    private String getValueLabel() {
+        return MessageFormat.format(
+            GUIBundle.getString("MainFrame_ValueLabel"),
+            /*java.util.Currency.getInstance(Locale.getDefault()).getSymbol()*/"$"
+        );
+    }
+
     public Country getCountry() {
         return this.country;
     }
