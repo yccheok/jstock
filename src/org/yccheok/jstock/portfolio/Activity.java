@@ -100,10 +100,7 @@ public class Activity {
 
         return type.toString().toLowerCase() + " " + Utils.currencyNumberFormat(amount);
     }
-    //static {
-    //    currencyFormat.setMaximumFractionDigits(2);
-    //    currencyFormat.setMinimumFractionDigits(2);
-    //}
+
     private final Type type;
     private final double amount;
     private Map<Param, Object> paramToObject = new HashMap<Param, Object>();

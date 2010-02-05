@@ -20,11 +20,10 @@
 package org.yccheok.jstock.portfolio;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.yccheok.jstock.engine.SimpleDate;
 
 /**
@@ -37,30 +36,26 @@ public class ActivitySummary {
         Activities activities = activitiesMap.get(date);
         if (activities == null) {
             activities = new Activities(date);
+            activitiesList.add(activities);
+            java.util.Collections.sort(this.activitiesList, new Comparator<Activities>() {
+                @Override
+                public int compare(Activities o1, Activities o2) {
+                    return o1.getDate().compareTo(o2.getDate());
+                }
+            });
             activitiesMap.put(date, activities);
         }
-
         return activities.add(activity);
     }
 
     public int size() {
-        return activitiesMap.size();
+        return activitiesList.size();
     }
 
     public Activities get(int index) {
-        final Set<SimpleDate> key = activitiesMap.keySet();
-        final List<SimpleDate> _simpleDates = new ArrayList<SimpleDate>(key);
-        java.util.Collections.sort(_simpleDates);
-        final SimpleDate simpleDate = _simpleDates.get(index);
-        return activitiesMap.get(simpleDate);
+        return activitiesList.get(index);
     }
 
-    public Collection<Activities> values() {
-        return activitiesMap.values();
-    }
-
-    /* simpleDates shall be removed. It is still here and marked as transient, for xstream backward compatible purpose. */
-    private transient List<SimpleDate> simpleDates = new ArrayList<SimpleDate>();
-    
+    private List<Activities> activitiesList = new ArrayList<Activities>();
     private final Map<SimpleDate, Activities> activitiesMap = new HashMap<SimpleDate, Activities>();
 }
