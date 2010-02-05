@@ -1031,12 +1031,13 @@ public class ChartJDialog extends javax.swing.JDialog {
         valueAxis.setUpperMargin(0.0);
         valueAxis.setLowerMargin(0.0);
         XYPlot plot = new XYPlot(this.priceOHLCDataset, timeAxis, valueAxis, null);
+
+        final CandlestickRenderer candlestickRenderer = new CandlestickRenderer();
+        plot.setRenderer(candlestickRenderer);
         
         // Give good width when zoom in, but too slow in calculation.
         // ((CandlestickRenderer)plot.getRenderer()).setAutoWidthMethod(CandlestickRenderer.WIDTHMETHOD_SMALLEST);
-        final CandlestickRenderer candlestickRenderer = new CandlestickRenderer();
 
-        plot.setRenderer(candlestickRenderer);
         CombinedDomainXYPlot cplot = new CombinedDomainXYPlot(timeAxis);
         cplot.add(plot, 3);
         cplot.setGap(8.0);
