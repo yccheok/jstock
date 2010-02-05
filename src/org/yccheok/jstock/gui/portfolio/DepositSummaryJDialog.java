@@ -258,7 +258,7 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
         }
 
         int viewIndex = this.jTable1.convertColumnIndexToView(1);
-        String string = numberFormat.format(jTable1.getValueAt(jTable1.getSelectedRow(), viewIndex));
+        String string = org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(jTable1.getValueAt(jTable1.getSelectedRow(), viewIndex));
         return string;
     }
 
@@ -355,13 +355,12 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
 
     public String getDepositSummaryText() {
         if (depositSummary != null) {
-            return "Total deposit is " + numberFormat.format(depositSummary.getTotal());
+            return "Total deposit is " + org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(depositSummary.getTotal());
         }
         return "";
     }
     
     private DepositSummary depositSummary;
-    private static final NumberFormat numberFormat = java.text.NumberFormat.getCurrencyInstance();
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;

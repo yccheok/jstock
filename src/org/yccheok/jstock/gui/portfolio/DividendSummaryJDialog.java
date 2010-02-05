@@ -274,7 +274,7 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
 
     public String getDividendSummaryText() {
         if (dividendSummary != null) {
-            return "<html><a href=\"\">" + numberFormat.format(dividendSummary.getTotal()) + "</a></html>";
+            return "<html><a href=\"\">" + org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(dividendSummary.getTotal()) + "</a></html>";
         }
         return "";
     }
@@ -421,7 +421,6 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
     private DividendSummary dividendSummary;
     // We want to use getStocksFromPortfolios from PortfolioManagementJPanel.
     private final PortfolioManagementJPanel portfolioManagementJPanel;
-    private static final NumberFormat numberFormat = java.text.NumberFormat.getCurrencyInstance();
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
