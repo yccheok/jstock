@@ -20,6 +20,7 @@
 package org.yccheok.jstock.gui;
 
 import com.thoughtworks.xstream.XStream;
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Graphics;
@@ -573,6 +574,11 @@ public class Utils {
     
     public static String getUserDataDirectory() {
         return System.getProperty("user.home") + File.separator + ".jstock" + File.separator + getApplicationVersionString() + File.separator;
+    }
+
+    public static AlphaComposite makeComposite(float alpha) {
+        int type = AlphaComposite.SRC_OVER;
+        return(AlphaComposite.getInstance(type, alpha));
     }
 
     public static boolean migrateFrom104jTo105() {
