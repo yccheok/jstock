@@ -131,10 +131,10 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
         public void run() {
             final Thread currentThread = Thread.currentThread();
             
-            for(StockServerFactory factory : factories) {
+            for (StockServerFactory factory : factories) {
                 StockHistoryServer history = factory.getStockHistoryServer(this.code, duration);
 
-                if(history != null) {
+                if (history != null) {
                     readerLock.lock();
                     
                     // Anyone try to stop us from publishing this history?
@@ -186,11 +186,11 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
                     break;
                 }
                
-                if(currentThread.isInterrupted())
+                if (currentThread.isInterrupted())
                     break;
             }
             
-            if(historyServer == null) {
+            if (historyServer == null) {
                 writerLock.lock();
         
                 stockCodes.remove(code);
@@ -210,17 +210,20 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
 
         @Override
         public boolean equals(Object o) {
-            if (o == this)
+            if (o == this) {
                 return true;
+            }
 
-            if(!(o instanceof StockHistoryRunnable))
+            if (!(o instanceof StockHistoryRunnable)) {
                 return false;
+            }
 
             StockHistoryRunnable stockHistoryRunnable = (StockHistoryRunnable)o;
 
             return this.code.equals(stockHistoryRunnable.code);
         }
         
+        @Override
         public String toString() {
             return StockHistoryRunnable.class.getName() + "[code=" + code + "]";
         }
