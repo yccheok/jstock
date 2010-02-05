@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2009 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -2199,7 +2199,7 @@ public class MainFrame extends javax.swing.JFrame {
             // Do not rely on isInterrupted flag only. The flag can be cleared by 3rd party easily.
             // Check for current thread as well.
             while (!currentThread.isInterrupted()  && (marketThread == Thread.currentThread())) {
-				final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactories();
+                final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactories();
                 for (StockServerFactory factory : stockServerFactories) {
                     MarketServer server = factory.getMarketServer();
                     
@@ -3346,9 +3346,7 @@ public class MainFrame extends javax.swing.JFrame {
         
         statusBar.setMainMessage(message)
                 .setImageIcon(icon, iconMessage)
-                .setCountryIcon(
-					jStockOptions.getCountry().getIcon(), 
-					jStockOptions.getCountry().toString());
+                .setCountryIcon(jStockOptions.getCountry().getIcon(), jStockOptions.getCountry().toString());
     }
 
     private MouseAdapter getDynamicChartMouseAdapter() {
