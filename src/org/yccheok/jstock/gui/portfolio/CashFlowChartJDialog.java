@@ -1,19 +1,20 @@
 /*
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.yccheok.jstock.gui.portfolio;
@@ -24,22 +25,30 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.annotations.XYAnnotation;
-import org.jfree.chart.annotations.XYImageAnnotation;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.labels.CustomXYToolTipGenerator;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.StandardXYItemRenderer;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.time.Day;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.XYDataset;
+import org.yccheok.jstock.engine.Code;
+import org.yccheok.jstock.engine.Observer;
+import org.yccheok.jstock.engine.RealTimeStockMonitor;
 import org.yccheok.jstock.engine.SimpleDate;
+import org.yccheok.jstock.engine.Stock;
+import org.yccheok.jstock.gui.MainFrame;
 import org.yccheok.jstock.gui.PortfolioManagementJPanel;
 import org.yccheok.jstock.portfolio.Activities;
 import org.yccheok.jstock.portfolio.Activity;
@@ -56,15 +65,20 @@ import org.yccheok.jstock.portfolio.TransactionSummary;
  *
  * @author yccheok
  */
-public class CashFlowChartJDialog extends javax.swing.JDialog {
+public class CashFlowChartJDialog extends javax.swing.JDialog implements Observer<RealTimeStockMonitor, java.util.List<Stock>> {
 
     /** Creates new form CashFlowChartJDialog */
     public CashFlowChartJDialog(java.awt.Frame parent, boolean modal, PortfolioManagementJPanel portfolioManagementJPanel) {
         super(parent, modal);
         initComponents();
+        initRealTimeStockMonitor();
 
         this.portfolioManagementJPanel = portfolioManagementJPanel;
-        initActivitySummary(portfolioManagementJPanel);
+        initActivitySummary(this.portfolioManagementJPanel);
+
+        // Renderer must be assigned before calling createOrUpdateStockTimeSeries.
+        // createOrUpdateStockTimeSeries is going to access renderer at index 1.
+        this.stockRenderer = new StandardXYItemRenderer();
 
         final JFreeChart freeChart = createChart();
         org.yccheok.jstock.charting.Utils.applyChartTheme(freeChart);
@@ -83,8 +97,8 @@ public class CashFlowChartJDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
+        jPanel1 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Cash Flow Chart");
@@ -93,9 +107,11 @@ public class CashFlowChartJDialog extends javax.swing.JDialog {
                 formWindowClosing(evt);
             }
         });
-        getContentPane().setLayout(new java.awt.BorderLayout(5, 5));
-        getContentPane().add(jPanel1, java.awt.BorderLayout.EAST);
+        getContentPane().setLayout(new java.awt.BorderLayout(0, 5));
         getContentPane().add(jPanel2, java.awt.BorderLayout.SOUTH);
+
+        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
+        getContentPane().add(jPanel1, java.awt.BorderLayout.EAST);
 
         java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
         setBounds((screenSize.width-978)/2, (screenSize.height-456)/2, 978, 456);
@@ -103,7 +119,8 @@ public class CashFlowChartJDialog extends javax.swing.JDialog {
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         // TODO add your handling code here:
-        this.saveDimension();;
+        this.saveDimension();
+        this.initRealTimeStockMonitor();
     }//GEN-LAST:event_formWindowClosing
 
     private void saveDimension() {
@@ -118,7 +135,64 @@ public class CashFlowChartJDialog extends javax.swing.JDialog {
         }
     }
 
-    private XYDataset createDataset() {
+    private TimeSeries createOrUpdateStockTimeSeries() {
+        if (this.stockTimeSeries == null) {
+            this.stockTimeSeries = new TimeSeries("Share", Day.class);
+        }
+
+        final CustomXYToolTipGenerator stock_ttg = new CustomXYToolTipGenerator();
+        final ArrayList<String> toolTips = new ArrayList<String>();
+        final java.text.NumberFormat numberFormat = java.text.NumberFormat.getInstance();
+        numberFormat.setMaximumFractionDigits(2);
+        numberFormat.setMinimumFractionDigits(2);
+
+        this.totalStockValue = 0.0;
+        for (int i = 0, count = activitySummary.size(); i < count; i++) {
+            final Activities activities = activitySummary.get(i);
+            boolean no_activity = true;
+            for (int j = 0, count2 = activities.size(); j < count2; j++) {
+                final Activity activity = activities.get(j);
+                final Activity.Type type = activity.getType();
+
+                if (type == Activity.Type.Buy) {
+                    no_activity = false;
+                    final int quantity = (Integer)activity.get(Activity.Param.Quantity);
+                    final Stock stock = (Stock)activity.get(Activity.Param.Stock);
+                    this.realTimeStockMonitor.addStockCode(stock.getCode());
+                    final Double price = this.codeToPrice.get(stock.getCode());
+                    if (price != null) {
+                        this.totalStockValue += (price * quantity);
+                    }
+                }
+                else if (type == Activity.Type.Sell) {
+                    no_activity = false;
+                    final int quantity = (Integer)activity.get(Activity.Param.Quantity);
+                    final Stock stock = (Stock)activity.get(Activity.Param.Stock);
+                    this.realTimeStockMonitor.addStockCode(stock.getCode());
+                    final Double price = this.codeToPrice.get(stock.getCode());
+                    if (price != null) {
+                        this.totalStockValue -= (price * quantity);
+                    }
+                }
+            }
+
+            if (no_activity) {
+                continue;
+            }
+
+            final SimpleDate date = activities.getDate();
+            final Date d = date.getTime();
+            this.stockTimeSeries.addOrUpdate(new Day(d), this.totalStockValue);
+            toolTips.add("<html>Share: (" + dateFormat.format(d) + ", " + numberFormat.format(this.totalStockValue) + ")<br>" + activities.toSummary() + "</html>");
+        }
+
+        stock_ttg.addToolTipSeries(toolTips);
+        this.stockRenderer.setToolTipGenerator(stock_ttg);
+        
+        return this.stockTimeSeries;
+    }
+
+    private XYDataset createCashDataset() {
         TimeSeries series = new TimeSeries("Cash", Day.class);
         final ArrayList<String> toolTips = new ArrayList<String>();
         final java.text.NumberFormat numberFormat = java.text.NumberFormat.getInstance();
@@ -126,8 +200,21 @@ public class CashFlowChartJDialog extends javax.swing.JDialog {
         numberFormat.setMinimumFractionDigits(2);
         
         double amount = 0.0;
+        this.totalDeposit = 0.0;
+        this.totalDividend = 0.0;
         for (int i = 0, count = activitySummary.size(); i < count; i++) {
             final Activities activities = activitySummary.get(i);
+            for (int j = 0, count2 = activities.size(); j < count2; j++) {
+                final Activity activity = activities.get(j);
+                final Activity.Type type = activity.getType();
+
+                if (type == Activity.Type.Deposit) {
+                    this.totalDeposit += activity.getAmount();
+                }
+                else if (type == Activity.Type.Dividend) {
+                    this.totalDividend += activity.getAmount();
+                }
+            }
             amount = amount + activities.getNetAmount();
             final SimpleDate date = activities.getDate();
             final Date d = date.getTime();
@@ -135,10 +222,11 @@ public class CashFlowChartJDialog extends javax.swing.JDialog {
             series.add(new Day(d), amount);
         }
 
-        ttg.addToolTipSeries(toolTips);
+        cash_ttg.addToolTipSeries(toolTips);
         return new TimeSeriesCollection(series);
     }
 
+    /*
     // Can we do it, before we add data set? So that we can done it in one pass.
     private void initAnnotation(XYPlot plot) {
         double amount = 0.0;
@@ -157,13 +245,13 @@ public class CashFlowChartJDialog extends javax.swing.JDialog {
                 c++;
                 plot.addAnnotation(xyannotation);
             }
-
         }
     }
+    */
 
     private JFreeChart createChart() {
 
-        XYDataset priceData = createDataset();
+        XYDataset priceData = createCashDataset();
 
         final String title = "Cash Flow";
         JFreeChart chart = ChartFactory.createTimeSeriesChart(
@@ -177,17 +265,18 @@ public class CashFlowChartJDialog extends javax.swing.JDialog {
         );
         
         XYPlot plot = chart.getXYPlot();
+        
         // Ugly looking :(
         //initAnnotation(plot);
 
         NumberAxis rangeAxis1 = (NumberAxis) plot.getRangeAxis();
         rangeAxis1.setNumberFormatOverride(currencyFormat);
-        XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer();
-        renderer.setShapesVisible(true);
-        renderer.setShapesFilled(true);
 
-        XYItemRenderer renderer1 = plot.getRenderer();
-        renderer1.setToolTipGenerator(ttg);
+        XYItemRenderer renderer0 = plot.getRenderer();
+        renderer0.setToolTipGenerator(cash_ttg);
+        
+        plot.setRenderer(1, this.stockRenderer);
+        plot.setDataset(1, new TimeSeriesCollection(this.createOrUpdateStockTimeSeries()));
 
         return chart;
     }
@@ -204,11 +293,23 @@ public class CashFlowChartJDialog extends javax.swing.JDialog {
                 final Contract contract = transaction.getContract();
                 Contract.Type type = contract.getType();
                 if (type == Contract.Type.Buy) {
-                    activitySummary.add(contract.getDate(), contract.getStock().getSymbol().toString(), Activity.Type.Buy, transaction.getNetTotal());
+                    final Activity activity = new Activity.Builder(Activity.Type.Buy, transaction.getNetTotal()).
+                            put(Activity.Param.Stock, contract.getStock()).
+                            put(Activity.Param.Quantity, contract.getQuantity()).
+                            build();
+                    activitySummary.add(contract.getDate(), activity);
                 }
                 else if (type == Contract.Type.Sell) {
-                    activitySummary.add(contract.getReferenceDate(), contract.getStock().getSymbol().toString(), Activity.Type.Buy, transaction.getReferenceTotal());
-                    activitySummary.add(contract.getDate(), contract.getStock().getSymbol().toString(), Activity.Type.Sell, transaction.getNetTotal());
+                    final Activity activity0 = new Activity.Builder(Activity.Type.Buy, transaction.getReferenceTotal()).
+                            put(Activity.Param.Stock, contract.getStock()).
+                            put(Activity.Param.Quantity, contract.getQuantity()).
+                            build();
+                    activitySummary.add(contract.getReferenceDate(), activity0);
+                    final Activity activity1 = new Activity.Builder(Activity.Type.Sell, transaction.getNetTotal()).
+                            put(Activity.Param.Stock, contract.getStock()).
+                            put(Activity.Param.Quantity, contract.getQuantity()).
+                            build();
+                    activitySummary.add(contract.getDate(), activity1);
                 }
                 else {
                     throw new java.lang.UnsupportedOperationException("Unsupported contract type " + type);
@@ -218,13 +319,45 @@ public class CashFlowChartJDialog extends javax.swing.JDialog {
 
         for (int i = 0, count = depositSummary.size(); i < count; i++) {
             final Deposit deposit = depositSummary.get(i);
-            activitySummary.add(deposit.getDate(), "", Activity.Type.Deposit, deposit.getAmount());
+            final Activity activity = new Activity.Builder(Activity.Type.Deposit, deposit.getAmount()).build();
+            activitySummary.add(deposit.getDate(), activity);
         }
 
         for (int i = 0, count = dividendSummary.size(); i < count; i++) {
             final Dividend dividend = dividendSummary.get(i);
-            activitySummary.add(dividend.getDate(), dividend.getStock().getSymbol().toString(), Activity.Type.Dividend, dividend.getAmount());
+            final Activity activity = new Activity.Builder(Activity.Type.Dividend, dividend.getAmount()).
+                    put(Activity.Param.Stock, dividend.getStock()).build();
+            activitySummary.add(dividend.getDate(), activity);
         }
+    }
+
+    private void initRealTimeStockMonitor() {
+        if (this.realTimeStockMonitor != null) {
+            final RealTimeStockMonitor oldRealTimeStockMonitor = this.realTimeStockMonitor;
+            org.yccheok.jstock.gui.Utils.getZoombiePool().execute(new Runnable() {
+                @Override
+                public void run() {
+                    log.info("Prepare to shut down " + oldRealTimeStockMonitor + "...");
+                    oldRealTimeStockMonitor.clearStockCodes();
+                    oldRealTimeStockMonitor.dettachAll();
+                    oldRealTimeStockMonitor.stop();
+                    log.info("Shut down " + oldRealTimeStockMonitor + " peacefully.");
+                }
+            });
+        }
+
+        this.realTimeStockMonitor = new RealTimeStockMonitor(4, 20, MainFrame.getInstance().getJStockOptions().getScanningSpeed());
+        this.realTimeStockMonitor.setStockServerFactories(MainFrame.getInstance().getStockServerFactories());
+
+        this.realTimeStockMonitor.attach(this);
+    }
+
+    @Override
+    public void update(RealTimeStockMonitor subject, List<Stock> arg) {
+        for (Stock stock : arg) {
+            this.codeToPrice.put(stock.getCode(), stock.getLastPrice());
+        }
+        this.createOrUpdateStockTimeSeries();
     }
 
     private static final NumberFormat currencyFormat = java.text.NumberFormat.getCurrencyInstance();
@@ -237,13 +370,21 @@ public class CashFlowChartJDialog extends javax.swing.JDialog {
     private final ChartPanel chartPanel;
     private final PortfolioManagementJPanel portfolioManagementJPanel;
     private final ActivitySummary activitySummary = new ActivitySummary();
-    private final CustomXYToolTipGenerator ttg = new CustomXYToolTipGenerator();
+    private final CustomXYToolTipGenerator cash_ttg = new CustomXYToolTipGenerator();
+
+    /* For stock information. */
+    private volatile TimeSeries stockTimeSeries;
+    private RealTimeStockMonitor realTimeStockMonitor;
+    private final XYItemRenderer stockRenderer;
+    private final Map<Code, Double> codeToPrice = new HashMap<Code, Double>();
+    private double totalDeposit = 0.0;
+    private double totalStockValue = 0.0;
+    private double totalDividend = 0.0;
+
+    private static final Log log = LogFactory.getLog(CashFlowChartJDialog.class);
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     // End of variables declaration//GEN-END:variables
-
-
-
 }
