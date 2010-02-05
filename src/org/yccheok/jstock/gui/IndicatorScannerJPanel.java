@@ -699,8 +699,8 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     }
 
     public void initRealTimeStockMonitor(java.util.List<StockServerFactory> stockServerFactories) {
-        if (realTimeStockMonitor != null) {
-            final RealTimeStockMonitor oldRealTimeStockMonitor = realTimeStockMonitor;
+        if (this.realTimeStockMonitor != null) {
+            final RealTimeStockMonitor oldRealTimeStockMonitor = this.realTimeStockMonitor;
             Utils.getZoombiePool().execute(new Runnable() {
                 @Override
                 public void run() {
@@ -713,10 +713,10 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             });
         }
         
-        realTimeStockMonitor = new RealTimeStockMonitor(4, 20, MainFrame.getInstance().getJStockOptions().getScanningSpeed());
-        realTimeStockMonitor.setStockServerFactories(stockServerFactories);
+        this.realTimeStockMonitor = new RealTimeStockMonitor(4, 20, MainFrame.getInstance().getJStockOptions().getScanningSpeed());
+        this.realTimeStockMonitor.setStockServerFactories(stockServerFactories);
         
-        realTimeStockMonitor.attach(this.realTimeStockMonitorObserver);
+        this.realTimeStockMonitor.attach(this.realTimeStockMonitorObserver);
     }
     
     // This is the workaround to overcome Erasure by generics. We are unable to make MainFrame to
