@@ -247,8 +247,10 @@ public class CrossHairUI extends AbstractLayerUI {
         final ChartPanel chartPanel = (ChartPanel)component;
         final JFreeChart chart = chartPanel.getChart();
         final CombinedDomainXYPlot cplot = (CombinedDomainXYPlot) chart.getPlot();
+        // Top most plot.
         final XYPlot plot = (XYPlot) cplot.getSubplots().get(0);
         final TimeSeriesCollection timeSeriesCollection = (TimeSeriesCollection)plot.getDataset();
+        // 0 are the main chart. 1, 2, 3... are TA.
         final TimeSeries timeSeries = timeSeriesCollection.getSeries(0);
 
         final Point mousePoint = SwingUtilities.convertPoint(e.getComponent(), e.getPoint(), layer);
@@ -306,7 +308,8 @@ public class CrossHairUI extends AbstractLayerUI {
         final double yJava2D = rangeAxis.valueToJava2D(yValue, _plotArea, rangeAxisEdge);
 
         this.pointIndex = bestMid;
-        this.point = new Point2D.Double(xJava2D, yJava2D);
+        // this.point = new Point2D.Double(xJava2D, yJava2D);
+        this.point = chartPanel.translateJava2DToScreen(new Point2D.Double(xJava2D, yJava2D));
         this.plotArea = _plotArea;
 
         if (_plotArea.contains(this.point)) {
