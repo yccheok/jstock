@@ -21,6 +21,7 @@ package org.yccheok.jstock.gui.charting;
 
 import java.awt.Dimension;
 import java.io.File;
+import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -28,6 +29,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jfree.chart.ChartFactory;
@@ -38,7 +41,6 @@ import org.jfree.chart.labels.CustomXYToolTipGenerator;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.StandardXYItemRenderer;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
-import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.time.Day;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
@@ -50,16 +52,16 @@ import org.yccheok.jstock.engine.SimpleDate;
 import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.gui.MainFrame;
 import org.yccheok.jstock.gui.PortfolioManagementJPanel;
+import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.portfolio.Activities;
 import org.yccheok.jstock.portfolio.Activity;
 import org.yccheok.jstock.portfolio.ActivitySummary;
 import org.yccheok.jstock.portfolio.Contract;
-import org.yccheok.jstock.portfolio.Deposit;
-import org.yccheok.jstock.portfolio.DepositSummary;
 import org.yccheok.jstock.portfolio.Dividend;
 import org.yccheok.jstock.portfolio.DividendSummary;
 import org.yccheok.jstock.portfolio.Transaction;
 import org.yccheok.jstock.portfolio.TransactionSummary;
+
 
 /**
  *
@@ -71,21 +73,38 @@ public class CashFlowChartJDialog extends javax.swing.JDialog implements Observe
     public CashFlowChartJDialog(java.awt.Frame parent, boolean modal, PortfolioManagementJPanel portfolioManagementJPanel) {
         super(parent, modal);
         initComponents();
+
+        // We need a stock price monitor, to update all the stocks value.
         initRealTimeStockMonitor();
 
+        // Initialize main data structures.
         this.portfolioManagementJPanel = portfolioManagementJPanel;
-        initActivitySummary(this.portfolioManagementJPanel);
+        initSummaries(this.portfolioManagementJPanel);
 
         // Renderer must be assigned before calling createOrUpdateStockTimeSeries.
         // createOrUpdateStockTimeSeries is going to access renderer at index 1.
-        this.stockRenderer = new StandardXYItemRenderer();
+        this.ROIRenderer = new StandardXYItemRenderer();
 
         final JFreeChart freeChart = createChart();
         org.yccheok.jstock.charting.Utils.applyChartTheme(freeChart);
-        chartPanel = new ChartPanel(freeChart, true, true, true, true, true);
-        getContentPane().add(chartPanel, java.awt.BorderLayout.CENTER);
+        this.chartPanel = new ChartPanel(freeChart, true, true, true, true, true);
+        this.updateChartTitle();
+
+        final org.jdesktop.jxlayer.JXLayer<ChartPanel> layer = new org.jdesktop.jxlayer.JXLayer<ChartPanel>(this.chartPanel);
+        this.investmentFlowLayerUI = new InvestmentFlowLayerUI<ChartPanel>(this);
+        layer.setUI(this.investmentFlowLayerUI);
+
+        getContentPane().add(layer, java.awt.BorderLayout.CENTER);
 
         loadDimension();
+
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                finishLookUpPrice = true;
+                investmentFlowLayerUI.setDirty(true);
+            }
+        }, 15000);
     }
 
     /** This method is called from within the constructor to
@@ -101,7 +120,7 @@ public class CashFlowChartJDialog extends javax.swing.JDialog implements Observe
         jPanel1 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Cash Flow Chart");
+        setTitle("Investment Flow Chart");
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
@@ -120,6 +139,10 @@ public class CashFlowChartJDialog extends javax.swing.JDialog implements Observe
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         // TODO add your handling code here:
         this.saveDimension();
+        // This will shut down the old real time monitor, and create a new
+        // real time monitor. Since there isn't any stock code being submitted
+        // to the newly created monitor, it will not start any thread.
+        // With this, we are able to perform thread clean up.
         this.initRealTimeStockMonitor();
     }//GEN-LAST:event_formWindowClosing
 
@@ -135,92 +158,110 @@ public class CashFlowChartJDialog extends javax.swing.JDialog implements Observe
         }
     }
 
-    private TimeSeries createOrUpdateStockTimeSeries() {
-        if (this.stockTimeSeries == null) {
-            this.stockTimeSeries = new TimeSeries("Share", Day.class);
+    private TimeSeries createOrUpdateROITimeSeries() {
+        if (this.ROITimeSeries == null) {
+            this.ROITimeSeries = new TimeSeries(GUIBundle.getString("InvestmentFlowChartJDialog_ReturnOfInvestment"), Day.class);
         }
 
         final CustomXYToolTipGenerator stock_ttg = new CustomXYToolTipGenerator();
         final ArrayList<String> toolTips = new ArrayList<String>();
-        final java.text.NumberFormat numberFormat = java.text.NumberFormat.getInstance();
-        numberFormat.setMaximumFractionDigits(2);
-        numberFormat.setMinimumFractionDigits(2);
 
-        this.totalStockValue = 0.0;
-        for (int i = 0, count = activitySummary.size(); i < count; i++) {
-            final Activities activities = activitySummary.get(i);
-            boolean no_activity = true;
+
+        this.totalROIValue = 0.0;
+        for (int i = 0, count = this.ROISummary.size(); i < count; i++) {
+            final Activities activities = this.ROISummary.get(i);
+            double amount = 0.0;
             for (int j = 0, count2 = activities.size(); j < count2; j++) {
                 final Activity activity = activities.get(j);
                 final Activity.Type type = activity.getType();
 
                 if (type == Activity.Type.Buy) {
-                    no_activity = false;
                     final int quantity = (Integer)activity.get(Activity.Param.Quantity);
                     final Stock stock = (Stock)activity.get(Activity.Param.Stock);
-                    this.realTimeStockMonitor.addStockCode(stock.getCode());
+                    if (lookUpCodesInitialized == false) {
+                        if (this.lookUpCodes.contains(stock.getCode()) == false) {
+                            this.lookUpCodes.add(stock.getCode());
+                        }
+                    }
                     final Double price = this.codeToPrice.get(stock.getCode());
                     if (price != null) {
-                        this.totalStockValue += (price * quantity);
+                        amount += (price * quantity);
                     }
                 }
-                else if (type == Activity.Type.Sell) {
-                    no_activity = false;
-                    final int quantity = (Integer)activity.get(Activity.Param.Quantity);
-                    final Stock stock = (Stock)activity.get(Activity.Param.Stock);
-                    this.realTimeStockMonitor.addStockCode(stock.getCode());
-                    final Double price = this.codeToPrice.get(stock.getCode());
-                    if (price != null) {
-                        this.totalStockValue -= (price * quantity);
-                    }
+                else if (type == Activity.Type.Dividend) {
+                    amount += activity.getAmount();
                 }
+                else {
+                    assert(false);
+                }
+            }   // for (int j = 0, count2 = activities.size(); j < count2; j++)
+
+            if (MainFrame.getInstance().getJStockOptions().isPenceToPoundConversionEnabled() == true) {
+                amount = amount / 100.0;
             }
 
-            if (no_activity) {
-                continue;
-            }
+            this.totalROIValue += amount;
 
             final SimpleDate date = activities.getDate();
             final Date d = date.getTime();
-            this.stockTimeSeries.addOrUpdate(new Day(d), this.totalStockValue);
-            toolTips.add("<html>Share: (" + dateFormat.format(d) + ", " + numberFormat.format(this.totalStockValue) + ")<br>" + activities.toSummary() + "</html>");
-        }
+            this.ROITimeSeries.addOrUpdate(new Day(d), this.totalROIValue);
+            final String tips = "<html>Return: (" + dateFormat.format(d) + ", " + numberFormat.format(amount) + ")<br> " + activities.toSummary() + "</html>";
+            toolTips.add(tips);
+        }   // for (int i = 0, count = this.ROISummary.size(); i < count; i++)
 
         stock_ttg.addToolTipSeries(toolTips);
-        this.stockRenderer.setToolTipGenerator(stock_ttg);
-        
-        return this.stockTimeSeries;
+        this.ROIRenderer.setToolTipGenerator(stock_ttg);
+
+        // We cannot iterate over this.lookUpCodes.
+        // realTimeStockMonitor's callback may remove lookUpCodes item during
+        // iterating process.
+        if (lookUpCodesInitialized == false) {
+            final List<Code> codes = new ArrayList<Code>(this.lookUpCodes);
+            for (Code code : codes) {
+                this.realTimeStockMonitor.addStockCode(code);
+            }
+        }
+        lookUpCodesInitialized = true;
+
+        return this.ROITimeSeries;
     }
 
-    private XYDataset createCashDataset() {
-        TimeSeries series = new TimeSeries("Cash", Day.class);
+    private XYDataset createInvestDataset() {
+        final TimeSeries series = new TimeSeries(GUIBundle.getString("InvestmentFlowChartJDialog_Invest"), Day.class);
         final ArrayList<String> toolTips = new ArrayList<String>();
-        final java.text.NumberFormat numberFormat = java.text.NumberFormat.getInstance();
-        numberFormat.setMaximumFractionDigits(2);
-        numberFormat.setMinimumFractionDigits(2);
         
-        double amount = 0.0;
-        this.totalDeposit = 0.0;
-        this.totalDividend = 0.0;
-        for (int i = 0, count = activitySummary.size(); i < count; i++) {
-            final Activities activities = activitySummary.get(i);
+        this.totalInvestValue = 0.0;
+        for (int i = 0, count = this.investSummary.size(); i < count; i++) {
+            final Activities activities = this.investSummary.get(i);
+            double amount = 0.0;
             for (int j = 0, count2 = activities.size(); j < count2; j++) {
                 final Activity activity = activities.get(j);
                 final Activity.Type type = activity.getType();
 
-                if (type == Activity.Type.Deposit) {
-                    this.totalDeposit += activity.getAmount();
+                if (type == Activity.Type.Buy) {
+                    amount += activity.getAmount();
                 }
-                else if (type == Activity.Type.Dividend) {
-                    this.totalDividend += activity.getAmount();
+                else if (type == Activity.Type.Sell) {
+                    amount -= activity.getAmount();
                 }
+                else {
+                    assert(false);
+                }
+            }   // for (int j = 0, count2 = activities.size(); j < count2; j++)
+
+            if (MainFrame.getInstance().getJStockOptions().isPenceToPoundConversionEnabled() == true) {
+                amount = amount / 100.0;
             }
-            amount = amount + activities.getNetAmount();
+            
+            this.totalInvestValue += amount;
+
             final SimpleDate date = activities.getDate();
             final Date d = date.getTime();
-            toolTips.add("<html>Cash: (" + dateFormat.format(d) + ", " + numberFormat.format(amount) + ")<br>" + activities.toSummary() + "</html>");
-            series.add(new Day(d), amount);
-        }
+            series.add(new Day(d), this.totalInvestValue);
+            final String tips = "<html>Invest: (" + dateFormat.format(d) + ", " + numberFormat.format(amount) + ")<br> " + activities.toSummary() + "</html>";
+            toolTips.add(tips);
+
+        }   // for (int i = 0, count = this.investSummary.size(); i < count; i++)
 
         cash_ttg.addToolTipSeries(toolTips);
         return new TimeSeriesCollection(series);
@@ -250,14 +291,12 @@ public class CashFlowChartJDialog extends javax.swing.JDialog implements Observe
     */
 
     private JFreeChart createChart() {
+        final XYDataset priceData = this.createInvestDataset();
 
-        XYDataset priceData = createCashDataset();
-
-        final String title = "Cash Flow";
         JFreeChart chart = ChartFactory.createTimeSeriesChart(
-            title,
-            "Date",
-            "Cash",
+            "",
+            GUIBundle.getString("InvestmentFlowChartJDialog_Date"),
+            GUIBundle.getString("InvestmentFlowChartJDialog_Value"),
             priceData,
             true,       // create legend?
             true,       // generate tooltips?
@@ -265,8 +304,8 @@ public class CashFlowChartJDialog extends javax.swing.JDialog implements Observe
         );
         
         XYPlot plot = chart.getXYPlot();
-        
-        // Ugly looking :(
+
+        // Nop! Too ugly!
         //initAnnotation(plot);
 
         NumberAxis rangeAxis1 = (NumberAxis) plot.getRangeAxis();
@@ -275,15 +314,14 @@ public class CashFlowChartJDialog extends javax.swing.JDialog implements Observe
         XYItemRenderer renderer0 = plot.getRenderer();
         renderer0.setToolTipGenerator(cash_ttg);
         
-        plot.setRenderer(1, this.stockRenderer);
-        plot.setDataset(1, new TimeSeriesCollection(this.createOrUpdateStockTimeSeries()));
+        plot.setRenderer(1, this.ROIRenderer);
+        plot.setDataset(1, new TimeSeriesCollection(this.createOrUpdateROITimeSeries()));
 
         return chart;
     }
 
-    private void initActivitySummary(PortfolioManagementJPanel portfolioManagementJPanel) {
+    private void initSummaries(PortfolioManagementJPanel portfolioManagementJPanel) {
         final List<TransactionSummary> transactionSummaries = portfolioManagementJPanel.getTransactionSummariesFromPortfolios();
-        final DepositSummary depositSummary = portfolioManagementJPanel.getDepositSummary();
         final DividendSummary dividendSummary = portfolioManagementJPanel.getDividendSummary();
 
         for (TransactionSummary transactionSummary : transactionSummaries) {
@@ -297,19 +335,20 @@ public class CashFlowChartJDialog extends javax.swing.JDialog implements Observe
                             put(Activity.Param.Stock, contract.getStock()).
                             put(Activity.Param.Quantity, contract.getQuantity()).
                             build();
-                    activitySummary.add(contract.getDate(), activity);
+                    this.ROISummary.add(contract.getDate(), activity);
+                    this.investSummary.add(contract.getDate(), activity);
                 }
                 else if (type == Contract.Type.Sell) {
                     final Activity activity0 = new Activity.Builder(Activity.Type.Buy, transaction.getReferenceTotal()).
                             put(Activity.Param.Stock, contract.getStock()).
                             put(Activity.Param.Quantity, contract.getQuantity()).
                             build();
-                    activitySummary.add(contract.getReferenceDate(), activity0);
+                    this.investSummary.add(contract.getReferenceDate(), activity0);
                     final Activity activity1 = new Activity.Builder(Activity.Type.Sell, transaction.getNetTotal()).
                             put(Activity.Param.Stock, contract.getStock()).
                             put(Activity.Param.Quantity, contract.getQuantity()).
                             build();
-                    activitySummary.add(contract.getDate(), activity1);
+                    this.investSummary.add(contract.getDate(), activity1);
                 }
                 else {
                     throw new java.lang.UnsupportedOperationException("Unsupported contract type " + type);
@@ -317,17 +356,11 @@ public class CashFlowChartJDialog extends javax.swing.JDialog implements Observe
             }
         }
 
-        for (int i = 0, count = depositSummary.size(); i < count; i++) {
-            final Deposit deposit = depositSummary.get(i);
-            final Activity activity = new Activity.Builder(Activity.Type.Deposit, deposit.getAmount()).build();
-            activitySummary.add(deposit.getDate(), activity);
-        }
-
         for (int i = 0, count = dividendSummary.size(); i < count; i++) {
             final Dividend dividend = dividendSummary.get(i);
             final Activity activity = new Activity.Builder(Activity.Type.Dividend, dividend.getAmount()).
                     put(Activity.Param.Stock, dividend.getStock()).build();
-            activitySummary.add(dividend.getDate(), activity);
+            this.ROISummary.add(dividend.getDate(), activity);
         }
     }
 
@@ -356,8 +389,41 @@ public class CashFlowChartJDialog extends javax.swing.JDialog implements Observe
     public void update(RealTimeStockMonitor subject, List<Stock> arg) {
         for (Stock stock : arg) {
             this.codeToPrice.put(stock.getCode(), stock.getLastPrice());
+            this.lookUpCodes.remove(stock.getCode());
         }
-        this.createOrUpdateStockTimeSeries();
+        this.createOrUpdateROITimeSeries();
+        this.updateChartTitle();
+
+        if (this.lookUpCodes.size() == 0) {
+            this.finishLookUpPrice = true;
+            this.investmentFlowLayerUI.setDirty(true);
+        }
+    }
+
+    private void updateChartTitle() {
+        final String invest = numberFormat.format(this.totalInvestValue);
+        final String roi = numberFormat.format(this.totalROIValue);
+        final double gain = this.totalROIValue - this.totalInvestValue;
+        final double percentage = this.totalInvestValue > 0.0 ? gain / this.totalInvestValue * 100.0 : 0.0;
+        final String gain_str = gain > 0.0 ? "+" + numberFormat.format(gain) : numberFormat.format(gain);
+        final String percentage_str = gain > 0.0 ? "+" + numberFormat.format(percentage) : numberFormat.format(percentage);
+
+        String title = null;
+        if (this.totalROIValue >= this.totalInvestValue) {
+            final String tmp = MessageFormat.format(GUIBundle.getString("InvestmentFlowChartJDialog_Gain"), gain_str, percentage_str);
+            title = MessageFormat.format(GUIBundle.getString("InvestmentFlowChartJDialog_ChartTitle"), invest, roi, tmp);
+        }
+        else {
+            final String tmp = MessageFormat.format(GUIBundle.getString("InvestmentFlowChartJDialog_Loss"), gain_str, percentage_str);
+            title = MessageFormat.format(GUIBundle.getString("InvestmentFlowChartJDialog_ChartTitle"), invest, roi, tmp);
+        }
+
+        this.chartPanel.getChart().setAntiAlias(true);
+        this.chartPanel.getChart().setTitle(title);
+    }
+
+    public boolean isFinishLookUpPrice() {
+        return this.finishLookUpPrice;
     }
 
     private static final NumberFormat currencyFormat = java.text.NumberFormat.getCurrencyInstance();
@@ -366,23 +432,46 @@ public class CashFlowChartJDialog extends javax.swing.JDialog implements Observe
         currencyFormat.setMaximumFractionDigits(0);
         currencyFormat.setMinimumFractionDigits(0);
     }
+
+    /* How much I had invested. */
+    /* Contains Buy, Sell. When Sell, it will pull down your investment value. */
+    private final ActivitySummary investSummary = new ActivitySummary();
+    /* Return of investment. */
+    /* Contains Buy, Sell and Dividend. */
+    private final ActivitySummary ROISummary = new ActivitySummary();
+
+    /* For ROI charting information. */
+    private final XYItemRenderer ROIRenderer;
+    private volatile TimeSeries ROITimeSeries;
+    private double totalROIValue = 0.0;
+
+    /* For Invest charting information. */
+    private double totalInvestValue = 0.0;
+
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("d-MMM-yyyy");
     private final ChartPanel chartPanel;
     private final PortfolioManagementJPanel portfolioManagementJPanel;
-    private final ActivitySummary activitySummary = new ActivitySummary();
     private final CustomXYToolTipGenerator cash_ttg = new CustomXYToolTipGenerator();
 
-    /* For stock information. */
-    private volatile TimeSeries stockTimeSeries;
-    private RealTimeStockMonitor realTimeStockMonitor;
-    private final XYItemRenderer stockRenderer;
+    /* For real time stock information. */
+    private RealTimeStockMonitor realTimeStockMonitor;    
     private final Map<Code, Double> codeToPrice = new HashMap<Code, Double>();
-    private double totalDeposit = 0.0;
-    private double totalStockValue = 0.0;
-    private double totalDividend = 0.0;
+    /* Whether we had finished scan through all the BUY stocks. */
+    private volatile boolean finishLookUpPrice = false;
+    private List<Code> lookUpCodes = new ArrayList<Code>();
+    private volatile boolean lookUpCodesInitialized = false;
+
+    /* Overlay layer. */
+    private final InvestmentFlowLayerUI<ChartPanel> investmentFlowLayerUI;
 
     private static final Log log = LogFactory.getLog(CashFlowChartJDialog.class);
 
+    static final java.text.NumberFormat numberFormat = java.text.NumberFormat.getInstance();
+    static {
+        numberFormat.setMaximumFractionDigits(2);
+        numberFormat.setMinimumFractionDigits(2);
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;

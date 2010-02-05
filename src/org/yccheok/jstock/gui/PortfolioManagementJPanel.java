@@ -1107,7 +1107,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             popup.addSeparator();
         }
 
-        menuItem = new JMenuItem("Cash Chart...", this.getImageIcon("/images/16x16/graph.png"));
+        menuItem = new JMenuItem("Investment Chart...", this.getImageIcon("/images/16x16/graph.png"));
 
         menuItem.addActionListener(new ActionListener() {
             @Override
@@ -1276,7 +1276,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             popup.addSeparator();
         }
 
-        menuItem = new JMenuItem("Cash Chart...", this.getImageIcon("/images/16x16/graph.png"));
+        menuItem = new JMenuItem("Investment Chart...", this.getImageIcon("/images/16x16/graph.png"));
 
         menuItem.addActionListener(new ActionListener() {
             @Override
