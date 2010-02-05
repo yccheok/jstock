@@ -52,7 +52,7 @@ import org.yccheok.jstock.engine.*;
 import org.jdesktop.swingx.treetable.*;
 import org.yccheok.jstock.file.Statement;
 import org.yccheok.jstock.file.Statements;
-import org.yccheok.jstock.gui.charting.CashFlowChartJDialog;
+import org.yccheok.jstock.gui.charting.InvestmentFlowChartJDialog;
 import org.yccheok.jstock.gui.portfolio.CommentJDialog;
 import org.yccheok.jstock.gui.portfolio.DepositSummaryJDialog;
 import org.yccheok.jstock.gui.portfolio.DepositSummaryTableModel;
@@ -1031,7 +1031,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
     private void showChashFlowChartJDialog() {
         final MainFrame m = MainFrame.getInstance();
-        CashFlowChartJDialog cashFlowChartJDialog = new CashFlowChartJDialog(m, false, this);
+        InvestmentFlowChartJDialog cashFlowChartJDialog = new InvestmentFlowChartJDialog(m, false, this);
         cashFlowChartJDialog.setVisible(true);
     }
 
