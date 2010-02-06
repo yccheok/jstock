@@ -48,6 +48,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import org.yccheok.jstock.engine.*;
 import java.util.*;
@@ -1640,6 +1641,22 @@ public class Utils {
     public static File promptOpenZippedJFileChooser() {
         final FileNameExtensionFilter zippedFilter = new FileNameExtensionFilter("Zipped Files (*.zip)", "zip");
         return promptOpenJFileChooser(zippedFilter);
+    }
+
+    public static String stockPriceDecimalFormat(Object value) {
+        // 0.1   -> "0.10"
+        // 0.01  -> "0.01"
+        // 0.001 -> "0.001"
+        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
+        return decimalFormat.format(value);
+    }
+
+    public static String stockPriceDecimalFormat(double value) {
+        // 0.1   -> "0.10"
+        // 0.01  -> "0.01"
+        // 0.001 -> "0.001"
+        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
+        return decimalFormat.format(value);
     }
 
     private static File promptSaveJFileChooser(String suggestedFileName, FileNameExtensionFilter... fileNameExtensionFilters) {
