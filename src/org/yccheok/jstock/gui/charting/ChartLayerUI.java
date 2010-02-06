@@ -67,9 +67,7 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
     private static final Color COLOR_BACKGROUND = new Color(255, 255, 153);
     private static final Color COLOR_BORDER = new Color(255, 204, 0);
     private final ChartJDialog chartJDialog;
-    private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEEE, MMMM d, yyyy");
-    private static final DecimalFormat decimalFormat = new DecimalFormat("0.00");
-    private static final DecimalFormat integerFormat = new DecimalFormat("###,###");
+
     private static final List<String> params = Collections.unmodifiableList(
             Arrays.asList(
             GUIBundle.getString("MainFrame_Prev"),
@@ -96,11 +94,15 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         List<String> values = new ArrayList<String>();
         final Stock stock = stockHistoryServer.getStock(stockHistoryServer.getCalendar(pointIndex));
 
-        values.add(ChartLayerUI.decimalFormat.format(stock.getPrevPrice()));
-        values.add(ChartLayerUI.decimalFormat.format(stock.getLastPrice()));
-        values.add(ChartLayerUI.decimalFormat.format(stock.getHighPrice()));
-        values.add(ChartLayerUI.decimalFormat.format(stock.getLowPrice()));
-        values.add(ChartLayerUI.integerFormat.format(stock.getVolume()));
+        // Number formats are generally not synchronized. It is recommended to create separate format instances for each thread. 
+        // If multiple threads access a format concurrently, it must be synchronized externally.
+        // http://stackoverflow.com/questions/2213410/usage-of-decimalformat-for-the-following-case
+        final DecimalFormat integerFormat = new DecimalFormat("###,###");
+        values.add(org.yccheok.jstock.gui.Utils.stockPriceDecimalFormat(stock.getPrevPrice()));
+        values.add(org.yccheok.jstock.gui.Utils.stockPriceDecimalFormat(stock.getLastPrice()));
+        values.add(org.yccheok.jstock.gui.Utils.stockPriceDecimalFormat(stock.getHighPrice()));
+        values.add(org.yccheok.jstock.gui.Utils.stockPriceDecimalFormat(stock.getLowPrice()));
+        values.add(integerFormat.format(stock.getVolume()));
 
         assert(values.size() == params.size());
         int index = 0;
@@ -118,6 +120,10 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         }
 
         final Date date =  stockHistoryServer.getCalendar(this.pointIndex).getTime();
+        
+        // Date formats are not synchronized. It is recommended to create separate format instances for each thread.
+        // If multiple threads access a format concurrently, it must be synchronized externally.
+        final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEEE, MMMM d, yyyy");
         final String dateString = simpleDateFormat.format(date);
         final int dateStringWidth = dateFontMetrics.stringWidth(dateString);
         final int dateStringHeight = dateFontMetrics.getHeight();
@@ -133,10 +139,10 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         final int suggestedX = (int)(point.getX() - width - boxPointMargin);
         final int suggestedY = (int)(point.getY() - (height >> 1));
         final int x =   suggestedX > this.drawArea.getX() ?
-                        (suggestedX + width) < (this.drawArea.getX() + this.drawArea.getWidth()) ? suggestedX : (int)(this.drawArea.getX() + this.drawArea.getWidth() - width - 1) :
+                        (suggestedX + width) < (this.drawArea.getX() + this.drawArea.getWidth()) ? suggestedX : (int)(this.drawArea.getX() + this.drawArea.getWidth() - width - boxPointMargin) :
                         (int)(point.getX() + boxPointMargin);
         final int y =   suggestedY > this.drawArea.getY() ?
-                        (suggestedY + height) < (this.drawArea.getY() + this.drawArea.getHeight()) ? suggestedY : (int)(this.drawArea.getY() + this.drawArea.getHeight() - height - 1) :
+                        (suggestedY + height) < (this.drawArea.getY() + this.drawArea.getHeight()) ? suggestedY : (int)(this.drawArea.getY() + this.drawArea.getHeight() - height - boxPointMargin) :
                         (int)(this.drawArea.getY() + boxPointMargin);
 
         final Object oldValueAntiAlias = g2.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
@@ -251,10 +257,6 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         final Point2D p2 = chartPanel.translateScreenToJava2D((Point)p);
         final Rectangle2D _plotArea = chartPanel.getScreenDataArea();
 
-        //if (cplot.getSubplots().)
-        //System.out.println("-----> " + chartPanel.getScreenDataArea());
-        //System.out.println(chartPanel.getScreenDataArea(150, 105));
-
         final ValueAxis domainAxis = plot.getDomainAxis();
         final RectangleEdge domainAxisEdge = plot.getDomainAxisEdge();
         final ValueAxis rangeAxis = plot.getRangeAxis();
@@ -313,8 +315,8 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         // This is just a try-n-error hack.
         // Do not use -4. Due to rounding error during point conversion (double to integer)
         this.drawArea.setRect(_plotArea.getX() + 2, _plotArea.getY() + 2,
-                _plotArea.getWidth() - 3 > 0 ? _plotArea.getWidth() - 3 : 1,
-                _plotArea.getHeight() - 3 > 0 ? _plotArea.getHeight() - 3 : 1);
+                _plotArea.getWidth() - 2 > 0 ? _plotArea.getWidth() - 2 : 1,
+                _plotArea.getHeight() - 2 > 0 ? _plotArea.getHeight() - 2 : 1);
 
         if (this.drawArea.contains(tmpPoint)) {
             this.pointIndex = tmpIndex;
