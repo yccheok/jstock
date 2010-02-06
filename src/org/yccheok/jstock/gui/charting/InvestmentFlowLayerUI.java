@@ -25,6 +25,7 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
@@ -47,6 +48,7 @@ import org.jfree.data.time.TimeSeriesDataItem;
 import org.jfree.ui.RectangleEdge;
 import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.gui.JStockOptions;
+import org.yccheok.jstock.gui.MainFrame;
 import org.yccheok.jstock.gui.Utils;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.internationalization.MessagesBundle;
@@ -66,7 +68,7 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
 
     private final Rectangle2D drawArea = new Rectangle2D.Double();
     
-    private final InvestmentFlowChartJDialog cashFlowChartJDialog;
+    private final InvestmentFlowChartJDialog investmentFlowChartJDialog;
 
     private static final Color COLOR_BLUE = new Color(85, 85, 255);
     private static final Color COLOR_RED = new Color(255, 85, 85);
@@ -77,11 +79,180 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
     private static final Color COLOR_BACKGROUND = new Color(255, 255, 153);
     private static final Color COLOR_BORDER = new Color(255, 204, 0);
 
+    /* Will be updated by updateROIInformationBox. */
+    private final List<String> ROIValues = new ArrayList<String>();
+    private final List<String> ROIParams = new ArrayList<String>();
+    private final Rectangle ROIRect = new Rectangle();
+    private double totalROIValue = 0.0;
+
+    /* Will be updated by updateInvestInformationBox. */
+    private final List<String> investValues = new ArrayList<String>();
+    private final List<String> investParams = new ArrayList<String>();
+    private final Rectangle investRect = new Rectangle();
+    private double totalInvestValue = 0.0;
+
     public InvestmentFlowLayerUI(InvestmentFlowChartJDialog cashFlowChartJDialog) {
-        this.cashFlowChartJDialog = cashFlowChartJDialog;
+        this.investmentFlowChartJDialog = cashFlowChartJDialog;
     }
 
-    private void drawROIInformationBox(Graphics2D g2, JXLayer<? extends V> layer) {
+    private void drawTitle(Graphics2D g2) {
+        final Object oldValueAntiAlias = g2.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
+        final Color oldColor = g2.getColor();
+        final Font oldFont = g2.getFont();
+
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        final Font titleFont = new Font(oldFont.getFontName(), oldFont.getStyle() + Font.BOLD, (int)(oldFont.getSize() * 1.5));
+        final int margin = 5;
+
+        final FontMetrics titleFontMetrics = g2.getFontMetrics(titleFont);
+        final FontMetrics oldFontMetrics = g2.getFontMetrics(oldFont);
+        final java.text.NumberFormat numberFormat = java.text.NumberFormat.getInstance();
+        numberFormat.setMaximumFractionDigits(2);
+        numberFormat.setMinimumFractionDigits(2);
+        final String invest = org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(this.investmentFlowChartJDialog.getTotalInvestValue());
+        final String roi = org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(this.investmentFlowChartJDialog.getTotalROIValue());
+        final double gain = this.investmentFlowChartJDialog.getTotalROIValue() - this.investmentFlowChartJDialog.getTotalInvestValue();
+        final double percentage = this.investmentFlowChartJDialog.getTotalInvestValue() > 0.0 ? gain / this.investmentFlowChartJDialog.getTotalInvestValue() * 100.0 : 0.0;
+        final String gain_str = org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(gain);
+        final String percentage_str = numberFormat.format(percentage);
+
+        final String INVEST = GUIBundle.getString("InvestmentFlowLayerUI_Invest");
+        final String RETURN = GUIBundle.getString("InvestmentFlowLayerUI_Return");
+        final String GAIN = GUIBundle.getString("InvestmentFlowLayerUI_Gain");
+        final String LOSS = GUIBundle.getString("InvestmentFlowLayerUI_Loss");
+
+        final int string_width = oldFontMetrics.stringWidth(INVEST + ": ") + titleFontMetrics.stringWidth(invest + " ") +
+                oldFontMetrics.stringWidth(RETURN + ": ") + titleFontMetrics.stringWidth(roi + " ") +
+                oldFontMetrics.stringWidth((gain >= 0 ? GAIN : LOSS) + ": ") + titleFontMetrics.stringWidth(gain_str + " (" + percentage_str + "%)");
+
+        int x = (int)(this.investmentFlowChartJDialog.getChartPanel().getWidth() - string_width) >> 1;
+        final int y = margin + titleFontMetrics.getAscent();
+
+        g2.setFont(oldFont);
+        g2.drawString(INVEST + ": ", x, y);
+        x += oldFontMetrics.stringWidth(INVEST + ": ");
+        g2.setFont(titleFont);
+        g2.drawString(invest + " ", x, y);
+        x += titleFontMetrics.stringWidth(invest + " ");
+        g2.setFont(oldFont);
+        g2.drawString(RETURN + ": ", x, y);
+        x += oldFontMetrics.stringWidth(RETURN + ": ");
+        g2.setFont(titleFont);
+        g2.drawString(roi + " ", x, y);
+        x += titleFontMetrics.stringWidth(roi + " ");
+        g2.setFont(oldFont);
+        if (gain >= 0) {
+            if (gain > 0) {
+                g2.setColor(MainFrame.getInstance().getJStockOptions().getHigherNumericalValueForegroundColor());
+            }
+            g2.drawString(GAIN + ": ", x, y);
+            x += oldFontMetrics.stringWidth(GAIN + ": ");
+        }
+        else {
+            g2.setColor(MainFrame.getInstance().getJStockOptions().getLowerNumericalValueForegroundColor());
+            g2.drawString(LOSS + ": ", x, y);
+            x += oldFontMetrics.stringWidth(GAIN + ": ");
+        }
+        g2.setFont(titleFont);
+        g2.drawString(gain_str + " (" + percentage_str + "%)", x, y);
+
+        g2.setColor(oldColor);
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, oldValueAntiAlias);
+        g2.setFont(oldFont);
+    }
+
+    private void drawInformationBox(
+            Graphics2D g2, Activities activities, Rectangle rect,
+            List<String> params, List<String> values, String totalParam, double totalValue,
+            Color background_color, Color border_color) {
+        final Font oldFont = g2.getFont();
+        final Font paramFont = new Font(oldFont.getFontName(), oldFont.getStyle(), oldFont.getSize());
+        final FontMetrics paramFontMetrics = g2.getFontMetrics(paramFont);
+        final Font valueFont = new Font(oldFont.getFontName(), oldFont.getStyle() + Font.BOLD, oldFont.getSize() + 1);
+        final FontMetrics valueFontMetrics = g2.getFontMetrics(valueFont);
+        final Font dateFont = new Font(oldFont.getFontName(), oldFont.getStyle(), oldFont.getSize() - 1);
+        final FontMetrics dateFontMetrics = g2.getFontMetrics(dateFont);
+        
+        final int x = (int)rect.getX();
+        final int y  = (int)rect.getY();
+        final int width = (int)rect.getWidth();
+        final int height = (int)rect.getHeight();
+        
+        final Object oldValueAntiAlias = g2.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
+        final Composite oldComposite = g2.getComposite();
+        final Color oldColor = g2.getColor();
+
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setColor(border_color);
+        g2.drawRoundRect(x - 1, y - 1, width + 1, height + 1, 15, 15);
+        g2.setColor(background_color);
+        g2.setComposite(Utils.makeComposite(0.75f));
+        g2.fillRoundRect(x, y, width, height, 15, 15);
+        g2.setComposite(oldComposite);
+        g2.setColor(oldColor);
+
+        final Date date =  activities.getDate().getTime();
+        final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEEE, MMMM d, yyyy");
+        final String dateString = simpleDateFormat.format(date);
+
+        final int padding = 5;
+
+        int yy = y  + padding + dateFontMetrics.getAscent();
+        g2.setFont(dateFont);
+        g2.setColor(COLOR_BLUE);
+        g2.drawString(dateString,
+                ((width - dateFontMetrics.stringWidth(dateString)) >> 1) + x,
+                yy);
+
+        int index = 0;
+        final int dateInfoHeightMargin = 5;
+        final int infoTotalHeightMargin = 5;
+        final int paramValueHeightMargin = 0;
+
+        yy += dateFontMetrics.getDescent() + dateInfoHeightMargin + Math.max(paramFontMetrics.getAscent(), valueFontMetrics.getAscent());
+        for (String param : params) {
+            final String value = values.get(index++);
+            g2.setColor(Color.BLACK);
+            g2.setFont(paramFont);
+            g2.drawString(param + ":",
+                padding + x,
+                yy);
+            g2.setFont(valueFont);
+            g2.drawString(value,
+                width - padding - valueFontMetrics.stringWidth(value) + x,
+                yy);
+            // Same as yy += valueFontMetrics.getDescent() + paramValueHeightMargin + valueFontMetrics.getAscent()
+            yy += paramValueHeightMargin + Math.max(paramFontMetrics.getHeight(), valueFontMetrics.getHeight());
+        }
+
+        if (values.size() > 1) {
+            yy -= paramValueHeightMargin;
+            yy += infoTotalHeightMargin;
+            if (totalValue > 0.0) {
+                g2.setColor(JStockOptions.DEFAULT_HIGHER_NUMERICAL_VALUE_FOREGROUND_COLOR);
+            }
+            else if (totalValue < 0.0) {
+                g2.setColor(JStockOptions.DEFAULT_LOWER_NUMERICAL_VALUE_FOREGROUND_COLOR);
+            }
+
+            g2.setFont(paramFont);
+            g2.drawString(totalParam + ":",
+                padding + x,
+                yy);
+            g2.setFont(valueFont);
+            final String totalValueStr = org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(totalValue);
+            g2.drawString(totalValueStr,
+                width - padding - valueFontMetrics.stringWidth(totalValueStr) + x,
+                yy);
+        }
+
+        g2.setColor(oldColor);
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, oldValueAntiAlias);
+        g2.setFont(oldFont);
+    }
+
+    private void updateROIInformationBox(Graphics2D g2) {
         final Font oldFont = g2.getFont();
         final Font paramFont = new Font(oldFont.getFontName(), oldFont.getStyle(), oldFont.getSize());
         final FontMetrics paramFontMetrics = g2.getFontMetrics(paramFont);
@@ -90,12 +261,11 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         final Font dateFont = new Font(oldFont.getFontName(), oldFont.getStyle(), oldFont.getSize() - 1);
         final FontMetrics dateFontMetrics = g2.getFontMetrics(dateFont);
 
-        final Activities activities = this.cashFlowChartJDialog.getROIActivities(this.ROIPointIndex);
+        final Activities activities = this.investmentFlowChartJDialog.getROIActivities(this.ROIPointIndex);
 
-        List<String> values = new ArrayList<String>();
-        List<String> params = new ArrayList<String>();
-
-        double total = 0.0;
+        this.ROIValues.clear();
+        this.ROIParams.clear();
+        this.totalROIValue = 0.0;
 
         for (int i = 0, size = activities.size(); i < size; i++) {
             final Activity activity = activities.get(i);
@@ -103,38 +273,38 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
             if (activity.getType() == Activity.Type.Buy) {
                 final int quantity = (Integer)activity.get(Activity.Param.Quantity);
                 final Stock stock = (Stock)activity.get(Activity.Param.Stock);
-                params.add(GUIBundle.getString("InvestmentFlowLayerUI_Own") + " " + quantity + " " + stock.getSymbol());
-                final double amount = quantity * this.cashFlowChartJDialog.getStockPrice(stock.getCode());
-                total += amount;
-                values.add(org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(amount));
+                this.ROIParams.add(GUIBundle.getString("InvestmentFlowLayerUI_Own") + " " + quantity + " " + stock.getSymbol());
+                final double amount = quantity * this.investmentFlowChartJDialog.getStockPrice(stock.getCode());
+                this.totalROIValue += amount;
+                this.ROIValues.add(org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(amount));
             }
             else if (activity.getType() == Activity.Type.Dividend) {
                 final Stock stock = (Stock)activity.get(Activity.Param.Stock);
-                params.add(activity.getType() + " " + stock.getSymbol());
-                total += activity.getAmount();
-                values.add(org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(activity.getAmount()));
+                this.ROIParams.add(activity.getType() + " " + stock.getSymbol());
+                this.totalROIValue += activity.getAmount();
+                this.ROIValues.add(org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(activity.getAmount()));
             }
             else {
                 assert(false);
             }
         }
 
-        final boolean isTotalNeeded = params.size() > 1;
+        final boolean isTotalNeeded = this.ROIParams.size() > 1;
         final String totalParam = GUIBundle.getString("InvestmentFlowLayerUI_Total_Return");
-        final String totalValue = org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(total);
+        final String totalValue = org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(this.totalROIValue);
         /* This is the height for "total" information. */
         int totalHeight = 0;
 
-        assert(values.size() == params.size());
+        assert(this.ROIParams.size() == this.ROIValues.size());
 
         int index = 0;
         final int paramValueWidthMargin = 10;
         final int paramValueHeightMargin = 0;
         int maxInfoWidth = -1;
         // paramFontMetrics will always "smaller" than valueFontMetrics.
-        int totalInfoHeight = Math.max(paramFontMetrics.getHeight(), valueFontMetrics.getHeight()) * values.size() + paramValueHeightMargin * (values.size() - 1);
-        for (String param : params) {
-            final String value = values.get(index++);
+        int totalInfoHeight = Math.max(paramFontMetrics.getHeight(), valueFontMetrics.getHeight()) * this.ROIValues.size() + paramValueHeightMargin * (this.ROIValues.size() - 1);
+        for (String param : this.ROIParams) {
+            final String value = this.ROIValues.get(index++);
             final int paramStringWidth = paramFontMetrics.stringWidth(param + ":") + paramValueWidthMargin + valueFontMetrics.stringWidth(value);
             if (maxInfoWidth < paramStringWidth) {
                 maxInfoWidth = paramStringWidth;
@@ -177,69 +347,10 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
                         (suggestedY + height) < (this.drawArea.getY() + this.drawArea.getHeight()) ? suggestedY : (int)(this.drawArea.getY() + this.drawArea.getHeight() - height - boxPointMargin) :
                         (int)(this.drawArea.getY() + boxPointMargin);
 
-        final Object oldValueAntiAlias = g2.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
-        final Composite oldComposite = g2.getComposite();
-        final Color oldColor = g2.getColor();
-
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.setColor(COLOR_BLUE_BORDER);
-        g2.drawRoundRect(x - 1, y - 1, width + 1, height + 1, 15, 15);
-        g2.setColor(COLOR_BLUE_BACKGROUND);
-        g2.setComposite(Utils.makeComposite(0.75f));
-        g2.fillRoundRect(x, y, width, height, 15, 15);
-        g2.setComposite(oldComposite);
-        g2.setColor(oldColor);
-
-        int yy = y  + padding + dateFontMetrics.getAscent();
-        g2.setFont(dateFont);
-        g2.setColor(COLOR_BLUE);
-        g2.drawString(dateString,
-                ((width - dateFontMetrics.stringWidth(dateString)) >> 1) + x,
-                yy);
-
-        index = 0;
-        yy += dateFontMetrics.getDescent() + dateInfoHeightMargin + valueFontMetrics.getAscent();
-        for (String param : params) {
-            final String value = values.get(index++);
-            g2.setColor(Color.BLACK);
-            g2.setFont(paramFont);
-            g2.drawString(param + ":",
-                padding + x,
-                yy);
-            g2.setFont(valueFont);
-            g2.drawString(value,
-                width - padding - valueFontMetrics.stringWidth(value) + x,
-                yy);
-            // Same as yy += valueFontMetrics.getDescent() + paramValueHeightMargin + valueFontMetrics.getAscent()
-            yy += paramValueHeightMargin + valueFontMetrics.getHeight();
-        }
-
-        if (isTotalNeeded) {
-            yy -= paramValueHeightMargin;
-            yy += infoTotalHeightMargin;
-            if (total > 0.0) {
-                g2.setColor(JStockOptions.DEFAULT_HIGHER_NUMERICAL_VALUE_FOREGROUND_COLOR);
-            }
-            else if (total < 0.0) {
-                g2.setColor(JStockOptions.DEFAULT_LOWER_NUMERICAL_VALUE_FOREGROUND_COLOR);
-            }
-
-            g2.setFont(paramFont);
-            g2.drawString(totalParam + ":",
-                padding + x,
-                yy);
-            g2.setFont(valueFont);
-            g2.drawString(totalValue,
-                width - padding - valueFontMetrics.stringWidth(totalValue) + x,
-                yy);
-        }
-
-        g2.setColor(oldColor);
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, oldValueAntiAlias);
-        g2.setFont(oldFont);
+        this.ROIRect.setRect(x, y, width, height);
     }
 
-    private void drawInvestInformationBox(Graphics2D g2, JXLayer<? extends V> layer) {
+    private void updateInvestInformationBox(Graphics2D g2) {
         final Font oldFont = g2.getFont();
         final Font paramFont = new Font(oldFont.getFontName(), oldFont.getStyle(), oldFont.getSize());
         final FontMetrics paramFontMetrics = g2.getFontMetrics(paramFont);
@@ -248,47 +359,46 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         final Font dateFont = new Font(oldFont.getFontName(), oldFont.getStyle(), oldFont.getSize() - 1);
         final FontMetrics dateFontMetrics = g2.getFontMetrics(dateFont);
 
-        final Activities activities = this.cashFlowChartJDialog.getInvestActivities(this.investPointIndex);
+        final Activities activities = this.investmentFlowChartJDialog.getInvestActivities(this.investPointIndex);
 
-        List<String> values = new ArrayList<String>();
-        List<String> params = new ArrayList<String>();
-
-        double total = 0.0;
+        this.investValues.clear();
+        this.investParams.clear();
+        this.totalInvestValue = 0.0;
 
         for (int i = 0, size = activities.size(); i < size; i++) {
             final Activity activity = activities.get(i);
             // Buy or Sell only.
-            params.add(activity.getType() + " " + activity.get(Activity.Param.Quantity) + " " + ((Stock)activity.get(Activity.Param.Stock)).getSymbol());
+            this.investParams.add(activity.getType() + " " + activity.get(Activity.Param.Quantity) + " " + ((Stock)activity.get(Activity.Param.Stock)).getSymbol());
 
             if (activity.getType() == Activity.Type.Buy) {
-                total += activity.getAmount();
-                values.add(org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(activity.getAmount()));
+                this.totalInvestValue += activity.getAmount();
+                this.investValues.add(org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(activity.getAmount()));
             }
             else if (activity.getType() == Activity.Type.Sell) {
-                total -= activity.getAmount();
-                values.add(org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(-activity.getAmount()));
+                this.totalInvestValue -= activity.getAmount();
+                this.investValues.add(org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(-activity.getAmount()));
             }
             else {
                 assert(false);
             }
         }
 
-        final boolean isTotalNeeded = params.size() > 1;
+        final boolean isTotalNeeded = this.investParams.size() > 1;
         final String totalParam = GUIBundle.getString("InvestmentFlowLayerUI_Total_Invest");
-        final String totalValue = org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(total);
+        final String totalValue = org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(this.totalInvestValue);
         /* This is the height for "total" information. */
         int totalHeight = 0;
 
-        assert(values.size() == params.size());
+        assert(this.investValues.size() == this.investParams.size());
 
         int index = 0;
         final int paramValueWidthMargin = 10;
         final int paramValueHeightMargin = 0;
         int maxInfoWidth = -1;
         // paramFontMetrics will always "smaller" than valueFontMetrics.
-        int totalInfoHeight = Math.max(paramFontMetrics.getHeight(), valueFontMetrics.getHeight()) * values.size() + paramValueHeightMargin * (values.size() - 1);
-        for (String param : params) {
-            final String value = values.get(index++);
+        int totalInfoHeight = Math.max(paramFontMetrics.getHeight(), valueFontMetrics.getHeight()) * this.investValues.size() + paramValueHeightMargin * (this.investValues.size() - 1);
+        for (String param : this.investParams) {
+            final String value = this.investValues.get(index++);
             final int paramStringWidth = paramFontMetrics.stringWidth(param + ":") + paramValueWidthMargin + valueFontMetrics.stringWidth(value);
             if (maxInfoWidth < paramStringWidth) {
                 maxInfoWidth = paramStringWidth;
@@ -331,66 +441,7 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
                         (suggestedY + height) < (this.drawArea.getY() + this.drawArea.getHeight()) ? suggestedY : (int)(this.drawArea.getY() + this.drawArea.getHeight() - height - boxPointMargin) :
                         (int)(this.drawArea.getY() + boxPointMargin);
 
-        final Object oldValueAntiAlias = g2.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
-        final Composite oldComposite = g2.getComposite();
-        final Color oldColor = g2.getColor();
-
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.setColor(COLOR_RED_BORDER);
-        g2.drawRoundRect(x - 1, y - 1, width + 1, height + 1, 15, 15);
-        g2.setColor(COLOR_RED_BACKGROUND);
-        g2.setComposite(Utils.makeComposite(0.75f));
-        g2.fillRoundRect(x, y, width, height, 15, 15);
-        g2.setComposite(oldComposite);
-        g2.setColor(oldColor);
-
-        int yy = y  + padding + dateFontMetrics.getAscent();
-        g2.setFont(dateFont);
-        g2.setColor(COLOR_BLUE);
-        g2.drawString(dateString,
-                ((width - dateFontMetrics.stringWidth(dateString)) >> 1) + x,
-                yy);
-
-        index = 0;
-        yy += dateFontMetrics.getDescent() + dateInfoHeightMargin + valueFontMetrics.getAscent();
-        for (String param : params) {
-            final String value = values.get(index++);
-            g2.setColor(Color.BLACK);
-            g2.setFont(paramFont);
-            g2.drawString(param + ":",
-                padding + x,
-                yy);
-            g2.setFont(valueFont);
-            g2.drawString(value,
-                width - padding - valueFontMetrics.stringWidth(value) + x,
-                yy);
-            // Same as yy += valueFontMetrics.getDescent() + paramValueHeightMargin + valueFontMetrics.getAscent()
-            yy += paramValueHeightMargin + valueFontMetrics.getHeight();
-        }
-        
-        if (isTotalNeeded) {
-            yy -= paramValueHeightMargin;
-            yy += infoTotalHeightMargin;
-            if (total > 0.0) {
-                g2.setColor(JStockOptions.DEFAULT_HIGHER_NUMERICAL_VALUE_FOREGROUND_COLOR);
-            }
-            else if (total < 0.0) {
-                g2.setColor(JStockOptions.DEFAULT_LOWER_NUMERICAL_VALUE_FOREGROUND_COLOR);
-            }
-
-            g2.setFont(paramFont);
-            g2.drawString(totalParam + ":",
-                padding + x,
-                yy);
-            g2.setFont(valueFont);
-            g2.drawString(totalValue,
-                width - padding - valueFontMetrics.stringWidth(totalValue) + x,
-                yy);
-        }
-
-        g2.setColor(oldColor);
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, oldValueAntiAlias);
-        g2.setFont(oldFont);
+        this.investRect.setRect(x, y, width, height);
     }
 
     private boolean updateROIPoint(Point2D _ROIPoint) {
@@ -398,7 +449,7 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
             return false;
         }
 
-        final ChartPanel chartPanel = this.cashFlowChartJDialog.getChartPanel();
+        final ChartPanel chartPanel = this.investmentFlowChartJDialog.getChartPanel();
         final JFreeChart chart = chartPanel.getChart();
         final XYPlot plot = (XYPlot) chart.getPlot();
         // 0 are the invest information. 1 is the ROI information.
@@ -507,7 +558,7 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
             return false;
         }
 
-        final ChartPanel chartPanel = this.cashFlowChartJDialog.getChartPanel();
+        final ChartPanel chartPanel = this.investmentFlowChartJDialog.getChartPanel();
         final JFreeChart chart = chartPanel.getChart();
         final XYPlot plot = (XYPlot) chart.getPlot();
         final TimeSeriesCollection timeSeriesCollection = (TimeSeriesCollection)plot.getDataset();
@@ -684,7 +735,7 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
                 _plotArea.getWidth() - 2 > 0 ? _plotArea.getWidth() - 2 : 1,
                 _plotArea.getHeight() - 2 > 0 ? _plotArea.getHeight() - 2 : 1);
 
-        if (false == this.cashFlowChartJDialog.isFinishLookUpPrice()) {
+        if (false == this.investmentFlowChartJDialog.isFinishLookUpPrice()) {
             this.drawBusyBox(g2, layer);
         }
 
@@ -698,7 +749,7 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
             g2.fillOval((int)(this.investPoint.getX() - (radius >> 1) + 0.5), (int)(this.investPoint.getY() - (radius >> 1) + 0.5), radius, radius);
             g2.setColor(oldColor);
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, oldValueAntiAlias);
-            this.drawInvestInformationBox(g2, layer);
+            this.updateInvestInformationBox(g2);
         }
 
         if (this.ROIPoint != null) {
@@ -711,8 +762,77 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
             g2.fillOval((int)(this.ROIPoint.getX() - (radius >> 1) + 0.5), (int)(this.ROIPoint.getY() - (radius >> 1) + 0.5), radius, radius);
             g2.setColor(oldColor);
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, oldValueAntiAlias);
-            this.drawROIInformationBox(g2, layer);
+            this.updateROIInformationBox(g2);
         }
+
+        this.solveConflict();
+
+        if (this.investPoint != null) {
+            this.drawInformationBox(g2, this.investmentFlowChartJDialog.getInvestActivities(this.investPointIndex), investRect, 
+                    investParams, investValues, GUIBundle.getString("InvestmentFlowLayerUI_Total_Invest"), totalInvestValue,
+                    COLOR_RED_BACKGROUND, COLOR_RED_BORDER);
+        }
+
+        if (this.ROIPoint != null) {
+            this.drawInformationBox(g2, this.investmentFlowChartJDialog.getROIActivities(this.ROIPointIndex), 
+                    ROIRect, ROIParams, ROIValues, GUIBundle.getString("InvestmentFlowLayerUI_Total_Return"), totalROIValue,
+                    COLOR_BLUE_BACKGROUND, COLOR_BLUE_BORDER);
+        }
+
+        this.drawTitle(g2);
+    }
+
+    private void solveConflict() {
+        if (this.investPoint == null || this.ROIPoint == null) {
+            /* No conflict to be solved. */
+            return;
+        }
+
+        /* Take border into consideration. */
+        final Rectangle ROIRectWithBorder = new Rectangle(this.ROIRect);
+        final Rectangle investRectWithBorder = new Rectangle(this.investRect);
+        ROIRectWithBorder.setLocation((int)ROIRectWithBorder.getX() - 1, (int)ROIRectWithBorder.getY() - 1);
+        ROIRectWithBorder.setSize((int)ROIRectWithBorder.getWidth() + 2, (int)ROIRectWithBorder.getHeight() + 2);
+        investRectWithBorder.setLocation((int)investRectWithBorder.getX() - 1, (int)investRectWithBorder.getY() - 1);
+        investRectWithBorder.setSize((int)investRectWithBorder.getWidth() + 2, (int)investRectWithBorder.getHeight() + 2);
+        if (false == ROIRectWithBorder.intersects(investRectWithBorder)) {
+            return;
+        }
+
+        final Rectangle oldROIRect = new Rectangle(this.ROIRect);
+        final Rectangle oldInvestRect = new Rectangle(this.investRect);
+
+        // Move to Down.
+        if (this.ROIRect.getY() > this.investRect.getY()) {
+            this.ROIRect.translate(0, (int)(this.investRect.getY() + this.investRect.getHeight() - this.ROIRect.getY() + 4));
+        }
+        else {
+            this.investRect.translate(0, (int)(this.ROIRect.getY() + this.ROIRect.getHeight() - this.investRect.getY() + 4));
+        }
+
+        if ((this.drawArea.getY() + this.drawArea.getHeight()) > (this.ROIRect.getY() + this.ROIRect.getHeight()) &&
+            (this.drawArea.getY() + this.drawArea.getHeight()) > (this.investRect.getY() + this.investRect.getHeight())) {
+            return;
+        }
+
+        this.ROIRect.setRect(oldROIRect);
+        this.investRect.setRect(oldInvestRect);
+
+        // Move to Up.
+        if (this.ROIRect.getY() > this.investRect.getY()) {
+            this.investRect.translate(0, -(int)(this.investRect.getY() + this.investRect.getHeight() - this.ROIRect.getY() + 4));
+        }
+        else {
+            this.ROIRect.translate(0, -(int)(this.ROIRect.getY() + this.ROIRect.getHeight() - this.investRect.getY() + 4));
+        }
+
+        if ((this.drawArea.getY() < this.ROIRect.getY()) &&
+            (this.drawArea.getY() < this.investRect.getY())) {
+            return;
+        }
+
+        this.ROIRect.setRect(oldROIRect);
+        this.investRect.setRect(oldInvestRect);
     }
 
     @Override
