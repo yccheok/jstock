@@ -243,6 +243,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
             final SimpleDate date = activities.getDate();
             final Date d = date.getTime();
             this.ROITimeSeries.addOrUpdate(new Day(d), this.totalROIValue);
+            final SimpleDateFormat dateFormat = new SimpleDateFormat("d-MMM-yyyy");
             final String tips = "<html>Return: (" + dateFormat.format(d) + ", " + numberFormat.format(amount) + ")<br> " + activities.toSummary() + "</html>";
             toolTips.add(tips);
         }   // for (int i = 0, count = this.ROISummary.size(); i < count; i++)
@@ -294,6 +295,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
             final SimpleDate date = activities.getDate();
             final Date d = date.getTime();
             series.add(new Day(d), this.totalInvestValue);
+            final SimpleDateFormat dateFormat = new SimpleDateFormat("d-MMM-yyyy");
             final String tips = "<html>Invest: (" + dateFormat.format(d) + ", " + numberFormat.format(amount) + ")<br> " + activities.toSummary() + "</html>";
             toolTips.add(tips);
 
@@ -468,7 +470,6 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
     /* For Invest charting information. */
     private double totalInvestValue = 0.0;
 
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("d-MMM-yyyy");
     private final ChartPanel chartPanel;
     private final PortfolioManagementJPanel portfolioManagementJPanel;
     private final CustomXYToolTipGenerator cash_ttg = new CustomXYToolTipGenerator();
