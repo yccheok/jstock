@@ -129,10 +129,15 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         final int boxPointMargin = 8;
         final int width = maxStringWidth + (padding << 1);
         final int height = maxStringHeight + (padding << 1);
+        // On left side of the ball.
         final int suggestedX = (int)(point.getX() - width - boxPointMargin);
         final int suggestedY = (int)(point.getY() - (height >> 1));
-        final int x = suggestedX > this.drawArea.getX() ? suggestedX : (int)(point.getX() + boxPointMargin);
-        final int y = suggestedY > this.drawArea.getY() ? suggestedY : (int)(this.drawArea.getY() + boxPointMargin);
+        final int x =   suggestedX > this.drawArea.getX() ?
+                        (suggestedX + width) < (this.drawArea.getX() + this.drawArea.getWidth()) ? suggestedX : (int)(this.drawArea.getX() + this.drawArea.getWidth() - width - 1) :
+                        (int)(point.getX() + boxPointMargin);
+        final int y =   suggestedY > this.drawArea.getY() ?
+                        (suggestedY + height) < (this.drawArea.getY() + this.drawArea.getHeight()) ? suggestedY : (int)(this.drawArea.getY() + this.drawArea.getHeight() - height - 1) :
+                        (int)(this.drawArea.getY() + boxPointMargin);
 
         final Object oldValueAntiAlias = g2.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
         final Composite oldComposite = g2.getComposite();
@@ -246,6 +251,10 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         final Point2D p2 = chartPanel.translateScreenToJava2D((Point)p);
         final Rectangle2D _plotArea = chartPanel.getScreenDataArea();
 
+        //if (cplot.getSubplots().)
+        //System.out.println("-----> " + chartPanel.getScreenDataArea());
+        //System.out.println(chartPanel.getScreenDataArea(150, 105));
+
         final ValueAxis domainAxis = plot.getDomainAxis();
         final RectangleEdge domainAxisEdge = plot.getDomainAxisEdge();
         final ValueAxis rangeAxis = plot.getRangeAxis();
@@ -302,9 +311,10 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         // want the center draw area.
         // However, I really have no idea how to obtain rect for center draw area.
         // This is just a try-n-error hack.
-        this.drawArea.setRect(_plotArea.getX() + 2, _plotArea.getY() + 3,
-                _plotArea.getWidth() - 4 > 0 ? _plotArea.getWidth() - 4 : 1,
-                _plotArea.getHeight() - 5 > 0 ? _plotArea.getHeight() - 5 : 1);
+        // Do not use -4. Due to rounding error during point conversion (double to integer)
+        this.drawArea.setRect(_plotArea.getX() + 2, _plotArea.getY() + 2,
+                _plotArea.getWidth() - 3 > 0 ? _plotArea.getWidth() - 3 : 1,
+                _plotArea.getHeight() - 3 > 0 ? _plotArea.getHeight() - 3 : 1);
 
         if (this.drawArea.contains(tmpPoint)) {
             this.pointIndex = tmpIndex;
