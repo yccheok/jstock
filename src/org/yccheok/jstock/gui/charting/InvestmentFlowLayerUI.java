@@ -24,7 +24,6 @@ import java.awt.Composite;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
@@ -34,7 +33,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 import org.jdesktop.jxlayer.JXLayer;
 import org.jdesktop.jxlayer.plaf.AbstractLayerUI;
@@ -48,14 +46,12 @@ import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.time.TimeSeriesDataItem;
 import org.jfree.ui.RectangleEdge;
 import org.yccheok.jstock.engine.Stock;
-import org.yccheok.jstock.gui.Icons;
 import org.yccheok.jstock.gui.JStockOptions;
 import org.yccheok.jstock.gui.Utils;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.internationalization.MessagesBundle;
 import org.yccheok.jstock.portfolio.Activities;
 import org.yccheok.jstock.portfolio.Activity;
-import org.yccheok.jstock.portfolio.ActivitySummary;
 
 /**
  *
@@ -76,6 +72,10 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
 
     private static final Color COLOR_BLUE = new Color(85, 85, 255);
     private static final Color COLOR_RED = new Color(255, 85, 85);
+    private static final Color COLOR_RED_BORDER = new Color(255, 85, 85);
+    private static final Color COLOR_RED_BACKGROUND = new Color(255, 255, 153);
+    private static final Color COLOR_BLUE_BORDER = new Color(85, 85, 255);
+    private static final Color COLOR_BLUE_BACKGROUND = new Color(255, 255, 153);
     private static final Color COLOR_BACKGROUND = new Color(255, 255, 153);
     private static final Color COLOR_BORDER = new Color(255, 204, 0);
 
@@ -162,19 +162,24 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         final int boxPointMargin = 8;
         final int width = maxStringWidth + (padding << 1);
         final int height = maxStringHeight + (padding << 1);
+        // On left side of the ball.
         final int suggestedX = (int)(this.investPoint.getX() - width - boxPointMargin);
         final int suggestedY = (int)(this.investPoint.getY() - (height >> 1));
-        final int x = suggestedX > this.drawArea.getX() ? suggestedX : (int)(this.investPoint.getX() + boxPointMargin);
-        final int y = suggestedY > this.drawArea.getY() ? suggestedY : (int)(this.drawArea.getY() + boxPointMargin);
+        final int x =   suggestedX > this.drawArea.getX() ?
+                        (suggestedX + width) < (this.drawArea.getX() + this.drawArea.getWidth()) ? suggestedX : (int)(this.drawArea.getX() + this.drawArea.getWidth() - width - 1) :
+                        (int)(investPoint.getX() + boxPointMargin);
+        final int y =   suggestedY > this.drawArea.getY() ?
+                        (suggestedY + height) < (this.drawArea.getY() + this.drawArea.getHeight()) ? suggestedY : (int)(this.drawArea.getY() + this.drawArea.getHeight() - height - 1) :
+                        (int)(this.drawArea.getY() + boxPointMargin);
 
         final Object oldValueAntiAlias = g2.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
         final Composite oldComposite = g2.getComposite();
         final Color oldColor = g2.getColor();
 
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.setColor(COLOR_BORDER);
+        g2.setColor(COLOR_RED_BORDER);
         g2.drawRoundRect(x - 1, y - 1, width + 1, height + 1, 15, 15);
-        g2.setColor(COLOR_BACKGROUND);
+        g2.setColor(COLOR_RED_BACKGROUND);
         g2.setComposite(Utils.makeComposite(0.75f));
         g2.fillRoundRect(x, y, width, height, 15, 15);
         g2.setComposite(oldComposite);
@@ -229,6 +234,106 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         g2.setFont(oldFont);
     }
 
+    private boolean updateROIPoint(Point2D _ROIPoint) {
+        if (_ROIPoint == null) {
+            return false;
+        }
+
+        final ChartPanel chartPanel = this.cashFlowChartJDialog.getChartPanel();
+        final JFreeChart chart = chartPanel.getChart();
+        final XYPlot plot = (XYPlot) chart.getPlot();
+        // 0 are the invest information. 1 is the ROI information.
+        final TimeSeriesCollection timeSeriesCollection = (TimeSeriesCollection)plot.getDataset(1);
+        final TimeSeries timeSeries = timeSeriesCollection.getSeries(0);
+
+        // I also not sure why. This is what are being done in Mouse Listener Demo 4.
+        final Point2D p2 = chartPanel.translateScreenToJava2D((Point)_ROIPoint);
+        final Rectangle2D _plotArea = chartPanel.getScreenDataArea();
+
+        /* Believe it? When there is another thread keep updateing time series data,
+         * and keep calling setDirty, _plotArea can be 0 size sometimes. Ignore it.
+         * Just assume we had processed it.
+         */
+        if (_plotArea.getWidth() == 0.0 && _plotArea.getHeight() == 0.0) {
+            /* Cheat the caller. */
+            return true;
+        }
+
+        final ValueAxis domainAxis = plot.getDomainAxis();
+        final RectangleEdge domainAxisEdge = plot.getDomainAxisEdge();
+        final ValueAxis rangeAxis = plot.getRangeAxis();
+        final RectangleEdge rangeAxisEdge = plot.getRangeAxisEdge();
+        final double coordinateX = domainAxis.java2DToValue(p2.getX(), _plotArea,
+                domainAxisEdge);
+
+        int low = 0;
+        int high = timeSeries.getItemCount() - 1;
+        Date date = new Date((long)coordinateX);
+        final long time = date.getTime();
+        long bestDistance = Long.MAX_VALUE;
+        int bestMid = 0;
+
+        while (low <= high) {
+            int mid = (low + high) >>> 1;
+
+            final TimeSeriesDataItem timeSeriesDataItem = timeSeries.getDataItem(mid);
+            final Day day = (Day)timeSeriesDataItem.getPeriod();
+            final long target = day.getFirstMillisecond();
+            final long cmp = target - time;
+
+            if (cmp < 0) {
+                low = mid + 1;
+            }
+            else if (cmp > 0) {
+                high = mid - 1;
+            }
+            else {
+                bestDistance = 0;
+                bestMid = mid;
+                break;
+            }
+
+            final long abs_cmp = Math.abs(cmp);
+            if (abs_cmp < bestDistance) {
+                bestDistance = abs_cmp;
+                bestMid = mid;
+            }
+        }
+
+        final TimeSeriesDataItem timeSeriesDataItem = timeSeries.getDataItem(bestMid);
+        final double xValue = timeSeriesDataItem.getPeriod().getFirstMillisecond();
+        final double yValue = timeSeriesDataItem.getValue().doubleValue();
+        final double xJava2D = domainAxis.valueToJava2D(xValue, _plotArea, domainAxisEdge);
+        final double yJava2D = rangeAxis.valueToJava2D(yValue, _plotArea, rangeAxisEdge);
+
+        final int tmpIndex = bestMid;
+        // this.point = new Point2D.Double(xJava2D, yJava2D);
+        final Point2D tmpPoint = chartPanel.translateJava2DToScreen(new Point2D.Double(xJava2D, yJava2D));
+        // This _plotArea is including the axises. We do not want axises. We only
+        // want the center draw area.
+        // However, I really have no idea how to obtain rect for center draw area.
+        // This is just a try-n-error hack.
+        // Do not use -4. Due to rounding error during point conversion (double to integer)
+        this.drawArea.setRect(_plotArea.getX() + 2, _plotArea.getY() + 2,
+                _plotArea.getWidth() - 3 > 0 ? _plotArea.getWidth() - 3 : 1,
+                _plotArea.getHeight() - 3 > 0 ? _plotArea.getHeight() - 3 : 1);
+        
+        if (this.drawArea.contains(tmpPoint)) {
+            this.ROIPointIndex = tmpIndex;
+            this.ROIPoint = tmpPoint;
+            return true;
+        }
+        return false;
+    }
+
+    public void updateROIPoint() {
+        if (this.updateROIPoint(this.ROIPoint) == false) {
+            /* Clear the point. */
+            this.ROIPoint = null;
+        }
+        this.setDirty(true);
+    }
+
     public void updateInvestPoint() {
         if (this.updateInvestPoint(this.investPoint) == false) {
             /* Clear the point. */
@@ -247,7 +352,6 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         final JFreeChart chart = chartPanel.getChart();
         final XYPlot plot = (XYPlot) chart.getPlot();
         final TimeSeriesCollection timeSeriesCollection = (TimeSeriesCollection)plot.getDataset();
-        // 0 are the invest information. 1 is the ROI information.
         final TimeSeries timeSeries = timeSeriesCollection.getSeries(0);
 
         // I also not sure why. This is what are being done in Mouse Listener Demo 4.
@@ -317,9 +421,10 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         // want the center draw area.
         // However, I really have no idea how to obtain rect for center draw area.
         // This is just a try-n-error hack.
-        this.drawArea.setRect(_plotArea.getX() + 2, _plotArea.getY() + 3,
-                _plotArea.getWidth() - 4 > 0 ? _plotArea.getWidth() - 4 : 1,
-                _plotArea.getHeight() - 5 > 0 ? _plotArea.getHeight() - 5 : 1);
+        // Do not use -4. Due to rounding error during point conversion (double to integer)
+        this.drawArea.setRect(_plotArea.getX() + 2, _plotArea.getY() + 2,
+                _plotArea.getWidth() - 3 > 0 ? _plotArea.getWidth() - 3 : 1,
+                _plotArea.getHeight() - 3 > 0 ? _plotArea.getHeight() - 3 : 1);
 
         if (this.drawArea.contains(tmpPoint)) {
             this.investPointIndex = tmpIndex;
@@ -336,7 +441,10 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
 
         final Point mousePoint = SwingUtilities.convertPoint(e.getComponent(), e.getPoint(), layer);
 
-        if (this.updateInvestPoint(mousePoint)) {
+        final boolean status0 = this.updateInvestPoint(mousePoint);
+        final boolean status1 = this.updateROIPoint(mousePoint);
+
+        if (status0 || status1) {
             this.setDirty(true);
         }
     }
@@ -410,11 +518,12 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         // want the center draw area.
         // However, I really have no idea how to obtain rect for center draw area.
         // This is just a try-n-error hack.
+        // Do not use -4. Due to rounding error during point conversion (double to integer)
         final Rectangle2D _plotArea = chartPanel.getScreenDataArea();
 
-        this.drawArea.setRect(_plotArea.getX() + 2, _plotArea.getY() + 3,
-                _plotArea.getWidth() - 4 > 0 ? _plotArea.getWidth() - 4 : 1,
-                _plotArea.getHeight() - 5 > 0 ? _plotArea.getHeight() - 5 : 1);
+        this.drawArea.setRect(_plotArea.getX() + 2, _plotArea.getY() + 2,
+                _plotArea.getWidth() - 3 > 0 ? _plotArea.getWidth() - 3 : 1,
+                _plotArea.getHeight() - 3 > 0 ? _plotArea.getHeight() - 3 : 1);
 
         if (false == this.cashFlowChartJDialog.isFinishLookUpPrice()) {
             this.drawBusyBox(g2, layer);
@@ -431,6 +540,18 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
             g2.setColor(oldColor);
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, oldValueAntiAlias);
             this.drawInvestInformationBox(g2, layer);
+        }
+
+        if (this.ROIPoint != null) {
+            final int radius = 8;
+            final Object oldValueAntiAlias = g2.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
+            final Color oldColor = g2.getColor();
+
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(COLOR_BLUE);
+            g2.fillOval((int)(this.ROIPoint.getX() - (radius >> 1) + 0.5), (int)(this.ROIPoint.getY() - (radius >> 1) + 0.5), radius, radius);
+            g2.setColor(oldColor);
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, oldValueAntiAlias);
         }
     }
 

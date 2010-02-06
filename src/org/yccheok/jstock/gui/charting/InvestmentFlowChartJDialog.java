@@ -115,7 +115,10 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
             @Override
             public void chartChanged(ChartChangeEvent event) {
                 if (event.getType() == ChartChangeEventType.GENERAL) {
+                    // Sequence is important. We will use invest information box as master.
+                    // ROI information box will be adjusted accordingly.
                     investmentFlowLayerUI.updateInvestPoint();
+                    investmentFlowLayerUI.updateROIPoint();
                 }
             }
         });
@@ -125,7 +128,10 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         {
             @Override
             public void componentResized(ComponentEvent e) {
+                // Sequence is important. We will use invest information box as master.
+                // ROI information box will be adjusted accordingly.
                 investmentFlowLayerUI.updateInvestPoint();
+                investmentFlowLayerUI.updateROIPoint();
             }
         });
     }
@@ -297,29 +303,6 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         return new TimeSeriesCollection(series);
     }
 
-    /*
-    // Can we do it, before we add data set? So that we can done it in one pass.
-    private void initAnnotation(XYPlot plot) {
-        double amount = 0.0;
-        for (int i = 0, count = activitySummary.size(); i < count; i++) {
-            final Activities activities = activitySummary.get(i);
-            amount = amount + activities.getNetAmount();
-            final SimpleDate date = activities.getDate();
-            final Date d = date.getTime();
-            final Day day = new Day(d);
-            final long milliSecond = day.getFirstMillisecond();
-
-            List<Activity.Type> types = activities.getTypes();
-            int c = 1;
-            for (Activity.Type type : types) {
-                XYAnnotation xyannotation = new XYImageAnnotation(milliSecond, amount - c * 16 - 5, type.getIcon().getImage());
-                c++;
-                plot.addAnnotation(xyannotation);
-            }
-        }
-    }
-    */
-
     private JFreeChart createChart() {
         final XYDataset priceData = this.createInvestDataset();
 
@@ -334,9 +317,6 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         );
         
         XYPlot plot = chart.getXYPlot();
-
-        // Nop! Too ugly!
-        //initAnnotation(plot);
 
         NumberAxis rangeAxis1 = (NumberAxis) plot.getRangeAxis();
         rangeAxis1.setNumberFormatOverride(currencyFormat);
