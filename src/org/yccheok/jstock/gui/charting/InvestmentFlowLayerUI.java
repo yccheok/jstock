@@ -24,6 +24,7 @@ import java.awt.Composite;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
@@ -59,15 +60,20 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         final Font font = new Font(oldFont.getFontName(), oldFont.getStyle(), oldFont.getSize());
         final FontMetrics fontMetrics = g2.getFontMetrics(font);
 
-        final String message = MessagesBundle.getString("info_message_retrieving_latest_stock_price");
-        final int maxWidth = fontMetrics.stringWidth(message);
-        final int maxHeight = fontMetrics.getHeight();
+        final Image image = ((ImageIcon)Icons.BUSY).getImage();
+        final int imgWidth = Icons.BUSY.getIconWidth();
+        final int imgHeight = Icons.BUSY.getIconHeight();
+        final int imgMessageWidthMargin = 5;
 
-        final int padding = 10;
+        final String message = MessagesBundle.getString("info_message_retrieving_latest_stock_price");
+        final int maxWidth = imgWidth + imgMessageWidthMargin + fontMetrics.stringWidth(message);
+        final int maxHeight = Math.max(imgHeight, fontMetrics.getHeight());
+
+        final int padding = 5;
         final int width = maxWidth + (padding << 1);
         final int height = maxHeight + (padding << 1);
-        final int x = (int)plotArea.getX() + ((int)this.plotArea.getWidth() - width) >> 1;
-        final int y = (int)plotArea.getY() + ((int)this.plotArea.getHeight() - height) >> 1;
+        final int x = (int)this.drawArea.getX() + (((int)this.drawArea.getWidth() - width) >> 1);
+        final int y = (int)this.drawArea.getY() + (((int)this.drawArea.getHeight() - height) >> 1);
 
         final Object oldValueAntiAlias = g2.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
         final Composite oldComposite = g2.getComposite();
@@ -75,21 +81,23 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
 
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setColor(COLOR_BORDER);
-        g2.drawRoundRect(x, y, width, height, 20, 20);
+        g2.drawRoundRect(x - 1, y - 1, width + 1, height + 1, 15, 15);
         g2.setColor(COLOR_BACKGROUND);
         g2.setComposite(Utils.makeComposite(0.75f));
-        g2.fillRoundRect(x + 1, y + 1, width - 1, height - 1, 20, 20);
+        g2.fillRoundRect(x, y, width, height, 15, 15);
         g2.setComposite(oldComposite);
         g2.setColor(oldColor);
 
+        g2.drawImage(image, x + padding, y + ((height - imgHeight) >> 1), layer.getView());
+
         g2.setFont(font);
         g2.setColor(COLOR_BLUE);
 
-        int yy = y + fontMetrics.getHeight() + padding;
+        int yy = y + ((height - fontMetrics.getHeight()) >> 1) + fontMetrics.getAscent();
         g2.setFont(font);
         g2.setColor(COLOR_BLUE);
         g2.drawString(message,
-                ((width - fontMetrics.stringWidth(message)) >> 1) + x,
+                x + padding + imgWidth + imgMessageWidthMargin,
                 yy);
         g2.setColor(oldColor);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, oldValueAntiAlias);
@@ -100,7 +108,16 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
     protected void paintLayer(Graphics2D g2, JXLayer<? extends V> layer) {
         super.paintLayer(g2, layer);
         final ChartPanel chartPanel = ((ChartPanel)layer.getView());
-        this.plotArea = chartPanel.getScreenDataArea();
+
+        // This _plotArea is including the axises. We do not want axises. We only
+        // want the center draw area.
+        // However, I really have no idea how to obtain rect for center draw area.
+        // This is just a try-n-error hack.
+        final Rectangle2D _plotArea = chartPanel.getScreenDataArea();
+        this.drawArea.setRect(_plotArea.getX() + 2, _plotArea.getY() + 3,
+                _plotArea.getWidth() - 4 > 0 ? _plotArea.getWidth() - 4 : 1,
+                _plotArea.getHeight() - 5 > 0 ? _plotArea.getHeight() - 5 : 1);
+
         if (false == this.cashFlowChartJDialog.isFinishLookUpPrice()) {
             this.drawBusyBox(g2, layer);
         }
@@ -118,6 +135,6 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         super.processMouseMotionEvent(e, layer);
     }
 
-    private Rectangle2D plotArea;
+    private final Rectangle2D drawArea = new Rectangle2D.Double();
     private final InvestmentFlowChartJDialog cashFlowChartJDialog;
 }
