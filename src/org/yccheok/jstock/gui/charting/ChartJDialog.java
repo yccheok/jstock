@@ -111,8 +111,8 @@ public class ChartJDialog extends javax.swing.JDialog {
         this.chartPanel = new ChartPanel(this.priceVolumeChart, true, true, true, true, true);
 
         org.jdesktop.jxlayer.JXLayer<ChartPanel> layer = new org.jdesktop.jxlayer.JXLayer<ChartPanel>(this.chartPanel);
-        this.crossHairUI = new ChartLayerUI<ChartPanel>(this);
-        layer.setUI(this.crossHairUI);
+        this.chartLayerUI = new ChartLayerUI<ChartPanel>(this);
+        layer.setUI(this.chartLayerUI);
 
         getContentPane().add(layer, java.awt.BorderLayout.CENTER);
         
@@ -120,7 +120,7 @@ public class ChartJDialog extends javax.swing.JDialog {
             @Override
             public void chartChanged(ChartChangeEvent event) {
                 if (event.getType() == ChartChangeEventType.GENERAL) {
-                    crossHairUI.updateBestPoint();
+                    chartLayerUI.updateBestPoint();
                 }
             }
         });
@@ -129,11 +129,9 @@ public class ChartJDialog extends javax.swing.JDialog {
         {
             @Override
             public void componentResized(ComponentEvent e) {
-                crossHairUI.updateBestPoint();
+                chartLayerUI.updateBestPoint();
             }
         });
-
-
     }
 
     public StockHistoryServer getStockHistoryServer() {
@@ -1580,7 +1578,7 @@ public class ChartJDialog extends javax.swing.JDialog {
     private JFreeChart candlestickChart;
 
     /* Overlay layer. */
-    private final ChartLayerUI<ChartPanel> crossHairUI;
+    private final ChartLayerUI<ChartPanel> chartLayerUI;
 
     private static final Log log = LogFactory.getLog(ChartJDialog.class);
 

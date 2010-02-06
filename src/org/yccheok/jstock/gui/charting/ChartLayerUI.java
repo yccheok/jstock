@@ -184,12 +184,6 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         g2.setFont(oldFont);
     }
     
-    /**
-     * Paints the magnifying glass.
-     *
-     * @param g2  the graphics device.
-     * @param layer  the layer.
-     */
     @Override
     protected void paintLayer(Graphics2D g2, JXLayer<? extends V> layer) {
         super.paintLayer(g2, layer);
@@ -210,24 +204,12 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         this.drawInformationBox(g2, layer);
     }
 
-    /**
-     * Updates the glass location in response to mouse events.
-     *
-     * @param e  the event.
-     * @param layer  the layer.
-     */
     @Override
     protected void processMouseEvent(MouseEvent e, JXLayer<? extends V> layer) {
         super.processMouseEvent(e, layer);
         this.processEvent(e, layer);
     }
 
-    /**
-     * Updates the glass location in response to mouse events.
-     *
-     * @param e  the event.
-     * @param layer  the layer.
-     */
     @Override
     protected void processMouseMotionEvent(MouseEvent e, JXLayer<? extends V> layer) {
         super.processMouseMotionEvent(e, layer);
@@ -243,6 +225,9 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
     }
 
     // Update this.drawArea, this.point and this.pointIndex.
+    // If point is not within drawArea, this.point and this.pointIndex
+    // will not be updated.
+    // this.drawArea will always be updated.
     private boolean updateBestPoint(Point2D p) {
         if (p == null) {
             return false;
@@ -310,9 +295,9 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         final double xJava2D = domainAxis.valueToJava2D(xValue, _plotArea, domainAxisEdge);
         final double yJava2D = rangeAxis.valueToJava2D(yValue, _plotArea, rangeAxisEdge);
 
-        this.pointIndex = bestMid;
+        final int tmpIndex = bestMid;
         // this.point = new Point2D.Double(xJava2D, yJava2D);
-        this.point = chartPanel.translateJava2DToScreen(new Point2D.Double(xJava2D, yJava2D));
+        final Point2D tmpPoint = chartPanel.translateJava2DToScreen(new Point2D.Double(xJava2D, yJava2D));
         // This _plotArea is including the axises. We do not want axises. We only
         // want the center draw area.
         // However, I really have no idea how to obtain rect for center draw area.
@@ -321,7 +306,12 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
                 _plotArea.getWidth() - 4 > 0 ? _plotArea.getWidth() - 4 : 1,
                 _plotArea.getHeight() - 5 > 0 ? _plotArea.getHeight() - 5 : 1);
 
-        return this.drawArea.contains(this.point);
+        if (this.drawArea.contains(tmpPoint)) {
+            this.pointIndex = tmpIndex;
+            this.point = tmpPoint;
+            return true;
+        }
+        return false;
     }
 
     private void processTimeSeriesCollectionEvent(MouseEvent e, JXLayer layer) {
