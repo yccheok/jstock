@@ -58,7 +58,7 @@ import org.yccheok.jstock.gui.JStockOptions;
 import org.yccheok.jstock.gui.Utils;
 import org.yccheok.jstock.internationalization.GUIBundle;
 
-public class CrossHairUI<V extends javax.swing.JComponent> extends AbstractLayerUI<V> {
+public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLayerUI<V> {
 
     private Point2D point = null;
     private int pointIndex = -1;
@@ -79,7 +79,7 @@ public class CrossHairUI<V extends javax.swing.JComponent> extends AbstractLayer
             GUIBundle.getString("MainFrame_Vol")
             ));
 
-    public CrossHairUI(ChartJDialog chartJDialog) {
+    public ChartLayerUI(ChartJDialog chartJDialog) {
         this.chartJDialog = chartJDialog;
     }
 
@@ -96,11 +96,11 @@ public class CrossHairUI<V extends javax.swing.JComponent> extends AbstractLayer
         List<String> values = new ArrayList<String>();
         final Stock stock = stockHistoryServer.getStock(stockHistoryServer.getCalendar(pointIndex));
 
-        values.add(CrossHairUI.decimalFormat.format(stock.getPrevPrice()));
-        values.add(CrossHairUI.decimalFormat.format(stock.getLastPrice()));
-        values.add(CrossHairUI.decimalFormat.format(stock.getHighPrice()));
-        values.add(CrossHairUI.decimalFormat.format(stock.getLowPrice()));
-        values.add(CrossHairUI.integerFormat.format(stock.getVolume()));
+        values.add(ChartLayerUI.decimalFormat.format(stock.getPrevPrice()));
+        values.add(ChartLayerUI.decimalFormat.format(stock.getLastPrice()));
+        values.add(ChartLayerUI.decimalFormat.format(stock.getHighPrice()));
+        values.add(ChartLayerUI.decimalFormat.format(stock.getLowPrice()));
+        values.add(ChartLayerUI.integerFormat.format(stock.getVolume()));
 
         assert(values.size() == params.size());
         int index = 0;

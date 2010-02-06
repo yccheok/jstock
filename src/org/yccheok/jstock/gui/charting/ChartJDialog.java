@@ -111,7 +111,7 @@ public class ChartJDialog extends javax.swing.JDialog {
         this.chartPanel = new ChartPanel(this.priceVolumeChart, true, true, true, true, true);
 
         org.jdesktop.jxlayer.JXLayer<ChartPanel> layer = new org.jdesktop.jxlayer.JXLayer<ChartPanel>(this.chartPanel);
-        this.crossHairUI = new CrossHairUI<ChartPanel>(this);
+        this.crossHairUI = new ChartLayerUI<ChartPanel>(this);
         layer.setUI(this.crossHairUI);
 
         getContentPane().add(layer, java.awt.BorderLayout.CENTER);
@@ -1580,7 +1580,7 @@ public class ChartJDialog extends javax.swing.JDialog {
     private JFreeChart candlestickChart;
 
     /* Overlay layer. */
-    private final CrossHairUI<ChartPanel> crossHairUI;
+    private final ChartLayerUI<ChartPanel> crossHairUI;
 
     private static final Log log = LogFactory.getLog(ChartJDialog.class);
 
