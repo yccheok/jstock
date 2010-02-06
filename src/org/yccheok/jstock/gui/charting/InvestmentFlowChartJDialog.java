@@ -93,7 +93,6 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         final JFreeChart freeChart = createChart();
         org.yccheok.jstock.charting.Utils.applyChartTheme(freeChart);
         this.chartPanel = new ChartPanel(freeChart, true, true, true, true, true);
-        this.updateChartTitle();
 
         final org.jdesktop.jxlayer.JXLayer<ChartPanel> layer = new org.jdesktop.jxlayer.JXLayer<ChartPanel>(this.chartPanel);
         this.investmentFlowLayerUI = new InvestmentFlowLayerUI<ChartPanel>(this);
@@ -417,10 +416,10 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
             this.lookUpCodes.remove(stock.getCode());
         }
         this.createOrUpdateROITimeSeries();
-        this.updateChartTitle();
 
         if (this.lookUpCodes.size() == 0) {
             this.finishLookUpPrice = true;
+            // Clear the busy message box drawn by JXLayer.
             this.investmentFlowLayerUI.setDirty(true);
             // Do I need to stop myself. Will user like to have continued
             // real-time update?
