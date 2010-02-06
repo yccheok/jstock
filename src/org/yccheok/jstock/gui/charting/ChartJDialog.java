@@ -974,7 +974,7 @@ public class ChartJDialog extends javax.swing.JDialog {
         renderer1.setToolTipGenerator(
             new StandardXYToolTipGenerator(
                 StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT,
-                new SimpleDateFormat("d-MMM-yyyy"), new DecimalFormat("0.00")
+                new SimpleDateFormat("d-MMM-yyyy"), new DecimalFormat("0.00#")
             )
         );
         plot.setRenderer(0, renderer1);
@@ -1177,7 +1177,7 @@ public class ChartJDialog extends javax.swing.JDialog {
                 renderer1.setToolTipGenerator(
                     new StandardXYToolTipGenerator(
                         StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT,
-                        new SimpleDateFormat("d-MMM-yyyy"), new DecimalFormat("0.00")
+                        new SimpleDateFormat("d-MMM-yyyy"), new DecimalFormat("0.00#")
                     )
                 );
                 plot.setRenderer(0, renderer1);
@@ -1254,7 +1254,7 @@ public class ChartJDialog extends javax.swing.JDialog {
                 renderer1.setToolTipGenerator(
                     new StandardXYToolTipGenerator(
                         StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT,
-                        new SimpleDateFormat("d-MMM-yyyy"), new DecimalFormat("0.00")
+                        new SimpleDateFormat("d-MMM-yyyy"), new DecimalFormat("0.00#")
                     )
                 );
                 plot.setRenderer(0, renderer1);
@@ -1331,7 +1331,7 @@ public class ChartJDialog extends javax.swing.JDialog {
                 renderer1.setToolTipGenerator(
                     new StandardXYToolTipGenerator(
                         StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT,
-                        new SimpleDateFormat("d-MMM-yyyy"), new DecimalFormat("0.00")
+                        new SimpleDateFormat("d-MMM-yyyy"), new DecimalFormat("0.00#")
                     )
                 );
                 plot.setRenderer(0, renderer1);
