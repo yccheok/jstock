@@ -306,6 +306,7 @@ public class WizardDownloadIndicatorJPanel extends javax.swing.JPanel {
         // When NOT to use the system independent newline characters
         // JTextArea lines should be separated by a single '\n' character, not the sequence that is used for file line separators in the operating system.
         // Console output (eg, System.out.println()), works fine with '\n', even on Windows.
+        final DateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy hh:mm:ss a");
         final String s = dateFormat.format(new Date()) + "\n" + message;
         this.memoryLog.add(s);
     }
@@ -328,7 +329,6 @@ public class WizardDownloadIndicatorJPanel extends javax.swing.JPanel {
     private static final Log log = LogFactory.getLog(WizardDownloadIndicatorJPanel.class);
 
     private final List<String> memoryLog = new ArrayList<String>();
-    private static final DateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy hh:mm:ss a");
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
