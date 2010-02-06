@@ -63,7 +63,7 @@ public class CrossHairUI<V extends javax.swing.JComponent> extends AbstractLayer
 
     private Point2D point = null;
     private int pointIndex = -1;
-    private Rectangle2D plotArea = null;
+    private final Rectangle2D drawArea = new Rectangle2D.Double();
     private static final Color COLOR_BLUE = new Color(85, 85, 255);
     private static final Color COLOR_BACKGROUND = new Color(255, 255, 153);
     private static final Color COLOR_BORDER = new Color(255, 204, 0);
@@ -129,8 +129,10 @@ public class CrossHairUI<V extends javax.swing.JComponent> extends AbstractLayer
         final int boxPointMargin = 8;
         final int width = maxStringWidth + (padding << 1);
         final int height = maxStringHeight + (padding << 1);
-        final int x = point.getX() - width > plotArea.getX() ? (int)(point.getX() - width - boxPointMargin) : (int)(point.getX() + boxPointMargin);
-        final int y = point.getY() - (height >> 1) > plotArea.getY() ? (int)(point.getY() - (height >> 1)) : (int)(plotArea.getY() + boxPointMargin);
+        final int suggestedX = (int)(point.getX() - width - boxPointMargin);
+        final int suggestedY = (int)(point.getY() - (height >> 1));
+        final int x = suggestedX > this.drawArea.getX() ? suggestedX : (int)(point.getX() + boxPointMargin);
+        final int y = suggestedY > this.drawArea.getY() ? suggestedY : (int)(this.drawArea.getY() + boxPointMargin);
 
         final Object oldValueAntiAlias = g2.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
         final Composite oldComposite = g2.getComposite();
@@ -138,14 +140,14 @@ public class CrossHairUI<V extends javax.swing.JComponent> extends AbstractLayer
 
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setColor(COLOR_BORDER);
-        g2.drawRoundRect(x, y, width, height, 20, 20);
+        g2.drawRoundRect(x - 1, y - 1, width + 1, height + 1, 15, 15);
         g2.setColor(COLOR_BACKGROUND);
         g2.setComposite(Utils.makeComposite(0.75f));
-        g2.fillRoundRect(x + 1, y + 1, width - 1, height - 1, 20, 20);
+        g2.fillRoundRect(x, y, width, height, 15, 15);
         g2.setComposite(oldComposite);
         g2.setColor(oldColor);
                 
-        int yy = y + dateFontMetrics.getHeight() + padding;
+        int yy = y  + padding + dateFontMetrics.getAscent();
         g2.setFont(dateFont);
         g2.setColor(COLOR_BLUE);
         g2.drawString(dateString,
@@ -153,7 +155,7 @@ public class CrossHairUI<V extends javax.swing.JComponent> extends AbstractLayer
                 yy);
 
         index = 0;
-        yy += dateInfoHeightMargin + valueFontMetrics.getHeight();
+        yy += dateFontMetrics.getDescent() + dateInfoHeightMargin + valueFontMetrics.getAscent();
         final String LAST_STR = GUIBundle.getString("MainFrame_Last");
         for (String param : params) {
             final String value = values.get(index++);
@@ -174,6 +176,7 @@ public class CrossHairUI<V extends javax.swing.JComponent> extends AbstractLayer
             g2.drawString(value,
                 width - padding - valueFontMetrics.stringWidth(value) + x,
                 yy);
+            // Same as yy += valueFontMetrics.getDescent() + paramValueHeightMargin + valueFontMetrics.getAscent()
             yy += paramValueHeightMargin + valueFontMetrics.getHeight();
         }
         g2.setColor(oldColor);
@@ -299,7 +302,13 @@ public class CrossHairUI<V extends javax.swing.JComponent> extends AbstractLayer
         this.pointIndex = bestMid;
         // this.point = new Point2D.Double(xJava2D, yJava2D);
         this.point = chartPanel.translateJava2DToScreen(new Point2D.Double(xJava2D, yJava2D));
-        this.plotArea = _plotArea;
+        // This _plotArea is including the axises. We do not want axises. We only
+        // want the center draw area.
+        // However, I really have no idea how to obtain rect for center draw area.
+        // This is just a try-n-error hack.
+        this.drawArea.setRect(_plotArea.getX() + 2, _plotArea.getY() + 3,
+                _plotArea.getWidth() - 4 > 0 ? _plotArea.getWidth() - 4 : 1,
+                _plotArea.getHeight() - 5 > 0 ? _plotArea.getHeight() - 5 : 1);
 
         if (_plotArea.contains(this.point)) {
             setDirty(true);
