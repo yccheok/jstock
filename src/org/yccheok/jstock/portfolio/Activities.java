@@ -19,7 +19,6 @@
 
 package org.yccheok.jstock.portfolio;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -114,11 +113,6 @@ public class Activities {
         return message;
     }
 
-    SimpleDateFormat dateFormat = new SimpleDateFormat("d-MMM-yyyy");
-    //static {
-    //    currencyFormat.setMaximumFractionDigits(2);
-    //    currencyFormat.setMinimumFractionDigits(2);
-    //}
     private final List<Activity> activities = new ArrayList<Activity>();
     private final SimpleDate simpleDate;
 }

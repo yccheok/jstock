@@ -64,8 +64,6 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
     private Point2D ROIPoint = null;
     private int ROIPointIndex = -1;
 
-    private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEEE, MMMM d, yyyy");
-
     private final Rectangle2D drawArea = new Rectangle2D.Double();
     
     private final InvestmentFlowChartJDialog cashFlowChartJDialog;
@@ -81,6 +79,10 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
 
     public InvestmentFlowLayerUI(InvestmentFlowChartJDialog cashFlowChartJDialog) {
         this.cashFlowChartJDialog = cashFlowChartJDialog;
+    }
+
+    private void drawROIInformationBox(Graphics2D g2, JXLayer<? extends V> layer) {
+
     }
 
     private void drawInvestInformationBox(Graphics2D g2, JXLayer<? extends V> layer) {
@@ -148,6 +150,7 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         }
 
         final Date date =  activities.getDate().getTime();
+        final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEEE, MMMM d, yyyy");
         final String dateString = simpleDateFormat.format(date);
         final int dateStringWidth = dateFontMetrics.stringWidth(dateString);
         final int dateStringHeight = dateFontMetrics.getHeight();
@@ -166,10 +169,10 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         final int suggestedX = (int)(this.investPoint.getX() - width - boxPointMargin);
         final int suggestedY = (int)(this.investPoint.getY() - (height >> 1));
         final int x =   suggestedX > this.drawArea.getX() ?
-                        (suggestedX + width) < (this.drawArea.getX() + this.drawArea.getWidth()) ? suggestedX : (int)(this.drawArea.getX() + this.drawArea.getWidth() - width - 1) :
+                        (suggestedX + width) < (this.drawArea.getX() + this.drawArea.getWidth()) ? suggestedX : (int)(this.drawArea.getX() + this.drawArea.getWidth() - width - boxPointMargin) :
                         (int)(investPoint.getX() + boxPointMargin);
         final int y =   suggestedY > this.drawArea.getY() ?
-                        (suggestedY + height) < (this.drawArea.getY() + this.drawArea.getHeight()) ? suggestedY : (int)(this.drawArea.getY() + this.drawArea.getHeight() - height - 1) :
+                        (suggestedY + height) < (this.drawArea.getY() + this.drawArea.getHeight()) ? suggestedY : (int)(this.drawArea.getY() + this.drawArea.getHeight() - height - boxPointMargin) :
                         (int)(this.drawArea.getY() + boxPointMargin);
 
         final Object oldValueAntiAlias = g2.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
@@ -315,8 +318,8 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         // This is just a try-n-error hack.
         // Do not use -4. Due to rounding error during point conversion (double to integer)
         this.drawArea.setRect(_plotArea.getX() + 2, _plotArea.getY() + 2,
-                _plotArea.getWidth() - 3 > 0 ? _plotArea.getWidth() - 3 : 1,
-                _plotArea.getHeight() - 3 > 0 ? _plotArea.getHeight() - 3 : 1);
+                _plotArea.getWidth() - 2 > 0 ? _plotArea.getWidth() - 2 : 1,
+                _plotArea.getHeight() - 2 > 0 ? _plotArea.getHeight() - 2 : 1);
         
         if (this.drawArea.contains(tmpPoint)) {
             this.ROIPointIndex = tmpIndex;
@@ -423,8 +426,8 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         // This is just a try-n-error hack.
         // Do not use -4. Due to rounding error during point conversion (double to integer)
         this.drawArea.setRect(_plotArea.getX() + 2, _plotArea.getY() + 2,
-                _plotArea.getWidth() - 3 > 0 ? _plotArea.getWidth() - 3 : 1,
-                _plotArea.getHeight() - 3 > 0 ? _plotArea.getHeight() - 3 : 1);
+                _plotArea.getWidth() - 2 > 0 ? _plotArea.getWidth() - 2 : 1,
+                _plotArea.getHeight() - 2 > 0 ? _plotArea.getHeight() - 2 : 1);
 
         if (this.drawArea.contains(tmpPoint)) {
             this.investPointIndex = tmpIndex;
@@ -522,8 +525,8 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         final Rectangle2D _plotArea = chartPanel.getScreenDataArea();
 
         this.drawArea.setRect(_plotArea.getX() + 2, _plotArea.getY() + 2,
-                _plotArea.getWidth() - 3 > 0 ? _plotArea.getWidth() - 3 : 1,
-                _plotArea.getHeight() - 3 > 0 ? _plotArea.getHeight() - 3 : 1);
+                _plotArea.getWidth() - 2 > 0 ? _plotArea.getWidth() - 2 : 1,
+                _plotArea.getHeight() - 2 > 0 ? _plotArea.getHeight() - 2 : 1);
 
         if (false == this.cashFlowChartJDialog.isFinishLookUpPrice()) {
             this.drawBusyBox(g2, layer);
@@ -552,6 +555,7 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
             g2.fillOval((int)(this.ROIPoint.getX() - (radius >> 1) + 0.5), (int)(this.ROIPoint.getY() - (radius >> 1) + 0.5), radius, radius);
             g2.setColor(oldColor);
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, oldValueAntiAlias);
+            this.drawROIInformationBox(g2, layer);
         }
     }
 
