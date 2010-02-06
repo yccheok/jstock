@@ -81,7 +81,7 @@ public class DynamicChart {
         renderer1.setToolTipGenerator(
             new StandardXYToolTipGenerator(
                 StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT,
-                new SimpleDateFormat("h:mm:ss a"), new DecimalFormat("0.00")
+                new SimpleDateFormat("h:mm:ss a"), new DecimalFormat("0.00#")
             )
         );
 
@@ -121,7 +121,7 @@ public class DynamicChart {
         renderer1.setToolTipGenerator(
             new StandardXYToolTipGenerator(
                 StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT,
-                new SimpleDateFormat("h:mm:ss a"), new DecimalFormat("0.00")
+                new SimpleDateFormat("h:mm:ss a"), new DecimalFormat("0.00#")
             )
         );
 
