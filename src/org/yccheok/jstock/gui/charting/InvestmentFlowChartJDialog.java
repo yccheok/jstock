@@ -20,6 +20,7 @@
 package org.yccheok.jstock.gui.charting;
 
 import java.awt.Dimension;
+import java.awt.event.ComponentEvent;
 import java.io.File;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
@@ -37,6 +38,9 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.event.ChartChangeEvent;
+import org.jfree.chart.event.ChartChangeEventType;
+import org.jfree.chart.event.ChartChangeListener;
 import org.jfree.chart.labels.CustomXYToolTipGenerator;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.StandardXYItemRenderer;
@@ -105,8 +109,31 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
                 investmentFlowLayerUI.setDirty(true);
             }
         }, 15000);
+
+        // Handle zoom-in.
+        this.chartPanel.getChart().addChangeListener(new ChartChangeListener() {
+            @Override
+            public void chartChanged(ChartChangeEvent event) {
+                if (event.getType() == ChartChangeEventType.GENERAL) {
+                    investmentFlowLayerUI.updateInvestPoint();
+                }
+            }
+        });
+
+        // Handle resize.
+        this.addComponentListener(new java.awt.event.ComponentAdapter()
+        {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                investmentFlowLayerUI.updateInvestPoint();
+            }
+        });
     }
 
+    public ChartPanel getChartPanel() {
+        return this.chartPanel;
+    }
+    
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -400,6 +427,8 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         if (this.lookUpCodes.size() == 0) {
             this.finishLookUpPrice = true;
             this.investmentFlowLayerUI.setDirty(true);
+            // Stop myself.
+            this.initRealTimeStockMonitor();
         }
     }
 
@@ -436,6 +465,14 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         currencyFormat.setMinimumFractionDigits(0);
     }
 
+    public Activities getInvestActivities(int index) {
+        return this.investSummary.get(index);
+    }
+
+    public Activities getROIActivities(int index) {
+        return this.ROISummary.get(index);
+    }
+    
     /* How much I had invested. */
     /* Contains Buy, Sell. When Sell, it will pull down your investment value. */
     private final ActivitySummary investSummary = new ActivitySummary();
