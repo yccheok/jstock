@@ -20,6 +20,7 @@
 
 package org.yccheok.jstock.gui.charting;
 
+import java.awt.event.ComponentEvent;
 import java.io.File;
 import org.yccheok.jstock.engine.*;
 
@@ -36,6 +37,9 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.event.ChartChangeEvent;
+import org.jfree.chart.event.ChartChangeEventType;
+import org.jfree.chart.event.ChartChangeListener;
 import org.jfree.chart.labels.StandardXYToolTipGenerator;
 import org.jfree.chart.labels.XYToolTipGenerator;
 import org.jfree.chart.plot.CombinedDomainXYPlot;
@@ -106,11 +110,38 @@ public class ChartJDialog extends javax.swing.JDialog {
         
         this.chartPanel = new ChartPanel(this.priceVolumeChart, true, true, true, true, true);
 
-        this.layer = new org.jdesktop.jxlayer.JXLayer<ChartPanel>(this.chartPanel);
-        final CrossHairUI<ChartPanel> ui = new CrossHairUI<ChartPanel>(stockHistoryServer);
-        layer.setUI(ui);
+        org.jdesktop.jxlayer.JXLayer<ChartPanel> layer = new org.jdesktop.jxlayer.JXLayer<ChartPanel>(this.chartPanel);
+        this.crossHairUI = new CrossHairUI<ChartPanel>(this);
+        layer.setUI(this.crossHairUI);
 
-        getContentPane().add(this.layer, java.awt.BorderLayout.CENTER);
+        getContentPane().add(layer, java.awt.BorderLayout.CENTER);
+        
+        this.chartPanel.getChart().addChangeListener(new ChartChangeListener() {
+            @Override
+            public void chartChanged(ChartChangeEvent event) {
+                if (event.getType() == ChartChangeEventType.GENERAL) {
+                    crossHairUI.updateBestPoint();
+                }
+            }
+        });
+
+        this.addComponentListener(new java.awt.event.ComponentAdapter()
+        {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                crossHairUI.updateBestPoint();
+            }
+        });
+
+
+    }
+
+    public StockHistoryServer getStockHistoryServer() {
+        return this.stockHistoryServer;
+    }
+
+    public ChartPanel getChartPanel() {
+        return this.chartPanel;
     }
     
     /** This method is called from within the constructor to
@@ -1549,7 +1580,7 @@ public class ChartJDialog extends javax.swing.JDialog {
     private JFreeChart candlestickChart;
 
     /* Overlay layer. */
-    private final org.jdesktop.jxlayer.JXLayer<ChartPanel> layer;
+    private final CrossHairUI<ChartPanel> crossHairUI;
 
     private static final Log log = LogFactory.getLog(ChartJDialog.class);
 

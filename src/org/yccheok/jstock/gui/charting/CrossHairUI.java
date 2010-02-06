@@ -19,7 +19,6 @@
 
 package org.yccheok.jstock.gui.charting;
 
-import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Composite;
@@ -67,7 +66,7 @@ public class CrossHairUI<V extends javax.swing.JComponent> extends AbstractLayer
     private static final Color COLOR_BLUE = new Color(85, 85, 255);
     private static final Color COLOR_BACKGROUND = new Color(255, 255, 153);
     private static final Color COLOR_BORDER = new Color(255, 204, 0);
-    private final StockHistoryServer stockHistoryServer;
+    private final ChartJDialog chartJDialog;
     private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEEE, MMMM d, yyyy");
     private static final DecimalFormat decimalFormat = new DecimalFormat("0.00");
     private static final DecimalFormat integerFormat = new DecimalFormat("###,###");
@@ -80,8 +79,8 @@ public class CrossHairUI<V extends javax.swing.JComponent> extends AbstractLayer
             GUIBundle.getString("MainFrame_Vol")
             ));
 
-    public CrossHairUI(StockHistoryServer stockHistoryServer) {
-        this.stockHistoryServer = stockHistoryServer;
+    public CrossHairUI(ChartJDialog chartJDialog) {
+        this.chartJDialog = chartJDialog;
     }
 
     private void drawInformationBox(Graphics2D g2, JXLayer<? extends V> layer) {
@@ -93,8 +92,9 @@ public class CrossHairUI<V extends javax.swing.JComponent> extends AbstractLayer
         final Font dateFont = new Font(oldFont.getFontName(), oldFont.getStyle(), oldFont.getSize() - 1);
         final FontMetrics dateFontMetrics = g2.getFontMetrics(dateFont);
 
+        final StockHistoryServer stockHistoryServer = this.chartJDialog.getStockHistoryServer();
         List<String> values = new ArrayList<String>();
-        final Stock stock = this.stockHistoryServer.getStock(this.stockHistoryServer.getCalendar(pointIndex));
+        final Stock stock = stockHistoryServer.getStock(stockHistoryServer.getCalendar(pointIndex));
 
         values.add(CrossHairUI.decimalFormat.format(stock.getPrevPrice()));
         values.add(CrossHairUI.decimalFormat.format(stock.getLastPrice()));
@@ -117,7 +117,7 @@ public class CrossHairUI<V extends javax.swing.JComponent> extends AbstractLayer
             }
         }
 
-        final Date date =  this.stockHistoryServer.getCalendar(this.pointIndex).getTime();
+        final Date date =  stockHistoryServer.getCalendar(this.pointIndex).getTime();
         final String dateString = simpleDateFormat.format(date);
         final int dateStringWidth = dateFontMetrics.stringWidth(dateString);
         final int dateStringHeight = dateFontMetrics.getHeight();
@@ -234,9 +234,21 @@ public class CrossHairUI<V extends javax.swing.JComponent> extends AbstractLayer
         this.processEvent(e, layer);
     }
 
-    private void processTimeSeriesCollectionEvent(MouseEvent e, JXLayer layer) {
-        final Component component = e.getComponent();
-        final ChartPanel chartPanel = (ChartPanel)component;
+    public void updateBestPoint() {
+        if (this.updateBestPoint(this.point) == false) {
+            /* Clear the point. */
+            this.point = null;
+        }
+        this.setDirty(true);
+    }
+
+    // Update this.drawArea, this.point and this.pointIndex.
+    private boolean updateBestPoint(Point2D p) {
+        if (p == null) {
+            return false;
+        }
+
+        final ChartPanel chartPanel = this.chartJDialog.getChartPanel();
         final JFreeChart chart = chartPanel.getChart();
         final CombinedDomainXYPlot cplot = (CombinedDomainXYPlot) chart.getPlot();
         // Top most plot.
@@ -245,16 +257,15 @@ public class CrossHairUI<V extends javax.swing.JComponent> extends AbstractLayer
         // 0 are the main chart. 1, 2, 3... are TA.
         final TimeSeries timeSeries = timeSeriesCollection.getSeries(0);
 
-        final Point mousePoint = SwingUtilities.convertPoint(e.getComponent(), e.getPoint(), layer);
         // I also not sure why. This is what are being done in Mouse Listener Demo 4.
-        final Point2D mousePoint2 = chartPanel.translateScreenToJava2D(mousePoint);
+        final Point2D p2 = chartPanel.translateScreenToJava2D((Point)p);
         final Rectangle2D _plotArea = chartPanel.getScreenDataArea();
 
         final ValueAxis domainAxis = plot.getDomainAxis();
         final RectangleEdge domainAxisEdge = plot.getDomainAxisEdge();
         final ValueAxis rangeAxis = plot.getRangeAxis();
         final RectangleEdge rangeAxisEdge = plot.getRangeAxisEdge();
-        double coordinateX = domainAxis.java2DToValue(mousePoint2.getX(), _plotArea,
+        final double coordinateX = domainAxis.java2DToValue(p2.getX(), _plotArea,
                 domainAxisEdge);
         //double coordinateY = rangeAxis.java2DToValue(mousePoint2.getY(), plotArea,
         //        rangeAxisEdge);
@@ -310,8 +321,14 @@ public class CrossHairUI<V extends javax.swing.JComponent> extends AbstractLayer
                 _plotArea.getWidth() - 4 > 0 ? _plotArea.getWidth() - 4 : 1,
                 _plotArea.getHeight() - 5 > 0 ? _plotArea.getHeight() - 5 : 1);
 
-        if (_plotArea.contains(this.point)) {
-            setDirty(true);
+        return this.drawArea.contains(this.point);
+    }
+
+    private void processTimeSeriesCollectionEvent(MouseEvent e, JXLayer layer) {
+        final Point mousePoint = SwingUtilities.convertPoint(e.getComponent(), e.getPoint(), layer);
+
+        if (this.updateBestPoint(mousePoint)) {
+            this.setDirty(true);
         }
     }
 
