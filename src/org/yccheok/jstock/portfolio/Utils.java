@@ -35,13 +35,15 @@ import org.yccheok.jstock.gui.SellPortfolioTreeTableModel;
  * @author Owner
  */
 public class Utils {
-    private static final NumberFormat format = java.text.NumberFormat.getCurrencyInstance();
-
     public static String currencyNumberFormat(Object value) {
+        // Number formats are generally not synchronized. It is recommended to create separate format instances for each thread. 
+        // If multiple threads access a format concurrently, it must be synchronized externally.
+        final NumberFormat format = java.text.NumberFormat.getCurrencyInstance();
         return format.format(value);
     }
 
     public static String currencyNumberFormat(double value) {
+        final NumberFormat format = java.text.NumberFormat.getCurrencyInstance();
         return format.format(value);
     }
 
