@@ -167,6 +167,11 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         final ArrayList<String> toolTips = new ArrayList<String>();
 
 
+        final boolean firstTime = (this.lookUpCodes == null);
+        if (firstTime) {
+            this.lookUpCodes = new ArrayList<Code>();
+        }
+
         this.totalROIValue = 0.0;
         for (int i = 0, count = this.ROISummary.size(); i < count; i++) {
             final Activities activities = this.ROISummary.get(i);
@@ -178,7 +183,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
                 if (type == Activity.Type.Buy) {
                     final int quantity = (Integer)activity.get(Activity.Param.Quantity);
                     final Stock stock = (Stock)activity.get(Activity.Param.Stock);
-                    if (lookUpCodesInitialized == false) {
+                    if (firstTime) {
                         if (this.lookUpCodes.contains(stock.getCode()) == false) {
                             this.lookUpCodes.add(stock.getCode());
                         }
@@ -215,14 +220,12 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         // We cannot iterate over this.lookUpCodes.
         // realTimeStockMonitor's callback may remove lookUpCodes item during
         // iterating process.
-        if (lookUpCodesInitialized == false) {
+        if (firstTime) {
             final List<Code> codes = new ArrayList<Code>(this.lookUpCodes);
             for (Code code : codes) {
                 this.realTimeStockMonitor.addStockCode(code);
             }
         }
-        lookUpCodesInitialized = true;
-
         return this.ROITimeSeries;
     }
 
@@ -458,8 +461,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
     private final Map<Code, Double> codeToPrice = new HashMap<Code, Double>();
     /* Whether we had finished scan through all the BUY stocks. */
     private volatile boolean finishLookUpPrice = false;
-    private List<Code> lookUpCodes = new ArrayList<Code>();
-    private volatile boolean lookUpCodesInitialized = false;
+    private volatile List<Code> lookUpCodes = null;
 
     /* Overlay layer. */
     private final InvestmentFlowLayerUI<ChartPanel> investmentFlowLayerUI;
