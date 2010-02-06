@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jfree.chart.ChartFactory;
@@ -409,8 +410,9 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         if (this.lookUpCodes.size() == 0) {
             this.finishLookUpPrice = true;
             this.investmentFlowLayerUI.setDirty(true);
-            // Stop myself.
-            this.initRealTimeStockMonitor();
+            // Do I need to stop myself. Will user like to have continued
+            // real-time update?
+            // this.initRealTimeStockMonitor();
         }
     }
 
@@ -440,6 +442,14 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         return this.finishLookUpPrice;
     }
 
+    public double getStockPrice(Code code) {
+        final Double value = this.codeToPrice.get(code);
+        if (value == null) {
+            return 0.0;
+        }
+        return value;
+    }
+    
     private static final NumberFormat currencyFormat = java.text.NumberFormat.getCurrencyInstance();
     static {
         // 0 decimal place, to save up some display area.
@@ -476,11 +486,11 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
 
     /* For real time stock information. */
     private RealTimeStockMonitor realTimeStockMonitor;    
-    private final Map<Code, Double> codeToPrice = new HashMap<Code, Double>();
+    private final Map<Code, Double> codeToPrice = new ConcurrentHashMap<Code, Double>();
     /* Whether we had finished scan through all the BUY stocks. */
     private volatile boolean finishLookUpPrice = false;
     private volatile List<Code> lookUpCodes = null;
-
+    
     /* Overlay layer. */
     private final InvestmentFlowLayerUI<ChartPanel> investmentFlowLayerUI;
 

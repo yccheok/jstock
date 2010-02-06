@@ -82,7 +82,161 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
     }
 
     private void drawROIInformationBox(Graphics2D g2, JXLayer<? extends V> layer) {
+        final Font oldFont = g2.getFont();
+        final Font paramFont = new Font(oldFont.getFontName(), oldFont.getStyle(), oldFont.getSize());
+        final FontMetrics paramFontMetrics = g2.getFontMetrics(paramFont);
+        final Font valueFont = new Font(oldFont.getFontName(), oldFont.getStyle() + Font.BOLD, oldFont.getSize() + 1);
+        final FontMetrics valueFontMetrics = g2.getFontMetrics(valueFont);
+        final Font dateFont = new Font(oldFont.getFontName(), oldFont.getStyle(), oldFont.getSize() - 1);
+        final FontMetrics dateFontMetrics = g2.getFontMetrics(dateFont);
 
+        final Activities activities = this.cashFlowChartJDialog.getROIActivities(this.ROIPointIndex);
+
+        List<String> values = new ArrayList<String>();
+        List<String> params = new ArrayList<String>();
+
+        double total = 0.0;
+
+        for (int i = 0, size = activities.size(); i < size; i++) {
+            final Activity activity = activities.get(i);
+            // Buy or Dividend only.
+            if (activity.getType() == Activity.Type.Buy) {
+                final int quantity = (Integer)activity.get(Activity.Param.Quantity);
+                final Stock stock = (Stock)activity.get(Activity.Param.Stock);
+                params.add(GUIBundle.getString("InvestmentFlowLayerUI_Own") + " " + quantity + " " + stock.getSymbol());
+                final double amount = quantity * this.cashFlowChartJDialog.getStockPrice(stock.getCode());
+                total += amount;
+                values.add(org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(amount));
+            }
+            else if (activity.getType() == Activity.Type.Dividend) {
+                final Stock stock = (Stock)activity.get(Activity.Param.Stock);
+                params.add(activity.getType() + " " + stock.getSymbol());
+                total += activity.getAmount();
+                values.add(org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(activity.getAmount()));
+            }
+            else {
+                assert(false);
+            }
+        }
+
+        final boolean isTotalNeeded = params.size() > 1;
+        final String totalParam = GUIBundle.getString("InvestmentFlowLayerUI_Total_Return");
+        final String totalValue = org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(total);
+        /* This is the height for "total" information. */
+        int totalHeight = 0;
+
+        assert(values.size() == params.size());
+
+        int index = 0;
+        final int paramValueWidthMargin = 10;
+        final int paramValueHeightMargin = 0;
+        int maxInfoWidth = -1;
+        // paramFontMetrics will always "smaller" than valueFontMetrics.
+        int totalInfoHeight = Math.max(paramFontMetrics.getHeight(), valueFontMetrics.getHeight()) * values.size() + paramValueHeightMargin * (values.size() - 1);
+        for (String param : params) {
+            final String value = values.get(index++);
+            final int paramStringWidth = paramFontMetrics.stringWidth(param + ":") + paramValueWidthMargin + valueFontMetrics.stringWidth(value);
+            if (maxInfoWidth < paramStringWidth) {
+                maxInfoWidth = paramStringWidth;
+            }
+        }
+
+        if (isTotalNeeded) {
+            final int tmp = paramFontMetrics.stringWidth(totalParam + ":") + paramValueWidthMargin + valueFontMetrics.stringWidth(totalValue);
+            if (maxInfoWidth < tmp) {
+                maxInfoWidth = tmp;
+            }
+            totalHeight = Math.max(paramFontMetrics.getHeight(), valueFontMetrics.getHeight());
+        }
+
+        final Date date =  activities.getDate().getTime();
+        final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEEE, MMMM d, yyyy");
+        final String dateString = simpleDateFormat.format(date);
+        final int dateStringWidth = dateFontMetrics.stringWidth(dateString);
+        final int dateStringHeight = dateFontMetrics.getHeight();
+        final int maxStringWidth = Math.max(dateStringWidth, maxInfoWidth);
+        final int dateInfoHeightMargin = 5;
+        final int infoTotalHeightMargin = 5;
+        final int maxStringHeight = isTotalNeeded ?
+                                    (dateStringHeight + dateInfoHeightMargin + totalInfoHeight + infoTotalHeightMargin + totalHeight) :
+                                    (dateStringHeight + dateInfoHeightMargin + totalInfoHeight);
+
+        // Now, We have a pretty good information on maxStringWidth and maxStringHeight.
+
+        final int padding = 5;
+        final int boxPointMargin = 8;
+        final int width = maxStringWidth + (padding << 1);
+        final int height = maxStringHeight + (padding << 1);
+        // On left side of the ball.
+        final int suggestedX = (int)(this.ROIPoint.getX() - width - boxPointMargin);
+        final int suggestedY = (int)(this.ROIPoint.getY() - (height >> 1));
+        final int x =   suggestedX > this.drawArea.getX() ?
+                        (suggestedX + width) < (this.drawArea.getX() + this.drawArea.getWidth()) ? suggestedX : (int)(this.drawArea.getX() + this.drawArea.getWidth() - width - boxPointMargin) :
+                        (int)(ROIPoint.getX() + boxPointMargin);
+        final int y =   suggestedY > this.drawArea.getY() ?
+                        (suggestedY + height) < (this.drawArea.getY() + this.drawArea.getHeight()) ? suggestedY : (int)(this.drawArea.getY() + this.drawArea.getHeight() - height - boxPointMargin) :
+                        (int)(this.drawArea.getY() + boxPointMargin);
+
+        final Object oldValueAntiAlias = g2.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
+        final Composite oldComposite = g2.getComposite();
+        final Color oldColor = g2.getColor();
+
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setColor(COLOR_BLUE_BORDER);
+        g2.drawRoundRect(x - 1, y - 1, width + 1, height + 1, 15, 15);
+        g2.setColor(COLOR_BLUE_BACKGROUND);
+        g2.setComposite(Utils.makeComposite(0.75f));
+        g2.fillRoundRect(x, y, width, height, 15, 15);
+        g2.setComposite(oldComposite);
+        g2.setColor(oldColor);
+
+        int yy = y  + padding + dateFontMetrics.getAscent();
+        g2.setFont(dateFont);
+        g2.setColor(COLOR_BLUE);
+        g2.drawString(dateString,
+                ((width - dateFontMetrics.stringWidth(dateString)) >> 1) + x,
+                yy);
+
+        index = 0;
+        yy += dateFontMetrics.getDescent() + dateInfoHeightMargin + valueFontMetrics.getAscent();
+        for (String param : params) {
+            final String value = values.get(index++);
+            g2.setColor(Color.BLACK);
+            g2.setFont(paramFont);
+            g2.drawString(param + ":",
+                padding + x,
+                yy);
+            g2.setFont(valueFont);
+            g2.drawString(value,
+                width - padding - valueFontMetrics.stringWidth(value) + x,
+                yy);
+            // Same as yy += valueFontMetrics.getDescent() + paramValueHeightMargin + valueFontMetrics.getAscent()
+            yy += paramValueHeightMargin + valueFontMetrics.getHeight();
+        }
+
+        if (isTotalNeeded) {
+            yy -= paramValueHeightMargin;
+            yy += infoTotalHeightMargin;
+            if (total > 0.0) {
+                g2.setColor(JStockOptions.DEFAULT_HIGHER_NUMERICAL_VALUE_FOREGROUND_COLOR);
+            }
+            else if (total < 0.0) {
+                g2.setColor(JStockOptions.DEFAULT_LOWER_NUMERICAL_VALUE_FOREGROUND_COLOR);
+            }
+
+            g2.setFont(paramFont);
+            g2.drawString(totalParam + ":",
+                padding + x,
+                yy);
+            g2.setFont(valueFont);
+            g2.drawString(totalValue,
+                width - padding - valueFontMetrics.stringWidth(totalValue) + x,
+                yy);
+        }
+
+        g2.setColor(oldColor);
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, oldValueAntiAlias);
+        g2.setFont(oldFont);
     }
 
     private void drawInvestInformationBox(Graphics2D g2, JXLayer<? extends V> layer) {
@@ -120,7 +274,7 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         }
 
         final boolean isTotalNeeded = params.size() > 1;
-        final String totalParam = GUIBundle.getString("InvestmentFlowLayerUI_Total");
+        final String totalParam = GUIBundle.getString("InvestmentFlowLayerUI_Total_Invest");
         final String totalValue = org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(total);
         /* This is the height for "total" information. */
         int totalHeight = 0;
@@ -160,6 +314,8 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         final int maxStringHeight = isTotalNeeded ? 
                                     (dateStringHeight + dateInfoHeightMargin + totalInfoHeight + infoTotalHeightMargin + totalHeight) :
                                     (dateStringHeight + dateInfoHeightMargin + totalInfoHeight);
+
+        // Now, We have a pretty good information on maxStringWidth and maxStringHeight.
 
         final int padding = 5;
         final int boxPointMargin = 8;
