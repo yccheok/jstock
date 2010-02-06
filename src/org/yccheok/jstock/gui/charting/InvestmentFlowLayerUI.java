@@ -114,6 +114,7 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         // However, I really have no idea how to obtain rect for center draw area.
         // This is just a try-n-error hack.
         final Rectangle2D _plotArea = chartPanel.getScreenDataArea();
+
         this.drawArea.setRect(_plotArea.getX() + 2, _plotArea.getY() + 3,
                 _plotArea.getWidth() - 4 > 0 ? _plotArea.getWidth() - 4 : 1,
                 _plotArea.getHeight() - 5 > 0 ? _plotArea.getHeight() - 5 : 1);
