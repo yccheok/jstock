@@ -206,7 +206,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
             this.lookUpCodes = new ArrayList<Code>();
         }
 
-        this.totalROIValue = 0.0;
+        double _totalROIValue = 0.0;
         for (int i = 0, count = this.ROISummary.size(); i < count; i++) {
             final Activities activities = this.ROISummary.get(i);
             double amount = 0.0;
@@ -239,15 +239,20 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
                 amount = amount / 100.0;
             }
 
-            this.totalROIValue += amount;
+            _totalROIValue += amount;
 
             final SimpleDate date = activities.getDate();
             final Date d = date.getTime();
-            this.ROITimeSeries.addOrUpdate(new Day(d), this.totalROIValue);
+            this.ROITimeSeries.addOrUpdate(new Day(d), _totalROIValue);
             final SimpleDateFormat dateFormat = new SimpleDateFormat("d-MMM-yyyy");
+            final java.text.NumberFormat numberFormat = java.text.NumberFormat.getInstance();
+            numberFormat.setMaximumFractionDigits(2);
+            numberFormat.setMinimumFractionDigits(2);
             final String tips = "<html>Return: (" + dateFormat.format(d) + ", " + numberFormat.format(amount) + ")<br> " + activities.toSummary() + "</html>";
             toolTips.add(tips);
         }   // for (int i = 0, count = this.ROISummary.size(); i < count; i++)
+
+        this.totalROIValue = _totalROIValue;
 
         stock_ttg.addToolTipSeries(toolTips);
         this.ROIRenderer.setToolTipGenerator(stock_ttg);
@@ -297,6 +302,9 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
             final Date d = date.getTime();
             series.add(new Day(d), this.totalInvestValue);
             final SimpleDateFormat dateFormat = new SimpleDateFormat("d-MMM-yyyy");
+            final java.text.NumberFormat numberFormat = java.text.NumberFormat.getInstance();
+            numberFormat.setMaximumFractionDigits(2);
+            numberFormat.setMinimumFractionDigits(2);
             final String tips = "<html>Invest: (" + dateFormat.format(d) + ", " + numberFormat.format(amount) + ")<br> " + activities.toSummary() + "</html>";
             toolTips.add(tips);
 
@@ -310,7 +318,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         final XYDataset priceData = this.createInvestDataset();
 
         JFreeChart chart = ChartFactory.createTimeSeriesChart(
-            "",
+            " ",
             GUIBundle.getString("InvestmentFlowChartJDialog_Date"),
             GUIBundle.getString("InvestmentFlowChartJDialog_Value"),
             priceData,
@@ -322,6 +330,10 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         XYPlot plot = chart.getXYPlot();
 
         NumberAxis rangeAxis1 = (NumberAxis) plot.getRangeAxis();
+        final NumberFormat currencyFormat = java.text.NumberFormat.getCurrencyInstance();
+        // 0 decimal place, to save up some display area.
+        currencyFormat.setMaximumFractionDigits(0);
+        currencyFormat.setMinimumFractionDigits(0);
         rangeAxis1.setNumberFormatOverride(currencyFormat);
 
         XYItemRenderer renderer0 = plot.getRenderer();
@@ -416,26 +428,12 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         }
     }
 
-    private void updateChartTitle() {
-        final String invest = numberFormat.format(this.totalInvestValue);
-        final String roi = numberFormat.format(this.totalROIValue);
-        final double gain = this.totalROIValue - this.totalInvestValue;
-        final double percentage = this.totalInvestValue > 0.0 ? gain / this.totalInvestValue * 100.0 : 0.0;
-        final String gain_str = gain > 0.0 ? "+" + numberFormat.format(gain) : numberFormat.format(gain);
-        final String percentage_str = gain > 0.0 ? "+" + numberFormat.format(percentage) : numberFormat.format(percentage);
+    public double getTotalInvestValue() {
+        return this.totalInvestValue;
+    }
 
-        String title = null;
-        if (this.totalROIValue >= this.totalInvestValue) {
-            final String tmp = MessageFormat.format(GUIBundle.getString("InvestmentFlowChartJDialog_Gain"), gain_str, percentage_str);
-            title = MessageFormat.format(GUIBundle.getString("InvestmentFlowChartJDialog_ChartTitle"), invest, roi, tmp);
-        }
-        else {
-            final String tmp = MessageFormat.format(GUIBundle.getString("InvestmentFlowChartJDialog_Loss"), gain_str, percentage_str);
-            title = MessageFormat.format(GUIBundle.getString("InvestmentFlowChartJDialog_ChartTitle"), invest, roi, tmp);
-        }
-
-        this.chartPanel.getChart().setAntiAlias(true);
-        this.chartPanel.getChart().setTitle(title);
+    public double getTotalROIValue() {
+        return this.totalROIValue;
     }
 
     public boolean isFinishLookUpPrice() {
@@ -450,13 +448,6 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         return value;
     }
     
-    private static final NumberFormat currencyFormat = java.text.NumberFormat.getCurrencyInstance();
-    static {
-        // 0 decimal place, to save up some display area.
-        currencyFormat.setMaximumFractionDigits(0);
-        currencyFormat.setMinimumFractionDigits(0);
-    }
-
     public Activities getInvestActivities(int index) {
         return this.investSummary.get(index);
     }
@@ -495,12 +486,6 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
     private final InvestmentFlowLayerUI<ChartPanel> investmentFlowLayerUI;
 
     private static final Log log = LogFactory.getLog(InvestmentFlowChartJDialog.class);
-
-    static final java.text.NumberFormat numberFormat = java.text.NumberFormat.getInstance();
-    static {
-        numberFormat.setMaximumFractionDigits(2);
-        numberFormat.setMinimumFractionDigits(2);
-    }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
