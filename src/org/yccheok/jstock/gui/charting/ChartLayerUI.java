@@ -252,10 +252,14 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         final TimeSeriesCollection timeSeriesCollection = (TimeSeriesCollection)plot.getDataset();
         // 0 are the main chart. 1, 2, 3... are TA.
         final TimeSeries timeSeries = timeSeriesCollection.getSeries(0);
-
+        
         // I also not sure why. This is what are being done in Mouse Listener Demo 4.
         final Point2D p2 = chartPanel.translateScreenToJava2D((Point)p);
-        final Rectangle2D _plotArea = chartPanel.getScreenDataArea();
+        // This doesn't give you correct plot area, after you had added CCI, RSI...
+        /* final Rectangle2D _plotArea = chartPanel.getScreenDataArea(); */
+
+        /* Try to get correct main chart area. */
+        final Rectangle2D _plotArea = chartPanel.getChartRenderingInfo().getPlotInfo().getSubplotInfo(0).getDataArea();
 
         final ValueAxis domainAxis = plot.getDomainAxis();
         final RectangleEdge domainAxisEdge = plot.getDomainAxisEdge();
