@@ -105,6 +105,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
+                // Timeout. Remove busy message box.
                 finishLookUpPrice = true;
                 investmentFlowLayerUI.setDirty(true);
             }
@@ -166,7 +167,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         getContentPane().add(jPanel1, java.awt.BorderLayout.EAST);
 
         java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-978)/2, (screenSize.height-456)/2, 978, 456);
+        setBounds((screenSize.width-750)/2, (screenSize.height-500)/2, 750, 500);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
