@@ -60,8 +60,61 @@ import org.yccheok.jstock.internationalization.GUIBundle;
 
 public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLayerUI<V> {
 
-    private Point2D point = null;
-    private int pointIndex = -1;
+    private static class TraceInfo {
+        private final Point2D point;
+        private final int dataIndex;
+        private final int plotIndex;
+        private final int seriesIndex;
+
+        private TraceInfo(Point2D point, int dataIndex, int plotIndex, int seriesIndex) {
+            this.point = point;
+            this.dataIndex = dataIndex;
+            this.plotIndex = plotIndex;
+            this.seriesIndex = seriesIndex;
+        }
+
+        public static TraceInfo newInstance(Point2D point, int dataIndex, int plotIndex, int seriesIndex) {
+            return new TraceInfo(point, dataIndex, plotIndex, seriesIndex);
+        }
+        
+        /**
+         * @return the point
+         */
+        public Point2D getPoint() {
+            return point;
+        }
+
+        /**
+         * @return the dataIndex
+         */
+        public int getDataIndex() {
+            return dataIndex;
+        }
+
+        /**
+         * @return the plotIndex
+         */
+        public int getPlotIndex() {
+            return plotIndex;
+        }
+
+        /**
+         * @return the seriesIndex
+         */
+        public int getSeriesIndex() {
+            return seriesIndex;
+        }
+    }
+
+    // Major tracing information for main chart.
+    private TraceInfo mainTraceInfo = TraceInfo.newInstance(null, 0, 0, 0);
+
+    // Balls location for indicator. No information box will be displayed along
+    // them.
+    private final List<Point2D> indicatorPoints = new ArrayList<Point2D>();
+    // Indexes used to access time series data for indicators.
+    private final List<Integer> indicatorIndexes = new ArrayList<Integer>();
+            
     private final Rectangle2D drawArea = new Rectangle2D.Double();
     private static final Color COLOR_BLUE = new Color(85, 85, 255);
     private static final Color COLOR_BACKGROUND = new Color(255, 255, 153);
@@ -92,7 +145,7 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
 
         final StockHistoryServer stockHistoryServer = this.chartJDialog.getStockHistoryServer();
         List<String> values = new ArrayList<String>();
-        final Stock stock = stockHistoryServer.getStock(stockHistoryServer.getCalendar(pointIndex));
+        final Stock stock = stockHistoryServer.getStock(stockHistoryServer.getCalendar(this.mainTraceInfo.getDataIndex()));
 
         // Number formats are generally not synchronized. It is recommended to create separate format instances for each thread. 
         // If multiple threads access a format concurrently, it must be synchronized externally.
@@ -119,7 +172,7 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
             }
         }
 
-        final Date date =  stockHistoryServer.getCalendar(this.pointIndex).getTime();
+        final Date date =  stockHistoryServer.getCalendar(this.mainTraceInfo.getDataIndex()).getTime();
         
         // Date formats are not synchronized. It is recommended to create separate format instances for each thread.
         // If multiple threads access a format concurrently, it must be synchronized externally.
@@ -136,11 +189,11 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         final int width = maxStringWidth + (padding << 1);
         final int height = maxStringHeight + (padding << 1);
         // On left side of the ball.
-        final int suggestedX = (int)(point.getX() - width - boxPointMargin);
-        final int suggestedY = (int)(point.getY() - (height >> 1));
+        final int suggestedX = (int)(this.mainTraceInfo.getPoint().getX() - width - boxPointMargin);
+        final int suggestedY = (int)(this.mainTraceInfo.getPoint().getY() - (height >> 1));
         final int x =   suggestedX > this.drawArea.getX() ?
                         (suggestedX + width) < (this.drawArea.getX() + this.drawArea.getWidth()) ? suggestedX : (int)(this.drawArea.getX() + this.drawArea.getWidth() - width - boxPointMargin) :
-                        (int)(point.getX() + boxPointMargin);
+                        (int)(this.mainTraceInfo.getPoint().getX() + boxPointMargin);
         final int y =   suggestedY > this.drawArea.getY() ?
                         (suggestedY + height) < (this.drawArea.getY() + this.drawArea.getHeight()) ? suggestedY : (int)(this.drawArea.getY() + this.drawArea.getHeight() - height - boxPointMargin) :
                         (int)(this.drawArea.getY() + boxPointMargin);
@@ -199,7 +252,7 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
     protected void paintLayer(Graphics2D g2, JXLayer<? extends V> layer) {
         super.paintLayer(g2, layer);
         
-        if (this.point == null) {
+        if (this.mainTraceInfo.getPoint() == null) {
             return;
         }
 
@@ -209,7 +262,7 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
 
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setColor(COLOR_BLUE);
-        g2.fillOval((int)(this.point.getX() - (radius >> 1) + 0.5), (int)(this.point.getY() - (radius >> 1) + 0.5), radius, radius);
+        g2.fillOval((int)(this.mainTraceInfo.getPoint().getX() - (radius >> 1) + 0.5), (int)(this.mainTraceInfo.getPoint().getY() - (radius >> 1) + 0.5), radius, radius);
         g2.setColor(oldColor);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, oldValueAntiAlias);
         this.drawInformationBox(g2, layer);
@@ -227,20 +280,89 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         this.processEvent(e, layer);
     }
 
-    public void updateBestPoint() {
-        if (this.updateBestPoint(this.point) == false) {
-            /* Clear the point. */
-            this.point = null;
+    // Indicator tracing information will always be determined by main tracing
+    // information. Not by mouse coordinate. Their x-location, must be exactly
+    // same as mainTraceInfo's point x-location.
+    //
+    // Their behavior are diference from mainTraceInfo. For mainTraceInfo, if we
+    // move our mouse cursor to a location where ball cannot be drawn, previous
+    // ball will remain in its old location.
+    //
+    // However, in order to avoid confusion from users, "why CCI ball is not 
+    // x-location tally with main ball", if an indicator ball unable to be drawn
+    // x-parallel with main ball, it will be removed.
+    //
+    // If particular indicator point is not within drawArea, it will be removed
+    // immediately. Their index, however will be updated, in order to access
+    // time series data, which will be shown in information box.
+    private void updateIndicatorPoints(int mainPointIndex) {
+        this.indicatorPoints.clear();
+        this.indicatorIndexes.clear();
+        if (this.mainTraceInfo == null) {
+            return;
         }
+
+        final ChartPanel chartPanel = this.chartJDialog.getChartPanel();
+        final JFreeChart chart = chartPanel.getChart();
+        final CombinedDomainXYPlot cplot = (CombinedDomainXYPlot) chart.getPlot();
+
+        // Get the date.
+        final Day day = (Day)((TimeSeriesCollection)((XYPlot)cplot.getSubplots().get(0)).getDataset()).getSeries(0).getDataItem(mainPointIndex).getPeriod();
+
+        // Begin with 1. 0 is main plot.
+        for (int i = 1, size = cplot.getSubplots().size(); i < size; i++) {
+            final XYPlot plot = (XYPlot) cplot.getSubplots().get(i);
+            final TimeSeriesCollection timeSeriesCollection = (TimeSeriesCollection)plot.getDataset();
+            final TimeSeries timeSeries = timeSeriesCollection.getSeries(0);
+            final int index = searchIndex(timeSeries, day);
+        }
+    }
+
+    // Use binary search to search for index.
+    // Return -1 if failed.
+    private int searchIndex(TimeSeries timeSeries, Day targetDay) {
+        int low = 0;
+        int high = timeSeries.getItemCount() - 1;
+
+        while (low <= high) {
+            int mid = (low + high) >>> 1;
+
+            final TimeSeriesDataItem timeSeriesDataItem = timeSeries.getDataItem(mid);
+            final Day searchDay = (Day)timeSeriesDataItem.getPeriod();
+            final long cmp = searchDay.compareTo(targetDay);
+
+            if (cmp < 0) {
+                low = mid + 1;
+            }
+            else if (cmp > 0) {
+                high = mid - 1;
+            }
+            else {
+                return mid;
+            }
+        }
+        return -1;
+    }
+
+    public void updateTraceInfos() {
+        this.updateMainTraceInfo();
+        // updateIndicatorTraceInfos must always be called only after updateMainTraceInfo.
+        this.updateIndicatorPoints(this.mainTraceInfo.getDataIndex());
         this.setDirty(true);
     }
 
-    // Update this.drawArea, this.point and this.pointIndex.
-    // If point is not within drawArea, this.point and this.pointIndex
-    // will not be updated.
-    // this.drawArea will always be updated.
-    private boolean updateBestPoint(Point2D p) {
-        if (p == null) {
+    private void updateMainTraceInfo() {
+        if (this.updateMainTraceInfo(this.mainTraceInfo.getPoint()) == false) {
+            /* Clear the mainTraceInfo. */
+            this.mainTraceInfo = TraceInfo.newInstance(null, 0, 0, 0);
+        }
+    }
+
+    // Update this.drawArea, this.mainTraceInfo
+    // If traceInfo is not within this.drawArea, this.mainTraceInfo will not be
+    // updated. However, this.drawArea will always be updated.
+    private boolean updateMainTraceInfo(Point2D point) {
+        if (point == null) {
             return false;
         }
 
@@ -254,7 +376,7 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         final TimeSeries timeSeries = timeSeriesCollection.getSeries(0);
         
         // I also not sure why. This is what are being done in Mouse Listener Demo 4.
-        final Point2D p2 = chartPanel.translateScreenToJava2D((Point)p);
+        final Point2D p2 = chartPanel.translateScreenToJava2D((Point)point);
         // This doesn't give you correct plot area, after you had added CCI, RSI...
         /* final Rectangle2D _plotArea = chartPanel.getScreenDataArea(); */
 
@@ -282,8 +404,8 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
 
             final TimeSeriesDataItem timeSeriesDataItem = timeSeries.getDataItem(mid);
             final Day day = (Day)timeSeriesDataItem.getPeriod();
-            final long target = day.getFirstMillisecond();
-            final long cmp = target - time;
+            final long search = day.getFirstMillisecond();
+            final long cmp = search - time;
 
             if (cmp < 0) {
                 low = mid + 1;
@@ -311,20 +433,20 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         final double yJava2D = rangeAxis.valueToJava2D(yValue, _plotArea, rangeAxisEdge);
 
         final int tmpIndex = bestMid;
-        // this.point = new Point2D.Double(xJava2D, yJava2D);
+        // this.mainPoint = new Point2D.Double(xJava2D, yJava2D);
         final Point2D tmpPoint = chartPanel.translateJava2DToScreen(new Point2D.Double(xJava2D, yJava2D));
         // This _plotArea is including the axises. We do not want axises. We only
         // want the center draw area.
         // However, I really have no idea how to obtain rect for center draw area.
         // This is just a try-n-error hack.
-        // Do not use -4. Due to rounding error during point conversion (double to integer)
+        // Do not use -4. Due to rounding error during mainPoint conversion (double to integer)
         this.drawArea.setRect(_plotArea.getX() + 2, _plotArea.getY() + 2,
                 _plotArea.getWidth() - 2 > 0 ? _plotArea.getWidth() - 2 : 1,
                 _plotArea.getHeight() - 2 > 0 ? _plotArea.getHeight() - 2 : 1);
 
         if (this.drawArea.contains(tmpPoint)) {
-            this.pointIndex = tmpIndex;
-            this.point = tmpPoint;
+            // 0 indicates main plot.
+            this.mainTraceInfo = TraceInfo.newInstance(tmpPoint, tmpIndex, 0, 0);
             return true;
         }
         return false;
@@ -332,8 +454,8 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
 
     private void processTimeSeriesCollectionEvent(MouseEvent e, JXLayer layer) {
         final Point mousePoint = SwingUtilities.convertPoint(e.getComponent(), e.getPoint(), layer);
-
-        if (this.updateBestPoint(mousePoint)) {
+        if (this.updateMainTraceInfo(mousePoint)) {
+            this.updateIndicatorPoints(this.mainTraceInfo.getDataIndex());
             this.setDirty(true);
         }
     }
@@ -352,7 +474,7 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
             this.processTimeSeriesCollectionEvent(e, layer);
         }
         else {
-            this.point = null;
+            this.mainTraceInfo = TraceInfo.newInstance(null, 0, 0, 0);
             this.setDirty(true);
         }
     }
