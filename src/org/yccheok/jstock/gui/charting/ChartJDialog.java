@@ -110,26 +110,34 @@ public class ChartJDialog extends javax.swing.JDialog {
         
         this.chartPanel = new ChartPanel(this.priceVolumeChart, true, true, true, true, true);
 
-        org.jdesktop.jxlayer.JXLayer<ChartPanel> layer = new org.jdesktop.jxlayer.JXLayer<ChartPanel>(this.chartPanel);
+        final org.jdesktop.jxlayer.JXLayer<ChartPanel> layer = new org.jdesktop.jxlayer.JXLayer<ChartPanel>(this.chartPanel);
         this.chartLayerUI = new ChartLayerUI<ChartPanel>(this);
         layer.setUI(this.chartLayerUI);
 
         getContentPane().add(layer, java.awt.BorderLayout.CENTER);
-        
+
+        // Handle zoom-in.
         this.chartPanel.getChart().addChangeListener(new ChartChangeListener() {
             @Override
             public void chartChanged(ChartChangeEvent event) {
+                // Is weird. This works well for zoom-in. When we add new CCI or
+                // RIS. This event function will be triggered too. However, the
+                // returned draw area will always be the old draw area, unless
+                // you move your move over.
+                // Even I try to capture event.getType() == ChartChangeEventType.NEW_DATASET
+                // also doesn't work.
                 if (event.getType() == ChartChangeEventType.GENERAL) {
-                    chartLayerUI.updateBestPoint();
+                    ChartJDialog.this.chartLayerUI.updateTraceInfos();
                 }
             }
         });
 
+        // Handle resize.
         this.addComponentListener(new java.awt.event.ComponentAdapter()
         {
             @Override
             public void componentResized(ComponentEvent e) {
-                chartLayerUI.updateBestPoint();
+                ChartJDialog.this.chartLayerUI.updateTraceInfos();
             }
         });
     }
@@ -1555,11 +1563,17 @@ public class ChartJDialog extends javax.swing.JDialog {
         public final Object parameter;
     }
 
+    public String getLegendName(int plotIndex, int seriesIndex) {
+        final JFreeChart chart = chartPanel.getChart();
+        final CombinedDomainXYPlot cplot = (CombinedDomainXYPlot) chart.getPlot();
+        return ((TimeSeriesCollection)((XYPlot)cplot.getSubplots().get(plotIndex)).getDataset()).getSeries(seriesIndex).getDescription();
+    }
+
     private final StockHistoryServer stockHistoryServer;
     private final ChartPanel chartPanel;
     private final Map<Integer, TimeSeries> time_series_moving_average_map = new HashMap<Integer, TimeSeries>();
     private final Map<Integer, TimeSeries> time_series_exponential_moving_average_map = new HashMap<Integer, TimeSeries>();
-    /* Days to index. */
+    /* Days to series index. (For main plot only) */
     private final Map<Integer, Integer> xydata_index_map = new HashMap<Integer, Integer>();
     private final List<TAEx> activeTAExs = new ArrayList<TAEx>();
     private static final int MAX_MAP_SIZE = 20;
