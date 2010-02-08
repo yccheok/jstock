@@ -488,8 +488,8 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
 
             final TimeSeriesDataItem timeSeriesDataItem = timeSeries.getDataItem(mid);
             final Day day = (Day)timeSeriesDataItem.getPeriod();
-            final long target = day.getFirstMillisecond();
-            final long cmp = target - time;
+            final long search = day.getFirstMillisecond();
+            final long cmp = search - time;
 
             if (cmp < 0) {
                 low = mid + 1;
@@ -596,8 +596,8 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
 
             final TimeSeriesDataItem timeSeriesDataItem = timeSeries.getDataItem(mid);
             final Day day = (Day)timeSeriesDataItem.getPeriod();
-            final long target = day.getFirstMillisecond();
-            final long cmp = target - time;
+            final long search = day.getFirstMillisecond();
+            final long cmp = search - time;
 
             if (cmp < 0) {
                 low = mid + 1;
