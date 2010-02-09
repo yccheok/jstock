@@ -309,7 +309,7 @@ public class IndicatorPanel extends JPanel {
 
         jComboBox1.setEditable(true);
         jComboBox1.setPreferredSize(new java.awt.Dimension(150, 24));
-        this.jComboBox1.getEditor().getEditorComponent().addKeyListener(jComboBox1EditorComponentKeyAdapter);
+        ((AutoCompleteJComboBox)jComboBox1).attach(this.getAutoCompleteJComboBoxObserver());
         jPanel7.add(jComboBox1);
 
         jPanel5.add(jPanel7, java.awt.BorderLayout.NORTH);
@@ -1312,73 +1312,60 @@ public class IndicatorPanel extends JPanel {
     public void setStockCodeAndSymbolDatabase(StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase) {
         ((AutoCompleteJComboBox)jComboBox1).setStockCodeAndSymbolDatabase(stockCodeAndSymbolDatabase);
     }
-    
-    public void initjComboBox1EditorComponentKeyListerner() {
-        KeyListener[] listeners = this.jComboBox1.getEditor().getEditorComponent().getKeyListeners();
-        
-        for(KeyListener listener : listeners) {
-            if(listener == jComboBox1EditorComponentKeyAdapter) {
-                return;
-            }
-        }
-        
-        // Bug in Java 6. Most probably this listener had been removed during look n feel updating, reassign!
-        this.jComboBox1.getEditor().getEditorComponent().addKeyListener(jComboBox1EditorComponentKeyAdapter);
-        log.info("Reassign key adapter to combo box");
-    }
-    
-    private KeyAdapter getjComboBox1EditorComponentKeyAdapter() {
-        return new KeyAdapter() {
+
+    private org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, String> getAutoCompleteJComboBoxObserver() {
+        return new org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, String>() {
             @Override
-            public void keyReleased(KeyEvent e) {
-                if(KeyEvent.VK_ENTER == e.getKeyCode()) {
-                    String stock = IndicatorPanel.this.jComboBox1.getEditor().getItem().toString();
-                    
-                    if(stock.length() > 0) {
-                        MainFrame m = MainFrame.getInstance();
-                        
-                        if(m == null) return;
-                        
-                        final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = m.getStockCodeAndSymbolDatabase();
-                        
-                        Code code = stockCodeAndSymbolDatabase.searchStockCode(stock);
-                        Symbol symbol = null;
-                            
-                        if (code != null) {
-                            symbol = stockCodeAndSymbolDatabase.codeToSymbol(code);                            
+            public void update(AutoCompleteJComboBox subject, String arg) {
+                if (arg == null || arg.length() <= 0) {
+                    return;
+                }
+
+                final String stock = arg;
+
+                MainFrame m = MainFrame.getInstance();
+
+                if (m == null) {
+                    return;
+                }
+
+                final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = m.getStockCodeAndSymbolDatabase();
+
+                Code code = stockCodeAndSymbolDatabase.searchStockCode(stock);
+                Symbol symbol = null;
+
+                if (code != null) {
+                    symbol = stockCodeAndSymbolDatabase.codeToSymbol(code);
+                }
+                else {
+                    symbol = stockCodeAndSymbolDatabase.searchStockSymbol(stock);
+
+                    if (symbol != null) {
+                        code = stockCodeAndSymbolDatabase.symbolToCode(symbol);
+                        assert(code != null);
+                    }
+                }
+
+                if (code != null && symbol != null) {
+                    if (stockTask != null) {
+                        stockTask._stop();
+
+                        try {
+                            stockTask.get();
+                        } catch (InterruptedException exp) {
+                            log.error(null, exp);
+                        } catch (ExecutionException exp) {
+                            log.error(null, exp);
                         }
-                        else {
-                            symbol = stockCodeAndSymbolDatabase.searchStockSymbol(stock);
-                                
-                            if (symbol != null) {
-                                code = stockCodeAndSymbolDatabase.symbolToCode(symbol);
-                                assert(code != null);
-                            }
-                        }
-                        
-                        if (code != null && symbol != null) {
-                            if(stockTask != null) {
-                                stockTask._stop();
-                                
-                                try {
-                                    stockTask.get();
-                                } catch (InterruptedException exp) {
-                                    log.error(null, exp);
-                                } catch (ExecutionException exp) {
-                                    log.error(null, exp);
-                                }                                
-                            }
-                            
-                            stockTask = new StockTask(code, symbol);
-                            stockTask.execute();
-                        }
-                        
-                    }   /* if(stock.length() > 0) */
-                }   /* if(KeyEvent.VK_ENTER == e.getKeyCode()) */
-            }   /* public void keyReleased(KeyEvent e) */
+                    }
+
+                    stockTask = new StockTask(code, symbol);
+                    stockTask.execute();
+                }
+            }
         };
     }
-    
+
     private class StockTask extends SwingWorker<Boolean, Stock> {
         private volatile boolean runnable = true;
         
@@ -1813,10 +1800,6 @@ public class IndicatorPanel extends JPanel {
     private static final Log log = LogFactory.getLog(IndicatorPanel.class);
     
     private StockTask stockTask;
-    
-    // As workaround to overcome the bug, when new look n feel being applied during runtime, the original
-    // KeyListner for ComboBoxEditor will be removed.
-    private final KeyListener jComboBox1EditorComponentKeyAdapter = getjComboBox1EditorComponentKeyAdapter();
     
     private Thread simulationThread;
 

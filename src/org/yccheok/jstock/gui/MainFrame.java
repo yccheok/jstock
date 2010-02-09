@@ -1333,7 +1333,6 @@ public class MainFrame extends javax.swing.JFrame {
         // priority.
         ((AutoCompleteJComboBox)jComboBox1).setStockCodeAndSymbolDatabase(stockCodeAndSymbolDatabase);
         this.indicatorPanel.setStockCodeAndSymbolDatabase(stockCodeAndSymbolDatabase);
-        this.indicatorPanel.initjComboBox1EditorComponentKeyListerner();
     }
 
     private void createChatJPanel() {
