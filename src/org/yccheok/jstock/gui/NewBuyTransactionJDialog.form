@@ -376,7 +376,7 @@
           </Properties>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new AutoCompleteJComboBox();"/>
-            <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="//this.jComboBox1.getEditor().getEditorComponent().addKeyListener(jComboBox1EditorComponentKeyAdapter);"/>
+            <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="((AutoCompleteJComboBox)jComboBox1).attach(this.getAutoCompleteJComboBoxObserver());"/>
           </AuxValues>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel6">

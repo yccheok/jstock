@@ -288,7 +288,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
 
         jComboBox1.setEditable(true);
         jComboBox1.setPreferredSize(new java.awt.Dimension(110, 24));
-        //this.jComboBox1.getEditor().getEditorComponent().addKeyListener(jComboBox1EditorComponentKeyAdapter);
+        ((AutoCompleteJComboBox)jComboBox1).attach(this.getAutoCompleteJComboBoxObserver());
 
         jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/inbox.png"))); // NOI18N
 
@@ -553,70 +553,50 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
     public void setStockCodeAndSymbolDatabase(StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase) {
         ((AutoCompleteJComboBox)jComboBox1).setStockCodeAndSymbolDatabase(stockCodeAndSymbolDatabase);
     }
-    
-    public void initjComboBox1EditorComponentKeyListerner() {
-        KeyListener[] listeners = this.jComboBox1.getEditor().getEditorComponent().getKeyListeners();
         
-        for (KeyListener listener : listeners) {
-            if (listener == jComboBox1EditorComponentKeyAdapter) {
-                return;
-            }
-        }
-        
-        // Bug in Java 6. Most probably this listener had been removed during look n feel updating, reassign!
-        this.jComboBox1.getEditor().getEditorComponent().addKeyListener(jComboBox1EditorComponentKeyAdapter);
-        log.info("Reassign key adapter to combo box");
-    }
-    
     public Transaction getTransaction() {
         return this.transaction;
     }
-    
-    private KeyAdapter getjComboBox1EditorComponentKeyAdapter() {
-     
-        return new KeyAdapter() {
+
+    private org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, String> getAutoCompleteJComboBoxObserver() {
+        return new org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, String>() {
             @Override
-            public void keyReleased(KeyEvent e) {
-                if (KeyEvent.VK_ENTER == e.getKeyCode()) {
+            public void update(AutoCompleteJComboBox subject, String arg) {
+                if (arg == null || arg.length() <= 0) {
+                    return;
+                }
 
-                    String s = NewBuyTransactionJDialog.this.jComboBox1.getEditor().getItem().toString();
-                    
-                    if (s.length() > 0) {
-                        MainFrame m = (MainFrame)NewBuyTransactionJDialog.this.getParent();
-                        
-                        if (m == null) return;
-                        
-                        final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = m.getStockCodeAndSymbolDatabase();
-                        
-                        Code code = stockCodeAndSymbolDatabase.searchStockCode(s);
-                        Symbol symbol = null;
-                            
-                        if (code != null) {
-                            symbol = stockCodeAndSymbolDatabase.codeToSymbol(code);                            
-                        }
-                        else {
-                            symbol = stockCodeAndSymbolDatabase.searchStockSymbol(s);
-                            if (symbol != null) {
-                                code = stockCodeAndSymbolDatabase.symbolToCode(symbol);
-                                // Shouldn't be null. This is because symbol is obtained directly
-                                // from database. Even later user modifies symbol or code through Database -> Stock Database...,
-                                // it shouldn't have any side effect.
-                                assert(code != null);
-                            }
-                        }
+                MainFrame m = (MainFrame)NewBuyTransactionJDialog.this.getParent();
 
-                        NewBuyTransactionJDialog.this.stock = Utils.getEmptyStock(code, symbol);
-                        NewBuyTransactionJDialog.this.jTextField1.setText(symbol.toString());
-                    }   /* if(stock.length() > 0) */
-                }   /* if(KeyEvent.VK_ENTER == e.getKeyCode()) */
-                
-            }   /* public void keyReleased(KeyEvent e) */
+                if (m == null) return;
+
+                final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = m.getStockCodeAndSymbolDatabase();
+
+                final String s = arg;
+                Code code = stockCodeAndSymbolDatabase.searchStockCode(s);
+                Symbol symbol = null;
+
+                if (code != null) {
+                    symbol = stockCodeAndSymbolDatabase.codeToSymbol(code);
+                }
+                else {
+                    symbol = stockCodeAndSymbolDatabase.searchStockSymbol(s);
+                    if (symbol != null) {
+                        code = stockCodeAndSymbolDatabase.symbolToCode(symbol);
+                        // Shouldn't be null. This is because symbol is obtained directly
+                        // from database. Even later user modifies symbol or code through Database -> Stock Database...,
+                        // it shouldn't have any side effect.
+                        assert(code != null);
+                    }
+                }
+
+                NewBuyTransactionJDialog.this.stock = Utils.getEmptyStock(code, symbol);
+                NewBuyTransactionJDialog.this.jTextField1.setText(symbol.toString());
+            }
         };
     }
 
     private static final Log log = LogFactory.getLog(NewBuyTransactionJDialog.class);
-    
-    private final KeyListener jComboBox1EditorComponentKeyAdapter = getjComboBox1EditorComponentKeyAdapter();
     
     private Transaction transaction = null;
     private String transactionComment = "";

@@ -742,8 +742,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         newTransactionJDialog.setStock(stock);
         newTransactionJDialog.setPrice(lastPrice);
         newTransactionJDialog.setJComboBoxEnabled(JComboBoxEnabled);
-        newTransactionJDialog.setStockCodeAndSymbolDatabase(stockCodeAndSymbolDatabase);
-        newTransactionJDialog.initjComboBox1EditorComponentKeyListerner();                
+        newTransactionJDialog.setStockCodeAndSymbolDatabase(stockCodeAndSymbolDatabase);               
         newTransactionJDialog.setVisible(true);
         
         final Transaction transaction = newTransactionJDialog.getTransaction();
