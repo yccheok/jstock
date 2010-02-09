@@ -1,7 +1,14 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
-JStock 1.0.5h - ????-??-??
+JStock 1.0.5h - 2010-02-10
+  Feature: Interactive chart with real-time information tracing.
+  Feature: Remove cash flow chart. Added investment flow chart, to keep track of
+           your investment time line.
+  Feature: Better usability of auto drop down combo box. Instead of having to
+           press enter, using one time mouse click will enable stock selection.
+  Feature: Better candlestick chart, with larger candle width. (But slower 
+           during zoom-in and zoom-out)
   Bugfix:  Unparseable date: "Date" (#2830487)
   Bugfix:  Cannot enter email password (#2924737)
   
