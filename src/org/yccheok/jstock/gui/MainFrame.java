@@ -117,7 +117,6 @@ public class MainFrame extends javax.swing.JFrame {
         this.initMarketJPanel();
         this.initUsernameAndPassword();
         this.initTableHeaderToolTips();
-        this.initjComboBox1EditorComponentKeyListerner();
         this.initMyJXStatusBarCountryLabelMouseAdapter();
         this.initMyJXStatusBarImageLabelMouseAdapter();
         this.initStockCodeAndSymbolDatabase(true);
@@ -285,7 +284,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         jComboBox1.setEditable(true);
         jComboBox1.setPreferredSize(new java.awt.Dimension(150, 24));
-        this.jComboBox1.getEditor().getEditorComponent().addKeyListener(jComboBox1EditorComponentKeyAdapter);
+        ((AutoCompleteJComboBox)this.jComboBox1).attach(getAutoCompleteJComboBoxObserver());
         jPanel1.add(jComboBox1);
 
         jPanel8.add(jPanel1, java.awt.BorderLayout.NORTH);
@@ -975,27 +974,27 @@ public class MainFrame extends javax.swing.JFrame {
         log.info("Widnow is closing.");     
     }//GEN-LAST:event_formWindowClosing
 
-	private void jMenuItem8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem8ActionPerformed
-	// TODO add your handling code here:
-    	if (this.stockCodeAndSymbolDatabase == null) {
-        	JOptionPane.showMessageDialog(this, "There are no database ready yet.", "Database not ready", JOptionPane.INFORMATION_MESSAGE);
-        	return;
-    	}
-    
-    	StockDatabaseJDialog stockDatabaseJDialog = new StockDatabaseJDialog(this, stockCodeAndSymbolDatabase, true);
-    	stockDatabaseJDialog.setSize(540, 540);
-    	stockDatabaseJDialog.setLocationRelativeTo(this);
-    	stockDatabaseJDialog.setVisible(true); 
-    
-    	if(stockDatabaseJDialog.getMutableStockCodeAndSymbolDatabase() != null) {
-        	this.stockCodeAndSymbolDatabase = stockDatabaseJDialog.getMutableStockCodeAndSymbolDatabase().toStockCodeAndSymbolDatabase();
-        	((AutoCompleteJComboBox)jComboBox1).setStockCodeAndSymbolDatabase(stockCodeAndSymbolDatabase);
-        	indicatorPanel.setStockCodeAndSymbolDatabase(stockCodeAndSymbolDatabase);        
-        
-        	log.info("saveStockCodeAndSymbolDatabase...");
-        	saveStockCodeAndSymbolDatabase();        
-    	}
-	}//GEN-LAST:event_jMenuItem8ActionPerformed
+    private void jMenuItem8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem8ActionPerformed
+        // TODO add your handling code here:
+        if (this.stockCodeAndSymbolDatabase == null) {
+            JOptionPane.showMessageDialog(this, "There are no database ready yet.", "Database not ready", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        StockDatabaseJDialog stockDatabaseJDialog = new StockDatabaseJDialog(this, stockCodeAndSymbolDatabase, true);
+        stockDatabaseJDialog.setSize(540, 540);
+        stockDatabaseJDialog.setLocationRelativeTo(this);
+        stockDatabaseJDialog.setVisible(true); 
+
+        if(stockDatabaseJDialog.getMutableStockCodeAndSymbolDatabase() != null) {
+            this.stockCodeAndSymbolDatabase = stockDatabaseJDialog.getMutableStockCodeAndSymbolDatabase().toStockCodeAndSymbolDatabase();
+            ((AutoCompleteJComboBox)jComboBox1).setStockCodeAndSymbolDatabase(stockCodeAndSymbolDatabase);
+            indicatorPanel.setStockCodeAndSymbolDatabase(stockCodeAndSymbolDatabase);
+
+            log.info("saveStockCodeAndSymbolDatabase...");
+            saveStockCodeAndSymbolDatabase();
+        }
+    }//GEN-LAST:event_jMenuItem8ActionPerformed
 
     private void jMenuItem9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem9ActionPerformed
         String suggestedFileName = "";
@@ -1305,16 +1304,16 @@ public class MainFrame extends javax.swing.JFrame {
             SwingUtilities.updateComponentTreeUI(this);
         }
         catch(java.lang.ClassNotFoundException exp) {
-            log.error("", exp);
+            log.error(null, exp);
         }
         catch(java.lang.InstantiationException exp) {
-            log.error("", exp);
+            log.error(null, exp);
         }
         catch(java.lang.IllegalAccessException exp) {
-            log.error("", exp);
+            log.error(null, exp);
         }
         catch(javax.swing.UnsupportedLookAndFeelException exp) {
-            log.error("", exp);
+            log.error(null, exp);
         }
         
         this.jStockOptions.setLookNFeel(lafClassName);
@@ -1334,7 +1333,6 @@ public class MainFrame extends javax.swing.JFrame {
         // priority.
         ((AutoCompleteJComboBox)jComboBox1).setStockCodeAndSymbolDatabase(stockCodeAndSymbolDatabase);
         this.indicatorPanel.setStockCodeAndSymbolDatabase(stockCodeAndSymbolDatabase);
-        initjComboBox1EditorComponentKeyListerner();
         this.indicatorPanel.initjComboBox1EditorComponentKeyListerner();
     }
 
@@ -1750,91 +1748,6 @@ public class MainFrame extends javax.swing.JFrame {
         };
     }
 
-    private KeyAdapter getjComboBox1EditorComponentKeyAdapter() {
-        return new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent e) {
-                
-                if (KeyEvent.VK_ENTER == e.getKeyCode()) {
-                    String stock = MainFrame.this.jComboBox1.getEditor().getItem().toString();
-                    
-                    if (stock.length() > 0) {
-                        Code code = stockCodeAndSymbolDatabase.searchStockCode(stock);
-                        Symbol symbol = null;
-                            
-                        if (code != null) {
-                            symbol = stockCodeAndSymbolDatabase.codeToSymbol(code);
-                            // First add the empty stock, so that the user will not have wrong perspective that
-                            // our system is slow.
-                            addStockToTable(Utils.getEmptyStock(code, symbol));
-                            realTimeStockMonitor.addStockCode(code);                                                                
-                        }
-                        else {
-                            symbol = stockCodeAndSymbolDatabase.searchStockSymbol(stock);
-                                
-                            if (symbol != null) {
-                                code = stockCodeAndSymbolDatabase.symbolToCode(symbol);
-                                // Shouldn't be null. This is because symbol is obtained directly
-                                // from database. Even later user modifies symbol or code through Database -> Stock Database...,
-                                // it shouldn't have any side effect.
-                                assert(code != null);
-                                addStockToTable(Utils.getEmptyStock(code, symbol));
-                                // We allow user to modify user defined type stock code and symbol.
-                                // 1st rule is, modified code cannot crash with existing stock's code or stock's symbol.
-                                // 2nd rule is, modified symbol cannot crash with existing stock's code or stock's symbol.
-                                //
-                                // Please consider the following senario :
-                                // (1) A stock code "6012.KL" and symbol "MAXIS" already added.
-                                // (2) Users modify "MAXIS" to "MAXIS SDN BHD".
-                                // (3) Users try to add "6012.KL". RealTimeStockMonitor will prevent this from happen,
-                                //     as it detectes there is a duplicated code.
-                                // (4) Users try to add "MAXIS SDN BHD". RealTimeStockMonitor will prevent this from happen,
-                                //     as it detectes there is a duplicated code, regardless the value of symbol.
-                                //
-                                // Please consider another senario :
-                                // (1) A stock code "6012.KL" and symbol "MAXIS" already added.
-                                // (2) Users modify "6012.KL" to "6013.KL".
-                                // (3) Users try to add "6013.KL". RealTimeStockMonitor will allow.
-                                //     At the end, there are two rows with same symbol "MAXIS", but different codes.
-                                // (4) Users try to add "MAXIS". RealTimeStockMonitor will allow.
-                                //     At the end, there are two rows with same symbol "MAXIS", but different codes.
-                                realTimeStockMonitor.addStockCode(stockCodeAndSymbolDatabase.symbolToCode(symbol));
-                            }
-                        }
-                    }   // if(stock.length() > 0)
-                    else {
-                        final String lastEnteredString = ((AutoCompleteJComboBox)MainFrame.this.jComboBox1).getLastEnteredString();
-                        
-                        if (lastEnteredString.length() < 1) {
-                            return;
-                        }
-                        
-                        if (MainFrame.this.stockCodeAndSymbolDatabaseTask != null)
-                        {
-                            if (MainFrame.this.stockCodeAndSymbolDatabaseTask.isDone() == false)
-                            {
-                                JOptionPane.showMessageDialog(MainFrame.this, lastEnteredString + " is not found in database\nPlease wait till database finished downloaded.", "Database downloading in progress", JOptionPane.INFORMATION_MESSAGE);
-                                return;
-                            }
-                        }
-                        
-                        JOptionPane.showMessageDialog(MainFrame.this, lastEnteredString + " is not found in database.\nYou may either add \"" + lastEnteredString + "\" manually through \"Database\" menu,\n" +
-                                "or you may get the latest database from stock server, by double click on " +
-                                "bottom right network icon.", "Database outdated", JOptionPane.INFORMATION_MESSAGE);
-                        
-                        //final int result = JOptionPane.showConfirmDialog(MainFrame.this, lastEnteredString + " is not found in database\nDo you want to perform reconnecting to stock server?\nThis may take several minutes to several hours. (depending on your network connection)", "Database outdated", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-                        //if(result == JOptionPane.YES_OPTION)
-                        //{
-                        //    initStockCodeAndSymbolDatabase(false);
-                        //}                            
-                    }
-                    
-                }   // if(KeyEvent.VK_ENTER == e.getKeyCode())
-
-            }   /* public void keyReleased(KeyEvent e) */
-        };
-    }
-
     public StockCodeAndSymbolDatabase getStockCodeAndSymbolDatabase() {
         return stockCodeAndSymbolDatabase;
     }
@@ -2065,14 +1978,68 @@ public class MainFrame extends javax.swing.JFrame {
         }   /* if(jStockOptions.isSMSEnabled()) */
     }
 
+    private org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, String> getAutoCompleteJComboBoxObserver() {
+        return new org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, String>() {
+            @Override
+            public void update(AutoCompleteJComboBox subject, String arg) {
+                if (arg == null || arg.length() <= 0) {
+                    return;
+                }
+                
+                final String stock = arg;
+
+                Code code = stockCodeAndSymbolDatabase.searchStockCode(stock);
+                Symbol symbol = null;
+
+                if (code != null) {
+                    symbol = stockCodeAndSymbolDatabase.codeToSymbol(code);
+                    // First add the empty stock, so that the user will not have wrong perspective that
+                    // our system is slow.
+                    addStockToTable(Utils.getEmptyStock(code, symbol));
+                    realTimeStockMonitor.addStockCode(code);
+                }
+                else {
+                    symbol = stockCodeAndSymbolDatabase.searchStockSymbol(stock);
+
+                    if (symbol != null) {
+                        code = stockCodeAndSymbolDatabase.symbolToCode(symbol);
+                        // Shouldn't be null. This is because symbol is obtained directly
+                        // from database. Even later user modifies symbol or code through Database -> Stock Database...,
+                        // it shouldn't have any side effect.
+                        assert(code != null);
+                        addStockToTable(Utils.getEmptyStock(code, symbol));
+                        // We allow user to modify user defined type stock code and symbol.
+                        // 1st rule is, modified code cannot crash with existing stock's code or stock's symbol.
+                        // 2nd rule is, modified symbol cannot crash with existing stock's code or stock's symbol.
+                        //
+                        // Please consider the following senario :
+                        // (1) A stock code "6012.KL" and symbol "MAXIS" already added.
+                        // (2) Users modify "MAXIS" to "MAXIS SDN BHD".
+                        // (3) Users try to add "6012.KL". RealTimeStockMonitor will prevent this from happen,
+                        //     as it detectes there is a duplicated code.
+                        // (4) Users try to add "MAXIS SDN BHD". RealTimeStockMonitor will prevent this from happen,
+                        //     as it detectes there is a duplicated code, regardless the value of symbol.
+                        //
+                        // Please consider another senario :
+                        // (1) A stock code "6012.KL" and symbol "MAXIS" already added.
+                        // (2) Users modify "6012.KL" to "6013.KL".
+                        // (3) Users try to add "6013.KL". RealTimeStockMonitor will allow.
+                        //     At the end, there are two rows with same symbol "MAXIS", but different codes.
+                        // (4) Users try to add "MAXIS". RealTimeStockMonitor will allow.
+                        //     At the end, there are two rows with same symbol "MAXIS", but different codes.
+                        realTimeStockMonitor.addStockCode(stockCodeAndSymbolDatabase.symbolToCode(symbol));
+                    }
+                }
+            }
+        };
+    }
+
     private org.yccheok.jstock.engine.Observer<Indicator, Boolean> getAlertStateManagerObserver() {
         return new org.yccheok.jstock.engine.Observer<Indicator, Boolean>() {
-
             @Override
             public void update(Indicator subject, Boolean arg) {
                 MainFrame.this.update(subject, arg);
             }
-
         };
     }
 
@@ -2404,20 +2371,6 @@ public class MainFrame extends javax.swing.JFrame {
     private void initMyJXStatusBarImageLabelMouseAdapter() {
         final MouseAdapter mouseAdapter = this.getMyJXStatusBarImageLabelMouseAdapter();
         this.statusBar.addImageLabelMouseListener(mouseAdapter);
-    }
-    
-    private void initjComboBox1EditorComponentKeyListerner() {
-        KeyListener[] listeners = this.jComboBox1.getEditor().getEditorComponent().getKeyListeners();
-        
-        for(KeyListener listener : listeners) {
-            if(listener == jComboBox1EditorComponentKeyAdapter) {
-                return;
-            }
-        }
-        
-        // Bug in Java 6. Most probably this listener had been removed during look n feel updating, reassign!
-        this.jComboBox1.getEditor().getEditorComponent().addKeyListener(jComboBox1EditorComponentKeyAdapter);
-        log.info("Reassign key adapter to combo box");
     }
     
     private void initRealTimeStockMonitor() {
@@ -3418,10 +3371,6 @@ public class MainFrame extends javax.swing.JFrame {
     private Thread marketThread = null;
     private StockHistorySerializer stockHistorySerializer = null;        
     private JStockOptions jStockOptions;
-
-    // As workaround to overcome the bug, when new look n feel being applied during runtime, the original
-    // KeyListner for ComboBoxEditor will be removed.
-    private final KeyListener jComboBox1EditorComponentKeyAdapter = getjComboBox1EditorComponentKeyAdapter();
     
     private IndicatorPanel indicatorPanel;
     private IndicatorScannerJPanel indicatorScannerJPanel;

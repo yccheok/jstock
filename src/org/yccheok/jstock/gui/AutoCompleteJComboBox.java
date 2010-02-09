@@ -33,7 +33,28 @@ import org.apache.commons.logging.LogFactory;
  * @author yccheok
  */
 public class AutoCompleteJComboBox extends JComboBox {
-    
+
+    private static class SubjectEx<S, A> extends Subject<S, A> {
+        @Override
+        public void notify(S subject, A arg) {
+            super.notify(subject, arg);
+        }
+    }
+
+    private final SubjectEx<AutoCompleteJComboBox, String> subject = new SubjectEx<AutoCompleteJComboBox, String>();
+
+    public void attach(Observer<AutoCompleteJComboBox, String> observer) {
+        subject.attach(observer);
+    }
+
+    public void dettach(Observer<AutoCompleteJComboBox, String> observer) {
+        subject.dettach(observer);
+    }
+
+    public void dettachAll() {
+        subject.dettachAll();
+    }
+
     /** Creates a new instance of AutoCompleteJComboBox */
     public AutoCompleteJComboBox() {
         this.stockCodeAndSymbolDatabase = null;
@@ -43,6 +64,31 @@ public class AutoCompleteJComboBox extends JComboBox {
         keyAdapter = this.getEditorComponentKeyAdapter();
         
         this.getEditor().getEditorComponent().addKeyListener(keyAdapter);
+
+        this.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                /* Handle mouse clicked. */
+                if ((e.getModifiers() & java.awt.event.InputEvent.BUTTON1_MASK) == java.awt.event.InputEvent.BUTTON1_MASK) {
+                    final Object object = AutoCompleteJComboBox.this.getEditor().getItem();
+
+                    /* Let us be extra paranoid. */
+                    if (object instanceof String) {
+                        AutoCompleteJComboBox.this.lastEnteredString = (String)object;
+                    }
+                    else {
+                        AutoCompleteJComboBox.this.lastEnteredString = "";
+                    }
+                    
+                    AutoCompleteJComboBox.this.subject.notify(AutoCompleteJComboBox.this, AutoCompleteJComboBox.this.lastEnteredString);
+
+                    AutoCompleteJComboBox.this.removeAllItems();
+                    return;
+                }
+            }
+
+        });
     }
     
     public void setStockCodeAndSymbolDatabase(StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase) {
@@ -75,7 +121,7 @@ public class AutoCompleteJComboBox extends JComboBox {
                     if (KeyEvent.VK_ENTER == e.getKeyCode()) {
                         if (AutoCompleteJComboBox.this.getItemCount() > 0) {
                             int index = AutoCompleteJComboBox.this.getSelectedIndex();
-                            if(index == -1) {
+                            if (index == -1) {
                                 lastEnteredString = (String)AutoCompleteJComboBox.this.getItemAt(0);
                                 AutoCompleteJComboBox.this.getEditor().setItem(lastEnteredString);
                             }
@@ -98,11 +144,13 @@ public class AutoCompleteJComboBox extends JComboBox {
                         }
                         
                         javax.swing.SwingUtilities.invokeLater(new Runnable() {
+                            @Override
                             public void run() {
                                 AutoCompleteJComboBox.this.removeAllItems();
                             }
                         });
-                                                                        
+
+                        AutoCompleteJComboBox.this.subject.notify(AutoCompleteJComboBox.this, AutoCompleteJComboBox.this.lastEnteredString);
                         return;
                     }   /* if(KeyEvent.VK_ENTER == e.getKeyCode()) */                                               
                     
@@ -227,11 +275,11 @@ public class AutoCompleteJComboBox extends JComboBox {
         }
 
         @Override
-		public JScrollPane createScroller()
-		{
+        public JScrollPane createScroller()
+        {
             return new JScrollPane(list,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-					JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		}
+                    JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        }
     }
     
     private StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase;
