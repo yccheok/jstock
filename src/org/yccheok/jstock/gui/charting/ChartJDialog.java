@@ -1563,12 +1563,6 @@ public class ChartJDialog extends javax.swing.JDialog {
         public final Object parameter;
     }
 
-    public String getLegendName(int plotIndex, int seriesIndex) {
-        final JFreeChart chart = chartPanel.getChart();
-        final CombinedDomainXYPlot cplot = (CombinedDomainXYPlot) chart.getPlot();
-        return ((TimeSeriesCollection)((XYPlot)cplot.getSubplots().get(plotIndex)).getDataset()).getSeries(seriesIndex).getDescription();
-    }
-
     private final StockHistoryServer stockHistoryServer;
     private final ChartPanel chartPanel;
     private final Map<Integer, TimeSeries> time_series_moving_average_map = new HashMap<Integer, TimeSeries>();
