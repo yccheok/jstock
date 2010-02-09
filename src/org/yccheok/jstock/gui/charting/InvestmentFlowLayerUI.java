@@ -66,7 +66,7 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
     private Point2D ROIPoint = null;
     private int ROIPointIndex = -1;
 
-    private final Rectangle2D drawArea = new Rectangle2D.Double();
+    private final Rectangle2D drawArea = new Rectangle();
     
     private final InvestmentFlowChartJDialog investmentFlowChartJDialog;
 
@@ -82,13 +82,13 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
     /* Will be updated by updateROIInformationBox. */
     private final List<String> ROIValues = new ArrayList<String>();
     private final List<String> ROIParams = new ArrayList<String>();
-    private final Rectangle ROIRect = new Rectangle();
+    private final Rectangle2D ROIRect = new Rectangle();
     private double totalROIValue = 0.0;
 
     /* Will be updated by updateInvestInformationBox. */
     private final List<String> investValues = new ArrayList<String>();
     private final List<String> investParams = new ArrayList<String>();
-    private final Rectangle investRect = new Rectangle();
+    private final Rectangle2D investRect = new Rectangle();
     private double totalInvestValue = 0.0;
 
     public InvestmentFlowLayerUI(InvestmentFlowChartJDialog cashFlowChartJDialog) {
@@ -163,7 +163,7 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
     }
 
     private void drawInformationBox(
-            Graphics2D g2, Activities activities, Rectangle rect,
+            Graphics2D g2, Activities activities, Rectangle2D rect,
             List<String> params, List<String> values, String totalParam, double totalValue,
             Color background_color, Color border_color) {
         final Font oldFont = g2.getFont();
@@ -269,7 +269,7 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
 
         for (int i = 0, size = activities.size(); i < size; i++) {
             final Activity activity = activities.get(i);
-            // Buy or Dividend only.
+            // Buy, Sell or Dividend only.
             if (activity.getType() == Activity.Type.Buy) {
                 final int quantity = (Integer)activity.get(Activity.Param.Quantity);
                 final Stock stock = (Stock)activity.get(Activity.Param.Stock);
@@ -277,6 +277,13 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
                 final double amount = quantity * this.investmentFlowChartJDialog.getStockPrice(stock.getCode());
                 this.totalROIValue += amount;
                 this.ROIValues.add(org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(amount));
+            }
+            else if (activity.getType() == Activity.Type.Sell) {
+                final int quantity = (Integer)activity.get(Activity.Param.Quantity);
+                final Stock stock = (Stock)activity.get(Activity.Param.Stock);
+                this.ROIParams.add(activity.getType() + " " + quantity + " " + stock.getSymbol());
+                this.totalROIValue += activity.getAmount();
+                this.ROIValues.add(org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(activity.getAmount()));
             }
             else if (activity.getType() == Activity.Type.Dividend) {
                 final Stock stock = (Stock)activity.get(Activity.Param.Stock);
@@ -337,15 +344,21 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         final int boxPointMargin = 8;
         final int width = maxStringWidth + (padding << 1);
         final int height = maxStringHeight + (padding << 1);
+
+        final int borderWidth = width + 2;
+        final int borderHeight = height + 2;
         // On left side of the ball.
-        final int suggestedX = (int)(this.ROIPoint.getX() - width - boxPointMargin);
-        final int suggestedY = (int)(this.ROIPoint.getY() - (height >> 1));
-        final int x =   suggestedX > this.drawArea.getX() ?
-                        (suggestedX + width) < (this.drawArea.getX() + this.drawArea.getWidth()) ? suggestedX : (int)(this.drawArea.getX() + this.drawArea.getWidth() - width - boxPointMargin) :
-                        (int)(ROIPoint.getX() + boxPointMargin);
-        final int y =   suggestedY > this.drawArea.getY() ?
-                        (suggestedY + height) < (this.drawArea.getY() + this.drawArea.getHeight()) ? suggestedY : (int)(this.drawArea.getY() + this.drawArea.getHeight() - height - boxPointMargin) :
-                        (int)(this.drawArea.getY() + boxPointMargin);
+        final double suggestedBorderX = this.ROIPoint.getX() - borderWidth - boxPointMargin;
+        final double suggestedBorderY = this.ROIPoint.getY() - (borderHeight >> 1);
+        final double bestBorderX = suggestedBorderX > this.drawArea.getX() ?
+                        (suggestedBorderX + borderWidth) < (this.drawArea.getX() + this.drawArea.getWidth()) ? suggestedBorderX : this.drawArea.getX() + this.drawArea.getWidth() - borderWidth - boxPointMargin :
+                        this.ROIPoint.getX() + boxPointMargin;
+        final double bestBorderY = suggestedBorderY > this.drawArea.getY() ?
+                        (suggestedBorderY + borderHeight) < (this.drawArea.getY() + this.drawArea.getHeight()) ? suggestedBorderY : this.drawArea.getY() + this.drawArea.getHeight() - borderHeight - boxPointMargin :
+                        this.drawArea.getY() + boxPointMargin;
+        
+        final double x = bestBorderX + 1;
+        final double y = bestBorderY + 1;
 
         this.ROIRect.setRect(x, y, width, height);
     }
@@ -367,16 +380,12 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
 
         for (int i = 0, size = activities.size(); i < size; i++) {
             final Activity activity = activities.get(i);
-            // Buy or Sell only.
+            // Buy only.
             this.investParams.add(activity.getType() + " " + activity.get(Activity.Param.Quantity) + " " + ((Stock)activity.get(Activity.Param.Stock)).getSymbol());
 
             if (activity.getType() == Activity.Type.Buy) {
                 this.totalInvestValue += activity.getAmount();
                 this.investValues.add(org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(activity.getAmount()));
-            }
-            else if (activity.getType() == Activity.Type.Sell) {
-                this.totalInvestValue -= activity.getAmount();
-                this.investValues.add(org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(-activity.getAmount()));
             }
             else {
                 assert(false);
@@ -458,7 +467,9 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
 
         // I also not sure why. This is what are being done in Mouse Listener Demo 4.
         final Point2D p2 = chartPanel.translateScreenToJava2D((Point)_ROIPoint);
-        final Rectangle2D _plotArea = chartPanel.getScreenDataArea();
+
+        /* Try to get correct main chart area. */
+        final Rectangle2D _plotArea = chartPanel.getChartRenderingInfo().getPlotInfo().getDataArea();
 
         /* Believe it? When there is another thread keep updateing time series data,
          * and keep calling setDirty, _plotArea can be 0 size sometimes. Ignore it.
@@ -517,16 +528,9 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         final double yJava2D = rangeAxis.valueToJava2D(yValue, _plotArea, rangeAxisEdge);
 
         final int tmpIndex = bestMid;
-        // this.point = new Point2D.Double(xJava2D, yJava2D);
+        // translateJava2DToScreen will internally convert Point2D.Double to Point.
         final Point2D tmpPoint = chartPanel.translateJava2DToScreen(new Point2D.Double(xJava2D, yJava2D));
-        // This _plotArea is including the axises. We do not want axises. We only
-        // want the center draw area.
-        // However, I really have no idea how to obtain rect for center draw area.
-        // This is just a try-n-error hack.
-        // Do not use -4. Due to rounding error during point conversion (double to integer)
-        this.drawArea.setRect(_plotArea.getX() + 2, _plotArea.getY() + 2,
-                _plotArea.getWidth() - 2 > 0 ? _plotArea.getWidth() - 2 : 1,
-                _plotArea.getHeight() - 2 > 0 ? _plotArea.getHeight() - 2 : 1);
+        this.drawArea.setRect(_plotArea);
         
         if (this.drawArea.contains(tmpPoint)) {
             this.ROIPointIndex = tmpIndex;
@@ -566,7 +570,9 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
 
         // I also not sure why. This is what are being done in Mouse Listener Demo 4.
         final Point2D p2 = chartPanel.translateScreenToJava2D((Point)_investPoint);
-        final Rectangle2D _plotArea = chartPanel.getScreenDataArea();
+
+        /* Try to get correct main chart area. */
+        final Rectangle2D _plotArea = chartPanel.getChartRenderingInfo().getPlotInfo().getDataArea();
 
         /* Believe it? When there is another thread keep updateing time series data,
          * and keep calling setDirty, _plotArea can be 0 size sometimes. Ignore it.
@@ -625,16 +631,9 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         final double yJava2D = rangeAxis.valueToJava2D(yValue, _plotArea, rangeAxisEdge);
 
         final int tmpIndex = bestMid;
-        // this.point = new Point2D.Double(xJava2D, yJava2D);
+        // translateJava2DToScreen will internally convert Point2D.Double to Point.
         final Point2D tmpPoint = chartPanel.translateJava2DToScreen(new Point2D.Double(xJava2D, yJava2D));
-        // This _plotArea is including the axises. We do not want axises. We only
-        // want the center draw area.
-        // However, I really have no idea how to obtain rect for center draw area.
-        // This is just a try-n-error hack.
-        // Do not use -4. Due to rounding error during point conversion (double to integer)
-        this.drawArea.setRect(_plotArea.getX() + 2, _plotArea.getY() + 2,
-                _plotArea.getWidth() - 2 > 0 ? _plotArea.getWidth() - 2 : 1,
-                _plotArea.getHeight() - 2 > 0 ? _plotArea.getHeight() - 2 : 1);
+        this.drawArea.setRect(_plotArea);
 
         if (this.drawArea.contains(tmpPoint)) {
             this.investPointIndex = tmpIndex;
@@ -724,42 +723,35 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
 
         final ChartPanel chartPanel = ((ChartPanel)layer.getView());
 
-        // This _plotArea is including the axises. We do not want axises. We only
-        // want the center draw area.
-        // However, I really have no idea how to obtain rect for center draw area.
-        // This is just a try-n-error hack.
-        // Do not use -4. Due to rounding error during point conversion (double to integer)
-        final Rectangle2D _plotArea = chartPanel.getScreenDataArea();
+        final Rectangle2D _plotArea = chartPanel.getChartRenderingInfo().getPlotInfo().getDataArea();
 
-        this.drawArea.setRect(_plotArea.getX() + 2, _plotArea.getY() + 2,
-                _plotArea.getWidth() - 2 > 0 ? _plotArea.getWidth() - 2 : 1,
-                _plotArea.getHeight() - 2 > 0 ? _plotArea.getHeight() - 2 : 1);
+        this.drawArea.setRect(_plotArea);
 
         if (false == this.investmentFlowChartJDialog.isFinishLookUpPrice()) {
             this.drawBusyBox(g2, layer);
         }
 
         if (this.investPoint != null) {
-            final int radius = 8;
+            final int RADIUS = 8;
             final Object oldValueAntiAlias = g2.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
             final Color oldColor = g2.getColor();
 
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2.setColor(COLOR_RED);
-            g2.fillOval((int)(this.investPoint.getX() - (radius >> 1) + 0.5), (int)(this.investPoint.getY() - (radius >> 1) + 0.5), radius, radius);
+            g2.fillOval((int)(this.investPoint.getX() - (RADIUS >> 1) + 0.5), (int)(this.investPoint.getY() - (RADIUS >> 1) + 0.5), RADIUS, RADIUS);
             g2.setColor(oldColor);
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, oldValueAntiAlias);
             this.updateInvestInformationBox(g2);
         }
 
         if (this.ROIPoint != null) {
-            final int radius = 8;
+            final int RADIUS = 8;
             final Object oldValueAntiAlias = g2.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
             final Color oldColor = g2.getColor();
 
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2.setColor(COLOR_BLUE);
-            g2.fillOval((int)(this.ROIPoint.getX() - (radius >> 1) + 0.5), (int)(this.ROIPoint.getY() - (radius >> 1) + 0.5), radius, radius);
+            g2.fillOval((int)(this.ROIPoint.getX() - (RADIUS >> 1) + 0.5), (int)(this.ROIPoint.getY() - (RADIUS >> 1) + 0.5), RADIUS, RADIUS);
             g2.setColor(oldColor);
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, oldValueAntiAlias);
             this.updateROIInformationBox(g2);
@@ -789,8 +781,8 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         }
 
         /* Take border into consideration. */
-        final Rectangle ROIRectWithBorder = new Rectangle(this.ROIRect);
-        final Rectangle investRectWithBorder = new Rectangle(this.investRect);
+        final Rectangle ROIRectWithBorder = new Rectangle((Rectangle)this.ROIRect);
+        final Rectangle investRectWithBorder = new Rectangle((Rectangle)this.investRect);
         ROIRectWithBorder.setLocation((int)ROIRectWithBorder.getX() - 1, (int)ROIRectWithBorder.getY() - 1);
         ROIRectWithBorder.setSize((int)ROIRectWithBorder.getWidth() + 2, (int)ROIRectWithBorder.getHeight() + 2);
         investRectWithBorder.setLocation((int)investRectWithBorder.getX() - 1, (int)investRectWithBorder.getY() - 1);
@@ -799,15 +791,15 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
             return;
         }
 
-        final Rectangle oldROIRect = new Rectangle(this.ROIRect);
-        final Rectangle oldInvestRect = new Rectangle(this.investRect);
+        final Rectangle oldROIRect = new Rectangle((Rectangle)this.ROIRect);
+        final Rectangle oldInvestRect = new Rectangle((Rectangle)this.investRect);
 
         // Move to Down.
         if (this.ROIRect.getY() > this.investRect.getY()) {
-            this.ROIRect.translate(0, (int)(this.investRect.getY() + this.investRect.getHeight() - this.ROIRect.getY() + 4));
+            ((Rectangle)this.ROIRect).translate(0, (int)(this.investRect.getY() + this.investRect.getHeight() - this.ROIRect.getY() + 4));
         }
         else {
-            this.investRect.translate(0, (int)(this.ROIRect.getY() + this.ROIRect.getHeight() - this.investRect.getY() + 4));
+            ((Rectangle)this.investRect).translate(0, (int)(this.ROIRect.getY() + this.ROIRect.getHeight() - this.investRect.getY() + 4));
         }
 
         if ((this.drawArea.getY() + this.drawArea.getHeight()) > (this.ROIRect.getY() + this.ROIRect.getHeight()) &&
@@ -820,10 +812,10 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
 
         // Move to Up.
         if (this.ROIRect.getY() > this.investRect.getY()) {
-            this.investRect.translate(0, -(int)(this.investRect.getY() + this.investRect.getHeight() - this.ROIRect.getY() + 4));
+            ((Rectangle)this.investRect).translate(0, -(int)(this.investRect.getY() + this.investRect.getHeight() - this.ROIRect.getY() + 4));
         }
         else {
-            this.ROIRect.translate(0, -(int)(this.ROIRect.getY() + this.ROIRect.getHeight() - this.investRect.getY() + 4));
+            ((Rectangle)this.ROIRect).translate(0, -(int)(this.ROIRect.getY() + this.ROIRect.getHeight() - this.investRect.getY() + 4));
         }
 
         if ((this.drawArea.getY() < this.ROIRect.getY()) &&
