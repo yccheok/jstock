@@ -647,7 +647,7 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         if (MouseEvent.MOUSE_DRAGGED == e.getID()) {
             return;
         }
-
+        
         final Point mousePoint = SwingUtilities.convertPoint(e.getComponent(), e.getPoint(), layer);
 
         final boolean status0 = this.updateInvestPoint(mousePoint);

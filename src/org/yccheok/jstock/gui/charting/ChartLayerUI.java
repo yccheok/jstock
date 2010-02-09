@@ -57,6 +57,7 @@ import org.jfree.ui.RectangleEdge;
 import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.StockHistoryServer;
 import org.yccheok.jstock.gui.JStockOptions;
+import org.yccheok.jstock.gui.MainFrame;
 import org.yccheok.jstock.gui.Utils;
 import org.yccheok.jstock.internationalization.GUIBundle;
 
@@ -134,6 +135,10 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
     }
 
     private void drawInformationBox(Graphics2D g2, JXLayer<? extends V> layer) {
+        if (MainFrame.getInstance().getJStockOptions().getYellowInformationBoxOption() == JStockOptions.YellowInformationBoxOption.Hide) {
+            return;
+        }
+
         final Font oldFont = g2.getFont();
         final Font paramFont = new Font(oldFont.getFontName(), oldFont.getStyle(), oldFont.getSize());
         final FontMetrics paramFontMetrics = g2.getFontMetrics(paramFont);
@@ -239,13 +244,28 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         // On left side of the ball.
         final double suggestedBorderX = this.mainTraceInfo.getPoint().getX() - borderWidth - boxPointMargin;
         final double suggestedBorderY = this.mainTraceInfo.getPoint().getY() - (borderHeight >> 1);
-        final double bestBorderX = suggestedBorderX > this.mainDrawArea.getX() ?
-                        (suggestedBorderX + borderWidth) < (this.mainDrawArea.getX() + this.mainDrawArea.getWidth()) ? suggestedBorderX : this.mainDrawArea.getX() + this.mainDrawArea.getWidth() - borderWidth - boxPointMargin :
-                        this.mainTraceInfo.getPoint().getX() + boxPointMargin;
-        final double bestBorderY = suggestedBorderY > this.mainDrawArea.getY() ?
-                        (suggestedBorderY + borderHeight) < (this.mainDrawArea.getY() + this.mainDrawArea.getHeight()) ? suggestedBorderY : this.mainDrawArea.getY() + this.mainDrawArea.getHeight() - borderHeight - boxPointMargin :
-                        this.mainDrawArea.getY() + boxPointMargin;
-        
+        double bestBorderX = 0;
+        double bestBorderY = 0;
+        if (MainFrame.getInstance().getJStockOptions().getYellowInformationBoxOption() == JStockOptions.YellowInformationBoxOption.Stay) {
+            if (this.mainTraceInfo.getPoint().getX() > ((int)(this.mainDrawArea.getX() + this.mainDrawArea.getWidth() + 0.5) >> 1)) {
+                bestBorderX = this.mainDrawArea.getX();
+                bestBorderY = this.mainDrawArea.getY();
+            }
+            else {
+                bestBorderX = this.mainDrawArea.getX() + this.mainDrawArea.getWidth() - borderWidth;
+                bestBorderY = this.mainDrawArea.getY();
+            }
+        }
+        else {
+            assert(MainFrame.getInstance().getJStockOptions().getYellowInformationBoxOption() == JStockOptions.YellowInformationBoxOption.Follow);
+            bestBorderX = suggestedBorderX > this.mainDrawArea.getX() ?
+                            (suggestedBorderX + borderWidth) < (this.mainDrawArea.getX() + this.mainDrawArea.getWidth()) ? suggestedBorderX : this.mainDrawArea.getX() + this.mainDrawArea.getWidth() - borderWidth - boxPointMargin :
+                            this.mainTraceInfo.getPoint().getX() + boxPointMargin;
+            bestBorderY = suggestedBorderY > this.mainDrawArea.getY() ?
+                            (suggestedBorderY + borderHeight) < (this.mainDrawArea.getY() + this.mainDrawArea.getHeight()) ? suggestedBorderY : this.mainDrawArea.getY() + this.mainDrawArea.getHeight() - borderHeight - boxPointMargin :
+                            this.mainDrawArea.getY() + boxPointMargin;
+        }
+
         final double x = bestBorderX + 1;
         final double y = bestBorderY + 1;
 
@@ -796,7 +816,7 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         if (MouseEvent.MOUSE_DRAGGED == e.getID()) {
             return;
         }
-        
+
         final Component component = e.getComponent();
         final ChartPanel chartPanel = (ChartPanel)component;
         final JFreeChart chart = chartPanel.getChart();

@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
+ * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +16,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+
 
 package org.yccheok.jstock.gui;
 
@@ -34,7 +35,27 @@ import org.yccheok.jstock.engine.Country;
  * @author yccheok
  */
 public class JStockOptions {
-    
+
+    /**
+     * @return the yellowInformationBoxOption
+     */
+    public YellowInformationBoxOption getYellowInformationBoxOption() {
+        return yellowInformationBoxOption;
+    }
+
+    /**
+     * @param yellowInformationBoxOption the yellowInformationBoxOption to set
+     */
+    public void setYellowInformationBoxOption(YellowInformationBoxOption yellowInformationBoxOption) {
+        this.yellowInformationBoxOption = yellowInformationBoxOption;
+    }
+
+    public enum YellowInformationBoxOption {
+        Stay,
+        Follow,
+        Hide
+    }
+
     public static final java.awt.Color DEFAULT_NORMAL_TEXT_FOREGROUND_COLOR = Color.BLACK;
     public static final java.awt.Color DEFAULT_HIGHER_NUMERICAL_VALUE_FOREGROUND_COLOR = new java.awt.Color(50, 150, 0);
     public static final java.awt.Color DEFAULT_LOWER_NUMERICAL_VALUE_FOREGROUND_COLOR = new java.awt.Color(200, 0, 50);
@@ -49,6 +70,8 @@ public class JStockOptions {
     public static final java.awt.Color DEFAULT_CHAT_OWN_MESSAGE_COLOR = new java.awt.Color(169, 169, 169);
     public static final java.awt.Color DEFAULT_CHAT_OTHER_MESSAGE_COLOR = new java.awt.Color(100, 149, 237);
 
+    private static final YellowInformationBoxOption DEFAULT_YELLOW_INFORMATION_BOX_OPTION = YellowInformationBoxOption.Follow;
+    
     private static final int DEFAULT_HISTORY_DURATION =  10;
 
     /** Creates a new instance of JStockOptions */
@@ -98,6 +121,8 @@ public class JStockOptions {
         this.setChatSystemMessageColor(DEFAULT_CHAT_SYSTEM_MESSAGE_COLOR);
         this.setChatOwnMessageColor(DEFAULT_CHAT_OWN_MESSAGE_COLOR);
         this.setChatOtherMessageColor(DEFAULT_CHAT_OTHER_MESSAGE_COLOR);
+
+        this.setYellowInformationBoxOption(DEFAULT_YELLOW_INFORMATION_BOX_OPTION);
     }
 
     private boolean soundEnabled;
@@ -183,6 +208,8 @@ public class JStockOptions {
     private int maxSMSPerDay = -1;
 
     private String portfolioName = "My Portfolio";
+
+    private YellowInformationBoxOption yellowInformationBoxOption = YellowInformationBoxOption.Follow;
     
     public boolean isAutoBrokerFeeCalculationEnabled() {
         return this.isAutoBrokerFeeCalculationEnabled;
@@ -277,6 +304,8 @@ public class JStockOptions {
         this.maxSMSPerDay = jStockOptions.maxSMSPerDay;
 
         this.portfolioName = jStockOptions.portfolioName;
+
+        this.yellowInformationBoxOption = jStockOptions.yellowInformationBoxOption;
     }
 
     // User may not trust us to store their password in cloud server. To avoid
@@ -368,6 +397,8 @@ public class JStockOptions {
         jStockOptions.maxSMSPerDay = this.maxSMSPerDay;
 
         jStockOptions.portfolioName = this.portfolioName;
+
+        jStockOptions.yellowInformationBoxOption = this.yellowInformationBoxOption;
 
         return jStockOptions;
     }
@@ -470,6 +501,10 @@ public class JStockOptions {
 
         if (this.getNewsID() == null) {
             this.setNewsID("");
+        }
+
+        if (this.yellowInformationBoxOption == null) {
+            this.yellowInformationBoxOption = YellowInformationBoxOption.Follow;
         }
 
         return this;
