@@ -1647,7 +1647,7 @@ public class Utils {
         // 0.1   -> "0.10"
         // 0.01  -> "0.01"
         // 0.001 -> "0.001"
-        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
+        final DecimalFormat decimalFormat = new DecimalFormat("0.00#");
         return decimalFormat.format(value);
     }
 
