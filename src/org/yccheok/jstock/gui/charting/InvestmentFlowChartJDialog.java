@@ -225,6 +225,9 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
                         amount += (price * quantity);
                     }
                 }
+                if (type == Activity.Type.Sell) {
+                    amount += activity.getAmount();
+                }
                 else if (type == Activity.Type.Dividend) {
                     amount += activity.getAmount();
                 }
@@ -371,7 +374,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
                             put(Activity.Param.Stock, contract.getStock()).
                             put(Activity.Param.Quantity, contract.getQuantity()).
                             build();
-                    this.investSummary.add(contract.getDate(), activity1);
+                    this.ROISummary.add(contract.getDate(), activity1);
                 }
                 else {
                     throw new java.lang.UnsupportedOperationException("Unsupported contract type " + type);
