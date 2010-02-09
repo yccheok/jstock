@@ -586,12 +586,14 @@ public class ChartJDialog extends javax.swing.JDialog {
                 this.priceVolumeChart = this.createPriceVolumeChart(stockHistoryServer);
             }
             chartPanel.setChart(this.priceVolumeChart);
+            this.chartLayerUI.updateTraceInfos();
         }
         else if (this.getCurrentMode() == Mode.Candlestick) {
             if (this.candlestickChart == null) {
                 this.candlestickChart = this.createCandlestickChart(stockHistoryServer);
             }
             chartPanel.setChart(this.candlestickChart);
+            this.chartLayerUI.updateTraceInfos();
         }
     }//GEN-LAST:event_jComboBox1ActionPerformed
 
@@ -1072,7 +1074,7 @@ public class ChartJDialog extends javax.swing.JDialog {
         plot.setRenderer(candlestickRenderer);
         
         // Give good width when zoom in, but too slow in calculation.
-        // ((CandlestickRenderer)plot.getRenderer()).setAutoWidthMethod(CandlestickRenderer.WIDTHMETHOD_SMALLEST);
+        ((CandlestickRenderer)plot.getRenderer()).setAutoWidthMethod(CandlestickRenderer.WIDTHMETHOD_SMALLEST);
 
         CombinedDomainXYPlot cplot = new CombinedDomainXYPlot(timeAxis);
         cplot.add(plot, 3);
@@ -1137,7 +1139,7 @@ public class ChartJDialog extends javax.swing.JDialog {
     }
 
     private String getMovingAverageKey(int days) {
-        return days + "d MA";
+        return days + "d SMA";
     }
 
     private String getRSIKey(int days) {

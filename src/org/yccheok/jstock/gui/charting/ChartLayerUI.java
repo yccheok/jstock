@@ -52,6 +52,7 @@ import org.jfree.data.time.Day;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.time.TimeSeriesDataItem;
+import org.jfree.data.xy.XYDataset;
 import org.jfree.ui.RectangleEdge;
 import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.StockHistoryServer;
@@ -86,7 +87,7 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         }
 
         /**
-         * @return the dataIndex
+         * @return the getDataIndex
          */
         public int getDataIndex() {
             return dataIndex;
@@ -385,11 +386,13 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         final JFreeChart chart = chartPanel.getChart();
         final CombinedDomainXYPlot cplot = (CombinedDomainXYPlot) chart.getPlot();
 
-        // Get the date.
-        final Day day = (Day)((TimeSeriesCollection)((XYPlot)cplot.getSubplots().get(0)).getDataset()).getSeries(0).getDataItem(mainPointIndex).getPeriod();
+        Day day = null;
 
-        // Interate through main plot's series.
-        {
+        final XYDataset xyDataset = ((XYPlot)cplot.getSubplots().get(0)).getDataset();
+        if (xyDataset instanceof TimeSeriesCollection) {
+            // Get the date.
+            day = (Day)((TimeSeriesCollection)xyDataset).getSeries(0).getDataItem(mainPointIndex).getPeriod();
+
             // 0 means main plot.
             final XYPlot plot = (XYPlot) cplot.getSubplots().get(0);
             final TimeSeriesCollection timeSeriesCollection = (TimeSeriesCollection)plot.getDataset();
@@ -397,7 +400,7 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
             for (int j = 1, size = timeSeriesCollection.getSeriesCount(); j < size; j++) {
                 final TimeSeries timeSeries = timeSeriesCollection.getSeries(j);
                 /* Time consuming. */
-                final int dataIndex = dataIndex(timeSeries, day);
+                final int dataIndex = getDataIndex(timeSeries, day);
 
                 if (dataIndex < 0) {
                     continue;
@@ -406,13 +409,45 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
                 final Point2D point = this.getPoint(0, j, dataIndex);
                 final String name = this.getLegendName(0, j);
                 final Number value = this.getValue(0, j, dataIndex);
-                
+
                 if (point == null || name == null || value == null) {
                     continue;
                 }
 
                 // We will never draw ball for SMA, EMA...
                 this.indicatorTraceInfos.add(TraceInfo.newInstance(null, 0, j, dataIndex));
+            }
+        }
+        else {
+            final Date date = ((org.jfree.data.xy.DefaultHighLowDataset)xyDataset).getXDate(0, mainPointIndex);
+            // OK to do so? Is "day" only used to compare day, excluding time information?
+            // Will day 13th September 2009, 1:00pm same as another day 13th September 2009, 3:00pm?
+            day = new Day(date);
+
+            // 0 means main plot.
+            final XYPlot plot = (XYPlot) cplot.getSubplots().get(0);
+            final int count = plot.getDatasetCount();
+            for (int i = 1; i < count; i++) {
+                final TimeSeriesCollection timeSeriesCollection = (TimeSeriesCollection)plot.getDataset(i);
+
+                final TimeSeries timeSeries = timeSeriesCollection.getSeries(0);
+                /* Time consuming. */
+                final int dataIndex = getDataIndex(timeSeries, day);
+
+                if (dataIndex < 0) {
+                    continue;
+                }
+
+                final Point2D point = this.getPoint(0, i, dataIndex);
+                final String name = this.getLegendName(0, i);
+                final Number value = this.getValue(0, i, dataIndex);
+
+                if (point == null || name == null || value == null) {
+                    continue;
+                }
+
+                // We will never draw ball for SMA, EMA...
+                this.indicatorTraceInfos.add(TraceInfo.newInstance(null, 0, i, dataIndex));
             }
         }
 
@@ -425,7 +460,7 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
             for (int j = 0, size2 = timeSeriesCollection.getSeriesCount(); j < size2; j++) {
                 final TimeSeries timeSeries = timeSeriesCollection.getSeries(j);
                 /* Time consuming. */
-                final int dataIndex = dataIndex(timeSeries, day);
+                final int dataIndex = getDataIndex(timeSeries, day);
 
                 if (dataIndex < 0) {
                     continue;
@@ -450,33 +485,7 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         }
     }
 
-    // Possible null, if the chart had been updated, but the drawing is not being
-    // rendered properly yet.
-    private String getLegendName(int plotIndex, int seriesIndex) {
-        final ChartPanel chartPanel = this.chartJDialog.getChartPanel();
-        final JFreeChart chart = chartPanel.getChart();
-        final CombinedDomainXYPlot cplot = (CombinedDomainXYPlot) chart.getPlot();
-
-        if (plotIndex >= chartPanel.getChartRenderingInfo().getPlotInfo().getSubplotCount()) {
-            /* Not ready yet. */
-            return null;
-        }
-
-        final XYPlot plot = (XYPlot)cplot.getSubplots().get(plotIndex);
-        final TimeSeriesCollection timeSeriesCollection = (TimeSeriesCollection)plot.getDataset();
-
-        if (seriesIndex >= timeSeriesCollection.getSeriesCount()) {
-            /* Not ready yet. */
-            return null;
-        }
-
-        final TimeSeries timeSeries = timeSeriesCollection.getSeries(seriesIndex);
-        return (String)timeSeries.getKey();
-    }
-
-    // Possible null, if the chart had been updated, but the drawing is not being
-    // rendered properly yet.
-    private Point2D getPoint(int plotIndex, int seriesIndex, int dataIndex) {
+    private TimeSeries getTimeSeries(int plotIndex, int seriesIndex) {
         final ChartPanel chartPanel = this.chartJDialog.getChartPanel();
         final JFreeChart chart = chartPanel.getChart();
         final CombinedDomainXYPlot cplot = (CombinedDomainXYPlot) chart.getPlot();
@@ -491,19 +500,53 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
             return null;
         }
 
+        final XYDataset xyDataset = ((XYPlot)cplot.getSubplots().get(plotIndex)).getDataset();
+        if (xyDataset instanceof TimeSeriesCollection) {
+            final TimeSeriesCollection timeSeriesCollection = (TimeSeriesCollection)xyDataset;
+            if (seriesIndex >= timeSeriesCollection.getSeriesCount()) {
+                return null;
+            }
+            return timeSeriesCollection.getSeries(seriesIndex);
+        }
+        else {
+            // 0 is candlestick chart.
+            if (plotIndex == 0 && seriesIndex == 0) {
+                return null;
+            }
+            if (seriesIndex >= ((XYPlot)cplot.getSubplots().get(plotIndex)).getDatasetCount()) {
+                return null;
+            }
+            final XYDataset d = ((XYPlot)cplot.getSubplots().get(plotIndex)).getDataset(seriesIndex);
+            return ((TimeSeriesCollection)d).getSeries(0);
+        }
+    }
+
+    // Possible null, if the chart had been updated, but the drawing is not being
+    // rendered properly yet.
+    private String getLegendName(int plotIndex, int seriesIndex) {
+        final TimeSeries timeSeries = this.getTimeSeries(plotIndex, seriesIndex);
+        if (timeSeries == null) {
+            return null;
+        }
+        return (String)timeSeries.getKey();
+    }
+
+    // Possible null, if the chart had been updated, but the drawing is not being
+    // rendered properly yet.
+    private Point2D getPoint(int plotIndex, int seriesIndex, int dataIndex) {
+        final TimeSeries timeSeries = this.getTimeSeries(plotIndex, seriesIndex);
+        if (timeSeries == null) {
+            return null;
+        }
+
+        final ChartPanel chartPanel = this.chartJDialog.getChartPanel();
+        final JFreeChart chart = chartPanel.getChart();
+        final CombinedDomainXYPlot cplot = (CombinedDomainXYPlot) chart.getPlot();
         final XYPlot plot = (XYPlot) cplot.getSubplots().get(plotIndex);
         final ValueAxis domainAxis = plot.getDomainAxis();
         final RectangleEdge domainAxisEdge = plot.getDomainAxisEdge();
         final ValueAxis rangeAxis = plot.getRangeAxis();
         final RectangleEdge rangeAxisEdge = plot.getRangeAxisEdge();
-        final TimeSeriesCollection timeSeriesCollection = (TimeSeriesCollection)plot.getDataset();
-
-        if (seriesIndex >= timeSeriesCollection.getSeriesCount()) {
-            /* Not ready yet. */
-            return null;
-        }
-
-        final TimeSeries timeSeries = timeSeriesCollection.getSeries(seriesIndex);
 
         if (dataIndex >= timeSeries.getItemCount()) {
             /* Not ready yet. */
@@ -523,25 +566,11 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
     // Possible null, if the chart had been updated, but the drawing is not being
     // rendered properly yet.
     private Number getValue(int plotIndex, int seriesIndex, int dataIndex) {
-        final ChartPanel chartPanel = this.chartJDialog.getChartPanel();
-        final JFreeChart chart = chartPanel.getChart();
-        final CombinedDomainXYPlot cplot = (CombinedDomainXYPlot) chart.getPlot();
-
-        if (plotIndex >= cplot.getSubplots().size()) {
-            /* Not ready yet. */
+        final TimeSeries timeSeries = this.getTimeSeries(plotIndex, seriesIndex);
+        if (timeSeries == null) {
             return null;
         }
         
-        final XYPlot plot = (XYPlot)cplot.getSubplots().get(plotIndex);
-        final TimeSeriesCollection timeSeriesCollection = (TimeSeriesCollection)plot.getDataset();
-
-        if (seriesIndex >= timeSeriesCollection.getSeriesCount()) {
-            /* Not ready yet. */
-            return null;
-        }
-
-        final TimeSeries timeSeries = timeSeriesCollection.getSeries(seriesIndex);
-
         if (dataIndex >= timeSeries.getItemCount()) {
             /* Not ready yet. */
             return null;
@@ -553,7 +582,7 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
 
     // Use binary search to search for index.
     // Return -1 if failed.
-    private int dataIndex(TimeSeries timeSeries, Day targetDay) {
+    private int getDataIndex(TimeSeries timeSeries, Day targetDay) {
         int low = 0;
         int high = timeSeries.getItemCount() - 1;
 
@@ -594,6 +623,88 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
     // Update this.mainDrawArea, this.mainTraceInfo
     // If traceInfo is not within this.mainDrawArea, this.mainTraceInfo will not be
     // updated. However, this.mainDrawArea will always be updated.
+    private boolean updateMainTraceInfoForCandlestick(Point2D point) {
+        if (point == null) {
+            return false;
+        }
+
+        final ChartPanel chartPanel = this.chartJDialog.getChartPanel();
+        final JFreeChart chart = chartPanel.getChart();
+        final CombinedDomainXYPlot cplot = (CombinedDomainXYPlot) chart.getPlot();
+        // Top most plot.
+        final XYPlot plot = (XYPlot) cplot.getSubplots().get(0);
+
+        final org.jfree.data.xy.DefaultHighLowDataset defaultHighLowDataset = (org.jfree.data.xy.DefaultHighLowDataset)plot.getDataset();
+
+        // I also not sure why. This is what are being done in Mouse Listener Demo 4.
+        final Point2D p2 = chartPanel.translateScreenToJava2D((Point)point);
+
+        /* Try to get correct main chart area. */
+        final Rectangle2D _plotArea = chartPanel.getChartRenderingInfo().getPlotInfo().getSubplotInfo(0).getDataArea();
+
+        final ValueAxis domainAxis = plot.getDomainAxis();
+        final RectangleEdge domainAxisEdge = plot.getDomainAxisEdge();
+        final ValueAxis rangeAxis = plot.getRangeAxis();
+        final RectangleEdge rangeAxisEdge = plot.getRangeAxisEdge();
+        final double coordinateX = domainAxis.java2DToValue(p2.getX(), _plotArea,
+                domainAxisEdge);
+        //double coordinateY = rangeAxis.java2DToValue(mousePoint2.getY(), plotArea,
+        //        rangeAxisEdge);
+
+        int low = 0;
+        int high = defaultHighLowDataset.getItemCount(0) - 1;
+        Date date = new Date((long)coordinateX);
+        final long time = date.getTime();
+        long bestDistance = Long.MAX_VALUE;
+        int bestMid = 0;
+
+        while (low <= high) {
+            int mid = (low + high) >>> 1;
+
+            final Date d = defaultHighLowDataset.getXDate(0, mid);
+            final long search = d.getTime();
+            final long cmp = search - time;
+
+            if (cmp < 0) {
+                low = mid + 1;
+            }
+            else if (cmp > 0) {
+                high = mid - 1;
+            }
+            else {
+                bestDistance = 0;
+                bestMid = mid;
+                break;
+            }
+
+            final long abs_cmp = Math.abs(cmp);
+            if (abs_cmp < bestDistance) {
+                bestDistance = abs_cmp;
+                bestMid = mid;
+            }
+        }
+
+        final double xValue = defaultHighLowDataset.getXDate(0, bestMid).getTime();
+        final double yValue = defaultHighLowDataset.getCloseValue(0, bestMid);
+        final double xJava2D = domainAxis.valueToJava2D(xValue, _plotArea, domainAxisEdge);
+        final double yJava2D = rangeAxis.valueToJava2D(yValue, _plotArea, rangeAxisEdge);
+
+        final int tmpIndex = bestMid;
+        // translateJava2DToScreen will internally convert Point2D.Double to Point.
+        final Point2D tmpPoint = chartPanel.translateJava2DToScreen(new Point2D.Double(xJava2D, yJava2D));
+        this.mainDrawArea.setRect(_plotArea);
+
+        if (this.mainDrawArea.contains(tmpPoint)) {
+            // 0 indicates main plot.
+            this.mainTraceInfo = TraceInfo.newInstance(tmpPoint, 0, 0, tmpIndex);
+            return true;
+        }
+        return false;
+    }
+
+    // Update this.mainDrawArea, this.mainTraceInfo
+    // If traceInfo is not within this.mainDrawArea, this.mainTraceInfo will not be
+    // updated. However, this.mainDrawArea will always be updated.
     private boolean updateMainTraceInfo(Point2D point) {
         if (point == null) {
             return false;
@@ -604,6 +715,11 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         final CombinedDomainXYPlot cplot = (CombinedDomainXYPlot) chart.getPlot();
         // Top most plot.
         final XYPlot plot = (XYPlot) cplot.getSubplots().get(0);
+
+        if (plot.getDataset() instanceof org.jfree.data.xy.DefaultHighLowDataset) {
+            return this.updateMainTraceInfoForCandlestick(point);
+        }
+
         final TimeSeriesCollection timeSeriesCollection = (TimeSeriesCollection)plot.getDataset();
         // 0 are the main chart. 1, 2, 3... are TA.
         final TimeSeries timeSeries = timeSeriesCollection.getSeries(0);
@@ -676,14 +792,6 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         return false;
     }
 
-    private void processTimeSeriesCollectionEvent(MouseEvent e, JXLayer layer) {
-        final Point mousePoint = SwingUtilities.convertPoint(e.getComponent(), e.getPoint(), layer);
-        if (this.updateMainTraceInfo(mousePoint)) {
-            this.updateIndicatorTraceInfos(this.mainTraceInfo.getDataIndex());
-            this.setDirty(true);
-        }
-    }
-
     private void processEvent(MouseEvent e, JXLayer layer) {
         if (MouseEvent.MOUSE_DRAGGED == e.getID()) {
             return;
@@ -694,11 +802,9 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         final JFreeChart chart = chartPanel.getChart();
         final CombinedDomainXYPlot cplot = (CombinedDomainXYPlot) chart.getPlot();
         final XYPlot plot = (XYPlot) cplot.getSubplots().get(0);
-        if (plot.getDataset() instanceof TimeSeriesCollection) {
-            this.processTimeSeriesCollectionEvent(e, layer);
-        }
-        else {
-            this.mainTraceInfo = TraceInfo.newInstance(null, 0, 0, 0);
+        final Point mousePoint = SwingUtilities.convertPoint(e.getComponent(), e.getPoint(), layer);
+        if (this.updateMainTraceInfo(mousePoint)) {
+            this.updateIndicatorTraceInfos(this.mainTraceInfo.getDataIndex());
             this.setDirty(true);
         }
     }
