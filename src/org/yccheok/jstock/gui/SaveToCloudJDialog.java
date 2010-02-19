@@ -667,18 +667,18 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
                             }
                         }
                         */
-                    }   // if(zipEntry.isDirectory())
+                    }   // if (zipEntry.isDirectory())
                 }
-                catch(IOException exp) {
+                catch (IOException exp) {
                     log.error(null, exp);
                     break;
                 }
                 finally {
-                    if(zipInputStream != null) {
+                    if (zipInputStream != null) {
                         try {
                             zipInputStream.closeEntry();
                         }
-                        catch(IOException exp) {
+                        catch (IOException exp) {
                             log.error(null, exp);
                             break;
                         }
@@ -687,11 +687,11 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
 
             }   // while(true)
         }
-        catch(IOException exp) {
+        catch (IOException exp) {
             log.error(null, exp);
         }
         finally {
-            if(zipInputStream != null) {
+            if (zipInputStream != null) {
                 try {
                     zipInputStream.close();
                 } catch (IOException ex) {
@@ -699,11 +699,11 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
                 }
             }
 
-            if(inputStream != null) {
+            if (inputStream != null) {
                 try {
                     inputStream.close();
                 } catch (IOException ex) {
-                    log.error("", ex);
+                    log.error(null, ex);
                 }
             }
         }
