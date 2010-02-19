@@ -36,6 +36,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -130,6 +131,16 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
             GUIBundle.getString("MainFrame_Vol")
             ));
 
+    private static final String longDateString;
+    static {
+        Calendar c = Calendar.getInstance();
+        c.set(2010, 8, 29);
+        // Wednesday, September 29, 2010
+        final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEEE, MMMM d, yyyy");
+        longDateString = simpleDateFormat.format(c.getTime());
+    }
+    private int maxWidth = Integer.MIN_VALUE;
+
     public ChartLayerUI(ChartJDialog chartJDialog) {
         this.chartJDialog = chartJDialog;
     }
@@ -216,7 +227,13 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         final String dateString = simpleDateFormat.format(date);
         final int dateStringWidth = dateFontMetrics.stringWidth(dateString);
         final int dateStringHeight = dateFontMetrics.getHeight();
-        final int maxStringWidth = Math.max(dateStringWidth, maxInfoWidth);
+        // We want to avoid information box from keep changing its width while
+        // user moves along the mouse. This will prevent user from feeling,
+        // information box is flickering, which is uncomfortable to user's eye.
+        final int maxStringWidth = Math.max(dateFontMetrics.stringWidth(longDateString), Math.max(this.maxWidth, Math.max(dateStringWidth, maxInfoWidth)));
+        if (maxStringWidth > this.maxWidth) {
+            this.maxWidth = maxStringWidth;
+        }
         final int dateInfoHeightMargin = 5;
         final int maxStringHeight = dateStringHeight + dateInfoHeightMargin + totalInfoHeight;
         
