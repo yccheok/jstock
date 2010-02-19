@@ -8,6 +8,7 @@ Graphic Designer:
 * The IconBlock Ltd <naga220@users.sourceforge.net>
 
 Developers:
+* Shuwn Yuan Tee <sytee@users.sourceforge.net>
 * Peter Gransdorfer <gransi@users.sourceforge.net>
 * Nanne Baars <nb76@users.sourceforge.net>
 
@@ -19,6 +20,7 @@ Mac Packager:
 
 Other Contributors (code, ideas, testing..):
 * Carlo de Wolf
+* bbuelte
 
 JStock includes code from:
 * JHotDraw (http://sourceforge.net/projects/jhotdraw/)
