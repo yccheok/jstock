@@ -695,7 +695,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private void showEditTransactionJDialog(Transaction transaction) {
         final MainFrame mainFrame = MainFrame.getInstance();
 
-        if(transaction.getContract().getType() == Contract.Type.Buy) {
+        if (transaction.getContract().getType() == Contract.Type.Buy) {
             NewBuyTransactionJDialog newTransactionJDialog = new NewBuyTransactionJDialog(mainFrame, true);
             newTransactionJDialog.setStockSelectionEnabled(false);
             newTransactionJDialog.setTransaction(transaction);
