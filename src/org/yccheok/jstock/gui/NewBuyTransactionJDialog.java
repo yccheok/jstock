@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
+ * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,9 +19,6 @@
 
 package org.yccheok.jstock.gui;
 
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Date;
@@ -43,9 +40,6 @@ import org.yccheok.jstock.portfolio.Broker;
 import org.yccheok.jstock.portfolio.BrokingFirm;
 import org.yccheok.jstock.portfolio.ClearingFee;
 import org.yccheok.jstock.portfolio.Contract;
-import org.yccheok.jstock.portfolio.SimpleBroker;
-import org.yccheok.jstock.portfolio.SimpleClearingFee;
-import org.yccheok.jstock.portfolio.SimpleStampDuty;
 import org.yccheok.jstock.portfolio.StampDuty;
 import org.yccheok.jstock.portfolio.Transaction;
 
@@ -59,7 +53,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         
-        if(shouldAutoCalculateBrokerFee())
+        if (shouldAutoCalculateBrokerFee())
         {
             this.jFormattedTextField3.setEditable(false);
             this.jFormattedTextField4.setEditable(false);
