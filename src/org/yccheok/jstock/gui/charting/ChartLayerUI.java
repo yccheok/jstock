@@ -136,7 +136,7 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         Calendar c = Calendar.getInstance();
         c.set(2010, 8, 29);
         // Wednesday, September 29, 2010
-        final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEEE, MMMM d, yyyy");
+        final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, MMM d, yyyy");
         longDateString = simpleDateFormat.format(c.getTime());
     }
     private int maxWidth = Integer.MIN_VALUE;
@@ -223,7 +223,7 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         
         // Date formats are not synchronized. It is recommended to create separate format instances for each thread.
         // If multiple threads access a format concurrently, it must be synchronized externally.
-        final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEEE, MMMM d, yyyy");
+        final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, MMM d, yyyy");
         final String dateString = simpleDateFormat.format(date);
         final int dateStringWidth = dateFontMetrics.stringWidth(dateString);
         final int dateStringHeight = dateFontMetrics.getHeight();

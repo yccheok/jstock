@@ -5,6 +5,7 @@ JStock 1.0.5i - 2010-02-??
   Bugfix:  We want to avoid information box from keep changing its width while
            user moves along the mouse. This will prevent user from feeling,
            information box is flickering, which is uncomfortable to user's eye.
+           Also, instead of using "Monday, December", we use "Mon, Dec".
            
 JStock 1.0.5h - 2010-02-10
   Feature: Interactive chart with real-time information tracing, together with
