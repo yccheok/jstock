@@ -57,6 +57,7 @@ import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.*;
 import org.yccheok.jstock.charting.TechnicalAnalysis;
 import org.yccheok.jstock.file.Statements;
+import org.yccheok.jstock.gui.MainFrame;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.internationalization.MessagesBundle;
 
@@ -216,6 +217,7 @@ public class ChartJDialog extends javax.swing.JDialog {
         jCheckBoxMenuItem15 = new javax.swing.JCheckBoxMenuItem();
         jSeparator4 = new javax.swing.JSeparator();
         jMenuItem4 = new javax.swing.JMenuItem();
+        jMenuItem8 = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JSeparator();
         jMenuItem2 = new javax.swing.JMenuItem();
         jMenu8 = new javax.swing.JMenu();
@@ -550,6 +552,14 @@ public class ChartJDialog extends javax.swing.JDialog {
         jMenu4.add(jMenuItem4);
 
         jMenu2.add(jMenu4);
+
+        jMenuItem8.setText(bundle.getString("ChartJDialog_Stochastic...")); // NOI18N
+        jMenuItem8.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem8ActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMenuItem8);
         jMenu2.add(jSeparator1);
 
         jMenuItem2.setText(bundle.getString("ChartJDialog_ClearAll")); // NOI18N
@@ -938,6 +948,12 @@ public class ChartJDialog extends javax.swing.JDialog {
             }
         } while(true);
     }//GEN-LAST:event_jMenuItem6ActionPerformed
+
+    private void jMenuItem8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem8ActionPerformed
+        StochasticOptionsJDialog stochasticOptionsJDialog = new StochasticOptionsJDialog(MainFrame.getInstance(), true);
+        stochasticOptionsJDialog.setLocationRelativeTo(this);
+        stochasticOptionsJDialog.setVisible(true);
+    }//GEN-LAST:event_jMenuItem8ActionPerformed
     
     private void updateLabels(StockHistoryServer stockHistoryServer) {
         java.text.NumberFormat numberFormat = java.text.NumberFormat.getInstance();
@@ -1643,6 +1659,7 @@ public class ChartJDialog extends javax.swing.JDialog {
     private javax.swing.JMenuItem jMenuItem5;
     private javax.swing.JMenuItem jMenuItem6;
     private javax.swing.JMenuItem jMenuItem7;
+    private javax.swing.JMenuItem jMenuItem8;
     private javax.swing.JMenuItem jMenuItem9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
