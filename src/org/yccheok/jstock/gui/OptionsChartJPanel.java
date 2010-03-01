@@ -55,7 +55,7 @@ public class OptionsChartJPanel extends javax.swing.JPanel implements JStockOpti
         jXHeader1.setTitle("Chart");
         add(jXHeader1, java.awt.BorderLayout.NORTH);
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Yellow information box tracing"));
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsChartJPanel_YellowInformationBox"))); // NOI18N
 
         buttonGroup1.add(jRadioButton1);
         jRadioButton1.setText("Make yellow information box follow the blue ball");
