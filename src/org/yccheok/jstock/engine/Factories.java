@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
+ * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -95,7 +95,6 @@ public enum Factories {
         indonesiaList.add(SingaporeYahooStockServerFactory.newInstance(Country.Indonesia));
         italyList.add(YahooStockServerFactory.newInstance(Country.Italy));
         koreaList.add(SingaporeYahooStockServerFactory.newInstance(Country.Korea));
-        malaysiaList.add(XStockServerFactory.newInstance());
         malaysiaList.add(SingaporeYahooStockServerFactory.newInstance(Country.Malaysia));
         netherlandsList.add(YahooStockServerFactory.newInstance(Country.Netherlands));
         norwayList.add(YahooStockServerFactory.newInstance(Country.Norway));

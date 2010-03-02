@@ -129,7 +129,7 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
         // Do we need to remove any old thread?
         final int numOfMonitorRequired = this.getNumOfRequiredThread();
 
-        if(this.stockMonitors.size() > numOfMonitorRequired) {
+        if (this.stockMonitors.size() > numOfMonitorRequired) {
             log.info("After removing : current thread size=" + this.stockMonitors.size() + ",numOfMonitorRequired=" + numOfMonitorRequired);
 
             StockMonitor stockMonitor = stockMonitors.remove(stockMonitors.size() - 1);
@@ -277,7 +277,7 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
                             // Acquire iterator in a safe way.
                             stockCodesReaderLock.lock();
                             final int stockCodesSize = stockCodes.size();
-                            if(currIndex < stockCodesSize) {
+                            if (currIndex < stockCodesSize) {
                                 listIterator = stockCodes.listIterator(currIndex);
                             }
                             stockCodesReaderLock.unlock();

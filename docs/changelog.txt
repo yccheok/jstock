@@ -6,6 +6,8 @@ JStock 1.0.5i - 2010-02-??
            user moves along the mouse. This will prevent user from feeling,
            information box is flickering, which is uncomfortable to user's eye.
            Also, instead of using "Monday, December", we use "Mon, Dec".
+  Bugfix:  Remove unused XStockServerFactory in Malaysia. This will make our
+           data feed speed slightly faster.
            
 JStock 1.0.5h - 2010-02-10
   Feature: Interactive chart with real-time information tracing, together with
