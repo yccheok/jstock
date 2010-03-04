@@ -20,6 +20,7 @@
 
 package org.yccheok.jstock.gui.charting;
 
+import java.awt.Cursor;
 import java.awt.event.ComponentEvent;
 import java.io.File;
 import org.yccheok.jstock.engine.*;
@@ -160,8 +161,15 @@ public class ChartJDialog extends javax.swing.JDialog {
     private void initComponents() {
 
         jPanel4 = new javax.swing.JPanel();
+        jPanel7 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         jComboBox1 = new javax.swing.JComboBox();
+        jPanel6 = new javax.swing.JPanel();
+        jLabel9 = new javax.swing.JLabel();
+        jLabel10 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
+        jLabel12 = new javax.swing.JLabel();
+        jLabel13 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
@@ -224,8 +232,12 @@ public class ChartJDialog extends javax.swing.JDialog {
         jMenuItem7 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        getContentPane().setLayout(new java.awt.BorderLayout(5, 5));
 
         jPanel4.setLayout(new java.awt.BorderLayout());
+
+        jPanel7.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 85));
+        jPanel4.add(jPanel7, java.awt.BorderLayout.WEST);
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Price Volume", "Candlestick" }));
         jComboBox1.addActionListener(new java.awt.event.ActionListener() {
@@ -236,6 +248,36 @@ public class ChartJDialog extends javax.swing.JDialog {
         jPanel5.add(jComboBox1);
 
         jPanel4.add(jPanel5, java.awt.BorderLayout.EAST);
+
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 10, 5));
+
+        jLabel9.setText("<html>\n<a href=\"\">7 Days</a>\n</html>");
+        jLabel9.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel9MouseClicked(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                jLabel9MouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                jLabel9MouseExited(evt);
+            }
+        });
+        jPanel6.add(jLabel9);
+
+        jLabel10.setText("<html>\n<a href=\"\">1 Month</a>\n</html>");
+        jPanel6.add(jLabel10);
+
+        jLabel11.setText("<html>\n<a href=\"\">3 Months</a>\n</html>");
+        jPanel6.add(jLabel11);
+
+        jLabel12.setText("<html>\n<a href=\"\">6 Months</a>\n</html>");
+        jPanel6.add(jLabel12);
+
+        jLabel13.setText("<html>\n<a href=\"\">1 Year</a>\n</html>");
+        jPanel6.add(jLabel13);
+
+        jPanel4.add(jPanel6, java.awt.BorderLayout.CENTER);
 
         getContentPane().add(jPanel4, java.awt.BorderLayout.SOUTH);
 
@@ -954,6 +996,22 @@ public class ChartJDialog extends javax.swing.JDialog {
         stochasticOptionsJDialog.setLocationRelativeTo(this);
         stochasticOptionsJDialog.setVisible(true);
     }//GEN-LAST:event_jMenuItem8ActionPerformed
+
+    private void jLabel9MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel9MouseClicked
+        final JFreeChart chart = chartPanel.getChart();
+        final CombinedDomainXYPlot cplot = (CombinedDomainXYPlot) chart.getPlot();
+        final XYPlot plot = (XYPlot) cplot.getSubplots().get(0);
+        final ValueAxis valueAxis = plot.getDomainAxis();
+        valueAxis.setRange(0, 100);
+    }//GEN-LAST:event_jLabel9MouseClicked
+
+    private void jLabel9MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel9MouseEntered
+        this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+    }//GEN-LAST:event_jLabel9MouseEntered
+
+    private void jLabel9MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel9MouseExited
+        this.setCursor(Cursor.getDefaultCursor());
+    }//GEN-LAST:event_jLabel9MouseExited
     
     private void updateLabels(StockHistoryServer stockHistoryServer) {
         java.text.NumberFormat numberFormat = java.text.NumberFormat.getInstance();
@@ -1471,6 +1529,42 @@ public class ChartJDialog extends javax.swing.JDialog {
         }
     }
 
+    /**
+     * Returns the current main plot of this chart dialog.
+     *
+     * @return the current main plot of this chart dialog
+     */
+    public XYPlot getPlot() {
+        final JFreeChart chart = this.chartPanel.getChart();
+        final CombinedDomainXYPlot cplot = (CombinedDomainXYPlot) chart.getPlot();
+        final XYPlot plot = (XYPlot) cplot.getSubplots().get(0);
+        return plot;
+    }
+
+    /**
+     * Returns the plot at the specified position in this chart dialog.
+     *
+     * @param index index of the plot to return
+     * @return the plot at the specified position in this chart dialog
+     */
+    public XYPlot getPlot(int index) {
+        final JFreeChart chart = this.chartPanel.getChart();
+        final CombinedDomainXYPlot cplot = (CombinedDomainXYPlot) chart.getPlot();
+        final XYPlot plot = (XYPlot) cplot.getSubplots().get(index);
+        return plot;
+    }
+
+    /**
+     * Returns the number of plots in this chart dialog.
+     *
+     * @return the number of plots in this chart dialog
+     */
+    public int getPlotSize() {
+        final JFreeChart chart = this.chartPanel.getChart();
+        final CombinedDomainXYPlot cplot = (CombinedDomainXYPlot) chart.getPlot();
+        return cplot.getSubplots().size();
+    }
+
     private void updateSMA(int days, boolean show) {
         /* To simplify our work, we will update candle stick chart as well. */
         if (this.candlestickChart == null) {
@@ -1636,6 +1730,10 @@ public class ChartJDialog extends javax.swing.JDialog {
     private javax.swing.JCheckBoxMenuItem jCheckBoxMenuItem9;
     private javax.swing.JComboBox jComboBox1;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -1643,6 +1741,7 @@ public class ChartJDialog extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
@@ -1666,6 +1765,8 @@ public class ChartJDialog extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;

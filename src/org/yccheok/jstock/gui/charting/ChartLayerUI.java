@@ -20,7 +20,6 @@
 package org.yccheok.jstock.gui.charting;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Composite;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -47,7 +46,6 @@ import org.jdesktop.jxlayer.plaf.AbstractLayerUI;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.ValueAxis;
-import org.jfree.chart.plot.CombinedDomainXYPlot;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.time.Day;
 import org.jfree.data.time.TimeSeries;
@@ -420,18 +418,16 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         }
 
         final ChartPanel chartPanel = this.chartJDialog.getChartPanel();
-        final JFreeChart chart = chartPanel.getChart();
-        final CombinedDomainXYPlot cplot = (CombinedDomainXYPlot) chart.getPlot();
 
         Day day = null;
 
-        final XYDataset xyDataset = ((XYPlot)cplot.getSubplots().get(0)).getDataset();
+        final XYDataset xyDataset = this.chartJDialog.getPlot().getDataset();
         if (xyDataset instanceof TimeSeriesCollection) {
             // Get the date.
             day = (Day)((TimeSeriesCollection)xyDataset).getSeries(0).getDataItem(mainPointIndex).getPeriod();
 
             // 0 means main plot.
-            final XYPlot plot = (XYPlot) cplot.getSubplots().get(0);
+            final XYPlot plot = this.chartJDialog.getPlot();
             final TimeSeriesCollection timeSeriesCollection = (TimeSeriesCollection)plot.getDataset();
             // Start with 1. We are not interested in main series.
             for (int j = 1, size = timeSeriesCollection.getSeriesCount(); j < size; j++) {
@@ -462,7 +458,7 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
             day = new Day(date);
 
             // 0 means main plot.
-            final XYPlot plot = (XYPlot) cplot.getSubplots().get(0);
+            final XYPlot plot = this.chartJDialog.getPlot();
             final int count = plot.getDatasetCount();
             for (int i = 1; i < count; i++) {
                 final TimeSeriesCollection timeSeriesCollection = (TimeSeriesCollection)plot.getDataset(i);
@@ -489,8 +485,8 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         }
 
         // Begin with 1. 0 is main plot.
-        for (int i = 1, size = cplot.getSubplots().size(); i < size; i++) {
-            final XYPlot plot = (XYPlot) cplot.getSubplots().get(i);
+        for (int i = 1, size = this.chartJDialog.getPlotSize(); i < size; i++) {
+            final XYPlot plot = this.chartJDialog.getPlot(i);
             final TimeSeriesCollection timeSeriesCollection = (TimeSeriesCollection)plot.getDataset();
             // So far, for subplot, each of them only have 1 series.
             assert(1 == timeSeriesCollection.getSeriesCount());
@@ -524,20 +520,18 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
 
     private TimeSeries getTimeSeries(int plotIndex, int seriesIndex) {
         final ChartPanel chartPanel = this.chartJDialog.getChartPanel();
-        final JFreeChart chart = chartPanel.getChart();
-        final CombinedDomainXYPlot cplot = (CombinedDomainXYPlot) chart.getPlot();
 
         if (plotIndex >= chartPanel.getChartRenderingInfo().getPlotInfo().getSubplotCount()) {
             /* Not ready yet. */
             return null;
         }
 
-        if (plotIndex >= cplot.getSubplots().size()) {
+        if (plotIndex >= this.chartJDialog.getPlotSize()) {
             /* Not ready yet. */
             return null;
         }
 
-        final XYDataset xyDataset = ((XYPlot)cplot.getSubplots().get(plotIndex)).getDataset();
+        final XYDataset xyDataset = this.chartJDialog.getPlot(plotIndex).getDataset();
         if (xyDataset instanceof TimeSeriesCollection) {
             final TimeSeriesCollection timeSeriesCollection = (TimeSeriesCollection)xyDataset;
             if (seriesIndex >= timeSeriesCollection.getSeriesCount()) {
@@ -550,10 +544,10 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
             if (plotIndex == 0 && seriesIndex == 0) {
                 return null;
             }
-            if (seriesIndex >= ((XYPlot)cplot.getSubplots().get(plotIndex)).getDatasetCount()) {
+            if (seriesIndex >= this.chartJDialog.getPlot(plotIndex).getDatasetCount()) {
                 return null;
             }
-            final XYDataset d = ((XYPlot)cplot.getSubplots().get(plotIndex)).getDataset(seriesIndex);
+            final XYDataset d = this.chartJDialog.getPlot(plotIndex).getDataset(seriesIndex);
             return ((TimeSeriesCollection)d).getSeries(0);
         }
     }
@@ -577,9 +571,7 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         }
 
         final ChartPanel chartPanel = this.chartJDialog.getChartPanel();
-        final JFreeChart chart = chartPanel.getChart();
-        final CombinedDomainXYPlot cplot = (CombinedDomainXYPlot) chart.getPlot();
-        final XYPlot plot = (XYPlot) cplot.getSubplots().get(plotIndex);
+        final XYPlot plot = this.chartJDialog.getPlot(plotIndex);
         final ValueAxis domainAxis = plot.getDomainAxis();
         final RectangleEdge domainAxisEdge = plot.getDomainAxisEdge();
         final ValueAxis rangeAxis = plot.getRangeAxis();
@@ -666,10 +658,8 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         }
 
         final ChartPanel chartPanel = this.chartJDialog.getChartPanel();
-        final JFreeChart chart = chartPanel.getChart();
-        final CombinedDomainXYPlot cplot = (CombinedDomainXYPlot) chart.getPlot();
         // Top most plot.
-        final XYPlot plot = (XYPlot) cplot.getSubplots().get(0);
+        final XYPlot plot = this.chartJDialog.getPlot();
 
         final org.jfree.data.xy.DefaultHighLowDataset defaultHighLowDataset = (org.jfree.data.xy.DefaultHighLowDataset)plot.getDataset();
 
@@ -748,10 +738,8 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         }
 
         final ChartPanel chartPanel = this.chartJDialog.getChartPanel();
-        final JFreeChart chart = chartPanel.getChart();
-        final CombinedDomainXYPlot cplot = (CombinedDomainXYPlot) chart.getPlot();
         // Top most plot.
-        final XYPlot plot = (XYPlot) cplot.getSubplots().get(0);
+        final XYPlot plot = this.chartJDialog.getPlot();
 
         if (plot.getDataset() instanceof org.jfree.data.xy.DefaultHighLowDataset) {
             return this.updateMainTraceInfoForCandlestick(point);
@@ -834,11 +822,6 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
             return;
         }
 
-        final Component component = e.getComponent();
-        final ChartPanel chartPanel = (ChartPanel)component;
-        final JFreeChart chart = chartPanel.getChart();
-        final CombinedDomainXYPlot cplot = (CombinedDomainXYPlot) chart.getPlot();
-        final XYPlot plot = (XYPlot) cplot.getSubplots().get(0);
         final Point mousePoint = SwingUtilities.convertPoint(e.getComponent(), e.getPoint(), layer);
         if (this.updateMainTraceInfo(mousePoint)) {
             this.updateIndicatorTraceInfos(this.mainTraceInfo.getDataIndex());
