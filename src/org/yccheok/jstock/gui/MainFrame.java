@@ -3120,7 +3120,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     private void initMarketJPanel() {
-        if(this.marketJPanel != null) {
+        if (this.marketJPanel != null) {
             jPanel2.remove(marketJPanel);            
         }
         
@@ -3135,7 +3135,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     private class LatestNewsTask extends SwingWorker<Void, String> {
-        // Delay first update checking for the 20 seconds
+        // Delay first update checking for 20 seconds.
         private static final int SHORT_DELAY = 20 * 1000;
 
         private volatile CountDownLatch doneSignal;       

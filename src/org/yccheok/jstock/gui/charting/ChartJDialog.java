@@ -19,6 +19,7 @@
 
 package org.yccheok.jstock.gui.charting;
 
+import java.awt.Font;
 import java.awt.event.ComponentEvent;
 import java.io.File;
 import org.yccheok.jstock.engine.*;
@@ -27,8 +28,12 @@ import java.util.*;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jfree.chart.ChartPanel;
@@ -58,6 +63,7 @@ import org.jfree.data.time.TimeSeriesDataItem;
 import org.jfree.data.xy.*;
 import org.yccheok.jstock.charting.TechnicalAnalysis;
 import org.yccheok.jstock.file.Statements;
+import org.yccheok.jstock.gui.JStockOptions;
 import org.yccheok.jstock.gui.MainFrame;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.internationalization.MessagesBundle;
@@ -104,9 +110,7 @@ public class ChartJDialog extends javax.swing.JDialog {
         this.priceTimeSeries = this.getPriceTimeSeries(stockHistoryServer);
         this.priceDataset = new TimeSeriesCollection(this.priceTimeSeries);
         this.priceOHLCDataset = this.getOHLCDataset(stockHistoryServer);
-        this.volumeDataset = this.getVolumeDataset(stockHistoryServer);
-
-        updateLabels(stockHistoryServer);        
+        this.volumeDataset = this.getVolumeDataset(stockHistoryServer);      
         
         this.priceVolumeChart = this.createPriceVolumeChart(stockHistoryServer);
         
@@ -126,6 +130,9 @@ public class ChartJDialog extends javax.swing.JDialog {
                 ChartJDialog.this.chartLayerUI.updateTraceInfos();
             }
         });
+
+        /* Update the high low labels. */
+        this.updateHighLowJLabels();
     }
 
     public StockHistoryServer getStockHistoryServer() {
@@ -145,7 +152,13 @@ public class ChartJDialog extends javax.swing.JDialog {
     private void initComponents() {
 
         jPanel4 = new javax.swing.JPanel();
-        jPanel7 = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jPanel3 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
         jComboBox1 = new javax.swing.JComboBox();
         jPanel6 = new javax.swing.JPanel();
@@ -155,17 +168,6 @@ public class ChartJDialog extends javax.swing.JDialog {
         jLabel12 = new org.yccheok.jstock.gui.charting.HyperlinkLikedJLabel();
         jLabel13 = new org.yccheok.jstock.gui.charting.HyperlinkLikedJLabel();
         jLabel14 = new org.yccheok.jstock.gui.charting.HyperlinkLikedJLabel();
-        jPanel1 = new javax.swing.JPanel();
-        jPanel2 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        jPanel3 = new javax.swing.JPanel();
-        jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
-        jLabel8 = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
@@ -219,10 +221,53 @@ public class ChartJDialog extends javax.swing.JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         getContentPane().setLayout(new java.awt.BorderLayout(5, 5));
 
-        jPanel4.setLayout(new java.awt.BorderLayout());
+        jPanel4.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 2, 5));
+        jPanel4.setLayout(new java.awt.BorderLayout(5, 5));
 
-        jPanel7.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 85));
-        jPanel4.add(jPanel7, java.awt.BorderLayout.WEST);
+        jPanel2.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 160));
+        jPanel2.setPreferredSize(new java.awt.Dimension(120, 33));
+
+        jPanel1.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
+
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
+        jLabel1.setText(bundle.getString("ChartJDialog_High")); // NOI18N
+        jPanel1.add(jLabel1);
+
+        jLabel3.setText(bundle.getString("ChartJDialog_Low")); // NOI18N
+        jPanel1.add(jLabel3);
+
+        jPanel3.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
+
+        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        jLabel2.setForeground(JStockOptions.DEFAULT_HIGHER_NUMERICAL_VALUE_FOREGROUND_COLOR);
+        jPanel3.add(jLabel2);
+
+        jLabel4.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        jLabel4.setForeground(JStockOptions.DEFAULT_LOWER_NUMERICAL_VALUE_FOREGROUND_COLOR);
+        jPanel3.add(jLabel4);
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanel4.add(jPanel2, java.awt.BorderLayout.WEST);
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Price Volume", "Candlestick" }));
         jComboBox1.addActionListener(new java.awt.event.ActionListener() {
@@ -236,7 +281,7 @@ public class ChartJDialog extends javax.swing.JDialog {
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 10, 10));
 
-        jLabel9.setText("<html>\n<a href=\"\">7 Days</a>\n</html>");
+        jLabel9.setText("<html> <a href=\"\">7 Days</a> </html>");
         jLabel9.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jLabel9MouseClicked(evt);
@@ -288,34 +333,6 @@ public class ChartJDialog extends javax.swing.JDialog {
 
         getContentPane().add(jPanel4, java.awt.BorderLayout.SOUTH);
 
-        jPanel1.setLayout(new java.awt.BorderLayout());
-
-        jLabel1.setFont(new java.awt.Font("Dialog", 0, 12));
-        jLabel1.setText("Market Capital (RM) : ");
-        jPanel2.add(jLabel1);
-        jPanel2.add(jLabel2);
-
-        jLabel3.setFont(new java.awt.Font("Dialog", 0, 12));
-        jLabel3.setText("Shares Issued : ");
-        jPanel2.add(jLabel3);
-        jPanel2.add(jLabel4);
-
-        jPanel1.add(jPanel2, java.awt.BorderLayout.WEST);
-
-        jLabel5.setFont(new java.awt.Font("Dialog", 0, 12));
-        jLabel5.setText("Board : ");
-        jPanel3.add(jLabel5);
-        jPanel3.add(jLabel6);
-
-        jLabel7.setFont(new java.awt.Font("Dialog", 0, 12));
-        jLabel7.setText("Sector : ");
-        jPanel3.add(jLabel7);
-        jPanel3.add(jLabel8);
-
-        jPanel1.add(jPanel3, java.awt.BorderLayout.EAST);
-
-        getContentPane().add(jPanel1, java.awt.BorderLayout.NORTH);
-
         jMenu1.setText("File");
 
         jMenuItem1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/filesave.png"))); // NOI18N
@@ -331,7 +348,6 @@ public class ChartJDialog extends javax.swing.JDialog {
 
         jMenu2.setText("Technical Analysis");
 
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
         jMenu3.setText(bundle.getString("ChartJDialog_SMA")); // NOI18N
         jMenu3.setToolTipText(bundle.getString("ChartJDialog_SimpleMovingAverage")); // NOI18N
 
@@ -646,6 +662,10 @@ public class ChartJDialog extends javax.swing.JDialog {
             }
             chartPanel.setChart(this.priceVolumeChart);
             this.chartLayerUI.updateTraceInfos();
+            /* Update high low labels as well. */
+            this.updateHighLowJLabels();
+            /* Reset all day labels. */
+            this.resetAllDayLabels();
         }
         else if (this.getCurrentMode() == Mode.Candlestick) {
             if (this.candlestickChart == null) {
@@ -653,6 +673,10 @@ public class ChartJDialog extends javax.swing.JDialog {
             }
             chartPanel.setChart(this.candlestickChart);
             this.chartLayerUI.updateTraceInfos();
+            /* Update high low labels as well. */
+            this.updateHighLowJLabels();
+            /* Reset all day labels. */
+            this.resetAllDayLabels();
         }
     }//GEN-LAST:event_jComboBox1ActionPerformed
 
@@ -1005,8 +1029,141 @@ public class ChartJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jMenuItem8ActionPerformed
 
     private void jLabel9MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel9MouseClicked
+        dayJLabelBeingClicked = (JLabel)evt.getSource();
         this.zoom(Calendar.DATE, -7);
     }//GEN-LAST:event_jLabel9MouseClicked
+
+    /**
+     * Calculate and update high low value labels, according to current displayed
+     * time range. This is a time consuming method, and shall be called by
+     * user thread.
+     */
+    private void _updateHighLowJLabels() {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                ChartJDialog.this.jLabel2.setText("");
+                ChartJDialog.this.jLabel4.setText("");
+            }
+        });
+
+        final ValueAxis valueAxis = this.getPlot().getDomainAxis();
+        final Range range = valueAxis.getRange();
+        final long lowerBound = (long)range.getLowerBound();
+        final long upperBound = (long)range.getUpperBound();
+
+        // Perform binary search, to located day in price time series, which
+        // is equal or lesser than upperBound.
+        int low = 0;
+        int high = this.priceTimeSeries.getItemCount() - 1;
+        long best_dist = Long.MAX_VALUE;
+        int best_mid = -1;
+        while (low <= high) {
+            int mid = (low + high) >>> 1;
+            final Day day = (Day)this.priceTimeSeries.getDataItem(mid).getPeriod();
+            long v = day.getFirstMillisecond();
+
+            if (v > upperBound) {
+                high = mid - 1;
+            }
+            else if (v < upperBound) {
+                low = mid + 1;
+                long dist = upperBound - v;
+                if (dist < best_dist) {
+                    best_dist = dist;
+                    best_mid = mid;
+                }
+            }
+            else {
+                best_dist = 0;
+                best_mid = mid;
+                break;
+            }
+        }
+
+        if (best_mid < 0) {
+            return;
+        }
+
+        double high_last_price = Double.NEGATIVE_INFINITY;
+        double low_last_price = Double.MAX_VALUE;
+        for (int i = best_mid; i >= 0; i--) {
+            final TimeSeriesDataItem item = this.priceTimeSeries.getDataItem(i);
+            final long time = ((Day)item.getPeriod()).getFirstMillisecond();
+            if (time < lowerBound) {
+                break;
+            }
+            double value = (Double)item.getValue();
+            if (value == 0.0) {
+                /* Market closed during that time. Ignore. */
+                continue;
+            }
+            if (high_last_price < value) {
+                high_last_price = value;
+            }
+            if (low_last_price > value) {
+                low_last_price = value;
+            }
+        }
+
+        final double h = high_last_price;
+        final double l = low_last_price;
+        if (high_last_price >= low_last_price) {
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    ChartJDialog.this.jLabel2.setText(org.yccheok.jstock.gui.Utils.stockPriceDecimalFormat(h));
+                    ChartJDialog.this.jLabel4.setText(org.yccheok.jstock.gui.Utils.stockPriceDecimalFormat(l));
+                }
+            });
+        }
+    }
+
+    /**
+     * Reset all day labels back to plain font.
+     */
+    private void resetAllDayLabels() {
+        JLabel[] labels = {jLabel9, jLabel10, jLabel11, jLabel12, jLabel13, jLabel14 };
+        for (JLabel label : labels) {
+            final Font oldFont = label.getFont();
+            final Font font = new Font(oldFont.getFontName(), oldFont.getStyle() & ~Font.BOLD, oldFont.getSize());
+            label.setFont(font);
+        }
+    }
+
+    /**
+     * Decide which day labels shall goes to bold, to indicate this label has
+     * been clicked.
+     */
+    private void updateDayJLabels() {
+        if (ChartJDialog.this.dayJLabelBeingClicked != null) {
+            /* Make the clicked label become bold. */
+            final JLabel me = ChartJDialog.this.dayJLabelBeingClicked;
+            ChartJDialog.this.dayJLabelBeingClicked = null;
+
+            /* Reset first. */
+            this.resetAllDayLabels();
+
+            /* Bold the target. */
+            final Font oldFont = me.getFont();
+            final Font font = new Font(oldFont.getFontName(), oldFont.getStyle() | Font.BOLD, oldFont.getSize());
+            me.setFont(font);
+        }
+    }
+
+    /**
+     * Calculate and update high low value labels, according to current displayed
+     * time range. This method will return immediately, as the calculating and
+     * updating task by performed by user thread.
+     */
+    private void updateHighLowJLabels() {
+        updateHighLowLabelsPool.execute(new Runnable() {
+            @Override
+            public void run() {
+                ChartJDialog.this._updateHighLowJLabels();
+            }
+        });
+    }
 
     /**
      * Zoom in to this chart with specific amount of time.
@@ -1020,7 +1177,7 @@ public class ChartJDialog extends javax.swing.JDialog {
         final Day day = (Day)this.priceTimeSeries.getDataItem(itemCount - 1).getPeriod();
         // Candle stick takes up half day space.
         // Volume price chart's volume information takes up whole day space.
-        final long end = day.getFirstMillisecond() + (this.getCurrentMode() == Mode.Candlestick ? (1000 * 60 * 60 * 12) : (1000 * 60 * 60 * 24));
+        final long end = day.getFirstMillisecond() + (this.getCurrentMode() == Mode.Candlestick ? (1000 * 60 * 60 * 12) : (1000 * 60 * 60 * 24 - 1));
         final Calendar calendar = Calendar.getInstance();
         // -1. Calendar's month is 0 based but JFreeChart's month is 1 based.
         calendar.set(day.getYear(), day.getMonth() - 1, day.getDayOfMonth(), 0, 0, 0);
@@ -1085,40 +1242,30 @@ public class ChartJDialog extends javax.swing.JDialog {
     }
 
     private void jLabel10MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel10MouseClicked
+        dayJLabelBeingClicked = (JLabel)evt.getSource();
         this.zoom(Calendar.MONTH, -1);
     }//GEN-LAST:event_jLabel10MouseClicked
 
     private void jLabel11MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel11MouseClicked
-        this.zoom(Calendar.MONTH, -3);
+        dayJLabelBeingClicked = (JLabel)evt.getSource();
+        this.zoom(Calendar.MONTH, -3);        
     }//GEN-LAST:event_jLabel11MouseClicked
 
     private void jLabel12MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel12MouseClicked
+        dayJLabelBeingClicked = (JLabel)evt.getSource();
         this.zoom(Calendar.MONTH, -6);
     }//GEN-LAST:event_jLabel12MouseClicked
 
     private void jLabel13MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel13MouseClicked
+        dayJLabelBeingClicked = (JLabel)evt.getSource();
         this.zoom(Calendar.YEAR, -1);
     }//GEN-LAST:event_jLabel13MouseClicked
 
     private void jLabel14MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel14MouseClicked
+        dayJLabelBeingClicked = (JLabel)evt.getSource();
         this.chartPanel.restoreAutoBounds();
     }//GEN-LAST:event_jLabel14MouseClicked
-    
-    private void updateLabels(StockHistoryServer stockHistoryServer) {
-        java.text.NumberFormat numberFormat = java.text.NumberFormat.getInstance();
-        this.jLabel4.setText(numberFormat.format(stockHistoryServer.getSharesIssued()));
-        
-        numberFormat.setMaximumFractionDigits(2);
-        numberFormat.setMinimumFractionDigits(2);
-        this.jLabel2.setText(numberFormat.format(stockHistoryServer.getMarketCapital()));
-        
-        final int num = stockHistoryServer.getNumOfCalendar();
-        final Stock stock = stockHistoryServer.getStock(stockHistoryServer.getCalendar(num - 1));
-        
-        this.jLabel6.setText(stock.getBoard().toString());
-        this.jLabel8.setText(stock.getIndustry().toString());
-    }    
-
+   
     /**
      * Creates a chart.
      *
@@ -1645,6 +1792,10 @@ public class ChartJDialog extends javax.swing.JDialog {
                 // also doesn't work.
                 if (event.getType() == ChartChangeEventType.GENERAL) {
                     ChartJDialog.this.chartLayerUI.updateTraceInfos();
+                    // Re-calculating high low value.
+                    ChartJDialog.this.updateHighLowJLabels();
+                    // Decide which label shall goes bold.
+                    ChartJDialog.this.updateDayJLabels();
                 }
             }
         };
@@ -1818,6 +1969,16 @@ public class ChartJDialog extends javax.swing.JDialog {
     private JFreeChart priceVolumeChart;
     private JFreeChart candlestickChart;
 
+    /**
+     * Thread pool, used to hold threads to update high low labels.
+     */
+    private final Executor updateHighLowLabelsPool = Executors.newFixedThreadPool(1);
+
+    /**
+     * A flag, used to determine which JLabel (7 Days, 1 Month...) being clicked.
+     */
+    javax.swing.JLabel dayJLabelBeingClicked = null;
+
     /* Overlay layer. */
     private final ChartLayerUI<ChartPanel> chartLayerUI;
 
@@ -1859,10 +2020,6 @@ public class ChartJDialog extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
@@ -1888,7 +2045,6 @@ public class ChartJDialog extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel7;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;

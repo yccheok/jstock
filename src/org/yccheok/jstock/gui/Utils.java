@@ -612,11 +612,11 @@ public class Utils {
     }
 
     public static Color getColor(double price, double referencePrice) {
-        if(price < referencePrice) {
+        if (price < referencePrice) {
             return JStockOptions.DEFAULT_LOWER_NUMERICAL_VALUE_FOREGROUND_COLOR;
         }
         
-        if(price > referencePrice) {
+        if (price > referencePrice) {
             return JStockOptions.DEFAULT_HIGHER_NUMERICAL_VALUE_FOREGROUND_COLOR;
         }
         
