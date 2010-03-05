@@ -504,11 +504,11 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         int maxSMSPerDay = -1;
         try {
             maxSMSPerDay = Integer.parseInt(jComboBox1.getSelectedItem().toString());
-			jStockOptions.setMaxSMSPerDay(maxSMSPerDay);
+            jStockOptions.setMaxSMSPerDay(maxSMSPerDay);
         }
-        catch(NumberFormatException exp) {
+        catch (NumberFormatException exp) {
             log.error(null, exp);
-			jStockOptions.setMaxSMSPerDay(-1);
+            jStockOptions.setMaxSMSPerDay(-1);
         }
         
 
