@@ -17,10 +17,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-
 package org.yccheok.jstock.gui.charting;
 
-import java.awt.Cursor;
 import java.awt.event.ComponentEvent;
 import java.io.File;
 import org.yccheok.jstock.engine.*;
@@ -51,10 +49,12 @@ import org.jfree.chart.renderer.xy.StandardXYItemRenderer;
 import org.jfree.chart.renderer.xy.XYBarRenderer;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.data.Range;
 import org.jfree.data.time.Day;
 import org.jfree.data.time.MovingAverage;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
+import org.jfree.data.time.TimeSeriesDataItem;
 import org.jfree.data.xy.*;
 import org.yccheok.jstock.charting.TechnicalAnalysis;
 import org.yccheok.jstock.file.Statements;
@@ -118,22 +118,6 @@ public class ChartJDialog extends javax.swing.JDialog {
 
         getContentPane().add(layer, java.awt.BorderLayout.CENTER);
 
-        // Handle zoom-in.
-        this.chartPanel.getChart().addChangeListener(new ChartChangeListener() {
-            @Override
-            public void chartChanged(ChartChangeEvent event) {
-                // Is weird. This works well for zoom-in. When we add new CCI or
-                // RIS. This event function will be triggered too. However, the
-                // returned draw area will always be the old draw area, unless
-                // you move your move over.
-                // Even I try to capture event.getType() == ChartChangeEventType.NEW_DATASET
-                // also doesn't work.
-                if (event.getType() == ChartChangeEventType.GENERAL) {
-                    ChartJDialog.this.chartLayerUI.updateTraceInfos();
-                }
-            }
-        });
-
         // Handle resize.
         this.addComponentListener(new java.awt.event.ComponentAdapter()
         {
@@ -165,11 +149,12 @@ public class ChartJDialog extends javax.swing.JDialog {
         jPanel5 = new javax.swing.JPanel();
         jComboBox1 = new javax.swing.JComboBox();
         jPanel6 = new javax.swing.JPanel();
-        jLabel9 = new javax.swing.JLabel();
-        jLabel10 = new javax.swing.JLabel();
-        jLabel11 = new javax.swing.JLabel();
-        jLabel12 = new javax.swing.JLabel();
-        jLabel13 = new javax.swing.JLabel();
+        jLabel9 = new org.yccheok.jstock.gui.charting.HyperlinkLikedJLabel();
+        jLabel10 = new org.yccheok.jstock.gui.charting.HyperlinkLikedJLabel();
+        jLabel11 = new org.yccheok.jstock.gui.charting.HyperlinkLikedJLabel();
+        jLabel12 = new org.yccheok.jstock.gui.charting.HyperlinkLikedJLabel();
+        jLabel13 = new org.yccheok.jstock.gui.charting.HyperlinkLikedJLabel();
+        jLabel14 = new org.yccheok.jstock.gui.charting.HyperlinkLikedJLabel();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
@@ -249,33 +234,55 @@ public class ChartJDialog extends javax.swing.JDialog {
 
         jPanel4.add(jPanel5, java.awt.BorderLayout.EAST);
 
-        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 10, 5));
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 10, 10));
 
         jLabel9.setText("<html>\n<a href=\"\">7 Days</a>\n</html>");
         jLabel9.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jLabel9MouseClicked(evt);
             }
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                jLabel9MouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                jLabel9MouseExited(evt);
-            }
         });
         jPanel6.add(jLabel9);
 
         jLabel10.setText("<html>\n<a href=\"\">1 Month</a>\n</html>");
+        jLabel10.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel10MouseClicked(evt);
+            }
+        });
         jPanel6.add(jLabel10);
 
         jLabel11.setText("<html>\n<a href=\"\">3 Months</a>\n</html>");
+        jLabel11.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel11MouseClicked(evt);
+            }
+        });
         jPanel6.add(jLabel11);
 
         jLabel12.setText("<html>\n<a href=\"\">6 Months</a>\n</html>");
+        jLabel12.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel12MouseClicked(evt);
+            }
+        });
         jPanel6.add(jLabel12);
 
         jLabel13.setText("<html>\n<a href=\"\">1 Year</a>\n</html>");
+        jLabel13.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel13MouseClicked(evt);
+            }
+        });
         jPanel6.add(jLabel13);
+
+        jLabel14.setText("<html>\n    <a href=\"\">All</a>\n</html>");
+        jLabel14.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel14MouseClicked(evt);
+            }
+        });
+        jPanel6.add(jLabel14);
 
         jPanel4.add(jPanel6, java.awt.BorderLayout.CENTER);
 
@@ -998,20 +1005,104 @@ public class ChartJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jMenuItem8ActionPerformed
 
     private void jLabel9MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel9MouseClicked
-        final JFreeChart chart = chartPanel.getChart();
-        final CombinedDomainXYPlot cplot = (CombinedDomainXYPlot) chart.getPlot();
-        final XYPlot plot = (XYPlot) cplot.getSubplots().get(0);
-        final ValueAxis valueAxis = plot.getDomainAxis();
-        valueAxis.setRange(0, 100);
+        this.zoom(Calendar.DATE, -7);
     }//GEN-LAST:event_jLabel9MouseClicked
 
-    private void jLabel9MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel9MouseEntered
-        this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-    }//GEN-LAST:event_jLabel9MouseEntered
+    /**
+     * Zoom in to this chart with specific amount of time.
+     * @param field the calendar field.
+     * @param amount the amount of date or time to be added to the field.
+     */
+    private void zoom(int field, int amount) {
+        this.chartPanel.restoreAutoBounds();
 
-    private void jLabel9MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel9MouseExited
-        this.setCursor(Cursor.getDefaultCursor());
-    }//GEN-LAST:event_jLabel9MouseExited
+        final int itemCount = this.priceTimeSeries.getItemCount();
+        final Day day = (Day)this.priceTimeSeries.getDataItem(itemCount - 1).getPeriod();
+        // Candle stick takes up half day space.
+        // Volume price chart's volume information takes up whole day space.
+        final long end = day.getFirstMillisecond() + (this.getCurrentMode() == Mode.Candlestick ? (1000 * 60 * 60 * 12) : (1000 * 60 * 60 * 24));
+        final Calendar calendar = Calendar.getInstance();
+        // -1. Calendar's month is 0 based but JFreeChart's month is 1 based.
+        calendar.set(day.getYear(), day.getMonth() - 1, day.getDayOfMonth(), 0, 0, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+
+        calendar.add(field, amount);
+        // Candle stick takes up half day space.
+        // Volume price chart's volume information does not take up any space.
+        final long start = Math.max(0, calendar.getTimeInMillis() - (this.getCurrentMode() == Mode.Candlestick ? (1000 * 60 * 60 * 12) : 0));
+        final ValueAxis valueAxis = this.getPlot().getDomainAxis();
+        valueAxis.setRange(start, end);
+
+        double min = Double.MAX_VALUE;
+        double max = Double.MIN_VALUE;
+        double max_volume = Double.MIN_VALUE;
+        for (int i = itemCount - 1; i >= 0; i--) {
+            final TimeSeriesDataItem item = this.priceTimeSeries.getDataItem(i);
+            final Day d = (Day)item.getPeriod();
+            if (d.getFirstMillisecond() < start) {
+                break;
+            }
+            final DefaultHighLowDataset defaultHighLowDataset = (DefaultHighLowDataset)this.priceOHLCDataset;
+            final double high = defaultHighLowDataset.getHighValue(0, i);
+            final double low = defaultHighLowDataset.getLowValue(0, i);
+            final double volume = defaultHighLowDataset.getVolumeValue(0, i);
+
+            if (max < high) {
+                max = high;
+            }
+            if (min > low) {
+                min = low;
+            }
+            if (max_volume < volume) {
+                max_volume = volume;
+            }
+        }
+
+        if (min > max) {
+            return;
+        }
+
+        final ValueAxis rangeAxis = this.getPlot().getRangeAxis();
+        final Range rangeAxisRange = rangeAxis.getRange();
+        // Increase each side by 1%
+        double tolerance = 0.01 * (max - min);
+        // The tolerance must within range [0.01, 1.0]
+        tolerance = Math.min(Math.max(0.01, tolerance), 1.0);
+        // The range must within the original chart range.
+        min = Math.max(rangeAxisRange.getLowerBound(), min - tolerance);
+        max = Math.min(rangeAxisRange.getUpperBound(), max + tolerance);
+
+        this.getPlot().getRangeAxis().setRange(min, max);
+
+        if (this.getPlot().getRangeAxisCount() > 1) {
+            final double volumeUpperBound = this.getPlot().getRangeAxis(1).getRange().getUpperBound();
+            final double suggestedVolumneUpperBound = max_volume * 4;
+            // To prevent over zoom-in.
+            if (suggestedVolumneUpperBound < volumeUpperBound) {
+                this.getPlot().getRangeAxis(1).setRange(0, suggestedVolumneUpperBound);
+            }
+        }
+    }
+
+    private void jLabel10MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel10MouseClicked
+        this.zoom(Calendar.MONTH, -1);
+    }//GEN-LAST:event_jLabel10MouseClicked
+
+    private void jLabel11MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel11MouseClicked
+        this.zoom(Calendar.MONTH, -3);
+    }//GEN-LAST:event_jLabel11MouseClicked
+
+    private void jLabel12MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel12MouseClicked
+        this.zoom(Calendar.MONTH, -6);
+    }//GEN-LAST:event_jLabel12MouseClicked
+
+    private void jLabel13MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel13MouseClicked
+        this.zoom(Calendar.YEAR, -1);
+    }//GEN-LAST:event_jLabel13MouseClicked
+
+    private void jLabel14MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel14MouseClicked
+        this.chartPanel.restoreAutoBounds();
+    }//GEN-LAST:event_jLabel14MouseClicked
     
     private void updateLabels(StockHistoryServer stockHistoryServer) {
         java.text.NumberFormat numberFormat = java.text.NumberFormat.getInstance();
@@ -1084,7 +1175,10 @@ public class ChartJDialog extends javax.swing.JDialog {
 
         JFreeChart chart = new JFreeChart(title, JFreeChart.DEFAULT_TITLE_FONT, cplot, true);
         org.yccheok.jstock.charting.Utils.applyChartTheme(chart);
-        
+
+        // Handle zooming event.
+        chart.addChangeListener(this.getChartChangeListner());
+
         return chart;
     }
 
@@ -1157,6 +1251,9 @@ public class ChartJDialog extends javax.swing.JDialog {
         JFreeChart chart = new JFreeChart(title, JFreeChart.DEFAULT_TITLE_FONT, cplot, true);
 
         org.yccheok.jstock.charting.Utils.applyChartTheme(chart);
+
+        // Handle zooming event.
+        chart.addChangeListener(this.getChartChangeListner());
 
         return chart;        
     }
@@ -1530,6 +1627,30 @@ public class ChartJDialog extends javax.swing.JDialog {
     }
 
     /**
+     * Returns chart change listener, which will be responsible for handling
+     * zooming event.
+     *
+     * @return chart change listener, which will be responsible for handling
+     * zooming event
+     */
+    private ChartChangeListener getChartChangeListner() {
+        return new ChartChangeListener() {
+            @Override
+            public void chartChanged(ChartChangeEvent event) {
+                // Is weird. This works well for zoom-in. When we add new CCI or
+                // RIS. This event function will be triggered too. However, the
+                // returned draw area will always be the old draw area, unless
+                // you move your move over.
+                // Even I try to capture event.getType() == ChartChangeEventType.NEW_DATASET
+                // also doesn't work.
+                if (event.getType() == ChartChangeEventType.GENERAL) {
+                    ChartJDialog.this.chartLayerUI.updateTraceInfos();
+                }
+            }
+        };
+    }
+
+    /**
      * Returns the current main plot of this chart dialog.
      *
      * @return the current main plot of this chart dialog
@@ -1734,6 +1855,7 @@ public class ChartJDialog extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
