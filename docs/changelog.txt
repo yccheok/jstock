@@ -2,6 +2,7 @@ This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
 JStock 1.0.5i - 2010-02-??
+  Feature: Having pre-defined range for history chart (#2954753)
   Bugfix:  We want to avoid information box from keep changing its width while
            user moves along the mouse. This will prevent user from feeling,
            information box is flickering, which is uncomfortable to user's eye.
