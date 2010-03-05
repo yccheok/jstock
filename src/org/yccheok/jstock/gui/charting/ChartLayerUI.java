@@ -44,7 +44,6 @@ import javax.swing.SwingUtilities;
 import org.jdesktop.jxlayer.JXLayer;
 import org.jdesktop.jxlayer.plaf.AbstractLayerUI;
 import org.jfree.chart.ChartPanel;
-import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.time.Day;
@@ -151,7 +150,7 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         final Font oldFont = g2.getFont();
         final Font paramFont = new Font(oldFont.getFontName(), oldFont.getStyle(), oldFont.getSize());
         final FontMetrics paramFontMetrics = g2.getFontMetrics(paramFont);
-        final Font valueFont = new Font(oldFont.getFontName(), oldFont.getStyle() + Font.BOLD, oldFont.getSize() + 1);
+        final Font valueFont = new Font(oldFont.getFontName(), oldFont.getStyle() | Font.BOLD, oldFont.getSize() + 1);
         final FontMetrics valueFontMetrics = g2.getFontMetrics(valueFont);
         final Font dateFont = new Font(oldFont.getFontName(), oldFont.getStyle(), oldFont.getSize() - 1);
         final FontMetrics dateFontMetrics = g2.getFontMetrics(dateFont);
