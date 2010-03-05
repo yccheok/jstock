@@ -1122,6 +1122,8 @@ public class MainFrame extends javax.swing.JFrame {
     public void selectActivePortfolio(String portfolio) {
         // Save current portfolio.
         MainFrame.this.portfolioManagementJPanel.savePortfolio();
+        // Save current GUI options.
+        MainFrame.this.portfolioManagementJPanel.saveGUIOptions();
         // And switch to new portfolio.
         MainFrame.this.getJStockOptions().setPortfolioName(portfolio);
         MainFrame.this.portfolioManagementJPanel.initPortfolio();
@@ -1643,8 +1645,8 @@ public class MainFrame extends javax.swing.JFrame {
         saveGUIOptions();
 
         saveRealTimeStocks();
-        this.portfolioManagementJPanel.savePortfolio();        
-        
+        this.portfolioManagementJPanel.savePortfolio();
+
         jStockOptions.setCountry(country);
         MainFrame.this.statusBar.setCountryIcon(country.getIcon(), country.toString());
 

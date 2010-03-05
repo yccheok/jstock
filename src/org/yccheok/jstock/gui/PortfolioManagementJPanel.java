@@ -1712,11 +1712,11 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             final javax.swing.table.JTableHeader jTableHeader = treeTable.getTableHeader();
             final JTable jTable = jTableHeader.getTable();
             JTableUtilities.setJTableOptions(jTable, guiOptions.getJTableOptions(tableIndex));
-		}
-	}
+        }
+    }
 
     public boolean saveGUIOptions() {
-        if(Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config") == false)
+        if (Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config") == false)
         {
             return false;
         }
