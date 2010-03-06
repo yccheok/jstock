@@ -153,6 +153,8 @@ public class ChartJDialog extends javax.swing.JDialog {
         final ChartJDialogOptions chartJDialogOptions = MainFrame.getInstance().getChartJDialogOptions();
         /* Are we in price volume or candlestick chart? */
         this.changeMode(chartJDialogOptions.getMode());
+        /* Zoom in to which days? */
+        this.zoom(chartJDialogOptions.getZoom());
     }
 
     public StockHistoryServer getStockHistoryServer() {
@@ -686,10 +688,6 @@ public class ChartJDialog extends javax.swing.JDialog {
             }
             chartPanel.setChart(this.priceVolumeChart);
             this.chartLayerUI.updateTraceInfos();
-            /* Update high low labels as well. */
-            this.updateHighLowJLabels();
-            /* Reset all day labels. */
-            this.resetAllDayLabels();
         }
         else if (mode == Mode.Candlestick) {
             if (this.candlestickChart == null) {
@@ -697,10 +695,6 @@ public class ChartJDialog extends javax.swing.JDialog {
             }
             chartPanel.setChart(this.candlestickChart);
             this.chartLayerUI.updateTraceInfos();
-            /* Update high low labels as well. */
-            this.updateHighLowJLabels();
-            /* Reset all day labels. */
-            this.resetAllDayLabels();
         }
 
         if (this.getCurrentMode() != mode) {
@@ -717,7 +711,8 @@ public class ChartJDialog extends javax.swing.JDialog {
     }
 
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
-        changeMode(this.getCurrentMode());
+        this.changeMode(this.getCurrentMode());
+        this.zoom(MainFrame.getInstance().getChartJDialogOptions().getZoom());
     }//GEN-LAST:event_jComboBox1ActionPerformed
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
@@ -1234,6 +1229,7 @@ public class ChartJDialog extends javax.swing.JDialog {
             this.jLabel14.setFont(org.yccheok.jstock.gui.Utils.getBoldFont(this.jLabel14.getFont()));
             break;
         }
+        MainFrame.getInstance().getChartJDialogOptions().setZoom(z);
     }
 
     /**
