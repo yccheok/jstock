@@ -462,6 +462,11 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
             for (int i = 1; i < count; i++) {
                 final TimeSeriesCollection timeSeriesCollection = (TimeSeriesCollection)plot.getDataset(i);
 
+                /* Not ready. */
+                if (timeSeriesCollection == null) {
+                    continue;
+                }
+
                 final TimeSeries timeSeries = timeSeriesCollection.getSeries(0);
                 /* Time consuming. */
                 final int dataIndex = getDataIndex(timeSeries, day);
