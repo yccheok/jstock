@@ -1145,9 +1145,7 @@ public class ChartJDialog extends javax.swing.JDialog {
             this.resetAllDayLabels();
 
             /* Bold the target. */
-            final Font oldFont = me.getFont();
-            final Font font = new Font(oldFont.getFontName(), oldFont.getStyle() | Font.BOLD, oldFont.getSize());
-            me.setFont(font);
+            me.setFont(org.yccheok.jstock.gui.Utils.getBoldFont(me.getFont()));
         }
     }
 

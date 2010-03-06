@@ -23,6 +23,7 @@ import com.thoughtworks.xstream.XStream;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Desktop;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
@@ -1755,6 +1756,17 @@ public class Utils {
     public static File promptSaveZippedJFileChooser(String suggestedFileName) {
         final FileNameExtensionFilter zippedFilter = new FileNameExtensionFilter("Zipped Files (*.zip)", "zip");
         return promptSaveJFileChooser(suggestedFileName, zippedFilter);
+    }
+
+    /**
+     * Get a new bold version of specified font, with rest of specified font
+     * attributes remained the same.
+     * 
+     * @param font specified font
+     * @return a new bold version of specified font
+     */
+    public static Font getBoldFont(Font font) {
+        return new Font(font.getFontName(), font.getStyle() | Font.BOLD, font.getSize());
     }
 
     // Calling to this method will affect state of JStockOptions.
