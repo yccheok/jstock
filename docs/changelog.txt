@@ -3,6 +3,13 @@ Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
 JStock 1.0.5i - 2010-02-??
   Feature: Having pre-defined range for history chart (#2954753)
+  Feature: Support any type of email alert (Yahoo! Mail, your company mail...),
+           not just GMail email alert. (#2920400)
+  Feature: Remember the technical analysis settings and GUI options of history
+           chart. User needs not to select their favorite technical analysis
+           whenever a new history chart pops up.
+  Bugfix:  Portfolio column doesn't stay when switching to another portfolio.
+           (#2957712)
   Bugfix:  We want to avoid information box from keep changing its width while
            user moves along the mouse. This will prevent user from feeling,
            information box is flickering, which is uncomfortable to user's eye.
