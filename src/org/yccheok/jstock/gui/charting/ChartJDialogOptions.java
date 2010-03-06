@@ -58,11 +58,15 @@ public class ChartJDialogOptions {
     }
 
     /**
-     * Appends the specified TAEx to the end of this options.
+     * Appends the specified TAEx to the end of this options. No duplicated TAEx
+     * will be allowed.
      * @param taEx TAEx to be appended to this options
-     * @return <tt>true</tt>
+     * @return <tt>false</tt> if duplicated TAEx found
      */
     public boolean add(ChartJDialog.TAEx taEx) {
+        if (this.TAExs.contains(taEx)) {
+            return false;
+        }
         return this.TAExs.add(taEx);
     }
 
