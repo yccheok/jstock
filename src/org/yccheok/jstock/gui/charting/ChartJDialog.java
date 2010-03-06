@@ -73,7 +73,7 @@ import org.yccheok.jstock.internationalization.MessagesBundle;
  * @author  yccheok
  */
 public class ChartJDialog extends javax.swing.JDialog {
-    private enum TA {
+    public enum TA {
         SMA,
         CCI,
         RSI,
@@ -81,9 +81,19 @@ public class ChartJDialog extends javax.swing.JDialog {
         MFI
     }
 
-    private enum Mode {
+    public enum Mode {
         PriceVolume,
         Candlestick
+    }
+
+    public enum Zoom {
+        Days7,
+        Month1,
+        Months3,
+        Months6,
+        Year1,
+        All,
+        None
     }
 
     private Mode getCurrentMode() {
@@ -1907,7 +1917,7 @@ public class ChartJDialog extends javax.swing.JDialog {
         }
     }
 
-    private static class TAEx {
+    public static class TAEx {
         private TAEx(TA ta, Object parameter) {
             if (ta == null || parameter == null) {
                 throw new IllegalArgumentException("Method arguments cannot be null");
@@ -1918,6 +1928,22 @@ public class ChartJDialog extends javax.swing.JDialog {
 
         public static TAEx newInstance(TA ta, Object parameter) {
             return new TAEx(ta, parameter);
+        }
+
+        /**
+         * Get the technical analysis type.
+         * @return the technical analysis type
+         */
+        public TA getTA() {
+            return this.ta;
+        }
+
+        /**
+         * Get the technical analysis parameter
+         * @return the technical analysis parameter.
+         */
+        public Object getParameter() {
+            return this.parameter;
         }
 
         @Override
@@ -1941,8 +1967,8 @@ public class ChartJDialog extends javax.swing.JDialog {
             return hash;
         }
 
-        public final TA ta;
-        public final Object parameter;
+        private final TA ta;
+        private final Object parameter;
     }
 
     private final StockHistoryServer stockHistoryServer;
