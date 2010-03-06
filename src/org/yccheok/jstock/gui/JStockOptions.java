@@ -50,6 +50,20 @@ public class JStockOptions {
         this.yellowInformationBoxOption = yellowInformationBoxOption;
     }
 
+    /**
+     * @return the CCEmail
+     */
+    public String getCCEmail() {
+        return CCEmail;
+    }
+
+    /**
+     * @param CCEmail the CCEmail to set
+     */
+    public void setCCEmail(String CCEmail) {
+        this.CCEmail = CCEmail;
+    }
+
     public enum YellowInformationBoxOption {
         Stay,
         Follow,
@@ -79,6 +93,7 @@ public class JStockOptions {
         setPopupMessage(true);
         setSendEmail(false);
         setEmail("");
+        setCCEmail("");
         setEmailPassword("");
         setSMSEnabled(false);
         setGoogleCalendarUsername("");
@@ -131,6 +146,7 @@ public class JStockOptions {
     private boolean sendEmail;
     private String email;
     private String emailPassword;
+    private String CCEmail;
     private String googleCalendarUsername;
     private String googleCalendarPassword;
     private boolean SMSEnabled;
@@ -225,6 +241,7 @@ public class JStockOptions {
 
         //this.sendEmail = jStockOptions.sendEmail;
         //this.email = jStockOptions.email;
+        //this.CCEmail = jStockOptions.CCEmail;
         //this.emailPassword = jStockOptions.emailPassword;
         //this.googleCalendarUsername = jStockOptions.googleCalendarUsername;
         //this.googleCalendarPassword = jStockOptions.googleCalendarPassword;
@@ -318,6 +335,7 @@ public class JStockOptions {
         jStockOptions.popupMessage = this.popupMessage;
         //jStockOptions.sendEmail = this.sendEmail;
         //jStockOptions.email = this.email;
+        //jStockOptions.CCEmail = this.CCEmail;
         //jStockOptions.emailPassword = this.emailPassword;
         //jStockOptions.googleCalendarUsername = this.googleCalendarUsername;
         //jStockOptions.googleCalendarPassword = this.googleCalendarPassword;
@@ -507,6 +525,10 @@ public class JStockOptions {
             this.yellowInformationBoxOption = YellowInformationBoxOption.Follow;
         }
 
+        if (this.getCCEmail() == null) {
+            this.setCCEmail("");
+        }
+        
         return this;
     }    
     
