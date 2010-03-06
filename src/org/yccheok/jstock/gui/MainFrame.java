@@ -20,6 +20,7 @@
 package org.yccheok.jstock.gui;
 
 import org.yccheok.jstock.gui.charting.ChartJDialog;
+import org.yccheok.jstock.gui.charting.ChartJDialogOptions;
 import org.yccheok.jstock.alert.GoogleMail;
 import org.yccheok.jstock.alert.GoogleCalendar;
 import javax.swing.table.*;
@@ -83,17 +84,17 @@ public class MainFrame extends javax.swing.JFrame {
         try {
             UIManager.setLookAndFeel(getJStockOptions().getLooknFeel());
         }
-        catch(java.lang.ClassNotFoundException exp) {
-            log.error("", exp);
+        catch (java.lang.ClassNotFoundException exp) {
+            log.error(null, exp);
         }
-        catch(java.lang.InstantiationException exp) {
-            log.error("", exp);
+        catch (java.lang.InstantiationException exp) {
+            log.error(null, exp);
         }
-        catch(java.lang.IllegalAccessException exp) {
-            log.error("", exp);
+        catch (java.lang.IllegalAccessException exp) {
+            log.error(null, exp);
         }
-        catch(javax.swing.UnsupportedLookAndFeelException exp) {
-            log.error("", exp);
+        catch (javax.swing.UnsupportedLookAndFeelException exp) {
+            log.error(null, exp);
         }
 
         initComponents();
@@ -130,7 +131,8 @@ public class MainFrame extends javax.swing.JFrame {
         this.initOthersStockHistoryMonitor();
         this.initBrokingFirmLogos();
         this.initGUIOptions();
-
+        this.initChartJDialogOptions();
+        
         // Turn to the last viewed page.
         this.jTabbedPane1.setSelectedIndex(this.getJStockOptions().getLastSelectedPageIndex());
     }
@@ -768,15 +770,26 @@ public class MainFrame extends javax.swing.JFrame {
 
 
     private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem6ActionPerformed
-// TODO add your handling code here
         OptionsJDialog optionsJDialog = new OptionsJDialog(this, true);
         optionsJDialog.setLocationRelativeTo(this);
         optionsJDialog.set(jStockOptions);
         optionsJDialog.setVisible(true);		
     }//GEN-LAST:event_jMenuItem6ActionPerformed
 
+    /**
+     * Returns JStock options of this main frame.
+     * @return Jstock options of this main frame
+     */
     public JStockOptions getJStockOptions() {
-        return jStockOptions;
+        return this.jStockOptions;
+    }
+
+    /**
+     * Returns the chart dialog options of this main frame.
+     * @return the chart dialog options of this main frame
+     */
+    public ChartJDialogOptions getChartJDialogOptions() {
+        return this.chartJDialogOptions;
     }
 
     // windowClosing
@@ -806,6 +819,9 @@ public class MainFrame extends javax.swing.JFrame {
 
             log.info("saveGUIOptions...");
             this.saveGUIOptions();
+
+            log.info("saveChartJDialogOptions...");
+            this.saveChartJDialogOptions();
 
             log.info("saveBrokingFirmLogos...");
             this.saveBrokingFirmLogos();
@@ -1395,7 +1411,7 @@ public class MainFrame extends javax.swing.JFrame {
                 }                
             });
             
-            if(jStockOptions.getCountry() == country) {
+            if (jStockOptions.getCountry() == country) {
                 ((JRadioButtonMenuItem) mi).setSelected(true);
             }
         }
@@ -1572,6 +1588,7 @@ public class MainFrame extends javax.swing.JFrame {
          */
         this.saveJStockOptions();
         this.saveGUIOptions();
+        this.saveChartJDialogOptions();
         this.saveBrokingFirmLogos();
         this.saveRealTimeStocks();
         this.indicatorPanel.saveAlertIndicatorProjectManager();
@@ -1631,6 +1648,9 @@ public class MainFrame extends javax.swing.JFrame {
             this.indicatorPanel.initIndicatorProjectManager();
             this.indicatorPanel.initModuleProjectManager();
         }
+
+        // Do we need to reload GUI settings, and chart dialog options?
+        // Will sudden change in GUI, give user a shock?
     }
 
     private void changeCountry(Country country) {
@@ -1644,6 +1664,8 @@ public class MainFrame extends javax.swing.JFrame {
         /* Save the GUI look. */
         saveGUIOptions();
 
+        /* Need to save chart dialog options? */
+        
         saveRealTimeStocks();
         this.portfolioManagementJPanel.savePortfolio();
 
@@ -2462,23 +2484,41 @@ public class MainFrame extends javax.swing.JFrame {
         return Utils.toXML(guiOptions, f);
     }
 
-    private void initJStockOptions() {
-        final File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "options.xml");
-        this.jStockOptions = Utils.fromXML(JStockOptions.class, f);
-        
-        if (jStockOptions == null) {
-            jStockOptions = new JStockOptions();
+    /**
+     * Initialize chart dialog options.
+     */
+    private void initChartJDialogOptions() {
+        final File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "chartjdialogoptions.xml");
+        final ChartJDialogOptions tmp = Utils.fromXML(ChartJDialogOptions.class, f);
+        if (tmp == null) {
+            this.chartJDialogOptions = new ChartJDialogOptions();
         }
         else {
+            this.chartJDialogOptions = tmp;
+            log.info("chartJDialogOptions loaded from " + f.toString() + " successfully.");
+        }
+    }
+
+    /**
+     * Initialize JStock options.
+     */
+    private void initJStockOptions() {
+        final File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "options.xml");
+        final JStockOptions tmp = Utils.fromXML(JStockOptions.class, f);
+        if (tmp == null) {
+            this.jStockOptions = new JStockOptions();
+        }
+        else {
+            this.jStockOptions = tmp;
             log.info("jstockOptions loaded from " + f.toString() + " successfully.");
         }
         /* Hard core fix. */
-        if (jStockOptions.getScanningSpeed() == 0) {
-            jStockOptions.setScanningSpeed(1000);
+        if (this.jStockOptions.getScanningSpeed() == 0) {
+            this.jStockOptions.setScanningSpeed(1000);
         }
                 
-        final String proxyHost = jStockOptions.getProxyServer();
-        final int proxyPort = jStockOptions.getProxyPort();
+        final String proxyHost = this.jStockOptions.getProxyServer();
+        final int proxyPort = this.jStockOptions.getProxyPort();
         
         if ((proxyHost.length() > 0) && (org.yccheok.jstock.engine.Utils.isValidPortNumber(proxyPort))) {
             System.getProperties().put("http.proxyHost", proxyHost);
@@ -2490,7 +2530,7 @@ public class MainFrame extends javax.swing.JFrame {
         }
 
         for (Country country : Country.values()) {
-            final Class c = jStockOptions.getPrimaryStockServerFactoryClass(country);
+            final Class c = this.jStockOptions.getPrimaryStockServerFactoryClass(country);
             if (c == null) {
                 continue;
             }
@@ -2651,14 +2691,32 @@ public class MainFrame extends javax.swing.JFrame {
         return Utils.toXML(this.stockCodeAndSymbolDatabase, f);
     }
     
+    /**
+     * Save chart dialog options to disc.
+     * @return <tt>true</tt> if saving operation is success
+     */
+    private boolean saveChartJDialogOptions() {
+        if (Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config") == false)
+        {
+            return false;
+        }
+
+        File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "chartjdialogoptions.xml");
+        return org.yccheok.jstock.gui.Utils.toXML(this.chartJDialogOptions, f);
+    }
+
+    /**
+     * Save JStock options to disc.
+     * @return <tt>true</tt> if saving operation is success
+     */
     private boolean saveJStockOptions() {
-        if(Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config") == false)
+        if (Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config") == false)
         {
             return false;
         }
         
         File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "options.xml");
-        return org.yccheok.jstock.gui.Utils.toXML(jStockOptions, f);
+        return org.yccheok.jstock.gui.Utils.toXML(this.jStockOptions, f);
     }
 
     private void removeOldHistoryData(Country country) {
@@ -3373,6 +3431,7 @@ public class MainFrame extends javax.swing.JFrame {
     private Thread marketThread = null;
     private StockHistorySerializer stockHistorySerializer = null;        
     private JStockOptions jStockOptions;
+    private ChartJDialogOptions chartJDialogOptions;
     
     private IndicatorPanel indicatorPanel;
     private IndicatorScannerJPanel indicatorScannerJPanel;

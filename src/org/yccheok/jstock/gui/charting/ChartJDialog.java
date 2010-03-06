@@ -45,7 +45,6 @@ import org.jfree.chart.event.ChartChangeEvent;
 import org.jfree.chart.event.ChartChangeEventType;
 import org.jfree.chart.event.ChartChangeListener;
 import org.jfree.chart.labels.StandardXYToolTipGenerator;
-import org.jfree.chart.labels.XYToolTipGenerator;
 import org.jfree.chart.plot.CombinedDomainXYPlot;
 import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.XYPlot;
@@ -92,14 +91,13 @@ public class ChartJDialog extends javax.swing.JDialog {
         Months3,
         Months6,
         Year1,
-        All,
-        None
+        All
     }
 
     private Mode getCurrentMode() {
         final String selected = this.jComboBox1.getSelectedItem().toString();
 
-        if(selected.equals("Price Volume")) {
+        if (selected.equals("Price Volume")) {
             return Mode.PriceVolume;
         }
         else if(selected.equals("Candlestick")) {
@@ -143,6 +141,18 @@ public class ChartJDialog extends javax.swing.JDialog {
 
         /* Update the high low labels. */
         this.updateHighLowJLabels();
+
+        /* Restores previous chart dialog options. */
+        this.loadChartJDialogOptions();
+    }
+
+    /**
+     * Restores previous chart dialog options.
+     */
+    private void loadChartJDialogOptions() {
+        final ChartJDialogOptions chartJDialogOptions = MainFrame.getInstance().getChartJDialogOptions();
+        /* Are we in price volume or candlestick chart? */
+        this.changeMode(chartJDialogOptions.getMode());
     }
 
     public StockHistoryServer getStockHistoryServer() {
@@ -665,8 +675,12 @@ public class ChartJDialog extends javax.swing.JDialog {
         setBounds((screenSize.width-750)/2, (screenSize.height-600)/2, 750, 600);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
-        if (this.getCurrentMode() == Mode.PriceVolume) {
+    /**
+     * Changes the mode (price volume or candlestick chart) of this chart dialog.
+     * @param the mode (price volume or candlestick chart) of this chart dialog to be changed.
+     */
+    private void changeMode(Mode mode) {
+        if (mode == Mode.PriceVolume) {
             if (this.priceVolumeChart == null) {
                 this.priceVolumeChart = this.createPriceVolumeChart(stockHistoryServer);
             }
@@ -677,7 +691,7 @@ public class ChartJDialog extends javax.swing.JDialog {
             /* Reset all day labels. */
             this.resetAllDayLabels();
         }
-        else if (this.getCurrentMode() == Mode.Candlestick) {
+        else if (mode == Mode.Candlestick) {
             if (this.candlestickChart == null) {
                 this.candlestickChart = this.createCandlestickChart(stockHistoryServer);
             }
@@ -688,6 +702,22 @@ public class ChartJDialog extends javax.swing.JDialog {
             /* Reset all day labels. */
             this.resetAllDayLabels();
         }
+
+        if (this.getCurrentMode() != mode) {
+            if (mode == Mode.PriceVolume) {
+                this.jComboBox1.setSelectedIndex(0);
+            }
+            else if (mode == Mode.Candlestick) {
+                this.jComboBox1.setSelectedIndex(1);
+            }
+        }
+
+        /* Remember the setting. */
+        MainFrame.getInstance().getChartJDialogOptions().setMode(mode);
+    }
+
+    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+        changeMode(this.getCurrentMode());
     }//GEN-LAST:event_jComboBox1ActionPerformed
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
@@ -1039,8 +1069,7 @@ public class ChartJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jMenuItem8ActionPerformed
 
     private void jLabel9MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel9MouseClicked
-        dayJLabelBeingClicked = (JLabel)evt.getSource();
-        this.zoom(Calendar.DATE, -7);
+        this.zoom(Zoom.Days7);
     }//GEN-LAST:event_jLabel9MouseClicked
 
     /**
@@ -1142,24 +1171,6 @@ public class ChartJDialog extends javax.swing.JDialog {
     }
 
     /**
-     * Decide which day labels shall goes to bold, to indicate this label has
-     * been clicked.
-     */
-    private void updateDayJLabels() {
-        if (ChartJDialog.this.dayJLabelBeingClicked != null) {
-            /* Make the clicked label become bold. */
-            final JLabel me = ChartJDialog.this.dayJLabelBeingClicked;
-            ChartJDialog.this.dayJLabelBeingClicked = null;
-
-            /* Reset first. */
-            this.resetAllDayLabels();
-
-            /* Bold the target. */
-            me.setFont(org.yccheok.jstock.gui.Utils.getBoldFont(me.getFont()));
-        }
-    }
-
-    /**
      * Calculate and update high low value labels, according to current displayed
      * time range. This method will return immediately, as the calculating and
      * updating task by performed by user thread.
@@ -1174,11 +1185,63 @@ public class ChartJDialog extends javax.swing.JDialog {
     }
 
     /**
+     * Zoom in to this chart according to zoom information, and update day labels
+     * as well.
+     * @param zoom zoom information
+     */
+    private void zoom(Zoom z) {
+        switch(z) {
+        case Days7:
+            this._zoom(Calendar.DATE, -7);
+            /* Reset first. */
+            this.resetAllDayLabels();
+            this.jLabel9.setFont(org.yccheok.jstock.gui.Utils.getBoldFont(this.jLabel9.getFont()));
+            break;
+
+        case Month1:
+            this._zoom(Calendar.MONTH, -1);
+            /* Reset first. */
+            this.resetAllDayLabels();
+            this.jLabel10.setFont(org.yccheok.jstock.gui.Utils.getBoldFont(this.jLabel10.getFont()));
+            break;
+
+        case Months3:
+            this._zoom(Calendar.MONTH, -3);
+            /* Reset first. */
+            this.resetAllDayLabels();
+            this.jLabel11.setFont(org.yccheok.jstock.gui.Utils.getBoldFont(this.jLabel11.getFont()));
+            break;
+
+        case Months6:
+            this._zoom(Calendar.MONTH, -6);
+            /* Reset first. */
+            this.resetAllDayLabels();
+            this.jLabel12.setFont(org.yccheok.jstock.gui.Utils.getBoldFont(this.jLabel12.getFont()));
+            break;
+
+        case Year1:
+            this._zoom(Calendar.YEAR, -1);
+            /* Reset first. */
+            this.resetAllDayLabels();
+            this.jLabel13.setFont(org.yccheok.jstock.gui.Utils.getBoldFont(this.jLabel13.getFont()));
+            break;
+
+        case All:
+            this.chartPanel.restoreAutoBounds();
+            /* Reset first. */
+            this.resetAllDayLabels();
+            /* Bold the target. */
+            this.jLabel14.setFont(org.yccheok.jstock.gui.Utils.getBoldFont(this.jLabel14.getFont()));
+            break;
+        }
+    }
+
+    /**
      * Zoom in to this chart with specific amount of time.
      * @param field the calendar field.
      * @param amount the amount of date or time to be added to the field.
      */
-    private void zoom(int field, int amount) {
+    private void _zoom(int field, int amount) {
         this.chartPanel.restoreAutoBounds();
 
         final int itemCount = this.priceTimeSeries.getItemCount();
@@ -1250,28 +1313,23 @@ public class ChartJDialog extends javax.swing.JDialog {
     }
 
     private void jLabel10MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel10MouseClicked
-        dayJLabelBeingClicked = (JLabel)evt.getSource();
-        this.zoom(Calendar.MONTH, -1);
+        this.zoom(Zoom.Month1);
     }//GEN-LAST:event_jLabel10MouseClicked
 
     private void jLabel11MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel11MouseClicked
-        dayJLabelBeingClicked = (JLabel)evt.getSource();
-        this.zoom(Calendar.MONTH, -3);        
+        this.zoom(Zoom.Months3);
     }//GEN-LAST:event_jLabel11MouseClicked
 
     private void jLabel12MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel12MouseClicked
-        dayJLabelBeingClicked = (JLabel)evt.getSource();
-        this.zoom(Calendar.MONTH, -6);
+        this.zoom(Zoom.Months6);
     }//GEN-LAST:event_jLabel12MouseClicked
 
     private void jLabel13MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel13MouseClicked
-        dayJLabelBeingClicked = (JLabel)evt.getSource();
-        this.zoom(Calendar.YEAR, -1);
+        this.zoom(Zoom.Year1);
     }//GEN-LAST:event_jLabel13MouseClicked
 
     private void jLabel14MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel14MouseClicked
-        dayJLabelBeingClicked = (JLabel)evt.getSource();
-        this.chartPanel.restoreAutoBounds();
+        this.zoom(Zoom.All);
     }//GEN-LAST:event_jLabel14MouseClicked
    
     /**
@@ -1790,8 +1848,6 @@ public class ChartJDialog extends javax.swing.JDialog {
                     ChartJDialog.this.chartLayerUI.updateTraceInfos();
                     // Re-calculating high low value.
                     ChartJDialog.this.updateHighLowJLabels();
-                    // Decide which label shall goes bold.
-                    ChartJDialog.this.updateDayJLabels();
                 }
             }
         };
@@ -1985,11 +2041,6 @@ public class ChartJDialog extends javax.swing.JDialog {
      * Thread pool, used to hold threads to update high low labels.
      */
     private final Executor updateHighLowLabelsPool = Executors.newFixedThreadPool(1);
-
-    /**
-     * A flag, used to determine which JLabel (7 Days, 1 Month...) being clicked.
-     */
-    javax.swing.JLabel dayJLabelBeingClicked = null;
 
     /* Overlay layer. */
     private final ChartLayerUI<ChartPanel> chartLayerUI;

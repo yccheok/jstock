@@ -39,7 +39,7 @@ public class ChartJDialogOptions {
     /**
      * Zoom options.
      */
-    private ChartJDialog.Zoom zoom = ChartJDialog.Zoom.None;
+    private ChartJDialog.Zoom zoom = ChartJDialog.Zoom.All;
 
     /**
      * Removes all TAExs from this options.
