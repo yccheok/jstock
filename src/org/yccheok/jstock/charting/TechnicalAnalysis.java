@@ -114,7 +114,7 @@ public class TechnicalAnalysis {
             throw new java.lang.IllegalArgumentException("period must be greater than 0");
         }
 
-        final TimeSeries series = new TimeSeries(name, Day.class);
+        final TimeSeries series = new TimeSeries(name);
         final int num = stockHistoryServer.getNumOfCalendar();
 
         final Core core = new Core();
@@ -146,7 +146,7 @@ public class TechnicalAnalysis {
             throw new java.lang.IllegalArgumentException("period must be greater than 0");
         }
 
-        final TimeSeries series = new TimeSeries(name, Day.class);
+        final TimeSeries series = new TimeSeries(name);
         final int num = stockHistoryServer.getNumOfCalendar();
 
         final Core core = new Core();
@@ -183,7 +183,7 @@ public class TechnicalAnalysis {
             throw new java.lang.IllegalArgumentException("period must be greater than 0");
         }
 
-        final TimeSeries series = new TimeSeries(name, Day.class);
+        final TimeSeries series = new TimeSeries(name);
         final int num = stockHistoryServer.getNumOfCalendar();
 
         final Core core = new Core();
@@ -216,7 +216,7 @@ public class TechnicalAnalysis {
             throw new java.lang.IllegalArgumentException("period must be greater than 0");
         }
 
-        final TimeSeries series = new TimeSeries(name, Day.class);
+        final TimeSeries series = new TimeSeries(name);
         final int num = stockHistoryServer.getNumOfCalendar();
 
         final Core core = new Core();

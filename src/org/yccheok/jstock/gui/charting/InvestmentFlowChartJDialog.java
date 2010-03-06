@@ -192,7 +192,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
 
     private TimeSeries createOrUpdateROITimeSeries() {
         if (this.ROITimeSeries == null) {
-            this.ROITimeSeries = new TimeSeries(GUIBundle.getString("InvestmentFlowChartJDialog_ReturnOfInvestment"), Day.class);
+            this.ROITimeSeries = new TimeSeries(GUIBundle.getString("InvestmentFlowChartJDialog_ReturnOfInvestment"));
         }
 
         final CustomXYToolTipGenerator stock_ttg = new CustomXYToolTipGenerator();
@@ -256,7 +256,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         this.totalROIValue = _totalROIValue;
 
         stock_ttg.addToolTipSeries(toolTips);
-        this.ROIRenderer.setToolTipGenerator(stock_ttg);
+        this.ROIRenderer.setBaseToolTipGenerator(stock_ttg);
 
         // We cannot iterate over this.lookUpCodes.
         // realTimeStockMonitor's callback may remove lookUpCodes item during
@@ -271,7 +271,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
     }
 
     private XYDataset createInvestDataset() {
-        final TimeSeries series = new TimeSeries(GUIBundle.getString("InvestmentFlowChartJDialog_Invest"), Day.class);
+        final TimeSeries series = new TimeSeries(GUIBundle.getString("InvestmentFlowChartJDialog_Invest"));
         final ArrayList<String> toolTips = new ArrayList<String>();
         
         this.totalInvestValue = 0.0;
@@ -338,7 +338,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         rangeAxis1.setNumberFormatOverride(currencyFormat);
 
         XYItemRenderer renderer0 = plot.getRenderer();
-        renderer0.setToolTipGenerator(cash_ttg);
+        renderer0.setBaseToolTipGenerator(cash_ttg);
         
         plot.setRenderer(1, this.ROIRenderer);
         plot.setDataset(1, new TimeSeriesCollection(this.createOrUpdateROITimeSeries()));

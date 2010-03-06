@@ -1297,11 +1297,8 @@ public class ChartJDialog extends javax.swing.JDialog {
 
         XYPlot plot = new XYPlot(this.priceDataset, timeAxis, rangeAxis1, null);
 
-        XYToolTipGenerator toolTipGenerator = StandardXYToolTipGenerator.getTimeSeriesInstance();
-
         XYItemRenderer renderer1 = new XYLineAndShapeRenderer(true, false);
-        renderer1.setBaseToolTipGenerator(toolTipGenerator);    // ???
-        renderer1.setToolTipGenerator(
+        renderer1.setBaseToolTipGenerator(
             new StandardXYToolTipGenerator(
                 StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT,
                 new SimpleDateFormat("d-MMM-yyyy"), new DecimalFormat("0.00#")
@@ -1316,7 +1313,7 @@ public class ChartJDialog extends javax.swing.JDialog {
         plot.mapDatasetToRangeAxis(1, 1);
 
         XYBarRenderer renderer2 = new XYBarRenderer(0.20);
-        renderer2.setToolTipGenerator(
+        renderer2.setBaseToolTipGenerator(
             new StandardXYToolTipGenerator(
                 StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT,
                 new SimpleDateFormat("d-MMM-yyyy"), new DecimalFormat("0,000.00")
@@ -1340,7 +1337,7 @@ public class ChartJDialog extends javax.swing.JDialog {
     private TimeSeries getPriceTimeSeries(StockHistoryServer stockHistoryServer) {
 
         // create dataset 1...
-        TimeSeries series1 = new TimeSeries(GUIBundle.getString("ChartJDialog_Price"), Day.class);
+        TimeSeries series1 = new TimeSeries(GUIBundle.getString("ChartJDialog_Price"));
         final int num = stockHistoryServer.getNumOfCalendar();
         
         for(int i = 0; i < num; i++) {
@@ -1359,7 +1356,7 @@ public class ChartJDialog extends javax.swing.JDialog {
     private IntervalXYDataset getVolumeDataset(StockHistoryServer stockHistoryServer) {
 
         // create dataset 2...
-        TimeSeries series1 = new TimeSeries(GUIBundle.getString("ChartJDialog_Volume"), Day.class);
+        TimeSeries series1 = new TimeSeries(GUIBundle.getString("ChartJDialog_Volume"));
 
         final int num = stockHistoryServer.getNumOfCalendar();
         
@@ -1506,11 +1503,8 @@ public class ChartJDialog extends javax.swing.JDialog {
 
                 XYPlot plot = new XYPlot(dataset, timeAxis, rangeAxis1, null);
 
-                XYToolTipGenerator toolTipGenerator = StandardXYToolTipGenerator.getTimeSeriesInstance();
-
                 XYItemRenderer renderer1 = new XYLineAndShapeRenderer(true, false);
-                renderer1.setBaseToolTipGenerator(toolTipGenerator);
-                renderer1.setToolTipGenerator(
+                renderer1.setBaseToolTipGenerator(
                     new StandardXYToolTipGenerator(
                         StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT,
                         new SimpleDateFormat("d-MMM-yyyy"), new DecimalFormat("0.00#")
@@ -1583,11 +1577,8 @@ public class ChartJDialog extends javax.swing.JDialog {
 
                 XYPlot plot = new XYPlot(dataset, timeAxis, rangeAxis1, null);
 
-                XYToolTipGenerator toolTipGenerator = StandardXYToolTipGenerator.getTimeSeriesInstance();
-
                 XYItemRenderer renderer1 = new XYLineAndShapeRenderer(true, false);
-                renderer1.setBaseToolTipGenerator(toolTipGenerator);
-                renderer1.setToolTipGenerator(
+                renderer1.setBaseToolTipGenerator(
                     new StandardXYToolTipGenerator(
                         StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT,
                         new SimpleDateFormat("d-MMM-yyyy"), new DecimalFormat("0.00#")
@@ -1660,11 +1651,8 @@ public class ChartJDialog extends javax.swing.JDialog {
 
                 XYPlot plot = new XYPlot(dataset, timeAxis, rangeAxis1, null);
 
-                XYToolTipGenerator toolTipGenerator = StandardXYToolTipGenerator.getTimeSeriesInstance();
-
                 XYItemRenderer renderer1 = new XYLineAndShapeRenderer(true, false);
-                renderer1.setBaseToolTipGenerator(toolTipGenerator);
-                renderer1.setToolTipGenerator(
+                renderer1.setBaseToolTipGenerator(
                     new StandardXYToolTipGenerator(
                         StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT,
                         new SimpleDateFormat("d-MMM-yyyy"), new DecimalFormat("0.00#")

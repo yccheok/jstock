@@ -44,7 +44,7 @@ import org.jfree.data.time.TimeSeriesCollection;
 public class DynamicChart {
     /** Creates new form DynamicChart */
     public DynamicChart() {        
-        this.price = new TimeSeries("Price", Second.class);
+        this.price = new TimeSeries("Price");
         // Sets the maximumItemAge attribute, which specifies the maximum age of data items in the series
         // (in terms of the RegularTimePeriod type used by this series). Whenever a new data value is
         // added, any data items that are older than the limit specified by maximumItemAge are automatically
@@ -78,7 +78,7 @@ public class DynamicChart {
         plot.getDomainAxis().setVisible(false);
 
         XYItemRenderer renderer1 = plot.getRenderer();
-        renderer1.setToolTipGenerator(
+        renderer1.setBaseToolTipGenerator(
             new StandardXYToolTipGenerator(
                 StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT,
                 new SimpleDateFormat("h:mm:ss a"), new DecimalFormat("0.00#")
@@ -118,7 +118,7 @@ public class DynamicChart {
         rangeAxis1.setNumberFormatOverride(format);
         
         XYItemRenderer renderer1 = plot.getRenderer();
-        renderer1.setToolTipGenerator(
+        renderer1.setBaseToolTipGenerator(
             new StandardXYToolTipGenerator(
                 StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT,
                 new SimpleDateFormat("h:mm:ss a"), new DecimalFormat("0.00#")

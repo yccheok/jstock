@@ -152,7 +152,7 @@
           <SubComponents>
             <Component class="javax.swing.JCheckBox" name="jCheckBox1">
               <Properties>
-                <Property name="label" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
                   <ResourceString bundle="org/yccheok/jstock/data/gui.properties" key="OptionsSellAdvisorJPanel_ShowStockValueInDollar" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                 </Property>
               </Properties>

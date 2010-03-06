@@ -89,7 +89,7 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsSellAdvisorJPanel_Wealth"))); // NOI18N
 
-        jCheckBox1.setLabel(bundle.getString("OptionsSellAdvisorJPanel_ShowStockValueInDollar")); // NOI18N
+        jCheckBox1.setText(bundle.getString("OptionsSellAdvisorJPanel_ShowStockValueInDollar")); // NOI18N
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
