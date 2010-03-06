@@ -1400,7 +1400,7 @@ public class MainFrame extends javax.swing.JFrame {
     public void createCountryMenuItem() {
         final Country[] countries = Country.values();
 
-        for(Country country : countries) {
+        for (Country country : countries) {
             final JMenuItem mi = (JRadioButtonMenuItem) jMenu6.add(new JRadioButtonMenuItem(country.toString(), country.getIcon()));
             buttonGroup2.add(mi);
             mi.addActionListener(new ActionListener() {
