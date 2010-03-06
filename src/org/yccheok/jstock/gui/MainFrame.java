@@ -1298,23 +1298,23 @@ public class MainFrame extends javax.swing.JFrame {
   
     public void setLookAndFeel(String lafClassName) {
         /* Backward compataible purpose. Old JStockOptions may contain null in this field. */
-        if(lafClassName == null)
+        if (lafClassName == null) {
             return;
-        
+        }
         try {
             UIManager.setLookAndFeel(lafClassName);
             SwingUtilities.updateComponentTreeUI(this);
         }
-        catch(java.lang.ClassNotFoundException exp) {
+        catch (java.lang.ClassNotFoundException exp) {
             log.error(null, exp);
         }
-        catch(java.lang.InstantiationException exp) {
+        catch (java.lang.InstantiationException exp) {
             log.error(null, exp);
         }
-        catch(java.lang.IllegalAccessException exp) {
+        catch (java.lang.IllegalAccessException exp) {
             log.error(null, exp);
         }
-        catch(javax.swing.UnsupportedLookAndFeelException exp) {
+        catch (javax.swing.UnsupportedLookAndFeelException exp) {
             log.error(null, exp);
         }
         
@@ -1325,7 +1325,7 @@ public class MainFrame extends javax.swing.JFrame {
             javax.swing.JRadioButtonMenuItem m = (javax.swing.JRadioButtonMenuItem)button;
             ChangeLookAndFeelAction a = (ChangeLookAndFeelAction)m.getActionListeners()[0];
                         
-            if(a.getLafClassName().equals(lafClassName)) {
+            if (a.getLafClassName().equals(lafClassName)) {
                 m.setSelected(true);
                 break;                   
             }
@@ -1928,11 +1928,12 @@ public class MainFrame extends javax.swing.JFrame {
 
                     try {
                         String email = Utils.decrypt(jStockOptions.getEmail());
-                        GoogleMail.Send(email, Utils.decrypt(jStockOptions.getEmailPassword()), email + "@gmail.com", title, message);
+                        final String CCEmail = Utils.decrypt(jStockOptions.getCCEmail());
+                        GoogleMail.Send(email, Utils.decrypt(jStockOptions.getEmailPassword()), email + "@gmail.com", CCEmail, title, message);
                     } catch (AddressException exp) {
-                        log.error("", exp);
+                        log.error(null, exp);
                     } catch (MessagingException exp) {
-                        log.error("", exp);
+                        log.error(null, exp);
                     }
                 }
             };

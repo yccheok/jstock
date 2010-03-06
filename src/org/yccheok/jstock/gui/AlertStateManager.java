@@ -83,7 +83,7 @@ public class AlertStateManager extends Subject<Indicator, Boolean> {
             if (o == this)
                 return true;
 
-            if(!(o instanceof Key))
+            if (!(o instanceof Key))
                 return false;
 
             boolean result = true;
@@ -134,7 +134,7 @@ public class AlertStateManager extends Subject<Indicator, Boolean> {
     public synchronized void clearState()
     {
         alertRecords.clear();
-		stockCodeToAlertRecords.clear();
+        stockCodeToAlertRecords.clear();
     }
 
     /* Re-start a particular stock from the initial state. */
@@ -182,7 +182,7 @@ public class AlertStateManager extends Subject<Indicator, Boolean> {
             stockCodeToAlertRecords.remove(code);
         }
 
-		// Remember to reset back to old stock.
+        // Remember to reset back to old stock.
         indicator.setStock(oldStock);
     }
 

@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2009 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -400,12 +400,13 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                     final String message = title + "\n(JStock)";
 
                     try {
-                        String email = Utils.decrypt(jStockOptions.getEmail());
-                        GoogleMail.Send(email, Utils.decrypt(jStockOptions.getEmailPassword()), email + "@gmail.com", title, message);
+                        final String email = Utils.decrypt(jStockOptions.getEmail());
+                        final String CCEmail = Utils.decrypt(jStockOptions.getCCEmail());
+                        GoogleMail.Send(email, Utils.decrypt(jStockOptions.getEmailPassword()), email + "@gmail.com", CCEmail, title, message);
                     } catch (AddressException exp) {
-                        log.error("", exp);
+                        log.error(null, exp);
                     } catch (MessagingException exp) {
-                        log.error("", exp);
+                        log.error(null, exp);
                     }
                 }
             };
