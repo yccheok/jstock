@@ -58,7 +58,8 @@ public class TechnicalAnalysis {
     public static Double createMFI(java.util.List<Double> highs,
             java.util.List<Double> lows,
             java.util.List<Double> closes,
-            java.util.List<Integer> volumes, int period) {
+            // TODO: CRITICAL LONG BUG REVISED NEEDED.
+            java.util.List<Long> volumes, int period) {
         if (period <= 0) {
             throw new java.lang.IllegalArgumentException("period must be greater than 0");
         }

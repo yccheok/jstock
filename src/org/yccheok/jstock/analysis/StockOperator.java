@@ -119,7 +119,8 @@ public class StockOperator extends AbstractOperator {
             case TypicalPrice:
                 return new Double(TechnicalAnalysis.getTypicalPrice(stock));
             case Volume:
-                return new Integer(stock.getVolume());
+                // TODO: CRITICAL LONG BUG REVISED NEEDED.
+                return new Long(stock.getVolume());
             case ChangePrice:
                 return new Double(stock.getChangePrice());
             case ChagePricePercentage:

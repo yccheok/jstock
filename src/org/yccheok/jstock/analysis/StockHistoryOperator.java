@@ -112,7 +112,8 @@ public class StockHistoryOperator extends AbstractOperator {
         java.util.List<Double> highs = new java.util.ArrayList<Double>();
         java.util.List<Double> lows = new java.util.ArrayList<Double>();
         java.util.List<Double> closes = new java.util.ArrayList<Double>();
-        java.util.List<Integer> volumes = new java.util.ArrayList<Integer>();
+        // TODO: CRITICAL LONG BUG REVISED NEEDED.
+        java.util.List<Long> volumes = new java.util.ArrayList<Long>();
 
         java.util.Calendar startCalendar = new java.util.GregorianCalendar();
         startCalendar.setTime(startDate);
