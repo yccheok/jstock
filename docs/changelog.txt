@@ -1,7 +1,7 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
-JStock 1.0.5i - 2010-02-??
+JStock 1.0.5i - 2010-03-07
   Feature: Having predefined range for history chart. (#2954753) During
            buy-low-sell-high strategy, it answers the question liked "what is 
            the lowest and highest price during last 3 months?"
