@@ -229,7 +229,8 @@ public class IndicatorTableModel extends AbstractTableModelWithMemory {
         Double.class,
         Double.class,
         Double.class,
-        Integer.class,
+        // TODO: CRITICAL LONG BUG REVISED NEEDED.
+        Long.class,
         Double.class,
         Double.class,
         Integer.class,

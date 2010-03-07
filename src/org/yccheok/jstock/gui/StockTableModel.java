@@ -43,7 +43,7 @@ public class StockTableModel extends AbstractTableModelWithMemory {
     public Object getOldValueAt(int rowIndex, int columnIndex) {
         List<Object> stockInfo = oldTableModel.get(rowIndex);
         
-        if(null == stockInfo) return null;
+        if (null == stockInfo) return null;
         
         return stockInfo.get(columnIndex);        
     }
@@ -241,7 +241,8 @@ public class StockTableModel extends AbstractTableModelWithMemory {
         Double.class,
         Double.class,
         Double.class,
-        Integer.class,
+        // TODO: CRITICAL LONG BUG REVISED NEEDED.
+        Long.class,
         Double.class,
         Double.class,
         Integer.class,

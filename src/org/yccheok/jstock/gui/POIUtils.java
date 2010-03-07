@@ -56,6 +56,22 @@ public class POIUtils {
                 }
             }
             
+            // TODO: CRITICAL LONG BUG REVISED NEEDED.
+            if (value.getClass().equals(Long.class))
+            {
+                final Double doubleLong = new Double(((Long)value).doubleValue());
+                Method method2 = findMethodToInvoke(doubleLong);
+                if (method2 != null) {
+                    try {
+                        method2.invoke(cell, doubleLong);
+                    } catch (Exception e) {
+                        log.error(null, e);
+                    }
+
+                    return;
+                }
+            }
+
             // Cannot find any matching method. Convert to String and try again.
             final String string = value.toString();
 
