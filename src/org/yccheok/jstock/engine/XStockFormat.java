@@ -51,6 +51,17 @@ public class XStockFormat implements StockFormat {
         }
         return 0.0;
     }
+    
+    // TODO: CRITICAL LONG BUG REVISED NEEDED.
+    private static long toLongOr0(String d) {
+        try {
+            return Long.parseLong(d);
+        }
+        catch (NumberFormatException exp) {
+            log.error(null, exp);
+        }
+        return 0;
+    }
 
     @Override
     public java.util.List<Stock> parse(String source) {
@@ -78,7 +89,7 @@ public class XStockFormat implements StockFormat {
                 final double lastPrice = token_length > LAST_PRICE_TOKEN_INDEX ? toDoubleOr0(token_elements[LAST_PRICE_TOKEN_INDEX]) : 0.0;
                 final double highPrice = token_length > HIGH_PRICE_TOKEN_INDEX ? toDoubleOr0(token_elements[HIGH_PRICE_TOKEN_INDEX]) : 0.0;
                 final double lowPrice = token_length > LOW_PRICE_TOKEN_INDEX ? toDoubleOr0(token_elements[LOW_PRICE_TOKEN_INDEX]) : 0.0;
-                final int volume = token_length > VOLUME_TOKEN_INDEX ? toIntegerOr0(token_elements[VOLUME_TOKEN_INDEX])/100 : 0;
+                final long volume = token_length > VOLUME_TOKEN_INDEX ? toLongOr0(token_elements[VOLUME_TOKEN_INDEX])/100 : 0;
 
                 java.math.BigDecimal _prevPrice = new java.math.BigDecimal("" + prevPrice);
                 java.math.BigDecimal _lastPrice = new java.math.BigDecimal("" + lastPrice);

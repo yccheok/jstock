@@ -348,7 +348,8 @@ public class MutableStock {
         this.stock = s;        
     }
 
-    public void setVolume(int volume) {
+    // TODO: CRITICAL LONG BUG REVISED NEEDED.
+    public void setVolume(long volume) {
         final Stock s = new Stock(
                 stock.getCode(),
                 stock.getSymbol(),
