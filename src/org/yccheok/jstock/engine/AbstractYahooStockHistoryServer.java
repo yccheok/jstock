@@ -118,7 +118,8 @@ public abstract class AbstractYahooStockHistoryServer implements StockHistorySer
             double highPrice = 0.0;
             double lowPrice = 0.0;
             double closePrice = 0.0;
-            int volume = 0;
+            // TODO: CRITICAL LONG BUG REVISED NEEDED.
+            long volume = 0;
             //double adjustedClosePrice = 0.0;
 
             try {
@@ -127,7 +128,8 @@ public abstract class AbstractYahooStockHistoryServer implements StockHistorySer
                 highPrice = Double.parseDouble(fields[2]);
                 lowPrice = Double.parseDouble(fields[3]);
                 closePrice = Double.parseDouble(fields[4]);
-                volume = Integer.parseInt(fields[5]);
+                // TODO: CRITICAL LONG BUG REVISED NEEDED.
+                volume = Long.parseLong(fields[5]);
                 //adjustedClosePrice = Double.parseDouble(fields[6]);
             }
             catch(NumberFormatException exp) {

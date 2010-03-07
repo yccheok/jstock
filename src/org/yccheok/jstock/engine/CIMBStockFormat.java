@@ -90,7 +90,8 @@ public class CIMBStockFormat implements StockFormat {
                     double lastPrice;    
                     double highPrice;  
                     double lowPrice;
-                    int volume;
+                    // TODO: CRITICAL LONG BUG REVISED NEEDED.
+                    long volume;
                     double changePrice;
                     double changePricePercentage;
                     int lastVolume;    
@@ -133,7 +134,8 @@ public class CIMBStockFormat implements StockFormat {
                             lastPrice = Double.parseDouble(stockFields[LAST_PRICE_TOKEN_INDEX]);
                             highPrice = Double.parseDouble(stockFields[HIGH_PRICE_TOKEN_INDEX]);
                             lowPrice = Double.parseDouble(stockFields[LOW_PRICE_TOKEN_INDEX]);
-                            volume = Integer.parseInt(stockFields[VOLUME_TOKEN_INDEX]);
+                            // TODO: CRITICAL LONG BUG REVISED NEEDED.
+                            volume = Long.parseLong(stockFields[VOLUME_TOKEN_INDEX]);
                             changePrice = Double.parseDouble(stockFields[CHANGE_PRICE_TOKEN_INDEX]);
                             changePricePercentage = Double.parseDouble(stockFields[CHANGE_PRICE_PERCENTAGE_TOKEN_INDEX]);
                             lastVolume = Integer.parseInt(stockFields[LAST_VOLUME_TOKEN_INDEX]);
@@ -235,7 +237,8 @@ public class CIMBStockFormat implements StockFormat {
                             lastPrice = Double.parseDouble(stockFields[LAST_PRICE_TOKEN_INDEX - ADJUST_OFFSET]);
                             highPrice = Double.parseDouble(stockFields[HIGH_PRICE_TOKEN_INDEX - ADJUST_OFFSET]);
                             lowPrice = Double.parseDouble(stockFields[LOW_PRICE_TOKEN_INDEX - ADJUST_OFFSET]);
-                            volume = Integer.parseInt(stockFields[VOLUME_TOKEN_INDEX - ADJUST_OFFSET]);
+                            // TODO: CRITICAL LONG BUG REVISED NEEDED.
+                            volume = Long.parseLong(stockFields[VOLUME_TOKEN_INDEX - ADJUST_OFFSET]);
                             changePrice = Double.parseDouble(stockFields[CHANGE_PRICE_TOKEN_INDEX - ADJUST_OFFSET]);
                             changePricePercentage = Double.parseDouble(stockFields[CHANGE_PRICE_PERCENTAGE_TOKEN_INDEX - ADJUST_OFFSET]);
                             lastVolume = Integer.parseInt(stockFields[LAST_VOLUME_TOKEN_INDEX - ADJUST_OFFSET]);

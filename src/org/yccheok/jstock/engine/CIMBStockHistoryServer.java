@@ -227,8 +227,9 @@ public class CIMBStockHistoryServer implements StockHistoryServer {
                 final double highPrice = Double.parseDouble(stockFields[2]);
                 final double lowPrice = Double.parseDouble(stockFields[3]);
                 final double lastPrice = Double.parseDouble(stockFields[4]);
+                // TODO: CRITICAL LONG BUG REVISED NEEDED.
                 /* Our system will use 100 units as 1 lot. Our system are in lot unit. */
-                final int volume = Integer.parseInt(stockFields[5]) / 100;
+                final long volume = Long.parseLong(stockFields[5]) / 100;
                 java.math.BigDecimal _openPrice = new java.math.BigDecimal("" + openPrice);
                 java.math.BigDecimal _lastPrice = new java.math.BigDecimal("" + lastPrice);
                 java.math.BigDecimal _changePrice = _lastPrice.subtract(_openPrice);
