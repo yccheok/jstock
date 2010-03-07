@@ -79,7 +79,8 @@ public class MutableStock {
         return stock.getLowPrice();
     }
 
-    public int getVolume() {
+    // TODO: CRITICAL LONG BUG REVISED NEEDED.
+    public long getVolume() {
         return stock.getVolume();
     }
 
