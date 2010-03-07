@@ -86,7 +86,8 @@ public class Statements {
             final Atom atom2 = new Atom(new Double(stock.getHighPrice()), GUIBundle.getString("StockHistory_High"));
             final Atom atom3 = new Atom(new Double(stock.getLowPrice()), GUIBundle.getString("StockHistory_Low"));
             final Atom atom4 = new Atom(new Double(stock.getLastPrice()), GUIBundle.getString("StockHistory_Close"));
-            final Atom atom5 = new Atom(new Integer(stock.getVolume()), GUIBundle.getString("StockHistory_Volume"));
+            // TODO: CRITICAL LONG BUG REVISED NEEDED.
+            final Atom atom5 = new Atom(new Long(stock.getVolume()), GUIBundle.getString("StockHistory_Volume"));
             atoms.add(atom0);
             atoms.add(atom1);
             atoms.add(atom2);

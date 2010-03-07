@@ -40,7 +40,8 @@ public class Stock {
         double lastPrice,
         double highPrice,
         double lowPrice,
-        int volume,
+        // TODO: CRITICAL LONG BUG REVISED NEEDED.
+        long volume,
         double changePrice,
         double changePricePercentage,
         int lastVolume,
@@ -158,7 +159,8 @@ public class Stock {
         return lowPrice;
     }
 
-    public int getVolume() {
+    // TODO: CRITICAL LONG BUG REVISED NEEDED.
+    public long getVolume() {
         return volume;
     }
 
@@ -348,7 +350,8 @@ public class Stock {
     private final double lastPrice;    
     private final double highPrice;  
     private final double lowPrice;
-    private final int volume;
+    // TODO: CRITICAL LONG BUG REVISED NEEDED.
+    private final long volume;
     private final double changePrice;
     private final double changePricePercentage;
     private final int lastVolume;    

@@ -127,7 +127,8 @@ public class YahooStockFormat implements StockFormat {
             double lastPrice = 0.0;    
             double highPrice = 0.0;  
             double lowPrice = 0.0;
-            int volume = 0;
+            // TODO: CRITICAL LONG BUG REVISED NEEDED.
+            long volume = 0;
             double changePrice = 0.0;
             double changePricePercentage = 0.0;
             int lastVolume = 0;    
@@ -180,7 +181,8 @@ public class YahooStockFormat implements StockFormat {
                 try { lowPrice = Double.parseDouble(fields[12]); } catch (NumberFormatException exp) {}
 
                 if (length < 15) break;
-                try { volume = Integer.parseInt(fields[14]); } catch (NumberFormatException exp) {}
+                // TODO: CRITICAL LONG BUG REVISED NEEDED.
+                try { volume = Long.parseLong(fields[14]); } catch (NumberFormatException exp) {}
 
                 if (length < 17) break;
                 try { changePrice = Double.parseDouble(quotePattern.matcher(fields[16]).replaceAll("").trim()); } catch (NumberFormatException exp) {}
