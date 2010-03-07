@@ -222,7 +222,7 @@
                     <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                       <Font name="Tahoma" size="10" style="0"/>
                     </Property>
-                    <Property name="text" type="java.lang.String" value="&lt;html&gt;&lt;a href=&quot;http://jstock.sourceforge.net/faq.html?utm_source=jstock&amp;utm_medium=database_dialog#database&quot;&gt;JStock FAQ&lt;/a&gt;&lt;/html&gt;"/>
+                    <Property name="text" type="java.lang.String" value="&lt;html&gt;&lt;a href=&quot;http://jstock.sourceforge.net/help_stock_database.html?utm_source=jstock&amp;utm_medium=database_dialog&quot;&gt;JStock FAQ&lt;/a&gt;&lt;/html&gt;"/>
                   </Properties>
                   <Events>
                     <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jLabel3MouseClicked"/>

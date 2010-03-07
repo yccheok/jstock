@@ -392,7 +392,7 @@
                 </Property>
                 <Property name="contentType" type="java.lang.String" value="text/html"/>
                 <Property name="editable" type="boolean" value="false"/>
-                <Property name="text" type="java.lang.String" value="&lt;html&gt;&#xd;&#xa;  &lt;head&gt;&#xd;&#xa;&#xd;&#xa;  &lt;/head&gt;&#xd;&#xa;  &lt;body&gt;&#xd;&#xa;        &lt;p style=&quot;margin-top: 0; font-size: 8px; font-family: Tahoma;&quot;&gt;Click &lt;a href=&quot;http://jstock.sourceforge.net/faq.html#sms&quot;&gt;here&lt;/a&gt; to find out how to setup your mobile phone&lt;/p&gt;&#xa;  &lt;/body&gt;&#xd;&#xa;&lt;/html&gt;&#xd;&#xa;"/>
+                <Property name="text" type="java.lang.String" value="&lt;html&gt;&#xd;&#xa;  &lt;head&gt;&#xd;&#xa;&#xd;&#xa;  &lt;/head&gt;&#xd;&#xa;  &lt;body&gt;&#xd;&#xa;        &lt;p style=&quot;margin-top: 0; font-size: 8px; font-family: Tahoma;&quot;&gt;Click &lt;a href=&quot;http://jstock.sourceforge.net/help_sms_alert.html?utm_source=jstock&amp;utm_medium=alert_dialog&quot;&gt;here&lt;/a&gt; to find out how to setup your mobile phone&lt;/p&gt;&#xa;  &lt;/body&gt;&#xd;&#xa;&lt;/html&gt;&#xd;&#xa;"/>
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>
               <Events>

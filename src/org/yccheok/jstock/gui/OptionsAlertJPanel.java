@@ -131,7 +131,7 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
 
         jTextField1.setEnabled(false);
 
-        jLabel12.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+        jLabel12.setFont(new java.awt.Font("Tahoma", 0, 10));
         jLabel12.setText("(e.g. john@yahoo.com)");
         jLabel12.setEnabled(false);
 
@@ -226,7 +226,7 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         jEditorPane3.setBackground(new java.awt.Color(240, 240, 240));
         jEditorPane3.setContentType("text/html");
         jEditorPane3.setEditable(false);
-        jEditorPane3.setText("<html>\r\n  <head>\r\n\r\n  </head>\r\n  <body>\r\n        <p style=\"margin-top: 0; font-size: 8px; font-family: Tahoma;\">Click <a href=\"http://jstock.sourceforge.net/faq.html#sms\">here</a> to find out how to setup your mobile phone</p>\n  </body>\r\n</html>\r\n");
+        jEditorPane3.setText("<html>\r\n  <head>\r\n\r\n  </head>\r\n  <body>\r\n        <p style=\"margin-top: 0; font-size: 8px; font-family: Tahoma;\">Click <a href=\"http://jstock.sourceforge.net/help_sms_alert.html?utm_source=jstock&utm_medium=alert_dialog\">here</a> to find out how to setup your mobile phone</p>\n  </body>\r\n</html>\r\n");
         jEditorPane3.setEnabled(false);
         jEditorPane3.addHyperlinkListener(new javax.swing.event.HyperlinkListener() {
             public void hyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {

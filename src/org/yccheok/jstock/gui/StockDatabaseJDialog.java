@@ -196,12 +196,12 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
 
             jPanel2.add(jPanel5, java.awt.BorderLayout.PAGE_START);
 
-            jLabel2.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+            jLabel2.setFont(new java.awt.Font("Tahoma", 0, 10));
             jLabel2.setText(bundle.getString("StockDatabaseJDialog_NeedHelpVisit")); // NOI18N
             jPanel10.add(jLabel2);
 
-            jLabel3.setFont(new java.awt.Font("Tahoma", 0, 10));
-            jLabel3.setText("<html><a href=\"http://jstock.sourceforge.net/faq.html?utm_source=jstock&utm_medium=database_dialog#database\">JStock FAQ</a></html>");
+            jLabel3.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+            jLabel3.setText("<html><a href=\"http://jstock.sourceforge.net/help_stock_database.html?utm_source=jstock&utm_medium=database_dialog\">JStock FAQ</a></html>");
             jLabel3.addMouseListener(new java.awt.event.MouseAdapter() {
                 public void mouseClicked(java.awt.event.MouseEvent evt) {
                     jLabel3MouseClicked(evt);
@@ -322,7 +322,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jLabel3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel3MouseClicked
-        Utils.launchWebBrowser("http://jstock.sourceforge.net/faq.html?utm_source=jstock&utm_medium=database_dialog#database");
+        Utils.launchWebBrowser("http://jstock.sourceforge.net/help_stock_database.html?utm_source=jstock&utm_medium=database_dialog");
     }//GEN-LAST:event_jLabel3MouseClicked
 
     private void jLabel3MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel3MouseEntered
