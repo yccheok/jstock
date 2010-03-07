@@ -215,7 +215,6 @@ public class MainFrame extends javax.swing.JFrame {
         jMenu2 = new javax.swing.JMenu();
         jMenuItem3 = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JSeparator();
-        jMenuItem12 = new javax.swing.JMenuItem();
         jMenuItem5 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -556,23 +555,14 @@ public class MainFrame extends javax.swing.JFrame {
 
         jMenu2.setText("Help");
 
-        jMenuItem3.setText("Help");
-        javax.help.HelpBroker hb = this.getHelpBroker();
-        if(hb != null) {
-            this.jMenuItem3.addActionListener(
-                new CSH.DisplayHelpFromSource(hb)
-            );
-        }
-        jMenu2.add(jMenuItem3);
-        jMenu2.add(jSeparator1);
-
-        jMenuItem12.setText(bundle.getString("MainFrame_JStockHome")); // NOI18N
-        jMenuItem12.addActionListener(new java.awt.event.ActionListener() {
+        jMenuItem3.setText(bundle.getString("MainFrame_OnlineHelp")); // NOI18N
+        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem12ActionPerformed(evt);
+                jMenuItem3ActionPerformed(evt);
             }
         });
-        jMenu2.add(jMenuItem12);
+        jMenu2.add(jMenuItem3);
+        jMenu2.add(jSeparator1);
 
         jMenuItem5.setText("About...");
         jMenuItem5.addActionListener(new java.awt.event.ActionListener() {
@@ -1131,9 +1121,9 @@ public class MainFrame extends javax.swing.JFrame {
         dialog.setVisible(true);
     }//GEN-LAST:event_jMenuItem10ActionPerformed
 
-    private void jMenuItem12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem12ActionPerformed
-        Utils.launchWebBrowser("http://jstock.sourceforge.net/?utm_source=jstock&utm_medium=help_menu");
-    }//GEN-LAST:event_jMenuItem12ActionPerformed
+    private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
+        Utils.launchWebBrowser("http://jstock.sourceforge.net/help.html?utm_source=jstock&utm_medium=help_menu");
+    }//GEN-LAST:event_jMenuItem3ActionPerformed
 
     public void selectActivePortfolio(String portfolio) {
         // Save current portfolio.
@@ -2600,22 +2590,6 @@ public class MainFrame extends javax.swing.JFrame {
                 }
             });
         }
-    } 
-    
-    private javax.help.HelpBroker getHelpBroker() {
-        final String hsName = "jhelpset.hs";        
-        HelpSet hs = null;
-        
-        try {
-            ClassLoader cl = MainFrame.class.getClassLoader();
-            URL hsURL = HelpSet.findHelpSet(cl, hsName);
-            hs = new HelpSet(null, hsURL);
-        } catch (Exception exp) {
-            log.error("", exp);
-            return null;
-        }
-
-        return hs.createHelpBroker();
     }
 
     private boolean saveRealTimeStocks() {
@@ -3522,7 +3496,6 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem10;
     private javax.swing.JMenuItem jMenuItem11;
-    private javax.swing.JMenuItem jMenuItem12;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
