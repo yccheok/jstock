@@ -217,11 +217,12 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
         {
             final int modelRow = table.convertRowIndexToModel(row);
             final int modelCol = tableModel.findColumn(VOL);
-            
-            final int volume = (Integer)tableModel.getValueAt(modelRow, modelCol);
+            // TODO: CRITICAL LONG BUG REVISED NEEDED.
+            final long volume = (Long)tableModel.getValueAt(modelRow, modelCol);
 
             final Object o = tableModel.getOldValueAt(modelRow, modelCol);
-            final int oldVolume = ((o == null) ? volume : (Integer)o);
+            // TODO: CRITICAL LONG BUG REVISED NEEDED.
+            final long oldVolume = ((o == null) ? volume : (Long)o);
             this.performCellBlinking(c, volume, oldVolume, getNormalTextForegroundColor(alert), getBackgroundColor(row, alert));
             return c;
         }

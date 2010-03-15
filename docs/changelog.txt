@@ -1,6 +1,10 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.5j - 2010-03-15
+  Bugfix:  Critical bug fixed, when color changed options is being enabled, the
+           entire Real-Time Info tab will freeze. (#2968754) (#2970454)
+           
 JStock 1.0.5i - 2010-03-07
   Feature: Having predefined range for history chart. (#2954753) During
            buy-low-sell-high strategy, it answers the question liked "what is 
