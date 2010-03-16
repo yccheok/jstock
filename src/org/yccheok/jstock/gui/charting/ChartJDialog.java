@@ -150,9 +150,9 @@ public class ChartJDialog extends javax.swing.JDialog {
             public void run() {
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
-                   public void run() {
+                    public void run() {
                         loadChartJDialogOptions();
-                   }
+                    }
                 });
             }
         }).start();
@@ -609,8 +609,7 @@ public class ChartJDialog extends javax.swing.JDialog {
     }
 
     private void jMenuItem7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem7ActionPerformed
-        this.loadChartJDialogOptions();
-        //org.yccheok.jstock.gui.Utils.launchWebBrowser("http://jstock.sourceforge.net/ma_indicator.html?utm_source=jstock&utm_medium=chart_dialog");
+        org.yccheok.jstock.gui.Utils.launchWebBrowser("http://jstock.sourceforge.net/ma_indicator.html?utm_source=jstock&utm_medium=chart_dialog");
     }//GEN-LAST:event_jMenuItem7ActionPerformed
 
     private void jLabel9MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel9MouseClicked
