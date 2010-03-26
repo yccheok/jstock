@@ -57,6 +57,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -66,6 +67,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JRadioButton;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -861,113 +863,236 @@ public class Utils {
     }
 
     public static CloudFile loadFromCloud(String username, String password) {
-        final String url = "https://jstock-cloud.appspot.com/DownloadServlet";
-        final PostMethod post = new PostMethod(url);
-        InputStream inputStream = null;
-        OutputStream outputStream = null;
+        CaptchaRespond captchaRespond = null;
+        do {
+            final String url = "https://jstock-cloud.appspot.com/DownloadServlet";
+            final PostMethod post = new PostMethod(url);
+            InputStream inputStream = null;
+            OutputStream outputStream = null;
 
-        try {
-            org.yccheok.jstock.engine.Utils.setHttpClientProxyFromSystemProperties(httpClient);
-            org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
+            try {
+                org.yccheok.jstock.engine.Utils.setHttpClientProxyFromSystemProperties(httpClient);
+                org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
 
-            NameValuePair[] data = {
-                new NameValuePair("Email", username),
-                new NameValuePair("Passwd", password)
-            };
-            post.setRequestBody(data);          
-            // No ProxyAuth support yet. I do not know how to do so.
-            httpClient.executeMethod(post);
-            final Header header = post.getResponseHeader("Content-Type");
-            if (header == null || header.getValue() == null || false == header.getValue().equalsIgnoreCase("application/octet-stream")) {
+                NameValuePair[] data = {
+                    new NameValuePair("Email", username),
+                    new NameValuePair("Passwd", password)
+                };
+
+                if (captchaRespond == null) {
+                    data = new NameValuePair[] {
+                        new NameValuePair("Email", username),
+                        new NameValuePair("Passwd", password)
+                    };
+                }
+                else {
+                    data = new NameValuePair[] {
+                        new NameValuePair("Email", username),
+                        new NameValuePair("Passwd", password),
+                        new NameValuePair("logintoken", captchaRespond.logintoken),
+                        new NameValuePair("logincaptcha", captchaRespond.logincaptcha)
+                    };
+                }
+
+                post.setRequestBody(data);
+                // No ProxyAuth support yet. I do not know how to do so.
+                httpClient.executeMethod(post);
+                final Header header = post.getResponseHeader("Content-Type");
+                if (header == null || header.getValue() == null) {
+                    return null;
+                }
+
+                if (true == header.getValue().equalsIgnoreCase("text/plain")) {
+                    final String respond = post.getResponseBodyAsString();
+                    if (respond == null) {
+                        return null;
+                    }
+                    /* Captcha guess? */
+                    captchaRespond = Utils.getCapchaRespond(respond);
+
+                    if (captchaRespond == null) {
+                        return null;
+                    }
+                    continue;
+                }
+
+                if (false == header.getValue().equalsIgnoreCase("application/octet-stream")) {
+                    return null;
+                }
+
+                String _checksum = post.getResponseHeader("jstock-custom-checksum").getValue();
+                String _date = post.getResponseHeader("jstock-custom-date").getValue();
+                String _version = post.getResponseHeader("jstock-custom-version").getValue();
+                if (_checksum == null || _date == null || _version == null) {
+                    return null;
+                }
+
+                long checksum = Long.parseLong(_checksum);
+                long date = Long.parseLong(_date);
+                int version = Integer.parseInt(_version);
+
+                inputStream = post.getResponseBodyAsStream();
+                final File temp = File.createTempFile(Utils.getJStockUUID(), ".zip");
+                temp.deleteOnExit();
+                outputStream = new FileOutputStream(temp);
+                byte buf[] = new byte[1024];
+                int len;
+                while ((len = inputStream.read(buf)) > 0) {
+                    outputStream.write(buf, 0, len);
+                }
+                return CloudFile.newInstance(temp, checksum, date, version);
+            }
+            catch (FileNotFoundException ex) {
+                log.error(null, ex);
                 return null;
             }
-
-            String _checksum = post.getResponseHeader("jstock-custom-checksum").getValue();
-            String _date = post.getResponseHeader("jstock-custom-date").getValue();
-            String _version = post.getResponseHeader("jstock-custom-version").getValue();
-            if (_checksum == null || _date == null || _version == null) {
+            catch (IOException ex) {
+                log.error(null, ex);
                 return null;
             }
-
-            long checksum = Long.parseLong(_checksum);
-            long date = Long.parseLong(_date);
-            int version = Integer.parseInt(_version);
-
-            inputStream = post.getResponseBodyAsStream();
-            final File temp = File.createTempFile(Utils.getJStockUUID(), ".zip");
-            temp.deleteOnExit();
-            outputStream = new FileOutputStream(temp);
-            byte buf[] = new byte[1024];
-            int len;
-            while ((len = inputStream.read(buf)) > 0) {
-                outputStream.write(buf, 0, len);
+            catch(NumberFormatException ex) {
+                log.error(null, ex);
+                return null;
             }
-            return CloudFile.newInstance(temp, checksum, date, version);
-        }
-        catch (FileNotFoundException ex) {
-            log.error(null, ex);
-            return null;
-        }
-        catch (IOException ex) {
-            log.error(null, ex);
-            return null;
-        }
-        catch(NumberFormatException ex) {
-            log.error(null, ex);
-            return null;
-        }
-        finally {
-            if (outputStream != null) {
-                try {
-                    outputStream.close();
-                } catch (IOException ex) {
-                    log.error(null, ex);
+            finally {
+                if (outputStream != null) {
+                    try {
+                        outputStream.close();
+                    } catch (IOException ex) {
+                        log.error(null, ex);
+                    }
                 }
-            }
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (IOException ex) {
-                    log.error(null, ex);
+                if (inputStream != null) {
+                    try {
+                        inputStream.close();
+                    } catch (IOException ex) {
+                        log.error(null, ex);
+                    }
                 }
+                post.releaseConnection();
             }
-            post.releaseConnection();
+        } while (true);
+    }
+
+    private static class CaptchaRespond {
+        public final String logintoken;
+        public final String logincaptcha;
+        public CaptchaRespond(String logintoken, String logincaptcha) {
+            this.logintoken = logintoken;
+            this.logincaptcha = logincaptcha;
         }
     }
 
+    private static CaptchaRespond getCapchaRespond(String respond) {
+        assert(respond != null);
+
+        /* Handle Captcha. */
+        final String[] res = respond.split("\\r?\\n");
+        final Map<String, String> map = new HashMap<String, String>();
+        for (String r : res) {
+            final String[] v = r.split("=", 2);
+            if (v.length == 2) {
+                if (v[0].trim().length() == 0 || v[1].trim().length() == 0) {
+                    continue;
+                }
+                map.put(v[0], v[1]);
+            }
+        }
+
+        if (map.containsKey("CaptchaToken") && map.containsKey("CaptchaUrl")) {
+            final String CaptchaToken = map.get("CaptchaToken");
+            final String CaptchaUrl = map.get("CaptchaUrl");
+
+            try {
+                URL url = new URL("https://www.google.com/accounts/" + CaptchaUrl);
+                BufferedImage image = ImageIO.read(url);
+                final CaptchaInputJDialog dialog = new CaptchaInputJDialog(MainFrame.getInstance(), image, true);
+                // Possible deadlock?
+                // SwingUtilities.invokeAndWait(new Runnable() {
+                //    @Override
+                //    public void run() {                        
+                //        dialog.setLocationRelativeTo(MainFrame.getInstance());
+                //        dialog.setVisible(true);
+                //    }
+                //});
+                dialog.setLocationRelativeTo(MainFrame.getInstance());
+                dialog.setVisible(true);
+                if (dialog.getCaptcha() == null || dialog.getCaptcha().length() <= 0) {
+                    return null;
+                }
+                return new CaptchaRespond(CaptchaToken, dialog.getCaptcha());
+            }
+            catch (Exception exp) {
+                log.error(null, exp);
+                return null;
+            }
+        }
+        return null;
+    }
+
     public static boolean saveToCloud(String username, String password, File file) {
-        final String url = "https://jstock-cloud.appspot.com/UploadServlet";
-        final PostMethod post = new PostMethod(url);
+        CaptchaRespond captchaRespond = null;
 
-        try {
-            org.yccheok.jstock.engine.Utils.setHttpClientProxyFromSystemProperties(httpClient);
-            org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
-            Part[] parts = {
-                new StringPart("Email", username),
-                new StringPart("Passwd", password),
-                new StringPart("Date", new Date().getTime() + ""),
-                new StringPart("Checksum", org.yccheok.jstock.analysis.Utils.getChecksum(file) + ""),
-                new StringPart("Version", org.yccheok.jstock.gui.Utils.getApplicationVersionID() + ""),
-                new FilePart("file", file)
-            };
-            post.setRequestEntity(new MultipartRequestEntity(parts, post.getParams()));
+        do {
+            final String url = "https://jstock-cloud.appspot.com/UploadServlet";
+            final PostMethod post = new PostMethod(url);
+            try {
+                org.yccheok.jstock.engine.Utils.setHttpClientProxyFromSystemProperties(httpClient);
+                org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
+                Part[] parts = null;
 
-            // No ProxyAuth support yet. I do not know how to do so.
-            httpClient.executeMethod(post);
-            final String respond = post.getResponseBodyAsString();
-            return (respond != null && respond.equals("OK"));
-        } 
-        catch (FileNotFoundException ex) {
-            log.error(null, ex);
-            return false;
-        }
-        catch (IOException ex) {
-            log.error(null, ex);
-            return false;
-        }
-        finally {
-            post.releaseConnection();
-        }
+                if (captchaRespond == null) {
+                    parts = new Part[]{
+                        new StringPart("Email", username),
+                        new StringPart("Passwd", password),
+                        new StringPart("Date", new Date().getTime() + ""),
+                        new StringPart("Checksum", org.yccheok.jstock.analysis.Utils.getChecksum(file) + ""),
+                        new StringPart("Version", org.yccheok.jstock.gui.Utils.getApplicationVersionID() + ""),
+                        new FilePart("file", file)
+                    };
+                }
+                else {
+                    parts = new Part[]{
+                        new StringPart("Email", username),
+                        new StringPart("Passwd", password),
+                        new StringPart("Date", new Date().getTime() + ""),
+                        new StringPart("Checksum", org.yccheok.jstock.analysis.Utils.getChecksum(file) + ""),
+                        new StringPart("Version", org.yccheok.jstock.gui.Utils.getApplicationVersionID() + ""),
+                        new StringPart("logintoken", captchaRespond.logintoken),
+                        new StringPart("logincaptcha", captchaRespond.logincaptcha),
+                        new FilePart("file", file)
+                    };
+                }
+                post.setRequestEntity(new MultipartRequestEntity(parts, post.getParams()));
+
+                // No ProxyAuth support yet. I do not know how to do so.
+                httpClient.executeMethod(post);
+                final String respond = post.getResponseBodyAsString();
+                if (respond == null) {
+                    return false;
+                }
+                if (respond.equals("OK")) {
+                    return true;
+                }
+
+                captchaRespond = Utils.getCapchaRespond(respond);
+
+                if (captchaRespond == null) {
+                    return false;
+                }
+            }
+            catch (FileNotFoundException ex) {
+                log.error(null, ex);
+                return false;
+            }
+            catch (IOException ex) {
+                log.error(null, ex);
+                return false;
+            }
+            finally {
+                post.releaseConnection();
+            }
+        } while (true);
     }
 
     public static boolean isCompatible(int applicationVersionID) {
