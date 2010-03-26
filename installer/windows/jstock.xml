@@ -15,19 +15,19 @@
   <icon>C:\Projects\jstock\installer\windows\chart.ico</icon>
   <jre>
     <path></path>
-    <minVersion>1.6.0</minVersion>
+    <minVersion>1.6.1</minVersion>
     <maxVersion></maxVersion>
     <jdkPreference>preferJre</jdkPreference>
     <initialHeapSize>64</initialHeapSize>
     <maxHeapSize>512</maxHeapSize>
   </jre>
   <versionInfo>
-    <fileVersion>1.0.6.0</fileVersion>
-    <txtFileVersion>1.0.6.0</txtFileVersion>
+    <fileVersion>1.0.6.1</fileVersion>
+    <txtFileVersion>1.0.6.1</txtFileVersion>
     <fileDescription>JStock - Stock Market Software</fileDescription>
     <copyright>Yan Cheng CHEOK &lt;yccheok@yahoo.com&gt;</copyright>
-    <productVersion>1.0.6.0</productVersion>
-    <txtProductVersion>1.0.6.0</txtProductVersion>
+    <productVersion>1.0.6.1</productVersion>
+    <txtProductVersion>1.0.6.1</txtProductVersion>
     <productName>JStock - Stock Market Software</productName>
     <companyName>Yan Cheng CHEOK &lt;yccheok@yahoo.com&gt;</companyName>
     <internalName>jstock</internalName>
