@@ -273,20 +273,27 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        if (this.jTextField1.getText().length() == 0)
+        if (this.jTextField1.getText().trim().length() == 0)
         {
             JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_username_cannot_be_empty"), MessagesBundle.getString("warning_title_username_cannot_be_empty"), JOptionPane.WARNING_MESSAGE);
             this.jTextField1.requestFocus();
             return;
         }
 
-        if (false == org.apache.commons.validator.EmailValidator.getInstance().isValid(this.jTextField1.getText())) {
+        if (false == org.apache.commons.validator.EmailValidator.getInstance().isValid(this.jTextField1.getText().trim())) {
             JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_invalid_email_address"), MessagesBundle.getString("warning_title_invalid_email_address"), JOptionPane.WARNING_MESSAGE);
             this.jTextField1.requestFocus();
             return;
         }
         
         if (this.jPasswordField1.getPassword().length == 0)
+        {
+            JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_password_cannot_be_empty"), MessagesBundle.getString("warning_title_password_cannot_be_empty"), JOptionPane.WARNING_MESSAGE);
+            this.jPasswordField1.requestFocus();
+            return;
+        }
+
+        if (new String(this.jPasswordField1.getPassword()).trim().length() == 0)
         {
             JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_password_cannot_be_empty"), MessagesBundle.getString("warning_title_password_cannot_be_empty"), JOptionPane.WARNING_MESSAGE);
             this.jPasswordField1.requestFocus();
@@ -353,8 +360,8 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
                     // Only save account information when cloud operation success.
                     if (jCheckBox1.isSelected() == true) {
                         jStockOptions.setRememberGoogleAccountEnabled(true);
-                        jStockOptions.setGoogleUsername(Utils.encrypt(jTextField1.getText()));
-                        jStockOptions.setGooglePassword(Utils.encrypt(new String(jPasswordField1.getPassword())));
+                        jStockOptions.setGoogleUsername(Utils.encrypt(jTextField1.getText().trim()));
+                        jStockOptions.setGooglePassword(Utils.encrypt(new String(jPasswordField1.getPassword())).trim());
                     }
                     // Close the dialog once cloud operation success.
                     setVisible(false);
@@ -392,8 +399,8 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
 
                 publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_LoadingFromCloud..."), Icons.BUSY));
 
-                final String username = jTextField1.getText();
-                final String password = new String(jPasswordField1.getPassword());
+                final String username = jTextField1.getText().trim();
+                final String password = new String(jPasswordField1.getPassword()).trim();
 
                 final Utils.CloudFile cloudFile = Utils.loadFromCloud(username, password);
                 if (cloudFile == null) {
