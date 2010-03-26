@@ -873,10 +873,7 @@ public class Utils {
                 org.yccheok.jstock.engine.Utils.setHttpClientProxyFromSystemProperties(httpClient);
                 org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
 
-                NameValuePair[] data = {
-                    new NameValuePair("Email", username),
-                    new NameValuePair("Passwd", password)
-                };
+                NameValuePair[] data = null;
 
                 if (captchaRespond == null) {
                     data = new NameValuePair[] {
@@ -901,7 +898,8 @@ public class Utils {
                     return null;
                 }
 
-                if (true == header.getValue().equalsIgnoreCase("text/plain")) {
+                // Returns text/plain; charset=iso-8859-1
+                if (true == header.getValue().contains("text/plain")) {
                     final String respond = post.getResponseBodyAsString();
                     if (respond == null) {
                         return null;
