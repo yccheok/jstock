@@ -322,6 +322,13 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
         this.jTextField1.setEnabled(false);
         this.jPasswordField1.setEnabled(false);
         this.jCheckBox1.setEnabled(false);
+
+        // Update GUI immediately. So that user will not feel our app is slow.
+        jLabel3.setText(GUIBundle.getString("SaveToCloudJDialog_PreparingData..."));
+        jLabel4.setIcon(Icons.BUSY);
+        jLabel3.setVisible(true);
+        jLabel4.setVisible(true);
+
         this.saveToCloudTask = this.getSaveToCloudTask();
         this.saveToCloudTask.execute();
     }//GEN-LAST:event_jButton1ActionPerformed
