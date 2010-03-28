@@ -344,7 +344,7 @@ public class Utils {
         final List<String> defaultServer = java.util.Collections.unmodifiableList(java.util.Arrays.asList("time-a.nist.gov", "time-b.nist.gov", "time-nw.nist.gov"));
         List<String> servers = Utils.NTPServers;
         if (servers != null) {
-			// We already have the server list.
+            // We already have the server list.
             return servers;
         }
 
@@ -353,13 +353,13 @@ public class Utils {
             String[] s = server.split(",");
             if (s.length > 0) {
                 List<String> me = java.util.Collections.unmodifiableList(java.util.Arrays.asList(s));
-				// Save it! So that we need not to ask for server list again next time.
+                // Save it! So that we need not to ask for server list again next time.
                 Utils.NTPServers = me;
                 return me;
             }
         }
         
-		// Use default servers, so that we need not to ask for server list again next time.
+        // Use default servers, so that we need not to ask for server list again next time.
         Utils.NTPServers = defaultServer;
         return defaultServer;
     }
@@ -396,15 +396,15 @@ public class Utils {
             final Desktop desktop = Desktop.getDesktop();
             if (desktop.isSupported(Desktop.Action.BROWSE))
             {
-                    if (url == null) {
-                        // www.yahoo.com considered an invalid URL. Hence, evt.getURL() returns null.
-                        String string = "http://" + evt.getDescription();
-                        try {
-                            url = new URL(string);
-                        } catch (MalformedURLException ex) {
-                            return;
-                        }
+                if (url == null) {
+                    // www.yahoo.com considered an invalid URL. Hence, evt.getURL() returns null.
+                    String string = "http://" + evt.getDescription();
+                    try {
+                        url = new URL(string);
+                    } catch (MalformedURLException ex) {
+                        return;
                     }
+                }
                 try {
                     desktop.browse(url.toURI());
                 }
