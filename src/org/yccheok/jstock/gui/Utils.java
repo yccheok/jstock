@@ -989,7 +989,9 @@ public class Utils {
         for (String r : res) {
             final String[] v = r.split("=", 2);
             if (v.length == 2) {
-                if (v[0].trim().length() == 0 || v[1].trim().length() == 0) {
+                v[0] = v[0].trim();
+                v[1] = v[1].trim();
+                if (v[0].length() == 0 || v[1].length() == 0) {
                     continue;
                 }
                 map.put(v[0], v[1]);
