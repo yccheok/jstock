@@ -79,7 +79,7 @@ public class TechnicalAnalysis {
         double[] _highs = ArrayUtils.toPrimitive(highs.toArray(new Double[0]));
         double[] _lows = ArrayUtils.toPrimitive(lows.toArray(new Double[0]));
         double[] _closes = ArrayUtils.toPrimitive(closes.toArray(new Double[0]));
-        int[] _volumes = ArrayUtils.toPrimitive(volumes.toArray(new Integer[0]));
+        long[] _volumes = ArrayUtils.toPrimitive(volumes.toArray(new Long[0]));
 
         double[] dv = new double[_volumes.length];
         for (int i = 0; i < dv.length; i++) {
