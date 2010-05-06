@@ -160,4 +160,13 @@ public class Utils {
         }
         return portfolioNames;
     }
+
+    /**
+     * Returns default portfolio name for all country.
+     *
+     * @return default portfolio name for all country
+     */
+    public static String getDefaultPortfolioName() {
+        return "My Portfolio";
+    }
 }

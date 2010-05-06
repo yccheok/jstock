@@ -223,7 +223,7 @@ public class JStockOptions {
     // Use -1 to indicate unlimited SMS per day.
     private int maxSMSPerDay = -1;
 
-    private String portfolioName = "My Portfolio";
+    private String portfolioName = org.yccheok.jstock.portfolio.Utils.getDefaultPortfolioName();
 
     private YellowInformationBoxOption yellowInformationBoxOption = YellowInformationBoxOption.Follow;
     
@@ -510,7 +510,7 @@ public class JStockOptions {
         }
 
         if (this.portfolioName == null) {
-            this.portfolioName = "My Portfolio";
+            this.portfolioName = org.yccheok.jstock.portfolio.Utils.getDefaultPortfolioName();
         }
 
         if (this.maxSMSPerDay <= 0) {

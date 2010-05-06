@@ -1513,7 +1513,28 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
     
     public void initPortfolio() {
-        final Country country = MainFrame.getInstance().getJStockOptions().getCountry();
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+
+        final Country country = jStockOptions.getCountry();
+
+        // First, we need to determine what portfolio names are there for
+        // this country.
+        final List<String> availablePortfolioNames = org.yccheok.jstock.portfolio.Utils.getPortfolioNames();
+        if (availablePortfolioNames.size() <= 0) {
+            // This is a fresh country selection without any portfolio.
+            // If we are switching from a country with portfolio, to another
+            // country without portfolio, the previous portfolio name will be
+            // carried over. By following Principle of least suprise, portfolio
+            // name will be reset to default.
+            jStockOptions.setPortfolioName(org.yccheok.jstock.portfolio.Utils.getDefaultPortfolioName());
+        }
+        else {
+            // Is user selected portfolio name within current available portfolio names?
+            if (false == availablePortfolioNames.contains(jStockOptions.getPortfolioName())) {
+                // Nope. Reset user selected portfolio name to the first available name.
+                jStockOptions.setPortfolioName(availablePortfolioNames.get(0));
+            }
+        }
         
         boolean sellReadSuccess = false;
         boolean buyReadSuccess = false;

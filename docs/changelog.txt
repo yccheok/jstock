@@ -3,7 +3,10 @@ Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
 JStock 1.0.5L - 2010-04-27
   Bugfix:  MFI calculation causing infinity loop. (#2989168)
-  
+  Bugfix:  When changing to a new country, the previous country's portfolio name
+           will be carried over to new country. The new country's portfolio name
+           shouldn't have any relation with old country's.
+           
 JStock 1.0.5k - 2010-03-27
   Bugfix:  During "Save to Cloud" and "Load from Cloud", Google will prompt for
            captcha verification sometimes. We will support captcha right now.
