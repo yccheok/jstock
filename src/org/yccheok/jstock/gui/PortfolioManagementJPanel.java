@@ -1519,7 +1519,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         boolean buyReadSuccess = false;
         boolean oldData = false;
         {
-            File f = new File(org.yccheok.jstock.portfolio.Utils.getPortfoliosDirectory() + "buyportfolio.xml");
+            File f = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "buyportfolio.xml");
             if (f.exists() == false) {
                 f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "buyportfolio.xml");
                 oldData = true;
@@ -1532,7 +1532,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
 
         {
-            File f = new File(org.yccheok.jstock.portfolio.Utils.getPortfoliosDirectory() + "sellportfolio.xml");
+            File f = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "sellportfolio.xml");
             if (f.exists() == false) {
                 f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "sellportfolio.xml");
                 oldData = true;
@@ -1544,8 +1544,12 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             }
         }
         
-        if (buyReadSuccess == false) buyTreeTable.setTreeTableModel(new BuyPortfolioTreeTableModel());
-        if (sellReadSuccess == false) sellTreeTable.setTreeTableModel(new SellPortfolioTreeTableModel());
+        if (buyReadSuccess == false) {
+            buyTreeTable.setTreeTableModel(new BuyPortfolioTreeTableModel());
+        }
+        if (sellReadSuccess == false) {
+            sellTreeTable.setTreeTableModel(new SellPortfolioTreeTableModel());
+        }
 
         // We need to have a hack way, to have "Comment" in the model, but not visible to user.
         // So that our ToolTipHighlighter can work correctly.
@@ -1559,7 +1563,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         boolean depositSummaryReadSuccess = false;
         {
-            File f = new File(org.yccheok.jstock.portfolio.Utils.getPortfoliosDirectory() + "depositsummary.xml");
+            File f = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "depositsummary.xml");
             if (f.exists() == false) {
                 f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "depositsummary.xml");
                 oldData = true;
@@ -1576,7 +1580,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         boolean dividendSummaryReadSuccess = false;
         {
-            File f = new File(org.yccheok.jstock.portfolio.Utils.getPortfoliosDirectory() + "dividendsummary.xml");
+            File f = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "dividendsummary.xml");
             if (f.exists() == false) {
                 f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "dividendsummary.xml");
                 oldData = true;
@@ -1605,31 +1609,31 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
    
     public boolean savePortfolio() {
-        if (Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.portfolio.Utils.getPortfoliosDirectory()) == false)
+        if (Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory()) == false)
         {
             return false;
         }        
         
         boolean status = true;
 
-        String filePath = org.yccheok.jstock.portfolio.Utils.getPortfoliosDirectory() + "buyportfolio.xml";
+        String filePath = org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "buyportfolio.xml";
         final BuyPortfolioTreeTableModel buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
         if (org.yccheok.jstock.gui.Utils.toXML(buyPortfolioTreeTableModel, filePath) == false) {
             status = false;
         }
 
-        filePath = org.yccheok.jstock.portfolio.Utils.getPortfoliosDirectory() + "sellportfolio.xml";
+        filePath = org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "sellportfolio.xml";
         final SellPortfolioTreeTableModel sellPortfolioTreeTableModel = (SellPortfolioTreeTableModel)sellTreeTable.getTreeTableModel();
         if (org.yccheok.jstock.gui.Utils.toXML(sellPortfolioTreeTableModel, filePath) == false) {
             status = false;
         }
 
-        filePath = org.yccheok.jstock.portfolio.Utils.getPortfoliosDirectory() + "depositsummary.xml";
+        filePath = org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "depositsummary.xml";
         if (org.yccheok.jstock.gui.Utils.toXML(this.getDepositSummary(), filePath) == false) {
             status = false;
         }
 
-        filePath = org.yccheok.jstock.portfolio.Utils.getPortfoliosDirectory() + "dividendsummary.xml";
+        filePath = org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "dividendsummary.xml";
         if (org.yccheok.jstock.gui.Utils.toXML(this.getDividendSummary(), filePath) == false) {
             status = false;
         }

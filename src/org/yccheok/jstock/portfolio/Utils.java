@@ -77,8 +77,8 @@ public class Utils {
             return false;
         }
 
-		// Do not allow to create empty portfolio, if the desired location already
-		// contain portfolio files.
+        // Do not allow to create empty portfolio, if the desired location already
+        // contain portfolio files.
         if (new File(directory + "buyportfolio.xml").exists() || new File(directory + "depositsummary.xml").exists() ||
             new File(directory + "sellportfolio.xml").exists() || new File(directory + "dividendsummary.xml").exists()) {
             return false;
@@ -96,12 +96,24 @@ public class Utils {
         org.yccheok.jstock.gui.Utils.toXML(dividendSummary, directory + "dividendsummary.xml");
     }
 
-	// Get current active portfolio directory.
-    public static String getPortfoliosDirectory() {
+    /**
+     * Returns the current active portfolio directory, based on user selected
+     * portfolio. There is chance where the returned directory doesn't exist. To
+     * verify against existence, use <code>Utils.isPortfolioDirectory</code>.
+     *
+     * @return current active portfolio directory
+     */
+    public static String getPortfolioDirectory() {
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
         return getPortfolioDirectory(jStockOptions.getPortfolioName());
     }
 
+    /**
+     * Returns true if the given file is a portfolio directory.
+     *
+     * @param file The <code>File</code> to be checked against
+     * @return true if the given file is a portfolio directory
+     */
     private static boolean isPortfolioDirectory(File file) {
         if (false == file.isDirectory()) {
             return false;
@@ -111,6 +123,25 @@ public class Utils {
         return list.contains("buyportfolio.xml") && list.contains("sellportfolio.xml") && list.contains("depositsummary.xml") && list.contains("dividendsummary.xml");
     }
 
+    /**
+     * Returns all available portfolio directories for current selected country.
+     *
+     * @return all available portfolio directories for current selected country
+     */
+    public static List<String> getPortfolioDirectories() {
+        final List<String> names = Utils.getPortfolioNames();
+        List<String> directories = new ArrayList<String>();
+        for (String name : names) {
+            directories.add(Utils.getPortfolioDirectory(name));
+        }
+        return directories;
+    }
+
+    /**
+     * Returns all available portfolio names for current selected country.
+     *
+     * @return all available portfolio names for current selected country
+     */
     public static List<String> getPortfolioNames() {
         List<String> portfolioNames = new ArrayList<String>();
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
@@ -120,7 +151,7 @@ public class Utils {
             // Either dir does not exist or is not a directory
             return portfolioNames;
         } else {
-			// Only seek for 1st level directory.
+            // Only seek for 1st level directory.
             for (File child : children) {
                 if (isPortfolioDirectory(child)) {
                     portfolioNames.add(child.getName());

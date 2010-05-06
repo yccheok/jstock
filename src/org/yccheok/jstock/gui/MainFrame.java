@@ -38,9 +38,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 
-import javax.help.*;
 import javax.swing.*;
-import java.net.URL;
 import java.text.MessageFormat;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
