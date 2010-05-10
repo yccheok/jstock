@@ -225,6 +225,8 @@ public class JStockOptions {
 
     private String portfolioName = org.yccheok.jstock.portfolio.Utils.getDefaultPortfolioName();
 
+    private String watchlistName = org.yccheok.jstock.portfolio.Utils.getDefaultWatchlistName();
+
     private YellowInformationBoxOption yellowInformationBoxOption = YellowInformationBoxOption.Follow;
     
     public boolean isAutoBrokerFeeCalculationEnabled() {
@@ -322,6 +324,8 @@ public class JStockOptions {
 
         this.portfolioName = jStockOptions.portfolioName;
 
+        this.watchlistName = jStockOptions.watchlistName;
+
         this.yellowInformationBoxOption = jStockOptions.yellowInformationBoxOption;
     }
 
@@ -415,6 +419,8 @@ public class JStockOptions {
         jStockOptions.maxSMSPerDay = this.maxSMSPerDay;
 
         jStockOptions.portfolioName = this.portfolioName;
+
+        jStockOptions.watchlistName = this.watchlistName;
 
         jStockOptions.yellowInformationBoxOption = this.yellowInformationBoxOption;
 
@@ -511,6 +517,10 @@ public class JStockOptions {
 
         if (this.portfolioName == null) {
             this.portfolioName = org.yccheok.jstock.portfolio.Utils.getDefaultPortfolioName();
+        }
+
+        if (this.watchlistName == null) {
+            this.watchlistName = org.yccheok.jstock.portfolio.Utils.getDefaultWatchlistName();
         }
 
         if (this.maxSMSPerDay <= 0) {
@@ -1047,6 +1057,20 @@ public class JStockOptions {
      */
     public void setPortfolioName(String portfolioName) {
         this.portfolioName = portfolioName;
+    }
+
+    /**
+     * @return the watchlistName
+     */
+    public String getWatchlistName() {
+        return watchlistName;
+    }
+
+    /**
+     * @param watchlistName the watchlistName to set
+     */
+    public void setWatchlistName(String watchlistName) {
+        this.watchlistName = watchlistName;
     }
 
     /**
