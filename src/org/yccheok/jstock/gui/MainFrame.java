@@ -157,7 +157,6 @@ public class MainFrame extends javax.swing.JFrame {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
         buttonGroup2 = new javax.swing.ButtonGroup();
-        buttonGroup3 = new javax.swing.ButtonGroup();
         jPanel6 = new javax.swing.JPanel();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel8 = new javax.swing.JPanel();
@@ -206,6 +205,7 @@ public class MainFrame extends javax.swing.JFrame {
         jMenu6 = new javax.swing.JMenu();
         jMenu7 = new javax.swing.JMenu();
         jMenuItem8 = new javax.swing.JMenuItem();
+        jMenu9 = new javax.swing.JMenu();
         jMenu8 = new javax.swing.JMenu();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem6 = new javax.swing.JMenuItem();
@@ -255,7 +255,7 @@ public class MainFrame extends javax.swing.JFrame {
         jPanel8.setLayout(new java.awt.BorderLayout(5, 5));
 
         jTable1.setAutoCreateRowSorter(true);
-        jTable1.setFont(new java.awt.Font("Tahoma", 1, 12));
+        jTable1.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jTable1.setModel(new StockTableModel());
         jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         this.jTable1.setDefaultRenderer(Number.class, new StockTableCellRenderer());
@@ -523,6 +523,18 @@ public class MainFrame extends javax.swing.JFrame {
         jMenu7.add(jMenuItem8);
 
         jMenuBar2.add(jMenu7);
+
+        jMenu9.setText(bundle.getString("MainFrame_Watchlist")); // NOI18N
+        jMenu9.addMenuListener(new javax.swing.event.MenuListener() {
+            public void menuCanceled(javax.swing.event.MenuEvent evt) {
+            }
+            public void menuDeselected(javax.swing.event.MenuEvent evt) {
+            }
+            public void menuSelected(javax.swing.event.MenuEvent evt) {
+                jMenu9MenuSelected(evt);
+            }
+        });
+        jMenuBar2.add(jMenu9);
 
         jMenu8.setText("Portfolio");
         jMenu8.addMenuListener(new javax.swing.event.MenuListener() {
@@ -1075,15 +1087,14 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem9ActionPerformed
 
     private void jMenu8MenuSelected(javax.swing.event.MenuEvent evt) {//GEN-FIRST:event_jMenu8MenuSelected
-        // TODO add your handling code here:
         this.jMenu8.removeAll();
         final java.util.List<String> portfolioNames = org.yccheok.jstock.portfolio.Utils.getPortfolioNames();
         final String currentPortfolioName = this.getJStockOptions().getPortfolioName();
+        final javax.swing.ButtonGroup buttonGroup = new javax.swing.ButtonGroup();
         for (String portfolioName : portfolioNames) {
             final JMenuItem mi = (JRadioButtonMenuItem) jMenu8.add(new JRadioButtonMenuItem(portfolioName));
-            buttonGroup3.add(mi);
+            buttonGroup.add(mi);
             mi.addActionListener(new ActionListener() {
-
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     final String s = ((JRadioButtonMenuItem)e.getSource()).getText();
@@ -1097,9 +1108,8 @@ public class MainFrame extends javax.swing.JFrame {
         }
 
         jMenu8.addSeparator();
-        final JMenuItem mi = new JMenuItem(GUIBundle.getString("MainFrame_MultiplePortolio"));
+        final JMenuItem mi = new JMenuItem(GUIBundle.getString("MainFrame_MultiplePortolio"), this.getImageIcon("/images/16x16/calc.png"));
         mi.addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 multiplePortfolios();
@@ -1122,6 +1132,37 @@ public class MainFrame extends javax.swing.JFrame {
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
         Utils.launchWebBrowser("http://jstock.sourceforge.net/help.html?utm_source=jstock&utm_medium=help_menu");
     }//GEN-LAST:event_jMenuItem3ActionPerformed
+
+    private void jMenu9MenuSelected(javax.swing.event.MenuEvent evt) {//GEN-FIRST:event_jMenu9MenuSelected
+        this.jMenu9.removeAll();        
+        final java.util.List<String> watchlistNames = org.yccheok.jstock.portfolio.Utils.getWatchlistNames();
+        final String currentWatchlistName = this.getJStockOptions().getWatchlistName();
+        final javax.swing.ButtonGroup buttonGroup = new javax.swing.ButtonGroup();
+        for (String watchlistName : watchlistNames) {
+            final JMenuItem mi = (JRadioButtonMenuItem)this.jMenu9.add(new JRadioButtonMenuItem(watchlistName));
+            buttonGroup.add(mi);
+            mi.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    final String s = ((JRadioButtonMenuItem)e.getSource()).getText();
+                    if (false == s.equals(currentWatchlistName)) {
+                    }
+                }
+
+            });
+            mi.setSelected(watchlistName.equals(currentWatchlistName));
+        }
+
+        this.jMenu9.addSeparator();
+        final JMenuItem mi = new JMenuItem(GUIBundle.getString("MainFrame_MultipleWatchlist"), this.getImageIcon("/images/16x16/stock_timezone.png"));
+        mi.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            }
+
+        });
+        this.jMenu9.add(mi);
+    }//GEN-LAST:event_jMenu9MenuSelected
 
     public void selectActivePortfolio(String portfolio) {
         // Save current portfolio.
@@ -1373,12 +1414,12 @@ public class MainFrame extends javax.swing.JFrame {
     // Due to the unknown problem in netbeans IDE, we will add in the tooltip
     // and icon seperately.
     private void createIconsAndToolTipTextForJTabbedPane() {
-        this.jTabbedPane1.setIconAt(0, this.getImageIcon("/images/16x16/strokedocker.png"));
+        this.jTabbedPane1.setIconAt(0, this.getImageIcon("/images/16x16/stock_timezone.png"));
         this.jTabbedPane1.setIconAt(1, this.getImageIcon("/images/16x16/color_line.png"));
         this.jTabbedPane1.setIconAt(2, this.getImageIcon("/images/16x16/find.png"));
         this.jTabbedPane1.setIconAt(3, this.getImageIcon("/images/16x16/calc.png"));
         this.jTabbedPane1.setIconAt(4, this.getImageIcon("/images/16x16/smile.png"));
-        this.jTabbedPane1.setToolTipTextAt(0, "Watch your favorite stock movement in real time");
+        this.jTabbedPane1.setToolTipTextAt(0, "Watch your favorite stock movement");
         this.jTabbedPane1.setToolTipTextAt(1, "Customize your own stock indicator for alert purpose");
         this.jTabbedPane1.setToolTipTextAt(2, "Scan through the entire stock market so that you will be informed what to sell or buy");
         this.jTabbedPane1.setToolTipTextAt(3, "Manage your real time portfolio, which enable you to track buy and sell records");
@@ -3458,7 +3499,6 @@ public class MainFrame extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.ButtonGroup buttonGroup2;
-    private javax.swing.ButtonGroup buttonGroup3;
     private javax.swing.JComboBox jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel18;
@@ -3490,6 +3530,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu6;
     private javax.swing.JMenu jMenu7;
     private javax.swing.JMenu jMenu8;
+    private javax.swing.JMenu jMenu9;
     private javax.swing.JMenuBar jMenuBar2;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem10;

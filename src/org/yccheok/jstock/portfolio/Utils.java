@@ -66,9 +66,30 @@ public class Utils {
         return new SimpleStampDuty("SimpleStampDuty", Double.MAX_VALUE, contract.getTotal(), stampDuty);
     }
 
+    /**
+     * Returns portfolio directory, based on given portfolio name. There is
+     * chance where the returned directory doesn't exist. To verify against
+     * existence, use <code>Utils.isPortfolioDirectory</code>.
+     *
+     * @param name portfolio name
+     * @return portfolio directory, based on given portfolio name
+     */
     public static String getPortfolioDirectory(String name) {
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
         return org.yccheok.jstock.gui.Utils.getUserDataDirectory() + jStockOptions.getCountry() + File.separator + "portfolios" + File.separator + name + File.separator;
+    }
+
+    /**
+     * Returns watchlist directory, based on given watchlist name. There is
+     * chance where the returned directory doesn't exist. To verify against
+     * existence, use <code>Utils.isWatchlistDirectory</code>.
+     *
+     * @param name watchlist name
+     * @return watchlist directory, based on given watchlist name
+     */
+    public static String getWatchlistDirectory(String name) {
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        return org.yccheok.jstock.gui.Utils.getUserDataDirectory() + jStockOptions.getCountry() + File.separator + "watchlist" + File.separator + name + File.separator;
     }
 
     public static boolean createEmptyPortfolio(String name) {
@@ -124,6 +145,21 @@ public class Utils {
     }
 
     /**
+     * Returns true if the given file is a watchlist directory.
+     *
+     * @param file The <code>File</code> to be checked against
+     * @return true if the given file is a watchlist directory
+     */
+    private static boolean isWatchlistDirectory(File file) {
+        if (false == file.isDirectory()) {
+            return false;
+        }
+        String[] files = file.list();
+        List<String> list = Arrays.asList(files);
+        return list.contains("realtimestock.xml") && list.contains("realtimestockalert.xml");
+    }
+
+    /**
      * Returns all available portfolio directories for current selected country.
      *
      * @return all available portfolio directories for current selected country
@@ -162,11 +198,44 @@ public class Utils {
     }
 
     /**
+     * Returns all available watchlist names for current selected country.
+     *
+     * @return all available watchlist names for current selected country
+     */
+    public static List<String> getWatchlistNames() {
+        List<String> watchlistNames = new ArrayList<String>();
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final File file = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + jStockOptions.getCountry() + File.separator + "watchlist" + File.separator);
+        File[] children = file.listFiles();
+        if (children == null) {
+            // Either dir does not exist or is not a directory
+            return watchlistNames;
+        } else {
+            // Only seek for 1st level directory.
+            for (File child : children) {
+                if (isWatchlistDirectory(child)) {
+                    watchlistNames.add(child.getName());
+                }
+            }
+        }
+        return watchlistNames;
+    }
+
+    /**
      * Returns default portfolio name for all country.
      *
      * @return default portfolio name for all country
      */
     public static String getDefaultPortfolioName() {
         return "My Portfolio";
+    }
+
+    /**
+     * Returns default watchlist name for all country.
+     *
+     * @return default watchlist name for all country
+     */
+    public static String getDefaultWatchlistName() {
+        return "My Watchlist";
     }
 }
