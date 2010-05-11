@@ -1618,7 +1618,14 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         // New directory creation is needed, as we had moved the directory of portolio.
         if (oldData) {
-            this.savePortfolio();
+            if (this.savePortfolio()) {
+                // OK. We have the saved portfolio in new directory structure.
+                // Let's remove all the files from old directory structure.
+                new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "buyportfolio.xml").delete();
+                new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "sellportfolio.xml").delete();
+                new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "depositsummary.xml").delete();
+                new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "dividendsummary.xml").delete();
+            }
         }
 
         updateRealTimeStockMonitorAccordingToBuyPortfolioTreeTableModel();
