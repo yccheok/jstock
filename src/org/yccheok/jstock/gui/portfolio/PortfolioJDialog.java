@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
+ * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -73,19 +73,20 @@ public class PortfolioJDialog extends javax.swing.JDialog {
         jList1 = new javax.swing.JList();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Multiple Portfolios");
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
+        setTitle(bundle.getString("PortfolioJDialog_MultiplePortfolios")); // NOI18N
         setResizable(false);
         getContentPane().setLayout(new java.awt.BorderLayout(5, 5));
 
-        jXHeader1.setDescription("Share the fun of JStock with your love and family, by creating individual portfolio for every family members.");
+        jXHeader1.setDescription(bundle.getString("PortfolioJDialog_Description")); // NOI18N
         jXHeader1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/32x32/calc.png"))); // NOI18N
-        jXHeader1.setTitle("Multiple Portfolios");
+        jXHeader1.setTitle(bundle.getString("PortfolioJDialog_MultiplePortfolios")); // NOI18N
         getContentPane().add(jXHeader1, java.awt.BorderLayout.NORTH);
 
         jPanel2.setLayout(new java.awt.BorderLayout(5, 5));
 
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/filenew.png"))); // NOI18N
-        jButton1.setText("New...");
+        jButton1.setText(bundle.getString("New...")); // NOI18N
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -94,7 +95,7 @@ public class PortfolioJDialog extends javax.swing.JDialog {
         jPanel1.add(jButton1);
 
         jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/editdelete.png"))); // NOI18N
-        jButton2.setText("Delete");
+        jButton2.setText(bundle.getString("Delete")); // NOI18N
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
@@ -103,7 +104,7 @@ public class PortfolioJDialog extends javax.swing.JDialog {
         jPanel1.add(jButton2);
 
         jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/edit.png"))); // NOI18N
-        jButton3.setText("Rename...");
+        jButton3.setText(bundle.getString("Rename...")); // NOI18N
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton3ActionPerformed(evt);
@@ -114,7 +115,7 @@ public class PortfolioJDialog extends javax.swing.JDialog {
         jPanel2.add(jPanel1, java.awt.BorderLayout.NORTH);
 
         jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/apply.png"))); // NOI18N
-        jButton4.setText("OK");
+        jButton4.setText(bundle.getString("OK")); // NOI18N
         jButton4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton4ActionPerformed(evt);
@@ -124,7 +125,7 @@ public class PortfolioJDialog extends javax.swing.JDialog {
 
         jPanel2.add(jPanel3, java.awt.BorderLayout.PAGE_END);
 
-        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Portfolio"));
+        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("PortfolioJDialog_Portfolio"))); // NOI18N
         jPanel4.setLayout(new java.awt.BorderLayout());
 
         jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
