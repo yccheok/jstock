@@ -225,7 +225,7 @@ public class JStockOptions {
 
     private String portfolioName = org.yccheok.jstock.portfolio.Utils.getDefaultPortfolioName();
 
-    private String watchlistName = org.yccheok.jstock.portfolio.Utils.getDefaultWatchlistName();
+    private String watchlistName = org.yccheok.jstock.watchlist.Utils.getDefaultWatchlistName();
 
     private YellowInformationBoxOption yellowInformationBoxOption = YellowInformationBoxOption.Follow;
     
@@ -520,7 +520,7 @@ public class JStockOptions {
         }
 
         if (this.watchlistName == null) {
-            this.watchlistName = org.yccheok.jstock.portfolio.Utils.getDefaultWatchlistName();
+            this.watchlistName = org.yccheok.jstock.watchlist.Utils.getDefaultWatchlistName();
         }
 
         if (this.maxSMSPerDay <= 0) {

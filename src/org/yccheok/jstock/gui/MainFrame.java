@@ -1108,7 +1108,7 @@ public class MainFrame extends javax.swing.JFrame {
         }
 
         jMenu8.addSeparator();
-        final JMenuItem mi = new JMenuItem(GUIBundle.getString("MainFrame_MultiplePortolio"), this.getImageIcon("/images/16x16/calc.png"));
+        final JMenuItem mi = new JMenuItem(GUIBundle.getString("MainFrame_MultiplePortolio..."), this.getImageIcon("/images/16x16/calc.png"));
         mi.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -1135,7 +1135,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void jMenu9MenuSelected(javax.swing.event.MenuEvent evt) {//GEN-FIRST:event_jMenu9MenuSelected
         this.jMenu9.removeAll();        
-        final java.util.List<String> watchlistNames = org.yccheok.jstock.portfolio.Utils.getWatchlistNames();
+        final java.util.List<String> watchlistNames = org.yccheok.jstock.watchlist.Utils.getWatchlistNames();
         final String currentWatchlistName = this.getJStockOptions().getWatchlistName();
         final javax.swing.ButtonGroup buttonGroup = new javax.swing.ButtonGroup();
         for (String watchlistName : watchlistNames) {
@@ -1146,6 +1146,7 @@ public class MainFrame extends javax.swing.JFrame {
                 public void actionPerformed(ActionEvent e) {
                     final String s = ((JRadioButtonMenuItem)e.getSource()).getText();
                     if (false == s.equals(currentWatchlistName)) {
+                        MainFrame.this.selectActiveWatchlist(s);
                     }
                 }
 
@@ -1154,15 +1155,20 @@ public class MainFrame extends javax.swing.JFrame {
         }
 
         this.jMenu9.addSeparator();
-        final JMenuItem mi = new JMenuItem(GUIBundle.getString("MainFrame_MultipleWatchlist"), this.getImageIcon("/images/16x16/stock_timezone.png"));
+        final JMenuItem mi = new JMenuItem(GUIBundle.getString("MainFrame_MultipleWatchlist..."), this.getImageIcon("/images/16x16/stock_timezone.png"));
         mi.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                multipleWatchlists();
             }
 
         });
         this.jMenu9.add(mi);
     }//GEN-LAST:event_jMenu9MenuSelected
+
+    public void selectActiveWatchlist(String portfolio) {
+
+    }
 
     public void selectActivePortfolio(String portfolio) {
         // Save current portfolio.
@@ -1172,6 +1178,9 @@ public class MainFrame extends javax.swing.JFrame {
         // And switch to new portfolio.
         MainFrame.this.getJStockOptions().setPortfolioName(portfolio);
         MainFrame.this.portfolioManagementJPanel.initPortfolio();
+    }
+
+    private void multipleWatchlists() {
     }
 
     private void multiplePortfolios() {
