@@ -215,17 +215,17 @@ public class WatchlistJDialog extends javax.swing.JDialog {
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         final int select = jList1.getSelectedIndex();
         if (select < 0 || select >= jList1.getModel().getSize()) {
-            JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_you_must_select_portfolio"), MessagesBundle.getString("warning_title_you_must_select_portfolio"), JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_you_must_select_watchlist"), MessagesBundle.getString("warning_title_you_must_select_watchlist"), JOptionPane.WARNING_MESSAGE);
             return;
         }
         final String selectedValue = (String)jList1.getSelectedValue();
         if (selectedValue == null) {
-            JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_you_must_select_portfolio"), MessagesBundle.getString("warning_title_you_must_select_portfolio"), JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_you_must_select_watchlist"), MessagesBundle.getString("warning_title_you_must_select_watchlist"), JOptionPane.WARNING_MESSAGE);
             return;
         }
         final MainFrame mainFrame = MainFrame.getInstance();
-        if (mainFrame.getJStockOptions().getPortfolioName().equals(selectedValue)) {
-            JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_cannot_delete_current_active_portflio"), MessagesBundle.getString("warning_title_cannot_delete_current_active_portflio"), JOptionPane.WARNING_MESSAGE);
+        if (mainFrame.getJStockOptions().getWatchlistName().equals(selectedValue)) {
+            JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_cannot_delete_current_active_watchlist"), MessagesBundle.getString("warning_title_cannot_delete_current_active_watchlist"), JOptionPane.WARNING_MESSAGE);
             return;
         }
         final String output = MessageFormat.format(MessagesBundle.getString("question_message_delete_template"), selectedValue);
@@ -233,7 +233,7 @@ public class WatchlistJDialog extends javax.swing.JDialog {
         if (result != javax.swing.JOptionPane.YES_OPTION) {
             return;
         }
-        if (org.yccheok.jstock.gui.Utils.deleteDir(new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory(selectedValue))))
+        if (org.yccheok.jstock.gui.Utils.deleteDir(new File(org.yccheok.jstock.watchlist.Utils.getWatchlistDirectory(selectedValue))))
         {
             init();
         }
@@ -244,31 +244,30 @@ public class WatchlistJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-        String newPortfolioName = null;
+        String newWatchlistName = null;
         while (true) {
-            newPortfolioName = JOptionPane.showInputDialog(this, MessagesBundle.getString("info_message_enter_new_portfolio_name"));
+            newWatchlistName = JOptionPane.showInputDialog(this, MessagesBundle.getString("info_message_enter_new_watchlist_name"));
 
-            if (newPortfolioName == null) {
+            if (newWatchlistName == null) {
                 return;
             }
 
-            if (newPortfolioName.length() <= 0) {
-                JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_you_need_to_specific_portfolio_name"), MessagesBundle.getString("warning_title_you_need_to_specific_portfolio_name"), JOptionPane.WARNING_MESSAGE);
+            if (newWatchlistName.length() <= 0) {
+                JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_you_need_to_specific_watchlist_name"), MessagesBundle.getString("warning_title_you_need_to_specific_watchlist_name"), JOptionPane.WARNING_MESSAGE);
                 continue;
             }
 
-            if (new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory(newPortfolioName)).exists()) {
-                JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_already_a_portfolio_with_same_name"), MessagesBundle.getString("warning_title_already_a_portfolio_with_same_name"), JOptionPane.WARNING_MESSAGE);
+            if (new File(org.yccheok.jstock.watchlist.Utils.getWatchlistDirectory(newWatchlistName)).exists()) {
+                JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_already_a_watchlist_with_same_name"), MessagesBundle.getString("warning_title_already_a_watchlist_with_same_name"), JOptionPane.WARNING_MESSAGE);
                 continue;
             }
 
-            if (newPortfolioName.contains(File.separator)) {
-                JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_invalid_portfolio_name"), MessagesBundle.getString("warning_title_invalid_portfolio_name"), JOptionPane.WARNING_MESSAGE);
+            if (newWatchlistName.contains(File.separator)) {
+                JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_invalid_watchlist_name"), MessagesBundle.getString("warning_title_invalid_watchlist_name"), JOptionPane.WARNING_MESSAGE);
                 continue;
             }
 
-            if (false == org.yccheok.jstock.portfolio.Utils.createEmptyPortfolio(newPortfolioName))
+            if (false == org.yccheok.jstock.watchlist.Utils.createEmptyWatchlist(newWatchlistName))
             {
                 JOptionPane.showMessageDialog(this, MessagesBundle.getString("error_message_unknown_error_during_new"), MessagesBundle.getString("error_title_unknown_error_during_new"), JOptionPane.ERROR_MESSAGE);
                 continue;
@@ -288,16 +287,15 @@ public class WatchlistJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jList1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jList1MouseClicked
-        // TODO add your handling code here:
         final JList list = (JList)evt.getSource();
         // Double-click
         if (evt.getClickCount() == 2) {          
             // Get item index
             final int index = list.locationToIndex(evt.getPoint());
-            final String portfolio = list.getModel().getElementAt(index).toString();
-            if (MainFrame.getInstance().getJStockOptions().getPortfolioName().equals(portfolio) == false) {
-                MainFrame.getInstance().selectActivePortfolio(portfolio);
-                // Ensure Bold effect on active portfolio.    
+            final String watchlist = list.getModel().getElementAt(index).toString();
+            if (MainFrame.getInstance().getJStockOptions().getWatchlistName().equals(watchlist) == false) {
+                MainFrame.getInstance().selectActiveWatchlist(watchlist);
+                // Ensure Bold effect on active watchlist.
                 this.jList1.repaint();
             }
         }
@@ -305,7 +303,7 @@ public class WatchlistJDialog extends javax.swing.JDialog {
 
     private void init() {
         ((DefaultListModel)(this.jList1.getModel())).clear();
-        List<String> names = org.yccheok.jstock.portfolio.Utils.getPortfolioNames();
+        final List<String> names = org.yccheok.jstock.watchlist.Utils.getWatchlistNames();
         for (String name : names) {
             ((DefaultListModel)(this.jList1.getModel())).addElement(name);
         }
@@ -319,9 +317,9 @@ public class WatchlistJDialog extends javax.swing.JDialog {
                 Component component = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (component != null && value != null) {
                     final MainFrame mainFrame = MainFrame.getInstance();
-                    final String portfolioName = mainFrame.getJStockOptions().getPortfolioName();
+                    final String watchlistName = mainFrame.getJStockOptions().getWatchlistName();
 
-                    if (value.toString().equals(portfolioName)) {
+                    if (value.toString().equals(watchlistName)) {
                         component.setFont(new Font(component.getFont().getName(), Font.BOLD, component.getFont().getSize()));
                     }
                 }
