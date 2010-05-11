@@ -84,6 +84,11 @@ public class Utils {
         return org.yccheok.jstock.gui.Utils.getUserDataDirectory() + jStockOptions.getCountry() + File.separator + "portfolios" + File.separator + name + File.separator;
     }
 
+    /**
+     * Creates empty portfolio for current selected country.
+     *
+     * @return true if empty portfolio creation success
+     */
     public static boolean createEmptyPortfolio(String name) {
         final String directory = getPortfolioDirectory(name);
         if (false == org.yccheok.jstock.gui.Utils.createCompleteDirectoryHierarchyIfDoesNotExist(directory)) {

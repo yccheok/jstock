@@ -25,13 +25,17 @@ import java.util.Arrays;
 import java.util.List;
 import org.yccheok.jstock.gui.JStockOptions;
 import org.yccheok.jstock.gui.MainFrame;
+import org.yccheok.jstock.gui.StockTableModel;
 
 /**
  *
  * @author yccheok
  */
 public class Utils {
-    // Prevent from being instantiated.
+
+    /**
+     * Prevent from being instantiated.
+     */
     private Utils() {
     }
 
@@ -95,5 +99,29 @@ public class Utils {
      */
     public static String getDefaultWatchlistName() {
         return "My Watchlist";
+    }
+
+    /**
+     * Creates empty watchlist for current selected country.
+     *
+     * @return true if empty watchlist creation success
+     */
+    public static boolean createEmptyWatchlist(String name) {
+        final String directory = getWatchlistDirectory(name);
+        if (false == org.yccheok.jstock.gui.Utils.createCompleteDirectoryHierarchyIfDoesNotExist(directory)) {
+            return false;
+        }
+
+        // Do not allow to create empty watchlist, if the desired location already
+        // contain watchlist files.
+        if (new File(directory + "realtimestock.xml").exists() || new File(directory + "realtimestockalert.xml").exists()) {
+            return false;
+        }
+
+        final StockTableModel stockTableModel = new StockTableModel();
+
+        return
+        org.yccheok.jstock.gui.Utils.toXML(stockTableModel, directory + "realtimestock.xml") &&
+        org.yccheok.jstock.gui.Utils.toXML(stockTableModel.getAlerts(), directory + "realtimestockalert.xml");
     }
 }
