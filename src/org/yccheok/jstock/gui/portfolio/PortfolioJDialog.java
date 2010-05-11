@@ -305,7 +305,7 @@ public class PortfolioJDialog extends javax.swing.JDialog {
 
     private void init() {
         ((DefaultListModel)(this.jList1.getModel())).clear();
-        List<String> names = org.yccheok.jstock.portfolio.Utils.getPortfolioNames();
+        final List<String> names = org.yccheok.jstock.portfolio.Utils.getPortfolioNames();
         for (String name : names) {
             ((DefaultListModel)(this.jList1.getModel())).addElement(name);
         }
