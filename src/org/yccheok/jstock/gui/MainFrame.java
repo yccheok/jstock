@@ -591,7 +591,6 @@ public class MainFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
-// TODO add your handling code here:
         if (this.getStockCodeAndSymbolDatabase() == null) {
             javax.swing.JOptionPane.showMessageDialog(this, "We haven't connected to stock server.", "Not Connected", javax.swing.JOptionPane.INFORMATION_MESSAGE);
             return;
@@ -2643,7 +2642,7 @@ public class MainFrame extends javax.swing.JFrame {
     private boolean saveRealTimeStocks() {
         final Country country = jStockOptions.getCountry();
 
-        if(Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config") == false)
+        if (Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config") == false)
         {
             return false;
         }
@@ -2659,7 +2658,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     private boolean saveBrokingFirmLogos() {
-        if(Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "logos") == false)
+        if (Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "logos") == false)
         {
             return false;
         }
