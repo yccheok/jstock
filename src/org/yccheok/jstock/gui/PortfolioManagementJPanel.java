@@ -1583,10 +1583,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         // Update GUI. Shall we?
         if (SwingUtilities.isEventDispatchThread()) {
-            this.buyTreeTable.setTreeTableModel(buyPortfolioTreeTableModel);
-            this.sellTreeTable.setTreeTableModel(sellPortfolioTreeTableModel);
-            this.depositSummary = _depositSummary;
-            this.dividendSummary = _dividendSummary;
+            PortfolioManagementJPanel.this.buyTreeTable.setTreeTableModel(buyPortfolioTreeTableModel);
+            PortfolioManagementJPanel.this.sellTreeTable.setTreeTableModel(sellPortfolioTreeTableModel);
+            PortfolioManagementJPanel.this.depositSummary = _depositSummary;
+            PortfolioManagementJPanel.this.dividendSummary = _dividendSummary;
             // We need to have a hack way, to have "Comment" in the model, but not visible to user.
             // So that our ToolTipHighlighter can work correctly.
             // setVisible should be called after JXTreeTable has been constructed. This is to avoid
@@ -1594,8 +1594,32 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             // ToolTipHighlighter will not work correctly if we tend to hide column view by removeColumn.
             // We need to hide the view by using TableColumnExt.setVisible.
             // Why? Don't ask me. Ask SwingX team.
-            ((TableColumnExt)this.buyTreeTable.getColumn("Comment")).setVisible(false);
-            ((TableColumnExt)this.sellTreeTable.getColumn("Comment")).setVisible(false);
+            ((TableColumnExt)PortfolioManagementJPanel.this.buyTreeTable.getColumn("Comment")).setVisible(false);
+            ((TableColumnExt)PortfolioManagementJPanel.this.sellTreeTable.getColumn("Comment")).setVisible(false);
+
+            // New directory creation is needed, as we had moved the directory of portolio.
+            if (oldData) {
+                if (PortfolioManagementJPanel.this.savePortfolio()) {
+                    // OK. We have the saved portfolio in new directory structure.
+                    // Let's remove all the files from old directory structure.
+                    buyPortfolioFile.delete();
+                    sellPortfolioFile.delete();
+                    depositSummaryFile.delete();
+                    dividendSummaryFile.delete();
+                    final File config_directory = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config");
+                    if (config_directory.list().length <= 0) {
+                        // Empty directory. Remove it.
+                        config_directory.delete();
+                    }
+                }
+            }
+
+            PortfolioManagementJPanel.this.updateRealTimeStockMonitorAccordingToBuyPortfolioTreeTableModel();
+
+            PortfolioManagementJPanel.this.updateWealthHeader();
+
+            // Give user preferred GUI look. We do it here, because the entire table model is being changed.
+            PortfolioManagementJPanel.this.initGUIOptions();
         }
         else {
             final BuyPortfolioTreeTableModel tmp0 = buyPortfolioTreeTableModel;
@@ -1619,33 +1643,33 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     // Why? Don't ask me. Ask SwingX team.
                     ((TableColumnExt)PortfolioManagementJPanel.this.buyTreeTable.getColumn("Comment")).setVisible(false);
                     ((TableColumnExt)PortfolioManagementJPanel.this.sellTreeTable.getColumn("Comment")).setVisible(false);
+
+                    // New directory creation is needed, as we had moved the directory of portolio.
+                    if (oldData) {
+                        if (PortfolioManagementJPanel.this.savePortfolio()) {
+                            // OK. We have the saved portfolio in new directory structure.
+                            // Let's remove all the files from old directory structure.
+                            buyPortfolioFile.delete();
+                            sellPortfolioFile.delete();
+                            depositSummaryFile.delete();
+                            dividendSummaryFile.delete();
+                            final File config_directory = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config");
+                            if (config_directory.list().length <= 0) {
+                                // Empty directory. Remove it.
+                                config_directory.delete();
+                            }
+                        }
+                    }
+
+                    PortfolioManagementJPanel.this.updateRealTimeStockMonitorAccordingToBuyPortfolioTreeTableModel();
+
+                    PortfolioManagementJPanel.this.updateWealthHeader();
+
+                    // Give user preferred GUI look. We do it here, because the entire table model is being changed.
+                    PortfolioManagementJPanel.this.initGUIOptions();
                 }
             });
         }
-
-        // New directory creation is needed, as we had moved the directory of portolio.
-        if (oldData) {
-            if (this.savePortfolio()) {
-                // OK. We have the saved portfolio in new directory structure.
-                // Let's remove all the files from old directory structure.
-                buyPortfolioFile.delete();
-                sellPortfolioFile.delete();
-                depositSummaryFile.delete();
-                dividendSummaryFile.delete();
-                final File config_directory = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config");
-                if (config_directory.list().length <= 0) {
-                    // Empty directory. Remove it.
-                    config_directory.delete();
-                }
-            }
-        }
-
-        this.updateRealTimeStockMonitorAccordingToBuyPortfolioTreeTableModel();
-        
-        this.updateWealthHeader();
-
-        // Give user preferred GUI look. We do it here, because the entire table model is being changed.
-        this.initGUIOptions();
     }
    
     public boolean savePortfolio() {
