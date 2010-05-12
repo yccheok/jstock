@@ -2,6 +2,8 @@ This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
 JStock 1.0.5L - 2010-??-??
+  Feature: Support multiple watchlists. Manage your favorite stock watchlist, by
+           splitting them into high growth stocks and dividend gained stocks.
   Bugfix:  MFI calculation causing infinity loop. (#2989168)
   Bugfix:  When changing to a new country, the previous country's portfolio name
            will be carried over to new country. The new country's portfolio name
