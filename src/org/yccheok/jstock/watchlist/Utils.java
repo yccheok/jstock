@@ -121,7 +121,7 @@ public class Utils {
         final StockTableModel stockTableModel = new StockTableModel();
 
         return
-        org.yccheok.jstock.gui.Utils.toXML(stockTableModel, directory + "realtimestock.xml") &&
+        org.yccheok.jstock.gui.Utils.toXML(stockTableModel.getStocks(), directory + "realtimestock.xml") &&
         org.yccheok.jstock.gui.Utils.toXML(stockTableModel.getAlerts(), directory + "realtimestockalert.xml");
     }
 }
