@@ -542,7 +542,10 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
         getFileEx(fileExs, "logos");
         for (Country country : Country.values()) {
             getFileEx(fileExs, country + File.separator + "portfolios");
+            // For legacy usage. Shall be removed after a few more release
+            // later than 1.0.5k
             getFileEx(fileExs, country + File.separator + "config");
+            getFileEx(fileExs, country + File.separator + "watchlist");
         }
 
         // Create a buffer for reading the files
