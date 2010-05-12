@@ -1255,18 +1255,24 @@ public class MainFrame extends javax.swing.JFrame {
         
         StockTableModel tableModel = (StockTableModel)jTable1.getModel();            
 
-        if(stockCodeHistoryGUI != null) stockCodeHistoryGUI.clear();
-        if(realTimeStockMonitor != null) realTimeStockMonitor.clearStockCodes();
-        if(stockHistoryMonitor != null) stockHistoryMonitor.clearStockCodes();
+        if (stockCodeHistoryGUI != null) {
+            stockCodeHistoryGUI.clear();
+        }
+        if (realTimeStockMonitor != null) {
+            realTimeStockMonitor.clearStockCodes();
+        }
+        if (stockHistoryMonitor != null) {
+            stockHistoryMonitor.clearStockCodes();
+        }
         tableModel.clearAllStocks();     
         this.initAlertStateManager();
 
         updateBuyerSellerInformation(null);
         this.updateDynamicChart(null);
 
-        if(stockCodeHistoryGUI != null) {
-            if(stockCodeHistoryGUI.size() == 0) {
-                if(this.stockCodeAndSymbolDatabase != null) {
+        if (stockCodeHistoryGUI != null) {
+            if (stockCodeHistoryGUI.size() == 0) {
+                if (this.stockCodeAndSymbolDatabase != null) {
                     statusBar.setProgressBar(false);
                     statusBar.setMainMessage("Connected");
                 }
@@ -2593,68 +2599,164 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     private void initRealTimeStocks() {
-        final Country country = jStockOptions.getCountry();
-        final File f0 = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "realtimestock.xml");
-        java.util.List<Stock> s = Utils.fromXML(java.util.List.class, f0);
-        if (s != null) {
-            log.info("Real time stocks loaded from " + f0.toString() + " successfully.");
+        final Country country = this.jStockOptions.getCountry();
+
+        // First, we need to determine what watchlist names are there for
+        // this country.
+        final java.util.List<String> availableWatchlistNames = org.yccheok.jstock.watchlist.Utils.getWatchlistNames();
+        final boolean oldData;
+        if (availableWatchlistNames.size() <= 0) {
+            // This is a fresh country selection without any watchlist.
+            // If we are switching from a country with watchlist, to another
+            // country without watchlist, the previous watchlist name will be
+            // carried over. By following Principle of least suprise, watchlist
+            // name will be reset to default.
+            this.jStockOptions.setWatchlistName(org.yccheok.jstock.watchlist.Utils.getDefaultWatchlistName());
+            oldData = true;
         }
-       
-        File f1 = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "realtimestockalert.xml");
-        java.util.List<StockAlert> a = Utils.fromXML(java.util.List.class, f1);
-        if (a != null) {
-            log.info("Real time stocks' alert loaded from " + f1.toString() + " successfully.");
+        else {
+            // Is user selected watchlist name within current available watchlist names?
+            if (false == availableWatchlistNames.contains(this.jStockOptions.getWatchlistName())) {
+                // Nope. Reset user selected watchlist name to the first available name.
+                this.jStockOptions.setWatchlistName(availableWatchlistNames.get(0));
+            }
+            oldData = false;
+        }
+        
+        final File realTimeStockFile;
+        final File realTimeStockAlertFile;
+        // Determine the files to be loaded from disc.
+        if (oldData) {
+            // Let's load through old way.
+            realTimeStockFile = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "realtimestock.xml");
+            realTimeStockAlertFile = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "realtimestockalert.xml");
+        }
+        else {
+            // New directory structure.
+            realTimeStockFile = new File(org.yccheok.jstock.watchlist.Utils.getWatchlistDirectory(this.jStockOptions.getWatchlistName())  + "realtimestock.xml");
+            realTimeStockAlertFile = new File(org.yccheok.jstock.watchlist.Utils.getWatchlistDirectory(this.jStockOptions.getWatchlistName())  + "realtimestockalert.xml");
         }
 
-        clearAllStocks();
-        
-        if(s != null) {            
-            final java.util.List<Stock> stocks = s;
-            final java.util.List<StockAlert> alerts = a;
-            
+        // Try to load files from disc.
+        java.util.List<Stock> stocks = Utils.fromXML(java.util.List.class, realTimeStockFile);
+        java.util.List<StockAlert> alerts = Utils.fromXML(java.util.List.class, realTimeStockAlertFile);
+
+        // Is XML files reading success? If not, initialize data structure with
+        // empty data.
+        if (stocks == null) {
+            stocks = new java.util.ArrayList<Stock>();
+        }
+        if (alerts == null) {
+            alerts = new java.util.ArrayList<StockAlert>();
+        }
+
+        // Update GUI. Shall we?
+        if (SwingUtilities.isEventDispatchThread()) {
+            // Remove previous stocks from GUI.
+            MainFrame.this.clearAllStocks();
+            // Insert stocks and alerts into GUI.
+            if (alerts.size() != stocks.size())
+            {
+                for (Stock stock : stocks) {
+                    final Stock emptyStock = Utils.getEmptyStock(stock.getCode(), stock.getSymbol());
+                    MainFrame.this.addStockToTable(emptyStock);
+                    MainFrame.this.realTimeStockMonitor.addStockCode(emptyStock.getCode());
+                }
+            }
+            else
+            {
+                final int size = stocks.size();
+                for(int i = 0; i < size; i++) {
+                    final Stock stock = stocks.get(i);
+                    final StockAlert alert = alerts.get(i);
+                    final Stock emptyStock = Utils.getEmptyStock(stock.getCode(), stock.getSymbol());
+                    MainFrame.this.addStockToTable(emptyStock, alert);
+                    MainFrame.this.realTimeStockMonitor.addStockCode(emptyStock.getCode());
+                }
+            }
+
+            // We are still having old directory structure.
+            if (oldData) {
+                // Let's save the information into new directory structure.
+                if (MainFrame.this.saveRealTimeStocks()) {
+                    // OK. We have all the saved watchlist in new directory structure.
+                    // Let's remove all the files in old directory structure.
+                    realTimeStockFile.delete();
+                    realTimeStockAlertFile.delete();
+
+                    final File config_directory = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config");
+                    if (config_directory.list().length <= 0) {
+                        // Empty directory. Remove it.
+                        config_directory.delete();
+                    }
+                }
+            }
+        }
+        else {
+            final java.util.List<Stock> tmp0 = stocks;
+            final java.util.List<StockAlert> tmp1 = alerts;
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    if (alerts == null || (alerts.size() != stocks.size()))
+                    // Remove previous stocks from GUI.
+                    MainFrame.this.clearAllStocks();
+                    // Insert stocks and alerts into GUI.
+                    if (tmp1.size() != tmp0.size())
                     {
-                        for(Stock stock : stocks) {
+                        for (Stock stock : tmp0) {
                             final Stock emptyStock = Utils.getEmptyStock(stock.getCode(), stock.getSymbol());
                             MainFrame.this.addStockToTable(emptyStock);
-                            realTimeStockMonitor.addStockCode(emptyStock.getCode());
+                            MainFrame.this.realTimeStockMonitor.addStockCode(emptyStock.getCode());
                         }
                     }
                     else
                     {
-                        final int size = stocks.size();
+                        final int size = tmp0.size();
                         for(int i = 0; i < size; i++) {
-                            final Stock stock = stocks.get(i);
-                            final StockAlert alert = alerts.get(i);
+                            final Stock stock = tmp0.get(i);
+                            final StockAlert alert = tmp1.get(i);
                             final Stock emptyStock = Utils.getEmptyStock(stock.getCode(), stock.getSymbol());
                             MainFrame.this.addStockToTable(emptyStock, alert);
-                            realTimeStockMonitor.addStockCode(emptyStock.getCode());
+                            MainFrame.this.realTimeStockMonitor.addStockCode(emptyStock.getCode());
                         }
                     }
-                }
-            });
-        }
+
+                    // We are still having old directory structure.
+                    if (oldData) {
+                        // Let's save the information into new directory structure.
+                        if (MainFrame.this.saveRealTimeStocks()) {
+                            // OK. We have all the saved watchlist in new directory structure.
+                            // Let's remove all the files in old directory structure.
+                            realTimeStockFile.delete();
+                            realTimeStockAlertFile.delete();
+
+                            final File config_directory = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config");
+                            if (config_directory.list().length <= 0) {
+                                // Empty directory. Remove it.
+                                config_directory.delete();
+                            }
+                        }
+                    }   // if (oldData)
+
+                }   //  public void run()
+            }); // SwingUtilities.invokeLater
+        }   // if (SwingUtilities.isEventDispatchThread())
     }
 
     private boolean saveRealTimeStocks() {
-        final Country country = jStockOptions.getCountry();
-
-        if (Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config") == false)
+        if (Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.watchlist.Utils.getWatchlistDirectory(this.jStockOptions.getWatchlistName())) == false)
         {
             return false;
         }
         
-        final File f0 = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "realtimestock.xml");
-        final boolean status0 = Utils.toXML(((StockTableModel)this.jTable1.getModel()).getStocks(), f0);
+        final File realTimeStockFile = new File(org.yccheok.jstock.watchlist.Utils.getWatchlistDirectory(this.jStockOptions.getWatchlistName()) + "realtimestock.xml");
+        final boolean status0 = Utils.toXML(((StockTableModel)this.jTable1.getModel()).getStocks(), realTimeStockFile);
         if (status0 == false) {
             return status0;
         }
 
-        final File f1 = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "realtimestockalert.xml");
-        return Utils.toXML(((StockTableModel)this.jTable1.getModel()).getAlerts(), f1);
+        final File realTimeStockAlertFile = new File(org.yccheok.jstock.watchlist.Utils.getWatchlistDirectory(this.jStockOptions.getWatchlistName()) + "realtimestockalert.xml");
+        return Utils.toXML(((StockTableModel)this.jTable1.getModel()).getAlerts(), realTimeStockAlertFile);
     }
     
     private boolean saveBrokingFirmLogos() {
@@ -2680,7 +2782,7 @@ public class MainFrame extends javax.swing.JFrame {
                 ImageIO.write(Utils.toBufferedImage(image), "png", f);
             }
             catch(java.io.IOException exp) {
-                log.error("", exp);
+                log.error(null, exp);
             }
         }
         
