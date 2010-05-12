@@ -34,7 +34,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
@@ -42,6 +41,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.table.*;
 import javax.swing.tree.TreePath;
 import org.apache.commons.logging.*;
@@ -1450,11 +1450,13 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
     
     private void updateRealTimeStockMonitorAccordingToBuyPortfolioTreeTableModel() {
-        if (this.realTimeStockMonitor == null) return;
+        if (this.realTimeStockMonitor == null) {
+            return;
+        }
         
         final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
                 
-        if(portfolioTreeTableModel != null) {
+        if (portfolioTreeTableModel != null) {
             this.buyTreeTable.setTreeTableModel(portfolioTreeTableModel);
             
             Portfolio portfolio = (Portfolio)portfolioTreeTableModel.getRoot();
@@ -1520,6 +1522,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         // First, we need to determine what portfolio names are there for
         // this country.
         final List<String> availablePortfolioNames = org.yccheok.jstock.portfolio.Utils.getPortfolioNames();
+        final boolean oldData;
         if (availablePortfolioNames.size() <= 0) {
             // This is a fresh country selection without any portfolio.
             // If we are switching from a country with portfolio, to another
@@ -1527,6 +1530,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             // carried over. By following Principle of least suprise, portfolio
             // name will be reset to default.
             jStockOptions.setPortfolioName(org.yccheok.jstock.portfolio.Utils.getDefaultPortfolioName());
+            oldData = true;
         }
         else {
             // Is user selected portfolio name within current available portfolio names?
@@ -1534,86 +1538,89 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 // Nope. Reset user selected portfolio name to the first available name.
                 jStockOptions.setPortfolioName(availablePortfolioNames.get(0));
             }
-        }
-        
-        boolean sellReadSuccess = false;
-        boolean buyReadSuccess = false;
-        boolean oldData = false;
-        {
-            File f = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "buyportfolio.xml");
-            if (f.exists() == false) {
-                f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "buyportfolio.xml");
-                oldData = true;
-            }
-            final BuyPortfolioTreeTableModel buyPortfolioTreeTableModel = Utils.fromXML(BuyPortfolioTreeTableModel.class, f);
-            if (buyPortfolioTreeTableModel != null) {
-                this.buyTreeTable.setTreeTableModel(buyPortfolioTreeTableModel);
-                buyReadSuccess = true;
-            }
+            oldData = false;
         }
 
-        {
-            File f = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "sellportfolio.xml");
-            if (f.exists() == false) {
-                f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "sellportfolio.xml");
-                oldData = true;
-            }
-            final SellPortfolioTreeTableModel sellPortfolioTreeTableModel = Utils.fromXML(SellPortfolioTreeTableModel.class, f);
-            if (sellPortfolioTreeTableModel != null) {
-                this.sellTreeTable.setTreeTableModel(sellPortfolioTreeTableModel);
-                sellReadSuccess = true;
-            }
+        final File buyPortfolioFile;
+        final File sellPortfolioFile;
+        final File depositSummaryFile;
+        final File dividendSummaryFile;
+
+        // Determine the files to be loaded from disc.
+        if (oldData) {
+            buyPortfolioFile = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "buyportfolio.xml");
+            sellPortfolioFile = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "sellportfolio.xml");
+            depositSummaryFile = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "depositsummary.xml");
+            dividendSummaryFile = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "dividendsummary.xml");
         }
-        
-        if (buyReadSuccess == false) {
-            buyTreeTable.setTreeTableModel(new BuyPortfolioTreeTableModel());
-        }
-        if (sellReadSuccess == false) {
-            sellTreeTable.setTreeTableModel(new SellPortfolioTreeTableModel());
+        else {
+            buyPortfolioFile = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "buyportfolio.xml");
+            sellPortfolioFile = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "sellportfolio.xml");
+            depositSummaryFile = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "depositsummary.xml");
+            dividendSummaryFile = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "dividendsummary.xml");
         }
 
-        // We need to have a hack way, to have "Comment" in the model, but not visible to user.
-        // So that our ToolTipHighlighter can work correctly.
-        // setVisible should be called after JXTreeTable has been constructed. This is to avoid
-        // initGUIOptions from calling JTable.removeColumn
-        // ToolTipHighlighter will not work correctly if we tend to hide column view by removeColumn.
-        // We need to hide the view by using TableColumnExt.setVisible.
-        // Why? Don't ask me. Ask SwingX team.
-        ((TableColumnExt)buyTreeTable.getColumn("Comment")).setVisible(false);
-        ((TableColumnExt)sellTreeTable.getColumn("Comment")).setVisible(false);
+        // Try to load files from disc.
+        BuyPortfolioTreeTableModel buyPortfolioTreeTableModel = Utils.fromXML(BuyPortfolioTreeTableModel.class, buyPortfolioFile);
+        SellPortfolioTreeTableModel sellPortfolioTreeTableModel = Utils.fromXML(SellPortfolioTreeTableModel.class, sellPortfolioFile);
+        DepositSummary _depositSummary = Utils.fromXML(DepositSummary.class, depositSummaryFile);
+        DividendSummary _dividendSummary = Utils.fromXML(DividendSummary.class, dividendSummaryFile);
 
-        boolean depositSummaryReadSuccess = false;
-        {
-            File f = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "depositsummary.xml");
-            if (f.exists() == false) {
-                f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "depositsummary.xml");
-                oldData = true;
-            }
-            this.depositSummary = Utils.fromXML(DepositSummary.class, f);
-            if (this.getDepositSummary() != null) {
-                depositSummaryReadSuccess = true;
-            }
+        // Is XML files reading success? If not, initialize data structure with
+        // empty data.
+        if (buyPortfolioTreeTableModel == null) {
+            buyPortfolioTreeTableModel = new BuyPortfolioTreeTableModel();
+        }
+        if (sellPortfolioTreeTableModel == null) {
+            sellPortfolioTreeTableModel = new SellPortfolioTreeTableModel();
+        }
+        if (_depositSummary == null) {
+            _depositSummary = new DepositSummary();
+        }
+        if (_dividendSummary == null) {
+            _dividendSummary = new DividendSummary();
         }
 
-        if (false == depositSummaryReadSuccess) {
-            this.depositSummary = new DepositSummary();
+        // Update GUI. Shall we?
+        if (SwingUtilities.isEventDispatchThread()) {
+            this.buyTreeTable.setTreeTableModel(buyPortfolioTreeTableModel);
+            this.sellTreeTable.setTreeTableModel(sellPortfolioTreeTableModel);
+            this.depositSummary = _depositSummary;
+            this.dividendSummary = _dividendSummary;
+            // We need to have a hack way, to have "Comment" in the model, but not visible to user.
+            // So that our ToolTipHighlighter can work correctly.
+            // setVisible should be called after JXTreeTable has been constructed. This is to avoid
+            // initGUIOptions from calling JTable.removeColumn
+            // ToolTipHighlighter will not work correctly if we tend to hide column view by removeColumn.
+            // We need to hide the view by using TableColumnExt.setVisible.
+            // Why? Don't ask me. Ask SwingX team.
+            ((TableColumnExt)this.buyTreeTable.getColumn("Comment")).setVisible(false);
+            ((TableColumnExt)this.sellTreeTable.getColumn("Comment")).setVisible(false);
         }
+        else {
+            final BuyPortfolioTreeTableModel tmp0 = buyPortfolioTreeTableModel;
+            final SellPortfolioTreeTableModel tmp1 = sellPortfolioTreeTableModel;
+            final DepositSummary tmp2 = _depositSummary;
+            final DividendSummary tmp3 = _dividendSummary;
 
-        boolean dividendSummaryReadSuccess = false;
-        {
-            File f = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "dividendsummary.xml");
-            if (f.exists() == false) {
-                f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "dividendsummary.xml");
-                oldData = true;
-            }
-            this.dividendSummary = Utils.fromXML(DividendSummary.class, f);
-            if (this.getDividendSummary() != null) {
-                dividendSummaryReadSuccess = true;
-            }
-        }
-
-        if (false == dividendSummaryReadSuccess) {
-            this.dividendSummary = new DividendSummary();
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    PortfolioManagementJPanel.this.buyTreeTable.setTreeTableModel(tmp0);
+                    PortfolioManagementJPanel.this.sellTreeTable.setTreeTableModel(tmp1);
+                    PortfolioManagementJPanel.this.depositSummary = tmp2;
+                    PortfolioManagementJPanel.this.dividendSummary = tmp3;
+                    // We need to have a hack way, to have "Comment" in the model, but not visible to user.
+                    // So that our ToolTipHighlighter can work correctly.
+                    // setVisible should be called after JXTreeTable has been constructed. This is to avoid
+                    // initGUIOptions from calling JTable.removeColumn
+                    // ToolTipHighlighter will not work correctly if we tend to hide column view by removeColumn.
+                    // We need to hide the view by using TableColumnExt.setVisible.
+                    // Why? Don't ask me. Ask SwingX team.
+                    ((TableColumnExt)PortfolioManagementJPanel.this.buyTreeTable.getColumn("Comment")).setVisible(false);
+                    ((TableColumnExt)PortfolioManagementJPanel.this.sellTreeTable.getColumn("Comment")).setVisible(false);
+                }
+            });
         }
 
         // New directory creation is needed, as we had moved the directory of portolio.
@@ -1621,16 +1628,21 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             if (this.savePortfolio()) {
                 // OK. We have the saved portfolio in new directory structure.
                 // Let's remove all the files from old directory structure.
-                new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "buyportfolio.xml").delete();
-                new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "sellportfolio.xml").delete();
-                new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "depositsummary.xml").delete();
-                new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "dividendsummary.xml").delete();
+                buyPortfolioFile.delete();
+                sellPortfolioFile.delete();
+                depositSummaryFile.delete();
+                dividendSummaryFile.delete();
+                final File config_directory = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config");
+                if (config_directory.list().length <= 0) {
+                    // Empty directory. Remove it.
+                    config_directory.delete();
+                }
             }
         }
 
-        updateRealTimeStockMonitorAccordingToBuyPortfolioTreeTableModel();
+        this.updateRealTimeStockMonitorAccordingToBuyPortfolioTreeTableModel();
         
-        updateWealthHeader();
+        this.updateWealthHeader();
 
         // Give user preferred GUI look. We do it here, because the entire table model is being changed.
         this.initGUIOptions();
