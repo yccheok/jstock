@@ -2712,9 +2712,11 @@ public class MainFrame extends javax.swing.JFrame {
                     realTimeStockAlertFile.delete();
 
                     final File config_directory = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config");
-                    if (config_directory.list().length <= 0) {
-                        // Empty directory. Remove it.
-                        config_directory.delete();
+                    if (config_directory.isDirectory()) {
+                        if (config_directory.list().length <= 0) {
+                            // Empty directory. Remove it.
+                            config_directory.delete();
+                        }
                     }
                 }
             }
@@ -2758,9 +2760,11 @@ public class MainFrame extends javax.swing.JFrame {
                             realTimeStockAlertFile.delete();
 
                             final File config_directory = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config");
-                            if (config_directory.list().length <= 0) {
-                                // Empty directory. Remove it.
-                                config_directory.delete();
+                            if (config_directory.isDirectory()) {
+                                if (config_directory.list().length <= 0) {
+                                    // Empty directory. Remove it.
+                                    config_directory.delete();
+                                }
                             }
                         }
                     }   // if (oldData)
