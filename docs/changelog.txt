@@ -4,6 +4,9 @@ Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 JStock 1.0.5L - 2010-??-??
   Feature: Support multiple watchlists. Manage your favorite stock watchlist, by
            splitting them into high growth stocks and dividend gained stocks.
+  Feature: User will have much better hint on what portfolio he is in, by 
+           looking at the label, instead of having to click on the drop-down 
+           menu. (#2957729)
   Bugfix:  MFI calculation causing infinity loop. (#2989168)
   Bugfix:  When changing to a new country, the previous country's portfolio name
            will be carried over to new country. The new country's portfolio name
