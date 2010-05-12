@@ -42,6 +42,7 @@ import javax.swing.JPopupMenu;
 
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
+import javax.swing.border.TitledBorder;
 import javax.swing.table.*;
 import javax.swing.tree.TreePath;
 import org.apache.commons.logging.*;
@@ -742,7 +743,16 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         newTransactionJDialog.setStock(stock);
         newTransactionJDialog.setPrice(lastPrice);
         newTransactionJDialog.setJComboBoxEnabled(JComboBoxEnabled);
-        newTransactionJDialog.setStockCodeAndSymbolDatabase(stockCodeAndSymbolDatabase);               
+        newTransactionJDialog.setStockCodeAndSymbolDatabase(stockCodeAndSymbolDatabase);
+
+        // If we are not in portfolio page, we shall provide user a hint, so that
+        // user will know this transaction will go into which portfolio, without
+        // having to click on the Portfolio drop-down menu.
+        if (mainFrame.getSelectedComponent() != this) {
+            final String title = newTransactionJDialog.getTitle() + " (" + mainFrame.getJStockOptions().getPortfolioName() + ")";
+            newTransactionJDialog.setTitle(title);
+        }
+
         newTransactionJDialog.setVisible(true);
         
         final Transaction transaction = newTransactionJDialog.getTransaction();
@@ -1622,6 +1632,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
             // Give user preferred GUI look. We do it here, because the entire table model is being changed.
             PortfolioManagementJPanel.this.initGUIOptions();
+
+            PortfolioManagementJPanel.this.updateTitledBorder();
         }
         else {
             final BuyPortfolioTreeTableModel tmp0 = buyPortfolioTreeTableModel;
@@ -1669,11 +1681,29 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
                     // Give user preferred GUI look. We do it here, because the entire table model is being changed.
                     PortfolioManagementJPanel.this.initGUIOptions();
+
+                    PortfolioManagementJPanel.this.updateTitledBorder();
                 }
             });
         }
     }
-   
+
+    private void updateTitledBorder() {
+        if (SwingUtilities.isEventDispatchThread()) {
+            final TitledBorder titledBorder = (TitledBorder)PortfolioManagementJPanel.this.jPanel1.getBorder();
+            titledBorder.setTitle(MainFrame.getInstance().getJStockOptions().getPortfolioName());
+        }
+        else {
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    final TitledBorder titledBorder = (TitledBorder)PortfolioManagementJPanel.this.jPanel1.getBorder();
+                    titledBorder.setTitle(MainFrame.getInstance().getJStockOptions().getPortfolioName());
+                }
+            });
+        }
+    }
+
     public boolean savePortfolio() {
         if (Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory()) == false)
         {
