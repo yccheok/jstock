@@ -55,6 +55,7 @@ import org.yccheok.jstock.file.Statements;
 import org.yccheok.jstock.gui.charting.DynamicChart;
 import org.yccheok.jstock.gui.portfolio.PortfolioJDialog;
 import org.yccheok.jstock.gui.table.NonNegativeDoubleEditor;
+import org.yccheok.jstock.gui.watchlist.WatchlistJDialog;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.internationalization.MessagesBundle;
 import org.yccheok.jstock.network.ProxyDetector;
@@ -143,6 +144,11 @@ public class MainFrame extends javax.swing.JFrame {
         private final static MainFrame INSTANCE = new MainFrame();
     }
 
+    /**
+     * Returns MainFrame as singleton.
+     * 
+     * @return MainFrame as singleton
+     */
     public static MainFrame getInstance() {
         return MainFrameHolder.INSTANCE;
     }
@@ -1165,10 +1171,28 @@ public class MainFrame extends javax.swing.JFrame {
         this.jMenu9.add(mi);
     }//GEN-LAST:event_jMenu9MenuSelected
 
-    public void selectActiveWatchlist(String portfolio) {
-
+    /**
+     * Activate specified watchlist.
+     *
+     * @param watchlist Watchlist name
+     */
+    public void selectActiveWatchlist(String watchlist) {
+        // Save current watchlist.
+        MainFrame.this.saveRealTimeStocks();
+        // Save current GUI options.
+        // Do not call MainFrame.this.saveGUIOptions() (Pay note on the underscore)
+        // , as that will save portfolio's and indicator scanner's as well.
+        MainFrame.this._saveGUIOptions();
+        // And switch to new portfolio.
+        MainFrame.this.getJStockOptions().setWatchlistName(watchlist);
+        MainFrame.this.initRealTimeStocks();
     }
 
+    /**
+     * Activate specified portfolio.
+     *
+     * @param portfolio Portfolio name
+     */
     public void selectActivePortfolio(String portfolio) {
         // Save current portfolio.
         MainFrame.this.portfolioManagementJPanel.savePortfolio();
@@ -1180,6 +1204,9 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     private void multipleWatchlists() {
+        WatchlistJDialog watchlistJDialog = new WatchlistJDialog(this, true);
+        watchlistJDialog.setLocationRelativeTo(this);
+        watchlistJDialog.setVisible(true);
     }
 
     private void multiplePortfolios() {
@@ -2506,7 +2533,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     private boolean _saveGUIOptions() {
-        if(Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config") == false)
+        if (Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config") == false)
         {
             return false;
         }
