@@ -7,14 +7,17 @@ JStock 1.0.5L - 2010-??-??
   Feature: User will have much better hint on what portfolio he is in, by 
            looking at the label, instead of having to click on the drop-down 
            menu. (#2957729)
+  Feature: User may launch calculator through Help menu. (#2919440)
   Bugfix:  MFI calculation causing infinity loop. (#2989168)
+  Bugfix:  Load cloud files fail in Linux, if the cloud files are saved from
+           Windows. (#2979338)
   Bugfix:  When changing to a new country, the previous country's portfolio name
            will be carried over to new country. The new country's portfolio name
            shouldn't have any relation with old country's.
   Bugfix:  Rename "Real-Time Info" to "Stock Watchlist".
   Bugfix:  Avoid potential OutOfMemory exception caused by endless add operation
            into the same button group.
-           
+
 JStock 1.0.5k - 2010-03-27
   Bugfix:  During "Save to Cloud" and "Load from Cloud", Google will prompt for
            captcha verification sometimes. We will support captcha right now.
