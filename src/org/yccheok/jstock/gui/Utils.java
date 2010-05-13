@@ -337,6 +337,18 @@ public class Utils {
         return map;
     }
 
+    /**
+     * Returns <code>ZipEntry</code> which is usable in both Linux and Windows.
+     *
+     * @param zipEntryName zip entry name
+     * @return <code>ZipEntry</code> which is usable in both Linux and Windows
+     */
+    public static ZipEntry getZipEntry(String zipEntryName) {
+        // Linux will not able to recognized File.seperator from Windows.
+        // Change all to "/", which will be recognized by both Linux and Windows.
+        return new ZipEntry(zipEntryName.replace(File.separator, "/"));
+    }
+    
     private static List<String> getNTPServers()
     {
         // The list is obtained from Windows Vista, Internet Time Server List itself.

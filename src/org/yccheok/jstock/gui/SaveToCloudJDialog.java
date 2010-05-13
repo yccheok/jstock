@@ -569,7 +569,7 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
                     in = new FileInputStream(fileEx.input);
                     final String zipEntryName = fileEx.output;
                     // Add ZIP entry to output stream.
-                    out.putNextEntry(new ZipEntry(zipEntryName));
+                    out.putNextEntry(Utils.getZipEntry(zipEntryName));
 
                     // Transfer bytes from the file to the ZIP file
                     int len;
