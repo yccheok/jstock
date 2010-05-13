@@ -223,8 +223,12 @@ public class CIMBStockFormat implements StockFormat {
                             
                             Stock.Board tmpBoard = stringToBoardMap.get(tmp.substring(0, 2));
                             Stock.Industry tmpIndustry = stringToIndustryMap.get(tmp.substring(2, 4));
-                            if(tmpBoard == null) tmpBoard = Stock.Board.Unknown;
-                            if(tmpIndustry == null) tmpIndustry = Stock.Industry.Unknown;
+                            if (tmpBoard == null) {
+                                tmpBoard = Stock.Board.Unknown;
+                            }
+                            if (tmpIndustry == null) {
+                                tmpIndustry = Stock.Industry.Unknown;
+                            }
 
                             // Yahoo format is our key reference format. This is to avoid problem occur for different
                             // stock code format found in different stock servers.
