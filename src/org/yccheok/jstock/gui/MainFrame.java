@@ -1185,6 +1185,9 @@ public class MainFrame extends javax.swing.JFrame {
             Runtime.getRuntime().exec("calc");
         } catch (IOException ex) {
             log.error(null, ex);
+            // External program not found. Use our own calculator.
+            org.yccheok.jstock.gui.portfolio.Calc calc = new org.yccheok.jstock.gui.portfolio.Calc(this, false);
+            calc.setVisible(true);
         }
     }//GEN-LAST:event_jMenuItem12ActionPerformed
 
