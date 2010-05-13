@@ -218,6 +218,7 @@ public class MainFrame extends javax.swing.JFrame {
         jMenu4 = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
         jMenuItem3 = new javax.swing.JMenuItem();
+        jMenuItem12 = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JSeparator();
         jMenuItem5 = new javax.swing.JMenuItem();
 
@@ -261,7 +262,7 @@ public class MainFrame extends javax.swing.JFrame {
         jPanel8.setLayout(new java.awt.BorderLayout(5, 5));
 
         jTable1.setAutoCreateRowSorter(true);
-        jTable1.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jTable1.setFont(new java.awt.Font("Tahoma", 1, 12));
         jTable1.setModel(new StockTableModel());
         jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         this.jTable1.setDefaultRenderer(Number.class, new StockTableCellRenderer());
@@ -578,6 +579,14 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
         jMenu2.add(jMenuItem3);
+
+        jMenuItem12.setText(bundle.getString("MainFrame_Calculator")); // NOI18N
+        jMenuItem12.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem12ActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMenuItem12);
         jMenu2.add(jSeparator1);
 
         jMenuItem5.setText("About...");
@@ -1170,6 +1179,14 @@ public class MainFrame extends javax.swing.JFrame {
         });
         this.jMenu9.add(mi);
     }//GEN-LAST:event_jMenu9MenuSelected
+
+    private void jMenuItem12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem12ActionPerformed
+        try {
+            Runtime.getRuntime().exec("calc");
+        } catch (IOException ex) {
+            log.error(null, ex);
+        }
+    }//GEN-LAST:event_jMenuItem12ActionPerformed
 
     /**
      * Activate specified watchlist.
@@ -3676,6 +3693,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem10;
     private javax.swing.JMenuItem jMenuItem11;
+    private javax.swing.JMenuItem jMenuItem12;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
