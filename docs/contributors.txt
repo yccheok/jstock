@@ -1,8 +1,8 @@
 People who have contributed to JStock
 -------------------------------------
 
-Original developer, project admin:
-* Yan Cheng Cheok <yccheok@yahoo.com>
+Original Developer, Project Admin:
+* Yan Cheng CHEOK <yccheok@yahoo.com>
 
 Graphic Designer:
 * The IconBlock Ltd <naga220@users.sourceforge.net>

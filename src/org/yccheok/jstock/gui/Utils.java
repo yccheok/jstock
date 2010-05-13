@@ -1107,39 +1107,43 @@ public class Utils {
     }
 
     public static boolean isCompatible(int applicationVersionID) {
-        if (applicationVersionID == 1051) {
+        if (applicationVersionID == APPLICATION_VERSION_ID) {
             return true;
         }
-        else if (applicationVersionID == 1052) {
-            return true;
-        }
-        else if (applicationVersionID == 1053) {
-            return true;
-        }
-        else if (applicationVersionID == 1054) {
-            return true;
-        }
-        else if (applicationVersionID == 1055) {
-            return true;
-        }
-        else if (applicationVersionID == 1056) {
-            return true;
-        }
-        else if (applicationVersionID == 1057) {
-            return true;
-        }
-        else if (applicationVersionID == 1058) {
-            return true;
-        }
-        else if (applicationVersionID == 1059) {
+        else if (applicationVersionID == 1061) {
             return true;
         }
         else if (applicationVersionID == 1060) {
             return true;
         }
-        else if (applicationVersionID == APPLICATION_VERSION_ID) {
+        else if (applicationVersionID == 1059) {
             return true;
-        }        
+        }
+        else if (applicationVersionID == 1058) {
+            return true;
+        }
+        else if (applicationVersionID == 1057) {
+            return true;
+        }
+        else if (applicationVersionID == 1056) {
+            return true;
+        }
+        else if (applicationVersionID == 1055) {
+            return true;
+        }
+        else if (applicationVersionID == 1054) {
+            return true;
+        }
+        else if (applicationVersionID == 1053) {
+            return true;
+        }
+        else if (applicationVersionID == 1052) {
+            return true;
+        }
+        else if (applicationVersionID == 1051) {
+            return true;
+        }
+      
         return false;
     }
 
@@ -1945,9 +1949,9 @@ public class Utils {
     private static final String APPLICATION_VERSION_STRING = "1.0.5";
 
     // For About box comparision on latest version purpose.
-    // 1.0.5k
+    // 1.0.5L
     // Remember to update isCompatible method.
-    private static final int APPLICATION_VERSION_ID = 1061;
+    private static final int APPLICATION_VERSION_ID = 1062;
 
     private static Executor zombiePool = Executors.newFixedThreadPool(Utils.NUM_OF_THREADS_ZOMBIE_POOL);
 
