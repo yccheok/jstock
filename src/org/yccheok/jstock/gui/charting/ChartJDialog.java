@@ -19,7 +19,9 @@
 
 package org.yccheok.jstock.gui.charting;
 
+import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Toolkit;
 import java.awt.event.ComponentEvent;
 import java.io.File;
 import org.yccheok.jstock.engine.*;
@@ -125,6 +127,22 @@ public class ChartJDialog extends javax.swing.JDialog {
         this.priceVolumeChart = this.createPriceVolumeChart(stockHistoryServer);
         
         this.chartPanel = new ChartPanel(this.priceVolumeChart, true, true, true, true, true);
+
+        // Yellow box and chart resizing (#2969416)
+        //
+        // paradoxoff :
+        // If the available size for a ChartPanel exceeds the dimensions defined
+        // by the maximumDrawWidth and maximumDrawHeight attributes, the
+        // ChartPanel will draw the chart in a Rectangle defined by the maximum
+        // sizes and then scale it to fill the available size.
+        // All you need to do is to avoid that scaling by using sufficiently
+        // large values for the maximumDrawWidth and maximumDrawHeight, e. g.
+        // by using the Dimension returned from
+        // Toolkit.getDefaultToolkit().getScreenSize()
+        // http://www.jfree.org/phpBB2/viewtopic.php?f=3&t=30059
+        final Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
+        this.chartPanel.setMaximumDrawWidth((int)Math.round(dimension.getWidth()));
+        this.chartPanel.setMaximumDrawHeight((int)Math.round(dimension.getHeight()));
 
         final org.jdesktop.jxlayer.JXLayer<ChartPanel> layer = new org.jdesktop.jxlayer.JXLayer<ChartPanel>(this.chartPanel);
         this.chartLayerUI = new ChartLayerUI<ChartPanel>(this);
