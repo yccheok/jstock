@@ -1,26 +1,27 @@
 People who have contributed to JStock
 -------------------------------------
 
-Original Developer, Project Admin:
+Project Admin:
 * Yan Cheng CHEOK <yccheok@yahoo.com>
 
 Graphic Designer:
 * The IconBlock Ltd <naga220@users.sourceforge.net>
 
-Developers:
+Programmer:
+* Yan Cheng CHEOK <yccheok@yahoo.com>
 * Shuwn Yuan Tee <sytee@users.sourceforge.net>
-* Peter Gransdorfer <gransi@users.sourceforge.net>
-* Nanne Baars <nb76@users.sourceforge.net>
 
 Web Designer:
 * Shuwn Yuan Tee <sytee@users.sourceforge.net>
 
-Mac Packager:
-* Karl Heinz Putz <puzzz@users.sourceforge.net>
-
-Other Contributors (code, ideas, testing..):
+Code Contributors: 
+* Peter Gransdorfer <gransi@users.sourceforge.net>
+* Nanne Baars <nb76@users.sourceforge.net>
 * Carlo de Wolf
 * bbuelte
+
+Mac Packager:
+* Karl Heinz Putz <puzzz@users.sourceforge.net>
 
 JStock includes code from:
 * JHotDraw (http://sourceforge.net/projects/jhotdraw/)
