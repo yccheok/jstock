@@ -972,21 +972,20 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     private void jTable1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTable1KeyPressed
-// TODO add your handling code here:
-        if(KeyEvent.VK_DELETE == evt.getKeyCode()) {
+        if (KeyEvent.VK_DELETE == evt.getKeyCode()) {
             this.deteleSelectedTableRow();
             return;
         }
         
-        if(evt.isActionKey()) {
+        if (evt.isActionKey()) {
             int[] rows = MainFrame.this.jTable1.getSelectedRows();
             
-            if(rows.length == 1) {
+            if (rows.length == 1) {
                 int row = rows[0];
                 
-                StockTableModel tableModel = (StockTableModel)jTable1.getModel();
-                int modelIndex = jTable1.convertRowIndexToModel(row);
-                Stock stock = tableModel.getStock(modelIndex);
+                final StockTableModel tableModel = (StockTableModel)jTable1.getModel();
+                final int modelIndex = jTable1.convertRowIndexToModel(row);
+                final Stock stock = tableModel.getStock(modelIndex);
                 updateBuyerSellerInformation(stock);
                 this.updateDynamicChart(stock);
             }
@@ -1000,12 +999,10 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jTable1KeyPressed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-// TODO add your handling code here:
         log.info("Widnow is closing.");     
     }//GEN-LAST:event_formWindowClosing
 
     private void jMenuItem8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem8ActionPerformed
-        // TODO add your handling code here:
         if (this.stockCodeAndSymbolDatabase == null) {
             JOptionPane.showMessageDialog(this, "There are no database ready yet.", "Database not ready", JOptionPane.INFORMATION_MESSAGE);
             return;
@@ -1639,7 +1636,7 @@ public class MainFrame extends javax.swing.JFrame {
     private void updateBuyerSellerInformation(Stock stock) {
         assert(java.awt.EventQueue.isDispatchThread());
 
-        if(stock == null) {
+        if (stock == null) {
             jLabel24.setText("");
             jLabel33.setText("");
             jLabel19.setText("");
@@ -2092,6 +2089,23 @@ public class MainFrame extends javax.swing.JFrame {
         }   /* if(jStockOptions.isSMSEnabled()) */
     }
 
+    /**
+     * Highlight stock at row <code>modelRow</code>, by making it selected and
+     * visible.
+     * 
+     * @param modelRow row respected to stock model
+     */
+    private void highlightStock(int modelRow) {
+        if (modelRow < 0) {
+            return;
+        }
+        final int row = this.jTable1.convertRowIndexToView(modelRow);
+        // Make it selected.
+        this.jTable1.getSelectionModel().setSelectionInterval(row, row);
+        // and visible.
+        JTableUtilities.scrollToVisible(this.jTable1, row, 0);
+    }
+
     private org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, String> getAutoCompleteJComboBoxObserver() {
         return new org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, String>() {
             @Override
@@ -2101,12 +2115,22 @@ public class MainFrame extends javax.swing.JFrame {
                 }
                 
                 final String stock = arg;
+                
+                // When user try to enter a stock, and the stock is already in
+                // the table, the stock shall be highlighted. Stock will be
+                // selected and the table shall be scrolled to be visible.
+                final StockTableModel tableModel = (StockTableModel)MainFrame.this.jTable1.getModel();
+                int modelRowBeforeAdded = -1;
 
                 Code code = stockCodeAndSymbolDatabase.searchStockCode(stock);
                 Symbol symbol = null;
 
                 if (code != null) {
                     symbol = stockCodeAndSymbolDatabase.codeToSymbol(code);
+
+                    // Update rowBeforeAdded before calling addStockToTable
+                    modelRowBeforeAdded = tableModel.findRow(Utils.getEmptyStock(code, symbol));
+
                     // First add the empty stock, so that the user will not have wrong perspective that
                     // our system is slow.
                     addStockToTable(Utils.getEmptyStock(code, symbol));
@@ -2121,6 +2145,10 @@ public class MainFrame extends javax.swing.JFrame {
                         // from database. Even later user modifies symbol or code through Database -> Stock Database...,
                         // it shouldn't have any side effect.
                         assert(code != null);
+
+                        // Update rowBeforeAdded before calling addStockToTable
+                        modelRowBeforeAdded = tableModel.findRow(Utils.getEmptyStock(code, symbol));
+
                         addStockToTable(Utils.getEmptyStock(code, symbol));
                         // We allow user to modify user defined type stock code and symbol.
                         // 1st rule is, modified code cannot crash with existing stock's code or stock's symbol.
@@ -2142,9 +2170,10 @@ public class MainFrame extends javax.swing.JFrame {
                         // (4) Users try to add "MAXIS". RealTimeStockMonitor will allow.
                         //     At the end, there are two rows with same symbol "MAXIS", but different codes.
                         realTimeStockMonitor.addStockCode(stockCodeAndSymbolDatabase.symbolToCode(symbol));
-                    }
-                }
-            }
+                    }   // if (symbol != null)
+                }   // if (code != null)
+                MainFrame.this.highlightStock(modelRowBeforeAdded);
+            }   // public void update(AutoCompleteJComboBox subject, String arg)
         };
     }
 
