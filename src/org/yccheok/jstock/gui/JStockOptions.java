@@ -24,6 +24,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.NTCredentials;
@@ -62,6 +63,20 @@ public class JStockOptions {
      */
     public void setCCEmail(String CCEmail) {
         this.CCEmail = CCEmail;
+    }
+
+    /**
+     * @return the locale
+     */
+    public Locale getLocale() {
+        return locale;
+    }
+
+    /**
+     * @param locale the locale to set
+     */
+    public void setLocale(Locale locale) {
+        this.locale = locale;
     }
 
     public enum YellowInformationBoxOption {
@@ -138,6 +153,7 @@ public class JStockOptions {
         this.setChatOtherMessageColor(DEFAULT_CHAT_OTHER_MESSAGE_COLOR);
 
         this.setYellowInformationBoxOption(DEFAULT_YELLOW_INFORMATION_BOX_OPTION);
+        this.setLocale(Locale.getDefault());
     }
 
     private boolean soundEnabled;
@@ -228,6 +244,8 @@ public class JStockOptions {
     private String watchlistName = org.yccheok.jstock.watchlist.Utils.getDefaultWatchlistName();
 
     private YellowInformationBoxOption yellowInformationBoxOption = YellowInformationBoxOption.Follow;
+
+    private Locale locale = Locale.getDefault();
     
     public boolean isAutoBrokerFeeCalculationEnabled() {
         return this.isAutoBrokerFeeCalculationEnabled;
@@ -327,6 +345,7 @@ public class JStockOptions {
         this.watchlistName = jStockOptions.watchlistName;
 
         this.yellowInformationBoxOption = jStockOptions.yellowInformationBoxOption;
+        this.locale = jStockOptions.locale;
     }
 
     // User may not trust us to store their password in cloud server. To avoid
@@ -423,6 +442,7 @@ public class JStockOptions {
         jStockOptions.watchlistName = this.watchlistName;
 
         jStockOptions.yellowInformationBoxOption = this.yellowInformationBoxOption;
+        jStockOptions.locale = this.locale;
 
         return jStockOptions;
     }
@@ -537,6 +557,10 @@ public class JStockOptions {
 
         if (this.getCCEmail() == null) {
             this.setCCEmail("");
+        }
+
+        if (this.getLocale() == null) {
+            this.setLocale(Locale.getDefault());
         }
         
         return this;
@@ -1125,8 +1149,8 @@ public class JStockOptions {
     /**
      * @param rememberGoogleAccountEnabled the rememberGoogleAccountEnabled to set
      */
-    public void setRememberGoogleAccountEnabled(boolean rememberAccountEnabled) {
-        this.rememberGoogleAccountEnabled = rememberAccountEnabled;
+    public void setRememberGoogleAccountEnabled(boolean rememberGoogleAccountEnabled) {
+        this.rememberGoogleAccountEnabled = rememberGoogleAccountEnabled;
     }
 
     /**
