@@ -102,7 +102,7 @@ public class Statements {
     /**
      * Construct Statements based on given Excel File.
      *
-     * @param key Given Excel File
+     * @param file Given Excel File
      * @return the List of constructed Statements. Empty list if fail.
      */
     public static List<Statements> newInstanceFromExcelFile(File file) {
@@ -238,7 +238,7 @@ public class Statements {
     /**
      * Construct Statements based on given CSV File.
      *
-     * @param key Given CSV File
+     * @param file Given CSV File
      * @return the constructed Statements. null if fail
      */
     public static Statements newInstanceFromCSVFile(File file) {
@@ -316,7 +316,7 @@ public class Statements {
     /**
      * Construct Statements based on given TableModel.
      *
-     * @param key Given TableModel
+     * @param tableModel Given TableModel
      * @return the constructed Statements. null if fail
      */
     public static Statements newInstanceFromTableModel(TableModel tableModel) {        
@@ -366,7 +366,7 @@ public class Statements {
     /**
      * Construct Statements based on given AbstractPortfolioTreeTableModel.
      *
-     * @param key Given AbstractPortfolioTreeTableModel
+     * @param abstractPortfolioTreeTableModel Given AbstractPortfolioTreeTableModel
      * @return the constructed Statements. null if fail
      */
     public static Statements newInstanceFromAbstractPortfolioTreeTableModel(AbstractPortfolioTreeTableModel abstractPortfolioTreeTableModel) {
