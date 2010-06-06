@@ -80,6 +80,8 @@ public class MainFrame extends javax.swing.JFrame {
         /* Workaround to solve JXTreeTable look n feel cannot be changed on the fly. */
         initJStockOptions();
 
+        Locale.setDefault(getJStockOptions().getLocale());
+        
         try {
             UIManager.setLookAndFeel(getJStockOptions().getLooknFeel());
         }
@@ -131,9 +133,23 @@ public class MainFrame extends javax.swing.JFrame {
         this.initBrokingFirmLogos();
         this.initGUIOptions();
         this.initChartJDialogOptions();
+        this.initLanguageMenuItemsSelection();
         
         // Turn to the last viewed page.
         this.jTabbedPane1.setSelectedIndex(this.getJStockOptions().getLastSelectedPageIndex());
+    }
+
+    /**
+     * Initialize language menu items so that correct item is being selected
+     * according to current default locale.
+     */
+    private void initLanguageMenuItemsSelection() {
+        if (Locale.getDefault().equals(Locale.SIMPLIFIED_CHINESE)) {
+            this.jRadioButtonMenuItem2.setSelected(true);
+        }
+        else {
+            this.jRadioButtonMenuItem1.setSelected(true);
+        }
     }
 
     /**
@@ -163,6 +179,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
         buttonGroup2 = new javax.swing.ButtonGroup();
+        buttonGroup3 = new javax.swing.ButtonGroup();
         jPanel6 = new javax.swing.JPanel();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel8 = new javax.swing.JPanel();
@@ -209,6 +226,9 @@ public class MainFrame extends javax.swing.JFrame {
         jMenuItem4 = new javax.swing.JMenuItem();
         jMenuItem7 = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
+        jMenu10 = new javax.swing.JMenu();
+        jRadioButtonMenuItem1 = new javax.swing.JRadioButtonMenuItem();
+        jRadioButtonMenuItem2 = new javax.swing.JRadioButtonMenuItem();
         jMenu7 = new javax.swing.JMenu();
         jMenuItem8 = new javax.swing.JMenuItem();
         jMenu9 = new javax.swing.JMenu();
@@ -223,8 +243,9 @@ public class MainFrame extends javax.swing.JFrame {
         jMenuItem5 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("JStock - Stock Market Software");
-        setFont(new java.awt.Font("Tahoma", 0, 12));
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
+        setTitle(bundle.getString("MainFrame_Application_Title")); // NOI18N
+        setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         setIconImage(getMyIconImage());
         addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -438,7 +459,6 @@ public class MainFrame extends javax.swing.JFrame {
 
         jPanel8.add(jPanel10, java.awt.BorderLayout.SOUTH);
 
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
         jTabbedPane1.addTab(bundle.getString("MainFrame_Title"), jPanel8); // NOI18N
 
         getContentPane().add(jTabbedPane1, java.awt.BorderLayout.CENTER);
@@ -446,7 +466,7 @@ public class MainFrame extends javax.swing.JFrame {
         jPanel2.setLayout(new java.awt.GridLayout(2, 1));
         getContentPane().add(jPanel2, java.awt.BorderLayout.NORTH);
 
-        jMenu3.setText("File");
+        jMenu3.setText(bundle.getString("MainFrame_File")); // NOI18N
 
         jMenuItem2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/project_open.png"))); // NOI18N
         jMenuItem2.setText("Open...");
@@ -518,6 +538,29 @@ public class MainFrame extends javax.swing.JFrame {
 
         jMenu6.setText("Country");
         jMenuBar2.add(jMenu6);
+
+        jMenu10.setText(bundle.getString("MainFrame_Language")); // NOI18N
+
+        buttonGroup3.add(jRadioButtonMenuItem1);
+        jRadioButtonMenuItem1.setSelected(true);
+        jRadioButtonMenuItem1.setText(bundle.getString("MainFrame_English")); // NOI18N
+        jRadioButtonMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButtonMenuItem1ActionPerformed(evt);
+            }
+        });
+        jMenu10.add(jRadioButtonMenuItem1);
+
+        buttonGroup3.add(jRadioButtonMenuItem2);
+        jRadioButtonMenuItem2.setText(bundle.getString("MainFrame_SimplifiedChinese")); // NOI18N
+        jRadioButtonMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButtonMenuItem2ActionPerformed(evt);
+            }
+        });
+        jMenu10.add(jRadioButtonMenuItem2);
+
+        jMenuBar2.add(jMenu10);
 
         jMenu7.setText("Database");
 
@@ -1188,6 +1231,52 @@ public class MainFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jMenuItem12ActionPerformed
 
+    private void jRadioButtonMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonMenuItem1ActionPerformed
+        this.changeLocale(Locale.ENGLISH);
+    }//GEN-LAST:event_jRadioButtonMenuItem1ActionPerformed
+
+    private void jRadioButtonMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonMenuItem2ActionPerformed
+        this.changeLocale(Locale.SIMPLIFIED_CHINESE);
+    }//GEN-LAST:event_jRadioButtonMenuItem2ActionPerformed
+
+    /**
+     * Change this application's locale to the desired locale.
+     * 
+     * @param locale the desired locale
+     */
+    private void changeLocale(final Locale locale) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            this._changeLocale(locale);
+        }
+        else {
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    MainFrame.this._changeLocale(locale);
+                }                
+            });
+        }
+    }
+
+    /**
+     * Change this application's locale to the specified locale. Do not call
+     * this method directly. Instead, call to <code>changeLocale</code>.
+     *
+     * @param locale the specified locale
+     */
+    private void _changeLocale(Locale locale) {
+        Locale.setDefault(locale);
+        this.jStockOptions.setLocale(locale);
+        GUIBundle.changeLocale(locale);
+        MessagesBundle.changeLocale(locale);
+
+        // Seem cumbersome. The good thing is, we need not to restart the
+        // application.
+        this.setTitle(GUIBundle.getString("MainFrame_Application_Title"));
+        this.trayIcon.setToolTip(GUIBundle.getString("MainFrame_Application_Title"));
+        this.jMenu3.setText(GUIBundle.getString("MainFrame_File"));
+    }
+    
     /**
      * Activate specified watchlist.
      *
@@ -1595,7 +1684,7 @@ public class MainFrame extends javax.swing.JFrame {
             defaultItem.addActionListener(exitListener);
             popup.add(defaultItem);
 
-            trayIcon = new TrayIcon(image, "JStock - Stock Market Software", popup);
+            trayIcon = new TrayIcon(image, GUIBundle.getString("MainFrame_Application_Title"), popup);
 
             ActionListener actionListener = new ActionListener() {
                 @Override
@@ -3689,6 +3778,7 @@ public class MainFrame extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.ButtonGroup buttonGroup2;
+    private javax.swing.ButtonGroup buttonGroup3;
     private javax.swing.JComboBox jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel18;
@@ -3713,6 +3803,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel37;
     private javax.swing.JLabel jLabel38;
     private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu jMenu10;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenu jMenu4;
@@ -3741,6 +3832,8 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
+    private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem1;
+    private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
