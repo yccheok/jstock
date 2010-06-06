@@ -81,7 +81,10 @@ public class MainFrame extends javax.swing.JFrame {
         initJStockOptions();
 
         Locale.setDefault(getJStockOptions().getLocale());
-        
+        // Do not forget to update resource bundles.
+        GUIBundle.changeLocale(getJStockOptions().getLocale());
+        MessagesBundle.changeLocale(getJStockOptions().getLocale());
+
         try {
             UIManager.setLookAndFeel(getJStockOptions().getLooknFeel());
         }
