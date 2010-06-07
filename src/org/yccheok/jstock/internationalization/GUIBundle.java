@@ -26,7 +26,6 @@
 
 package org.yccheok.jstock.internationalization;
 
-import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
@@ -41,7 +40,7 @@ import java.util.ResourceBundle;
  */
 public class GUIBundle {
 
-    private static ResourceBundle bundle;
+    private static final ResourceBundle bundle;
 
     static {
         bundle = ResourceBundle.getBundle("org.yccheok.jstock.data.gui");
@@ -51,15 +50,6 @@ public class GUIBundle {
      * No need to create an instance
      */
     private GUIBundle() {
-    }
-
-    /**
-     * Change this bundle locale to the specified locale.
-     *
-     * @param locale the specified locale
-     */
-    public static void changeLocale(Locale locale) {
-        bundle = ResourceBundle.getBundle("org.yccheok.jstock.data.gui", locale);
     }
 
     /**
