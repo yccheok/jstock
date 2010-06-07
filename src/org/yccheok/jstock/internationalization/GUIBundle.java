@@ -40,10 +40,11 @@ import java.util.ResourceBundle;
  */
 public class GUIBundle {
 
-    private static final ResourceBundle bundle;
-
-    static {
-        bundle = ResourceBundle.getBundle("org.yccheok.jstock.data.gui");
+    // The technique known as the initialization on demand holder idiom, 
+    // is as lazy as possible.
+    // http://en.wikipedia.org/wiki/Initialization_on_demand_holder_idiom
+    private static class BundleHolder {
+        private static final ResourceBundle bundle = ResourceBundle.getBundle("org.yccheok.jstock.data.gui");
     }
 
     /**
@@ -62,6 +63,6 @@ public class GUIBundle {
      * @return the string for the given key
      */
     public static String getString(String key) {
-        return bundle.getString(key);
+        return BundleHolder.bundle.getString(key);
     }
 }
