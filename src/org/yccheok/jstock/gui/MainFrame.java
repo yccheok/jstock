@@ -81,9 +81,6 @@ public class MainFrame extends javax.swing.JFrame {
         initJStockOptions();
 
         Locale.setDefault(getJStockOptions().getLocale());
-        // Do not forget to update resource bundles.
-        GUIBundle.changeLocale(getJStockOptions().getLocale());
-        MessagesBundle.changeLocale(getJStockOptions().getLocale());
 
         try {
             UIManager.setLookAndFeel(getJStockOptions().getLooknFeel());
@@ -663,7 +660,6 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem4ActionPerformed
 
     private void jMenuItem7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem7ActionPerformed
-// TODO add your handling code here:
         this.clearAllStocks();
     }//GEN-LAST:event_jMenuItem7ActionPerformed
 
@@ -852,6 +848,22 @@ public class MainFrame extends javax.swing.JFrame {
         return this.chartJDialogOptions;
     }
 
+    /**
+     * Save the entire application settings.
+     */
+    public void save() {
+        // Save the last viewed page.
+        this.getJStockOptions().setLastSelectedPageIndex(this.jTabbedPane1.getSelectedIndex());
+        this.saveJStockOptions();
+        this.saveGUIOptions();
+        this.saveChartJDialogOptions();
+        this.saveBrokingFirmLogos();
+        this.saveRealTimeStocks();
+        this.indicatorPanel.saveAlertIndicatorProjectManager();
+        this.indicatorPanel.saveModuleIndicatorProjectManager();
+        this.portfolioManagementJPanel.savePortfolio();
+    }
+
     // windowClosing
     // Invoked when the user attempts to close the window from the window's system menu.
     //
@@ -864,40 +876,8 @@ public class MainFrame extends javax.swing.JFrame {
      */
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
         try {
-            log.info("Widnow is closed...");
-
-            //log.info("stop indicator scanner panel...");
-            //this.indicatorScannerJPanel.stop();
-
-            //log.info("stop indicator panel...");
-            //this.indicatorPanel.stop();
-
-            log.info("saveJStockOptions...");
-            // Save the last viewed page.
-            this.getJStockOptions().setLastSelectedPageIndex(this.jTabbedPane1.getSelectedIndex());
-            this.saveJStockOptions();
-
-            log.info("saveGUIOptions...");
-            this.saveGUIOptions();
-
-            log.info("saveChartJDialogOptions...");
-            this.saveChartJDialogOptions();
-
-            log.info("saveBrokingFirmLogos...");
-            this.saveBrokingFirmLogos();
-
-            log.info("saveRealTimeStocks...");
-            this.saveRealTimeStocks();
-
-            log.info("saveIndicatorProjectManager...");
-            this.indicatorPanel.saveAlertIndicatorProjectManager();
-
-            log.info("saveModuleProjectManager...");
-            this.indicatorPanel.saveModuleIndicatorProjectManager();
-
-            log.info("savePortfolio...");
-            this.portfolioManagementJPanel.savePortfolio();
-
+            this.save();
+            
             log.info("latestNewsTask stop...");
             if(this.latestNewsTask != null)
             {
@@ -962,13 +942,11 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem5ActionPerformed
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-// TODO add your handling code here:
         this.setVisible(false);
         this.dispose();
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void formWindowIconified(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowIconified
-// TODO add your handling code here:
         // Calling setVisible(false) will cause modal dialog box to be unblocked
         // for JDialog.setVisible(true). This will happen in Linux system where
         // user are allowed to minimize window even there is a modal JDialog box
@@ -1235,50 +1213,16 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem12ActionPerformed
 
     private void jRadioButtonMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonMenuItem1ActionPerformed
-        this.changeLocale(Locale.ENGLISH);
+        Locale.setDefault(Locale.ENGLISH);
+        this.jStockOptions.setLocale(Locale.ENGLISH);
+        org.yccheok.jstock.gui.Utils.restartApplication(this);
     }//GEN-LAST:event_jRadioButtonMenuItem1ActionPerformed
 
     private void jRadioButtonMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonMenuItem2ActionPerformed
-        this.changeLocale(Locale.SIMPLIFIED_CHINESE);
+        Locale.setDefault(Locale.SIMPLIFIED_CHINESE);
+        this.jStockOptions.setLocale(Locale.SIMPLIFIED_CHINESE);        
+        org.yccheok.jstock.gui.Utils.restartApplication(this);
     }//GEN-LAST:event_jRadioButtonMenuItem2ActionPerformed
-
-    /**
-     * Change this application's locale to the desired locale.
-     * 
-     * @param locale the desired locale
-     */
-    private void changeLocale(final Locale locale) {
-        if (SwingUtilities.isEventDispatchThread()) {
-            this._changeLocale(locale);
-        }
-        else {
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    MainFrame.this._changeLocale(locale);
-                }                
-            });
-        }
-    }
-
-    /**
-     * Change this application's locale to the specified locale. Do not call
-     * this method directly. Instead, call to <code>changeLocale</code>.
-     *
-     * @param locale the specified locale
-     */
-    private void _changeLocale(Locale locale) {
-        Locale.setDefault(locale);
-        this.jStockOptions.setLocale(locale);
-        GUIBundle.changeLocale(locale);
-        MessagesBundle.changeLocale(locale);
-
-        // Seem cumbersome. The good thing is, we need not to restart the
-        // application.
-        this.setTitle(GUIBundle.getString("MainFrame_Application_Title"));
-        this.trayIcon.setToolTip(GUIBundle.getString("MainFrame_Application_Title"));
-        this.jMenu3.setText(GUIBundle.getString("MainFrame_File"));
-    }
     
     /**
      * Activate specified watchlist.

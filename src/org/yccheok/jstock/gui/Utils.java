@@ -107,6 +107,77 @@ public class Utils {
     private Utils() {
     }
 
+    /**
+     * Restart the application.
+     *
+     * There are some important aspects to have in mind for this code:
+     * + The application's main class must be in a jar file. mainFrame
+     *   must be an instance of any class inside the same jar file (could be the
+     *   main class too).
+     * + The called java VM will be the same that the application is currently
+     *   running on.
+     * + There is no special error checking: the java VM may return an error like
+     *   class not found or jar not found, and it will not be caught by the code
+     *   posted above.
+     *
+     * The function will never return if it doesn't catch an error. It would be
+     * a good practice to close all the handlers that could conflict with the
+     * 'duplicate' new application before calling restartApplication(). There
+     * will be a small time (which depends on many factors) where both
+     * applications will be running at the same time.
+     *
+     * @param mainFrame One and only one mainFrame
+     * @return true if restart success
+     */
+    public static boolean restartApplication(MainFrame mainFrame)
+    {
+        String javaBin = System.getProperty("java.home") + "/bin/javaw";
+        File jarFile;
+        try {
+            jarFile = new File
+            (mainFrame.getClass().getProtectionDomain()
+            .getCodeSource().getLocation().toURI());
+        }
+        catch(Exception e) {
+            log.error(null, e);
+            return false;
+        }
+
+        /* is it a jar file or exe file? */
+        if (!jarFile.getName().endsWith(".jar") && !jarFile.getName().endsWith(".exe")) {
+            //no, it's a .class probably
+            return false;
+        }
+
+        String toExec[] = null;
+
+        if (jarFile.getName().endsWith(".exe")) {
+            toExec = new String[] { jarFile.getPath() };
+        }
+        else {
+            toExec = new String[] { javaBin, "-jar", jarFile.getPath() };
+        }
+     
+        // Before launching new JStock, save all the application settings.
+        mainFrame.save();
+
+        try {
+            Process p = Runtime.getRuntime().exec(toExec);
+        }
+        catch(Exception e) {
+            log.error(null, e);
+            return false;
+        }
+
+        // And close the old's if new JStock launched successfully.
+        mainFrame.setVisible(false);
+        mainFrame.dispose();
+
+        System.exit(0);
+
+        return true;
+    }
+
     public static java.util.Date getNTPDate() {
         List<String> hosts = getNTPServers();
 
