@@ -49,6 +49,11 @@ package org.yccheok.jstock.gui;
 import java.awt.*;
 
 import java.text.DateFormat;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
 import javax.swing.*;
 
 import javax.swing.table.*;
@@ -300,5 +305,33 @@ public class JTableUtilities {
         column.setCellEditor(new DateFieldTableEditor());
         column.setCellRenderer(new DateRendererDecoratorEx(column.getCellRenderer(), format));
     }
+
+    /**
+     * Get the key for a given string and locale.
+     *
+     * @param string the string for the desired key
+     * @param locale the locale for the desired key
+     * @return the key for a given string and locale
+     */
+    private static String getKey(String string, Locale locale) {
+        if (string2KeyMap.containsKey(locale)) {
+            final Map<String, String> string2Key = string2KeyMap.get(locale);
+            return string2Key.get(string);
+        }
+
+        final Map<String, String> string2Key = new HashMap<String, String>();
+        final ResourceBundle bundle = ResourceBundle.getBundle("org.yccheok.jstock.data.gui", locale);
+
+        final Enumeration<String> enumeration = bundle.getKeys();
+        while (enumeration.hasMoreElements()) {
+            final String key = enumeration.nextElement();
+            string2Key.put(bundle.getString(key), key);
+        }
+
+        string2KeyMap.put(locale, string2Key);
+        return string2Key.get(string);
+    }
+
+    private static final Map<Locale, Map<String, String>> string2KeyMap = new HashMap<Locale, Map<String, String>>();
 }
 
