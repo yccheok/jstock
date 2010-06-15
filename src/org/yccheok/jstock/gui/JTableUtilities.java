@@ -59,6 +59,7 @@ import javax.swing.*;
 import javax.swing.table.*;
 import net.sf.nachocalendar.table.DateFieldTableEditor;
 import org.yccheok.jstock.gui.table.DateRendererDecoratorEx;
+import org.yccheok.jstock.internationalization.GUIBundle;
 
 
 
@@ -130,15 +131,43 @@ public class JTableUtilities {
 
     public static void setJTableOptions(JTable jTable, GUIOptions.JTableOptions jTableOptions)
     {
+        final Locale locale = jTableOptions.getLocale();
+        
     	// Remove unwanted column. MUST BE DONE FIRST!
         for (int i = 0; i < jTable.getColumnCount(); i++) {
             final String name = jTable.getColumnName(i);
 
-            /* Remove any unwanted columns. */
-            if (jTableOptions.contains(name) == false)
-            {
-                removeTableColumn(jTable, name);
-                i--;
+            // In to avoid the following situation.
+            // 1. GUIOptions is being saved when we are in Chinese locale.
+            // 2. Application is restarted in English locale.
+            // 3. We are trying to compare English wording with Chinese wording.
+            //
+            // Before performing comparison, we shall convert name, to the locale
+            // of table options.
+            final String key = getKey(name, Locale.getDefault());
+
+            // Ensure correct resource file is being loaded.
+            // When ResourceBundle.getBundle(..., locale) is being called, the
+            // system will try to search in the following sequence.
+            // 1. gui_<locale>.properties.
+            // 2. gui_<default_locale>.properties.
+            // 3. gui.properties.
+            final Locale oldLocale = Locale.getDefault();
+            Locale.setDefault(locale);
+            try {
+                final ResourceBundle bundle = ResourceBundle.getBundle("org.yccheok.jstock.data.gui", locale);
+                final String translated_name = key == null ? name : bundle.getString(key);
+                Locale.setDefault(oldLocale);
+
+                /* Remove any unwanted columns. */
+                if (jTableOptions.contains(translated_name) == false)
+                {
+                    removeTableColumn(jTable, name);
+                    i--;
+                }
+            }
+            finally {
+                Locale.setDefault(oldLocale);
             }
         }
 
@@ -149,12 +178,15 @@ public class JTableUtilities {
         /* Sort the columns according to user preference. */
         for (int i = 0; i < optionsCount; i++) {
             final String name = jTableOptions.getColumnName(i);
+            final String key = getKey(name, locale);
+            final String translated_name = key == null ? name : GUIBundle.getString(key);
+
             int index = -1;
             for (int j = 0; j < tableCount; j++) {
-                if (jTable.getColumnName(j).equals(name))
+                if (jTable.getColumnName(j).equals(translated_name))
                 {
                     /* Restore width. */
-                    jTable.getColumn(name).setPreferredWidth(jTableOptions.getColumnWidth(i));
+                    jTable.getColumn(translated_name).setPreferredWidth(jTableOptions.getColumnWidth(i));
 
                     index = j;
                     break;
@@ -320,15 +352,29 @@ public class JTableUtilities {
         }
 
         final Map<String, String> string2Key = new HashMap<String, String>();
-        final ResourceBundle bundle = ResourceBundle.getBundle("org.yccheok.jstock.data.gui", locale);
 
-        final Enumeration<String> enumeration = bundle.getKeys();
-        while (enumeration.hasMoreElements()) {
-            final String key = enumeration.nextElement();
-            string2Key.put(bundle.getString(key), key);
+        // Ensure correct resource file is being loaded.
+        // When ResourceBundle.getBundle(..., locale) is being called, the
+        // system will try to search in the following sequence.
+        // 1. gui_<locale>.properties.
+        // 2. gui_<default_locale>.properties.
+        // 3. gui.properties.
+        final Locale oldLocale = Locale.getDefault();
+        Locale.setDefault(locale);
+        try {
+            final ResourceBundle bundle = ResourceBundle.getBundle("org.yccheok.jstock.data.gui", locale);
+
+            final Enumeration<String> enumeration = bundle.getKeys();
+            while (enumeration.hasMoreElements()) {
+                final String key = enumeration.nextElement();
+                string2Key.put(bundle.getString(key), key);
+            }
+
+            string2KeyMap.put(locale, string2Key);
         }
-
-        string2KeyMap.put(locale, string2Key);
+        finally {
+            Locale.setDefault(oldLocale);
+        }
         return string2Key.get(string);
     }
 

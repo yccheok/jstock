@@ -713,7 +713,6 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
-    // TODO add your handling code here:
         final File file = Utils.promptOpenCSVAndExcelJFileChooser();
         if (file == null) {
             return;
@@ -1213,13 +1212,11 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem12ActionPerformed
 
     private void jRadioButtonMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonMenuItem1ActionPerformed
-        Locale.setDefault(Locale.ENGLISH);
         this.jStockOptions.setLocale(Locale.ENGLISH);
         org.yccheok.jstock.gui.Utils.restartApplication(this);
     }//GEN-LAST:event_jRadioButtonMenuItem1ActionPerformed
 
     private void jRadioButtonMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonMenuItem2ActionPerformed
-        Locale.setDefault(Locale.SIMPLIFIED_CHINESE);
         this.jStockOptions.setLocale(Locale.SIMPLIFIED_CHINESE);        
         org.yccheok.jstock.gui.Utils.restartApplication(this);
     }//GEN-LAST:event_jRadioButtonMenuItem2ActionPerformed
