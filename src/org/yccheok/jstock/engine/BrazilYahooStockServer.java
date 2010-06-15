@@ -217,9 +217,9 @@ public class BrazilYahooStockServer extends AbstractYahooStockServer {
 
     private static final Map<Country, URL> servers = new HashMap<Country, URL>();
 
-    //<a href="/q/cp?s=^BVSP&c=1">Último</a>
+    //<a href="/q/cp?s=^BVSP&c=1">Ãšltimo</a>
     //      become ==>
-    //<a href="/q/cp?s=%5EBVSP&amp;c=1">Último</a>
+    //<a href="/q/cp?s=%5EBVSP&amp;c=1">Ãšltimo</a>
     private static final Pattern urlPattern = Pattern.compile("<a\\s+href\\s*=\\s*\"(/q/cp\\?s=%5EBVSP&amp;c=\\d+)\">");
     private static final Log log = LogFactory.getLog(BrazilYahooStockServer.class);
 
