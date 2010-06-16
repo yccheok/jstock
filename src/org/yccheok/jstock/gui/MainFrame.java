@@ -1213,12 +1213,20 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void jRadioButtonMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonMenuItem1ActionPerformed
         this.jStockOptions.setLocale(Locale.ENGLISH);
-        org.yccheok.jstock.gui.Utils.restartApplication(this);
+        // Do not suprise user with sudden restart. Ask for their permission to do so.
+        final int result = JOptionPane.showConfirmDialog(this, MessagesBundle.getString("question_message_restart_now"), MessagesBundle.getString("question_title_restart_now"), JOptionPane.YES_NO_OPTION);
+        if (result == JOptionPane.YES_OPTION) {
+            org.yccheok.jstock.gui.Utils.restartApplication(this);
+        }
     }//GEN-LAST:event_jRadioButtonMenuItem1ActionPerformed
 
     private void jRadioButtonMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonMenuItem2ActionPerformed
-        this.jStockOptions.setLocale(Locale.SIMPLIFIED_CHINESE);        
-        org.yccheok.jstock.gui.Utils.restartApplication(this);
+        this.jStockOptions.setLocale(Locale.SIMPLIFIED_CHINESE);
+        // Do not suprise user with sudden restart. Ask for their permission to do so.
+        final int result = JOptionPane.showConfirmDialog(this, MessagesBundle.getString("question_message_restart_now"), MessagesBundle.getString("question_title_restart_now"), JOptionPane.YES_NO_OPTION);
+        if (result == JOptionPane.YES_OPTION) {
+            org.yccheok.jstock.gui.Utils.restartApplication(this);
+        }
     }//GEN-LAST:event_jRadioButtonMenuItem2ActionPerformed
     
     /**
