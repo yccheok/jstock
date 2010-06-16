@@ -20,6 +20,7 @@
 package org.yccheok.jstock.gui;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Desktop;
@@ -1549,7 +1550,7 @@ public class Utils {
 
     @SuppressWarnings("unchecked")
     public static <A> A fromXML(Class c, InputStream inputStream) {
-        XStream xStream = new XStream();
+        XStream xStream = new XStream(new DomDriver("UTF-8"));
 
         try {
             Object object = xStream.fromXML(inputStream);
@@ -1579,7 +1580,7 @@ public class Utils {
 
     @SuppressWarnings("unchecked")
     public static <A> A fromXML(Class c, File file) {
-        XStream xStream = new XStream();
+        XStream xStream = new XStream(new DomDriver("UTF-8"));
         InputStream inputStream = null;
 
         try {
@@ -1614,7 +1615,7 @@ public class Utils {
     }
 
     public static boolean toXML(Object object, File file) {
-        XStream xStream = new XStream();
+        XStream xStream = new XStream(new DomDriver("UTF-8"));
         OutputStream outputStream = null;
 
         try {
