@@ -345,7 +345,11 @@ public class JStockOptions {
         this.watchlistName = jStockOptions.watchlistName;
 
         this.yellowInformationBoxOption = jStockOptions.yellowInformationBoxOption;
-        this.locale = jStockOptions.locale;
+        
+        // We won't save locale into cloud. As to have effect on new locale,
+        // restarting the entire application is required. We do not want user
+        // to restart the application after loading from cloud.
+        //this.locale = jStockOptions.locale;
     }
 
     // User may not trust us to store their password in cloud server. To avoid
@@ -442,7 +446,10 @@ public class JStockOptions {
         jStockOptions.watchlistName = this.watchlistName;
 
         jStockOptions.yellowInformationBoxOption = this.yellowInformationBoxOption;
-        jStockOptions.locale = this.locale;
+        // We won't save locale into cloud. As to have effect on new locale,
+        // restarting the entire application is required. We do not want user
+        // to restart the application after loading from cloud.
+        //jStockOptions.locale = this.locale;
 
         return jStockOptions;
     }
