@@ -158,11 +158,11 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
             }
         });
 
-        jLabel10.setFont(new java.awt.Font("Tahoma", 1, 11));
+        jLabel10.setFont(jLabel10.getFont().deriveFont(jLabel10.getFont().getStyle() | java.awt.Font.BOLD));
         jLabel10.setText("Net Value");
 
         jFormattedTextField6.setEditable(false);
-        jFormattedTextField6.setFont(new java.awt.Font("Tahoma", 1, 11));
+        jFormattedTextField6.setFont(jFormattedTextField6.getFont().deriveFont(jFormattedTextField6.getFont().getStyle() | java.awt.Font.BOLD));
         jFormattedTextField6.setValue(new Double(0.0));
 
         jLabel1.setText("Unit");

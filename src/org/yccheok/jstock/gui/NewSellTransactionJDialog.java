@@ -168,11 +168,11 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
             }
         });
 
-        jLabel10.setFont(new java.awt.Font("Tahoma", 1, 11));
+        jLabel10.setFont(jLabel10.getFont().deriveFont(jLabel10.getFont().getStyle() | java.awt.Font.BOLD));
         jLabel10.setText("Profit (%)");
 
         jFormattedTextField6.setEditable(false);
-        jFormattedTextField6.setFont(new java.awt.Font("Tahoma", 1, 11));
+        jFormattedTextField6.setFont(jFormattedTextField6.getFont().deriveFont(jFormattedTextField6.getFont().getStyle() | java.awt.Font.BOLD));
         jFormattedTextField6.setValue(new Double(0.0));
 
         jLabel1.setText("Unit");
@@ -197,10 +197,10 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         jLabel11.setText("Stamp Duty");
 
         jFormattedTextField8.setEditable(false);
-        jFormattedTextField8.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jFormattedTextField8.setFont(jFormattedTextField8.getFont().deriveFont(jFormattedTextField8.getFont().getStyle() | java.awt.Font.BOLD));
         jFormattedTextField8.setValue(new Double(0.0));
 
-        jLabel12.setFont(new java.awt.Font("Tahoma", 1, 11));
+        jLabel12.setFont(jLabel12.getFont().deriveFont(jLabel12.getFont().getStyle() | java.awt.Font.BOLD));
         jLabel12.setText("Profit ($)");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
