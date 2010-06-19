@@ -142,13 +142,13 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         jLabel1.setText(getShareLabel());
         jPanel3.add(jLabel1);
 
-        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 11));
+        jLabel2.setFont(jLabel2.getFont().deriveFont(jLabel2.getFont().getStyle() | java.awt.Font.BOLD));
         jPanel3.add(jLabel2);
 
         jLabel3.setText(getCashLabel());
         jPanel3.add(jLabel3);
 
-        jLabel4.setFont(new java.awt.Font("Tahoma", 1, 11));
+        jLabel4.setFont(jLabel4.getFont().deriveFont(jLabel4.getFont().getStyle() | java.awt.Font.BOLD));
         jPanel3.add(jLabel4);
 
         jPanel4.add(jPanel3, java.awt.BorderLayout.WEST);
@@ -156,13 +156,13 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         jLabel5.setText(getPaperProfitLabel());
         jPanel5.add(jLabel5);
 
-        jLabel6.setFont(new java.awt.Font("Tahoma", 1, 11));
+        jLabel6.setFont(jLabel6.getFont().deriveFont(jLabel6.getFont().getStyle() | java.awt.Font.BOLD));
         jPanel5.add(jLabel6);
 
         jLabel7.setText(getRealizedProfitLabel());
         jPanel5.add(jLabel7);
 
-        jLabel8.setFont(new java.awt.Font("Tahoma", 1, 11));
+        jLabel8.setFont(jLabel8.getFont().deriveFont(jLabel8.getFont().getStyle() | java.awt.Font.BOLD));
         jPanel5.add(jLabel8);
 
         jPanel4.add(jPanel5, java.awt.BorderLayout.EAST);
