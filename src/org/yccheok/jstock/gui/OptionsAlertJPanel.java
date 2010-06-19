@@ -131,7 +131,7 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
 
         jTextField1.setEnabled(false);
 
-        jLabel12.setFont(new java.awt.Font("Tahoma", 0, 10));
+        jLabel12.setFont(jLabel12.getFont().deriveFont(jLabel12.getFont().getSize()-1f));
         jLabel12.setText("(e.g. john@yahoo.com)");
         jLabel12.setEnabled(false);
 
@@ -234,7 +234,7 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
             }
         });
 
-        jLabel6.setFont(new java.awt.Font("Tahoma", 0, 10));
+        jLabel6.setFont(jLabel6.getFont().deriveFont(jLabel6.getFont().getSize()-1f));
         jLabel6.setText("(e.g. john@gmail.com)");
         jLabel6.setEnabled(false);
 
