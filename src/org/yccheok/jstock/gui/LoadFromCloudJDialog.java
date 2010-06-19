@@ -173,7 +173,7 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
             }
         });
 
-        jLabel6.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+        jLabel6.setFont(jLabel6.getFont().deriveFont(jLabel6.getFont().getSize()-1f));
         jLabel6.setText("(e.g. john@gmail.com)");
 
         jCheckBox1.setText(bundle.getString("LoadFromCloudJDialog_KeepMeSignedIn")); // NOI18N
