@@ -1987,7 +1987,7 @@ public class Utils {
      * @return a new bold version of specified font
      */
     public static Font getBoldFont(Font font) {
-        return new Font(font.getFontName(), font.getStyle() | Font.BOLD, font.getSize());
+        return font.deriveFont(font.getStyle() | Font.BOLD);
     }
 
     // Calling to this method will affect state of JStockOptions.
