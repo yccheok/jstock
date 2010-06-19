@@ -468,7 +468,7 @@ public class MainFrame extends javax.swing.JFrame {
         jMenu3.setText(bundle.getString("MainFrame_File")); // NOI18N
 
         jMenuItem2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/project_open.png"))); // NOI18N
-        jMenuItem2.setText("Open...");
+        jMenuItem2.setText(bundle.getString("MainFrame_Open...")); // NOI18N
         jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem2ActionPerformed(evt);
@@ -477,7 +477,7 @@ public class MainFrame extends javax.swing.JFrame {
         jMenu3.add(jMenuItem2);
 
         jMenuItem9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/filesave.png"))); // NOI18N
-        jMenuItem9.setText("Save As...");
+        jMenuItem9.setText(bundle.getString("MainFrame_SaveAs...")); // NOI18N
         jMenuItem9.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem9ActionPerformed(evt);
@@ -505,7 +505,7 @@ public class MainFrame extends javax.swing.JFrame {
         jMenu3.add(jMenuItem10);
         jMenu3.add(jSeparator3);
 
-        jMenuItem1.setText("Exit");
+        jMenuItem1.setText(bundle.getString("MainFrame_Exit")); // NOI18N
         jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem1ActionPerformed(evt);
