@@ -36,6 +36,7 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.ListCellRenderer;
 import org.yccheok.jstock.gui.MainFrame;
+import org.yccheok.jstock.gui.Utils;
 import org.yccheok.jstock.internationalization.MessagesBundle;
 
 /**
@@ -322,7 +323,8 @@ public class PortfolioJDialog extends javax.swing.JDialog {
                     final String portfolioName = mainFrame.getJStockOptions().getPortfolioName();
 
                     if (value.toString().equals(portfolioName)) {
-                        component.setFont(new Font(component.getFont().getName(), Font.BOLD, component.getFont().getSize()));
+                        final Font oldFont = component.getFont();
+                        component.setFont(Utils.getBoldFont(oldFont));
                     }
                 }
                 return component;
