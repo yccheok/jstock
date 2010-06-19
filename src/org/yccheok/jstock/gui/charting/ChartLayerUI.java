@@ -148,11 +148,11 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         }
 
         final Font oldFont = g2.getFont();
-        final Font paramFont = new Font(oldFont.getFontName(), oldFont.getStyle(), oldFont.getSize());
+        final Font paramFont = oldFont;
         final FontMetrics paramFontMetrics = g2.getFontMetrics(paramFont);
-        final Font valueFont = new Font(oldFont.getFontName(), oldFont.getStyle() | Font.BOLD, oldFont.getSize() + 1);
+        final Font valueFont = oldFont.deriveFont(oldFont.getStyle() | Font.BOLD, (float)oldFont.getSize() + 1);
         final FontMetrics valueFontMetrics = g2.getFontMetrics(valueFont);
-        final Font dateFont = new Font(oldFont.getFontName(), oldFont.getStyle(), oldFont.getSize() - 1);
+        final Font dateFont = oldFont.deriveFont((float)oldFont.getSize() - 1);
         final FontMetrics dateFontMetrics = g2.getFontMetrics(dateFont);
 
         final StockHistoryServer stockHistoryServer = this.chartJDialog.getStockHistoryServer();
