@@ -320,7 +320,8 @@ public class WatchlistJDialog extends javax.swing.JDialog {
                     final String watchlistName = mainFrame.getJStockOptions().getWatchlistName();
 
                     if (value.toString().equals(watchlistName)) {
-                        component.setFont(new Font(component.getFont().getName(), Font.BOLD, component.getFont().getSize()));
+                        final Font oldFont = component.getFont();
+                        component.setFont(oldFont.deriveFont(Font.BOLD));
                     }
                 }
                 return component;
