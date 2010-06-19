@@ -196,11 +196,11 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
 
             jPanel2.add(jPanel5, java.awt.BorderLayout.PAGE_START);
 
-            jLabel2.setFont(new java.awt.Font("Tahoma", 0, 10));
+            jLabel2.setFont(jLabel2.getFont().deriveFont(jLabel2.getFont().getSize()-1f));
             jLabel2.setText(bundle.getString("StockDatabaseJDialog_NeedHelpVisit")); // NOI18N
             jPanel10.add(jLabel2);
 
-            jLabel3.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+            jLabel3.setFont(jLabel3.getFont().deriveFont(jLabel3.getFont().getSize()-1f));
             jLabel3.setText("<html><a href=\"http://jstock.sourceforge.net/help_stock_database.html?utm_source=jstock&utm_medium=database_dialog\">JStock FAQ</a></html>");
             jLabel3.addMouseListener(new java.awt.event.MouseAdapter() {
                 public void mouseClicked(java.awt.event.MouseEvent evt) {

@@ -67,7 +67,7 @@ public class OptionsSpeedJPanel extends javax.swing.JPanel implements JStockOpti
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "1", "5", "10", "20", "30", "40", "50", "60" }));
 
-        jLabel2.setFont(new java.awt.Font("Dialog", 0, 10)); // NOI18N
+        jLabel2.setFont(jLabel2.getFont().deriveFont(jLabel2.getFont().getSize()-1f));
         jLabel2.setText("(smaller means faster)");
 
         jComboBox3.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "seconds", "minutes", "hours" }));
@@ -85,7 +85,7 @@ public class OptionsSpeedJPanel extends javax.swing.JPanel implements JStockOpti
                 .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel2)
-                .addContainerGap(21, Short.MAX_VALUE))
+                .addContainerGap(27, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -101,7 +101,7 @@ public class OptionsSpeedJPanel extends javax.swing.JPanel implements JStockOpti
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("History data"));
 
-        jLabel4.setFont(new java.awt.Font("Dialog", 0, 10));
+        jLabel4.setFont(jLabel4.getFont().deriveFont(jLabel4.getFont().getSize()-1f));
         jLabel4.setText("(smaller means faster)");
 
         jComboBox2.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "1", "2", "3", "5", "10", "15", "20" }));
@@ -119,7 +119,7 @@ public class OptionsSpeedJPanel extends javax.swing.JPanel implements JStockOpti
                 .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel4)
-                .addContainerGap(110, Short.MAX_VALUE))
+                .addContainerGap(116, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
