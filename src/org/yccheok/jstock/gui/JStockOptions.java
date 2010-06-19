@@ -22,7 +22,7 @@ package org.yccheok.jstock.gui;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -105,55 +105,55 @@ public class JStockOptions {
 
     /** Creates a new instance of JStockOptions */
     public JStockOptions() {
-        setPopupMessage(true);
-        setSendEmail(false);
-        setEmail("");
-        setCCEmail("");
-        setEmailPassword("");
-        setSMSEnabled(false);
-        setGoogleCalendarUsername("");
-        setGoogleCalendarPassword("");
-        setSingleIndicatorAlert(true);
-        setProxyServer("");
-        setProxyPort(-1);
-        setScanningSpeed(1000);
-        setAlertSpeed(5);
-        setLookNFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-        setCountry(Country.Malaysia);
-        setSoundEnabled(false);
+        this.popupMessage = true;
+        this.sendEmail = false;
+        this.email = "";
+        this.CCEmail = "";
+        this.emailPassword = "";
+        this.SMSEnabled = false;
+        this.googleCalendarUsername = "";
+        this.googleCalendarPassword = "";
+        this.singleIndicatorAlert = true;
+        this.proxyServer = "";
+        this.proxyPort = -1;
+        this.scanningSpeed = 1000;
+        this.alertSpeed = 5;
+        this.looknFeel = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
+        this.country = Country.Malaysia;
+        this.soundEnabled = false;
 
-        this.setNormalTextForegroundColor(DEFAULT_NORMAL_TEXT_FOREGROUND_COLOR);
-        this.setHigherNumericalValueForegroundColor(DEFAULT_HIGHER_NUMERICAL_VALUE_FOREGROUND_COLOR);
-        this.setLowerNumericalValueForegroundColor(DEFAULT_LOWER_NUMERICAL_VALUE_FOREGROUND_COLOR);
+        this.normalTextForegroundColor = DEFAULT_NORMAL_TEXT_FOREGROUND_COLOR;
+        this.higherNumericalValueForegroundColor = DEFAULT_HIGHER_NUMERICAL_VALUE_FOREGROUND_COLOR;
+        this.lowerNumericalValueForegroundColor = DEFAULT_LOWER_NUMERICAL_VALUE_FOREGROUND_COLOR;
         
-        setFirstRowBackgroundColor(DEFAULT_FIRST_ROW_BACKGROUND_COLOR);
-        setSecondRowBackgroundColor(DEFAULT_SECOND_ROW_BACKGROUND_COLOR);
+        this.firstRowBackgroundColor = DEFAULT_FIRST_ROW_BACKGROUND_COLOR;
+        this.secondRowBackgroundColor = DEFAULT_SECOND_ROW_BACKGROUND_COLOR;
                 
-        this.setEnableColorChange(false);
-        this.setAutoUpdateForegroundColor(DEFAULT_AUTO_UPDATE_FOREGROUND_COLOR);
-        this.setAutoUpdateBackgroundColor(DEFAULT_AUTO_UPDATE_BACKGROUND_COLOR);
+        this.enableColorChange = false;
+        this.autoUpdateForegroundColor = DEFAULT_AUTO_UPDATE_FOREGROUND_COLOR;
+        this.autoUpdateBackgroundColor = DEFAULT_AUTO_UPDATE_BACKGROUND_COLOR;
 
-        this.setEnableColorAlert(false);
-        this.setAlertForegroundColor(DEFAULT_ALERT_FOREGROUND_COLOR);
-        this.setAlertBackgroundColor(DEFAULT_ALERT_BACKGROUND_COLOR);
+        this.enableColorAlert = false;
+        this.alertForegroundColor = DEFAULT_ALERT_FOREGROUND_COLOR;
+        this.alertBackgroundColor = DEFAULT_ALERT_BACKGROUND_COLOR;
 
-        this.setAutoUpdateNewsEnabled(true);
-        this.setNewsID("");
+        this.isAutoUpdateNewsEnabled = true;
+        this.newsID = "";
 
-        this.setHistoryDuration(DEFAULT_HISTORY_DURATION);
+        this.historyDuration = DEFAULT_HISTORY_DURATION;
 
-        this.setChatEnabled(false);
-        this.setChatUsername("");
-        this.setChatPassword("");
-        this.setChatFlashNotificationEnabled(true);
-        this.setChatSoundNotificationEnabled(true);
+        this.isChatEnabled = false;
+        this.chatUsername = "";
+        this.chatPassword = "";
+        this.isChatFlashNotificationEnabled = true;
+        this.isChatSoundNotificationEnabled = true;
 
-        this.setChatSystemMessageColor(DEFAULT_CHAT_SYSTEM_MESSAGE_COLOR);
-        this.setChatOwnMessageColor(DEFAULT_CHAT_OWN_MESSAGE_COLOR);
-        this.setChatOtherMessageColor(DEFAULT_CHAT_OTHER_MESSAGE_COLOR);
+        this.chatSystemMessageColor = DEFAULT_CHAT_SYSTEM_MESSAGE_COLOR;
+        this.chatOwnMessageColor = DEFAULT_CHAT_OWN_MESSAGE_COLOR;
+        this.chatOtherMessageColor = DEFAULT_CHAT_OTHER_MESSAGE_COLOR;
 
-        this.setYellowInformationBoxOption(DEFAULT_YELLOW_INFORMATION_BOX_OPTION);
-        this.setLocale(Locale.getDefault());
+        this.yellowInformationBoxOption = DEFAULT_YELLOW_INFORMATION_BOX_OPTION;
+        this.locale = Locale.getDefault();
     }
 
     private boolean soundEnabled;
@@ -231,7 +231,7 @@ public class JStockOptions {
     private String lastFileIODirectory = System.getProperty("user.home");
     private String lastFileNameExtensionDescription = "CSV Documents (*.csv)";
 
-    private Map<Country, Class> primaryStockServerFactoryClasses = new HashMap<Country, Class>();
+    private Map<Country, Class> primaryStockServerFactoryClasses = new EnumMap<Country, Class>(Country.class);
 
     // Remember the last view page.
     private int lastSelectedPageIndex = 0;
@@ -539,7 +539,7 @@ public class JStockOptions {
         }
 
         if (this.primaryStockServerFactoryClasses == null) {
-            primaryStockServerFactoryClasses = new HashMap<Country, Class>();
+            primaryStockServerFactoryClasses = new EnumMap<Country, Class>(Country.class);
         }
 
         if (this.portfolioName == null) {
