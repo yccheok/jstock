@@ -57,7 +57,7 @@ import java.util.ResourceBundle;
 import javax.swing.*;
 
 import javax.swing.table.*;
-import net.sf.nachocalendar.table.DateFieldTableEditor;
+import org.jdesktop.swingx.table.DatePickerCellEditor;
 import org.yccheok.jstock.gui.table.DateRendererDecoratorEx;
 import org.yccheok.jstock.internationalization.GUIBundle;
 
@@ -334,7 +334,7 @@ public class JTableUtilities {
      */
     private static void setDateEditorForRow(JTable table, int row, DateFormat format) {
         TableColumn column = table.getColumnModel().getColumn(row);
-        column.setCellEditor(new DateFieldTableEditor());
+        column.setCellEditor(new DatePickerCellEditor());
         column.setCellRenderer(new DateRendererDecoratorEx(column.getCellRenderer(), format));
     }
 
