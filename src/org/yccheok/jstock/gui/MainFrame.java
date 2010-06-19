@@ -245,7 +245,6 @@ public class MainFrame extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
         setTitle(bundle.getString("MainFrame_Application_Title")); // NOI18N
-        setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         setIconImage(getMyIconImage());
         addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -283,7 +282,7 @@ public class MainFrame extends javax.swing.JFrame {
         jPanel8.setLayout(new java.awt.BorderLayout(5, 5));
 
         jTable1.setAutoCreateRowSorter(true);
-        jTable1.setFont(new java.awt.Font("Tahoma", 1, 12));
+        jTable1.setFont(jTable1.getFont().deriveFont(jTable1.getFont().getStyle() | java.awt.Font.BOLD, jTable1.getFont().getSize()+1));
         jTable1.setModel(new StockTableModel());
         jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         this.jTable1.setDefaultRenderer(Number.class, new StockTableCellRenderer());
