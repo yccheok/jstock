@@ -112,7 +112,7 @@ public class MarketJPanel extends javax.swing.JPanel {
             JLabel value = new JLabel();
             value.setName(index.name());
             map.put(index.name(), value);
-            value.setFont(new java.awt.Font("Tahoma", 1, 11));
+            value.setFont(Utils.getBoldFont(value.getFont()));
             leftPanel.add(value);
 
             // Install mouse handler.
@@ -142,7 +142,7 @@ public class MarketJPanel extends javax.swing.JPanel {
         JLabel volume_value = new JLabel();
         volume_value.setName("volume");
         map.put("volume", volume_value);
-        volume_value.setFont(new java.awt.Font("Tahoma", 1, 11));
+        volume_value.setFont(Utils.getBoldFont(volume_value.getFont()));
         volume_value.setForeground(new java.awt.Color(153, 102, 0));
         leftPanel.add(volume_value);
 
@@ -151,7 +151,7 @@ public class MarketJPanel extends javax.swing.JPanel {
         JLabel value_value = new JLabel();
         value_value.setName("value");
         map.put("value", value_value);
-        value_value.setFont(new java.awt.Font("Tahoma", 1, 11));
+        value_value.setFont(Utils.getBoldFont(value_value.getFont()));
         value_value.setForeground(new java.awt.Color(153, 102, 0));
         leftPanel.add(value_value);
         
@@ -160,7 +160,7 @@ public class MarketJPanel extends javax.swing.JPanel {
         JLabel up_value = new JLabel();
         up_value.setName("up");
         map.put("up", up_value);
-        up_value.setFont(new java.awt.Font("Tahoma", 1, 11));
+        up_value.setFont(Utils.getBoldFont(up_value.getFont()));
         up_value.setForeground(new java.awt.Color(50, 150, 0));
         rightPanel.add(up_value);
 
@@ -168,8 +168,8 @@ public class MarketJPanel extends javax.swing.JPanel {
         rightPanel.add(down);
         JLabel down_value = new JLabel();
         down_value.setName("down");
-        map.put("down", down_value);        
-        down_value.setFont(new java.awt.Font("Tahoma", 1, 11));
+        map.put("down", down_value);
+        down_value.setFont(Utils.getBoldFont(down_value.getFont()));
         down_value.setForeground(new java.awt.Color(200, 0, 50));
         rightPanel.add(down_value);
 
@@ -177,8 +177,8 @@ public class MarketJPanel extends javax.swing.JPanel {
         rightPanel.add(unchanged);
         JLabel unchanged_value = new JLabel();
         unchanged_value.setName("unchanged");
-        map.put("unchanged", unchanged_value);        
-        unchanged_value.setFont(new java.awt.Font("Tahoma", 1, 11));
+        map.put("unchanged", unchanged_value);
+        unchanged_value.setFont(Utils.getBoldFont(unchanged_value.getFont()));
         unchanged_value.setForeground(new java.awt.Color(0, 0, 0));
         rightPanel.add(unchanged_value);      
     }
