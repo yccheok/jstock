@@ -727,7 +727,8 @@ public class ChartJDialog extends javax.swing.JDialog {
         JLabel[] labels = {jLabel9, jLabel10, jLabel11, jLabel12, jLabel13, jLabel14 };
         for (JLabel label : labels) {
             final Font oldFont = label.getFont();
-            final Font font = new Font(oldFont.getFontName(), oldFont.getStyle() & ~Font.BOLD, oldFont.getSize());
+            // Reset BOLD attribute.
+            final Font font = oldFont.deriveFont(oldFont.getStyle() & ~Font.BOLD);
             label.setFont(font);
         }
     }
