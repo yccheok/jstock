@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
+ * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -331,10 +331,10 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
 
         jLabel2.setText("Port");
 
-        jLabel3.setFont(new java.awt.Font("Dialog", 0, 10));
+        jLabel3.setFont(jLabel3.getFont().deriveFont(jLabel3.getFont().getSize()-1f));
         jLabel3.setText("(e.g. 192.168.0.165)");
 
-        jLabel4.setFont(new java.awt.Font("Dialog", 0, 10));
+        jLabel4.setFont(jLabel4.getFont().deriveFont(jLabel4.getFont().getSize()-1f));
         jLabel4.setText("(e.g. 1024)");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -354,7 +354,7 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel3)
                     .addComponent(jLabel4))
-                .addContainerGap(144, Short.MAX_VALUE))
+                .addContainerGap(153, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
