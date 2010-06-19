@@ -102,7 +102,8 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
 
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        final Font titleFont = new Font(oldFont.getFontName(), oldFont.getStyle() | Font.BOLD, (int)(oldFont.getSize() * 1.5));
+        final Font titleFont = oldFont.deriveFont(oldFont.getStyle() | Font.BOLD, (float)oldFont.getSize() * 1.5f);
+
         final int margin = 5;
 
         final FontMetrics titleFontMetrics = g2.getFontMetrics(titleFont);
@@ -167,11 +168,11 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
             List<String> params, List<String> values, String totalParam, double totalValue,
             Color background_color, Color border_color) {
         final Font oldFont = g2.getFont();
-        final Font paramFont = new Font(oldFont.getFontName(), oldFont.getStyle(), oldFont.getSize());
+        final Font paramFont = oldFont;
         final FontMetrics paramFontMetrics = g2.getFontMetrics(paramFont);
-        final Font valueFont = new Font(oldFont.getFontName(), oldFont.getStyle() | Font.BOLD, oldFont.getSize() + 1);
+        final Font valueFont = oldFont.deriveFont(oldFont.getStyle() | Font.BOLD, (float)oldFont.getSize() + 1);
         final FontMetrics valueFontMetrics = g2.getFontMetrics(valueFont);
-        final Font dateFont = new Font(oldFont.getFontName(), oldFont.getStyle(), oldFont.getSize() - 1);
+        final Font dateFont = oldFont.deriveFont((float)oldFont.getSize() - 1);
         final FontMetrics dateFontMetrics = g2.getFontMetrics(dateFont);
         
         final int x = (int)rect.getX();
@@ -254,11 +255,11 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
 
     private void updateROIInformationBox(Graphics2D g2) {
         final Font oldFont = g2.getFont();
-        final Font paramFont = new Font(oldFont.getFontName(), oldFont.getStyle(), oldFont.getSize());
+        final Font paramFont = oldFont;
         final FontMetrics paramFontMetrics = g2.getFontMetrics(paramFont);
-        final Font valueFont = new Font(oldFont.getFontName(), oldFont.getStyle() | Font.BOLD, oldFont.getSize() + 1);
+        final Font valueFont = oldFont.deriveFont(oldFont.getStyle() | Font.BOLD, (float)oldFont.getSize() + 1);
         final FontMetrics valueFontMetrics = g2.getFontMetrics(valueFont);
-        final Font dateFont = new Font(oldFont.getFontName(), oldFont.getStyle(), oldFont.getSize() - 1);
+        final Font dateFont = oldFont.deriveFont((float)oldFont.getSize() - 1);
         final FontMetrics dateFontMetrics = g2.getFontMetrics(dateFont);
 
         final Activities activities = this.investmentFlowChartJDialog.getROIActivities(this.ROIPointIndex);
@@ -365,11 +366,11 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
 
     private void updateInvestInformationBox(Graphics2D g2) {
         final Font oldFont = g2.getFont();
-        final Font paramFont = new Font(oldFont.getFontName(), oldFont.getStyle(), oldFont.getSize());
+        final Font paramFont = oldFont;
         final FontMetrics paramFontMetrics = g2.getFontMetrics(paramFont);
-        final Font valueFont = new Font(oldFont.getFontName(), oldFont.getStyle() | Font.BOLD, oldFont.getSize() + 1);
+        final Font valueFont = oldFont.deriveFont(oldFont.getStyle() | Font.BOLD, (float)oldFont.getSize() + 1);
         final FontMetrics valueFontMetrics = g2.getFontMetrics(valueFont);
-        final Font dateFont = new Font(oldFont.getFontName(), oldFont.getStyle(), oldFont.getSize() - 1);
+        final Font dateFont = oldFont.deriveFont((float)oldFont.getSize() - 1);
         final FontMetrics dateFontMetrics = g2.getFontMetrics(dateFont);
 
         final Activities activities = this.investmentFlowChartJDialog.getInvestActivities(this.investPointIndex);
@@ -665,7 +666,7 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
 
     private void drawBusyBox(Graphics2D g2, JXLayer<? extends V> layer) {
         final Font oldFont = g2.getFont();
-        final Font font = new Font(oldFont.getFontName(), oldFont.getStyle(), oldFont.getSize());
+        final Font font = oldFont;
         final FontMetrics fontMetrics = g2.getFontMetrics(font);
 
         // Not sure why. Draw GIF image on JXLayer, will cause endless setDirty
