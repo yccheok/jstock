@@ -1742,7 +1742,8 @@ public class IndicatorPanel extends JPanel {
                 if (component != null && value != null) {
                     final OperatorIndicator operatorIndicator = projectManager.getOperatorIndicator(value.toString());
                     if (operatorIndicator != null && operatorIndicator.getType() != projectManager.getPreferredOperatorIndicatorType()) {
-                        component.setFont(new Font(component.getFont().getName(), Font.ITALIC, component.getFont().getSize()));
+                        final Font oldFont = component.getFont();
+                        component.setFont(oldFont.deriveFont(oldFont.getStyle() | Font.ITALIC));
                     }
                 }
                 return component;
