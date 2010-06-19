@@ -515,9 +515,9 @@ public class MainFrame extends javax.swing.JFrame {
 
         jMenuBar2.add(jMenu3);
 
-        jMenu5.setText("Edit");
+        jMenu5.setText(bundle.getString("MainFrame_Edit")); // NOI18N
 
-        jMenuItem4.setText("Add Stocks...");
+        jMenuItem4.setText(bundle.getString("MainFrame_AddStocks...")); // NOI18N
         jMenuItem4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem4ActionPerformed(evt);
@@ -525,7 +525,7 @@ public class MainFrame extends javax.swing.JFrame {
         });
         jMenu5.add(jMenuItem4);
 
-        jMenuItem7.setText("Clear All Stocks");
+        jMenuItem7.setText(bundle.getString("MainFrame_ClearAllStocks")); // NOI18N
         jMenuItem7.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem7ActionPerformed(evt);
@@ -535,7 +535,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         jMenuBar2.add(jMenu5);
 
-        jMenu6.setText("Country");
+        jMenu6.setText(bundle.getString("MainFrame_Country")); // NOI18N
         jMenuBar2.add(jMenu6);
 
         jMenu10.setText(bundle.getString("MainFrame_Language")); // NOI18N
@@ -561,9 +561,9 @@ public class MainFrame extends javax.swing.JFrame {
 
         jMenuBar2.add(jMenu10);
 
-        jMenu7.setText("Database");
+        jMenu7.setText(bundle.getString("MainFrame_Database")); // NOI18N
 
-        jMenuItem8.setText("Stock Database...");
+        jMenuItem8.setText(bundle.getString("MainFrame_StockDatabase...")); // NOI18N
         jMenuItem8.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem8ActionPerformed(evt);
@@ -585,7 +585,7 @@ public class MainFrame extends javax.swing.JFrame {
         });
         jMenuBar2.add(jMenu9);
 
-        jMenu8.setText("Portfolio");
+        jMenu8.setText(bundle.getString("MainFrame_Portfolio")); // NOI18N
         jMenu8.addMenuListener(new javax.swing.event.MenuListener() {
             public void menuCanceled(javax.swing.event.MenuEvent evt) {
             }
@@ -597,9 +597,9 @@ public class MainFrame extends javax.swing.JFrame {
         });
         jMenuBar2.add(jMenu8);
 
-        jMenu1.setText("Options");
+        jMenu1.setText(bundle.getString("MainFrame_Options")); // NOI18N
 
-        jMenuItem6.setText("Options...");
+        jMenuItem6.setText(bundle.getString("MainFrame_Options...")); // NOI18N
         jMenuItem6.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem6ActionPerformed(evt);
@@ -609,10 +609,10 @@ public class MainFrame extends javax.swing.JFrame {
 
         jMenuBar2.add(jMenu1);
 
-        jMenu4.setText("Look n Feel");
+        jMenu4.setText(bundle.getString("MainFrame_LooknFeel")); // NOI18N
         jMenuBar2.add(jMenu4);
 
-        jMenu2.setText("Help");
+        jMenu2.setText(bundle.getString("MainFrame_Help")); // NOI18N
 
         jMenuItem3.setText(bundle.getString("MainFrame_OnlineHelp")); // NOI18N
         jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
@@ -631,7 +631,7 @@ public class MainFrame extends javax.swing.JFrame {
         jMenu2.add(jMenuItem12);
         jMenu2.add(jSeparator1);
 
-        jMenuItem5.setText("About...");
+        jMenuItem5.setText(bundle.getString("MainFrame_About...")); // NOI18N
         jMenuItem5.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem5ActionPerformed(evt);
@@ -1482,7 +1482,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void createChatJPanel() {
         chatJPanel = new org.yccheok.jstock.chat.ChatJPanel();
-        jTabbedPane1.addTab("Market Chit Chat", chatJPanel);
+        jTabbedPane1.addTab(GUIBundle.getString("ChatJPanel_Title"), chatJPanel);
         if (jStockOptions.isChatEnabled())
         {
             chatJPanel.startChatServiceManager();
@@ -1500,7 +1500,7 @@ public class MainFrame extends javax.swing.JFrame {
     
     private void createStockIndicatorEditor() {
         indicatorPanel = new IndicatorPanel();                
-        jTabbedPane1.addTab("Stock Indicator Editor", indicatorPanel);
+        jTabbedPane1.addTab(GUIBundle.getString("IndicatorPanel_Title"), indicatorPanel);
     }
 
     private void createIndicatorScannerJPanel() {
@@ -1667,8 +1667,8 @@ public class MainFrame extends javax.swing.JFrame {
     
         ColumnHeaderToolTips tips = new ColumnHeaderToolTips();
 
-        tips.setToolTip(jTable1.getColumn("Fall Below"), "Alert user when last price fall below or equal to specified value");
-        tips.setToolTip(jTable1.getColumn("Rise Above"), "Alert user when last price rise above or equal to specified value");
+        tips.setToolTip(jTable1.getColumn(GUIBundle.getString("MainFrame_FallBelow")), "Alert user when last price fall below or equal to specified value");
+        tips.setToolTip(jTable1.getColumn(GUIBundle.getString("MainFrame_RiseAbove")), "Alert user when last price rise above or equal to specified value");
 
         header.addMouseMotionListener(tips);        
     }
