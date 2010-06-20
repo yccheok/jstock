@@ -8,6 +8,8 @@ JStock 1.0.5m - xxxx-xx-xx
            (#3011843)
   Bugfix:  Do not change the table cell color, when last price is 0, and causing
            Fall Below and Rise Above alert condition to be triggered.
+  Bugfix:  Deposit and dividend may contains meaningless records due to
+           incorrect data structure handling by their respective dialog boxes.
            
 JStock 1.0.5L - 2010-05-14
   Feature: Support multiple watchlists. Manage your favorite stock watchlist, by
