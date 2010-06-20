@@ -144,7 +144,7 @@ public class MainFrame extends javax.swing.JFrame {
      * according to current default locale.
      */
     private void initLanguageMenuItemsSelection() {
-        if (Locale.getDefault().equals(Locale.SIMPLIFIED_CHINESE)) {
+        if (Locale.getDefault().getLanguage().equals(Locale.SIMPLIFIED_CHINESE.getLanguage())) {
             this.jRadioButtonMenuItem2.setSelected(true);
         }
         else {
@@ -542,7 +542,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         buttonGroup3.add(jRadioButtonMenuItem1);
         jRadioButtonMenuItem1.setSelected(true);
-        jRadioButtonMenuItem1.setText(bundle.getString("MainFrame_English")); // NOI18N
+        jRadioButtonMenuItem1.setText(Locale.ENGLISH.getDisplayLanguage(Locale.getDefault()));
         jRadioButtonMenuItem1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jRadioButtonMenuItem1ActionPerformed(evt);
@@ -551,7 +551,7 @@ public class MainFrame extends javax.swing.JFrame {
         jMenu10.add(jRadioButtonMenuItem1);
 
         buttonGroup3.add(jRadioButtonMenuItem2);
-        jRadioButtonMenuItem2.setText(bundle.getString("MainFrame_SimplifiedChinese")); // NOI18N
+        jRadioButtonMenuItem2.setText(Locale.SIMPLIFIED_CHINESE.getDisplayLanguage(Locale.getDefault()));
         jRadioButtonMenuItem2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jRadioButtonMenuItem2ActionPerformed(evt);
@@ -1211,7 +1211,8 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem12ActionPerformed
 
     private void jRadioButtonMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonMenuItem1ActionPerformed
-        this.jStockOptions.setLocale(Locale.ENGLISH);
+        final Locale locale = new Locale(Locale.ENGLISH.getLanguage(), Locale.getDefault().getCountry(), Locale.getDefault().getVariant());
+        this.jStockOptions.setLocale(locale);
         // Do not suprise user with sudden restart. Ask for their permission to do so.
         final int result = JOptionPane.showConfirmDialog(this, MessagesBundle.getString("question_message_restart_now"), MessagesBundle.getString("question_title_restart_now"), JOptionPane.YES_NO_OPTION);
         if (result == JOptionPane.YES_OPTION) {
@@ -1220,7 +1221,8 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jRadioButtonMenuItem1ActionPerformed
 
     private void jRadioButtonMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonMenuItem2ActionPerformed
-        this.jStockOptions.setLocale(Locale.SIMPLIFIED_CHINESE);
+        final Locale locale = new Locale(Locale.SIMPLIFIED_CHINESE.getLanguage(), Locale.getDefault().getCountry(), Locale.getDefault().getVariant());
+        this.jStockOptions.setLocale(locale);
         // Do not suprise user with sudden restart. Ask for their permission to do so.
         final int result = JOptionPane.showConfirmDialog(this, MessagesBundle.getString("question_message_restart_now"), MessagesBundle.getString("question_title_restart_now"), JOptionPane.YES_NO_OPTION);
         if (result == JOptionPane.YES_OPTION) {
