@@ -126,6 +126,10 @@ public class Utils {
         }
         final JCalendar jCalendar = jDateChooser.getJCalendar();
         jCalendar.setWeekOfYearVisible(false);
+        // Blue liked color.
+        jCalendar.setDecorationBackgroundColor(new Color(0x3366CC));
+        jCalendar.setSundayForeground(Color.WHITE);
+        jCalendar.setWeekdayForeground(Color.WHITE);
         return jDateChooser;
     }
 
