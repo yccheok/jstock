@@ -22,6 +22,7 @@ package org.yccheok.jstock.gui;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.toedter.calendar.JCalendar;
+import com.toedter.calendar.JDateChooser;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Desktop;
@@ -51,8 +52,10 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import org.yccheok.jstock.engine.*;
 import java.util.*;
 import java.util.concurrent.Executor;
@@ -110,13 +113,20 @@ public class Utils {
     }
 
     /**
-     * Make the look n feel of JCalendar standardize, so that it will be
-     * consistent across our application.
+     * Returns our default JDateChooser, to be used across entire application.
+     * This is to ensure we are having a consistence look n feel GUI.
      *
-     * @param jCalendar The JCaledar
+     * @return The default JDateChooser
      */
-    public static void standardizeJCalendarLook(JCalendar jCalendar) {
+    public static JDateChooser getDefaultJDateChooser() {
+        final JDateChooser jDateChooser = new JDateChooser();
+        final DateFormat format = DateFormat.getDateInstance(DateFormat.SHORT);
+        if (format instanceof SimpleDateFormat) {
+            jDateChooser.setDateFormatString(((SimpleDateFormat)format).toPattern());
+        }
+        final JCalendar jCalendar = jDateChooser.getJCalendar();
         jCalendar.setWeekOfYearVisible(false);
+        return jDateChooser;
     }
 
     /**

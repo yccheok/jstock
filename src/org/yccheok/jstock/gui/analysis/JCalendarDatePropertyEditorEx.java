@@ -22,10 +22,9 @@
 package org.yccheok.jstock.gui.analysis;
 
 import com.l2fprod.common.beans.editor.AbstractPropertyEditor;
+import com.toedter.calendar.JDateChooser;
 import java.util.Date;
 import java.util.Locale;
-
-import com.toedter.calendar.JDateChooser;
 import org.yccheok.jstock.gui.Utils;
 
 /**
@@ -39,8 +38,7 @@ public class JCalendarDatePropertyEditorEx extends AbstractPropertyEditor {
    * Constructor for JCalendarDatePropertyEditor
    */
   public JCalendarDatePropertyEditorEx() {
-    editor = new JDateChooser();
-    Utils.standardizeJCalendarLook(((JDateChooser)this.editor).getJCalendar());
+    editor = Utils.getDefaultJDateChooser();
   }
 
   /**
@@ -52,9 +50,7 @@ public class JCalendarDatePropertyEditorEx extends AbstractPropertyEditor {
    * @param locale Locale used to display the Date object
    */
   public JCalendarDatePropertyEditorEx(String dateFormatString, Locale locale) {
-    editor = new JDateChooser();
-    Utils.standardizeJCalendarLook(((JDateChooser)this.editor).getJCalendar());
-    ((JDateChooser)this.editor).getJCalendar().setWeekOfYearVisible(false);
+    editor = Utils.getDefaultJDateChooser();
     ((JDateChooser)editor).setDateFormatString(dateFormatString);
     ((JDateChooser)editor).setLocale(locale);
   }
@@ -65,8 +61,7 @@ public class JCalendarDatePropertyEditorEx extends AbstractPropertyEditor {
    * @param locale Locale used to display the Date object
    */
   public JCalendarDatePropertyEditorEx(Locale locale) {
-    editor = new JDateChooser();
-    Utils.standardizeJCalendarLook(((JDateChooser)this.editor).getJCalendar());
+    editor = Utils.getDefaultJDateChooser();
     ((JDateChooser)editor).setLocale(locale);
   }
 

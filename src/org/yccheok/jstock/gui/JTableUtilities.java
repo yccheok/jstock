@@ -1,4 +1,4 @@
-/*/*
+/*
  * JStock - Free Stock Market Software
  * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
@@ -21,6 +21,7 @@ package org.yccheok.jstock.gui;
 
 import java.awt.*;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
@@ -28,7 +29,6 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import javax.swing.*;
 import javax.swing.table.*;
-import org.jdesktop.swingx.table.DatePickerCellEditor;
 import org.yccheok.jstock.gui.table.DateRendererDecoratorEx;
 import org.yccheok.jstock.gui.table.JDateChooserCellEditorEx;
 import org.yccheok.jstock.internationalization.GUIBundle;
@@ -280,19 +280,10 @@ public class JTableUtilities {
      * @param table JTable to set up
      * @param row Column to apply
      */
-    public static void setDateEditorForRow(JTable table, int row) {
-        DateFormat format = DateFormat.getDateInstance(DateFormat.SHORT);
-        setDateEditorForRow(table, row, format);
-    }
-
-    /** Sets the editor/renderer for Date objects to provided JTable, for the specified column.
-     * @param table JTable to set up
-     * @param row Column to apply
-     * @param format Format to use
-     */
-    private static void setDateEditorForRow(JTable table, int row, DateFormat format) {
-        TableColumn column = table.getColumnModel().getColumn(row);
-        column.setCellEditor(new JDateChooserCellEditorEx(format.toString()));
+    public static void setDateEditorAndRendererForRow(JTable table, int row) {
+        final TableColumn column = table.getColumnModel().getColumn(row);
+        column.setCellEditor(new JDateChooserCellEditorEx());
+        final DateFormat format = DateFormat.getDateInstance(DateFormat.SHORT);
         column.setCellRenderer(new DateRendererDecoratorEx(column.getCellRenderer(), format));
     }
 
