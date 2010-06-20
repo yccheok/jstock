@@ -19,6 +19,7 @@
 
 package org.yccheok.jstock.gui;
 
+import org.yccheok.jstock.gui.analysis.ObjectInspectorJPanel;
 import com.nexes.wizard.Wizard;
 import com.nexes.wizard.WizardModel;
 import com.nexes.wizard.WizardPanelDescriptor;
