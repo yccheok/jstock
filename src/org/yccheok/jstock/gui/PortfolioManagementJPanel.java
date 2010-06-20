@@ -926,7 +926,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         depositSummaryJDialog.setLocationRelativeTo(this);
         depositSummaryJDialog.setVisible(true);
 
-        final DepositSummary _depositSummary = depositSummaryJDialog.getDepositSummary();
+        final DepositSummary _depositSummary = depositSummaryJDialog.getDepositSummaryAfterPressingOK();
         if (_depositSummary != null) {
             this.depositSummary = _depositSummary;
             updateWealthHeader();
