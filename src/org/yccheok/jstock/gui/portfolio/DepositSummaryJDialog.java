@@ -1,25 +1,20 @@
 /*
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
- */
-
-/*
- * DepositSummaryJDialog.java
- *
- * Created on Jun 5, 2009, 9:24:25 PM
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.yccheok.jstock.gui.portfolio;
@@ -38,6 +33,7 @@ import org.yccheok.jstock.gui.MainFrame;
 import org.yccheok.jstock.portfolio.Commentable;
 import org.yccheok.jstock.portfolio.Deposit;
 import org.yccheok.jstock.portfolio.DepositSummary;
+import org.yccheok.jstock.portfolio.Utils;
 
 /**
  *
@@ -48,7 +44,9 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
     /** Creates new form DepositSummaryJDialog */
     public DepositSummaryJDialog(java.awt.Frame parent, boolean modal, DepositSummary depositSummary) {
         super(parent, modal);
-        this.depositSummary = new DepositSummary(depositSummary);
+        // Clone another copy to avoid original copy from being corrupted.
+        this.depositSummaryForTableModel = new DepositSummary(depositSummary);
+        this.depositSummaryResult = null;
         initComponents();
     }
 
@@ -112,7 +110,7 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
 
         jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
-        jTable1.setModel(new DepositSummaryTableModel(this.depositSummary));
+        jTable1.setModel(new DepositSummaryTableModel(this.depositSummaryForTableModel));
         org.yccheok.jstock.gui.table.CurrencyRenderer currencyRenderer = new org.yccheok.jstock.gui.table.CurrencyRenderer();
         currencyRenderer.setHorizontalAlignment(org.yccheok.jstock.gui.table.CurrencyRenderer.LEFT);
         jTable1.setDefaultEditor(Double.class, new org.yccheok.jstock.gui.table.NonNegativeEmptyDoubleEditor());
@@ -193,25 +191,19 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jTable1KeyPressed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-        for (int i = 0; i < depositSummary.size(); i++) {
-            Deposit deposit = depositSummary.get(i);
-            if (deposit.getAmount() <= 0.0) {
-                depositSummary.remove(deposit);
-                i--;
-            }
-        }
+        this.depositSummaryResult = this.depositSummaryForTableModel;
+        Utils.removeMeaninglessRecords(this.depositSummaryResult);
         this.setVisible(false);
         this.dispose();
     }//GEN-LAST:event_jButton1ActionPerformed
 
     public DepositSummary getDepositSummary() {
-        return this.depositSummary;
+        return this.depositSummaryResult;
     }
     
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
-        depositSummary = null;
+        this.depositSummaryResult = null;
         this.setVisible(false);
         this.dispose();
     }//GEN-LAST:event_jButton2ActionPerformed
@@ -353,14 +345,17 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
         }
     }
 
-    public String getDepositSummaryText() {
-        if (depositSummary != null) {
-            return "Total deposit is " + org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(depositSummary.getTotal());
+    private String getDepositSummaryText() {
+        if (depositSummaryForTableModel != null) {
+            return "Total deposit is " + org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(depositSummaryForTableModel.getTotal());
         }
         return "";
     }
-    
-    private DepositSummary depositSummary;
+
+    // Data structure hold by table.
+    private DepositSummary depositSummaryForTableModel;
+    // Final deposit result edited by user.
+    private DepositSummary depositSummaryResult = null;
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
