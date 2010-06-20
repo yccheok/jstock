@@ -48,8 +48,8 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
         super(parent, modal);
         this.portfolioManagementJPanel = portfolioManagementJPanel;
         // Clone another copy to avoid original copy from being corrupted.
-        this.dividendSummaryForTableModel = new DividendSummary(dividendSummary);
-        this.dividendSummaryResult = null;
+        this.dividendSummary = new DividendSummary(dividendSummary);
+        this.dividendSummaryAfterPressingOK = null;
         initComponents();
     }
 
@@ -158,7 +158,7 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
 
         jPanel1.add(jPanel4, java.awt.BorderLayout.PAGE_END);
 
-        jTable1.setModel(new DividendSummaryTableModel(this.dividendSummaryForTableModel));
+        jTable1.setModel(new DividendSummaryTableModel(this.dividendSummary));
         org.yccheok.jstock.gui.table.CurrencyRenderer currencyRenderer = new org.yccheok.jstock.gui.table.CurrencyRenderer();
         currencyRenderer.setHorizontalAlignment(org.yccheok.jstock.gui.table.CurrencyRenderer.LEFT);
         jTable1.setDefaultEditor(Double.class, new org.yccheok.jstock.gui.table.NonNegativeEmptyDoubleEditor());
@@ -211,15 +211,15 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jTable1PropertyChange
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        this.dividendSummaryResult = this.dividendSummaryForTableModel;
-        Utils.removeMeaninglessRecords(this.dividendSummaryResult);
+        this.dividendSummaryAfterPressingOK = this.dividendSummary;
+        Utils.removeMeaninglessRecords(this.dividendSummaryAfterPressingOK);
         this.setVisible(false);
         this.dispose();
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
-        this.dividendSummaryResult = null;
+        this.dividendSummaryAfterPressingOK = null;
         this.setVisible(false);
         this.dispose();
     }//GEN-LAST:event_jButton2ActionPerformed
@@ -235,7 +235,7 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jLabel2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel2MouseClicked
-        if (this.dividendSummaryForTableModel == null || this.dividendSummaryForTableModel.getTotal() <= 0.0) {
+        if (this.dividendSummary == null || this.dividendSummary.getTotal() <= 0.0) {
             return;
         }
         final MainFrame m = MainFrame.getInstance();
@@ -244,7 +244,7 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jLabel2MouseClicked
 
     private void jLabel2MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel2MouseEntered
-        if (this.dividendSummaryForTableModel == null || this.dividendSummaryForTableModel.getTotal() <= 0.0) {
+        if (this.dividendSummary == null || this.dividendSummary.getTotal() <= 0.0) {
             this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
         }
         else {
@@ -256,14 +256,29 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
         this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
     }//GEN-LAST:event_jLabel2MouseExited
 
-    public DividendSummary getDividendSummary()
-    {
-        return this.dividendSummaryResult;
+    /**
+     * Returns dividend represented by this dialog.
+     *
+     * @return Dividend represented by this dialog
+     */
+    public DividendSummary getDividendSummary() {
+        return this.dividendSummary;
+    }
+
+    /**
+     * Returns dividend represented by this dialog after OK button is pressed.
+     * If OK button is not being pressed, <code>null</code> will be returned.
+     *
+     * @return Dividend represented by this dialog. <code>null</code> will be
+     * returned if OK button is not being pressed
+     */
+    public DividendSummary getDividendSummaryAfterPressingOK() {
+        return this.dividendSummaryAfterPressingOK;
     }
 
     private String getDividendSummaryText() {
-        if (dividendSummaryForTableModel != null) {
-            return "<html><a href=\"\">" + org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(dividendSummaryForTableModel.getTotal()) + "</a></html>";
+        if (this.dividendSummary != null) {
+            return "<html><a href=\"\">" + org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(this.dividendSummary.getTotal()) + "</a></html>";
         }
         return "";
     }
@@ -408,9 +423,9 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
     }
 
     // Data structure hold by table.
-    private DividendSummary dividendSummaryForTableModel;
-    // Final dividend result edited by user.
-    private DividendSummary dividendSummaryResult = null;
+    private DividendSummary dividendSummary;
+    // Final dividend result after pressing OK button.
+    private DividendSummary dividendSummaryAfterPressingOK = null;
     // We want to use getStocksFromPortfolios from PortfolioManagementJPanel.
     private final PortfolioManagementJPanel portfolioManagementJPanel;
 
