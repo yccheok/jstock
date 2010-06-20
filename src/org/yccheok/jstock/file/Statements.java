@@ -79,7 +79,7 @@ public class Statements {
         for (int i = 0; i < size; i++) {
             final Calendar calendar = server.getCalendar(i);
             final Stock stock = server.getStock(calendar);
-			assert(calendar != null && stock != null);
+            assert(calendar != null && stock != null);
             final List<Atom> atoms = new ArrayList<Atom>();
             final Atom atom0 = new Atom(dateFormat.format(calendar.getTime()), GUIBundle.getString("StockHistory_Date"));
             final Atom atom1 = new Atom(new Double(stock.getOpenPrice()), GUIBundle.getString("StockHistory_Open"));

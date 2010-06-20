@@ -913,7 +913,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
         dividendSummaryJDialog.setVisible(true);
 
-        final DividendSummary _dividendSummary = dividendSummaryJDialog.getDividendSummary();
+        final DividendSummary _dividendSummary = dividendSummaryJDialog.getDividendSummaryAfterPressingOK();
         if (_dividendSummary != null) {
             this.dividendSummary = _dividendSummary;
             updateWealthHeader();
