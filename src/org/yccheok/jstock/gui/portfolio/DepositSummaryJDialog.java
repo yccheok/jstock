@@ -24,14 +24,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.text.NumberFormat;
 import java.util.Arrays;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import org.yccheok.jstock.gui.JTableUtilities;
 import org.yccheok.jstock.gui.MainFrame;
 import org.yccheok.jstock.portfolio.Commentable;
-import org.yccheok.jstock.portfolio.Deposit;
 import org.yccheok.jstock.portfolio.DepositSummary;
 import org.yccheok.jstock.portfolio.Utils;
 
@@ -45,8 +43,8 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
     public DepositSummaryJDialog(java.awt.Frame parent, boolean modal, DepositSummary depositSummary) {
         super(parent, modal);
         // Clone another copy to avoid original copy from being corrupted.
-        this.depositSummaryForTableModel = new DepositSummary(depositSummary);
-        this.depositSummaryResult = null;
+        this.depositSummary = new DepositSummary(depositSummary);
+        this.depositSummaryAfterPressingOK = null;
         initComponents();
     }
 
@@ -110,7 +108,7 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
 
         jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
-        jTable1.setModel(new DepositSummaryTableModel(this.depositSummaryForTableModel));
+        jTable1.setModel(new DepositSummaryTableModel(this.depositSummary));
         org.yccheok.jstock.gui.table.CurrencyRenderer currencyRenderer = new org.yccheok.jstock.gui.table.CurrencyRenderer();
         currencyRenderer.setHorizontalAlignment(org.yccheok.jstock.gui.table.CurrencyRenderer.LEFT);
         jTable1.setDefaultEditor(Double.class, new org.yccheok.jstock.gui.table.NonNegativeEmptyDoubleEditor());
@@ -191,19 +189,35 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jTable1KeyPressed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        this.depositSummaryResult = this.depositSummaryForTableModel;
-        Utils.removeMeaninglessRecords(this.depositSummaryResult);
+        this.depositSummaryAfterPressingOK = this.depositSummary;
+        Utils.removeMeaninglessRecords(this.depositSummaryAfterPressingOK);
         this.setVisible(false);
         this.dispose();
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    /**
+     * Returns deposit represented by this dialog.
+     *
+     * @return Deposit represented by this dialog
+     */
     public DepositSummary getDepositSummary() {
-        return this.depositSummaryResult;
+        return this.depositSummary;
     }
-    
+
+    /**
+     * Returns deposit represented by this dialog after OK button is pressed.
+     * If OK button is not being pressed, <code>null</code> will be returned.
+     *
+     * @return Deposit represented by this dialog. <code>null</code> will be
+     * returned if OK button is not being pressed
+     */
+    public DepositSummary getDepositSummaryAfterPressingOK() {
+        return this.depositSummaryAfterPressingOK;
+    }
+
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
-        this.depositSummaryResult = null;
+        this.depositSummaryAfterPressingOK = null;
         this.setVisible(false);
         this.dispose();
     }//GEN-LAST:event_jButton2ActionPerformed
@@ -346,16 +360,16 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
     }
 
     private String getDepositSummaryText() {
-        if (depositSummaryForTableModel != null) {
-            return "Total deposit is " + org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(depositSummaryForTableModel.getTotal());
+        if (this.depositSummary != null) {
+            return "Total deposit is " + org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(this.depositSummary.getTotal());
         }
         return "";
     }
 
     // Data structure hold by table.
-    private DepositSummary depositSummaryForTableModel;
-    // Final deposit result edited by user.
-    private DepositSummary depositSummaryResult = null;
+    private DepositSummary depositSummary;
+    // Final deposit result after pressing OK button.
+    private DepositSummary depositSummaryAfterPressingOK = null;
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
