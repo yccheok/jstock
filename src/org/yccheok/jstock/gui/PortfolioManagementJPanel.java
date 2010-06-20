@@ -1591,6 +1591,16 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             _dividendSummary = new DividendSummary();
         }
 
+        /*
+         * Due to bug occurs at version 1.0.5L and earlier, _depositSummary
+         * and _dividendSummary may contains meaningless records. We will
+         * manually remove them. The below 2 code lines shall be removed as well,
+         * after a few more releases. During that time, most users shall already
+         * have a bug fixed xstream file.
+         */
+         org.yccheok.jstock.portfolio.Utils.removeMeaninglessRecords(_depositSummary);
+         org.yccheok.jstock.portfolio.Utils.removeMeaninglessRecords(_dividendSummary);
+
         // Update GUI. Shall we?
         if (SwingUtilities.isEventDispatchThread()) {
             PortfolioManagementJPanel.this.buyTreeTable.setTreeTableModel(buyPortfolioTreeTableModel);
