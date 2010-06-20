@@ -1,26 +1,23 @@
 /*
- * ObjectInspectorJPanel.java
- *
- * Created on June 8, 2007, 10:48 PM
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- * Copyright (C) 2007 Cheok YanCheng <yccheok@yahoo.com>
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package org.yccheok.jstock.gui;
+package org.yccheok.jstock.gui.analysis;
 
 import com.l2fprod.common.swing.renderer.*;
 import com.l2fprod.common.propertysheet.*;
@@ -34,10 +31,13 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Date;
 
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.yccheok.jstock.gui.EnumComboBoxPropertyEditor;
+import org.yccheok.jstock.gui.analysis.JCalendarDatePropertyEditorEx;
 
 /**
  *
@@ -54,13 +54,14 @@ public class ObjectInspectorJPanel extends PropertySheetPanel {
         try {
             beanInfo = Introspector.getBeanInfo(bean.getClass());
         } catch (IntrospectionException exp) {
-            log.error("", exp);
+            log.error(null, exp);
         }
                 
         this.getTable().setEditorFactory(new PropertyEditorRegistryEx());
         PropertyEditorRegistry editor = (PropertyEditorRegistry)this.getTable().getEditorFactory();
         PropertyRendererRegistry renderer = (PropertyRendererRegistry)this.getTable().getRendererFactory();
 
+        editor.registerEditor(Date.class, new JCalendarDatePropertyEditorEx());
         editor.registerEditor(Enum.class, new EnumComboBoxPropertyEditor());
     
         DefaultCellRenderer r = new DefaultCellRenderer();
@@ -91,12 +92,13 @@ public class ObjectInspectorJPanel extends PropertySheetPanel {
 
     private static class PropertyEditorRegistryEx extends PropertyEditorRegistry {
         // We will try to get the "nearest" super class.        
+        @Override
         public synchronized PropertyEditor getEditor(Class type) {
             PropertyEditor editor = super.getEditor(type);
 
             Class c = type;
         
-            while(editor == null) {
+            while (editor == null) {
                 c = c.getSuperclass();
 
                 if(c == null)

@@ -21,6 +21,7 @@ package org.yccheok.jstock.gui;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
+import com.toedter.calendar.JCalendar;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Desktop;
@@ -106,6 +107,16 @@ import org.yccheok.jstock.internationalization.MessagesBundle;
 public class Utils {
     /** Creates a new instance of Utils */
     private Utils() {
+    }
+
+    /**
+     * Make the look n feel of JCalendar standardize, so that it will be
+     * consistent across our application.
+     *
+     * @param jCalendar The JCaledar
+     */
+    public static void standardizeJCalendarLook(JCalendar jCalendar) {
+        jCalendar.setWeekOfYearVisible(false);
     }
 
     /**
