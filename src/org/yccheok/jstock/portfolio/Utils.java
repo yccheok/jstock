@@ -187,4 +187,36 @@ public class Utils {
     public static String getDefaultPortfolioName() {
         return "My Portfolio";
     }
+
+    /**
+     * Removes meaningless records from dividendSummary.
+     *
+     * @param dividendSummary The dividend summary
+     */
+    public static void removeMeaninglessRecords(DividendSummary dividendSummary) {
+        for (int i = 0; i < dividendSummary.size(); i++) {
+            Dividend dividend = dividendSummary.get(i);
+            if (dividend.getAmount() <= 0.0 || dividend.getStock().getCode().toString().length() <= 0) {
+                // Remove meaningless record.
+                dividendSummary.remove(dividend);
+                i--;
+            }
+        }
+    }
+
+    /**
+     * Removes meaningless records from depositSummary.
+     *
+     * @param depositSummary The deposit summary
+     */
+    public static void removeMeaninglessRecords(DepositSummary depositSummary) {
+        for (int i = 0; i < depositSummary.size(); i++) {
+            Deposit deposit = depositSummary.get(i);
+            if (deposit.getAmount() <= 0.0) {
+                // Remove meaningless record.
+                depositSummary.remove(deposit);
+                i--;
+            }
+        }
+    }
 }
