@@ -46,12 +46,7 @@ public class JDateChooserCellEditorEx extends AbstractCellEditor implements
 
     private static final long serialVersionUID = -1279512020450996723L;
 
-    private final JDateChooser dateChooser = new JDateChooser();
-
-    public JDateChooserCellEditorEx(String dateFormatString) {
-        this.dateChooser.setDateFormatString(dateFormatString);
-        Utils.standardizeJCalendarLook(this.dateChooser.getJCalendar());
-    }
+    private final JDateChooser dateChooser = Utils.getDefaultJDateChooser();
 
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value,
