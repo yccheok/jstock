@@ -259,6 +259,7 @@ public class Wizard extends WindowAdapter implements PropertyChangeListener {
      * dialog's graphical components as necessary.
      * @param evt PropertyChangeEvent passed from the model to signal that one of its properties has changed value.
      */    
+    @Override
     public void propertyChange(PropertyChangeEvent evt) {
         
         if (evt.getPropertyName().equals(WizardModel.CURRENT_PANEL_DESCRIPTOR_PROPERTY)) {
@@ -307,7 +308,7 @@ public class Wizard extends WindowAdapter implements PropertyChangeListener {
      * @param boolean newValue The new enabled status of the button.
      */ 
     public void setBackButtonEnabled(boolean newValue) {
-        wizardModel.setBackButtonEnabled(new Boolean(newValue));
+        wizardModel.setBackButtonEnabled(newValue);
     }
 
    /**
@@ -323,7 +324,7 @@ public class Wizard extends WindowAdapter implements PropertyChangeListener {
      * @param boolean newValue The new enabled status of the button.
      */ 
     public void setNextFinishButtonEnabled(boolean newValue) {
-        wizardModel.setNextFinishButtonEnabled(new Boolean(newValue));
+        wizardModel.setNextFinishButtonEnabled(newValue);
     }
  
    /**
@@ -339,7 +340,7 @@ public class Wizard extends WindowAdapter implements PropertyChangeListener {
      * @param boolean newValue The new enabled status of the button.
      */ 
     public void setCancelButtonEnabled(boolean newValue) {
-        wizardModel.setCancelButtonEnabled(new Boolean(newValue));
+        wizardModel.setCancelButtonEnabled(newValue);
     }
     
     /**
