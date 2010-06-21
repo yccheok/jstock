@@ -1614,8 +1614,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             // ToolTipHighlighter will not work correctly if we tend to hide column view by removeColumn.
             // We need to hide the view by using TableColumnExt.setVisible.
             // Why? Don't ask me. Ask SwingX team.
-            ((TableColumnExt)PortfolioManagementJPanel.this.buyTreeTable.getColumn("Comment")).setVisible(false);
-            ((TableColumnExt)PortfolioManagementJPanel.this.sellTreeTable.getColumn("Comment")).setVisible(false);
+            ((TableColumnExt)PortfolioManagementJPanel.this.buyTreeTable.getColumn(GUIBundle.getString("PortfolioManagementJPanel_Comment"))).setVisible(false);
+            ((TableColumnExt)PortfolioManagementJPanel.this.sellTreeTable.getColumn(GUIBundle.getString("PortfolioManagementJPanel_Comment"))).setVisible(false);
 
             // New directory creation is needed, as we had moved the directory of portolio.
             if (oldData) {
@@ -1665,8 +1665,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     // ToolTipHighlighter will not work correctly if we tend to hide column view by removeColumn.
                     // We need to hide the view by using TableColumnExt.setVisible.
                     // Why? Don't ask me. Ask SwingX team.
-                    ((TableColumnExt)PortfolioManagementJPanel.this.buyTreeTable.getColumn("Comment")).setVisible(false);
-                    ((TableColumnExt)PortfolioManagementJPanel.this.sellTreeTable.getColumn("Comment")).setVisible(false);
+                    ((TableColumnExt)PortfolioManagementJPanel.this.buyTreeTable.getColumn(GUIBundle.getString("PortfolioManagementJPanel_Comment"))).setVisible(false);
+                    ((TableColumnExt)PortfolioManagementJPanel.this.sellTreeTable.getColumn(GUIBundle.getString("PortfolioManagementJPanel_Comment"))).setVisible(false);
 
                     // New directory creation is needed, as we had moved the directory of portolio.
                     if (oldData) {
