@@ -771,28 +771,26 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         final AbstractPortfolioTreeTableModel portfolioTreeTableModel = (AbstractPortfolioTreeTableModel)treeTable.getTreeTableModel();
         final TreePath[] treePaths = treeTable.getTreeSelectionModel().getSelectionPaths();
         
-        if(treePaths == null) {
+        if (treePaths == null) {
             return;
         }
         
-        for(TreePath treePath : treePaths) {
+        for (TreePath treePath : treePaths) {
             final Object o = treePath.getLastPathComponent();
-
-            if(portfolioTreeTableModel.getRoot() == o) continue;
-            
+            if (portfolioTreeTableModel.getRoot() == o) {
+                continue;
+            }
             final MutableTreeTableNode mutableTreeTableNode = (MutableTreeTableNode)o;
-
-            if(isValidTreeTableNode(portfolioTreeTableModel, mutableTreeTableNode) == false) {
+            if (isValidTreeTableNode(portfolioTreeTableModel, mutableTreeTableNode) == false) {
                 //???
                 portfolioTreeTableModel.fireTreeTableNodeChanged(mutableTreeTableNode);
                 continue;
             }
                         
-            if(o instanceof Transaction) {                
-                portfolioTreeTableModel.removeTransaction((Transaction)o);
-                
+            if (o instanceof Transaction) {
+                portfolioTreeTableModel.removeTransaction((Transaction)o);                
             }
-            else if(o instanceof TransactionSummary) {
+            else if (o instanceof TransactionSummary) {
                 portfolioTreeTableModel.removeTransactionSummary((TransactionSummary)o);
             }
         }        
