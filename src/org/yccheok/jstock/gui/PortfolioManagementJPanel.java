@@ -172,7 +172,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         jSplitPane1.setDividerLocation(250);
         jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
-        jScrollPane1.setBorder(javax.swing.BorderFactory.createTitledBorder("Buy"));
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
+        jScrollPane1.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("PortfolioManagementJPanel_Buy"))); // NOI18N
 
         buyTreeTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         buyTreeTable.setRootVisible(true);
@@ -194,7 +195,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         jSplitPane1.setLeftComponent(jScrollPane1);
 
-        jScrollPane2.setBorder(javax.swing.BorderFactory.createTitledBorder("Sell"));
+        jScrollPane2.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("PortfolioManagementJPanel_Sell"))); // NOI18N
 
         sellTreeTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         sellTreeTable.setRootVisible(true);
@@ -221,7 +222,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         add(jPanel1, java.awt.BorderLayout.CENTER);
 
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/inbox.png"))); // NOI18N
-        jButton1.setText("Buy...");
+        jButton1.setText(bundle.getString("PortfolioManagementJPanel_Buy...")); // NOI18N
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -230,7 +231,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         jPanel2.add(jButton1);
 
         jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/outbox.png"))); // NOI18N
-        jButton3.setText("Sell...");
+        jButton3.setText(bundle.getString("PortfolioManagementJPanel_Sell...")); // NOI18N
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton3ActionPerformed(evt);
@@ -239,7 +240,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         jPanel2.add(jButton3);
 
         jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/money.png"))); // NOI18N
-        jButton4.setText("Deposit...");
+        jButton4.setText(bundle.getString("PortfolioManagementJPanel_Deposit...")); // NOI18N
         jButton4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton4ActionPerformed(evt);
@@ -248,7 +249,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         jPanel2.add(jButton4);
 
         jButton5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/money2.png"))); // NOI18N
-        jButton5.setText("Dividend...");
+        jButton5.setText(bundle.getString("PortfolioManagementJPanel_Dividen...")); // NOI18N
         jButton5.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton5ActionPerformed(evt);

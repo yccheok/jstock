@@ -105,10 +105,10 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
-        setTitle(bundle.getString("Buy")); // NOI18N
+        setTitle(bundle.getString("NewBuyTransactionJDialog_Buy")); // NOI18N
         setResizable(false);
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Transaction"));
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("NewBuyTransactionJDialog_Transaction"))); // NOI18N
 
         jTextField1.setEditable(false);
 
@@ -279,7 +279,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
 
         getContentPane().add(jPanel4, java.awt.BorderLayout.SOUTH);
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Stock"));
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("NewBuyTransactionJDialog_Stock"))); // NOI18N
 
         jComboBox1.setEditable(true);
         jComboBox1.setPreferredSize(new java.awt.Dimension(110, 24));
