@@ -181,7 +181,7 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
         });
 
         jLabel6.setFont(jLabel6.getFont().deriveFont(jLabel6.getFont().getSize()-1f));
-        jLabel6.setText("(e.g. john@gmail.com)");
+        jLabel6.setText(bundle.getString("SaveToCloudJDialog_EmailExample")); // NOI18N
 
         jCheckBox1.setText(bundle.getString("SaveToCloudJDialog_KeepMeSignedIn")); // NOI18N
 
