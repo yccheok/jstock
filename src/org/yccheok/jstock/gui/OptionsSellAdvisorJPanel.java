@@ -62,7 +62,7 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
         jXHeader1.setTitle(bundle.getString("OptionsSellAdvisorJPanel_Wealth")); // NOI18N
         add(jXHeader1, java.awt.BorderLayout.NORTH);
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsSellAdvisorJPanel_SellAdvisor"))); // NOI18N
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsSellAdvisorJPanel_BestSellPriceSuggestion"))); // NOI18N
 
         jLabel1.setText("Expected profit percentage (%)");
 
