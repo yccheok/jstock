@@ -28,6 +28,7 @@ import javax.swing.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.internationalization.MessagesBundle;
 
 /**
@@ -84,14 +85,14 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
 
         setLayout(new java.awt.BorderLayout());
 
-        jXHeader1.setDescription("Alert user when an indicator is being triggered.");
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
+        jXHeader1.setDescription(bundle.getString("OptionsAlertJPanel_description")); // NOI18N
         jXHeader1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/32x32/bell.png"))); // NOI18N
-        jXHeader1.setTitle("Alert");
+        jXHeader1.setTitle(bundle.getString("OptionsAlertJPanel_Alert")); // NOI18N
         add(jXHeader1, java.awt.BorderLayout.NORTH);
 
-        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Email"));
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsAlertJPanel_Email"))); // NOI18N
 
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
         jCheckBox2.setText(bundle.getString("OptionsAlertJPanel_SendMessageToEmails")); // NOI18N
         jCheckBox2.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         jCheckBox2.setMargin(new java.awt.Insets(0, 0, 0, 0));
@@ -101,10 +102,10 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
             }
         });
 
-        jLabel1.setText("E-mail");
+        jLabel1.setText(bundle.getString("OptionsAlertJPanel_Email")); // NOI18N
         jLabel1.setEnabled(false);
 
-        jLabel3.setText("Password");
+        jLabel3.setText(bundle.getString("OptionsAlertJPanel_Password")); // NOI18N
         jLabel3.setEnabled(false);
 
         jTextField2.setEnabled(false);
@@ -116,7 +117,7 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         jLabel2.setEnabled(false);
 
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/mail_send.png"))); // NOI18N
-        jButton1.setText("Test email");
+        jButton1.setText(bundle.getString("OptionsAlertJPanel_TestEmail")); // NOI18N
         jButton1.setEnabled(false);
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -132,7 +133,7 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         jTextField1.setEnabled(false);
 
         jLabel12.setFont(jLabel12.getFont().deriveFont(jLabel12.getFont().getSize()-1f));
-        jLabel12.setText("(e.g. john@yahoo.com)");
+        jLabel12.setText(bundle.getString("OptionsAlertJPanel_EmailExample")); // NOI18N
         jLabel12.setEnabled(false);
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
@@ -193,9 +194,9 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
                 .addContainerGap())
         );
 
-        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("SMS"));
+        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsAlertJPanel_SMS"))); // NOI18N
 
-        jCheckBox3.setText("SMS through Google Calendar");
+        jCheckBox3.setText(bundle.getString("OptionsAlertJPanel_SMSThroughGoogleCalendar")); // NOI18N
         jCheckBox3.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         jCheckBox3.setMargin(new java.awt.Insets(0, 0, 0, 0));
         jCheckBox3.addItemListener(new java.awt.event.ItemListener() {
@@ -204,10 +205,10 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
             }
         });
 
-        jLabel4.setText("Username");
+        jLabel4.setText(bundle.getString("OptionsAlertJPanel_Username")); // NOI18N
         jLabel4.setEnabled(false);
 
-        jLabel5.setText("Password");
+        jLabel5.setText(bundle.getString("OptionsAlertJPanel_Password")); // NOI18N
         jLabel5.setEnabled(false);
 
         jTextField3.setEnabled(false);
@@ -215,7 +216,7 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         jPasswordField2.setEnabled(false);
 
         jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/sms_protocol.png"))); // NOI18N
-        jButton2.setText("Test SMS");
+        jButton2.setText(bundle.getString("OptionsAlertJPanel_TestSMS")); // NOI18N
         jButton2.setEnabled(false);
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -226,7 +227,7 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         jEditorPane3.setBackground(new java.awt.Color(240, 240, 240));
         jEditorPane3.setContentType("text/html");
         jEditorPane3.setEditable(false);
-        jEditorPane3.setText("<html>\r\n  <head>\r\n\r\n  </head>\r\n  <body>\r\n        <p style=\"margin-top: 0; font-size: 8px; font-family: Tahoma;\">Click <a href=\"http://jstock.sourceforge.net/help_sms_alert.html?utm_source=jstock&utm_medium=alert_dialog\">here</a> to find out how to setup your mobile phone</p>\n  </body>\r\n</html>\r\n");
+        jEditorPane3.setText(bundle.getString("OptionsAlertJPanel_FindOutHowToSetupYourMobilePhone")); // NOI18N
         jEditorPane3.setEnabled(false);
         jEditorPane3.addHyperlinkListener(new javax.swing.event.HyperlinkListener() {
             public void hyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {
@@ -235,18 +236,18 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         });
 
         jLabel6.setFont(jLabel6.getFont().deriveFont(jLabel6.getFont().getSize()-1f));
-        jLabel6.setText("(e.g. john@gmail.com)");
+        jLabel6.setText(bundle.getString("OptionsAlertJPanel_EmailExample2")); // NOI18N
         jLabel6.setEnabled(false);
 
         jLabel8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/spinner.gif"))); // NOI18N
 
-        jLabel9.setText("Limit");
+        jLabel9.setText(bundle.getString("OptionsAlertJPanel_Limit")); // NOI18N
         jLabel9.setEnabled(false);
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "1", "5", "10", "20", "50", "Unlimited" }));
+        jComboBox1.setModel(getComboBoxModel());
         jComboBox1.setEnabled(false);
 
-        jLabel10.setText("SMS per day");
+        jLabel10.setText(bundle.getString("OptionsAlertJPanel_SMSPerDay")); // NOI18N
         jLabel10.setEnabled(false);
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
@@ -310,13 +311,13 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
                 .addGap(16, 16, 16))
         );
 
-        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("System"));
+        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsAlertJPanel_System"))); // NOI18N
 
-        jCheckBox1.setText("Showing a message at the bottom right corner of screen");
+        jCheckBox1.setText(bundle.getString("OptionsAlertJPanel_ShowAMessage")); // NOI18N
         jCheckBox1.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         jCheckBox1.setMargin(new java.awt.Insets(0, 0, 0, 0));
 
-        jCheckBox4.setText("Playing alert sound");
+        jCheckBox4.setText(bundle.getString("OptionsAlertJPanel_PlayingAlertSound")); // NOI18N
         jCheckBox4.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         jCheckBox4.setMargin(new java.awt.Insets(0, 0, 0, 0));
         jCheckBox4.addItemListener(new java.awt.event.ItemListener() {
@@ -326,7 +327,7 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         });
 
         jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/sound.png"))); // NOI18N
-        jButton3.setText("Test sound");
+        jButton3.setText(bundle.getString("OptionsAlertJPanel_TestSound")); // NOI18N
         jButton3.setEnabled(false);
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -459,7 +460,11 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
             this.testEmailSwingWorker.cancel(true);
         }
     }
-    
+
+    private ComboBoxModel getComboBoxModel() {
+        return new javax.swing.DefaultComboBoxModel(new String[] { "1", "5", "10", "20", "50", GUIBundle.getString("OptionsAlertJPanel_Unlimited") });
+    }
+
     @Override
     public void set(JStockOptions jStockOptions) {
         jCheckBox1.setSelected(jStockOptions.isPopupMessage());
@@ -473,7 +478,7 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         jPasswordField2.setText(Utils.decrypt(jStockOptions.getGoogleCalendarPassword()));
 
         if (jStockOptions.getMaxSMSPerDay() <= 0) {
-            jComboBox1.setSelectedItem("Unlimited");
+            jComboBox1.setSelectedItem(GUIBundle.getString("OptionsAlertJPanel_Unlimited"));
         }
         else {
             jComboBox1.setSelectedItem("" + jStockOptions.getMaxSMSPerDay());
