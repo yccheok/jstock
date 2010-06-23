@@ -57,6 +57,7 @@ import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.MutableStockCodeAndSymbolDatabase;
 import org.yccheok.jstock.engine.StockCodeAndSymbolDatabase;
 import org.yccheok.jstock.engine.Symbol;
+import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.internationalization.MessagesBundle;
 
 /**
@@ -106,7 +107,8 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         jButton4 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Stock Database");
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
+        setTitle(bundle.getString("StockDatabaseJDialog_StockDatabase")); // NOI18N
         setResizable(false);
         addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -116,17 +118,16 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
 
         jPanel6.setLayout(new java.awt.BorderLayout(5, 5));
 
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
         jXHeader1.setDescription(bundle.getString("StockDatabaseJDialog_Description")); // NOI18N
         jXHeader1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/64x64/db_add.png"))); // NOI18N
-        jXHeader1.setTitle("Stock Database");
+        jXHeader1.setTitle(bundle.getString("StockDatabaseJDialog_StockDatabase")); // NOI18N
         jPanel6.add(jXHeader1, java.awt.BorderLayout.CENTER);
 
         getContentPane().add(jPanel6, java.awt.BorderLayout.NORTH);
 
         jPanel4.setLayout(new java.awt.GridLayout(1, 0));
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Stock Exchange Server (Read only)"));
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("StockDatabaseJDialog_StockExchangeServer"))); // NOI18N
         jPanel1.setLayout(new java.awt.BorderLayout());
 
         jTable1.setAutoCreateRowSorter(true);
@@ -156,7 +157,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
 
             jPanel4.add(jPanel1);
 
-            jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("User Defined"));
+            jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("StockDatabaseJDialog_UserDefined"))); // NOI18N
             jPanel2.setLayout(new java.awt.BorderLayout());
 
             jTable2.setAutoCreateRowSorter(true);
@@ -177,7 +178,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
             jPanel2.add(jScrollPane2, java.awt.BorderLayout.CENTER);
 
             jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/filenew.png"))); // NOI18N
-            jButton1.setText("New");
+            jButton1.setText(bundle.getString("StockDatabaseJDialog_New")); // NOI18N
             jButton1.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     jButton1ActionPerformed(evt);
@@ -186,7 +187,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
             jPanel5.add(jButton1);
 
             jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/editdelete.png"))); // NOI18N
-            jButton2.setText("Delete");
+            jButton2.setText(bundle.getString("StockDatabaseJDialog_Delete")); // NOI18N
             jButton2.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     jButton2ActionPerformed(evt);
@@ -201,7 +202,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
             jPanel10.add(jLabel2);
 
             jLabel3.setFont(jLabel3.getFont().deriveFont(jLabel3.getFont().getSize()-1f));
-            jLabel3.setText("<html><a href=\"http://jstock.sourceforge.net/help_stock_database.html?utm_source=jstock&utm_medium=database_dialog\">JStock FAQ</a></html>");
+            jLabel3.setText(bundle.getString("StockDatabaseJDialog_HelpURL")); // NOI18N
             jLabel3.addMouseListener(new java.awt.event.MouseAdapter() {
                 public void mouseClicked(java.awt.event.MouseEvent evt) {
                     jLabel3MouseClicked(evt);
@@ -224,13 +225,13 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
             jPanel7.setLayout(new java.awt.BorderLayout());
 
             jLabel1.setForeground(new java.awt.Color(0, 0, 255));
-            jLabel1.setText("There are total " + mutableStockCodeAndSymbolDatabase.getCodes().size() + " stock(s)");
+            jLabel1.setText(getTotalStockString());
             jPanel8.add(jLabel1);
 
             jPanel7.add(jPanel8, java.awt.BorderLayout.NORTH);
 
             jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/apply.png"))); // NOI18N
-            jButton3.setText("OK");
+            jButton3.setText(bundle.getString("StockDatabaseJDialog_OK")); // NOI18N
             jButton3.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     jButton3ActionPerformed(evt);
@@ -239,7 +240,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
             jPanel9.add(jButton3);
 
             jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/button_cancel.png"))); // NOI18N
-            jButton4.setText("Cancel");
+            jButton4.setText(bundle.getString("StockDatabaseJDialog_Cancel")); // NOI18N
             jButton4.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     jButton4ActionPerformed(evt);
@@ -827,6 +828,10 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
             return super.stopCellEditing();
         }
 
+    }
+
+    private String getTotalStockString() {
+        return MessageFormat.format(GUIBundle.getString("StockDatabaseJDialog_TotalStock_template"), mutableStockCodeAndSymbolDatabase.getCodes().size());
     }
 
     private MutableStockCodeAndSymbolDatabase mutableStockCodeAndSymbolDatabase = null;
