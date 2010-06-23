@@ -185,7 +185,7 @@ public class SellPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel
             
             switch(column) {
                 case 0:
-                    return "Sell";
+                    return GUIBundle.getString("PortfolioManagementJPanel_Sell");
         
                 case 5:
                     if (jStockOptions.isPenceToPoundConversionEnabled() == false) {

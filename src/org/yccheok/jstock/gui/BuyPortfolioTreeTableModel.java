@@ -309,12 +309,12 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
     public Object getValueAt(Object node, int column) {
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
 
-        if(node instanceof Portfolio) {
+        if (node instanceof Portfolio) {
             final Portfolio portfolio = (Portfolio)node;
             
             switch(column) {
                 case 0:
-                    return "Buy";
+                    return GUIBundle.getString("PortfolioManagementJPanel_Buy");
         
                 case 5:
                     if (jStockOptions.isPenceToPoundConversionEnabled() == false) {

@@ -95,12 +95,13 @@ public class StockJDialog extends javax.swing.JDialog {
         jCheckBox24 = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Select Stock");
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
+        setTitle(bundle.getString("StockJDialog_SelectStock")); // NOI18N
         setResizable(false);
         getContentPane().setLayout(new java.awt.BorderLayout(5, 5));
 
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/apply.png"))); // NOI18N
-        jButton1.setText("OK");
+        jButton1.setText(bundle.getString("StockJDialog_OK")); // NOI18N
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -109,7 +110,7 @@ public class StockJDialog extends javax.swing.JDialog {
         jPanel4.add(jButton1);
 
         jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/button_cancel.png"))); // NOI18N
-        jButton2.setText("Cancel");
+        jButton2.setText(bundle.getString("StockJDialog_Cancel")); // NOI18N
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
@@ -119,11 +120,11 @@ public class StockJDialog extends javax.swing.JDialog {
 
         getContentPane().add(jPanel4, java.awt.BorderLayout.SOUTH);
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Type of stock"));
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("StockJDialog_TypeOfStock"))); // NOI18N
 
         buttonGroup1.add(jRadioButton2);
         jRadioButton2.setSelected(true);
-        jRadioButton2.setText("Select entire stock market (Everything including Call warrant, Loans...)");
+        jRadioButton2.setText(bundle.getString("StockJDialog_SelectEntireStockMarket")); // NOI18N
         jRadioButton2.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         jRadioButton2.setMargin(new java.awt.Insets(0, 0, 0, 0));
         jRadioButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -133,7 +134,7 @@ public class StockJDialog extends javax.swing.JDialog {
         });
 
         buttonGroup1.add(jRadioButton3);
-        jRadioButton3.setText("Select based on board");
+        jRadioButton3.setText(bundle.getString("StockJDialog_SelectasedOnBoard")); // NOI18N
         jRadioButton3.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         jRadioButton3.setMargin(new java.awt.Insets(0, 0, 0, 0));
         jRadioButton3.addActionListener(new java.awt.event.ActionListener() {
@@ -142,7 +143,7 @@ public class StockJDialog extends javax.swing.JDialog {
             }
         });
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Board"));
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("StockJDialog_Board"))); // NOI18N
 
         jCheckBox1.setText("Main board");
         jCheckBox1.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
@@ -200,7 +201,7 @@ public class StockJDialog extends javax.swing.JDialog {
                     .addComponent(jCheckBox23)
                     .addComponent(jCheckBox27)
                     .addComponent(jCheckBox21))
-                .addContainerGap(82, Short.MAX_VALUE))
+                .addContainerGap(21, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -223,7 +224,7 @@ public class StockJDialog extends javax.swing.JDialog {
         );
 
         buttonGroup1.add(jRadioButton4);
-        jRadioButton4.setText("Select based on industry");
+        jRadioButton4.setText(bundle.getString("StockJDialog_SelectBasedOnIndustry")); // NOI18N
         jRadioButton4.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         jRadioButton4.setMargin(new java.awt.Insets(0, 0, 0, 0));
         jRadioButton4.addActionListener(new java.awt.event.ActionListener() {
@@ -232,7 +233,7 @@ public class StockJDialog extends javax.swing.JDialog {
             }
         });
 
-        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Industry"));
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("StockJDialog_Industry"))); // NOI18N
 
         jCheckBox5.setText("Consumer products");
         jCheckBox5.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
@@ -337,7 +338,7 @@ public class StockJDialog extends javax.swing.JDialog {
                     .addComponent(jCheckBox13)
                     .addComponent(jCheckBox10)
                     .addComponent(jCheckBox9))
-                .addContainerGap(71, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
