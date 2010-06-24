@@ -309,7 +309,6 @@ public class MainFrame extends javax.swing.JFrame {
         jPanel1.add(jLabel1);
 
         jComboBox1.setEditable(true);
-        jComboBox1.setBorder(null);
         jComboBox1.setPreferredSize(new java.awt.Dimension(150, 24));
         ((AutoCompleteJComboBox)this.jComboBox1).attach(getAutoCompleteJComboBoxObserver());
         jPanel1.add(jComboBox1);

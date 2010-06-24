@@ -99,19 +99,20 @@ public class OptionsBrokerJPanel extends javax.swing.JPanel implements JStockOpt
 
         setLayout(new java.awt.BorderLayout());
 
-        jXHeader1.setDescription("Perform auto broker fee, stamp duty and clearing fee calculation, based on your transaction.");
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
+        jXHeader1.setDescription(bundle.getString("OptionsBrokerJPanel_Description")); // NOI18N
         jXHeader1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/32x32/calc.png"))); // NOI18N
-        jXHeader1.setTitle("Broker Fee");
+        jXHeader1.setTitle(bundle.getString("OptionsBrokerJPanel_BrokerFee")); // NOI18N
         add(jXHeader1, java.awt.BorderLayout.NORTH);
 
-        jCheckBox1.setText("Auto calculate broker fee, stamp duty and clearing fee");
+        jCheckBox1.setText(bundle.getString("OptionsBrokerJPanel_AutoCalculate")); // NOI18N
         jCheckBox1.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 jCheckBox1ItemStateChanged(evt);
             }
         });
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Broking Firm"));
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsBrokerJPanel_BrokingFirm"))); // NOI18N
 
         jList1.setModel(new DefaultListModel());
         jList1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
@@ -129,38 +130,38 @@ public class OptionsBrokerJPanel extends javax.swing.JPanel implements JStockOpt
         jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jPanel6.add(jLabel1, java.awt.BorderLayout.CENTER);
 
-        jButton1.setText("Add...");
+        jButton1.setText(bundle.getString("OptionsBrokerJPanel_Add...")); // NOI18N
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
             }
         });
 
-        jButton2.setText("Delete");
+        jButton2.setText(bundle.getString("OptionsBrokerJPanel_Delete")); // NOI18N
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
             }
         });
 
-        jButton3.setText("Edit...");
+        jButton3.setText(bundle.getString("OptionsBrokerJPanel_Edit...")); // NOI18N
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton3ActionPerformed(evt);
             }
         });
 
-        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Broker Fee"));
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsBrokerJPanel_BrokerFee"))); // NOI18N
 
         jFormattedTextField1.setValue(new Double(0.0));
 
         jFormattedTextField2.setValue(new Double(0.0));
 
-        jLabel2.setText("Rate (%)");
+        jLabel2.setText(bundle.getString("OptionsBrokerJPanel_Rate%")); // NOI18N
 
-        jLabel3.setText("Maximum Fee");
+        jLabel3.setText(bundle.getString("OptionsBrokerJPanel_MaximumFee")); // NOI18N
 
-        jLabel4.setText("Minimum Fee");
+        jLabel4.setText(bundle.getString("OptionsBrokerJPanel_MinimumFee")); // NOI18N
 
         jFormattedTextField3.setValue(new Double(0.0));
 
@@ -198,17 +199,17 @@ public class OptionsBrokerJPanel extends javax.swing.JPanel implements JStockOpt
                 .addContainerGap(6, Short.MAX_VALUE))
         );
 
-        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Clearing Fee"));
+        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsBrokerJPanel_ClearingFee"))); // NOI18N
 
         jFormattedTextField4.setValue(new Double(0.0));
 
         jFormattedTextField5.setValue(new Double(0.0));
 
-        jLabel5.setText("Rate (%)");
+        jLabel5.setText(bundle.getString("OptionsBrokerJPanel_Rate%")); // NOI18N
 
-        jLabel6.setText("Maximum Fee");
+        jLabel6.setText(bundle.getString("OptionsBrokerJPanel_MaximumFee")); // NOI18N
 
-        jLabel7.setText("Minimum Fee");
+        jLabel7.setText(bundle.getString("OptionsBrokerJPanel_MinimumFee")); // NOI18N
 
         jFormattedTextField6.setValue(new Double(0.0));
 
@@ -246,17 +247,17 @@ public class OptionsBrokerJPanel extends javax.swing.JPanel implements JStockOpt
                 .addContainerGap(6, Short.MAX_VALUE))
         );
 
-        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Stamp Duty"));
+        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsBrokerJPanel_StampDuty"))); // NOI18N
 
         jFormattedTextField7.setValue(new Double(0.0));
 
         jFormattedTextField8.setValue(new Double(1.0));
 
-        jLabel8.setText("Rate");
+        jLabel8.setText(bundle.getString("OptionsBrokerJPanel_Rate")); // NOI18N
 
-        jLabel9.setText("Fraction");
+        jLabel9.setText(bundle.getString("OptionsBrokerJPanel_Fraction")); // NOI18N
 
-        jLabel10.setText("Maximum Fee");
+        jLabel10.setText(bundle.getString("OptionsBrokerJPanel_MaximumFee")); // NOI18N
 
         jFormattedTextField9.setValue(new Double(0.0));
 
@@ -362,7 +363,7 @@ public class OptionsBrokerJPanel extends javax.swing.JPanel implements JStockOpt
                 .addComponent(jCheckBox1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(14, Short.MAX_VALUE))
+                .addContainerGap(25, Short.MAX_VALUE))
         );
 
         add(jPanel1, java.awt.BorderLayout.CENTER);
