@@ -19,9 +19,11 @@
 
 package org.yccheok.jstock.gui;
 
+import javax.swing.ComboBoxModel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.Duration;
+import org.yccheok.jstock.internationalization.GUIBundle;
 
 /**
  *
@@ -56,21 +58,22 @@ public class OptionsSpeedJPanel extends javax.swing.JPanel implements JStockOpti
 
         setLayout(new java.awt.BorderLayout());
 
-        jXHeader1.setDescription("The speed to scan through the stock market. The faster the speed, the more resources it requires from your computer.");
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
+        jXHeader1.setDescription(bundle.getString("OptionsSpeedJPanel_Description")); // NOI18N
         jXHeader1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/32x32/clock.png"))); // NOI18N
-        jXHeader1.setTitle("Scanning Speed");
+        jXHeader1.setTitle(bundle.getString("OptionsSpeedJPanel_ScanningSpeed")); // NOI18N
         add(jXHeader1, java.awt.BorderLayout.NORTH);
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Real-time data"));
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsSpeedJPanel_RealtimeData"))); // NOI18N
 
-        jLabel1.setText("Stock scanning speed");
+        jLabel1.setText(bundle.getString("OptionsSpeedJPanel_StockScanningSpeed")); // NOI18N
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "1", "5", "10", "20", "30", "40", "50", "60" }));
 
         jLabel2.setFont(jLabel2.getFont().deriveFont(jLabel2.getFont().getSize()-1f));
-        jLabel2.setText("(smaller means faster)");
+        jLabel2.setText(bundle.getString("OptionsSpeedJPanel_SmallerMeansFaster")); // NOI18N
 
-        jComboBox3.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "seconds", "minutes", "hours" }));
+        jComboBox3.setModel(getComboBoxModel());
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -90,23 +93,22 @@ public class OptionsSpeedJPanel extends javax.swing.JPanel implements JStockOpti
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel2))
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2)
                     .addComponent(jLabel1))
-                .addContainerGap(12, Short.MAX_VALUE))
+                .addContainerGap(16, Short.MAX_VALUE))
         );
 
-        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("History data"));
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsSpeedJPanel_HistoryData"))); // NOI18N
 
         jLabel4.setFont(jLabel4.getFont().deriveFont(jLabel4.getFont().getSize()-1f));
-        jLabel4.setText("(smaller means faster)");
+        jLabel4.setText(bundle.getString("OptionsSpeedJPanel_SmallerMeansFaster")); // NOI18N
 
         jComboBox2.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "1", "2", "3", "5", "10", "15", "20" }));
 
-        jLabel3.setText("History duration (year)");
+        jLabel3.setText(bundle.getString("OptionsSpeedJPanel_HistoryDuration")); // NOI18N
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -149,7 +151,7 @@ public class OptionsSpeedJPanel extends javax.swing.JPanel implements JStockOpti
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(20, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         add(jPanel1, java.awt.BorderLayout.CENTER);
@@ -184,15 +186,15 @@ public class OptionsSpeedJPanel extends javax.swing.JPanel implements JStockOpti
         try {
             speed = Integer.parseInt(jComboBox1.getSelectedItem().toString());
         }
-        catch(NumberFormatException exp) {
-            log.error("", exp);
+        catch (NumberFormatException exp) {
+            log.error(null, exp);
         }
 
         try {
             historyDuration = Integer.parseInt(jComboBox2.getSelectedItem().toString());
         }
-        catch(NumberFormatException exp) {
-            log.error("", exp);
+        catch (NumberFormatException exp) {
+            log.error(null, exp);
         }
 
         if (jComboBox3.getSelectedIndex() == 0) {
@@ -211,14 +213,22 @@ public class OptionsSpeedJPanel extends javax.swing.JPanel implements JStockOpti
         jStockOptions.setHistoryDuration(historyDuration);
         
         MainFrame m = MainFrame.getInstance();
-        if(m != null) {
+        if (m != null) {
             m.updateScanningSpeed(jStockOptions.getScanningSpeed());
             m.updateHistoryDuration(Duration.getTodayDurationByYears(historyDuration));
         }
         
         return true;
     }
-    
+
+    private ComboBoxModel getComboBoxModel() {
+        return new javax.swing.DefaultComboBoxModel(new String[] {
+            GUIBundle.getString("OptionsSpeedJPanel_Seconds"),
+            GUIBundle.getString("OptionsSpeedJPanel_Minutes"),
+            GUIBundle.getString("OptionsSpeedJPanel_Hours"),
+        });
+    }
+
     private static final Log log = LogFactory.getLog(OptionsSpeedJPanel.class);
     
     // Variables declaration - do not modify//GEN-BEGIN:variables

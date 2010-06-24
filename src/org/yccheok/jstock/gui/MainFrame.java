@@ -28,16 +28,11 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
-
 import org.yccheok.jstock.engine.*;
-
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-
 import javax.swing.*;
 import java.text.MessageFormat;
 import java.util.concurrent.CountDownLatch;

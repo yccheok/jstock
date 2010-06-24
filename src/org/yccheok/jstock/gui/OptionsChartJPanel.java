@@ -52,19 +52,19 @@ public class OptionsChartJPanel extends javax.swing.JPanel implements JStockOpti
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
         jXHeader1.setDescription(bundle.getString("OptionsChartJPanel_Description")); // NOI18N
         jXHeader1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/32x32/kchart.png"))); // NOI18N
-        jXHeader1.setTitle("Chart");
+        jXHeader1.setTitle(bundle.getString("OptionsChartJPanel_Chart")); // NOI18N
         add(jXHeader1, java.awt.BorderLayout.NORTH);
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsChartJPanel_YellowInformationBox"))); // NOI18N
 
         buttonGroup1.add(jRadioButton1);
-        jRadioButton1.setText("Make yellow information box follow the blue ball");
+        jRadioButton1.setText(bundle.getString("OptionsChartJPanel_FollowTheBlueBall")); // NOI18N
 
         buttonGroup1.add(jRadioButton2);
-        jRadioButton2.setText("Make yellow information box stay on the top of chart");
+        jRadioButton2.setText(bundle.getString("OptionsChartJPanel_OnTheTopOfChart")); // NOI18N
 
         buttonGroup1.add(jRadioButton3);
-        jRadioButton3.setText("Do not show yellow information box");
+        jRadioButton3.setText(bundle.getString("OptionsChartJPanel_DoNotShow")); // NOI18N
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
