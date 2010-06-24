@@ -305,10 +305,11 @@ public class MainFrame extends javax.swing.JFrame {
 
         jPanel8.add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
-        jLabel1.setText("Stock");
+        jLabel1.setText(bundle.getString("MainFrame_Stock")); // NOI18N
         jPanel1.add(jLabel1);
 
         jComboBox1.setEditable(true);
+        jComboBox1.setBorder(null);
         jComboBox1.setPreferredSize(new java.awt.Dimension(150, 24));
         ((AutoCompleteJComboBox)this.jComboBox1).attach(getAutoCompleteJComboBoxObserver());
         jPanel1.add(jComboBox1);
