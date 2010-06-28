@@ -836,7 +836,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         // TODO add your handling code here:
         final List<Stock> stocks = this.getSelectedStocks(buyTreeTable);
         if (stocks.size() != 1) {
-            JOptionPane.showMessageDialog(this, "You need to select only single stock from buy portfolio to perform sell transaction.", "Single Stock Selection Needed", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/messages").getString("info_message_you_need_to_select_only_single_stock_from_buy_portfolio_to_perform_sell_transaction"), java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/messages").getString("info_title_you_need_to_select_only_single_stock_from_buy_portfolio_to_perform_sell_transaction"), JOptionPane.INFORMATION_MESSAGE);
             return;
         }
 
@@ -1057,7 +1057,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         JMenuItem menuItem = null;
 
-        menuItem = new JMenuItem("Deposit...", this.getImageIcon("/images/16x16/money.png"));
+        menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("PortfolioManagement_Deposit..."), this.getImageIcon("/images/16x16/money.png"));
 
         menuItem.addActionListener(new ActionListener() {
             @Override
@@ -1068,7 +1068,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         popup.add(menuItem);
 
-        menuItem = new JMenuItem("Dividend...", this.getImageIcon("/images/16x16/money2.png"));
+        menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("PortfolioManagement_Dividend..."), this.getImageIcon("/images/16x16/money2.png"));
 
         menuItem.addActionListener(new ActionListener() {
             @Override
@@ -1082,7 +1082,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         popup.addSeparator();
         
         if (transactions.size() == 1) {
-            menuItem = new JMenuItem("Edit...", this.getImageIcon("/images/16x16/edit.png"));
+            menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("PortfolioManagement_Edit..."), this.getImageIcon("/images/16x16/edit.png"));
 
             menuItem.addActionListener(new ActionListener() {
                 @Override
@@ -1097,7 +1097,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         final Commentable commentable = getSelectedCommentable(this.sellTreeTable);
         final String tmp = getSelectedFirstColumnString(this.sellTreeTable);
         if (commentable != null && tmp != null) {
-            menuItem = new JMenuItem("Note...", this.getImageIcon("/images/16x16/sticky.png"));
+            menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("PortfolioManagement_Note..."), this.getImageIcon("/images/16x16/sticky.png"));
 
             menuItem.addActionListener(new ActionListener() {
                 @Override
@@ -1115,7 +1115,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             popup.addSeparator();
         }
 
-        menuItem = new JMenuItem("Investment Chart...", this.getImageIcon("/images/16x16/graph.png"));
+        menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("PortfolioManagement_InvestmentChart..."), this.getImageIcon("/images/16x16/graph.png"));
 
         menuItem.addActionListener(new ActionListener() {
             @Override
@@ -1137,7 +1137,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         popup.add(menuItem);
 
-        menuItem = new JMenuItem("Summary...", this.getImageIcon("/images/16x16/pie_chart.png"));
+        menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("PortfolioManagement_Summary..."), this.getImageIcon("/images/16x16/pie_chart.png"));
         
         menuItem.addActionListener(new ActionListener() {
             @Override
@@ -1151,7 +1151,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         if(isOnlyTreeTableRootBeingSelected(sellTreeTable) == false && (sellTreeTable.getSelectedRow() > 0)) {
             final MainFrame m = MainFrame.getInstance();
                                 
-            menuItem = new JMenuItem("History...", this.getImageIcon("/images/16x16/strokedocker.png"));
+            menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("PortfolioManagement_History..."), this.getImageIcon("/images/16x16/strokedocker.png"));
 
             menuItem.addActionListener(new ActionListener() {
                 @Override
@@ -1167,7 +1167,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             popup.add(menuItem);
             popup.addSeparator();
             
-            menuItem = new JMenuItem("Delete", this.getImageIcon("/images/16x16/editdelete.png"));
+            menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("PortfolioManagement_Delete"), this.getImageIcon("/images/16x16/editdelete.png"));
 
             menuItem.addActionListener(new ActionListener() {
                 @Override
@@ -1191,7 +1191,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private JPopupMenu getBuyTreeTablePopupMenu() {                
         JPopupMenu popup = new JPopupMenu();
 
-        JMenuItem menuItem = new JMenuItem("Buy...", this.getImageIcon("/images/16x16/inbox.png"));
+        JMenuItem menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("PortfolioManagement_Buy..."), this.getImageIcon("/images/16x16/inbox.png"));
 
         menuItem.addActionListener(new ActionListener() {
             @Override
@@ -1212,7 +1212,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         final List<Stock> stocks = this.getSelectedStocks(this.buyTreeTable);
 
         if (transactions.size() > 0 && stocks.size() == 1) {
-            menuItem = new JMenuItem("Sell...", this.getImageIcon("/images/16x16/outbox.png"));
+            menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("PortfolioManagement_Sell..."), this.getImageIcon("/images/16x16/outbox.png"));
             
             menuItem.addActionListener(new ActionListener() {
                 @Override
@@ -1226,7 +1226,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         popup.addSeparator();
 
-        menuItem = new JMenuItem("Deposit...", this.getImageIcon("/images/16x16/money.png"));
+        menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("PortfolioManagement_Deposit..."), this.getImageIcon("/images/16x16/money.png"));
 
         menuItem.addActionListener(new ActionListener() {
             @Override
@@ -1237,7 +1237,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         popup.add(menuItem);
 
-        menuItem = new JMenuItem("Dividend...", this.getImageIcon("/images/16x16/money2.png"));
+        menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("PortfolioManagement_Dividend..."), this.getImageIcon("/images/16x16/money2.png"));
 
         menuItem.addActionListener(new ActionListener() {
             @Override
@@ -1251,7 +1251,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         popup.addSeparator();
                 
         if (transactions.size() == 1) {
-            menuItem = new JMenuItem("Edit...", this.getImageIcon("/images/16x16/edit.png"));
+            menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("PortfolioManagement_Edit..."), this.getImageIcon("/images/16x16/edit.png"));
             
             menuItem.addActionListener(new ActionListener() {
                 @Override
@@ -1266,7 +1266,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         final Commentable commentable = getSelectedCommentable(this.buyTreeTable);
         final String tmp = getSelectedFirstColumnString(this.buyTreeTable);
         if (commentable != null && tmp != null) {
-            menuItem = new JMenuItem("Note...", this.getImageIcon("/images/16x16/sticky.png"));
+            menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("PortfolioManagement_Note..."), this.getImageIcon("/images/16x16/sticky.png"));
 
             menuItem.addActionListener(new ActionListener() {
                 @Override
@@ -1284,7 +1284,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             popup.addSeparator();
         }
 
-        menuItem = new JMenuItem("Investment Chart...", this.getImageIcon("/images/16x16/graph.png"));
+        menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("PortfolioManagement_InvestmentChart..."), this.getImageIcon("/images/16x16/graph.png"));
 
         menuItem.addActionListener(new ActionListener() {
             @Override
@@ -1306,7 +1306,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         popup.add(menuItem);
 
-        menuItem = new JMenuItem("Summary...", this.getImageIcon("/images/16x16/pie_chart.png"));
+        menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("PortfolioManagement_Summary..."), this.getImageIcon("/images/16x16/pie_chart.png"));
         
         menuItem.addActionListener(new ActionListener() {
             @Override
@@ -1322,7 +1322,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             
             final MainFrame m = MainFrame.getInstance();
                                 
-            menuItem = new JMenuItem("History...", this.getImageIcon("/images/16x16/strokedocker.png"));
+            menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("PortfolioManagement_History..."), this.getImageIcon("/images/16x16/strokedocker.png"));
 
             menuItem.addActionListener(new ActionListener() {
                 @Override
@@ -1338,7 +1338,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             popup.add(menuItem);
             popup.addSeparator();
             
-            menuItem = new JMenuItem("Delete", this.getImageIcon("/images/16x16/editdelete.png"));
+            menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("PortfolioManagement_Delete"), this.getImageIcon("/images/16x16/editdelete.png"));
 
             menuItem.addActionListener(new ActionListener() {
                 @Override
@@ -1963,21 +1963,21 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     
     private String getCashLabel() {
         return MessageFormat.format(
-            GUIBundle.getString("PortfolioManagementJPanel_CashLabel"),
+            GUIBundle.getString("PortfolioManagementJPanel_CashLabel_template"),
             /*java.util.Currency.getInstance(Locale.getDefault()).getSymbol()*/"$"
         );
     }
     
     private String getPaperProfitLabel() {
         return MessageFormat.format(
-            GUIBundle.getString("PortfolioManagementJPanel_PaperProfitLabel"),
+            GUIBundle.getString("PortfolioManagementJPanel_PaperProfitLabel_template"),
             /*java.util.Currency.getInstance(Locale.getDefault()).getSymbol()*/"$"
         );
     }
     
     private String getRealizedProfitLabel() {
         return MessageFormat.format(
-            GUIBundle.getString("PortfolioManagementJPanel_RealizedProfitLabel"),
+            GUIBundle.getString("PortfolioManagementJPanel_RealizedProfitLabel_template"),
             /*java.util.Currency.getInstance(Locale.getDefault()).getSymbol()*/"$"
         );
     }

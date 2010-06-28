@@ -432,7 +432,7 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
                 }
                 /* Check for version. */
                 if (Utils.isCompatible(cloudFile.version) == false) {
-                    final String message = MessageFormat.format(GUIBundle.getString("LoadFromCloudJDialog_VersionNotCompatible"), cloudFile.version);
+                    final String message = MessageFormat.format(GUIBundle.getString("LoadFromCloudJDialog_VersionNotCompatible_template"), cloudFile.version);
                     publish(Status.newInstance(message, Icons.ERROR));
                     return false;
                 }

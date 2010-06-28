@@ -185,7 +185,7 @@ public class MarketJPanel extends javax.swing.JPanel {
 
     private String getValueLabel() {
         return MessageFormat.format(
-            GUIBundle.getString("MainFrame_ValueLabel"),
+            GUIBundle.getString("MainFrame_ValueLabel_template"),
             /*java.util.Currency.getInstance(Locale.getDefault()).getSymbol()*/"$"
         );
     }

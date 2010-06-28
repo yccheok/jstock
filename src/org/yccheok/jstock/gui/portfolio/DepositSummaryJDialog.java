@@ -318,7 +318,7 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
             menuItem.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        showCommentJDialog(commentable, MessageFormat.format(GUIBundle.getString("DepositSummaryJDialog_NoteFor"), text));
+                        showCommentJDialog(commentable, MessageFormat.format(GUIBundle.getString("DepositSummaryJDialog_NoteFor_template"), text));
                     }
             });
 
@@ -364,7 +364,7 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
 
     private String getDepositSummaryText() {
         if (this.depositSummary != null) {
-            return MessageFormat.format(GUIBundle.getString("DepositSummaryJDialog_TotalDepositIs"), org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(this.depositSummary.getTotal()));
+            return MessageFormat.format(GUIBundle.getString("DepositSummaryJDialog_TotalDepositIs_template"), org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(this.depositSummary.getTotal()));
         }
         return "";
     }

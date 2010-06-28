@@ -362,7 +362,7 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
             menuItem.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        showCommentJDialog(commentable, MessageFormat.format(GUIBundle.getString("DividendSummaryJDialog_NoteFor"), text));
+                        showCommentJDialog(commentable, MessageFormat.format(GUIBundle.getString("DividendSummaryJDialog_NoteFor_template"), text));
                     }
             });
 
