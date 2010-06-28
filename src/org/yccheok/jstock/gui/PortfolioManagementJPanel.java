@@ -662,7 +662,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         final MainFrame mainFrame = MainFrame.getInstance();        
         NewSellTransactionJDialog newSellTransactionJDialog = new NewSellTransactionJDialog(mainFrame, true);
         if (buyTransactions.size() > 1) {
-            newSellTransactionJDialog.setTitle(newSellTransactionJDialog.getTitle() + " ["+ buyTransactions.size() + " Batch Sell]");
+            final String template = GUIBundle.getString("PortfolioManagementJPanel_BatchSell_template");
+            newSellTransactionJDialog.setTitle(MessageFormat.format(template, newSellTransactionJDialog.getTitle(), buyTransactions.size()));
         }
         newSellTransactionJDialog.setLocationRelativeTo(this);
         newSellTransactionJDialog.setBuyTransactions(buyTransactions);       
@@ -701,7 +702,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             NewBuyTransactionJDialog newTransactionJDialog = new NewBuyTransactionJDialog(mainFrame, true);
             newTransactionJDialog.setStockSelectionEnabled(false);
             newTransactionJDialog.setTransaction(transaction);
-            newTransactionJDialog.setTitle("Edit " + transaction.getContract().getStock().getSymbol() + " Buy");
+            final String template = GUIBundle.getString("PortfolioManagementJPanel_EditBuy_template");
+            newTransactionJDialog.setTitle(MessageFormat.format(template, transaction.getContract().getStock().getSymbol()));
             newTransactionJDialog.setLocationRelativeTo(this);
             newTransactionJDialog.setVisible(true);
 
@@ -716,7 +718,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             
             NewSellTransactionJDialog newTransactionJDialog = new NewSellTransactionJDialog(mainFrame, true);
             newTransactionJDialog.setSellTransaction(transaction);
-            newTransactionJDialog.setTitle("Edit " + transaction.getContract().getStock().getSymbol() + " Sell");
+            final String template = GUIBundle.getString("PortfolioManagementJPanel_EditSell_template");
+            newTransactionJDialog.setTitle(MessageFormat.format(template, transaction.getContract().getStock().getSymbol()));
             newTransactionJDialog.setLocationRelativeTo(this);
             newTransactionJDialog.setVisible(true);
 
@@ -735,7 +738,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = mainFrame.getStockCodeAndSymbolDatabase();
         
         if(stockCodeAndSymbolDatabase == null) {
-            javax.swing.JOptionPane.showMessageDialog(this, "We haven't connected to stock server.", "Not Connected", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            javax.swing.JOptionPane.showMessageDialog(this, MessagesBundle.getString("info_message_we_havent_connected_to_stock_server"), MessagesBundle.getString("info_title_we_havent_connected_to_stock_server"), javax.swing.JOptionPane.INFORMATION_MESSAGE);
             return;
         }
         
@@ -1102,7 +1105,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             menuItem.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent evt) {
-                    final String title = "Note for " + tmp;
+                    final String template = GUIBundle.getString("PortfolioManagementJPanel_NoteFor_template");
+                    final String title = MessageFormat.format(template, tmp);
                     PortfolioManagementJPanel.this.showCommentJDialog(commentable, title);
                 }
             });
@@ -1271,7 +1275,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             menuItem.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent evt) {
-                    final String title = "Note for " + tmp;
+                    final String template = GUIBundle.getString("PortfolioManagementJPanel_NoteFor_template");
+                    final String title = MessageFormat.format(template, tmp);
                     PortfolioManagementJPanel.this.showCommentJDialog(commentable, title);
                 }
             });
