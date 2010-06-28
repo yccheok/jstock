@@ -21,6 +21,7 @@ package org.yccheok.jstock.gui;
 
 import java.awt.*;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
@@ -102,7 +103,7 @@ public class JTableUtilities {
             //
             // Before performing comparison, we shall convert name, to the locale
             // of table options.
-            final String key = getKey(name, Locale.getDefault());
+            final java.util.List<String> keys = getKeys(name, Locale.getDefault());
 
             // Ensure correct resource file is being loaded.
             // When ResourceBundle.getBundle(..., locale) is being called, the
@@ -114,11 +115,20 @@ public class JTableUtilities {
             Locale.setDefault(locale);
             try {
                 final ResourceBundle bundle = ResourceBundle.getBundle("org.yccheok.jstock.data.gui", locale);
-                final String translated_name = key == null ? name : bundle.getString(key);
                 Locale.setDefault(oldLocale);
 
+                // Try all the keys.
+                boolean found = false;
+                for (String key : keys) {
+                    final String translated_name = bundle.getString(key);
+                    if (jTableOptions.contains(translated_name)) {
+                        found = true;
+                        break;
+                    }
+                }
+
                 /* Remove any unwanted columns. */
-                if (jTableOptions.contains(translated_name) == false)
+                if (found == false)
                 {
                     removeTableColumn(jTable, name);
                     i--;
@@ -136,12 +146,22 @@ public class JTableUtilities {
         /* Sort the columns according to user preference. */
         for (int i = 0; i < optionsCount; i++) {
             final String name = jTableOptions.getColumnName(i);
-            final String key = getKey(name, locale);
-            final String translated_name = key == null ? name : GUIBundle.getString(key);
-
+            final java.util.List<String> keys = getKeys(name, locale);
+            
             int index = -1;
             for (int j = 0; j < tableCount; j++) {
-                if (jTable.getColumnName(j).equals(translated_name))
+                // Try all the keys.
+                boolean found = false;
+                String translated_name = null;
+                for (String key : keys) {
+                    translated_name = GUIBundle.getString(key);
+                    if (jTable.getColumnName(j).equals(translated_name)) {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (found)
                 {
                     /* Restore width. */
                     jTable.getColumn(translated_name).setPreferredWidth(jTableOptions.getColumnWidth(i));
@@ -290,19 +310,19 @@ public class JTableUtilities {
     }
 
     /**
-     * Get the key for a given string and locale.
+     * Get the keys for a given string and locale.
      *
      * @param string the string for the desired key
      * @param locale the locale for the desired key
-     * @return the key for a given string and locale
+     * @return the keys for a given string and locale
      */
-    private static String getKey(String string, Locale locale) {
+    private static java.util.List<String> getKeys(String string, Locale locale) {
         if (string2KeyMap.containsKey(locale)) {
-            final Map<String, String> string2Key = string2KeyMap.get(locale);
+            final Map<String, java.util.List<String>> string2Key = string2KeyMap.get(locale);
             return string2Key.get(string);
         }
 
-        final Map<String, String> string2Key = new HashMap<String, String>();
+        final Map<String, java.util.List<String>> string2Key = new HashMap<String, java.util.List<String>>();
 
         // Ensure correct resource file is being loaded.
         // When ResourceBundle.getBundle(..., locale) is being called, the
@@ -318,7 +338,13 @@ public class JTableUtilities {
             final Enumeration<String> enumeration = bundle.getKeys();
             while (enumeration.hasMoreElements()) {
                 final String key = enumeration.nextElement();
-                string2Key.put(bundle.getString(key), key);
+                final String str = bundle.getString(key);
+                java.util.List list = string2Key.get(str);
+                if (list == null) {
+                    list = new ArrayList<String>();
+                    string2Key.put(str, list);
+                }
+                list.add(key);
             }
 
             string2KeyMap.put(locale, string2Key);
@@ -326,9 +352,14 @@ public class JTableUtilities {
         finally {
             Locale.setDefault(oldLocale);
         }
-        return string2Key.get(string);
+
+        final java.util.List<String> result = string2Key.get(string);
+        if (result == null) {
+            return java.util.Collections.EMPTY_LIST;
+        }
+        return result;
     }
 
-    private static final Map<Locale, Map<String, String>> string2KeyMap = new HashMap<Locale, Map<String, String>>();
+    private static final Map<Locale, Map<String, java.util.List<String>>> string2KeyMap = new HashMap<Locale, Map<String, java.util.List<String>>>();
 }
 

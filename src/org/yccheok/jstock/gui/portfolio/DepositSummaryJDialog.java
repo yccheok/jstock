@@ -24,11 +24,13 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.MessageFormat;
 import java.util.Arrays;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import org.yccheok.jstock.gui.JTableUtilities;
 import org.yccheok.jstock.gui.MainFrame;
+import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.portfolio.Commentable;
 import org.yccheok.jstock.portfolio.DepositSummary;
 import org.yccheok.jstock.portfolio.Utils;
@@ -70,7 +72,8 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
         jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Cash Deposit");
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
+        setTitle(bundle.getString("DepositSummaryJDialog_CashDeposit")); // NOI18N
         setResizable(false);
         addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -79,13 +82,13 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
         });
         getContentPane().setLayout(new java.awt.BorderLayout(5, 5));
 
-        jXHeader1.setDescription("Manage your cash deposit information.");
+        jXHeader1.setDescription(bundle.getString("DepositSummaryJDialog_Description")); // NOI18N
         jXHeader1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/32x32/money.png"))); // NOI18N
-        jXHeader1.setTitle("Deposit");
+        jXHeader1.setTitle(bundle.getString("DepositSummaryJDialog_Deposit")); // NOI18N
         getContentPane().add(jXHeader1, java.awt.BorderLayout.PAGE_START);
 
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/apply.png"))); // NOI18N
-        jButton1.setText("OK");
+        jButton1.setText(bundle.getString("DepositSummaryJDialog_OK")); // NOI18N
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -94,7 +97,7 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
         jPanel1.add(jButton1);
 
         jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/button_cancel.png"))); // NOI18N
-        jButton2.setText("Cancel");
+        jButton2.setText(bundle.getString("DepositSummaryJDialog_Cancel")); // NOI18N
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
@@ -134,7 +137,7 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
         jPanel2.add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
         jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/filenew.png"))); // NOI18N
-        jButton3.setText("New");
+        jButton3.setText(bundle.getString("DepositSummaryJDialog_New")); // NOI18N
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton3ActionPerformed(evt);
@@ -143,7 +146,7 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
         jPanel3.add(jButton3);
 
         jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/editdelete.png"))); // NOI18N
-        jButton4.setText("Delete");
+        jButton4.setText(bundle.getString("DepositSummaryJDialog_Delete")); // NOI18N
         jButton4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton4ActionPerformed(evt);
@@ -294,7 +297,7 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
     private JPopupMenu getMyJTablePopupMenu() {
         final JPopupMenu popup = new JPopupMenu();
 
-        javax.swing.JMenuItem menuItem = new JMenuItem("New", new javax.swing.ImageIcon(getClass().getResource("/images/16x16/filenew.png")));
+        javax.swing.JMenuItem menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("DepositSummary_New"), new javax.swing.ImageIcon(getClass().getResource("/images/16x16/filenew.png")));
 
         menuItem.addActionListener(new ActionListener() {
                 @Override
@@ -310,12 +313,12 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
         if (commentable != null && text != null) {
             popup.addSeparator();
 
-            menuItem = new JMenuItem("Note...", new javax.swing.ImageIcon(getClass().getResource("/images/16x16/sticky.png")));
+            menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("DepositSummary_Note..."), new javax.swing.ImageIcon(getClass().getResource("/images/16x16/sticky.png")));
 
             menuItem.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        showCommentJDialog(commentable, "Note for " + text);
+                        showCommentJDialog(commentable, MessageFormat.format(GUIBundle.getString("DepositSummaryJDialog_NoteFor"), text));
                     }
             });
 
@@ -325,7 +328,7 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
         if(jTable1.getSelectedRowCount() >= 1) {
             popup.addSeparator();
 
-            menuItem = new JMenuItem("Delete", new javax.swing.ImageIcon(getClass().getResource("/images/16x16/editdelete.png")));
+            menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("DELETE"), new javax.swing.ImageIcon(getClass().getResource("/images/16x16/editdelete.png")));
 
             menuItem.addActionListener(new ActionListener() {
                 @Override
@@ -361,7 +364,7 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
 
     private String getDepositSummaryText() {
         if (this.depositSummary != null) {
-            return "Total deposit is " + org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(this.depositSummary.getTotal());
+            return MessageFormat.format(GUIBundle.getString("DepositSummaryJDialog_TotalDepositIs"), org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(this.depositSummary.getTotal()));
         }
         return "";
     }

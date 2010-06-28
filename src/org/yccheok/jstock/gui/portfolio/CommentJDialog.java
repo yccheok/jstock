@@ -68,7 +68,8 @@ public class CommentJDialog extends javax.swing.JDialog {
         getContentPane().add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/apply.png"))); // NOI18N
-        jButton1.setText("OK");
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
+        jButton1.setText(bundle.getString("CommentJDialog_OK")); // NOI18N
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -77,7 +78,7 @@ public class CommentJDialog extends javax.swing.JDialog {
         jPanel1.add(jButton1);
 
         jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/button_cancel.png"))); // NOI18N
-        jButton2.setText("Cancel");
+        jButton2.setText(bundle.getString("CommentJDialog_Cancel")); // NOI18N
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
