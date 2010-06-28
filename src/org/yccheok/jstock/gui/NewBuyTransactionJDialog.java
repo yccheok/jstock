@@ -100,8 +100,8 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
-        jComboBox1 = new AutoCompleteJComboBox();
         jLabel6 = new javax.swing.JLabel();
+        jComboBox1 = new AutoCompleteJComboBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
@@ -112,7 +112,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
 
         jTextField1.setEditable(false);
 
-        jLabel2.setText("Symbol");
+        jLabel2.setText(bundle.getString("NewSellTransactionJDialog_Symbol")); // NOI18N
 
         jSpinner1.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(100), Integer.valueOf(1), null, Integer.valueOf(100)));
         jSpinner1.addChangeListener(new javax.swing.event.ChangeListener() {
@@ -125,7 +125,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         jPanel3.setMaximumSize(new java.awt.Dimension(32767, 20));
         jPanel3.setPreferredSize(new java.awt.Dimension(100, 20));
 
-        jLabel4.setText("Date");
+        jLabel4.setText(bundle.getString("NewBuyTransactionJDialog_Date")); // NOI18N
 
         jFormattedTextField1.setValue(new Double(0.0));
         jFormattedTextField1.addFocusListener(new java.awt.event.FocusAdapter() {
@@ -159,23 +159,23 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         });
 
         jLabel10.setFont(jLabel10.getFont().deriveFont(jLabel10.getFont().getStyle() | java.awt.Font.BOLD));
-        jLabel10.setText("Net Value");
+        jLabel10.setText(bundle.getString("NewBuyTransactionJDialog_NetValue")); // NOI18N
 
         jFormattedTextField6.setEditable(false);
         jFormattedTextField6.setFont(jFormattedTextField6.getFont().deriveFont(jFormattedTextField6.getFont().getStyle() | java.awt.Font.BOLD));
         jFormattedTextField6.setValue(new Double(0.0));
 
-        jLabel1.setText("Unit");
+        jLabel1.setText(bundle.getString("NewBuyTransactionJDialog_Unit")); // NOI18N
 
-        jLabel3.setText("Price");
+        jLabel3.setText(bundle.getString("NewBuyTransactionJDialog_Price")); // NOI18N
 
-        jLabel5.setText("Value");
+        jLabel5.setText(bundle.getString("NewBuyTransactionJDialog_Value")); // NOI18N
 
-        jLabel7.setText("Broker");
+        jLabel7.setText(bundle.getString("NewBuyTransactionJDialog_Broker")); // NOI18N
 
-        jLabel8.setText("Clearing");
+        jLabel8.setText(bundle.getString("NewBuyTransactionJDialog_Clearing")); // NOI18N
 
-        jLabel9.setText("Stamp Duty");
+        jLabel9.setText(bundle.getString("NewBuyTransactionJDialog_StampDuty")); // NOI18N
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -249,7 +249,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jFormattedTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 29, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 41, Short.MAX_VALUE)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel10)
                     .addComponent(jFormattedTextField6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -260,7 +260,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/apply.png"))); // NOI18N
-        jButton1.setText("OK");
+        jButton1.setText(bundle.getString("NewBuyTransactionJDialog_OK")); // NOI18N
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -269,7 +269,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         jPanel4.add(jButton1);
 
         jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/button_cancel.png"))); // NOI18N
-        jButton2.setText("Cancel");
+        jButton2.setText(bundle.getString("NewBuyTransactionJDialog_Cancel")); // NOI18N
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
@@ -280,33 +280,15 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         getContentPane().add(jPanel4, java.awt.BorderLayout.SOUTH);
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("NewBuyTransactionJDialog_Stock"))); // NOI18N
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 15, 5));
+
+        jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/inbox.png"))); // NOI18N
+        jPanel1.add(jLabel6);
 
         jComboBox1.setEditable(true);
         jComboBox1.setPreferredSize(new java.awt.Dimension(110, 24));
         ((AutoCompleteJComboBox)jComboBox1).attach(this.getAutoCompleteJComboBoxObserver());
-
-        jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/inbox.png"))); // NOI18N
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel6)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 43, Short.MAX_VALUE)
-                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel6)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+        jPanel1.add(jComboBox1);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.NORTH);
 

@@ -124,7 +124,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
 
         jTextField1.setEditable(false);
 
-        jLabel2.setText("Symbol");
+        jLabel2.setText(bundle.getString("NewBuyTransactionJDialog_Symbol")); // NOI18N
 
         jSpinner1.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(100), Integer.valueOf(1), null, Integer.valueOf(100)));
         jSpinner1.addChangeListener(new javax.swing.event.ChangeListener() {
@@ -137,7 +137,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         jPanel3.setMaximumSize(new java.awt.Dimension(32767, 20));
         jPanel3.setPreferredSize(new java.awt.Dimension(100, 20));
 
-        jLabel4.setText("Date");
+        jLabel4.setText(bundle.getString("NewBuyTransactionJDialog_Date")); // NOI18N
 
         jFormattedTextField1.setValue(new Double(0.0));
         jFormattedTextField1.addFocusListener(new java.awt.event.FocusAdapter() {
@@ -167,23 +167,23 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         });
 
         jLabel10.setFont(jLabel10.getFont().deriveFont(jLabel10.getFont().getStyle() | java.awt.Font.BOLD));
-        jLabel10.setText("Profit (%)");
+        jLabel10.setText(bundle.getString("NewSellTransactionJDialog_Profit%")); // NOI18N
 
         jFormattedTextField6.setEditable(false);
         jFormattedTextField6.setFont(jFormattedTextField6.getFont().deriveFont(jFormattedTextField6.getFont().getStyle() | java.awt.Font.BOLD));
         jFormattedTextField6.setValue(new Double(0.0));
 
-        jLabel1.setText("Unit");
+        jLabel1.setText(bundle.getString("NewSellTransactionJDialog_Unit")); // NOI18N
 
-        jLabel3.setText("Price");
+        jLabel3.setText(bundle.getString("NewSellTransactionJDialog_Price")); // NOI18N
 
-        jLabel5.setText("Value");
+        jLabel5.setText(bundle.getString("NewSellTransactionJDialog_Value")); // NOI18N
 
-        jLabel7.setText("Buy Cost");
+        jLabel7.setText(bundle.getString("NewSellTransactionJDialog_BuyCost")); // NOI18N
 
-        jLabel8.setText("Broker");
+        jLabel8.setText(bundle.getString("NewSellTransactionJDialog_Broker")); // NOI18N
 
-        jLabel9.setText("Clearing");
+        jLabel9.setText(bundle.getString("NewSellTransactionJDialog_Clearing")); // NOI18N
 
         jFormattedTextField7.setValue(new Double(0.0));
         jFormattedTextField7.addFocusListener(new java.awt.event.FocusAdapter() {
@@ -192,14 +192,14 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
             }
         });
 
-        jLabel11.setText("Stamp Duty");
+        jLabel11.setText(bundle.getString("NewSellTransactionJDialog_StampDuty")); // NOI18N
 
         jFormattedTextField8.setEditable(false);
         jFormattedTextField8.setFont(jFormattedTextField8.getFont().deriveFont(jFormattedTextField8.getFont().getStyle() | java.awt.Font.BOLD));
         jFormattedTextField8.setValue(new Double(0.0));
 
         jLabel12.setFont(jLabel12.getFont().deriveFont(jLabel12.getFont().getStyle() | java.awt.Font.BOLD));
-        jLabel12.setText("Profit ($)");
+        jLabel12.setText(bundle.getString("NewSellTransactionJDialog_Profit$")); // NOI18N
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -283,7 +283,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel11)
                             .addComponent(jFormattedTextField7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 25, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 38, Short.MAX_VALUE)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jFormattedTextField6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel10))
@@ -298,7 +298,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/apply.png"))); // NOI18N
-        jButton1.setText("OK");
+        jButton1.setText(bundle.getString("NewSellTransactionJDialog_OK")); // NOI18N
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -307,7 +307,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         jPanel4.add(jButton1);
 
         jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/button_cancel.png"))); // NOI18N
-        jButton2.setText("Cancel");
+        jButton2.setText(bundle.getString("NewSellTransactionJDialog_Cancel")); // NOI18N
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
@@ -318,8 +318,10 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         getContentPane().add(jPanel4, java.awt.BorderLayout.SOUTH);
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("NewSellTransactionJDialog_Stock"))); // NOI18N
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 15, 5));
 
         jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/outbox.png"))); // NOI18N
+        jPanel1.add(jLabel6);
 
         jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/idea.png"))); // NOI18N
         jButton3.setText(bundle.getString("NewSellTransactionJDialog_BestPrice")); // NOI18N
@@ -329,27 +331,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
                 jButton3ActionPerformed(evt);
             }
         });
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel6)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 43, Short.MAX_VALUE)
-                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18))
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButton3)
-                    .addComponent(jLabel6))
-                .addContainerGap(12, Short.MAX_VALUE))
-        );
+        jPanel1.add(jButton3);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.NORTH);
 
