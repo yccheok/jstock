@@ -71,23 +71,24 @@ public class OptionsChatJPanel extends javax.swing.JPanel implements JStockOptio
 
         setLayout(new java.awt.BorderLayout());
 
-        jXHeader1.setDescription("Chit chat with other JStock users regarding the hottest stock market news");
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
+        jXHeader1.setDescription(bundle.getString("OptionsChatJPanel_Description")); // NOI18N
         jXHeader1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/32x32/ksmiletris.png"))); // NOI18N
-        jXHeader1.setTitle("Market Chit Chat");
+        jXHeader1.setTitle(bundle.getString("OptionsChatJPanel_Title")); // NOI18N
         add(jXHeader1, java.awt.BorderLayout.NORTH);
 
-        jCheckBox1.setText("I want to chit chat with others regarding hottest stock market news");
+        jCheckBox1.setText(bundle.getString("OptionsChatJPanel_IWantToChitChat")); // NOI18N
         jCheckBox1.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 jCheckBox1ItemStateChanged(evt);
             }
         });
 
-        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Notification"));
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsChatJPanel_Notification"))); // NOI18N
 
-        jCheckBox2.setText("Play sound when there is new message");
+        jCheckBox2.setText(bundle.getString("OptionsChatJPanel_PlaySound")); // NOI18N
 
-        jCheckBox3.setText("Flash the tab when there is new message");
+        jCheckBox3.setText(bundle.getString("OptionsChatJPanel_FlashTheTab")); // NOI18N
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -110,10 +111,10 @@ public class OptionsChatJPanel extends javax.swing.JPanel implements JStockOptio
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Color"));
+        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsChatJPanel_Color"))); // NOI18N
         jPanel5.setLayout(new java.awt.BorderLayout());
 
-        jButton1.setText("Reset to Default Color");
+        jButton1.setText(bundle.getString("OptionsChatJPanel_ResetToDefaultColor")); // NOI18N
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -123,7 +124,7 @@ public class OptionsChatJPanel extends javax.swing.JPanel implements JStockOptio
 
         jPanel5.add(jPanel9, java.awt.BorderLayout.SOUTH);
 
-        jLabel3.setText("System Message");
+        jLabel3.setText(bundle.getString("OptionsChatJPanel_SystemMessage")); // NOI18N
 
         jPanel6.setBackground(new java.awt.Color(255, 0, 0));
         jPanel6.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -145,7 +146,7 @@ public class OptionsChatJPanel extends javax.swing.JPanel implements JStockOptio
             .addGap(0, 22, Short.MAX_VALUE)
         );
 
-        jLabel4.setText("Own Message");
+        jLabel4.setText(bundle.getString("OptionsChatJPanel_OwnMessage")); // NOI18N
 
         jPanel7.setBackground(new java.awt.Color(169, 169, 169));
         jPanel7.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -167,7 +168,7 @@ public class OptionsChatJPanel extends javax.swing.JPanel implements JStockOptio
             .addGap(0, 22, Short.MAX_VALUE)
         );
 
-        jLabel5.setText("Other Users Message");
+        jLabel5.setText(bundle.getString("OptionsChatJPanel_OtherUsersMessage")); // NOI18N
 
         jPanel8.setBackground(new java.awt.Color(100, 149, 237));
         jPanel8.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -225,10 +226,10 @@ public class OptionsChatJPanel extends javax.swing.JPanel implements JStockOptio
 
         jPanel5.add(jPanel4, java.awt.BorderLayout.CENTER);
 
-        jPanel10.setBorder(javax.swing.BorderFactory.createTitledBorder("Account"));
+        jPanel10.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsChatJPanel_Account"))); // NOI18N
         jPanel10.setLayout(new java.awt.BorderLayout());
 
-        jButton2.setText("Change Password...");
+        jButton2.setText(bundle.getString("OptionsChatJPanel_ChangePassword...")); // NOI18N
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
@@ -244,15 +245,15 @@ public class OptionsChatJPanel extends javax.swing.JPanel implements JStockOptio
             }
         });
 
-        jLabel1.setText("Username");
+        jLabel1.setText(bundle.getString("OptionsChatJPanel_Username")); // NOI18N
 
         jLabel2.setFont(jLabel2.getFont().deriveFont(jLabel2.getFont().getSize()-1f));
-        jLabel2.setText("(Just pick any name you prefer)");
+        jLabel2.setText(bundle.getString("OptionsChatJPanel_JustPickAnyName")); // NOI18N
 
-        jLabel6.setText("Password");
+        jLabel6.setText(bundle.getString("OptionsChatJPanel_Password")); // NOI18N
 
         jLabel7.setFont(jLabel7.getFont().deriveFont(jLabel7.getFont().getSize()-1f));
-        jLabel7.setText("(Just pick any password you prefer)");
+        jLabel7.setText(bundle.getString("OptionsChatJPanel_JustPickAnyPassword")); // NOI18N
 
         jPasswordField1.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {

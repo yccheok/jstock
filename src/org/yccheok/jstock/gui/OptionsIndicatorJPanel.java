@@ -48,21 +48,22 @@ public class OptionsIndicatorJPanel extends javax.swing.JPanel implements JStock
 
         setLayout(new java.awt.BorderLayout());
 
-        jXHeader1.setDescription("Filter out potential stocks from the entire stock market using custom built indicator.");
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
+        jXHeader1.setDescription(bundle.getString("OptionsIndicatorJPanel_Description")); // NOI18N
         jXHeader1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/32x32/find.png"))); // NOI18N
-        jXHeader1.setTitle("Indicator");
+        jXHeader1.setTitle(bundle.getString("OptionsIndicatorJPanel_Indicator")); // NOI18N
         add(jXHeader1, java.awt.BorderLayout.NORTH);
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Options"));
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsIndicatorJPanel_Options"))); // NOI18N
 
         buttonGroup1.add(jRadioButton1);
         jRadioButton1.setSelected(true);
-        jRadioButton1.setText("Alert when one of the indicators reached");
+        jRadioButton1.setText(bundle.getString("OptionsIndicatorJPanel_AlertWhenOneOfTheIndicatorsReached")); // NOI18N
         jRadioButton1.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         jRadioButton1.setMargin(new java.awt.Insets(0, 0, 0, 0));
 
         buttonGroup1.add(jRadioButton2);
-        jRadioButton2.setText("Alert when all the indicators reached");
+        jRadioButton2.setText(bundle.getString("OptionsIndicatorJPanel_AlertWhenAllTheIndicatorsReached")); // NOI18N
         jRadioButton2.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         jRadioButton2.setMargin(new java.awt.Insets(0, 0, 0, 0));
 

@@ -1,23 +1,20 @@
 /*
- * OptionsColorJPanel.java
- *
- * Created on December 3, 2007, 10:32 PM
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- * Copyright (C) 2007 Cheok YanCheng <yccheok@yahoo.com>
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.yccheok.jstock.gui;
@@ -349,7 +346,7 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel7))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(4, Short.MAX_VALUE))
         );
 
         jPanel13.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsColorJPanel_FallBelowAndRiseAboveAlert"))); // NOI18N
@@ -441,7 +438,7 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
                 .addGroup(jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel17, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel9))
-                .addContainerGap(14, Short.MAX_VALUE))
+                .addContainerGap(11, Short.MAX_VALUE))
         );
 
         jButton8.setText(bundle.getString("OptionsColorJPanel_ResetToDefaultColor")); // NOI18N
@@ -457,17 +454,16 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(126, 126, 126)
+                        .addComponent(jButton8))
+                    .addComponent(jPanel13, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(126, 126, 126)
-                        .addComponent(jButton8))
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jPanel13, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -481,12 +477,12 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
                     .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jPanel13, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jPanel13, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
                 .addComponent(jButton8)
-                .addContainerGap(79, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jPanel1Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jPanel2, jPanel3});
@@ -517,18 +513,17 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
         jPanel17.setBackground(JStockOptions.DEFAULT_ALERT_BACKGROUND_COLOR);
 
         this.jCheckBox1.setSelected(false);
-	}//GEN-LAST:event_jButton8ActionPerformed
+    }//GEN-LAST:event_jButton8ActionPerformed
 
     private void jPanel17MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel17MouseClicked
-        // TODO add your handling code here:
-        if(jPanel17.isEnabled() == false) return;
+        if (jPanel17.isEnabled() == false) return;
 
         final java.awt.Color color = javax.swing.JColorChooser.showDialog(this, "Choose a color", this.jPanel17.getBackground());
 
-        if(null == color) return;
+        if (null == color) return;
 
         jPanel17.setBackground(color);
-	}//GEN-LAST:event_jPanel17MouseClicked
+    }//GEN-LAST:event_jPanel17MouseClicked
 
     private void jPanel16MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel16MouseClicked
         // TODO add your handling code here:
@@ -536,10 +531,10 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
 
         final java.awt.Color color = javax.swing.JColorChooser.showDialog(this, "Choose a color", this.jPanel16.getBackground());
 
-        if(null == color) return;
+        if (null == color) return;
 
         jPanel16.setBackground(color);
-	}//GEN-LAST:event_jPanel16MouseClicked
+    }//GEN-LAST:event_jPanel16MouseClicked
 
     private void jCheckBox2ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jCheckBox2ItemStateChanged
         // TODO add your handling code here:
@@ -549,84 +544,78 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
         jLabel9.setEnabled(status);
         jPanel16.setEnabled(status);
         jPanel17.setEnabled(status);
-	}//GEN-LAST:event_jCheckBox2ItemStateChanged
+    }//GEN-LAST:event_jCheckBox2ItemStateChanged
 
     private void jPanel12MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel12MouseClicked
-        // TODO add your handling code here:
         if(jPanel12.isEnabled() == false) return;
 
         final java.awt.Color color = javax.swing.JColorChooser.showDialog(this, "Choose a color", this.jPanel12.getBackground());
 
-        if(null == color) return;
+        if (null == color) return;
 
         jPanel12.setBackground(color);
-	}//GEN-LAST:event_jPanel12MouseClicked
+    }//GEN-LAST:event_jPanel12MouseClicked
 
     private void jPanel11MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel11MouseClicked
-        // TODO add your handling code here:
-        if(jPanel11.isEnabled() == false) return;
+        if (jPanel11.isEnabled() == false) return;
 
         final java.awt.Color color = javax.swing.JColorChooser.showDialog(this, "Choose a color", this.jPanel11.getBackground());
 
         if(null == color) return;
 
         jPanel11.setBackground(color);
-	}//GEN-LAST:event_jPanel11MouseClicked
+    }//GEN-LAST:event_jPanel11MouseClicked
 
     private void jCheckBox1ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jCheckBox1ItemStateChanged
-        // TODO add your handling code here:
         final boolean status = jCheckBox1.isSelected();
 
         jLabel6.setEnabled(status);
         jLabel7.setEnabled(status);
         jPanel11.setEnabled(status);
         jPanel12.setEnabled(status);
-	}//GEN-LAST:event_jCheckBox1ItemStateChanged
+    }//GEN-LAST:event_jCheckBox1ItemStateChanged
 
     private void jPanel10MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel10MouseClicked
-        // TODO add your handling code here:
+
         final java.awt.Color color = javax.swing.JColorChooser.showDialog(this, "Choose a color", this.jPanel10.getBackground());
 
-        if(null == color) return;
+        if (null == color) return;
 
         jPanel10.setBackground(color);
-	}//GEN-LAST:event_jPanel10MouseClicked
+    }//GEN-LAST:event_jPanel10MouseClicked
 
     private void jPanel9MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel9MouseClicked
         // TODO add your handling code here:
         final java.awt.Color color = javax.swing.JColorChooser.showDialog(this, "Choose a color", this.jPanel9.getBackground());
 
-        if(null == color) return;
+        if (null == color) return;
 
         jPanel9.setBackground(color);
     }//GEN-LAST:event_jPanel9MouseClicked
 
     private void jPanel8MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel8MouseClicked
-        // TODO add your handling code here:
         final java.awt.Color color = javax.swing.JColorChooser.showDialog(this, "Choose a color", this.jPanel8.getBackground());
 
-        if(null == color) return;
+        if (null == color) return;
 
         jPanel8.setBackground(color);
-	}//GEN-LAST:event_jPanel8MouseClicked
+    }//GEN-LAST:event_jPanel8MouseClicked
 
     private void jPanel7MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel7MouseClicked
-        // TODO add your handling code here:
         final java.awt.Color color = javax.swing.JColorChooser.showDialog(this, "Choose a color", this.jPanel7.getBackground());
 
         if(null == color) return;
 
         jPanel7.setBackground(color);
-	}//GEN-LAST:event_jPanel7MouseClicked
+    }//GEN-LAST:event_jPanel7MouseClicked
 
     private void jPanel6MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel6MouseClicked
-        // TODO add your handling code here:
         final java.awt.Color color = javax.swing.JColorChooser.showDialog(this, "Choose a color", this.jPanel6.getBackground());
 
         if(null == color) return;
 
         jPanel6.setBackground(color);
-	}//GEN-LAST:event_jPanel6MouseClicked
+    }//GEN-LAST:event_jPanel6MouseClicked
 
     @Override
     public void set(JStockOptions jStockOptions) {        
@@ -666,10 +655,9 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
         jStockOptions.setEnableColorAlert(jCheckBox2.isSelected());
         
         MainFrame m = MainFrame.getInstance();
-        if(m != null) {
+        if (m != null) {
             m.repaintTable();
-        }
-        
+        }        
         return true;
     }
             

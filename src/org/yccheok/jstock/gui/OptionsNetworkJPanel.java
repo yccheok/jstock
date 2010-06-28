@@ -249,12 +249,13 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
 
         setLayout(new java.awt.BorderLayout());
 
-        jXHeader1.setDescription("If you are behind an organization network, you may need to specific network proxy server. Consult your network administrator for more info.");
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
+        jXHeader1.setDescription(bundle.getString("OptionsNetworkJPanel_Description")); // NOI18N
         jXHeader1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/32x32/connect_to_network.png"))); // NOI18N
-        jXHeader1.setTitle("Proxy Server");
+        jXHeader1.setTitle(bundle.getString("OptionsNetworkJPanel_ProxyServer")); // NOI18N
         add(jXHeader1, java.awt.BorderLayout.NORTH);
 
-        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Stock Server"));
+        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsNetworkJPanel_StockServer"))); // NOI18N
 
         jPanel5.setLayout(new java.awt.GridLayout(3, 1, 5, 5));
 
@@ -274,20 +275,20 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
                 .addContainerGap())
         );
 
-        jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Proxy Server"));
+        jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsNetworkJPanel_ProxyServer"))); // NOI18N
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("NT LAN Manager (NTLM)"));
 
-        jCheckBox1.setText("Enable NTLM");
+        jCheckBox1.setText(bundle.getString("OptionsNetworkJPanel_EnableNTLM")); // NOI18N
         jCheckBox1.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 jCheckBox1ItemStateChanged(evt);
             }
         });
 
-        jLabel5.setText("Username");
+        jLabel5.setText(bundle.getString("OptionsNetworkJPanel_Username")); // NOI18N
 
-        jLabel6.setText("Password");
+        jLabel6.setText(bundle.getString("OptionsNetworkJPanel_Password")); // NOI18N
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -325,17 +326,17 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Server"));
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsNetworkJPanel_Server"))); // NOI18N
 
-        jLabel1.setText("Proxy server");
+        jLabel1.setText(bundle.getString("OptionsNetworkJPanel_ProxyServer")); // NOI18N
 
-        jLabel2.setText("Port");
+        jLabel2.setText(bundle.getString("OptionsNetworkJPanel_Port")); // NOI18N
 
         jLabel3.setFont(jLabel3.getFont().deriveFont(jLabel3.getFont().getSize()-1f));
-        jLabel3.setText("(e.g. 192.168.0.165)");
+        jLabel3.setText(bundle.getString("OptionsNetworkJPanel_Example0")); // NOI18N
 
         jLabel4.setFont(jLabel4.getFont().deriveFont(jLabel4.getFont().getSize()-1f));
-        jLabel4.setText("(e.g. 1024)");
+        jLabel4.setText(bundle.getString("OptionsNetworkJPanel_Example1")); // NOI18N
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -354,7 +355,7 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel3)
                     .addComponent(jLabel4))
-                .addContainerGap(153, Short.MAX_VALUE))
+                .addContainerGap(152, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -373,7 +374,6 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
         );
 
         jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/idea.png"))); // NOI18N
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
         jButton2.setText(bundle.getString("OptionsNetworkJPanel_AutoDetectProxy")); // NOI18N
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
