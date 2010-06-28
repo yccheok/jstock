@@ -57,19 +57,19 @@ public class OptionsUpdateJPanel extends javax.swing.JPanel implements JStockOpt
 
         setLayout(new java.awt.BorderLayout());
 
-        jXHeader1.setDescription("Whenever there is update on JStock, you will be automatically informed.");
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
+        jXHeader1.setDescription(bundle.getString("OptionsUpdateJPanel_Description")); // NOI18N
         jXHeader1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/32x32/epiphany-download.png"))); // NOI18N
-        jXHeader1.setTitle("Update");
+        jXHeader1.setTitle(bundle.getString("OptionsUpdateJPanel_Update")); // NOI18N
         add(jXHeader1, java.awt.BorderLayout.NORTH);
 
-        jCheckBox1.setText("Inform me when there is latest news on JStock");
+        jCheckBox1.setText(bundle.getString("OptionsUpdateJPanel_InformMe")); // NOI18N
         jCheckBox1.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 jCheckBox1ItemStateChanged(evt);
             }
         });
 
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
         jButton1.setText(bundle.getString("OptionsUpdateJPanel_ShowLastUpdateNews")); // NOI18N
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
