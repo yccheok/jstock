@@ -369,10 +369,10 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
             popup.add(menuItem);
         }
 
-        if(jTable1.getSelectedRowCount() >= 1) {
+        if (jTable1.getSelectedRowCount() >= 1) {
             popup.addSeparator();
 
-            menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("DELETE"), new javax.swing.ImageIcon(getClass().getResource("/images/16x16/editdelete.png")));
+            menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("DividendSummaryJDialog_Delete"), new javax.swing.ImageIcon(getClass().getResource("/images/16x16/editdelete.png")));
 
             menuItem.addActionListener(new ActionListener() {
                 @Override

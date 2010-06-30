@@ -137,7 +137,7 @@ public class MarketJPanel extends javax.swing.JPanel {
             });
         }
         
-        JLabel volume = new JLabel("Volume (Lots) : ");
+        JLabel volume = new JLabel(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MarketJPanel_Volume"));
         leftPanel.add(volume);
         JLabel volume_value = new JLabel();
         volume_value.setName("volume");
@@ -155,7 +155,7 @@ public class MarketJPanel extends javax.swing.JPanel {
         value_value.setForeground(new java.awt.Color(153, 102, 0));
         leftPanel.add(value_value);
         
-        JLabel up = new JLabel("Up : ");
+        JLabel up = new JLabel(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MarketJPanel_Up"));
         rightPanel.add(up);
         JLabel up_value = new JLabel();
         up_value.setName("up");
@@ -164,7 +164,7 @@ public class MarketJPanel extends javax.swing.JPanel {
         up_value.setForeground(new java.awt.Color(50, 150, 0));
         rightPanel.add(up_value);
 
-        JLabel down = new JLabel("Down : ");
+        JLabel down = new JLabel(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MarketJPanel_Down"));
         rightPanel.add(down);
         JLabel down_value = new JLabel();
         down_value.setName("down");
@@ -173,7 +173,7 @@ public class MarketJPanel extends javax.swing.JPanel {
         down_value.setForeground(new java.awt.Color(200, 0, 50));
         rightPanel.add(down_value);
 
-        JLabel unchanged = new JLabel("Unchaged : ");
+        JLabel unchanged = new JLabel(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MarketJPanel_Unchanged"));
         rightPanel.add(unchanged);
         JLabel unchanged_value = new JLabel();
         unchanged_value.setName("unchanged");

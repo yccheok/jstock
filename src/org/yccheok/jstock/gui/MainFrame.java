@@ -332,7 +332,7 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel21.setBackground(new java.awt.Color(184, 207, 229));
         jLabel21.setForeground(new java.awt.Color(255, 255, 255));
         jLabel21.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel21.setText("3rd Buy");
+        jLabel21.setText(bundle.getString("MainFrame_3rdBuy")); // NOI18N
         jLabel21.setBorder(javax.swing.BorderFactory.createEmptyBorder(2, 2, 2, 2));
         jLabel21.setFocusTraversalPolicyProvider(true);
         jLabel21.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -341,7 +341,7 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel20.setBackground(new java.awt.Color(184, 207, 229));
         jLabel20.setForeground(new java.awt.Color(255, 255, 255));
         jLabel20.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel20.setText("2nd Buy");
+        jLabel20.setText(bundle.getString("MainFrame_2ndBuy")); // NOI18N
         jLabel20.setBorder(javax.swing.BorderFactory.createEmptyBorder(2, 2, 2, 2));
         jLabel20.setFocusTraversalPolicyProvider(true);
         jLabel20.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -350,7 +350,7 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel22.setBackground(new java.awt.Color(184, 207, 229));
         jLabel22.setForeground(new java.awt.Color(255, 255, 255));
         jLabel22.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel22.setText("1st Buy");
+        jLabel22.setText(bundle.getString("MainFrame_1stBuy")); // NOI18N
         jLabel22.setBorder(javax.swing.BorderFactory.createEmptyBorder(2, 2, 2, 2));
         jLabel22.setFocusTraversalPolicyProvider(true);
         jLabel22.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -359,28 +359,28 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel28.setBackground(new java.awt.Color(184, 207, 229));
         jLabel28.setForeground(new java.awt.Color(255, 255, 255));
         jLabel28.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel28.setText("1st Sell");
+        jLabel28.setText(bundle.getString("MainFrame_1stSell")); // NOI18N
         jLabel28.setBorder(javax.swing.BorderFactory.createEmptyBorder(2, 2, 2, 2));
         jPanel7.add(jLabel28);
 
         jLabel36.setBackground(new java.awt.Color(184, 207, 229));
         jLabel36.setForeground(new java.awt.Color(255, 255, 255));
         jLabel36.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel36.setText("2nd Sell");
+        jLabel36.setText(bundle.getString("MainFrame_2ndSell")); // NOI18N
         jLabel36.setBorder(javax.swing.BorderFactory.createEmptyBorder(2, 2, 2, 2));
         jPanel7.add(jLabel36);
 
         jLabel31.setBackground(new java.awt.Color(184, 207, 229));
         jLabel31.setForeground(new java.awt.Color(255, 255, 255));
         jLabel31.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel31.setText("3rd Sell");
+        jLabel31.setText(bundle.getString("MainFrame_3rdSell")); // NOI18N
         jLabel31.setBorder(javax.swing.BorderFactory.createEmptyBorder(2, 2, 2, 2));
         jPanel7.add(jLabel31);
 
         jLabel18.setBackground(new java.awt.Color(184, 207, 229));
         jLabel18.setForeground(new java.awt.Color(255, 255, 255));
         jLabel18.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel18.setText("Price");
+        jLabel18.setText(bundle.getString("MainFrame_Price")); // NOI18N
         jPanel7.add(jLabel18);
 
         jLabel24.setBackground(new java.awt.Color(255, 255, 204));
@@ -416,7 +416,7 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel23.setBackground(new java.awt.Color(184, 207, 229));
         jLabel23.setForeground(new java.awt.Color(255, 255, 255));
         jLabel23.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel23.setText("Qty");
+        jLabel23.setText(bundle.getString("MainFrame_Qty")); // NOI18N
         jPanel7.add(jLabel23);
 
         jLabel25.setBackground(new java.awt.Color(255, 255, 204));
@@ -644,7 +644,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
         if (this.getStockCodeAndSymbolDatabase() == null) {
-            javax.swing.JOptionPane.showMessageDialog(this, "We haven't connected to stock server.", "Not Connected", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            javax.swing.JOptionPane.showMessageDialog(this, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/messages").getString("info_message_we_havent_connected_to_stock_server"), java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/messages").getString("info_title_we_havent_connected_to_stock_server"), javax.swing.JOptionPane.INFORMATION_MESSAGE);
             return;
         }
         
@@ -1021,7 +1021,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void jMenuItem8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem8ActionPerformed
         if (this.stockCodeAndSymbolDatabase == null) {
-            JOptionPane.showMessageDialog(this, "There are no database ready yet.", "Database not ready", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/messages").getString("info_message_there_are_no_database_ready_yet"), java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/messages").getString("info_title_there_are_no_database_ready_yet"), JOptionPane.INFORMATION_MESSAGE);
             return;
         }
 
@@ -1352,10 +1352,10 @@ public class MainFrame extends javax.swing.JFrame {
         this.updateDynamicChart(null);
 
         if (stockCodeHistoryGUI != null) {
-            if (stockCodeHistoryGUI.size() == 0) {
+            if (stockCodeHistoryGUI.isEmpty()) {
                 if (this.stockCodeAndSymbolDatabase != null) {
                     statusBar.setProgressBar(false);
-                    statusBar.setMainMessage("Connected");
+                    statusBar.setMainMessage(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_Connected"));
                 }
             }        
         }
@@ -1390,10 +1390,10 @@ public class MainFrame extends javax.swing.JFrame {
         updateBuyerSellerInformation(null);
         this.updateDynamicChart(null);
 
-        if (stockCodeHistoryGUI.size() == 0) {
+        if (stockCodeHistoryGUI.isEmpty()) {
             if (this.stockCodeAndSymbolDatabase != null) {
                 statusBar.setProgressBar(false);
-                statusBar.setMainMessage("Connected");
+                statusBar.setMainMessage(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_Connected"));
             }
         }
     }
@@ -1514,11 +1514,11 @@ public class MainFrame extends javax.swing.JFrame {
         this.jTabbedPane1.setIconAt(2, this.getImageIcon("/images/16x16/find.png"));
         this.jTabbedPane1.setIconAt(3, this.getImageIcon("/images/16x16/calc.png"));
         this.jTabbedPane1.setIconAt(4, this.getImageIcon("/images/16x16/smile.png"));
-        this.jTabbedPane1.setToolTipTextAt(0, "Watch your favorite stock movement");
-        this.jTabbedPane1.setToolTipTextAt(1, "Customize your own stock indicator for alert purpose");
-        this.jTabbedPane1.setToolTipTextAt(2, "Scan through the entire stock market so that you will be informed what to sell or buy");
-        this.jTabbedPane1.setToolTipTextAt(3, "Manage your real time portfolio, which enable you to track buy and sell records");
-        this.jTabbedPane1.setToolTipTextAt(4, "Chit chat with other JStock users regarding the hottest stock market news");
+        this.jTabbedPane1.setToolTipTextAt(0, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_WatchYourFavoriteStockMovement"));
+        this.jTabbedPane1.setToolTipTextAt(1, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_CustomizeYourOwnStockIndicatorForAlertPurpose"));
+        this.jTabbedPane1.setToolTipTextAt(2, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_ScanThroughTheEntireStockMarketSoThatYouWillBeInformedWhatToSellOrBuy"));
+        this.jTabbedPane1.setToolTipTextAt(3, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_ManageYourRealTimePortfolioWhichEnableYouToTrackBuyAndSellRecords"));
+        this.jTabbedPane1.setToolTipTextAt(4, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_ChitChatWithOtherJStockUsersRegardingTheHottestStockMarketNews"));
     }
       
     public void createCountryMenuItem() {
@@ -1628,7 +1628,7 @@ public class MainFrame extends javax.swing.JFrame {
             };
 
             PopupMenu popup = new PopupMenu();
-            MenuItem defaultItem = new MenuItem("Exit");
+            MenuItem defaultItem = new MenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_Exit"));
             defaultItem.addActionListener(exitListener);
             popup.add(defaultItem);
 
@@ -1648,14 +1648,13 @@ public class MainFrame extends javax.swing.JFrame {
                 tray.add(trayIcon);
             } catch (AWTException e) {
                 trayIcon = null;
-                JOptionPane.showMessageDialog(MainFrame.this, "TrayIcon could not be added.", "System Tray Not Supported", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(MainFrame.this, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/messages").getString("warning_message_trayicon_could_not_be_added"), java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/messages").getString("warning_title_trayicon_could_not_be_added"), JOptionPane.WARNING_MESSAGE);
             }
 
         } else {
             //  System Tray is not supported
-
             trayIcon = null;
-            JOptionPane.showMessageDialog(MainFrame.this, "System tray is not supported. You may not get stock alert notify.", "System Tray Not Supported", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(MainFrame.this, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/messages").getString("warning_message_system_tray_is_not_supported"), java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/messages").getString("warning_title_system_tray_is_not_supported"), JOptionPane.WARNING_MESSAGE);
         }        
     }
     
@@ -1664,8 +1663,8 @@ public class MainFrame extends javax.swing.JFrame {
     
         ColumnHeaderToolTips tips = new ColumnHeaderToolTips();
 
-        tips.setToolTip(jTable1.getColumn(GUIBundle.getString("MainFrame_FallBelow")), "Alert user when last price fall below or equal to specified value");
-        tips.setToolTip(jTable1.getColumn(GUIBundle.getString("MainFrame_RiseAbove")), "Alert user when last price rise above or equal to specified value");
+        tips.setToolTip(jTable1.getColumn(GUIBundle.getString("MainFrame_FallBelow")), java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_AlertUserWhenLastPriceFallBelowOrEqualToSpecifiedValue"));
+        tips.setToolTip(jTable1.getColumn(GUIBundle.getString("MainFrame_RiseAbove")), java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_AlertUserWhenLastPriceFallAboveOrEqualToSpecifiedValue"));
 
         header.addMouseMotionListener(tips);        
     }
@@ -1880,8 +1879,8 @@ public class MainFrame extends javax.swing.JFrame {
                                     stockCodeAndSymbolDatabaseTask = null;
                                 }
                                 
-                                statusBar.setMainMessage("Network error");
-                                statusBar.setImageIcon(getImageIcon("/images/16x16/network-error.png"), "Double cliked to try again");
+                                statusBar.setMainMessage(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_NetworkError"));
+                                statusBar.setImageIcon(getImageIcon("/images/16x16/network-error.png"), java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_DoubleClickedToTryAgain"));
                                 statusBar.setProgressBar(false);                                
                             }
                         }
@@ -1995,11 +1994,13 @@ public class MainFrame extends javax.swing.JFrame {
 
                     if (((OperatorIndicator)indicator).getName().equalsIgnoreCase("fallbelow"))
                     {
-                        message = stock.getSymbol() + " (" + lastPrice + ") fall below " + price;
+                        final String template = GUIBundle.getString("MainFrame_FallBelow_template");
+                        message = MessageFormat.format(template, stock.getSymbol(), lastPrice, price);
                     }
                     else
                     {
-                        message = stock.getSymbol() + " (" + lastPrice + ") rise above " + price;
+                        final String template = GUIBundle.getString("MainFrame_RiseAbove_template");
+                        message = MessageFormat.format(template, stock.getSymbol(), lastPrice, price);
                     }
 
                     if (jStockOptions.isPopupMessage()) {
@@ -2063,11 +2064,13 @@ public class MainFrame extends javax.swing.JFrame {
 
                     if (((OperatorIndicator)indicator).getName().equalsIgnoreCase("fallbelow"))
                     {
-                        title = stock.getSymbol() + " (" + lastPrice + ") fall below " + price;
+                        final String template = GUIBundle.getString("MainFrame_FallBelow_template");
+                        title = MessageFormat.format(template, stock.getSymbol(), lastPrice, price);
                     }
                     else
                     {
-                        title = stock.getSymbol() + " (" + lastPrice + ") rise above " + price;
+                        final String template = GUIBundle.getString("MainFrame_RiseAbove_template");
+                        title = MessageFormat.format(template, stock.getSymbol(), lastPrice, price);
                     }
 
                     final String message = title + "\n(JStock)";
@@ -2087,8 +2090,8 @@ public class MainFrame extends javax.swing.JFrame {
             try {
                 emailAlertPool.submit(r);
             }
-            catch(java.util.concurrent.RejectedExecutionException exp) {
-                log.error("", exp);
+            catch (java.util.concurrent.RejectedExecutionException exp) {
+                log.error(null, exp);
             }
         }   /* if(jStockOptions.isSendEmail()) */
 
@@ -2100,11 +2103,13 @@ public class MainFrame extends javax.swing.JFrame {
 					
                     if (((OperatorIndicator)indicator).getName().equalsIgnoreCase("fallbelow"))
                     {
-                        message = stock.getSymbol() + " (" + lastPrice + ") fall below " + price;
+                        final String template = GUIBundle.getString("MainFrame_FallBelow_template");
+                        message = MessageFormat.format(template, stock.getSymbol(), lastPrice, price);
                     }
                     else
                     {
-                        message = stock.getSymbol() + " (" + lastPrice + ") rise above " + price;
+                        final String template = GUIBundle.getString("MainFrame_RiseAbove_template");
+                        message = MessageFormat.format(template, stock.getSymbol(), lastPrice, price);
                     }
 
                     final String username = Utils.decrypt(jStockOptions.getGoogleCalendarUsername());
@@ -2249,10 +2254,12 @@ public class MainFrame extends javax.swing.JFrame {
     public void displayHistoryChart(Stock stock) {
         final StockHistoryServer stockHistoryServer = stockHistoryMonitor.getStockHistoryServer(stock.getCode());
 
-        if(stockHistoryServer == null) {
-            if(stockCodeHistoryGUI.add(stock.getCode()) && stockHistoryMonitor.addStockCode(stock.getCode())) {
+        if (stockHistoryServer == null) {
+            if (stockCodeHistoryGUI.add(stock.getCode()) && stockHistoryMonitor.addStockCode(stock.getCode())) {
                 statusBar.setProgressBar(true);
-                statusBar.setMainMessage("Looking for " + stock.getSymbol() + " history. Still waiting for history total " + stockCodeHistoryGUI.size() + "...");                            
+                final String template = GUIBundle.getString("MainFrame_LookingForHistory_template");
+                final String message = MessageFormat.format(template, stock.getSymbol(), stockCodeHistoryGUI.size());
+                statusBar.setMainMessage(message);
             }
         }
         else {
@@ -2265,14 +2272,14 @@ public class MainFrame extends javax.swing.JFrame {
         final JPopupMenu popup = new JPopupMenu();
         final TableModel tableModel = jTable1.getModel();            
         
-        javax.swing.JMenuItem menuItem = new JMenuItem("History...", this.getImageIcon("/images/16x16/strokedocker.png"));
+        javax.swing.JMenuItem menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_History..."), this.getImageIcon("/images/16x16/strokedocker.png"));
         
         menuItem.addActionListener(new ActionListener() {
             @Override
         	public void actionPerformed(ActionEvent evt) {
                 if (MainFrame.this.stockCodeAndSymbolDatabase == null)
                 {
-                    javax.swing.JOptionPane.showMessageDialog(MainFrame.this, "We haven't connected to stock server.", "Not Connected", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                    javax.swing.JOptionPane.showMessageDialog(MainFrame.this, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/messages").getString("info_message_we_havent_connected_to_stock_server"), java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/messages").getString("info_title_we_havent_connected_to_stock_server"), javax.swing.JOptionPane.INFORMATION_MESSAGE);
                     return;
                 }
 
@@ -2292,7 +2299,7 @@ public class MainFrame extends javax.swing.JFrame {
         popup.addSeparator();        
         
         if (jTable1.getSelectedRowCount() == 1) {
-            menuItem = new JMenuItem("Buy...", this.getImageIcon("/images/16x16/inbox.png"));
+            menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_Buy..."), this.getImageIcon("/images/16x16/inbox.png"));
 
             menuItem.addActionListener(new ActionListener() {
                 @Override
@@ -2322,7 +2329,7 @@ public class MainFrame extends javax.swing.JFrame {
             popup.addSeparator();
         }                
         
-        menuItem = new JMenuItem("Delete", this.getImageIcon("/images/16x16/editdelete.png"));
+        menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_Delete"), this.getImageIcon("/images/16x16/editdelete.png"));
         
         menuItem.addActionListener(new ActionListener() {
             @Override
@@ -2391,25 +2398,25 @@ public class MainFrame extends javax.swing.JFrame {
                 success = get();
 
             }
-            catch(InterruptedException exp) {
-                log.error("", exp);
+            catch (InterruptedException exp) {
+                log.error(null, exp);
             }
-            catch(java.util.concurrent.ExecutionException exp) {
-                log.error("", exp);
+            catch (java.util.concurrent.ExecutionException exp) {
+                log.error(null, exp);
             }
            
             // If we are asked to stop explicitly, do not perform any update
             // on GUI.
-            if(runnable)
+            if (runnable)
             {
-                if(success) {
-                    statusBar.setMainMessage("Connected");
-                    statusBar.setImageIcon(getImageIcon("/images/16x16/network-transmit-receive.png"), "Connected");
+                if (success) {
+                    statusBar.setMainMessage(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_Connected"));
+                    statusBar.setImageIcon(getImageIcon("/images/16x16/network-transmit-receive.png"), java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_Connected"));
                     statusBar.setProgressBar(false);                    
                 }
                 else {
-                    statusBar.setMainMessage("Network error");
-                    statusBar.setImageIcon(getImageIcon("/images/16x16/network-error.png"), "Double cliked to try again");
+                    statusBar.setMainMessage(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_NetworkError"));
+                    statusBar.setImageIcon(getImageIcon("/images/16x16/network-error.png"), java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_DoubleClickedToTryAgain"));
                     statusBar.setProgressBar(false);
                 }
             }
@@ -2491,17 +2498,17 @@ public class MainFrame extends javax.swing.JFrame {
                         }                        
                         break;
                     }
-                    catch(StockNotFoundException exp) {
-                        log.error("", exp);
+                    catch (StockNotFoundException exp) {
+                        log.error(null, exp);
                     }
                     finally {
-                        if(stockServer instanceof Subject)
+                        if (stockServer instanceof Subject)
                         {
                             ((Subject<StockServer, Integer>)stockServer).dettach(StockCodeAndSymbolDatabaseTask.this);
                         }
                     }
                     
-                    if(isCancelled() || !runnable) {
+                    if (isCancelled() || !runnable) {
                         break;
                     }
                 }
@@ -2528,16 +2535,17 @@ public class MainFrame extends javax.swing.JFrame {
 
         @Override
         protected void process(java.util.List<Integer> chunks) {
-            if(runnable)
+            if (runnable)
             {
                 int max = 0;
-                for(Integer integer : chunks) {
+                for (Integer integer : chunks) {
                     if(max < integer.intValue())
                         max = integer.intValue();
                 }
-                
-                statusBar.setMainMessage(max + " stock(s) has been downloaded so far ...");
-                statusBar.setImageIcon(getImageIcon("/images/16x16/network-connecting.png"), "Connecting...");
+                final String template = GUIBundle.getString("MainFrame_StocksHasBeenDownloadedSoFar..._template");
+                final String message = MessageFormat.format(template, max);
+                statusBar.setMainMessage(message);
+                statusBar.setImageIcon(getImageIcon("/images/16x16/network-connecting.png"), java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_Connecting..."));
                 statusBar.setProgressBar(true);                    
             }
         }
@@ -2589,7 +2597,7 @@ public class MainFrame extends javax.swing.JFrame {
 
                 jStockOptions.getBrokingFirm(i).setLogo(bufferedImage);
             } catch (IOException exp) {
-                log.error("", exp);
+                log.error(null, exp);
             }
         }
     }
@@ -2898,7 +2906,7 @@ public class MainFrame extends javax.swing.JFrame {
             try {
                 ImageIO.write(Utils.toBufferedImage(image), "png", f);
             }
-            catch(java.io.IOException exp) {
+            catch (java.io.IOException exp) {
                 log.error(null, exp);
             }
         }
@@ -3079,8 +3087,8 @@ public class MainFrame extends javax.swing.JFrame {
             }
         }
 
-        this.setStatusBar(true, "Connecting to stock server to retrieve stock information ...");
-        statusBar.setImageIcon(getImageIcon("/images/16x16/network-connecting.png"), "Connecting ...");
+        this.setStatusBar(true, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_ConnectingToStockServerToRetrieveStockInformation..."));
+        statusBar.setImageIcon(getImageIcon("/images/16x16/network-connecting.png"), java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_Connecting..."));
 
         // We may hold a large database previously. Invoke garbage collector to perform cleanup.
         System.gc();
@@ -3237,22 +3245,30 @@ public class MainFrame extends javax.swing.JFrame {
                 Symbol symbol = MainFrame.this.stockCodeAndSymbolDatabase.codeToSymbol(code);
                 final boolean shouldShowGUI = MainFrame.this.stockCodeHistoryGUI.remove(code);
                
-                if (stockCodeHistoryGUI.size() == 0) {
+                if (stockCodeHistoryGUI.isEmpty()) {
                     statusBar.setProgressBar(false);
 
                     if (runnable.getStockHistoryServer() != null) {
-                        statusBar.setMainMessage((symbol != null ? symbol : code) + " history success.");
+                        final String template = GUIBundle.getString("MainFrame_HistorySuccess_template");
+                        final String message = MessageFormat.format(template, (symbol != null ? symbol : code));
+                        statusBar.setMainMessage(message);
                     }
                     else {
-                        statusBar.setMainMessage((symbol != null ? symbol : code) + " history failed.");
+                        final String template = GUIBundle.getString("MainFrame_HistoryFailed_template");
+                        final String message = MessageFormat.format(template, (symbol != null ? symbol : code));
+                        statusBar.setMainMessage(message);
                     }
                 }
                 else {
                     if (runnable.getStockHistoryServer() != null) {
-                        statusBar.setMainMessage((symbol != null ? symbol : code) + " history success. Still waiting for history total " + stockCodeHistoryGUI.size() + " ...");
+                        final String template = GUIBundle.getString("MainFrame_HistorySuccessStillWaitingForHistoryTotal_template");
+                        final String message = MessageFormat.format(template, (symbol != null ? symbol : code), stockCodeHistoryGUI.size());
+                        statusBar.setMainMessage(message);
                     }
                     else {
-                        statusBar.setMainMessage((symbol != null ? symbol : code) + " history failed. Still waiting for history total " + stockCodeHistoryGUI.size() + " ...");
+                        final String template = GUIBundle.getString("MainFrame_HistoryFailedStillWaitingForHistoryTotal_template");
+                        final String message = MessageFormat.format(template, (symbol != null ? symbol : code), stockCodeHistoryGUI.size());
+                        statusBar.setMainMessage(message);
                     }
                 }
                
@@ -3594,9 +3610,9 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void initStatusBar()
     {
-        final String message = "Connecting to stock server to retrieve stock information ...";
+        final String message = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_ConnectingToStockServerToRetrieveStockInformation...");
         final ImageIcon icon = getImageIcon("/images/16x16/network-connecting.png");
-        final String iconMessage = "Connecting...";
+        final String iconMessage = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_Connecting...");
         
         statusBar.setMainMessage(message)
                 .setImageIcon(icon, iconMessage)
@@ -3619,7 +3635,9 @@ public class MainFrame extends javax.swing.JFrame {
                     }
 
                     final Symbol symbol = MainFrame.this.getStockCodeAndSymbolDatabase().codeToSymbol(stock.getCode());
-                    dynamicChart.showNewJDialog(MainFrame.this, symbol + " Intraday Movement");
+                    final String template = GUIBundle.getString("MainFrame_IntradayMovementTemplate");
+                    final String message = MessageFormat.format(template, symbol);
+                    dynamicChart.showNewJDialog(MainFrame.this, message);
                 }
             }
             // Shall we provide visualize mouse move over effect, so that user

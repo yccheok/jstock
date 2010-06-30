@@ -328,7 +328,7 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
         if(jTable1.getSelectedRowCount() >= 1) {
             popup.addSeparator();
 
-            menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("DELETE"), new javax.swing.ImageIcon(getClass().getResource("/images/16x16/editdelete.png")));
+            menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("DepositSummaryJDialog_Delete"), new javax.swing.ImageIcon(getClass().getResource("/images/16x16/editdelete.png")));
 
             menuItem.addActionListener(new ActionListener() {
                 @Override
