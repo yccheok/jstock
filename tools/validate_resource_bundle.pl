@@ -87,6 +87,18 @@ sub process
 				print "WARNING : key '$key' not found ($name $line_number)\n";
 			}            
         }
+        elsif ($line =~ /getBundle\("org\/yccheok\/jstock\/data\/gui"\)\.getString\("([^"]+)"\)/) {
+			my $key = $1;
+			if (not $gui_bundle{$key}) {
+				print "WARNING : key '$key' not found ($name $line_number)\n";
+			}        
+        }
+        elsif ($line =~ /getBundle\("org\/yccheok\/jstock\/data\/messages"\)\.getString\("([^"]+)"\)/) {
+			my $key = $1;
+			if (not $messages_bundle{$key}) {
+				print "WARNING : key '$key' not found ($name $line_number)\n";
+			}        
+        }        
 	}
 	close(FILE);
 	$process_counter++;
