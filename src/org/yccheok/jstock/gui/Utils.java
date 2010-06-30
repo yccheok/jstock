@@ -21,8 +21,6 @@ package org.yccheok.jstock.gui;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
-import com.toedter.calendar.JCalendar;
-import com.toedter.calendar.JDateChooser;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Desktop;
@@ -52,10 +50,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
 import org.yccheok.jstock.engine.*;
 import java.util.*;
 import java.util.concurrent.Executor;
@@ -110,27 +106,6 @@ import org.yccheok.jstock.internationalization.MessagesBundle;
 public class Utils {
     /** Creates a new instance of Utils */
     private Utils() {
-    }
-
-    /**
-     * Returns our default JDateChooser, to be used across entire application.
-     * This is to ensure we are having a consistence look n feel GUI.
-     *
-     * @return The default JDateChooser
-     */
-    public static JDateChooser getDefaultJDateChooser() {
-        final JDateChooser jDateChooser = new JDateChooser();
-        final DateFormat format = DateFormat.getDateInstance(DateFormat.SHORT);
-        if (format instanceof SimpleDateFormat) {
-            jDateChooser.setDateFormatString(((SimpleDateFormat)format).toPattern());
-        }
-        final JCalendar jCalendar = jDateChooser.getJCalendar();
-        jCalendar.setWeekOfYearVisible(false);
-        // Blue liked color.
-        jCalendar.setDecorationBackgroundColor(new Color(0x3366CC));
-        jCalendar.setSundayForeground(Color.WHITE);
-        jCalendar.setWeekdayForeground(Color.WHITE);
-        return jDateChooser;
     }
 
     /**

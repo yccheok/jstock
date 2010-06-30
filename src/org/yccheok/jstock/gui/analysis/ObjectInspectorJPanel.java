@@ -37,7 +37,6 @@ import java.util.Date;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.gui.EnumComboBoxPropertyEditor;
-import org.yccheok.jstock.gui.analysis.JCalendarDatePropertyEditorEx;
 
 /**
  *
@@ -61,7 +60,6 @@ public class ObjectInspectorJPanel extends PropertySheetPanel {
         PropertyEditorRegistry editor = (PropertyEditorRegistry)this.getTable().getEditorFactory();
         PropertyRendererRegistry renderer = (PropertyRendererRegistry)this.getTable().getRendererFactory();
 
-        editor.registerEditor(Date.class, new JCalendarDatePropertyEditorEx());
         editor.registerEditor(Enum.class, new EnumComboBoxPropertyEditor());
     
         DefaultCellRenderer r = new DefaultCellRenderer();
