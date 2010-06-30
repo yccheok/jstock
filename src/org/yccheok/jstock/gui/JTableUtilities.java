@@ -30,8 +30,8 @@ import java.util.ResourceBundle;
 import javax.swing.*;
 import javax.swing.table.*;
 //import org.jdesktop.swingx.table.DatePickerCellEditor;
+import net.sf.nachocalendar.table.DateFieldTableEditor;
 import org.yccheok.jstock.gui.table.DateRendererDecoratorEx;
-import org.yccheok.jstock.gui.table.JDateChooserCellEditorEx;
 import org.yccheok.jstock.internationalization.GUIBundle;
 
 public class JTableUtilities {
@@ -304,7 +304,7 @@ public class JTableUtilities {
         final TableColumn column = table.getColumnModel().getColumn(row);
         // SwingX's. Pretty but buggy.
         //column.setCellEditor(new DatePickerCellEditor());
-        column.setCellEditor(new JDateChooserCellEditorEx());
+        column.setCellEditor(new DateFieldTableEditor());
         final DateFormat format = DateFormat.getDateInstance(DateFormat.SHORT);
         column.setCellRenderer(new DateRendererDecoratorEx(column.getCellRenderer(), format));
     }
