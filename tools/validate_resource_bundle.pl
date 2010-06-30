@@ -69,31 +69,31 @@ sub process
 		}
 		chomp $line;
 
-		if ($line =~ /GUIBundle\.getString\("([^"]+)"\)/) {
+		while ($line =~ /GUIBundle\.getString\("([^"]+)"\)/g) {
 			my $key = $1;
 			if (not $gui_bundle{$key}) {
 				print "WARNING : key '$key' not found ($name $line_number)\n";
 			}
 		}
-		elsif ($line =~ /MessagesBundle\.getString\("([^"]+)"\)/) {
+		while ($line =~ /MessagesBundle\.getString\("([^"]+)"\)/g) {
 			my $key = $1;
 			if (not $messages_bundle{$key}) {
 				print "WARNING : key '$key' not found ($name $line_number)\n";
 			}		
 		}
-        elsif ($line =~ /bundle\.getString\("([^"]+)"\)/) {
+        while ($line =~ /bundle\.getString\("([^"]+)"\)/g) {
             my $key = $1;
 			if (not $messages_bundle{$key} and not $gui_bundle{$key}) {
 				print "WARNING : key '$key' not found ($name $line_number)\n";
 			}            
         }
-        elsif ($line =~ /getBundle\("org\/yccheok\/jstock\/data\/gui"\)\.getString\("([^"]+)"\)/) {
+        while ($line =~ /getBundle\("org\/yccheok\/jstock\/data\/gui"\)\.getString\("([^"]+)"\)/g) {
 			my $key = $1;
 			if (not $gui_bundle{$key}) {
 				print "WARNING : key '$key' not found ($name $line_number)\n";
 			}        
         }
-        elsif ($line =~ /getBundle\("org\/yccheok\/jstock\/data\/messages"\)\.getString\("([^"]+)"\)/) {
+        while ($line =~ /getBundle\("org\/yccheok\/jstock\/data\/messages"\)\.getString\("([^"]+)"\)/g) {
 			my $key = $1;
 			if (not $messages_bundle{$key}) {
 				print "WARNING : key '$key' not found ($name $line_number)\n";
