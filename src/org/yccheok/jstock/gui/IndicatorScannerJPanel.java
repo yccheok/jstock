@@ -28,6 +28,7 @@ import com.nexes.wizard.*;
 import javax.swing.*;
 import java.awt.event.*;
 import java.io.File;
+import java.text.MessageFormat;
 import javax.swing.table.*;
 import java.util.*;
 import org.yccheok.jstock.engine.*;
@@ -79,7 +80,8 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         setLayout(new java.awt.BorderLayout(5, 5));
 
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/player_play.png"))); // NOI18N
-        jButton1.setText("Scan...");
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
+        jButton1.setText(bundle.getString("IndicatorScannerJPanel_Scan...")); // NOI18N
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -88,7 +90,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         jPanel1.add(jButton1);
 
         jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/stop.png"))); // NOI18N
-        jButton2.setText("Stop");
+        jButton2.setText(bundle.getString("IndicatorScannerJPanel_Stop")); // NOI18N
         jButton2.setEnabled(false);
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -99,7 +101,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
 
         add(jPanel1, java.awt.BorderLayout.SOUTH);
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Indicator Scan Result"));
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("IndicatorScannerJPanel_IndicatorScanResult"))); // NOI18N
         jPanel2.setLayout(new java.awt.BorderLayout());
 
         jTable1.setAutoCreateRowSorter(true);
@@ -144,7 +146,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         final MainFrame m = getMainFrame();
         
         if (m.getStockCodeAndSymbolDatabase() == null) {
-            javax.swing.JOptionPane.showMessageDialog(this, "We haven't connected to stock server.", "Not Connected", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            javax.swing.JOptionPane.showMessageDialog(this, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/messages").getString("info_message_we_havent_connected_to_stock_server"), java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/messages").getString("info_title_we_havent_connected_to_stock_server"), javax.swing.JOptionPane.INFORMATION_MESSAGE);
             return;
         }
 
@@ -167,7 +169,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         jButton1.setEnabled(false);
         jButton2.setEnabled(true);
 
-        m.setStatusBar(true, "Indicator scanner is scanning...");
+        m.setStatusBar(true, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("IndicatorScannerJPanel_IndicatorScannerIsScanning..."));
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void initGUIOptions() {        
@@ -335,7 +337,8 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                 public void run() {
                     final Stock stock = indicator.getStock();
                     final double price = stock.getLastPrice();
-                    final String message = stock.getSymbol() + " (" + price + ") hits " + indicator.toString();
+                    final String template = GUIBundle.getString("IndicatorScannerJPanel_Hit_template");
+                    final String message = MessageFormat.format(template, stock.getSymbol(), price, indicator.toString());
 
                     if (jStockOptions.isPopupMessage()) {
                         m.displayPopupMessage(stock.getSymbol().toString(), message);
@@ -394,9 +397,9 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                 @Override
                 public void run() {
                     final Stock stock = indicator.getStock();
-					final double price = stock.getLastPrice();
-                    final String title = stock.getSymbol() + " (" + price + ") hits " + indicator.toString();
-
+                    final double price = stock.getLastPrice();
+                    final String template = GUIBundle.getString("IndicatorScannerJPanel_Hit_template");
+                    final String title = MessageFormat.format(template, stock.getSymbol(), price, indicator.toString());
                     final String message = title + "\n(JStock)";
 
                     try {
@@ -414,18 +417,19 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             try {
                 emailAlertPool.submit(r);
             }
-            catch(java.util.concurrent.RejectedExecutionException exp) {
-                log.error("", exp);
+            catch (java.util.concurrent.RejectedExecutionException exp) {
+                log.error(null, exp);
             }
         }
 
-        if(jStockOptions.isSMSEnabled()) {
+        if (jStockOptions.isSMSEnabled()) {
             final Runnable r = new Runnable() {
                 @Override
                 public void run() {
                     final Stock stock = indicator.getStock();
-					final double price = stock.getLastPrice();
-                    final String message = stock.getSymbol() + " (" + price + ") hits " + indicator.toString();
+                    final double price = stock.getLastPrice();
+                    final String template = GUIBundle.getString("IndicatorScannerJPanel_Hit_template");
+                    final String message = MessageFormat.format(template, stock.getSymbol(), price, indicator.toString());
 
                     final String username = Utils.decrypt(jStockOptions.getGoogleCalendarUsername());
                     if (SMSLimiter.INSTANCE.isSMSAllowed()) {
@@ -509,7 +513,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         
         removeAllIndicatorsFromTable();
 
-        m.setStatusBar(false, "Connected");
+        m.setStatusBar(false, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("IndicatorScannerJPanel_Connected"));
     }
     
     public void stop()
@@ -581,7 +585,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             
         });
 
-        m.setStatusBar(false, "Connected");
+        m.setStatusBar(false, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("IndicatorScannerJPanel_Connected"));
     }
     
     private void initWizardDialog() {
@@ -589,7 +593,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         
         wizard = new Wizard(m);
 
-        wizard.getDialog().setTitle("Indicator Scanning Wizard");
+        wizard.getDialog().setTitle(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("IndicatorScannerJPanel_IndicatorScanningWizard"));
         wizard.getDialog().setResizable(false);
         
         WizardPanelDescriptor wizardSelectIndicatorDescriptor = new WizardSelectIndicatorDescriptor();
@@ -663,7 +667,9 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
 
         Symbol symbol = m.getStockCodeAndSymbolDatabase().codeToSymbol(code);
 
-       this.updateStatusBarIfStopButtonIsNotPressed("Indicator scanner found " + symbol + " history. Perform calculation...");
+        final String template = GUIBundle.getString("IndicatorScannerJPanel_IndicatorScannerFoundHistory_template");
+        final String message = MessageFormat.format(template, symbol);
+        this.updateStatusBarIfStopButtonIsNotPressed(message);
 
         for (OperatorIndicator operatorIndicator : indicators)
         {
@@ -745,7 +751,9 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         }
         if (stocks.size() > 0)
         {
-            updateStatusBarIfStopButtonIsNotPressed("Indicator scanner is scanning " + stocks.get(0).getSymbol() +"...");
+            final String template = GUIBundle.getString("IndicatorScannerJPanel_IndicatorScannerIsScanning..._template");
+            final String message = MessageFormat.format(template, stocks.get(0).getSymbol());
+            updateStatusBarIfStopButtonIsNotPressed(message);
         }
 
         for (Stock stock : stocks) {
@@ -851,7 +859,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         
         final MainFrame m = getMainFrame();
         
-        javax.swing.JMenuItem menuItem = new JMenuItem("History...", this.getImageIcon("/images/16x16/strokedocker.png"));
+        javax.swing.JMenuItem menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("IndicatorScannerJPanel_History..."), this.getImageIcon("/images/16x16/strokedocker.png"));
         
         menuItem.addActionListener(new ActionListener() {
             @Override
