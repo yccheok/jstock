@@ -20,7 +20,9 @@
 package org.yccheok.jstock.charting;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.util.List;
+import java.util.Locale;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.StandardChartTheme;
 import org.jfree.chart.plot.CombinedDomainXYPlot;
@@ -40,6 +42,25 @@ public class Utils {
         chartTheme.setDomainGridlinePaint(Color.LIGHT_GRAY);
         chartTheme.setRangeGridlinePaint(Color.LIGHT_GRAY);
         chartTheme.setPlotOutlinePaint(Color.LIGHT_GRAY);
+        
+        // The default font used by JFreeChart unable to render Chinese properly.
+        // We need to provide font which is able to support Chinese rendering.
+        if (Locale.getDefault().getLanguage().equals(Locale.SIMPLIFIED_CHINESE.getLanguage())) {
+            final Font oldExtraLargeFont = chartTheme.getExtraLargeFont();
+            final Font oldLargeFont = chartTheme.getLargeFont();
+            final Font oldRegularFont = chartTheme.getRegularFont();
+            final Font oldSmallFont = chartTheme.getSmallFont();
+
+            final Font extraLargeFont = new Font("Sans-serif", oldExtraLargeFont.getStyle(), oldExtraLargeFont.getSize());
+            final Font largeFont = new Font("Sans-serif", oldLargeFont.getStyle(), oldLargeFont.getSize());
+            final Font regularFont = new Font("Sans-serif", oldRegularFont.getStyle(), oldRegularFont.getSize());
+            final Font smallFont = new Font("Sans-serif", oldSmallFont.getStyle(), oldSmallFont.getSize());
+
+            chartTheme.setExtraLargeFont(extraLargeFont);
+            chartTheme.setLargeFont(largeFont);
+            chartTheme.setRegularFont(regularFont);
+            chartTheme.setSmallFont(smallFont);
+        }
 
         if (chart.getPlot() instanceof CombinedDomainXYPlot) {
             @SuppressWarnings("unchecked")
