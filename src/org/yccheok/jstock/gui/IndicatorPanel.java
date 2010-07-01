@@ -204,7 +204,8 @@ public class IndicatorPanel extends JPanel {
         // Priority give to left component.
         jSplitPane1.setResizeWeight(1.0);
 
-        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Stock Indicator"));
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
+        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("IndicatorPanel_StockIndicator"))); // NOI18N
         jPanel4.setLayout(new java.awt.BorderLayout(5, 5));
 
         scrollPane.setViewportView(view);
@@ -229,13 +230,12 @@ public class IndicatorPanel extends JPanel {
         jSplitPane2.setMinimumSize(new java.awt.Dimension(300, 261));
         jSplitPane2.setPreferredSize(new java.awt.Dimension(150, 368));
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Database"));
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("IndicatorPanel_Database"))); // NOI18N
         jPanel2.setLayout(new java.awt.BorderLayout(5, 5));
 
         jPanel3.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 0, 5, 5));
 
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/filenew.png"))); // NOI18N
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
         jButton1.setText(bundle.getString("New...")); // NOI18N
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -278,17 +278,17 @@ public class IndicatorPanel extends JPanel {
 
         jPanel11.add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
-        jTabbedPane1.addTab("Alert Indicator", new javax.swing.ImageIcon(getClass().getResource("/images/16x16/bell.png")), jPanel11); // NOI18N
+        jTabbedPane1.addTab(bundle.getString("IndicatorPanel_AlertIndicator"), new javax.swing.ImageIcon(getClass().getResource("/images/16x16/bell.png")), jPanel11); // NOI18N
 
         jPanel2.add(jTabbedPane1, java.awt.BorderLayout.CENTER);
 
         jSplitPane2.setTopComponent(jPanel2);
 
-        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Stock Sample Data"));
+        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("IndicatorPanel_StockSampleData"))); // NOI18N
         jPanel5.setLayout(new java.awt.BorderLayout(5, 5));
 
         jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/player_play.png"))); // NOI18N
-        jButton4.setText("Simulate");
+        jButton4.setText(bundle.getString("IndicatorPanel_Simulate")); // NOI18N
         jButton4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton4ActionPerformed(evt);
@@ -297,7 +297,7 @@ public class IndicatorPanel extends JPanel {
         jPanel6.add(jButton4);
 
         jButton6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/stop.png"))); // NOI18N
-        jButton6.setText("Stop");
+        jButton6.setText(bundle.getString("IndicatorPanel_Stop")); // NOI18N
         jButton6.setEnabled(false);
         jButton6.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -331,7 +331,7 @@ public class IndicatorPanel extends JPanel {
         stop();
         
         MainFrame m = MainFrame.getInstance();
-        m.setStatusBar(false, "Simulation stopped");
+        m.setStatusBar(false, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("IndicatorPanel_SimulationStopped"));
     }//GEN-LAST:event_jButton6ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
@@ -1395,7 +1395,7 @@ public class IndicatorPanel extends JPanel {
                 return success; 
             }
             
-            m.setStatusBar(true, "Stock sample data retrieving in progress...");
+            m.setStatusBar(true, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("IndicatorPanel_StockSampleDataRetrievingInProgress..."));
             
             java.util.List<StockServerFactory> stockServerFactories = m.getStockServerFactories();
             
@@ -1409,8 +1409,8 @@ public class IndicatorPanel extends JPanel {
                         success = true;
                         break;
                     }
-                    catch(StockNotFoundException exp) {
-                        log.error("", exp);
+                    catch (StockNotFoundException exp) {
+                        log.error(null, exp);
                     }
 
                     if(isCancelled() || !runnable) {
@@ -1437,11 +1437,11 @@ public class IndicatorPanel extends JPanel {
                 if(stock != null) {
                     ((ObjectInspectorJPanel)objectInspectorJPanel).setBean(new MutableStock(stock));
                     if(m != null)
-                        m.setStatusBar(false, "Stock sample data retrieved success");
+                        m.setStatusBar(false, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("IndicatorPanel_StockSampleDataRetrievedSuccess"));
                 }
                 else {
                     if(m != null)
-                        m.setStatusBar(false, "Stock sample data retrieved failed");
+                        m.setStatusBar(false, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("IndicatorPanel_StockSampleDataRetrievedFailed"));
                 }
              }
          }        
@@ -1455,9 +1455,9 @@ public class IndicatorPanel extends JPanel {
             try {
                 stockTask.get();
             } catch (InterruptedException exp) {
-                log.error("", exp);
+                log.error(null, exp);
             } catch (ExecutionException exp) {
-                log.error("", exp);
+                log.error(null, exp);
             }
 
             stockTask = null;
@@ -1471,8 +1471,8 @@ public class IndicatorPanel extends JPanel {
             try {
                 this.simulationThread.join();
             }
-            catch(InterruptedException exp) {
-                log.error("", exp);
+            catch (InterruptedException exp) {
+                log.error(null, exp);
             }
 
             this.simulationThread = null;
