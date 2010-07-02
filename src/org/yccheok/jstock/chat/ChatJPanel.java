@@ -112,7 +112,8 @@ public class ChatJPanel extends javax.swing.JPanel {
         jScrollPane2 = new javax.swing.JScrollPane();
         jList1 = new javax.swing.JList();
 
-        setBorder(javax.swing.BorderFactory.createTitledBorder("Market Chit Chat"));
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
+        setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("ChatJPanel_MarketChitChat"))); // NOI18N
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentHidden(java.awt.event.ComponentEvent evt) {
                 formComponentHidden(evt);
@@ -165,7 +166,7 @@ public class ChatJPanel extends javax.swing.JPanel {
 
         jScrollPane3.setMinimumSize(new java.awt.Dimension(160, 23));
 
-        jList2.setBorder(javax.swing.BorderFactory.createTitledBorder("Users"));
+        jList2.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("ChatJPanel_Users"))); // NOI18N
         jList2.setModel(new DefaultListModel());
         jList2.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPane3.setViewportView(jList2);
@@ -176,7 +177,7 @@ public class ChatJPanel extends javax.swing.JPanel {
 
         jScrollPane2.setMinimumSize(new java.awt.Dimension(160, 23));
 
-        jList1.setBorder(javax.swing.BorderFactory.createTitledBorder("Channels"));
+        jList1.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("ChatJPanel_Channels"))); // NOI18N
         jList1.setModel(new DefaultListModel());
         jList1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPane2.setViewportView(jList1);

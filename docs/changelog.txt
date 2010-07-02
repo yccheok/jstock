@@ -1,7 +1,9 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
-JStock 1.0.5m - xxxx-xx-xx
+JStock 1.0.5m - 2010-07-03
+  Feature: Internationalization and localization. Currently, only Simplified
+           Chinese is supported. (#2214275)
   Bugfix:  When chart dialog is being re-sized big enough, yellow box will not 
            be able to move toward right most. (#2969416)
   Bugfix:  Highlight the stock, when the stock is already in the list. 
