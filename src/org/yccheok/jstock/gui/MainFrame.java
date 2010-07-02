@@ -2100,15 +2100,24 @@ public class MainFrame extends javax.swing.JFrame {
                 @Override
                 public void run() {
                     String message = "";
-					
+                    // Google Calendar seems not fully support Chinese characters SMS yet.
+                    // We will temporary switch back to English characters SMS.
+                    // gui_en.properties and messages_en.properties shall be removed,
+                    // once Google supports Chinese SMS.
+                    //
+                    //final String template = GUIBundle.getString("IndicatorScannerJPanel_Hit_template");
+                    final ResourceBundle bundle = ResourceBundle.getBundle("org.yccheok.jstock.data.gui", Locale.ENGLISH);
+
                     if (((OperatorIndicator)indicator).getName().equalsIgnoreCase("fallbelow"))
                     {
-                        final String template = GUIBundle.getString("MainFrame_FallBelow_template");
+                        // final String template = GUIBundle.getString("MainFrame_FallBelow_template");
+                        final String template = bundle.getString("MainFrame_FallBelow_template");
                         message = MessageFormat.format(template, stock.getSymbol(), lastPrice, price);
                     }
                     else
                     {
-                        final String template = GUIBundle.getString("MainFrame_RiseAbove_template");
+                        // final String template = GUIBundle.getString("MainFrame_RiseAbove_template");
+                        final String template = bundle.getString("MainFrame_RiseAbove_template");
                         message = MessageFormat.format(template, stock.getSymbol(), lastPrice, price);
                     }
 

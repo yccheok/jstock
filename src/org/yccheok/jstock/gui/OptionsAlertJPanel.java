@@ -19,6 +19,8 @@
 
 package org.yccheok.jstock.gui;
 
+import java.util.Locale;
+import java.util.ResourceBundle;
 import org.yccheok.jstock.alert.GoogleMail;
 import org.yccheok.jstock.alert.GoogleCalendar;
 import java.util.concurrent.ExecutionException;
@@ -663,7 +665,14 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
             public Boolean doInBackground() {
                 final String username = jTextField3.getText().trim();
                 final String password = new String(jPasswordField2.getPassword());
-                final boolean status = GoogleCalendar.SMS(username, password, MessagesBundle.getString("info_message_congratulation_sms_alert_system_is_working"));
+                // Google Calendar seems not fully support Chinese characters SMS yet.
+                // We will temporary switch back to English characters SMS.
+                // gui_en.properties and messages_en.properties shall be removed,
+                // once Google supports Chinese SMS.
+                //
+                //final boolean status = GoogleCalendar.SMS(username, password, MessagesBundle.getString("info_message_congratulation_sms_alert_system_is_working"));
+                final ResourceBundle bundle = ResourceBundle.getBundle("org.yccheok.jstock.data.messages", Locale.ENGLISH);
+                final boolean status = GoogleCalendar.SMS(username, password, bundle.getString("info_message_congratulation_sms_alert_system_is_working"));
                 return status;
             }
 
