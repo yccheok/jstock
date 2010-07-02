@@ -134,7 +134,7 @@ public class StockJDialog extends javax.swing.JDialog {
         });
 
         buttonGroup1.add(jRadioButton3);
-        jRadioButton3.setText(bundle.getString("StockJDialog_SelectasedOnBoard")); // NOI18N
+        jRadioButton3.setText(bundle.getString("StockJDialog_SelectBasedOnBoard")); // NOI18N
         jRadioButton3.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         jRadioButton3.setMargin(new java.awt.Insets(0, 0, 0, 0));
         jRadioButton3.addActionListener(new java.awt.event.ActionListener() {

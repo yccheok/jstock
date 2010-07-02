@@ -95,14 +95,15 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(638, 488));
         setLayout(new java.awt.BorderLayout(5, 5));
 
-        jXHeader1.setDescription("You may select to scan only the stocks which are within your interest. You may select either Main board, Second board, Mesdaq...Or you may select either Plantation, Banking, Consumer industry...Of course, you may also select entire stock market.");
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
+        jXHeader1.setDescription(bundle.getString("WizardSelectStockJPanel_Description")); // NOI18N
         jXHeader1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/64x64/find.png"))); // NOI18N
-        jXHeader1.setTitle("Select Stock of Interest");
+        jXHeader1.setTitle(bundle.getString("WizardSelectStockJPanel_SelectStockOfInterest")); // NOI18N
         add(jXHeader1, java.awt.BorderLayout.NORTH);
 
         buttonGroup1.add(jRadioButton1);
         jRadioButton1.setSelected(true);
-        jRadioButton1.setText("Scan the entire stock market (Everything including Call warrant, Loans...)");
+        jRadioButton1.setText(bundle.getString("WizardSelectStockJPanel__SelectEntireStockMarket")); // NOI18N
         jRadioButton1.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         jRadioButton1.setMargin(new java.awt.Insets(0, 0, 0, 0));
         jRadioButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -112,7 +113,7 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
         });
 
         buttonGroup1.add(jRadioButton2);
-        jRadioButton2.setText("Scan based on board");
+        jRadioButton2.setText(bundle.getString("WizardSelectStockJPanel_SelectBasedOnBoard")); // NOI18N
         jRadioButton2.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         jRadioButton2.setMargin(new java.awt.Insets(0, 0, 0, 0));
         jRadioButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -121,7 +122,7 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
             }
         });
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Board"));
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("WizardSelectStockJPanel_Board"))); // NOI18N
 
         jCheckBox1.setText("Main board");
         jCheckBox1.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
@@ -183,7 +184,7 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
                     .addComponent(jCheckBox27)
                     .addComponent(jCheckBox23)
                     .addComponent(jCheckBox21))
-                .addContainerGap(18, Short.MAX_VALUE))
+                .addContainerGap(23, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -206,7 +207,7 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
         );
 
         buttonGroup1.add(jRadioButton3);
-        jRadioButton3.setText("Scan based on industry");
+        jRadioButton3.setText(bundle.getString("WizardSelectStockJPanel_ScanBasedOnIndustry")); // NOI18N
         jRadioButton3.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         jRadioButton3.setMargin(new java.awt.Insets(0, 0, 0, 0));
         jRadioButton3.addActionListener(new java.awt.event.ActionListener() {
@@ -215,7 +216,7 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
             }
         });
 
-        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Industry"));
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("WizardSelectStockJPanel_Industry"))); // NOI18N
 
         jCheckBox5.setText("Consumer products");
         jCheckBox5.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
@@ -320,7 +321,7 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
                     .addComponent(jCheckBox13)
                     .addComponent(jCheckBox10)
                     .addComponent(jCheckBox9))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(15, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -358,7 +359,7 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
         );
 
         buttonGroup1.add(jRadioButton4);
-        jRadioButton4.setText("Scan based on Real-Time Info tab");
+        jRadioButton4.setText(bundle.getString("WizardSelectStockJPanel_ScanBasedOnStockWatchlistTab")); // NOI18N
         jRadioButton4.setMargin(new java.awt.Insets(0, 0, 0, 0));
         jRadioButton4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -373,17 +374,21 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jRadioButton1)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jRadioButton2)
-                        .addGap(16, 16, 16)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addComponent(jRadioButton3)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(jRadioButton4))
+                    .addComponent(jRadioButton2)
+                    .addComponent(jRadioButton3))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(10, 10, 10)
+                .addComponent(jRadioButton4)
+                .addContainerGap(329, Short.MAX_VALUE))
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(10, 10, 10)
+                .addComponent(jRadioButton1)
+                .addGap(138, 138, 138))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -400,7 +405,7 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
                     .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(jRadioButton4)
-                .addContainerGap(18, Short.MAX_VALUE))
+                .addContainerGap(25, Short.MAX_VALUE))
         );
 
         add(jPanel1, java.awt.BorderLayout.CENTER);

@@ -22,8 +22,10 @@
 
 package org.yccheok.jstock.gui;
 
+import java.text.MessageFormat;
 import javax.swing.*;
 import org.yccheok.jstock.analysis.*;
+import org.yccheok.jstock.internationalization.GUIBundle;
 
 /**
  *
@@ -52,9 +54,10 @@ public class WizardSelectIndicatorJPanel extends javax.swing.JPanel {
 
         setLayout(new java.awt.BorderLayout(5, 5));
 
-        jXHeader1.setDescription("Select the stocks indicators you wish to used during real-time scanning. The less stock indicator you choose, the faster the scanning speed.\n\n* Press down CTRL to select more than one indicator.");
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
+        jXHeader1.setDescription(bundle.getString("Main_WizardSelectIndicatorJPanel_Description")); // NOI18N
         jXHeader1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/64x64/viewmag.png"))); // NOI18N
-        jXHeader1.setTitle("Select Stock Indicators");
+        jXHeader1.setTitle(bundle.getString("Main_WizardSelectIndicatorJPanel_SelectStockIndicators")); // NOI18N
         add(jXHeader1, java.awt.BorderLayout.NORTH);
 
         jList1.setModel(new javax.swing.DefaultListModel());
@@ -65,8 +68,8 @@ public class WizardSelectIndicatorJPanel extends javax.swing.JPanel {
         });
         jScrollPane1.setViewportView(jList1);
 
-        jLabel1.setText("No indicator being selected");
         jLabel1.setForeground(new java.awt.Color(255, 0, 0));
+        jLabel1.setText(bundle.getString("Main_WizardSelectIndicatorJPanel_NoIndicatorBeingSelected")); // NOI18N
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -98,11 +101,13 @@ public class WizardSelectIndicatorJPanel extends javax.swing.JPanel {
         
         if(numOfSelectedItems == 0) {
             jLabel1.setForeground(java.awt.Color.RED);
-            jLabel1.setText("No indicator being selected");            
+            jLabel1.setText(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("Main_WizardSelectIndicatorJPanel_NoIndicatorBeingSelected"));
         }
         else {
             jLabel1.setForeground(java.awt.Color.BLUE);
-            jLabel1.setText(numOfSelectedItems + " indicator(s) being selected");            
+            final String template = GUIBundle.getString("Main_WizardSelectIndicatorJPanel_Indicator(s)BeingSelected_template");
+            final String message = MessageFormat.format(template, numOfSelectedItems);
+            jLabel1.setText(message);
         }
     }//GEN-LAST:event_jList1ValueChanged
     
