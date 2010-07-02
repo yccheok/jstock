@@ -24,12 +24,14 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.text.MessageFormat;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.blobsallad.Controller;
+import org.yccheok.jstock.internationalization.GUIBundle;
 
 /**
  *
@@ -41,13 +43,13 @@ public class AboutJDialog extends javax.swing.JDialog {
         public void run() {
             Utils.ApplicationInfo applicationInfo = Utils.getLatestApplicationInfo();
 
-            if (applicationInfo == null) {
+            if (applicationInfo == null) {            
                 // Unknown.                
-                updateCheckForUpdateStatus("<p style=\"margin-top: 0; font-size: 9px; font-family: Tahoma;\"><b>Unknown update status.</b></p>");
+                updateCheckForUpdateStatus(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("AboutJDialog_UnknownUpdateStatus"));
             }
             else if (applicationInfo.applicationVersionID <= Utils.getApplicationVersionID()) {
                 // Update to date.
-                updateCheckForUpdateStatus("<p style=\"margin-top: 0; font-size: 9px; font-family: Tahoma; color: green\"><b>JStock is up to date.</b></p>");
+                updateCheckForUpdateStatus(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("AboutJDialog_JStockIsUpToDate"));
             }
             else {
                 // Out date.
@@ -68,7 +70,9 @@ public class AboutJDialog extends javax.swing.JDialog {
                 // Due to the bug in jbusycomponent, we will not see hand cursor, when we move the mouse over the download link.
                 // I had tried to remove the previous jbusycomponent, and add with the new editor pane. However, this will increase
                 // the chance of having flicking displayed window.
-                updateCheckForUpdateStatus("<p style=\"margin-top: 0; font-size: 9px; font-family: Tahoma;\"><b>JStock is not up-to-date. Click <a href=\"" + url + "\">here</a> to update.</b></p>");
+                final String template = GUIBundle.getString("AboutJDialog_JStockIsNotUpToDate_template");
+                final String message = MessageFormat.format(template, url);
+                updateCheckForUpdateStatus(message);
             }
         }
     });
@@ -95,7 +99,9 @@ public class AboutJDialog extends javax.swing.JDialog {
     public AboutJDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        updateCheckForUpdateStatus("<p style=\"margin-top: 0; font-size: 9px; font-family: Tahoma;\"><b>Checking for updates... </b><img src=\"" + Utils.toHTMLFileSrcFormat(Utils.getExtraDataDirectory() + "spinner.gif") + "\"/></p>");
+        final String template = GUIBundle.getString("AboutJDialog_CheckingForUpdates..._template");
+        final String message = MessageFormat.format(template, Utils.toHTMLFileSrcFormat(Utils.getExtraDataDirectory() + "spinner.gif"));
+        updateCheckForUpdateStatus(message);
 
         checkForUpdateThread.start();
    }
@@ -131,7 +137,8 @@ public class AboutJDialog extends javax.swing.JDialog {
         jLabel3 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("About JStock");
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
+        setTitle(bundle.getString("AboutJDialog_AboutJStock")); // NOI18N
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosed(java.awt.event.WindowEvent evt) {
@@ -139,7 +146,7 @@ public class AboutJDialog extends javax.swing.JDialog {
             }
         });
 
-        jButton1.setText("OK");
+        jButton1.setText(bundle.getString("AboutJDialog_OK")); // NOI18N
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -168,7 +175,7 @@ public class AboutJDialog extends javax.swing.JDialog {
         jEditorPane3.setBackground(new java.awt.Color(240, 240, 240));
         jEditorPane3.setContentType("text/html");
         jEditorPane3.setEditable(false);
-        jEditorPane3.setText("<html>\r\n  <head>\r\n\r\n  </head>\r\n  <body>\r\n        <p style=\"margin-top: 0; font-size: 9px; font-family: Tahoma;\">Homepage : <a href=\"http://jstock.sourceforge.net/?utm_source=jstock&utm_medium=about_box_link\">http://jstock.sourceforge.net</a></p>\n  </body>\r\n</html>\r\n");
+        jEditorPane3.setText(bundle.getString("AboutJDialog_Homepage")); // NOI18N
         jEditorPane3.addHyperlinkListener(new javax.swing.event.HyperlinkListener() {
             public void hyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {
                 jEditorPane1HyperlinkUpdate(evt);
@@ -181,7 +188,7 @@ public class AboutJDialog extends javax.swing.JDialog {
         jEditorPane2.setBackground(new java.awt.Color(240, 240, 240));
         jEditorPane2.setContentType("text/html");
         jEditorPane2.setEditable(false);
-        jEditorPane2.setText("<html>\n<head>\n</head>\n    <body>\n        <p style=\"margin-top: 0; font-size: 9px; font-family: Tahoma;\"><b>Checking for updates...</b></p>\n    </body>\n</html>");
+        jEditorPane2.setText(bundle.getString("AboutJDialog_CheckingForUpdates...")); // NOI18N
         jEditorPane2.addHyperlinkListener(new javax.swing.event.HyperlinkListener() {
             public void hyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {
                 jEditorPane1HyperlinkUpdate(evt);
@@ -193,7 +200,7 @@ public class AboutJDialog extends javax.swing.JDialog {
 
         jPanel3.add(jPanel9, java.awt.BorderLayout.SOUTH);
 
-        jTabbedPane1.addTab("General", jPanel3);
+        jTabbedPane1.addTab(bundle.getString("AboutJDialog_General"), jPanel3); // NOI18N
 
         jPanel4.setLayout(new java.awt.BorderLayout());
 
@@ -212,7 +219,7 @@ public class AboutJDialog extends javax.swing.JDialog {
 
         jPanel4.add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
-        jTabbedPane1.addTab("Credits", jPanel4);
+        jTabbedPane1.addTab(bundle.getString("AboutJDialog_Credits"), jPanel4); // NOI18N
 
         jPanel5.setLayout(new java.awt.BorderLayout());
 
@@ -228,7 +235,7 @@ public class AboutJDialog extends javax.swing.JDialog {
 
         jPanel5.add(jScrollPane2, java.awt.BorderLayout.CENTER);
 
-        jTabbedPane1.addTab("License", jPanel5);
+        jTabbedPane1.addTab(bundle.getString("AboutJDialog_License"), jPanel5); // NOI18N
 
         jPanel6.setLayout(new java.awt.BorderLayout(2, 2));
         jPanel6.add(jPanel7, java.awt.BorderLayout.CENTER);
@@ -236,15 +243,17 @@ public class AboutJDialog extends javax.swing.JDialog {
         jPanel8.setBorder(javax.swing.BorderFactory.createEmptyBorder(2, 2, 2, 2));
         jPanel8.setLayout(new java.awt.GridLayout(2, 0));
 
-        jLabel2.setText("Move around blob with arrow keys or mouse.");
+        jLabel2.setText(bundle.getString("AboutJDialog_MoveAroundBlobWithArrowKeysOrMouse")); // NOI18N
         jPanel8.add(jLabel2);
+        jLabel2.getAccessibleContext().setAccessibleName(bundle.getString("AboutJDialog_MoveAroundBlobWithArrowKeysOrMouse")); // NOI18N
 
-        jLabel3.setText("Split blob with h. Join blobs with j. Turn gravity on / off with g.");
+        jLabel3.setText(bundle.getString("AboutJDialog_SplitBlobWithHJoinBlobsWithJTurnGravityOnOffWithG")); // NOI18N
         jPanel8.add(jLabel3);
+        jLabel3.getAccessibleContext().setAccessibleName(bundle.getString("AboutJDialog_SplitBlobWithHJoinBlobsWithJTurnGravityOnOffWithG")); // NOI18N
 
         jPanel6.add(jPanel8, java.awt.BorderLayout.SOUTH);
 
-        jTabbedPane1.addTab("Blobsallad", jPanel6);
+        jTabbedPane1.addTab(bundle.getString("AboutJDialog_Blobsallad"), jPanel6); // NOI18N
 
         getContentPane().add(jTabbedPane1, java.awt.BorderLayout.CENTER);
 

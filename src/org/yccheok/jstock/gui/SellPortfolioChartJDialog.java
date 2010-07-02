@@ -26,6 +26,7 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.data.general.DefaultPieDataset;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.Symbol;
+import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.portfolio.Dividend;
 import org.yccheok.jstock.portfolio.DividendSummary;
 import org.yccheok.jstock.portfolio.Portfolio;
@@ -39,31 +40,31 @@ import org.yccheok.jstock.portfolio.TransactionSummary;
 public class SellPortfolioChartJDialog extends javax.swing.JDialog {
     
     private static final String[] cNames = {
-        "Net Gain %",
-        "Net Loss %",
-        "Gain %",
-        "Loss %",
-        "Net Gain Value",
-        "Net Loss Value",
-        "Gain Value",
-        "Loss Value",
-        "Dividend",
-        "Net Selling Value",
-        "Selling Value", 
-        "Purchase Value",
-        "Gain Price",
-        "Lose Price",
-        "Selling Price",
-        "Purchase Price",        
-        "Units",
-        "Broker", 
-        "Stamp Duty", 
-        "Clearing Fee", 
+        GUIBundle.getString("SellPortfolioTreeTableModel_NetGainValue"),
+        GUIBundle.getString("SellPortfolioTreeTableModel_NetLossValue"),
+        GUIBundle.getString("SellPortfolioTreeTableModel_GainValue"),
+        GUIBundle.getString("SellPortfolioTreeTableModel_LossValue"),
+        GUIBundle.getString("SellPortfolioTreeTableModel_NetGainPercentage"),
+        GUIBundle.getString("SellPortfolioTreeTableModel_NetLossPercentage"),
+        GUIBundle.getString("SellPortfolioTreeTableModel_GainPercentage"),
+        GUIBundle.getString("SellPortfolioTreeTableModel_LossPercentage"),
+        GUIBundle.getString("SellPortfolioTreeTableModel_Dividend"),
+        GUIBundle.getString("SellPortfolioTreeTableModel_NetSellingValue"),
+        GUIBundle.getString("SellPortfolioTreeTableModel_SellingValue"),
+        GUIBundle.getString("SellPortfolioTreeTableModel_PurchaseValue"),
+        GUIBundle.getString("SellPortfolioTreeTableModel_GainPrice"),
+        GUIBundle.getString("SellPortfolioTreeTableModel_LossPrice"),
+        GUIBundle.getString("SellPortfolioTreeTableModel_SellingPrice"),
+        GUIBundle.getString("SellPortfolioTreeTableModel_PurchasePrice"),
+        GUIBundle.getString("SellPortfolioTreeTableModel_Units"),
+        GUIBundle.getString("SellPortfolioTreeTableModel_Broker"),
+        GUIBundle.getString("SellPortfolioTreeTableModel_StampDuty"),
+        GUIBundle.getString("SellPortfolioTreeTableModel_ClearingFee")
     };
     
     /** Creates new form SellPortfolioChartJDialog */
     public SellPortfolioChartJDialog(java.awt.Frame parent, boolean modal, SellPortfolioTreeTableModel portfolioTreeTableModel, DividendSummary dividendSummary) {
-        super(parent, "Sell Summary", modal);
+        super(parent, GUIBundle.getString("SellPortfolioChartJDialog_SellSummary"), modal);
 
         this.dividendSummary = dividendSummary;
         this.initCodeToTotalDividend(dividendSummary);
@@ -137,10 +138,12 @@ public class SellPortfolioChartJDialog extends javax.swing.JDialog {
         final int count = portfolio.getChildCount();
         DefaultPieDataset data = new DefaultPieDataset();
 
-        for(int i = 0; i < count; i++) {
+        for (int i = 0; i < count; i++) {
             TransactionSummary transactionSummary = (TransactionSummary)portfolio.getChildAt(i);
             
-            if(transactionSummary.getChildCount() <= 0) continue;
+            if (transactionSummary.getChildCount() <= 0) {
+                continue;
+            }
             
             Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
             final Symbol symbol = transaction.getContract().getStock().getSymbol();
@@ -148,28 +151,28 @@ public class SellPortfolioChartJDialog extends javax.swing.JDialog {
 
             /* Should use reflection technology. */
             if(name.equals(cNames[0])) {
-                data.setValue(symbol.toString(), portfolioTreeTableModel.getNetGainLossPercentage(transactionSummary));
+                data.setValue(symbol.toString(), portfolioTreeTableModel.getNetGainLossValue(transactionSummary));
             }
             if(name.equals(cNames[1])) {
-                data.setValue(symbol.toString(), -portfolioTreeTableModel.getNetGainLossPercentage(transactionSummary));
+                data.setValue(symbol.toString(), -portfolioTreeTableModel.getNetGainLossValue(transactionSummary));
             }            
             else if(name.equals(cNames[2])) {
-                data.setValue(symbol.toString(), portfolioTreeTableModel.getGainLossPercentage(transactionSummary));                
+                data.setValue(symbol.toString(), portfolioTreeTableModel.getGainLossValue(transactionSummary));
             }
             else if(name.equals(cNames[3])) {
-                data.setValue(symbol.toString(), -portfolioTreeTableModel.getGainLossPercentage(transactionSummary));                
+                data.setValue(symbol.toString(), -portfolioTreeTableModel.getGainLossValue(transactionSummary));
             }            
             else if(name.equals(cNames[4])) {
-                data.setValue(symbol.toString(), portfolioTreeTableModel.getNetGainLossValue(transactionSummary));                
+                data.setValue(symbol.toString(), portfolioTreeTableModel.getNetGainLossPercentage(transactionSummary));
             }
             else if(name.equals(cNames[5])) {
-                data.setValue(symbol.toString(), -portfolioTreeTableModel.getNetGainLossValue(transactionSummary));                
+                data.setValue(symbol.toString(), -portfolioTreeTableModel.getNetGainLossPercentage(transactionSummary));
             }
             else if(name.equals(cNames[6])) {
-                data.setValue(symbol.toString(), portfolioTreeTableModel.getGainLossValue(transactionSummary));                
+                data.setValue(symbol.toString(), portfolioTreeTableModel.getGainLossPercentage(transactionSummary));
             }
             else if(name.equals(cNames[7])) {
-                data.setValue(symbol.toString(), -portfolioTreeTableModel.getGainLossValue(transactionSummary));                
+                data.setValue(symbol.toString(), -portfolioTreeTableModel.getGainLossPercentage(transactionSummary));
             }            
             else if(name.equals(cNames[8])) {
                 Double value = this.codeToTotalDividend.get(code);

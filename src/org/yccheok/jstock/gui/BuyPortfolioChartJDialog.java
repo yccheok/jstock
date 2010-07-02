@@ -26,6 +26,7 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.data.general.DefaultPieDataset;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.Symbol;
+import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.portfolio.Dividend;
 import org.yccheok.jstock.portfolio.DividendSummary;
 import org.yccheok.jstock.portfolio.Portfolio;
@@ -39,31 +40,31 @@ import org.yccheok.jstock.portfolio.TransactionSummary;
 public class BuyPortfolioChartJDialog extends javax.swing.JDialog {
     
     private static final String[] cNames = {
-        "Net Gain %",
-        "Net Loss %",
-        "Gain %",
-        "Loss %",
-        "Net Gain Value",
-        "Net Loss Value",
-        "Gain Value",
-        "Loss Value",
-        "Dividend",
-        "Net Purchase Value",
-        "Purchase Value", 
-        "Current Value",
-        "Gain Price",
-        "Loss Price",
-        "Purchase Price",
-        "Current Price",        
-        "Units",
-        "Broker", 
-        "Stamp Duty", 
-        "Clearing Fee", 
+        GUIBundle.getString("BuyPortfolioTreeTableModel_NetGainValue"),
+        GUIBundle.getString("BuyPortfolioTreeTableModel_NetLossValue"),
+        GUIBundle.getString("BuyPortfolioTreeTableModel_GainValue"),
+        GUIBundle.getString("BuyPortfolioTreeTableModel_LossValue"),
+        GUIBundle.getString("BuyPortfolioTreeTableModel_NetGainPercentage"),
+        GUIBundle.getString("BuyPortfolioTreeTableModel_NetLossPercentage"),
+        GUIBundle.getString("BuyPortfolioTreeTableModel_GainPercentage"),
+        GUIBundle.getString("BuyPortfolioTreeTableModel_LossPercentage"),
+        GUIBundle.getString("BuyPortfolioTreeTableModel_Dividend"),
+        GUIBundle.getString("BuyPortfolioTreeTableModel_NetPurchaseValue"),
+        GUIBundle.getString("BuyPortfolioTreeTableModel_PurchaseValue"),
+        GUIBundle.getString("BuyPortfolioTreeTableModel_CurrentValue"),
+        GUIBundle.getString("BuyPortfolioTreeTableModel_GainPrice"),
+        GUIBundle.getString("BuyPortfolioTreeTableModel_LossPrice"),
+        GUIBundle.getString("BuyPortfolioTreeTableModel_PurchasePrice"),
+        GUIBundle.getString("BuyPortfolioTreeTableModel_CurrentPrice"),
+        GUIBundle.getString("BuyPortfolioTreeTableModel_Units"),
+        GUIBundle.getString("BuyPortfolioTreeTableModel_Broker"),
+        GUIBundle.getString("BuyPortfolioTreeTableModel_StampDuty"),
+        GUIBundle.getString("BuyPortfolioTreeTableModel_ClearingFee"),
     };
     
     /** Creates new form BuyPortfolioChartJDialog */
     public BuyPortfolioChartJDialog(java.awt.Frame parent, boolean modal, BuyPortfolioTreeTableModel portfolioTreeTableModel, DividendSummary dividendSummary) {
-        super(parent, "Buy Summary", modal);
+        super(parent, GUIBundle.getString("BuyPortfolioChartJDialog_BuySummary"), modal);
 
         this.dividendSummary = dividendSummary;
         this.initCodeToTotalDividend(dividendSummary);
@@ -148,28 +149,28 @@ public class BuyPortfolioChartJDialog extends javax.swing.JDialog {
 
             /* Should use reflection technology. */
             if(name.equals(cNames[0])) {
-                data.setValue(symbol.toString(), portfolioTreeTableModel.getNetGainLossPercentage(transactionSummary));
+                data.setValue(symbol.toString(), portfolioTreeTableModel.getNetGainLossValue(transactionSummary));
             }
             if(name.equals(cNames[1])) {
-                data.setValue(symbol.toString(), -portfolioTreeTableModel.getNetGainLossPercentage(transactionSummary));
+                data.setValue(symbol.toString(), -portfolioTreeTableModel.getNetGainLossValue(transactionSummary));
             }            
             else if(name.equals(cNames[2])) {
-                data.setValue(symbol.toString(), portfolioTreeTableModel.getGainLossPercentage(transactionSummary));                
+                data.setValue(symbol.toString(), portfolioTreeTableModel.getGainLossValue(transactionSummary));
             }
             else if(name.equals(cNames[3])) {
-                data.setValue(symbol.toString(), -portfolioTreeTableModel.getGainLossPercentage(transactionSummary));                
+                data.setValue(symbol.toString(), -portfolioTreeTableModel.getGainLossValue(transactionSummary));
             }            
             else if(name.equals(cNames[4])) {
-                data.setValue(symbol.toString(), portfolioTreeTableModel.getNetGainLossValue(transactionSummary));                
+                data.setValue(symbol.toString(), portfolioTreeTableModel.getNetGainLossPercentage(transactionSummary));
             }
             else if(name.equals(cNames[5])) {
-                data.setValue(symbol.toString(), -portfolioTreeTableModel.getNetGainLossValue(transactionSummary));                
+                data.setValue(symbol.toString(), -portfolioTreeTableModel.getNetGainLossPercentage(transactionSummary));
             }
             else if(name.equals(cNames[6])) {
-                data.setValue(symbol.toString(), portfolioTreeTableModel.getGainLossValue(transactionSummary));                
+                data.setValue(symbol.toString(), portfolioTreeTableModel.getGainLossPercentage(transactionSummary));
             }
             else if(name.equals(cNames[7])) {
-                data.setValue(symbol.toString(), -portfolioTreeTableModel.getGainLossValue(transactionSummary));                
+                data.setValue(symbol.toString(), -portfolioTreeTableModel.getGainLossPercentage(transactionSummary));
             }            
             else if(name.equals(cNames[8])) {
                 Double value = this.codeToTotalDividend.get(code);
