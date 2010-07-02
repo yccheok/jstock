@@ -32,6 +32,7 @@ import java.text.SimpleDateFormat;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import javax.swing.ComboBoxModel;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -101,10 +102,10 @@ public class ChartJDialog extends javax.swing.JDialog {
     private Mode getCurrentMode() {
         final String selected = this.jComboBox1.getSelectedItem().toString();
 
-        if (selected.equals("Price Volume")) {
+        if (selected.equals(GUIBundle.getString("ChartJDialog_PriceVolume"))) {
             return Mode.PriceVolume;
         }
-        else if(selected.equals("Candlestick")) {
+        else if(selected.equals(GUIBundle.getString("ChartJDialog_Candlestick"))) {
             return Mode.Candlestick;
         }
         assert(false);
@@ -192,7 +193,7 @@ public class ChartJDialog extends javax.swing.JDialog {
             "info_message_please_enter_number_of_days_for_RSI",
             "info_message_please_enter_number_of_days_for_CCI"
         };
-        final Map<TA, Set<Object>> m = new HashMap<TA, Set<Object>>();
+        final Map<TA, Set<Object>> m = new EnumMap<TA, Set<Object>>(TA.class);
         final int taExSize = MainFrame.getInstance().getChartJDialogOptions().getTAExSize();
         for (int i = 0; i < taExSize; i++) {
             final TAEx taEx = MainFrame.getInstance().getChartJDialogOptions().getTAEx(i);
@@ -412,7 +413,7 @@ public class ChartJDialog extends javax.swing.JDialog {
 
         jPanel4.add(jPanel2, java.awt.BorderLayout.WEST);
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Price Volume", "Candlestick" }));
+        jComboBox1.setModel(getComboBoxModel());
         jComboBox1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBox1ActionPerformed(evt);
@@ -424,7 +425,7 @@ public class ChartJDialog extends javax.swing.JDialog {
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 10, 10));
 
-        jLabel9.setText("<html> <a href=\"\">7 Days</a> </html>");
+        jLabel9.setText(bundle.getString("ChartJDialog_7Days")); // NOI18N
         jLabel9.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jLabel9MouseClicked(evt);
@@ -432,7 +433,7 @@ public class ChartJDialog extends javax.swing.JDialog {
         });
         jPanel6.add(jLabel9);
 
-        jLabel10.setText("<html>\n<a href=\"\">1 Month</a>\n</html>");
+        jLabel10.setText(bundle.getString("ChartJDialog_1Month")); // NOI18N
         jLabel10.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jLabel10MouseClicked(evt);
@@ -440,7 +441,7 @@ public class ChartJDialog extends javax.swing.JDialog {
         });
         jPanel6.add(jLabel10);
 
-        jLabel11.setText("<html>\n<a href=\"\">3 Months</a>\n</html>");
+        jLabel11.setText(bundle.getString("ChartJDialog_3Months")); // NOI18N
         jLabel11.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jLabel11MouseClicked(evt);
@@ -448,7 +449,7 @@ public class ChartJDialog extends javax.swing.JDialog {
         });
         jPanel6.add(jLabel11);
 
-        jLabel12.setText("<html>\n<a href=\"\">6 Months</a>\n</html>");
+        jLabel12.setText(bundle.getString("ChartJDialog_6Months")); // NOI18N
         jLabel12.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jLabel12MouseClicked(evt);
@@ -456,7 +457,7 @@ public class ChartJDialog extends javax.swing.JDialog {
         });
         jPanel6.add(jLabel12);
 
-        jLabel13.setText("<html>\n<a href=\"\">1 Year</a>\n</html>");
+        jLabel13.setText(bundle.getString("ChartJDialog_1Year")); // NOI18N
         jLabel13.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jLabel13MouseClicked(evt);
@@ -464,7 +465,7 @@ public class ChartJDialog extends javax.swing.JDialog {
         });
         jPanel6.add(jLabel13);
 
-        jLabel14.setText("<html>\n    <a href=\"\">All</a>\n</html>");
+        jLabel14.setText(bundle.getString("ChartJDialog_All")); // NOI18N
         jLabel14.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jLabel14MouseClicked(evt);
@@ -476,10 +477,10 @@ public class ChartJDialog extends javax.swing.JDialog {
 
         getContentPane().add(jPanel4, java.awt.BorderLayout.SOUTH);
 
-        jMenu1.setText("File");
+        jMenu1.setText(bundle.getString("ChartJDialog_File")); // NOI18N
 
         jMenuItem1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/filesave.png"))); // NOI18N
-        jMenuItem1.setText("Save As...");
+        jMenuItem1.setText(bundle.getString("ChartJDialog_SaveAs...")); // NOI18N
         jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem1ActionPerformed(evt);
@@ -518,6 +519,10 @@ public class ChartJDialog extends javax.swing.JDialog {
         java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
         setBounds((screenSize.width-750)/2, (screenSize.height-600)/2, 750, 600);
     }// </editor-fold>//GEN-END:initComponents
+
+    private ComboBoxModel getComboBoxModel() {
+        return new javax.swing.DefaultComboBoxModel(new String[] { GUIBundle.getString("ChartJDialog_PriceVolume"), GUIBundle.getString("ChartJDialog_Candlestick") });
+    }
 
     /**
      * Changes the mode (price volume or candlestick chart) of this chart dialog.
@@ -1043,7 +1048,7 @@ public class ChartJDialog extends javax.swing.JDialog {
      *
      * @return a sample high low dataset.
      */
-    public OHLCDataset getOHLCDataset(StockHistoryServer stockHistoryServer) {
+    private OHLCDataset getOHLCDataset(StockHistoryServer stockHistoryServer) {
 
         final int num = stockHistoryServer.getNumOfCalendar();
         

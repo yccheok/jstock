@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.swing.ComboBoxModel;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -36,6 +37,7 @@ import org.jfree.data.category.DefaultCategoryDataset;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.Symbol;
+import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.portfolio.Dividend;
 import org.yccheok.jstock.portfolio.DividendSummary;
 
@@ -94,6 +96,10 @@ public class DividendSummaryBarChartJDialog extends javax.swing.JDialog {
         for (String string : strings) {
             this.jComboBox1.addItem(string);
         }
+    }
+
+    private ComboBoxModel getComboBoxModel() {
+        return new javax.swing.DefaultComboBoxModel(new String[] { GUIBundle.getString("DividendSummaryBarChartJDialog_AllStock(s)") });
     }
 
     private CategoryDataset createDataset() {
@@ -177,7 +183,7 @@ public class DividendSummaryBarChartJDialog extends javax.swing.JDialog {
 
         jPanel1.setLayout(new java.awt.BorderLayout(5, 5));
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "All Stock(s)" }));
+        jComboBox1.setModel(getComboBoxModel());
         jComboBox1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBox1ActionPerformed(evt);
