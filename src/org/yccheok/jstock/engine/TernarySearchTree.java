@@ -102,7 +102,7 @@ public class TernarySearchTree<E> {
         int charIndex = 0;
         
         while(true) {
-            if(currentNode == null) return null;
+            if (currentNode == null) return null;
             int charComp = compareCharsAlphabetically(key.charAt(charIndex), currentNode.splitchar);
             
             if (charComp == 0) {

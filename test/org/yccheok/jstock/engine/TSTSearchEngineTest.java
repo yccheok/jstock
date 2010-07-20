@@ -7,6 +7,7 @@ package org.yccheok.jstock.engine;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle;
 import junit.framework.TestCase;
 
 /**
@@ -14,7 +15,8 @@ import junit.framework.TestCase;
  * @author yccheok
  */
 public class TSTSearchEngineTest extends TestCase {
-    
+    private static final ResourceBundle bundle = ResourceBundle.getBundle("org.yccheok.jstock.engine.test");
+
     public TSTSearchEngineTest(String testName) {
         super(testName);
     }
@@ -33,6 +35,7 @@ public class TSTSearchEngineTest extends TestCase {
      * Test of searchAll method, of class TSTSearchEngine.
      */
     public void testSearchAll() {
+        {
         TSTSearchEngine<Name> engine = new TSTSearchEngine<Name>();
         engine.put(new Name("Mr Cheok"));   // <--
         engine.put(new Name("miss Lim"));
@@ -40,12 +43,24 @@ public class TSTSearchEngineTest extends TestCase {
         engine.put(new Name("mr H"));       // <--
         engine.put(new Name("ABCDEFG"));
         assertEquals(3, engine.searchAll("MR").size());
+        }
+
+        {
+        TSTSearchEngine<Name> engine = new TSTSearchEngine<Name>();
+        engine.put(new Name(bundle.getString("wo_men")));           // <--
+        engine.put(new Name(bundle.getString("ta_men")));
+        engine.put(new Name(bundle.getString("wo_men_de")));        // <--
+        engine.put(new Name(bundle.getString("wo_men_de_jia")));    // <--
+        engine.put(new Name(bundle.getString("ni_hao_ma")));
+        assertEquals(3, engine.searchAll(bundle.getString("wo")).size());
+        }
     }
 
     /**
      * Test of search method, of class TSTSearchEngine.
      */
     public void testSearch() {
+        {
         TSTSearchEngine<Name> engine = new TSTSearchEngine<Name>();
         engine.put(new Name("A"));
         engine.put(new Name("AB"));
@@ -54,6 +69,17 @@ public class TSTSearchEngineTest extends TestCase {
         engine.put(new Name("ABCDEFG"));
         Name name = engine.search("abcdef");
         assertEquals(new Name("ABCDEF"), name);
+        }
+        {
+        TSTSearchEngine<Name> engine = new TSTSearchEngine<Name>();
+        engine.put(new Name(bundle.getString("wo")));
+        engine.put(new Name(bundle.getString("wo_men")));
+        engine.put(new Name(bundle.getString("wo_men_de")));
+        engine.put(new Name(bundle.getString("wo_men_de_jia")));
+        engine.put(new Name(bundle.getString("wo_men_de_jia_li")));
+        Name name = engine.search(bundle.getString("wo_men_de_jia"));
+        assertEquals(new Name(bundle.getString("wo_men_de_jia")), name);
+        }
     }
 
     /**
@@ -96,7 +122,7 @@ public class TSTSearchEngineTest extends TestCase {
     }
 
     class Name {
-        private String name;
+        private final String name;
 
         public Name(String name) {
             this.name = name;
