@@ -176,7 +176,7 @@ public abstract class AbstractYahooStockHistoryServer implements StockHistorySer
             previousClosePrice = closePrice;
         }
 
-        return (historyDatabase.size() > 1);
+        return (historyDatabase.size() > 0);
     }
 
     private void buildHistory(Code code) throws StockHistoryNotFoundException
