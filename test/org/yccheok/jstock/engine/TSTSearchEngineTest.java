@@ -86,19 +86,29 @@ public class TSTSearchEngineTest extends TestCase {
      * Test of put method, of class TSTSearchEngine.
      */
     public void testPut() {
+        {
         TSTSearchEngine engine = new TSTSearchEngine();
         engine.put(new Name("efg"));
         engine.put(new Name("abc"));
         engine.put(new Name("abc"));
         List<Name> result = engine.searchAll("AB");
         assertEquals(2, result.size());
+        }
+        {
+        TSTSearchEngine engine = new TSTSearchEngine();
+        engine.put(new Name(bundle.getString("ni_men")));
+        engine.put(new Name(bundle.getString("wo_men")));
+        engine.put(new Name(bundle.getString("wo_men")));
+        List<Name> result = engine.searchAll(bundle.getString("wo_men"));
+        assertEquals(2, result.size());
+        }
     }
 
     /**
      * Test of remove method, of class TSTSearchEngine.
      */
     public void testRemove() {
-        System.out.println("remove");
+        {
         List<Name> names = new ArrayList<Name>();
         names.add(new Name("a"));
         names.add(new Name("aA"));  // <-- remove
@@ -119,6 +129,29 @@ public class TSTSearchEngineTest extends TestCase {
         engine.remove(new Name("a"));
         result = engine.searchAll("a");
         assertEquals(1, result.size());
+        }
+        {
+        List<Name> names = new ArrayList<Name>();
+        names.add(new Name(bundle.getString("wo")));
+        names.add(new Name(bundle.getString("wo_men")));  // <-- remove
+        names.add(new Name(bundle.getString("wo_men_de")));
+        names.add(new Name(bundle.getString("wo_men_de_jia")));
+        TSTSearchEngine<Name> engine = new TSTSearchEngine<Name>(names);
+        List<Name> result = engine.searchAll(bundle.getString("wo"));
+        assertEquals(4, result.size());
+        engine.remove(new Name(bundle.getString("wo_men")));
+        result = engine.searchAll(bundle.getString("wo"));
+        assertEquals(3, result.size());
+
+        names = new ArrayList<Name>();
+        names.add(new Name(bundle.getString("wo_men_de")));
+        engine = new TSTSearchEngine<Name>(names);
+        result = engine.searchAll(bundle.getString("wo"));
+        assertEquals(1, result.size());
+        engine.remove(new Name(bundle.getString("wo")));
+        result = engine.searchAll(bundle.getString("wo"));
+        assertEquals(1, result.size());
+        }
     }
 
     class Name {
