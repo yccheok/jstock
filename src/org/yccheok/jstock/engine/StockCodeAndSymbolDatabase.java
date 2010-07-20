@@ -250,10 +250,10 @@ public class StockCodeAndSymbolDatabase {
     protected Map<Symbol, Code> symbolToCode = new HashMap<Symbol, Code>();
     protected Map<Code, Symbol> codeToSymbol = new HashMap<Code, Symbol>();
 
-    protected Map<Stock.Industry, List<Code>> industryToCodes = new HashMap<Stock.Industry, List<Code>>();
-    protected Map<Stock.Board, List<Code>> boardToCodes = new HashMap<Stock.Board, List<Code>>();
-    protected Map<Stock.Industry, List<Symbol>> industryToSymbols = new HashMap<Stock.Industry, List<Symbol>>();
-    protected Map<Stock.Board, List<Symbol>> boardToSymbols = new HashMap<Stock.Board, List<Symbol>>();
+    protected Map<Stock.Industry, List<Code>> industryToCodes = new EnumMap<Stock.Industry, List<Code>>(Stock.Industry.class);
+    protected Map<Stock.Board, List<Code>> boardToCodes = new EnumMap<Stock.Board, List<Code>>(Stock.Board.class);
+    protected Map<Stock.Industry, List<Symbol>> industryToSymbols = new EnumMap<Stock.Industry, List<Symbol>>(Stock.Industry.class);
+    protected Map<Stock.Board, List<Symbol>> boardToSymbols = new EnumMap<Stock.Board, List<Symbol>>(Stock.Board.class);
 
     protected List<Symbol> symbols = new ArrayList<Symbol>();
     protected List<Code> codes = new ArrayList<Code>();
