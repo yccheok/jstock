@@ -204,41 +204,11 @@ public class WizardDownloadIndicatorJPanel extends javax.swing.JPanel {
                 for (IndicatorDownloadManager.Info info : indicatorDownloadInfos) {
                     final String message0 = MessageFormat.format(GUIBundle.getString("WizardDownloadlIndicatorJPanel_DownloadingIndicator_template..."), info.projectName);
                     publish(Status.newInstance(message0, Icons.BUSY));
-                    final Utils.InputStreamAndMethod inputStreamAndMethod = Utils.getResponseBodyAsStreamBasedOnProxyAuthOption(info.fileURL.toString());
-                    if (inputStreamAndMethod.inputStream == null) {
+                    final File temp = Utils.downloadAsTempFile(info.fileURL.toString());
+                    if (temp == null) {
                         final String fail_message0 = MessageFormat.format(GUIBundle.getString("WizardDownloadlIndicatorJPanel_DownloadIndicatorFail_template"), info.projectName);
                         publish(Status.newInstance(fail_message0, Icons.BUSY));
-                        inputStreamAndMethod.method.releaseConnection();
                         continue;
-                    }
-                    // Write to temp file.
-                    OutputStream out = null;
-                    File temp = null;
-                    try {
-                        // Create temp file.
-                        temp = File.createTempFile(Utils.getJStockUUID(), info.projectName + ".zip");
-                        // Delete temp file when program exits.
-                        temp.deleteOnExit();
-
-                        out = new FileOutputStream(temp);
-
-                        // Transfer bytes from the ZIP file to the output file
-                        byte[] buf = new byte[1024];
-                        int len;
-                        while ((len = inputStreamAndMethod.inputStream.read(buf)) > 0) {
-                            out.write(buf, 0, len);
-                        }
-                    }
-                    catch (IOException ex) {
-                        final String fail_message0 = MessageFormat.format(GUIBundle.getString("WizardDownloadlIndicatorJPanel_DownloadIndicatorFail_template"), info.projectName);
-                        publish(Status.newInstance(fail_message0, Icons.BUSY));
-                        log.error(null, ex);
-                        continue;
-                    }
-                    finally {
-                        Utils.close(out);
-                        Utils.close(inputStreamAndMethod.inputStream);
-                        inputStreamAndMethod.method.releaseConnection();
                     }
 
                     // Check for zipfile check sum.
