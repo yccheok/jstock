@@ -236,18 +236,8 @@ public class WizardDownloadIndicatorJPanel extends javax.swing.JPanel {
                         continue;
                     }
                     finally {
-                        if (out != null) {
-                            try {
-                                out.close();
-                            } catch (IOException ex) {
-                                log.error(null, ex);
-                            }
-                        }
-                        try {
-                            inputStreamAndMethod.inputStream.close();
-                        } catch (IOException ex) {
-                            log.error(null, ex);
-                        }
+                        Utils.close(out);
+                        Utils.close(inputStreamAndMethod.inputStream);
                         inputStreamAndMethod.method.releaseConnection();
                     }
 

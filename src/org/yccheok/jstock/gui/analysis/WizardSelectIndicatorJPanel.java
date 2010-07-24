@@ -399,13 +399,8 @@ public class WizardSelectIndicatorJPanel extends javax.swing.JPanel {
                 }
 
                 final IndicatorDownloadManager _indicatorDownloadManager = Utils.fromXML(IndicatorDownloadManager.class, inputStreamAndMethod.inputStream);
-                try {
-                    inputStreamAndMethod.inputStream.close();
-                } catch (IOException exp) {
-                    log.error(null, exp);
-                } finally {
-                    inputStreamAndMethod.method.releaseConnection();
-                }
+                Utils.close( inputStreamAndMethod.inputStream);
+                inputStreamAndMethod.method.releaseConnection();
                 if (_indicatorDownloadManager == null) {
                     return null;
                 }

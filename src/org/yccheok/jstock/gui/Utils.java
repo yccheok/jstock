@@ -264,24 +264,11 @@ public class Utils {
                     break;
                 }
                 finally {
-                    if (outputStream != null) {
-                        try {
-                            outputStream.close();
-                        }
-                        catch (IOException exp) {
-                            log.error(null, exp);
-                            break;
-                        }
+                    if (false == close(outputStream)) {
+                        break;
                     }
-
-                    if (zipInputStream != null) {
-                        try {
-                            zipInputStream.closeEntry();
-                        }
-                        catch (IOException exp) {
-                            log.error(null, exp);
-                            break;
-                        }
+                    if (false == closeEntry(zipInputStream)) {
+                        break;
                     }
                 }
 
@@ -2003,6 +1990,26 @@ public class Utils {
     }
 
     /**
+     * Performs close operation on ZIP input stream, without the need of
+     * writing cumbersome try...catch block.
+     *
+     * @param zipInputStream The ZIP input stream.
+     * @return Returns false if there is an exception during close operation.
+     * Otherwise returns true.
+     */
+    public static boolean closeEntry(ZipInputStream zipInputStream) {
+        if (null != zipInputStream) {
+            try {
+                zipInputStream.closeEntry();
+            } catch (IOException ex) {
+                log.error(null, ex);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Performs close operation on Closeable stream, without the need of
      * writing cumbersome try...catch block.
      *
@@ -2057,7 +2064,6 @@ public class Utils {
         }
         catch (IOException ex) {
             log.error(null, ex);
-            return null;
         }
         finally {
             close(out);
