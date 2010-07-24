@@ -70,16 +70,8 @@ public class Utils {
             log.error(null, ex);
         }
         finally {
-            try {
-                cis.close();
-            } catch (IOException ex) {
-                log.error(null, ex);
-            }
-            try {
-                stream.close();
-            } catch (IOException ex) {
-                log.error(null, ex);
-            }
+            org.yccheok.jstock.gui.Utils.close(cis);
+            org.yccheok.jstock.gui.Utils.close(stream);
         }
         return 0;
     }
