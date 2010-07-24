@@ -2438,7 +2438,7 @@ public class MainFrame extends javax.swing.JFrame {
             Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database");
             final File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database" + File.separator + "stockcodeandsymboldatabase.xml");
             
-            if(this.readFromDisk)
+            if (this.readFromDisk)
             {                                
                 // We try to first load from disk. The information may be outdated,
                 // but it is far more better than letting user to wait for several
@@ -2483,8 +2483,10 @@ public class MainFrame extends javax.swing.JFrame {
 
                     StockServer stockServer = factory.getStockServer();
                     
-                    if(stockServer instanceof Subject)
+                    if (stockServer instanceof Subject)
                     {
+                        // I am interested to receive update notification from
+                        // this stock server.
                         ((Subject<StockServer, Integer>)stockServer).attach(StockCodeAndSymbolDatabaseTask.this);
                     }
                     
@@ -2494,7 +2496,7 @@ public class MainFrame extends javax.swing.JFrame {
                         // Prepare proper synchronization for us to change country.
                         synchronized(this)
                         {
-                            if(runnable)
+                            if (runnable)
                             {
                                 stockCodeAndSymbolDatabase = tmp;
                                 

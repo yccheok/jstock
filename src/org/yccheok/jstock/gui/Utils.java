@@ -39,6 +39,7 @@ import java.awt.image.ColorModel;
 import java.awt.image.PixelGrabber;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -1999,6 +2000,71 @@ public class Utils {
         final FileNameExtensionFilter csvFilter = new FileNameExtensionFilter("CSV Documents (*.csv)", "csv");
         final FileNameExtensionFilter xlsFilter = new FileNameExtensionFilter("Microsoft Excel (*.xls)", "xls");
         return promptSaveJFileChooser(suggestedFileName, csvFilter, xlsFilter);
+    }
+
+    /**
+     * Performs close operation on Closeable stream, without the need of
+     * writing cumbersome try...catch block.
+     *
+     * @param closeable The closeable stream.
+     * @return Returns false if there is an exception during close operation.
+     * Otherwise returns true.
+     */
+    public static boolean close(Closeable closeable) {
+        if (null != closeable) {
+            try {
+                closeable.close();
+            } catch (IOException ex) {
+                log.error(null, ex);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Performs download and save the download as temporary file.
+     * 
+     * @param location Download URL location
+     * @return The saved temporary file if download success. <code>null</code>
+     * if failed.
+     */
+    public static File downloadAsTempFile(String location) {
+        final Utils.InputStreamAndMethod inputStreamAndMethod = Utils.getResponseBodyAsStreamBasedOnProxyAuthOption(location);
+        if (inputStreamAndMethod.inputStream == null) {
+            inputStreamAndMethod.method.releaseConnection();
+            return null;
+        }
+        // Write to temp file.
+        OutputStream out = null;
+        File temp = null;
+        try {
+            // Create temp file.
+            temp = File.createTempFile(Utils.getJStockUUID(), null);
+            // Delete temp file when program exits.
+            temp.deleteOnExit();
+
+            out = new FileOutputStream(temp);
+
+            // Transfer bytes from the ZIP file to the output file
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = inputStreamAndMethod.inputStream.read(buf)) > 0) {
+                out.write(buf, 0, len);
+            }
+            // Success!
+            return temp;
+        }
+        catch (IOException ex) {
+            log.error(null, ex);
+            return null;
+        }
+        finally {
+            close(out);
+            close(inputStreamAndMethod.inputStream);
+            inputStreamAndMethod.method.releaseConnection();
+        }
+        return null;
     }
 
     public static class ApplicationInfo
