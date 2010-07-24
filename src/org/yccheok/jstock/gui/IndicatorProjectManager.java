@@ -237,7 +237,7 @@ public class IndicatorProjectManager {
                 }
                 finally {
                     Utils.close(out);
-                    in.closeEntry();
+                    Utils.closeEntry(in);
                 }
             }
         }
@@ -379,10 +379,8 @@ public class IndicatorProjectManager {
                 }
                 finally {
                     // Complete the entry
-                    out.closeEntry();
-                    if (in != null) {
-                        in.close();
-                    }
+                    Utils.closeEntry(out);
+                    Utils.close(in);
                 }
             }
         } catch (IOException ex) {
@@ -390,14 +388,8 @@ public class IndicatorProjectManager {
             return false;
         }
         finally {
-            if (out != null) {
-                try {
-                    // Complete the ZIP file
-                    out.close();
-                } catch (IOException ex) {
-                    log.error(null, ex);
-                    return false;
-                }
+            if (false == Utils.close(out)) {
+                return false;
             }
         }
         return true;
