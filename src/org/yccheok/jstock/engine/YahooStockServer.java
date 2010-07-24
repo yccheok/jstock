@@ -23,7 +23,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -228,7 +228,7 @@ public class YahooStockServer extends AbstractYahooStockServer {
 
     private final URL baseURL;
     
-    private static final Map<Country, URL> servers = new HashMap<Country, URL>();
+    private static final Map<Country, URL> servers = new EnumMap<Country, URL>(Country.class);
     private static final Pattern urlPattern = Pattern.compile("<a\\s+href\\s*=\\s*\"?(/uk/index.php.+?)\"?>", Pattern.CASE_INSENSITIVE);
     private static final Log log = LogFactory.getLog(YahooStockServer.class);
 

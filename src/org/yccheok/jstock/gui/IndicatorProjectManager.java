@@ -236,9 +236,7 @@ public class IndicatorProjectManager {
                     }
                 }
                 finally {
-                    if (out != null) {
-                        out.close();
-                    }
+                    Utils.close(out);
                     in.closeEntry();
                 }
             }
@@ -248,14 +246,7 @@ public class IndicatorProjectManager {
             status = false;
         }
         finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException ex) {
-                    log.error(null, ex);
-                    status = false;
-                }
-            }
+            status = Utils.close(in);
         }
 
         if (status == false) {
