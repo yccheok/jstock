@@ -19,6 +19,7 @@
 
 package org.yccheok.jstock.engine;
 
+import java.io.File;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.commons.httpclient.*;
@@ -263,6 +264,20 @@ public class Utils {
         return isValidPortNumber(port);
     }
 
+    /**
+     * One of the shortcomings of JStock is that, it is very difficult to get a
+     * complete list of available stocks in a market. Most stock servers do not
+     * provide information on complete list of available stocks. We can overcome
+     * this, by reading the stock list information from a CSV file.
+     *
+     * @param file The CSV file
+     * @return List of stocks carried by the CSV file.
+     */
+    public static List<Stock> getStocksFromCSVFile(File file) {
+        List<Stock> stocks = new ArrayList<Stock>();
+        return stocks;
+    }
+    
     private static final List<Index> australiaIndices = new ArrayList<Index>();
     private static final List<Index> austriaIndices = new ArrayList<Index>();
     private static final List<Index> belgiumIndices = new ArrayList<Index>();
