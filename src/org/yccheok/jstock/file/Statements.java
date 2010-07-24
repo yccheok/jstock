@@ -224,13 +224,7 @@ public class Statements {
         }
         finally
         {
-            if (fileInputStream != null) {
-                try {
-                    fileInputStream.close();
-                } catch (IOException ex) {
-                    log.error(null, ex);
-                }
-            }
+            org.yccheok.jstock.gui.Utils.close(fileInputStream);
         }
         return statementsList;
     }
@@ -260,7 +254,7 @@ public class Statements {
                 }
             }   /* if ((nextLine = csvreader.readNext()) != null) */
 
-            if (types.size() == 0) {
+            if (types.isEmpty()) {
                 return null;
             }
 
@@ -281,7 +275,7 @@ public class Statements {
                     atoms.add(atom);
                 }
                 final Statement statement = new Statement(atoms);
-                if (s.statements.size() != 0) {
+                if (!s.statements.isEmpty()) {
                     if (s.statements.get(0).getType() != statement.getType()) {
                         // Doesn't not match. Return null to indicate we fail to
                         // construct Statements from TableModel.
@@ -295,18 +289,15 @@ public class Statements {
             log.error(null, ex);
         }
         finally {
+
             try {
                 csvreader.close();
             } catch (IOException ex) {
                 log.error(null, ex);
             }
-            try {
-                reader.close();
-            } catch (IOException ex) {
-                log.error(null, ex);
-            }
+            org.yccheok.jstock.gui.Utils.close(reader);
         }
-        if (s.statements.size() == 0) {
+        if (s.statements.isEmpty()) {
             // No statement being found. Returns null.
             return null;
         }
@@ -461,11 +452,7 @@ public class Statements {
         } catch (IOException ex) {
             log.error(null, ex);
         }
-        try {
-            writer.close();
-        } catch (IOException ex) {
-            log.error(null, ex);
-        }
+        org.yccheok.jstock.gui.Utils.close(writer);
         return true;
     }
 
@@ -505,13 +492,7 @@ public class Statements {
             log.error(null, ex);
         }
         finally {
-            if (fileOut != null) {
-                try {
-                    fileOut.close();
-                } catch (IOException ex) {
-                    log.error(null, ex);
-                }
-            }
+            org.yccheok.jstock.gui.Utils.close(fileOut);
         }
         return status;
     }
@@ -564,13 +545,7 @@ public class Statements {
             log.error(null, ex);
         }
         finally {
-            if (fileOut != null) {
-                try {
-                    fileOut.close();
-                } catch (IOException ex) {
-                    log.error(null, ex);
-                }
-            }
+            org.yccheok.jstock.gui.Utils.close(fileOut);
         }
         return status;
     }
