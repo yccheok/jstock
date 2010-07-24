@@ -69,7 +69,7 @@ public abstract class AbstractYahooStockServer extends Subject<AbstractYahooStoc
     public List<Stock> getStocksBySymbols(List<Symbol> symbols) throws StockNotFoundException {
         List<Stock> stocks = new ArrayList<Stock>();
 
-        if (symbols.size() == 0) {
+        if (symbols.isEmpty()) {
             return stocks;
         }
 

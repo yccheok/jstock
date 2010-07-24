@@ -84,30 +84,12 @@ public class CIMBStockHistoryServer implements StockHistoryServer {
                 while((n = gZipInputStream.read(data, 0, data.length)) != -1) {
                     s.append(new String(data, 0, n));
                 }
-            }
-            catch (java.io.IOException exp) {
+            } catch (java.io.IOException exp) {
                 log.error(null, exp);
                 continue;
-            }
-            finally {                
-                // Do not do anything if fail to clean up. Just ignore the
-                // exception.
-                if (gZipInputStream != null) {
-                    try {
-                        gZipInputStream.close();
-                    } catch (IOException exp) {
-                        log.error(null, exp);
-                    }
-                }
-
-                if (inputStreamAndMethod.inputStream != null) {
-                    try {
-                        inputStreamAndMethod.inputStream.close();
-                    } catch (IOException exp) {
-                        log.error(null, exp);
-                    }
-                }
-                
+            } finally {
+                org.yccheok.jstock.gui.Utils.close(gZipInputStream);
+                org.yccheok.jstock.gui.Utils.close(inputStreamAndMethod.inputStream);
                 inputStreamAndMethod.method.releaseConnection();
             }
 
