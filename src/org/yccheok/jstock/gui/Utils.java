@@ -59,6 +59,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -279,21 +280,8 @@ public class Utils {
             status = false;
         }
         finally {
-            if (zipInputStream != null) {
-                try {
-                    zipInputStream.close();
-                } catch (IOException ex) {
-                    log.error(null, ex);
-                }
-            }
-
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (IOException ex) {
-                    log.error(null, ex);
-                }
-            }
+            close(zipInputStream);
+            close(inputStream);
         }
         return status;
     }
@@ -321,11 +309,7 @@ public class Utils {
             return null;
         }
         finally {
-            try {
-                inputStreamAndMethod.inputStream.close();
-            } catch (IOException exp) {
-                log.error(null, exp);
-            }
+            close(inputStreamAndMethod.inputStream);
             inputStreamAndMethod.method.releaseConnection();
         }
         final String _id = properties.getProperty("id");
@@ -370,11 +354,7 @@ public class Utils {
             return java.util.Collections.emptyMap();
         }
         finally {
-            try {
-                inputStreamAndMethod.inputStream.close();
-            } catch (IOException exp) {
-                log.error(null, exp);
-            }
+            close(inputStreamAndMethod.inputStream);
             inputStreamAndMethod.method.releaseConnection();
         }
         final String _id = properties.getProperty("id");
@@ -1024,20 +1004,8 @@ public class Utils {
                 return null;
             }
             finally {
-                if (outputStream != null) {
-                    try {
-                        outputStream.close();
-                    } catch (IOException ex) {
-                        log.error(null, ex);
-                    }
-                }
-                if (inputStream != null) {
-                    try {
-                        inputStream.close();
-                    } catch (IOException ex) {
-                        log.error(null, ex);
-                    }
-                }
+                close(outputStream);
+                close(inputStream);
                 post.releaseConnection();
             }
         } while (true);
@@ -1502,11 +1470,7 @@ public class Utils {
 
         }
         finally {
-            try {
-                inputStreamAndMethod.inputStream.close();
-            } catch (IOException exp) {
-                log.error(null, exp);
-            }
+            close(inputStreamAndMethod.inputStream);
             inputStreamAndMethod.method.releaseConnection();
         }
 
@@ -1585,16 +1549,10 @@ public class Utils {
             log.error(null, exp);
         }
         finally {
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                    inputStream = null;
-                }
-                catch (java.io.IOException exp) {
-                    log.error(null, exp);
-                    return null;
-                }
+            if (false == close(inputStream)) {
+                return null;
             }
+            inputStream = null;
         }
 
         return null;
@@ -1618,16 +1576,10 @@ public class Utils {
             return false;
         }
         finally {
-            if (outputStream != null) {
-                try {
-                    outputStream.close();
-                    outputStream = null;
-                }
-                catch (java.io.IOException exp) {
-                    log.error(null, exp);
-                    return false;
-                }
+            if (false == close(outputStream)) {
+                return false;
             }
+            outputStream = null;
         }
 
         return true;
@@ -1987,6 +1939,26 @@ public class Utils {
         final FileNameExtensionFilter csvFilter = new FileNameExtensionFilter("CSV Documents (*.csv)", "csv");
         final FileNameExtensionFilter xlsFilter = new FileNameExtensionFilter("Microsoft Excel (*.xls)", "xls");
         return promptSaveJFileChooser(suggestedFileName, csvFilter, xlsFilter);
+    }
+
+    /**
+     * Performs close operation on ZIP output stream, without the need of
+     * writing cumbersome try...catch block.
+     *
+     * @param zipOutputStream The ZIP input stream.
+     * @return Returns false if there is an exception during close operation.
+     * Otherwise returns true.
+     */
+    public static boolean closeEntry(ZipOutputStream zipOutputStream) {
+        if (null != zipOutputStream) {
+            try {
+                zipOutputStream.closeEntry();
+            } catch (IOException ex) {
+                log.error(null, ex);
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
