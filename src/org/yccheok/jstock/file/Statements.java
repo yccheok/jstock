@@ -28,6 +28,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -153,7 +154,7 @@ public class Statements {
                     }
                 }
 
-                if (types.size() == 0) {
+                if (types.isEmpty()) {
                     continue;
                 }
 
@@ -202,7 +203,7 @@ public class Statements {
                         atoms.add(new Atom(value, types.get(j - startCell)));
                     }
                     final Statement statement = new Statement(atoms);
-                    if (s.statements.size() != 0) {
+                    if (!s.statements.isEmpty()) {
                         if (s.statements.get(0).getType() != statement.getType()) {
 							// Give up.
                             s.statements.clear();
@@ -249,9 +250,7 @@ public class Statements {
         try {
             String [] nextLine;
             if ((nextLine = csvreader.readNext()) != null) {
-                for (String item : nextLine) {
-                    types.add(item);
-                }
+                types.addAll(Arrays.asList(nextLine));
             }   /* if ((nextLine = csvreader.readNext()) != null) */
 
             if (types.isEmpty()) {
@@ -289,7 +288,6 @@ public class Statements {
             log.error(null, ex);
         }
         finally {
-
             try {
                 csvreader.close();
             } catch (IOException ex) {
@@ -338,7 +336,7 @@ public class Statements {
                 }
             }
             final Statement statement = new Statement(atoms);
-            if (s.statements.size() != 0) {
+            if (!s.statements.isEmpty()) {
                 if (s.statements.get(0).getType() != statement.getType()) {
                     // Doesn't not match. Return null to indicate we fail to
                     // construct Statements from TableModel.
@@ -347,7 +345,7 @@ public class Statements {
             }
             s.statements.add(statement);
         }
-        if (s.statements.size() == 0) {
+        if (s.statements.isEmpty()) {
             // No statement being found. Returns null.
             return null;
         }
@@ -401,7 +399,7 @@ public class Statements {
                     }
                 }
                 final Statement statement = new Statement(atoms);
-                if (s.statements.size() != 0) {
+                if (!s.statements.isEmpty()) {
                     if (s.statements.get(0).getType() != statement.getType()) {
                         // Doesn't not match. Return null to indicate we fail to
                         // construct Statements from TableModel.
@@ -411,7 +409,7 @@ public class Statements {
                 s.statements.add(statement);
             }   // for (int j = 0; j < transactionCount; j++)
         }   //  for (int i = 0; i < summaryCount; i++)
-        if (s.statements.size() == 0) {
+        if (s.statements.isEmpty()) {
             // No statement being found. Returns null.
             return null;
         }
