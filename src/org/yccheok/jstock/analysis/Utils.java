@@ -24,8 +24,6 @@ package org.yccheok.jstock.analysis;
 
 import java.io.*;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.Adler32;
 import java.util.zip.CheckedInputStream;
 import org.apache.commons.logging.Log;

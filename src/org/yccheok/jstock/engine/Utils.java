@@ -19,10 +19,17 @@
 
 package org.yccheok.jstock.engine;
 
+import au.com.bytecode.opencsv.CSVReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.commons.httpclient.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  *
@@ -275,6 +282,70 @@ public class Utils {
      */
     public static List<Stock> getStocksFromCSVFile(File file) {
         List<Stock> stocks = new ArrayList<Stock>();
+        FileInputStream fileInputStream = null;
+        InputStreamReader inputStreamReader = null;
+        CSVReader csvreader = null;
+        try {
+            fileInputStream = new FileInputStream(file);
+            inputStreamReader = new InputStreamReader(fileInputStream,  Charset.forName("UTF-8"));
+            csvreader = new CSVReader(inputStreamReader);
+            final String[] types = csvreader.readNext();
+            if (types == null) {
+                // Fail. Returns empty stock list.
+                return stocks;
+            }
+            int code_index = -1;
+            int symbol_index = -1;
+            int name_index = -1;
+            boolean success_index = false;
+            // Search for the indecies for code, symbol and name.
+            for (int index = 0; index < types.length; index++) {
+                final String type = types[index];
+                if (0 == type.compareToIgnoreCase("code")) {
+                    code_index = index;
+                } else if (0 == type.compareToIgnoreCase("symbol")) {
+                    symbol_index = index;
+                } else if (0 == type.compareToIgnoreCase("name")) {
+                    name_index = index;
+                }
+
+                if (code_index != -1 && symbol_index != -1 && name_index != -1) {
+                    // All found. Early quit.
+                    success_index = true;
+                    break;
+                }
+            }
+
+            // Are we having all the indecies?
+            if (false == success_index) {
+                // Nope. Returns empty stock list.
+                return stocks;
+            }
+
+            String [] nextLine;
+            while ((nextLine = csvreader.readNext()) != null) {
+                // Shall we continue to ignore, or shall we just return early to
+                // flag an error?
+                if (nextLine.length != types.length) {
+                    // Give a warning message.
+                    log.error("Incorrect CSV format. There should be exactly " + types.length + " item(s)");
+                    continue;
+                }
+                // TODO:
+            }
+        } catch (IOException ex) {
+            log.error(null, ex);
+        } finally {
+            if (csvreader != null) {
+                try {
+                    csvreader.close();
+                } catch (IOException ex) {
+                    log.error(null, ex);
+                }
+            }
+            org.yccheok.jstock.gui.Utils.close(inputStreamReader);
+            org.yccheok.jstock.gui.Utils.close(fileInputStream);
+        }
         return stocks;
     }
     
@@ -443,4 +514,6 @@ public class Utils {
     public static String getJStockStaticServer() {
         return JSTOCK_STATIC_SERVER;
     }
+
+    private static final Log log = LogFactory.getLog(Utils.class);
 }
