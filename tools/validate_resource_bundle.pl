@@ -23,7 +23,7 @@ sub init
 {
     my $name = $_;
     my $dir = $File::Find::dir;
-    my $file = $File::Find::name;	
+    my $file = $File::Find::name;
     if ($file !~ /(gui\.properties$)|(messages\.properties$)/) {
         return;
     }
@@ -56,7 +56,7 @@ sub process
 {
     my $name = $_;
     my $dir = $File::Find::dir;
-    my $file = $File::Find::name;	
+    my $file = $File::Find::name;
     if ($file !~ /\.java$/) {
         return;
     }
