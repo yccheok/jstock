@@ -2,7 +2,7 @@
 use strict;
 sub strip_spaces { my $str = shift; $str =~ y/ //d; $str }
 open INPUT, "<C:/Projects/guestbook/war/stocks_information/china/stocks.csv" or die $!;
-open OUTPUT, ">C:/Projects/guestbook/war/stocks_information/china/stocks-new.csv" or die $!;
+open OUTPUT, ">C:/Projects/guestbook/war/stocks_information/china/tmp.csv" or die $!;
 while (my $line = <INPUT>) {
     $line =~ s/(\d+)/ sprintf '%.6d'.'.sz', $1 /e;
     $line =~ s/("[^"]+",)/ strip_spaces($1) /e;
@@ -10,3 +10,4 @@ while (my $line = <INPUT>) {
 }
 close OUTPUT;
 close INPUT;
+rename("C:/Projects/guestbook/war/stocks_information/china/tmp.csv", "C:/Projects/guestbook/war/stocks_information/china/stocks.csv");
