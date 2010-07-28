@@ -2377,8 +2377,7 @@ public class MainFrame extends javax.swing.JFrame {
                 
                 try {
                     Thread.sleep(jStockOptions.getScanningSpeed());
-                }
-                catch(InterruptedException exp) {
+                } catch (InterruptedException exp) {
                     log.error(null, exp);
                     break;
                 }
@@ -2451,13 +2450,13 @@ public class MainFrame extends javax.swing.JFrame {
                     // Prepare proper synchronization for us to change country.
                     synchronized(StockCodeAndSymbolDatabaseTask.this)
                     {
-                        if (runnable)
+                        if (this.runnable)
                         {
-                            stockCodeAndSymbolDatabase = tmp;
+                            MainFrame.this.stockCodeAndSymbolDatabase = tmp;
 
                             // Register the auto complete JComboBox with latest database.
-                            ((AutoCompleteJComboBox)jComboBox1).setStockCodeAndSymbolDatabase(stockCodeAndSymbolDatabase);
-                            indicatorPanel.setStockCodeAndSymbolDatabase(stockCodeAndSymbolDatabase);
+                            ((AutoCompleteJComboBox)MainFrame.this.jComboBox1).setStockCodeAndSymbolDatabase(MainFrame.this.stockCodeAndSymbolDatabase);
+                            MainFrame.this.indicatorPanel.setStockCodeAndSymbolDatabase(MainFrame.this.stockCodeAndSymbolDatabase);
                             
                             return true;
                         }
@@ -2473,11 +2472,44 @@ public class MainFrame extends javax.swing.JFrame {
             // explicitly doesn't allow us to read from disk. Let's perform
             // networking stuff.
             //
+            // For networking stuff, first, we will try on JStock static server.
+            // If fail, we will continue to try on Yahoo Stock Server (Or other
+            // stock servers).
             Boolean success = false;
-            int tries = 0;            
-            final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactories(country);
             StockCodeAndSymbolDatabase tmp = null;
-            
+
+            final String location = org.yccheok.jstock.engine.Utils.getStocksCSVFileLocation(country);
+            // Try to download the CSV file.
+            final File file = Utils.downloadAsTempFile(location);
+            // Is download success?
+            if (file != null) {
+                // Try to parse the CSV file.
+                final java.util.List<Stock> stocks = org.yccheok.jstock.engine.Utils.getStocksFromCSVFile(file);
+                // Is the stocks good enough?
+                if (false == stocks.isEmpty()) {
+                    // Let's make our database since we get a list of good stocks.
+                    tmp = new StockCodeAndSymbolDatabase(stocks);
+                    // Prepare proper synchronization for us to change country.
+                    synchronized(this)
+                    {
+                        if (runnable)
+                        {
+                            MainFrame.this.stockCodeAndSymbolDatabase = tmp;
+
+                            // Register the auto complete JComboBox with latest database.
+                            ((AutoCompleteJComboBox)MainFrame.this.jComboBox1).setStockCodeAndSymbolDatabase(MainFrame.this.stockCodeAndSymbolDatabase);
+                            MainFrame.this.indicatorPanel.setStockCodeAndSymbolDatabase(MainFrame.this.stockCodeAndSymbolDatabase);
+                            // Yup. The entire operation is success. Do not return
+                            // first. We need to save the database as XML.
+                            success = true;
+                        }
+                    }
+                }
+            }
+
+            // Try on Yahoo Stock Server (Or other stock servers).
+            int tries = 0;            
+            final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactories(country);            
             while (!isCancelled() && !success && runnable) {
                 for (StockServerFactory factory : stockServerFactories) {
 
@@ -2527,11 +2559,13 @@ public class MainFrame extends javax.swing.JFrame {
                 tries++;
                 
                 // We had tried NUM_OF_RETRY times, but still failed. Abort.
-                if(tries >= NUM_OF_RETRY) break;
+                if (tries >= NUM_OF_RETRY) {
+                    break;
+                }
 
             }
              
-            if(success == true)
+            if (success == true)
             {
                 org.yccheok.jstock.gui.Utils.toXML(tmp, f);
             }
