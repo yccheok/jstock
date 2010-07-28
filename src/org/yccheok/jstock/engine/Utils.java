@@ -275,7 +275,7 @@ public class Utils {
      * Gets the CSV file, which will be used to construct 
      * {@code StockCodeAndSymbolDatabase} object.
      *
-     * @param counter The country of the stock market
+     * @param country The country of the stock market
      * @return Location of the stocks CSV file.
      */
     public static String getStocksCSVFileLocation(Country country) {

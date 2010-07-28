@@ -53,6 +53,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
+import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
 import org.yccheok.jstock.engine.*;
 import java.util.*;
 import java.util.concurrent.Executor;
@@ -73,6 +74,11 @@ import javax.swing.JRadioButton;
 import javax.swing.UIManager;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import net.sourceforge.pinyin4j.PinyinHelper;
+import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
+import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
+import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
+import net.sourceforge.pinyin4j.format.HanyuPinyinVCharType;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
@@ -89,6 +95,7 @@ import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
+import org.apache.commons.lang.CharUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.net.TimeTCPClient;
@@ -2033,11 +2040,9 @@ public class Utils {
             }
             // Success!
             return temp;
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             log.error(null, ex);
-        }
-        finally {
+        } finally {
             close(out);
             close(inputStreamAndMethod.inputStream);
             inputStreamAndMethod.method.releaseConnection();
@@ -2045,14 +2050,121 @@ public class Utils {
         return null;
     }
 
+    /**
+     * Returns list of Han Yu Pin Yin's prefix of every characters. If the
+     * character is an alphabet or numerical, the original character will be
+     * used. If there is any error occur during conversion, that particular
+     * character will be ignored.
+     *
+     * @param chinese String to be converted
+     * @return List of Han Yu Pin Yin's prefix of every characters.
+     */
+    public static List<String> toHanyuPinyin(String chinese) {
+        // Is this an empty string?
+        if (chinese.isEmpty()) {
+            return new ArrayList<String>();
+        }
+
+        // Use StringBuffer instead of String during processing for speed
+        // optimization.
+        List<StringBuffer> stringBuffers = null;
+
+        for (int i = 0, length = chinese.length(); i < length; i++) {
+            final char c = chinese.charAt(i);
+
+            String[] pinyins = null;
+            final java.util.Set<Character> set = new java.util.HashSet<Character>();
+            // Is this Chinese character?
+            if (CharUtils.isAscii(c)) {
+                if (CharUtils.isAsciiAlphanumeric(c)) {
+                    // We are only interested in 'abc' and '123'.
+                    set.add(c);
+                }
+            } else {
+                // This is possible a Chinese character.
+                try {
+                    pinyins = PinyinHelper.toHanyuPinyinStringArray(c, DEFAULT_HANYU_PINYIN_OUTPUT_FORMAT);
+                    if (pinyins != null) {
+                        for (String pinyin : pinyins) {
+                            set.add(pinyin.charAt(0));
+                        }
+                    }
+                } catch (BadHanyuPinyinOutputFormatCombination ex) {
+                    log.error(null, ex);
+                    // No. This is not Chinese character.
+                    // Just ignore the error. Continue for the rest of characters.
+                    // return new ArrayList<String>();
+                }            
+            }
+            final List<StringBuffer> tmps = stringBuffers;
+            stringBuffers = new ArrayList<StringBuffer>();
+
+            if (tmps == null) {
+                // This will be the first converted character.
+                for (Character character : set) {
+                    final StringBuffer me = new StringBuffer();
+                    me.append(character);
+                    stringBuffers.add(me);
+                }
+            } else {
+                for (Character character : set) {
+                    for (StringBuffer tmp : tmps) {
+                        final StringBuffer me = new StringBuffer();
+                        me.append(tmp);
+                        me.append(character);
+                        stringBuffers.add(me);
+                    }
+                }
+            }
+        }
+
+        List<String> result = new ArrayList<String>();
+        // Do we have any converted characters?
+        if (stringBuffers != null) {
+            for (StringBuffer stringBuffer : stringBuffers) {
+                result.add(stringBuffer.toString());
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Represents latest application information. This is being used for
+     * application upgrading.
+     */
     public static class ApplicationInfo
     {
+        /**
+         * ID to represent application version.
+         */
         public final int applicationVersionID;
+        /**
+         * URL link to download Windows application version <code>applicationVersionID</code>
+         */
         public final String windowsDownloadLink;
+        /**
+         * URL link to download Linux application version <code>applicationVersionID</code>
+         */
         public final String linuxDownloadLink;
+        /**
+         * URL link to download Mac application version <code>applicationVersionID</code>
+         */
         public final String macDownloadLink;
+        /**
+         * URL link to download Solaris application version <code>applicationVersionID</code>
+         */
         public final String solarisDownloadLink;
 
+        /**
+         * Constructs application information object.
+         *
+         * @param applicationVersionID ID to represent application version
+         * @param windowsDownloadLink URL link to download Windows application
+         * @param linuxDownloadLink URL link to download Linux application
+         * @param macDownloadLink URL link to download Mac application
+         * @param solarisDownloadLink URL link to download Solaris application
+         */
         public ApplicationInfo(int applicationVersionID, String windowsDownloadLink, String linuxDownloadLink, String macDownloadLink, String solarisDownloadLink) {
             this.applicationVersionID = applicationVersionID;
             this.windowsDownloadLink = windowsDownloadLink;
@@ -2060,6 +2172,13 @@ public class Utils {
             this.macDownloadLink = macDownloadLink;
             this.solarisDownloadLink = solarisDownloadLink;
         }
+    }
+
+    private static final HanyuPinyinOutputFormat DEFAULT_HANYU_PINYIN_OUTPUT_FORMAT = new HanyuPinyinOutputFormat();
+    static {
+        DEFAULT_HANYU_PINYIN_OUTPUT_FORMAT.setCaseType(HanyuPinyinCaseType.LOWERCASE);
+        DEFAULT_HANYU_PINYIN_OUTPUT_FORMAT.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
+        DEFAULT_HANYU_PINYIN_OUTPUT_FORMAT.setVCharType(HanyuPinyinVCharType.WITH_V);
     }
 
     private static volatile List<String> NTPServers = null;
