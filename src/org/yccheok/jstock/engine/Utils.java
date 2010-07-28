@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
+ * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -272,6 +272,19 @@ public class Utils {
     }
 
     /**
+     * Gets the CSV file, which will be used to construct 
+     * {@code StockCodeAndSymbolDatabase} object.
+     *
+     * @param counter The country of the stock market
+     * @return Location of the stocks CSV file.
+     */
+    public static String getStocksCSVFileLocation(Country country) {
+        // Must use lower case, as Google App Engine only support URL in lower
+        // case.
+        return JSTOCK_STATIC_SERVER + "stocks_information/" + country.toString().toLowerCase() + "/" + "stocks.csv";
+    }
+
+    /**
      * One of the shortcomings of JStock is that, it is very difficult to get a
      * complete list of available stocks in a market. Most stock servers do not
      * provide information on complete list of available stocks. We can overcome
@@ -331,7 +344,11 @@ public class Utils {
                     log.error("Incorrect CSV format. There should be exactly " + types.length + " item(s)");
                     continue;
                 }
-                // TODO:
+                final String code = nextLine[code_index];
+                final String symbol = nextLine[symbol_index];
+                final String name = nextLine[name_index];
+                final Stock stock = org.yccheok.jstock.gui.Utils.getEmptyStock(Code.newInstance(code), Symbol.newInstance(symbol));
+                stocks.add(stock);
             }
         } catch (IOException ex) {
             log.error(null, ex);

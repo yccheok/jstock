@@ -1,23 +1,20 @@
 /*
- * StockCodeAndSymbolDatabase.java
- *
- * Created on April 21, 2007, 6:13 PM
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- * Copyright (C) 2007 Cheok YanCheng <yccheok@yahoo.com>
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.yccheok.jstock.engine;
@@ -30,8 +27,16 @@ import org.yccheok.jstock.engine.Stock.Industry;
  * @author yccheok
  */
 public class StockCodeAndSymbolDatabase {
-    
-    /** Creates a new instance of StockCodeAndSymbolDatabase */
+
+    /** 
+     * Initializes a newly created {@code StockCodeAndSymbolDatabase} object so 
+     * that it contains the available stock codes and symbols information for
+     * a stock market. The information is being retrieved from stock server.
+     *
+     * @param stockServer Stock server which provides stock information
+     * @throws StockNotFoundException If fail to retrieve stock information from
+     *         stock server
+     */
     public StockCodeAndSymbolDatabase(StockServer stockServer) throws StockNotFoundException {
         List<Stock> stocks = null;
         
@@ -41,23 +46,45 @@ public class StockCodeAndSymbolDatabase {
         catch (StockNotFoundException exp) {
             throw exp;
         }
-        
-        for (Stock stock : stocks)
-        {
+
+        this.init(stocks);
+    }
+
+    /**
+     * Initializes a newly created {@code StockCodeAndSymbolDatabase} object so
+     * that it contains the available stock codes and symbols information for
+     * a stock market. The information is being retrieved from list of stocks.
+     *
+     * @param stocks List of stocks which provides stock information
+     */
+    public StockCodeAndSymbolDatabase(List<Stock> stocks) {
+        this.init(stocks);
+    }
+
+    /**
+     * Initializes this {@code StockCodeAndSymbolDatabase} based on given list
+     * of stocks.
+     *
+     * @param stocks List of stocks which provides stock information
+     */
+    private void init(List<Stock> stocks) {
+        for (Stock stock : stocks) {
             Symbol symbol = stock.getSymbol();
             Code code = stock.getCode();
             Stock.Industry industry = stock.getIndustry();
             Stock.Board board = stock.getBoard();
-            
-            if (symbol.toString().length() == 0 || code.toString().length() == 0) continue;
+
+            if (symbol.toString().length() == 0 || code.toString().length() == 0) {
+                continue;
+            }
 
             this.codes.add(code);
             this.symbols.add(symbol);
 
             symbolToCode.put(symbol, code);
-             
+
             codeToSymbol.put(code, symbol);
-            
+
             List<Code> _codes = industryToCodes.get(industry);
             if (_codes == null) {
                 _codes = new ArrayList<Code>();
@@ -66,7 +93,7 @@ public class StockCodeAndSymbolDatabase {
             _codes.add(code);
 
             _codes = boardToCodes.get(board);
-            if(_codes == null) {
+            if (_codes == null) {
                 _codes = new ArrayList<Code>();
                 boardToCodes.put(board, _codes);
             }
@@ -78,7 +105,7 @@ public class StockCodeAndSymbolDatabase {
                 industryToSymbols.put(industry, _symbols);
             }
             _symbols.add(symbol);
-            
+
             _symbols = boardToSymbols.get(board);
             if (_symbols == null) {
                 _symbols = new ArrayList<Symbol>();
@@ -86,11 +113,18 @@ public class StockCodeAndSymbolDatabase {
             }
             _symbols.add(symbol);
         }
-        
+
         symbolSearchEngine = new TSTSearchEngine<Symbol>(symbols);
         codeSearchEngine = new TSTSearchEngine<Code>(codes);
     }
-    
+
+    /**
+     * Initializes a newly created {@code StockCodeAndSymbolDatabase} object so
+     * that it contains same stock information as argument; in other words, the
+     * newly created database is a copy of the argument database.
+     *
+     * @param src A {@code StockCodeAndSymbolDatabase}
+     */
     public StockCodeAndSymbolDatabase(StockCodeAndSymbolDatabase src) {
         this.symbolToCode.putAll(src.symbolToCode);
         this.codeToSymbol.putAll(src.codeToSymbol);
