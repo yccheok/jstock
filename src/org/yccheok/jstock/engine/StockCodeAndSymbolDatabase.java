@@ -262,7 +262,7 @@ public class StockCodeAndSymbolDatabase {
             }
         }
 
-		/* For backward compatible */
+        /* For backward compatible */
         if (codes == null || codes.size() <= 0) {
         	if (codes == null) {
             	codes = new ArrayList<Code>();
