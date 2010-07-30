@@ -19,7 +19,7 @@
 
 package org.yccheok.jstock.engine;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -33,7 +33,7 @@ public enum Factories {
             
     public List<StockServerFactory> getStockServerFactories(Country country) {
         List<StockServerFactory> list = map.get(country);
-        if(list != null) {
+        if (list != null) {
             return java.util.Collections.unmodifiableList(list);
         }
         
@@ -54,7 +54,7 @@ public enum Factories {
         }
     }
 
-    private static final Map<Country, List<StockServerFactory>> map = new HashMap<Country, List<StockServerFactory>>();
+    private static final Map<Country, List<StockServerFactory>> map = new EnumMap<Country, List<StockServerFactory>>(Country.class);
     
     static {
         final List<StockServerFactory> australiaList = new CopyOnWriteArrayList<StockServerFactory>();
