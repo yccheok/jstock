@@ -30,6 +30,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.commons.httpclient.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.yccheok.jstock.gui.MainFrame;
 
 /**
  *
@@ -470,6 +471,17 @@ public class Utils {
         }
         
         return result;
+    }
+
+    /**
+     * Returns best search engine based on current selected country.
+     * 
+     * @param list List of elements, to be inserted into search engine
+     * @return Best search engine based on current selected country.
+     */
+    public static <E> SearchEngine<E> getSearchEngine(List<E> list) {
+        final Country country = MainFrame.getInstance().getJStockOptions().getCountry();
+        return new TSTSearchEngine<E>(list);
     }
 
     public static List<Index> getStockIndices(Country country) {
