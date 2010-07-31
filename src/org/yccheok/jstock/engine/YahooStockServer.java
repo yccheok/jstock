@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2009 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,11 +46,7 @@ public class YahooStockServer extends AbstractYahooStockServer {
     
     public YahooStockServer(Country country) {
         super(country);
-        baseURL = YahooStockServer.servers.get(country);
-        
-        if (baseURL == null) {
-            throw new java.lang.IllegalArgumentException("Illegal country as argument (" + country +")");
-        }        
+        this.baseURL = YahooStockServer.servers.get(country);
     }
     
     // The returned URLs, shouldn't have any duplication with visited,
@@ -82,6 +78,12 @@ public class YahooStockServer extends AbstractYahooStockServer {
     
     @Override
     public List<Stock> getAllStocks() throws StockNotFoundException {
+        if (this.baseURL == null) {
+            // For certain countries, we have no intention to getAllStocks
+            // through Yahoo service. In that case, the baseURL will simply
+            // be null.
+            throw new StockNotFoundException(this.getCountry().toString());
+        }
         List<URL> visited = new ArrayList<URL>();
         
         List<Stock> stocks = new ArrayList<Stock>();
@@ -292,7 +294,7 @@ public class YahooStockServer extends AbstractYahooStockServer {
             servers.put(Country.UnitedKingdom, new URL("http://uk.finsearch.yahoo.com/uk/index.php?s=uk_sort&nm=**&tp=S&r=L&sub=Look+Up"));
             servers.put(Country.UnitedState, new URL("http://uk.finsearch.yahoo.com/uk/index.php?s=uk_sort&nm=**&tp=S&r=US&sub=Look+Up"));
         }
-        catch(MalformedURLException exp) {
+        catch (MalformedURLException exp) {
             // Shouldn't happen.
             exp.printStackTrace();
         }
