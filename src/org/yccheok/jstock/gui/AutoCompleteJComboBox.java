@@ -203,11 +203,7 @@ public class AutoCompleteJComboBox extends JComboBox {
                 }   /* if(!e.isActionKey()) */
             }   /* public void keyReleased(KeyEvent e) */
         };
-    }    
-    
-    public String getLastEnteredString() {
-        return this.lastEnteredString;
-    }
+    } 
 
     @Override
     public void setUI(ComboBoxUI ui)
