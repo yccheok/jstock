@@ -2369,7 +2369,7 @@ public class MainFrame extends javax.swing.JFrame {
                     
                     final Market market = server.getMarket();
                     
-                    if(market != null) {
+                    if (market != null) {
                         update(market);
                         break;
                     }
@@ -3151,9 +3151,9 @@ public class MainFrame extends javax.swing.JFrame {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                for(Stock stock : stocks) {
+                for (Stock stock : stocks) {                    
                     updateStockToTable(stock);
-                    if(isStockBeingSelected(stock)) {
+                    if (isStockBeingSelected(stock)) {
                         MainFrame.this.updateBuyerSellerInformation(stock);
                         MainFrame.this.updateDynamicChart(stock);
                     }
