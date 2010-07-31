@@ -90,7 +90,17 @@ public class TSTSearchEngineTest extends TestCase {
         TSTSearchEngine engine = new TSTSearchEngine();
         engine.put(new Name("efg"));
         engine.put(new Name("abc"));
+        // Duplication will be ignored.
         engine.put(new Name("abc"));
+        List<Name> result = engine.searchAll("AB");
+        assertEquals(1, result.size());
+        }
+        {
+        TSTSearchEngine engine = new TSTSearchEngine();
+        engine.put(new Name("efg"));
+        engine.put(new Name("abc"));
+        // Different case do not considered as duplication.
+        engine.put(new Name("abC"));
         List<Name> result = engine.searchAll("AB");
         assertEquals(2, result.size());
         }
@@ -98,9 +108,10 @@ public class TSTSearchEngineTest extends TestCase {
         TSTSearchEngine engine = new TSTSearchEngine();
         engine.put(new Name(bundle.getString("ni_men")));
         engine.put(new Name(bundle.getString("wo_men")));
+        // Duplication will be ignored.
         engine.put(new Name(bundle.getString("wo_men")));
         List<Name> result = engine.searchAll(bundle.getString("wo_men"));
-        assertEquals(2, result.size());
+        assertEquals(1, result.size());
         }
     }
 
