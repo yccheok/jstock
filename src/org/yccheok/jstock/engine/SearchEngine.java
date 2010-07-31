@@ -31,6 +31,7 @@ public interface SearchEngine<E> {
      *
      * @param prefix String prefix to match against elements
      * @return A list of E elements, which will be similar to a given string prefix.
+     * Returns empty list if no match found.
      */
     public List<E> searchAll(String prefix);
     /**
@@ -38,6 +39,7 @@ public interface SearchEngine<E> {
      *
      * @param prefix String prefix to match against elements
      * @return An element, which will be most similar to a given string prefix.
+     * Returns <code>null</code> if no match found.
      */
     public E search(String prefix);
 }
