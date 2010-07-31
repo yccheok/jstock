@@ -22,7 +22,7 @@ package org.yccheok.jstock.engine;
 import java.util.*;
 
 /**
- * This class is used to suggest a list of E items, which will be similar to a
+ * This class is used to suggest a list of items, which will be similar to a
  * given string prefix. Tenary Search Tree will be the primary data structure
  * to hold the complete list of E items. The searching mechanism is case insensitive.
  */
@@ -51,13 +51,14 @@ public class TSTSearchEngine<E> implements SearchEngine<E> {
      * The searching mechanism is case insensitive.
      * 
      * @param prefix String prefix to match against elements
-     * @return A list of E elements, which will be similar to a given string prefix.
+     * @return A list of elements, which will be similar to a given string prefix.
+     * Returns empty list if no match found.
      */
     @Override
     public List<E> searchAll(String prefix) {
         final String mapKey = prefix.toUpperCase();
-        List<String> keys = tst.matchPrefix(mapKey);
-        List<E> list = new ArrayList<E>();
+        final List<String> keys = tst.matchPrefix(mapKey);
+        final List<E> list = new ArrayList<E>();
         for (String key : keys) {
             // map.get(key) must be non-null.
             list.addAll(map.get(key));
@@ -71,16 +72,17 @@ public class TSTSearchEngine<E> implements SearchEngine<E> {
      *
      * @param prefix String prefix to match against elements
      * @return An element, which will be most similar to a given string prefix.
+     * Returns <code>null</code> if no match found.
      */
     @Override
     public E search(String prefix) {
         final String mapKey = prefix.toUpperCase();
-        List<String> keys = tst.matchPrefix(mapKey);
-        if (keys.size() > 0) {
+        final List<String> keys = tst.matchPrefix(mapKey);
+        if (keys.isEmpty() == false) {
             final String key = keys.get(0);
             // key must be non-null.
-            List<E> l = map.get(key);
-            return l.size() > 0 ? l.get(0) : null;
+            final Set<E> s = map.get(key);
+            return s.isEmpty() == false ? s.iterator().next() : null;
         }
         return null;
     }
@@ -93,12 +95,12 @@ public class TSTSearchEngine<E> implements SearchEngine<E> {
         final String mapKey = value.toString().toUpperCase();
         tst.put(mapKey, mapKey);
 
-        List<E> list = map.get(mapKey);
-        if (list == null) {
-            list = new ArrayList<E>();
-            map.put(mapKey, list);
+        Set<E> set = map.get(mapKey);
+        if (set == null) {
+            set = new HashSet<E>();
+            map.put(mapKey, set);
         }
-        list.add(value);
+        set.add(value);
     }
     
     /**
@@ -121,5 +123,5 @@ public class TSTSearchEngine<E> implements SearchEngine<E> {
     // has the capability to handle case insensitive, it should be holding
     // E value instead of String (String will be used as the key to access
     // map).
-    private final Map<String, List<E>> map = new HashMap<String, List<E>>();
+    private final Map<String, Set<E>> map = new HashMap<String, Set<E>>();
 }
