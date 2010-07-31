@@ -84,7 +84,7 @@ public class MutableStockCodeAndSymbolDatabase extends StockCodeAndSymbolDatabas
             return false;
         }
         
-        final Code _code = symbolToCode.get(symbol);
+        final Code _code = this.symbolToCode.get(symbol);
         
         // We should ensure the symbol which we intend to remove is inside the
         // database. In our case, the symbols which we wish to remove are coming from
@@ -102,7 +102,7 @@ public class MutableStockCodeAndSymbolDatabase extends StockCodeAndSymbolDatabas
             return false;
         }
 
-        final Symbol _symbol = codeToSymbol.get(code);
+        final Symbol _symbol = this.codeToSymbol.get(code);
 
         if (_symbol == null) {
             return false;
@@ -116,47 +116,56 @@ public class MutableStockCodeAndSymbolDatabase extends StockCodeAndSymbolDatabas
         final Stock.Industry industry = Stock.Industry.UserDefined;
         final Stock.Board board = Stock.Board.UserDefined;
         
-        final List<Code> iCodes = industryToCodes.get(industry);
-        final List<Code> bCodes = boardToCodes.get(board);
-        final List<Symbol> iSymbols = industryToSymbols.get(industry);
-        final List<Symbol> bSymbols = boardToSymbols.get(board);
+        final List<Code> iCodes = this.industryToCodes.get(industry);
+        final List<Code> bCodes = this.boardToCodes.get(board);
+        final List<Symbol> iSymbols = this.industryToSymbols.get(industry);
+        final List<Symbol> bSymbols = this.boardToSymbols.get(board);
 
         if (iCodes == null || bCodes == null || iSymbols == null || bSymbols == null) {
             return false;
         }  
         
-        if ((!(symbolSearchEngine instanceof TSTSearchEngine)) || (!(codeSearchEngine instanceof TSTSearchEngine)))
+        if ((!(this.symbolSearchEngine instanceof TSTSearchEngine)) || (!(this.codeSearchEngine instanceof TSTSearchEngine)))
         {
             return false;
         }
+
+        if (this.symbolPinyinSearchEngine != null) {
+            if (!(this.symbolPinyinSearchEngine instanceof PinyinTSTSearchEngine)) {
+                return false;
+            }
+        }
+
+        this.symbols.remove(symbol);
+        this.codes.remove(code);
+
+        if (this.symbolPinyinSearchEngine != null) {
+            ((PinyinTSTSearchEngine<Symbol>)this.symbolSearchEngine).remove(symbol);
+        }
+        ((TSTSearchEngine<Symbol>)this.symbolSearchEngine).remove(symbol);
+        ((TSTSearchEngine<Code>)this.codeSearchEngine).remove(code);
         
-        symbols.remove(symbol);
-        codes.remove(code);
-        
-        ((TSTSearchEngine<Symbol>)symbolSearchEngine).remove(symbol);
-        ((TSTSearchEngine<Code>)codeSearchEngine).remove(code);
-        
-        symbolToCode.remove(symbol);
-        codeToSymbol.remove(code);
+        this.symbolToCode.remove(symbol);
+        this.codeToSymbol.remove(code);
 
         iCodes.remove(code);
         if (iCodes.size() <= 0) {
-            industryToCodes.remove(industry);
+            this.industryToCodes.remove(industry);
         }
 
         bCodes.remove(code);
         if (bCodes.size() <= 0) {
-            boardToCodes.remove(board);
+            this.boardToCodes.remove(board);
         }
 
         iSymbols.remove(symbol);
         if (iSymbols.size() <= 0) {
-            industryToSymbols.remove(industry);
+            this.industryToSymbols.remove(industry);
         }
 
         bSymbols.remove(symbol);
         if (bSymbols.size() <= 0) {
-            boardToSymbols.remove(board);
+            this.boardToSymbols.remove(board);
         }
         
         return true;        
@@ -173,51 +182,60 @@ public class MutableStockCodeAndSymbolDatabase extends StockCodeAndSymbolDatabas
         }
 
         // We need to ensure there is no duplicated code or symbol being added.
-        if (symbolToCode.containsKey(symbol) || codeToSymbol.containsKey(code)) {
+        if (this.symbolToCode.containsKey(symbol) || this.codeToSymbol.containsKey(code)) {
             return false;
         }
 
-        if((!(symbolSearchEngine instanceof TSTSearchEngine)) || (!(codeSearchEngine instanceof TSTSearchEngine))) {
+        if((!(this.symbolSearchEngine instanceof TSTSearchEngine)) || (!(this.codeSearchEngine instanceof TSTSearchEngine))) {
             return false;
+        }
+
+        if (this.symbolPinyinSearchEngine != null) {
+            if (!(this.symbolPinyinSearchEngine instanceof PinyinTSTSearchEngine)) {
+                return false;
+            }
         }
 
         this.symbols.add(symbol);
         this.codes.add(code);
 
-        ((TSTSearchEngine<Symbol>)symbolSearchEngine).put(symbol);
-        ((TSTSearchEngine<Code>)codeSearchEngine).put(code);
+        if (this.symbolPinyinSearchEngine != null) {
+            ((PinyinTSTSearchEngine<Symbol>)this.symbolSearchEngine).put(symbol);
+        }
+        ((TSTSearchEngine<Symbol>)this.symbolSearchEngine).put(symbol);
+        ((TSTSearchEngine<Code>)this.codeSearchEngine).put(code);
         
-        symbolToCode.put(symbol, code);
-        codeToSymbol.put(code, symbol);
+        this.symbolToCode.put(symbol, code);
+        this.codeToSymbol.put(code, symbol);
         
         final Stock.Industry industry = Stock.Industry.UserDefined;
         final Stock.Board board = Stock.Board.UserDefined;
         
-        List<Code> _codes = industryToCodes.get(industry);
+        List<Code> _codes = this.industryToCodes.get(industry);
         if (_codes == null) {
             _codes = new ArrayList<Code>();
-            industryToCodes.put(industry, _codes);
+            this.industryToCodes.put(industry, _codes);
         }
         _codes.add(code);
 
-        _codes = boardToCodes.get(board);
+        _codes = this.boardToCodes.get(board);
         if (_codes == null) {
             _codes = new ArrayList<Code>();
-            boardToCodes.put(board, _codes);
+            this.boardToCodes.put(board, _codes);
         }
         _codes.add(code);
 
-        List<Symbol> _symbols = industryToSymbols.get(industry);
+        List<Symbol> _symbols = this.industryToSymbols.get(industry);
         if (_symbols == null) {
             _symbols = new ArrayList<Symbol>();
-            industryToSymbols.put(industry, _symbols);
+            this.industryToSymbols.put(industry, _symbols);
         }
         _symbols.add(symbol);
 
-        _symbols = boardToSymbols.get(board);
+        _symbols = this.boardToSymbols.get(board);
         if (_symbols == null) {
             _symbols = new ArrayList<Symbol>();
-            boardToSymbols.put(board, _symbols);
+            this.boardToSymbols.put(board, _symbols);
         }
         _symbols.add(symbol);
         

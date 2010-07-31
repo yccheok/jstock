@@ -69,6 +69,7 @@ public class PinyinTSTSearchEngine<E> implements SearchEngine<E> {
      * 
      * @param prefix Pinyin prefix to match against elements
      * @return A list of elements, which will be similar to a given pinyin prefix.
+     * Returns empty list if no match found.
      */
     @Override
     public List<E> searchAll(String pinyinPrefix) {
@@ -87,6 +88,7 @@ public class PinyinTSTSearchEngine<E> implements SearchEngine<E> {
      *
      * @param prefix String prefix to match against elements
      * @return An element, which will be most similar to a given string prefix.
+     * Returns <code>null</code> if no match found.
      */
     @Override
     public E search(String pinyinPrefix) {
