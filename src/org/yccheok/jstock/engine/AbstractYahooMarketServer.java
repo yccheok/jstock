@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2009 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 package org.yccheok.jstock.engine;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,7 +58,7 @@ public abstract class AbstractYahooMarketServer implements MarketServer {
         else {
             this.indicies = Utils.getStockIndices(country);
         }
-        if (this.indicies.size() == 0) {
+        if (this.indicies.isEmpty()) {
             throw new java.lang.IllegalArgumentException(country.toString());
         }
         for (Index index : indicies) {
@@ -79,7 +80,7 @@ public abstract class AbstractYahooMarketServer implements MarketServer {
     }
 
     private final class YahooMarket implements Market {
-        private final Map<Index, Stock> map = new HashMap<Index, Stock>();
+        private final Map<Index, Stock> map = new EnumMap<Index, Stock>(Index.class);
         
         public YahooMarket() throws StockNotFoundException {
             List<Stock> stocks;
