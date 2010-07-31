@@ -80,42 +80,42 @@ public class StockCodeAndSymbolDatabase {
 
             this.codes.add(code);
             this.symbols.add(symbol);
+            this.symbolToCode.put(symbol, code);
+            this.codeToSymbol.put(code, symbol);
 
-            symbolToCode.put(symbol, code);
-
-            codeToSymbol.put(code, symbol);
-
-            List<Code> _codes = industryToCodes.get(industry);
+            List<Code> _codes = this.industryToCodes.get(industry);
             if (_codes == null) {
                 _codes = new ArrayList<Code>();
-                industryToCodes.put(industry, _codes);
+                this.industryToCodes.put(industry, _codes);
             }
             _codes.add(code);
 
-            _codes = boardToCodes.get(board);
+            _codes = this.boardToCodes.get(board);
             if (_codes == null) {
                 _codes = new ArrayList<Code>();
-                boardToCodes.put(board, _codes);
+                this.boardToCodes.put(board, _codes);
             }
             _codes.add(code);
 
-            List<Symbol> _symbols = industryToSymbols.get(industry);
+            List<Symbol> _symbols = this.industryToSymbols.get(industry);
             if(_symbols == null) {
                 _symbols = new ArrayList<Symbol>();
-                industryToSymbols.put(industry, _symbols);
+                this.industryToSymbols.put(industry, _symbols);
             }
             _symbols.add(symbol);
 
-            _symbols = boardToSymbols.get(board);
+            _symbols = this.boardToSymbols.get(board);
             if (_symbols == null) {
                 _symbols = new ArrayList<Symbol>();
-                boardToSymbols.put(board, _symbols);
+                this.boardToSymbols.put(board, _symbols);
             }
             _symbols.add(symbol);
         }
 
-        symbolSearchEngine = new TSTSearchEngine<Symbol>(symbols);
-        codeSearchEngine = new TSTSearchEngine<Code>(codes);
+        // Initialize all search engines.
+        this.symbolPinyinSearchEngine = Utils.isPinyinTSTSearchEngineRequiredForSymbol() ? new PinyinTSTSearchEngine<Symbol>(this.symbols) : null;
+        this.symbolSearchEngine = new TSTSearchEngine<Symbol>(this.symbols);
+        this.codeSearchEngine = new TSTSearchEngine<Code>(this.codes);
     }
 
     /**
@@ -129,12 +129,6 @@ public class StockCodeAndSymbolDatabase {
         this.symbolToCode.putAll(src.symbolToCode);
         this.codeToSymbol.putAll(src.codeToSymbol);
 
-        /*
-        this.industryToCodes.putAll(src.industryToCodes);
-        this.boardToCodes.putAll(src.boardToCodes);
-        this.industryToSymbols.putAll(src.industryToSymbols);
-        this.boardToSymbols.putAll(src.boardToSymbols);
-        */
         deepCopy(this.industryToCodes, src.industryToCodes);
         deepCopy(this.boardToCodes, src.boardToCodes);
         deepCopy(this.industryToSymbols, src.industryToSymbols);
@@ -142,9 +136,11 @@ public class StockCodeAndSymbolDatabase {
         
         this.symbols = new ArrayList<Symbol>(src.symbols);
         this.codes = new ArrayList<Code>(src.codes);
-
-        symbolSearchEngine = new TSTSearchEngine<Symbol>(this.symbols);
-        codeSearchEngine = new TSTSearchEngine<Code>(this.codes);        
+        
+        // Initialize all search engines.
+        this.symbolPinyinSearchEngine = Utils.isPinyinTSTSearchEngineRequiredForSymbol() ? new PinyinTSTSearchEngine<Symbol>(this.symbols) : null;
+        this.symbolSearchEngine = new TSTSearchEngine<Symbol>(this.symbols);
+        this.codeSearchEngine = new TSTSearchEngine<Code>(this.codes);
     }
     
     @SuppressWarnings("unchecked")
@@ -158,27 +154,51 @@ public class StockCodeAndSymbolDatabase {
     }
     
     public List<Symbol> searchStockSymbols(String symbol) {
-        return Collections.unmodifiableList(symbolSearchEngine.searchAll(symbol));
+        if (this.symbolPinyinSearchEngine != null) {
+            // Can symbol is pinyin?
+            final List<Symbol> _symbols = this.symbolPinyinSearchEngine.searchAll(symbol);
+            if (_symbols.isEmpty()) {
+                // Nope. Perform deeper search.
+                return Collections.unmodifiableList(this.symbolSearchEngine.searchAll(symbol));
+            }
+            else {
+                return Collections.unmodifiableList(_symbols);
+            }
+        }
+        // Need not to involve pinyin search engine.
+        return Collections.unmodifiableList(this.symbolSearchEngine.searchAll(symbol));
     }
     
     public List<Code> searchStockCodes(String code) {
-        return Collections.unmodifiableList(codeSearchEngine.searchAll(code));
+        return Collections.unmodifiableList(this.codeSearchEngine.searchAll(code));
     }
     
     public Symbol searchStockSymbol(String symbol) {
-        return symbolSearchEngine.search(symbol);
+        if (this.symbolPinyinSearchEngine != null) {
+            // Can symbol is pinyin?
+            final Symbol _symbol = this.symbolPinyinSearchEngine.search(symbol);
+            if (_symbol == null) {
+                // Nope. Perform deeper search.
+                return this.symbolSearchEngine.search(symbol);
+            }
+            else {
+                return _symbol;
+            }
+        }
+        // Need not to involve pinyin search engine.
+        return this.symbolSearchEngine.search(symbol);
     }
     
     public Code searchStockCode(String code) {
-        return codeSearchEngine.search(code);
+        return this.codeSearchEngine.search(code);
     }
     
     public Symbol codeToSymbol(Code code) {
-        return codeToSymbol.get(code);   
+        return this.codeToSymbol.get(code);
     }
 
     public Code symbolToCode(Symbol symbol) {
-        return symbolToCode.get(symbol);
+        return this.symbolToCode.get(symbol);
     }
 
     public List<Symbol> getSymbols() {
@@ -186,7 +206,7 @@ public class StockCodeAndSymbolDatabase {
         // We need to ensure by applying a single index on the data structures
         // returned by getCodes and getSymbols, we should able to get code and
         // symbol which are associated with the same stock.    
-        return Collections.unmodifiableList(symbols);
+        return Collections.unmodifiableList(this.symbols);
     }
 
     public List<Code> getCodes() {
@@ -194,12 +214,12 @@ public class StockCodeAndSymbolDatabase {
         // We need to ensure by applying a single index on the data structures
         // returned by getCodes and getSymbols, we should able to get code and
         // symbol which are associated with the same stock.
-        return Collections.unmodifiableList(codes);
+        return Collections.unmodifiableList(this.codes);
     }
     
     public List<Code> getCodes(Stock.Industry industry)
     {
-        final List<Code> list = industryToCodes.get(industry);
+        final List<Code> list = this.industryToCodes.get(industry);
         if(list == null) {
             return Collections.emptyList();
         }
@@ -208,7 +228,7 @@ public class StockCodeAndSymbolDatabase {
 
     public List<Code> getCodes(Stock.Board board)
     {
-        final List<Code> list = boardToCodes.get(board);        
+        final List<Code> list = this.boardToCodes.get(board);
         if(list == null) {
             return Collections.emptyList();
         }
@@ -217,7 +237,7 @@ public class StockCodeAndSymbolDatabase {
 
     public List<Symbol> getSymbols(Stock.Industry industry)
     {
-        final List<Symbol> list = industryToSymbols.get(industry);
+        final List<Symbol> list = this.industryToSymbols.get(industry);
         if(list == null) {
             return Collections.emptyList();
         }
@@ -226,7 +246,7 @@ public class StockCodeAndSymbolDatabase {
 
     public List<Symbol> getSymbols(Stock.Board board)
     {
-        final List<Symbol> list = boardToSymbols.get(board);
+        final List<Symbol> list = this.boardToSymbols.get(board);
         if(list == null) {
             return Collections.emptyList();
         }
@@ -234,18 +254,18 @@ public class StockCodeAndSymbolDatabase {
     }
     
     public Set<Stock.Industry> getIndustries() {
-        return Collections.unmodifiableSet(industryToCodes.keySet());
+        return Collections.unmodifiableSet(this.industryToCodes.keySet());
     }
     
     public Set<Stock.Board> getBoards() {                
-        return Collections.unmodifiableSet(boardToCodes.keySet());
+        return Collections.unmodifiableSet(this.boardToCodes.keySet());
     }
     
     private Object readResolve() {
         /* For backward compatible */
-        if (symbols == null || symbols.size() <= 0) {
-        	if (symbols == null) {
-            	symbols = new ArrayList<Symbol>();
+        if (this.symbols == null || this.symbols.size() <= 0) {
+            if (this.symbols == null) {
+            	this.symbols = new ArrayList<Symbol>();
             }
 
             // During iteration for symbols and codes, we must use key set from
@@ -255,43 +275,45 @@ public class StockCodeAndSymbolDatabase {
             // symbol which are associated with the same stock.
             //
             // Hence, do not use industryToSymbols.keySet.
-            for (Industry industry : industryToCodes.keySet())
+            for (Industry industry : this.industryToCodes.keySet())
             {
-
-                symbols.addAll(industryToSymbols.get(industry));
+                this.symbols.addAll(this.industryToSymbols.get(industry));
             }
         }
 
         /* For backward compatible */
-        if (codes == null || codes.size() <= 0) {
-        	if (codes == null) {
-            	codes = new ArrayList<Code>();
+        if (this.codes == null || this.codes.size() <= 0) {
+            if (this.codes == null) {
+            	this.codes = new ArrayList<Code>();
             }
             
             // See the above comment on why we need to use industryToCodes.keySet.
             for (Industry industry : industryToCodes.keySet())
             {
-                codes.addAll(industryToCodes.get(industry));
+                this.codes.addAll(this.industryToCodes.get(industry));
             }
         }
 
-        symbolSearchEngine = new TSTSearchEngine<Symbol>(symbols);
-        codeSearchEngine = new TSTSearchEngine<Code>(codes);
+        // Initialize all search engines.
+        this.symbolPinyinSearchEngine = Utils.isPinyinTSTSearchEngineRequiredForSymbol() ? new PinyinTSTSearchEngine<Symbol>(this.symbols) : null;
+        this.symbolSearchEngine = new TSTSearchEngine<Symbol>(this.symbols);
+        this.codeSearchEngine = new TSTSearchEngine<Code>(this.codes);
 
         return this;
     }
 
-    protected Map<Symbol, Code> symbolToCode = new HashMap<Symbol, Code>();
-    protected Map<Code, Symbol> codeToSymbol = new HashMap<Code, Symbol>();
+    protected final Map<Symbol, Code> symbolToCode = new HashMap<Symbol, Code>();
+    protected final Map<Code, Symbol> codeToSymbol = new HashMap<Code, Symbol>();
 
-    protected Map<Stock.Industry, List<Code>> industryToCodes = new EnumMap<Stock.Industry, List<Code>>(Stock.Industry.class);
-    protected Map<Stock.Board, List<Code>> boardToCodes = new EnumMap<Stock.Board, List<Code>>(Stock.Board.class);
-    protected Map<Stock.Industry, List<Symbol>> industryToSymbols = new EnumMap<Stock.Industry, List<Symbol>>(Stock.Industry.class);
-    protected Map<Stock.Board, List<Symbol>> boardToSymbols = new EnumMap<Stock.Board, List<Symbol>>(Stock.Board.class);
+    protected final Map<Stock.Industry, List<Code>> industryToCodes = new EnumMap<Stock.Industry, List<Code>>(Stock.Industry.class);
+    protected final Map<Stock.Board, List<Code>> boardToCodes = new EnumMap<Stock.Board, List<Code>>(Stock.Board.class);
+    protected final Map<Stock.Industry, List<Symbol>> industryToSymbols = new EnumMap<Stock.Industry, List<Symbol>>(Stock.Industry.class);
+    protected final Map<Stock.Board, List<Symbol>> boardToSymbols = new EnumMap<Stock.Board, List<Symbol>>(Stock.Board.class);
 
     protected List<Symbol> symbols = new ArrayList<Symbol>();
     protected List<Code> codes = new ArrayList<Code>();
 
     protected transient SearchEngine<Symbol> symbolSearchEngine;
+    protected transient SearchEngine<Symbol> symbolPinyinSearchEngine;
     protected transient SearchEngine<Code> codeSearchEngine;
 }
