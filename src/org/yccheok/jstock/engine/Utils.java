@@ -372,6 +372,7 @@ public class Utils {
     private static final List<Index> belgiumIndices = new ArrayList<Index>();
     private static final List<Index> brazilIndices = new ArrayList<Index>();
     private static final List<Index> canadaIndices = new ArrayList<Index>();
+    private static final List<Index> chinaIndices = new ArrayList<Index>();
     private static final List<Index> denmarkIndices = new ArrayList<Index>();
     private static final List<Index> franceIndices = new ArrayList<Index>();
     private static final List<Index> germanyIndices = new ArrayList<Index>();
@@ -399,6 +400,7 @@ public class Utils {
         belgiumIndices.add(Index.BFX);
         brazilIndices.add(Index.BVSP);
         canadaIndices.add(Index.GSPTSE);
+        chinaIndices.add(Index.SSEC);
         denmarkIndices.add(Index.OMXC20CO);
         franceIndices.add(Index.FCHI);  
         germanyIndices.add(Index.DAX);
@@ -479,9 +481,9 @@ public class Utils {
      * @param list List of elements, to be inserted into search engine
      * @return Best search engine based on current selected country.
      */
-    public static <E> SearchEngine<E> getSearchEngine(List<E> list) {
+    public static boolean isPinyinTSTSearchEngineRequiredForSymbol() {
         final Country country = MainFrame.getInstance().getJStockOptions().getCountry();
-        return new TSTSearchEngine<E>(list);
+        return (country == Country.China);
     }
 
     public static List<Index> getStockIndices(Country country) {
@@ -497,6 +499,8 @@ public class Utils {
                 return java.util.Collections.unmodifiableList(Utils.brazilIndices);
             case Canada:
                 return java.util.Collections.unmodifiableList(Utils.canadaIndices);
+            case China:
+                return java.util.Collections.unmodifiableList(Utils.chinaIndices);
             case Denmark:
                 return java.util.Collections.unmodifiableList(Utils.denmarkIndices);
             case France:
