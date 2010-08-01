@@ -486,6 +486,31 @@ public class Utils {
         return (country == Country.China);
     }
 
+    /**
+     * Returns <code>true</code> if we should maintain the symbol as database's,
+     * even the symbol provided by stock server is different from our database.
+     * This happens when our symbol in database is Chinese, but the symbol
+     * returned by stock server is in English.
+     * 
+     * @return <code>true</code> if we should maintain the symbol as database's.
+     */
+    public static boolean isSymbolImmutable() {
+        final Country country = MainFrame.getInstance().getJStockOptions().getCountry();
+        return (country == Country.China);
+    }
+
+    /**
+     * Returns <code>true</code> if we need to use red color to indicate "rise
+     * above". Green color to indicate "fall below".
+     * 
+     * @return <code>true</code> if we need to use red color to indicate "rise
+     * above". Green color to indicate "fall below".
+     */
+    public static boolean isFallBelowAndRiseAboveColorReverse() {
+        final Country country = MainFrame.getInstance().getJStockOptions().getCountry();
+        return (country == Country.China);
+    }
+
     public static List<Index> getStockIndices(Country country) {
         switch (country)
         {
