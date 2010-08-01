@@ -1931,13 +1931,11 @@ public class MainFrame extends javax.swing.JFrame {
     private boolean isStockBeingSelected(final Stock stock) {
         int[] rows = MainFrame.this.jTable1.getSelectedRows();
             
-        if(rows.length == 1) {
-            int row = rows[0];
-                
-            StockTableModel tableModel = (StockTableModel)jTable1.getModel();
-            int modelIndex = jTable1.convertRowIndexToModel(row);
-            if(stock.getCode().equals(tableModel.getStock(modelIndex).getCode()))
-            {
+        if (rows.length == 1) {
+            final int row = rows[0];
+            final StockTableModel tableModel = (StockTableModel)jTable1.getModel();
+            final int modelIndex = jTable1.convertRowIndexToModel(row);
+            if (stock.getCode().equals(tableModel.getStock(modelIndex).getCode())) {
                 return true;
             }
         }
@@ -3143,6 +3141,22 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     public void update(RealTimeStockMonitor monitor, final java.util.List<Stock> stocks) {
+        if (org.yccheok.jstock.engine.Utils.isSymbolImmutable()) {
+            // We need to ignore symbol names given by stock server.
+            // Replace them with database's.
+            for (int i = 0, size = stocks.size(); i < size; i++) {
+                final Stock stock = stocks.get(i);
+                final Symbol symbol = this.stockCodeAndSymbolDatabase.codeToSymbol(stock.getCode());
+                if (symbol != null) {
+                    stocks.set(i, stock.setSymbol(symbol));
+                }
+                else {
+                    // Shouldn't be null. Let's give some warning on this.
+                    log.error(null, "Wrong stock code " + stock.getCode() + " given by stock server.");
+                }
+            }
+        }
+        
         // Do it in GUI event dispatch thread. Otherwise, we may face deadlock.
         // For example, we lock the jTable, and try to remove the stock from the
         // real time monitor. While we wait for the real time monitor to complete,
