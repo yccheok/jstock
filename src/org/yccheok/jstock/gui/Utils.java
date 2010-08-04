@@ -673,12 +673,21 @@ public class Utils {
     }
 
     public static Color getColor(double price, double referencePrice) {
+        final boolean reverse = org.yccheok.jstock.engine.Utils.isFallBelowAndRiseAboveColorReverse();
         if (price < referencePrice) {
-            return JStockOptions.DEFAULT_LOWER_NUMERICAL_VALUE_FOREGROUND_COLOR;
+            if (reverse) {
+                return JStockOptions.DEFAULT_HIGHER_NUMERICAL_VALUE_FOREGROUND_COLOR;
+            } else {
+                return JStockOptions.DEFAULT_LOWER_NUMERICAL_VALUE_FOREGROUND_COLOR;
+            }
         }
         
         if (price > referencePrice) {
-            return JStockOptions.DEFAULT_HIGHER_NUMERICAL_VALUE_FOREGROUND_COLOR;
+            if (reverse) {
+                return JStockOptions.DEFAULT_LOWER_NUMERICAL_VALUE_FOREGROUND_COLOR;
+            } else {
+                return JStockOptions.DEFAULT_HIGHER_NUMERICAL_VALUE_FOREGROUND_COLOR;
+            }
         }
         
         return JStockOptions.DEFAULT_NORMAL_TEXT_FOREGROUND_COLOR;
