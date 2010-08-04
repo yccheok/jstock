@@ -145,13 +145,21 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         g2.setFont(oldFont);
         if (gain >= 0) {
             if (gain > 0) {
-                g2.setColor(MainFrame.getInstance().getJStockOptions().getHigherNumericalValueForegroundColor());
+                if (org.yccheok.jstock.engine.Utils.isFallBelowAndRiseAboveColorReverse()) {
+                    g2.setColor(MainFrame.getInstance().getJStockOptions().getLowerNumericalValueForegroundColor());
+                } else {
+                    g2.setColor(MainFrame.getInstance().getJStockOptions().getHigherNumericalValueForegroundColor());
+                }
             }
             g2.drawString(GAIN + ": ", x, y);
             x += oldFontMetrics.stringWidth(GAIN + ": ");
         }
         else {
-            g2.setColor(MainFrame.getInstance().getJStockOptions().getLowerNumericalValueForegroundColor());
+            if (org.yccheok.jstock.engine.Utils.isFallBelowAndRiseAboveColorReverse()) {
+                g2.setColor(MainFrame.getInstance().getJStockOptions().getHigherNumericalValueForegroundColor());
+            } else {
+                g2.setColor(MainFrame.getInstance().getJStockOptions().getLowerNumericalValueForegroundColor());
+            }
             g2.drawString(LOSS + ": ", x, y);
             x += oldFontMetrics.stringWidth(GAIN + ": ");
         }
