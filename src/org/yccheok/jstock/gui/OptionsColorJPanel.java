@@ -28,6 +28,13 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
     /** Creates new form OptionsColorJPanel */
     public OptionsColorJPanel() {
         initComponents();
+
+        if (org.yccheok.jstock.engine.Utils.isFallBelowAndRiseAboveColorReverse()) {
+            // Reverse the fall below and rise above labelling.
+            final String tmp = this.jLabel2.getText();
+            this.jLabel2.setText(this.jLabel3.getText());
+            this.jLabel3.setText(tmp);
+        }
     }
     
     /** This method is called from within the constructor to
@@ -80,7 +87,7 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
 
         jLabel2.setText(bundle.getString("OptionsColorJPanel_LowerNumericalValue")); // NOI18N
 
-        jLabel3.setText(bundle.getString("OptionsColorJPanel_LowerNumericalValue")); // NOI18N
+        jLabel3.setText(bundle.getString("OptionsColorJPanel_HigherNumericalValue")); // NOI18N
 
         jPanel6.setBackground(new java.awt.Color(0, 0, 0));
         jPanel6.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
