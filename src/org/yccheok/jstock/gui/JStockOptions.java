@@ -598,7 +598,7 @@ public class JStockOptions {
     }
     
     public BrokingFirm getSelectedBrokingFirm() {
-        if((this.selectedBrokingFirmIndex < 0) || (this.selectedBrokingFirmIndex >= this.getBrokingFirmSize()))
+        if ((this.selectedBrokingFirmIndex < 0) || (this.selectedBrokingFirmIndex >= this.getBrokingFirmSize()))
             return null;
         
         return this.brokingFirms.get(this.selectedBrokingFirmIndex);

@@ -3152,7 +3152,7 @@ public class MainFrame extends javax.swing.JFrame {
                 }
                 else {
                     // Shouldn't be null. Let's give some warning on this.
-                    log.error(null, "Wrong stock code " + stock.getCode() + " given by stock server.");
+                    log.error("Wrong stock code " + stock.getCode() + " given by stock server.");
                 }
             }
         }
