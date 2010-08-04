@@ -64,7 +64,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             return jStockOptions.getAlertBackgroundColor();
         }
 
-        if(row % 2 == 0) {
+        if (row % 2 == 0) {
             return jStockOptions.getFirstRowBackgroundColor();
         }
         
@@ -83,16 +83,25 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
 
     private Color getForegroundColor(double value, double ref, boolean alert) {
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final boolean reverse = org.yccheok.jstock.engine.Utils.isFallBelowAndRiseAboveColorReverse();
 
         if (alert) {
             return jStockOptions.getAlertForegroundColor();
         }
 
         if (value > ref) {
-            return jStockOptions.getHigherNumericalValueForegroundColor();
+            if (reverse) {
+                return jStockOptions.getLowerNumericalValueForegroundColor();
+            } else {
+                return jStockOptions.getHigherNumericalValueForegroundColor();
+            }
         }
         else if (value < ref) {
-            return jStockOptions.getLowerNumericalValueForegroundColor();
+            if (reverse) {
+                return jStockOptions.getHigherNumericalValueForegroundColor();
+            } else {
+                return jStockOptions.getLowerNumericalValueForegroundColor();
+            }
         }
         
         return jStockOptions.getNormalTextForegroundColor();
