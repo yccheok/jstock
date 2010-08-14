@@ -114,7 +114,7 @@ public class AutoCompleteJComboBox extends JComboBox {
             @Override
             public void keyReleased(KeyEvent e) {
                 if (!e.isActionKey()) {
-                    String string = AutoCompleteJComboBox.this.getEditor().getItem().toString();
+                    final String string = AutoCompleteJComboBox.this.getEditor().getItem().toString();
                     
                     AutoCompleteJComboBox.this.hidePopup();                                        
                     
