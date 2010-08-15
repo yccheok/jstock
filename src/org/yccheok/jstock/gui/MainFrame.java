@@ -1907,7 +1907,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     public java.util.List<Stock> getStocks() {
-        StockTableModel tableModel = (StockTableModel)jTable1.getModel();
+        final StockTableModel tableModel = (StockTableModel)jTable1.getModel();
         return tableModel.getStocks();
     }
     
@@ -1916,14 +1916,14 @@ public class MainFrame extends javax.swing.JFrame {
     public void addStockToTable(final Stock stock, final StockAlert alert) {
         assert(java.awt.EventQueue.isDispatchThread());
         
-        StockTableModel tableModel = (StockTableModel)jTable1.getModel();
+        final StockTableModel tableModel = (StockTableModel)jTable1.getModel();
         tableModel.addStock(stock, alert);
     }
 
     public void addStockToTable(final Stock stock) {
         assert(java.awt.EventQueue.isDispatchThread());
 
-        StockTableModel tableModel = (StockTableModel)jTable1.getModel();
+        final StockTableModel tableModel = (StockTableModel)jTable1.getModel();
         tableModel.addStock(stock);
     }
 
@@ -3145,14 +3145,24 @@ public class MainFrame extends javax.swing.JFrame {
             // We need to ignore symbol names given by stock server.
             // Replace them with database's.
             for (int i = 0, size = stocks.size(); i < size; i++) {
-                final Stock stock = stocks.get(i);
-                final Symbol symbol = this.stockCodeAndSymbolDatabase.codeToSymbol(stock.getCode());
-                if (symbol != null) {
-                    stocks.set(i, stock.setSymbol(symbol));
-                }
-                else {
-                    // Shouldn't be null. Let's give some warning on this.
-                    log.error("Wrong stock code " + stock.getCode() + " given by stock server.");
+                final Stock stock = stocks.get(i);                
+                if (this.stockCodeAndSymbolDatabase != null) {
+                    final Symbol symbol = this.stockCodeAndSymbolDatabase.codeToSymbol(stock.getCode());
+                    if (symbol != null) {
+                        stocks.set(i, stock.deriveStock(symbol));
+                    } else {
+                        // Shouldn't be null. Let's give some warning on this.
+                        log.error("Wrong stock code " + stock.getCode() + " given by stock server.");
+                    }
+                } else {
+                    // stockCodeAndSymbolDatabase is not ready yet. Use the information
+                    // from stock table.
+                    final StockTableModel tableModel = (StockTableModel)jTable1.getModel();
+                    final int row = tableModel.findRow(stock);
+                    if (row >= 0) {
+                        final Symbol symbol = tableModel.getStock(row).getSymbol();
+                        stocks.set(i, stock.deriveStock(symbol));
+                    }
                 }
             }
         }
