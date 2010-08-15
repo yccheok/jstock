@@ -234,7 +234,7 @@ public class Stock {
      * @return A clone copy of this stock with its symbol being modified to
      * specified symbol.
      */
-    public Stock setSymbol(Symbol symbol) {
+    public Stock deriveStock(Symbol symbol) {
         return new Stock(
             this.code,
             symbol,
