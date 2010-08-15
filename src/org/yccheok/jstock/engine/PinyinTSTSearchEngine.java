@@ -77,7 +77,13 @@ public class PinyinTSTSearchEngine<E> implements SearchEngine<E> {
         List<E> list = new ArrayList<E>();
         for (String pinyin : pinyins) {
             // map.get(pinyin) must be non-null.
-            list.addAll(pinyinMap.get(pinyin));
+            final List<E> tmps = pinyinMap.get(pinyin);
+            for (E tmp : tmps) {
+                if (list.contains(tmp) == false) {
+                    // Avoid duplication.
+                    list.add(tmp);
+                }
+            }
         }
         return list;
     }
@@ -96,8 +102,8 @@ public class PinyinTSTSearchEngine<E> implements SearchEngine<E> {
         if (pinyins.isEmpty() == false) {
             final String pinyin = pinyins.get(0);
             // pinyin must be non-null.
-            Set<E> s = pinyinMap.get(pinyin);
-            return s.isEmpty() == false ? s.iterator().next() : null;
+            List<E> l = pinyinMap.get(pinyin);
+            return l.isEmpty() == false ? l.get(0) : null;
         }
         return null;
     }
@@ -111,12 +117,15 @@ public class PinyinTSTSearchEngine<E> implements SearchEngine<E> {
         for (String pinyin : pinyins) {
             searchEngine.put(pinyin);
 
-            Set<E> set = pinyinMap.get(pinyin);
-            if (set == null) {
-                set = new HashSet<E>();
-                pinyinMap.put(pinyin, set);
+            List<E> list = pinyinMap.get(pinyin);
+            if (list == null) {
+                list = new ArrayList<E>();
+                pinyinMap.put(pinyin, list);
             }
-            set.add(value);
+            if (list.contains(value) == false) {
+                // Avoid duplication.
+                list.add(value);
+            }
         }
     }
 
@@ -128,9 +137,9 @@ public class PinyinTSTSearchEngine<E> implements SearchEngine<E> {
         final List<String> pinyins = org.yccheok.jstock.gui.Utils.toHanyuPinyin(value.toString());
         for (String pinyin : pinyins) {
             searchEngine.remove(pinyin);
-            final Set set = pinyinMap.get(pinyin);
-            set.remove(value);
-            if (set.isEmpty()) {
+            final List list = pinyinMap.get(pinyin);
+            list.remove(value);
+            if (list.isEmpty()) {
                 pinyinMap.remove(pinyin);
             }
         }
@@ -139,5 +148,5 @@ public class PinyinTSTSearchEngine<E> implements SearchEngine<E> {
     // Re-use TSTSearchEngine, as we just like its case-insensitive behavior.
     private final TSTSearchEngine<String> searchEngine = new TSTSearchEngine<String>();
     // Translate Pinyin to list of items.
-    private Map<String, Set<E>> pinyinMap = new HashMap<String, Set<E>>();
+    private Map<String, List<E>> pinyinMap = new HashMap<String, List<E>>();
 }
