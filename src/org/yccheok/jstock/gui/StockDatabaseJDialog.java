@@ -45,6 +45,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.RowFilter;
+import javax.swing.RowFilter.Entry;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.AbstractTableModel;
@@ -484,17 +485,45 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
     @SuppressWarnings("unchecked")
     private void newFilter()
     {
+        final String text = jTextField1.getText();
+
         // I really have no idea what the second parameter is.
-        RowFilter<CodeSymbolTableModel, Integer> rf = null;
+        final RowFilter<CodeSymbolTableModel, Integer> rf;
         
         //If current expression doesn't parse, don't update.
         try {
             // (?i) is for case insensitive.
-            rf = RowFilter.regexFilter("^(?i)" + Pattern.quote(jTextField1.getText()));
+            rf = RowFilter.regexFilter("^(?i)" + Pattern.quote(text));
         } catch (java.util.regex.PatternSyntaxException e) {
             return;
         }
-        ((TableRowSorter<CodeSymbolTableModel>)jTable1.getRowSorter()).setRowFilter(rf);
+
+        if (org.yccheok.jstock.engine.Utils.isPinyinTSTSearchEngineRequiredForSymbol() == false) {
+            ((TableRowSorter<CodeSymbolTableModel>)jTable1.getRowSorter()).setRowFilter(rf);
+        } else {
+            ((TableRowSorter<CodeSymbolTableModel>)jTable1.getRowSorter()).setRowFilter(new RowFilter<CodeSymbolTableModel, Integer>() {
+
+                @Override
+                public boolean include(Entry<? extends CodeSymbolTableModel, ? extends Integer> entry) {
+                    // Try regexFilter first.
+                    if (rf.include(entry)) {
+                        return true;
+                    }
+                    // Fail. Further try with pinyin. Pinyin is in lower case.
+                    final String lower_text = text.toLowerCase();
+                    final CodeSymbolTableModel model = entry.getModel();
+                    final Symbol symbol = model.getSymbols().get(entry.getIdentifier());
+                    List<String> pinyins = org.yccheok.jstock.gui.Utils.toHanyuPinyin(symbol.toString());
+                    for (String pinyin : pinyins) {
+                        if (pinyin.startsWith(lower_text)) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+
+            });
+        }
     }
     
     /* Use exclusively by CodeSymbolTableModel. */
