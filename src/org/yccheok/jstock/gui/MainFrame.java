@@ -1551,8 +1551,8 @@ public class MainFrame extends javax.swing.JFrame {
             buttonGroup1.add(mi);
             mi.addActionListener(new ChangeLookAndFeelAction(this, lafInfo[i].getClassName()));
             
-            if(currentlaf != null) {
-                if(lafInfo[i].getClassName().equals(currentlaf.getClass().getName()))
+            if (currentlaf != null) {
+                if (lafInfo[i].getClassName().equals(currentlaf.getClass().getName()))
                 {
                     ((JRadioButtonMenuItem) mi).setSelected(true);
                 }
