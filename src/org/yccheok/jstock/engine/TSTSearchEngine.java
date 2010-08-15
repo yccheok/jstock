@@ -81,8 +81,8 @@ public class TSTSearchEngine<E> implements SearchEngine<E> {
         if (keys.isEmpty() == false) {
             final String key = keys.get(0);
             // key must be non-null.
-            final Set<E> s = map.get(key);
-            return s.isEmpty() == false ? s.iterator().next() : null;
+            final List<E> l = map.get(key);
+            return l.isEmpty() == false ? l.get(0) : null;
         }
         return null;
     }
@@ -95,12 +95,16 @@ public class TSTSearchEngine<E> implements SearchEngine<E> {
         final String mapKey = value.toString().toUpperCase();
         tst.put(mapKey, mapKey);
 
-        Set<E> set = map.get(mapKey);
-        if (set == null) {
-            set = new HashSet<E>();
-            map.put(mapKey, set);
+        List<E> list = map.get(mapKey);
+        if (list == null) {
+            list = new ArrayList<E>();
+            map.put(mapKey, list);
         }
-        set.add(value);
+        // Avoid duplication. Don't use Set, as order is
+        // important for us.
+        if (false == list.contains(value)) {
+            list.add(value);
+        }
     }
     
     /**
@@ -123,5 +127,8 @@ public class TSTSearchEngine<E> implements SearchEngine<E> {
     // has the capability to handle case insensitive, it should be holding
     // E value instead of String (String will be used as the key to access
     // map).
-    private final Map<String, Set<E>> map = new HashMap<String, Set<E>>();
+    //
+    // There should be no duplicated item in List. Don't use Set, as order
+    // is important for us.
+    private final Map<String, List<E>> map = new HashMap<String, List<E>>();
 }
