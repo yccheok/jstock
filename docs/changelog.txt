@@ -4,7 +4,8 @@ Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 JStock 1.0.5n - xxxx-xx-xx
   Bugfix:  Wrong returned value by AbstractYahooStockHistoryServer.parse.
            Contributed by Mark DeSpain. (#3031918)
-  
+  Bugfix:  No duplicated items will be allowed in TSTSearchEngine.
+
 JStock 1.0.5m - 2010-07-03
   Feature: Internationalization and localization. Currently, only Simplified
            Chinese is supported. (#2214275)
