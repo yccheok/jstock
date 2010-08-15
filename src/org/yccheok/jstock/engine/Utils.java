@@ -500,6 +500,19 @@ public class Utils {
     }
 
     /**
+     * Returns <code>true</code> if we should maintain the name as database's,
+     * even the name provided by stock server is different from our database.
+     * This happens when our name in database is Chinese, but the name returned
+     * by stock server is in English.
+     *
+     * @return <code>true</code> if we should maintain the name as database's.
+     */
+    public static boolean isNameImmutable() {
+        final Country country = MainFrame.getInstance().getJStockOptions().getCountry();
+        return (country == Country.China);
+    }
+
+    /**
      * Returns <code>true</code> if we need to use red color to indicate "rise
      * above". Green color to indicate "fall below".
      * 

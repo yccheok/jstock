@@ -2589,7 +2589,7 @@ public class MainFrame extends javax.swing.JFrame {
             {
                 int max = 0;
                 for (Integer integer : chunks) {
-                    if(max < integer.intValue())
+                    if (max < integer.intValue())
                         max = integer.intValue();
                 }
                 final String template = GUIBundle.getString("MainFrame_StocksHasBeenDownloadedSoFar..._template");
