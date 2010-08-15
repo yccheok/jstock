@@ -21,9 +21,15 @@ package org.yccheok.jstock.gui;
 
 import javax.swing.*;
 import java.awt.event.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.plaf.ComboBoxUI;
+import javax.swing.plaf.basic.BasicComboBoxEditor;
 import javax.swing.plaf.basic.BasicComboPopup;
 import javax.swing.plaf.basic.ComboPopup;
+import javax.swing.plaf.metal.MetalComboBoxEditor;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.JTextComponent;
 import org.yccheok.jstock.engine.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -61,9 +67,21 @@ public class AutoCompleteJComboBox extends JComboBox {
         
         this.setEditable(true);
         
-        keyAdapter = this.getEditorComponentKeyAdapter();
-        
-        this.getEditor().getEditorComponent().addKeyListener(keyAdapter);
+        this.keyAdapter = this.getEditorComponentKeyAdapter();
+
+        // Use our own editor, in order to implement auto-complete feature.
+        this.jComboBoxEditor = new MyJComboBoxEditor();
+        this.setEditor(this.jComboBoxEditor);
+
+        // Use to handle ENTER key pressed.
+        this.getEditor().getEditorComponent().addKeyListener(this.keyAdapter);
+
+        // Do not use keyAdapter to handle auto-complete feature, as it doesn't
+        // handle IME input well. For example, you type "wm" and press "3",
+        // keyAdapter will have no idea you are trying to choose the 3rd choice
+        // provided by your IME. Instead, use documentListener, which will be
+        // much more reliable.
+        ((JTextComponent)this.getEditor().getEditorComponent()).getDocument().addDocumentListener(this.getDocumentListener());
 
         this.addActionListener(new ActionListener() {
 
@@ -72,32 +90,43 @@ public class AutoCompleteJComboBox extends JComboBox {
                 /* Handle mouse clicked. */
                 if ((e.getModifiers() & java.awt.event.InputEvent.BUTTON1_MASK) == java.awt.event.InputEvent.BUTTON1_MASK) {
                     final Object object = AutoCompleteJComboBox.this.getEditor().getItem();
-
+                    String lastEnteredString = "";
                     /* Let us be extra paranoid. */
                     if (object instanceof String) {
-                        AutoCompleteJComboBox.this.lastEnteredString = (String)object;
+                        lastEnteredString = (String)object;
                     }
                     else {
-                        AutoCompleteJComboBox.this.lastEnteredString = "";
+                        lastEnteredString = "";
                     }
                     
-                    AutoCompleteJComboBox.this.subject.notify(AutoCompleteJComboBox.this, AutoCompleteJComboBox.this.lastEnteredString);
+                    AutoCompleteJComboBox.this.subject.notify(AutoCompleteJComboBox.this, lastEnteredString);
 
-                    AutoCompleteJComboBox.this.removeAllItems();
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            // We schedule the below actions in GUI event queue,
+                            // so that DocumentListener will not be triggered.
+                            // But I am not sure why.
+                            AutoCompleteJComboBox.this.getEditor().setItem(null);
+                            AutoCompleteJComboBox.this.hidePopup();
+                            AutoCompleteJComboBox.this.removeAllItems();
+                        }
+                    });
+
                     return;
                 }
             }
 
         });
     }
-    
+
     public void setStockCodeAndSymbolDatabase(StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase) {
         this.stockCodeAndSymbolDatabase = stockCodeAndSymbolDatabase;
         
         KeyListener[] listeners = this.getEditor().getEditorComponent().getKeyListeners();
         
         for (KeyListener listener : listeners) {
-            if(listener == keyAdapter) {
+            if (listener == keyAdapter) {
                 return;
             }
         }
@@ -106,101 +135,186 @@ public class AutoCompleteJComboBox extends JComboBox {
         this.getEditor().getEditorComponent().addKeyListener(keyAdapter);
         log.info("Reassign key adapter to combo box");        
     }
-    
+
+    private DocumentListener getDocumentListener() {
+        return new DocumentListener() {
+            private volatile boolean ignore = false;
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                try {
+                    final String string = e.getDocument().getText(0, e.getDocument().getLength());
+                    handle(string);
+                } catch (BadLocationException ex) {
+                    log.error(null, ex);
+                }
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                try {
+                    final String string = e.getDocument().getText(0, e.getDocument().getLength());
+                    handle(string);
+                } catch (BadLocationException ex) {
+                    log.error(null, ex);
+                }
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                try {
+                    final String string = e.getDocument().getText(0, e.getDocument().getLength());
+                    handle(string);
+                } catch (BadLocationException ex) {
+                    log.error(null, ex);
+                }
+            }
+
+            private void _handle(final String string) {
+                if (AutoCompleteJComboBox.this.getSelectedItem() != null) {
+                    if (AutoCompleteJComboBox.this.getSelectedItem().equals(string)) {
+                        // We need to differentiate, whether "string" is from user
+                        // typing, or drop down list selection. This is because when
+                        // user perform selection, document change event will be triggered
+                        // too. When string is from drop down list selection, user
+                        // are not expecting any auto complete suggestion. Return early.
+                        return;
+                    }
+                }
+
+                if (string.length() <= 0) {
+                    // Empty string. Return early. Do not perform hidePopup and
+                    // removeAllItems right here. As when user performs list
+                    // selection, previous text field item will be removed, and
+                    // cause us fall into this scope. We do not want to hidePopup
+                    // and removeAllItems when user is selecting his item.
+                    //
+                    // hidePopup and removeAllItems when user clears off all items
+                    // in text field, will be performed through keyReleased.
+                    return;
+                }                
+
+                // Use to avoid endless DocumentEvent triggering.
+                ignore = true;
+                // During _handle operation, there will be a lot of ListDataListeners
+                // trying to modify the content of our text field. We will not allow
+                // them to do so.
+                //
+                // Without setReadOnly(true), when we type the first character "w", IME
+                // will suggest "我". However, when we call removeAllItems and addItem,
+                // JComboBox will "commit" this suggestion to JComboBox's text field.
+                // Hence, if we continue to type second character "m", the string displayed
+                // at JComboBox's text field will be "我我们".
+                //
+                AutoCompleteJComboBox.this.jComboBoxEditor.setReadOnly(true);
+
+                // Must hide popup. If not, the pop up windows will not be
+                // resized.
+                AutoCompleteJComboBox.this.hidePopup();
+                AutoCompleteJComboBox.this.removeAllItems();
+                if (AutoCompleteJComboBox.this.stockCodeAndSymbolDatabase != null) {
+                    java.util.List<Code> codes = codes = stockCodeAndSymbolDatabase.searchStockCodes(string);
+
+                    boolean shouldShowPopup = false;
+
+                    // Here is our user friendly rule.
+                    // (1) User will first like to search for their prefer stock by code. Hence, we only list
+                    // out stock code to them. No more, no less.
+                    // (2) If we cannot find any stock based on user given stock code, we will search by using
+                    // stock symbol.
+                    // (3) Do not search using both code and symbol at the same time. There are too much information,
+                    // which will make user unhappy.
+                    for (Code c : codes) {
+                        AutoCompleteJComboBox.this.addItem(c.toString());
+                        shouldShowPopup = true;
+                    }
+
+                    if (shouldShowPopup) {
+                        AutoCompleteJComboBox.this.showPopup();
+                    }
+                    else {
+                        java.util.List<Symbol> symbols = stockCodeAndSymbolDatabase.searchStockSymbols(string);
+
+                        for (Symbol s : symbols) {
+                            AutoCompleteJComboBox.this.addItem(s.toString());
+                            shouldShowPopup = true;
+                        }
+
+                        if (shouldShowPopup) {
+                            AutoCompleteJComboBox.this.showPopup();
+                        }   // if (shouldShowPopup)
+                    }   // if (shouldShowPopup)
+                }   // if (AutoCompleteJComboBox.this.stockCodeAndSymbolDatabase != null)
+
+                // When we are in windows look n feel, the text will always be selected. We do not want that.
+                JTextField jTextField = (JTextField)AutoCompleteJComboBox.this.getEditor().getEditorComponent();
+                jTextField.setSelectionStart(jTextField.getText().length());
+                jTextField.setSelectionEnd(jTextField.getText().length());
+                jTextField.setCaretPosition(jTextField.getText().length());
+
+                // Restore.
+                AutoCompleteJComboBox.this.jComboBoxEditor.setReadOnly(false);
+                ignore = false;
+            }
+
+            private void handle(final String string) {
+                if (ignore) {
+                    return;
+                }
+
+                // Submit to GUI event queue. Used to avoid
+                // Exception in thread "AWT-EventQueue-0" java.lang.IllegalStateException: Attempt to mutate in notification
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        _handle(string);
+                    }
+                });
+            }
+        };
+    }
+
     // We should make this powerful combo box shared amoing different classes.
     private KeyAdapter getEditorComponentKeyAdapter() {
         
         return new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
-                if (!e.isActionKey()) {
-                    final String string = AutoCompleteJComboBox.this.getEditor().getItem().toString();
-                    
-                    AutoCompleteJComboBox.this.hidePopup();                                        
-                    
-                    if (KeyEvent.VK_ENTER == e.getKeyCode()) {
-                        if (AutoCompleteJComboBox.this.getItemCount() > 0) {
-                            int index = AutoCompleteJComboBox.this.getSelectedIndex();
-                            if (index == -1) {
-                                lastEnteredString = (String)AutoCompleteJComboBox.this.getItemAt(0);
-                                AutoCompleteJComboBox.this.getEditor().setItem(lastEnteredString);
-                            }
-                            else {
-                                lastEnteredString = (String)AutoCompleteJComboBox.this.getItemAt(index);
-                                AutoCompleteJComboBox.this.getEditor().setItem(lastEnteredString);
-                            }
+                if (KeyEvent.VK_ENTER == e.getKeyCode()) {
+                    String lastEnteredString = "";
+                    if (AutoCompleteJComboBox.this.getItemCount() > 0) {
+                        int index = AutoCompleteJComboBox.this.getSelectedIndex();
+                        if (index == -1) {
+                            lastEnteredString = (String)AutoCompleteJComboBox.this.getItemAt(0);
                         }
                         else {
-                            final Object object = AutoCompleteJComboBox.this.getEditor().getItem();
-                            
-                            if (object instanceof String) {
-                                lastEnteredString = (String)object;
-                            }
-                            else {
-                                lastEnteredString = "";
-                            }
-                            
-                            AutoCompleteJComboBox.this.getEditor().setItem(null);
+                            lastEnteredString = (String)AutoCompleteJComboBox.this.getItemAt(index);
                         }
-                        
-                        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                AutoCompleteJComboBox.this.removeAllItems();
-                            }
-                        });
-
-                        AutoCompleteJComboBox.this.subject.notify(AutoCompleteJComboBox.this, AutoCompleteJComboBox.this.lastEnteredString);
-                        return;
-                    }   /* if(KeyEvent.VK_ENTER == e.getKeyCode()) */                                               
-                    
-                    AutoCompleteJComboBox.this.removeAllItems();
-                    
-                    if (string.length() > 0) {
-                        if (AutoCompleteJComboBox.this.stockCodeAndSymbolDatabase != null) {
-                            java.util.List<Code> codes = codes = stockCodeAndSymbolDatabase.searchStockCodes(string);
-
-                            boolean shouldShowPopup = false;
-
-                            // Here is our user friendly rule.
-                            // (1) User will first like to search for their prefer stock by code. Hence, we only list
-                            // out stock code to them. No more, no less.
-                            // (2) If we cannot find any stock based on user given stock code, we will search by using
-                            // stock symbol.
-                            // (3) Do not search using both code and symbol at the same time. There are too much information,
-                            // which will make user unhappy.
-                            for(Code c : codes) {
-                                AutoCompleteJComboBox.this.addItem(c.toString());
-                                shouldShowPopup = true;
-                            }
-
-                            if (shouldShowPopup) {
-                                AutoCompleteJComboBox.this.showPopup();
-                            }
-                            else {
-                                java.util.List<Symbol> symbols = stockCodeAndSymbolDatabase.searchStockSymbols(string);
-
-                                for(Symbol s : symbols) {
-                                    AutoCompleteJComboBox.this.addItem(s.toString());
-                                    shouldShowPopup = true;
-                                }
-
-                                if (shouldShowPopup) {
-                                    AutoCompleteJComboBox.this.showPopup();
-                                }   // if (shouldShowPopup)
-                            }   // if (shouldShowPopup)
-                        }   // if (AutoCompleteJComboBox.this.stockCodeAndSymbolDatabase != null)
                     }
-                    
-                    AutoCompleteJComboBox.this.getEditor().setItem(string);
-                    
-                    /* When we are in windows look n feel, the text will always be selected. We do not want that. */
-                    JTextField jTextField = (JTextField)AutoCompleteJComboBox.this.getEditor().getEditorComponent();
-                    jTextField.setSelectionStart(jTextField.getText().length());
-                    jTextField.setSelectionEnd(jTextField.getText().length());
-                    jTextField.setCaretPosition(jTextField.getText().length());
-                    
-                }   /* if(!e.isActionKey()) */
+                    else {
+                        final Object object = AutoCompleteJComboBox.this.getEditor().getItem();
+
+                        if (object instanceof String) {
+                            lastEnteredString = (String)object;
+                        }
+                        else {
+                            lastEnteredString = "";
+                        }
+                    }
+
+                    AutoCompleteJComboBox.this.removeAllItems();
+                    AutoCompleteJComboBox.this.subject.notify(AutoCompleteJComboBox.this, lastEnteredString);
+                    return;
+                }   /* if(KeyEvent.VK_ENTER == e.getKeyCode()) */
+
+                // If user removes item from text field, we will hidePopup and
+                // removeAllItems. Please refer DocumentListener.handle, on why
+                // don't we handle hidePopup and removeAllItems there.
+                final Object object = AutoCompleteJComboBox.this.getEditor().getItem();
+                if (object == null || object.toString().length() <= 0) {
+                    AutoCompleteJComboBox.this.hidePopup();
+                    AutoCompleteJComboBox.this.removeAllItems();
+                }
             }   /* public void keyReleased(KeyEvent e) */
         };
     } 
@@ -208,7 +322,7 @@ public class AutoCompleteJComboBox extends JComboBox {
     @Override
     public void setUI(ComboBoxUI ui)
     {
-        if(ui != null)
+        if (ui != null)
         {
             // Let's try our own customized UI.
             Class c = ui.getClass();
@@ -277,10 +391,51 @@ public class AutoCompleteJComboBox extends JComboBox {
                     JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         }
     }
-    
+
+    // WARNING : If Java is having a major refactor on BasicComboBoxEditor class,
+    // the following workaround will break. However, this is the best we can do
+    // at this moment.
+    private class MyJComboBoxEditor extends BasicComboBoxEditor {
+        @Override
+        protected JTextField createEditorComponent() {
+            final MyTextField _editor = new MyTextField("");
+            // Is there a better way to configure the correct UI for
+            // JTextField?
+            if (UIManager.getLookAndFeel().getClass().getName().equals("javax.swing.plaf.metal.MetalLookAndFeel")) {
+                final JComponent jComponent = (JComponent)(new MetalComboBoxEditor().getEditorComponent());
+                _editor.setBorder(jComponent.getBorder());
+            }
+            else {
+                _editor.setBorder(null);
+            }
+            return _editor;
+        }
+
+        public void setReadOnly(boolean readonly) {
+            this.readonly = readonly;
+        }
+
+        private class MyTextField extends JTextField {
+            public MyTextField(String s) {
+                super(s);
+            }
+            
+            // workaround for 4530952
+            @Override
+            public void setText(String s) {
+                if (readonly || getText().equals(s)) {
+                    return;
+                }
+                super.setText(s);
+            }
+        }
+
+        private boolean readonly = false;
+    }
+
     private StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase;
-    private KeyAdapter keyAdapter;
-    private volatile String lastEnteredString = "";
-    
+    private final KeyAdapter keyAdapter;
+    private final MyJComboBoxEditor jComboBoxEditor;
+
     private static final Log log = LogFactory.getLog(AutoCompleteJComboBox.class);
 }
