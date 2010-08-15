@@ -545,9 +545,18 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
 
                 MainFrame m = (MainFrame)NewBuyTransactionJDialog.this.getParent();
 
-                if (m == null) return;
+                if (m == null) {
+                    return;
+                }
 
                 final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = m.getStockCodeAndSymbolDatabase();
+
+                if (stockCodeAndSymbolDatabase == null) {
+                    // Database is not ready yet. Shall we pop up a warning to
+                    // user?
+                    log.info("Database is not ready yet.");
+                    return;
+                }
 
                 final String s = arg;
                 Code code = stockCodeAndSymbolDatabase.searchStockCode(s);

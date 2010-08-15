@@ -1332,6 +1332,13 @@ public class IndicatorPanel extends JPanel {
 
                 final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = m.getStockCodeAndSymbolDatabase();
 
+                if (stockCodeAndSymbolDatabase == null) {
+                    // Database is not ready yet. Shall we pop up a warning to
+                    // user?
+                    log.info("Database is not ready yet.");
+                    return;
+                }
+
                 Code code = stockCodeAndSymbolDatabase.searchStockCode(stock);
                 Symbol symbol = null;
 
@@ -1390,7 +1397,7 @@ public class IndicatorPanel extends JPanel {
             
             MainFrame m = MainFrame.getInstance();
 
-            if(m == null) {
+            if (m == null) {
                 publish(s);
                 return success; 
             }
@@ -1421,7 +1428,7 @@ public class IndicatorPanel extends JPanel {
                 tries++;
                 
                 // We had tried NUM_OF_RETRY times, but still failed. Abort.
-                if(tries >= NUM_OF_RETRY) break;
+                if (tries >= NUM_OF_RETRY) break;
 
             }
             
@@ -1432,16 +1439,31 @@ public class IndicatorPanel extends JPanel {
         @Override
          protected void process(java.util.List<Stock> stocks) {
              for (Stock stock : stocks) {
-                 MainFrame m = MainFrame.getInstance();
+                final MainFrame m = MainFrame.getInstance();
                  
-                if(stock != null) {
-                    ((ObjectInspectorJPanel)objectInspectorJPanel).setBean(new MutableStock(stock));
-                    if(m != null)
+                if (stock != null) {
+                    // Special handling for China stock market.
+                    if (org.yccheok.jstock.engine.Utils.isSymbolImmutable()) {
+                        final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = m.getStockCodeAndSymbolDatabase();
+                        final Symbol _symbol = stockCodeAndSymbolDatabase.codeToSymbol(stock.getCode());
+                        if (_symbol == null) {
+                            // Nothing we can do about it. Use the symbol returned from
+                            // stock server.
+                            ((ObjectInspectorJPanel)objectInspectorJPanel).setBean(new MutableStock(stock));
+                        } else {
+                            ((ObjectInspectorJPanel)objectInspectorJPanel).setBean(new MutableStock(stock.deriveStock(_symbol)));
+                        }
+                    } else {
+                        ((ObjectInspectorJPanel)objectInspectorJPanel).setBean(new MutableStock(stock));
+                    }
+                    
+                    if (m != null) {
                         m.setStatusBar(false, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("IndicatorPanel_StockSampleDataRetrievedSuccess"));
-                }
-                else {
-                    if(m != null)
+                    }
+                } else {
+                    if (m != null) {
                         m.setStatusBar(false, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("IndicatorPanel_StockSampleDataRetrievedFailed"));
+                    }
                 }
              }
          }        

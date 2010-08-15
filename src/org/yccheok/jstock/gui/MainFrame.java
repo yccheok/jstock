@@ -2162,7 +2162,14 @@ public class MainFrame extends javax.swing.JFrame {
                 if (arg == null || arg.length() <= 0) {
                     return;
                 }
-                
+
+                if (MainFrame.this.stockCodeAndSymbolDatabase == null) {
+                    // Database is not ready yet. Shall we pop up a warning to
+                    // user?
+                    log.info("Database is not ready yet.");
+                    return;
+                }
+
                 final String stock = arg;
                 
                 // When user try to enter a stock, and the stock is already in
