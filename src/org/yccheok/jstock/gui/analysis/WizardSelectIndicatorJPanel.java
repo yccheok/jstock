@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Observer;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import javax.swing.JLabel;
 import javax.swing.JTable;
@@ -374,11 +375,19 @@ public class WizardSelectIndicatorJPanel extends javax.swing.JPanel {
                     WizardSelectIndicatorJPanel.this.indicatorDownloadManager = null;
                     return;
                 }
+                
                 try {
                     WizardSelectIndicatorJPanel.this.indicatorDownloadManager = get();
                 } catch (InterruptedException ex) {
                     log.error(null, ex);
                 } catch (ExecutionException ex) {
+                    log.error(null, ex);
+                } catch (CancellationException ex) {
+                    // Some developers suggest to catch this exception, instead of 
+                    // checking on isCancelled. As I am not confident by merely 
+                    // isCancelled check can prevent CancellationException (What 
+                    // if cancellation is happen just after isCancelled check?),
+                    // I will apply both techniques.
                     log.error(null, ex);
                 }
 
