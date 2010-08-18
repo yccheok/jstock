@@ -19,6 +19,7 @@
 
 package org.yccheok.jstock.gui;
 
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import javax.swing.JRadioButton;
 import javax.swing.SwingWorker;
@@ -145,6 +146,18 @@ public class StockServerFactoryJRadioButton extends JRadioButton {
 
             @Override
             public void done() {
+                // The done Method: When you are informed that the SwingWorker
+                // is done via a property change or via the SwingWorker object's
+                // done method, you need to be aware that the get methods can
+                // throw a CancellationException. A CancellationException is a
+                // RuntimeException, which means you do not need to declare it
+                // thrown and you do not need to catch it. Instead, you should
+                // test the SwingWorker using the isCancelled method before you
+                // use the get method.
+                if (this.isCancelled()) {
+                    return;
+                }
+
                 Health health = null;
                 try {
                     health = get();
@@ -152,7 +165,15 @@ public class StockServerFactoryJRadioButton extends JRadioButton {
                     log.error(null, ex);
                 } catch (ExecutionException ex) {
                     log.error(null, ex);
+                } catch (CancellationException ex) {
+                    // Some developers suggest to catch this exception, instead of 
+                    // checking on isCancelled. As I am not confident by merely 
+                    // isCancelled check can prevent CancellationException (What 
+                    // if cancellation is happen just after isCancelled check?),
+                    // I will apply both techniques.
+                    log.error(null, ex);
                 }
+
                 if (health == null || health.isGood() == false) {
                     StockServerFactoryJRadioButton.this.setStatus(Status.Failed);
                 }
