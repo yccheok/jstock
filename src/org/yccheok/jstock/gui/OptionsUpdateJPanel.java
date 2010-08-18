@@ -22,6 +22,7 @@
 
 package org.yccheok.jstock.gui;
 
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
@@ -147,6 +148,13 @@ public class OptionsUpdateJPanel extends javax.swing.JPanel implements JStockOpt
                 } catch (InterruptedException ex) {
                     log.error(null, ex);
                 } catch (ExecutionException ex) {
+                    log.error(null, ex);
+                } catch (CancellationException ex) {
+                    // Some developers suggest to catch this exception, instead of
+                    // checking on isCancelled. As I am not confident by merely
+                    // isCancelled check can prevent CancellationException (What
+                    // if cancellation is happen just after isCancelled check?),
+                    // I will apply both techniques. 
                     log.error(null, ex);
                 }
 

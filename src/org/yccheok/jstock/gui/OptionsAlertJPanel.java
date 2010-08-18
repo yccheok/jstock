@@ -21,6 +21,7 @@ package org.yccheok.jstock.gui;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.concurrent.CancellationException;
 import org.yccheok.jstock.alert.GoogleMail;
 import org.yccheok.jstock.alert.GoogleCalendar;
 import java.util.concurrent.ExecutionException;
@@ -641,6 +642,13 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
                     log.error(null, ex);
                 } catch (ExecutionException ex) {
                     log.error(null, ex);
+                } catch (CancellationException ex) {
+                    // Some developers suggest to catch this exception, instead of
+                    // checking on isCancelled. As I am not confident by merely
+                    // isCancelled check can prevent CancellationException (What
+                    // if cancellation is happen just after isCancelled check?),
+                    // I will apply both techniques. 
+                    log.error(null, ex);
                 }
 
                 OptionsAlertJPanel.this.updateGUIState();
@@ -699,7 +707,14 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
                     log.error(null, ex);
                 } catch (ExecutionException ex) {
                     log.error(null, ex);
-                }                
+                } catch (CancellationException ex) {
+                    // Some developers suggest to catch this exception, instead of
+                    // checking on isCancelled. As I am not confident by merely
+                    // isCancelled check can prevent CancellationException (What
+                    // if cancellation is happen just after isCancelled check?),
+                    // I will apply both techniques. 
+                    log.error(null, ex);
+                }
 
                 OptionsAlertJPanel.this.updateGUIState();
 

@@ -26,6 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import javax.swing.*;
 import java.text.*;
 import java.util.Enumeration;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import javax.swing.text.*;
 import org.yccheok.jstock.engine.Country;
@@ -127,6 +128,13 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
                 } catch (InterruptedException ex) {
                     log.error(null, ex);
                 } catch (ExecutionException ex) {
+                    log.error(null, ex);
+                } catch (CancellationException ex) {
+                    // Some developers suggest to catch this exception, instead of
+                    // checking on isCancelled. As I am not confident by merely
+                    // isCancelled check can prevent CancellationException (What
+                    // if cancellation is happen just after isCancelled check?),
+                    // I will apply both techniques.
                     log.error(null, ex);
                 }
 
