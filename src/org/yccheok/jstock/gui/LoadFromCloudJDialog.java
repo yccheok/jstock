@@ -28,6 +28,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import javax.swing.Icon;
 import javax.swing.JOptionPane;
@@ -343,13 +344,20 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
             @Override
             protected void done() {
                 boolean result = false;
-                
+
+                // Some developers suggest to catch this exception, instead of
+                // checking on isCancelled. As I am not confident by merely
+                // isCancelled check can prevent CancellationException (What
+                // if cancellation is happen just after isCancelled check?),
+                // I will apply both techniques.
                 if (this.isCancelled() == false) {
                     try {
                         result = this.get();
                     } catch (InterruptedException ex) {
                         log.error(null, ex);
                     } catch (ExecutionException ex) {
+                        log.error(null, ex);
+                    } catch (CancellationException ex) {
                         log.error(null, ex);
                     }
                 }
@@ -437,8 +445,23 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
                     return false;
                 }
 
+                // Place isCancelled check after time consuming operation.
+                // Not the best way, but perhaps the easiest way to cancel
+                // the operation.
+                if (isCancelled()) {
+                    return false;
+                }
+
                 publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_ExtractingData..."), Icons.BUSY));
                 final boolean status = Utils.extractZipFile(cloudFile.file, true);
+
+                // Place isCancelled check after time consuming operation.
+                // Not the best way, but perhaps the easiest way to cancel
+                // the operation.
+                if (isCancelled()) {
+                    return false;
+                }
+                
                 if (false == status) {
                     publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_ExtractingDataFail"), Icons.ERROR));
                 }

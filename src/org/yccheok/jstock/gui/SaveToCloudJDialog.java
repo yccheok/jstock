@@ -31,6 +31,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -375,12 +376,19 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
             protected void done() {
                 boolean result = false;
 
+                // Some developers suggest to catch this exception, instead of
+                // checking on isCancelled. As I am not confident by merely
+                // isCancelled check can prevent CancellationException (What
+                // if cancellation is happen just after isCancelled check?),
+                // I will apply both techniques. 
                 if (this.isCancelled() == false) {
                     try {
                         result = this.get();
                     } catch (InterruptedException ex) {
                         log.error(null, ex);
                     } catch (ExecutionException ex) {
+                        log.error(null, ex);
+                    } catch (CancellationException ex) {
                         log.error(null, ex);
                     }
                 }
@@ -440,6 +448,13 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
                 
                 final File zipFile = getJStockZipFile();
                 
+                // Place isCancelled check after time consuming operation.
+                // Not the best way, but perhaps the easiest way to cancel
+                // the operation.
+                if (isCancelled()) {
+                    return false;
+                }
+
                 if (zipFile == null) {
                     publish(Status.newInstance(GUIBundle.getString("SaveToCloudJDialog_PreparingDataFail"), Icons.ERROR));
                     return false;
