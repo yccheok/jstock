@@ -35,7 +35,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import javax.swing.*;
 import java.text.MessageFormat;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -872,38 +874,11 @@ public class MainFrame extends javax.swing.JFrame {
             this.save();
             
             log.info("latestNewsTask stop...");
-            if(this.latestNewsTask != null)
+
+            if (this.latestNewsTask != null)
             {
                 this.latestNewsTask.cancel(true);
             }
-
-            //log.info("stockCodeAndSymbolDatabaseTask stop...");
-            //stockCodeAndSymbolDatabaseTask._stop();
-
-            //try {
-            //    stockCodeAndSymbolDatabaseTask.get();
-            //}
-            //catch(InterruptedException exp) {
-            //    log.error("", exp);
-            //}
-            //catch(java.util.concurrent.ExecutionException exp) {
-            //    log.error("", exp);
-            //}
-
-            //log.info("marketThread stop...");
-            //marketThread.interrupt();
-
-            //try {
-            //    marketThread.join();
-            //}
-            //catch(InterruptedException exp) {
-            //    log.error("", exp);
-            //}
-
-            //log.info("realTimeStockMonitor stop...");
-            //realTimeStockMonitor.stop();
-            //log.info("stockHistoryMonitor stop...");
-            //stockHistoryMonitor.stop();
 
             this.chatJPanel.stopChatServiceManager();
 
@@ -1020,20 +995,23 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_formWindowClosing
 
     private void jMenuItem8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem8ActionPerformed
-        if (this.stockCodeAndSymbolDatabase == null) {
+        // Use local variable to ensure thread safety.
+        final StockCodeAndSymbolDatabase symbol_database = this.stockCodeAndSymbolDatabase;
+
+        if (symbol_database == null) {
             JOptionPane.showMessageDialog(this, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/messages").getString("info_message_there_are_no_database_ready_yet"), java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/messages").getString("info_title_there_are_no_database_ready_yet"), JOptionPane.INFORMATION_MESSAGE);
             return;
         }
 
-        StockDatabaseJDialog stockDatabaseJDialog = new StockDatabaseJDialog(this, stockCodeAndSymbolDatabase, true);
+        StockDatabaseJDialog stockDatabaseJDialog = new StockDatabaseJDialog(this, symbol_database, true);
         stockDatabaseJDialog.setSize(540, 540);
         stockDatabaseJDialog.setLocationRelativeTo(this);
         stockDatabaseJDialog.setVisible(true); 
 
-        if(stockDatabaseJDialog.getMutableStockCodeAndSymbolDatabase() != null) {
+        if (stockDatabaseJDialog.getMutableStockCodeAndSymbolDatabase() != null) {
             this.stockCodeAndSymbolDatabase = stockDatabaseJDialog.getMutableStockCodeAndSymbolDatabase().toStockCodeAndSymbolDatabase();
-            ((AutoCompleteJComboBox)jComboBox1).setStockCodeAndSymbolDatabase(stockCodeAndSymbolDatabase);
-            indicatorPanel.setStockCodeAndSymbolDatabase(stockCodeAndSymbolDatabase);
+            ((AutoCompleteJComboBox)jComboBox1).setStockCodeAndSymbolDatabase(this.stockCodeAndSymbolDatabase);
+            indicatorPanel.setStockCodeAndSymbolDatabase(this.stockCodeAndSymbolDatabase);
 
             log.info("saveStockCodeAndSymbolDatabase...");
             saveStockCodeAndSymbolDatabase();
@@ -1857,26 +1835,52 @@ public class MainFrame extends javax.swing.JFrame {
         return new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if(e.getClickCount() == 2) {
+                if (e.getClickCount() == 2) {
                     
-                    // Make sure no same task is running.
-                    if (stockCodeAndSymbolDatabaseTask != null) {
-                        if (stockCodeAndSymbolDatabaseTask.isDone() == true) {
-                            final int result = JOptionPane.showConfirmDialog(MainFrame.this, MessagesBundle.getString("question_message_perform_server_reconnecting"), MessagesBundle.getString("question_title_perform_server_reconnecting"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-                            if (result == JOptionPane.YES_OPTION)
-                            {
-                                initStockCodeAndSymbolDatabase(false);
+                    // Make sure no other task is running.
+                    // Use local variable to be thread safe.
+                    final DatabaseTask task = MainFrame.this.databaseTask;
+                    if (task != null) {
+                        if (task.isDone() == true) {
+                            // Task is done. But, does it success?
+                            boolean success = false;
+                            // Some developers suggest that check for isCancelled before calling get
+                            // to avoid CancellationException. Others suggest that just perform catch
+                            // on all Exceptions. I will do it both.
+                            if (task.isCancelled() == false) {
+                                try {
+                                    success = task.get();
+                                } catch (InterruptedException ex) {
+                                    log.error(null, ex);
+                                } catch (ExecutionException ex) {
+                                    log.error(null, ex);
+                                } catch (CancellationException ex) {
+                                    log.error(null, ex);
+                                }
+                            }
+                            if (success == false) {
+                                // Fail. Automatically reload database for user. Need not to prompt them message.
+                                // As, they do not have any database right now.
+                                MainFrame.this.initStockCodeAndSymbolDatabase(true);
+                                
+                            } else {
+                                final int result = JOptionPane.showConfirmDialog(MainFrame.this, MessagesBundle.getString("question_message_perform_server_reconnecting"), MessagesBundle.getString("question_title_perform_server_reconnecting"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                                if (result == JOptionPane.YES_OPTION) {
+                                    MainFrame.this.initStockCodeAndSymbolDatabase(false);
+                                }
                             }
                         }
                         else {
+                            // There is task still running. Ask user whether he wants
+                            // to stop it.
                             final int result = JOptionPane.showConfirmDialog(MainFrame.this, MessagesBundle.getString("question_message_cancel_server_reconnecting"), MessagesBundle.getString("question_title_cancel_server_reconnecting"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
                             
                             if (result == JOptionPane.YES_OPTION)
                             {                            
-                                synchronized(stockCodeAndSymbolDatabaseTask)
+                                synchronized (MainFrame.this.databaseTaskMonitor)
                                 {
-                                    stockCodeAndSymbolDatabaseTask._stop();
-                                    stockCodeAndSymbolDatabaseTask = null;
+                                    MainFrame.this.databaseTask.cancel(true);
+                                    MainFrame.this.databaseTask = null;
                                 }
                                 
                                 statusBar.setMainMessage(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_NetworkError"));
@@ -2163,7 +2167,9 @@ public class MainFrame extends javax.swing.JFrame {
                     return;
                 }
 
-                if (MainFrame.this.stockCodeAndSymbolDatabase == null) {
+                // Use local variable to ensure thread safety.
+                final StockCodeAndSymbolDatabase symbol_database = MainFrame.this.stockCodeAndSymbolDatabase;
+                if (symbol_database == null) {
                     // Database is not ready yet. Shall we pop up a warning to
                     // user?
                     log.info("Database is not ready yet.");
@@ -2178,11 +2184,11 @@ public class MainFrame extends javax.swing.JFrame {
                 final StockTableModel tableModel = (StockTableModel)MainFrame.this.jTable1.getModel();
                 int modelRowBeforeAdded = -1;
 
-                Code code = stockCodeAndSymbolDatabase.searchStockCode(stock);
+                Code code = symbol_database.searchStockCode(stock);
                 Symbol symbol = null;
 
                 if (code != null) {
-                    symbol = stockCodeAndSymbolDatabase.codeToSymbol(code);
+                    symbol = symbol_database.codeToSymbol(code);
 
                     // Update rowBeforeAdded before calling addStockToTable
                     modelRowBeforeAdded = tableModel.findRow(Utils.getEmptyStock(code, symbol));
@@ -2193,10 +2199,10 @@ public class MainFrame extends javax.swing.JFrame {
                     realTimeStockMonitor.addStockCode(code);
                 }
                 else {
-                    symbol = stockCodeAndSymbolDatabase.searchStockSymbol(stock);
+                    symbol = symbol_database.searchStockSymbol(stock);
 
                     if (symbol != null) {
-                        code = stockCodeAndSymbolDatabase.symbolToCode(symbol);
+                        code = symbol_database.symbolToCode(symbol);
                         // Shouldn't be null. This is because symbol is obtained directly
                         // from database. Even later user modifies symbol or code through Database -> Stock Database...,
                         // it shouldn't have any side effect.
@@ -2225,7 +2231,7 @@ public class MainFrame extends javax.swing.JFrame {
                         //     At the end, there are two rows with same symbol "MAXIS", but different codes.
                         // (4) Users try to add "MAXIS". RealTimeStockMonitor will allow.
                         //     At the end, there are two rows with same symbol "MAXIS", but different codes.
-                        realTimeStockMonitor.addStockCode(stockCodeAndSymbolDatabase.symbolToCode(symbol));
+                        realTimeStockMonitor.addStockCode(symbol_database.symbolToCode(symbol));
                     }   // if (symbol != null)
                 }   // if (code != null)
                 MainFrame.this.highlightStock(modelRowBeforeAdded);
@@ -2389,49 +2395,57 @@ public class MainFrame extends javax.swing.JFrame {
             }
         }        
     }
-    
-    private class StockCodeAndSymbolDatabaseTask extends SwingWorker<Boolean, Integer> implements org.yccheok.jstock.engine.Observer<StockServer, Integer>{
-        private volatile boolean runnable = true;
+
+    // Task to initialize both stockCodeAndSymbolDatabase and stockNameDatabase.
+    private class DatabaseTask extends SwingWorker<Boolean, Integer> implements org.yccheok.jstock.engine.Observer<StockServer, Integer>{
         private boolean readFromDisk = true;
         
-        public StockCodeAndSymbolDatabaseTask(boolean readFromDisk)
+        public DatabaseTask(boolean readFromDisk)
         {
             this.readFromDisk = readFromDisk;
         }
         
-        public void _stop() {
-            runnable = false;
-        }
-        
         @Override
         protected void done() {
+            // The done Method: When you are informed that the SwingWorker
+            // is done via a property change or via the SwingWorker object's
+            // done method, you need to be aware that the get methods can
+            // throw a CancellationException. A CancellationException is a
+            // RuntimeException, which means you do not need to declare it
+            // thrown and you do not need to catch it. Instead, you should
+            // test the SwingWorker using the isCancelled method before you
+            // use the get method.
+            if (this.isCancelled()) {
+                // Cancelled by user explicitly. Do not perform any GUI update.
+                // No pop-up message.
+                return;
+            }
+
             boolean success = false;
             
             try {
                 success = get();
-
             }
             catch (InterruptedException exp) {
                 log.error(null, exp);
             }
             catch (java.util.concurrent.ExecutionException exp) {
                 log.error(null, exp);
+            } catch (CancellationException ex) {
+                // Not sure. Some developers suggest to catch this exception as
+                // well instead of checking on isCancelled. I will do it both.
+                log.error(null, ex);
             }
            
-            // If we are asked to stop explicitly, do not perform any update
-            // on GUI.
-            if (runnable)
-            {
-                if (success) {
-                    statusBar.setMainMessage(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_Connected"));
-                    statusBar.setImageIcon(getImageIcon("/images/16x16/network-transmit-receive.png"), java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_Connected"));
-                    statusBar.setProgressBar(false);                    
-                }
-                else {
-                    statusBar.setMainMessage(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_NetworkError"));
-                    statusBar.setImageIcon(getImageIcon("/images/16x16/network-error.png"), java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_DoubleClickedToTryAgain"));
-                    statusBar.setProgressBar(false);
-                }
+            if (success) {
+                statusBar.setMainMessage(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_Connected"));
+                statusBar.setImageIcon(getImageIcon("/images/16x16/network-transmit-receive.png"), java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_Connected"));
+                statusBar.setProgressBar(false);
+            }
+            else {
+                statusBar.setMainMessage(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_NetworkError"));
+                statusBar.setImageIcon(getImageIcon("/images/16x16/network-error.png"), java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_DoubleClickedToTryAgain"));
+                statusBar.setProgressBar(false);
             }
        }
        
@@ -2453,9 +2467,9 @@ public class MainFrame extends javax.swing.JFrame {
                     log.info("Stock code and symbol database loaded from " + f.toString() + " successfully.");            
                 
                     // Prepare proper synchronization for us to change country.
-                    synchronized(StockCodeAndSymbolDatabaseTask.this)
+                    synchronized (MainFrame.this.databaseTaskMonitor)
                     {
-                        if (this.runnable)
+                        if (this.isCancelled() == false)
                         {
                             MainFrame.this.stockCodeAndSymbolDatabase = tmp;
 
@@ -2495,9 +2509,9 @@ public class MainFrame extends javax.swing.JFrame {
                     // Let's make our database since we get a list of good stocks.
                     tmp = new StockCodeAndSymbolDatabase(stocks);
                     // Prepare proper synchronization for us to change country.
-                    synchronized(this)
+                    synchronized (MainFrame.this.databaseTaskMonitor)
                     {
-                        if (runnable)
+                        if (this.isCancelled() == false)
                         {
                             MainFrame.this.stockCodeAndSymbolDatabase = tmp;
 
@@ -2515,7 +2529,7 @@ public class MainFrame extends javax.swing.JFrame {
             // Try on Yahoo Stock Server (Or other stock servers).
             int tries = 0;            
             final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactories(country);            
-            while (!isCancelled() && !success && runnable) {
+            while (!isCancelled() && !success) {
                 for (StockServerFactory factory : stockServerFactories) {
 
                     StockServer stockServer = factory.getStockServer();
@@ -2524,16 +2538,16 @@ public class MainFrame extends javax.swing.JFrame {
                     {
                         // I am interested to receive update notification from
                         // this stock server.
-                        ((Subject<StockServer, Integer>)stockServer).attach(StockCodeAndSymbolDatabaseTask.this);
+                        ((Subject<StockServer, Integer>)stockServer).attach(DatabaseTask.this);
                     }
                     
                     try {                        
                         tmp = new StockCodeAndSymbolDatabase(stockServer);
                         
                         // Prepare proper synchronization for us to change country.
-                        synchronized(this)
+                        synchronized (MainFrame.this.databaseTaskMonitor)
                         {
-                            if (runnable)
+                            if (this.isCancelled() == false)
                             {
                                 stockCodeAndSymbolDatabase = tmp;
                                 
@@ -2552,11 +2566,11 @@ public class MainFrame extends javax.swing.JFrame {
                     finally {
                         if (stockServer instanceof Subject)
                         {
-                            ((Subject<StockServer, Integer>)stockServer).dettach(StockCodeAndSymbolDatabaseTask.this);
+                            ((Subject<StockServer, Integer>)stockServer).dettach(DatabaseTask.this);
                         }
                     }
                     
-                    if (isCancelled() || !runnable) {
+                    if (isCancelled()) {
                         break;
                     }
                 }
@@ -2585,7 +2599,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         @Override
         protected void process(java.util.List<Integer> chunks) {
-            if (runnable)
+            if (this.isCancelled() == false)
             {
                 int max = 0;
                 for (Integer integer : chunks) {
@@ -2971,22 +2985,25 @@ public class MainFrame extends javax.swing.JFrame {
         {
             return false;
         }
-        
-        if (stockCodeAndSymbolDatabase == null)
+
+        // Use local variable to ensure thread safety.
+        final StockCodeAndSymbolDatabase symbol_database = this.stockCodeAndSymbolDatabase;
+
+        if (symbol_database == null)
         {
             return false;
         }
 
         // This could happen when OutOfMemoryException happen while fetching stock database information
         // from the server.
-        if (stockCodeAndSymbolDatabase.getCodes().size() <= 0)
+        if (symbol_database.getCodes().size() <= 0)
         {
             log.info("Database was corrupted.");
             return false;
         }
 
         final File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database" + File.separator + "stockcodeandsymboldatabase.xml");
-        return Utils.toXML(this.stockCodeAndSymbolDatabase, f);
+        return Utils.toXML(symbol_database, f);
     }
     
     /**
@@ -3125,26 +3142,29 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     private void initStockCodeAndSymbolDatabase(boolean readFromDisk) {
-        // Stop any on-going activities.
-        if (this.stockCodeAndSymbolDatabaseTask != null)
-        {
-            synchronized(this.stockCodeAndSymbolDatabaseTask)
-            {
-                this.stockCodeAndSymbolDatabaseTask._stop();
-                stockCodeAndSymbolDatabase = null;
-                ((AutoCompleteJComboBox)jComboBox1).setStockCodeAndSymbolDatabase(null);
-                indicatorPanel.setStockCodeAndSymbolDatabase(null);                
-            }
-        }
-
+        // Update GUI state.
         this.setStatusBar(true, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_ConnectingToStockServerToRetrieveStockInformation..."));
-        statusBar.setImageIcon(getImageIcon("/images/16x16/network-connecting.png"), java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_Connecting..."));
+        this.statusBar.setImageIcon(getImageIcon("/images/16x16/network-connecting.png"), java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_Connecting..."));
+
+        // Stop any on-going activities.
+        // Entire block will be synchronized, as we do not want to hit by more
+        // than 1 databaseTask running.
+        synchronized (this.databaseTaskMonitor)
+        {
+            if (this.databaseTask != null)
+            {
+                this.databaseTask.cancel(true);
+                this.stockCodeAndSymbolDatabase = null;
+                ((AutoCompleteJComboBox)this.jComboBox1).setStockCodeAndSymbolDatabase(null);
+                this.indicatorPanel.setStockCodeAndSymbolDatabase(null);
+            }
+            
+            this.databaseTask = new DatabaseTask(readFromDisk);
+            this.databaseTask.execute();
+        }
 
         // We may hold a large database previously. Invoke garbage collector to perform cleanup.
         System.gc();
-        
-        stockCodeAndSymbolDatabaseTask = new StockCodeAndSymbolDatabaseTask(readFromDisk);
-        stockCodeAndSymbolDatabaseTask.execute();
     }
     
     public void update(RealTimeStockMonitor monitor, final java.util.List<Stock> stocks) {
@@ -3152,9 +3172,11 @@ public class MainFrame extends javax.swing.JFrame {
             // We need to ignore symbol names given by stock server.
             // Replace them with database's.
             for (int i = 0, size = stocks.size(); i < size; i++) {
-                final Stock stock = stocks.get(i);                
-                if (this.stockCodeAndSymbolDatabase != null) {
-                    final Symbol symbol = this.stockCodeAndSymbolDatabase.codeToSymbol(stock.getCode());
+                final Stock stock = stocks.get(i);  
+                // Use local variable to ensure thread safety.
+                final StockCodeAndSymbolDatabase symbol_database = this.stockCodeAndSymbolDatabase;
+                if (symbol_database != null) {
+                    final Symbol symbol = symbol_database.codeToSymbol(stock.getCode());
                     if (symbol != null) {
                         stocks.set(i, stock.deriveStock(symbol));
                     } else {
@@ -3760,7 +3782,10 @@ public class MainFrame extends javax.swing.JFrame {
     private volatile StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = null;
     private RealTimeStockMonitor realTimeStockMonitor = null;
     private StockHistoryMonitor stockHistoryMonitor = null;
-    private StockCodeAndSymbolDatabaseTask stockCodeAndSymbolDatabaseTask = null;
+    
+    private DatabaseTask databaseTask = null;
+    private final Object databaseTaskMonitor = new Object();
+
     private LatestNewsTask latestNewsTask = null;
     private Thread marketThread = null;
     private StockHistorySerializer stockHistorySerializer = null;        
