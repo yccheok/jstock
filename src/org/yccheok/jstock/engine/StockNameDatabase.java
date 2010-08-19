@@ -19,6 +19,10 @@
 
 package org.yccheok.jstock.engine;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * This class is used to provide stock code to stock name mapping, as some
  * stock server doesn't return good stock name. For example, China users wish
@@ -27,5 +31,28 @@ package org.yccheok.jstock.engine;
  * <code>StockNameDatabase</code>.
  */
 public class StockNameDatabase {
+    /**
+     * Initializes a newly created {@code StockNameDatabase} object so
+     * that it contains stock code to stock name mapping information. The
+     * information is being retrieved from list of stocks.
+     *
+     * @param stocks List of stocks which provides stock information
+     */
+    public StockNameDatabase(List<Stock> stocks) {
+        for (Stock stock : stocks) {
+            codeToName.put(stock.getCode(), stock.getName());
+        }
+    }
 
+    /**
+     * Returns name based on the code.
+     * @param code The code
+     * @return name based on the code. <code>null</code> will be returned if
+     * no match found.
+     */
+    public String codeToName(Code code) {
+        return codeToName.get(code);
+    }
+
+    private final Map<Code, String> codeToName = new HashMap<Code, String>();
 }

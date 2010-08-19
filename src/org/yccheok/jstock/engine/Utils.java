@@ -348,7 +348,7 @@ public class Utils {
                 final String code = nextLine[code_index];
                 final String symbol = nextLine[symbol_index];
                 final String name = nextLine[name_index];
-                final Stock stock = org.yccheok.jstock.gui.Utils.getEmptyStock(Code.newInstance(code), Symbol.newInstance(symbol));
+                final Stock stock = org.yccheok.jstock.gui.Utils.getEmptyStock(Code.newInstance(code), Symbol.newInstance(symbol)).deriveStock(name);
                 stocks.add(stock);
             }
         } catch (IOException ex) {

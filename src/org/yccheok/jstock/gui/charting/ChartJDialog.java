@@ -916,7 +916,7 @@ public class ChartJDialog extends javax.swing.JDialog {
         final int num = stockHistoryServer.getNumOfCalendar();
         final Stock stock = stockHistoryServer.getStock(stockHistoryServer.getCalendar(num - 1));
 
-        final String title = stock.getName();
+        final String title = getBestStockName(stock);
 
         final ValueAxis timeAxis = new DateAxis(GUIBundle.getString("ChartJDialog_Date"));
         timeAxis.setLowerMargin(0.02);                  // reduce the default margins
@@ -1002,7 +1002,19 @@ public class ChartJDialog extends javax.swing.JDialog {
         return new TimeSeriesCollection(series1);
     }
     
-    
+    private String getBestStockName(Stock stock) {
+        if (org.yccheok.jstock.engine.Utils.isNameImmutable()) {
+            final StockNameDatabase stockNameDatabase = MainFrame.getInstance().getStockNameDatabase();
+            if (stockNameDatabase != null) {
+                final String name = stockNameDatabase.codeToName(stock.getCode());
+                if (name != null) {
+                    return name;
+                }
+            }
+        }
+        return stock.getName();
+    }
+
     /**
      * Creates a chart.
      * 
@@ -1014,7 +1026,7 @@ public class ChartJDialog extends javax.swing.JDialog {
         final int num = stockHistoryServer.getNumOfCalendar();
         final Stock stock = stockHistoryServer.getStock(stockHistoryServer.getCalendar(num - 1));
         
-        final String title = stock.getName();
+        final String title = getBestStockName(stock);
         
         final ValueAxis timeAxis = new DateAxis(GUIBundle.getString("ChartJDialog_Date"));
         final NumberAxis valueAxis = new NumberAxis(GUIBundle.getString("ChartJDialog_Price"));

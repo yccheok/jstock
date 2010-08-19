@@ -226,6 +226,48 @@ public class Stock {
     }
 
     /**
+     * Returns a clone copy of this stock with its name being modified to
+     * specified name. This stock remains unchanged, as it is designed as
+     * immutable class.
+     *
+     * @param name Specified name to be modified to
+     * @return A clone copy of this stock with its name being modified to
+     * specified name.
+     */
+    public Stock deriveStock(String name) {
+        return new Stock(
+            this.code,
+            this.symbol,
+            name,
+            this.board,
+            this.industry,
+            this.prevPrice,
+            this.openPrice,
+            this.lastPrice,
+            this.highPrice,
+            this.lowPrice,
+            // TODO: CRITICAL LONG BUG REVISED NEEDED.
+            this.volume,
+            this.changePrice,
+            this.changePricePercentage,
+            this.lastVolume,
+            this.buyPrice,
+            this.buyQuantity,
+            this.sellPrice,
+            this.sellQuantity,
+            this.secondBuyPrice,
+            this.secondBuyQuantity,
+            this.secondSellPrice,
+            this.secondSellQuantity,
+            this.thirdBuyPrice,
+            this.thirdBuyQuantity,
+            this.thirdSellPrice,
+            this.thirdSellQuantity,
+            this.calendar
+        );
+    }
+    
+    /**
      * Returns a clone copy of this stock with its symbol being modified to
      * specified symbol. This stock remains unchanged, as it is designed as
      * immutable class.

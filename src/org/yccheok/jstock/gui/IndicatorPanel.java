@@ -1435,21 +1435,31 @@ public class IndicatorPanel extends JPanel {
                 final MainFrame m = MainFrame.getInstance();
                  
                 if (stock != null) {
+                    Stock new_stock = stock;
+
                     // Special handling for China stock market.
                     if (org.yccheok.jstock.engine.Utils.isSymbolImmutable()) {
                         final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = m.getStockCodeAndSymbolDatabase();
-                        final Symbol _symbol = stockCodeAndSymbolDatabase.codeToSymbol(stock.getCode());
-                        if (_symbol == null) {
-                            // Nothing we can do about it. Use the symbol returned from
-                            // stock server.
-                            ((ObjectInspectorJPanel)objectInspectorJPanel).setBean(new MutableStock(stock));
-                        } else {
-                            ((ObjectInspectorJPanel)objectInspectorJPanel).setBean(new MutableStock(stock.deriveStock(_symbol)));
+                        if (stockCodeAndSymbolDatabase != null) {
+                            final Symbol _symbol = stockCodeAndSymbolDatabase.codeToSymbol(new_stock.getCode());
+                            if (_symbol != null) {
+                                new_stock = new_stock.deriveStock(_symbol);
+                            }
                         }
-                    } else {
-                        ((ObjectInspectorJPanel)objectInspectorJPanel).setBean(new MutableStock(stock));
                     }
-                    
+
+                    if (org.yccheok.jstock.engine.Utils.isNameImmutable()) {
+                        final StockNameDatabase stockNameDatabase = m.getStockNameDatabase();
+                        if (stockNameDatabase != null) {
+                            final String _name = stockNameDatabase.codeToName(new_stock.getCode());
+                            if (_name != null) {
+                                new_stock = new_stock.deriveStock(_name);
+                            }
+                        }
+                    }
+
+                    ((ObjectInspectorJPanel)objectInspectorJPanel).setBean(new MutableStock(new_stock));
+
                     if (m != null) {
                         m.setStatusBar(false, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("IndicatorPanel_StockSampleDataRetrievedSuccess"));
                     }
