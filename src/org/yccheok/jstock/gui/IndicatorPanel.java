@@ -1355,16 +1355,9 @@ public class IndicatorPanel extends JPanel {
                 }
 
                 if (code != null && symbol != null) {
-                    if (stockTask != null) {
-                        stockTask._stop();
-
-                        try {
-                            stockTask.get();
-                        } catch (InterruptedException exp) {
-                            log.error(null, exp);
-                        } catch (ExecutionException exp) {
-                            log.error(null, exp);
-                        }
+                    final StockTask tmp = stockTask;
+                    if (tmp != null) {
+                        tmp.cancel(true);
                     }
 
                     stockTask = new StockTask(code, symbol);
@@ -1374,19 +1367,13 @@ public class IndicatorPanel extends JPanel {
         };
     }
 
-    private class StockTask extends SwingWorker<Boolean, Stock> {
-        private volatile boolean runnable = true;
-        
+    private class StockTask extends SwingWorker<Boolean, Stock> {        
         final Code code;
         final Symbol symbol;
         
         public StockTask(Code code, Symbol symbol) {
             this.code = code;
             this.symbol = symbol;
-        }
-        
-        public void _stop() {
-            runnable = false;
         }
         
         @Override
@@ -1406,7 +1393,7 @@ public class IndicatorPanel extends JPanel {
             
             java.util.List<StockServerFactory> stockServerFactories = m.getStockServerFactories();
             
-            while(!isCancelled() && !success && runnable) {
+            while (!isCancelled() && !success) {
                 for (StockServerFactory factory : stockServerFactories) {
                     
                     StockServer server = factory.getStockServer();
@@ -1420,7 +1407,7 @@ public class IndicatorPanel extends JPanel {
                         log.error(null, exp);
                     }
 
-                    if(isCancelled() || !runnable) {
+                    if (isCancelled()) {
                         break;
                     }
                 }
@@ -1428,7 +1415,9 @@ public class IndicatorPanel extends JPanel {
                 tries++;
                 
                 // We had tried NUM_OF_RETRY times, but still failed. Abort.
-                if (tries >= NUM_OF_RETRY) break;
+                if (tries >= NUM_OF_RETRY) {
+                    break;
+                }
 
             }
             
@@ -1439,6 +1428,10 @@ public class IndicatorPanel extends JPanel {
         @Override
          protected void process(java.util.List<Stock> stocks) {
              for (Stock stock : stocks) {
+                if (this.isCancelled()) {
+                    return;
+                }
+
                 final MainFrame m = MainFrame.getInstance();
                  
                 if (stock != null) {
@@ -1469,25 +1462,17 @@ public class IndicatorPanel extends JPanel {
          }        
     }
     
-    public void stop()
+    private void stop()
     {
-        if(stockTask != null) {                
-            stockTask._stop();
+        final StockTask tmp = this.stockTask;
 
-            try {
-                stockTask.get();
-            } catch (InterruptedException exp) {
-                log.error(null, exp);
-            } catch (ExecutionException exp) {
-                log.error(null, exp);
-            }
-
-            stockTask = null;
-
+        if (tmp != null) {
+            tmp.cancel(true);
+            this.stockTask = null;
             log.info("Terminated stock task");
         }
 
-        if(this.simulationThread != null) {
+        if (this.simulationThread != null) {
             this.simulationThread.interrupt();
 
             try {
