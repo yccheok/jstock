@@ -490,7 +490,7 @@ public class ChartJDialog extends javax.swing.JDialog {
 
         jMenuBar1.add(jMenu1);
 
-        jMenu2.setText("Technical Analysis");
+        jMenu2.setText(bundle.getString("ChartJDialog_TechnicalAnalysis")); // NOI18N
         jMenu2.addMenuListener(new javax.swing.event.MenuListener() {
             public void menuCanceled(javax.swing.event.MenuEvent evt) {
             }

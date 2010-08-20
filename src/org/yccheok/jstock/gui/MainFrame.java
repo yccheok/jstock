@@ -73,9 +73,12 @@ public class MainFrame extends javax.swing.JFrame {
     {
     }
 
-    private void init() {
+    /**
+     * Initialize this MainFrame based on the JStockOptions.
+     */
+    private void init(JStockOptions jStockOptions) {
         /* Workaround to solve JXTreeTable look n feel cannot be changed on the fly. */
-        initJStockOptions();
+        initJStockOptions(jStockOptions);
 
         Locale.setDefault(getJStockOptions().getLocale());
 
@@ -1266,6 +1269,47 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     /**
+     * Returns the best JStockOptions, based on command line argument.
+     */
+    private static JStockOptions getJStockOptions(String args[]) {
+        final File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "options.xml");
+        JStockOptions jStockOptions = Utils.fromXML(JStockOptions.class, f);
+        if (jStockOptions == null) {
+            // JStockOptions's file not found. Perhaps this is the first time we
+            // run JStock.
+            jStockOptions = new JStockOptions();
+        }
+            
+        for (String arg : args) {
+            final String[] tokens = arg.split("=");
+            if (tokens.length != 2) {
+                continue;
+            }
+            final String compare = tokens[0].trim();
+            if (compare.equalsIgnoreCase("-country")) {
+                final String countryStr = tokens[1].trim();
+                try {
+                    final Country country = Country.valueOf(countryStr);
+                    if (country == Country.China) {
+                        // Has user switch to this country before?
+                        if (false == new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country).exists()) {
+                            // First time switching to this country. Use the settings from
+                            // command line argument.
+                            jStockOptions.setCountry(country);
+                            final Locale locale = new Locale(Locale.SIMPLIFIED_CHINESE.getLanguage(), Locale.getDefault().getCountry(), Locale.getDefault().getVariant());
+                            jStockOptions.setLocale(locale);
+                        }
+                    }
+                } catch(IllegalArgumentException ex) {
+                    log.error(null, ex);
+                }
+            }
+        }
+
+        return jStockOptions;
+    }
+
+    /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
@@ -1290,21 +1334,15 @@ public class MainFrame extends javax.swing.JFrame {
         
         Utils.setDefaultLookAndFeel();
 
+        final String[] _args = args;
+
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
                 final MainFrame mainFrame = MainFrame.getInstance();
-                mainFrame.init();
+                mainFrame.init(getJStockOptions(_args));
                 mainFrame.setExtendedState(Frame.MAXIMIZED_BOTH);
                 mainFrame.setVisible(true);
-
-                final LookAndFeel lnf = UIManager.getLookAndFeel();
-                // User choose not to use default native look and feel. Let's make user happy by giving
-                // what they want.
-                if (false == lnf.getClass().getName().equals(mainFrame.getJStockOptions().getLooknFeel())) {
-                    log.info("User prefer not to use native " + lnf.getClass().getName());
-                    mainFrame.setLookAndFeel(mainFrame.getJStockOptions().getLooknFeel());
-                }
             }
         });
     }
@@ -2764,16 +2802,9 @@ public class MainFrame extends javax.swing.JFrame {
     /**
      * Initialize JStock options.
      */
-    private void initJStockOptions() {
-        final File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "options.xml");
-        final JStockOptions tmp = Utils.fromXML(JStockOptions.class, f);
-        if (tmp == null) {
-            this.jStockOptions = new JStockOptions();
-        }
-        else {
-            this.jStockOptions = tmp;
-            log.info("jstockOptions loaded from " + f.toString() + " successfully.");
-        }
+    private void initJStockOptions(JStockOptions jStockOptions) {
+        this.jStockOptions = jStockOptions;
+
         /* Hard core fix. */
         if (this.jStockOptions.getScanningSpeed() == 0) {
             this.jStockOptions.setScanningSpeed(1000);
