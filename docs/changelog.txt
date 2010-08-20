@@ -5,7 +5,10 @@ JStock 1.0.5n - xxxx-xx-xx
   Bugfix:  Wrong returned value by AbstractYahooStockHistoryServer.parse.
            Contributed by Mark DeSpain. (#3031918)
   Bugfix:  No duplicated items will be allowed in TSTSearchEngine.
-
+  Bugfix:  Cancelation doesn't work, in LoadFromCloudJDialog and 
+           SaveToCloudJDialog.
+  Bugfix:  Avoid possible NPE caused by null StockCodeAndSymbolDatabase.
+  
 JStock 1.0.5m - 2010-07-03
   Feature: Internationalization and localization. Currently, only Simplified
            Chinese is supported. (#2214275)

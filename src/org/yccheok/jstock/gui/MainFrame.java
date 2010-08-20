@@ -3217,7 +3217,7 @@ public class MainFrame extends javax.swing.JFrame {
 
                 // Use local variable to ensure thread safety.
                 final StockCodeAndSymbolDatabase symbol_database = this.stockCodeAndSymbolDatabase;
-                final StockNameDatabase name_database = this.stockNameDatabase;
+                //final StockNameDatabase name_database = this.stockNameDatabase;
                 
                 if (symbol_database != null) {
                     final Symbol symbol = symbol_database.codeToSymbol(stock.getCode());
@@ -3410,8 +3410,15 @@ public class MainFrame extends javax.swing.JFrame {
             @Override
             public void run() {
                 Code code = runnable.getCode();
-                // Possible null if we are trying to get index history.
-                Symbol symbol = MainFrame.this.stockCodeAndSymbolDatabase.codeToSymbol(code);
+                Symbol symbol = null;
+
+                // Use local variable to ensure thread safety.
+                final StockCodeAndSymbolDatabase symbol_database = MainFrame.this.stockCodeAndSymbolDatabase;
+                // Is the database ready?
+                if (symbol_database != null) {
+                    // Possible null if we are trying to get index history.
+                    symbol = symbol_database.codeToSymbol(code);
+                }
                 final boolean shouldShowGUI = MainFrame.this.stockCodeHistoryGUI.remove(code);
                
                 if (stockCodeHistoryGUI.isEmpty()) {
@@ -3802,10 +3809,16 @@ public class MainFrame extends javax.swing.JFrame {
                     if (dynamicChart == null) {
                         return;
                     }
-
-                    final Symbol symbol = MainFrame.this.getStockCodeAndSymbolDatabase().codeToSymbol(stock.getCode());
+                    Symbol symbol = null;
+                    // Use local variable to ensure thread safety.
+                    final StockCodeAndSymbolDatabase symbol_database = MainFrame.this.stockCodeAndSymbolDatabase;
+                    // Is the database ready?
+                    if (symbol_database != null) {
+                        // Possible null if we are trying to get index history.
+                        symbol = symbol_database.codeToSymbol(stock.getCode());
+                    }
                     final String template = GUIBundle.getString("MainFrame_IntradayMovementTemplate");
-                    final String message = MessageFormat.format(template, symbol);
+                    final String message = MessageFormat.format(template, symbol == null ? stock.getSymbol() : symbol);
                     dynamicChart.showNewJDialog(MainFrame.this, message);
                 }
             }
