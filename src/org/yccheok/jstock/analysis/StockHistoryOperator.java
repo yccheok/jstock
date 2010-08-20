@@ -75,7 +75,7 @@ public class StockHistoryOperator extends AbstractOperator {
     private double average(java.util.List<Double> values) {
         final int size = values.size();
         assert (size >= 0);
-        Double sum = 0.0;
+        double sum = 0.0;
         for (Double v : values) {
             sum = sum + v;
         }

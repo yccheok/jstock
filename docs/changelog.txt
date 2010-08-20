@@ -4,6 +4,8 @@ Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 JStock 1.0.5n - xxxx-xx-xx
   Bugfix:  Wrong returned value by AbstractYahooStockHistoryServer.parse.
            Contributed by Mark DeSpain. (#3031918)
+  Bugfix:  Avoid unnecessary instantiation of Double objects. Contributed by 
+           Mark DeSpain.(#3037411)
   Bugfix:  No duplicated items will be allowed in TSTSearchEngine.
   Bugfix:  Cancelation doesn't work, in LoadFromCloudJDialog and 
            SaveToCloudJDialog.
