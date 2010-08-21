@@ -79,6 +79,62 @@ public class JStockOptions {
         this.locale = locale;
     }
 
+    /**
+     * @return the fallBelowAlertForegroundColor
+     */
+    public Color getFallBelowAlertForegroundColor() {
+        return fallBelowAlertForegroundColor;
+    }
+
+    /**
+     * @param fallBelowAlertForegroundColor the fallBelowAlertForegroundColor to set
+     */
+    public void setFallBelowAlertForegroundColor(Color fallBelowAlertForegroundColor) {
+        this.fallBelowAlertForegroundColor = fallBelowAlertForegroundColor;
+    }
+
+    /**
+     * @return the fallBelowAlertBackgroundColor
+     */
+    public Color getFallBelowAlertBackgroundColor() {
+        return fallBelowAlertBackgroundColor;
+    }
+
+    /**
+     * @param fallBelowAlertBackgroundColor the fallBelowAlertBackgroundColor to set
+     */
+    public void setFallBelowAlertBackgroundColor(Color fallBelowAlertBackgroundColor) {
+        this.fallBelowAlertBackgroundColor = fallBelowAlertBackgroundColor;
+    }
+
+    /**
+     * @return the riseAboveAlertForegroundColor
+     */
+    public Color getRiseAboveAlertForegroundColor() {
+        return riseAboveAlertForegroundColor;
+    }
+
+    /**
+     * @param riseAboveAlertForegroundColor the riseAboveAlertForegroundColor to set
+     */
+    public void setRiseAboveAlertForegroundColor(Color riseAboveAlertForegroundColor) {
+        this.riseAboveAlertForegroundColor = riseAboveAlertForegroundColor;
+    }
+
+    /**
+     * @return the riseAboveAlertBackgroundColor
+     */
+    public Color getRiseAboveAlertBackgroundColor() {
+        return riseAboveAlertBackgroundColor;
+    }
+
+    /**
+     * @param riseAboveAlertBackgroundColor the riseAboveAlertBackgroundColor to set
+     */
+    public void setRiseAboveAlertBackgroundColor(Color riseAboveAlertBackgroundColor) {
+        this.riseAboveAlertBackgroundColor = riseAboveAlertBackgroundColor;
+    }
+
     public enum YellowInformationBoxOption {
         Stay,
         Follow,
@@ -92,8 +148,11 @@ public class JStockOptions {
     public static final java.awt.Color DEFAULT_SECOND_ROW_BACKGROUND_COLOR = new java.awt.Color(255, 255, 204);
     public static final java.awt.Color DEFAULT_AUTO_UPDATE_FOREGROUND_COLOR = Color.BLACK;
     public static final java.awt.Color DEFAULT_AUTO_UPDATE_BACKGROUND_COLOR = Color.RED;
-    public static final java.awt.Color DEFAULT_ALERT_FOREGROUND_COLOR = Color.YELLOW;
-    public static final java.awt.Color DEFAULT_ALERT_BACKGROUND_COLOR = Color.BLACK;
+
+    public static final java.awt.Color DEFAULT_FALL_BELOW_ALERT_FOREGROUND_COLOR = Color.YELLOW;
+    public static final java.awt.Color DEFAULT_FALL_BELOW_ALERT_BACKGROUND_COLOR = Color.BLACK;
+    public static final java.awt.Color DEFAULT_RISE_ABOVE_ALERT_FOREGROUND_COLOR = Color.YELLOW;
+    public static final java.awt.Color DEFAULT_RISE_ABOVE_ALERT_BACKGROUND_COLOR = Color.BLACK;
 
     public static final java.awt.Color DEFAULT_CHAT_SYSTEM_MESSAGE_COLOR = Color.RED;
     public static final java.awt.Color DEFAULT_CHAT_OWN_MESSAGE_COLOR = new java.awt.Color(169, 169, 169);
@@ -134,8 +193,10 @@ public class JStockOptions {
         this.autoUpdateBackgroundColor = DEFAULT_AUTO_UPDATE_BACKGROUND_COLOR;
 
         this.enableColorAlert = false;
-        this.alertForegroundColor = DEFAULT_ALERT_FOREGROUND_COLOR;
-        this.alertBackgroundColor = DEFAULT_ALERT_BACKGROUND_COLOR;
+        this.fallBelowAlertForegroundColor = DEFAULT_FALL_BELOW_ALERT_FOREGROUND_COLOR;
+        this.fallBelowAlertBackgroundColor = DEFAULT_FALL_BELOW_ALERT_BACKGROUND_COLOR;
+        this.riseAboveAlertForegroundColor = DEFAULT_RISE_ABOVE_ALERT_FOREGROUND_COLOR;
+        this.riseAboveAlertBackgroundColor = DEFAULT_RISE_ABOVE_ALERT_BACKGROUND_COLOR;
 
         this.isAutoUpdateNewsEnabled = true;
         this.newsID = "";
@@ -183,8 +244,16 @@ public class JStockOptions {
     private Color secondRowBackgroundColor;
     private Color autoUpdateForegroundColor;
     private Color autoUpdateBackgroundColor;
-    private Color alertForegroundColor;
-    private Color alertBackgroundColor;
+    @Deprecated
+    private transient Color alertForegroundColor;
+    @Deprecated
+    private transient Color alertBackgroundColor;
+    // As replacement for alertForegroundColor and alertBackgroundColor.
+    private Color fallBelowAlertForegroundColor;
+    private Color fallBelowAlertBackgroundColor;
+    private Color riseAboveAlertForegroundColor;
+    private Color riseAboveAlertBackgroundColor;
+
     private boolean enableColorChange;
     private boolean enableColorAlert;
 
@@ -281,8 +350,10 @@ public class JStockOptions {
         this.secondRowBackgroundColor = jStockOptions.secondRowBackgroundColor;
         this.autoUpdateForegroundColor = jStockOptions.autoUpdateForegroundColor;
         this.autoUpdateBackgroundColor = jStockOptions.autoUpdateBackgroundColor;
-        this.alertForegroundColor = jStockOptions.alertForegroundColor;
-        this.alertBackgroundColor = jStockOptions.alertBackgroundColor;
+        this.fallBelowAlertForegroundColor = jStockOptions.fallBelowAlertForegroundColor;
+        this.fallBelowAlertBackgroundColor = jStockOptions.fallBelowAlertBackgroundColor;
+        this.riseAboveAlertForegroundColor = jStockOptions.riseAboveAlertForegroundColor;
+        this.riseAboveAlertBackgroundColor = jStockOptions.riseAboveAlertBackgroundColor;
         this.enableColorChange = jStockOptions.enableColorChange;
         this.enableColorAlert = jStockOptions.enableColorAlert;
 
@@ -382,8 +453,10 @@ public class JStockOptions {
         jStockOptions.secondRowBackgroundColor = this.secondRowBackgroundColor;
         jStockOptions.autoUpdateForegroundColor = this.autoUpdateForegroundColor;
         jStockOptions.autoUpdateBackgroundColor = this.autoUpdateBackgroundColor;
-        jStockOptions.alertForegroundColor = this.alertForegroundColor;
-        jStockOptions.alertBackgroundColor = this.alertBackgroundColor;
+        jStockOptions.fallBelowAlertForegroundColor = this.getFallBelowAlertForegroundColor;
+        jStockOptions.fallBelowAlertBackgroundColor = this.getFallBelowAlertBackgroundColor;
+        jStockOptions.riseAboveAlertForegroundColor = this.getRiseAboveAlertForegroundColor;
+        jStockOptions.riseAboveAlertBackgroundColor = this.getRiseAboveAlertBackgroundColor;
         jStockOptions.enableColorChange = this.enableColorChange;
         jStockOptions.enableColorAlert = this.enableColorAlert;
 
@@ -494,12 +567,20 @@ public class JStockOptions {
             this.setChatOtherMessageColor(DEFAULT_CHAT_OTHER_MESSAGE_COLOR);
         }
 
-        if (this.getAlertForegroundColor() == null) {
-            this.setAlertForegroundColor(DEFAULT_ALERT_FOREGROUND_COLOR);
+        if (this.getFallBelowAlertForegroundColor() == null) {
+            this.setFallBelowAlertForegroundColor(DEFAULT_FALL_BELOW_ALERT_FOREGROUND_COLOR);
         }
 
-        if (this.getAlertBackgroundColor() == null) {
-            this.setAlertBackgroundColor(DEFAULT_ALERT_BACKGROUND_COLOR);    
+        if (this.getFallBelowAlertBackgroundColor() == null) {
+            this.setFallBelowAlertBackgroundColor(DEFAULT_FALL_BELOW_ALERT_BACKGROUND_COLOR);    
+        }
+
+        if (this.getRiseAboveAlertForegroundColor() == null) {
+            this.setRiseAboveAlertForegroundColor(DEFAULT_RISE_ABOVE_ALERT_FOREGROUND_COLOR);
+        }
+
+        if (this.getRiseAboveAlertBackgroundColor() == null) {
+            this.setRiseAboveAlertBackgroundColor(DEFAULT_RISE_ABOVE_ALERT_BACKGROUND_COLOR);    
         }
 
         if (this.proxyAuthUserName == null) {
@@ -880,34 +961,6 @@ public class JStockOptions {
      */
     public void setChatPassword(String chatPassword) {
         this.chatPassword = chatPassword;
-    }
-
-    /**
-     * @return the alertForegroundColor
-     */
-    public Color getAlertForegroundColor() {
-        return alertForegroundColor;
-    }
-
-    /**
-     * @param alertForegroundColor the alertForegroundColor to set
-     */
-    public void setAlertForegroundColor(Color alertForegroundColor) {
-        this.alertForegroundColor = alertForegroundColor;
-    }
-
-    /**
-     * @return the alertBackgroundColor
-     */
-    public Color getAlertBackgroundColor() {
-        return alertBackgroundColor;
-    }
-
-    /**
-     * @param alertBackgroundColor the alertBackgroundColor to set
-     */
-    public void setAlertBackgroundColor(Color alertBackgroundColor) {
-        this.alertBackgroundColor = alertBackgroundColor;
     }
 
     /**
