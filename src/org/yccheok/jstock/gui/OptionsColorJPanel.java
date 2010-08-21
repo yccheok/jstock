@@ -19,6 +19,8 @@
 
 package org.yccheok.jstock.gui;
 
+import org.yccheok.jstock.internationalization.GUIBundle;
+
 /**
  *
  * @author  yccheok
@@ -45,34 +47,61 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPanel24 = new javax.swing.JPanel();
         jPanel14 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
+        jPanel5 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         jPanel8 = new javax.swing.JPanel();
+        jPanel15 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
+        jPanel18 = new javax.swing.JPanel();
         jPanel9 = new javax.swing.JPanel();
         jPanel10 = new javax.swing.JPanel();
-        jPanel4 = new javax.swing.JPanel();
-        jCheckBox1 = new javax.swing.JCheckBox();
-        jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
-        jPanel11 = new javax.swing.JPanel();
-        jPanel12 = new javax.swing.JPanel();
+        jPanel19 = new javax.swing.JPanel();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
         jPanel13 = new javax.swing.JPanel();
-        jCheckBox2 = new javax.swing.JCheckBox();
+        jPanel4 = new javax.swing.JPanel();
         jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
+        jPanel23 = new javax.swing.JPanel();
         jPanel16 = new javax.swing.JPanel();
         jPanel17 = new javax.swing.JPanel();
+        jCheckBox1 = new javax.swing.JCheckBox();
+        jPanel22 = new javax.swing.JPanel();
+        jPanel21 = new javax.swing.JPanel();
+        jPanel11 = new javax.swing.JPanel();
+        jPanel12 = new javax.swing.JPanel();
+        jPanel20 = new javax.swing.JPanel();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
         jButton8 = new javax.swing.JButton();
+        jCheckBox2 = new javax.swing.JCheckBox();
+        jPanel25 = new javax.swing.JPanel();
+        jPanel26 = new javax.swing.JPanel();
+        jLabel10 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
+        jPanel27 = new javax.swing.JPanel();
+        jPanel28 = new javax.swing.JPanel();
+        jPanel29 = new javax.swing.JPanel();
         jXHeader1 = new org.jdesktop.swingx.JXHeader();
+
+        javax.swing.GroupLayout jPanel24Layout = new javax.swing.GroupLayout(jPanel24);
+        jPanel24.setLayout(jPanel24Layout);
+        jPanel24Layout.setHorizontalGroup(
+            jPanel24Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+        );
+        jPanel24Layout.setVerticalGroup(
+            jPanel24Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+        );
 
         setLayout(new java.awt.BorderLayout());
 
@@ -82,12 +111,10 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
 
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsColorJPanel_TableForeground"))); // NOI18N
+        jPanel2.setLayout(new java.awt.BorderLayout());
 
-        jLabel1.setText(bundle.getString("OptionsColorJPanel_NormalText")); // NOI18N
-
-        jLabel2.setText(bundle.getString("OptionsColorJPanel_LowerNumericalValue")); // NOI18N
-
-        jLabel3.setText(bundle.getString("OptionsColorJPanel_HigherNumericalValue")); // NOI18N
+        jPanel5.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        jPanel5.setLayout(new java.awt.GridLayout(3, 1, 5, 5));
 
         jPanel6.setBackground(new java.awt.Color(0, 0, 0));
         jPanel6.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -109,6 +136,8 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
             .addGap(0, 22, Short.MAX_VALUE)
         );
 
+        jPanel5.add(jPanel6);
+
         jPanel7.setBackground(new java.awt.Color(255, 0, 0));
         jPanel7.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         jPanel7.setPreferredSize(new java.awt.Dimension(24, 24));
@@ -129,6 +158,8 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
             .addGap(0, 22, Short.MAX_VALUE)
         );
 
+        jPanel5.add(jPanel7);
+
         jPanel8.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         jPanel8.setPreferredSize(new java.awt.Dimension(24, 24));
         jPanel8.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -148,52 +179,29 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
             .addGap(0, 22, Short.MAX_VALUE)
         );
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel3)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2)
-                            .addComponent(jLabel1))
-                        .addGap(28, 28, 28)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(19, Short.MAX_VALUE))
-        );
+        jPanel5.add(jPanel8);
 
-        jPanel2Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jPanel6, jPanel7, jPanel8});
+        jPanel2.add(jPanel5, java.awt.BorderLayout.EAST);
 
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1)
-                    .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(7, 7, 7)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel2)
-                    .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel3)
-                    .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(20, Short.MAX_VALUE))
-        );
+        jPanel15.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        jPanel15.setLayout(new java.awt.GridLayout(3, 1, 5, 5));
 
-        jPanel2Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jPanel6, jPanel7, jPanel8});
+        jLabel1.setText(bundle.getString("OptionsColorJPanel_NormalText")); // NOI18N
+        jPanel15.add(jLabel1);
+
+        jLabel2.setText(bundle.getString("OptionsColorJPanel_LowerNumericalValue")); // NOI18N
+        jPanel15.add(jLabel2);
+
+        jLabel3.setText(bundle.getString("OptionsColorJPanel_HigherNumericalValue")); // NOI18N
+        jPanel15.add(jLabel3);
+
+        jPanel2.add(jPanel15, java.awt.BorderLayout.CENTER);
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsColorJPanel_TableBackground"))); // NOI18N
+        jPanel3.setLayout(new java.awt.BorderLayout(5, 5));
 
-        jLabel4.setText(bundle.getString("OptionsColorJPanel_FirstRow")); // NOI18N
-
-        jLabel5.setText(bundle.getString("OptionsColorJPanel_SecondRow")); // NOI18N
+        jPanel18.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        jPanel18.setLayout(new java.awt.GridLayout(3, 1, 5, 5));
 
         jPanel9.setBackground(new java.awt.Color(0, 0, 0));
         jPanel9.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -214,6 +222,8 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
             jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 22, Short.MAX_VALUE)
         );
+
+        jPanel18.add(jPanel9);
 
         jPanel10.setBackground(new java.awt.Color(255, 255, 255));
         jPanel10.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -236,142 +246,39 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
             .addGap(0, 22, Short.MAX_VALUE)
         );
 
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel4)
-                    .addComponent(jLabel5))
-                .addGap(76, 76, 76)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(19, Short.MAX_VALUE))
-        );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel4)
-                    .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel5))
-                .addContainerGap(51, Short.MAX_VALUE))
-        );
+        jPanel18.add(jPanel10);
 
-        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsColorJPanel_AutoUpdate"))); // NOI18N
+        jPanel3.add(jPanel18, java.awt.BorderLayout.EAST);
 
-        jCheckBox1.setText(bundle.getString("OptionsColorJPanel_EnableColorChangeUpdate")); // NOI18N
-        jCheckBox1.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        jCheckBox1.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        jCheckBox1.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                jCheckBox1ItemStateChanged(evt);
-            }
-        });
+        jPanel19.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        jPanel19.setLayout(new java.awt.GridLayout(3, 1, 5, 5));
 
-        jLabel6.setText(bundle.getString("OptionsColorJPanel_Foreground")); // NOI18N
-        jLabel6.setEnabled(false);
+        jLabel4.setText(bundle.getString("OptionsColorJPanel_FirstRow")); // NOI18N
+        jPanel19.add(jLabel4);
 
-        jLabel7.setText(bundle.getString("OptionsColorJPanel_Background")); // NOI18N
-        jLabel7.setEnabled(false);
+        jLabel5.setText(bundle.getString("OptionsColorJPanel_SecondRow")); // NOI18N
+        jPanel19.add(jLabel5);
 
-        jPanel11.setBackground(new java.awt.Color(0, 0, 0));
-        jPanel11.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        jPanel11.setEnabled(false);
-        jPanel11.setPreferredSize(new java.awt.Dimension(24, 24));
-        jPanel11.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jPanel11MouseClicked(evt);
-            }
-        });
+        jPanel3.add(jPanel19, java.awt.BorderLayout.CENTER);
 
-        javax.swing.GroupLayout jPanel11Layout = new javax.swing.GroupLayout(jPanel11);
-        jPanel11.setLayout(jPanel11Layout);
-        jPanel11Layout.setHorizontalGroup(
-            jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 22, Short.MAX_VALUE)
-        );
-        jPanel11Layout.setVerticalGroup(
-            jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 22, Short.MAX_VALUE)
-        );
+        jPanel13.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsColorJPanel_FallBelowAlert"))); // NOI18N
+        jPanel13.setLayout(new java.awt.BorderLayout());
 
-        jPanel12.setBackground(new java.awt.Color(0, 0, 0));
-        jPanel12.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        jPanel12.setEnabled(false);
-        jPanel12.setPreferredSize(new java.awt.Dimension(24, 24));
-        jPanel12.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jPanel12MouseClicked(evt);
-            }
-        });
-
-        javax.swing.GroupLayout jPanel12Layout = new javax.swing.GroupLayout(jPanel12);
-        jPanel12.setLayout(jPanel12Layout);
-        jPanel12Layout.setHorizontalGroup(
-            jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 22, Short.MAX_VALUE)
-        );
-        jPanel12Layout.setVerticalGroup(
-            jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 22, Short.MAX_VALUE)
-        );
-
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jCheckBox1)
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel6)
-                            .addComponent(jLabel7))
-                        .addGap(82, 82, 82)
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jPanel11, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jPanel12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(41, Short.MAX_VALUE))
-        );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addComponent(jCheckBox1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel6)
-                    .addComponent(jPanel11, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(6, 6, 6)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel7))
-                .addContainerGap(4, Short.MAX_VALUE))
-        );
-
-        jPanel13.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsColorJPanel_FallBelowAndRiseAboveAlert"))); // NOI18N
-
-        jCheckBox2.setText(bundle.getString("OptionsColorJPanel_EnableColorChangeAlert")); // NOI18N
-        jCheckBox2.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        jCheckBox2.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        jCheckBox2.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                jCheckBox2ItemStateChanged(evt);
-            }
-        });
+        jPanel4.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        jPanel4.setLayout(new java.awt.GridLayout(2, 1, 5, 5));
 
         jLabel8.setText(bundle.getString("OptionsColorJPanel_Foreground")); // NOI18N
         jLabel8.setEnabled(false);
+        jPanel4.add(jLabel8);
 
         jLabel9.setText(bundle.getString("OptionsColorJPanel_Background")); // NOI18N
         jLabel9.setEnabled(false);
+        jPanel4.add(jLabel9);
+
+        jPanel13.add(jPanel4, java.awt.BorderLayout.CENTER);
+
+        jPanel23.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        jPanel23.setLayout(new java.awt.GridLayout(2, 1, 5, 5));
 
         jPanel16.setBackground(new java.awt.Color(0, 0, 0));
         jPanel16.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -394,6 +301,8 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
             .addGap(0, 22, Short.MAX_VALUE)
         );
 
+        jPanel23.add(jPanel16);
+
         jPanel17.setBackground(new java.awt.Color(0, 0, 0));
         jPanel17.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         jPanel17.setEnabled(false);
@@ -415,38 +324,85 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
             .addGap(0, 22, Short.MAX_VALUE)
         );
 
-        javax.swing.GroupLayout jPanel13Layout = new javax.swing.GroupLayout(jPanel13);
-        jPanel13.setLayout(jPanel13Layout);
-        jPanel13Layout.setHorizontalGroup(
-            jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel13Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jCheckBox2)
-                    .addGroup(jPanel13Layout.createSequentialGroup()
-                        .addGroup(jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel8)
-                            .addComponent(jLabel9))
-                        .addGap(82, 82, 82)
-                        .addGroup(jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jPanel16, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jPanel17, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(53, Short.MAX_VALUE))
+        jPanel23.add(jPanel17);
+
+        jPanel13.add(jPanel23, java.awt.BorderLayout.EAST);
+
+        jCheckBox1.setText(bundle.getString("OptionsColorJPanel_EnableColorChangeUpdate")); // NOI18N
+        jCheckBox1.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        jCheckBox1.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        jCheckBox1.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jCheckBox1ItemStateChanged(evt);
+            }
+        });
+
+        jPanel22.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsColorJPanel_AutoUpdate"))); // NOI18N
+        jPanel22.setLayout(new java.awt.BorderLayout());
+
+        jPanel21.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        jPanel21.setLayout(new java.awt.GridLayout(2, 1, 5, 5));
+
+        jPanel11.setBackground(new java.awt.Color(0, 0, 0));
+        jPanel11.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        jPanel11.setEnabled(false);
+        jPanel11.setPreferredSize(new java.awt.Dimension(24, 24));
+        jPanel11.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jPanel11MouseClicked(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel11Layout = new javax.swing.GroupLayout(jPanel11);
+        jPanel11.setLayout(jPanel11Layout);
+        jPanel11Layout.setHorizontalGroup(
+            jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 22, Short.MAX_VALUE)
         );
-        jPanel13Layout.setVerticalGroup(
-            jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel13Layout.createSequentialGroup()
-                .addComponent(jCheckBox2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel8)
-                    .addComponent(jPanel16, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(6, 6, 6)
-                .addGroup(jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel17, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel9))
-                .addContainerGap(11, Short.MAX_VALUE))
+        jPanel11Layout.setVerticalGroup(
+            jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 22, Short.MAX_VALUE)
         );
+
+        jPanel21.add(jPanel11);
+
+        jPanel12.setBackground(new java.awt.Color(0, 0, 0));
+        jPanel12.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        jPanel12.setEnabled(false);
+        jPanel12.setPreferredSize(new java.awt.Dimension(24, 24));
+        jPanel12.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jPanel12MouseClicked(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel12Layout = new javax.swing.GroupLayout(jPanel12);
+        jPanel12.setLayout(jPanel12Layout);
+        jPanel12Layout.setHorizontalGroup(
+            jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 22, Short.MAX_VALUE)
+        );
+        jPanel12Layout.setVerticalGroup(
+            jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 22, Short.MAX_VALUE)
+        );
+
+        jPanel21.add(jPanel12);
+
+        jPanel22.add(jPanel21, java.awt.BorderLayout.EAST);
+
+        jPanel20.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        jPanel20.setLayout(new java.awt.GridLayout(2, 1, 5, 5));
+
+        jLabel6.setText(bundle.getString("OptionsColorJPanel_Foreground")); // NOI18N
+        jLabel6.setEnabled(false);
+        jPanel20.add(jLabel6);
+
+        jLabel7.setText(bundle.getString("OptionsColorJPanel_Background")); // NOI18N
+        jLabel7.setEnabled(false);
+        jPanel20.add(jLabel7);
+
+        jPanel22.add(jPanel20, java.awt.BorderLayout.CENTER);
 
         jButton8.setText(bundle.getString("OptionsColorJPanel_ResetToDefaultColor")); // NOI18N
         jButton8.addActionListener(new java.awt.event.ActionListener() {
@@ -455,44 +411,141 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
             }
         });
 
+        jCheckBox2.setText(bundle.getString("OptionsColorJPanel_EnableColorChangeAlert")); // NOI18N
+        jCheckBox2.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        jCheckBox2.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        jCheckBox2.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jCheckBox2ItemStateChanged(evt);
+            }
+        });
+
+        jPanel25.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsColorJPanel_RiseAboveAlert"))); // NOI18N
+        jPanel25.setLayout(new java.awt.BorderLayout());
+
+        jPanel26.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        jPanel26.setLayout(new java.awt.GridLayout(2, 1, 5, 5));
+
+        jLabel10.setText(bundle.getString("OptionsColorJPanel_Foreground")); // NOI18N
+        jLabel10.setEnabled(false);
+        jPanel26.add(jLabel10);
+
+        jLabel11.setText(bundle.getString("OptionsColorJPanel_Background")); // NOI18N
+        jLabel11.setEnabled(false);
+        jPanel26.add(jLabel11);
+
+        jPanel25.add(jPanel26, java.awt.BorderLayout.CENTER);
+
+        jPanel27.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        jPanel27.setLayout(new java.awt.GridLayout(2, 1, 5, 5));
+
+        jPanel28.setBackground(new java.awt.Color(0, 0, 0));
+        jPanel28.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        jPanel28.setEnabled(false);
+        jPanel28.setPreferredSize(new java.awt.Dimension(24, 24));
+        jPanel28.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jPanel28MouseClicked(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel28Layout = new javax.swing.GroupLayout(jPanel28);
+        jPanel28.setLayout(jPanel28Layout);
+        jPanel28Layout.setHorizontalGroup(
+            jPanel28Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 22, Short.MAX_VALUE)
+        );
+        jPanel28Layout.setVerticalGroup(
+            jPanel28Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 22, Short.MAX_VALUE)
+        );
+
+        jPanel27.add(jPanel28);
+
+        jPanel29.setBackground(new java.awt.Color(0, 0, 0));
+        jPanel29.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        jPanel29.setEnabled(false);
+        jPanel29.setPreferredSize(new java.awt.Dimension(24, 24));
+        jPanel29.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jPanel29MouseClicked(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel29Layout = new javax.swing.GroupLayout(jPanel29);
+        jPanel29.setLayout(jPanel29Layout);
+        jPanel29Layout.setHorizontalGroup(
+            jPanel29Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 22, Short.MAX_VALUE)
+        );
+        jPanel29Layout.setVerticalGroup(
+            jPanel29Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 22, Short.MAX_VALUE)
+        );
+
+        jPanel27.add(jPanel29);
+
+        jPanel25.add(jPanel27, java.awt.BorderLayout.EAST);
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(126, 126, 126)
-                        .addComponent(jButton8))
-                    .addComponent(jPanel13, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 196, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jCheckBox2)
+                                .addGap(75, 75, 75))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jPanel13, javax.swing.GroupLayout.DEFAULT_SIZE, 196, Short.MAX_VALUE)
+                                .addGap(18, 18, 18)
+                                .addComponent(jPanel25, javax.swing.GroupLayout.DEFAULT_SIZE, 196, Short.MAX_VALUE)))
+                        .addContainerGap())
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(132, 132, 132)
+                                .addComponent(jButton8))
+                            .addComponent(jCheckBox1)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jPanel22, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 151, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addContainerGap(73, Short.MAX_VALUE))))
         );
 
-        jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jPanel2, jPanel3});
+        jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jPanel13, jPanel2, jPanel22, jPanel25, jPanel3});
 
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jPanel13, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
+                .addComponent(jCheckBox2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel13, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jPanel25, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addComponent(jCheckBox1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel22, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(11, 11, 11)
                 .addComponent(jButton8)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(106, Short.MAX_VALUE))
         );
 
-        jPanel1Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jPanel2, jPanel3});
+        jPanel1Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jPanel13, jPanel25});
 
         jPanel14.add(jPanel1, java.awt.BorderLayout.CENTER);
 
@@ -516,8 +569,11 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
         jPanel11.setBackground(JStockOptions.DEFAULT_AUTO_UPDATE_FOREGROUND_COLOR);
         jPanel12.setBackground(JStockOptions.DEFAULT_AUTO_UPDATE_BACKGROUND_COLOR);
 
-        jPanel16.setBackground(JStockOptions.DEFAULT_ALERT_FOREGROUND_COLOR);
-        jPanel17.setBackground(JStockOptions.DEFAULT_ALERT_BACKGROUND_COLOR);
+        jPanel16.setBackground(JStockOptions.DEFAULT_FALL_BELOW_ALERT_FOREGROUND_COLOR);
+        jPanel17.setBackground(JStockOptions.DEFAULT_FALL_BELOW_ALERT_BACKGROUND_COLOR);
+
+        jPanel28.setBackground(JStockOptions.DEFAULT_RISE_ABOVE_ALERT_FOREGROUND_COLOR);
+        jPanel29.setBackground(JStockOptions.DEFAULT_RISE_ABOVE_ALERT_BACKGROUND_COLOR);
 
         this.jCheckBox1.setSelected(false);
     }//GEN-LAST:event_jButton8ActionPerformed
@@ -525,7 +581,7 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
     private void jPanel17MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel17MouseClicked
         if (jPanel17.isEnabled() == false) return;
 
-        final java.awt.Color color = javax.swing.JColorChooser.showDialog(this, "Choose a color", this.jPanel17.getBackground());
+        final java.awt.Color color = javax.swing.JColorChooser.showDialog(this, GUIBundle.getString("OptionsColorJPanel_ChooseAColor"), this.jPanel17.getBackground());
 
         if (null == color) return;
 
@@ -533,13 +589,13 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
     }//GEN-LAST:event_jPanel17MouseClicked
 
     private void jPanel16MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel16MouseClicked
-        // TODO add your handling code here:
-        if(jPanel16.isEnabled() == false) return;
-
-        final java.awt.Color color = javax.swing.JColorChooser.showDialog(this, "Choose a color", this.jPanel16.getBackground());
-
-        if (null == color) return;
-
+        if (jPanel16.isEnabled() == false) {
+            return;
+        }
+        final java.awt.Color color = javax.swing.JColorChooser.showDialog(this, GUIBundle.getString("OptionsColorJPanel_ChooseAColor"), this.jPanel16.getBackground());
+        if (null == color) {
+            return;
+        }
         jPanel16.setBackground(color);
     }//GEN-LAST:event_jPanel16MouseClicked
 
@@ -549,14 +605,20 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
 
         jLabel8.setEnabled(status);
         jLabel9.setEnabled(status);
+        jLabel10.setEnabled(status);
+        jLabel11.setEnabled(status);
         jPanel16.setEnabled(status);
         jPanel17.setEnabled(status);
+        jPanel13.setEnabled(status);
+        jPanel25.setEnabled(status);
+        jPanel28.setEnabled(status);
+        jPanel29.setEnabled(status);
     }//GEN-LAST:event_jCheckBox2ItemStateChanged
 
     private void jPanel12MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel12MouseClicked
         if(jPanel12.isEnabled() == false) return;
 
-        final java.awt.Color color = javax.swing.JColorChooser.showDialog(this, "Choose a color", this.jPanel12.getBackground());
+        final java.awt.Color color = javax.swing.JColorChooser.showDialog(this, GUIBundle.getString("OptionsColorJPanel_ChooseAColor"), this.jPanel12.getBackground());
 
         if (null == color) return;
 
@@ -566,7 +628,7 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
     private void jPanel11MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel11MouseClicked
         if (jPanel11.isEnabled() == false) return;
 
-        final java.awt.Color color = javax.swing.JColorChooser.showDialog(this, "Choose a color", this.jPanel11.getBackground());
+        final java.awt.Color color = javax.swing.JColorChooser.showDialog(this, GUIBundle.getString("OptionsColorJPanel_ChooseAColor"), this.jPanel11.getBackground());
 
         if(null == color) return;
 
@@ -580,11 +642,12 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
         jLabel7.setEnabled(status);
         jPanel11.setEnabled(status);
         jPanel12.setEnabled(status);
+        jPanel22.setEnabled(status);
     }//GEN-LAST:event_jCheckBox1ItemStateChanged
 
     private void jPanel10MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel10MouseClicked
 
-        final java.awt.Color color = javax.swing.JColorChooser.showDialog(this, "Choose a color", this.jPanel10.getBackground());
+        final java.awt.Color color = javax.swing.JColorChooser.showDialog(this, GUIBundle.getString("OptionsColorJPanel_ChooseAColor"), this.jPanel10.getBackground());
 
         if (null == color) return;
 
@@ -593,7 +656,7 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
 
     private void jPanel9MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel9MouseClicked
         // TODO add your handling code here:
-        final java.awt.Color color = javax.swing.JColorChooser.showDialog(this, "Choose a color", this.jPanel9.getBackground());
+        final java.awt.Color color = javax.swing.JColorChooser.showDialog(this, GUIBundle.getString("OptionsColorJPanel_ChooseAColor"), this.jPanel9.getBackground());
 
         if (null == color) return;
 
@@ -601,7 +664,7 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
     }//GEN-LAST:event_jPanel9MouseClicked
 
     private void jPanel8MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel8MouseClicked
-        final java.awt.Color color = javax.swing.JColorChooser.showDialog(this, "Choose a color", this.jPanel8.getBackground());
+        final java.awt.Color color = javax.swing.JColorChooser.showDialog(this, GUIBundle.getString("OptionsColorJPanel_ChooseAColor"), this.jPanel8.getBackground());
 
         if (null == color) return;
 
@@ -609,7 +672,7 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
     }//GEN-LAST:event_jPanel8MouseClicked
 
     private void jPanel7MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel7MouseClicked
-        final java.awt.Color color = javax.swing.JColorChooser.showDialog(this, "Choose a color", this.jPanel7.getBackground());
+        final java.awt.Color color = javax.swing.JColorChooser.showDialog(this, GUIBundle.getString("OptionsColorJPanel_ChooseAColor"), this.jPanel7.getBackground());
 
         if(null == color) return;
 
@@ -617,12 +680,34 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
     }//GEN-LAST:event_jPanel7MouseClicked
 
     private void jPanel6MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel6MouseClicked
-        final java.awt.Color color = javax.swing.JColorChooser.showDialog(this, "Choose a color", this.jPanel6.getBackground());
+        final java.awt.Color color = javax.swing.JColorChooser.showDialog(this, GUIBundle.getString("OptionsColorJPanel_ChooseAColor"), this.jPanel6.getBackground());
 
         if(null == color) return;
 
         jPanel6.setBackground(color);
     }//GEN-LAST:event_jPanel6MouseClicked
+
+    private void jPanel28MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel28MouseClicked
+        if (jPanel28.isEnabled() == false) {
+            return;
+        }
+        final java.awt.Color color = javax.swing.JColorChooser.showDialog(this, GUIBundle.getString("OptionsColorJPanel_ChooseAColor"), this.jPanel28.getBackground());
+        if (null == color) {
+            return;
+        }
+        jPanel28.setBackground(color);
+    }//GEN-LAST:event_jPanel28MouseClicked
+
+    private void jPanel29MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel29MouseClicked
+        if (jPanel29.isEnabled() == false) {
+            return;
+        }
+        final java.awt.Color color = javax.swing.JColorChooser.showDialog(this, GUIBundle.getString("OptionsColorJPanel_ChooseAColor"), this.jPanel29.getBackground());
+        if (null == color) {
+            return;
+        }
+        jPanel29.setBackground(color);
+    }//GEN-LAST:event_jPanel29MouseClicked
 
     @Override
     public void set(JStockOptions jStockOptions) {        
@@ -636,8 +721,11 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
         jPanel11.setBackground(jStockOptions.getAutoUpdateForegroundColor());
         jPanel12.setBackground(jStockOptions.getAutoUpdateBackgroundColor());
 
-        jPanel16.setBackground(jStockOptions.getAlertForegroundColor());
-        jPanel17.setBackground(jStockOptions.getAlertBackgroundColor());
+        jPanel16.setBackground(jStockOptions.getFallBelowAlertForegroundColor());
+        jPanel17.setBackground(jStockOptions.getFallBelowAlertBackgroundColor());
+
+        jPanel28.setBackground(jStockOptions.getRiseAboveAlertForegroundColor());
+        jPanel29.setBackground(jStockOptions.getRiseAboveAlertBackgroundColor());
         
         this.jCheckBox1.setSelected(jStockOptions.isEnableColorChange());
         this.jCheckBox2.setSelected(jStockOptions.isEnableColorAlert());
@@ -655,8 +743,11 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
         jStockOptions.setAutoUpdateForegroundColor(jPanel11.getBackground());        
         jStockOptions.setAutoUpdateBackgroundColor(jPanel12.getBackground());
 
-        jStockOptions.setAlertForegroundColor(jPanel16.getBackground());
-        jStockOptions.setAlertBackgroundColor(jPanel17.getBackground());
+        jStockOptions.setFallBelowAlertForegroundColor(jPanel16.getBackground());
+        jStockOptions.setFallBelowAlertBackgroundColor(jPanel17.getBackground());
+
+        jStockOptions.setRiseAboveAlertForegroundColor(jPanel28.getBackground());
+        jStockOptions.setRiseAboveAlertBackgroundColor(jPanel29.getBackground());
         
         jStockOptions.setEnableColorChange(jCheckBox1.isSelected());
         jStockOptions.setEnableColorAlert(jCheckBox2.isSelected());
@@ -673,6 +764,8 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JCheckBox jCheckBox2;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -687,11 +780,25 @@ public class OptionsColorJPanel extends javax.swing.JPanel implements JStockOpti
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel14;
+    private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel16;
     private javax.swing.JPanel jPanel17;
+    private javax.swing.JPanel jPanel18;
+    private javax.swing.JPanel jPanel19;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel20;
+    private javax.swing.JPanel jPanel21;
+    private javax.swing.JPanel jPanel22;
+    private javax.swing.JPanel jPanel23;
+    private javax.swing.JPanel jPanel24;
+    private javax.swing.JPanel jPanel25;
+    private javax.swing.JPanel jPanel26;
+    private javax.swing.JPanel jPanel27;
+    private javax.swing.JPanel jPanel28;
+    private javax.swing.JPanel jPanel29;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
