@@ -19,6 +19,7 @@
 
 package org.yccheok.jstock.gui.portfolio;
 
+import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -37,6 +38,8 @@ import org.jfree.data.category.DefaultCategoryDataset;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.Symbol;
+import org.yccheok.jstock.gui.JStockOptions;
+import org.yccheok.jstock.gui.MainFrame;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.portfolio.Dividend;
 import org.yccheok.jstock.portfolio.DividendSummary;
@@ -145,6 +148,12 @@ public class DividendSummaryBarChartJDialog extends javax.swing.JDialog {
             total += ((DefaultCategoryDataset)dataset).getValue(0, i).doubleValue();
         }
 
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final String currencySymbol = jStockOptions.getCurrencySymbol(jStockOptions.getCountry());
+        // Use apostrophes to escape currencySymbol. If currencySymbol contains
+        // apostrophes, we may need to escape those by doubling them.
+        final NumberFormat currencyFormat = new DecimalFormat("'" + currencySymbol.replace("'", "''") + "'#,##0");
+
         final String title = MessageFormat.format(org.yccheok.jstock.internationalization.GUIBundle.getString("DividendSummaryBarChartJDialog_DividendByYear_template"), this.jComboBox1.getSelectedItem(), currencyFormat.format(total));
         final String domain_label = org.yccheok.jstock.internationalization.GUIBundle.getString("DividendSummaryBarChartJDialog_Year");
         final String range_label = org.yccheok.jstock.internationalization.GUIBundle.getString("DividendSummaryBarChartJDialog_Dividend");
@@ -204,12 +213,6 @@ public class DividendSummaryBarChartJDialog extends javax.swing.JDialog {
     private final Map<Symbol, Code> symbolToCode = new java.util.HashMap<Symbol, Code>();
     private final ChartPanel chartPanel;
     private final DividendSummary dividendSummary;
-    private static final NumberFormat currencyFormat = java.text.NumberFormat.getCurrencyInstance();
-    static {
-        // 0 decimal place, to save up some display area.
-        currencyFormat.setMaximumFractionDigits(0);
-        currencyFormat.setMinimumFractionDigits(0);
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox jComboBox1;
