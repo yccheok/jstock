@@ -827,12 +827,12 @@ public class MainFrame extends javax.swing.JFrame {
         OptionsJDialog optionsJDialog = new OptionsJDialog(this, true);
         optionsJDialog.setLocationRelativeTo(this);
         optionsJDialog.set(jStockOptions);
-        optionsJDialog.setVisible(true);		
+        optionsJDialog.setVisible(true);
     }//GEN-LAST:event_jMenuItem6ActionPerformed
 
     /**
      * Returns JStock options of this main frame.
-     * @return Jstock options of this main frame
+     * @return JStock options of this main frame
      */
     public JStockOptions getJStockOptions() {
         return this.jStockOptions;
