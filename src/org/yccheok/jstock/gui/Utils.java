@@ -621,8 +621,8 @@ public class Utils {
     public static boolean createDirectoryIfDoesNotExist(String directory) {
         java.io.File f = new java.io.File(directory);
         
-        if(f.exists() == false) {
-            if(f.mkdir())
+        if (f.exists() == false) {
+            if (f.mkdir())
             {
                 return true;
             }
