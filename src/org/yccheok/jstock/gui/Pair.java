@@ -26,7 +26,7 @@ package org.yccheok.jstock.gui;
  * @param <A> first element
  * @param <B> second element
  */
-public class Pair<A, B> {
+public final class Pair<A, B> {
     private final A first;
     private final B second;
 
