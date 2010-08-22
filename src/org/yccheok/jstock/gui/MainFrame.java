@@ -56,6 +56,7 @@ import org.yccheok.jstock.gui.watchlist.WatchlistJDialog;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.internationalization.MessagesBundle;
 import org.yccheok.jstock.network.ProxyDetector;
+import org.yccheok.jstock.network.Utils.Type;
 
 /**
  *
@@ -1139,7 +1140,7 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem10ActionPerformed
 
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
-        Utils.launchWebBrowser("http://jstock.sourceforge.net/help.html?utm_source=jstock&utm_medium=help_menu");
+        Utils.launchWebBrowser(org.yccheok.jstock.network.Utils.getURL(Type.HELP_HTML));
     }//GEN-LAST:event_jMenuItem3ActionPerformed
 
     private void jMenu9MenuSelected(javax.swing.event.MenuEvent evt) {//GEN-FIRST:event_jMenu9MenuSelected
@@ -3696,7 +3697,7 @@ public class MainFrame extends javax.swing.JFrame {
                     log.info(null, ex);
                     break;
                 }
-                final java.util.Map<String, String> map = Utils.getUUIDValue(org.yccheok.jstock.engine.Utils.getJStockStaticServer() + "news_information/index.txt");
+                final java.util.Map<String, String> map = Utils.getUUIDValue(org.yccheok.jstock.network.Utils.getURL(Type.NEWS_INFORMATION_TXT));
                 final String newsID = MainFrame.this.getJStockOptions().getNewsID();
                 if (newsID.equals(map.get("news_id"))) {
                     // Seen before. Quit.

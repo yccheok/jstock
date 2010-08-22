@@ -29,6 +29,7 @@ import javax.swing.SwingWorker;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.internationalization.MessagesBundle;
+import org.yccheok.jstock.network.Utils.Type;
 
 /**
  *
@@ -176,7 +177,7 @@ public class OptionsUpdateJPanel extends javax.swing.JPanel implements JStockOpt
             protected String doInBackground() {
                 if (!isCancelled())
                 {
-                    final java.util.Map<String, String> map = Utils.getUUIDValue(org.yccheok.jstock.engine.Utils.getJStockStaticServer() + "news_information/index.txt");
+                    final java.util.Map<String, String> map = Utils.getUUIDValue(org.yccheok.jstock.network.Utils.getURL(Type.NEWS_INFORMATION_TXT));
                     final String location = map.get("news_url");
                     if (location == null) {
                         return null;
