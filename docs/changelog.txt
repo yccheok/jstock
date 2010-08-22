@@ -3,6 +3,8 @@ Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
 JStock 1.0.5n - xxxx-xx-xx
   Feature: Different colors for fall below alert and rise above alert. (#3005532)
+  Feature: User may choose their preferred currency symbol, per country basic.
+           (#3002019)
   Bugfix:  Wrong returned value by AbstractYahooStockHistoryServer.parse.
            Contributed by Mark DeSpain. (#3031918)
   Bugfix:  Avoid unnecessary instantiation of Double objects. Contributed by 
