@@ -22,6 +22,7 @@ package org.yccheok.jstock.gui.charting;
 import java.awt.Dimension;
 import java.awt.event.ComponentEvent;
 import java.io.File;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -53,6 +54,7 @@ import org.yccheok.jstock.engine.Observer;
 import org.yccheok.jstock.engine.RealTimeStockMonitor;
 import org.yccheok.jstock.engine.SimpleDate;
 import org.yccheok.jstock.engine.Stock;
+import org.yccheok.jstock.gui.JStockOptions;
 import org.yccheok.jstock.gui.MainFrame;
 import org.yccheok.jstock.gui.PortfolioManagementJPanel;
 import org.yccheok.jstock.internationalization.GUIBundle;
@@ -331,10 +333,13 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         XYPlot plot = chart.getXYPlot();
 
         NumberAxis rangeAxis1 = (NumberAxis) plot.getRangeAxis();
-        final NumberFormat currencyFormat = java.text.NumberFormat.getCurrencyInstance();
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final String currencySymbol = jStockOptions.getCurrencySymbol(jStockOptions.getCountry());
+        // Use apostrophes to escape currencySymbol. If currencySymbol contains
+        // apostrophes, we may need to escape those by doubling them.
+        //
         // 0 decimal place, to save up some display area.
-        currencyFormat.setMaximumFractionDigits(0);
-        currencyFormat.setMinimumFractionDigits(0);
+        NumberFormat currencyFormat = new DecimalFormat("'" + currencySymbol.replace("'", "''") + "'#,##0");
         rangeAxis1.setNumberFormatOverride(currencyFormat);
 
         XYItemRenderer renderer0 = plot.getRenderer();
