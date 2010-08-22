@@ -1528,7 +1528,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         return Collections.unmodifiableList(stocks);
     }
     
-    public void initPortfolio() {
+    public final void initPortfolio() {
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
 
         final Country country = jStockOptions.getCountry();
@@ -1947,8 +1947,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
     
     public void softStart() {
-        if(realTimeStockMonitor == null) return;
-                
+        if (realTimeStockMonitor == null) {
+            return;
+        }    
         realTimeStockMonitor.softStart();
     }
     
@@ -1959,31 +1960,45 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         realTimeStockMonitor.softStop();
     }
 
+    /**
+     * Refresh all the labels with latest currency symbol.
+     */
+    public void refreshCurrencySymbol() {
+        jLabel1.setText(getShareLabel());
+        jLabel3.setText(getCashLabel());
+        jLabel5.setText(getPaperProfitLabel());
+        jLabel7.setText(getRealizedProfitLabel());
+    }
+
     private String getShareLabel() {
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
         return MessageFormat.format(
             GUIBundle.getString("PortfolioManagementJPanel_ShareLabel"),
-            /*java.util.Currency.getInstance(Locale.getDefault()).getSymbol()*/"$"
+            jStockOptions.getCurrencySymbol(jStockOptions.getCountry())
         );
     }
     
     private String getCashLabel() {
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
         return MessageFormat.format(
             GUIBundle.getString("PortfolioManagementJPanel_CashLabel_template"),
-            /*java.util.Currency.getInstance(Locale.getDefault()).getSymbol()*/"$"
+            jStockOptions.getCurrencySymbol(jStockOptions.getCountry())
         );
     }
     
     private String getPaperProfitLabel() {
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
         return MessageFormat.format(
             GUIBundle.getString("PortfolioManagementJPanel_PaperProfitLabel_template"),
-            /*java.util.Currency.getInstance(Locale.getDefault()).getSymbol()*/"$"
+            jStockOptions.getCurrencySymbol(jStockOptions.getCountry())
         );
     }
     
     private String getRealizedProfitLabel() {
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
         return MessageFormat.format(
             GUIBundle.getString("PortfolioManagementJPanel_RealizedProfitLabel_template"),
-            /*java.util.Currency.getInstance(Locale.getDefault()).getSymbol()*/"$"
+            jStockOptions.getCurrencySymbol(jStockOptions.getCountry())
         );
     }
 
