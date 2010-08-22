@@ -29,6 +29,12 @@ import org.yccheok.jstock.internationalization.GUIBundle;
  * @author yccheok
  */
 public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRenderer {
+
+    private enum Alert {
+        FallBelow,
+        RiseAbove,
+        NoAlert
+    }
     
     /** Creates a new instance of StockTableCellRender */
     public StockTableCellRenderer() {
@@ -57,11 +63,13 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
         });                                
     }
     
-    private Color getBackgroundColor(int row, boolean alert) {
+    private Color getBackgroundColor(int row, Alert alert) {
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
 
-        if (alert) {
-            return jStockOptions.getAlertBackgroundColor();
+        if (alert == Alert.FallBelow) {
+            return jStockOptions.getFallBelowAlertBackgroundColor();
+        } else if (alert == Alert.RiseAbove) {
+            return jStockOptions.getRiseAboveAlertBackgroundColor();
         }
 
         if (row % 2 == 0) {
@@ -71,22 +79,26 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
         return jStockOptions.getSecondRowBackgroundColor();
     }
 
-    private Color getNormalTextForegroundColor(boolean alert) {
+    private Color getNormalTextForegroundColor(Alert alert) {
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
 
-        if (alert) {
-            return jStockOptions.getAlertForegroundColor();
+        if (alert == Alert.FallBelow) {
+            return jStockOptions.getFallBelowAlertForegroundColor();
+        } else if (alert == Alert.RiseAbove) {
+            return jStockOptions.getRiseAboveAlertForegroundColor();
         }
 
         return jStockOptions.getNormalTextForegroundColor();
     }
 
-    private Color getForegroundColor(double value, double ref, boolean alert) {
+    private Color getForegroundColor(double value, double ref, Alert alert) {
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
         final boolean reverse = org.yccheok.jstock.engine.Utils.isFallBelowAndRiseAboveColorReverse();
 
-        if (alert) {
-            return jStockOptions.getAlertForegroundColor();
+        if (alert == Alert.FallBelow) {
+            return jStockOptions.getFallBelowAlertForegroundColor();
+        } else if (alert == Alert.RiseAbove) {
+            return jStockOptions.getRiseAboveAlertForegroundColor();
         }
 
         if (value > ref) {
@@ -119,7 +131,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
         final double prevPrice = (Double)tableModel.getValueAt(modelRow, tableModel.findColumn(PREV));
         final double lastPrice = (Double)tableModel.getValueAt(modelRow, tableModel.findColumn(LAST));
 
-        boolean alert = false;
+        Alert alert = Alert.NoAlert;
 
         // Using lastPrice = 0 to compare against fall below and rise above
         // target price is meaningless. In normal condition, no stock price
@@ -133,13 +145,13 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
 
             if (riseAbove != null) {
                 if (lastPrice >= riseAbove) {
-                    alert = true;
+                    alert = Alert.RiseAbove;
                 }
             }
 
             if (fallBelow != null) {
                 if (lastPrice <= fallBelow) {
-                    alert = true;
+                    alert = Alert.FallBelow;
                 }
             }
         }
@@ -286,7 +298,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
         final double prevPrice = (Double)tableModel.getValueAt(modelRow, tableModel.findColumn(PREV));
         final double lastPrice = (Double)tableModel.getValueAt(modelRow, tableModel.findColumn(LAST));
 
-        boolean alert = false;
+        Alert alert = Alert.NoAlert;
 
         // Using lastPrice = 0 to compare against fall below and rise above
         // target price is meaningless. In normal condition, no stock price
@@ -301,13 +313,13 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
 
             if (riseAbove != null) {
                 if (lastPrice >= riseAbove) {
-                    alert = true;
+                    alert = Alert.RiseAbove;
                 }
             }
 
             if (fallBelow != null) {
                 if (lastPrice <= fallBelow) {
-                    alert = true;
+                    alert = Alert.FallBelow;
                 }
             }
         }
