@@ -31,6 +31,7 @@ import org.apache.commons.httpclient.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.gui.MainFrame;
+import org.yccheok.jstock.network.Utils.Type;
 
 /**
  *
@@ -67,9 +68,7 @@ public class Utils {
         "wLllc3ZJq73EFWMqYiXOf0YzVzRexVbjXSjOn9Yiu0GZOXFfHXwmWag/K23uY9Sr",
         "Av6N5TreyjHoPuRV5g81WQjW8JWqPrHPbzOC/uYfxNHMgWW3CcyCFJgrjRA+RuHL",
         "5FyQRFsBGV3fYfc3JFbwwwCV2qEXOsiKxC4vdmF7lC8lZl4k6SuIU32yVp5xCaJk"
-    };
-
-    private static final String JSTOCK_STATIC_SERVER = "http://jstock-static.appspot.com/";
+    };    
 
     public static List<String> getXMarketServers() {
         List<String> servers = Utils.XMarketServers;
@@ -78,7 +77,7 @@ public class Utils {
             return new CopyOnWriteArrayList<String>(servers);
         }
 
-        final String server = org.yccheok.jstock.gui.Utils.getUUIDValue(getJStockStaticServer() + "servers_information/x_market_servers.txt", "server");
+        final String server = org.yccheok.jstock.gui.Utils.getUUIDValue(org.yccheok.jstock.network.Utils.getURL(Type.X_MARKET_SERVERS_TXT), "server");
         if (server != null) {
             final String decrypted_server = org.yccheok.jstock.gui.Utils.decrypt(server);
             String[] s = decrypted_server.split(",");
@@ -105,7 +104,7 @@ public class Utils {
             return new CopyOnWriteArrayList<String>(servers);
         }
 
-        final String server = org.yccheok.jstock.gui.Utils.getUUIDValue(getJStockStaticServer() + "servers_information/cimb_market_servers.txt", "server");
+        final String server = org.yccheok.jstock.gui.Utils.getUUIDValue(org.yccheok.jstock.network.Utils.getURL(Type.CIMB_MARKET_SERVERS_TXT), "server");
         if (server != null) {
             String[] s = server.split(",");
             if (s.length > 0) {
@@ -128,7 +127,7 @@ public class Utils {
             return new CopyOnWriteArrayList<String>(servers);
         }
 
-        final String server = org.yccheok.jstock.gui.Utils.getUUIDValue(getJStockStaticServer() + "servers_information/x_stock_servers.txt", "server");
+        final String server = org.yccheok.jstock.gui.Utils.getUUIDValue(org.yccheok.jstock.network.Utils.getURL(Type.X_STOCK_SERVERS_TXT), "server");
         if (server != null) {
             final String decrypted_server = org.yccheok.jstock.gui.Utils.decrypt(server);
             String[] s = decrypted_server.split(",");
@@ -155,7 +154,7 @@ public class Utils {
             return new CopyOnWriteArrayList<String>(servers);
         }
 
-        final String server = org.yccheok.jstock.gui.Utils.getUUIDValue(getJStockStaticServer() + "servers_information/cimb_stock_servers.txt", "server");
+        final String server = org.yccheok.jstock.gui.Utils.getUUIDValue(org.yccheok.jstock.network.Utils.getURL(Type.CIMB_STOCK_SERVERS_TXT), "server");
         if (server != null) {
             String[] s = server.split(",");
             if (s.length > 0) {
@@ -178,7 +177,7 @@ public class Utils {
             return new CopyOnWriteArrayList<String>(servers);
         }
 
-        final String server = org.yccheok.jstock.gui.Utils.getUUIDValue(getJStockStaticServer() + "servers_information/cimb_history_servers.txt", "server");
+        final String server = org.yccheok.jstock.gui.Utils.getUUIDValue(org.yccheok.jstock.network.Utils.getURL(Type.CIMB_HISTORY_SERVERS_TXT), "server");
         if (server != null) {
             String[] s = server.split(",");
             if (s.length > 0) {
@@ -228,7 +227,7 @@ public class Utils {
         
         long diffMillis = 0;
         
-        if(b) {
+        if (b) {
             // Get difference in milliseconds
             diffMillis = calendar0.getTimeInMillis()-calendar1.getTimeInMillis();
         }
@@ -282,7 +281,7 @@ public class Utils {
     public static String getStocksCSVFileLocation(Country country) {
         // Must use lower case, as Google App Engine only support URL in lower
         // case.
-        return JSTOCK_STATIC_SERVER + "stocks_information/" + country.toString().toLowerCase() + "/" + "stocks.csv";
+        return org.yccheok.jstock.network.Utils.getJStockStaticServer() + "stocks_information/" + country.toString().toLowerCase() + "/" + "stocks.csv";
     }
 
     /**
@@ -580,10 +579,6 @@ public class Utils {
         }
         
         return java.util.Collections.emptyList();
-    }
-
-    public static String getJStockStaticServer() {
-        return JSTOCK_STATIC_SERVER;
     }
 
     private static final Log log = LogFactory.getLog(Utils.class);

@@ -660,9 +660,6 @@ public class JStockOptions {
         
         if (this.currencies == null) {
             this.currencies = new EnumMap<Country, String>(Country.class);
-            for (Country c : Country.values()) {
-                this.currencies.put(c, Utils.getDefaultCurrencySymbol());
-            }
         }
 
         return this;
@@ -1271,10 +1268,16 @@ public class JStockOptions {
 
     /**
      * @param c the country to get
-     * @return the currency symbol
+     * @return the currency symbol. If not currency symbol for the country, a
+     * default symbol will be returned
      */
     public String getCurrencySymbol(Country c) {
-        return this.currencies.get(c);
+        final String currecySymbol = this.currencies.get(c);
+        if (currecySymbol == null) {
+            // Not found. Returns default currency symbol.
+            return Utils.getDefaultCurrencySymbol();
+        }
+        return currecySymbol;
     }
 
     /**
