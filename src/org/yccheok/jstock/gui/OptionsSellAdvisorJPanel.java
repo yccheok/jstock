@@ -19,6 +19,7 @@
 
 package org.yccheok.jstock.gui;
 
+import java.awt.Component;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Arrays;
@@ -30,6 +31,9 @@ import java.util.Set;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFormattedTextField;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.Document;
+import javax.swing.text.JTextComponent;
 import javax.swing.text.NumberFormatter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -43,6 +47,14 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
     /** Creates new form OptionsSellAdvisorJPanel */
     public OptionsSellAdvisorJPanel() {
         initComponents();
+        final Component component = this.jComboBox1.getEditor().getEditorComponent();
+        if (component instanceof JTextComponent) {
+            // Do not allow user to enter more than 5 characters.
+            final Document document = ((JTextComponent)component).getDocument();
+            if (document instanceof AbstractDocument) {
+                ((AbstractDocument)document).setDocumentFilter(new DocumentSizeFilter(5));
+            }
+        }
     }
 
     /** This method is called from within the constructor to
@@ -123,6 +135,7 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
 
         jLabel2.setText(bundle.getString("OptionsSellAdvisorJPanel_Symbol")); // NOI18N
 
+        jComboBox1.setEditable(true);
         jComboBox1.setModel(getComboBoxModel());
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
@@ -133,8 +146,8 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
                 .addContainerGap()
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(279, Short.MAX_VALUE))
+                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(243, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -257,7 +270,10 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
         commitEdit();
         jStockOptions.setExpectedProfitPercentage((Double)jFormattedTextField1.getValue());
         jStockOptions.setPenceToPoundConversionEnabled(this.jCheckBox1.isSelected());
-        jStockOptions.setCurrencySymbol(jStockOptions.getCountry(), jComboBox1.getSelectedItem().toString());
+        final String currencySymbol = jComboBox1.getSelectedItem().toString().trim();
+        if (currencySymbol.isEmpty() == false) {
+            jStockOptions.setCurrencySymbol(jStockOptions.getCountry(), currencySymbol);
+        }
         // Remember to refresh the GUIs as well.
         MainFrame.getInstance().getPortfolioManagementJPanel().refreshCurrencySymbol();
         return true;
