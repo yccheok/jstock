@@ -2139,6 +2139,17 @@ public class Utils {
     }
 
     /**
+     * Returns default currency symbol, regardless what country we are in right
+     * now.
+     *
+     * @return Default currency symbol, regardless what country we are in right
+     * now.
+     */
+    public static String getDefaultCurrencySymbol() {
+        return "$";
+    }
+    
+    /**
      * Represents latest application information. This is being used for
      * application upgrading.
      */
