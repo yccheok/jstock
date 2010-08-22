@@ -45,6 +45,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.Country;
 import org.yccheok.jstock.gui.MainFrame;
+import org.yccheok.jstock.network.Utils.Type;
 
 /**
  *
@@ -67,7 +68,7 @@ public class Utils {
     {
         final String defaultServer = "jabber.org";
 
-        final String _server = org.yccheok.jstock.gui.Utils.getUUIDValue(org.yccheok.jstock.engine.Utils.getJStockStaticServer() + "servers_information/chat_server.txt", "server");
+        final String _server = org.yccheok.jstock.gui.Utils.getUUIDValue(org.yccheok.jstock.network.Utils.getURL(Type.CHAT_SERVER_TXT), "server");
 
         if (_server == null) {
             log.info("Server not found");
