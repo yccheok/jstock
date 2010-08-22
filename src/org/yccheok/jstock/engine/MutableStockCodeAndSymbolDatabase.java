@@ -186,7 +186,7 @@ public class MutableStockCodeAndSymbolDatabase extends StockCodeAndSymbolDatabas
             return false;
         }
 
-        if((!(this.symbolSearchEngine instanceof TSTSearchEngine)) || (!(this.codeSearchEngine instanceof TSTSearchEngine))) {
+        if ((!(this.symbolSearchEngine instanceof TSTSearchEngine)) || (!(this.codeSearchEngine instanceof TSTSearchEngine))) {
             return false;
         }
 
