@@ -296,7 +296,8 @@ public class JTableUtilities {
         viewport.scrollRectToVisible(rect);
     }
 
-    /** Sets the editor/renderer for Date objects to provided JTable, for the specified column.
+    /**
+     * Sets the editor/renderer for Date objects to provided JTable, for the specified column.
      * @param table JTable to set up
      * @param row Column to apply
      */
