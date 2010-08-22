@@ -324,7 +324,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jLabel3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel3MouseClicked
-        Utils.launchWebBrowser("http://jstock.sourceforge.net/help_stock_database.html?utm_source=jstock&utm_medium=database_dialog");
+        Utils.launchWebBrowser(org.yccheok.jstock.network.Utils.getURL(org.yccheok.jstock.network.Utils.Type.HELP_STOCK_DATABASE_HTML));
     }//GEN-LAST:event_jLabel3MouseClicked
 
     private void jLabel3MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel3MouseEntered

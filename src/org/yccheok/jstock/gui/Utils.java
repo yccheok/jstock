@@ -107,6 +107,7 @@ import org.yccheok.jstock.analysis.OperatorIndicator;
 import org.yccheok.jstock.analysis.SinkOperator;
 import org.yccheok.jstock.analysis.StockOperator;
 import org.yccheok.jstock.internationalization.MessagesBundle;
+import org.yccheok.jstock.network.Utils.Type;
 
 /**
  *
@@ -407,7 +408,7 @@ public class Utils {
             return servers;
         }
 
-        final String server = getUUIDValue(org.yccheok.jstock.engine.Utils.getJStockStaticServer() + "servers_information/ntp_server.txt", "server");
+        final String server = getUUIDValue(org.yccheok.jstock.network.Utils.getURL(Type.NTP_SERVER_TXT), "server");
         if (server != null) {
             String[] s = server.split(",");
             if (s.length > 0) {
@@ -1463,7 +1464,7 @@ public class Utils {
 
     public static ApplicationInfo getLatestApplicationInfo()
     {
-        final String request = org.yccheok.jstock.engine.Utils.getJStockStaticServer() + "version_information/index.txt";
+        final String request = org.yccheok.jstock.network.Utils.getURL(Type.VERSION_INFORMATION_TXT);
 
         final org.yccheok.jstock.gui.Utils.InputStreamAndMethod inputStreamAndMethod = org.yccheok.jstock.gui.Utils.getResponseBodyAsStreamBasedOnProxyAuthOption(request);
 
