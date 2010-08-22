@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.analysis.OperatorIndicator;
+import org.yccheok.jstock.network.Utils.Type;
 
 /**
  *
@@ -75,10 +76,10 @@ public class IndicatorDownloadManager {
 
     public static String getIndicatorDownloadManagerDescriptionFileLocation(OperatorIndicator.Type operatorIndicatorType) {
         if (operatorIndicatorType == OperatorIndicator.Type.AlertIndicator) {
-            return org.yccheok.jstock.engine.Utils.getJStockStaticServer() + "alert_indicators/indicator_download_manager.xml";
+            return org.yccheok.jstock.network.Utils.getURL(Type.ALERT_INDICATOR_DOWNLOAD_MANAGER_XML);
         }
         else if (operatorIndicatorType == OperatorIndicator.Type.ModuleIndicator) {
-            return org.yccheok.jstock.engine.Utils.getJStockStaticServer() + "module_indicators/indicator_download_manager.xml";
+            return org.yccheok.jstock.network.Utils.getURL(Type.MODULE_INDICATOR_DOWNLOAD_MANAGER_XML);
         }
         else {
             throw new java.lang.IllegalArgumentException();
@@ -93,16 +94,32 @@ public class IndicatorDownloadManager {
     public static void deploy() {
         try {
             IndicatorDownloadManager me = new IndicatorDownloadManager();
-            me.add(Info.newInstance("MACD Down Trend Signal", OperatorIndicator.Type.AlertIndicator, org.yccheok.jstock.analysis.Utils.getChecksum("C:\\Projects\\guestbook\\war\\alert_indicators\\MACDDownTrendSignal.zip"), org.yccheok.jstock.engine.Utils.getJStockStaticServer() + "alert_indicators/MACDDownTrendSignal.zip", org.yccheok.jstock.engine.Utils.getJStockStaticServer() + "alert_indicators/MACDDownTrendSignal.html"));
-            me.add(Info.newInstance("MACD Up Trend Signal", OperatorIndicator.Type.AlertIndicator, org.yccheok.jstock.analysis.Utils.getChecksum("C:\\Projects\\guestbook\\war\\alert_indicators\\MACDUpTrendSignal.zip"), org.yccheok.jstock.engine.Utils.getJStockStaticServer() + "alert_indicators/MACDUpTrendSignal.zip", org.yccheok.jstock.engine.Utils.getJStockStaticServer() + "alert_indicators/MACDUpTrendSignal.html"));
-            me.add(Info.newInstance("MFI Down Trend Signal", OperatorIndicator.Type.AlertIndicator, org.yccheok.jstock.analysis.Utils.getChecksum("C:\\Projects\\guestbook\\war\\alert_indicators\\MFIDownTrendSignal.zip"), org.yccheok.jstock.engine.Utils.getJStockStaticServer() + "alert_indicators/MFIDownTrendSignal.zip", org.yccheok.jstock.engine.Utils.getJStockStaticServer() + "alert_indicators/MFIDownTrendSignal.html"));
-            me.add(Info.newInstance("MFI Up Trend Signal", OperatorIndicator.Type.AlertIndicator, org.yccheok.jstock.analysis.Utils.getChecksum("C:\\Projects\\guestbook\\war\\alert_indicators\\MFIUpTrendSignal.zip"), org.yccheok.jstock.engine.Utils.getJStockStaticServer() + "alert_indicators/MFIUpTrendSignal.zip", org.yccheok.jstock.engine.Utils.getJStockStaticServer() + "alert_indicators/MFIUpTrendSignal.html"));
-            me.add(Info.newInstance("RSI Sell Signal", OperatorIndicator.Type.AlertIndicator, org.yccheok.jstock.analysis.Utils.getChecksum("C:\\Projects\\guestbook\\war\\alert_indicators\\RSISellSignal.zip"), org.yccheok.jstock.engine.Utils.getJStockStaticServer() + "alert_indicators/RSISellSignal.zip", org.yccheok.jstock.engine.Utils.getJStockStaticServer() + "alert_indicators/RSISellSignal.html"));
-            me.add(Info.newInstance("RSI Buy Signal", OperatorIndicator.Type.AlertIndicator, org.yccheok.jstock.analysis.Utils.getChecksum("C:\\Projects\\guestbook\\war\\alert_indicators\\RSIBuySignal.zip"), org.yccheok.jstock.engine.Utils.getJStockStaticServer() + "alert_indicators/RSIBuySignal.zip", org.yccheok.jstock.engine.Utils.getJStockStaticServer() + "alert_indicators/RSIBuySignal.html"));
-            me.add(Info.newInstance("CCI Sell Signal", OperatorIndicator.Type.AlertIndicator, org.yccheok.jstock.analysis.Utils.getChecksum("C:\\Projects\\guestbook\\war\\alert_indicators\\CCISellSignal.zip"), org.yccheok.jstock.engine.Utils.getJStockStaticServer() + "alert_indicators/CCISellSignal.zip", org.yccheok.jstock.engine.Utils.getJStockStaticServer() + "alert_indicators/CCISellSignal.html"));
-            me.add(Info.newInstance("CCI Buy Signal", OperatorIndicator.Type.AlertIndicator, org.yccheok.jstock.analysis.Utils.getChecksum("C:\\Projects\\guestbook\\war\\alert_indicators\\CCIBuySignal.zip"), org.yccheok.jstock.engine.Utils.getJStockStaticServer() + "alert_indicators/CCIBuySignal.zip", org.yccheok.jstock.engine.Utils.getJStockStaticServer() + "alert_indicators/CCIBuySignal.html"));
+            me.add(Info.newInstance("MACD Down Trend Signal", OperatorIndicator.Type.AlertIndicator, org.yccheok.jstock.analysis.Utils.getChecksum("C:\\Projects\\guestbook\\war\\alert_indicators\\MACDDownTrendSignal.zip"), org.yccheok.jstock.network.Utils.getJStockStaticServer() + "alert_indicators/MACDDownTrendSignal.zip", org.yccheok.jstock.network.Utils.getJStockStaticServer() + "alert_indicators/MACDDownTrendSignal.html"));
+            me.add(Info.newInstance("MACD Up Trend Signal", OperatorIndicator.Type.AlertIndicator, org.yccheok.jstock.analysis.Utils.getChecksum("C:\\Projects\\guestbook\\war\\alert_indicators\\MACDUpTrendSignal.zip"), org.yccheok.jstock.network.Utils.getJStockStaticServer() + "alert_indicators/MACDUpTrendSignal.zip", org.yccheok.jstock.network.Utils.getJStockStaticServer() + "alert_indicators/MACDUpTrendSignal.html"));
+            me.add(Info.newInstance("MFI Down Trend Signal", OperatorIndicator.Type.AlertIndicator, org.yccheok.jstock.analysis.Utils.getChecksum("C:\\Projects\\guestbook\\war\\alert_indicators\\MFIDownTrendSignal.zip"), org.yccheok.jstock.network.Utils.getJStockStaticServer() + "alert_indicators/MFIDownTrendSignal.zip", org.yccheok.jstock.network.Utils.getJStockStaticServer() + "alert_indicators/MFIDownTrendSignal.html"));
+            me.add(Info.newInstance("MFI Up Trend Signal", OperatorIndicator.Type.AlertIndicator, org.yccheok.jstock.analysis.Utils.getChecksum("C:\\Projects\\guestbook\\war\\alert_indicators\\MFIUpTrendSignal.zip"), org.yccheok.jstock.network.Utils.getJStockStaticServer() + "alert_indicators/MFIUpTrendSignal.zip", org.yccheok.jstock.network.Utils.getJStockStaticServer() + "alert_indicators/MFIUpTrendSignal.html"));
+            me.add(Info.newInstance("RSI Sell Signal", OperatorIndicator.Type.AlertIndicator, org.yccheok.jstock.analysis.Utils.getChecksum("C:\\Projects\\guestbook\\war\\alert_indicators\\RSISellSignal.zip"), org.yccheok.jstock.network.Utils.getJStockStaticServer() + "alert_indicators/RSISellSignal.zip", org.yccheok.jstock.network.Utils.getJStockStaticServer() + "alert_indicators/RSISellSignal.html"));
+            me.add(Info.newInstance("RSI Buy Signal", OperatorIndicator.Type.AlertIndicator, org.yccheok.jstock.analysis.Utils.getChecksum("C:\\Projects\\guestbook\\war\\alert_indicators\\RSIBuySignal.zip"), org.yccheok.jstock.network.Utils.getJStockStaticServer() + "alert_indicators/RSIBuySignal.zip", org.yccheok.jstock.network.Utils.getJStockStaticServer() + "alert_indicators/RSIBuySignal.html"));
+            me.add(Info.newInstance("CCI Sell Signal", OperatorIndicator.Type.AlertIndicator, org.yccheok.jstock.analysis.Utils.getChecksum("C:\\Projects\\guestbook\\war\\alert_indicators\\CCISellSignal.zip"), org.yccheok.jstock.network.Utils.getJStockStaticServer() + "alert_indicators/CCISellSignal.zip", org.yccheok.jstock.network.Utils.getJStockStaticServer() + "alert_indicators/CCISellSignal.html"));
+            me.add(Info.newInstance("CCI Buy Signal", OperatorIndicator.Type.AlertIndicator, org.yccheok.jstock.analysis.Utils.getChecksum("C:\\Projects\\guestbook\\war\\alert_indicators\\CCIBuySignal.zip"), org.yccheok.jstock.network.Utils.getJStockStaticServer() + "alert_indicators/CCIBuySignal.zip", org.yccheok.jstock.network.Utils.getJStockStaticServer() + "alert_indicators/CCIBuySignal.html"));
 
             org.yccheok.jstock.gui.Utils.toXML(me, "C:\\Projects\\guestbook\\war\\alert_indicators\\indicator_download_manager.xml");
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(IndicatorDownloadManager.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        try {
+            IndicatorDownloadManager me = new IndicatorDownloadManager();
+            me.add(Info.newInstance("MACD Down Trend Signal", OperatorIndicator.Type.AlertIndicator, org.yccheok.jstock.analysis.Utils.getChecksum("C:\\Projects\\guestbook\\war\\alert_indicators\\zh\\MACDDownTrendSignal.zip"), org.yccheok.jstock.network.Utils.getJStockStaticServer() + "alert_indicators/zh/MACDDownTrendSignal.zip", org.yccheok.jstock.network.Utils.getJStockStaticServer() + "alert_indicators/zh/MACDDownTrendSignal.html"));
+            me.add(Info.newInstance("MACD Up Trend Signal", OperatorIndicator.Type.AlertIndicator, org.yccheok.jstock.analysis.Utils.getChecksum("C:\\Projects\\guestbook\\war\\alert_indicators\\zh\\MACDUpTrendSignal.zip"), org.yccheok.jstock.network.Utils.getJStockStaticServer() + "alert_indicators/zh/MACDUpTrendSignal.zip", org.yccheok.jstock.network.Utils.getJStockStaticServer() + "alert_indicators/zh/MACDUpTrendSignal.html"));
+            me.add(Info.newInstance("MFI Down Trend Signal", OperatorIndicator.Type.AlertIndicator, org.yccheok.jstock.analysis.Utils.getChecksum("C:\\Projects\\guestbook\\war\\alert_indicators\\zh\\MFIDownTrendSignal.zip"), org.yccheok.jstock.network.Utils.getJStockStaticServer() + "alert_indicators/zh/MFIDownTrendSignal.zip", org.yccheok.jstock.network.Utils.getJStockStaticServer() + "alert_indicators/zh/MFIDownTrendSignal.html"));
+            me.add(Info.newInstance("MFI Up Trend Signal", OperatorIndicator.Type.AlertIndicator, org.yccheok.jstock.analysis.Utils.getChecksum("C:\\Projects\\guestbook\\war\\alert_indicators\\zh\\MFIUpTrendSignal.zip"), org.yccheok.jstock.network.Utils.getJStockStaticServer() + "alert_indicators/zh/MFIUpTrendSignal.zip", org.yccheok.jstock.network.Utils.getJStockStaticServer() + "alert_indicators/zh/MFIUpTrendSignal.html"));
+            me.add(Info.newInstance("RSI Sell Signal", OperatorIndicator.Type.AlertIndicator, org.yccheok.jstock.analysis.Utils.getChecksum("C:\\Projects\\guestbook\\war\\alert_indicators\\zh\\RSISellSignal.zip"), org.yccheok.jstock.network.Utils.getJStockStaticServer() + "alert_indicators/zh/RSISellSignal.zip", org.yccheok.jstock.network.Utils.getJStockStaticServer() + "alert_indicators/zh/RSISellSignal.html"));
+            me.add(Info.newInstance("RSI Buy Signal", OperatorIndicator.Type.AlertIndicator, org.yccheok.jstock.analysis.Utils.getChecksum("C:\\Projects\\guestbook\\war\\alert_indicators\\zh\\RSIBuySignal.zip"), org.yccheok.jstock.network.Utils.getJStockStaticServer() + "alert_indicators/zh/RSIBuySignal.zip", org.yccheok.jstock.network.Utils.getJStockStaticServer() + "alert_indicators/zh/RSIBuySignal.html"));
+            me.add(Info.newInstance("CCI Sell Signal", OperatorIndicator.Type.AlertIndicator, org.yccheok.jstock.analysis.Utils.getChecksum("C:\\Projects\\guestbook\\war\\alert_indicators\\zh\\CCISellSignal.zip"), org.yccheok.jstock.network.Utils.getJStockStaticServer() + "alert_indicators/zh/CCISellSignal.zip", org.yccheok.jstock.network.Utils.getJStockStaticServer() + "alert_indicators/zh/CCISellSignal.html"));
+            me.add(Info.newInstance("CCI Buy Signal", OperatorIndicator.Type.AlertIndicator, org.yccheok.jstock.analysis.Utils.getChecksum("C:\\Projects\\guestbook\\war\\alert_indicators\\zh\\CCIBuySignal.zip"), org.yccheok.jstock.network.Utils.getJStockStaticServer() + "alert_indicators/zh/CCIBuySignal.zip", org.yccheok.jstock.network.Utils.getJStockStaticServer() + "alert_indicators/zh/CCIBuySignal.html"));
+
+            org.yccheok.jstock.gui.Utils.toXML(me, "C:\\Projects\\guestbook\\war\\alert_indicators\\zh\\indicator_download_manager.xml");
         } catch (MalformedURLException ex) {
             Logger.getLogger(IndicatorDownloadManager.class.getName()).log(Level.SEVERE, null, ex);
         }
