@@ -71,6 +71,8 @@ import org.yccheok.jstock.gui.MainFrame;
 import org.yccheok.jstock.gui.charting.ChartJDialog.TAEx;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.internationalization.MessagesBundle;
+import org.yccheok.jstock.network.Utils;
+import org.yccheok.jstock.network.Utils.Type;
 
 /**
  *
@@ -632,7 +634,7 @@ public class ChartJDialog extends javax.swing.JDialog {
     }
 
     private void jMenuItem7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem7ActionPerformed
-        org.yccheok.jstock.gui.Utils.launchWebBrowser("http://jstock.sourceforge.net/ma_indicator.html?utm_source=jstock&utm_medium=chart_dialog");
+        org.yccheok.jstock.gui.Utils.launchWebBrowser(Utils.getURL(Type.MA_INDICATOR_HTML));
     }//GEN-LAST:event_jMenuItem7ActionPerformed
 
     private void jLabel9MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel9MouseClicked
