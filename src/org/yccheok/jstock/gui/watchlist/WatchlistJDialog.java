@@ -182,7 +182,7 @@ public class WatchlistJDialog extends javax.swing.JDialog {
                 continue;
             }
 
-            if (new File(org.yccheok.jstock.watchlist.Utils.getWatchlistDirectory(newWatchlistName)).exists()) {
+            if (Utils.isFileOrDirectoryExist(org.yccheok.jstock.watchlist.Utils.getWatchlistDirectory(newWatchlistName))) {
                 JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_already_a_watchlist_with_same_name"), MessagesBundle.getString("warning_title_already_a_watchlist_with_same_name"), JOptionPane.WARNING_MESSAGE);
                 continue;
             }
@@ -257,7 +257,7 @@ public class WatchlistJDialog extends javax.swing.JDialog {
                 continue;
             }
 
-            if (new File(org.yccheok.jstock.watchlist.Utils.getWatchlistDirectory(newWatchlistName)).exists()) {
+            if (Utils.isFileOrDirectoryExist(org.yccheok.jstock.watchlist.Utils.getWatchlistDirectory(newWatchlistName))) {
                 JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_already_a_watchlist_with_same_name"), MessagesBundle.getString("warning_title_already_a_watchlist_with_same_name"), JOptionPane.WARNING_MESSAGE);
                 continue;
             }

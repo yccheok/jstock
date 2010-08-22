@@ -183,7 +183,7 @@ public class PortfolioJDialog extends javax.swing.JDialog {
                 continue;
             }
 
-            if (new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory(newPortfolioName)).exists()) {
+            if (Utils.isFileOrDirectoryExist(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory(newPortfolioName))) {
                 JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_already_a_portfolio_with_same_name"), MessagesBundle.getString("warning_title_already_a_portfolio_with_same_name"), JOptionPane.WARNING_MESSAGE);
                 continue;
             }
@@ -259,7 +259,7 @@ public class PortfolioJDialog extends javax.swing.JDialog {
                 continue;
             }
 
-            if (new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory(newPortfolioName)).exists()) {
+            if (Utils.isFileOrDirectoryExist(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory(newPortfolioName))) {
                 JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_already_a_portfolio_with_same_name"), MessagesBundle.getString("warning_title_already_a_portfolio_with_same_name"), JOptionPane.WARNING_MESSAGE);
                 continue;
             }
