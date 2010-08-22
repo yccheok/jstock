@@ -339,7 +339,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         // apostrophes, we may need to escape those by doubling them.
         //
         // 0 decimal place, to save up some display area.
-        NumberFormat currencyFormat = new DecimalFormat("'" + currencySymbol.replace("'", "''") + "'#,##0");
+        final NumberFormat currencyFormat = new DecimalFormat("'" + currencySymbol.replace("'", "''") + "'#,##0");
         rangeAxis1.setNumberFormatOverride(currencyFormat);
 
         XYItemRenderer renderer0 = plot.getRenderer();

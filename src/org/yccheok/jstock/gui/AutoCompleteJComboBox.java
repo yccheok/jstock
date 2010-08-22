@@ -19,6 +19,7 @@
 
 package org.yccheok.jstock.gui;
 
+import java.awt.Component;
 import javax.swing.*;
 import java.awt.event.*;
 import javax.swing.event.DocumentEvent;
@@ -81,7 +82,12 @@ public class AutoCompleteJComboBox extends JComboBox {
         // keyAdapter will have no idea you are trying to choose the 3rd choice
         // provided by your IME. Instead, use documentListener, which will be
         // much more reliable.
-        ((JTextComponent)this.getEditor().getEditorComponent()).getDocument().addDocumentListener(this.getDocumentListener());
+        final Component component = this.getEditor().getEditorComponent();
+        if (component instanceof JTextComponent) {
+            ((JTextComponent)component).getDocument().addDocumentListener(this.getDocumentListener());
+        } else {
+            log.error("Unable to attach DocumentListener to AutoCompleteJComboBox.");
+        }
 
         this.addActionListener(new ActionListener() {
 
@@ -247,10 +253,13 @@ public class AutoCompleteJComboBox extends JComboBox {
                 }   // if (AutoCompleteJComboBox.this.stockCodeAndSymbolDatabase != null)
 
                 // When we are in windows look n feel, the text will always be selected. We do not want that.
-                JTextField jTextField = (JTextField)AutoCompleteJComboBox.this.getEditor().getEditorComponent();
-                jTextField.setSelectionStart(jTextField.getText().length());
-                jTextField.setSelectionEnd(jTextField.getText().length());
-                jTextField.setCaretPosition(jTextField.getText().length());
+                final Component component = AutoCompleteJComboBox.this.getEditor().getEditorComponent();
+                if (component instanceof JTextField) {
+                    JTextField jTextField = (JTextField)component;
+                    jTextField.setSelectionStart(jTextField.getText().length());
+                    jTextField.setSelectionEnd(jTextField.getText().length());
+                    jTextField.setCaretPosition(jTextField.getText().length());
+                }
 
                 // Restore.
                 AutoCompleteJComboBox.this.jComboBoxEditor.setReadOnly(false);
@@ -402,8 +411,11 @@ public class AutoCompleteJComboBox extends JComboBox {
             // Is there a better way to configure the correct UI for
             // JTextField?
             if (UIManager.getLookAndFeel().getClass().getName().equals("javax.swing.plaf.metal.MetalLookAndFeel")) {
-                final JComponent jComponent = (JComponent)(new MetalComboBoxEditor().getEditorComponent());
-                _editor.setBorder(jComponent.getBorder());
+                final Component component = new MetalComboBoxEditor().getEditorComponent();
+                if (component instanceof JComponent) {
+                    final JComponent jComponent = (JComponent)component;
+                    _editor.setBorder(jComponent.getBorder());
+                }
             }
             else {
                 _editor.setBorder(null);

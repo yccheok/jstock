@@ -20,11 +20,13 @@
 package org.yccheok.jstock.portfolio;
 
 import java.io.File;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.yccheok.jstock.engine.Code;
+import org.yccheok.jstock.engine.Country;
 import org.yccheok.jstock.gui.BuyPortfolioTreeTableModel;
 import org.yccheok.jstock.gui.JStockOptions;
 import org.yccheok.jstock.gui.MainFrame;
@@ -40,16 +42,23 @@ public class Utils {
     private Utils() {
     }
 
+    // Use ThreadLocal to ensure thread safety.
+    private static final ThreadLocal <NumberFormat> numberFormat = new ThreadLocal <NumberFormat>() {
+        @Override protected NumberFormat initialValue() {
+            return new DecimalFormat("#,##0.00");
+        }
+    };
+
     public static String currencyNumberFormat(Object value) {
-        // Number formats are generally not synchronized. It is recommended to create separate format instances for each thread. 
-        // If multiple threads access a format concurrently, it must be synchronized externally.
-        final NumberFormat format = java.text.NumberFormat.getCurrencyInstance();
-        return format.format(value);
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final Country country = jStockOptions.getCountry();
+        return jStockOptions.getCurrencySymbol(country) + numberFormat.get().format(value);
     }
 
     public static String currencyNumberFormat(double value) {
-        final NumberFormat format = java.text.NumberFormat.getCurrencyInstance();
-        return format.format(value);
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final Country country = jStockOptions.getCountry();
+        return jStockOptions.getCurrencySymbol(country) + numberFormat.get().format(value);
     }
 
     public static boolean isTransactionWithEqualStockCode(Transaction t0, Transaction t1) {
