@@ -315,6 +315,8 @@ public class JStockOptions {
     private YellowInformationBoxOption yellowInformationBoxOption = YellowInformationBoxOption.Follow;
 
     private Locale locale = Locale.getDefault();
+
+    private Map<Country, String> currencies = new EnumMap<Country, String>(Country.class);
     
     public boolean isAutoBrokerFeeCalculationEnabled() {
         return this.isAutoBrokerFeeCalculationEnabled;
@@ -421,6 +423,8 @@ public class JStockOptions {
         // restarting the entire application is required. We do not want user
         // to restart the application after loading from cloud.
         //this.locale = jStockOptions.locale;
+
+        this.currencies = new EnumMap<Country, String>(jStockOptions.currencies);
     }
 
     // User may not trust us to store their password in cloud server. To avoid
@@ -453,10 +457,10 @@ public class JStockOptions {
         jStockOptions.secondRowBackgroundColor = this.secondRowBackgroundColor;
         jStockOptions.autoUpdateForegroundColor = this.autoUpdateForegroundColor;
         jStockOptions.autoUpdateBackgroundColor = this.autoUpdateBackgroundColor;
-        jStockOptions.fallBelowAlertForegroundColor = this.getFallBelowAlertForegroundColor;
-        jStockOptions.fallBelowAlertBackgroundColor = this.getFallBelowAlertBackgroundColor;
-        jStockOptions.riseAboveAlertForegroundColor = this.getRiseAboveAlertForegroundColor;
-        jStockOptions.riseAboveAlertBackgroundColor = this.getRiseAboveAlertBackgroundColor;
+        jStockOptions.fallBelowAlertForegroundColor = this.fallBelowAlertForegroundColor;
+        jStockOptions.fallBelowAlertBackgroundColor = this.fallBelowAlertBackgroundColor;
+        jStockOptions.riseAboveAlertForegroundColor = this.riseAboveAlertForegroundColor;
+        jStockOptions.riseAboveAlertBackgroundColor = this.riseAboveAlertBackgroundColor;
         jStockOptions.enableColorChange = this.enableColorChange;
         jStockOptions.enableColorAlert = this.enableColorAlert;
 
@@ -523,6 +527,9 @@ public class JStockOptions {
         // restarting the entire application is required. We do not want user
         // to restart the application after loading from cloud.
         //jStockOptions.locale = this.locale;
+
+        // Perform deep copy.
+        jStockOptions.currencies = new EnumMap<Country, String>(this.currencies);
 
         return jStockOptions;
     }
@@ -651,6 +658,13 @@ public class JStockOptions {
             this.setLocale(Locale.getDefault());
         }
         
+        if (this.currencies == null) {
+            this.currencies = new EnumMap<Country, String>(Country.class);
+            for (Country c : Country.values()) {
+                this.currencies.put(c, Utils.getDefaultCurrencySymbol());
+            }
+        }
+
         return this;
     }    
     
@@ -1253,5 +1267,21 @@ public class JStockOptions {
      */
     public void setSoundEnabled(boolean soundEnabled) {
         this.soundEnabled = soundEnabled;
+    }
+
+    /**
+     * @param c the country to get
+     * @return the currency symbol
+     */
+    public String getCurrencySymbol(Country c) {
+        return this.currencies.get(c);
+    }
+
+    /**
+     * @param c the country to set
+     * @param s the currency symbol to set
+     */
+    public void setCurrencySymbol(Country c, String s) {
+        this.currencies.put(c, s);
     }
 }
