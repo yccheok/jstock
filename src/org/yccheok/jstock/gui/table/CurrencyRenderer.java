@@ -19,8 +19,6 @@
 
 package org.yccheok.jstock.gui.table;
 
-import java.text.NumberFormat;
-
 /**
  *
  * @author yancheng
