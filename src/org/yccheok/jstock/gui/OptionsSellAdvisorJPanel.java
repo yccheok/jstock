@@ -1,26 +1,34 @@
 /*
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- * Copyright (C) 2009 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-
 
 package org.yccheok.jstock.gui;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.util.Arrays;
+import java.util.Currency;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFormattedTextField;
 import javax.swing.text.NumberFormatter;
 import org.apache.commons.logging.Log;
@@ -53,6 +61,9 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
         jFormattedTextField1 = getPercentageJFormattedTextField();
         javax.swing.JPanel jPanel3 = new javax.swing.JPanel();
         jCheckBox1 = new javax.swing.JCheckBox();
+        javax.swing.JPanel jPanel4 = new javax.swing.JPanel();
+        javax.swing.JLabel jLabel2 = new javax.swing.JLabel();
+        jComboBox1 = new javax.swing.JComboBox();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -108,6 +119,33 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsSellAdvisorJPanel_Currency"))); // NOI18N
+
+        jLabel2.setText(bundle.getString("OptionsSellAdvisorJPanel_Symbol")); // NOI18N
+
+        jComboBox1.setModel(getComboBoxModel());
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(279, Short.MAX_VALUE))
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -115,6 +153,7 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jPanel4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
@@ -126,7 +165,9 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(95, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         add(jPanel1, java.awt.BorderLayout.CENTER);
@@ -142,12 +183,64 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
         
         return field;
     }
-    
+
+    private static ComboBoxModel getComboBoxModel() {
+        synchronized(defaultComboBoxModel) {
+            if (defaultComboBoxModel.getSize() > 0) {
+                return defaultComboBoxModel;
+            }
+
+            String[] countries = {
+                "AU",	// Austrialia
+                "AT",	// Austria
+                "BE",	// Belgium
+                "BR",	// Brazil
+                "CA",	// Canada
+                "CN",	// China
+                "DK",	// Denmark
+                "FR",	// France
+                "DE",	// Germany
+                "HK",	// HongKong
+                "IN",	// India
+                "ID",	// Indonesia
+                "IT",	// Italy
+                "KR",	// Korea
+                "MY",	// Malaysia
+                "NL",	// Netherlands
+                "NO",	// Norway
+                "PT",	// Portugal
+                "SG",	// Singapore
+                "ES",	// Spain
+                "SE",	// Sweden
+                "CH",	// Switzerland
+                "TW",	// Taiwan
+                "GB",	// Unitedkingdom
+                "US",	// UnitedState
+            };
+
+            final List<String> countryList = Arrays.asList(countries);
+            final Locale[] locales = Locale.getAvailableLocales();
+            // Order is important.
+            final Set<String> set = new LinkedHashSet<String>();
+            set.add(Utils.getDefaultCurrencySymbol());
+            for (Locale locale : locales) {
+                if (countryList.contains(locale.getCountry()) == false) {
+                    continue;
+                }                
+                set.add(Currency.getInstance(locale).getSymbol(locale));
+            }
+            for (String s : set) {
+                defaultComboBoxModel.addElement(s);
+            }
+        }
+        return defaultComboBoxModel;
+    }
+
     private void commitEdit() {
         try {
             jFormattedTextField1.commitEdit();
         } catch (ParseException ex) {
-            log.error("", ex);
+            log.error(null, ex);
         }
     }
     
@@ -155,21 +248,27 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
     public void set(JStockOptions jStockOptions) {
         this.jFormattedTextField1.setValue(new Double(jStockOptions.getExpectedProfitPercentage()));
         this.jCheckBox1.setSelected(jStockOptions.isPenceToPoundConversionEnabled());
+        this.jComboBox1.setSelectedItem(jStockOptions.getCurrencySymbol(jStockOptions.getCountry()));
         commitEdit();
     }
 
+    @Override
     public boolean apply(JStockOptions jStockOptions) {
         commitEdit();
         jStockOptions.setExpectedProfitPercentage((Double)jFormattedTextField1.getValue());
         jStockOptions.setPenceToPoundConversionEnabled(this.jCheckBox1.isSelected());
+        jStockOptions.setCurrencySymbol(jStockOptions.getCountry(), jComboBox1.getSelectedItem().toString());
+        // Remember to refresh the GUIs as well.
+        MainFrame.getInstance().getPortfolioManagementJPanel().refreshCurrencySymbol();
         return true;
     }
     
     private static final Log log = LogFactory.getLog(OptionsSellAdvisorJPanel.class);
-    
+    private static final DefaultComboBoxModel defaultComboBoxModel = new DefaultComboBoxModel();
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox jCheckBox1;
+    private javax.swing.JComboBox jComboBox1;
     private javax.swing.JFormattedTextField jFormattedTextField1;
     // End of variables declaration//GEN-END:variables
-
 }
