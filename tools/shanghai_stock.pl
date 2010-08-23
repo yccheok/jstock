@@ -79,12 +79,13 @@ sub extract_stock_info
 	#print "stocks  [" . Data::Dumper::Dumper(\@stocks) . "] \n";
 
 
+	my $main_url = "http://www.sse.com.cn";
 	# grep stock code, name for each stock
 	my @stocks_info;
 	foreach my $stock (@stocks)
 	{
-		my ($stock_name, $stock_code);
-		if ($stock =~ /<td class="table3" bgcolor=".+?">(\w+)<\/td>/)
+		my ($stock_name, $stock_code, $stock_url, $stock_long_name);
+		if ($stock =~ /<td class="table3" bgcolor=".+?">([^<]+)?<\/td>/)
 		{
 			$stock_name = $1;
 		}
@@ -94,9 +95,21 @@ sub extract_stock_info
 			$stock_code = $1;
 		}
 
+		if ($stock =~ /<a href="(.+?&COMPANY_CODE=$stock_code)"\s*>$stock_code<\/a>/)
+		{
+			$stock_url = $main_url . $1;
+			$mech->get( $stock_url );
+			my $content = $mech->content();
+
+			if ($content =~ /<span class="pagetitle"\s*>(.+)?\s+$stock_code<br>/)
+			{
+				$stock_long_name = $1;
+			}
+		}
+
 		if ($stock_code and $stock_name)
 		{
-			push(@stocks_info, $stock_code.'.SS'.',"'.$stock_name.'","'.$stock_name.'","","","","","","","","","","","","","","","","",""' );
+			push(@stocks_info, $stock_code.'.SS'.',"'.$stock_name.'","'.$stock_long_name.'","","","","","","","","","","","","","","","","",""' );
 		}
 	}
 
