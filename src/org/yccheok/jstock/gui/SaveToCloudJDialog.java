@@ -516,12 +516,8 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
     }
 
     private File getJStockZipFile() {
-        // Do we really need to know which country database file had
-        // been modified? Can we just don't upload stockcodeandsymboldatabase.xml?
-        // The operation needs around 10++ seconds. Especially when dealing with
-        // large Germany database file. If this doesn't give good user experience,
-        // give up from saving stockcodeandsymboldatabase.xml
-        final List<File> files = getModifiedCountryFiles();
+        // Look for "user-defined-database.xml" for all countries.
+        final List<File> files = getUserDefinedDatabaseFiles();
         final List<FileEx> fileExs = new ArrayList<FileEx>();
         for (File file : files) {
             final String filename;
@@ -613,108 +609,13 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
         return temp;
     }
 
-    // Oh goody. This is a slooooooooooooooooooow method.
-    private List<File> getModifiedCountryFiles() {
+    private List<File> getUserDefinedDatabaseFiles() {
         final List<File> files = new ArrayList<File>();
-        InputStream inputStream = null;
-        ZipInputStream zipInputStream = null;
-
-        try {
-            inputStream = new FileInputStream("database" + File.separator + "database.zip");
-
-            zipInputStream = new ZipInputStream(inputStream);
-            final byte[] data = new byte[1024];
-
-            while(true) {
-                ZipEntry zipEntry = null;
-
-                try {
-                    zipEntry = zipInputStream.getNextEntry();
-
-                    if (zipEntry == null) break;
-
-                    final String destination = Utils.getUserDataDirectory() + zipEntry.getName();
-
-                    // Ignore if file doesn't exist.
-                    if (Utils.isFileOrDirectoryExist(destination) == false) continue;
-
-                    if (zipEntry.isDirectory())
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        final long originalSize = zipEntry.getSize();
-                        final long currentSize = new File(destination).length();
-                        if (originalSize != currentSize) {
-                            // Two files are different. That's mean user had added UserDefined symbol.
-                            files.add(new File(destination));
-                        }
-
-                        /* NOTE : No checksum checking. Too slow.
-                        // Write to temp file.
-                        OutputStream out = null;
-                        File temp = null;
-                        try {
-                            // Create temp file.
-                            temp = File.createTempFile(Utils.getJStockUUID(), ".xml");
-                            // Delete temp file when program exits.
-                            temp.deleteOnExit();
-
-                            out = new FileOutputStream(temp);
-
-                            int len;
-                            while ((len = zipInputStream.read(data)) > 0) {
-                                out.write(data, 0, len);
-                            }
-
-                            final long currentChecksum = org.yccheok.jstock.analysis.Utils.getChecksum(destination);
-                            final long originalChecksum = org.yccheok.jstock.analysis.Utils.getChecksum(temp);
-                            if (currentChecksum != originalChecksum) {
-                                // Two files are different. That's mean user had added UserDefined symbol.
-                                files.add(new File(destination));
-                            }
-                        }
-                        catch (IOException ex) {
-                            log.error(null, ex);
-                            continue;
-                        }
-                        finally {
-                            if (out != null) {
-                                try {
-                                    out.close();
-                                } catch (IOException ex) {
-                                    log.error(null, ex);
-                                }
-                            }
-                        }
-                        */
-                    }   // if (zipEntry.isDirectory())
-                }
-                catch (IOException exp) {
-                    log.error(null, exp);
-                    break;
-                }
-                finally {
-                    if (zipInputStream != null) {
-                        try {
-                            zipInputStream.closeEntry();
-                        }
-                        catch (IOException exp) {
-                            log.error(null, exp);
-                            break;
-                        }
-                    }
-                }
-
-            }   // while(true)
-        }
-        catch (IOException exp) {
-            log.error(null, exp);
-        }
-        finally {
-            Utils.close(zipInputStream);
-            Utils.close(inputStream);
+        for (Country country : Country.values()) {
+            final File file = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database" + File.separator + "user-defined-database.xml");
+            if (file.exists()) {
+                files.add(file);
+            }
         }
         return files;
     }
