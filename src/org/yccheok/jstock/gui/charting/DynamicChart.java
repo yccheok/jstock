@@ -36,6 +36,7 @@ import org.jfree.data.general.SeriesException;
 import org.jfree.data.time.Second;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
+import org.yccheok.jstock.internationalization.GUIBundle;
 
 /**
  *
@@ -102,8 +103,8 @@ public class DynamicChart {
 
         JFreeChart freeChart = ChartFactory.createTimeSeriesChart(
             title,
-            "Date",
-            "Price",
+            GUIBundle.getString("DynamicChart_Date"),
+            GUIBundle.getString("DynamicChart_Price"),
             dataset,
             true,
             true,
