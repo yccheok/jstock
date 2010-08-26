@@ -1,6 +1,9 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.5p - 2010-??-??
+  Bugfix:  Added missing Labels_en.properties.
+  
 JStock 1.0.5n - 2010-08-25
   Feature: Support China stock market. (#3049597)
   Feature: Different colors for fall below alert and rise above alert. (#3005532)
