@@ -231,7 +231,6 @@ public class StockRelativeHistoryOperator extends AbstractOperator {
             }
         }   // if (this.function == Function.MFI)
 
-        double v = function == Function.Min ? Double.MAX_VALUE : 0.0;
         final int dataSize = values.size();
         
         if (dataSize == 0) {
@@ -242,19 +241,27 @@ public class StockRelativeHistoryOperator extends AbstractOperator {
             }
             return;
         }
+
+        // Do not use primitive. As we do not want to perform auto unboxing
+        // on TechnicalAnalysis's returned value. It might be null.
+        Double v = function == Function.Min ? Double.MAX_VALUE : 0.0;
+        // Use tmp_v to prevent frequent boxing/unboxing operation.
+        double tmp_v = v;
         
         switch(function)
         {
             case Max:
                 for (Double _value : values) {
-                    v = Math.max(v, _value);
+                    tmp_v = Math.max(tmp_v, _value);
                 }
+                v = tmp_v;
                 break;
                 
             case Min:
                 for (Double _value : values) {
-                    v = Math.min(v, _value);
+                    tmp_v = Math.min(tmp_v, _value);
                 }
+                v = tmp_v;
                 break;
 
             case Average:
@@ -268,9 +275,10 @@ public class StockRelativeHistoryOperator extends AbstractOperator {
                 }
                 average = average / (double)dataSize;
                 for (Double _value : values) {
-                    v = v + Math.abs(_value - average);
+                    tmp_v = tmp_v + Math.abs(_value - average);
                 }
-                v = v / (double)dataSize;
+                tmp_v = tmp_v / (double)dataSize;
+                v = tmp_v;
                 break;
 
             case RSI:
@@ -291,7 +299,7 @@ public class StockRelativeHistoryOperator extends AbstractOperator {
         
         Object oldValue = this.value;
         
-        this.value = new Double(v);
+        this.value = v;
         
         if (Utils.equals(oldValue, value) == false) {
             this.firePropertyChange("value", oldValue, this.value);
