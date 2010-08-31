@@ -91,7 +91,7 @@ public class GoogleMail {
         Session session = Session.getInstance(props, null);
 
         // -- Create a new message --
-        Message msg = new MimeMessage(session);
+        final MimeMessage msg = new MimeMessage(session);
 
         // -- Set the FROM and TO fields --
         msg.setFrom(new InternetAddress(username + "@gmail.com"));
@@ -102,7 +102,7 @@ public class GoogleMail {
         }
 
         msg.setSubject(title);
-        msg.setText(message);
+        msg.setText(message, "utf-8");
         msg.setSentDate(new Date());
         
         SMTPTransport t = (SMTPTransport)session.getTransport("smtps");
