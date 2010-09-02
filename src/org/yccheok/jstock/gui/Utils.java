@@ -20,7 +20,6 @@
 package org.yccheok.jstock.gui;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Desktop;
@@ -46,11 +45,16 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
@@ -1488,11 +1492,12 @@ public class Utils {
     }
 
     @SuppressWarnings("unchecked")
-    public static <A> A fromXML(Class c, InputStream inputStream) {
-        XStream xStream = new XStream(new DomDriver("UTF-8"));
+    public static <A> A fromXML(Class c, Reader reader) {
+        // Don't ever try to use DomDriver. They are VERY slow.
+        XStream xStream = new XStream();
 
         try {
-            Object object = xStream.fromXML(inputStream);
+            Object object = xStream.fromXML(reader);
             if (c.isInstance(object)) {
                 return (A)object;
             }
@@ -1501,17 +1506,7 @@ public class Utils {
             log.error(null, exp);
         }
         finally {
-            /* The caller shall close input stream explicitly. */
-            //if (inputStream != null) {
-            //    try {
-            //        inputStream.close();
-            //        inputStream = null;
-            //    }
-            //    catch (java.io.IOException exp) {
-            //        log.error(null, exp);
-            //        return null;
-            //    }
-            //}
+            /* The caller shall close reader explicitly. */
         }
 
         return null;
@@ -1519,12 +1514,16 @@ public class Utils {
 
     @SuppressWarnings("unchecked")
     public static <A> A fromXML(Class c, File file) {
-        XStream xStream = new XStream(new DomDriver("UTF-8"));
+        // Don't ever try to use DomDriver. They are VERY slow.
+        XStream xStream = new XStream();
         InputStream inputStream = null;
+        Reader reader = null;
 
         try {
             inputStream = new java.io.FileInputStream(file);
-            Object object = xStream.fromXML(inputStream);
+            reader = new InputStreamReader(inputStream, Charset.forName("UTF-8"));
+            Object object = xStream.fromXML(reader);
+
             if (c.isInstance(object)) {
                 return (A)object;
             }
@@ -1533,9 +1532,13 @@ public class Utils {
             log.error(null, exp);
         }
         finally {
+            if (false == close(reader)) {
+                return null;
+            }
             if (false == close(inputStream)) {
                 return null;
             }
+            reader = null;
             inputStream = null;
         }
 
@@ -1548,11 +1551,13 @@ public class Utils {
     }
 
     public static boolean toXML(Object object, File file) {
-        XStream xStream = new XStream(new DomDriver("UTF-8"));
+        XStream xStream = new XStream();
         OutputStream outputStream = null;
+        Writer writer = null;
 
         try {
             outputStream = new FileOutputStream(file);
+            writer = new OutputStreamWriter(outputStream, Charset.forName("UTF-8"));
             xStream.toXML(object, outputStream);
         }
         catch (Exception exp) {
@@ -1560,9 +1565,13 @@ public class Utils {
             return false;
         }
         finally {
+            if (false == close(writer)) {
+                return false;
+            }
             if (false == close(outputStream)) {
                 return false;
             }
+            writer = null;
             outputStream = null;
         }
 

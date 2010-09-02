@@ -428,10 +428,9 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                 public void run() {
                     final Stock stock = indicator.getStock();
                     final double price = stock.getLastPrice();
-                    // Google Calendar seems not fully support Chinese characters SMS yet.
-                    // We will temporary switch back to English characters SMS.
-                    // gui_en.properties and messages_en.properties shall be removed,
-                    // once Google supports Chinese SMS.
+                    // Google Calendar only support "short" Chinese message.
+                    // Usually our indicator name are quite long.
+                    // We do not have any workaround except fall back to English message.
                     //
                     //final String template = GUIBundle.getString("IndicatorScannerJPanel_Hit_template");
                     final ResourceBundle bundle = ResourceBundle.getBundle("org.yccheok.jstock.data.gui", Locale.ENGLISH);

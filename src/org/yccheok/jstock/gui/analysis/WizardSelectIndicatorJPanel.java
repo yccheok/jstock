@@ -22,7 +22,10 @@ package org.yccheok.jstock.gui.analysis;
 import java.awt.Color;
 import java.awt.Component;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -407,8 +410,16 @@ public class WizardSelectIndicatorJPanel extends javax.swing.JPanel {
                     return null;
                 }
 
-                final IndicatorDownloadManager _indicatorDownloadManager = Utils.fromXML(IndicatorDownloadManager.class, inputStreamAndMethod.inputStream);
-                Utils.close( inputStreamAndMethod.inputStream);
+                // Why we design method parameter to accept Reader instead of
+                // InputStream?
+                // This is because if we construct Reader within fromXML, we will
+                // have to close the Reader within fromXML. This will close the 
+                // InputStream implicitly as well. This is not what we want. We 
+                // want the caller to close InputStream explicitly.
+                final Reader reader = new InputStreamReader(inputStreamAndMethod.inputStream, Charset.forName("UTF-8"));
+                final IndicatorDownloadManager _indicatorDownloadManager = Utils.fromXML(IndicatorDownloadManager.class, reader);
+                Utils.close(reader);
+                Utils.close(inputStreamAndMethod.inputStream);
                 inputStreamAndMethod.method.releaseConnection();
                 if (_indicatorDownloadManager == null) {
                     return null;
