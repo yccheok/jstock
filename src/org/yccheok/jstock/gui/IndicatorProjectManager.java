@@ -246,7 +246,7 @@ public class IndicatorProjectManager {
             status = false;
         }
         finally {
-            status = Utils.close(in);
+            Utils.close(in);
         }
 
         if (status == false) {
@@ -388,9 +388,7 @@ public class IndicatorProjectManager {
             return false;
         }
         finally {
-            if (false == Utils.close(out)) {
-                return false;
-            }
+            Utils.close(out);
         }
         return true;
     }

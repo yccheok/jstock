@@ -47,26 +47,26 @@ public class GUIOptions {
             this.locale = locale;
         }
 
-		public static class ColumnOption {
-			private String columnName;
-			private final int columnWidth;
+        public static class ColumnOption {
+            private String columnName;
+            private final int columnWidth;
 
-			private ColumnOption(String columnName, int columnWidth) {
-				this.columnName = columnName;
-				this.columnWidth = columnWidth;
-			}
+            private ColumnOption(String columnName, int columnWidth) {
+                this.columnName = columnName;
+                this.columnWidth = columnWidth;
+            }
 
-			public static ColumnOption newInstance(String columnName, int columnWidth) {
-				return new ColumnOption(columnName, columnWidth);
-			}
+            public static ColumnOption newInstance(String columnName, int columnWidth) {
+                return new ColumnOption(columnName, columnWidth);
+            }
 
-			public String getColumnName() {
-				return columnName;
-			}
+            public String getColumnName() {
+                return columnName;
+            }
 
-			public int getColumnWidth() {
-				return columnWidth;
-			}
+            public int getColumnWidth() {
+                return columnWidth;
+            }
 
             // hashCode and equals, only perform computation on columnName.
             @Override
@@ -92,7 +92,7 @@ public class GUIOptions {
 
                 return this.columnName.equals(((ColumnOption)o).columnName);
             }
-		}
+        }
 		
         private final List<ColumnOption> columnOptions = new ArrayList<ColumnOption>();
         private Locale locale = Locale.getDefault();

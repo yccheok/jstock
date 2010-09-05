@@ -277,12 +277,8 @@ public class Utils {
                     break;
                 }
                 finally {
-                    if (false == close(outputStream)) {
-                        break;
-                    }
-                    if (false == closeEntry(zipInputStream)) {
-                        break;
-                    }
+                    close(outputStream);
+                    closeEntry(zipInputStream);
                 }
 
             }   // while(true)
@@ -1159,7 +1155,7 @@ public class Utils {
         if (applicationVersionID == APPLICATION_VERSION_ID) {
             return true;
         }
-        else if (applicationVersionID >= 1051 && applicationVersionID <= 1064) {
+        else if (applicationVersionID >= 1051 && applicationVersionID <= 1065) {
             return true;
         }
       
@@ -1532,14 +1528,8 @@ public class Utils {
             log.error(null, exp);
         }
         finally {
-            if (false == close(reader)) {
-                return null;
-            }
-            if (false == close(inputStream)) {
-                return null;
-            }
-            reader = null;
-            inputStream = null;
+            close(reader);
+            close(inputStream);
         }
 
         return null;
@@ -1565,14 +1555,8 @@ public class Utils {
             return false;
         }
         finally {
-            if (false == close(writer)) {
-                return false;
-            }
-            if (false == close(outputStream)) {
-                return false;
-            }
-            writer = null;
-            outputStream = null;
+            close(writer);
+            close(outputStream);
         }
 
         return true;
@@ -1959,19 +1943,21 @@ public class Utils {
      * writing cumbersome try...catch block.
      *
      * @param zipInputStream The ZIP input stream.
-     * @return Returns false if there is an exception during close operation.
-     * Otherwise returns true.
      */
-    public static boolean closeEntry(ZipInputStream zipInputStream) {
+    public static void closeEntry(ZipInputStream zipInputStream) {
+        // Instead of returning boolean, we will just simply swallow any
+        // exception silently. This is because this method will usually be
+        // invoked within finally block. If we are having control statement
+        // (return, break, continue) within finally block, a lot of surprise may
+        // happen.
+        // http://stackoverflow.com/questions/48088/returning-from-a-finally-block-in-java
         if (null != zipInputStream) {
             try {
                 zipInputStream.closeEntry();
             } catch (IOException ex) {
                 log.error(null, ex);
-                return false;
             }
         }
-        return true;
     }
 
     /**
@@ -1979,19 +1965,21 @@ public class Utils {
      * writing cumbersome try...catch block.
      *
      * @param closeable The closeable stream.
-     * @return Returns false if there is an exception during close operation.
-     * Otherwise returns true.
      */
-    public static boolean close(Closeable closeable) {
+    public static void close(Closeable closeable) {
+        // Instead of returning boolean, we will just simply swallow any
+        // exception silently. This is because this method will usually be
+        // invoked within finally block. If we are having control statement
+        // (return, break, continue) within finally block, a lot of surprise may
+        // happen.
+        // http://stackoverflow.com/questions/48088/returning-from-a-finally-block-in-java
         if (null != closeable) {
             try {
                 closeable.close();
             } catch (IOException ex) {
                 log.error(null, ex);
-                return false;
             }
         }
-        return true;
     }
 
     /**
@@ -2184,9 +2172,9 @@ public class Utils {
     private static final String APPLICATION_VERSION_STRING = "1.0.5";
 
     // For About box comparision on latest version purpose.
-    // 1.0.5p
+    // 1.0.5q
     // Remember to update isCompatible method.
-    private static final int APPLICATION_VERSION_ID = 1065;
+    private static final int APPLICATION_VERSION_ID = 1066;
 
     private static Executor zombiePool = Executors.newFixedThreadPool(Utils.NUM_OF_THREADS_ZOMBIE_POOL);
 

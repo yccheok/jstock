@@ -90,8 +90,16 @@ public class JTableUtilities {
 
     public static void setJTableOptions(JTable jTable, GUIOptions.JTableOptions jTableOptions)
     {
+        if (jTableOptions.getColumnSize() <= 0) {
+            // A bug introduced in version 1.0.5p. Due to incorrect
+            // implementation of Utils.toXML, we may get a table option with 0
+            // column turned on. To avoid all columns being turned off, we will
+            // return early.
+            return;
+        }
+
         final Locale locale = jTableOptions.getLocale();
-        
+
     	// Remove unwanted column. MUST BE DONE FIRST!
         for (int i = 0; i < jTable.getColumnCount(); i++) {
             final String name = jTable.getColumnName(i);
