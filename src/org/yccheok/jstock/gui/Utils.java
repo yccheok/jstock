@@ -1558,7 +1558,7 @@ public class Utils {
         try {
             outputStream = new FileOutputStream(file);
             writer = new OutputStreamWriter(outputStream, Charset.forName("UTF-8"));
-            xStream.toXML(object, outputStream);
+            xStream.toXML(object, writer);
         }
         catch (Exception exp) {
             log.error(null, exp);
