@@ -29,6 +29,7 @@ import java.util.Locale;
  */
 public class GUIOptions {
     private final List<JTableOptions> jTableOptionsList = new ArrayList<JTableOptions>();
+    private List<Integer> dividerLocationList = new ArrayList<Integer>();
 
     public static class JTableOptions
     {
@@ -123,7 +124,7 @@ public class GUIOptions {
 
         public int getColumnWidth(int index)
         {
-			return columnOptions.get(index).getColumnWidth();
+            return columnOptions.get(index).getColumnWidth();
         }
 
         public boolean addColumnOption(ColumnOption option) {
@@ -185,13 +186,34 @@ public class GUIOptions {
         return jTableOptionsList.size();
     }
 
+    public int getDividerLocationSize() {
+        return dividerLocationList.size();
+    }
+
     public JTableOptions getJTableOptions(int index)
     {
-		/* Returns immutable version. */
+        /* Returns immutable version. */
         return new UnmodifiableJTableOptions(jTableOptionsList.get(index));
+    }
+
+    public int getDividerLocation(int index) {
+        return dividerLocationList.get(index);
+
     }
 
     public void addJTableOptions(JTableOptions jTableOptions) {
         this.jTableOptionsList.add(jTableOptions);
+    }
+
+    public void addDividerLocation(int dividerLocation) {
+        this.dividerLocationList.add(dividerLocation);
+    }
+
+    private Object readResolve() {
+        /* For backward compatible */
+        if (dividerLocationList == null) {
+            dividerLocationList = new ArrayList<Integer>();
+        }
+        return this;
     }
 }

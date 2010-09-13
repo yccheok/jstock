@@ -1806,7 +1806,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
     private void initGUIOptions() {
         File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "portfoliomanagementjpanel.xml");
-        GUIOptions guiOptions = Utils.fromXML(GUIOptions.class, f);
+        final GUIOptions guiOptions = Utils.fromXML(GUIOptions.class, f);
 
         if (guiOptions == null)
         {
@@ -1826,6 +1826,28 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             final javax.swing.table.JTableHeader jTableHeader = treeTable.getTableHeader();
             final JTable jTable = jTableHeader.getTable();
             JTableUtilities.setJTableOptions(jTable, guiOptions.getJTableOptions(tableIndex));
+        }
+
+        // Do we have the divider location option?
+        if (guiOptions.getDividerLocationSize() > 0) {
+            // Yes. Remember the divider location.
+            // It will be used in updateDividerLocation later.
+            this.dividerLocation = guiOptions.getDividerLocation(0);
+        }
+    }
+
+    // Also, be aware: Calling setDividerLocation(double) before the JSplitPane
+    // is visible will not work correctly.
+    // Workaround for bug : http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6528446
+    public void updateDividerLocation() {
+        if (this.dividerLocation > 0) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    // Have the code in AWT event dispatching thread, in order
+                    // to ensure MainFrame is already shown on the screen.
+                    jSplitPane1.setDividerLocation(dividerLocation);
+                }
+            });
         }
     }
 
@@ -1855,6 +1877,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             guiOptions.addJTableOptions(jTableOptions);
         }
 
+        guiOptions.addDividerLocation(jSplitPane1.getDividerLocation());
+        
         File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "portfoliomanagementjpanel.xml");
         return org.yccheok.jstock.gui.Utils.toXML(guiOptions, f);
     }
@@ -2003,6 +2027,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
 
     private static final Log log = LogFactory.getLog(PortfolioManagementJPanel.class);
+
+    private int dividerLocation = -1;
 
     // Data structure.
     private DepositSummary depositSummary = new DepositSummary();

@@ -1345,10 +1345,16 @@ public class MainFrame extends javax.swing.JFrame {
                 mainFrame.init(getJStockOptions(_args));
                 mainFrame.setExtendedState(Frame.MAXIMIZED_BOTH);
                 mainFrame.setVisible(true);
+                mainFrame.updateDividerLocation();
             }
         });
     }
-    
+
+    // Restore the last saved divider location for portfolio management panel.
+    private void updateDividerLocation() {
+        this.portfolioManagementJPanel.updateDividerLocation();
+    }
+
     private void clearAllStocks() {
         assert(java.awt.EventQueue.isDispatchThread());
         
