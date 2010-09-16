@@ -753,7 +753,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         // user will know this transaction will go into which portfolio, without
         // having to click on the Portfolio drop-down menu.
         if (mainFrame.getSelectedComponent() != this) {
-            final String title = newTransactionJDialog.getTitle() + " (" + mainFrame.getJStockOptions().getPortfolioName() + ")";
+            final JStockOptions jStockOptions = mainFrame.getJStockOptions();
+            final Country country = jStockOptions.getCountry();
+            final String title = newTransactionJDialog.getTitle() + " (" + jStockOptions.getPortfolioName(country) + ")";
             newTransactionJDialog.setTitle(title);
         }
 
@@ -1543,14 +1545,14 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             // country without portfolio, the previous portfolio name will be
             // carried over. By following Principle of least suprise, portfolio
             // name will be reset to default.
-            jStockOptions.setPortfolioName(org.yccheok.jstock.portfolio.Utils.getDefaultPortfolioName());
+            jStockOptions.setPortfolioName(country, org.yccheok.jstock.portfolio.Utils.getDefaultPortfolioName());
             oldData = true;
         }
         else {
             // Is user selected portfolio name within current available portfolio names?
-            if (false == availablePortfolioNames.contains(jStockOptions.getPortfolioName())) {
+            if (false == availablePortfolioNames.contains(jStockOptions.getPortfolioName(country))) {
                 // Nope. Reset user selected portfolio name to the first available name.
-                jStockOptions.setPortfolioName(availablePortfolioNames.get(0));
+                jStockOptions.setPortfolioName(country, availablePortfolioNames.get(0));
             }
             oldData = false;
         }
@@ -1703,16 +1705,17 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
 
     private void updateTitledBorder() {
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
         if (SwingUtilities.isEventDispatchThread()) {
             final TitledBorder titledBorder = (TitledBorder)PortfolioManagementJPanel.this.jPanel1.getBorder();
-            titledBorder.setTitle(MainFrame.getInstance().getJStockOptions().getPortfolioName());
+            titledBorder.setTitle(jStockOptions.getPortfolioName(jStockOptions.getCountry()));
         }
         else {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     final TitledBorder titledBorder = (TitledBorder)PortfolioManagementJPanel.this.jPanel1.getBorder();
-                    titledBorder.setTitle(MainFrame.getInstance().getJStockOptions().getPortfolioName());
+                    titledBorder.setTitle(jStockOptions.getPortfolioName(jStockOptions.getCountry()));
                 }
             });
         }
