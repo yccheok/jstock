@@ -40,6 +40,15 @@ public class StockServerFactoryJRadioButton extends JRadioButton {
         this.stockServerFactory = stockServerFactory;
         this.setStatus(Status.Busy);
         this.setToolTipText("Checking for server health...");
+
+        final Class c = stockServerFactory.getClass();
+        if (c == org.yccheok.jstock.engine.GoogleStockServerFactory.class) {
+            // Hacking from preventing GoogleStockServerFactory being selected
+            // as primary server. This is because GoogleStockServerFactory is
+            // not fully completed yet.
+            this.setEnabled(false);
+        }
+
         initSwingWorker();
     }
 

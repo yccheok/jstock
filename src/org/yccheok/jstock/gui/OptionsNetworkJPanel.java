@@ -19,6 +19,7 @@
 
 package org.yccheok.jstock.gui;
 
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import org.apache.commons.logging.Log;
@@ -162,6 +163,7 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
 
         for (StockServerFactory stockServerFactory : stockServerFactories) {
             final StockServerFactoryJRadioButton stockServerJRadioButton = new StockServerFactoryJRadioButton(stockServerFactory);
+            
             if (first == null) {
                 first = stockServerJRadioButton;
             }
@@ -183,7 +185,18 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
                 label.setText(text);
             }
             this.buttonGroup1.add(stockServerJRadioButton);
-            jPanel5.add(stockServerJRadioButton);
+            final JPanel jPanel = new JPanel();
+            final FlowLayout layout = new FlowLayout();
+            layout.setAlignment(FlowLayout.LEFT);
+            layout.setHgap(0);
+            layout.setVgap(0);
+            jPanel.setLayout(layout);
+            // Instead of placing stockServerJRadioButton on jPanel5 directly, 
+            // we places it on a FlowLayout panel. This is the prevent 
+            // stockServerJRadioButton width being extended to the left end of
+            // window.
+            jPanel.add(stockServerJRadioButton);
+            jPanel5.add(jPanel);
         }
 
         if (selected == false) {
