@@ -308,7 +308,9 @@ public class JStockOptions {
     // Use -1 to indicate unlimited SMS per day.
     private int maxSMSPerDay = -1;
 
-    private String portfolioName = org.yccheok.jstock.portfolio.Utils.getDefaultPortfolioName();
+    @Deprecated
+    private transient String portfolioName = org.yccheok.jstock.portfolio.Utils.getDefaultPortfolioName();
+    private Map<Country, String> portfolioNames = new EnumMap<Country, String>(Country.class);
 
     private String watchlistName = org.yccheok.jstock.watchlist.Utils.getDefaultWatchlistName();
 
@@ -413,7 +415,7 @@ public class JStockOptions {
         // Use -1 to indicate unlimited SMS per day.
         this.maxSMSPerDay = jStockOptions.maxSMSPerDay;
 
-        this.portfolioName = jStockOptions.portfolioName;
+        this.portfolioNames = new EnumMap<Country, String>(jStockOptions.portfolioNames);
 
         this.watchlistName = jStockOptions.watchlistName;
 
@@ -518,7 +520,7 @@ public class JStockOptions {
         // Use -1 to indicate unlimited SMS per day.
         jStockOptions.maxSMSPerDay = this.maxSMSPerDay;
 
-        jStockOptions.portfolioName = this.portfolioName;
+        jStockOptions.portfolioNames = new EnumMap<Country, String>(this.portfolioNames);
 
         jStockOptions.watchlistName = this.watchlistName;
 
@@ -630,8 +632,8 @@ public class JStockOptions {
             primaryStockServerFactoryClasses = new EnumMap<Country, Class>(Country.class);
         }
 
-        if (this.portfolioName == null) {
-            this.portfolioName = org.yccheok.jstock.portfolio.Utils.getDefaultPortfolioName();
+        if (this.portfolioNames == null) {
+            this.portfolioNames = new EnumMap<Country, String>(Country.class);
         }
 
         if (this.watchlistName == null) {
@@ -1141,17 +1143,25 @@ public class JStockOptions {
     }
 
     /**
-     * @return the portfolioName
+     * @param c the country to get
+     * @return the portfolio name. If not portfolio name for the country, a
+     * default portfolio name will be returned
      */
-    public String getPortfolioName() {
-        return portfolioName;
+    public String getPortfolioName(Country c) {
+        final String p = this.portfolioNames.get(c);
+        if (p == null) {
+            // Not found. Returns default portfolio name.
+            return org.yccheok.jstock.portfolio.Utils.getDefaultPortfolioName();
+        }
+        return p;
     }
 
     /**
-     * @param portfolioName the portfolioName to set
+     * @param c the country to set
+     * @param s the portfolio name to set
      */
-    public void setPortfolioName(String portfolioName) {
-        this.portfolioName = portfolioName;
+    public void setPortfolioName(Country c, String p) {
+        this.portfolioNames.put(c, p);
     }
 
     /**
