@@ -26,12 +26,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.commons.httpclient.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.gui.MainFrame;
-import org.yccheok.jstock.network.Utils.Type;
 
 /**
  *
@@ -41,157 +39,7 @@ public class Utils {
     
     /** Creates a new instance of Utils */
     private Utils() {
-    }
-
-    // Use Copy On Write ArrayList, so that we can perform sorting.
-    private static volatile List<String> CIMBMarketServers = null;
-    private static volatile List<String> CIMBStockServers = null;
-    private static volatile List<String> CIMBHistoryServers = null;
-
-    private static volatile List<String> XMarketServers = null;
-    private static volatile List<String> XStockServers = null;
-
-    private static final String[] DEFAULT_CIMB_SERVERS = new String[] {
-        "http://n2ntbfd01.itradecimb.com/",
-        "http://n2ntbfd02.itradecimb.com/",
-        "http://n2ntbfd03.itradecimb.com/",
-        "http://n2ntbfd04.itradecimb.com/",
-        "http://n2ntbfd05.itradecimb.com/",
-        "http://n2ntbfd06.itradecimb.com/",
-        "http://n2ntbfd07.itradecimb.com/",
-        "http://n2ntbfd08.itradecimb.com/",
-        "http://n2ntbfd09.itradecimb.com/",
-        "http://n2ntbfd10.itradecimb.com/"
-    };
-
-    private static final String[] DEFAULT_X_SERVERS = new String[] {
-        "wLllc3ZJq73EFWMqYiXOf0YzVzRexVbjXSjOn9Yiu0GZOXFfHXwmWag/K23uY9Sr",
-        "Av6N5TreyjHoPuRV5g81WQjW8JWqPrHPbzOC/uYfxNHMgWW3CcyCFJgrjRA+RuHL",
-        "5FyQRFsBGV3fYfc3JFbwwwCV2qEXOsiKxC4vdmF7lC8lZl4k6SuIU32yVp5xCaJk"
-    };    
-
-    public static List<String> getXMarketServers() {
-        List<String> servers = Utils.XMarketServers;
-        if (servers != null) {
-            // We already have the server list.
-            return new CopyOnWriteArrayList<String>(servers);
-        }
-
-        final String server = org.yccheok.jstock.gui.Utils.getUUIDValue(org.yccheok.jstock.network.Utils.getURL(Type.X_MARKET_SERVERS_TXT), "server");
-        if (server != null) {
-            final String decrypted_server = org.yccheok.jstock.gui.Utils.decrypt(server);
-            String[] s = decrypted_server.split(",");
-            if (s.length > 0) {
-                List<String> me = new CopyOnWriteArrayList<String>(java.util.Arrays.asList(s));
-                // Save it! So that we need not to ask for server list again next time.
-                Utils.XMarketServers = me;
-                return new CopyOnWriteArrayList<String>(me);
-            }
-        }
-        servers = new CopyOnWriteArrayList<String>(java.util.Arrays.asList(DEFAULT_X_SERVERS));
-        for (int i = 0; i < servers.size(); i++) {
-            servers.set(i, org.yccheok.jstock.gui.Utils.decrypt(servers.get(i)));
-        }
-        // Save it! So that we need not to ask for server list again next time.
-        Utils.XMarketServers = servers;
-        return new CopyOnWriteArrayList<String>(servers);
-    }
-
-    public static List<String> getCIMBMarketServers() {
-        List<String> servers = Utils.CIMBMarketServers;
-        if (servers != null) {
-            // We already have the server list.
-            return new CopyOnWriteArrayList<String>(servers);
-        }
-
-        final String server = org.yccheok.jstock.gui.Utils.getUUIDValue(org.yccheok.jstock.network.Utils.getURL(Type.CIMB_MARKET_SERVERS_TXT), "server");
-        if (server != null) {
-            String[] s = server.split(",");
-            if (s.length > 0) {
-                List<String> me = new CopyOnWriteArrayList<String>(java.util.Arrays.asList(s));
-                // Save it! So that we need not to ask for server list again next time.
-                Utils.CIMBMarketServers = me;
-                return new CopyOnWriteArrayList<String>(me);
-            }
-        }
-        servers = new CopyOnWriteArrayList<String>(java.util.Arrays.asList(DEFAULT_CIMB_SERVERS));
-        // Save it! So that we need not to ask for server list again next time.
-        Utils.CIMBMarketServers = servers;
-        return new CopyOnWriteArrayList<String>(servers);
-    }
-
-    public static List<String> getXStockServers() {
-        List<String> servers = Utils.XStockServers;
-        if (servers != null) {
-            // We already have the server list.
-            return new CopyOnWriteArrayList<String>(servers);
-        }
-
-        final String server = org.yccheok.jstock.gui.Utils.getUUIDValue(org.yccheok.jstock.network.Utils.getURL(Type.X_STOCK_SERVERS_TXT), "server");
-        if (server != null) {
-            final String decrypted_server = org.yccheok.jstock.gui.Utils.decrypt(server);
-            String[] s = decrypted_server.split(",");
-            if (s.length > 0) {
-                List<String> me = new CopyOnWriteArrayList<String>(java.util.Arrays.asList(s));
-                // Save it! So that we need not to ask for server list again next time.
-                Utils.XStockServers = me;
-                return new CopyOnWriteArrayList<String>(me);
-            }
-        }
-        servers = new CopyOnWriteArrayList<String>(java.util.Arrays.asList(DEFAULT_X_SERVERS));
-        for (int i = 0; i < servers.size(); i++) {
-            servers.set(i, org.yccheok.jstock.gui.Utils.decrypt(servers.get(i)));
-        }
-        // Save it! So that we need not to ask for server list again next time.
-        Utils.XStockServers = servers;
-        return new CopyOnWriteArrayList<String>(servers);
-    }
-
-    public static List<String> getCIMBStockServers() {
-        List<String> servers = Utils.CIMBStockServers;
-        if (servers != null) {
-            // We already have the server list.
-            return new CopyOnWriteArrayList<String>(servers);
-        }
-
-        final String server = org.yccheok.jstock.gui.Utils.getUUIDValue(org.yccheok.jstock.network.Utils.getURL(Type.CIMB_STOCK_SERVERS_TXT), "server");
-        if (server != null) {
-            String[] s = server.split(",");
-            if (s.length > 0) {
-                List<String> me = new CopyOnWriteArrayList<String>(java.util.Arrays.asList(s));
-				// Save it! So that we need not to ask for server list again next time.
-                Utils.CIMBStockServers = me;
-                return new CopyOnWriteArrayList<String>(me);
-            }
-        }
-        servers = new CopyOnWriteArrayList<String>(java.util.Arrays.asList(DEFAULT_CIMB_SERVERS));
-        // Save it! So that we need not to ask for server list again next time.
-        Utils.CIMBStockServers = servers;
-        return new CopyOnWriteArrayList<String>(servers);
-    }
-
-    public static List<String> getCIMBHistoryServers() {
-        List<String> servers = Utils.CIMBHistoryServers;
-        if (servers != null) {
-            // We already have the server list.
-            return new CopyOnWriteArrayList<String>(servers);
-        }
-
-        final String server = org.yccheok.jstock.gui.Utils.getUUIDValue(org.yccheok.jstock.network.Utils.getURL(Type.CIMB_HISTORY_SERVERS_TXT), "server");
-        if (server != null) {
-            String[] s = server.split(",");
-            if (s.length > 0) {
-                List<String> me = new CopyOnWriteArrayList<String>(java.util.Arrays.asList(s));
-                // Save it! So that we need not to ask for server list again next time.
-                Utils.CIMBHistoryServers = me;
-                return new CopyOnWriteArrayList<String>(me);
-            }
-        }
-        servers = new CopyOnWriteArrayList<String>(java.util.Arrays.asList(DEFAULT_CIMB_SERVERS));
-        // Save it! So that we need not to ask for server list again next time.
-        Utils.CIMBHistoryServers = servers;
-        return new CopyOnWriteArrayList<String>(servers);
-    }
+    }   
 
     public static void setHttpClientProxyFromSystemProperties(HttpClient httpClient) {
         final String httpproxyHost = System.getProperties().getProperty("http.proxyHost");
@@ -580,6 +428,62 @@ public class Utils {
         
         return java.util.Collections.emptyList();
     }
+
+    /**
+     * Returns JSON string, by parsing respond from Google server.
+     *
+     * @param respond string returned from Google server directly
+     * @return JSON string, by parsing respond from Google server
+     */
+    public static String GoogleRespondToJSON(String respond) {
+        final int beginIndex = respond.indexOf("[");
+        final int endIndex = respond.lastIndexOf("]");
+        if (beginIndex < 0) {
+            return "";
+        }
+        if (beginIndex > endIndex) {
+            return "";
+        }
+        return respond.substring(beginIndex, endIndex + 1);
+    }
+
+    /**
+     * Returns an empty StockServer, which does nothing but always throw
+     * StockNotFoundException.
+     *
+     * @return an empty StockServer, which does nothing but always throw
+     * StockNotFoundException
+     */
+    public static StockServer emptyStockServer() {
+        return EMPTY_STOCK_SERVER;
+    }
+
+    private static final StockServer EMPTY_STOCK_SERVER = new StockServer() {
+        @Override
+        public Stock getStock(Symbol symbol) throws StockNotFoundException {
+            throw new StockNotFoundException();
+        }
+
+        @Override
+        public Stock getStock(Code code) throws StockNotFoundException {
+            throw new StockNotFoundException();
+        }
+
+        @Override
+        public List<Stock> getStocksBySymbols(List<Symbol> symbols) throws StockNotFoundException {
+            throw new StockNotFoundException();
+        }
+
+        @Override
+        public List<Stock> getStocksByCodes(List<Code> codes) throws StockNotFoundException {
+            throw new StockNotFoundException();
+        }
+
+        @Override
+        public List<Stock> getAllStocks() throws StockNotFoundException {
+            throw new StockNotFoundException();
+        }
+    };
 
     private static final Log log = LogFactory.getLog(Utils.class);
 }
