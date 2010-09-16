@@ -45,10 +45,7 @@ public class StockServerFactoryJRadioButton extends JRadioButton {
 
     public static String toReadableText(StockServerFactory stockServerFactory) {
         Class c = stockServerFactory.getClass();
-        if (c == org.yccheok.jstock.engine.CIMBStockServerFactory.class) {
-            return GUIBundle.getString("StockServerFactoryJRadioButton_CIMBStockServerFactory");
-        }
-        else if (c == org.yccheok.jstock.engine.SingaporeYahooStockServerFactory.class) {
+        if (c == org.yccheok.jstock.engine.SingaporeYahooStockServerFactory.class) {
             return GUIBundle.getString("StockServerFactoryJRadioButton_SingaporeYahooStockServerFactory");
         }
         else if (c == org.yccheok.jstock.engine.BrazilYahooStockServerFactory.class) {
@@ -57,8 +54,8 @@ public class StockServerFactoryJRadioButton extends JRadioButton {
         else if (c == org.yccheok.jstock.engine.YahooStockServerFactory.class) {
             return GUIBundle.getString("StockServerFactoryJRadioButton_YahooStockServerFactory");
         }
-        else if (c == org.yccheok.jstock.engine.XStockServerFactory.class) {
-            return GUIBundle.getString("StockServerFactoryJRadioButton_XStockServerFactory");
+        else if (c == org.yccheok.jstock.engine.GoogleStockServerFactory.class) {
+            return GUIBundle.getString("StockServerFactoryJRadioButton_GoogleStockServerFactory");
         }
         return c.getSimpleName();
     }
@@ -73,11 +70,7 @@ public class StockServerFactoryJRadioButton extends JRadioButton {
 
         // Microsoft.
         Code code = Code.newInstance("MSFT");
-        if (c == org.yccheok.jstock.engine.CIMBStockServer.class) {
-            // PBBANK.
-            code = Code.newInstance("1295.KL");
-        }
-        else if (c == org.yccheok.jstock.engine.SingaporeYahooStockServer.class) {
+        if (c == org.yccheok.jstock.engine.SingaporeYahooStockServer.class) {
             // PBBANK.
             code = Code.newInstance("1295.KL");
         }
@@ -88,8 +81,8 @@ public class StockServerFactoryJRadioButton extends JRadioButton {
         else if (c == org.yccheok.jstock.engine.YahooStockServer.class) {
             code = Code.newInstance("MSFT");
         }
-        else if (c == org.yccheok.jstock.engine.XStockServer.class) {
-            code = Code.newInstance("1295.KL");
+        else if (c == org.yccheok.jstock.engine.GoogleStockServerFactory.class) {
+            code = Code.newInstance("MSFT");
         }
         try {
             stockServerFactory.getStockServer().getStock(code);
