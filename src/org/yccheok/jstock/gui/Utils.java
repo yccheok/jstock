@@ -2039,9 +2039,9 @@ public class Utils {
             return new ArrayList<String>();
         }
 
-        // Use StringBuffer instead of String during processing for speed
+        // Use StringBuilder instead of String during processing for speed
         // optimization.
-        List<StringBuffer> stringBuffers = null;
+        List<StringBuilder> stringBuilders = null;
 
         for (int i = 0, length = chinese.length(); i < length; i++) {
             final char c = chinese.charAt(i);
@@ -2070,23 +2070,23 @@ public class Utils {
                     // return new ArrayList<String>();
                 }            
             }
-            final List<StringBuffer> tmps = stringBuffers;
-            stringBuffers = new ArrayList<StringBuffer>();
+            final List<StringBuilder> tmps = stringBuilders;
+            stringBuilders = new ArrayList<StringBuilder>();
 
             if (tmps == null) {
                 // This will be the first converted character.
                 for (Character character : set) {
-                    final StringBuffer me = new StringBuffer();
+                    final StringBuilder me = new StringBuilder();
                     me.append(character);
-                    stringBuffers.add(me);
+                    stringBuilders.add(me);
                 }
             } else {
                 for (Character character : set) {
-                    for (StringBuffer tmp : tmps) {
-                        final StringBuffer me = new StringBuffer();
+                    for (StringBuilder tmp : tmps) {
+                        final StringBuilder me = new StringBuilder();
                         me.append(tmp);
                         me.append(character);
-                        stringBuffers.add(me);
+                        stringBuilders.add(me);
                     }
                 }
             }
@@ -2094,9 +2094,9 @@ public class Utils {
 
         List<String> result = new ArrayList<String>();
         // Do we have any converted characters?
-        if (stringBuffers != null) {
-            for (StringBuffer stringBuffer : stringBuffers) {
-                result.add(stringBuffer.toString());
+        if (stringBuilders != null) {
+            for (StringBuilder stringBuilder : stringBuilders) {
+                result.add(stringBuilder.toString());
             }
         }
 
