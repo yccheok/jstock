@@ -347,9 +347,9 @@ public abstract class AbstractYahooStockServer extends Subject<AbstractYahooStoc
     // c1 = Change
     // p2 = Change Percent
     // k3 = Last Trade Size <-- We need to take special care on this, it may give us 1,234...
-    // b = Bid
+    // b3 = Bid (Real-time) <-- We use b = Bid previously. However, most stocks return 0.
     // b6 = Bid Size        <-- We need to take special care on this, it may give us 1,234...
-    // a = Ask
+    // b2 = Ask (Real-time) <-- We use a = Ask previously. However, most stocks return 0.
     // a5 = Ask Size        <-- We need to take special care on this, it may give us 1,234...
     // d1 = Last Trade Date
     // t1 = Last Trade Time
@@ -358,7 +358,7 @@ public abstract class AbstractYahooStockServer extends Subject<AbstractYahooStoc
     // "+1400.00","N/A - +4.31%",+1400.00,"+4.31%","+1400.00 - +4.31%"
     //
     // "MAERSKB.CO","AP MOELLER-MAERS-","Copenhagen",32500.00,33700.00,34200.00,33400.00,660,"+1200.00","N/A - +3.69%",33,33500.00,54,33700.00,96,"11/10/2008","10:53am"
-    private static final String YAHOO_STOCK_FORMAT = "&f=snxspsosl1shsgsvsc1sp2sk3sbsb6sasa5sd1t1";
+    private static final String YAHOO_STOCK_FORMAT = "&f=snxspsosl1shsgsvsc1sp2sk3sb3sb6sb2sa5sd1t1";
 
     private final Country country;
 }
