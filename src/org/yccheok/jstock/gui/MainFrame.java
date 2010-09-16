@@ -1100,7 +1100,8 @@ public class MainFrame extends javax.swing.JFrame {
     private void jMenu8MenuSelected(javax.swing.event.MenuEvent evt) {//GEN-FIRST:event_jMenu8MenuSelected
         this.jMenu8.removeAll();
         final java.util.List<String> portfolioNames = org.yccheok.jstock.portfolio.Utils.getPortfolioNames();
-        final String currentPortfolioName = this.getJStockOptions().getPortfolioName();
+        final Country country = this.getJStockOptions().getCountry();
+        final String currentPortfolioName = this.getJStockOptions().getPortfolioName(country);
         final javax.swing.ButtonGroup buttonGroup = new javax.swing.ButtonGroup();
         for (String portfolioName : portfolioNames) {
             final JMenuItem mi = (JRadioButtonMenuItem) jMenu8.add(new JRadioButtonMenuItem(portfolioName));
@@ -1236,7 +1237,8 @@ public class MainFrame extends javax.swing.JFrame {
         // Save current GUI options.
         MainFrame.this.portfolioManagementJPanel.saveGUIOptions();
         // And switch to new portfolio.
-        MainFrame.this.getJStockOptions().setPortfolioName(portfolio);
+        final Country country = MainFrame.this.getJStockOptions().getCountry();
+        MainFrame.this.getJStockOptions().setPortfolioName(country, portfolio);
         MainFrame.this.portfolioManagementJPanel.initPortfolio();
     }
 
