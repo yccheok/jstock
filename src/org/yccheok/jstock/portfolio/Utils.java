@@ -132,7 +132,7 @@ public class Utils {
      */
     public static String getPortfolioDirectory() {
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
-        return getPortfolioDirectory(jStockOptions.getPortfolioName());
+        return getPortfolioDirectory(jStockOptions.getPortfolioName(jStockOptions.getCountry()));
     }
 
     /**
