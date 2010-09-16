@@ -108,6 +108,7 @@ public enum Factories {
         taiwanList.add(SingaporeYahooStockServerFactory.newInstance(Country.Taiwan));
         unitedKingdomList.add(YahooStockServerFactory.newInstance(Country.UnitedKingdom));
         unitedStateList.add(YahooStockServerFactory.newInstance(Country.UnitedState));
+        unitedStateList.add(GoogleStockServerFactory.newInstance(Country.UnitedState));
 
         map.put(Country.Australia, australiaList);
         map.put(Country.Austria, austriaList);
