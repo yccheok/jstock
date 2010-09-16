@@ -19,13 +19,300 @@
 
 package org.yccheok.jstock.engine;
 
+import java.util.Calendar;
+
 /**
  *
  * @author yccheok
  */
 public class Stock {
     
+    // Builder pattern.
+    // We are using a builder pattern when face with many constructor 
+    // parameters.
+    public static class Builder {
+        // Required parameters.
+        private final Code code;
+        private final Symbol symbol;
+
+        // Optional parameters - initialized to default values.
+        private String name = "";
+        private Board board = Board.Unknown;
+        private Industry industry = Industry.Unknown;
+        private double prevPrice = 0.0;
+        private double openPrice = 0.0;
+        private double lastPrice = 0.0;
+        private double highPrice = 0.0;
+        private double lowPrice = 0.0;
+        private long volume = 0;
+        private double changePrice = 0.0;
+        private double changePricePercentage = 0.0;
+        private int lastVolume = 0;
+        private double buyPrice = 0.0;
+        private int buyQuantity = 0;
+        private double sellPrice = 0.0;
+        private int sellQuantity = 0;
+        private double secondBuyPrice = 0.0;
+        private int secondBuyQuantity = 0;
+        private double secondSellPrice = 0.0;
+        private int secondSellQuantity = 0;
+        private double thirdBuyPrice = 0.0;
+        private int thirdBuyQuantity = 0;
+        private double thirdSellPrice = 0.0;
+        private int thirdSellQuantity = 0;
+        // We suppose to provide a default value for calendar. However, it may
+        // seem expensive. We will do it later during build.
+        private java.util.Calendar calendar = null;
+        private volatile boolean hasCalendarInitialized = false;
+
+        public Builder(Code code, Symbol symbol) {
+            this.code = code;
+            this.symbol = symbol;
+        }
+
+        /**
+         * @param name the name to set
+         */
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        /**
+         * @param board the board to set
+         */
+        public Builder board(Board board) {
+            this.board = board;
+            return this;
+        }
+
+        /**
+         * @param industry the industry to set
+         */
+        public Builder industry(Industry industry) {
+            this.industry = industry;
+            return this;
+        }
+
+        /**
+         * @param prevPrice the prevPrice to set
+         */
+        public Builder prevPrice(double prevPrice) {
+            this.prevPrice = prevPrice;
+            return this;
+        }
+
+        /**
+         * @param openPrice the openPrice to set
+         */
+        public Builder openPrice(double openPrice) {
+            this.openPrice = openPrice;
+            return this;
+        }
+
+        /**
+         * @param lastPrice the lastPrice to set
+         */
+        public Builder lastPrice(double lastPrice) {
+            this.lastPrice = lastPrice;
+            return this;
+        }
+
+        /**
+         * @param highPrice the highPrice to set
+         */
+        public Builder highPrice(double highPrice) {
+            this.highPrice = highPrice;
+            return this;
+        }
+
+        /**
+         * @param lowPrice the lowPrice to set
+         */
+        public Builder lowPrice(double lowPrice) {
+            this.lowPrice = lowPrice;
+            return this;
+        }
+
+        /**
+         * @param volume the volume to set
+         */
+        public Builder volume(long volume) {
+            this.volume = volume;
+            return this;
+        }
+
+        /**
+         * @param changePrice the changePrice to set
+         */
+        public Builder changePrice(double changePrice) {
+            this.changePrice = changePrice;
+            return this;
+        }
+
+        /**
+         * @param changePricePercentage the changePricePercentage to set
+         */
+        public Builder changePricePercentage(double changePricePercentage) {
+            this.changePricePercentage = changePricePercentage;
+            return this;
+        }
+
+        /**
+         * @param lastVolume the lastVolume to set
+         */
+        public Builder lastVolume(int lastVolume) {
+            this.lastVolume = lastVolume;
+            return this;
+        }
+
+        /**
+         * @param buyPrice the buyPrice to set
+         */
+        public Builder buyPrice(double buyPrice) {
+            this.buyPrice = buyPrice;
+            return this;
+        }
+
+        /**
+         * @param buyQuantity the buyQuantity to set
+         */
+        public Builder buyQuantity(int buyQuantity) {
+            this.buyQuantity = buyQuantity;
+            return this;
+        }
+
+        /**
+         * @param sellPrice the sellPrice to set
+         */
+        public Builder sellPrice(double sellPrice) {
+            this.sellPrice = sellPrice;
+            return this;
+        }
+
+        /**
+         * @param sellQuantity the sellQuantity to set
+         */
+        public Builder sellQuantity(int sellQuantity) {
+            this.sellQuantity = sellQuantity;
+            return this;
+        }
+
+        /**
+         * @param secondBuyPrice the secondBuyPrice to set
+         */
+        public Builder secondBuyPrice(double secondBuyPrice) {
+            this.secondBuyPrice = secondBuyPrice;
+            return this;
+        }
+
+        /**
+         * @param secondBuyQuantity the secondBuyQuantity to set
+         */
+        public Builder secondBuyQuantity(int secondBuyQuantity) {
+            this.secondBuyQuantity = secondBuyQuantity;
+            return this;
+        }
+
+        /**
+         * @param secondSellPrice the secondSellPrice to set
+         */
+        public Builder secondSellPrice(double secondSellPrice) {
+            this.secondSellPrice = secondSellPrice;
+            return this;
+        }
+
+        /**
+         * @param secondSellQuantity the secondSellQuantity to set
+         */
+        public Builder secondSellQuantity(int secondSellQuantity) {
+            this.secondSellQuantity = secondSellQuantity;
+            return this;
+        }
+
+        /**
+         * @param thirdBuyPrice the thirdBuyPrice to set
+         */
+        public Builder thirdBuyPrice(double thirdBuyPrice) {
+            this.thirdBuyPrice = thirdBuyPrice;
+            return this;
+        }
+
+        /**
+         * @param thirdBuyQuantity the thirdBuyQuantity to set
+         */
+        public Builder thirdBuyQuantity(int thirdBuyQuantity) {
+            this.thirdBuyQuantity = thirdBuyQuantity;
+            return this;
+        }
+
+        /**
+         * @param thirdSellPrice the thirdSellPrice to set
+         */
+        public Builder thirdSellPrice(double thirdSellPrice) {
+            this.thirdSellPrice = thirdSellPrice;
+            return this;
+        }
+
+        /**
+         * @param thirdSellQuantity the thirdSellQuantity to set
+         */
+        public Builder thirdSellQuantity(int thirdSellQuantity) {
+            this.thirdSellQuantity = thirdSellQuantity;
+            return this;
+        }
+
+        /**
+         * @param calendar the calendar to set
+         */
+        public Builder calendar(java.util.Calendar calendar) {
+            this.calendar = calendar;
+            this.hasCalendarInitialized = true;
+            return this;
+        }
+
+        public Stock build() {
+            if (hasCalendarInitialized == false) {
+                // If we haven't initialized calendar before, do it right now.
+                this.calendar = Calendar.getInstance();
+            }
+            return new Stock(this);
+        }
+    }
+
     /** Creates a new instance of Stock */
+    private Stock(Builder builder) {
+        this(
+            builder.code,
+            builder.symbol,
+            builder.name,
+            builder.board,
+            builder.industry,
+            builder.prevPrice,
+            builder.openPrice,
+            builder.lastPrice,
+            builder.highPrice,
+            builder.lowPrice,
+            builder.volume,
+            builder.changePrice,
+            builder.changePricePercentage,
+            builder.lastVolume,
+            builder.buyPrice,
+            builder.buyQuantity,
+            builder.sellPrice,
+            builder.sellQuantity,
+            builder.secondBuyPrice,
+            builder.secondBuyQuantity,
+            builder.secondSellPrice,
+            builder.secondSellQuantity,
+            builder.thirdBuyPrice,
+            builder.thirdBuyQuantity,
+            builder.thirdSellPrice,
+            builder.thirdSellQuantity,
+            builder.calendar
+            );
+    }
+    
     public Stock(
         Code code,
         Symbol symbol,
@@ -85,7 +372,9 @@ public class Stock {
         this.thirdSellQuantity = thirdSellQuantity;
         this.calendar = calendar;
     }
-    
+
+    // I didn't make this construcotr private. As I would like to make user able
+    // to construct Stock either through this constructor or Builder.
     public Stock(Stock stock) {
         this.code = stock.code;
         this.symbol = stock.symbol;
