@@ -35,6 +35,8 @@ import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.ListCellRenderer;
+import org.yccheok.jstock.engine.Country;
+import org.yccheok.jstock.gui.JStockOptions;
 import org.yccheok.jstock.gui.MainFrame;
 import org.yccheok.jstock.gui.Utils;
 import org.yccheok.jstock.internationalization.MessagesBundle;
@@ -167,7 +169,8 @@ public class PortfolioJDialog extends javax.swing.JDialog {
 
         boolean needToReload = false;
         final MainFrame mainFrame = MainFrame.getInstance();
-        if (mainFrame.getJStockOptions().getPortfolioName().equals(oldPortfolioName)) {
+        final JStockOptions jStockOptions = mainFrame.getJStockOptions();
+        if (jStockOptions.getPortfolioName(jStockOptions.getCountry()).equals(oldPortfolioName)) {
             needToReload = true;
         }
 
@@ -204,7 +207,7 @@ public class PortfolioJDialog extends javax.swing.JDialog {
             else
             {
                 if (needToReload) {
-                    mainFrame.getJStockOptions().setPortfolioName(newPortfolioName);                    
+                    jStockOptions.setPortfolioName(jStockOptions.getCountry(), newPortfolioName);
                 }
                 init();
             }
@@ -225,7 +228,8 @@ public class PortfolioJDialog extends javax.swing.JDialog {
             return;
         }
         final MainFrame mainFrame = MainFrame.getInstance();
-        if (mainFrame.getJStockOptions().getPortfolioName().equals(selectedValue)) {
+        final JStockOptions jStockOptions = mainFrame.getJStockOptions();
+        if (jStockOptions.getPortfolioName(jStockOptions.getCountry()).equals(selectedValue)) {
             JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_cannot_delete_current_active_portflio"), MessagesBundle.getString("warning_title_cannot_delete_current_active_portflio"), JOptionPane.WARNING_MESSAGE);
             return;
         }
@@ -296,7 +300,9 @@ public class PortfolioJDialog extends javax.swing.JDialog {
             // Get item index
             final int index = list.locationToIndex(evt.getPoint());
             final String portfolio = list.getModel().getElementAt(index).toString();
-            if (MainFrame.getInstance().getJStockOptions().getPortfolioName().equals(portfolio) == false) {
+            final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+            final Country country = jStockOptions.getCountry();
+            if (jStockOptions.getPortfolioName(country).equals(portfolio) == false) {
                 MainFrame.getInstance().selectActivePortfolio(portfolio);
                 // Ensure Bold effect on active portfolio.    
                 this.jList1.repaint();
@@ -320,7 +326,8 @@ public class PortfolioJDialog extends javax.swing.JDialog {
                 Component component = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (component != null && value != null) {
                     final MainFrame mainFrame = MainFrame.getInstance();
-                    final String portfolioName = mainFrame.getJStockOptions().getPortfolioName();
+                    final JStockOptions jStockOptions = mainFrame.getJStockOptions();
+                    final String portfolioName = jStockOptions.getPortfolioName(jStockOptions.getCountry());
 
                     if (value.toString().equals(portfolioName)) {
                         final Font oldFont = component.getFont();
