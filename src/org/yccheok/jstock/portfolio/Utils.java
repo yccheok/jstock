@@ -221,11 +221,89 @@ public class Utils {
     public static void removeMeaninglessRecords(DepositSummary depositSummary) {
         for (int i = 0; i < depositSummary.size(); i++) {
             Deposit deposit = depositSummary.get(i);
-            if (deposit.getAmount() <= 0.0) {
+            if (essentiallyEqual(deposit.getAmount(), 0.0)) {
                 // Remove meaningless record.
                 depositSummary.remove(deposit);
                 i--;
             }
         }
     }
+
+    /**
+     * Returns total deposit from cash summary.
+     *
+     * @param cashSummary the cash summary
+     * @return total deposit from cash summary
+     */
+    public static double getTotalDeposit(DepositSummary cashSummary) {
+        final int size = cashSummary.size();
+        double totalDeposit = 0.0;
+        for (int i = 0; i < size; i++) {
+            final Deposit deposit = cashSummary.get(i);
+            final double amount = deposit.getAmount();
+            if (definitelyGreaterThan(amount, 0.0)) {
+                totalDeposit += amount;
+            }
+        }
+        return totalDeposit;
+    }
+
+    /**
+     * Returns total withdraw from cash summary.
+     *
+     * @param cashSummary the cash summary
+     * @return total withdraw from cash summary
+     */
+    public static double getTotalWithdraw(DepositSummary cashSummary) {
+        final int size = cashSummary.size();
+        double totalWidthdraw = 0.0;
+        for (int i = 0; i < size; i++) {
+            final Deposit withdraw = cashSummary.get(i);
+            final double amount = withdraw.getAmount();
+            if (definitelyLessThan(amount, 0.0)) {
+                totalWidthdraw += amount;
+            }
+        }
+        return totalWidthdraw;
+    }
+
+    /**
+     * Returns true if the two double values is essentially equal.
+     *
+     * @param a first double value
+     * @param b second double value
+     * @return true if the two double value is essentially equal
+     */
+    public static boolean essentiallyEqual(double a, double b)
+    {
+        return Math.abs(a - b) <= ( (Math.abs(a) > Math.abs(b) ? Math.abs(b) : Math.abs(a)) * EPSILON);
+    }
+
+    /**
+     * Returns true if the a is definitely greater than b.
+     *
+     * @param a first double value
+     * @param b second double value
+     * @return true if the a is definitely greater than b
+     */
+    public static boolean definitelyGreaterThan(double a, double b)
+    {
+        return (a - b) > ( (Math.abs(a) < Math.abs(b) ? Math.abs(b) : Math.abs(a)) * EPSILON);
+    }
+
+    /**
+     * Returns true if the a is definitely lesser than b.
+     *
+     * @param a first double value
+     * @param b second double value
+     * @return true if the a is definitely lesser than b
+     */
+    public static boolean definitelyLessThan(double a, double b)
+    {
+        return (b - a) > ( (Math.abs(a) < Math.abs(b) ? Math.abs(b) : Math.abs(a)) * EPSILON);
+    }
+
+    // 0.00000001 is a magic number. I have 0 idea what I should have for this
+    // value.
+    private static final double EPSILON = 0.00000001;
 }
