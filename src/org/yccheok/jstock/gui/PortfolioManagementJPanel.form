@@ -260,7 +260,7 @@
               <Image iconType="3" name="/images/16x16/money.png"/>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="org/yccheok/jstock/data/gui.properties" key="PortfolioManagementJPanel_Deposit..." replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="org/yccheok/jstock/data/gui.properties" key="PortfolioManagementJPanel_Cash..." replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Events>

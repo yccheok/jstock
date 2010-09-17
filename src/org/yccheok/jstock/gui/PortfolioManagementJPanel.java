@@ -240,7 +240,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         jPanel2.add(jButton3);
 
         jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/money.png"))); // NOI18N
-        jButton4.setText(bundle.getString("PortfolioManagementJPanel_Deposit...")); // NOI18N
+        jButton4.setText(bundle.getString("PortfolioManagementJPanel_Cash...")); // NOI18N
         jButton4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton4ActionPerformed(evt);
@@ -1062,7 +1062,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         JMenuItem menuItem = null;
 
-        menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("PortfolioManagement_Deposit..."), this.getImageIcon("/images/16x16/money.png"));
+        menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("PortfolioManagementJPanel_Cash..."), this.getImageIcon("/images/16x16/money.png"));
 
         menuItem.addActionListener(new ActionListener() {
             @Override
@@ -1232,7 +1232,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         popup.addSeparator();
 
-        menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("PortfolioManagement_Deposit..."), this.getImageIcon("/images/16x16/money.png"));
+        menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("PortfolioManagementJPanel_Cash..."), this.getImageIcon("/images/16x16/money.png"));
 
         menuItem.addActionListener(new ActionListener() {
             @Override
