@@ -3,6 +3,7 @@ Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
 JStock 1.0.5r - ????-??-?
   Feature: Remember position of portfolio horizontal split bar. (#3060396)
+  Feature: Last selected portfolio should be per country basic. (#3062599)
   Bugfix:  Yahoo! Finance no longer provide current information for Dow Jones
            Index. We will be getting the information from Google Finance.
   Bugfix:  Prevent most stocks from returning 0 for Buy and Sell price.
