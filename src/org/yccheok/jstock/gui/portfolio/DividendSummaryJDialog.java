@@ -93,7 +93,7 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
         jXHeader1.setDescription(bundle.getString("DividendSummaryJDialog_Description")); // NOI18N
         jXHeader1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/32x32/money2.png"))); // NOI18N
         jXHeader1.setTitle(bundle.getString("DividendSummaryJDialog_Dividend")); // NOI18N
-        getContentPane().add(jXHeader1, java.awt.BorderLayout.PAGE_START);
+        getContentPane().add(jXHeader1, java.awt.BorderLayout.NORTH);
 
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/apply.png"))); // NOI18N
         jButton1.setText(bundle.getString("DividendSummary_OK")); // NOI18N
@@ -113,7 +113,7 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
         });
         jPanel2.add(jButton2);
 
-        getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_END);
+        getContentPane().add(jPanel2, java.awt.BorderLayout.SOUTH);
 
         jPanel1.setLayout(new java.awt.BorderLayout(5, 5));
 
