@@ -19,6 +19,7 @@
 
 package org.yccheok.jstock.gui.portfolio;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -66,14 +67,24 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
+        jPanel5 = new javax.swing.JPanel();
+        jPanel7 = new javax.swing.JPanel();
+        jPanel4 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        jPanel8 = new javax.swing.JPanel();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jPanel6 = new javax.swing.JPanel();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
-        setTitle(bundle.getString("DepositSummaryJDialog_CashDeposit")); // NOI18N
+        setTitle(bundle.getString("DepositSummaryJDialog_CashDepositAndWithdraw")); // NOI18N
         setResizable(false);
         addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -84,8 +95,8 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
 
         jXHeader1.setDescription(bundle.getString("DepositSummaryJDialog_Description")); // NOI18N
         jXHeader1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/32x32/money.png"))); // NOI18N
-        jXHeader1.setTitle(bundle.getString("DepositSummaryJDialog_Deposit")); // NOI18N
-        getContentPane().add(jXHeader1, java.awt.BorderLayout.PAGE_START);
+        jXHeader1.setTitle(bundle.getString("DepositSummaryJDialog_Cash")); // NOI18N
+        getContentPane().add(jXHeader1, java.awt.BorderLayout.NORTH);
 
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/apply.png"))); // NOI18N
         jButton1.setText(bundle.getString("DepositSummaryJDialog_OK")); // NOI18N
@@ -105,7 +116,7 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
         });
         jPanel1.add(jButton2);
 
-        getContentPane().add(jPanel1, java.awt.BorderLayout.PAGE_END);
+        getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
         jPanel2.setLayout(new java.awt.BorderLayout(5, 5));
 
@@ -114,7 +125,7 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
         jTable1.setModel(new DepositSummaryTableModel(this.depositSummary));
         org.yccheok.jstock.gui.table.CurrencyRenderer currencyRenderer = new org.yccheok.jstock.gui.table.CurrencyRenderer();
         currencyRenderer.setHorizontalAlignment(org.yccheok.jstock.gui.table.CurrencyRenderer.LEFT);
-        jTable1.setDefaultEditor(Double.class, new org.yccheok.jstock.gui.table.NonNegativeEmptyDoubleEditor());
+        jTable1.setDefaultEditor(Double.class, new org.yccheok.jstock.gui.table.NonEmptyDoubleEditor());
         jTable1.setDefaultRenderer(Double.class, currencyRenderer);
         // JTableCustomizer.setEditorForRow(jTable1, 1);
         // Do not use JTableCustomizer. We need to have our own implementation to decide 
@@ -136,6 +147,48 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
 
         jPanel2.add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
+        jPanel5.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 3, 1, 3));
+        jPanel5.setLayout(new java.awt.BorderLayout());
+
+        jPanel7.setLayout(new java.awt.BorderLayout(2, 0));
+
+        jPanel4.setLayout(new java.awt.GridLayout(2, 1, 2, 2));
+
+        jLabel2.setText(bundle.getString("DepositSummaryJDialog_Deposit")); // NOI18N
+        jPanel4.add(jLabel2);
+
+        jLabel1.setText(bundle.getString("DepositSummary_Withdraw")); // NOI18N
+        jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jPanel4.add(jLabel1);
+
+        jPanel7.add(jPanel4, java.awt.BorderLayout.WEST);
+
+        jPanel8.setLayout(new java.awt.GridLayout(2, 1, 2, 2));
+
+        jLabel5.setFont(jLabel5.getFont().deriveFont(jLabel5.getFont().getStyle() | java.awt.Font.BOLD));
+        jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+        jPanel8.add(jLabel5);
+
+        jLabel3.setFont(jLabel3.getFont().deriveFont(jLabel3.getFont().getStyle() | java.awt.Font.BOLD));
+        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+        jPanel8.add(jLabel3);
+
+        jPanel7.add(jPanel8, java.awt.BorderLayout.EAST);
+
+        jPanel5.add(jPanel7, java.awt.BorderLayout.WEST);
+
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 2, 0));
+
+        jLabel4.setText(bundle.getString("DepositSummaryJDialog_Total")); // NOI18N
+        jPanel6.add(jLabel4);
+
+        jLabel6.setFont(jLabel6.getFont().deriveFont(jLabel6.getFont().getStyle() | java.awt.Font.BOLD));
+        jPanel6.add(jLabel6);
+
+        jPanel5.add(jPanel6, java.awt.BorderLayout.EAST);
+
+        jPanel2.add(jPanel5, java.awt.BorderLayout.SOUTH);
+
         jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/filenew.png"))); // NOI18N
         jButton3.setText(bundle.getString("DepositSummaryJDialog_New")); // NOI18N
         jButton3.addActionListener(new java.awt.event.ActionListener() {
@@ -155,12 +208,6 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
         jPanel3.add(jButton4);
 
         jPanel2.add(jPanel3, java.awt.BorderLayout.PAGE_START);
-
-        jLabel1.setForeground(new java.awt.Color(0, 0, 255));
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText(getDepositSummaryText());
-        jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jPanel2.add(jLabel1, java.awt.BorderLayout.SOUTH);
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
@@ -226,8 +273,16 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jTable1PropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jTable1PropertyChange
-        // TODO add your handling code here:
-        this.jLabel1.setText(this.getDepositSummaryText());
+        // Whenever there is data change, update cash summary information.
+        final double totalDeposit = Utils.getTotalDeposit(depositSummary);
+        final double totalWithdraw = Utils.getTotalWithdraw(depositSummary);
+        final double total = depositSummary.getTotal();
+        jLabel5.setForeground(org.yccheok.jstock.gui.Utils.getColor(totalDeposit, 0.0));
+        jLabel3.setForeground(org.yccheok.jstock.gui.Utils.getColor(totalWithdraw, 0.0));
+        jLabel6.setForeground(org.yccheok.jstock.gui.Utils.getColor(total, 0.0));
+        jLabel5.setText(Utils.currencyNumberFormat(totalDeposit));
+        jLabel3.setText(Utils.currencyNumberFormat(totalWithdraw));
+        jLabel6.setText(Utils.currencyNumberFormat(total));
     }//GEN-LAST:event_jTable1PropertyChange
 
     private void addNewDeposit() {
@@ -380,9 +435,19 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
     private org.jdesktop.swingx.JXHeader jXHeader1;
