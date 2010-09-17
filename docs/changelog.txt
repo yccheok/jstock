@@ -2,6 +2,7 @@ This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
 JStock 1.0.5r - ????-??-?
+  Feature: Enable cash withdrawal by entering -ve amount. (#2924161)
   Feature: Remember position of portfolio horizontal split bar. (#3060396)
   Feature: Last selected portfolio should be per country basic. (#3062599)
   Bugfix:  Yahoo! Finance no longer provide current information for Dow Jones
