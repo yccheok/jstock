@@ -474,6 +474,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             }
         }
     
+        @Override
         public void mouseMoved(MouseEvent evt) {
             TableColumn col = null;
             JTableHeader header = (JTableHeader)evt.getSource();
@@ -584,6 +585,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         systemTrayAlertPool = Executors.newFixedThreadPool(1);        
         
         SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 jButton1.setEnabled(true);
                 jButton2.setEnabled(false);            
@@ -751,10 +753,38 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         MainFrame.getInstance().setStatusBar(true, message);
     }
 
-    public void update(RealTimeStockMonitor monitor, final java.util.List<Stock> stocks) {
+    private void update(RealTimeStockMonitor monitor, final java.util.List<Stock> stocks) {
         if (this.stop_button_pressed) {
             return;
         }
+
+        // Special handling for China stock market.
+        if (org.yccheok.jstock.engine.Utils.isSymbolImmutable()) {
+            // We need to ignore symbol names given by stock server.
+            // Replace them with database's.
+            for (int i = 0, size = stocks.size(); i < size; i++) {
+                final Stock stock = stocks.get(i);
+                Stock new_stock = stock;
+
+                // Use local variable to ensure thread safety.
+                final StockCodeAndSymbolDatabase symbol_database = MainFrame.getInstance().getStockCodeAndSymbolDatabase();
+
+                if (symbol_database != null) {
+                    final Symbol symbol = symbol_database.codeToSymbol(stock.getCode());
+                    if (symbol != null) {
+                        new_stock = new_stock.deriveStock(symbol);
+                    } else {
+                        // Shouldn't be null. Let's give some warning on this.
+                        log.error("Wrong stock code " + stock.getCode() + " given by stock server.");
+                    }
+                }
+
+                if (stock != new_stock) {
+                    stocks.set(i, new_stock);
+                }
+            }
+        }
+
         if (stocks.size() > 0)
         {
             final String template = GUIBundle.getString("IndicatorScannerJPanel_IndicatorScannerIsScanning..._template");
