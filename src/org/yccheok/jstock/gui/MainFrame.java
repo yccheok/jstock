@@ -2878,7 +2878,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         /* Hard core fix. */
         if (this.jStockOptions.getScanningSpeed() == 0) {
-            this.jStockOptions.setScanningSpeed(1000);
+            this.jStockOptions.setScanningSpeed(5000);
         }
                 
         final String proxyHost = this.jStockOptions.getProxyServer();
