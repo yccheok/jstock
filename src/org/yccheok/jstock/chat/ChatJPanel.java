@@ -46,6 +46,7 @@ import org.jivesoftware.smack.packet.Presence;
 import org.yccheok.jstock.chat.ChatServiceManager.State;
 import org.yccheok.jstock.gui.JStockOptions;
 import org.yccheok.jstock.gui.MainFrame;
+import org.yccheok.jstock.internationalization.GUIBundle;
 
 /**
  *
@@ -315,7 +316,7 @@ public class ChatJPanel extends javax.swing.JPanel {
 
             @Override
             public void run() {
-                jLabel1.setToolTipText("Not connected");
+                jLabel1.setToolTipText(GUIBundle.getString("ChatJPanel_NotConnected"));
                 jLabel1.setIcon(connectingIcon);
             }
 
@@ -334,7 +335,7 @@ public class ChatJPanel extends javax.swing.JPanel {
         {
             jLabel1.setEnabled(false);
             jLabel1.setText(MainFrame.getInstance().getJStockOptions().getChatUsername());
-            jLabel1.setToolTipText("Not connected");
+            jLabel1.setToolTipText(GUIBundle.getString("ChatJPanel_NotConnected"));
         }
     }
 
@@ -441,7 +442,7 @@ public class ChatJPanel extends javax.swing.JPanel {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    jLabel1.setToolTipText("Connecting to chat server...");
+                    jLabel1.setToolTipText(GUIBundle.getString("ChatJPanel_ConnectingToChatServer..."));
                     if (!firstTime) {
                         // Not sure why. Having the JSplitPane resizeWeight and all JList
                         // minimum, maximum, preferred size being specified, the divider position
@@ -458,7 +459,7 @@ public class ChatJPanel extends javax.swing.JPanel {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    jLabel1.setToolTipText("Connected");
+                    jLabel1.setToolTipText(GUIBundle.getString("ChatJPanel_Connected"));
                     jLabel1.setText(MainFrame.getInstance().getJStockOptions().getChatUsername());
                 }
             });
@@ -468,7 +469,7 @@ public class ChatJPanel extends javax.swing.JPanel {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    jLabel1.setToolTipText("Creating new account...");
+                    jLabel1.setToolTipText(GUIBundle.getString("ChatJPanel_CreatingNewAccount..."));
                 }
             });
             break;
@@ -477,7 +478,7 @@ public class ChatJPanel extends javax.swing.JPanel {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    jLabel1.setToolTipText("Creating new room...");                    
+                    jLabel1.setToolTipText(GUIBundle.getString("ChatJPanel_CreatingNewRoom..."));
                 }
             });
             break;
@@ -492,7 +493,7 @@ public class ChatJPanel extends javax.swing.JPanel {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    jLabel1.setToolTipText("Room created");
+                    jLabel1.setToolTipText(GUIBundle.getString("ChatJPanel_RoomCreated"));
                     jLabel1.setIcon(connectedIcon);
                     ChatJPanel.this.addChannel(Utils.getRoomName(MainFrame.getInstance().getJStockOptions().getCountry()));
                 }
