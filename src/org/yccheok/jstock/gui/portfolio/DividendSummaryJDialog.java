@@ -29,6 +29,8 @@ import java.text.MessageFormat;
 import java.util.Arrays;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.gui.JTableUtilities;
 import org.yccheok.jstock.gui.MainFrame;
@@ -162,8 +164,10 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
 
         jTable1.setModel(new DividendSummaryTableModel(this.dividendSummary));
         org.yccheok.jstock.gui.table.CurrencyRenderer currencyRenderer = new org.yccheok.jstock.gui.table.CurrencyRenderer();
-        currencyRenderer.setHorizontalAlignment(org.yccheok.jstock.gui.table.CurrencyRenderer.LEFT);
-        jTable1.setDefaultEditor(Double.class, new org.yccheok.jstock.gui.table.NonNegativeEmptyDoubleEditor());
+        org.yccheok.jstock.gui.table.NonNegativeEmptyDoubleEditor currencyEditor = new org.yccheok.jstock.gui.table.NonNegativeEmptyDoubleEditor();
+        currencyRenderer.setHorizontalAlignment(org.yccheok.jstock.gui.table.CurrencyRenderer.RIGHT);
+        ((JTextField)currencyEditor.getComponent()).setHorizontalAlignment(SwingConstants.RIGHT);
+        jTable1.setDefaultEditor(Double.class, currencyEditor);
         jTable1.setDefaultRenderer(Double.class, currencyRenderer);
         jTable1.setDefaultEditor(Stock.class, new org.yccheok.jstock.gui.table.StockEditor(this.portfolioManagementJPanel.getStocksFromPortfolios()));
         jTable1.setDefaultRenderer(Stock.class, new StockRenderer());

@@ -29,6 +29,8 @@ import java.text.MessageFormat;
 import java.util.Arrays;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import org.yccheok.jstock.gui.JTableUtilities;
 import org.yccheok.jstock.gui.MainFrame;
 import org.yccheok.jstock.internationalization.GUIBundle;
@@ -84,7 +86,7 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
-        setTitle(bundle.getString("DepositSummaryJDialog_CashDepositAndWithdraw")); // NOI18N
+        setTitle(bundle.getString("DepositSummaryJDialog_CashDepositAndWithdrawal")); // NOI18N
         setResizable(false);
         addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -124,8 +126,11 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
 
         jTable1.setModel(new DepositSummaryTableModel(this.depositSummary));
         org.yccheok.jstock.gui.table.CurrencyRenderer currencyRenderer = new org.yccheok.jstock.gui.table.CurrencyRenderer();
-        currencyRenderer.setHorizontalAlignment(org.yccheok.jstock.gui.table.CurrencyRenderer.LEFT);
-        jTable1.setDefaultEditor(Double.class, new org.yccheok.jstock.gui.table.NonEmptyDoubleEditor());
+        org.yccheok.jstock.gui.table.NonEmptyDoubleEditor currencyEditor = new org.yccheok.jstock.gui.table.NonEmptyDoubleEditor();
+        currencyRenderer.setHorizontalAlignment(org.yccheok.jstock.gui.table.CurrencyRenderer.RIGHT);
+        ((JTextField)currencyEditor.getComponent()).setHorizontalAlignment(SwingConstants.RIGHT);
+
+        jTable1.setDefaultEditor(Double.class, currencyEditor);
         jTable1.setDefaultRenderer(Double.class, currencyRenderer);
         // JTableCustomizer.setEditorForRow(jTable1, 1);
         // Do not use JTableCustomizer. We need to have our own implementation to decide 
