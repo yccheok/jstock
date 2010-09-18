@@ -32,6 +32,7 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.text.*;
 import org.yccheok.jstock.engine.Country;
 import org.yccheok.jstock.engine.StockServerFactory;
+import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.internationalization.MessagesBundle;
 import org.yccheok.jstock.network.ProxyDetector;
 
@@ -172,7 +173,7 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    final String text = StockServerFactoryJRadioButton.toReadableText(stockServerJRadioButton.getStockServerFactory()) + " is being used as primary server";
+                    final String text = MessageFormat.format(GUIBundle.getString("OptionsNetworkJPanel_IsBeingUsedAsPrimaryServer_template"), StockServerFactoryJRadioButton.toReadableText(stockServerJRadioButton.getStockServerFactory()));
                     label.setText(text);
                 }
                 
@@ -181,7 +182,7 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
             if (stockServerFactory.getClass() == jStockOptions.getPrimaryStockServerFactoryClass(country)) {
                 selected = true;
                 stockServerJRadioButton.setSelected(true);
-                final String text = StockServerFactoryJRadioButton.toReadableText(stockServerJRadioButton.getStockServerFactory()) + " is being used as primary server";
+                final String text = MessageFormat.format(GUIBundle.getString("OptionsNetworkJPanel_IsBeingUsedAsPrimaryServer_template"), StockServerFactoryJRadioButton.toReadableText(stockServerJRadioButton.getStockServerFactory()));
                 label.setText(text);
             }
             this.buttonGroup1.add(stockServerJRadioButton);
@@ -202,7 +203,7 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
         if (selected == false) {
             if (first != null) {
                 first.setSelected(true);
-                final String text = StockServerFactoryJRadioButton.toReadableText(first.getStockServerFactory()) + " is being used as primary server";
+                final String text = MessageFormat.format(GUIBundle.getString("OptionsNetworkJPanel_IsBeingUsedAsPrimaryServer_template"), StockServerFactoryJRadioButton.toReadableText(first.getStockServerFactory()));
                 label.setText(text);
             }
         }
