@@ -79,7 +79,8 @@ public class NewBrokingFirmJDialog extends javax.swing.JDialog {
         setResizable(false);
 
         jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/apply.png"))); // NOI18N
-        jButton2.setText("OK");
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
+        jButton2.setText(bundle.getString("NewBrokingFirmJDialog_OK")); // NOI18N
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
@@ -88,7 +89,7 @@ public class NewBrokingFirmJDialog extends javax.swing.JDialog {
         jPanel3.add(jButton2);
 
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/button_cancel.png"))); // NOI18N
-        jButton1.setText("Cancel");
+        jButton1.setText(bundle.getString("NewBrokingFirmJDialog_Cancel")); // NOI18N
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -98,13 +99,13 @@ public class NewBrokingFirmJDialog extends javax.swing.JDialog {
 
         getContentPane().add(jPanel3, java.awt.BorderLayout.SOUTH);
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Broking Firm"));
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("NewBrokingFirmJDialog_BrokingFirm"))); // NOI18N
 
-        jLabel3.setText("Logo");
+        jLabel3.setText(bundle.getString("NewBrokingFirmJDialog_Logo")); // NOI18N
 
-        jLabel1.setText("Name");
+        jLabel1.setText(bundle.getString("NewBrokingFirmJDialog_Name")); // NOI18N
 
-        jCheckBox1.setText("Use logo");
+        jCheckBox1.setText(bundle.getString("NewBrokingFirmJDialog_UseLogo")); // NOI18N
         jCheckBox1.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 jCheckBox1ItemStateChanged(evt);
