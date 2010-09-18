@@ -140,7 +140,7 @@ public class MutableStockCodeAndSymbolDatabase extends StockCodeAndSymbolDatabas
         this.codes.remove(code);
 
         if (this.symbolPinyinSearchEngine != null) {
-            ((PinyinTSTSearchEngine<Symbol>)this.symbolSearchEngine).remove(symbol);
+            ((PinyinTSTSearchEngine<Symbol>)this.symbolPinyinSearchEngine).remove(symbol);
         }
         ((TSTSearchEngine<Symbol>)this.symbolSearchEngine).remove(symbol);
         ((TSTSearchEngine<Code>)this.codeSearchEngine).remove(code);
@@ -200,7 +200,7 @@ public class MutableStockCodeAndSymbolDatabase extends StockCodeAndSymbolDatabas
         this.codes.add(code);
 
         if (this.symbolPinyinSearchEngine != null) {
-            ((PinyinTSTSearchEngine<Symbol>)this.symbolSearchEngine).put(symbol);
+            ((PinyinTSTSearchEngine<Symbol>)this.symbolPinyinSearchEngine).put(symbol);
         }
         ((TSTSearchEngine<Symbol>)this.symbolSearchEngine).put(symbol);
         ((TSTSearchEngine<Code>)this.codeSearchEngine).put(code);
