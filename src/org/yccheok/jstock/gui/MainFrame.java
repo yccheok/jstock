@@ -3653,8 +3653,9 @@ public class MainFrame extends javax.swing.JFrame {
 
         private void maybeShowPopup(MouseEvent e) {
             if (e.isPopupTrigger()) {
-                if(jTable1.getSelectedColumn() != -1)
+                if (jTable1.getSelectedRowCount() > 0) {
                     getMyJTablePopupMenu().show(e.getComponent(), e.getX(), e.getY());
+                }
             }
         }
     }
