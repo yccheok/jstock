@@ -4,6 +4,10 @@ Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 JStock 1.0.6 - ????-??-??
   Bugfix:  Even when there is no stock being selected in Stock Watchlist and
            Stock Indicator Scanner, right clicked menu is still shown.
+  Bugfix:  Provide a better usability experience, by doesn't not require user to
+           press ENTER, after finish editing. This will affect deposit dialog,
+           dividend dialog, stock database dialog, and property dialog for
+           stock indicator editor.
            
 JStock 1.0.5r - 2010-09-19
   Feature: Enable cash withdrawal by entering -ve amount. (#2924161)
