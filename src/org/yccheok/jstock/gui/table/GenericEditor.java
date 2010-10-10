@@ -48,10 +48,10 @@ public abstract class GenericEditor extends DefaultCellEditor {
 /* End modified by Cheok for jstock usage. */
 
     Class[] argTypes = new Class[]{String.class};
-	java.lang.reflect.Constructor constructor;
-	Object value;
+    java.lang.reflect.Constructor constructor;
+    Object value;
 
-	public GenericEditor() {
+    public GenericEditor() {
         super(new JTextField());
         getComponent().setName("Table.editor");
     }
@@ -62,15 +62,15 @@ public abstract class GenericEditor extends DefaultCellEditor {
     /* End modified by Cheok for jstock usage. */
 
     @Override
-	public boolean stopCellEditing() {
+    public boolean stopCellEditing() {
         String s = (String)super.getCellEditorValue();
-	    // Here we are dealing with the case where a user
-	    // has deleted the string value in a cell, possibly
-	    // after a failed validation. Return null, so that
-	    // they have the option to replace the value with
-	    // null or use escape to restore the original.
-	    // For Strings, return "" for backward compatibility.
-	    if ("".equals(s)) {
+        // Here we are dealing with the case where a user
+        // has deleted the string value in a cell, possibly
+        // after a failed validation. Return null, so that
+        // they have the option to replace the value with
+        // null or use escape to restore the original.
+        // For Strings, return "" for backward compatibility.
+        if ("".equals(s)) {
             if (isEmptyAllowed()) {
                 if (constructor.getDeclaringClass() == String.class) {
                     value = s;
@@ -81,15 +81,15 @@ public abstract class GenericEditor extends DefaultCellEditor {
                 ((JComponent)getComponent()).setBorder(new LineBorder(Color.red));
                 return false;
             }
-	    }
+        }
 
-	    try {
+        try {
             value = constructor.newInstance(new Object[]{s});
-	    }
-	    catch (Exception e) {
+        }
+        catch (Exception e) {
             ((JComponent)getComponent()).setBorder(new LineBorder(Color.red));
             return false;
-	    }
+        }
 
         /* Start modified by Cheok for jstock usage. */
         if (false == validate(value))
@@ -99,17 +99,17 @@ public abstract class GenericEditor extends DefaultCellEditor {
         }
         /* End modified by Cheok for jstock usage. */
 
-	    return super.stopCellEditing();
-	}
+        return super.stopCellEditing();
+    }
 
     @SuppressWarnings("unchecked")
     @Override
-	public Component getTableCellEditorComponent(JTable table, Object value,
+    public Component getTableCellEditorComponent(JTable table, Object value,
 						 boolean isSelected,
 						 int row, int column) {
-	    this.value = null;
-            ((JComponent)getComponent()).setBorder(new LineBorder(Color.black));
-	    try {
+        this.value = null;
+        ((JComponent)getComponent()).setBorder(new LineBorder(Color.black));
+        try {
             Class type = table.getColumnClass(column);
             // Since our obligation is to produce a value which is
             // assignable for the required type it is OK to use the
@@ -122,13 +122,13 @@ public abstract class GenericEditor extends DefaultCellEditor {
         }
 	    catch (Exception e) {
             return null;
-	    }
+        }
 
-	    return super.getTableCellEditorComponent(table, value, isSelected, row, column);
-	}
+        return super.getTableCellEditorComponent(table, value, isSelected, row, column);
+    }
 
     @Override
-	public Object getCellEditorValue() {
-	    return value;
-	}
+    public Object getCellEditorValue() {
+        return value;
+    }
 }
