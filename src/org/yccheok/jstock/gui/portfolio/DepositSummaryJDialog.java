@@ -31,6 +31,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.table.TableCellEditor;
 import org.yccheok.jstock.gui.JTableUtilities;
 import org.yccheok.jstock.gui.MainFrame;
 import org.yccheok.jstock.internationalization.GUIBundle;
@@ -244,6 +245,18 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jTable1KeyPressed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // Returns the active cell editor, which is null if the table is not
+        // currently editing. 
+        final TableCellEditor tableCellEditor = this.jTable1.getCellEditor();
+        if (tableCellEditor != null) {
+            // Save the value to table model.
+            final boolean status = tableCellEditor.stopCellEditing();
+            if (false == status) {
+                // User enters an invalid value. Prevent user from closing
+                // the dialog.
+                return;
+            }
+        }
         this.depositSummaryAfterPressingOK = this.depositSummary;
         Utils.removeMeaninglessRecords(this.depositSummaryAfterPressingOK);
         this.setVisible(false);
