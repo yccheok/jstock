@@ -66,7 +66,9 @@ public class GenericRenderer extends DefaultTableCellRenderer {
             }
         }
 
-        if(isSelected || hasFocus) return c;
+        if (isSelected || hasFocus) {
+            return c;
+        }
 
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
 
