@@ -21,8 +21,6 @@ package org.yccheok.jstock.gui.analysis;
 
 import java.awt.*;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  *
@@ -48,11 +46,24 @@ public class ObjectInspectorJFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
         setBounds((screenSize.width-265)/2, (screenSize.height-317)/2, 265, 317);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        this.sheet.stopCellEditing();
+        // Shall we just dispose the window and ignore returned value from sheet?
+        // Or shall we prompt user on his mistake and request him to make
+        // correction?
+        this.dispose();
+    }//GEN-LAST:event_formWindowClosing
        
     private ObjectInspectorJPanel createPropertySheetPanel(Object bean) {    
         final ObjectInspectorJPanel objectInspectorJPanel = new ObjectInspectorJPanel(bean);
@@ -66,9 +77,7 @@ public class ObjectInspectorJFrame extends javax.swing.JFrame {
     }
     
     private final ObjectInspectorJPanel sheet;
-        
-    private static final Log log = LogFactory.getLog(ObjectInspectorJFrame.class);
-    
+            
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
     
