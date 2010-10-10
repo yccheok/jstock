@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.DefaultCellEditor;
+import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -46,6 +47,7 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.RowFilter;
 import javax.swing.RowFilter.Entry;
+import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.AbstractTableModel;
@@ -291,6 +293,19 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
 
     /* OK button being pressed. */
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // Returns the active cell editor, which is null if the table is not
+        // currently editing. 
+        final TableCellEditor tableCellEditor = this.jTable2.getCellEditor();
+        if (tableCellEditor != null) {
+            // Save the value to table model.
+            final boolean status = tableCellEditor.stopCellEditing();
+            if (false == status) {
+                // User enters an invalid value. Prevent user from closing
+                // dialog.
+                return;
+            }
+        }
+
         final CodeSymbolTableModel model = (CodeSymbolTableModel)(jTable2.getModel());
         final List<Code> codes = model.getCodes();
         final List<Symbol> symbols = model.getSymbols();
@@ -708,62 +723,11 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
     }
             
     private class MyTableCellEditor extends DefaultCellEditor {    
-        private JFormattedTextField ftf;
         private final Class c;
 
         public MyTableCellEditor(Class c) {
-            super(new JFormattedTextField());
+            super(new JTextField());
             this.c = c;
-            ftf = (JFormattedTextField)getComponent();
-
-            ftf.setHorizontalAlignment(JTextField.TRAILING);
-            ftf.setFocusLostBehavior(JFormattedTextField.PERSIST);
-
-            //React when the user presses Enter while the editor is
-            //active.  (Tab is handled as specified by
-            //JFormattedTextField's focusLostBehavior property.)
-            ftf.getInputMap().put(KeyStroke.getKeyStroke(
-                                            KeyEvent.VK_ENTER, 0),
-                                            "check");
-            ftf.getActionMap().put("check", new AbstractAction() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    final CodeSymbolTableModel model1 = (CodeSymbolTableModel)(StockDatabaseJDialog.this.jTable1.getModel());
-                    final CodeSymbolTableModel model2 = (CodeSymbolTableModel)(StockDatabaseJDialog.this.jTable2.getModel());
-                    final String searchedText = ftf.getText().toUpperCase();
-                    
-                    final int modelIndex1 = model1.findCodeOrSymbol(searchedText);
-                    /* Compare Symbol to Symbol, Code to Code. */
-                    final int modelIndex2 = Code.class == MyTableCellEditor.this.c ? model2.findCode(searchedText) : model2.findSymbol(searchedText);
-                    boolean isValid = true;
-
-                    if (modelIndex1 >= 0) {
-                        if (searchedText.length() > 0) {
-                            if (searchedText.equalsIgnoreCase(ftf.getValue().toString()) == false) {
-                                //JOptionPane.showMessageDialog(StockDatabaseJDialog.this, searchedText + " is conflicting with stock exchange server database.", "Conflicting", JOptionPane.INFORMATION_MESSAGE);
-                                isValid = false;
-                            }
-                        }
-                    }
-                    if (modelIndex2 >= 0) {
-                        if (searchedText.length() > 0) {
-                            if (searchedText.equalsIgnoreCase(ftf.getValue().toString()) == false) {
-                                //JOptionPane.showMessageDialog(StockDatabaseJDialog.this, searchedText + " is conflicting with user defined database.", "Conflicting", JOptionPane.INFORMATION_MESSAGE);
-                                isValid = false;
-                            }
-                        }
-                    }
-                    if (isValid) {
-                        try {
-                            ftf.commitEdit();
-                        } catch (ParseException ex) {
-                            log.error(null, ex);
-                        }
-                    }
-
-                    ftf.postActionEvent(); //inform the editor
-                }
-            });
         }
 
         // Override to invoke setValue on the formatted text field.
@@ -771,25 +735,22 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         public Component getTableCellEditorComponent(JTable table,
                 Object value, boolean isSelected,
                 int row, int column) {
-            JFormattedTextField _ftf =
-                (JFormattedTextField)super.getTableCellEditorComponent(
-                    table, value, isSelected, row, column);
-            _ftf.setValue(value);
-            return _ftf;
+            ((JComponent)getComponent()).setBorder(new LineBorder(Color.black));
+            return super.getTableCellEditorComponent(table, value, isSelected, row, column);
         }
 
         // Override to ensure that the value remains an Integer.
         @Override
         public Object getCellEditorValue() {
-            JFormattedTextField _ftf = (JFormattedTextField)getComponent();
-            Object o = _ftf.getValue();
-            if (o == null) {
+            JTextField textField = (JTextField)getComponent();
+            String str = textField.getText();
+            if (str == null) {
                 return null;
             }
             try {
                 @SuppressWarnings("unchecked")
                 Method method = this.c.getMethod("newInstance", String.class);
-                return method.invoke(null, o.toString().toUpperCase());
+                return method.invoke(null, str.toUpperCase());
             } catch (Exception ex) {
                 log.error(null, ex);
             }
@@ -803,66 +764,88 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         //of this method so that everything gets cleaned up.
         @Override
         public boolean stopCellEditing() {
-            JFormattedTextField _ftf = (JFormattedTextField)getComponent();
-            final CodeSymbolTableModel model1 = (CodeSymbolTableModel)(StockDatabaseJDialog.this.jTable1.getModel());
-            final CodeSymbolTableModel model2 = (CodeSymbolTableModel)(StockDatabaseJDialog.this.jTable2.getModel());
-            final String searchedText = _ftf.getText().toUpperCase();
-            final int modelIndex1 = model1.findCodeOrSymbol(searchedText);
-            final int modelIndex2 = Code.class == MyTableCellEditor.this.c ? model2.findCode(searchedText) : model2.findSymbol(searchedText);
-            boolean isValid = true;
-
-            if (modelIndex1 >= 0) {
-                // We only take into consideration of string greater than 0. As
-                // we allow multiple empty lines within a table.
-                if (searchedText.length() > 0) {
-                    // CHEOK : I also not sure why need not check for (and why need to check for) ???
-                    // searchedText.equalsIgnoreCase(_ftf.getValue().toString())
-                    final String message = MessageFormat.format(MessagesBundle.getString("warning_message_duplicated_stock_template"), searchedText);
-                    final String title = MessagesBundle.getString("warning_title_duplicated_stock");
-                    JOptionPane.showMessageDialog(StockDatabaseJDialog.this, message, title, JOptionPane.INFORMATION_MESSAGE);
-                    selectStockExchangeServerDatabaseTable(modelIndex1);
-                    isValid = false;
-                }
+            final String string = ((String)super.getCellEditorValue()).toUpperCase();
+            if (0 == string.length()) {
+                // We are not interest to evaluate empty string. Return
+                // immediately.
+                return super.stopCellEditing();
             }
-            
-            if (modelIndex2 >= 0) {
-                // We only take into consideration of string greater than 0. As
-                // we allow multiple empty lines within a table.
-                if (searchedText.length() > 0) {
-                    // Imagine there is an item "123" at the first row of editable table,
-                    // and it is already being added into SymbolTableModel. We will come into this block,
-                    // when we double click on the particular row (which makes it into editable mode), and
-                    // then click on another row (which will invoke stopCellEditing). We do not have intention
-                    // to make any change on current content. Hence, we should do another checking, to ensure
-                    // we only pop up the warning message, if the content is being modified. _ftf.getValue().toString()
-                    // is the value before modification.
-                    if (searchedText.equalsIgnoreCase(_ftf.getValue().toString()) == false) {
-                        // There is modification being done and it is conflicting with SymbolTableModel.
-                        final String message = MessageFormat.format(MessagesBundle.getString("warning_message_duplicated_stock_template"), searchedText);
-                        final String title = MessagesBundle.getString("warning_title_duplicated_stock");
-                        JOptionPane.showMessageDialog(StockDatabaseJDialog.this, message, title, JOptionPane.INFORMATION_MESSAGE);
-                        selectUserDefinedDatabaseTable(modelIndex2);
-                        isValid = false;
+
+            final IndexEx indexEx = getIndexEx(string, c);
+            if (indexEx != null) {
+                if (indexEx.table == jTable2) {
+                    if (indexEx.index == jTable2.convertRowIndexToModel(jTable2.getEditingRow())) {
+                        // Is me myself lah! Ignore the validation rule.
+                        return super.stopCellEditing();
                     }
                 }
-            }
-            if (isValid) {
-                try {
-                    _ftf.commitEdit();
-                } catch (ParseException ex) {
-                    log.error(null, ex);
+                
+                ((JComponent)getComponent()).setBorder(new LineBorder(Color.red));
+                if (indexEx.table == jTable1) {
+                    selectStockExchangeServerDatabaseTable(indexEx.index);
+                } else {
+                    assert(indexEx.table == jTable2);
+                    selectUserDefinedDatabaseTable(indexEx.index);
                 }
-            }                    
+                // Warn the user.
+                final String message = MessageFormat.format(MessagesBundle.getString("warning_message_duplicated_stock_template"), string);
+                final String title = MessagesBundle.getString("warning_title_duplicated_stock");
+                JOptionPane.showMessageDialog(StockDatabaseJDialog.this, message, title, JOptionPane.INFORMATION_MESSAGE);
+                return false;
+            }
 
             return super.stopCellEditing();
         }
-
     }
 
     private String getTotalStockString() {
         return MessageFormat.format(GUIBundle.getString("StockDatabaseJDialog_TotalStock_template"), mutableStockCodeAndSymbolDatabase.getCodes().size());
     }
 
+    /**
+     * Returns first encountered row index based on the string. <code>null</code>
+     * if not found.
+     * 
+     * @param string The string
+     * @param c Code or Symbol class
+     * @return first encountered row index based on the string. <code>null</code>
+     * if not found
+     */
+    private IndexEx getIndexEx(String string, Class c) {
+        final CodeSymbolTableModel model1 = (CodeSymbolTableModel)(StockDatabaseJDialog.this.jTable1.getModel());
+        final int modelIndex1 = model1.findCodeOrSymbol(string);
+        if (modelIndex1 >= 0) {
+            return IndexEx.newInstance(modelIndex1, jTable1);
+        }
+
+        // Perform further checking.
+        final CodeSymbolTableModel model2 = (CodeSymbolTableModel)(StockDatabaseJDialog.this.jTable2.getModel());
+        final int modelIndex2 = Code.class == c ? model2.findCode(string) : model2.findSymbol(string);
+        if (modelIndex2 >= 0) {
+            return IndexEx.newInstance(modelIndex2, jTable2);
+        }
+
+        // Not found.
+        return null;
+    }
+
+    /**
+     * Carry 2 information, which are index, and table.
+     */
+    private static class IndexEx {
+        private IndexEx(int index, JTable table) {
+            this.index = index;
+            this.table = table;
+        }
+
+        public static IndexEx newInstance(int index, JTable table) {
+            return new IndexEx(index, table);
+        }
+
+        public final int index;
+        public final JTable table;
+    }
+    
     private MutableStockCodeAndSymbolDatabase mutableStockCodeAndSymbolDatabase = null;
     private MutableStockCodeAndSymbolDatabase result = null;
     
