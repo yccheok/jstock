@@ -21,10 +21,8 @@ package org.yccheok.jstock.engine;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * This class is used to suggest a list of items, based on given Pinyin prefix.
