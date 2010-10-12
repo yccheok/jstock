@@ -19,6 +19,7 @@
 
 package org.yccheok.jstock.engine;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -27,8 +28,7 @@ import java.util.List;
 import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * Retrieves stock market index information through Google Finance.
@@ -79,6 +79,8 @@ public class GoogleMarketServer implements MarketServer {
 
     private final class GoogleMarket implements Market {
         private final Map<Index, Stock> map = new EnumMap<Index, Stock>(Index.class);
+        // Will it be better if we make this as static?
+        private final ObjectMapper mapper = new ObjectMapper();
 
         public GoogleMarket() throws StockNotFoundException {            
             try {
@@ -96,12 +98,12 @@ public class GoogleMarketServer implements MarketServer {
                 final String respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(location);
                 // Google returns "// [ { "id": ... } ]".
                 // We need to turn them into "[ { "id": ... } ]".
-                final JSONArray jsonArray = new JSONArray(Utils.GoogleRespondToJSON(respond));
+                final List<Map> jsonArray = mapper.readValue(Utils.GoogleRespondToJSON(respond), List.class);
                 final List<Stock> stocks = new ArrayList<Stock>();
-                for (int i = 0, size = jsonArray.length(); i < size; i++) {
-                    final JSONObject jsonObject = jsonArray.getJSONObject(i);
-                    final double l_curr = Double.parseDouble(jsonObject.getString("l_cur").replace(",", ""));
-                    final double c = Double.parseDouble(jsonObject.getString("c").replace(",", ""));
+                for (int i = 0, size = jsonArray.size(); i < size; i++) {
+                    final Map<String, String> jsonObject = jsonArray.get(i);
+                    final double l_curr = Double.parseDouble(jsonObject.get("l_cur").replace(",", ""));
+                    final double c = Double.parseDouble(jsonObject.get("c").replace(",", ""));
                     // We ignore changePricePercentage. GoogleMarket doesn't
                     // need to return this value.
                     final Stock stock = new Stock.Builder(codes.get(i), Symbol.newInstance(codes.get(i).toString())).lastPrice(l_curr).changePrice(c).build();
@@ -113,7 +115,11 @@ public class GoogleMarketServer implements MarketServer {
                 }
             } catch (UnsupportedEncodingException ex) {
                 throw new StockNotFoundException(null, ex);
-            } catch (org.json.JSONException ex) {
+            } catch (IOException ex) {
+                throw new StockNotFoundException(null, ex);
+            } catch (Exception ex) {
+                // Jackson library may cause runtime exception if there is error
+                // in the JSON string.
                 throw new StockNotFoundException(null, ex);
             }
         }
