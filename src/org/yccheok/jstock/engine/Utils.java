@@ -448,6 +448,24 @@ public class Utils {
     }
 
     /**
+     * Returns JSON string, by parsing respond from Yahoo server.
+     *
+     * @param respond string returned from Yahoo server directly
+     * @return JSON string, by parsing respond from Yahoo server
+     */
+    public static String YahooRespondToJSON(String respond) {
+        final int beginIndex = respond.indexOf("{");
+        final int endIndex = respond.lastIndexOf("}");
+        if (beginIndex < 0) {
+            return "";
+        }
+        if (beginIndex > endIndex) {
+            return "";
+        }
+        return respond.substring(beginIndex, endIndex + 1);
+    }
+
+    /**
      * Returns an empty StockServer, which does nothing but always throw
      * StockNotFoundException.
      *
