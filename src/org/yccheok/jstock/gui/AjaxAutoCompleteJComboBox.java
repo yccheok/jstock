@@ -33,11 +33,16 @@ import org.yccheok.jstock.engine.AjaxYahooSearchEngineMonitor;
 import org.yccheok.jstock.engine.Observer;
 
 /**
+ * This is a combo box, which will provides a list of suggested stocks, by
+ * getting asynchronous Ajax search result from server.
  *
  * @author yccheok
  */
 public class AjaxAutoCompleteJComboBox extends JComboBox {
 
+    /**
+     * Create an instance of AjaxAutoCompleteJComboBox.
+     */
     public AjaxAutoCompleteJComboBox() {
         super();
         ajaxYahooSearchEngineMonitor.attach(getMonitorObserver());
@@ -103,6 +108,9 @@ public class AjaxAutoCompleteJComboBox extends JComboBox {
         };
     }
 
+    /**
+     * Stop any threading activities.
+     */
     public void stop() {
         ajaxYahooSearchEngineMonitor.stop();
     }

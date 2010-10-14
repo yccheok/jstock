@@ -46,7 +46,6 @@ public class AjaxYahooSearchEngine implements SearchEngine<AjaxYahooSearchEngine
     public List<ResultType> searchAll(String prefix) {
         final String respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(getURL(prefix));
         final String json = Utils.YahooRespondToJSON(respond);
-        System.out.println(json);
         try {
             final Holder value = mapper.readValue(json, Holder.class);
             // Shall I check value.ResultSet.Query against prefix?
