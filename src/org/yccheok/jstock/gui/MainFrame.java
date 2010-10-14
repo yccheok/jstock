@@ -3625,7 +3625,7 @@ public class MainFrame extends javax.swing.JFrame {
         public void mouseClicked(MouseEvent evt) {
             int[] rows = MainFrame.this.jTable1.getSelectedRows();
             
-            if(rows.length == 1) {
+            if (rows.length == 1) {
                 int row = rows[0];
                 
                 StockTableModel tableModel = (StockTableModel)jTable1.getModel();
