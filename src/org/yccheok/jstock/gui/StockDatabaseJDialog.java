@@ -29,22 +29,18 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
-import javax.swing.AbstractAction;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComponent;
-import javax.swing.JFormattedTextField;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.KeyStroke;
 import javax.swing.RowFilter;
 import javax.swing.RowFilter.Entry;
 import javax.swing.border.LineBorder;
@@ -97,8 +93,8 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         jScrollPane2 = new javax.swing.JScrollPane();
         jTable2 = new javax.swing.JTable();
         jPanel5 = new javax.swing.JPanel();
+        jComboBox1 = new AjaxAutoCompleteJComboBox();
         jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
         jPanel10 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
@@ -116,6 +112,11 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 formMouseClicked(evt);
+            }
+        });
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                formWindowClosed(evt);
             }
         });
 
@@ -180,6 +181,11 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
 
             jPanel2.add(jScrollPane2, java.awt.BorderLayout.CENTER);
 
+            jComboBox1.setEditable(true);
+            jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+            jComboBox1.setPreferredSize(new java.awt.Dimension(150, 24));
+            jPanel5.add(jComboBox1);
+
             jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/filenew.png"))); // NOI18N
             jButton1.setText(bundle.getString("StockDatabaseJDialog_New")); // NOI18N
             jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -188,15 +194,6 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
                 }
             });
             jPanel5.add(jButton1);
-
-            jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/editdelete.png"))); // NOI18N
-            jButton2.setText(bundle.getString("StockDatabaseJDialog_Delete")); // NOI18N
-            jButton2.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    jButton2ActionPerformed(evt);
-                }
-            });
-            jPanel5.add(jButton2);
 
             jPanel2.add(jPanel5, java.awt.BorderLayout.PAGE_START);
 
@@ -263,15 +260,6 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         clearAllTablesSelection();
     }//GEN-LAST:event_formMouseClicked
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-    // TODO add your handling code here:
-        addNewSymbol();
-    }//GEN-LAST:event_jButton1ActionPerformed
-
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        deleteSelectedUserDefinedDatabase();
-    }//GEN-LAST:event_jButton2ActionPerformed
-
     private void jTable2KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTable2KeyPressed
         if(KeyEvent.VK_DELETE == evt.getKeyCode()) {
             this.deleteSelectedUserDefinedDatabase();
@@ -317,18 +305,24 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         final int size = codes.size();
         for (int i = 0; i < size; i++) {
             final Code code = codes.get(i);
-            Symbol symbol = symbols.get(i);
-
-            if (code.toString().length() <= 0) {
+            // In fact, we shouldn't need to trim the string again, as
+            // MyTableCellEditor has done that for us. The code is here to fix
+            // old user-defined-database.xml, with possibility to have data
+            // begin and end with white space. This is because old version of
+            // JStock (1.0.5r) doesn't perform trimming.
+            final String codeStr = code.toString().trim();
+            if (codeStr.length() <= 0) {
                 continue;
             }
-            if (symbol.toString().length() <= 0) {
+            final Symbol symbol = symbols.get(i);
+            String symbolStr = symbol.toString().trim();
+            if (symbolStr.length() <= 0) {
                 /* We allow empty symbol to be entered by user. In 0 length
                  * symbol case, we will make it same as code.
                  */
-                symbol = Symbol.newInstance(code.toString());
+                symbolStr = codeStr;
             }
-            this.mutableStockCodeAndSymbolDatabase.addUserDefinedCodeAndSymbol(code, symbol);
+            this.mutableStockCodeAndSymbolDatabase.addUserDefinedCodeAndSymbol(Code.newInstance(codeStr), Symbol.newInstance(symbolStr));
         }
 
         
@@ -349,6 +343,15 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
     private void jLabel3MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel3MouseExited
         this.setCursor(Cursor.getDefaultCursor());
     }//GEN-LAST:event_jLabel3MouseExited
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        addNewSymbol();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
+        ((AjaxAutoCompleteJComboBox)this.jComboBox1).stop();
+    }//GEN-LAST:event_formWindowClosed
     
     private class TableRowPopupListener extends MouseAdapter {
         
@@ -460,15 +463,15 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         javax.swing.JMenuItem menuItem = new JMenuItem("New", new javax.swing.ImageIcon(getClass().getResource("/images/16x16/filenew.png")));
         
         menuItem.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    addNewSymbol();
-                }
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                addNewSymbol();
+            }
         });
 
         popup.add(menuItem);
         
-        if(jTable2.getSelectedRowCount() >= 1) {
+        if (jTable2.getSelectedRowCount() >= 1) {
             popup.addSeparator();
             
             menuItem = new JMenuItem("Delete", new javax.swing.ImageIcon(getClass().getResource("/images/16x16/editdelete.png")));
@@ -745,8 +748,11 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
             JTextField textField = (JTextField)getComponent();
             String str = textField.getText();
             if (str == null) {
+                // Possible?
                 return null;
             }
+            // Remember to trim the string.
+            str = str.trim();
             try {
                 @SuppressWarnings("unchecked")
                 Method method = this.c.getMethod("newInstance", String.class);
@@ -764,7 +770,8 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         //of this method so that everything gets cleaned up.
         @Override
         public boolean stopCellEditing() {
-            final String string = ((String)super.getCellEditorValue()).toUpperCase();
+            // Remember to trim the string.
+            final String string = ((String)super.getCellEditorValue()).trim().toUpperCase();
             if (0 == string.length()) {
                 // We are not interest to evaluate empty string. Return
                 // immediately.
@@ -853,9 +860,9 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     javax.swing.JButton jButton1;
-    javax.swing.JButton jButton2;
     javax.swing.JButton jButton3;
     javax.swing.JButton jButton4;
+    javax.swing.JComboBox jComboBox1;
     javax.swing.JLabel jLabel1;
     javax.swing.JLabel jLabel2;
     javax.swing.JLabel jLabel3;
