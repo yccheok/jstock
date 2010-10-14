@@ -20,6 +20,7 @@
 package org.yccheok.jstock.engine;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Collections;
 import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -49,7 +50,7 @@ public class AjaxYahooSearchEngine implements SearchEngine<AjaxYahooSearchEngine
         try {
             final Holder value = mapper.readValue(json, Holder.class);
             // Shall I check value.ResultSet.Query against prefix?
-            return value.ResultSet.Result;
+            return Collections.unmodifiableList(value.ResultSet.Result);
         } catch (Exception ex) {
             log.error(null, ex);
         }
