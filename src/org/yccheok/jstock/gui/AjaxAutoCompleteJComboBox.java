@@ -65,8 +65,10 @@ public class AjaxAutoCompleteJComboBox extends JComboBox {
             @Override
             public void insertUpdate(DocumentEvent e) {
                 try {
-                    final String string = e.getDocument().getText(0, e.getDocument().getLength());
-                    _handle(string);
+                    final String string = e.getDocument().getText(0, e.getDocument().getLength()).trim();
+                    if (string.isEmpty() == false) {
+                        _handle(string);
+                    }
                 } catch (BadLocationException ex) {
                     log.error(null, ex);
                 }
@@ -75,8 +77,10 @@ public class AjaxAutoCompleteJComboBox extends JComboBox {
             @Override
             public void removeUpdate(DocumentEvent e) {
                 try {
-                    final String string = e.getDocument().getText(0, e.getDocument().getLength());
-                    _handle(string);
+                    final String string = e.getDocument().getText(0, e.getDocument().getLength()).trim();
+                    if (string.isEmpty() == false) {
+                        _handle(string);
+                    }
                 } catch (BadLocationException ex) {
                     log.error(null, ex);
                 }
@@ -85,8 +89,10 @@ public class AjaxAutoCompleteJComboBox extends JComboBox {
             @Override
             public void changedUpdate(DocumentEvent e) {
                 try {
-                    final String string = e.getDocument().getText(0, e.getDocument().getLength());
-                    _handle(string);
+                    final String string = e.getDocument().getText(0, e.getDocument().getLength()).trim();
+                    if (string.isEmpty() == false) {
+                        _handle(string);
+                    }
                 } catch (BadLocationException ex) {
                     log.error(null, ex);
                 }
@@ -101,10 +107,12 @@ public class AjaxAutoCompleteJComboBox extends JComboBox {
     private Observer<AjaxYahooSearchEngineMonitor, AjaxYahooSearchEngine.ResultSetType> getMonitorObserver() {
         return new Observer<AjaxYahooSearchEngineMonitor, AjaxYahooSearchEngine.ResultSetType>() {
             @Override
-            public void update(AjaxYahooSearchEngineMonitor subject, ResultSetType arg) {
-                //FIXME:
-                //final String string = ((JTextComponent)AjaxAutoCompleteJComboBox.this.getEditor()).getText().trim();
-
+            public void update(final AjaxYahooSearchEngineMonitor subject, final ResultSetType arg) {
+                final String string = AjaxAutoCompleteJComboBox.this.getEditor().getItem().toString().trim();
+                if (string.isEmpty() || false == string.equalsIgnoreCase(arg.Query)) {
+                    return;
+                }
+                System.out.println(string + " --> " + arg.Query);
             }
         };
     }
