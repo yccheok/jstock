@@ -93,7 +93,7 @@ public class AjaxAutoCompleteJComboBox extends JComboBox {
             }
 
             private void _handle(final String string) {
-                ajaxYahooSearchEngineMonitor.put(string);
+                ajaxYahooSearchEngineMonitor.clearAndPut(string);
             }
        };
     }
@@ -102,7 +102,8 @@ public class AjaxAutoCompleteJComboBox extends JComboBox {
         return new Observer<AjaxYahooSearchEngineMonitor, AjaxYahooSearchEngine.ResultSetType>() {
             @Override
             public void update(AjaxYahooSearchEngineMonitor subject, ResultSetType arg) {
-                final String string = ((JTextComponent)AjaxAutoCompleteJComboBox.this.getEditor()).getText().trim();
+                //FIXME:
+                //final String string = ((JTextComponent)AjaxAutoCompleteJComboBox.this.getEditor()).getText().trim();
 
             }
         };

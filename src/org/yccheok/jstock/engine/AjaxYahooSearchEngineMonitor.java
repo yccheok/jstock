@@ -43,16 +43,17 @@ public class AjaxYahooSearchEngineMonitor extends Subject<AjaxYahooSearchEngineM
     }
 
     /**
-     * Inserts the specified element into this queue, waiting if necessary for
-     * space to become available.
+     * Removes all previous elements, and inserts the specified element into
+     * this queue, waiting if necessary for space to become available.
      * 
      * @param string the searched string
      * @throws RuntimeException if <code>stop</code> has been called before
      */
-    public void put(String string) {
+    public synchronized void clearAndPut(String string) {
         if (executor.isShutdown()) {
             throw new RuntimeException("Executor is shutdown.");
         }
+        blockingQueue.clear();
         try {
             blockingQueue.put(string);
         } catch (InterruptedException ex) {
