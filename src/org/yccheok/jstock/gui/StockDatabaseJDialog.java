@@ -182,7 +182,6 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
             jPanel2.add(jScrollPane2, java.awt.BorderLayout.CENTER);
 
             jComboBox1.setEditable(true);
-            jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
             jComboBox1.setPreferredSize(new java.awt.Dimension(150, 24));
             jPanel5.add(jComboBox1);
 
