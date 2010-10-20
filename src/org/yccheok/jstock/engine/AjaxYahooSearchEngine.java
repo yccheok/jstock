@@ -155,6 +155,11 @@ public class AjaxYahooSearchEngine implements SearchEngine<AjaxYahooSearchEngine
          * The stock type displayed name.
          */
         public final String typeDisp = null;
+
+        @Override
+        public String toString() {
+            return symbol;
+        }
     }
 
     // Will it be better if we make this as static?

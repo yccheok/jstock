@@ -9,6 +9,7 @@ JStock 1.0.6 - ????-??-??
            dividend dialog, stock database dialog, and property dialog for
            stock indicator editor.
   Bugfix:  We forget to trim the input in StockDatabaseJDialog.
+  Bugfix:  Trim the string input in AutoCompleteJComboBox.
   
 JStock 1.0.5r - 2010-09-19
   Feature: Enable cash withdrawal by entering -ve amount. (#2924161)
