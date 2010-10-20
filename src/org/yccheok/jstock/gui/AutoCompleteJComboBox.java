@@ -41,6 +41,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class AutoCompleteJComboBox extends JComboBox {
 
+    // Use SubjectEx, in order to make notify method public.
     private static class SubjectEx<S, A> extends Subject<S, A> {
         @Override
         public void notify(S subject, A arg) {
@@ -188,7 +189,7 @@ public class AutoCompleteJComboBox extends JComboBox {
                     }
                 }
 
-                if (string.length() <= 0) {
+                if (string.isEmpty()) {
                     // Empty string. Return early. Do not perform hidePopup and
                     // removeAllItems right here. As when user performs list
                     // selection, previous text field item will be removed, and
