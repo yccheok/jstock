@@ -53,24 +53,24 @@ public class ResultSetCellRenderer extends javax.swing.JPanel implements ListCel
         setLayout(new javax.swing.BoxLayout(this, javax.swing.BoxLayout.X_AXIS));
 
         jLabel1.setText("jLabel1");
-        jLabel1.setMaximumSize(new java.awt.Dimension(72, 14));
-        jLabel1.setMinimumSize(new java.awt.Dimension(72, 14));
-        jLabel1.setPreferredSize(new java.awt.Dimension(72, 14));
+        jLabel1.setMaximumSize(new java.awt.Dimension(88, 14));
+        jLabel1.setMinimumSize(new java.awt.Dimension(88, 14));
+        jLabel1.setPreferredSize(new java.awt.Dimension(88, 14));
         add(jLabel1);
 
         jLabel2.setText("jLabel2");
-        jLabel2.setMaximumSize(new java.awt.Dimension(144, 14));
-        jLabel2.setMinimumSize(new java.awt.Dimension(144, 14));
-        jLabel2.setPreferredSize(new java.awt.Dimension(144, 14));
+        jLabel2.setMaximumSize(new java.awt.Dimension(200, 14));
+        jLabel2.setMinimumSize(new java.awt.Dimension(200, 14));
+        jLabel2.setPreferredSize(new java.awt.Dimension(200, 14));
         add(jLabel2);
 
-        jLabel3.setFont(jLabel3.getFont().deriveFont(jLabel3.getFont().getSize()-1f));
+        jLabel3.setFont(jLabel3.getFont().deriveFont(jLabel3.getFont().getSize()-2f));
         jLabel3.setForeground(javax.swing.UIManager.getDefaults().getColor("ComboBox.disabledForeground"));
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
         jLabel3.setText("jLabel3");
-        jLabel3.setMaximumSize(new java.awt.Dimension(48, 13));
-        jLabel3.setMinimumSize(new java.awt.Dimension(48, 13));
-        jLabel3.setPreferredSize(new java.awt.Dimension(48, 13));
+        jLabel3.setMaximumSize(new java.awt.Dimension(104, 13));
+        jLabel3.setMinimumSize(new java.awt.Dimension(104, 13));
+        jLabel3.setPreferredSize(new java.awt.Dimension(104, 13));
         add(jLabel3);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -102,7 +102,9 @@ public class ResultSetCellRenderer extends javax.swing.JPanel implements ListCel
         final ResultType result = (ResultType)value;
         jLabel1.setText(result.symbol);
         jLabel2.setText(result.name);
-        jLabel3.setText(result.typeDisp + " - " + result.exchDisp);
+        final String type = result.typeDisp != null ? result.typeDisp : result.type;
+        final String exch = result.exchDisp != null ? result.exchDisp : result.exch;
+        jLabel3.setText(type  + " - " + exch);
         return this;
     }
 
