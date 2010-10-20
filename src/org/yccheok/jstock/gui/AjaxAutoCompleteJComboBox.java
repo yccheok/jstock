@@ -20,6 +20,7 @@
 package org.yccheok.jstock.gui;
 
 import java.awt.Component;
+import java.awt.Rectangle;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
@@ -245,6 +246,13 @@ public class AjaxAutoCompleteJComboBox extends JComboBox {
         {
             return new JScrollPane(list,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                     JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        }
+
+        @Override
+        public Rectangle computePopupBounds(int px, int py, int pw, int ph)
+        {
+            int w = 418;
+            return super.computePopupBounds(px, py, w, ph);
         }
     }
 
