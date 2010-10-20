@@ -149,7 +149,7 @@ public class AutoCompleteJComboBox extends JComboBox {
             @Override
             public void insertUpdate(DocumentEvent e) {
                 try {
-                    final String string = e.getDocument().getText(0, e.getDocument().getLength());
+                    final String string = e.getDocument().getText(0, e.getDocument().getLength()).trim();
                     handle(string);
                 } catch (BadLocationException ex) {
                     log.error(null, ex);
@@ -159,7 +159,7 @@ public class AutoCompleteJComboBox extends JComboBox {
             @Override
             public void removeUpdate(DocumentEvent e) {
                 try {
-                    final String string = e.getDocument().getText(0, e.getDocument().getLength());
+                    final String string = e.getDocument().getText(0, e.getDocument().getLength()).trim();
                     handle(string);
                 } catch (BadLocationException ex) {
                     log.error(null, ex);
@@ -169,7 +169,7 @@ public class AutoCompleteJComboBox extends JComboBox {
             @Override
             public void changedUpdate(DocumentEvent e) {
                 try {
-                    final String string = e.getDocument().getText(0, e.getDocument().getLength());
+                    final String string = e.getDocument().getText(0, e.getDocument().getLength()).trim();
                     handle(string);
                 } catch (BadLocationException ex) {
                     log.error(null, ex);
@@ -304,7 +304,7 @@ public class AutoCompleteJComboBox extends JComboBox {
                         final Object object = AutoCompleteJComboBox.this.getEditor().getItem();
 
                         if (object instanceof String) {
-                            lastEnteredString = (String)object;
+                            lastEnteredString = ((String)object).trim();
                         }
                         else {
                             lastEnteredString = "";
