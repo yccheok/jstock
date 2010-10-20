@@ -21,6 +21,8 @@ package org.yccheok.jstock.gui;
 
 import java.awt.Component;
 import java.awt.Rectangle;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
@@ -43,6 +45,7 @@ import org.yccheok.jstock.engine.AjaxYahooSearchEngine.ResultSetType;
 import org.yccheok.jstock.engine.AjaxYahooSearchEngine.ResultType;
 import org.yccheok.jstock.engine.AjaxYahooSearchEngineMonitor;
 import org.yccheok.jstock.engine.Observer;
+import org.yccheok.jstock.engine.Subject;
 
 /**
  * This is a combo box, which will provides a list of suggested stocks, by
@@ -52,6 +55,28 @@ import org.yccheok.jstock.engine.Observer;
  */
 public class AjaxAutoCompleteJComboBox extends JComboBox {
 
+    // Use SubjectEx, in order to make notify method public.
+    private static class SubjectEx<S, A> extends Subject<S, A> {
+        @Override
+        public void notify(S subject, A arg) {
+            super.notify(subject, arg);
+        }
+    }
+
+    private final SubjectEx<AjaxAutoCompleteJComboBox, String> subject = new SubjectEx<AjaxAutoCompleteJComboBox, String>();
+
+    public void attach(Observer<AjaxAutoCompleteJComboBox, String> observer) {
+        subject.attach(observer);
+    }
+
+    public void dettach(Observer<AjaxAutoCompleteJComboBox, String> observer) {
+        subject.dettach(observer);
+    }
+
+    public void dettachAll() {
+        subject.dettachAll();
+    }
+
     /**
      * Create an instance of AjaxAutoCompleteJComboBox.
      */
@@ -60,9 +85,14 @@ public class AjaxAutoCompleteJComboBox extends JComboBox {
 
         this.setEditable(true);
 
+        this.keyAdapter = this.getEditorComponentKeyAdapter();
+
         // Use our own editor, in order to implement auto-complete feature.
         this.jComboBoxEditor = new MyJComboBoxEditor();
         this.setEditor(this.jComboBoxEditor);
+
+        // Use to handle ENTER key pressed.
+        this.getEditor().getEditorComponent().addKeyListener(this.keyAdapter);
 
         // Do not use keyAdapter to handle auto-complete feature, as it doesn't
         // handle IME input well. For example, you type "wm" and press "3",
@@ -114,14 +144,77 @@ public class AjaxAutoCompleteJComboBox extends JComboBox {
             }
 
             private void _handle(final String string) {
-                if (string.isEmpty() == false) {
-                    ajaxYahooSearchEngineMonitor.clearAndPut(string);
-                } else {
+                if (AjaxAutoCompleteJComboBox.this.getSelectedItem() != null) {
+                    if (AjaxAutoCompleteJComboBox.this.getSelectedItem().toString().equals(string)) {
+                        // We need to differentiate, whether "string" is from user
+                        // typing, or drop down list selection. This is because when
+                        // user perform selection, document change event will be triggered
+                        // too. When string is from drop down list selection, user
+                        // are not expecting any auto complete suggestion. Return early.
+                        return;
+                    }
+                }
+
+                if (string.isEmpty()) {
+                    // Empty string. Return early. Do not perform hidePopup and
+                    // removeAllItems right here. As when user performs list
+                    // selection, previous text field item will be removed, and
+                    // cause us fall into this scope. We do not want to hidePopup
+                    // and removeAllItems when user is selecting his item.
+                    //
+                    // hidePopup and removeAllItems when user clears off all items
+                    // in text field, will be performed through keyReleased.
+                    return;
+                }
+
+                ajaxYahooSearchEngineMonitor.clearAndPut(string);
+            }
+       };
+    }
+
+    // We should make this powerful combo box shared amoing different classes.
+    private KeyAdapter getEditorComponentKeyAdapter() {
+
+        return new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if (KeyEvent.VK_ENTER == e.getKeyCode()) {
+                    String lastEnteredString = "";
+                    if (AjaxAutoCompleteJComboBox.this.getItemCount() > 0) {
+                        int index = AjaxAutoCompleteJComboBox.this.getSelectedIndex();
+                        if (index == -1) {
+                            lastEnteredString = AjaxAutoCompleteJComboBox.this.getItemAt(0).toString();
+                        }
+                        else {
+                            lastEnteredString = AjaxAutoCompleteJComboBox.this.getItemAt(index).toString();
+                        }
+                    }
+                    else {
+                        final Object object = AjaxAutoCompleteJComboBox.this.getEditor().getItem();
+
+                        if (object instanceof String) {
+                            lastEnteredString = ((String)object).trim();
+                        }
+                        else {
+                            lastEnteredString = "";
+                        }
+                    }
+
+                    AjaxAutoCompleteJComboBox.this.removeAllItems();
+                    AjaxAutoCompleteJComboBox.this.subject.notify(AjaxAutoCompleteJComboBox.this, lastEnteredString);
+                    return;
+                }   /* if(KeyEvent.VK_ENTER == e.getKeyCode()) */
+
+                // If user removes item from text field, we will hidePopup and
+                // removeAllItems. Please refer DocumentListener.handle, on why
+                // don't we handle hidePopup and removeAllItems there.
+                final Object object = AjaxAutoCompleteJComboBox.this.getEditor().getItem();
+                if (object == null || object.toString().length() <= 0) {
                     AjaxAutoCompleteJComboBox.this.hidePopup();
                     AjaxAutoCompleteJComboBox.this.removeAllItems();
                 }
-            }
-       };
+            }   /* public void keyReleased(KeyEvent e) */
+        };
     }
 
     private Observer<AjaxYahooSearchEngineMonitor, AjaxYahooSearchEngine.ResultSetType> getMonitorObserver() {
@@ -309,5 +402,6 @@ public class AjaxAutoCompleteJComboBox extends JComboBox {
 
     private final AjaxYahooSearchEngineMonitor ajaxYahooSearchEngineMonitor = new AjaxYahooSearchEngineMonitor();
     private final MyJComboBoxEditor jComboBoxEditor;
+    private final KeyAdapter keyAdapter;
     private static final Log log = LogFactory.getLog(AjaxAutoCompleteJComboBox.class);
 }
