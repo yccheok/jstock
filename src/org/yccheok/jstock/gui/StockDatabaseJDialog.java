@@ -69,7 +69,9 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
     public StockDatabaseJDialog(java.awt.Frame parent, StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase, boolean modal) {
         super(parent, modal);
         this.mutableStockCodeAndSymbolDatabase = new MutableStockCodeAndSymbolDatabase(stockCodeAndSymbolDatabase);
-        initComponents();                
+        initComponents();
+        // Focus on our Ajax auto complete JComboBox.
+        this.jComboBox1.requestFocus();
     }
 
     /** This method is called from within the constructor to
@@ -94,7 +96,6 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         jTable2 = new javax.swing.JTable();
         jPanel5 = new javax.swing.JPanel();
         jComboBox1 = new AjaxAutoCompleteJComboBox();
-        jButton1 = new javax.swing.JButton();
         jPanel10 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
@@ -164,6 +165,8 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
             jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("StockDatabaseJDialog_UserDefined"))); // NOI18N
             jPanel2.setLayout(new java.awt.BorderLayout());
 
+            this.jScrollPane2.addMouseListener(new TableRowPopupListener(true));
+
             jTable2.setAutoCreateRowSorter(true);
             jTable2.setModel(getUserDefinedCodeSymbolTableModel());
             this.jTable2.addMouseListener(new TableRowPopupListener());
@@ -185,16 +188,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
             jComboBox1.setPreferredSize(new java.awt.Dimension(150, 24));
             jPanel5.add(jComboBox1);
 
-            jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/filenew.png"))); // NOI18N
-            jButton1.setText(bundle.getString("StockDatabaseJDialog_New")); // NOI18N
-            jButton1.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    jButton1ActionPerformed(evt);
-                }
-            });
-            jPanel5.add(jButton1);
-
-            jPanel2.add(jPanel5, java.awt.BorderLayout.PAGE_START);
+            jPanel2.add(jPanel5, java.awt.BorderLayout.NORTH);
 
             jLabel2.setFont(jLabel2.getFont().deriveFont(jLabel2.getFont().getSize()-1f));
             jLabel2.setText(bundle.getString("StockDatabaseJDialog_NeedHelpVisit")); // NOI18N
@@ -215,7 +209,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
             });
             jPanel10.add(jLabel3);
 
-            jPanel2.add(jPanel10, java.awt.BorderLayout.PAGE_END);
+            jPanel2.add(jPanel10, java.awt.BorderLayout.SOUTH);
 
             jPanel4.add(jPanel2);
 
@@ -343,18 +337,21 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         this.setCursor(Cursor.getDefaultCursor());
     }//GEN-LAST:event_jLabel3MouseExited
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-        addNewSymbol();
-    }//GEN-LAST:event_jButton1ActionPerformed
-
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
         // Any all threading activities in AjaxAutoCompleteJComboBox.
         ((AjaxAutoCompleteJComboBox)this.jComboBox1).stop();
     }//GEN-LAST:event_formWindowClosed
     
     private class TableRowPopupListener extends MouseAdapter {
-        
+        private boolean newMenuItemOnly = false;
+
+        public TableRowPopupListener(boolean newMenuItemOnly) {
+            this.newMenuItemOnly = newMenuItemOnly;
+        }
+
+        public TableRowPopupListener() {
+        }
+
         @Override
         public void mousePressed(MouseEvent e) {
             maybeShowPopup(e);
@@ -367,7 +364,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
 
         private void maybeShowPopup(MouseEvent e) {
             if (e.isPopupTrigger()) {
-                getMyJTablePopupMenu().show(e.getComponent(), e.getX(), e.getY());
+                getMyJTablePopupMenu(newMenuItemOnly).show(e.getComponent(), e.getX(), e.getY());
             }
         }
     }
@@ -457,7 +454,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         selectUserDefinedDatabaseTable(selectedModelIndex);        
     }
     
-    private JPopupMenu getMyJTablePopupMenu() {
+    private JPopupMenu getMyJTablePopupMenu(boolean newMenuItemOnly) {
         final JPopupMenu popup = new JPopupMenu();
         
         javax.swing.JMenuItem menuItem = new JMenuItem("New", new javax.swing.ImageIcon(getClass().getResource("/images/16x16/filenew.png")));
@@ -470,7 +467,12 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         });
 
         popup.add(menuItem);
-        
+
+        if (newMenuItemOnly) {
+            /* Single menu item only. */
+            return popup;
+        }
+
         if (jTable2.getSelectedRowCount() >= 1) {
             popup.addSeparator();
             
@@ -859,7 +861,6 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
     private static final Log log = LogFactory.getLog(StockDatabaseJDialog.class);
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    javax.swing.JButton jButton1;
     javax.swing.JButton jButton3;
     javax.swing.JButton jButton4;
     javax.swing.JComboBox jComboBox1;
