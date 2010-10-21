@@ -20,26 +20,29 @@
 package org.yccheok.jstock.gui;
 
 import java.awt.Component;
-import java.awt.Rectangle;
+import java.awt.Dimension;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.plaf.ComboBoxUI;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.plaf.basic.BasicComboBoxEditor;
-import javax.swing.plaf.basic.BasicComboPopup;
-import javax.swing.plaf.basic.ComboPopup;
 import javax.swing.plaf.metal.MetalComboBoxEditor;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jdesktop.swingx.JXTable;
 import org.yccheok.jstock.engine.AjaxYahooSearchEngine;
 import org.yccheok.jstock.engine.AjaxYahooSearchEngine.ResultSetType;
 import org.yccheok.jstock.engine.AjaxYahooSearchEngine.ResultType;
@@ -109,6 +112,30 @@ public class AjaxAutoCompleteJComboBox extends JComboBox {
         ajaxYahooSearchEngineMonitor.attach(getMonitorObserver());
 
         this.setRenderer(new ResultSetCellRenderer());
+
+        // Create horizontal scroll bar if needed.
+        this.adjustScrollBar();
+
+        // Have a wide enough drop down list.
+        this.addPopupMenuListener(this.getPopupMenuListener());
+    }
+
+    private PopupMenuListener getPopupMenuListener() {
+        return new PopupMenuListener() {
+            @Override
+            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                // We will have a much wider drop down list.
+                adjustPopupWidth();
+            }
+
+            @Override
+            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+            }
+
+            @Override
+            public void popupMenuCanceled(PopupMenuEvent e) {
+            }
+        };
     }
 
     private DocumentListener getDocumentListener() {
@@ -269,84 +296,38 @@ public class AjaxAutoCompleteJComboBox extends JComboBox {
         };
     }
 
-    @Override
-    public void setUI(ComboBoxUI ui)
-    {
-        if (ui != null)
-        {
-            // Let's try our own customized UI.
-            Class c = ui.getClass();
-            final String myClass = "org.yccheok.jstock.gui.AjaxAutoCompleteJComboBox$My" + c.getSimpleName();
-
-            try {
-                ComboBoxUI myUI = (ComboBoxUI) Class.forName(myClass).newInstance();
-                super.setUI(myUI);
-                return;
-            } catch (ClassNotFoundException ex) {
-                log.error(null, ex);
-            } catch (InstantiationException ex) {
-                log.error(null, ex);
-            } catch (IllegalAccessException ex) {
-                log.error(null, ex);
-            }
+    private void adjustPopupWidth() {
+        if (this.getItemCount() == 0) return;
+        Object comp = this.getUI().getAccessibleChild(this, 0);
+        if (!(comp instanceof JPopupMenu)) {
+            return;
         }
-
-        // Either null, or we fail to use our own customized UI.
-        // Fall back to default.
-        super.setUI(ui);
+        JPopupMenu popup = (JPopupMenu) comp;
+        JScrollPane scrollPane = (JScrollPane) popup.getComponent(0);
+        Object value = this.getItemAt(0);
+        Component rendererComp = this.getRenderer().getListCellRendererComponent(null, value, 0, false, false);
+        if (rendererComp instanceof JXTable) {
+            scrollPane.setColumnHeaderView(((JTable) rendererComp).getTableHeader());
+        }
+        Dimension prefSize = rendererComp.getPreferredSize();
+        Dimension size = scrollPane.getPreferredSize();
+        // +20, as the vertical scroll bar occupy space too.
+        size.width = Math.max(size.width, prefSize.width) + 20;
+        scrollPane.setPreferredSize(size);
+        scrollPane.setMaximumSize(size);
+        scrollPane.revalidate();
     }
 
-    // This is a non-portable method to make combo box horizontal scroll bar.
-    // Whenever there is a new look-n-feel, we need to manually provide the ComboBoxUI.
-    // Any idea on how to make this portable?
-    //
-    protected static class MyWindowsComboBoxUI extends com.sun.java.swing.plaf.windows.WindowsComboBoxUI
-    {
-        @Override
-        protected ComboPopup createPopup()
-        {
-            return new MyComboPopup(comboBox);
+    private void adjustScrollBar() {
+        //if (this.getItemCount() == 0) return;
+        Object comp = this.getUI().getAccessibleChild(this, 0);
+        if (!(comp instanceof JPopupMenu)) {
+            return;
         }
-    }
-
-    protected static class MyMotifComboBoxUI extends com.sun.java.swing.plaf.motif.MotifComboBoxUI
-    {
-        @Override
-        protected ComboPopup createPopup()
-        {
-            return new MyComboPopup(comboBox);
-        }
-    }
-
-    protected static class MyMetalComboBoxUI extends javax.swing.plaf.metal.MetalComboBoxUI
-    {
-        @Override
-        protected ComboPopup createPopup()
-        {
-            return new MyComboPopup(comboBox);
-        }
-    }
-
-    private static class MyComboPopup extends BasicComboPopup
-    {
-        public MyComboPopup(JComboBox combo)
-        {
-            super(combo);
-        }
-
-        @Override
-        public JScrollPane createScroller()
-        {
-            return new JScrollPane(list,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                    JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        }
-
-        @Override
-        public Rectangle computePopupBounds(int px, int py, int pw, int ph)
-        {
-            int w = 418;
-            return super.computePopupBounds(px, py, w, ph);
-        }
+        JPopupMenu popup = (JPopupMenu) comp;
+        JScrollPane scrollPane = (JScrollPane) popup.getComponent(0);
+        scrollPane.setHorizontalScrollBar(new JScrollBar(JScrollBar.HORIZONTAL));
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
     }
 
     // WARNING : If Java is having a major refactor on BasicComboBoxEditor class,
