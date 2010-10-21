@@ -24,10 +24,7 @@ import javax.swing.*;
 import java.awt.event.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.plaf.ComboBoxUI;
 import javax.swing.plaf.basic.BasicComboBoxEditor;
-import javax.swing.plaf.basic.BasicComboPopup;
-import javax.swing.plaf.basic.ComboPopup;
 import javax.swing.plaf.metal.MetalComboBoxEditor;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
@@ -125,6 +122,9 @@ public class AutoCompleteJComboBox extends JComboBox {
             }
 
         });
+
+        // Create horizontal scroll bar if needed.
+        adjustScrollBar();
     }
 
     public void setStockCodeAndSymbolDatabase(StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase) {
@@ -329,77 +329,16 @@ public class AutoCompleteJComboBox extends JComboBox {
         };
     } 
 
-    @Override
-    public void setUI(ComboBoxUI ui)
-    {
-        if (ui != null)
-        {
-            // Let's try our own customized UI.
-            Class c = ui.getClass();
-            final String myClass = "org.yccheok.jstock.gui.AutoCompleteJComboBox$My" + c.getSimpleName();
-
-            try {
-                ComboBoxUI myUI = (ComboBoxUI) Class.forName(myClass).newInstance();
-                super.setUI(myUI);
-                return;
-            } catch (ClassNotFoundException ex) {
-                log.error(null, ex);
-            } catch (InstantiationException ex) {
-                log.error(null, ex);
-            } catch (IllegalAccessException ex) {
-                log.error(null, ex);
-            }
+    private void adjustScrollBar() {
+        //if (this.getItemCount() == 0) return;
+        Object comp = this.getUI().getAccessibleChild(this, 0);
+        if (!(comp instanceof JPopupMenu)) {
+            return;
         }
-
-        // Either null, or we fail to use our own customized UI.
-        // Fall back to default.
-        super.setUI(ui);
-    }
-
-    // This is a non-portable method to make combo box horizontal scroll bar.
-    // Whenever there is a new look-n-feel, we need to manually provide the ComboBoxUI.
-    // Any idea on how to make this portable?
-    //
-    protected static class MyWindowsComboBoxUI extends com.sun.java.swing.plaf.windows.WindowsComboBoxUI
-    {
-        @Override
-        protected ComboPopup createPopup()
-        {
-            return new MyComboPopup(comboBox);
-        }
-    }
-    
-    protected static class MyMotifComboBoxUI extends com.sun.java.swing.plaf.motif.MotifComboBoxUI
-    {
-        @Override
-        protected ComboPopup createPopup()
-        {
-            return new MyComboPopup(comboBox);
-        }
-    }
-    
-    protected static class MyMetalComboBoxUI extends javax.swing.plaf.metal.MetalComboBoxUI
-    {
-        @Override
-        protected ComboPopup createPopup()
-        {
-            return new MyComboPopup(comboBox);
-        }
-    }
-    
-    private static class MyComboPopup extends BasicComboPopup
-    {
-        public MyComboPopup(JComboBox combo)
-        {
-            super(combo);
-        }
-
-        @Override
-        public JScrollPane createScroller()
-        {
-            return new JScrollPane(list,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                    JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        }
+        JPopupMenu popup = (JPopupMenu) comp;
+        JScrollPane scrollPane = (JScrollPane) popup.getComponent(0);
+        scrollPane.setHorizontalScrollBar(new JScrollBar(JScrollBar.HORIZONTAL));
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
     }
 
     // WARNING : If Java is having a major refactor on BasicComboBoxEditor class,
