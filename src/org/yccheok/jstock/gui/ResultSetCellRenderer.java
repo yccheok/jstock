@@ -87,17 +87,37 @@ public class ResultSetCellRenderer extends javax.swing.JPanel implements ListCel
     private final Color csfc = UIManager.getColor("ComboBox.selectionForeground");
     private final Color csbc = UIManager.getColor("ComboBox.selectionBackground");
     private final Color cdfc = UIManager.getColor("ComboBox.disabledForeground");
+    // For Nimbus look n feel.
+    private final Color nimbus_csfc;
+    {
+         Color c = UIManager.getColor("ComboBox:\"ComboBox.renderer\"[Selected].textForeground");
+         // Pretty interesting. Applying "c" directly on the component will not
+         // work. I have the create a new instance of Color based on "c" to make
+         // it works.
+         nimbus_csfc = new Color(c.getRed(), c.getGreen(), c.getBlue());
+    }
+    private final Color nimbus_csbc;
+    {
+        Color c = UIManager.getColor("ComboBox:\"ComboBox.renderer\"[Selected].background");
+         // Pretty interesting. Applying "c" directly on the component will not
+         // work. I have the create a new instance of Color based on "c" to make
+         // it works.
+        nimbus_csbc = new Color(c.getRed(), c.getGreen(), c.getBlue());
+    }
 
     @Override
     public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-        this.setBackground(isSelected ? csbc : cbc);
-	this.setForeground(isSelected ? csfc : cfc);
-        jLabel1.setBackground(isSelected ? csbc : cbc);
-	jLabel1.setForeground(isSelected ? csfc : cfc);
-        jLabel2.setBackground(isSelected ? csbc : cbc);
-	jLabel2.setForeground(isSelected ? csfc : cfc);
-        jLabel3.setBackground(isSelected ? csbc : cbc);
-	jLabel3.setForeground(cdfc);
+        final Color _csbc = csbc != null ? csbc : nimbus_csbc;
+        final Color _csfc = csfc != null ? csfc : nimbus_csfc;
+        
+        this.setBackground(isSelected ? _csbc : cbc);
+        this.setForeground(isSelected ? _csfc : cfc);
+        jLabel1.setBackground(isSelected ? _csbc : cbc);
+        jLabel1.setForeground(isSelected ? _csfc : cfc);
+        jLabel2.setBackground(isSelected ? _csbc : cbc);
+        jLabel2.setForeground(isSelected ? _csfc : cfc);
+        jLabel3.setBackground(isSelected ? _csbc : cbc);
+        jLabel3.setForeground(cdfc);
 
         final ResultType result = (ResultType)value;
         jLabel1.setText(result.symbol);
