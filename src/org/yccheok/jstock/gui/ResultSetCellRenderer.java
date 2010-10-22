@@ -94,7 +94,7 @@ public class ResultSetCellRenderer extends javax.swing.JPanel implements ListCel
          // Pretty interesting. Applying "c" directly on the component will not
          // work. I have the create a new instance of Color based on "c" to make
          // it works.
-         nimbus_csfc = new Color(c.getRed(), c.getGreen(), c.getBlue());
+         nimbus_csfc = c != null ? new Color(c.getRed(), c.getGreen(), c.getBlue()) : null;
     }
     private final Color nimbus_csbc;
     {
@@ -102,7 +102,7 @@ public class ResultSetCellRenderer extends javax.swing.JPanel implements ListCel
          // Pretty interesting. Applying "c" directly on the component will not
          // work. I have the create a new instance of Color based on "c" to make
          // it works.
-        nimbus_csbc = new Color(c.getRed(), c.getGreen(), c.getBlue());
+        nimbus_csbc = c != null ? new Color(c.getRed(), c.getGreen(), c.getBlue()) : null;
     }
 
     @Override
