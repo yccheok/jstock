@@ -134,11 +134,11 @@ public class AjaxYahooSearchEngine implements SearchEngine<AjaxYahooSearchEngine
         /**
          * The symbol.
          */
-        public final String symbol = null;
+        public final String symbol;
         /**
          * The name.
          */
-        public final String name = null;
+        public final String name;
         /**
          * The stock exchange.
          */
@@ -155,6 +155,27 @@ public class AjaxYahooSearchEngine implements SearchEngine<AjaxYahooSearchEngine
          * The stock type displayed name.
          */
         public final String typeDisp = null;
+
+        /**
+         * Creates a new instance of ResultType, with the specified symbol and
+         * name.
+         *
+         * @param symbol The symbol
+         * @param name The name
+         */
+        public ResultType(String symbol, String name) {
+            this.symbol = symbol;
+            this.name = name;
+        }
+
+        /**
+         * Default constructor. Must have, in order for jackson to work
+         * properly.
+         */
+        public ResultType() {
+            this.symbol = null;
+            this.name = null;
+        }
 
         @Override
         public String toString() {
