@@ -70,14 +70,27 @@ public class AjaxAutoCompleteJComboBox extends JComboBox {
 
     private final SubjectEx<AjaxAutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType> subject = new SubjectEx<AjaxAutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType>();
 
+    /**
+     * Attach an observer to listen to ResultType available event.
+     *
+     * @param observer An observer to listen to ResultType available event
+     */
     public void attach(Observer<AjaxAutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType> observer) {
         subject.attach(observer);
     }
 
+    /**
+     * Dettach an observer from listening to ResultType available event.
+     *
+     * @param observer An observer from listening to ResultType available event
+     */
     public void dettach(Observer<AjaxAutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType> observer) {
         subject.dettach(observer);
     }
 
+    /**
+     * Dettach all observers.
+     */
     public void dettachAll() {
         subject.dettachAll();
     }
@@ -131,14 +144,13 @@ public class AjaxAutoCompleteJComboBox extends JComboBox {
                 /* Handle mouse clicked. */
                 if ((e.getModifiers() & java.awt.event.InputEvent.BUTTON1_MASK) == java.awt.event.InputEvent.BUTTON1_MASK) {
                     final Object object = AjaxAutoCompleteJComboBox.this.getEditor().getItem();
-                    AjaxYahooSearchEngine.ResultType lastEnteredResult = null;
                     
                     // The object can be either String or AjaxYahooSearchEngine.ResultType.
                     // If user keys in the item, editor's item will be String.
                     // If user clicks on the drop down list, editor's item will be
                     // AjaxYahooSearchEngine.ResultType.
                     if (object instanceof AjaxYahooSearchEngine.ResultType) {
-                        lastEnteredResult = (AjaxYahooSearchEngine.ResultType)object;
+                        AjaxYahooSearchEngine.ResultType lastEnteredResult = (AjaxYahooSearchEngine.ResultType)object;
                         AjaxAutoCompleteJComboBox.this.subject.notify(AjaxAutoCompleteJComboBox.this, lastEnteredResult);
                     }
 
