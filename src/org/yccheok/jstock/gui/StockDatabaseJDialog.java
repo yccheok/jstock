@@ -673,38 +673,38 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
             fireTableCellUpdated(row, col);
         }
 
+        // Make it as case-insensitive comparison.
         public int findSymbol(String string) {
-            final Symbol symbol = Symbol.newInstance(string);
-            final int symbolIndex = symbols.indexOf(symbol);
-            if (symbolIndex >= 0) {
-                return symbolIndex;
+            int symbolIndex = -1;
+            for (int i = 0, size = symbols.size(); i < size; i++) {
+                if (symbols.get(i).toString().equalsIgnoreCase(string)) {
+                    symbolIndex = i;
+                    break;
+                }
             }
-            return -1;
+            return symbolIndex;
         }
 
+        // Make it as case-insensitive comparison.
         public int findCode(String string) {
-            final Code code = Code.newInstance(string);
-            final int codeIndex = codes.indexOf(code);
-            if (codeIndex >= 0) {
-                return codeIndex;
+            int codeIndex = -1;
+            for (int i = 0, size = codes.size(); i < size; i++) {
+                if (codes.get(i).toString().equalsIgnoreCase(string)) {
+                    codeIndex = i;
+                    break;
+                }
             }
-            return -1;
+            return codeIndex;
         }
 
         public int findCodeOrSymbol(String string) {
-            final Symbol symbol = Symbol.newInstance(string);
-            final int symbolIndex = symbols.indexOf(symbol);
+            final int symbolIndex = findSymbol(string);
             if (symbolIndex >= 0) {
                 return symbolIndex;
             }
 
-            final Code code = Code.newInstance(string);
-            final int codeIndex = codes.indexOf(code);
-            if (codeIndex >= 0) {
-                return codeIndex;
-            }
-            
-            return -1;
+            final int codeIndex = findCode(string);
+            return codeIndex;
         }
 
         public int addNewCodeSymbol() {
@@ -758,7 +758,8 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
             try {
                 @SuppressWarnings("unchecked")
                 Method method = this.c.getMethod("newInstance", String.class);
-                return method.invoke(null, str.toUpperCase());
+                // We will only enforce upper case for Code.
+                return method.invoke(null, c == Code.class ? str.toUpperCase() : str);
             } catch (Exception ex) {
                 log.error(null, ex);
             }
@@ -773,7 +774,14 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         @Override
         public boolean stopCellEditing() {
             // Remember to trim the string.
-            final String string = ((String)super.getCellEditorValue()).trim().toUpperCase();
+            final String string;
+            if (c == Code.class) {
+                // We will only enforce upper case for Code.
+                string = ((String)super.getCellEditorValue()).trim().toUpperCase();
+            } else {
+                string = ((String)super.getCellEditorValue()).trim();
+            }
+            
             if (0 == string.length()) {
                 // We are not interest to evaluate empty string. Return
                 // immediately.
