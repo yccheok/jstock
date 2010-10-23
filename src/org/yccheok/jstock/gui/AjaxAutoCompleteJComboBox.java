@@ -21,6 +21,8 @@ package org.yccheok.jstock.gui;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import javax.swing.JComboBox;
@@ -66,13 +68,13 @@ public class AjaxAutoCompleteJComboBox extends JComboBox {
         }
     }
 
-    private final SubjectEx<AjaxAutoCompleteJComboBox, String> subject = new SubjectEx<AjaxAutoCompleteJComboBox, String>();
+    private final SubjectEx<AjaxAutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType> subject = new SubjectEx<AjaxAutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType>();
 
-    public void attach(Observer<AjaxAutoCompleteJComboBox, String> observer) {
+    public void attach(Observer<AjaxAutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType> observer) {
         subject.attach(observer);
     }
 
-    public void dettach(Observer<AjaxAutoCompleteJComboBox, String> observer) {
+    public void dettach(Observer<AjaxAutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType> observer) {
         subject.dettach(observer);
     }
 
@@ -113,11 +115,49 @@ public class AjaxAutoCompleteJComboBox extends JComboBox {
 
         this.setRenderer(new ResultSetCellRenderer());
 
-        // Create horizontal scroll bar if needed.
-        this.adjustScrollBar();
+        this.addActionListener(getActionListener());
 
         // Have a wide enough drop down list.
         this.addPopupMenuListener(this.getPopupMenuListener());
+
+        // Create horizontal scroll bar if needed.
+        this.adjustScrollBar();
+    }
+
+    private ActionListener getActionListener() {
+        return new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                /* Handle mouse clicked. */
+                if ((e.getModifiers() & java.awt.event.InputEvent.BUTTON1_MASK) == java.awt.event.InputEvent.BUTTON1_MASK) {
+                    final Object object = AjaxAutoCompleteJComboBox.this.getEditor().getItem();
+                    AjaxYahooSearchEngine.ResultType lastEnteredResult = null;
+                    
+                    // The object can be either String or AjaxYahooSearchEngine.ResultType.
+                    // If user keys in the item, editor's item will be String.
+                    // If user clicks on the drop down list, editor's item will be
+                    // AjaxYahooSearchEngine.ResultType.
+                    if (object instanceof AjaxYahooSearchEngine.ResultType) {
+                        lastEnteredResult = (AjaxYahooSearchEngine.ResultType)object;
+                        AjaxAutoCompleteJComboBox.this.subject.notify(AjaxAutoCompleteJComboBox.this, lastEnteredResult);
+                    }
+
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            // We schedule the below actions in GUI event queue,
+                            // so that DocumentListener will not be triggered.
+                            // But I am not sure why.
+                            AjaxAutoCompleteJComboBox.this.getEditor().setItem(null);
+                            AjaxAutoCompleteJComboBox.this.hidePopup();
+                            AjaxAutoCompleteJComboBox.this.removeAllItems();
+                        }
+                    });
+
+                    return;
+                }
+            }
+        };
     }
 
     private PopupMenuListener getPopupMenuListener() {
@@ -206,29 +246,36 @@ public class AjaxAutoCompleteJComboBox extends JComboBox {
             @Override
             public void keyReleased(KeyEvent e) {
                 if (KeyEvent.VK_ENTER == e.getKeyCode()) {
-                    String lastEnteredString = "";
+                    AjaxYahooSearchEngine.ResultType lastEnteredResult = null;
+
                     if (AjaxAutoCompleteJComboBox.this.getItemCount() > 0) {
                         int index = AjaxAutoCompleteJComboBox.this.getSelectedIndex();
+
                         if (index == -1) {
-                            lastEnteredString = AjaxAutoCompleteJComboBox.this.getItemAt(0).toString();
+                            assert(AjaxAutoCompleteJComboBox.this.getItemAt(0) instanceof AjaxYahooSearchEngine.ResultType);
+                            lastEnteredResult = (AjaxYahooSearchEngine.ResultType)AjaxAutoCompleteJComboBox.this.getItemAt(0);
                         }
                         else {
-                            lastEnteredString = AjaxAutoCompleteJComboBox.this.getItemAt(index).toString();
+                            assert(AjaxAutoCompleteJComboBox.this.getItemAt(index) instanceof AjaxYahooSearchEngine.ResultType);
+                            lastEnteredResult = (AjaxYahooSearchEngine.ResultType)AjaxAutoCompleteJComboBox.this.getItemAt(index);
                         }
                     }
                     else {
                         final Object object = AjaxAutoCompleteJComboBox.this.getEditor().getItem();
-
+                        
                         if (object instanceof String) {
-                            lastEnteredString = ((String)object).trim();
-                        }
-                        else {
-                            lastEnteredString = "";
+                            // All upper-case, if the result is not coming from server.
+                            final String string = ((String)object).trim().toUpperCase();
+                            if (string.length() > 0) {
+                                lastEnteredResult = new AjaxYahooSearchEngine.ResultType(string, string);
+                            }
                         }
                     }
 
                     AjaxAutoCompleteJComboBox.this.removeAllItems();
-                    AjaxAutoCompleteJComboBox.this.subject.notify(AjaxAutoCompleteJComboBox.this, lastEnteredString);
+                    if (lastEnteredResult != null) {
+                        AjaxAutoCompleteJComboBox.this.subject.notify(AjaxAutoCompleteJComboBox.this, lastEnteredResult);
+                    }
                     return;
                 }   /* if(KeyEvent.VK_ENTER == e.getKeyCode()) */
 
