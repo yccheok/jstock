@@ -43,6 +43,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.RowFilter;
 import javax.swing.RowFilter.Entry;
+import javax.swing.SwingUtilities;
 import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -52,8 +53,11 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.yccheok.jstock.engine.AjaxYahooSearchEngine;
+import org.yccheok.jstock.engine.AjaxYahooSearchEngine.ResultType;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.MutableStockCodeAndSymbolDatabase;
+import org.yccheok.jstock.engine.Observer;
 import org.yccheok.jstock.engine.StockCodeAndSymbolDatabase;
 import org.yccheok.jstock.engine.Symbol;
 import org.yccheok.jstock.internationalization.GUIBundle;
@@ -72,6 +76,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         initComponents();
         // Focus on our Ajax auto complete JComboBox.
         this.jComboBox1.requestFocus();
+        ((AjaxAutoCompleteJComboBox)this.jComboBox1).attach(getAjaxAutoCompleteJComboBoxObserver());
     }
 
     /** This method is called from within the constructor to
@@ -266,7 +271,8 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
     }
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-    // TODO add your handling code here:
+        // We are no longer interest to receive any event from combo box.
+        ((AjaxAutoCompleteJComboBox)this.jComboBox1).dettachAll();
         this.result = null;
         this.setVisible(false);
         this.dispose();    
@@ -274,6 +280,9 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
 
     /* OK button being pressed. */
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // We are no longer interest to receive any event from combo box.
+        ((AjaxAutoCompleteJComboBox)this.jComboBox1).dettachAll();
+
         // Returns the active cell editor, which is null if the table is not
         // currently editing. 
         final TableCellEditor tableCellEditor = this.jTable2.getCellEditor();
@@ -338,6 +347,8 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jLabel3MouseExited
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
+        // We are no longer interest to receive any event from combo box.
+        ((AjaxAutoCompleteJComboBox)this.jComboBox1).dettachAll();
         // Any all threading activities in AjaxAutoCompleteJComboBox.
         ((AjaxAutoCompleteJComboBox)this.jComboBox1).stop();
     }//GEN-LAST:event_formWindowClosed
@@ -453,7 +464,83 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         final int selectedModelIndex = model.addNewCodeSymbol();
         selectUserDefinedDatabaseTable(selectedModelIndex);        
     }
-    
+
+    private void addNewSymbol(ResultType result) {
+        final CodeSymbolTableModel model = (CodeSymbolTableModel)jTable2.getModel();
+        final int selectedModelIndex = model.addNewCodeSymbol(result);
+        selectUserDefinedDatabaseTable(selectedModelIndex);
+    }
+
+    // Get the best ResultType if possible.
+    // Retuns null if the result cannot be rectified.
+    private ResultType rectifyResult(ResultType result) {
+        String symbolStr = result.symbol;
+        String nameStr = result.name;
+        if (symbolStr == null) {
+            return null;
+        }
+        if (symbolStr.trim().isEmpty()) {
+            return null;
+        }
+        symbolStr = symbolStr.trim().toUpperCase();
+        if (nameStr == null) {
+            nameStr = symbolStr;
+        }
+        if (nameStr.trim().isEmpty()) {
+            nameStr = symbolStr;
+        }
+        nameStr = nameStr.trim();
+        return result.deriveWithSymbol(symbolStr).deriveWithName(nameStr);
+    }
+
+    private Observer<AjaxAutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType> getAjaxAutoCompleteJComboBoxObserver() {
+        return new Observer<AjaxAutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType>() {
+            @Override
+            public void update(AjaxAutoCompleteJComboBox subject, ResultType arg) {
+                assert(arg != null);
+                assert(SwingUtilities.isEventDispatchThread());
+                // Ensure arg is in the correct format.
+                final ResultType result = rectifyResult(arg);
+                if (result == null) {
+                    // Invalid format. Nothing we can do about it. Returns
+                    // early.
+                    return;
+                }
+                // Check for duplication.
+                // Symbol from Yahoo means Code in JStock.
+                String message_string = result.symbol;
+                IndexEx indexEx = getIndexEx(result.symbol, Code.class);
+                if (indexEx == null) {
+                    message_string = result.name;
+                    // Name from Yahoo means Symbol in JStock.
+                    indexEx = getIndexEx(result.name, Symbol.class);
+                }
+                if (indexEx != null) {
+                    if (indexEx.table == jTable1) {
+                        selectStockExchangeServerDatabaseTable(indexEx.index);
+                    } else {
+                        assert(indexEx.table == jTable2);
+                        selectUserDefinedDatabaseTable(indexEx.index);
+                    }
+                    // Warn the user.
+                    final String message = MessageFormat.format(MessagesBundle.getString("warning_message_duplicated_stock_template"), message_string);
+                    final String title = MessagesBundle.getString("warning_title_duplicated_stock");
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            JOptionPane.showMessageDialog(StockDatabaseJDialog.this, message, title, JOptionPane.INFORMATION_MESSAGE);
+                        }
+                    });
+                    // No thanks! I will ignore the result.
+                    return;
+                }
+
+                // Everything just looks fine. Let's insert it into the table.
+                addNewSymbol(result);
+            }
+        };
+    }
+
     private JPopupMenu getMyJTablePopupMenu(boolean newMenuItemOnly) {
         final JPopupMenu popup = new JPopupMenu();
         
@@ -710,6 +797,20 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         public int addNewCodeSymbol() {
             final Code code = Code.newInstance("");
             final Symbol symbol = Symbol.newInstance("");
+            this.codes.add(code);
+            this.symbols.add(symbol);
+
+            final int index = symbols.size() - 1;
+            this.fireTableRowsInserted(index, index);
+
+            return index;
+        }
+
+        public int addNewCodeSymbol(ResultType result) {
+            // Symbol from Yahoo means Code in JStock.
+            final Code code = Code.newInstance(result.symbol);
+            // Name from Yahoo means Symbol in JStock.
+            final Symbol symbol = Symbol.newInstance(result.name);
             this.codes.add(code);
             this.symbols.add(symbol);
 
