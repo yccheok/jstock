@@ -87,8 +87,14 @@ public class AutoCompleteJComboBox extends JComboBox {
             log.error("Unable to attach DocumentListener to AutoCompleteJComboBox.");
         }
 
-        this.addActionListener(new ActionListener() {
+        this.addActionListener(getActionListener());
 
+        // Create horizontal scroll bar if needed.
+        adjustScrollBar();
+    }
+
+    private ActionListener getActionListener() {
+        return new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 /* Handle mouse clicked. */
@@ -120,11 +126,7 @@ public class AutoCompleteJComboBox extends JComboBox {
                     return;
                 }
             }
-
-        });
-
-        // Create horizontal scroll bar if needed.
-        adjustScrollBar();
+        };
     }
 
     public void setStockCodeAndSymbolDatabase(StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase) {
