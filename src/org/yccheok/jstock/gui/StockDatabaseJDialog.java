@@ -22,6 +22,8 @@ package org.yccheok.jstock.gui;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -35,6 +37,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.swing.DefaultCellEditor;
+import javax.swing.ImageIcon;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -44,6 +48,7 @@ import javax.swing.JTextField;
 import javax.swing.RowFilter;
 import javax.swing.RowFilter.Entry;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -53,6 +58,8 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jdesktop.jxlayer.JXLayer;
+import org.jdesktop.jxlayer.plaf.AbstractLayerUI;
 import org.yccheok.jstock.engine.AjaxYahooSearchEngine;
 import org.yccheok.jstock.engine.AjaxYahooSearchEngine.ResultType;
 import org.yccheok.jstock.engine.Code;
@@ -74,9 +81,19 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         super(parent, modal);
         this.mutableStockCodeAndSymbolDatabase = new MutableStockCodeAndSymbolDatabase(stockCodeAndSymbolDatabase);
         initComponents();
+
+        // Wrap combo box.
+        final JXLayer<JComboBox> layer = new JXLayer<JComboBox>(this.jComboBox1);
+        // Set our LayerUI.
+        this.jComboBoxLayerUI = new JComboBoxLayerUI();
+        layer.setUI(jComboBoxLayerUI);
+        // Add the layer as usual combo box.
+        jPanel5.add(layer);
+
         // Focus on our Ajax auto complete JComboBox.
         this.jComboBox1.requestFocus();
-        ((AjaxAutoCompleteJComboBox)this.jComboBox1).attach(getAjaxAutoCompleteJComboBoxObserver());
+        ((AjaxAutoCompleteJComboBox)this.jComboBox1).attachResultObserver(getResultObserver());
+        ((AjaxAutoCompleteJComboBox)this.jComboBox1).attachBusyObserver(getBusyObserver());
     }
 
     /** This method is called from within the constructor to
@@ -88,6 +105,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jComboBox1 = new AjaxAutoCompleteJComboBox();
         jPanel6 = new javax.swing.JPanel();
         jXHeader1 = new org.jdesktop.swingx.JXHeader();
         jPanel4 = new javax.swing.JPanel();
@@ -100,7 +118,6 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         jScrollPane2 = new javax.swing.JScrollPane();
         jTable2 = new javax.swing.JTable();
         jPanel5 = new javax.swing.JPanel();
-        jComboBox1 = new AjaxAutoCompleteJComboBox();
         jPanel10 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
@@ -110,6 +127,9 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         jPanel9 = new javax.swing.JPanel();
         jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
+
+        jComboBox1.setEditable(true);
+        jComboBox1.setPreferredSize(new java.awt.Dimension(160, 24));
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
@@ -188,11 +208,6 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
             jScrollPane2.setViewportView(jTable2);
 
             jPanel2.add(jScrollPane2, java.awt.BorderLayout.CENTER);
-
-            jComboBox1.setEditable(true);
-            jComboBox1.setPreferredSize(new java.awt.Dimension(150, 24));
-            jPanel5.add(jComboBox1);
-
             jPanel2.add(jPanel5, java.awt.BorderLayout.NORTH);
 
             jLabel2.setFont(jLabel2.getFont().deriveFont(jLabel2.getFont().getSize()-1f));
@@ -493,7 +508,37 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         return result.deriveWithSymbol(symbolStr).deriveWithName(nameStr);
     }
 
-    private Observer<AjaxAutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType> getAjaxAutoCompleteJComboBoxObserver() {
+    private Observer<AjaxAutoCompleteJComboBox, Boolean> getBusyObserver() {
+        return new Observer<AjaxAutoCompleteJComboBox, Boolean>() {
+            @Override
+            public void update(AjaxAutoCompleteJComboBox subject, Boolean arg) {
+                final boolean isBusy = arg;
+                Timer me = busyTimer;
+                if (me != null) {
+                    // Stop previous timer from displaying busy indicator.
+                    me.stop();
+                }
+                if (isBusy == false) {
+                    jComboBoxLayerUI.setBusy(isBusy);
+                } else {
+                    // Do not display busy indicator immediately to avoid from
+                    // annoying the user. Wait for some time. 1 second should be
+                    // good enough, as under normal network connection, the
+                    // specified time shall be enough to obtain result from
+                    // server.
+                    busyTimer = new Timer(1000, new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            jComboBoxLayerUI.setBusy(isBusy);
+                        }
+                    });
+                    busyTimer.start();
+                }
+            }
+        };
+    }
+
+    private Observer<AjaxAutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType> getResultObserver() {
         return new Observer<AjaxAutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType>() {
             @Override
             public void update(AjaxAutoCompleteJComboBox subject, ResultType arg) {
@@ -823,7 +868,59 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         private final String[] columnNames = {"Code", "Symbol"};
         private final Class[] columnClasses = {Code.class, Symbol.class};
     }
-    
+
+    private static class JComboBoxLayerUI<V extends JComboBox> extends AbstractLayerUI<V> {
+        private volatile boolean isBusy = false;
+
+        public void setBusy(boolean isBusy) {
+            final boolean oldFlag = this.isBusy;
+            this.isBusy = isBusy;
+            // Do we need to repaint?
+            if (oldFlag != this.isBusy) {
+                // Update Immediately.
+                this.setDirty(true);
+            }
+        }
+
+        @Override
+        protected void paintLayer(Graphics2D g2, JXLayer<? extends V> layer) {
+            super.paintLayer(g2, layer);
+            
+            if (this.isBusy == false) {
+                return;
+            }
+            
+            // Store previous attributes.
+            //final Color oldColor = g2.getColor();
+            //final Font oldFont = g2.getFont();
+            //final Object oldValueAntiAlias = g2.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
+
+            // Set new attributes.
+            //g2.setColor(javax.swing.UIManager.getDefaults().getColor("ComboBox.disabledForeground"));
+            //g2.setFont(oldFont.deriveFont((float)oldFont.getSize() * 0.8f));
+            //g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            //final FontMetrics fontMetrics = g2.getFontMetrics();
+            //final int fontHeight = fontMetrics.getHeight();
+            //final int fontWidth = fontMetrics.stringWidth("Busy...");
+            final int height = layer.getView().getEditor().getEditorComponent().getHeight();
+            final int width = layer.getView().getEditor().getEditorComponent().getWidth();
+            final int padding = 2;
+            //final int x = width - fontWidth - padding;
+            //final int y = ((height - fontHeight) >> 1) + fontHeight;
+            //g2.drawString("Busy...", x, y);
+
+            final Image image = ((ImageIcon)Icons.BUSY).getImage();
+            final int imgWidth = Icons.BUSY.getIconWidth();
+            final int imgHeight = Icons.BUSY.getIconHeight();
+            g2.drawImage(image, width - imgWidth - padding, (height - imgHeight) >> 1, layer.getView());
+
+            // Restore old attributes.
+            //g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, oldValueAntiAlias);
+            //g2.setFont(oldFont);
+            //g2.setColor(oldColor);
+        }
+    }
     private TableCellEditor getCellEditor(Class c) {
         return new MyTableCellEditor(c);
     }
@@ -963,35 +1060,37 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         public final int index;
         public final JTable table;
     }
-    
+
+    private Timer busyTimer = null;
+    private final JComboBoxLayerUI jComboBoxLayerUI;
     private MutableStockCodeAndSymbolDatabase mutableStockCodeAndSymbolDatabase = null;
     private MutableStockCodeAndSymbolDatabase result = null;
     
     private static final Log log = LogFactory.getLog(StockDatabaseJDialog.class);
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    javax.swing.JButton jButton3;
-    javax.swing.JButton jButton4;
-    javax.swing.JComboBox jComboBox1;
-    javax.swing.JLabel jLabel1;
-    javax.swing.JLabel jLabel2;
-    javax.swing.JLabel jLabel3;
-    javax.swing.JPanel jPanel1;
-    javax.swing.JPanel jPanel10;
-    javax.swing.JPanel jPanel2;
-    javax.swing.JPanel jPanel3;
-    javax.swing.JPanel jPanel4;
-    javax.swing.JPanel jPanel5;
-    javax.swing.JPanel jPanel6;
-    javax.swing.JPanel jPanel7;
-    javax.swing.JPanel jPanel8;
-    javax.swing.JPanel jPanel9;
-    javax.swing.JScrollPane jScrollPane1;
-    javax.swing.JScrollPane jScrollPane2;
-    javax.swing.JTable jTable1;
-    javax.swing.JTable jTable2;
-    javax.swing.JTextField jTextField1;
-    org.jdesktop.swingx.JXHeader jXHeader1;
+    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
+    private javax.swing.JComboBox jComboBox1;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTable jTable1;
+    private javax.swing.JTable jTable2;
+    private javax.swing.JTextField jTextField1;
+    private org.jdesktop.swingx.JXHeader jXHeader1;
     // End of variables declaration//GEN-END:variables
 
 }

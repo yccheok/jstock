@@ -68,31 +68,33 @@ public class AjaxAutoCompleteJComboBox extends JComboBox {
         }
     }
 
-    private final SubjectEx<AjaxAutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType> subject = new SubjectEx<AjaxAutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType>();
+    private final SubjectEx<AjaxAutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType> resultSubject = new SubjectEx<AjaxAutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType>();
+    private final SubjectEx<AjaxAutoCompleteJComboBox, Boolean> busySubject = new SubjectEx<AjaxAutoCompleteJComboBox, Boolean>();
 
     /**
      * Attach an observer to listen to ResultType available event.
      *
      * @param observer An observer to listen to ResultType available event
      */
-    public void attach(Observer<AjaxAutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType> observer) {
-        subject.attach(observer);
+    public void attachResultObserver(Observer<AjaxAutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType> observer) {
+        resultSubject.attach(observer);
     }
 
     /**
-     * Dettach an observer from listening to ResultType available event.
+     * Attach an observer to listen to busy state event.
      *
-     * @param observer An observer from listening to ResultType available event
+     * @param observer An observer to listen to busy state event
      */
-    public void dettach(Observer<AjaxAutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType> observer) {
-        subject.dettach(observer);
+    public void attachBusyObserver(Observer<AjaxAutoCompleteJComboBox, Boolean> observer) {
+        busySubject.attach(observer);
     }
 
     /**
      * Dettach all observers.
      */
     public void dettachAll() {
-        subject.dettachAll();
+        resultSubject.dettachAll();
+        busySubject.dettachAll();
     }
 
     /**
@@ -151,7 +153,7 @@ public class AjaxAutoCompleteJComboBox extends JComboBox {
                     // AjaxYahooSearchEngine.ResultType.
                     if (object instanceof AjaxYahooSearchEngine.ResultType) {
                         AjaxYahooSearchEngine.ResultType lastEnteredResult = (AjaxYahooSearchEngine.ResultType)object;
-                        AjaxAutoCompleteJComboBox.this.subject.notify(AjaxAutoCompleteJComboBox.this, lastEnteredResult);
+                        AjaxAutoCompleteJComboBox.this.resultSubject.notify(AjaxAutoCompleteJComboBox.this, lastEnteredResult);
                     }
 
                     SwingUtilities.invokeLater(new Runnable() {
@@ -223,6 +225,9 @@ public class AjaxAutoCompleteJComboBox extends JComboBox {
             }
 
             private void _handle(final String string) {
+                // We are no longer busy.
+                busySubject.notify(AjaxAutoCompleteJComboBox.this, false);
+
                 if (AjaxAutoCompleteJComboBox.this.getSelectedItem() != null) {
                     if (AjaxAutoCompleteJComboBox.this.getSelectedItem().toString().equals(string)) {
                         // We need to differentiate, whether "string" is from user
@@ -246,6 +251,8 @@ public class AjaxAutoCompleteJComboBox extends JComboBox {
                     return;
                 }
 
+                // We are busy contacting server right now.
+                busySubject.notify(AjaxAutoCompleteJComboBox.this, true);
                 ajaxYahooSearchEngineMonitor.clearAndPut(string);
             }
        };
@@ -258,6 +265,9 @@ public class AjaxAutoCompleteJComboBox extends JComboBox {
             @Override
             public void keyReleased(KeyEvent e) {
                 if (KeyEvent.VK_ENTER == e.getKeyCode()) {
+                    // We are no longer busy.
+                    busySubject.notify(AjaxAutoCompleteJComboBox.this, false);
+
                     AjaxYahooSearchEngine.ResultType lastEnteredResult = null;
 
                     if (AjaxAutoCompleteJComboBox.this.getItemCount() > 0) {
@@ -286,7 +296,7 @@ public class AjaxAutoCompleteJComboBox extends JComboBox {
 
                     AjaxAutoCompleteJComboBox.this.removeAllItems();
                     if (lastEnteredResult != null) {
-                        AjaxAutoCompleteJComboBox.this.subject.notify(AjaxAutoCompleteJComboBox.this, lastEnteredResult);
+                        AjaxAutoCompleteJComboBox.this.resultSubject.notify(AjaxAutoCompleteJComboBox.this, lastEnteredResult);
                     }
                     return;
                 }   /* if(KeyEvent.VK_ENTER == e.getKeyCode()) */
@@ -325,6 +335,9 @@ public class AjaxAutoCompleteJComboBox extends JComboBox {
                     return;
                 }
 
+                // We are no longer busy.
+                busySubject.notify(AjaxAutoCompleteJComboBox.this, false);
+
                 // During _update operation, there will be a lot of ListDataListeners
                 // trying to modify the content of our text field. We will not allow
                 // them to do so.
@@ -337,6 +350,8 @@ public class AjaxAutoCompleteJComboBox extends JComboBox {
                 //
                 AjaxAutoCompleteJComboBox.this.jComboBoxEditor.setReadOnly(true);
 
+                // Must hide popup. If not, the pop up windows will not be
+                // resized. But this causes flickering. :(
                 AjaxAutoCompleteJComboBox.this.hidePopup();
                 AjaxAutoCompleteJComboBox.this.removeAllItems();
 
