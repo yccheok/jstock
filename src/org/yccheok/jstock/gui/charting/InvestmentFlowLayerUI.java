@@ -111,11 +111,11 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         final java.text.NumberFormat numberFormat = java.text.NumberFormat.getInstance();
         numberFormat.setMaximumFractionDigits(2);
         numberFormat.setMinimumFractionDigits(2);
-        final String invest = org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(this.investmentFlowChartJDialog.getTotalInvestValue());
-        final String roi = org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(this.investmentFlowChartJDialog.getTotalROIValue());
+        final String invest = org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(this.investmentFlowChartJDialog.getTotalInvestValue());
+        final String roi = org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(this.investmentFlowChartJDialog.getTotalROIValue());
         final double gain = this.investmentFlowChartJDialog.getTotalROIValue() - this.investmentFlowChartJDialog.getTotalInvestValue();
         final double percentage = this.investmentFlowChartJDialog.getTotalInvestValue() > 0.0 ? gain / this.investmentFlowChartJDialog.getTotalInvestValue() * 100.0 : 0.0;
-        final String gain_str = org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(gain);
+        final String gain_str = org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(gain);
         final String percentage_str = numberFormat.format(percentage);
 
         final String INVEST = GUIBundle.getString("InvestmentFlowLayerUI_Invest");
@@ -250,7 +250,7 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
                 padding + x,
                 yy);
             g2.setFont(valueFont);
-            final String totalValueStr = org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(totalValue);
+            final String totalValueStr = org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(totalValue);
             g2.drawString(totalValueStr,
                 width - padding - valueFontMetrics.stringWidth(totalValueStr) + x,
                 yy);
@@ -285,20 +285,20 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
                 this.ROIParams.add(GUIBundle.getString("InvestmentFlowLayerUI_Own") + " " + quantity + " " + stock.getSymbol());
                 final double amount = quantity * this.investmentFlowChartJDialog.getStockPrice(stock.getCode());
                 this.totalROIValue += amount;
-                this.ROIValues.add(org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(amount));
+                this.ROIValues.add(org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(amount));
             }
             else if (activity.getType() == Activity.Type.Sell) {
                 final int quantity = (Integer)activity.get(Activity.Param.Quantity);
                 final Stock stock = (Stock)activity.get(Activity.Param.Stock);
                 this.ROIParams.add(activity.getType() + " " + quantity + " " + stock.getSymbol());
                 this.totalROIValue += activity.getAmount();
-                this.ROIValues.add(org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(activity.getAmount()));
+                this.ROIValues.add(org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(activity.getAmount()));
             }
             else if (activity.getType() == Activity.Type.Dividend) {
                 final Stock stock = (Stock)activity.get(Activity.Param.Stock);
                 this.ROIParams.add(activity.getType() + " " + stock.getSymbol());
                 this.totalROIValue += activity.getAmount();
-                this.ROIValues.add(org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(activity.getAmount()));
+                this.ROIValues.add(org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(activity.getAmount()));
             }
             else {
                 assert(false);
@@ -307,7 +307,7 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
 
         final boolean isTotalNeeded = this.ROIParams.size() > 1;
         final String totalParam = GUIBundle.getString("InvestmentFlowLayerUI_Total_Return");
-        final String totalValue = org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(this.totalROIValue);
+        final String totalValue = org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(this.totalROIValue);
         /* This is the height for "total" information. */
         int totalHeight = 0;
 
@@ -394,7 +394,7 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
 
             if (activity.getType() == Activity.Type.Buy) {
                 this.totalInvestValue += activity.getAmount();
-                this.investValues.add(org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(activity.getAmount()));
+                this.investValues.add(org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(activity.getAmount()));
             }
             else {
                 assert(false);
@@ -403,7 +403,7 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
 
         final boolean isTotalNeeded = this.investParams.size() > 1;
         final String totalParam = GUIBundle.getString("InvestmentFlowLayerUI_Total_Invest");
-        final String totalValue = org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(this.totalInvestValue);
+        final String totalValue = org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(this.totalInvestValue);
         /* This is the height for "total" information. */
         int totalHeight = 0;
 
