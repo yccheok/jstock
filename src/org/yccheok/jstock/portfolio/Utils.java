@@ -49,16 +49,48 @@ public class Utils {
         }
     };
 
-    public static String currencyNumberFormat(Object value) {
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
-        final Country country = jStockOptions.getCountry();
-        return jStockOptions.getCurrencySymbol(country) + numberFormat.get().format(value);
+    /**
+     * Convert the value to currency representation (without symbol).
+     *
+     * @param value the value to be converted
+     * @return currency representation (without symbol)
+     */
+    public static String toCurrency(Object value) {
+        return numberFormat.get().format(value);
     }
 
-    public static String currencyNumberFormat(double value) {
+    /**
+     * Convert the value to currency representation (without symbol).
+     * 
+     * @param value the value to be converted
+     * @return currency representation (without symbol)
+     */
+    public static String toCurrency(double value) {
+        return numberFormat.get().format(value);
+    }
+
+    /**
+     * Convert the value to currency representation (with symbol).
+     * 
+     * @param value the value to be converted
+     * @return currency representation (with symbol)
+     */
+    public static String toCurrencyWithSymbol(Object value) {
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
         final Country country = jStockOptions.getCountry();
-        return jStockOptions.getCurrencySymbol(country) + numberFormat.get().format(value);
+        return jStockOptions.getCurrencySymbol(country) + toCurrency(value);
+    }
+
+    /**
+     * Convert the value to currency representation (with symbol).
+     * 
+     * @param value the value to be converted
+     * @return currency representation (with symbol)
+     */
+    public static String toCurrencyWithSymbol(double value) {
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final Country country = jStockOptions.getCountry();
+        return jStockOptions.getCurrencySymbol(country) + toCurrency(value);
     }
 
     public static boolean isTransactionWithEqualStockCode(Transaction t0, Transaction t1) {
