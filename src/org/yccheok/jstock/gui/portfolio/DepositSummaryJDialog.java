@@ -298,9 +298,9 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
         jLabel5.setForeground(org.yccheok.jstock.gui.Utils.getColor(totalDeposit, 0.0));
         jLabel3.setForeground(org.yccheok.jstock.gui.Utils.getColor(totalWithdraw, 0.0));
         jLabel6.setForeground(org.yccheok.jstock.gui.Utils.getColor(total, 0.0));
-        jLabel5.setText(Utils.currencyNumberFormat(totalDeposit));
-        jLabel3.setText(Utils.currencyNumberFormat(totalWithdraw));
-        jLabel6.setText(Utils.currencyNumberFormat(total));
+        jLabel5.setText(Utils.toCurrencyWithSymbol(totalDeposit));
+        jLabel3.setText(Utils.toCurrencyWithSymbol(totalWithdraw));
+        jLabel6.setText(Utils.toCurrencyWithSymbol(total));
     }//GEN-LAST:event_jTable1PropertyChange
 
     private void addNewDeposit() {
@@ -340,7 +340,7 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
         }
 
         int viewIndex = this.jTable1.convertColumnIndexToView(1);
-        String string = org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(jTable1.getValueAt(jTable1.getSelectedRow(), viewIndex));
+        String string = org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(jTable1.getValueAt(jTable1.getSelectedRow(), viewIndex));
         return string;
     }
 
@@ -437,7 +437,7 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
 
     private String getDepositSummaryText() {
         if (this.depositSummary != null) {
-            return MessageFormat.format(GUIBundle.getString("DepositSummaryJDialog_TotalDepositIs_template"), org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(this.depositSummary.getTotal()));
+            return MessageFormat.format(GUIBundle.getString("DepositSummaryJDialog_TotalDepositIs_template"), org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(this.depositSummary.getTotal()));
         }
         return "";
     }

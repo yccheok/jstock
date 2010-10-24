@@ -297,7 +297,7 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
 
     private String getDividendSummaryText() {
         if (this.dividendSummary != null) {
-            return "<html><a href=\"\">" + org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(this.dividendSummary.getTotal()) + "</a></html>";
+            return "<html><a href=\"\">" + org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(this.dividendSummary.getTotal()) + "</a></html>";
         }
         return "";
     }
