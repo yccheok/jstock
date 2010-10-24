@@ -20,6 +20,7 @@
 package org.yccheok.jstock.gui;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -36,6 +37,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
@@ -186,6 +188,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         org.jdesktop.swingx.decorator.Highlighter highlighter0 = org.jdesktop.swingx.decorator.HighlighterFactory.createSimpleStriping(new Color(245, 245, 220));
         buyTreeTable.addHighlighter(highlighter0);
         buyTreeTable.addHighlighter(new ToolTipHighlighter());
+
+        initTreeTableDefaultRenderer(buyTreeTable);
         buyTreeTable.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
             public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
                 buyTreeTableValueChanged(evt);
@@ -208,6 +212,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         org.jdesktop.swingx.decorator.Highlighter highlighter1 = org.jdesktop.swingx.decorator.HighlighterFactory.createSimpleStriping(new Color(245, 245, 220));
         sellTreeTable.addHighlighter(highlighter1);
         sellTreeTable.addHighlighter(new ToolTipHighlighter());
+
+        initTreeTableDefaultRenderer(sellTreeTable);
         sellTreeTable.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
             public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
                 sellTreeTableValueChanged(evt);
@@ -270,7 +276,26 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             this.showNewBuyTransactionJDialog(Utils.getEmptyStock(Code.newInstance(""), Symbol.newInstance("")), 0.0, true);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
-    
+
+    // Define our own renderers, so that we may have a consistent decimal places.
+    private void initTreeTableDefaultRenderer(JXTreeTable treeTable) {
+        final TableCellRenderer doubleOldTableCellRenderer = treeTable.getDefaultRenderer(Double.class);
+
+        treeTable.setDefaultRenderer(Double.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                final Component c = doubleOldTableCellRenderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                if (c instanceof JLabel) {
+                    if (value != null) {
+                        // Re-define the displayed value.
+                        ((JLabel)c).setText(org.yccheok.jstock.portfolio.Utils.toCurrency(value));
+                    }
+                }
+                return c;
+            }
+        });
+    }
+
     private boolean isValidTreeTableNode(TreeTableModel treeTableModel, Object node) {
         boolean result = false;
         
