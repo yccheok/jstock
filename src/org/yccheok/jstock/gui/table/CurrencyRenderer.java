@@ -30,6 +30,6 @@ public class CurrencyRenderer extends GenericRenderer {
 
     @Override
     public void setValue(Object value) {
-        setText((value == null) ? "" : org.yccheok.jstock.portfolio.Utils.currencyNumberFormat(value));
+        setText((value == null) ? "" : org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(value));
     }
 }
