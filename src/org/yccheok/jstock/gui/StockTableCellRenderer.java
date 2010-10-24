@@ -337,7 +337,14 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             final double sellPrice = (Double)tableModel.getValueAt(modelRow, modelCol);
 
             c.setForeground(this.getForegroundColor(sellPrice, prevPrice, alert));
-        } 
+        }
+        else if (table.getColumnName(column).equalsIgnoreCase(OPEN)) {
+            final int modelCol = tableModel.findColumn(OPEN);
+
+            final double openPrice = (Double)tableModel.getValueAt(modelRow, modelCol);
+
+            c.setForeground(this.getForegroundColor(openPrice, prevPrice, alert));
+        }
         else if (table.getColumnName(column).equalsIgnoreCase(LAST)) {
             c.setForeground(this.getForegroundColor(lastPrice, prevPrice, alert));
         }      
@@ -382,6 +389,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
     } 
     
     private static final String PREV;
+    private static final String OPEN;
     private static final String RISE_ABOVE;
     private static final String FALL_BELOW;
     private static final String LAST;
@@ -399,6 +407,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
 
     static {
         PREV = GUIBundle.getString("MainFrame_Prev");
+        OPEN = GUIBundle.getString("MainFrame_Open");
         RISE_ABOVE = GUIBundle.getString("MainFrame_RiseAbove");
         FALL_BELOW = GUIBundle.getString("MainFrame_FallBelow");
         LAST = GUIBundle.getString("MainFrame_Last");

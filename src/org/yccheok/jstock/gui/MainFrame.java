@@ -2815,11 +2815,21 @@ public class MainFrame extends javax.swing.JFrame {
 
         if (guiOptions == null)
         {
+            // When user launches JStock for first time, we will help him to
+            // turn off the following column(s), as we feel those information
+            // is redundant. If they wish to view those information, they have
+            // to turn it on explicitly.
+            JTableUtilities.removeTableColumn(jTable1, GUIBundle.getString("MainFrame_Open"));
             return;
         }
 
         if (guiOptions.getJTableOptionsSize() <= 0)
         {
+            // When user launches JStock for first time, we will help him to
+            // turn off the following column(s), as we feel those information
+            // is redundant. If they wish to view those information, they have
+            // to turn it on explicitly.
+            JTableUtilities.removeTableColumn(jTable1, GUIBundle.getString("MainFrame_Open"));
             return;
         }
 
