@@ -95,10 +95,10 @@ public class Activity {
         Stock stock = (Stock)this.get(Param.Stock);
 
         if (stock != null) {
-            return stock.getSymbol().toString() + " " + type.toString().toLowerCase() + " " + Utils.currencyNumberFormat(amount);
+            return stock.getSymbol().toString() + " " + type.toString().toLowerCase() + " " + Utils.toCurrencyWithSymbol(amount);
         }
 
-        return type.toString().toLowerCase() + " " + Utils.currencyNumberFormat(amount);
+        return type.toString().toLowerCase() + " " + Utils.toCurrencyWithSymbol(amount);
     }
 
     private final Type type;

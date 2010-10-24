@@ -99,10 +99,10 @@ public class Activities {
             Double d = datas.get(key);
             /* Must not be null due to first loop. */
             if (who.length() > 1) {
-                message = message + who + " " + type.toString().toLowerCase() + " " + Utils.currencyNumberFormat(d);
+                message = message + who + " " + type.toString().toLowerCase() + " " + Utils.toCurrencyWithSymbol(d);
             }
             else {
-                message = message + type.toString().toLowerCase() + " " + Utils.currencyNumberFormat(d);
+                message = message + type.toString().toLowerCase() + " " + Utils.toCurrencyWithSymbol(d);
             }
 
             if (count < size) {
