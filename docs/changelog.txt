@@ -5,6 +5,8 @@ JStock 1.0.6 - ????-??-??
   Feature: When user try to add stocks through Stock Database, they will able to 
            make query to Online Stock Database, to ensure the added stocks is
            always up-to-date.
+  Feature: Support "Open Price" column in Stock Watchlist and Stock Indicator
+           Scanner.
   Bugfix:  Even when there is no stock being selected in Stock Watchlist and
            Stock Indicator Scanner, right clicked menu is still shown.
   Bugfix:  Provide a better usability experience, by doesn't not require user to
