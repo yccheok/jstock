@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
+ * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,8 @@ package org.yccheok.jstock.charting;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import org.jfree.chart.JFreeChart;
@@ -28,12 +30,248 @@ import org.jfree.chart.StandardChartTheme;
 import org.jfree.chart.plot.CombinedDomainXYPlot;
 import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.XYPlot;
+import org.yccheok.jstock.engine.Stock;
+import org.yccheok.jstock.engine.StockHistoryServer;
 
 /**
  *
  * @author yccheok
  */
 public class Utils {
+
+    /**
+     * Returns daily chart data based on given stock history server.
+     *
+     * @param stockHistoryServer the stock history server
+     * @return list of daily chart data
+     */
+    public static List<ChartData> getDailyChartData(StockHistoryServer stockHistoryServer) {
+        final int days = stockHistoryServer.getNumOfCalendar();
+
+        List<ChartData> chartDatas = new ArrayList<ChartData>();
+
+        double prevPrice = 0;
+        double openPrice = 0;
+        double lastPrice = 0;
+        double highPrice = Double.MIN_VALUE;
+        double lowPrice = Double.MAX_VALUE;
+        long volume = 0;
+        long timestamp = 0;
+
+        // Just perform simple one to one copy, without performing any
+        // filtering.
+        for (int i = 0; i < days; i++) {
+            Calendar calendar = stockHistoryServer.getCalendar(i);
+            Stock stock = stockHistoryServer.getStock(calendar);
+            prevPrice = stock.getPrevPrice();
+            openPrice = stock.getOpenPrice();
+            lastPrice = stock.getLastPrice();
+            highPrice = stock.getHighPrice();
+            lowPrice = stock.getLowPrice();
+            volume = stock.getVolume();
+            timestamp = stock.getCalendar().getTimeInMillis();
+            ChartData chartData = ChartData.newInstance(
+                    prevPrice,
+                    openPrice,
+                    lastPrice,
+                    highPrice,
+                    lowPrice,
+                    volume,
+                    timestamp);
+            chartDatas.add(chartData);
+        }
+        return chartDatas;
+    }
+
+    /**
+     * Returns weekly chart data based on given stock history server.
+     * 
+     * @param stockHistoryServer the stock history server
+     * @return list of weekly chart data
+     */
+    public static List<ChartData> getWeeklyChartData(StockHistoryServer stockHistoryServer) {
+        final int days = stockHistoryServer.getNumOfCalendar();
+        Calendar prevCalendar = null;
+
+        List<ChartData> chartDatas = new ArrayList<ChartData>();
+
+        double prevPrice = 0;
+        double openPrice = 0;
+        double lastPrice = 0;
+        double highPrice = Double.MIN_VALUE;
+        double lowPrice = Double.MAX_VALUE;
+        long volume = 0;
+        long timestamp = 0;
+        int count = 0;
+
+        for (int i = 0; i < days; i++) {
+            // First, determine the current data is same week as the previous
+            // data.
+            boolean isSameWeek = false;
+            Calendar calendar = stockHistoryServer.getCalendar(i);
+            Stock stock = stockHistoryServer.getStock(calendar);
+
+            if (prevCalendar != null) {
+                int weekOfYear = calendar.get(Calendar.WEEK_OF_YEAR);
+                int prevWeekOfYear = prevCalendar.get(Calendar.WEEK_OF_YEAR);
+                // Is this the same week?
+                isSameWeek = (weekOfYear == prevWeekOfYear);
+            } else {
+                // First time for us to enter this for loop.
+                isSameWeek = true;
+                openPrice = stock.getOpenPrice();
+                prevPrice = stock.getPrevPrice();
+            }
+            
+            if (isSameWeek == false) {
+                // This is a new week. There must be data for previous week.
+                assert(count > 0);
+                ChartData chartData = ChartData.newInstance(
+                        prevPrice,
+                        openPrice,
+                        lastPrice / count,  // Average last price.
+                        highPrice,
+                        lowPrice,
+                        volume / count,     // Average volume.
+                        timestamp);
+                chartDatas.add(chartData);
+
+                // First day of the week.
+                prevPrice = stock.getPrevPrice();
+                openPrice = stock.getOpenPrice();
+                lastPrice = stock.getLastPrice();
+                highPrice = stock.getHighPrice();
+                lowPrice = stock.getLowPrice();
+                volume = stock.getVolume();
+                timestamp = stock.getCalendar().getTimeInMillis();
+                count = 1;
+            } else {
+                // We will not update prevPrice and openPrice. They will remain
+                // as the first day of the week's.
+                lastPrice += stock.getLastPrice();
+                highPrice = Math.max(highPrice, stock.getHighPrice());
+                lowPrice = Math.min(lowPrice, stock.getLowPrice());
+                volume += stock.getVolume();
+                timestamp = stock.getCalendar().getTimeInMillis();
+                count++;
+            }
+
+            prevCalendar = calendar;
+        }
+
+        // Is there any data which is not being inserted yet?
+        if (count > 0) {
+            ChartData chartData = ChartData.newInstance(
+                    prevPrice,
+                    openPrice,
+                    lastPrice / count,
+                    highPrice,
+                    lowPrice,
+                    volume / count,
+                    timestamp);
+            chartDatas.add(chartData);
+        }
+
+        return chartDatas;
+    }
+
+    /**
+     * Returns monthly chart data based on given stock history server.
+     *
+     * @param stockHistoryServer the stock history server
+     * @return list of monthly chart data
+     */
+    public static List<ChartData> getMonthlyChartData(StockHistoryServer stockHistoryServer) {
+        final int days = stockHistoryServer.getNumOfCalendar();
+        Calendar prevCalendar = null;
+
+        List<ChartData> chartDatas = new ArrayList<ChartData>();
+
+        double prevPrice = 0;
+        double openPrice = 0;
+        double lastPrice = 0;
+        double highPrice = Double.MIN_VALUE;
+        double lowPrice = Double.MAX_VALUE;
+        long volume = 0;
+        long timestamp = 0;
+        int count = 0;
+
+        for (int i = 0; i < days; i++) {
+            // First, determine the current data is same month as the previous
+            // data.
+            boolean isSameMonth = false;
+            Calendar calendar = stockHistoryServer.getCalendar(i);
+            Stock stock = stockHistoryServer.getStock(calendar);
+
+            if (prevCalendar != null) {
+                int month = calendar.get(Calendar.MONTH);
+                int prevMonth = prevCalendar.get(Calendar.MONTH);
+                // Is this the same month?
+                isSameMonth = (month == prevMonth);
+            } else {
+                // First time for us to enter this for loop.
+                isSameMonth = true;
+                openPrice = stock.getOpenPrice();
+                prevPrice = stock.getPrevPrice();
+            }
+
+            if (isSameMonth == false) {
+                // This is a new month. There must be data for previous month.
+                assert(count > 0);
+                ChartData chartData = ChartData.newInstance(
+                        prevPrice,
+                        openPrice,
+                        lastPrice / count,  // Average last price.
+                        highPrice,
+                        lowPrice,
+                        volume / count,     // Average volume.
+                        timestamp);
+                chartDatas.add(chartData);
+
+                // First day of the month.
+                prevPrice = stock.getPrevPrice();
+                openPrice = stock.getOpenPrice();
+                lastPrice = stock.getLastPrice();
+                highPrice = stock.getHighPrice();
+                lowPrice = stock.getLowPrice();
+                volume = stock.getVolume();
+                timestamp = stock.getCalendar().getTimeInMillis();
+                count = 1;
+            } else {
+                // We will not update prevPrice and openPrice. They will remain
+                // as the first day of the month's.
+                lastPrice += stock.getLastPrice();
+                highPrice = Math.max(highPrice, stock.getHighPrice());
+                lowPrice = Math.min(lowPrice, stock.getLowPrice());
+                volume += stock.getVolume();
+                timestamp = stock.getCalendar().getTimeInMillis();
+                count++;
+            }
+
+            prevCalendar = calendar;
+        }
+
+        // Is there any data which is not being inserted yet?
+        if (count > 0) {
+            ChartData chartData = ChartData.newInstance(
+                    prevPrice,
+                    openPrice,
+                    lastPrice / count,
+                    highPrice,
+                    lowPrice,
+                    volume / count,
+                    timestamp);
+            chartDatas.add(chartData);
+        }
+
+        return chartDatas;
+    }
+
+    /**
+     * Applying chart theme based on given JFreeChart.
+     *
+     * @param chart the JFreeChart
+     */
     public static void applyChartTheme(JFreeChart chart) {
         final StandardChartTheme chartTheme = (StandardChartTheme)org.jfree.chart.StandardChartTheme.createJFreeTheme();
         chartTheme.setXYBarPainter(barPainter);
