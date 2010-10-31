@@ -165,22 +165,6 @@ public class ChartJDialog extends javax.swing.JDialog {
                 ChartJDialog.this.chartLayerUI.updateTraceInfos();
             }
         });
-
-        /* Restores previous chart dialog options. */
-        /* Time consuming. Let us show the main chart first, and then ask thread
-         * to perform drawing.
-         */
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        loadChartJDialogOptions();
-                    }
-                });
-            }
-        }).start();
     }
 
     /**
@@ -624,7 +608,15 @@ public class ChartJDialog extends javax.swing.JDialog {
         // We need to rebuild TA menus.
         this.jMenu2.removeAll();
 
-        /* Update the GUI. */
+        /* Remember the setting. */
+        MainFrame.getInstance().getChartJDialogOptions().setInterval(interval);
+        /* Remember current interval. */
+        this.currentInverval = interval;
+
+        // Update the GUI.
+        // Only done this after "Remember current interval".
+        // As this will trigger actionPerformed event. We will use currentInverval
+        // to prevent it from re-entering this method.
         if (interval == Interval.Daily) {
             this.jComboBox1.setSelectedItem(GUIBundle.getString("ChartJDialog_Daily"));
         }
@@ -634,11 +626,6 @@ public class ChartJDialog extends javax.swing.JDialog {
         else if(interval == Interval.Monthly) {
             this.jComboBox1.setSelectedItem(GUIBundle.getString("ChartJDialog_Monthly"));
         }
-
-        /* Remember the setting. */
-        MainFrame.getInstance().getChartJDialogOptions().setInterval(interval);
-        /* Remember current interval. */
-        this.currentInverval = interval;
 
         new Thread(new Runnable() {
             @Override
@@ -688,6 +675,11 @@ public class ChartJDialog extends javax.swing.JDialog {
             }
         }
 
+        /* Remember the setting. */
+        MainFrame.getInstance().getChartJDialogOptions().setType(type);
+        /* Remember current interval. */
+        this.currentType = type;
+
         /* Update the GUI. */
         if (type == Type.PriceVolume) {
             this.jRadioButtonMenuItem1.setSelected(true);
@@ -695,11 +687,6 @@ public class ChartJDialog extends javax.swing.JDialog {
         else if (type == Type.Candlestick) {
             this.jRadioButtonMenuItem2.setSelected(true);
         }
-
-        /* Remember the setting. */
-        MainFrame.getInstance().getChartJDialogOptions().setType(type);
-        /* Remember current interval. */
-        this.currentType = type;
     }
 
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
