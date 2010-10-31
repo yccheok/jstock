@@ -504,7 +504,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         NumberFormatter formatter= new NumberFormatter(format);
         formatter.setMinimum(0.0);
         formatter.setValueClass(Double.class);
-        JFormattedTextField field= new JFormattedTextField(formatter);
+        JFormattedTextField field = new JFormattedTextField(formatter);
         return field;
     }
 
