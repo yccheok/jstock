@@ -56,7 +56,7 @@ public class StockHistorySerializer {
 
         Calendar calendar = null;
         
-        if((calendar = stockHistoryServer.getCalendar(0)) == null)
+        if ((calendar = stockHistoryServer.getCalendar(0)) == null)
             return false;
         
         Stock stock = stockHistoryServer.getStock(calendar);
