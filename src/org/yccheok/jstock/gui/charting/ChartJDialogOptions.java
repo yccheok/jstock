@@ -35,12 +35,29 @@ public class ChartJDialogOptions {
     /**
      * Price volume chart or candlestick chart.
      */
-    private ChartJDialog.Mode mode = ChartJDialog.Mode.PriceVolume;
+    private ChartJDialog.Type type = ChartJDialog.Type.PriceVolume;
     /**
      * Zoom options.
      */
     private ChartJDialog.Zoom zoom = ChartJDialog.Zoom.All;
+    /**
+     * Interval options.
+     */
+    private ChartJDialog.Interval interval = ChartJDialog.Interval.Daily;
 
+    private Object readResolve() {
+        if (type == null) {
+            type = ChartJDialog.Type.PriceVolume;
+        }
+        if (zoom == null) {
+            zoom = ChartJDialog.Zoom.All;
+        }
+        if (interval == null) {
+            interval = ChartJDialog.Interval.Daily;
+        }
+        return this;
+    }
+    
     /**
      * Removes all TAExs from this options.
      */
@@ -89,17 +106,17 @@ public class ChartJDialogOptions {
     }
 
     /**
-     * @return the mode
+     * @return the type
      */
-    public ChartJDialog.Mode getMode() {
-        return this.mode;
+    public ChartJDialog.Type getType() {
+        return this.type;
     }
 
     /**
-     * @param mode the mode to set
+     * @param type the type to set
      */
-    public void setMode(ChartJDialog.Mode mode) {
-        this.mode = mode;
+    public void setType(ChartJDialog.Type type) {
+        this.type = type;
     }
 
     /**
@@ -114,5 +131,19 @@ public class ChartJDialogOptions {
      */
     public void setZoom(ChartJDialog.Zoom zoom) {
         this.zoom = zoom;
+    }
+
+    /**
+     * @return the interval
+     */
+    public ChartJDialog.Interval getInterval() {
+        return interval;
+    }
+
+    /**
+     * @param interval the interval to set
+     */
+    public void setInterval(ChartJDialog.Interval interval) {
+        this.interval = interval;
     }
 }
