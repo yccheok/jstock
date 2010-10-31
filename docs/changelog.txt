@@ -8,6 +8,8 @@ JStock 1.0.6 - ????-??-??
            always up-to-date.
   Feature: Support "Open Price" column in Stock Watchlist and Stock Indicator
            Scanner.
+  Feature: Enhancement on charting, by providing daily, weekly and monthly 
+           chart.
   Bugfix:  Even when there is no stock being selected in Stock Watchlist and
            Stock Indicator Scanner, right clicked menu is still shown.
   Bugfix:  Provide a better usability experience, by doesn't not require user to

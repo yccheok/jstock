@@ -109,29 +109,11 @@ public class ChartJDialog extends javax.swing.JDialog {
     }
 
     private Interval getCurrentInterval() {
-        final String selected = this.jComboBox1.getSelectedItem().toString();
-
-        if (selected.equals(GUIBundle.getString("ChartJDialog_Daily"))) {
-            return Interval.Daily;
-        }
-        else if(selected.equals(GUIBundle.getString("ChartJDialog_Weekly"))) {
-            return Interval.Weekly;
-        }
-        else if(selected.equals(GUIBundle.getString("ChartJDialog_Monthly"))) {
-            return Interval.Monthly;
-        }
-        assert(false);
-        return null;
+        return this.currentInverval;
     }
     
     private Type getCurrentType() {
-        if (this.jRadioButtonMenuItem1.isSelected()) {
-            return Type.PriceVolume;
-        } else if (this.jRadioButtonMenuItem2.isSelected()) {
-            return Type.Candlestick;
-        }
-        assert(false);
-        return null;
+        return this.currentType;
     }
 
     /** Creates new form ChartJDialog */
@@ -610,6 +592,11 @@ public class ChartJDialog extends javax.swing.JDialog {
     }
 
     private void changeInterval(Interval interval) {
+        if (interval == getCurrentInterval()) {
+            // Same as current interval. Nothing to do. Returns early.
+            return;
+        }
+        
         if (interval == Interval.Weekly) {
             this.chartDatas = org.yccheok.jstock.charting.Utils.getWeeklyChartData(this.stockHistoryServer);
         } else if (interval == Interval.Monthly) {
@@ -637,21 +624,21 @@ public class ChartJDialog extends javax.swing.JDialog {
         // We need to rebuild TA menus.
         this.jMenu2.removeAll();
 
+        /* Update the GUI. */
+        if (interval == Interval.Daily) {
+            this.jComboBox1.setSelectedItem(GUIBundle.getString("ChartJDialog_Daily"));
+        }
+        else if(interval == Interval.Weekly) {
+            this.jComboBox1.setSelectedItem(GUIBundle.getString("ChartJDialog_Weekly"));
+        }
+        else if(interval == Interval.Monthly) {
+            this.jComboBox1.setSelectedItem(GUIBundle.getString("ChartJDialog_Monthly"));
+        }
+
         /* Remember the setting. */
         MainFrame.getInstance().getChartJDialogOptions().setInterval(interval);
-
-        /* Update the GUI. */
-        if (getCurrentInterval() != interval) {
-            if (interval == Interval.Daily) {
-                this.jComboBox1.setSelectedItem(GUIBundle.getString("ChartJDialog_Daily"));
-            }
-            else if(interval == Interval.Weekly) {
-                this.jComboBox1.setSelectedItem(GUIBundle.getString("ChartJDialog_Weekly"));
-            }
-            else if(interval == Interval.Monthly) {
-                this.jComboBox1.setSelectedItem(GUIBundle.getString("ChartJDialog_Monthly"));
-            }
-        }
+        /* Remember current interval. */
+        this.currentInverval = interval;
 
         new Thread(new Runnable() {
             @Override
@@ -671,6 +658,17 @@ public class ChartJDialog extends javax.swing.JDialog {
      * @param the type (price volume or candlestick chart) of this chart dialog to be changed.
      */
     private void changeType(Type type) {
+        if (type == this.getCurrentType()) {
+            if (this.priceVolumeChart == null && type == Type.PriceVolume) {
+                // Do not returns early! Chart creation is needed.
+            } else if (this.candlestickChart == null && type == Type.Candlestick) {
+                // Do not returns early! Chart creation is needed.
+            } else {
+                // Same as current type. Nothing to do. Returns early.
+                return;
+            }
+        }
+
         if (type == Type.PriceVolume) {
             if (this.priceVolumeChart == null) {
                 this.priceVolumeChart = this.createPriceVolumeChart(this.priceDataset, this.volumeDataset);
@@ -691,21 +689,32 @@ public class ChartJDialog extends javax.swing.JDialog {
         }
 
         /* Update the GUI. */
-        if (this.getCurrentType() != type) {
-            if (type == Type.PriceVolume) {
-                this.jRadioButtonMenuItem1.setSelected(true);
-            }
-            else if (type == Type.Candlestick) {
-                this.jRadioButtonMenuItem2.setSelected(true);
-            }
+        if (type == Type.PriceVolume) {
+            this.jRadioButtonMenuItem1.setSelected(true);
+        }
+        else if (type == Type.Candlestick) {
+            this.jRadioButtonMenuItem2.setSelected(true);
         }
 
         /* Remember the setting. */
         MainFrame.getInstance().getChartJDialogOptions().setType(type);
+        /* Remember current interval. */
+        this.currentType = type;
     }
 
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
-        this.changeInterval(getCurrentInterval());
+        final String selected = this.jComboBox1.getSelectedItem().toString();
+        Interval interval = Interval.Daily;
+        if (selected.equals(GUIBundle.getString("ChartJDialog_Daily"))) {
+            interval = Interval.Daily;
+        }
+        else if(selected.equals(GUIBundle.getString("ChartJDialog_Weekly"))) {
+            interval = Interval.Weekly;
+        }
+        else if(selected.equals(GUIBundle.getString("ChartJDialog_Monthly"))) {
+            interval = Interval.Monthly;
+        }
+        this.changeInterval(interval);
     }//GEN-LAST:event_jComboBox1ActionPerformed
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
@@ -1829,6 +1838,9 @@ public class ChartJDialog extends javax.swing.JDialog {
         private final TA ta;
         private final Object parameter;
     }
+
+    private Interval currentInverval = null;
+    private Type currentType = null;
 
     private final StockHistoryServer stockHistoryServer;
     /* Derived based on stockHistoryServer. */
