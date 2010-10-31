@@ -52,6 +52,7 @@ import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.time.TimeSeriesDataItem;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.ui.RectangleEdge;
+import org.yccheok.jstock.charting.ChartData;
 import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.StockHistoryServer;
 import org.yccheok.jstock.gui.JStockOptions;
@@ -155,19 +156,19 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         final Font dateFont = oldFont.deriveFont((float)oldFont.getSize() - 1);
         final FontMetrics dateFontMetrics = g2.getFontMetrics(dateFont);
 
-        final StockHistoryServer stockHistoryServer = this.chartJDialog.getStockHistoryServer();
+        final List<ChartData> chartDatas = this.chartJDialog.getChartDatas();
         List<String> values = new ArrayList<String>();
-        final Stock stock = stockHistoryServer.getStock(stockHistoryServer.getCalendar(this.mainTraceInfo.getDataIndex()));
+        final ChartData chartData = chartDatas.get(this.mainTraceInfo.getDataIndex());
 
         // Number formats are generally not synchronized. It is recommended to create separate format instances for each thread. 
         // If multiple threads access a format concurrently, it must be synchronized externally.
         // http://stackoverflow.com/questions/2213410/usage-of-decimalformat-for-the-following-case
         final DecimalFormat integerFormat = new DecimalFormat("###,###");
-        values.add(org.yccheok.jstock.gui.Utils.stockPriceDecimalFormat(stock.getPrevPrice()));
-        values.add(org.yccheok.jstock.gui.Utils.stockPriceDecimalFormat(stock.getLastPrice()));
-        values.add(org.yccheok.jstock.gui.Utils.stockPriceDecimalFormat(stock.getHighPrice()));
-        values.add(org.yccheok.jstock.gui.Utils.stockPriceDecimalFormat(stock.getLowPrice()));
-        values.add(integerFormat.format(stock.getVolume()));
+        values.add(org.yccheok.jstock.gui.Utils.stockPriceDecimalFormat(chartData.getPrevPrice()));
+        values.add(org.yccheok.jstock.gui.Utils.stockPriceDecimalFormat(chartData.getLastPrice()));
+        values.add(org.yccheok.jstock.gui.Utils.stockPriceDecimalFormat(chartData.getHighPrice()));
+        values.add(org.yccheok.jstock.gui.Utils.stockPriceDecimalFormat(chartData.getLowPrice()));
+        values.add(integerFormat.format(chartData.getVolume()));
 
         final List<String> indicatorParams = new ArrayList<String>();
         final List<String> indicatorValues = new ArrayList<String>();
@@ -216,7 +217,7 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
             }
         }
 
-        final Date date =  stockHistoryServer.getCalendar(this.mainTraceInfo.getDataIndex()).getTime();
+        final Date date =  new Date(chartData.getTimestamp());
         
         // Date formats are not synchronized. It is recommended to create separate format instances for each thread.
         // If multiple threads access a format concurrently, it must be synchronized externally.
@@ -310,10 +311,11 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
             final String value = values.get(index++);
             g2.setColor(Color.BLACK);
             if (param.equals(LAST_STR)) {
-                if (stock.getChangePrice() > 0.0) {
+                final double changePrice = chartData.getLastPrice() - chartData.getPrevPrice();
+                if (changePrice > 0.0) {
                     g2.setColor(JStockOptions.DEFAULT_HIGHER_NUMERICAL_VALUE_FOREGROUND_COLOR);
                 }
-                else if (stock.getChangePrice() < 0.0) {
+                else if (changePrice < 0.0) {
                     g2.setColor(JStockOptions.DEFAULT_LOWER_NUMERICAL_VALUE_FOREGROUND_COLOR);
                 }
             }
