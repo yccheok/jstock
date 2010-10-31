@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2009 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,24 +17,32 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-
 package org.yccheok.jstock.charting;
 
 import com.tictactec.ta.lib.Core;
 import com.tictactec.ta.lib.MInteger;
+import java.util.Date;
+import java.util.List;
 import org.apache.commons.lang.ArrayUtils;
 import org.jfree.data.time.Day;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.XYDataset;
 import org.yccheok.jstock.engine.Stock;
-import org.yccheok.jstock.engine.StockHistoryServer;
 
 /**
  *
  * @author yccheok
  */
 public class TechnicalAnalysis {
+
+    /**
+     * Returns the latest EMA.
+     *
+     * @param values list of raw data input
+     * @param period the duration period
+     * @return the latest EMA
+     */
     public static Double createEMA(java.util.List<Double> values, int period) {
         if (period <= 0) {
             throw new java.lang.IllegalArgumentException("period must be greater than 0");
@@ -55,6 +63,16 @@ public class TechnicalAnalysis {
         return output[outNbElement.value - 1];
     }
 
+    /**
+     * Returns the latest MFI.
+     *
+     * @param highs list of high price
+     * @param lows list of low price
+     * @param closes list of close price
+     * @param volumes list of volume
+     * @param period the duration period
+     * @return the latest MFI
+     */
     public static Double createMFI(java.util.List<Double> highs,
             java.util.List<Double> lows,
             java.util.List<Double> closes,
@@ -82,14 +100,19 @@ public class TechnicalAnalysis {
         long[] _volumes = ArrayUtils.toPrimitive(volumes.toArray(new Long[0]));
 
         double[] dv = new double[_volumes.length];
-        for (int i = 0; i < dv.length; i++) {
-            dv[i] = _volumes[i];
-        }
+        System.arraycopy(_volumes, 0, dv, 0, dv.length);
         core.mfi(0, _highs.length - 1, _highs, _lows, _closes, dv,  period, outBegIdx, outNbElement, output);
 
         return output[outNbElement.value - 1];
     }
 
+    /**
+     * Returns the latest RSI.
+     *
+     * @param values list of raw data input
+     * @param period the duration period
+     * @return the latest RSI
+     */
     public static Double createRSI(java.util.List<Double> values, int period) {
         if (period <= 0) {
             throw new java.lang.IllegalArgumentException("period must be greater than 0");
@@ -110,13 +133,61 @@ public class TechnicalAnalysis {
         return output[outNbElement.value - 1];
     }
 
-    public static TimeSeries createEMA(StockHistoryServer stockHistoryServer, String name, int period) {
+    /**
+     * Returns SMA time series for charting purpose.
+     *
+     * @param chartDatas list of chart data
+     * @param name name for the time series
+     * @param period the duration period
+     * @return SMA time series for charting purpose
+     */
+    public static TimeSeries createSMA(List<ChartData> chartDatas, String name, int period) {
         if (period <= 0) {
             throw new java.lang.IllegalArgumentException("period must be greater than 0");
         }
 
         final TimeSeries series = new TimeSeries(name);
-        final int num = stockHistoryServer.getNumOfCalendar();
+        final int num = chartDatas.size();
+
+        final Core core = new Core();
+        final int allocationSize = num - core.smaLookback(period);
+        if (allocationSize <= 0) {
+            return series;
+        }
+        final double[] last = new double[num];
+        // Fill up last array.
+        for (int i = 0; i < num; i++) {
+            last[i] = chartDatas.get(i).getLastPrice();
+        }
+
+        final double[] output = new double[allocationSize];
+        final MInteger outBegIdx = new MInteger();
+        final MInteger outNbElement = new MInteger();
+
+        core.sma(0, last.length - 1, last, period, outBegIdx, outNbElement, output);
+
+        for (int i = 0; i < outNbElement.value; i++) {
+            series.add(new Day(new Date(chartDatas.get(i + outBegIdx.value).getTimestamp())), output[i]);
+        }
+
+        return series;
+    }
+
+    /**
+     * Returns EMA time series for charting purpose.
+     *
+     * @param chartDatas list of chart data
+     * @param name name for the time series
+     * @param period the duration period
+     * @return EMA time series for charting purpose
+     */
+    public static TimeSeries createEMA(List<ChartData> chartDatas, String name, int period) {
+        if (period <= 0) {
+            throw new java.lang.IllegalArgumentException("period must be greater than 0");
+        }
+
+        final TimeSeries series = new TimeSeries(name);
+        final int num = chartDatas.size();
 
         final Core core = new Core();
         final int allocationSize = num - core.emaLookback(period);
@@ -126,7 +197,7 @@ public class TechnicalAnalysis {
         final double[] last = new double[num];
         // Fill up last array.
         for (int i = 0; i < num; i++) {
-            last[i] = stockHistoryServer.getStock(stockHistoryServer.getCalendar(i)).getLastPrice();
+            last[i] = chartDatas.get(i).getLastPrice();
         }
 
         final double[] output = new double[allocationSize];
@@ -136,19 +207,27 @@ public class TechnicalAnalysis {
         core.ema(0, last.length - 1, last, period, outBegIdx, outNbElement, output);
 
         for (int i = 0; i < outNbElement.value; i++) {
-            series.add(new Day(stockHistoryServer.getCalendar(i + outBegIdx.value).getTime()), output[i]);
+            series.add(new Day(new Date(chartDatas.get(i + outBegIdx.value).getTimestamp())), output[i]);
         }
 
         return series;
     }
 
-    public static XYDataset createCCI(StockHistoryServer stockHistoryServer, String name, int period) {
+    /**
+     * Returns CCI XYDataset for charting purpose.
+     *
+     * @param chartDatas list of chart data
+     * @param name name for the XYDataset
+     * @param period the duration period
+     * @return CCI XYDataset for charting purpose
+     */
+    public static XYDataset createCCI(List<ChartData> chartDatas, String name, int period) {
         if (period <= 0) {
             throw new java.lang.IllegalArgumentException("period must be greater than 0");
         }
 
         final TimeSeries series = new TimeSeries(name);
-        final int num = stockHistoryServer.getNumOfCalendar();
+        final int num = chartDatas.size();
 
         final Core core = new Core();
         final int allocationSize = num - core.cciLookback(period);
@@ -161,9 +240,9 @@ public class TechnicalAnalysis {
         final double[] close = new double[num];
         // Fill up last array.
         for (int i = 0; i < num; i++) {
-            high[i] = stockHistoryServer.getStock(stockHistoryServer.getCalendar(i)).getHighPrice();
-            low[i] = stockHistoryServer.getStock(stockHistoryServer.getCalendar(i)).getLowPrice();
-            close[i] = stockHistoryServer.getStock(stockHistoryServer.getCalendar(i)).getLastPrice();
+            high[i] = chartDatas.get(i).getHighPrice();
+            low[i] = chartDatas.get(i).getLowPrice();
+            close[i] = chartDatas.get(i).getLastPrice();
         }
 
         final double[] output = new double[allocationSize];
@@ -173,19 +252,27 @@ public class TechnicalAnalysis {
         core.cci(0, num - 1, high, low, close, period, outBegIdx, outNbElement, output);
 
         for (int i = 0; i < outNbElement.value; i++) {
-            series.add(new Day(stockHistoryServer.getCalendar(i + outBegIdx.value).getTime()), output[i]);
+            series.add(new Day(new Date(chartDatas.get(i + outBegIdx.value).getTimestamp())), output[i]);
         }
 
         return new TimeSeriesCollection(series);
     }
 
-    public static XYDataset createRSI(StockHistoryServer stockHistoryServer, String name, int period) {
+    /**
+     * Returns RSI XYDataset for charting purpose.
+     *
+     * @param chartDatas list of chart data
+     * @param name name for the XYDataset
+     * @param period the duration period
+     * @return RSI XYDataset for charting purpose
+     */
+    public static XYDataset createRSI(List<ChartData> chartDatas, String name, int period) {
         if (period <= 0) {
             throw new java.lang.IllegalArgumentException("period must be greater than 0");
         }
 
         final TimeSeries series = new TimeSeries(name);
-        final int num = stockHistoryServer.getNumOfCalendar();
+        final int num = chartDatas.size();
 
         final Core core = new Core();
         final int allocationSize = num - core.rsiLookback(period);
@@ -196,7 +283,7 @@ public class TechnicalAnalysis {
         final double[] last = new double[num];
         // Fill up last array.
         for (int i = 0; i < num; i++) {
-            last[i] = stockHistoryServer.getStock(stockHistoryServer.getCalendar(i)).getLastPrice();
+            last[i] = chartDatas.get(i).getLastPrice();
         }
 
         final double[] output = new double[allocationSize];
@@ -206,19 +293,27 @@ public class TechnicalAnalysis {
         core.rsi(0, last.length - 1, last, period, outBegIdx, outNbElement, output);
 
         for (int i = 0; i < outNbElement.value; i++) {
-            series.add(new Day(stockHistoryServer.getCalendar(i + outBegIdx.value).getTime()), output[i]);
+            series.add(new Day(new Date(chartDatas.get(i + outBegIdx.value).getTimestamp())), output[i]);
         }
 
         return new TimeSeriesCollection(series);
     }
 
-    public static XYDataset createMFI(StockHistoryServer stockHistoryServer, String name, int period) {
+    /**
+     * Returns MFI XYDataset for charting purpose.
+     *
+     * @param chartDatas list of chart data
+     * @param name name for the XYDataset
+     * @param period the duration period
+     * @return MFI XYDataset for charting purpose
+     */
+    public static XYDataset createMFI(List<ChartData> chartDatas, String name, int period) {
         if (period <= 0) {
             throw new java.lang.IllegalArgumentException("period must be greater than 0");
         }
 
         final TimeSeries series = new TimeSeries(name);
-        final int num = stockHistoryServer.getNumOfCalendar();
+        final int num = chartDatas.size();
 
         final Core core = new Core();
         final int allocationSize = num - core.mfiLookback(period);
@@ -232,10 +327,10 @@ public class TechnicalAnalysis {
         final double[] volume = new double[num];
         // Fill up last array.
         for (int i = 0; i < num; i++) {
-            high[i] = stockHistoryServer.getStock(stockHistoryServer.getCalendar(i)).getHighPrice();
-            low[i] = stockHistoryServer.getStock(stockHistoryServer.getCalendar(i)).getLowPrice();
-            close[i] = stockHistoryServer.getStock(stockHistoryServer.getCalendar(i)).getLastPrice();
-            volume[i] = stockHistoryServer.getStock(stockHistoryServer.getCalendar(i)).getVolume();
+            high[i] = chartDatas.get(i).getHighPrice();
+            low[i] = chartDatas.get(i).getLowPrice();
+            close[i] = chartDatas.get(i).getLastPrice();
+            volume[i] = chartDatas.get(i).getVolume();
         }
 
         final double[] output = new double[allocationSize];
@@ -245,12 +340,18 @@ public class TechnicalAnalysis {
         core.mfi(0, num - 1, high, low, close, volume,  period, outBegIdx, outNbElement, output);
 
         for (int i = 0; i < outNbElement.value; i++) {
-            series.add(new Day(stockHistoryServer.getCalendar(i + outBegIdx.value).getTime()), output[i]);
+            series.add(new Day(new Date(chartDatas.get(i + outBegIdx.value).getTimestamp())), output[i]);
         }
 
         return new TimeSeriesCollection(series);
     }
 
+    /**
+     * Returns typical price of the stock.
+     * 
+     * @param stock the stock
+     * @return typical price of the stock
+     */
     public static double getTypicalPrice(Stock stock) {
         return (stock.getHighPrice() + stock.getLowPrice() + stock.getLastPrice()) / 3.0;
     }
