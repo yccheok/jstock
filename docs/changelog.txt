@@ -10,12 +10,17 @@ JStock 1.0.5s - 2010-11-??
            Scanner.
   Feature: Enhancement on charting, by providing daily, weekly and monthly 
            chart.
+  Feature: Able to use left/right arrow key to move around yellow information
+           box.
   Bugfix:  Even when there is no stock being selected in Stock Watchlist and
            Stock Indicator Scanner, right clicked menu is still shown.
   Bugfix:  Provide a better usability experience, by doesn't not require user to
            press ENTER, after finish editing. This will affect deposit dialog,
            dividend dialog, stock database dialog, and property dialog for
            stock indicator editor.
+  Bugfix:  No longer using horizontal scroll bar for stock input text field.
+           Instead, we will automatically enlarge the drop down field when there
+           is a need.
   Bugfix:  We forget to trim the input in StockDatabaseJDialog.
   Bugfix:  Trim the string input in AutoCompleteJComboBox.
   
