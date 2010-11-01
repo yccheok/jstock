@@ -146,6 +146,11 @@ public class ChartJDialog extends javax.swing.JDialog {
         final Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
         this.chartPanel.setMaximumDrawWidth((int)Math.round(dimension.getWidth()));
         this.chartPanel.setMaximumDrawHeight((int)Math.round(dimension.getHeight()));
+ 
+       // Make chartPanel able to receive key event.
+        // So that we may use arrow key to move around yellow information box.
+        this.chartPanel.setFocusable(true);
+        this.chartPanel.requestFocus();
 
         final org.jdesktop.jxlayer.JXLayer<ChartPanel> layer = new org.jdesktop.jxlayer.JXLayer<ChartPanel>(this.chartPanel);
         this.chartLayerUI = new ChartLayerUI<ChartPanel>(this);
@@ -661,6 +666,9 @@ public class ChartJDialog extends javax.swing.JDialog {
                 this.priceVolumeChart = this.createPriceVolumeChart(this.priceDataset, this.volumeDataset);
             }
             chartPanel.setChart(this.priceVolumeChart);
+            // Make chartPanel able to receive key event.
+            // So that we may use arrow key to move around yellow information box.
+            chartPanel.requestFocus();
             if (this.chartLayerUI != null) {
                 this.chartLayerUI.updateTraceInfos();
             }
@@ -670,6 +678,9 @@ public class ChartJDialog extends javax.swing.JDialog {
                 this.candlestickChart = this.createCandlestickChart(this.priceOHLCDataset);
             }
             chartPanel.setChart(this.candlestickChart);
+            // Make chartPanel able to receive key event.
+            // So that we may use arrow key to move around yellow information box.
+            chartPanel.requestFocus();            
             if (this.chartLayerUI != null) {
                 this.chartLayerUI.updateTraceInfos();
             }
