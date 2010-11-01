@@ -27,6 +27,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 
@@ -53,8 +54,6 @@ import org.jfree.data.time.TimeSeriesDataItem;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.ui.RectangleEdge;
 import org.yccheok.jstock.charting.ChartData;
-import org.yccheok.jstock.engine.Stock;
-import org.yccheok.jstock.engine.StockHistoryServer;
 import org.yccheok.jstock.gui.JStockOptions;
 import org.yccheok.jstock.gui.MainFrame;
 import org.yccheok.jstock.gui.Utils;
@@ -570,9 +569,41 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
 
     // Possible null, if the chart had been updated, but the drawing is not being
     // rendered properly yet.
-    private Point2D getPoint(int plotIndex, int seriesIndex, int dataIndex) {
+    // (We need to refactor this method to merge with getPoint)
+    private Point2D.Double _getPointForCandlestick(int plotIndex, int seriesIndex, int dataIndex) {
+        final ChartPanel chartPanel = this.chartJDialog.getChartPanel();
+        final XYPlot plot = this.chartJDialog.getPlot(plotIndex);
+        final ValueAxis domainAxis = plot.getDomainAxis();
+        final RectangleEdge domainAxisEdge = plot.getDomainAxisEdge();
+        final ValueAxis rangeAxis = plot.getRangeAxis();
+        final RectangleEdge rangeAxisEdge = plot.getRangeAxisEdge();
+
+        final org.jfree.data.xy.DefaultHighLowDataset defaultHighLowDataset = (org.jfree.data.xy.DefaultHighLowDataset)plot.getDataset(seriesIndex);
+
+        if (dataIndex >= defaultHighLowDataset.getItemCount(0)) {
+            /* Not ready yet. */
+            return null;
+        }
+
+        final double xValue = defaultHighLowDataset.getXDate(0, dataIndex).getTime();
+        final double yValue = defaultHighLowDataset.getCloseValue(0, dataIndex);
+        final Rectangle2D plotArea = chartPanel.getChartRenderingInfo().getPlotInfo().getSubplotInfo(plotIndex).getDataArea();
+        final double xJava2D = domainAxis.valueToJava2D(xValue, plotArea, domainAxisEdge);
+        final double yJava2D = rangeAxis.valueToJava2D(yValue, plotArea, rangeAxisEdge);
+        // Use Double version, to avoid from losing precision.
+        return new Point2D.Double(xJava2D, yJava2D);
+    }
+
+    // Possible null, if the chart had been updated, but the drawing is not being
+    // rendered properly yet.
+    private Point2D.Double getPoint(int plotIndex, int seriesIndex, int dataIndex) {
         final TimeSeries timeSeries = this.getTimeSeries(plotIndex, seriesIndex);
         if (timeSeries == null) {
+            // Possible this is candlestick?
+            final XYPlot plot = this.chartJDialog.getPlot(plotIndex);
+            if (plot.getDataset(seriesIndex) instanceof org.jfree.data.xy.DefaultHighLowDataset) {
+                return this._getPointForCandlestick(plotIndex, seriesIndex, dataIndex);
+            }
             return null;
         }
 
@@ -594,8 +625,8 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         final Rectangle2D plotArea = chartPanel.getChartRenderingInfo().getPlotInfo().getSubplotInfo(plotIndex).getDataArea();
         final double xJava2D = domainAxis.valueToJava2D(xValue, plotArea, domainAxisEdge);
         final double yJava2D = rangeAxis.valueToJava2D(yValue, plotArea, rangeAxisEdge);
-
-        return new Point((int)xJava2D, (int)yJava2D);
+        // Use Double version, to avoid from losing precision.
+        return new Point2D.Double(xJava2D, yJava2D);
     }
 
     // Possible null, if the chart had been updated, but the drawing is not being
@@ -641,6 +672,31 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         return -1;
     }
 
+    // Use to move yellow information box by using arrow key.
+    private void updateTraceInfosIfPossible(int dataOffset) {
+        // Do we have a valid mainTraceInfo?
+        if (this.mainTraceInfo.point == null) {
+            // Nope. Returns early.
+            return;
+        }
+        final int newDataIndex = dataOffset + this.mainTraceInfo.dataIndex;
+        if (newDataIndex < 0) {
+            // We try to offset beyond chart boundary. Returns early.
+        }
+        
+        /* Try to get correct main chart area. */
+        final ChartPanel chartPanel = this.chartJDialog.getChartPanel();
+        final Rectangle2D _plotArea = chartPanel.getChartRenderingInfo().getPlotInfo().getSubplotInfo(0).getDataArea();
+
+        final Point2D tmpPoint = this.getPoint(0, 0, newDataIndex);
+        if (tmpPoint == null || _plotArea.contains(tmpPoint) == false) {
+            return;
+        }
+
+        this.mainTraceInfo = TraceInfo.newInstance(tmpPoint, 0, 0, newDataIndex);
+        this.updateTraceInfos();
+    }
+
     public void updateTraceInfos() {
         this.updateMainTraceInfo();
         // updateIndicatorTraceInfos must always be called only after updateMainTraceInfo.
@@ -658,7 +714,8 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
     // Update this.mainDrawArea, this.mainTraceInfo
     // If traceInfo is not within this.mainDrawArea, this.mainTraceInfo will not be
     // updated. However, this.mainDrawArea will always be updated.
-    private boolean updateMainTraceInfoForCandlestick(Point2D point) {
+    // (We need to refactor this method to merge with updateMainTraceInfo)
+    private boolean _updateMainTraceInfoForCandlestick(Point2D point) {
         if (point == null) {
             return false;
         }
@@ -670,7 +727,9 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         final org.jfree.data.xy.DefaultHighLowDataset defaultHighLowDataset = (org.jfree.data.xy.DefaultHighLowDataset)plot.getDataset();
 
         // I also not sure why. This is what are being done in Mouse Listener Demo 4.
-        final Point2D p2 = chartPanel.translateScreenToJava2D((Point)point);
+        //
+        // Don't use it. It will cause us to lose precision.
+        //final Point2D p2 = chartPanel.translateScreenToJava2D((Point)point);
 
         /* Try to get correct main chart area. */
         final Rectangle2D _plotArea = chartPanel.getChartRenderingInfo().getPlotInfo().getSubplotInfo(0).getDataArea();
@@ -679,7 +738,10 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         final RectangleEdge domainAxisEdge = plot.getDomainAxisEdge();
         final ValueAxis rangeAxis = plot.getRangeAxis();
         final RectangleEdge rangeAxisEdge = plot.getRangeAxisEdge();
-        final double coordinateX = domainAxis.java2DToValue(p2.getX(), _plotArea,
+        // Don't use it. It will cause us to lose precision.
+        //final double coordinateX = domainAxis.java2DToValue(p2.getX(), _plotArea,
+        //        domainAxisEdge);
+        final double coordinateX = domainAxis.java2DToValue(point.getX(), _plotArea,
                 domainAxisEdge);
         //double coordinateY = rangeAxis.java2DToValue(mousePoint2.getY(), plotArea,
         //        rangeAxisEdge);
@@ -735,6 +797,23 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         return false;
     }
 
+    @Override
+    public void processKeyEvent(java.awt.event.KeyEvent e, JXLayer<? extends V> l) {
+        if (e.getID() != KeyEvent.KEY_PRESSED) {
+            // We are only interested in KEY_PRESSED event.
+            return;
+        }
+        final int code = e.getKeyCode();
+        switch(code) {
+            case KeyEvent.VK_LEFT:
+                this.updateTraceInfosIfPossible(-1);
+                break;
+            case KeyEvent.VK_RIGHT:
+                this.updateTraceInfosIfPossible(+1);
+                break;
+        }
+    }
+
     // Update this.mainDrawArea, this.mainTraceInfo
     // If traceInfo is not within this.mainDrawArea, this.mainTraceInfo will not be
     // updated. However, this.mainDrawArea will always be updated.
@@ -748,7 +827,7 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         final XYPlot plot = this.chartJDialog.getPlot();
 
         if (plot.getDataset() instanceof org.jfree.data.xy.DefaultHighLowDataset) {
-            return this.updateMainTraceInfoForCandlestick(point);
+            return this._updateMainTraceInfoForCandlestick(point);
         }
 
         final TimeSeriesCollection timeSeriesCollection = (TimeSeriesCollection)plot.getDataset();
@@ -756,7 +835,9 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         final TimeSeries timeSeries = timeSeriesCollection.getSeries(0);
         
         // I also not sure why. This is what are being done in Mouse Listener Demo 4.
-        final Point2D p2 = chartPanel.translateScreenToJava2D((Point)point);
+        //
+        // Don't use it. It will cause us to lose precision.
+        //final Point2D p2 = chartPanel.translateScreenToJava2D((Point)point);
 
         /* Try to get correct main chart area. */
         final Rectangle2D _plotArea = chartPanel.getChartRenderingInfo().getPlotInfo().getSubplotInfo(0).getDataArea();
@@ -765,7 +846,10 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         final RectangleEdge domainAxisEdge = plot.getDomainAxisEdge();
         final ValueAxis rangeAxis = plot.getRangeAxis();
         final RectangleEdge rangeAxisEdge = plot.getRangeAxisEdge();
-        final double coordinateX = domainAxis.java2DToValue(p2.getX(), _plotArea,
+        // Don't use it. It will cause us to lose precision.
+        //final double coordinateX = domainAxis.java2DToValue(p2.getX(), _plotArea,
+        //        domainAxisEdge);
+        final double coordinateX = domainAxis.java2DToValue(point.getX(), _plotArea, 
                 domainAxisEdge);
         //double coordinateY = rangeAxis.java2DToValue(mousePoint2.getY(), plotArea,
         //        rangeAxisEdge);
