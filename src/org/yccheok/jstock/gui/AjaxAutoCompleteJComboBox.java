@@ -136,6 +136,7 @@ public class AjaxAutoCompleteJComboBox extends JComboBox {
         this.addPopupMenuListener(this.getPopupMenuListener());
 
         // Create horizontal scroll bar if needed.
+        // (I am not sure I still need this one as I already have adjustPopupWidth)
         this.adjustScrollBar();
     }
 
@@ -380,16 +381,17 @@ public class AjaxAutoCompleteJComboBox extends JComboBox {
         JScrollPane scrollPane = (JScrollPane) popup.getComponent(0);
         Object value = this.getItemAt(0);
         Component rendererComp = this.getRenderer().getListCellRendererComponent(null, value, 0, false, false);
-        if (rendererComp instanceof JXTable) {
-            scrollPane.setColumnHeaderView(((JTable) rendererComp).getTableHeader());
-        }
+        //if (rendererComp instanceof JXTable) {
+        //    scrollPane.setColumnHeaderView(((JTable) rendererComp).getTableHeader());
+        //}
         Dimension prefSize = rendererComp.getPreferredSize();
         Dimension size = scrollPane.getPreferredSize();
         // +20, as the vertical scroll bar occupy space too.
         size.width = Math.max(size.width, prefSize.width) + 20;
         scrollPane.setPreferredSize(size);
         scrollPane.setMaximumSize(size);
-        scrollPane.revalidate();
+        // Do we need to call revalidate?
+        //scrollPane.revalidate();
     }
 
     private void adjustScrollBar() {
