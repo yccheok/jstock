@@ -30,7 +30,6 @@ import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -44,7 +43,6 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jdesktop.swingx.JXTable;
 import org.yccheok.jstock.engine.AjaxYahooSearchEngine;
 import org.yccheok.jstock.engine.AjaxYahooSearchEngine.ResultSetType;
 import org.yccheok.jstock.engine.AjaxYahooSearchEngine.ResultType;
@@ -395,13 +393,31 @@ public class AjaxAutoCompleteJComboBox extends JComboBox {
     }
 
     private void adjustScrollBar() {
-        //if (this.getItemCount() == 0) return;
-        Object comp = this.getUI().getAccessibleChild(this, 0);
-        if (!(comp instanceof JPopupMenu)) {
+        final int max_search = 8;
+        // i < max_search is just a safe guard when getAccessibleChildrenCount
+        // returns an arbitary large number. 8 is magic number
+        JPopupMenu popup = null;
+        for (int i = 0, count = this.getUI().getAccessibleChildrenCount(this); i < count && i < max_search; i++) {
+            Object o = this.getUI().getAccessibleChild(this, 0);
+            if (o instanceof JPopupMenu) {
+                popup = (JPopupMenu)o;
+                break;
+            }
+        }
+        if (popup == null) {
             return;
         }
-        JPopupMenu popup = (JPopupMenu) comp;
-        JScrollPane scrollPane = (JScrollPane) popup.getComponent(0);
+        JScrollPane scrollPane = null;
+        for (int i = 0, count = popup.getComponentCount(); i < count && i < max_search; i++) {
+            Component c = popup.getComponent(i);
+            if (c instanceof JScrollPane) {
+                scrollPane = (JScrollPane)c;
+                break;
+            }
+        }
+        if (scrollPane == null) {
+            return;
+        }
         scrollPane.setHorizontalScrollBar(new JScrollBar(JScrollBar.HORIZONTAL));
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
     }

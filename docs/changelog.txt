@@ -1,6 +1,10 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.5t - 2010-11-05
+  Bugfix:  Critical fix on Mac platform, where user is facing ClassCastException
+           during startup.
+  
 JStock 1.0.5s - 2010-11-02
   Feature: Having consistent decimal places for portfolio page. (#3092882)
   Feature: When user try to add stocks through Stock Database, they will able to 
