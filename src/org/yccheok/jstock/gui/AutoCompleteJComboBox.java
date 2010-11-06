@@ -387,7 +387,7 @@ public class AutoCompleteJComboBox extends JComboBox {
         // returns an arbitary large number. 8 is magic number
         JPopupMenu popup = null;
         for (int i = 0, count = this.getUI().getAccessibleChildrenCount(this); i < count && i < max_search; i++) {
-            Object o = this.getUI().getAccessibleChild(this, 0);
+            Object o = this.getUI().getAccessibleChild(this, i);
             if (o instanceof JPopupMenu) {
                 popup = (JPopupMenu)o;
                 break;
