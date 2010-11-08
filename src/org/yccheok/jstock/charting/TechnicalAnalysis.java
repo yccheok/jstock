@@ -100,7 +100,11 @@ public class TechnicalAnalysis {
         long[] _volumes = ArrayUtils.toPrimitive(volumes.toArray(new Long[0]));
 
         double[] dv = new double[_volumes.length];
-        System.arraycopy(_volumes, 0, dv, 0, dv.length);
+        // Do not use System.arraycopy.
+        // It will cause java.lang.ArrayStoreException, due to type mismatch.
+        for (int i = 0; i < dv.length; i++) {
+            dv[i] = _volumes[i];
+        }
         core.mfi(0, _highs.length - 1, _highs, _lows, _closes, dv,  period, outBegIdx, outNbElement, output);
 
         return output[outNbElement.value - 1];
