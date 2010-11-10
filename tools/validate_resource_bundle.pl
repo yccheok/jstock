@@ -30,11 +30,109 @@ if ($ARGV[0])
     $dir = $ARGV[0];
 }
 
+####################
+# Default Language #
+####################
+reset_global_variables();
 find(\&init, $dir);
 find(\&process, $dir);
-
 print "\n$init_counter resource keys being initiazlied.\n";
 print "$process_counter files being processed.\n";
+print "Validation on (default) files done!\n\n\n";
+
+####################
+# English Language #
+####################
+reset_global_variables();
+find(\&init_en, $dir);
+find(\&process, $dir);
+print "\n$init_counter resource keys being initiazlied.\n";
+print "$process_counter files being processed.\n";
+print "Validation on (en) files done!\n\n\n";
+
+####################
+# Chinese Language #
+####################
+reset_global_variables();
+find(\&init_zh, $dir);
+find(\&process, $dir);
+print "\n$init_counter resource keys being initiazlied.\n";
+print "$process_counter files being processed.\n";
+print "Validation on (zh) files done!\n\n\n";
+
+sub reset_global_variables
+{
+    %gui_bundle = ();
+    %messages_bundle = ();
+    $init_counter = 0;
+    $process_counter = 0;
+}
+
+sub init_zh
+{
+    my $name = $_;
+    my $dir = $File::Find::dir;
+    my $file = $File::Find::name;
+    if ($file !~ /(gui_zh\.properties$)|(messages_zh\.properties$)/) {
+        return;
+    }
+
+    my $hash = \%gui_bundle;
+    if ($file =~ /(messages_zh\.properties$)/) {
+        $hash = \%messages_bundle;
+    }
+    open FILE, $file or die $!;
+    while (my $line = <FILE>) {
+        if ($line =~ /^#/) {
+            next;
+        }
+        chomp $line;
+
+        if ($line =~ /([^=]+)=(.+)/) {
+            my $key = $1;
+            my $value = $2;
+            if ($hash->{$key}) {
+                print "WARNING : conflict occurs for key '$key'\n";
+            }
+            $hash->{$key} = $value;
+            $init_counter++;
+        }
+    }
+    close(FILE);
+}
+
+sub init_en
+{
+    my $name = $_;
+    my $dir = $File::Find::dir;
+    my $file = $File::Find::name;
+    if ($file !~ /(gui_en\.properties$)|(messages_en\.properties$)/) {
+        return;
+    }
+
+    my $hash = \%gui_bundle;
+    if ($file =~ /(messages_en\.properties$)/) {
+        $hash = \%messages_bundle;
+    }
+    open FILE, $file or die $!;
+    while (my $line = <FILE>) {
+        if ($line =~ /^#/) {
+            next;
+        }
+        chomp $line;
+
+        if ($line =~ /([^=]+)=(.+)/) {
+            my $key = $1;
+            my $value = $2;
+            if ($hash->{$key}) {
+                print "WARNING : conflict occurs for key '$key'\n";
+            }
+            $hash->{$key} = $value;
+            $init_counter++;
+        }
+    }
+    close(FILE);
+}
 
 sub init
 {
