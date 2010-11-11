@@ -1675,6 +1675,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             PortfolioManagementJPanel.this.initGUIOptions();
 
             PortfolioManagementJPanel.this.updateTitledBorder();
+
+            // Every country is having different currency symbol. Remember to
+            // refresh the currency symbol after we change the country.
+            PortfolioManagementJPanel.this.refreshCurrencySymbol();
         }
         else {
             final BuyPortfolioTreeTableModel tmp0 = buyPortfolioTreeTableModel;
@@ -1724,6 +1728,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     PortfolioManagementJPanel.this.initGUIOptions();
 
                     PortfolioManagementJPanel.this.updateTitledBorder();
+
+                    // Every country is having different currency symbol. Remember to
+                    // refresh the currency symbol after we change the country.
+                    PortfolioManagementJPanel.this.refreshCurrencySymbol();
                 }
             });
         }

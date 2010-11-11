@@ -1,6 +1,9 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock ?.?.?? - ????-??-??
+  Bugfix:  Remember to update currency symbol after we change the country.
+  
 JStock 1.0.5u - 2010-11-08
   Bugfix:  Fix on MFI calculation error during stock indicator scanning.
   
