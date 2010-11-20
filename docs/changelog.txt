@@ -3,7 +3,10 @@ Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
 JStock ?.?.?? - ????-??-??
   Bugfix:  Remember to update currency symbol after we change the country.
-  
+  Bugfix:  Prevent exception, when inserting new column through right clicked
+           menu.  The newly inserted column will now at the right side of 
+           clicked column instead of left.
+           
 JStock 1.0.5u - 2010-11-08
   Bugfix:  Fix on MFI calculation error during stock indicator scanning.
   

@@ -193,8 +193,7 @@ public class JTableUtilities {
 
     
 
-    public static void insertTableColumnFromModel(JTable jTable, Object value, int targetColumn) {        
-
+    public static void insertTableColumnFromModel(JTable jTable, Object value, int clickedColumnIndex) {
         boolean isVisible = true;
 
         
@@ -213,7 +212,7 @@ public class JTableUtilities {
 
         
 
-        if(isVisible) return;
+        if (isVisible) return;
 
                 
 
@@ -229,8 +228,17 @@ public class JTableUtilities {
 
         makeTableColumnWidthFit(jTable, jTable.getColumnCount() - 1, 5);
 
-        jTable.moveColumn(jTable.getColumnCount() - 1, targetColumn);
-
+        // If we right clicked on the 3rd column, and select a new column, we
+        // would like the new column to be inserted into 4th column. Note that,
+        // clickedColumnIndex will be < 0, if we right clicked on empty area.
+        if (clickedColumnIndex < 0) {
+            // Have it in the last column when we right clicked on empty area.
+            jTable.moveColumn(jTable.getColumnCount() - 1, jTable.getColumnCount() - 1);
+        } else {
+            // +1, as we want our newly inserted column to be at the right of
+            // clicked column.
+            jTable.moveColumn(jTable.getColumnCount() - 1, Math.min(jTable.getColumnCount() - 1, clickedColumnIndex + 1));
+        }
     }
 
     
