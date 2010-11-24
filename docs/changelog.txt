@@ -1,12 +1,13 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
-JStock ?.?.?? - ????-??-??
+JStock 1.0.5v - 2010-11-25
   Bugfix:  Remember to update currency symbol after we change the country.
   Bugfix:  Prevent exception, when inserting new column through right clicked
            menu.  The newly inserted column will now at the right side of 
            clicked column instead of left.
-           
+  Bugfix:  Unable to load CSV and Excel file into Stock Watchlist.
+  
 JStock 1.0.5u - 2010-11-08
   Bugfix:  Fix on MFI calculation error during stock indicator scanning.
   
