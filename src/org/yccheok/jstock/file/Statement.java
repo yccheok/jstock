@@ -115,26 +115,27 @@ public class Statement {
     }
 
     private Type whatType(List<Atom> atoms) {
-        if (atoms.size() == 16)
+        if (atoms.size() == 17)
         {
             /* Wow! */
             if (
             atoms.get(0).getType().equals(GUIBundle.getString("MainFrame_Code")) &&
             atoms.get(1).getType().equals(GUIBundle.getString("MainFrame_Symbol")) &&
             atoms.get(2).getType().equals(GUIBundle.getString("MainFrame_Prev")) &&
-            atoms.get(3).getType().equals(GUIBundle.getString("MainFrame_Last")) &&
-            atoms.get(4).getType().equals(GUIBundle.getString("MainFrame_High")) &&
-            atoms.get(5).getType().equals(GUIBundle.getString("MainFrame_Low")) &&
-            atoms.get(6).getType().equals(GUIBundle.getString("MainFrame_Vol")) &&
-            atoms.get(7).getType().equals(GUIBundle.getString("MainFrame_Chg")) &&
-            atoms.get(8).getType().equals(GUIBundle.getString("MainFrame_ChgPercentage")) &&
-            atoms.get(9).getType().equals(GUIBundle.getString("MainFrame_LVol")) &&
-            atoms.get(10).getType().equals(GUIBundle.getString("MainFrame_Buy")) &&
-            atoms.get(11).getType().equals(GUIBundle.getString("MainFrame_BQty")) &&
-            atoms.get(12).getType().equals(GUIBundle.getString("MainFrame_Sell")) &&
-            atoms.get(13).getType().equals(GUIBundle.getString("MainFrame_SQty")) &&
-            atoms.get(14).getType().equals(GUIBundle.getString("MainFrame_FallBelow")) &&
-            atoms.get(15).getType().equals(GUIBundle.getString("MainFrame_RiseAbove"))
+            atoms.get(3).getType().equals(GUIBundle.getString("MainFrame_Open")) &&
+            atoms.get(4).getType().equals(GUIBundle.getString("MainFrame_Last")) &&
+            atoms.get(5).getType().equals(GUIBundle.getString("MainFrame_High")) &&
+            atoms.get(6).getType().equals(GUIBundle.getString("MainFrame_Low")) &&
+            atoms.get(7).getType().equals(GUIBundle.getString("MainFrame_Vol")) &&
+            atoms.get(8).getType().equals(GUIBundle.getString("MainFrame_Chg")) &&
+            atoms.get(9).getType().equals(GUIBundle.getString("MainFrame_ChgPercentage")) &&
+            atoms.get(10).getType().equals(GUIBundle.getString("MainFrame_LVol")) &&
+            atoms.get(11).getType().equals(GUIBundle.getString("MainFrame_Buy")) &&
+            atoms.get(12).getType().equals(GUIBundle.getString("MainFrame_BQty")) &&
+            atoms.get(13).getType().equals(GUIBundle.getString("MainFrame_Sell")) &&
+            atoms.get(14).getType().equals(GUIBundle.getString("MainFrame_SQty")) &&
+            atoms.get(15).getType().equals(GUIBundle.getString("MainFrame_FallBelow")) &&
+            atoms.get(16).getType().equals(GUIBundle.getString("MainFrame_RiseAbove"))
             ) {
                 return Type.RealtimeInfo;
             }
@@ -210,26 +211,27 @@ public class Statement {
                 return Type.PortfolioManagementDividend;
             }
         }
-        else if (atoms.size() == 17) {
+        else if (atoms.size() == 18) {
             /* Wow! */
             if (
             atoms.get(0).getType().equals(GUIBundle.getString("IndicatorScannerJPanel_Indicator")) &&
             atoms.get(1).getType().equals(GUIBundle.getString("MainFrame_Code")) &&
             atoms.get(2).getType().equals(GUIBundle.getString("MainFrame_Symbol")) &&
             atoms.get(3).getType().equals(GUIBundle.getString("MainFrame_Prev")) &&
-            atoms.get(4).getType().equals(GUIBundle.getString("MainFrame_Last")) &&
-            atoms.get(5).getType().equals(GUIBundle.getString("MainFrame_High")) &&
-            atoms.get(6).getType().equals(GUIBundle.getString("MainFrame_Low")) &&
-            atoms.get(7).getType().equals(GUIBundle.getString("MainFrame_Vol")) &&
-            atoms.get(8).getType().equals(GUIBundle.getString("MainFrame_Chg")) &&
-            atoms.get(9).getType().equals(GUIBundle.getString("MainFrame_ChgPercentage")) &&
-            atoms.get(10).getType().equals(GUIBundle.getString("MainFrame_LVol")) &&
-            atoms.get(11).getType().equals(GUIBundle.getString("MainFrame_Buy")) &&
-            atoms.get(12).getType().equals(GUIBundle.getString("MainFrame_BQty")) &&
-            atoms.get(13).getType().equals(GUIBundle.getString("MainFrame_Sell")) &&
-            atoms.get(14).getType().equals(GUIBundle.getString("MainFrame_SQty")) &&
-            atoms.get(15).getType().equals(GUIBundle.getString("IndicatorScannerJPanel_MCapital")) &&
-            atoms.get(16).getType().equals(GUIBundle.getString("IndicatorScannerJPanel_SIssued"))
+            atoms.get(4).getType().equals(GUIBundle.getString("MainFrame_Open")) &&
+            atoms.get(5).getType().equals(GUIBundle.getString("MainFrame_Last")) &&
+            atoms.get(6).getType().equals(GUIBundle.getString("MainFrame_High")) &&
+            atoms.get(7).getType().equals(GUIBundle.getString("MainFrame_Low")) &&
+            atoms.get(8).getType().equals(GUIBundle.getString("MainFrame_Vol")) &&
+            atoms.get(9).getType().equals(GUIBundle.getString("MainFrame_Chg")) &&
+            atoms.get(10).getType().equals(GUIBundle.getString("MainFrame_ChgPercentage")) &&
+            atoms.get(11).getType().equals(GUIBundle.getString("MainFrame_LVol")) &&
+            atoms.get(12).getType().equals(GUIBundle.getString("MainFrame_Buy")) &&
+            atoms.get(13).getType().equals(GUIBundle.getString("MainFrame_BQty")) &&
+            atoms.get(14).getType().equals(GUIBundle.getString("MainFrame_Sell")) &&
+            atoms.get(15).getType().equals(GUIBundle.getString("MainFrame_SQty")) &&
+            atoms.get(16).getType().equals(GUIBundle.getString("IndicatorScannerJPanel_MCapital")) &&
+            atoms.get(17).getType().equals(GUIBundle.getString("IndicatorScannerJPanel_SIssued"))
             ) {
                 return Type.StockIndicatorScanner;
             }
