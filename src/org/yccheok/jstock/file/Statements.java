@@ -205,7 +205,7 @@ public class Statements {
                     final Statement statement = new Statement(atoms);
                     if (!s.statements.isEmpty()) {
                         if (s.statements.get(0).getType() != statement.getType()) {
-							// Give up.
+                            // Give up.
                             s.statements.clear();
                             break;
                         }
