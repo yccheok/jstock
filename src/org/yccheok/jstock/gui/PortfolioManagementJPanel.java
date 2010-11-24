@@ -1878,6 +1878,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     public void updateDividerLocation() {
         if (this.dividerLocation > 0) {
             SwingUtilities.invokeLater(new Runnable() {
+                @Override
                 public void run() {
                     // Have the code in AWT event dispatching thread, in order
                     // to ensure MainFrame is already shown on the screen.
