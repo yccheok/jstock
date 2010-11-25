@@ -1,6 +1,11 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.5w - 2010-11-26
+  Bugfix:  If we perform server re-connecting explicitly, there might be chance
+           where the entire stock database will be corrupted due to empty stock
+           list returned from stock server.
+           
 JStock 1.0.5v - 2010-11-25
   Bugfix:  Remember to update currency symbol after we change the country.
   Bugfix:  Prevent exception, when inserting new column through right clicked

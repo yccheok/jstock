@@ -114,7 +114,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         this.createSystemTrayIcon();
 
-        this.initPreloadDatabase();
+        this.initPreloadDatabase(false);
         this.initChatDatas();
         this.initExtraDatas();
         this.initStatusBar();
@@ -1964,6 +1964,9 @@ public class MainFrame extends javax.swing.JFrame {
                         }
                     }
                     else {
+                        // User cancels databaseTask explicitly. (Cancel while
+                        // JStock is fetching database from server). Let's read
+                        // from disk.
                         initDatabase(true);
                     }
                             
@@ -2532,6 +2535,13 @@ public class MainFrame extends javax.swing.JFrame {
                 // hours.
                 StockCodeAndSymbolDatabase tmp_symbol_database = org.yccheok.jstock.gui.Utils.fromXML(StockCodeAndSymbolDatabase.class, symbol_file);
 
+                if (tmp_symbol_database == null || tmp_symbol_database.isEmpty()) {
+                    // Perhaps we are having a corrupted database. We will
+                    // restore from database.zip.
+                    initPreloadDatabase(true);
+                    tmp_symbol_database = org.yccheok.jstock.gui.Utils.fromXML(StockCodeAndSymbolDatabase.class, symbol_file);
+                }
+
                 // StockNameDatabase is an optional item.
                 final StockNameDatabase tmp_name_database;
                 if (org.yccheok.jstock.engine.Utils.isNameImmutable()) {
@@ -2540,7 +2550,7 @@ public class MainFrame extends javax.swing.JFrame {
                     tmp_name_database = null;
                 }
 
-                if (tmp_symbol_database != null) {
+                if (tmp_symbol_database != null && false == tmp_symbol_database.isEmpty()) {
                     log.info("Stock code and symbol database loaded from " + symbol_file.toString() + " successfully.");
 
                     // Yes. We need to integrate "user-defined-database.xml" into tmp_symbol_database
@@ -2648,6 +2658,9 @@ public class MainFrame extends javax.swing.JFrame {
             final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactories(country);            
             while (!isCancelled() && !success) {
                 for (StockServerFactory factory : stockServerFactories) {
+                    if (isCancelled()) {
+                        break;
+                    }
 
                     StockServer stockServer = factory.getStockServer();
                     
@@ -2660,6 +2673,10 @@ public class MainFrame extends javax.swing.JFrame {
                     
                     try {
                         final java.util.List<Stock> stocks = stockServer.getAllStocks();
+                        if (stocks.isEmpty()) {
+                            // No result from this stock server. Try next server.
+                            continue;
+                        }
                         tmp_symbol_database = new StockCodeAndSymbolDatabase(stocks);
                         // StockNameDatabase is an optional item.
                         if (org.yccheok.jstock.engine.Utils.isNameImmutable()) {
@@ -2709,10 +2726,9 @@ public class MainFrame extends javax.swing.JFrame {
                             ((Subject<StockServer, Integer>)stockServer).dettach(DatabaseTask.this);
                         }
                     }
-                    
-                    if (isCancelled()) {
-                        break;
-                    }
+
+                    // If we come to here, this means no result from this stock
+                    // server. Try next server.
                 }
                 
                 tries++;
@@ -2721,11 +2737,11 @@ public class MainFrame extends javax.swing.JFrame {
                 if (tries >= NUM_OF_RETRY) {
                     break;
                 }
-
             }
              
             if (success == true)
             {
+                assert(tmp_symbol_database.isEmpty() == false);
                 org.yccheok.jstock.gui.Utils.toXML(tmp_symbol_database, symbol_file);
                 if (tmp_name_database != null) {
                     org.yccheok.jstock.gui.Utils.toXML(tmp_name_database, name_file);
@@ -3792,9 +3808,9 @@ public class MainFrame extends javax.swing.JFrame {
         jPanel2.revalidate();
     }
 
-    private void initPreloadDatabase() {
+    private void initPreloadDatabase(boolean overWrite) {
         /* No overwrite. */
-        Utils.extractZipFile("database" + File.separator + "database.zip", false);
+        Utils.extractZipFile("database" + File.separator + "database.zip", overWrite);
     }
 
     private class LatestNewsTask extends SwingWorker<Void, String> {
