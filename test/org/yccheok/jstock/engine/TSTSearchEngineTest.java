@@ -119,6 +119,18 @@ public class TSTSearchEngineTest extends TestCase {
      * Test of remove method, of class TSTSearchEngine.
      */
     public void testRemove() {
+        // Test for single element.
+        {
+        List<Name> names = new ArrayList<Name>();
+        names.add(new Name("MSFT"));  // <-- remove
+        TSTSearchEngine<Name> engine = new TSTSearchEngine<Name>(names);
+        List<Name> result = engine.searchAll("M");
+        assertEquals(1, result.size());
+        engine.remove(new Name("MSFT"));
+        result = engine.searchAll("M");
+        assertEquals(0, result.size());
+        }
+
         {
         List<Name> names = new ArrayList<Name>();
         names.add(new Name("a"));

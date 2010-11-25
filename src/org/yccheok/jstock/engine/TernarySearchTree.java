@@ -221,6 +221,18 @@ public class TernarySearchTree<E> {
         boolean lokidNull = currentNode.relatives[TSTNode.LOKID] == null;
         boolean hikidNull = currentNode.relatives[TSTNode.HIKID] == null;
 
+        ////////////////////////////////////////////////////////////////////////
+        // Add by Cheok. To resolve java.lang.NullPointerException
+        // I am not sure this is the correct solution, as I have not gone
+        // through this sourc code in detail.
+        if (currentParent == null && currentNode == this.rootNode) {
+            // if this executes, then current node is root node
+            rootNode = null;
+            return null;
+        }
+        // Add by Cheok. To resolve java.lang.NullPointerException
+        ////////////////////////////////////////////////////////////////////////
+
         // now find out what kind of child current node is
         int childType;
         if(currentParent.relatives[TSTNode.LOKID] == currentNode) {
