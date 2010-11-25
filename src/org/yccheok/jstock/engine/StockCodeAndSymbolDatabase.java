@@ -302,6 +302,16 @@ public class StockCodeAndSymbolDatabase {
         return this;
     }
 
+    /**
+     * Returns true if this is an empty database.
+     * 
+     * @return true if this is an empty database
+     */
+    public boolean isEmpty() {
+        assert(codes.size() == symbols.size());
+        return codes.isEmpty() || symbols.isEmpty();
+    }
+
     protected final Map<Symbol, Code> symbolToCode = new HashMap<Symbol, Code>();
     protected final Map<Code, Symbol> codeToSymbol = new HashMap<Code, Symbol>();
 
