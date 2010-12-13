@@ -1,6 +1,10 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock ?.?.?? - ????-??-??
+  Bugfix:  Instead of limiting currency decimal places to 2 only, we allow them 
+           to float between 2 to 3, to avoid from losing precision.
+           
 JStock 1.0.5w - 2010-11-26
   Bugfix:  If we perform server re-connecting explicitly, there might be chance
            where the entire stock database will be corrupted due to empty stock

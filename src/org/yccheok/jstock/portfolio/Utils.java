@@ -45,7 +45,9 @@ public class Utils {
     // Use ThreadLocal to ensure thread safety.
     private static final ThreadLocal <NumberFormat> numberFormat = new ThreadLocal <NumberFormat>() {
         @Override protected NumberFormat initialValue() {
-            return new DecimalFormat("#,##0.00");
+            // Instead of limiting currency decimal places to 2 only, we allow
+            // them to float between 2 to 3, to avoid from losing precision.
+            return new DecimalFormat("#,##0.00#");
         }
     };
 
