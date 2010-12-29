@@ -366,39 +366,91 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
     }
     
     private boolean isValidInput() {
-        if(this.jTextField1.getText().length() <= 0)
+        if (this.jTextField1.getText().length() <= 0) {
+            do {
+                // Perhaps user forgets to press enter? Let us help him to transfer
+                // the stock to text field.
+                final Object object = this.jComboBox1.getItemAt(0);
+                if (object != null) {
+                    // There is item(s) in this combo box. Let's transfer the 1st
+                    // item into text field.
+                    MainFrame m = (MainFrame)NewBuyTransactionJDialog.this.getParent();
+
+                    if (m == null) {
+                        break;
+                    }
+
+                    final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = m.getStockCodeAndSymbolDatabase();
+
+                    if (stockCodeAndSymbolDatabase == null) {
+                        // Database is not ready yet. Shall we pop up a warning to
+                        // user?
+                        log.info("Database is not ready yet.");
+                        break;
+                    }
+
+                    final String string = object.toString().trim();
+                    Code code = stockCodeAndSymbolDatabase.searchStockCode(string);
+                    Symbol symbol = null;
+
+                    if (code != null) {
+                        symbol = stockCodeAndSymbolDatabase.codeToSymbol(code);
+                    }
+                    else {
+                        symbol = stockCodeAndSymbolDatabase.searchStockSymbol(string);
+                        if (symbol != null) {
+                            code = stockCodeAndSymbolDatabase.symbolToCode(symbol);
+                            // Shouldn't be null. This is because symbol is obtained directly
+                            // from database. Even later user modifies symbol or code through Database -> Stock Database...,
+                            // it shouldn't have any side effect.
+                            assert(code != null);
+                        }
+                    }
+
+                    assert(symbol != null);
+                    assert(code != null);
+                    NewBuyTransactionJDialog.this.stock = Utils.getEmptyStock(code, symbol);
+
+                    this.jTextField1.setText(symbol.toString());
+                }
+                break;
+            } while (true);
+        }
+
+        // Has user key in any stock?
+        if (this.jTextField1.getText().length() <= 0)
         {
             this.jComboBox1.requestFocus();
-            JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_please_type_stock_symbol_and_press_enter"), MessagesBundle.getString("warning_title_please_type_stock_symbol_and_press_enter"), JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_please_enter_stock_symbol"), MessagesBundle.getString("warning_title_please_enter_stock_symbol"), JOptionPane.WARNING_MESSAGE);
             return false;
         }
         
-        if(this.jFormattedTextField1.getText().length() <= 0) {
+        if (this.jFormattedTextField1.getText().length() <= 0) {
             this.jFormattedTextField1.requestFocus();
             return false;
         }
 
-        if(this.jFormattedTextField2.getText().length() <= 0) {
+        if (this.jFormattedTextField2.getText().length() <= 0) {
             this.jFormattedTextField2.requestFocus();
             return false;
         }
 
-        if(this.jFormattedTextField3.getText().length() <= 0) {
+        if (this.jFormattedTextField3.getText().length() <= 0) {
             this.jFormattedTextField3.requestFocus();
             return false;
         }
 
-        if(this.jFormattedTextField4.getText().length() <= 0) {
+        if (this.jFormattedTextField4.getText().length() <= 0) {
             this.jFormattedTextField4.requestFocus();
             return false;
         }
 
-        if(this.jFormattedTextField5.getText().length() <= 0) {
+        if (this.jFormattedTextField5.getText().length() <= 0) {
             this.jFormattedTextField5.requestFocus();
             return false;
         }
 
-        if(this.jFormattedTextField6.getText().length() <= 0) {
+        if (this.jFormattedTextField6.getText().length() <= 0) {
             this.jFormattedTextField6.requestFocus();
             return false;
         }
@@ -576,6 +628,8 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
                     }
                 }
 
+                assert(symbol != null);
+                assert(code != null);
                 NewBuyTransactionJDialog.this.stock = Utils.getEmptyStock(code, symbol);
                 NewBuyTransactionJDialog.this.jTextField1.setText(symbol.toString());
             }
