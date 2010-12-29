@@ -119,7 +119,6 @@ public class MainFrame extends javax.swing.JFrame {
         this.initExtraDatas();
         this.initStatusBar();
         this.initMarketJPanel();
-        this.initUsernameAndPassword();
         this.initTableHeaderToolTips();
         this.initMyJXStatusBarCountryLabelMouseAdapter();
         this.initMyJXStatusBarImageLabelMouseAdapter();
@@ -1215,6 +1214,7 @@ public class MainFrame extends javax.swing.JFrame {
      * @param watchlist Watchlist name
      */
     public void selectActiveWatchlist(String watchlist) {
+        assert(SwingUtilities.isEventDispatchThread());
         // Save current watchlist.
         MainFrame.this.saveRealTimeStocks();
         // Save current GUI options.
@@ -1224,6 +1224,9 @@ public class MainFrame extends javax.swing.JFrame {
         // And switch to new portfolio.
         MainFrame.this.getJStockOptions().setWatchlistName(watchlist);
         MainFrame.this.initRealTimeStocks();
+        // I guess user wants to watch the current active watchlist right now.
+        // We will help him to turn to the stock watchlist page.
+        MainFrame.this.jTabbedPane1.setSelectedIndex(0);
     }
 
     /**
@@ -1232,6 +1235,7 @@ public class MainFrame extends javax.swing.JFrame {
      * @param portfolio Portfolio name
      */
     public void selectActivePortfolio(String portfolio) {
+        assert(SwingUtilities.isEventDispatchThread());
         // Save current portfolio.
         MainFrame.this.portfolioManagementJPanel.savePortfolio();
         // Save current GUI options.
@@ -1240,6 +1244,9 @@ public class MainFrame extends javax.swing.JFrame {
         final Country country = MainFrame.this.getJStockOptions().getCountry();
         MainFrame.this.getJStockOptions().setPortfolioName(country, portfolio);
         MainFrame.this.portfolioManagementJPanel.initPortfolio();
+        // I guess user wants to watch the current active portfolio right now.
+        // We will help him to turn to the portfolio page.
+        MainFrame.this.jTabbedPane1.setSelectedIndex(3);
     }
 
     private void multipleWatchlists() {
@@ -3310,9 +3317,6 @@ public class MainFrame extends javax.swing.JFrame {
         stockHistoryMonitor.setStockHistorySerializer(stockHistorySerializer);
 
         stockHistoryMonitor.setDuration(Duration.getTodayDurationByYears(jStockOptions.getHistoryDuration()));
-    }
-    
-    private void initUsernameAndPassword() {
     }
 
     public void initLatestNewsTask()
