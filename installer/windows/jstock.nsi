@@ -179,3 +179,10 @@ Function DetectJRE
   
   	done:
 FunctionEnd
+
+ Function un.onInit
+    ; "No" button by default.
+    MessageBox MB_YESNO|MB_DEFBUTTON2 "This will uninstall JStock. Press $\"Yes$\" to continue." IDYES NoAbort
+        Abort ; causes uninstaller to quit.
+    NoAbort:
+ FunctionEnd

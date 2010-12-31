@@ -6,6 +6,8 @@ JStock ?.?.?? - ????-??-??
            press ENTER explicitly.
   Feature: Automatic switch to the particular page, when user tries to activate 
            a portfolio or watchlist.
+  Feature: Having a confirmation dialog box, to avoid user from clicking 
+           uninstall icon accidentally.
   Bugfix:  Instead of limiting currency decimal places to 2 only, we allow them 
            to float between 2 to 3, to avoid from losing precision.
            
