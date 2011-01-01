@@ -23,10 +23,6 @@
 package org.yccheok.jstock.gui;
 
 import org.jhotdraw.draw.*;
-import java.awt.*;
-import java.awt.geom.*;
-import org.jhotdraw.xml.*;
-import java.io.*;
 
 /**
  *
