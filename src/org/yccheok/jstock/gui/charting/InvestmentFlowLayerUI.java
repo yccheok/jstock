@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -547,8 +547,20 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         final double yJava2D = rangeAxis.valueToJava2D(yValue, _plotArea, rangeAxisEdge);
 
         final int tmpIndex = bestMid;
+        // Do not perform translation as this will cause precision losing.
+        // We might experience unstable point. For example,
+        //
+        // this.ROIPoint is 700.9, there are 2 data points which are 700 and
+        // 701.
+        // During first updateROIPoint(this.ROIPoint) call, data point 701
+        // will be chosen, and this.ROIPoint has been truncated to 700.
+        // During second updateROIPoint(this.ROIPoint) call, data point 700
+        // will be chosen. We may observe an unstable point swings between 700
+        // and 701.
+        //
         // translateJava2DToScreen will internally convert Point2D.Double to Point.
-        final Point2D tmpPoint = chartPanel.translateJava2DToScreen(new Point2D.Double(xJava2D, yJava2D));
+        //final Point2D tmpPoint = chartPanel.translateJava2DToScreen(new Point2D.Double(xJava2D, yJava2D));
+        final Point2D tmpPoint = new Point2D.Double(xJava2D, yJava2D);
         this.drawArea.setRect(_plotArea);
         
         if (this.drawArea.contains(tmpPoint)) {
@@ -654,8 +666,20 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         final double yJava2D = rangeAxis.valueToJava2D(yValue, _plotArea, rangeAxisEdge);
 
         final int tmpIndex = bestMid;
+        // Do not perform translation as this will cause precision losing.
+        // We might experience unstable point. For example,
+        //
+        // this.investPoint is 700.9, there are 2 data points which are 700 and
+        // 701.
+        // During first updateInvestPoint(this.investPoint) call, data point 701
+        // will be chosen, and this.investPoint has been truncated to 700.
+        // During second updateInvestPoint(this.investPoint) call, data point 700
+        // will be chosen. We may observe an unstable point swings between 700
+        // and 701.
+        //
         // translateJava2DToScreen will internally convert Point2D.Double to Point.
-        final Point2D tmpPoint = chartPanel.translateJava2DToScreen(new Point2D.Double(xJava2D, yJava2D));
+        //final Point2D tmpPoint = chartPanel.translateJava2DToScreen(new Point2D.Double(xJava2D, yJava2D));
+        final Point2D tmpPoint = new Point2D.Double(xJava2D, yJava2D);
         this.drawArea.setRect(_plotArea);
 
         if (this.drawArea.contains(tmpPoint)) {
