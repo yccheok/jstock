@@ -27,6 +27,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -61,6 +62,13 @@ import org.yccheok.jstock.portfolio.Activity;
  */
 public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends AbstractLayerUI<V> {
 
+    private enum Type {
+        Invest,
+        ROI
+    }
+
+    // Refactoring required here. Perhaps we should wrap up
+    // (investPoint, investPointIndex) and (ROIPoint, ROIPointIndex) as class.
     private Point2D investPoint = null;
     private int investPointIndex = -1;
     private Point2D ROIPoint = null;
@@ -470,12 +478,14 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         final ChartPanel chartPanel = this.investmentFlowChartJDialog.getChartPanel();
         final JFreeChart chart = chartPanel.getChart();
         final XYPlot plot = (XYPlot) chart.getPlot();
-        // 0 are the invest information. 1 is the ROI information.
+        // Dataset 0 are the invest information. 1 is the ROI information.
         final TimeSeriesCollection timeSeriesCollection = (TimeSeriesCollection)plot.getDataset(1);
         final TimeSeries timeSeries = timeSeriesCollection.getSeries(0);
 
         // I also not sure why. This is what are being done in Mouse Listener Demo 4.
-        final Point2D p2 = chartPanel.translateScreenToJava2D((Point)_ROIPoint);
+        //
+        // Don't use it. It will cause us to lose precision.
+        //final Point2D p2 = chartPanel.translateScreenToJava2D((Point)_ROIPoint);
 
         /* Try to get correct main chart area. */
         final Rectangle2D _plotArea = chartPanel.getChartRenderingInfo().getPlotInfo().getDataArea();
@@ -493,7 +503,7 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         final RectangleEdge domainAxisEdge = plot.getDomainAxisEdge();
         final ValueAxis rangeAxis = plot.getRangeAxis();
         final RectangleEdge rangeAxisEdge = plot.getRangeAxisEdge();
-        final double coordinateX = domainAxis.java2DToValue(p2.getX(), _plotArea,
+        final double coordinateX = domainAxis.java2DToValue(_ROIPoint.getX(), _plotArea,
                 domainAxisEdge);
 
         int low = 0;
@@ -553,6 +563,7 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         if (this.updateROIPoint(this.ROIPoint) == false) {
             /* Clear the point. */
             this.ROIPoint = null;
+            this.ROIPointIndex = -1;
         }
         this.setDirty(true);
     }
@@ -561,6 +572,7 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         if (this.updateInvestPoint(this.investPoint) == false) {
             /* Clear the point. */
             this.investPoint = null;
+            this.investPointIndex = -1;
         }
         this.setDirty(true);
     }
@@ -578,7 +590,9 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         final TimeSeries timeSeries = timeSeriesCollection.getSeries(0);
 
         // I also not sure why. This is what are being done in Mouse Listener Demo 4.
-        final Point2D p2 = chartPanel.translateScreenToJava2D((Point)_investPoint);
+        //
+        // Don't use it. It will cause us to lose precision.
+        //final Point2D p2 = chartPanel.translateScreenToJava2D((Point)_investPoint);
 
         /* Try to get correct main chart area. */
         final Rectangle2D _plotArea = chartPanel.getChartRenderingInfo().getPlotInfo().getDataArea();
@@ -596,7 +610,7 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         final RectangleEdge domainAxisEdge = plot.getDomainAxisEdge();
         final ValueAxis rangeAxis = plot.getRangeAxis();
         final RectangleEdge rangeAxisEdge = plot.getRangeAxisEdge();
-        final double coordinateX = domainAxis.java2DToValue(p2.getX(), _plotArea,
+        final double coordinateX = domainAxis.java2DToValue(_investPoint.getX(), _plotArea,
                 domainAxisEdge);
 
         int low = 0;
@@ -846,5 +860,133 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
     protected void processMouseMotionEvent(MouseEvent e, JXLayer<? extends V> layer) {
         super.processMouseMotionEvent(e, layer);
         this.processEvent(e, layer);
+    }
+
+    @Override
+    public void processKeyEvent(java.awt.event.KeyEvent e, JXLayer<? extends V> l) {
+        if (e.getID() != KeyEvent.KEY_PRESSED) {
+            // We are only interested in KEY_PRESSED event.
+            return;
+        }
+        final int code = e.getKeyCode();
+        switch(code) {
+            case KeyEvent.VK_LEFT:
+                this.updatePointAndIndexIfPossible(-1);
+                break;
+            case KeyEvent.VK_RIGHT:
+                this.updatePointAndIndexIfPossible(+1);
+                break;
+        }
+    }
+
+    // Each time, only either ROI or Invest point will be offset. But not both.
+    // To determine which of them shall be offset, the resultant offset point 
+    // shall kept the distance among ROI and Invest point minimal.
+    private void updatePointAndIndexIfPossible(int dataOffset) {
+        Type updatedType = null;
+
+        if (this.investPointIndex < 0) {
+            // Should be null.
+            assert(this.investPoint == null);
+            // Invest point is not being initialized yet. We will perform update
+            // on ROI.
+            if (this.ROIPointIndex < 0) {
+                // But ROI point is not being initialized yet. We will not
+                // update any of them.
+                return;
+            }
+            updatedType = Type.ROI;
+        }
+        else if (this.ROIPointIndex < 0) {
+            // Should be null.
+            assert(this.ROIPoint == null);
+            assert(this.investPointIndex >= 0);
+            updatedType = Type.Invest;
+        }
+
+        int tmpROIPointIndex = -1;
+        int tmpInvestPointIndex = -1;
+        Point2D tmpROIPoint = null;
+        Point2D tmpInvestPoint = null;
+        if (updatedType == null) {
+            tmpROIPointIndex = dataOffset + this.ROIPointIndex;
+            tmpInvestPointIndex = dataOffset + this.investPointIndex;
+            tmpROIPoint = getPoint(tmpROIPointIndex, Type.ROI);
+            tmpInvestPoint = getPoint(tmpInvestPointIndex, Type.Invest);
+
+            if (tmpROIPoint == null) {
+                if (tmpInvestPoint == null) {
+                    // No update can be performed. Returns early.
+                    return;
+                }
+                updatedType = Type.Invest;
+            }
+            else if (tmpInvestPoint == null) {
+                assert(tmpROIPoint != null);
+                updatedType = Type.ROI;
+            } else {
+                // Distance check.
+                double d0 = Math.abs(tmpROIPoint.getX() - this.investPoint.getX());
+                double d1 = Math.abs(tmpInvestPoint.getX() - this.ROIPoint.getX());
+                if (d0 < d1) {
+                    updatedType = Type.ROI;
+                } else {
+                    updatedType = Type.Invest;
+                }
+            }
+        }
+
+        assert(updatedType != null);
+
+        if (updatedType == Type.ROI) {
+            this.ROIPointIndex = dataOffset + this.ROIPointIndex;
+            this.ROIPoint = tmpROIPoint != null ? tmpROIPoint : getPoint(this.ROIPointIndex, Type.ROI);
+            this.updateROIPoint();
+        } else {
+            assert(updatedType == Type.Invest);
+            this.investPointIndex = dataOffset + this.investPointIndex;
+            this.investPoint = tmpInvestPoint != null ? tmpInvestPoint : getPoint(this.investPointIndex, Type.Invest);
+            this.updateInvestPoint();
+        }
+    }
+
+    // Get the mouse coordinate, based on given data index. Returns null, if
+    // the given data index is out of data range.
+    private Point2D.Double getPoint(int dataIndex, Type type) {
+        if (dataIndex < 0) {
+            return null;
+        }
+
+        final ChartPanel chartPanel = this.investmentFlowChartJDialog.getChartPanel();
+        final JFreeChart chart = chartPanel.getChart();
+        final XYPlot plot = (XYPlot) chart.getPlot();
+        // Dataset 0 are the invest information. 1 is the ROI information.
+        final TimeSeriesCollection timeSeriesCollection;
+        if (type == Type.Invest) {
+            timeSeriesCollection = (TimeSeriesCollection)plot.getDataset(0);
+        } else {
+            assert(type == Type.ROI);
+            timeSeriesCollection = (TimeSeriesCollection)plot.getDataset(1);
+        }
+        final TimeSeries timeSeries = timeSeriesCollection.getSeries(0);
+
+        if (dataIndex >= timeSeries.getItemCount()) {
+            /* Not ready yet. */
+            return null;
+        }
+
+        final ValueAxis domainAxis = plot.getDomainAxis();
+        final RectangleEdge domainAxisEdge = plot.getDomainAxisEdge();
+        final ValueAxis rangeAxis = plot.getRangeAxis();
+        final RectangleEdge rangeAxisEdge = plot.getRangeAxisEdge();
+
+        final TimeSeriesDataItem timeSeriesDataItem = timeSeries.getDataItem(dataIndex);
+        final double xValue = timeSeriesDataItem.getPeriod().getFirstMillisecond();
+        final double yValue = timeSeriesDataItem.getValue().doubleValue();
+        final Rectangle2D plotArea = chartPanel.getChartRenderingInfo().getPlotInfo().getDataArea();
+        final double xJava2D = domainAxis.valueToJava2D(xValue, plotArea, domainAxisEdge);
+        final double yJava2D = rangeAxis.valueToJava2D(yValue, plotArea, rangeAxisEdge);
+        // Use Double version, to avoid from losing precision.
+        return new Point2D.Double(xJava2D, yJava2D);
     }
 }

@@ -94,6 +94,11 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         org.yccheok.jstock.charting.Utils.applyChartTheme(freeChart);
         this.chartPanel = new ChartPanel(freeChart, true, true, true, true, true);
 
+        // Make chartPanel able to receive key event.
+        // So that we may use arrow key to move around yellow information boxes.
+        this.chartPanel.setFocusable(true);
+        this.chartPanel.requestFocus();
+        
         final org.jdesktop.jxlayer.JXLayer<ChartPanel> layer = new org.jdesktop.jxlayer.JXLayer<ChartPanel>(this.chartPanel);
         this.investmentFlowLayerUI = new InvestmentFlowLayerUI<ChartPanel>(this);
         layer.setUI(this.investmentFlowLayerUI);

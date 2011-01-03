@@ -607,17 +607,17 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
             return null;
         }
 
+        if (dataIndex >= timeSeries.getItemCount()) {
+            /* Not ready yet. */
+            return null;
+        }
+
         final ChartPanel chartPanel = this.chartJDialog.getChartPanel();
         final XYPlot plot = this.chartJDialog.getPlot(plotIndex);
         final ValueAxis domainAxis = plot.getDomainAxis();
         final RectangleEdge domainAxisEdge = plot.getDomainAxisEdge();
         final ValueAxis rangeAxis = plot.getRangeAxis();
         final RectangleEdge rangeAxisEdge = plot.getRangeAxisEdge();
-
-        if (dataIndex >= timeSeries.getItemCount()) {
-            /* Not ready yet. */
-            return null;
-        }
         
         final TimeSeriesDataItem timeSeriesDataItem = timeSeries.getDataItem(dataIndex);
         final double xValue = timeSeriesDataItem.getPeriod().getFirstMillisecond();

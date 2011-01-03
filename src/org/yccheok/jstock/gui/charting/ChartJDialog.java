@@ -147,7 +147,7 @@ public class ChartJDialog extends javax.swing.JDialog {
         this.chartPanel.setMaximumDrawWidth((int)Math.round(dimension.getWidth()));
         this.chartPanel.setMaximumDrawHeight((int)Math.round(dimension.getHeight()));
  
-       // Make chartPanel able to receive key event.
+        // Make chartPanel able to receive key event.
         // So that we may use arrow key to move around yellow information box.
         this.chartPanel.setFocusable(true);
         this.chartPanel.requestFocus();

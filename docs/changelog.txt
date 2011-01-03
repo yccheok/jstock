@@ -2,6 +2,8 @@ This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
 JStock ?.?.?? - ????-??-??
+  Feature: Able to use left/right arrow key to move around yellow information
+           boxes of Investment Flow Chart.
   Feature: Make the stock purchase process smoother, by doesn't require user to
            press ENTER explicitly.
   Feature: Automatic switch to the particular page, when user tries to activate 
