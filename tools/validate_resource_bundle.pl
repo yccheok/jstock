@@ -60,12 +60,61 @@ print "\n$init_counter resource keys being initiazlied.\n";
 print "$process_counter files being processed.\n";
 print "Validation on (zh) files done!\n\n\n";
 
+####################
+# Germany Language #
+####################
+reset_global_variables();
+find(\&init_de, $dir);
+find(\&process, $dir);
+print "\n$init_counter resource keys being initiazlied.\n";
+print "$process_counter files being processed.\n";
+print "Validation on (de) files done!\n\n\n";
+
 sub reset_global_variables
 {
     %gui_bundle = ();
     %messages_bundle = ();
     $init_counter = 0;
     $process_counter = 0;
+}
+
+sub init_de
+{
+    my $name = $_;
+    my $dir = $File::Find::dir;
+    my $file = $File::Find::name;
+    # Till we have messages_de.properties, we will use default messages.properties
+    # at current moment.
+    #if ($file !~ /(gui_de\.properties$)|(messages_de\.properties$)/) {
+    if ($file !~ /(gui_de\.properties$)|(messages\.properties$)/) {
+        return;
+    }
+
+    my $hash = \%gui_bundle;
+    # Till we have messages_de.properties, we will use default messages.properties
+    # at current moment.
+    #if ($file =~ /(messages_de\.properties$)/) {
+    if ($file =~ /(messages\.properties$)/) {
+        $hash = \%messages_bundle;
+    }
+    open FILE, $file or die $!;
+    while (my $line = <FILE>) {
+        if ($line =~ /^#/) {
+            next;
+        }
+        chomp $line;
+
+        if ($line =~ /([^=]+)=(.+)/) {
+            my $key = $1;
+            my $value = $2;
+            if ($hash->{$key}) {
+                print "WARNING : conflict occurs for key '$key'\n";
+            }
+            $hash->{$key} = $value;
+            $init_counter++;
+        }
+    }
+    close(FILE);
 }
 
 sub init_zh

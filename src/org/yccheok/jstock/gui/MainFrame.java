@@ -147,8 +147,9 @@ public class MainFrame extends javax.swing.JFrame {
     private void initLanguageMenuItemsSelection() {
         if (Locale.getDefault().getLanguage().equals(Locale.SIMPLIFIED_CHINESE.getLanguage())) {
             this.jRadioButtonMenuItem2.setSelected(true);
-        }
-        else {
+        } else if (Locale.getDefault().getLanguage().equals(Locale.GERMAN.getLanguage())) {
+            this.jRadioButtonMenuItem3.setSelected(true);
+        } else {
             this.jRadioButtonMenuItem1.setSelected(true);
         }
     }
@@ -230,6 +231,7 @@ public class MainFrame extends javax.swing.JFrame {
         jMenu10 = new javax.swing.JMenu();
         jRadioButtonMenuItem1 = new javax.swing.JRadioButtonMenuItem();
         jRadioButtonMenuItem2 = new javax.swing.JRadioButtonMenuItem();
+        jRadioButtonMenuItem3 = new javax.swing.JRadioButtonMenuItem();
         jMenu7 = new javax.swing.JMenu();
         jMenuItem8 = new javax.swing.JMenuItem();
         jMenu9 = new javax.swing.JMenu();
@@ -559,6 +561,15 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
         jMenu10.add(jRadioButtonMenuItem2);
+
+        buttonGroup3.add(jRadioButtonMenuItem3);
+        jRadioButtonMenuItem3.setText(Locale.GERMAN.getDisplayLanguage(Locale.getDefault()));
+        jRadioButtonMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButtonMenuItem3ActionPerformed(evt);
+            }
+        });
+        jMenu10.add(jRadioButtonMenuItem3);
 
         jMenuBar2.add(jMenu10);
 
@@ -1207,6 +1218,16 @@ public class MainFrame extends javax.swing.JFrame {
             org.yccheok.jstock.gui.Utils.restartApplication(this);
         }
     }//GEN-LAST:event_jRadioButtonMenuItem2ActionPerformed
+
+    private void jRadioButtonMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonMenuItem3ActionPerformed
+        final Locale locale = new Locale(Locale.GERMAN.getLanguage(), Locale.getDefault().getCountry(), Locale.getDefault().getVariant());
+        this.jStockOptions.setLocale(locale);
+        // Do not suprise user with sudden restart. Ask for their permission to do so.
+        final int result = JOptionPane.showConfirmDialog(this, MessagesBundle.getString("question_message_restart_now"), MessagesBundle.getString("question_title_restart_now"), JOptionPane.YES_NO_OPTION);
+        if (result == JOptionPane.YES_OPTION) {
+            org.yccheok.jstock.gui.Utils.restartApplication(this);
+        }
+    }//GEN-LAST:event_jRadioButtonMenuItem3ActionPerformed
     
     /**
      * Activate specified watchlist.
@@ -4178,6 +4199,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel8;
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem1;
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem2;
+    private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
