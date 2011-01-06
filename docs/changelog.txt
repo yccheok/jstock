@@ -10,6 +10,9 @@ JStock ?.?.?? - ????-??-??
            a portfolio or watchlist.
   Feature: Having a confirmation dialog box, to avoid user from clicking 
            uninstall icon accidentally.
+  *Feature: Supports German language. Contributed by Stefan Angrick.
+  Bugfix:  Adjust combo box popup width, so that horizontal scrollbar will not
+           displayed.
   Bugfix:  Instead of limiting currency decimal places to 2 only, we allow them 
            to float between 2 to 3, to avoid from losing precision.
            

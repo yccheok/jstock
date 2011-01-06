@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,9 @@ package org.yccheok.jstock.gui;
 import com.thoughtworks.xstream.XStream;
 import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Desktop;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GraphicsConfiguration;
@@ -73,11 +75,17 @@ import javax.sound.sampled.LineEvent;
 import javax.sound.sampled.LineListener;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
+import javax.swing.JList;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.plaf.basic.BasicComboPopup;
 import net.sourceforge.pinyin4j.PinyinHelper;
 import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
 import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
@@ -120,6 +128,68 @@ import org.yccheok.jstock.network.Utils.Type;
 public class Utils {
     /** Creates a new instance of Utils */
     private Utils() {
+    }
+
+    /**
+     * Adjust popup for combo box, so that horizontal scrollbar will not display.
+     * http://forums.oracle.com/forums/thread.jspa?messageID=8037483&#8037483
+     * http://www.camick.com/java/source/BoundsPopupMenuListener.java
+     *
+     * @param comboBox The combo box
+     */
+    public static void adjustPopupWidth(JComboBox comboBox) {
+        if (comboBox.getItemCount() == 0) return;
+        Object comp = comboBox.getAccessibleContext().getAccessibleChild(0);
+        if (!(comp instanceof BasicComboPopup)) {
+            return;
+        }
+        BasicComboPopup popup = (BasicComboPopup)comp;
+        JList list = popup.getList();
+        JScrollPane scrollPane = getScrollPane(popup);
+
+        // Just to be paranoid enough.
+        if (list == null || scrollPane == null) {
+            return;
+        }
+
+        //  Determine the maximimum width to use:
+        //  a) determine the popup preferred width
+        //  b) ensure width is not less than the scroll pane width
+        int popupWidth = list.getPreferredSize().width
+                        + 5  // make sure horizontal scrollbar doesn't appear
+                        + getScrollBarWidth(popup, scrollPane);
+        Dimension scrollPaneSize = scrollPane.getPreferredSize();
+        popupWidth = Math.max(popupWidth, scrollPaneSize.width);
+
+        //  Adjust the width
+        scrollPaneSize.width = popupWidth;
+        scrollPane.setPreferredSize(scrollPaneSize);
+        scrollPane.setMaximumSize(scrollPaneSize);
+    }
+
+    /*
+     *  I can't find any property on the scrollBar to determine if it will be
+     *  displayed or not so use brute force to determine this.
+     */
+    private static int getScrollBarWidth(BasicComboPopup popup, JScrollPane scrollPane) {
+        int scrollBarWidth = 0;
+        JComboBox comboBox = (JComboBox)popup.getInvoker();
+
+        if (comboBox.getItemCount() > comboBox.getMaximumRowCount()) {
+            JScrollBar vertical = scrollPane.getVerticalScrollBar();
+            scrollBarWidth = vertical.getPreferredSize().width;
+        }
+
+        return scrollBarWidth;
+    }
+
+    /*
+     *  Get the scroll pane used by the popup so its bounds can be adjusted
+     */
+    private static JScrollPane getScrollPane(BasicComboPopup popup) {
+        JList list = popup.getList();
+        Container c = SwingUtilities.getAncestorOfClass(JScrollPane.class, list);
+        return (JScrollPane)c;
     }
 
     /**

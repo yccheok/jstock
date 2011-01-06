@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@
 package org.yccheok.jstock.gui;
 
 import java.awt.Component;
-import java.awt.Dimension;
 import javax.swing.*;
 import java.awt.event.*;
 import javax.swing.event.DocumentEvent;
@@ -28,7 +27,6 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.plaf.basic.BasicComboBoxEditor;
-import javax.swing.plaf.basic.BasicComboPopup;
 import javax.swing.plaf.metal.MetalComboBoxEditor;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
@@ -101,36 +99,12 @@ public class AutoCompleteJComboBox extends JComboBox {
         adjustScrollBar();
     }
 
-    // http://forums.oracle.com/forums/thread.jspa?messageID=8037483&#8037483
-    private void adjustPopupWidth() {
-        if (this.getItemCount() == 0) return;
-        Object comp = this.getUI().getAccessibleChild(this, 0);
-        if (!(comp instanceof JPopupMenu)) {
-            return;
-        }
-        JPopupMenu popup = (JPopupMenu) comp;
-        JScrollPane scrollPane = (JScrollPane) popup.getComponent(0);
-        //Object value = this.getItemAt(0);
-        //Component rendererComp = this.getRenderer().getListCellRendererComponent(null, value, 0, false, false);
-        //if (rendererComp instanceof JXTable) {
-        //    scrollPane.setColumnHeaderView(((JTable) rendererComp).getTableHeader());
-        //}
-        BasicComboPopup basic = (BasicComboPopup)comp;
-        Dimension prefSize = basic.getList().getPreferredSize();
-        Dimension size = scrollPane.getPreferredSize();
-        size.width = Math.max(size.width, prefSize.width);
-        scrollPane.setPreferredSize(size);
-        scrollPane.setMaximumSize(size);
-        // Do we need to call revalidate?
-        //scrollPane.revalidate();
-    }
-
     private PopupMenuListener getPopupMenuListener() {
         return new PopupMenuListener() {
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
                 // We will have a much wider drop down list.
-                adjustPopupWidth();
+                Utils.adjustPopupWidth(AutoCompleteJComboBox.this);
             }
 
             @Override

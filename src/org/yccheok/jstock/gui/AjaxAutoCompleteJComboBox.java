@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@
 package org.yccheok.jstock.gui;
 
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -178,7 +177,7 @@ public class AjaxAutoCompleteJComboBox extends JComboBox {
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
                 // We will have a much wider drop down list.
-                adjustPopupWidth();
+                Utils.adjustPopupWidth(AjaxAutoCompleteJComboBox.this);
             }
 
             @Override
@@ -367,29 +366,6 @@ public class AjaxAutoCompleteJComboBox extends JComboBox {
                 AjaxAutoCompleteJComboBox.this.jComboBoxEditor.setReadOnly(false);
             }
         };
-    }
-
-    private void adjustPopupWidth() {
-        if (this.getItemCount() == 0) return;
-        Object comp = this.getUI().getAccessibleChild(this, 0);
-        if (!(comp instanceof JPopupMenu)) {
-            return;
-        }
-        JPopupMenu popup = (JPopupMenu) comp;
-        JScrollPane scrollPane = (JScrollPane) popup.getComponent(0);
-        Object value = this.getItemAt(0);
-        Component rendererComp = this.getRenderer().getListCellRendererComponent(null, value, 0, false, false);
-        //if (rendererComp instanceof JXTable) {
-        //    scrollPane.setColumnHeaderView(((JTable) rendererComp).getTableHeader());
-        //}
-        Dimension prefSize = rendererComp.getPreferredSize();
-        Dimension size = scrollPane.getPreferredSize();
-        // +20, as the vertical scroll bar occupy space too.
-        size.width = Math.max(size.width, prefSize.width) + 20;
-        scrollPane.setPreferredSize(size);
-        scrollPane.setMaximumSize(size);
-        // Do we need to call revalidate?
-        //scrollPane.revalidate();
     }
 
     private void adjustScrollBar() {
