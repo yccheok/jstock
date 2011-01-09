@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,6 +44,7 @@ import java.util.concurrent.Executors;
 import javax.imageio.ImageIO;
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
+import org.jdesktop.jxlayer.JXLayer;
 import org.yccheok.jstock.alert.SMSLimiter;
 import org.yccheok.jstock.analysis.Indicator;
 import org.yccheok.jstock.analysis.OperatorIndicator;
@@ -134,8 +135,9 @@ public class MainFrame extends javax.swing.JFrame {
         this.initBrokingFirmLogos();
         this.initGUIOptions();
         this.initChartJDialogOptions();
-        this.initLanguageMenuItemsSelection();
-        
+        this.initLanguageMenuItemsSelection();        
+        this.initJXLayerOnJComboBox();
+
         // Turn to the last viewed page.
         this.jTabbedPane1.setSelectedIndex(this.getJStockOptions().getLastSelectedPageIndex());
     }
@@ -169,6 +171,19 @@ public class MainFrame extends javax.swing.JFrame {
      */
     public static MainFrame getInstance() {
         return MainFrameHolder.INSTANCE;
+    }
+
+    // Install JXLayer around JComboBox.
+    // It is used to display busy indicator.
+    private void initJXLayerOnJComboBox() {
+        // Wrap combo box.
+        final JXLayer<JComboBox> layer = new JXLayer<JComboBox>(this.jComboBox1);
+        // Set our LayerUI.
+        JComboBoxLayerUI jComboBoxLayerUI = new JComboBoxLayerUI();
+        layer.setUI(jComboBoxLayerUI);
+        ((AutoCompleteJComboBox)this.jComboBox1).attachBusyObserver(jComboBoxLayerUI);
+        // Add the layer as usual combo box.
+        jPanel1.add(layer);
     }
 
     /** This method is called from within the constructor to

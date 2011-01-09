@@ -33,6 +33,8 @@ import javax.swing.text.JTextComponent;
 import org.yccheok.jstock.engine.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.yccheok.jstock.engine.AjaxYahooSearchEngine.ResultSetType;
+import org.yccheok.jstock.engine.AjaxYahooSearchEngine.ResultType;
 
 /**
  *
@@ -60,12 +62,19 @@ public class AutoCompleteJComboBox extends JComboBox {
 
     public void dettachAll() {
         subject.dettachAll();
+        // For online database feature.
+        resultSubject.dettachAll();
+        busySubject.dettachAll();
     }
 
     /** Creates a new instance of AutoCompleteJComboBox */
     public AutoCompleteJComboBox() {
         this.stockCodeAndSymbolDatabase = null;
-        
+
+        // Save the offline mode renderer, so that we may reuse it when we
+        // switch back to offline mode.
+        this.offlineModeCellRenderer = this.getRenderer();
+
         this.setEditable(true);
         
         this.keyAdapter = this.getEditorComponentKeyAdapter();
@@ -89,6 +98,8 @@ public class AutoCompleteJComboBox extends JComboBox {
             log.error("Unable to attach DocumentListener to AutoCompleteJComboBox.");
         }
 
+        this.ajaxYahooSearchEngineMonitor.attach(getMonitorObserver());
+        
         this.addActionListener(getActionListener());
 
         // Have a wide enough drop down list.
@@ -204,8 +215,13 @@ public class AutoCompleteJComboBox extends JComboBox {
             }
 
             private void _handle(final String string) {
+                // We are no longer busy.
+                busySubject.notify(AutoCompleteJComboBox.this, false);
+
                 if (AutoCompleteJComboBox.this.getSelectedItem() != null) {
-                    if (AutoCompleteJComboBox.this.getSelectedItem().equals(string)) {
+                    // Remember to use toString(). As getSelectedItem() can be
+                    // either String, or ResultSet.
+                    if (AutoCompleteJComboBox.this.getSelectedItem().toString().equals(string)) {
                         // We need to differentiate, whether "string" is from user
                         // typing, or drop down list selection. This is because when
                         // user perform selection, document change event will be triggered
@@ -250,6 +266,11 @@ public class AutoCompleteJComboBox extends JComboBox {
 
                     boolean shouldShowPopup = false;
 
+                    if (codes.isEmpty() == false) {
+                        // Change to offline mode before adding any item.
+                        changeMode(Mode.Offline);
+                    }
+
                     // Here is our user friendly rule.
                     // (1) User will first like to search for their prefer stock by code. Hence, we only list
                     // out stock code to them. No more, no less.
@@ -268,6 +289,11 @@ public class AutoCompleteJComboBox extends JComboBox {
                     else {
                         java.util.List<Symbol> symbols = stockCodeAndSymbolDatabase.searchStockSymbols(string);
 
+                        if (symbols.isEmpty() == false) {
+                            // Change to offline mode before adding any item.
+                            changeMode(Mode.Offline);
+                        }
+
                         for (Symbol s : symbols) {
                             AutoCompleteJComboBox.this.addItem(s.toString());
                             shouldShowPopup = true;
@@ -275,7 +301,13 @@ public class AutoCompleteJComboBox extends JComboBox {
 
                         if (shouldShowPopup) {
                             AutoCompleteJComboBox.this.showPopup();
-                        }   // if (shouldShowPopup)
+                        }  else {
+                            // OK. We found nothing from offline database. Let's
+                            // ask help from online database.
+                            // We are busy contacting server right now.
+                            busySubject.notify(AutoCompleteJComboBox.this, true);
+                            ajaxYahooSearchEngineMonitor.clearAndPut(string);
+                        }
                     }   // if (shouldShowPopup)
                 }   // if (AutoCompleteJComboBox.this.stockCodeAndSymbolDatabase != null)
 
@@ -317,14 +349,31 @@ public class AutoCompleteJComboBox extends JComboBox {
             @Override
             public void keyReleased(KeyEvent e) {
                 if (KeyEvent.VK_ENTER == e.getKeyCode()) {
-                    String lastEnteredString = "";
+                    // We are no longer busy.
+                    busySubject.notify(AutoCompleteJComboBox.this, false);
+                    
+                    String lastEnteredString = null;
+                    AjaxYahooSearchEngine.ResultType lastEnteredresultType = null;
+
                     if (AutoCompleteJComboBox.this.getItemCount() > 0) {
                         int index = AutoCompleteJComboBox.this.getSelectedIndex();
                         if (index == -1) {
-                            lastEnteredString = (String)AutoCompleteJComboBox.this.getItemAt(0);
+                            Object object = AutoCompleteJComboBox.this.getItemAt(0);
+                            if (object instanceof String) {
+                                lastEnteredString = (String)object;
+                            } else {
+                                assert(object instanceof AjaxYahooSearchEngine.ResultType);
+                                lastEnteredresultType = (AjaxYahooSearchEngine.ResultType)object;
+                            }
                         }
                         else {
-                            lastEnteredString = (String)AutoCompleteJComboBox.this.getItemAt(index);
+                            Object object = AutoCompleteJComboBox.this.getItemAt(index);
+                            if (object instanceof String) {
+                                lastEnteredString = (String)object;
+                            } else {
+                                assert(object instanceof AjaxYahooSearchEngine.ResultType);
+                                lastEnteredresultType = (AjaxYahooSearchEngine.ResultType)object;
+                            }
                         }
                     }
                     else {
@@ -339,7 +388,13 @@ public class AutoCompleteJComboBox extends JComboBox {
                     }
 
                     AutoCompleteJComboBox.this.removeAllItems();
-                    AutoCompleteJComboBox.this.subject.notify(AutoCompleteJComboBox.this, lastEnteredString);
+                    if (lastEnteredString != null) {
+                        AutoCompleteJComboBox.this.subject.notify(AutoCompleteJComboBox.this, lastEnteredString);
+                    } else {
+                        assert(lastEnteredresultType != null);
+                        AutoCompleteJComboBox.this.resultSubject.notify(AutoCompleteJComboBox.this, lastEnteredresultType);
+                    }
+
                     return;
                 }   /* if(KeyEvent.VK_ENTER == e.getKeyCode()) */
 
@@ -429,6 +484,124 @@ public class AutoCompleteJComboBox extends JComboBox {
         private boolean readonly = false;
     }
 
+    /***************************************************************************
+     * START OF ONLINE DATABASE FEATURE
+     **************************************************************************/
+    private enum Mode {
+        Offline,    // Suggestion will be getting through offline database.
+        Online      // Suggestion will be getting through online database.
+    }
+
+    private void changeMode(Mode mode) {
+        if (this.mode == mode) {
+            return;
+        }
+        // When we change mode, the previous inserted item(s) no longer valid.
+        // Let's clear them up first, before we switch to a new renderer.
+        this.removeAllItems();
+
+        if (mode == Mode.Offline) {
+            this.setRenderer(offlineModeCellRenderer);
+        } else {
+            assert(mode == Mode.Online);
+            this.setRenderer(onlineModeCellRenderer);
+        }
+        this.mode = mode;
+    }
+
+    private Observer<AjaxYahooSearchEngineMonitor, AjaxYahooSearchEngine.ResultSetType> getMonitorObserver() {
+        return new Observer<AjaxYahooSearchEngineMonitor, AjaxYahooSearchEngine.ResultSetType>() {
+            @Override
+            public void update(final AjaxYahooSearchEngineMonitor subject, final ResultSetType arg) {
+                if (SwingUtilities.isEventDispatchThread()) {
+                    _update(subject, arg);
+                } else {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            _update(subject, arg);
+                        }
+                    });
+                }
+            }
+
+            public void _update(AjaxYahooSearchEngineMonitor subject, ResultSetType arg)  {
+                final String string = AutoCompleteJComboBox.this.getEditor().getItem().toString().trim();
+                if (string.isEmpty() || false == string.equalsIgnoreCase(arg.Query)) {
+                    return;
+                }
+
+                // We are no longer busy.
+                busySubject.notify(AutoCompleteJComboBox.this, false);
+
+                // During _update operation, there will be a lot of ListDataListeners
+                // trying to modify the content of our text field. We will not allow
+                // them to do so.
+                //
+                // Without setReadOnly(true), when we type the first character "w", IME
+                // will suggest "我". However, when we call removeAllItems and addItem,
+                // JComboBox will "commit" this suggestion to JComboBox's text field.
+                // Hence, if we continue to type second character "m", the string displayed
+                // at JComboBox's text field will be "我我们".
+                //
+                AutoCompleteJComboBox.this.jComboBoxEditor.setReadOnly(true);
+
+                // Must hide popup. If not, the pop up windows will not be
+                // resized. But this causes flickering. :(
+                AutoCompleteJComboBox.this.hidePopup();
+                AutoCompleteJComboBox.this.removeAllItems();
+
+                if (arg.Result.isEmpty() == false) {
+                    // Change to online mode before adding any item.
+                    changeMode(Mode.Online);
+                }
+
+                boolean shouldShowPopup = false;
+                for (ResultType result : arg.Result) {
+                    AutoCompleteJComboBox.this.addItem(result);
+                    shouldShowPopup = true;
+                }
+                if (shouldShowPopup) {
+                    AutoCompleteJComboBox.this.showPopup();
+                }
+
+                // Restore.
+                AutoCompleteJComboBox.this.jComboBoxEditor.setReadOnly(false);
+            }
+        };
+    }
+
+    private final SubjectEx<AutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType> resultSubject = new SubjectEx<AutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType>();
+    private final SubjectEx<AutoCompleteJComboBox, Boolean> busySubject = new SubjectEx<AutoCompleteJComboBox, Boolean>();
+
+    /**
+     * Attach an observer to listen to ResultType available event.
+     *
+     * @param observer An observer to listen to ResultType available event
+     */
+    public void attachResultObserver(Observer<AutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType> observer) {
+        resultSubject.attach(observer);
+    }
+
+    /**
+     * Attach an observer to listen to busy state event.
+     *
+     * @param observer An observer to listen to busy state event
+     */
+    public void attachBusyObserver(Observer<AutoCompleteJComboBox, Boolean> observer) {
+        busySubject.attach(observer);
+    }
+
+    private Mode mode = Mode.Offline;
+    private final ListCellRenderer offlineModeCellRenderer;
+    private final ListCellRenderer onlineModeCellRenderer = new ResultSetCellRenderer();
+    // Online database.
+    private final AjaxYahooSearchEngineMonitor ajaxYahooSearchEngineMonitor = new AjaxYahooSearchEngineMonitor();
+    /***************************************************************************
+     * END OF ONLINE DATABASE FEATURE
+     **************************************************************************/
+
+    // Offline database.
     private StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase;
     private final KeyAdapter keyAdapter;
     private final MyJComboBoxEditor jComboBoxEditor;

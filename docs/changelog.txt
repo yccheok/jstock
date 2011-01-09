@@ -4,13 +4,15 @@ Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 JStock ?.?.?? - ????-??-??
   Feature: Able to use left/right arrow key to move around yellow information
            boxes of Investment Flow Chart.
+ *Feature: Able to look for stock from online database automatically, if the
+           stock is not found in offline database.
   Feature: Make the stock purchase process smoother, by doesn't require user to
            press ENTER explicitly.
   Feature: Automatic switch to the particular page, when user tries to activate 
            a portfolio or watchlist.
   Feature: Having a confirmation dialog box, to avoid user from clicking 
            uninstall icon accidentally.
-  *Feature: Supports German language. Contributed by Stefan Angrick.
+ *Feature: Supports German language. Contributed by Stefan Angrick.
   Bugfix:  Adjust combo box popup width, so that horizontal scrollbar will not
            displayed.
   Bugfix:  Instead of limiting currency decimal places to 2 only, we allow them 

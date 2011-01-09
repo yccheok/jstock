@@ -34,12 +34,12 @@ import org.yccheok.jstock.engine.Observer;
  *
  * @author yccheok
  */
-public class JComboBoxLayerUI<V extends JComboBox> extends AbstractLayerUI<V> implements Observer<AjaxAutoCompleteJComboBox, Boolean> {
+public class JComboBoxLayerUI<V extends JComboBox> extends AbstractLayerUI<V> implements Observer<V, Boolean> {
     private volatile boolean isBusy = false;
     private Timer busyTimer = null;
 
     @Override
-    public void update(AjaxAutoCompleteJComboBox subject, Boolean arg) {
+    public void update(V subject, Boolean arg) {
         final boolean _isBusy = arg;
         Timer me = busyTimer;
         if (me != null) {

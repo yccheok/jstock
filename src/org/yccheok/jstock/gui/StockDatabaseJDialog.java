@@ -77,18 +77,25 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         this.mutableStockCodeAndSymbolDatabase = new MutableStockCodeAndSymbolDatabase(stockCodeAndSymbolDatabase);
         initComponents();
 
+        initJXLayerOnJComboBox();
+
+        // Focus on our Ajax auto complete JComboBox.
+        this.jComboBox1.requestFocus();
+        ((AjaxAutoCompleteJComboBox)this.jComboBox1).attachResultObserver(getResultObserver());
+        
+    }
+
+    // Install JXLayer around JComboBox.
+    // It is used to display busy indicator.
+    private void initJXLayerOnJComboBox() {
         // Wrap combo box.
         final JXLayer<JComboBox> layer = new JXLayer<JComboBox>(this.jComboBox1);
         // Set our LayerUI.
         JComboBoxLayerUI jComboBoxLayerUI = new JComboBoxLayerUI();
         layer.setUI(jComboBoxLayerUI);
+        ((AjaxAutoCompleteJComboBox)this.jComboBox1).attachBusyObserver(jComboBoxLayerUI);
         // Add the layer as usual combo box.
         jPanel5.add(layer);
-
-        // Focus on our Ajax auto complete JComboBox.
-        this.jComboBox1.requestFocus();
-        ((AjaxAutoCompleteJComboBox)this.jComboBox1).attachResultObserver(getResultObserver());
-        ((AjaxAutoCompleteJComboBox)this.jComboBox1).attachBusyObserver(jComboBoxLayerUI);
     }
 
     /** This method is called from within the constructor to
