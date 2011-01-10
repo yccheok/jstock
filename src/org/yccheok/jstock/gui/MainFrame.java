@@ -48,6 +48,7 @@ import org.jdesktop.jxlayer.JXLayer;
 import org.yccheok.jstock.alert.SMSLimiter;
 import org.yccheok.jstock.analysis.Indicator;
 import org.yccheok.jstock.analysis.OperatorIndicator;
+import org.yccheok.jstock.engine.AjaxYahooSearchEngine.ResultType;
 import org.yccheok.jstock.engine.Stock.Board;
 import org.yccheok.jstock.file.Statement;
 import org.yccheok.jstock.file.Statements;
@@ -197,6 +198,7 @@ public class MainFrame extends javax.swing.JFrame {
         buttonGroup1 = new javax.swing.ButtonGroup();
         buttonGroup2 = new javax.swing.ButtonGroup();
         buttonGroup3 = new javax.swing.ButtonGroup();
+        jComboBox1 = new AutoCompleteJComboBox();
         jPanel6 = new javax.swing.JPanel();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel8 = new javax.swing.JPanel();
@@ -204,7 +206,6 @@ public class MainFrame extends javax.swing.JFrame {
         jTable1 = new javax.swing.JTable();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        jComboBox1 = new AutoCompleteJComboBox();
         jPanel10 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
@@ -259,6 +260,11 @@ public class MainFrame extends javax.swing.JFrame {
         jMenuItem12 = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JSeparator();
         jMenuItem5 = new javax.swing.JMenuItem();
+
+        jComboBox1.setEditable(true);
+        jComboBox1.setPreferredSize(new java.awt.Dimension(150, 24));
+        ((AutoCompleteJComboBox)this.jComboBox1).attach(getAutoCompleteJComboBoxObserver());
+        ((AutoCompleteJComboBox)this.jComboBox1).attachResultObserver(getResultObserver());
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
@@ -325,11 +331,6 @@ public class MainFrame extends javax.swing.JFrame {
 
         jLabel1.setText(bundle.getString("MainFrame_Stock")); // NOI18N
         jPanel1.add(jLabel1);
-
-        jComboBox1.setEditable(true);
-        jComboBox1.setPreferredSize(new java.awt.Dimension(150, 24));
-        ((AutoCompleteJComboBox)this.jComboBox1).attach(getAutoCompleteJComboBoxObserver());
-        jPanel1.add(jComboBox1);
 
         jPanel8.add(jPanel1, java.awt.BorderLayout.NORTH);
 
@@ -4078,6 +4079,15 @@ public class MainFrame extends javax.swing.JFrame {
         public void keyTyped(java.awt.event.KeyEvent e) {
             MainFrame.this.jTable1.getSelectionModel().clearSelection();
         }
+    }
+
+    private org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType> getResultObserver() {
+        return new org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType>() {
+            @Override
+            public void update(AutoCompleteJComboBox subject, ResultType arg) {
+                System.out.println("(INCOMPLETE)" + arg);
+            }
+        };
     }
 
     private TrayIcon trayIcon;

@@ -135,16 +135,20 @@ public class AutoCompleteJComboBox extends JComboBox {
                 /* Handle mouse clicked. */
                 if ((e.getModifiers() & java.awt.event.InputEvent.BUTTON1_MASK) == java.awt.event.InputEvent.BUTTON1_MASK) {
                     final Object object = AutoCompleteJComboBox.this.getEditor().getItem();
-                    String lastEnteredString = "";
                     /* Let us be extra paranoid. */
                     if (object instanceof String) {
-                        lastEnteredString = (String)object;
+                        String lastEnteredString = (String)object;
+                        AutoCompleteJComboBox.this.subject.notify(AutoCompleteJComboBox.this, lastEnteredString);
+                    } else if (object instanceof AjaxYahooSearchEngine.ResultType) {
+                        AjaxYahooSearchEngine.ResultType lastEnteredResult = (AjaxYahooSearchEngine.ResultType)object;
+                        AutoCompleteJComboBox.this.resultSubject.notify(AutoCompleteJComboBox.this, lastEnteredResult);
                     }
                     else {
-                        lastEnteredString = "";
+                        // Do we really need to send across empty string?
+                        // AjaxAutoCompleteJComboBox doesn't have such behavior.
+                        // Should we remove this line?
+                        AutoCompleteJComboBox.this.subject.notify(AutoCompleteJComboBox.this, "");
                     }
-                    
-                    AutoCompleteJComboBox.this.subject.notify(AutoCompleteJComboBox.this, lastEnteredString);
 
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
@@ -383,6 +387,9 @@ public class AutoCompleteJComboBox extends JComboBox {
                             lastEnteredString = ((String)object).trim();
                         }
                         else {
+                            // Do we really need to send across empty string?
+                            // AjaxAutoCompleteJComboBox doesn't have such behavior.
+                            // Should we remove this line?
                             lastEnteredString = "";
                         }
                     }
