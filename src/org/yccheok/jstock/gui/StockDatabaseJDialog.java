@@ -488,28 +488,6 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         selectUserDefinedDatabaseTable(selectedModelIndex);
     }
 
-    // Get the best ResultType if possible.
-    // Retuns null if the result cannot be rectified.
-    private ResultType rectifyResult(ResultType result) {
-        String symbolStr = result.symbol;
-        String nameStr = result.name;
-        if (symbolStr == null) {
-            return null;
-        }
-        if (symbolStr.trim().isEmpty()) {
-            return null;
-        }
-        symbolStr = symbolStr.trim().toUpperCase();
-        if (nameStr == null) {
-            nameStr = symbolStr;
-        }
-        if (nameStr.trim().isEmpty()) {
-            nameStr = symbolStr;
-        }
-        nameStr = nameStr.trim();
-        return result.deriveWithSymbol(symbolStr).deriveWithName(nameStr);
-    }
-
     private Observer<AjaxAutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType> getResultObserver() {
         return new Observer<AjaxAutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType>() {
             @Override
@@ -517,7 +495,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
                 assert(arg != null);
                 assert(SwingUtilities.isEventDispatchThread());
                 // Ensure arg is in the correct format.
-                final ResultType result = rectifyResult(arg);
+                final ResultType result = org.yccheok.jstock.engine.Utils.rectifyResult(arg);
                 if (result == null) {
                     // Invalid format. Nothing we can do about it. Returns
                     // early.
@@ -948,7 +926,16 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
      */
     private IndexEx getIndexEx(String string, Class c) {
         final CodeSymbolTableModel model1 = (CodeSymbolTableModel)(StockDatabaseJDialog.this.jTable1.getModel());
-        final int modelIndex1 = model1.findCodeOrSymbol(string);
+        /*
+         * Shall we have a strict duplicated detection rule, (Do not allow a
+         * newly inserted string to be same as Code or Symbol, regardless which
+         * column it is from)
+         *
+         * Or, shall we have a loosen duplicated detection rule? (Do not allow
+         * a newly inserted string to be same as its type).
+         */
+        //final int modelIndex1 = model1.findCodeOrSymbol(string);
+        final int modelIndex1 = Code.class == c ? model1.findCode(string) : model1.findSymbol(string);
         if (modelIndex1 >= 0) {
             return IndexEx.newInstance(modelIndex1, jTable1);
         }

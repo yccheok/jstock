@@ -4002,6 +4002,12 @@ public class MainFrame extends javax.swing.JFrame {
         return this.chatJPanel.isLogin();
     }
 
+    /**
+     * Changes the chat password.
+     *
+     * @param newPassword new password
+     * @return true if success
+     */
     public boolean changeChatPassword(String newPassword) {
         return this.chatJPanel.changePassword(newPassword);
     }
@@ -4085,11 +4091,28 @@ public class MainFrame extends javax.swing.JFrame {
         return new org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType>() {
             @Override
             public void update(AutoCompleteJComboBox subject, ResultType arg) {
-                System.out.println("(INCOMPLETE)" + arg);
+                assert(arg != null);
+               addResultTypeToDatabase(arg);
             }
         };
     }
 
+    /**
+     * Added result from online database into offline database.
+     *
+     * @param resultType result from online database
+     * @return true if success
+     */
+    public boolean addResultTypeToDatabase(ResultType resultType) {
+        assert(resultType != null);
+        ResultType result = org.yccheok.jstock.engine.Utils.rectifyResult(resultType);
+        if (result == null) {
+            // Invalid result from online database.
+            return false;
+        }
+        return false;
+    }
+    
     private TrayIcon trayIcon;
     
     private static final Log log = LogFactory.getLog(MainFrame.class);

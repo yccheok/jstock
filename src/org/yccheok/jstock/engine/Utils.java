@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ import java.util.*;
 import org.apache.commons.httpclient.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.yccheok.jstock.engine.AjaxYahooSearchEngine.ResultType;
 import org.yccheok.jstock.gui.MainFrame;
 
 /**
@@ -41,6 +42,41 @@ public class Utils {
     private Utils() {
     }   
 
+
+    /**
+     * Generate the best online database result if possible so that it is
+     * acceptable by JStock application.
+     *
+     * @param result result from online database
+     * @return best result after rectified. null if result cannot be rectified
+     */
+    public static ResultType rectifyResult(ResultType result) {
+        String symbolStr = result.symbol;
+        String nameStr = result.name;
+        if (symbolStr == null) {
+            return null;
+        }
+        if (symbolStr.trim().isEmpty()) {
+            return null;
+        }
+        symbolStr = symbolStr.trim().toUpperCase();
+        if (nameStr == null) {
+            // If name is not available, we will make it same as symbol.
+            nameStr = symbolStr;
+        }
+        if (nameStr.trim().isEmpty()) {
+            // If name is not available, we will make it same as symbol.
+            nameStr = symbolStr;
+        }
+        nameStr = nameStr.trim();
+        return result.deriveWithSymbol(symbolStr).deriveWithName(nameStr);
+    }
+
+    /**
+     * Initialize HttpClient with information from system properties.
+     *
+     * @param httpClient HttpClient to be initialized
+     */
     public static void setHttpClientProxyFromSystemProperties(HttpClient httpClient) {
         final String httpproxyHost = System.getProperties().getProperty("http.proxyHost");
         final String httpproxyPort = System.getProperties().getProperty("http.proxyPort");
