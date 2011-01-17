@@ -24,7 +24,6 @@ import com.nexes.wizard.Wizard;
 import com.nexes.wizard.WizardModel;
 import com.nexes.wizard.WizardPanelDescriptor;
 import org.yccheok.jstock.gui.analysis.OperatorFigureCreationTool;
-import java.util.concurrent.ExecutionException;
 import org.jhotdraw.util.*;
 
 import java.io.*;
@@ -324,8 +323,9 @@ public class IndicatorPanel extends JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
-// TODO add your handling code here:
+        // Start button.
         this.jButton4.setEnabled(true);
+        // Stop button.
         this.jButton6.setEnabled(false);     
         
         stop();
@@ -427,12 +427,18 @@ public class IndicatorPanel extends JPanel {
             }
         }
 
+        // Start button.
         this.jButton4.setEnabled(false);
+        // Stop button.
         this.jButton6.setEnabled(true);
-        if (simulationThread != null) {
-            simulationThread.interrupt();
+
+        final Thread thread = this.simulationThread;
+        // Set null to stop the simulation thread.
+        this.simulationThread = null;
+        if (thread != null) {
+            thread.interrupt();
             try {
-                simulationThread.join();
+                thread.join();
             }
             catch (InterruptedException exp) {
                 log.error(null, exp);
@@ -1482,17 +1488,18 @@ public class IndicatorPanel extends JPanel {
             log.info("Terminated stock task");
         }
 
-        if (this.simulationThread != null) {
-            this.simulationThread.interrupt();
+        final Thread thread = this.simulationThread;
+        // Set null to stop the simulation thread.
+        this.simulationThread = null;
+        if (thread != null) {
+            thread.interrupt();
 
             try {
-                this.simulationThread.join();
+                thread.join();
             }
             catch (InterruptedException exp) {
                 log.error(null, exp);
             }
-
-            this.simulationThread = null;
             
             log.info("Terminated simulation thread");
         }        
@@ -1513,6 +1520,7 @@ public class IndicatorPanel extends JPanel {
         final IndicatorDefaultDrawing indicatorDefaultDrawing = (IndicatorDefaultDrawing)this.view.getDrawing();
         final OperatorIndicator operatorIndicator = indicatorDefaultDrawing.getOperatorIndicator();
         final Duration historyDuration = operatorIndicator.getNeededStockHistoryDuration();
+        final Thread currentThread = Thread.currentThread();
 
         // When stock is null, this means this indicator needs neither stock real-time information
         // nor stock history information.
@@ -1556,13 +1564,15 @@ public class IndicatorPanel extends JPanel {
             }
 
             if (stockHistoryServer == null) {
+                // Start button.
                 this.jButton4.setEnabled(true);
+                // Stop button.
                 this.jButton6.setEnabled(false);
                 m.setStatusBar(false, MessagesBundle.getString("info_message_history_not_found"));
                 return;
             }
 
-            if (Thread.interrupted() || simulationThread != Thread.currentThread()) {
+            if (currentThread.isInterrupted() || simulationThread != currentThread) {
                 return;
             }
 
@@ -1570,7 +1580,7 @@ public class IndicatorPanel extends JPanel {
             operatorIndicator.setStockHistoryServer(stockHistoryServer);
         }   /* if(operatorIndicator.isStockHistoryServerNeeded()) { */
         
-        if (Thread.interrupted() || simulationThread != Thread.currentThread()) {
+        if (currentThread.isInterrupted() || simulationThread != currentThread) {
             return;
         }
         
@@ -1578,7 +1588,7 @@ public class IndicatorPanel extends JPanel {
         
         operatorIndicator.preCalculate();
         
-        if (Thread.interrupted() || simulationThread != Thread.currentThread()) {
+        if (currentThread.isInterrupted() || simulationThread != currentThread) {
             return;
         }
         
@@ -1594,7 +1604,7 @@ public class IndicatorPanel extends JPanel {
    
         long estimatedTime = System.nanoTime() - startTime;
 
-        if (Thread.interrupted() || simulationThread != Thread.currentThread()) {
+        if (currentThread.isInterrupted() || simulationThread != currentThread) {
             return;
         }
 
@@ -1604,11 +1614,13 @@ public class IndicatorPanel extends JPanel {
         );
         m.setStatusBar(false, output);
 
+        // Start button.
         this.jButton4.setEnabled(true);
+        // Stop button.
         this.jButton6.setEnabled(false);
     }
     
-    public void initIndicatorProjectManager() {
+    public final void initIndicatorProjectManager() {
         File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "indicator" + File.separator + "project.xml");
         this.alertIndicatorProjectManager = org.yccheok.jstock.gui.Utils.fromXML(IndicatorProjectManager.class, f);
         if (this.alertIndicatorProjectManager != null) {
@@ -1633,7 +1645,7 @@ public class IndicatorPanel extends JPanel {
         });
     }
 
-    public void initModuleProjectManager() {
+    public final void initModuleProjectManager() {
         final File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "module" + File.separator + "project.xml");
         this.moduleIndicatorProjectManager = org.yccheok.jstock.gui.Utils.fromXML(IndicatorProjectManager.class, f);
         if (this.moduleIndicatorProjectManager != null) {
@@ -1820,7 +1832,7 @@ public class IndicatorPanel extends JPanel {
     
     private StockTask stockTask;
     
-    private Thread simulationThread;
+    private volatile Thread simulationThread;
 
     private static final int NUM_OF_RETRY = 3;
 
