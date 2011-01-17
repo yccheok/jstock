@@ -837,11 +837,12 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private void buyTreeTableValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_buyTreeTableValueChanged
         // TODO add your handling code here:
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    if(buyTreeTable.getSelectedRowCount() > 0) {
-                        sellTreeTable.clearSelection();
-                    }
-                }        
+            @Override
+            public void run() {
+                if(buyTreeTable.getSelectedRowCount() > 0) {
+                    sellTreeTable.clearSelection();
+                }
+            }
         });
     }//GEN-LAST:event_buyTreeTableValueChanged
 

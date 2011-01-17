@@ -1493,7 +1493,6 @@ public class IndicatorPanel extends JPanel {
         this.simulationThread = null;
         if (thread != null) {
             thread.interrupt();
-
             try {
                 thread.join();
             }
