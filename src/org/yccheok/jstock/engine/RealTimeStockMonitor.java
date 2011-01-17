@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -95,8 +95,11 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
         // and able to retrieve Iterator in a safe way without getting 
         // IndexOutOfBoundException.
         stockCodesWriterLock.lock();
-        stockCodes.clear();
-        stockCodesWriterLock.unlock();   
+        try {
+            stockCodes.clear();
+        } finally {
+            stockCodesWriterLock.unlock();
+        }
         
         while(stockMonitors.size() > 0) {
             StockMonitor stockMonitor = stockMonitors.remove(stockMonitors.size() - 1);
@@ -123,8 +126,12 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
         // and able to retrieve Iterator in a safe way without getting 
         // IndexOutOfBoundException.
         stockCodesWriterLock.lock();
-        boolean status = stockCodes.remove(code);
-        stockCodesWriterLock.unlock();
+        boolean status = false;
+        try {
+            status = stockCodes.remove(code);
+        } finally {
+            stockCodesWriterLock.unlock();
+        }
 
         // Do we need to remove any old thread?
         final int numOfMonitorRequired = this.getNumOfRequiredThread();
@@ -224,14 +231,12 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
         }
         
         private synchronized void softWait() throws InterruptedException {
-            synchronized (this) {
-                if (status == Status.Pause) {
-                    while (status != Status.Resume) {
-                        wait();
-                    }
-
-                    status = Status.Normal;
+            if (status == Status.Pause) {
+                while (status != Status.Resume) {
+                    wait();
                 }
+
+                status = Status.Normal;
             }
         }
 
@@ -276,11 +281,14 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
 
                             // Acquire iterator in a safe way.
                             stockCodesReaderLock.lock();
-                            final int stockCodesSize = stockCodes.size();
-                            if (currIndex < stockCodesSize) {
-                                listIterator = stockCodes.listIterator(currIndex);
+                            try {
+                                final int stockCodesSize = stockCodes.size();
+                                if (currIndex < stockCodesSize) {
+                                    listIterator = stockCodes.listIterator(currIndex);
+                                }
+                            } finally {
+                                stockCodesReaderLock.unlock();
                             }
-                            stockCodesReaderLock.unlock();
 
                             if (listIterator != null) {
                                 List<Code> codes = new ArrayList<Code>();
