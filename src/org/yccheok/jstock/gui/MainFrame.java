@@ -2488,7 +2488,7 @@ public class MainFrame extends javax.swing.JFrame {
 
             // Do not rely on isInterrupted flag only. The flag can be cleared by 3rd party easily.
             // Check for current thread as well.
-            while (!currentThread.isInterrupted()  && (marketThread == Thread.currentThread())) {
+            while (!currentThread.isInterrupted()  && (marketThread == currentThread)) {
                 final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactories();
                 for (StockServerFactory factory : stockServerFactories) {
                     MarketServer server = factory.getMarketServer();
@@ -3320,9 +3320,9 @@ public class MainFrame extends javax.swing.JFrame {
         this.indicatorScannerJPanel.initStockHistoryMonitor(Collections.unmodifiableList(stockServerFactories));
     }
 
-	// Do not combine initOthersStockHistoryMonitor with initStockHistoryMonitor. We need to be able to update
-	// only MainFrame's history monitor, when we change the history duration option. Other's history monitors
-	// are not affected.
+    // Do not combine initOthersStockHistoryMonitor with initStockHistoryMonitor. We need to be able to update
+    // only MainFrame's history monitor, when we change the history duration option. Other's history monitors
+    // are not affected.
     private void initStockHistoryMonitor() {
         if(stockHistoryMonitor != null) {
             final StockHistoryMonitor oldStockHistoryMonitor = stockHistoryMonitor;
@@ -3385,8 +3385,8 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     private void initMarketThread() {
-        if(marketThread != null) {
-            final Thread oldMarketThread = marketThread;
+        final Thread oldMarketThread = marketThread;
+        if (oldMarketThread != null) {
             zombiePool.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -3868,7 +3868,7 @@ public class MainFrame extends javax.swing.JFrame {
         protected void process(java.util.List<String> messages) {
             boolean show = false;
 
-            for(String message : messages)
+            for (String message : messages)
             {
                 AutoUpdateNewsJDialog dialog = new AutoUpdateNewsJDialog(MainFrame.this, true);
                 dialog.setNews(message);
@@ -4133,7 +4133,7 @@ public class MainFrame extends javax.swing.JFrame {
     private final Object databaseTaskMonitor = new Object();
 
     private LatestNewsTask latestNewsTask = null;
-    private Thread marketThread = null;
+    private volatile Thread marketThread = null;
     private StockHistorySerializer stockHistorySerializer = null;        
     private JStockOptions jStockOptions;
     private ChartJDialogOptions chartJDialogOptions;
