@@ -101,7 +101,7 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
             stockCodesWriterLock.unlock();
         }
         
-        while(stockMonitors.size() > 0) {
+        while (stockMonitors.size() > 0) {
             StockMonitor stockMonitor = stockMonitors.remove(stockMonitors.size() - 1);
             stockMonitor._stop();
             /*

@@ -130,15 +130,16 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         /* Hacking way to make startScanThread stop within a very short time. */
         stop_button_pressed = true;
 
-        if (this.startScanThread != null)
+        final Thread thread = this.startScanThread;
+        this.startScanThread = null;
+        if (thread != null)
         {
+            thread.interrupt();
             try {
-                this.startScanThread.join();
+                thread.join();
             } catch (InterruptedException ex) {
                 log.error(null, ex);
             }
-
-            this.startScanThread = null;
         }
 
         stop_button_pressed = false;
@@ -538,16 +539,16 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         /* Hacking way to make startScanThread stop within a very short time. */
         stop_button_pressed = true;
 
-        if (this.startScanThread != null)
+        final Thread thread = this.startScanThread;
+        this.startScanThread = null;
+        if (thread != null)
         {
-            this.startScanThread.interrupt();
+            thread.interrupt();
             try {
-                this.startScanThread.join();
+                thread.join();
             } catch (InterruptedException ex) {
                 log.error(null, ex);
             }
-
-            this.startScanThread = null;
         }
         
         final MainFrame m = getMainFrame();
@@ -1063,9 +1064,15 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     // This is a dirty way, but it just work :)
     private volatile Boolean allowIndicatorShown = true;
 
+    // This boolean flag is important, as we are unable to use 
+    // this.startScanThread != currentThread to stop an operation. We need to
+    // stop several threads at the same time such as RealTimeStockMonitor.
     private volatile boolean stop_button_pressed = true;
 
-    private Thread startScanThread = null;
+    // There isn't any need to make this thread volatile, as we do not use
+    // this.startScanThread != currentThread technique to stop a thread. This is
+    // just to be consistence across entire project.
+    private volatile Thread startScanThread = null;
 
     private static final Log log = LogFactory.getLog(IndicatorScannerJPanel.class);
 
