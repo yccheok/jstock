@@ -443,7 +443,8 @@ public class AjaxAutoCompleteJComboBox extends JComboBox {
     }
 
     /**
-     * Stop any threading activities.
+     * Stop Ajax threading activity in this combo box. Once stop, this combo box
+     * can no longer be reused.
      */
     public void stop() {
         ajaxYahooSearchEngineMonitor.stop();
