@@ -890,6 +890,17 @@ public class MainFrame extends javax.swing.JFrame {
         this.portfolioManagementJPanel.savePortfolio();
     }
 
+    /**
+     * Dettach all and stop Ajax threading activity in combo box. Once stop, 
+     * this combo box can no longer be reused.
+     */
+    private void dettachAllAndStopAutoCompleteJComboBox() {
+        // We are no longer interest to receive any event from combo box.
+        ((AutoCompleteJComboBox)this.jComboBox1).dettachAll();
+        // Stop all threading activities in AutoCompleteJComboBox.
+        ((AutoCompleteJComboBox)this.jComboBox1).stop();
+    }
+
     // windowClosing
     // Invoked when the user attempts to close the window from the window's system menu.
     //
@@ -903,6 +914,9 @@ public class MainFrame extends javax.swing.JFrame {
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
         try {
             this.save();
+
+            dettachAllAndStopAutoCompleteJComboBox();
+            this.indicatorPanel.dettachAllAndStopAutoCompleteJComboBox();
             
             log.info("latestNewsTask stop...");
 
@@ -3324,7 +3338,7 @@ public class MainFrame extends javax.swing.JFrame {
     // only MainFrame's history monitor, when we change the history duration option. Other's history monitors
     // are not affected.
     private void initStockHistoryMonitor() {
-        if(stockHistoryMonitor != null) {
+        if (stockHistoryMonitor != null) {
             final StockHistoryMonitor oldStockHistoryMonitor = stockHistoryMonitor;
             zombiePool.execute(new Runnable() {
                 @Override

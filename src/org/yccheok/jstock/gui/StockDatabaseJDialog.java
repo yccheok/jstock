@@ -366,7 +366,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
         // We are no longer interest to receive any event from combo box.
         ((AjaxAutoCompleteJComboBox)this.jComboBox1).dettachAll();
-        // Any all threading activities in AjaxAutoCompleteJComboBox.
+        // Stop all threading activities in AjaxAutoCompleteJComboBox.
         ((AjaxAutoCompleteJComboBox)this.jComboBox1).stop();
     }//GEN-LAST:event_formWindowClosed
     

@@ -107,6 +107,11 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
         setTitle(bundle.getString("NewBuyTransactionJDialog_Buy")); // NOI18N
         setResizable(false);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                formWindowClosed(evt);
+            }
+        });
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("NewBuyTransactionJDialog_Transaction"))); // NOI18N
 
@@ -550,6 +555,21 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         // TODO add your handling code here:
         update();
     }//GEN-LAST:event_jFormattedTextField5FocusLost
+
+    /**
+     * Dettach all and stop Ajax threading activity in combo box. Once stop,
+     * this combo box can no longer be reused.
+     */
+    private void dettachAllAndStopAutoCompleteJComboBox() {
+        // We are no longer interest to receive any event from combo box.
+        ((AutoCompleteJComboBox)this.jComboBox1).dettachAll();
+        // Stop all threading activities in AutoCompleteJComboBox.
+        ((AutoCompleteJComboBox)this.jComboBox1).stop();
+    }
+
+    private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
+        dettachAllAndStopAutoCompleteJComboBox();
+    }//GEN-LAST:event_formWindowClosed
         
     private JFormattedTextField getCurrencyJFormattedTextField() {
         NumberFormat format= NumberFormat.getNumberInstance();

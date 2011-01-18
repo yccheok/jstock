@@ -599,6 +599,14 @@ public class AutoCompleteJComboBox extends JComboBox {
         busySubject.attach(observer);
     }
 
+    /**
+     * Stop Ajax threading activity in this combo box. Once stop, this combo box
+     * can no longer be reused.
+     */
+    public void stop() {
+        ajaxYahooSearchEngineMonitor.stop();
+    }
+
     private Mode mode = Mode.Offline;
     private final ListCellRenderer offlineModeCellRenderer;
     private final ListCellRenderer onlineModeCellRenderer = new ResultSetCellRenderer();

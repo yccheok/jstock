@@ -1477,7 +1477,18 @@ public class IndicatorPanel extends JPanel {
              }
          }        
     }
-    
+
+    /**
+     * Dettach all and stop Ajax threading activity in combo box. Once stop,
+     * this combo box can no longer be reused.
+     */
+    public void dettachAllAndStopAutoCompleteJComboBox() {
+        // We are no longer interest to receive any event from combo box.
+        ((AutoCompleteJComboBox)this.jComboBox1).dettachAll();
+        // Stop all threading activities in AutoCompleteJComboBox.
+        ((AutoCompleteJComboBox)this.jComboBox1).stop();
+    }
+
     private void stop()
     {
         final StockTask tmp = this.stockTask;
@@ -1543,7 +1554,7 @@ public class IndicatorPanel extends JPanel {
                     @Override
                     public void update(StockHistoryMonitor monitor, StockHistoryMonitor.StockHistoryRunnable runnable)
                     {
-                        if(runnable.getCode().equals(stock.getCode())) {
+                        if (runnable.getCode().equals(stock.getCode())) {
                             countDownLatch.countDown();
                         }
                     }
