@@ -78,7 +78,7 @@ public class AjaxYahooSearchEngineMonitor extends Subject<AjaxYahooSearchEngineM
         @Override
         public void run() {
             String string;
-            while (true) {
+            while (!executor.isShutdown()) {
                 try {
                     string = blockingQueue.take();
                     List<ResultType> results = searchEngine.searchAll(string);
