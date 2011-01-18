@@ -1,23 +1,20 @@
 /*
- * StockHistoryMonitor.java
- *
- * Created on May 1, 2007, 10:46 PM
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- * Copyright (C) 2007 Cheok YanCheng <yccheok@yahoo.com>
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.yccheok.jstock.engine;
@@ -59,47 +56,48 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
     public boolean addStockCode(final Code code) {
         writerLock.lock();
 
-        // Should we perform lock downgrading?
-        //
-        /*
-             class CachedData {
-               Object data;
-               volatile boolean cacheValid;
-               ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
+        try {
+            // Should we perform lock downgrading?
+            //
+            /*
+                 class CachedData {
+                   Object data;
+                   volatile boolean cacheValid;
+                   ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
 
-               void processCachedData() {
-                 rwl.readLock().lock();
-                 if (!cacheValid) {
-                    // upgrade lock manually
-                    rwl.readLock().unlock();   // must unlock first to obtain writelock
-                    rwl.writeLock().lock();
-                    if (!cacheValid) { // recheck
-                      data = ...
-                      cacheValid = true;
-                    }
-                    // downgrade lock
-                    rwl.readLock().lock();  // reacquire read without giving up write lock
-                    rwl.writeLock().unlock(); // unlock write, still hold read
+                   void processCachedData() {
+                     rwl.readLock().lock();
+                     if (!cacheValid) {
+                        // upgrade lock manually
+                        rwl.readLock().unlock();   // must unlock first to obtain writelock
+                        rwl.writeLock().lock();
+                        if (!cacheValid) { // recheck
+                          data = ...
+                          cacheValid = true;
+                        }
+                        // downgrade lock
+                        rwl.readLock().lock();  // reacquire read without giving up write lock
+                        rwl.writeLock().unlock(); // unlock write, still hold read
+                     }
+
+                     use(data);
+                     rwl.readLock().unlock();
+                   }
                  }
+             */
 
-                 use(data);
-                 rwl.readLock().unlock();
-               }
-             }
-         */
+            if (stockCodes.contains(code)) {
+                return false;
+            }
 
-        if(stockCodes.contains(code)) {
+            boolean status = stockCodes.add(code);
+
+            pool.execute(new StockHistoryRunnable(code));
+
+            return status;
+        } finally {
             writerLock.unlock();
-            return false;            
         }
-        
-        boolean status = stockCodes.add(code);
-        
-        pool.execute(new StockHistoryRunnable(code));
-
-        writerLock.unlock();
-
-        return status;
     }
 
     /**
@@ -132,70 +130,82 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
             final Thread currentThread = Thread.currentThread();
             
             for (StockServerFactory factory : factories) {
+                // Do not apply ExecutorService.isShutDown technique, to quit
+                // from this loop. This is because pool variable isn't final.
+                // We might be referring to the wrong pool. But checking for
+                // Thread.isInterrupted isn't fool proof either, as the
+                // interrupted flag might be cleared by other funtions. Fixing
+                // this might be complicated. Till now, it hasn't gave us any
+                // trouble. Hence, don't fix it if it isn't broken.
+                if (currentThread.isInterrupted()) {
+                    break;
+                }
+
                 StockHistoryServer history = factory.getStockHistoryServer(this.code, duration);
 
                 if (history != null) {
                     readerLock.lock();
-                    
-                    // Anyone try to stop us from publishing this history?
-                    if(stockCodes.contains(code)) {
-                        this.historyServer = history;
 
-                        // Concurrent access problem may happen here. Two or more threads may read
-                        // and modify histories. Although we can use new reader/writer lock pair to prevent,
-                        // this will increase complexity.
-                        //
-                        // Hence, We choose to use "Double-Checked Locking", to avoid expensive of synchronized block.
-                        //
-                        // However, "Double-Checked Locking" is not guarantee to work well. Please refer to
-                        // http://www.ibm.com/developerworks/java/library/j-jtp02244.html
-                        // http://www.ibm.com/developerworks/library/j-jtp03304/
-                        //
-                        // Any how, we allow error tolerance here.
-                        // The worst case is that, histories.size() >= StockHistoryMonitor.this.databaseSize.
-                        // But that doesn't really matter.
-                        //
-                        boolean shouldUseSerializer = false;
+                    try {
+                        // Anyone try to stop us from publishing this history?
+                        if (stockCodes.contains(code)) {
+                            this.historyServer = history;
 
-                        if (histories.size() < StockHistoryMonitor.this.DATABASE_SIZE) {
-                            synchronized (histories) {
-                                if(histories.size() < StockHistoryMonitor.this.DATABASE_SIZE) {
-                                    histories.put(code, history);
+                            // Concurrent access problem may happen here. Two or more threads may read
+                            // and modify histories. Although we can use new reader/writer lock pair to prevent,
+                            // this will increase complexity.
+                            //
+                            // Hence, We choose to use "Double-Checked Locking", to avoid expensive of synchronized block.
+                            //
+                            // However, "Double-Checked Locking" is not guarantee to work well. Please refer to
+                            // http://www.ibm.com/developerworks/java/library/j-jtp02244.html
+                            // http://www.ibm.com/developerworks/library/j-jtp03304/
+                            //
+                            // Any how, we allow error tolerance here.
+                            // The worst case is that, histories.size() >= StockHistoryMonitor.this.databaseSize.
+                            // But that doesn't really matter.
+                            //
+                            boolean shouldUseSerializer = false;
+
+                            if (histories.size() < StockHistoryMonitor.this.DATABASE_SIZE) {
+                                synchronized (histories) {
+                                    if(histories.size() < StockHistoryMonitor.this.DATABASE_SIZE) {
+                                        histories.put(code, history);
+                                    }
+                                    else {
+                                        shouldUseSerializer = true;
+                                    }
                                 }
-                                else {
-                                    shouldUseSerializer = true;
-                                }
-                            }
-                        }
-                        else {
-                            shouldUseSerializer = true;
-                        }
-                        
-                        if (shouldUseSerializer) {
-                            if(StockHistoryMonitor.this.stockHistorySerializer != null) {
-                                StockHistoryMonitor.this.stockHistorySerializer.save(history);
                             }
                             else {
-                                log.error("Fail to perform serialization on stock history due to uninitialized serialization component.");
+                                shouldUseSerializer = true;
+                            }
+
+                            if (shouldUseSerializer) {
+                                if(StockHistoryMonitor.this.stockHistorySerializer != null) {
+                                    StockHistoryMonitor.this.stockHistorySerializer.save(history);
+                                }
+                                else {
+                                    log.error("Fail to perform serialization on stock history due to uninitialized serialization component.");
+                                }
                             }
                         }
+                    } finally {
+                        readerLock.unlock();
                     }
                     
-                    readerLock.unlock();
-                    
+                    // Break from loop, as we already obtain the history.
                     break;
-                }
-               
-                if (currentThread.isInterrupted())
-                    break;
-            }
+                }   // if (history != null)
+            }   // for
             
             if (historyServer == null) {
                 writerLock.lock();
-        
-                stockCodes.remove(code);
-        
-                writerLock.unlock();
+                try {
+                    stockCodes.remove(code);
+                } finally {
+                    writerLock.unlock();
+                }
             }
             
             // We need to notify the listener. Whether the history is success or
@@ -243,85 +253,86 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
     public void clearStockCodes() {        
         writerLock.lock();
 
-        final ThreadPoolExecutor threadPoolExecutor = ((ThreadPoolExecutor)pool);
-        final int nThreads = threadPoolExecutor.getMaximumPoolSize();
+        try {
+            final ThreadPoolExecutor threadPoolExecutor = ((ThreadPoolExecutor)pool);
+            final int nThreads = threadPoolExecutor.getMaximumPoolSize();
 
-        stockCodes.clear();
-        
-        histories.clear();                
+            stockCodes.clear();
 
-        threadPoolExecutor.shutdownNow();  
-        
-        // pool is not valid any more. Discard it and re-create.
-        pool = Executors.newFixedThreadPool(nThreads);
+            histories.clear();
 
-        writerLock.unlock();
+            threadPoolExecutor.shutdownNow();
+
+            // pool is not valid any more. Discard it and re-create.
+            pool = Executors.newFixedThreadPool(nThreads);
+        } finally {
+            writerLock.unlock();
+        }
     }
     
     public boolean removeStockCode(Code code) {
         writerLock.lock();
-        
-        boolean status = stockCodes.remove(code);
-        
-        histories.remove(code);                
+        try {
+            boolean status = stockCodes.remove(code);
 
-        ((ThreadPoolExecutor)pool).remove(new StockHistoryRunnable(code));
+            histories.remove(code);
 
-        writerLock.unlock();
+            ((ThreadPoolExecutor)pool).remove(new StockHistoryRunnable(code));
 
-        return status;
+            return status;
+        } finally {
+            writerLock.unlock();
+        }
     }
     
     public StockHistoryServer getStockHistoryServer(Code code) {
         readerLock.lock();
 
-        if (histories.containsKey(code))
-        {
-            final StockHistoryServer stockHistoryServer = histories.get(code);
-
-            readerLock.unlock();
-
-            return stockHistoryServer;
-        }
-        else {
-            if (StockHistoryMonitor.this.stockHistorySerializer != null) {
-                StockHistoryServer stockHistoryServer = StockHistoryMonitor.this.stockHistorySerializer.load(code);
-                
-                /* So that next time we won't read from the disk. */
-                if (stockHistoryServer != null && (this.DATABASE_SIZE > histories.size())) {
-                    // Concurrent access problem may happen here. Two or more threads may read
-                    // and modify histories. Although we can use new reader/writer lock pair to prevent,
-                    // this will increase complexity.
-                    //
-                    // Hence, We choose to use "Double-Checked Locking", to avoid expensive of synchronized block.
-                    //
-                    // However, "Double-Checked Locking" is not guarantee to work well. Please refer to
-                    // http://www.ibm.com/developerworks/java/library/j-jtp02244.html
-                    // http://www.ibm.com/developerworks/library/j-jtp03304/
-                    //
-                    // Any how, we allow error tolerance here.
-                    // The worst case is that, histories.size() >= StockHistoryMonitor.this.databaseSize.
-                    // But that doesn't really matter.
-                    //
-                    synchronized (histories) {
-                        if(stockHistoryServer != null && (this.DATABASE_SIZE > histories.size())) {
-                            histories.put(code, stockHistoryServer);
-                        }
-                    }
-                }
-
-                readerLock.unlock();
+        try {
+            if (histories.containsKey(code))
+            {
+                final StockHistoryServer stockHistoryServer = histories.get(code);
 
                 return stockHistoryServer;
             }
             else {
-                log.error("Fail to retrieve stock history due to uninitialized serialization component.");                
-            }
-        }
+                if (StockHistoryMonitor.this.stockHistorySerializer != null) {
+                    StockHistoryServer stockHistoryServer = StockHistoryMonitor.this.stockHistorySerializer.load(code);
 
-        readerLock.unlock();
-        
-        return null;
+                    /* So that next time we won't read from the disk. */
+                    if (stockHistoryServer != null && (this.DATABASE_SIZE > histories.size())) {
+                        // Concurrent access problem may happen here. Two or more threads may read
+                        // and modify histories. Although we can use new reader/writer lock pair to prevent,
+                        // this will increase complexity.
+                        //
+                        // Hence, We choose to use "Double-Checked Locking", to avoid expensive of synchronized block.
+                        //
+                        // However, "Double-Checked Locking" is not guarantee to work well. Please refer to
+                        // http://www.ibm.com/developerworks/java/library/j-jtp02244.html
+                        // http://www.ibm.com/developerworks/library/j-jtp03304/
+                        //
+                        // Any how, we allow error tolerance here.
+                        // The worst case is that, histories.size() >= StockHistoryMonitor.this.databaseSize.
+                        // But that doesn't really matter.
+                        //
+                        synchronized (histories) {
+                            if(stockHistoryServer != null && (this.DATABASE_SIZE > histories.size())) {
+                                histories.put(code, stockHistoryServer);
+                            }
+                        }
+                    }
+
+                    return stockHistoryServer;
+                }
+                else {
+                    log.error("Fail to retrieve stock history due to uninitialized serialization component.");
+                }
+            }
+
+            return null;
+        } finally {
+             readerLock.unlock();
+        }
     }
     
     public void setStockHistorySerializer(StockHistorySerializer stockHistorySerializer) {
@@ -331,24 +342,26 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
     // Never export out stockCodes information. They are being used internally.
     
     public void stop() {
-        writerLock.lock();
+        ThreadPoolExecutor threadPoolExecutor = null;
+        writerLock.lock();       
+        try {
+            threadPoolExecutor = ((ThreadPoolExecutor)pool);
+            final int nThreads = threadPoolExecutor.getMaximumPoolSize();
 
-        final ThreadPoolExecutor threadPoolExecutor = ((ThreadPoolExecutor)pool);
-        final int nThreads = threadPoolExecutor.getMaximumPoolSize();
-        
-        // Dangerous. Some users, do expect receive callback once they submit tasks into
-        // monitor. However, if we are calling shutdownNow, user may not receive any
-        // callback from those submitted tasks, which haven't started yet. Calling
-        // shutdown() enables submitted tasks have chances to run once.
-        //
-        // threadPoolExecutor.shutdownNow();
-        threadPoolExecutor.shutdown();
-        threadPoolExecutor.purge();
+            // Dangerous. Some users, do expect receive callback once they submit tasks into
+            // monitor. However, if we are calling shutdownNow, user may not receive any
+            // callback from those submitted tasks, which haven't started yet. Calling
+            // shutdown() enables submitted tasks have chances to run once.
+            //
+            // threadPoolExecutor.shutdownNow();
+            threadPoolExecutor.shutdown();
+            threadPoolExecutor.purge();
 
-        // pool is not valid any more. Discard it and re-create.
-        pool = Executors.newFixedThreadPool(nThreads);
-
-        writerLock.unlock();
+            // pool is not valid any more. Discard it and re-create.
+            pool = Executors.newFixedThreadPool(nThreads);
+        } finally {
+            writerLock.unlock();
+        }
 
         // No unlock after awaitTermination, might cause deadlock.
         
@@ -356,7 +369,7 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
         try {
             threadPoolExecutor.awaitTermination(100, TimeUnit.DAYS);
         }
-        catch(InterruptedException exp) {
+        catch (InterruptedException exp) {
             log.error("", exp);
         }
     }
