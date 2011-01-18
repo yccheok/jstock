@@ -913,8 +913,15 @@ public class MainFrame extends javax.swing.JFrame {
      */
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
         try {
+            // Always be the first statement. As no matter what happen, we must
+            // save all the configuration files.
             this.save();
 
+            // Hide the icon immediately.
+            if (trayIcon != null) {
+                SystemTray.getSystemTray().remove(trayIcon);
+            }
+            
             dettachAllAndStopAutoCompleteJComboBox();
             this.indicatorPanel.dettachAllAndStopAutoCompleteJComboBox();
             
@@ -926,10 +933,6 @@ public class MainFrame extends javax.swing.JFrame {
             }
 
             this.chatJPanel.stopChatServiceManager();
-
-            if (trayIcon != null) {
-                SystemTray.getSystemTray().remove(trayIcon);
-            }
 
             // We suppose to call shutdownAll to clean up all network resources.
             // However, that will cause Exception in other threads if they are still using httpclient.
@@ -3780,7 +3783,9 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     public void displayPopupMessage(final String caption, final String message) {
-        if(trayIcon == null) return;
+        if (trayIcon == null) {
+            return;
+        }
 
         if (SwingUtilities.isEventDispatchThread())
         {
