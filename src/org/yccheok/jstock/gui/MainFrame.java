@@ -141,6 +141,14 @@ public class MainFrame extends javax.swing.JFrame {
 
         // Turn to the last viewed page.
         this.jTabbedPane1.setSelectedIndex(this.getJStockOptions().getLastSelectedPageIndex());
+
+        // setSelectedIndex will not always trigger jTabbedPane1StateChanged,
+        // if the selected index is same as current page index. However, we are
+        // expecting jTabbedPane1StateChanged to suspend/resume
+        // portfolioManagementJPanel's RealtTimeStockMonitor in order to preserve
+        // network resource. Hence, we need to call handleJTabbedPaneStateChanged
+        // explicitly.
+        handleJTabbedPaneStateChanged(this.jTabbedPane1);
     }
 
     /**
@@ -776,15 +784,8 @@ public class MainFrame extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, output, MessagesBundle.getString("error_title_bad_file_format"), JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_jMenuItem2ActionPerformed
-    
-    // Policy : Each pane should have their own real time stock monitoring.
-    //
-    //          Each pane should share history monitoring with main frame, 
-    //          for optimized history retrieving purpose.
-    //
-    private void jTabbedPane1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jTabbedPane1StateChanged
-        // TODO add your handling code here:
-        JTabbedPane pane = (JTabbedPane)evt.getSource();
+
+    private void handleJTabbedPaneStateChanged(JTabbedPane pane) {
         // MainFrame
         if (pane.getSelectedComponent() == this.jPanel8) {
             this.jMenuItem2.setEnabled(true);   // Load
@@ -848,6 +849,17 @@ public class MainFrame extends javax.swing.JFrame {
                 }
             });
         }
+    }
+
+    // Policy : Each pane should have their own real time stock monitoring.
+    //
+    //          Each pane should share history monitoring with main frame, 
+    //          for optimized history retrieving purpose.
+    //
+    private void jTabbedPane1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jTabbedPane1StateChanged
+        // TODO add your handling code here:
+        JTabbedPane pane = (JTabbedPane)evt.getSource();
+        handleJTabbedPaneStateChanged(pane);
     }//GEN-LAST:event_jTabbedPane1StateChanged
 
 
@@ -1396,21 +1408,21 @@ public class MainFrame extends javax.swing.JFrame {
         // before we manually change the system properties according to
         // JStockOptions.
         ProxyDetector.getInstance();      
-        
+
         Utils.setDefaultLookAndFeel();
 
         final String[] _args = args;
 
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
-            public void run() {
+    public void run() {
                 final MainFrame mainFrame = MainFrame.getInstance();
                 mainFrame.init(getJStockOptions(_args));
                 mainFrame.setExtendedState(Frame.MAXIMIZED_BOTH);
                 mainFrame.setVisible(true);
                 mainFrame.updateDividerLocation();
-            }
-        });
+    }
+    });
     }
 
     // Restore the last saved divider location for portfolio management panel.
@@ -2859,14 +2871,14 @@ public class MainFrame extends javax.swing.JFrame {
                 }
             });
         }
-        
+
         realTimeStockMonitor = new RealTimeStockMonitor(4, 20, jStockOptions.getScanningSpeed());
         
         final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactories();
         realTimeStockMonitor.setStockServerFactories(stockServerFactories);
 
         realTimeStockMonitor.attach(this.realTimeStockMonitorObserver);
-        
+
         this.indicatorScannerJPanel.initRealTimeStockMonitor(Collections.unmodifiableList(stockServerFactories));
         this.portfolioManagementJPanel.initRealTimeStockMonitor(Collections.unmodifiableList(stockServerFactories));
     }
