@@ -13,10 +13,15 @@ JStock ?.?.?? - ????-??-??
   Feature: Having a confirmation dialog box, to avoid user from clicking 
            uninstall icon accidentally.
  *Feature: Supports German language. Contributed by Stefan Angrick.
+  Bugfix:  Able to suspend and resume network activity in 
+           PortfolioManagementJPanel when not in used, so that network resource
+           is being preserved.
   Bugfix:  Adjust combo box popup width, so that horizontal scrollbar will not
            displayed.
   Bugfix:  Instead of limiting currency decimal places to 2 only, we allow them 
            to float between 2 to 3, to avoid from losing precision.
+  Bugfix:  Prevent user from uploading Stock Watchlist file with too many stocks
+           to cloud server.
            
 JStock 1.0.5w - 2010-11-26
   Bugfix:  If we perform server re-connecting explicitly, there might be chance

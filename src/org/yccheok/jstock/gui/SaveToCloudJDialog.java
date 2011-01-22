@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,19 +25,19 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 import javax.swing.Icon;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -490,29 +490,104 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
         }
     }
 
+    // Version of getFileEx which ignores LastErrorCode.
+    private List<FileEx> getFileEx(List<FileEx> fileExs, String name) {
+        return getFileEx(fileExs, name, null);
+    }
+
     // name can be anything which is found under directory
     // C:\Users\yccheok\.jstock\1.0.5
     // For example, "Australia", "config", "chat"...
     // The returned FileEx list, will only contain files. No directories
     // will be included.
-    private List<FileEx> getFileEx(List<FileEx> fileExs, String name) {
+    private List<FileEx> getFileEx(List<FileEx> fileExs, String name, LastErrorCode lastErrorCode) {
         final File dir = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + name);
 
         if (dir.isDirectory()) {
             String[] children = dir.list();
             for (String child : children) {
-                getFileEx(fileExs, name + File.separator + child);
+				// Must call back method with lastErrorCode.
+                getFileEx(fileExs, name + File.separator + child, lastErrorCode);
             }
         }
         else {
             if (name.equalsIgnoreCase("config" + File.separator + "options.xml")) {
                 // Special case. Skip it! We will handle it through insensitiveClone.
+            } else if (name.contains("watchlist") && name.endsWith("realtimestock.xml")) {
+                // Some users add all stocks into a watchlist. Since the file
+                // will be very large (around 50MB). We have no way, but ignore
+                // the file.
+                if (dir.length() < 1024 * 1024 * 24) {
+                    // Currently, we place 24MB as our limitation.
+                    fileExs.add(FileEx.newInstance(dir, name));
+                } else {
+                    // Flag a warning. We are going to tell user that his file
+                    // will be ignored.
+					if (lastErrorCode != null) {
+                    	lastErrorCode.flag = true;
+					}
+                }
             }
             else {
                 fileExs.add(FileEx.newInstance(dir, name));
             }
         }
         return fileExs;
+    }
+
+    /**
+     * LastErrorCode is used to indicate whether something has gone wrong during
+     * getFileEx operation.
+     */
+    private static class LastErrorCode {
+        /**
+         * When false, it means everything just fine.
+         */
+        boolean flag = false;
+    }
+
+    // We will ask user whether he want to continue to save to cloud, as we are
+    // going to ignore his stock watchlist file(s). Returns true if user wants
+    // to continue.
+    private boolean promptUserToContinue(final List<Country> countryWithWatchlistFilesBeingIgnored) {
+        if (countryWithWatchlistFilesBeingIgnored.isEmpty()) {
+            // No watchlist file(s) is ignored.
+            return true;
+        }
+
+        int size = countryWithWatchlistFilesBeingIgnored.size();
+        final String message;
+        final String title;
+        if (size == 1) {
+            message = MessageFormat.format(MessagesBundle.getString("question_message_too_many_stocks_during_save_to_cloud_template"), countryWithWatchlistFilesBeingIgnored.get(0));
+            title = MessagesBundle.getString("question_title_too_many_stocks_during_save_to_cloud");
+        } else {
+            message = MessageFormat.format(MessagesBundle.getString("question_message_too_many_stocks_in_multiple_countries_during_save_to_cloud_template"), size);
+            title = MessagesBundle.getString("question_title_too_many_stocks_in_multiple_countries_during_save_to_cloud");
+        }
+
+
+        // Ensure thread safety when we pop up confirmation dialog box. Is it
+        // possible to cause deadlock due to invokeAndWait?
+        final int[] choice = new int[1];
+        choice[0] = JOptionPane.NO_OPTION;
+        if (SwingUtilities.isEventDispatchThread()) {
+            choice[0] = JOptionPane.showConfirmDialog(SaveToCloudJDialog.this, message, title, JOptionPane.YES_NO_OPTION);
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(new Runnable() {
+                    @Override
+                    public void run() {
+                        choice[0] = JOptionPane.showConfirmDialog(SaveToCloudJDialog.this, message, title, JOptionPane.YES_NO_OPTION);
+                    }
+                });
+            } catch (InterruptedException ex) {
+                log.error(null, ex);
+            } catch (InvocationTargetException ex) {
+                log.error(null, ex);
+            }
+        }
+        return choice[0] == JOptionPane.YES_OPTION;
     }
 
     private File getJStockZipFile() {
@@ -524,6 +599,7 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
             try {
                 filename = file.getCanonicalPath();
             } catch (IOException ex) {
+                // Should we return null? As the saved information is not complete.
                 log.error(null, ex);
                 continue;
             }
@@ -546,9 +622,11 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
             org.yccheok.jstock.gui.Utils.toXML(insensitiveJStockOptions, tempJStockOptions);
             fileExs.add(FileEx.newInstance(tempJStockOptions, "config" + File.separator + "options.xml"));
         } catch (IOException ex) {
+            // Should we return null? As the saved information is not complete.
             log.error(null, ex);
         }
 
+        final List<Country> countryWithWatchlistFilesBeingIgnored = new ArrayList<Country>();
         getFileEx(fileExs, "config");
         getFileEx(fileExs, "indicator");
         getFileEx(fileExs, "logos");
@@ -557,7 +635,18 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
             // For legacy usage. Shall be removed after a few more release
             // later than 1.0.5k
             getFileEx(fileExs, country + File.separator + "config");
-            getFileEx(fileExs, country + File.separator + "watchlist");
+
+            LastErrorCode lastErrorCode = new LastErrorCode();
+            getFileEx(fileExs, country + File.separator + "watchlist", lastErrorCode);
+            if (lastErrorCode.flag) {
+                // Watchlist file(s) is being ignored due to too much stocks in
+                // the watchlist.
+                countryWithWatchlistFilesBeingIgnored.add(country);
+            }
+        }
+
+        if (false == promptUserToContinue(countryWithWatchlistFilesBeingIgnored)) {
+            return null;
         }
 
         // Create a buffer for reading the files
@@ -591,6 +680,7 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
                 }
                 catch (IOException exp) {
                     log.error(null, exp);
+                    // Should we return null? As the saved information is not complete.
                     continue;
                 }
                 finally {
@@ -601,6 +691,7 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
             }
         } 
         catch (IOException exp) {
+            // Should we return null? As the saved information is not complete.
             log.error(null, exp);
         }
         finally {
