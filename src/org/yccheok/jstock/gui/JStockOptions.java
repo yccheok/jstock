@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -319,7 +319,11 @@ public class JStockOptions {
     private Locale locale = Locale.getDefault();
 
     private Map<Country, String> currencies = new EnumMap<Country, String>(Country.class);
-    
+
+    private Map<Country, Boolean> currencyExchangeEnable = new EnumMap<Country, Boolean>(Country.class);
+
+    private Map<Country, Country> localCurrencyCountries = new EnumMap<Country, Country>(Country.class);
+
     public boolean isAutoBrokerFeeCalculationEnabled() {
         return this.isAutoBrokerFeeCalculationEnabled;
     }
@@ -662,6 +666,14 @@ public class JStockOptions {
         
         if (this.currencies == null) {
             this.currencies = new EnumMap<Country, String>(Country.class);
+        }
+
+        if (this.currencyExchangeEnable == null) {
+            this.currencyExchangeEnable = new EnumMap<Country, Boolean>(Country.class);
+        }
+
+        if (this.localCurrencyCountries == null) {
+            this.localCurrencyCountries = new EnumMap<Country, Country>(Country.class);
         }
 
         return this;
@@ -1296,5 +1308,53 @@ public class JStockOptions {
      */
     public void setCurrencySymbol(Country c, String s) {
         this.currencies.put(c, s);
+    }
+
+    /**
+     * Returns true if currency exchange feature is enabled for country.
+     *
+     * @param c the country to get
+     * @return true if currency exchange feature is enabled for the country
+     */
+    public boolean isCurrencyExchangeEnable(Country c) {
+        Boolean flag = this.currencyExchangeEnable.get(c);
+        if (flag != null) {
+            return flag;
+        }
+        return false;
+    }
+
+    /**
+     * Enables currency exchange feature for the country.
+     *
+     * @param country the country to set
+     * @param enable true to enable
+     */
+    public void setCurrencyExchangeEnable(Country country, boolean enable) {
+        this.currencyExchangeEnable.put(country, enable);
+    }
+
+    /**
+     * Returns country of local currency used to purchase foreign stocks. If no
+     * country of local currency found for the country of foreign stocks,
+     * country of foreign stocks itself will be returned. So that we can get
+     * 1:1 exchange ratio.
+     * 
+     * @param country country of foreign stocks
+     * @return country of local currency used to purchase foreign stocks
+     */
+    public Country getLocalCurrencyCountry(Country country) {
+        return this.localCurrencyCountries.get(country);
+    }
+
+    /**
+     * Set the country of local currency used to purchase foreign stocks.
+     * 
+     * @param country country of foreign stocks
+     * @param localCurrencyCountry country of local currency used to purchase
+     * foreign stocks
+     */
+    public void setLocalCurrencyCountry(Country country, Country localCurrencyCountry) {
+        this.localCurrencyCountries.put(country, localCurrencyCountry);
     }
 }

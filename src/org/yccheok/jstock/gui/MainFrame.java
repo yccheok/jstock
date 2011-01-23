@@ -1899,6 +1899,7 @@ public class MainFrame extends javax.swing.JFrame {
         this.initMarketJPanel();
         this.initStockHistoryMonitor();
         this.initOthersStockHistoryMonitor();
+        this.initCurrencyExchangeMonitor();
         // Initialize real time monitor must come before initialize real time
         // stocks. We need to submit real time stocks to real time stock monitor.
         // Hence, after we load real time stocks from file, real time stock monitor
@@ -1966,6 +1967,7 @@ public class MainFrame extends javax.swing.JFrame {
         this.initMarketJPanel();
         this.initStockHistoryMonitor();
         this.initOthersStockHistoryMonitor();
+        this.initCurrencyExchangeMonitor();
         // Initialize real time monitor must come before initialize real time
         // stocks. We need to submit real time stocks to real time stock monitor.
         // Hence, after we load real time stocks from file, real time stock monitor
@@ -2895,9 +2897,13 @@ public class MainFrame extends javax.swing.JFrame {
                 }
             });
         }
-        currencyExchangeMonitor = new CurrencyExchangeMonitor();
-        // Start immediately.
-        currencyExchangeMonitor.start();
+        final Country fromCountry = this.jStockOptions.getCountry();
+        final Country toCountry = this.jStockOptions.getLocalCurrencyCountry(fromCountry);
+        currencyExchangeMonitor = new CurrencyExchangeMonitor(fromCountry, toCountry);
+        if (this.jStockOptions.isCurrencyExchangeEnable(fromCountry)) {
+            // Start immediately.
+            currencyExchangeMonitor.start();
+        }
     }
 
     private void initRealTimeStockMonitor() {
