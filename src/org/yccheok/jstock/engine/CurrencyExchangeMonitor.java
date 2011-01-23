@@ -19,6 +19,9 @@
 
 package org.yccheok.jstock.engine;
 
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -26,6 +29,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.yccheok.jstock.network.Utils.Type;
 
 /**
  *
@@ -84,7 +88,14 @@ public class CurrencyExchangeMonitor {
         }
     }
 
+    // CurrencyExchangeRunnable is doing 2 things:
+    //
+    // (1) Keep trying to fill in countryToCurrencyCode with latest
+    // country -> currency information, until it successes at least once.
+    // (2) Fetch the latest currency exchange information, according to given
+    // fromCountry and toCountry.
     private class CurrencyExchangeRunnable implements Runnable {
+
         @Override
         public void run() {
             while (!executor.isShutdown()) {
@@ -105,8 +116,69 @@ public class CurrencyExchangeMonitor {
                         }
                     }
                 }
+
+                if (successUpdatedCountryToCurrencyCode == false) {
+                    // Keep trying to fill in countryToCurrencyCode with latest
+                    // country -> currency information, until it successes at
+                    // least once.
+                    final String server = org.yccheok.jstock.network.Utils.getURL(Type.CURRENCY_CODE_TXT);
+                    Map<String, String> map = org.yccheok.jstock.gui.Utils.getUUIDValue(server);
+                    for (Entry<String, String> entry : map.entrySet()) {
+                        if (entry.getValue() != null) {
+                            try {
+                                countryToCurrencyCode.put(Country.valueOf(entry.getKey()), entry.getValue());
+                            } catch (java.lang.IllegalArgumentException ex) {
+                                // I am not sure whether I should set
+                                // successUpdatedCountryToCurrencyCode to false.
+                                log.error(null, ex);
+                            }
+                            // OK. We need not to contact CURRENCY_CODE_TXT's
+                            // server anymore.
+                            successUpdatedCountryToCurrencyCode = true;
+                        }
+                    }
+                }
             }
         }
+    }
+
+    // This map, is used to convert a country to its latest assiciated currency.
+    // This map will at most be updated by currencyExchangeRunnable once, from
+    // CURRENCY_CODE_TXT's server. Even we are unable to obtain information
+    // from CURRENCY_CODE_TXT's server, this map itself still able to provide
+    // default information.
+    private static final Map<Country, String> countryToCurrencyCode =  new ConcurrentHashMap<Country, String>();
+    // Whether we had updated countryToCurrencyCode at least once?
+    // Do I have to use volatile here? As this flag may write by a thread, but
+    // read by another thread later.
+    private static boolean successUpdatedCountryToCurrencyCode = false;
+
+    static {
+        countryToCurrencyCode.put(Country.Australia, "AUD");
+        countryToCurrencyCode.put(Country.Austria, "EUR");
+        countryToCurrencyCode.put(Country.Belgium, "EUR");
+        countryToCurrencyCode.put(Country.Brazil, "BRL");
+        countryToCurrencyCode.put(Country.Canada, "CAD");
+        countryToCurrencyCode.put(Country.China, "CNY");
+        countryToCurrencyCode.put(Country.Denmark, "DKK");
+        countryToCurrencyCode.put(Country.France, "EUR");
+        countryToCurrencyCode.put(Country.Germany, "EUR");
+        countryToCurrencyCode.put(Country.HongKong, "HKD");
+        countryToCurrencyCode.put(Country.India, "INR");
+        countryToCurrencyCode.put(Country.Indonesia, "IDR");
+        countryToCurrencyCode.put(Country.Italy, "EUR");
+        countryToCurrencyCode.put(Country.Korea, "KPW");
+        countryToCurrencyCode.put(Country.Malaysia, "MYR");
+        countryToCurrencyCode.put(Country.Netherlands, "EUR");
+        countryToCurrencyCode.put(Country.Norway, "NOK");
+        countryToCurrencyCode.put(Country.Portugal, "EUR");
+        countryToCurrencyCode.put(Country.Singapore, "SGD");
+        countryToCurrencyCode.put(Country.Spain, "EUR");
+        countryToCurrencyCode.put(Country.Sweden, "SEK");
+        countryToCurrencyCode.put(Country.Switzerland, "CHF");
+        countryToCurrencyCode.put(Country.Taiwan, "TWD");
+        countryToCurrencyCode.put(Country.UnitedKingdom, "GBP");
+        countryToCurrencyCode.put(Country.UnitedState, "USD");
     }
 
     // Doesn't require volatile, as this variable is being accessed within

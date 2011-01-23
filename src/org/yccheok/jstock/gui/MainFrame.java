@@ -127,6 +127,7 @@ public class MainFrame extends javax.swing.JFrame {
         this.initDatabase(true);
         this.initMarketThread();
         this.initLatestNewsTask();
+        this.initCurrencyExchangeMonitor();
         this.initRealTimeStockMonitor();
         this.initRealTimeStocks();
         this.initAlertStateManager();
@@ -145,9 +146,9 @@ public class MainFrame extends javax.swing.JFrame {
         // setSelectedIndex will not always trigger jTabbedPane1StateChanged,
         // if the selected index is same as current page index. However, we are
         // expecting jTabbedPane1StateChanged to suspend/resume
-        // portfolioManagementJPanel's RealtTimeStockMonitor in order to preserve
-        // network resource. Hence, we need to call handleJTabbedPaneStateChanged
-        // explicitly.
+        // PortfolioManagementJPanel's RealtTimeStockMonitor and MainFrame's
+        // CurrencyExchangeMonitor, in order to preserve network resource. Hence,
+        // we need to call handleJTabbedPaneStateChanged explicitly.
         handleJTabbedPaneStateChanged(this.jTabbedPane1);
     }
 
@@ -792,8 +793,13 @@ public class MainFrame extends javax.swing.JFrame {
             this.jMenuItem9.setEnabled(true);   // Save
 
             if (this.portfolioManagementJPanel != null) {
-                this.portfolioManagementJPanel.softStop();
-                log.info("Stop portfolio monitor.");
+                this.portfolioManagementJPanel.suspendRealTimeStockMonitor();
+                log.info("Suspend portfolio monitor.");
+            }
+
+            if (this.currencyExchangeMonitor != null) {
+                this.currencyExchangeMonitor.suspend();
+                log.info("Suspend currency exchange monitor.");
             }
         }
         else if (pane.getSelectedComponent() == this.indicatorPanel) {
@@ -801,8 +807,13 @@ public class MainFrame extends javax.swing.JFrame {
             this.jMenuItem9.setEnabled(false);  // Save
 
             if (this.portfolioManagementJPanel != null) {
-                this.portfolioManagementJPanel.softStop();
-                log.info("Stop portfolio monitor.");
+                this.portfolioManagementJPanel.suspendRealTimeStockMonitor();
+                log.info("Suspend portfolio monitor.");
+            }
+
+            if (this.currencyExchangeMonitor != null) {
+                this.currencyExchangeMonitor.suspend();
+                log.info("Suspend currency exchange monitor.");
             }
         }
         else if(pane.getSelectedComponent() == this.indicatorScannerJPanel) {
@@ -810,8 +821,13 @@ public class MainFrame extends javax.swing.JFrame {
             this.jMenuItem9.setEnabled(true);   // Save
 
             if (this.portfolioManagementJPanel != null) {
-                this.portfolioManagementJPanel.softStop();
-                log.info("Stop portfolio monitor.");
+                this.portfolioManagementJPanel.suspendRealTimeStockMonitor();
+                log.info("Suspend portfolio monitor.");
+            }
+
+            if (this.currencyExchangeMonitor != null) {
+                this.currencyExchangeMonitor.suspend();
+                log.info("Suspend currency exchange monitor.");
             }
         }
         else if(pane.getSelectedComponent() == this.portfolioManagementJPanel) {
@@ -819,8 +835,13 @@ public class MainFrame extends javax.swing.JFrame {
             this.jMenuItem9.setEnabled(true);   // Save
 
             if (this.portfolioManagementJPanel != null) {
-                this.portfolioManagementJPanel.softStart();
-                log.info("Start portfolio monitor.");
+                this.portfolioManagementJPanel.resumeRealTimeStockMonitor();
+                log.info("Resume portfolio monitor.");
+            }
+
+            if (this.currencyExchangeMonitor != null) {
+                this.currencyExchangeMonitor.resume();
+                log.info("Resume currency exchange monitor.");
             }
         }
         else if (pane.getSelectedComponent() == this.chatJPanel) {
@@ -828,8 +849,13 @@ public class MainFrame extends javax.swing.JFrame {
             this.jMenuItem9.setEnabled(false);  // Load
 
             if (this.portfolioManagementJPanel != null) {
-                this.portfolioManagementJPanel.softStop();
-                log.info("Stop portfolio monitor.");
+                this.portfolioManagementJPanel.suspendRealTimeStockMonitor();
+                log.info("Suspend portfolio monitor.");
+            }
+
+            if (this.currencyExchangeMonitor != null) {
+                this.currencyExchangeMonitor.suspend();
+                log.info("Suspend currency exchange monitor.");
             }
         }
 
@@ -2856,7 +2882,24 @@ public class MainFrame extends javax.swing.JFrame {
         final MouseAdapter mouseAdapter = this.getMyJXStatusBarImageLabelMouseAdapter();
         this.statusBar.addImageLabelMouseListener(mouseAdapter);
     }
-    
+
+    private void initCurrencyExchangeMonitor() {
+        if (currencyExchangeMonitor != null) {
+            final CurrencyExchangeMonitor oldCurrencyExchangeMonitor = currencyExchangeMonitor;
+            zombiePool.execute(new Runnable() {
+                @Override
+                public void run() {
+                    log.info("Prepare to shut down " + oldCurrencyExchangeMonitor + "...");
+                    oldCurrencyExchangeMonitor.stop();
+                    log.info("Shut down " + oldCurrencyExchangeMonitor + " peacefully.");
+                }
+            });
+        }
+        currencyExchangeMonitor = new CurrencyExchangeMonitor();
+        // Start immediately.
+        currencyExchangeMonitor.start();
+    }
+
     private void initRealTimeStockMonitor() {
         if (realTimeStockMonitor != null) {
             final RealTimeStockMonitor oldRealTimeStockMonitor = realTimeStockMonitor;
@@ -4159,7 +4202,8 @@ public class MainFrame extends javax.swing.JFrame {
     
     private RealTimeStockMonitor realTimeStockMonitor = null;
     private StockHistoryMonitor stockHistoryMonitor = null;
-    
+    private CurrencyExchangeMonitor currencyExchangeMonitor = null;
+
     private DatabaseTask databaseTask = null;
     private final Object databaseTaskMonitor = new Object();
 
