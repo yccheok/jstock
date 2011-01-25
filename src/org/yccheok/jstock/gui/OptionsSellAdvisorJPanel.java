@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 package org.yccheok.jstock.gui;
 
 import java.awt.Component;
+import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Arrays;
@@ -28,15 +29,21 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import javax.swing.BorderFactory;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFormattedTextField;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.ListCellRenderer;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.NumberFormatter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.yccheok.jstock.engine.Country;
+import org.yccheok.jstock.internationalization.GUIBundle;
 
 /**
  *
@@ -76,6 +83,8 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
         javax.swing.JPanel jPanel4 = new javax.swing.JPanel();
         javax.swing.JLabel jLabel2 = new javax.swing.JLabel();
         jComboBox1 = new javax.swing.JComboBox();
+        jComboBox2 = new javax.swing.JComboBox();
+        jCheckBox2 = new javax.swing.JCheckBox();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -138,16 +147,32 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
         jComboBox1.setEditable(true);
         jComboBox1.setModel(getComboBoxModel());
 
+        jComboBox2.setModel(getCountryComboBoxModel());
+        jComboBox2.setRenderer(new MyCellRenderer());
+
+        jCheckBox2.setText(getConvertCurrencyString());
+        jCheckBox2.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jCheckBox2ItemStateChanged(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(243, Short.MAX_VALUE))
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addComponent(jCheckBox2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(224, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -156,7 +181,11 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jCheckBox2)
+                    .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -180,11 +209,21 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(59, Short.MAX_VALUE))
         );
 
         add(jPanel1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jCheckBox2ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jCheckBox2ItemStateChanged
+        // Update the GUI state of combo box.
+        updateGUIState();
+    }//GEN-LAST:event_jCheckBox2ItemStateChanged
+
+    // Print out label text for currency exchange enable check box.
+    private String getConvertCurrencyString() {
+        return MessageFormat.format(GUIBundle.getString("OptionsSellAdvisorJPanel_ConvertCurrencyFromTo"), MainFrame.getInstance().getJStockOptions().getCountry());
+    }
 
     private JFormattedTextField getPercentageJFormattedTextField() {
         NumberFormat format= NumberFormat.getNumberInstance();
@@ -197,6 +236,24 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
         return field;
     }
 
+    private ComboBoxModel getCountryComboBoxModel() {
+        // Ensure thread safety for lazy initialization technique.
+        synchronized(defaultCountryComboBoxModel) {
+            // Lazy initialization.
+            if (defaultCountryComboBoxModel.getSize() > 0) {
+                return defaultCountryComboBoxModel;
+            }
+            for (Country country : Country.values()) {
+                if (country.equals(MainFrame.getInstance().getJStockOptions().getCountry())) {
+                    // Skip "local" country.
+                    continue;
+                }
+                defaultCountryComboBoxModel.addElement(country);
+            }
+        }
+        return defaultCountryComboBoxModel;
+    }
+    
     private static ComboBoxModel getComboBoxModel() {
         synchronized(defaultComboBoxModel) {
             if (defaultComboBoxModel.getSize() > 0) {
@@ -262,7 +319,11 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
         this.jFormattedTextField1.setValue(new Double(jStockOptions.getExpectedProfitPercentage()));
         this.jCheckBox1.setSelected(jStockOptions.isPenceToPoundConversionEnabled());
         this.jComboBox1.setSelectedItem(jStockOptions.getCurrencySymbol(jStockOptions.getCountry()));
+        this.jCheckBox2.setSelected(jStockOptions.isCurrencyExchangeEnable(jStockOptions.getCountry()));
+        this.jComboBox2.setSelectedItem(jStockOptions.getLocalCurrencyCountry(jStockOptions.getCountry()));
+
         commitEdit();
+        updateGUIState();
     }
 
     @Override
@@ -274,17 +335,74 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
         if (currencySymbol.isEmpty() == false) {
             jStockOptions.setCurrencySymbol(jStockOptions.getCountry(), currencySymbol);
         }
+
+        jStockOptions.setCurrencyExchangeEnable(jStockOptions.getCountry(), jCheckBox2.isSelected());
+        jStockOptions.setLocalCurrencyCountry(jStockOptions.getCountry(), (Country)jComboBox2.getSelectedItem());
+
         // Remember to refresh the GUIs as well.
         MainFrame.getInstance().getPortfolioManagementJPanel().refreshCurrencySymbol();
         return true;
     }
-    
+
+    // Update the GUI state of combo box, according to currency exchange enable
+    // feature.
+    private void updateGUIState() {
+        jComboBox2.setEnabled(jCheckBox2.isSelected());
+    }
+
+    // Display an icon and a string for each object in the list.
+    private static class MyCellRenderer extends JLabel implements ListCellRenderer {
+        public MyCellRenderer()
+        {
+            super();
+            this.setBorder(BorderFactory.createEmptyBorder(2, 0, 2, 0));
+        }
+        // This is the only method defined by ListCellRenderer.
+        // We just reconfigure the JLabel each time we're called.
+
+        @Override
+        public Component getListCellRendererComponent(
+                JList list,              // the list
+                Object value,            // value to display
+                int index,               // cell index
+                boolean isSelected,      // is the cell selected
+                boolean cellHasFocus)    // does the cell have focus
+        {
+            String s = value.toString();
+            setText(s);
+
+            if(value instanceof Country) {
+                setIcon(((Country)value).getIcon());
+            }
+
+            if (isSelected) {
+                setBackground(list.getSelectionBackground());
+                setForeground(list.getSelectionForeground());
+            } else {
+                setBackground(list.getBackground());
+                setForeground(list.getForeground());
+            }
+
+            setEnabled(list.isEnabled());
+            setFont(list.getFont());
+            setOpaque(true);
+
+            return this;
+        }
+    }
+
     private static final Log log = LogFactory.getLog(OptionsSellAdvisorJPanel.class);
     private static final DefaultComboBoxModel defaultComboBoxModel = new DefaultComboBoxModel();
+    // Do not have this combo box model as static. As we do not want to have
+    // current selected country in the combo box, different country will need
+    // to have different combo box model.
+    private final DefaultComboBoxModel defaultCountryComboBoxModel = new DefaultComboBoxModel();
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox jCheckBox1;
+    private javax.swing.JCheckBox jCheckBox2;
     private javax.swing.JComboBox jComboBox1;
+    private javax.swing.JComboBox jComboBox2;
     private javax.swing.JFormattedTextField jFormattedTextField1;
     // End of variables declaration//GEN-END:variables
 }

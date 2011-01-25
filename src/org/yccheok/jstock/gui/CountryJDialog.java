@@ -1,7 +1,20 @@
 /*
- * CountryJDialog.java
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
- * Created on November 7, 2008, 11:02 PM
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.yccheok.jstock.gui;
@@ -124,26 +137,11 @@ public class CountryJDialog extends javax.swing.JDialog {
         this.dispose();    
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    /**
-    * @param args the command line arguments
-    */
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                CountryJDialog dialog = new CountryJDialog(new javax.swing.JFrame(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
-    }
-
     private ListModel getMyListModel() {
         return new AbstractListModel() {
+            @Override
             public int getSize() { return Country.values().length; }
+            @Override
             public Object getElementAt(int index) { return Country.values()[index]; }
         };
     }
@@ -158,6 +156,7 @@ public class CountryJDialog extends javax.swing.JDialog {
         // This is the only method defined by ListCellRenderer.
         // We just reconfigure the JLabel each time we're called.
 
+        @Override
         public Component getListCellRendererComponent(
                 JList list,              // the list
                 Object value,            // value to display

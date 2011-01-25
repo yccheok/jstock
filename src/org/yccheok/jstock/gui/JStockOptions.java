@@ -1344,7 +1344,11 @@ public class JStockOptions {
      * @return country of local currency used to purchase foreign stocks
      */
     public Country getLocalCurrencyCountry(Country country) {
-        return this.localCurrencyCountries.get(country);
+        Country localCountry = this.localCurrencyCountries.get(country);
+        if (localCountry != null) {
+            return localCountry;
+        }
+        return country;
     }
 
     /**
