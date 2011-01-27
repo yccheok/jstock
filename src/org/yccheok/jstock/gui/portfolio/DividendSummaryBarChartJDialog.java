@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -94,6 +94,7 @@ public class DividendSummaryBarChartJDialog extends javax.swing.JDialog {
             }
         }
 
+        // Ensure symbols are in alphabetical order.
         java.util.Collections.sort(strings);
 
         for (String string : strings) {

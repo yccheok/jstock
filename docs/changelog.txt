@@ -22,7 +22,9 @@ JStock ?.?.?? - ????-??-??
            to float between 2 to 3, to avoid from losing precision.
   Bugfix:  Prevent user from uploading Stock Watchlist file with too many stocks
            to cloud server.
-           
+  Bugfix:  Under dividend dialog box, the stock selection through combo box will 
+           be sorted in alphabetical order.
+                        
 JStock 1.0.5w - 2010-11-26
   Bugfix:  If we perform server re-connecting explicitly, there might be chance
            where the entire stock database will be corrupted due to empty stock
