@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,12 +38,13 @@ public class Utils {
         CHAT_SERVER_TXT,
         NTP_SERVER_TXT,
         VERSION_INFORMATION_TXT,
+        CURRENCY_CODE_TXT,
         MODULE_INDICATOR_DOWNLOAD_MANAGER_XML,
         ALERT_INDICATOR_DOWNLOAD_MANAGER_XML,
         HELP_STOCK_DATABASE_HTML,
         PRIVACY_HTML,
         HELP_HTML,
-        MA_INDICATOR_HTML,       
+        MA_INDICATOR_HTML,
     }
 
     private Utils() {
@@ -82,6 +83,7 @@ public class Utils {
         map.put(Type.NTP_SERVER_TXT, JSTOCK_STATIC_SERVER + "servers_information/ntp_server.txt");
         map.put(Type.NEWS_INFORMATION_TXT, JSTOCK_STATIC_SERVER + "news_information/index.txt");
         map.put(Type.VERSION_INFORMATION_TXT, JSTOCK_STATIC_SERVER + "version_information/index.txt");
+        map.put(Type.CURRENCY_CODE_TXT, JSTOCK_STATIC_SERVER + "currency_information/currency_code.txt");
         map.put(Type.MODULE_INDICATOR_DOWNLOAD_MANAGER_XML, JSTOCK_STATIC_SERVER + "module_indicators/indicator_download_manager.xml");
         map.put(Type.ALERT_INDICATOR_DOWNLOAD_MANAGER_XML, JSTOCK_STATIC_SERVER + "alert_indicators/indicator_download_manager.xml");
         map.put(Type.HELP_STOCK_DATABASE_HTML, "http://jstock.sourceforge.net/help_stock_database.html?utm_source=jstock&utm_medium=database_dialog");
@@ -98,6 +100,7 @@ public class Utils {
         zh_map.put(Type.NTP_SERVER_TXT, JSTOCK_STATIC_SERVER + "servers_information/ntp_server.txt");
         zh_map.put(Type.NEWS_INFORMATION_TXT, JSTOCK_STATIC_SERVER + "news_information/zh/index.txt");
         zh_map.put(Type.VERSION_INFORMATION_TXT, JSTOCK_STATIC_SERVER + "version_information/zh/index.txt");
+        zh_map.put(Type.CURRENCY_CODE_TXT, JSTOCK_STATIC_SERVER + "currency_information/currency_code.txt");
         zh_map.put(Type.MODULE_INDICATOR_DOWNLOAD_MANAGER_XML, JSTOCK_STATIC_SERVER + "module_indicators/zh/indicator_download_manager.xml");
         zh_map.put(Type.ALERT_INDICATOR_DOWNLOAD_MANAGER_XML, JSTOCK_STATIC_SERVER + "alert_indicators/zh/indicator_download_manager.xml");
         zh_map.put(Type.HELP_STOCK_DATABASE_HTML, "http://jstock.sourceforge.net/zh/help_stock_database.html?utm_source=jstock&utm_medium=database_dialog");
