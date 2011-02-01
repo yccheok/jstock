@@ -160,19 +160,19 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
         return status;
     }    
     
-    public synchronized void softStart() {
+    public synchronized void resume() {
         for (StockMonitor stockMonitor : stockMonitors) {
-            stockMonitor.softStart();
+            stockMonitor._resume();
         }
     }
 
-    public synchronized void softStop() {
+    public synchronized void suspend() {
         for (StockMonitor stockMonitor : stockMonitors) {
-            stockMonitor.softStop();
+            stockMonitor._suspend();
         }
     }    
     
-    public synchronized void start() {
+    private synchronized void start() {
         // Do we need to remove any old thread?
         final int numOfMonitorRequired = this.getNumOfRequiredThread();
         
@@ -223,33 +223,34 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
     }
     
     private class StockMonitor extends Thread {    
-        private volatile Status status = Status.Normal;
-    
+        // Doesn't require volatile, as this variable is being accessed within
+        // synchronized block.
+        private boolean suspend = false;
+
         public StockMonitor(int index) {
             this.index = index;
             thread = this;
         }
-        
-        private synchronized void softWait() throws InterruptedException {
-            if (status == Status.Pause) {
-                while (status != Status.Resume) {
-                    wait();
-                }
 
-                status = Status.Normal;
+        // Use name with underscore, in order to avoid naming crashing with
+        // Thread's.
+        private synchronized void _wait() throws InterruptedException {
+            while (suspend) {
+                wait();
             }
         }
 
-        public synchronized void softStart() {
-            if (status == Status.Pause) {
-                status = Status.Resume;
-                notify();
-            }
-        }
-
-        public synchronized void softStop() {
-            status = Status.Pause;
+        // Use name with underscore, in order to avoid naming crashing with
+        // Thread's.
+        public synchronized void _resume() {
+            suspend = false;
             notify();
+        }
+
+        // Use name with underscore, in order to avoid naming crashing with
+        // Thread's.
+        public synchronized void _suspend() {
+            suspend = true;
         }    
         
         @Override
@@ -260,14 +261,14 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
             final int step = numOfStockPerIteration * maxThread;
 
 
-            while (thisThread == thread) {
+            while (thisThread == thread) {                
                 // Fail safe. So that middle in the code, if there is a unexpected exception being thrown, our thread
                 // still remain alive. Take note that, entering exception block for each loop is expensive. Hence, we have double
                 // loop strategy.
                 try {
                     while (thisThread == thread) {
                         try {
-                            softWait();
+                            _wait();
                         }
                         catch (InterruptedException exp) {
                             log.error(null, exp);
@@ -353,12 +354,6 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
         private final int index;
         private volatile Thread thread;
     }
-    
-    private enum Status {
-        Pause,
-        Resume,
-        Normal
-    };
         
     // Delay in ms
     private volatile long delay;

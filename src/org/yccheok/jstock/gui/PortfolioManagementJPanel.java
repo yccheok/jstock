@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -1444,7 +1444,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         final Portfolio buyPortfolio = (Portfolio) buyPortfolioTreeTableModel.getRoot();
         final Portfolio sellPortfolio = (Portfolio) sellPortfolioTreeTableModel.getRoot();
 
-        List<Code> codes = new ArrayList<Code>();
+        Set<Code> codes = new HashSet<Code>();
         List<Stock> stocks = new ArrayList<Stock>();
 
         final int count = buyPortfolio.getChildCount();
@@ -1504,7 +1504,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             Portfolio portfolio = (Portfolio)portfolioTreeTableModel.getRoot();
             final int count = portfolio.getChildCount();
             
-            for(int i=0; i<count; i++) {
+            for (int i = 0; i < count; i++) {
                 TransactionSummary transactionSummary = (TransactionSummary)portfolio.getChildAt(i);
                 
                 if(transactionSummary.getChildCount() <= 0) continue;
@@ -1522,11 +1522,11 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         List<Stock> stocks = new ArrayList<Stock>();
         Set<Code> c = new HashSet<Code>();
         
-        if(treePaths == null) {
+        if (treePaths == null) {
             return Collections.unmodifiableList(stocks);
         }
         
-        for(TreePath treePath : treePaths) {
+        for (TreePath treePath : treePaths) {
             final Object lastPathComponent = treePath.getLastPathComponent();
             
             if (lastPathComponent instanceof TransactionSummary) {
@@ -2008,18 +2008,18 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         });
     }
     
-    public void softStart() {
+    public void resumeRealTimeStockMonitor() {
         if (realTimeStockMonitor == null) {
             return;
         }    
-        realTimeStockMonitor.softStart();
+        realTimeStockMonitor.resume();
     }
     
-    public void softStop() {
+    public void suspendRealTimeStockMonitor() {
         if (realTimeStockMonitor == null) {
             return;
         }        
-        realTimeStockMonitor.softStop();
+        realTimeStockMonitor.suspend();
     }
 
     /**
