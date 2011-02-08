@@ -25,8 +25,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.network.Utils.Type;
@@ -36,6 +34,17 @@ import org.yccheok.jstock.network.Utils.Type;
  * @author yccheok
  */
 public class CurrencyExchangeMonitor {
+
+    /**
+     * Constructs an instance of CurrencyExchangeMonitor.
+     * 
+     * @param fromCountry convert from this country's currency
+     * @param toCountry convert to this country's currency
+     */
+    public CurrencyExchangeMonitor(Country fromCountry, Country toCountry) {
+        this.fromCountry = fromCountry;
+        this.toCountry = toCountry;
+    }
 
     /**
      * Starts currency exchange monitoring activities. This method can be called
@@ -100,9 +109,11 @@ public class CurrencyExchangeMonitor {
         public void run() {
             while (!executor.isShutdown()) {
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(org.yccheok.jstock.gui.MainFrame.getInstance().getJStockOptions().getScanningSpeed());
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(CurrencyExchangeMonitor.class.getName()).log(Level.SEVERE, null, ex);
+                    log.error(null, ex);
+                    // Usually triggered by executor.shutdownNow
+                    return;
                 }
 
                 synchronized(this) {
@@ -180,6 +191,16 @@ public class CurrencyExchangeMonitor {
         countryToCurrencyCode.put(Country.UnitedKingdom, "GBP");
         countryToCurrencyCode.put(Country.UnitedState, "USD");
     }
+
+    /**
+     * Convert from this country's currency.
+     */
+    private final Country fromCountry;
+
+    /**
+     * Convert to this country's currency.
+     */
+    private final Country toCountry;
 
     // Doesn't require volatile, as this variable is being accessed within
     // synchronized block.

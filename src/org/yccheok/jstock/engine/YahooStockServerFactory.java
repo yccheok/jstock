@@ -47,8 +47,8 @@ public class YahooStockServerFactory implements StockServerFactory {
         try {
             return new YahooStockHistoryServer(country, code);
         }
-        catch(StockHistoryNotFoundException exp) {
-            log.error("", exp);
+        catch (StockHistoryNotFoundException exp) {
+            log.error(null, exp);
             return null;
         }
     }
@@ -58,7 +58,7 @@ public class YahooStockServerFactory implements StockServerFactory {
         try {
             return new YahooStockHistoryServer(country, code, duration);
         }
-        catch(StockHistoryNotFoundException exp) {
+        catch (StockHistoryNotFoundException exp) {
             log.error(null, exp);
             return null;
         }
