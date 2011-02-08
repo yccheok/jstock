@@ -12,6 +12,8 @@ JStock ?.?.?? - ????-??-??
            a portfolio or watchlist.
   Feature: Having a confirmation dialog box, to avoid user from clicking 
            uninstall icon accidentally.
+  Feature: Indicator scanning completion progress will be displayed at status
+           bar.  
  *Feature: Supports German language. Contributed by Stefan Angrick.
   Bugfix:  Able to suspend and resume network activity in 
            PortfolioManagementJPanel when not in used, so that network resource

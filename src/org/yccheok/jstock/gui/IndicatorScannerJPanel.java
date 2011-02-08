@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,13 +53,17 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         
         initTableHeaderToolTips();
         this.initGUIOptions();
-        this.initAlertStateManager();
-    }
+        
+        // Reader and writer locks, so that we can have a correct stop operation.
+        java.util.concurrent.locks.ReadWriteLock readWriteLock = new java.util.concurrent.locks.ReentrantReadWriteLock();
+        reader = readWriteLock.readLock();
+        writer = readWriteLock.writeLock();
 
-    private void initAlertStateManager()
-    {
-        alertStateManager.clearState();
-        alertStateManager.attach(this);
+        // Get ready with all the data structures when pressing "start".
+        initRealTimeStockMonitor(MainFrame.getInstance().getStockServerFactories());
+        initStockHistoryMonitor(MainFrame.getInstance().getStockServerFactories());
+        initAlertDataStructures();
+        initCompleteProgressDataStructures();
     }
 
     /** This method is called from within the constructor to
@@ -127,24 +131,13 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        /* Hacking way to make startScanThread stop within a very short time. */
-        stop_button_pressed = true;
-
-        final Thread thread = this.startScanThread;
-        this.startScanThread = null;
-        if (thread != null)
-        {
-            thread.interrupt();
-            try {
-                thread.join();
-            } catch (InterruptedException ex) {
-                log.error(null, ex);
-            }
-        }
+        // this.startScanThread must be null, as "stop" button must be pressed
+        // before we can press "start" button.
+        assert(this.startScanThread == null);
 
         stop_button_pressed = false;
 
-        final MainFrame m = getMainFrame();
+        final MainFrame m = MainFrame.getInstance();
         
         if (m.getStockCodeAndSymbolDatabase() == null) {
             javax.swing.JOptionPane.showMessageDialog(this, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/messages").getString("info_message_we_havent_connected_to_stock_server"), java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/messages").getString("info_title_we_havent_connected_to_stock_server"), javax.swing.JOptionPane.INFORMATION_MESSAGE);
@@ -164,7 +157,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
 
         final WizardModel wizardModel = wizard.getModel();
 
-        this.startScanThread = getStartScanThread(wizardModel, m);
+        this.startScanThread = getStartScanThread(wizardModel);
         this.startScanThread.start();
 
         jButton1.setEnabled(false);
@@ -226,6 +219,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     // Time consuming method. It involves file I/O reading (getOperatorIndicator).
     private void initOperatorIndicators(WizardModel wizardModel)
     {
+        // Clear the previous operator indicators.
         this.operatorIndicators.clear();
 
         WizardPanelDescriptor wizardPanelDescriptor0 = wizardModel.getPanelDescriptor(WizardSelectStockDescriptor.IDENTIFIER);
@@ -233,7 +227,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         WizardPanelDescriptor wizardPanelDescriptor1 = wizardModel.getPanelDescriptor(WizardSelectIndicatorDescriptor.IDENTIFIER);
         WizardSelectIndicatorJPanel wizardSelectIndicatorJPanel = (WizardSelectIndicatorJPanel)wizardPanelDescriptor1.getPanelComponent();
 
-        final MainFrame m = getMainFrame();
+        final MainFrame m = MainFrame.getInstance();
         final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = m.getStockCodeAndSymbolDatabase();
         final IndicatorProjectManager alertIndicatorProjectManager = m.getAlertIndicatorProjectManager();
         java.util.List<String> projects = wizardSelectIndicatorJPanel.getSelectedProjects();
@@ -243,6 +237,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             if (this.stop_button_pressed) {
                 return;
             }
+
             final java.util.List<OperatorIndicator> result = new java.util.ArrayList<OperatorIndicator>();
 
             this.operatorIndicators.put(code, result);
@@ -325,8 +320,28 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
 
     @Override
     public void update(final Indicator indicator, Boolean result) {
-        if (this.stop_button_pressed) {
-            return;
+        // Use local variables, to ensure we do not consume the newly
+        // initialized variables after stop(). The code should be placed before
+        // "if (this.stop_button_pressed)" check.
+        ExecutorService _emailAlertPool = null;
+        ExecutorService _smsAlertPool = null;
+        ExecutorService _systemTrayAlertPool = null;
+
+        // There are 2 reasons why we are applying lock right here.
+        // 1) Ensure visibility, as we do not apply volatile in all member
+        //    variables.
+        // 2) Make sure it is mutual exclusive with stop operation.
+        reader.lock();
+        try {
+            _emailAlertPool = this.emailAlertPool;
+            _smsAlertPool = this.smsAlertPool;
+            _systemTrayAlertPool = this.systemTrayAlertPool;
+
+            if (this.stop_button_pressed) {
+                return;
+            }
+        } finally {
+            reader.unlock();
         }
 
         final boolean flag = result;
@@ -369,7 +384,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             };
 
             try {
-                systemTrayAlertPool.submit(r);
+                _systemTrayAlertPool.submit(r);
             }
             catch (java.util.concurrent.RejectedExecutionException exp) {
                 log.error(null, exp);
@@ -396,7 +411,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             };
 
             try {
-                systemTrayAlertPool.submit(r);
+                _systemTrayAlertPool.submit(r);
             }
             catch (java.util.concurrent.RejectedExecutionException exp) {
                 log.error(null, exp);
@@ -426,7 +441,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             };
 
             try {
-                emailAlertPool.submit(r);
+                _emailAlertPool.submit(r);
             }
             catch (java.util.concurrent.RejectedExecutionException exp) {
                 log.error(null, exp);
@@ -459,7 +474,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             };
 
             try {
-                smsAlertPool.submit(r);
+                _smsAlertPool.submit(r);
             }
             catch(java.util.concurrent.RejectedExecutionException exp) {
                 log.error(null, exp);
@@ -519,12 +534,11 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     
     public void clear()
     {
-        final MainFrame m = getMainFrame();
+        final MainFrame m = MainFrame.getInstance();
         this.initRealTimeStockMonitor(m.getStockServerFactories());
         this.initStockHistoryMonitor(m.getStockServerFactories());
 
         this.operatorIndicators.clear();
-
         // Ask help from dirty flag, so that background thread won't have
         // chance to show indicators on the table.
         allowIndicatorShown = false;
@@ -536,65 +550,34 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     
     public void stop()
     {
-        /* Hacking way to make startScanThread stop within a very short time. */
-        stop_button_pressed = true;
+        writer.lock();
+        try {
+            /* Hacking way to make startScanThread stop within a very short time. */
+            stop_button_pressed = true;
 
-        final Thread thread = this.startScanThread;
-        this.startScanThread = null;
-        if (thread != null)
-        {
-            thread.interrupt();
-            try {
-                thread.join();
-            } catch (InterruptedException ex) {
-                log.error(null, ex);
-            }
-        }
-        
-        final MainFrame m = getMainFrame();
-        this.initRealTimeStockMonitor(m.getStockServerFactories());
-        this.initStockHistoryMonitor(m.getStockServerFactories());
-
-        final ExecutorService oldSystemTrayAlertPool = systemTrayAlertPool;
-        final ExecutorService oldEmailAlertPool = emailAlertPool;
-        final ExecutorService oldSMSAlertPool = smsAlertPool;
-
-        Utils.getZoombiePool().execute(new Runnable() {
-            @Override
-            public void run() {
-                log.info("Prepare to shut down " + oldSystemTrayAlertPool + "...");
-                oldSystemTrayAlertPool.shutdownNow();
-                try {            
-                    oldSystemTrayAlertPool.awaitTermination(100, TimeUnit.DAYS);
-                } catch (InterruptedException exp) {
-                    log.error(null, exp);
-                }
-                log.info("Shut down " + oldSystemTrayAlertPool + " peacefully.");
-                
-                log.info("Prepare to shut down " + oldEmailAlertPool + "...");
-                oldEmailAlertPool.shutdownNow();
-                try {            
-                    oldEmailAlertPool.awaitTermination(100, TimeUnit.DAYS);
-                } catch (InterruptedException exp) {
-                    log.error(null, exp);
-                }
-                log.info("Shut down " + oldEmailAlertPool + " peacefully.");
-
-                log.info("Prepare to shut down " + oldSMSAlertPool + "...");
-                oldSMSAlertPool.shutdownNow();
+            // We must ensure there is no reader locking mechanism within 
+            // startScanThread. If not, deadlock might happen.
+            final Thread thread = this.startScanThread;
+            this.startScanThread = null;
+            if (thread != null)
+            {
+                thread.interrupt();
                 try {
-                    oldSMSAlertPool.awaitTermination(100, TimeUnit.DAYS);
-                } catch (InterruptedException exp) {
-                    log.error(null, exp);
+                    thread.join();
+                } catch (InterruptedException ex) {
+                    log.error(null, ex);
                 }
-                log.info("Shut down " + oldSMSAlertPool + " peacefully.");
             }
-        }); 
-        
-        emailAlertPool = Executors.newFixedThreadPool(1);
-        smsAlertPool = Executors.newFixedThreadPool(1);
-        systemTrayAlertPool = Executors.newFixedThreadPool(1);        
-        
+            final MainFrame m = MainFrame.getInstance();
+            this.initRealTimeStockMonitor(m.getStockServerFactories());
+            this.initStockHistoryMonitor(m.getStockServerFactories());
+            this.initAlertDataStructures();
+            this.initCompleteProgressDataStructures();
+        } finally {
+            writer.unlock();
+        }
+
+
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -604,11 +587,11 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             
         });
 
-        m.setStatusBar(false, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("IndicatorScannerJPanel_Connected"));
+        MainFrame.getInstance().setStatusBar(false, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("IndicatorScannerJPanel_Connected"));
     }
     
     private void initWizardDialog() {
-        final MainFrame m = getMainFrame();
+        final MainFrame m = MainFrame.getInstance();
         
         wizard = new Wizard(m);
 
@@ -633,7 +616,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         this.realTimeStockMonitor.setDelay(speed);
     }
 
-    public void initStockHistoryMonitor(java.util.List<StockServerFactory> stockServerFactories) {
+    public final void initStockHistoryMonitor(java.util.List<StockServerFactory> stockServerFactories) {
         if (stockHistoryMonitor != null) {
             final StockHistoryMonitor oldStockHistoryMonitor = stockHistoryMonitor;
             Utils.getZoombiePool().execute(new Runnable() {
@@ -664,10 +647,30 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
 
     private void update(StockHistoryMonitor monitor, StockHistoryMonitor.StockHistoryRunnable runnable)
     {
-        if (this.stop_button_pressed) {
-            return;
+        // Use local variables, to ensure we do not consume the newly
+        // initialized variables after stop(). The code should be placed before
+        // "if (this.stop_button_pressed)" check.
+        Set<Code> _failedCodes = null;
+        StockHistoryMonitor _stockHistoryMonitor = null;
+        RealTimeStockMonitor _realTimeStockMonitor = null;
+
+        // There are 2 reasons why we are applying lock right here.
+        // 1) Ensure visibility, as we do not apply volatile in all member
+        //    variables.
+        // 2) Make sure it is mutual exclusive with stop operation.
+        reader.lock();
+        try {
+            _failedCodes = this.failedCodes;
+            _stockHistoryMonitor = this.stockHistoryMonitor;
+            _realTimeStockMonitor = this.realTimeStockMonitor;
+            if (this.stop_button_pressed || _stockHistoryMonitor != monitor) {
+                return;
+            }
+        } finally {
+            reader.unlock();
         }
-        final MainFrame m = this.getMainFrame();
+
+        final MainFrame m = MainFrame.getInstance();
         final Code code = runnable.getCode();
 
         List<OperatorIndicator> indicators = this.operatorIndicators.get(code);
@@ -679,15 +682,19 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         final StockHistoryServer stockHistoryServer = runnable.getStockHistoryServer();
         if (stockHistoryServer == null)
         {
+            _failedCodes.add(code);
+
             // Probably the network is down. Retry infinityly.
             monitor.addStockCode(code);
             return;
         }
 
+        _failedCodes.remove(code);
+
         Symbol symbol = m.getStockCodeAndSymbolDatabase().codeToSymbol(code);
 
         final String template = GUIBundle.getString("IndicatorScannerJPanel_IndicatorScannerFoundHistory_template");
-        final String message = MessageFormat.format(template, symbol);
+        final String message = MessageFormat.format(template, symbol, getCompleteScannedStocksPercentage());
         this.updateStatusBarIfStopButtonIsNotPressed(message);
 
         for (OperatorIndicator operatorIndicator : indicators)
@@ -701,7 +708,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         }
 
         // Perform real time monitoring, for the code with history information.
-        realTimeStockMonitor.addStockCode(code);
+        _realTimeStockMonitor.addStockCode(code);
     }
 
     private org.yccheok.jstock.engine.Observer<StockHistoryMonitor, StockHistoryMonitor.StockHistoryRunnable> getStockHistoryMonitorObserver() {
@@ -724,7 +731,80 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         }
     }
 
-    public void initRealTimeStockMonitor(java.util.List<StockServerFactory> stockServerFactories) {
+    // Initializes data structure used for complete progress calculation.
+    private void initCompleteProgressDataStructures() {
+        Set<Code> oldSuccessCodes = successCodes;
+        Set<Code> oldFailedCodes = failedCodes;
+        if (oldSuccessCodes != null) {
+            oldSuccessCodes.clear();
+        }
+        if (oldFailedCodes != null) {
+            oldFailedCodes.clear();
+        }        
+        successCodes = new java.util.concurrent.CopyOnWriteArraySet<Code>();
+        failedCodes = new java.util.concurrent.CopyOnWriteArraySet<Code>();    
+    }
+    
+    // Initializes data structure used for alerting purpose.
+    private void initAlertDataStructures() {
+        AlertStateManager oldAlertStateManager = alertStateManager;
+        if (oldAlertStateManager != null) {
+            oldAlertStateManager.dettachAll();
+            oldAlertStateManager.clearState();
+        }
+
+        final ExecutorService oldSystemTrayAlertPool = systemTrayAlertPool;
+        final ExecutorService oldEmailAlertPool = emailAlertPool;
+        final ExecutorService oldSMSAlertPool = smsAlertPool;
+
+        Utils.getZoombiePool().execute(new Runnable() {
+            @Override
+            public void run() {
+                if (oldSystemTrayAlertPool != null) {
+                    log.info("Prepare to shut down " + oldSystemTrayAlertPool + "...");
+                    oldSystemTrayAlertPool.shutdownNow();
+                    try {
+                        oldSystemTrayAlertPool.awaitTermination(100, TimeUnit.DAYS);
+                    } catch (InterruptedException exp) {
+                        log.error(null, exp);
+                    }
+                    log.info("Shut down " + oldSystemTrayAlertPool + " peacefully.");
+
+                    log.info("Prepare to shut down " + oldEmailAlertPool + "...");
+                }
+
+                if (oldEmailAlertPool != null) {
+                    oldEmailAlertPool.shutdownNow();
+                    try {
+                        oldEmailAlertPool.awaitTermination(100, TimeUnit.DAYS);
+                    } catch (InterruptedException exp) {
+                        log.error(null, exp);
+                    }
+                    log.info("Shut down " + oldEmailAlertPool + " peacefully.");
+                }
+
+                if (oldSMSAlertPool != null) {
+                    log.info("Prepare to shut down " + oldSMSAlertPool + "...");
+                    oldSMSAlertPool.shutdownNow();
+                    try {
+                        oldSMSAlertPool.awaitTermination(100, TimeUnit.DAYS);
+                    } catch (InterruptedException exp) {
+                        log.error(null, exp);
+                    }
+                    log.info("Shut down " + oldSMSAlertPool + " peacefully.");
+                }
+            }
+        });
+
+        alertStateManager = new AlertStateManager();
+        alertStateManager.attach(this);
+
+        emailAlertPool = Executors.newFixedThreadPool(1);
+        smsAlertPool = Executors.newFixedThreadPool(1);
+        systemTrayAlertPool = Executors.newFixedThreadPool(1);
+    }
+
+    public final void initRealTimeStockMonitor(java.util.List<StockServerFactory> stockServerFactories) {
         if (this.realTimeStockMonitor != null) {
             final RealTimeStockMonitor oldRealTimeStockMonitor = this.realTimeStockMonitor;
             Utils.getZoombiePool().execute(new Runnable() {
@@ -758,6 +838,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     }
 
     private void updateStatusBarIfStopButtonIsNotPressed(String message) {
+        // Do we need to apply lock right here?
         if (this.stop_button_pressed) {
             return;
         }
@@ -765,8 +846,37 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     }
 
     private void update(RealTimeStockMonitor monitor, final java.util.List<Stock> stocks) {
-        if (this.stop_button_pressed) {
-            return;
+        // Use local variables, to ensure we do not consume the newly
+        // initialized variables after stop(). The code should be placed before
+        // "if (this.stop_button_pressed)" check.
+        AlertStateManager _alertStateManager = null;
+        Set<Code> _successCodes = null;
+
+        // There are 2 reasons why we are applying lock right here.
+        // 1) Ensure visibility, as we do not apply volatile in all member 
+        //    variables.
+        // 2) Make sure it is mutual exclusive with stop operation.
+        reader.lock();
+        try {
+            _alertStateManager = this.alertStateManager;
+            _successCodes = this.successCodes;
+            RealTimeStockMonitor _realTimeStockMonitor = this.realTimeStockMonitor;
+
+            // Perform "_realTimeStockMonitor != monitor" check, to ensure we
+            // are not using newly constructed realTimeStockMonitor. By just
+            // merely using stop_button_pressed guard flag will not work as,
+            //
+            // 1) User presses on stop button.
+            // 2) Old realTimeStockMonitor may stall.
+            // 3) User presses on start button, and create new realTimeStockMonitor.
+            // 4) stop_button_pressed has became true.
+            // 5) Old realTimeStockMonitor resume. This may cause both old and
+            //    new realTimeStockMonitor running.
+            if (this.stop_button_pressed || _realTimeStockMonitor != monitor) {
+                return;
+            }
+        } finally {
+            reader.unlock();
         }
 
         // Special handling for China stock market.
@@ -798,8 +908,10 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
 
         if (stocks.size() > 0)
         {
+            // We only print out the first stock, to avoid too many different
+            // messages within a short duration.
             final String template = GUIBundle.getString("IndicatorScannerJPanel_IndicatorScannerIsScanning..._template");
-            final String message = MessageFormat.format(template, stocks.get(0).getSymbol());
+            final String message = MessageFormat.format(template, stocks.get(0).getSymbol(), getCompleteScannedStocksPercentage());
             updateStatusBarIfStopButtonIsNotPressed(message);
         }
 
@@ -812,24 +924,50 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             
             final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
 
-            if(jStockOptions.isSingleIndicatorAlert()) {
-                for(OperatorIndicator indicator : indicators) {
+            if (jStockOptions.isSingleIndicatorAlert()) {
+                for (OperatorIndicator indicator : indicators) {
                     indicator.setStock(stock);
-                    alertStateManager.alert(indicator);
+                    _alertStateManager.alert(indicator);
                 }
             }
             else
             {
                 // Multiple indicators alert.
-                for(OperatorIndicator indicator : indicators) {
+                for (OperatorIndicator indicator : indicators) {
                     indicator.setStock(stock);
                 }
 
-                alertStateManager.alert(indicators);
+                _alertStateManager.alert(indicators);
             }
-        }                
+
+            // Indicates we has finished scanning this stock.
+            _successCodes.add(stock.getCode());
+        }
+        
+        // Display the same message again, so that we will get the most updated
+        // complete percentage. Should we use back the same message template?
+        if (stocks.size() > 0)
+        {
+            final String template = GUIBundle.getString("IndicatorScannerJPanel_IndicatorScannerIsScanning..._template");
+            final String message = MessageFormat.format(template, stocks.get(0).getSymbol(), getCompleteScannedStocksPercentage());
+            updateStatusBarIfStopButtonIsNotPressed(message);
+        }
     }  
-    
+
+    private int getCompleteScannedStocksPercentage() {
+        int expected = operatorIndicators.size();
+        int failedCodesSize = failedCodes.size();
+        int successCodesSize = successCodes.size();
+        // As long as there is a least 1 success stock, we will consider failed
+        // stocks as well. This is a very crude way, to determine Internet
+        // connection is available, and the failed stocks are just caused by
+        // incorrect stock codes.
+        if ((successCodesSize > 0) && (expected > 0)) {
+            return (successCodesSize + failedCodesSize) * 100 / expected;
+        }
+        return 0;
+    }
+
     // Should we synchronized the jTable1, or post the job at GUI event dispatch
     // queue?
     private void addIndicatorToTable(final Indicator indicator) {
@@ -840,8 +978,9 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                 
                 // Dirty way to prevent background thread from showing indicators
                 // on the table.
-                if(allowIndicatorShown)
+                if (allowIndicatorShown) {
                     tableModel.addIndicator(indicator);
+                }
            } 
         };
         
@@ -904,7 +1043,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     private JPopupMenu getMyJTablePopupMenu() {
         JPopupMenu popup = new JPopupMenu();
         
-        final MainFrame m = getMainFrame();
+        final MainFrame m = MainFrame.getInstance();
         
         javax.swing.JMenuItem menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("IndicatorScannerJPanel_History..."), this.getImageIcon("/images/16x16/strokedocker.png"));
         
@@ -969,16 +1108,6 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         return popup;
     }
 
-    private MainFrame getMainFrame()
-    {
-        if (mainFrame == null)
-        {
-            mainFrame = MainFrame.getInstance();
-        }
-
-        return mainFrame;
-    }
-
     public void repaintTable() {
         jTable1.repaint();
     }
@@ -1011,7 +1140,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         return statements.saveAsExcelFile(file, GUIBundle.getString("IndicatorScannerJPanel_Title"));
     }
 
-    private Thread getStartScanThread(final WizardModel wizardModel, final MainFrame mainFrame)
+    private Thread getStartScanThread(final WizardModel wizardModel)
     {
         return new Thread(new Runnable() {
             @Override
@@ -1025,11 +1154,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                     return;
                 }
 
-                initRealTimeStockMonitor(mainFrame.getStockServerFactories());
-                initStockHistoryMonitor(mainFrame.getStockServerFactories());
-
                 removeAllIndicatorsFromTable();
-                alertStateManager.clearState();
 
                 initOperatorIndicators(wizardModel);
             }
@@ -1045,16 +1170,18 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     
     private Wizard wizard;
     private RealTimeStockMonitor realTimeStockMonitor;
-    private org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
-    private java.util.Map<Code, java.util.List<OperatorIndicator>> operatorIndicators = new java.util.concurrent.ConcurrentHashMap<Code, java.util.List<OperatorIndicator>>();
+    private final org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
+    private final java.util.Map<Code, java.util.List<OperatorIndicator>> operatorIndicators = new java.util.concurrent.ConcurrentHashMap<Code, java.util.List<OperatorIndicator>>();
 
-    private final AlertStateManager alertStateManager = new AlertStateManager();
-    private ExecutorService emailAlertPool = Executors.newFixedThreadPool(1);
-    private ExecutorService smsAlertPool = Executors.newFixedThreadPool(1);
-    private ExecutorService systemTrayAlertPool = Executors.newFixedThreadPool(1);
-    private MainFrame mainFrame = null;
+    private Set<Code> successCodes;
+    private Set<Code> failedCodes;
+
+    private AlertStateManager alertStateManager;
+    private ExecutorService emailAlertPool;
+    private ExecutorService smsAlertPool;
+    private ExecutorService systemTrayAlertPool;
     
-    private org.yccheok.jstock.engine.Observer<StockHistoryMonitor, StockHistoryMonitor.StockHistoryRunnable> stockHistoryMonitorObserver = this.getStockHistoryMonitorObserver();
+    private final org.yccheok.jstock.engine.Observer<StockHistoryMonitor, StockHistoryMonitor.StockHistoryRunnable> stockHistoryMonitorObserver = this.getStockHistoryMonitorObserver();
 
     private StockHistoryMonitor stockHistoryMonitor = null;
 
@@ -1068,6 +1195,10 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     // this.startScanThread != currentThread to stop an operation. We need to
     // stop several threads at the same time such as RealTimeStockMonitor.
     private volatile boolean stop_button_pressed = true;
+
+    // Reader and writer locks, so that we can have a correct stop operation.
+    private final java.util.concurrent.locks.Lock reader;
+    private final java.util.concurrent.locks.Lock writer;
 
     // There isn't any need to make this thread volatile, as we do not use
     // this.startScanThread != currentThread technique to stop a thread. This is

@@ -509,23 +509,23 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
         
         MainFrame m = MainFrame.getInstance();
         
-        if(m.getStockCodeAndSymbolDatabase() == null) {
+        if (m.getStockCodeAndSymbolDatabase() == null) {
             log.error("Unable to locate MainFrame");
             return false;
         }
         
-        if(jRadioButton1.isSelected()) {
+        if (jRadioButton1.isSelected()) {
             selectedCodes.addAll(m.getStockCodeAndSymbolDatabase().getCodes());
             return true;
         }
         
-        if(jRadioButton2.isSelected()) {            
-             for(JCheckBox checkBox : boardCheckBoxes) {                    
-                if(checkBox.isSelected() == false) continue;
+        if (jRadioButton2.isSelected()) {
+             for (JCheckBox checkBox : boardCheckBoxes) {
+                if (checkBox.isSelected() == false) continue;
 
                 final Stock.Board board = this.checkBoxToBoard.get(checkBox);
 
-                if(board == null) {
+                if (board == null) {
                     log.error("Wrong text in JCheckBox GUI : " + checkBox.getText());
                     continue;
                 }
@@ -536,13 +536,13 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
             return true;
         }
         
-        if(jRadioButton3.isSelected()) {            
-             for(JCheckBox checkBox : industryCheckBoxes) {                    
-                if(checkBox.isSelected() == false) continue;
+        if (jRadioButton3.isSelected()) {
+             for (JCheckBox checkBox : industryCheckBoxes) {
+                if (checkBox.isSelected() == false) continue;
 
                 final Stock.Industry industry = this.checkBoxToIndustry.get(checkBox);
 
-                if(industry == null) {
+                if (industry == null) {
                     log.error("Wrong text in JCheckBox GUI : " + checkBox.getText());
                     continue;
                 }
@@ -553,9 +553,9 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
             return true;
         }
         
-        if(jRadioButton4.isSelected()) {
+        if (jRadioButton4.isSelected()) {
             java.util.List<Stock> stocks = m.getStocks();
-            for(Stock stock : stocks) {
+            for (Stock stock : stocks) {
                 selectedCodes.add(stock.getCode());
             }
 
