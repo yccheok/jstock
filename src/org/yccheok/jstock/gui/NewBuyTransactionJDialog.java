@@ -301,7 +301,6 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
         this.transaction = null;
         this.setVisible(false);
         this.dispose();
@@ -464,7 +463,6 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
     }
     
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
         if (isValidInput() == false) {
             return;
         }
@@ -532,27 +530,22 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
     }
     
     private void jSpinner1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinner1StateChanged
-        // TODO add your handling code here:  
         update();
     }//GEN-LAST:event_jSpinner1StateChanged
 
     private void jFormattedTextField1FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jFormattedTextField1FocusLost
-        // TODO add your handling code here:
         update();
     }//GEN-LAST:event_jFormattedTextField1FocusLost
 
     private void jFormattedTextField3FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jFormattedTextField3FocusLost
-        // TODO add your handling code here:
         update();
     }//GEN-LAST:event_jFormattedTextField3FocusLost
 
     private void jFormattedTextField4FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jFormattedTextField4FocusLost
-        // TODO add your handling code here:
         update();
     }//GEN-LAST:event_jFormattedTextField4FocusLost
 
     private void jFormattedTextField5FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jFormattedTextField5FocusLost
-        // TODO add your handling code here:
         update();
     }//GEN-LAST:event_jFormattedTextField5FocusLost
 

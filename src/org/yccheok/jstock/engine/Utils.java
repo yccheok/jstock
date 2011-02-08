@@ -512,6 +512,24 @@ public class Utils {
         return EMPTY_STOCK_SERVER;
     }
 
+    /**
+     * Returns an empty MarketServer, which does nothing but always returning a
+     * null Market.
+     *
+     * @return an empty MarketServer, which does nothing but always returning a
+     * null Market.
+     */
+    public static MarketServer emptyMarketServer() {
+        return EMPTY_MARKET_SERVER;
+    }
+
+    private static final MarketServer EMPTY_MARKET_SERVER = new MarketServer() {
+        @Override
+        public Market getMarket() {
+            return null;
+        }
+    };
+
     private static final StockServer EMPTY_STOCK_SERVER = new StockServer() {
         @Override
         public Stock getStock(Symbol symbol) throws StockNotFoundException {

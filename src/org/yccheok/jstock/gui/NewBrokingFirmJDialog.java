@@ -167,8 +167,7 @@ public class NewBrokingFirmJDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
-        if(false == isValidInput()) {
+        if (false == isValidInput()) {
             return;
         }
         
@@ -184,7 +183,6 @@ public class NewBrokingFirmJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
         this.brokingFirm = null;
         this.setVisible(false);
         this.dispose();        
@@ -231,12 +229,10 @@ public class NewBrokingFirmJDialog extends javax.swing.JDialog {
     }
     
     private void jLabel2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel2MouseClicked
-        // TODO add your handling code here:
         this.letUserSelectAnImage();
     }//GEN-LAST:event_jLabel2MouseClicked
 
     private void jCheckBox1ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jCheckBox1ItemStateChanged
-        // TODO add your handling code here:
         JCheckBox me = (JCheckBox)evt.getSource();
         
         if(me.isSelected() && (this.logo == null)) {
