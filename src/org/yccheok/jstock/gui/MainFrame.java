@@ -724,12 +724,24 @@ public class MainFrame extends javax.swing.JFrame {
                     realTimeStockMonitor.addStockCode(Code.newInstance(codeStr));
                 }
             }
-        }
-        else if (statements.getType() == Statement.Type.PortfolioManagementBuy || statements.getType() == Statement.Type.PortfolioManagementSell || statements.getType() == Statement.Type.PortfolioManagementDeposit || statements.getType() == Statement.Type.PortfolioManagementDividend) {
+        } else if (statements.getType() == Statement.Type.StockIndicatorScanner) {
+            // Some users request of having Stock Watchlist able to load stocks
+            // saved from Stock Indicators Scanner.
+            final int size = statements.size();
+            for (int i = 0; i < size; i++) {
+                final org.yccheok.jstock.file.Statement statement = statements.get(i);
+                final String codeStr = statement.getValueAsString(GUIBundle.getString("MainFrame_Code"));
+                final String symbolStr = statement.getValueAsString(GUIBundle.getString("MainFrame_Symbol"));
+                if (codeStr.length() > 0 && symbolStr.length() > 0) {
+                    final Stock stock = Utils.getEmptyStock(Code.newInstance(codeStr), Symbol.newInstance(symbolStr));
+                    this.addStockToTable(stock);
+                    realTimeStockMonitor.addStockCode(Code.newInstance(codeStr));
+                }
+            }
+        } else if (statements.getType() == Statement.Type.PortfolioManagementBuy || statements.getType() == Statement.Type.PortfolioManagementSell || statements.getType() == Statement.Type.PortfolioManagementDeposit || statements.getType() == Statement.Type.PortfolioManagementDividend) {
             /* Open using other tabs. */
             return this.portfolioManagementJPanel.openAsStatements(statements, file);
-        }
-        else {
+        } else {
             return false;
         }
         return true;

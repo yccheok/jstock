@@ -2,6 +2,8 @@ This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
 JStock ?.?.?? - ????-??-??
+  Feature: Stock Watchlist will able to load result saved from Stock Indicator
+           Scanner. (#3176566)
   Feature: Able to use left/right arrow key to move around yellow information
            boxes of Investment Flow Chart.
  *Feature: Able to look for stock from online database automatically, if the

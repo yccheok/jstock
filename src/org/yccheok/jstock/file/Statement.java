@@ -115,7 +115,11 @@ public class Statement {
     }
 
     private Type whatType(List<Atom> atoms) {
-        if (atoms.size() == 17)
+        // Use if...if instead of if...else, as atoms may be having same size,
+        // but their type may be different. Hence, we will just let them fall
+        // through all size checking.
+        final int size = atoms.size();
+        if (size == 17)
         {
             /* Wow! */
             if (
@@ -140,7 +144,7 @@ public class Statement {
                 return Type.RealtimeInfo;
             }
         }
-        else if (atoms.size() == 18) {
+        if (size == 18) {
             /* Wow! Beware, Stock will being translated into Code and Symbol */
             // GUIBundle.getString("PortfolioManagementJPanel_Stock")
             if (
@@ -166,7 +170,7 @@ public class Statement {
                 return Type.PortfolioManagementBuy;
             }
         }
-        else if (atoms.size() == 19) {
+        if (size == 19) {
             /* Wow! Beware, Stock will being translated into Code and Symbol */
             // GUIBundle.getString("PortfolioManagementJPanel_Stock")
             if (
@@ -193,7 +197,7 @@ public class Statement {
                 return Type.PortfolioManagementSell;
             }
         }
-        else if (atoms.size() == 2) {
+        if (size == 2) {
             if (
             atoms.get(0).getType().equals(GUIBundle.getString("PortfolioManagementJPanel_Date")) &&
             atoms.get(1).getType().equals(GUIBundle.getString("PortfolioManagementJPanel_Cash"))
@@ -201,7 +205,7 @@ public class Statement {
                 return Type.PortfolioManagementDeposit;
             }
         }
-        else if (atoms.size() == 4) {
+        if (size == 4) {
             if (
             atoms.get(0).getType().equals(GUIBundle.getString("PortfolioManagementJPanel_Date")) &&
             atoms.get(1).getType().equals(GUIBundle.getString("MainFrame_Code")) &&
@@ -211,7 +215,7 @@ public class Statement {
                 return Type.PortfolioManagementDividend;
             }
         }
-        else if (atoms.size() == 18) {
+        if (size == 18) {
             /* Wow! */
             if (
             atoms.get(0).getType().equals(GUIBundle.getString("IndicatorScannerJPanel_Indicator")) &&
@@ -236,7 +240,7 @@ public class Statement {
                 return Type.StockIndicatorScanner;
             }
         }
-        else if (atoms.size() == 6) {
+        if (size == 6) {
             /* Wow! */
             if (
             atoms.get(0).getType().equals(GUIBundle.getString("StockHistory_Date")) &&

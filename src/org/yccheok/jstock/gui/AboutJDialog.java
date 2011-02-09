@@ -256,7 +256,6 @@ public class AboutJDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-    // TODO add your handling code here:
         this.dispose();
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -265,12 +264,10 @@ public class AboutJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jEditorPane1HyperlinkUpdate
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
-        // TODO add your handling code here:
         controller.stop();
     }//GEN-LAST:event_formWindowClosed
 
     private void jTabbedPane1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jTabbedPane1StateChanged
-        // TODO add your handling code here:
         JTabbedPane pane = (JTabbedPane)evt.getSource();
         if (pane.getSelectedComponent() == this.jPanel6) {
             // Have blob sallad to grab the focus.

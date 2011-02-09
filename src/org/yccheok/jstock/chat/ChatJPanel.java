@@ -201,11 +201,9 @@ public class ChatJPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_formComponentShown
 
     private void formComponentHidden(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentHidden
-        // TODO add your handling code here:
     }//GEN-LAST:event_formComponentHidden
 
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
-        // TODO add your handling code here:
         String text = this.jTextField1.getText();
         if (text.length() <= 0) {
             return;
