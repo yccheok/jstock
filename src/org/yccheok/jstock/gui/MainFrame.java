@@ -4183,7 +4183,7 @@ public class MainFrame extends javax.swing.JFrame {
             @Override
             public void update(AutoCompleteJComboBox subject, ResultType arg) {
                 assert(arg != null);
-               addResultTypeToDatabase(arg);
+                addResultTypeToDatabase(arg);
             }
         };
     }
