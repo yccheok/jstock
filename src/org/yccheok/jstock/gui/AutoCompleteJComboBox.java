@@ -309,8 +309,12 @@ public class AutoCompleteJComboBox extends JComboBox {
                             // OK. We found nothing from offline database. Let's
                             // ask help from online database.
                             // We are busy contacting server right now.
-                            busySubject.notify(AutoCompleteJComboBox.this, true);
-                            ajaxYahooSearchEngineMonitor.clearAndPut(string);
+
+                            // TODO
+                            // Only enable ajaxYahooSearchEngineMonitor, till we solve
+                            // http://sourceforge.net/apps/mediawiki/jstock/index.php?title=TechnicalDisability
+                            //busySubject.notify(AutoCompleteJComboBox.this, true);
+                            //ajaxYahooSearchEngineMonitor.clearAndPut(string);
                         }
                     }   // if (shouldShowPopup)
                 }   // if (AutoCompleteJComboBox.this.stockCodeAndSymbolDatabase != null)

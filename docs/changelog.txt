@@ -1,13 +1,11 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
-JStock ?.?.?? - ????-??-??
+JStock 1.0.5x - 2011-02-12
   Feature: Stock Watchlist will able to load result saved from Stock Indicator
            Scanner. (#3176566)
   Feature: Able to use left/right arrow key to move around yellow information
            boxes of Investment Flow Chart.
- *Feature: Able to look for stock from online database automatically, if the
-           stock is not found in offline database.
   Feature: Make the stock purchase process smoother, by doesn't require user to
            press ENTER explicitly.
   Feature: Automatic switch to the particular page, when user tries to activate 
@@ -15,8 +13,7 @@ JStock ?.?.?? - ????-??-??
   Feature: Having a confirmation dialog box, to avoid user from clicking 
            uninstall icon accidentally.
   Feature: Indicator scanning completion progress will be displayed at status
-           bar.  
- *Feature: Supports German language. Contributed by Stefan Angrick.
+           bar.
   Bugfix:  Able to suspend and resume network activity in 
            PortfolioManagementJPanel when not in used, so that network resource
            is being preserved.

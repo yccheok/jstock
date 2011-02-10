@@ -208,6 +208,7 @@ public class MainFrame extends javax.swing.JFrame {
         buttonGroup2 = new javax.swing.ButtonGroup();
         buttonGroup3 = new javax.swing.ButtonGroup();
         jComboBox1 = new AutoCompleteJComboBox();
+        jRadioButtonMenuItem3 = new javax.swing.JRadioButtonMenuItem();
         jPanel6 = new javax.swing.JPanel();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel8 = new javax.swing.JPanel();
@@ -256,7 +257,6 @@ public class MainFrame extends javax.swing.JFrame {
         jMenu10 = new javax.swing.JMenu();
         jRadioButtonMenuItem1 = new javax.swing.JRadioButtonMenuItem();
         jRadioButtonMenuItem2 = new javax.swing.JRadioButtonMenuItem();
-        jRadioButtonMenuItem3 = new javax.swing.JRadioButtonMenuItem();
         jMenu7 = new javax.swing.JMenu();
         jMenuItem8 = new javax.swing.JMenuItem();
         jMenu9 = new javax.swing.JMenu();
@@ -274,6 +274,14 @@ public class MainFrame extends javax.swing.JFrame {
         jComboBox1.setPreferredSize(new java.awt.Dimension(150, 24));
         ((AutoCompleteJComboBox)this.jComboBox1).attach(getAutoCompleteJComboBoxObserver());
         ((AutoCompleteJComboBox)this.jComboBox1).attachResultObserver(getResultObserver());
+
+        buttonGroup3.add(jRadioButtonMenuItem3);
+        jRadioButtonMenuItem3.setText(Locale.GERMAN.getDisplayLanguage(Locale.getDefault()));
+        jRadioButtonMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButtonMenuItem3ActionPerformed(evt);
+            }
+        });
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
@@ -586,15 +594,6 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
         jMenu10.add(jRadioButtonMenuItem2);
-
-        buttonGroup3.add(jRadioButtonMenuItem3);
-        jRadioButtonMenuItem3.setText(Locale.GERMAN.getDisplayLanguage(Locale.getDefault()));
-        jRadioButtonMenuItem3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioButtonMenuItem3ActionPerformed(evt);
-            }
-        });
-        jMenu10.add(jRadioButtonMenuItem3);
 
         jMenuBar2.add(jMenu10);
 
