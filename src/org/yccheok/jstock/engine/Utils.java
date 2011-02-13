@@ -513,6 +513,52 @@ public class Utils {
     }
 
     /**
+     * Returns a new double initialized to the value represented by the
+     * specified String, as performed by the valueOf method of class Double.
+     * If failed, 0.0 will be returned.
+     *
+     * @return the double value represented by the string argument.
+     */
+    public static double parseDouble(String value) {
+        if (value == null) {
+            // This is an invalid value.
+            return 0.0;
+        }
+
+        try {
+            // Use String.replace, in order to turn "1,234,567%" into "1234567".
+            return Double.parseDouble(value.replace(",", "").replace("%", ""));
+        } catch (NumberFormatException ex) {
+            log.error(null, ex);
+        }
+        // This is an invalid value.
+        return 0.0;
+    }
+
+    /**
+     * Returns a new long initialized to the value represented by the
+     * specified String, as performed by the valueOf method of class Long.
+     * If failed, 0L will be returned.
+     *
+     * @return the long value represented by the string argument.
+     */
+    public static long parseLong(String value) {
+        if (value == null) {
+            // This is an invalid value.
+            return 0L;
+        }
+        
+        try {
+            // Use String.replace, in order to turn "1,234,567%" into "1234567".
+            return Long.parseLong(value.replace(",", "").replace("%", ""));
+        } catch (NumberFormatException ex) {
+            log.error(null, ex);
+        }
+        // This is an invalid value.
+        return 0L;
+    }
+
+    /**
      * Returns an empty MarketServer, which does nothing but always returning a
      * null Market.
      *

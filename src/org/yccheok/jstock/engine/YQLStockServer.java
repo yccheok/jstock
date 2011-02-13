@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * Concrete implementation of YQL stock server.
@@ -32,6 +33,13 @@ import org.apache.commons.logging.LogFactory;
  */
 public class YQLStockServer implements StockServer {
 
+    /**
+     * Returns stock based on given symbol.
+     * @param symbol the symbol
+     * @return stock based on given symbol
+     * @throws StockNotFoundException if stock is not found based on given
+     * symbol
+     */
     @Override
     public Stock getStock(Symbol symbol) throws StockNotFoundException {
         List<Symbol> symbols = new ArrayList<Symbol>();
@@ -43,6 +51,13 @@ public class YQLStockServer implements StockServer {
         throw new StockNotFoundException();
     }
 
+    /**
+     * Returns stock based on given code.
+     * @param code the code
+     * @return stock based on given code
+     * @throws StockNotFoundException if stock is not found based on given
+     * symbol
+     */
     @Override
     public Stock getStock(Code code) throws StockNotFoundException {
         List<Code> codes = new ArrayList<Code>();
@@ -54,6 +69,15 @@ public class YQLStockServer implements StockServer {
         throw new StockNotFoundException();
     }
 
+    /**
+     * Returns list of stocks based on given list of symbols. The length of
+     * the returned stock list will be equal to the given symbol list.
+     *
+     * @param symbols list of symbols
+     * @return list of stocks based on given list of symbols
+     * @throws StockNotFoundException if list of stocks is not found based on
+     * given list of symbols
+     */
     @Override
     public List<Stock> getStocksBySymbols(List<Symbol> symbols) throws StockNotFoundException {
         List<Code> codes = new ArrayList<Code>();
@@ -63,8 +87,18 @@ public class YQLStockServer implements StockServer {
         return getStocksByCodes(codes);
     }
 
+    /**
+     * Returns list of stocks based on given list of codes. The length of
+     * the returned stock list will be equal to the given code list.
+     *
+     * @param codes list of codes
+     * @return list of stocks based on given list of codes
+     * @throws StockNotFoundException if list of stocks is not found based on
+     * given list of codes
+     */
     @Override
     public List<Stock> getStocksByCodes(List<Code> codes) throws StockNotFoundException {
+        // Generate a list of queries to be sent over to YQL server.
         StringBuilder builder = new StringBuilder("select symbol,Name,PreviousClose,LastTradePriceOnly,Open,DaysHigh,DaysLow,Volume,Change,PercentChange,BidRealtime,AskRealtime from yahoo.finance.quotes where symbol in (");
         List<Stock> stocks = new ArrayList<Stock>();
         List<String> queries = new ArrayList<String>();
@@ -102,25 +136,105 @@ public class YQLStockServer implements StockServer {
                  builder.append("\",");
             }
         }
-
+        
         for (String query : queries) {
             StringBuilder tmp = new StringBuilder(baseURL);
             tmp.append(query);
+            // Preparing the query.
             final String request = tmp.toString();
-            // TODO add code to parse request into json.
+            // Send the query to YQL server one by one.
+            final String respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(request);
+            // Ensure we are getting valid JSON respond.
+            final String json = Utils.YahooRespondToJSON(respond);
+            try {
+                final Holder value = mapper.readValue(json, Holder.class);
+                List<QuoteType> quotes = value.query.results.quote;
+                for (QuoteType quote : quotes) {
+                    // symbol (will be used as Code in JStock) and Name from
+                    // YQL must be non-empty.
+                    if (quote.symbol == null || quote.symbol.trim().isEmpty()) {
+                        continue;
+                    }
+                    if (quote.Name == null || quote.Name.trim().isEmpty()) {
+                        continue;
+                    }
+                    final Stock stock = new Stock.Builder(Code.newInstance(quote.symbol.trim()), Symbol.newInstance(quote.Name.trim())).
+                            prevPrice(Utils.parseDouble(quote.PreviousClose)).
+                            lastPrice(Utils.parseDouble(quote.LastTradePriceOnly)).
+                            openPrice(Utils.parseDouble(quote.Open)).
+                            highPrice(Utils.parseDouble(quote.DaysHigh)).
+                            lowPrice(Utils.parseDouble(quote.DaysLow)).
+                            volume(Utils.parseLong(quote.Volume)).
+                            changePrice(Utils.parseDouble(quote.Change)).
+                            changePricePercentage(Utils.parseDouble(quote.PercentChange)).
+                            buyPrice(Utils.parseDouble(quote.BidRealtime)).
+                            sellPrice(Utils.parseDouble(quote.AskRealtime)).
+                            build();
+                    stocks.add(stock);
+                }
+            } catch (Exception ex) {
+                log.error(null, ex);
+            }
         }
-        
-        throw new StockNotFoundException();
+
+        // Are we getting enough stocks from YQL?
+        if (isToleranceAllowed(stocks.size(), codes.size())) {
+            List<Code> currentCodes = new ArrayList<Code>();
+            for (Stock stock : stocks) {
+                currentCodes.add(stock.getCode());
+            }
+
+            for (Code code : codes) {
+                if (currentCodes.contains(code) == false) {
+                    // If we are not getting enough stocks from YQL, we need
+                    // to append empty stock into the returned result manually.
+                    stocks.add(org.yccheok.jstock.gui.Utils.getEmptyStock(code, Symbol.newInstance(code.toString())));
+                }
+            }
+        }
+
+        // Ensure number of stocks matches with what user has requested.
+        if (stocks.size() != codes.size()) {
+            throw new StockNotFoundException("Stock size (" + stocks.size() + ") inconsistent with code size (" + codes.size() + ")");
+        }
+
+        return stocks;
     }
 
+    /**
+     * Returns list of all stocks in this stock server.
+     * @return list of all stocks in this stock server
+     * @throws StockNotFoundException if the operation fails
+     */
     @Override
     public List<Stock> getAllStocks() throws StockNotFoundException {
         throw new StockNotFoundException();
     }
 
+    // If I request currSize number of stock, and YQLStockServer only return
+    // expectedSize number of stock, is it allowable?
+    private boolean isToleranceAllowed(int currSize, int expectedSize) {
+        if (currSize >= expectedSize) {
+            return true;
+        }
+        if (expectedSize <= 0) {
+            return true;
+        }
+        double result = 100.0 - ((double)(expectedSize - currSize) / (double)expectedSize * 100.0);
+        return (result >= STABILITY_RATE);
+    }
+
+    // Will it be better if we make this as static?
+    private final ObjectMapper mapper = new ObjectMapper();
+
     // Yahoo server limit is 200. We shorter, to avoid URL from being too long.
     // Yahoo sometimes does complain URL for being too long.
     private static final int MAX_STOCK_PER_ITERATION = 180;
+
+    // Yahoo server's result is not stable. If we request for 100 stocks, it may only
+    // return 99 stocks to us. We allow stability rate in %. Higher rate means more
+    // stable.
+    private static final double STABILITY_RATE = 90.0;
 
     private static final String baseURL = "http://query.yahooapis.com/v1/public/yql?q=";
 
@@ -137,7 +251,7 @@ public class YQLStockServer implements StockServer {
         public final String count = null;
         public final String created = null;
         public final String lang = null;
-        public final ResultsType result = null;
+        public final ResultsType results = null;
     }
 
     private static class ResultsType {
@@ -145,17 +259,17 @@ public class YQLStockServer implements StockServer {
     }
 
     private static class QuoteType {
-        public static final String symbol = null;
-        public static final String Name = null;
-        public static final String PreviousClose = null;
-        public static final String LastTradePriceOnly = null;
-        public static final String Open = null;
-        public static final String DaysHigh = null;
-        public static final String DaysLow = null;
-        public static final String Volume = null;
-        public static final String Change = null;
-        public static final String PercentChange = null;
-        public static final String BidRealtime = null;
-        public static final String AskRealtime = null;
+        public final String symbol = null;
+        public final String Name = null;
+        public final String PreviousClose = null;
+        public final String LastTradePriceOnly = null;
+        public final String Open = null;
+        public final String DaysHigh = null;
+        public final String DaysLow = null;
+        public final String Volume = null;
+        public final String Change = null;
+        public final String PercentChange = null;
+        public final String BidRealtime = null;
+        public final String AskRealtime = null;
     }
 }
