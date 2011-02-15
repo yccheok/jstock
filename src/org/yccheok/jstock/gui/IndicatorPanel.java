@@ -1444,7 +1444,10 @@ public class IndicatorPanel extends JPanel {
                     Stock new_stock = stock;
 
                     // Special handling for China stock market.
-                    if (org.yccheok.jstock.engine.Utils.isSymbolImmutable()) {
+                    // Also, sometimes for other countries, Yahoo will return
+                    // empty string for their symbol. We will fix it through
+                    // offline database.
+                    if (org.yccheok.jstock.engine.Utils.isSymbolImmutable() || new_stock.getSymbol().toString().isEmpty()) {
                         final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = m.getStockCodeAndSymbolDatabase();
                         if (stockCodeAndSymbolDatabase != null) {
                             final Symbol _symbol = stockCodeAndSymbolDatabase.codeToSymbol(new_stock.getCode());

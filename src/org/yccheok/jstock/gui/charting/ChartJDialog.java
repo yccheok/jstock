@@ -1199,7 +1199,31 @@ public class ChartJDialog extends javax.swing.JDialog {
                 }
             }
         }
-        return stock.getName();
+
+        final String name = stock.getName();
+        // For unknown reason, server may return us empty stock name.
+        if (name.isEmpty()) {
+            final Symbol symbol = stock.getSymbol();
+            if (false == symbol.toString().isEmpty()) {
+                // Luckly. The symbol is not empty. Use it as replacement to
+                // name.
+                return symbol.toString();
+            }
+            // Symbol from server is empty. We need to ask help from offline
+            // database.
+            final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = MainFrame.getInstance().getStockCodeAndSymbolDatabase();
+            if (stockCodeAndSymbolDatabase != null) {
+                final Symbol s = stockCodeAndSymbolDatabase.codeToSymbol(stock.getCode());
+                if (s != null) {
+                    // Use symbol as replacement if possible.
+                    return s.toString();
+                }
+            }
+            // If not, we will just apply code as replacement.
+            return stock.getCode().toString();
+        }
+
+        return name;
     }
 
     /**

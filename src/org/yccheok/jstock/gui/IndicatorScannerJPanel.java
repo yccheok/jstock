@@ -879,14 +879,14 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             reader.unlock();
         }
 
-        // Special handling for China stock market.
-        if (org.yccheok.jstock.engine.Utils.isSymbolImmutable()) {
-            // We need to ignore symbol names given by stock server.
-            // Replace them with database's.
-            for (int i = 0, size = stocks.size(); i < size; i++) {
-                final Stock stock = stocks.get(i);
-                Stock new_stock = stock;
-
+        final boolean isSymbolImmutable = org.yccheok.jstock.engine.Utils.isSymbolImmutable();
+        for (int i = 0, size = stocks.size(); i < size; i++) {
+            final Stock stock = stocks.get(i);
+            Stock new_stock = stock;
+            // Special handling for China stock market. Also, sometimes for
+            // other countries, Yahoo will return empty string for their symbol.
+            // We will fix it through offline database.
+            if (isSymbolImmutable || new_stock.getSymbol().toString().isEmpty()) {                
                 // Use local variable to ensure thread safety.
                 final StockCodeAndSymbolDatabase symbol_database = MainFrame.getInstance().getStockCodeAndSymbolDatabase();
 
@@ -898,13 +898,12 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                         // Shouldn't be null. Let's give some warning on this.
                         log.error("Wrong stock code " + stock.getCode() + " given by stock server.");
                     }
-                }
-
-                if (stock != new_stock) {
-                    stocks.set(i, new_stock);
-                }
-            }
-        }
+                    if (stock != new_stock) {
+                        stocks.set(i, new_stock);
+                    }
+                }   // if (symbol_database != null)
+            } // if (org.yccheok.jstock.engine.Utils.isSymbolImmutable() || new_stock.getSymbol().toString().isEmpty())
+        }   // for (int i = 0, size = stocks.size(); i < size; i++)
 
         if (stocks.size() > 0)
         {

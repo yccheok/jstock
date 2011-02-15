@@ -3522,14 +3522,15 @@ public class MainFrame extends javax.swing.JFrame {
         System.gc();
     }
     
-    public void update(RealTimeStockMonitor monitor, final java.util.List<Stock> stocks) {
-        if (org.yccheok.jstock.engine.Utils.isSymbolImmutable()) {
-            // We need to ignore symbol names given by stock server.
-            // Replace them with database's.
-            for (int i = 0, size = stocks.size(); i < size; i++) {
-                final Stock stock = stocks.get(i);
-                Stock new_stock = stock;
-
+    public void update(RealTimeStockMonitor monitor, final java.util.List<Stock> stocks) {        
+        // We need to ignore symbol names given by stock server. Replace them
+        // with database's.
+        final boolean isSymbolImmutable = org.yccheok.jstock.engine.Utils.isSymbolImmutable();                
+        for (int i = 0, size = stocks.size(); i < size; i++) {
+            final Stock stock = stocks.get(i);
+            Stock new_stock = stock;
+            // Sometimes server goes crazy by returning empty symbol.
+            if (isSymbolImmutable || new_stock.getSymbol().toString().isEmpty()) {                
                 // Use local variable to ensure thread safety.
                 final StockCodeAndSymbolDatabase symbol_database = this.stockCodeAndSymbolDatabase;
                 //final StockNameDatabase name_database = this.stockNameDatabase;
@@ -3551,7 +3552,7 @@ public class MainFrame extends javax.swing.JFrame {
                         final Symbol symbol = tableModel.getStock(row).getSymbol();
                         new_stock = new_stock.deriveStock(symbol);
                     }
-                }
+                }   // if (symbol_database != null)
 
                 // Doesn't matter, as we do not need to show "name" in table.
                 // Need not to perform derive for speed optimization.
@@ -3579,8 +3580,8 @@ public class MainFrame extends javax.swing.JFrame {
                 if (stock != new_stock) {
                     stocks.set(i, new_stock);
                 }
-            }
-        }
+            }   // if (isSymbolImmutable || new_stock.getSymbol().toString().isEmpty())
+        }   // for (int i = 0, size = stocks.size(); i < size; i++)
         
         // Do it in GUI event dispatch thread. Otherwise, we may face deadlock.
         // For example, we lock the jTable, and try to remove the stock from the
