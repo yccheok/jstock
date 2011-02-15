@@ -28,8 +28,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * Concrete implementation of YQL stock server.
- *
- * @author yccheok
  */
 public class YQLStockServer implements StockServer {
 
@@ -146,6 +144,7 @@ public class YQLStockServer implements StockServer {
             final String respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(request);
             // Ensure we are getting valid JSON respond.
             final String json = Utils.YahooRespondToJSON(respond);
+            boolean success_at_least_one = false;
             try {
                 final Holder value = mapper.readValue(json, Holder.class);
                 List<QuoteType> quotes = value.query.results.quote;
@@ -155,10 +154,14 @@ public class YQLStockServer implements StockServer {
                     if (quote.symbol == null || quote.symbol.trim().isEmpty()) {
                         continue;
                     }
-                    if (quote.Name == null || quote.Name.trim().isEmpty()) {
-                        continue;
+                    // Is OK to have empty name.
+                    // Sometimes Yahoo server goes crazy by returning empty name.
+                    String Name = "";
+                    if (quote.Name != null && quote.Name.trim().isEmpty() == false) {
+                        // We are so lucky! Yahoo returns us something.
+                        Name = quote.Name.trim();
                     }
-                    final Stock stock = new Stock.Builder(Code.newInstance(quote.symbol.trim()), Symbol.newInstance(quote.Name.trim())).
+                    final Stock stock = new Stock.Builder(Code.newInstance(quote.symbol.trim()), Symbol.newInstance(Name)).
                             prevPrice(Utils.parseDouble(quote.PreviousClose)).
                             lastPrice(Utils.parseDouble(quote.LastTradePriceOnly)).
                             openPrice(Utils.parseDouble(quote.Open)).
@@ -171,11 +174,47 @@ public class YQLStockServer implements StockServer {
                             sellPrice(Utils.parseDouble(quote.AskRealtime)).
                             build();
                     stocks.add(stock);
+                    success_at_least_one = true;
                 }
             } catch (Exception ex) {
                 log.error(null, ex);
             }
-        }
+            
+            if (false == success_at_least_one) {
+                // Never success. Try with Holder2.
+                try {
+                    final Holder2 value = mapper.readValue(json, Holder2.class);
+                    QuoteType quote = value.query.results.quote;
+                    // symbol (will be used as Code in JStock) and Name from
+                    // YQL must be non-empty.
+                    if (quote.symbol == null || quote.symbol.trim().isEmpty()) {
+                        continue;
+                    }
+                    // Is OK to have empty name.
+                    // Sometimes Yahoo server goes crazy by returning empty name.
+                    String Name = "";
+                    if (quote.Name != null && quote.Name.trim().isEmpty() == false) {
+                        // We are so lucky! Yahoo returns us something.
+                        Name = quote.Name.trim();
+                    }
+                    final Stock stock = new Stock.Builder(Code.newInstance(quote.symbol.trim()), Symbol.newInstance(Name)).
+                            prevPrice(Utils.parseDouble(quote.PreviousClose)).
+                            lastPrice(Utils.parseDouble(quote.LastTradePriceOnly)).
+                            openPrice(Utils.parseDouble(quote.Open)).
+                            highPrice(Utils.parseDouble(quote.DaysHigh)).
+                            lowPrice(Utils.parseDouble(quote.DaysLow)).
+                            volume(Utils.parseLong(quote.Volume)).
+                            changePrice(Utils.parseDouble(quote.Change)).
+                            changePricePercentage(Utils.parseDouble(quote.PercentChange)).
+                            buyPrice(Utils.parseDouble(quote.BidRealtime)).
+                            sellPrice(Utils.parseDouble(quote.AskRealtime)).
+                            build();
+                    stocks.add(stock);
+                } catch (Exception ex) {
+                    log.error(null, ex);
+                }
+            }   //  if (false == success_at_least_one)
+        }   // for (String query : queries)
 
         // Are we getting enough stocks from YQL?
         if (isToleranceAllowed(stocks.size(), codes.size())) {
@@ -242,6 +281,7 @@ public class YQLStockServer implements StockServer {
 
     /**
      * Type used to hold JSON result from Yahoo server.
+     * Quote information will be return as array of JSON objects.
      */
     private static class Holder {
         public final QueryType query = null;
@@ -271,5 +311,24 @@ public class YQLStockServer implements StockServer {
         public final String PercentChange = null;
         public final String BidRealtime = null;
         public final String AskRealtime = null;
+    }
+
+    /**
+     * Type used to hold JSON result from Yahoo server.
+     * Quote information will be return as single JSON object.
+     */
+    private static class Holder2 {
+        public final QueryType2 query = null;
+    }
+
+    private static class QueryType2 {
+        public final String count = null;
+        public final String created = null;
+        public final String lang = null;
+        public final ResultsType2 results = null;
+    }
+
+    private static class ResultsType2 {
+        public final QuoteType quote = null;
     }
 }
