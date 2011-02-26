@@ -46,9 +46,10 @@ public class StockNameDatabase {
 
     /**
      * Returns name based on the code.
+     * 
      * @param code The code
      * @return name based on the code. <code>null</code> will be returned if
-     * no match found.
+     * no match found
      */
     public String codeToName(Code code) {
         return codeToName.get(code);

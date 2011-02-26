@@ -28,7 +28,7 @@ public class Code {
     }
     
     public static Code newInstance(String code) {
-        if(code == null) {
+        if (code == null) {
             throw new java.lang.IllegalArgumentException("code cannot be null");
         }
         
