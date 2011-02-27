@@ -70,4 +70,14 @@ public class StockInfo {
         hash = 43 * hash + this.symbol.hashCode();
         return hash;
     }
+
+    // A stock info which its toString will return code.
+    // Having a correct implementation of toString is important as :
+    // 1) Our search engine build the key index through toString.
+    // 2) Our auto complete combo box display its drop down list items based on
+    //    toString.
+    @Override
+    public String toString() {
+        return this.code.toString();
+    }
 }
