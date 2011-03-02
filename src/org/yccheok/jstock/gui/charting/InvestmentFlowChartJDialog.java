@@ -177,7 +177,6 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-        // TODO add your handling code here:
         this.saveDimension();
         // This will shut down the old real time monitor, and create a new
         // real time monitor. Since there isn't any stock code being submitted

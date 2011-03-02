@@ -200,20 +200,17 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseClicked
-        // TODO add your handling code here:
         clearAllTablesSelection();
     }//GEN-LAST:event_formMouseClicked
 
     private void jTable1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTable1KeyPressed
-        // TODO add your handling code here:
-        if(KeyEvent.VK_DELETE == evt.getKeyCode()) {
+        if (KeyEvent.VK_DELETE == evt.getKeyCode()) {
             this.deleteSelectedDividend();
             return;
         }
     }//GEN-LAST:event_jTable1KeyPressed
 
     private void jTable1PropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jTable1PropertyChange
-        // TODO add your handling code here:
         this.jLabel2.setText(this.getDividendSummaryText());
     }//GEN-LAST:event_jTable1PropertyChange
 
@@ -237,19 +234,16 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
         this.dividendSummaryAfterPressingOK = null;
         this.setVisible(false);
         this.dispose();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        // TODO add your handling code here:
         this.addNewDividend();
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        // TODO add your handling code here:
         this.deleteSelectedDividend();
     }//GEN-LAST:event_jButton4ActionPerformed
 

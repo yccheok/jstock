@@ -255,7 +255,6 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jLabel5MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel5MouseClicked
-        // TODO add your handling code here:
         MemoryLogJDialog memoryLogJDialog = new MemoryLogJDialog(MainFrame.getInstance(), true);
         memoryLogJDialog.setLocationRelativeTo(this);
         memoryLogJDialog.setLog(memoryLog);
@@ -263,12 +262,10 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jLabel5MouseClicked
 
     private void jLabel5MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel5MouseEntered
-        // TODO add your handling code here:
         this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }//GEN-LAST:event_jLabel5MouseEntered
 
     private void jLabel5MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel5MouseExited
-        // TODO add your handling code here:
         this.setCursor(Cursor.getDefaultCursor());
     }//GEN-LAST:event_jLabel5MouseExited
 
@@ -316,7 +313,6 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jPasswordField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jPasswordField1ActionPerformed
-        // TODO add your handling code here:
         jButton1ActionPerformed(evt);
     }//GEN-LAST:event_jPasswordField1ActionPerformed
 
