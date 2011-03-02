@@ -96,7 +96,6 @@ public class WizardSelectIndicatorJPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jList1ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList1ValueChanged
-// TODO add your handling code here:
         final int numOfSelectedItems = getSelectedProjects().size();
         
         if(numOfSelectedItems == 0) {

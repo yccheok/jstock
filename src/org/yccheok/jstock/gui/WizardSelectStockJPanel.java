@@ -412,31 +412,27 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jRadioButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton3ActionPerformed
-// TODO add your handling code here:
         updateCheckBoxesState();
     }//GEN-LAST:event_jRadioButton3ActionPerformed
 
     private void jRadioButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton2ActionPerformed
-// TODO add your handling code here:
         updateCheckBoxesState();
     }//GEN-LAST:event_jRadioButton2ActionPerformed
 
     private void jRadioButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton1ActionPerformed
-// TODO add your handling code here:
         updateCheckBoxesState();
     }//GEN-LAST:event_jRadioButton1ActionPerformed
 
     private void jRadioButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton4ActionPerformed
-        // TODO add your handling code here:
         updateCheckBoxesState();
     }//GEN-LAST:event_jRadioButton4ActionPerformed
     
     public void updateCheckBoxesState() {
-        for(Component component : jPanel2.getComponents()) {
+        for (Component component : jPanel2.getComponents()) {
             component.setEnabled(jRadioButton2.isSelected());
         }
 
-        for(Component component : jPanel3.getComponents()) {
+        for (Component component : jPanel3.getComponents()) {
             component.setEnabled(jRadioButton3.isSelected());
         }        
     }
