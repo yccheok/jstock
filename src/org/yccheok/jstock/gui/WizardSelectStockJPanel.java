@@ -1,21 +1,20 @@
 /*
- * WizardSelectStockJPanel.java
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- * Copyright (C) 2007 Cheok YanCheng <yccheok@yahoo.com>
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.yccheok.jstock.gui;
@@ -23,9 +22,7 @@ package org.yccheok.jstock.gui;
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Set;
 import org.yccheok.jstock.engine.*;
 
 import org.apache.commons.logging.Log;
@@ -38,11 +35,11 @@ import org.apache.commons.logging.LogFactory;
 public class WizardSelectStockJPanel extends javax.swing.JPanel {
     
     /** Creates new form WizardSelectStockJPanel */
-    public WizardSelectStockJPanel(StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase) {
+    public WizardSelectStockJPanel(StockInfoDatabase stockInfoDatabase) {
         initComponents();
         
-        initBoardCheckBoxes(stockCodeAndSymbolDatabase);
-        initIndustryCheckBoxes(stockCodeAndSymbolDatabase);
+        initBoardCheckBoxes(stockInfoDatabase);
+        initIndustryCheckBoxes(stockInfoDatabase);
         
         updateCheckBoxesState();        
     }
@@ -427,7 +424,7 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
         updateCheckBoxesState();
     }//GEN-LAST:event_jRadioButton4ActionPerformed
     
-    public void updateCheckBoxesState() {
+    public final void updateCheckBoxesState() {
         for (Component component : jPanel2.getComponents()) {
             component.setEnabled(jRadioButton2.isSelected());
         }
@@ -500,18 +497,18 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
         jRadioButton4.addActionListener(actionListener);
     }
     
-    public boolean buildSelectedCode() {
-        selectedCodes.clear();
+    public boolean buildSelectedStockCodes() {
+        selectedStockInfos.clear();
         
         MainFrame m = MainFrame.getInstance();
-        
-        if (m.getStockCodeAndSymbolDatabase() == null) {
+        StockInfoDatabase stock_info_database = m.getStockInfoDatabase();
+        if (stock_info_database == null) {
             log.error("Unable to locate MainFrame");
             return false;
         }
         
         if (jRadioButton1.isSelected()) {
-            selectedCodes.addAll(m.getStockCodeAndSymbolDatabase().getCodes());
+            selectedStockInfos.addAll(stock_info_database.getStockInfos());
             return true;
         }
         
@@ -526,7 +523,7 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
                     continue;
                 }
 
-                selectedCodes.addAll(m.getStockCodeAndSymbolDatabase().getCodes(board));
+                selectedStockInfos.addAll(stock_info_database.getStockInfos(board));
             } 
                         
             return true;
@@ -543,7 +540,7 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
                     continue;
                 }
 
-                selectedCodes.addAll(m.getStockCodeAndSymbolDatabase().getCodes(industry));
+                selectedStockInfos.addAll(stock_info_database.getStockInfos(industry));
             } 
                         
             return true;
@@ -552,7 +549,7 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
         if (jRadioButton4.isSelected()) {
             java.util.List<Stock> stocks = m.getStocks();
             for (Stock stock : stocks) {
-                selectedCodes.add(stock.getCode());
+                selectedStockInfos.add(new StockInfo(stock.getCode(), stock.getSymbol()));
             }
 
 	    return true;
@@ -561,11 +558,11 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
         return false;
     }
     
-    public java.util.List<Code> getSelectedCodes() {
-        return java.util.Collections.unmodifiableList(selectedCodes);
+    public java.util.List<StockInfo> getSelectedStockInfos() {
+        return java.util.Collections.unmodifiableList(selectedStockInfos);
     }
     
-    private void initBoardCheckBoxes(StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase) {
+    private void initBoardCheckBoxes(StockInfoDatabase stockInfoDatabase) {
         boardCheckBoxes.add(jCheckBox1);
         boardCheckBoxes.add(jCheckBox2);
         boardCheckBoxes.add(jCheckBox21);
@@ -580,15 +577,13 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
             checkBox.setVisible(false);
         }
         
-        Set<Stock.Board> boards = stockCodeAndSymbolDatabase.getBoards();
-        java.util.List<Stock.Board> sortedBoards = new ArrayList<Stock.Board>();
-        sortedBoards.addAll(boards);
+        java.util.List<Stock.Board> sortedBoards = stockInfoDatabase.getBoards();
         Collections.sort(sortedBoards);
         
         int count = 0;
-        for(Stock.Board board : sortedBoards) {
-            if(count >= boardCheckBoxes.size()) {
-                log.error("You do not have enough check box components (" + boardCheckBoxes.size() + ") to hold board (" + boards.size() + ")");
+        for (Stock.Board board : sortedBoards) {
+            if (count >= boardCheckBoxes.size()) {
+                log.error("You do not have enough check box components (" + boardCheckBoxes.size() + ") to hold board (" + sortedBoards.size() + ")");
                 break;
             }
             
@@ -599,7 +594,7 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
         }        
     }
 
-    private void initIndustryCheckBoxes(StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase) {
+    private void initIndustryCheckBoxes(StockInfoDatabase stockInfoDatabase) {
         industryCheckBoxes.add(jCheckBox5);
         industryCheckBoxes.add(jCheckBox7);
         industryCheckBoxes.add(jCheckBox9);
@@ -619,19 +614,17 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
         industryCheckBoxes.add(jCheckBox20);
         industryCheckBoxes.add(jCheckBox24);
         
-        for(JCheckBox checkBox : industryCheckBoxes) {
+        for (JCheckBox checkBox : industryCheckBoxes) {
             checkBox.setVisible(false);
         }
         
-        Set<Stock.Industry> industries = stockCodeAndSymbolDatabase.getIndustries();
-        java.util.List<Stock.Industry> sortedIndustries = new ArrayList<Stock.Industry>();
-        sortedIndustries.addAll(industries);
+        java.util.List<Stock.Industry> sortedIndustries = stockInfoDatabase.getIndustries();
         Collections.sort(sortedIndustries);
         
         int count = 0;
-        for(Stock.Industry industry : sortedIndustries) {
-            if(count >= industryCheckBoxes.size()) {
-                log.error("You do not have enough check box components (" + industryCheckBoxes.size() + ") to hold industry (" + industries.size() + ")");
+        for (Stock.Industry industry : sortedIndustries) {
+            if (count >= industryCheckBoxes.size()) {
+                log.error("You do not have enough check box components (" + industryCheckBoxes.size() + ") to hold industry (" + sortedIndustries.size() + ")");
                 break;
             }
             
@@ -647,7 +640,7 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
     private java.util.Map<javax.swing.JCheckBox, Stock.Industry> checkBoxToIndustry = new java.util.HashMap<javax.swing.JCheckBox, Stock.Industry>();
     private java.util.Map<javax.swing.JCheckBox, Stock.Board> checkBoxToBoard = new java.util.HashMap<javax.swing.JCheckBox, Stock.Board>();
     
-    private java.util.List<Code> selectedCodes = new java.util.ArrayList<Code>();
+    private java.util.List<StockInfo> selectedStockInfos = new java.util.ArrayList<StockInfo>();
     
     private static final Log log = LogFactory.getLog(WizardSelectStockJPanel.class);
     

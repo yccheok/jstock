@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -1211,9 +1211,9 @@ public class ChartJDialog extends javax.swing.JDialog {
             }
             // Symbol from server is empty. We need to ask help from offline
             // database.
-            final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = MainFrame.getInstance().getStockCodeAndSymbolDatabase();
-            if (stockCodeAndSymbolDatabase != null) {
-                final Symbol s = stockCodeAndSymbolDatabase.codeToSymbol(stock.getCode());
+            final StockInfoDatabase stockInfoDatabase = MainFrame.getInstance().getStockInfoDatabase();
+            if (stockInfoDatabase != null) {
+                final Symbol s = stockInfoDatabase.codeToSymbol(stock.getCode());
                 if (s != null) {
                     // Use symbol as replacement if possible.
                     return s.toString();
