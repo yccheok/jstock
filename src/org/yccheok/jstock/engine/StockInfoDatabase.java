@@ -22,6 +22,7 @@ package org.yccheok.jstock.engine;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -60,12 +61,11 @@ public class StockInfoDatabase {
     public StockInfoDatabase(StockServer stockServer) throws StockNotFoundException {
         List<Stock> stocks = null;
 
-        try {
-            stocks = stockServer.getAllStocks();
-        }
-        catch (StockNotFoundException exp) {
-            throw exp;
-        }
+        stocks = stockServer.getAllStocks();
+
+        java.util.concurrent.locks.ReadWriteLock readWriteLock = new java.util.concurrent.locks.ReentrantReadWriteLock();
+        reader = readWriteLock.readLock();
+        writer = readWriteLock.writeLock();
 
         this.init(stocks);
     }
@@ -76,6 +76,10 @@ public class StockInfoDatabase {
      * @param stocks list of stocks
      */
     public StockInfoDatabase(List<Stock> stocks) {
+        java.util.concurrent.locks.ReadWriteLock readWriteLock = new java.util.concurrent.locks.ReentrantReadWriteLock();
+        reader = readWriteLock.readLock();
+        writer = readWriteLock.writeLock();
+
         this.init(stocks);
     }
 
@@ -111,6 +115,15 @@ public class StockInfoDatabase {
                 this.boardToStockInfos.put(board, _stockInfos);
             }
             _stockInfos.add(stockInfo);
+
+            // Initialize codeToStockInfo and symbolToStockInfos.
+            codeToStockInfo.put(stockInfo.code, stockInfo);
+            List<StockInfo> s = symbolToStockInfos.get(stockInfo.symbol);
+            if (s == null) {
+                s = new ArrayList<StockInfo>();
+                symbolToStockInfos.put(stockInfo.symbol, s);
+            }
+            s.add(stockInfo);
         }
 
         // Initialize all search engines with correct list of stock info.
@@ -129,18 +142,23 @@ public class StockInfoDatabase {
      * @return list of stock info based on given searched string
      */
     public List<StockInfo> searchStockInfos(String string) {
-        List<StockInfo> _stockInfos  = this.codeSearchEngine.searchAll(string);
-        if (_stockInfos.isEmpty()) {
-            if (this.symbolPinyinSearchEngine != null) {
-                _stockInfos = this.symbolPinyinSearchEngine.searchAll(string);
-                if (_stockInfos.isEmpty()) {
+        reader.lock();
+        try {
+            List<StockInfo> _stockInfos  = this.codeSearchEngine.searchAll(string);
+            if (_stockInfos.isEmpty()) {
+                if (this.symbolPinyinSearchEngine != null) {
+                    _stockInfos = this.symbolPinyinSearchEngine.searchAll(string);
+                    if (_stockInfos.isEmpty()) {
+                        _stockInfos = this.symbolSearchEngine.searchAll(string);
+                    }
+                } else {
                     _stockInfos = this.symbolSearchEngine.searchAll(string);
                 }
-            } else {
-                _stockInfos = this.symbolSearchEngine.searchAll(string);
             }
+            return Collections.unmodifiableList(_stockInfos);
+        } finally {
+            reader.unlock();
         }
-        return Collections.unmodifiableList(_stockInfos);
     }
 
     /**
@@ -150,71 +168,110 @@ public class StockInfoDatabase {
      * based on symbol.
      *
      * @param string the searched string
-     * @return best matched stock info based on searched string
+     * @return best matched stock info based on searched string. null if not
+     * found
      */
     public StockInfo searchStockInfo(String string) {
-        StockInfo stockInfo = this.codeSearchEngine.search(string);
-        if (null == stockInfo) {
-            if (this.symbolPinyinSearchEngine != null) {
-                stockInfo = this.symbolPinyinSearchEngine.search(string);
-                if (null == stockInfo) {
+        reader.lock();
+        try {
+            StockInfo stockInfo = this.codeSearchEngine.search(string);
+            if (null == stockInfo) {
+                if (this.symbolPinyinSearchEngine != null) {
+                    stockInfo = this.symbolPinyinSearchEngine.search(string);
+                    if (null == stockInfo) {
+                        stockInfo = this.symbolSearchEngine.search(string);
+                    }
+                } else {
                     stockInfo = this.symbolSearchEngine.search(string);
                 }
-            } else {
-                stockInfo = this.symbolSearchEngine.search(string);
             }
+            return stockInfo;
+        } finally {
+            reader.unlock();
         }
-        return stockInfo;
     }
 
     /**
-     * Returns a list of stock info based on given industry. Since a new list
-     * will be created each time, this method is rather time consuming.
+     * Returns list of stock info based on given industry. Since a new list will
+     * be created each time, this method is rather time consuming.
      *
      * @param industry the industry
      * @return a list of stock info based on given industry
      */
     public List<StockInfo> getStockInfos(Stock.Industry industry) {
-        final List<StockInfo> list = this.industryToStockInfos.get(industry);
-        if(list == null) {
-            return Collections.emptyList();
+        reader.lock();
+        try {
+            final List<StockInfo> list = this.industryToStockInfos.get(industry);
+            if(list == null) {
+                return Collections.emptyList();
+            }
+            // Create a new list as StockInfoDatabase is a mutable class.
+            return new ArrayList(list);
+        } finally {
+            reader.unlock();
         }
-        return new ArrayList(list);
     }
 
     /**
-     * Returns a list of stock info based on given board. Since a new list will
-     * be created each time, this method is rather time consuming.
+     * Returns list of stock info based on given board. Since a new list will be
+     * created each time, this method is rather time consuming.
      *
      * @param board the board
      * @return a list of stock info based on given board
      */
     public List<StockInfo> getStockInfos(Stock.Board board) {
-        final List<StockInfo> list = this.boardToStockInfos.get(board);
-        if(list == null) {
-            return Collections.emptyList();
+        reader.lock();
+        try {
+            final List<StockInfo> list = this.boardToStockInfos.get(board);
+            if (list == null) {
+                return Collections.emptyList();
+            }
+            // Create a new list as StockInfoDatabase is a mutable class.
+            return new ArrayList(list);
+        } finally {
+            reader.unlock();
         }
-        return new ArrayList(list);
     }
 
+    /**
+     * Returns list of all the stock info of this database. Since a new list
+     * will be created each time, this method is rather time consuming.
+     *
+     * @return list of all the stock info of this database
+     */
+    public List<StockInfo> getStockInfos() {
+        reader.lock();
+        try {
+            // Construct a new list as StockInfoDatabase is a mutable class.
+            return new ArrayList(stockInfos);
+        } finally {
+            reader.unlock();
+        }
+    }
+    
     /**
      * Remove all user defined stock info from this database.
      *
      * @return true if success
      */
     public boolean removeAllUserDefinedStockInfos() {
-        List<StockInfo> _stockInfos = this.industryToStockInfos.get(Stock.Industry.UserDefined);
-        if (_stockInfos == null) {
-            return false;
+        writer.lock();
+        try {
+            List<StockInfo> _stockInfos = this.industryToStockInfos.get(Stock.Industry.UserDefined);
+            if (_stockInfos == null) {
+                return false;
+            }
+            // Use a new list. As the list items hold by industryToStockInfos will
+            // be removed in for loop iteration.
+            _stockInfos = new ArrayList<StockInfo>(_stockInfos);
+            boolean result = true;
+            for (StockInfo stockInfo : _stockInfos) {
+                result &= this.removeUserDefinedStockInfo(stockInfo);
+            }
+            return result;
+        } finally {
+            writer.unlock();
         }
-        // Use a new list. As the list items hold by industryToStockInfos will
-        // be removed in for loop iteration.
-        _stockInfos = new ArrayList<StockInfo>(_stockInfos);
-        boolean result = true;
-        for (StockInfo stockInfo : _stockInfos) {
-            result &= this.removeUserDefinedStockInfo(stockInfo);
-        }
-        return result;
     }
 
     private boolean removeUserDefinedStockInfo(StockInfo stockInfo) {
@@ -283,34 +340,55 @@ public class StockInfoDatabase {
      * @return a list of non user defined stock info
      */
     public List<StockInfo> getNonUserDefinedStockInfos() {
-        List<StockInfo> _stockInfos = new ArrayList<StockInfo>(stockInfos);
-        List<StockInfo> userDefinedStockInfos = this.industryToStockInfos.get(Stock.Industry.UserDefined);
-        if (userDefinedStockInfos != null) {
-            _stockInfos.removeAll(userDefinedStockInfos);
+        reader.lock();
+        try {
+            List<StockInfo> _stockInfos = new ArrayList<StockInfo>(stockInfos);
+            List<StockInfo> userDefinedStockInfos = this.industryToStockInfos.get(Stock.Industry.UserDefined);
+            if (userDefinedStockInfos != null) {
+                _stockInfos.removeAll(userDefinedStockInfos);
+            }
+            return _stockInfos;
+        } finally {
+            reader.unlock();
         }
-        return _stockInfos;
     }
 
     /**
-     * Returns a list of user defined stock info.
+     * Returns a list of user defined stock info. Since a new list will be
+     * created each time, this method is rather time consuming.
      *
      * @return a list of user defined stock info
      */
     public List<StockInfo> getUserDefinedStockInfos() {
-        List<StockInfo> _stockInfos = this.industryToStockInfos.get(Stock.Industry.UserDefined);
-        if (_stockInfos == null) {
-            return Collections.emptyList();
+        reader.lock();
+        try {
+            List<StockInfo> _stockInfos = this.industryToStockInfos.get(Stock.Industry.UserDefined);
+            if (_stockInfos == null) {
+                return Collections.emptyList();
+            }
+            // Construct a new list as StockInfoDatabase is a mutable class.
+            return new ArrayList<StockInfo>(_stockInfos);
+        } finally {
+            reader.unlock();
         }
-        return new ArrayList<StockInfo>(_stockInfos);
     }
 
     /**
-     * Add in user defined stock info into this database.
+     * Adds in user defined stock info into this database.
      *
      * @param stockInfo the stock info
      * @return true if success
      */
     public boolean addUserDefinedStockInfo(StockInfo stockInfo) {
+        writer.lock();
+        try {
+            return _addUserDefinedStockInfo(stockInfo);
+        } finally {
+            writer.unlock();
+        }
+    }
+
+    private boolean _addUserDefinedStockInfo(StockInfo stockInfo) {
         if (stockInfo == null) {
             throw new java.lang.IllegalArgumentException("Stock info cannot be null");
         }
@@ -367,12 +445,147 @@ public class StockInfoDatabase {
     }
 
     /**
+     * Returns true if this is an empty database.
+     *
+     * @return true if this is an empty database
+     */
+    public boolean isEmpty() {
+        reader.lock();
+        try {
+            return this.stockInfos.isEmpty();
+        } finally {
+            reader.unlock();
+        }
+    }
+
+    /**
      * Returns number of stock info in this database.
      *
      * @return number of stock info in this database
      */
     public int size() {
-        return this.stockInfos.size();
+        reader.lock();
+        try {
+            return this.stockInfos.size();
+        } finally {
+            reader.unlock();
+        }
+    }
+
+    /**
+     * Converts code to symbol.
+     *
+     * @param code the code
+     * @return symbol based on code to symbol conversion. null if the conversion
+     * failed
+     */
+    public Symbol codeToSymbol(Code code) {
+        reader.lock();
+        try {
+            StockInfo stockInfo = this.codeToStockInfo(code);
+            return stockInfo != null ? stockInfo.symbol : null;
+        } finally {
+            reader.unlock();
+        }
+    }
+
+    /**
+     * Converts code to stock info.
+     *
+     * @param code the code
+     * @return stock info based on code to stock info conversion. null if the
+     * conversion failed
+     */
+    public StockInfo codeToStockInfo(Code code) {
+        reader.lock();
+        try {
+            return codeToStockInfo.get(code);
+        } finally {
+            reader.unlock();
+        }
+    }
+
+    /**
+     * Converts symbol to list of code.
+     *
+     * @param symbol the symbol
+     * @return list of code based on symbol to code conversion. Empty list will
+     * be returned if failed
+     */
+    public List<StockInfo> symbolToStockInfos(Symbol symbol) {
+        reader.lock();
+        try {
+            List<StockInfo> _stockInfos = symbolToStockInfos.get(symbol);
+            if (_stockInfos == null) {
+                return java.util.Collections.emptyList();
+            }
+            return _stockInfos;
+        } finally {
+            reader.unlock();
+        }
+    }
+
+    /**
+     * Returns list of all the stock board of this database. Since a new list
+     * will be created each time, this method is rather time consuming.
+     *
+     * @return list of all the stock board of this database
+     */
+    public List<Stock.Board> getBoards() {
+        reader.lock();
+        try {
+            // Construct a new list as StockInfoDatabase is a mutable class.
+            return new ArrayList<Stock.Board>(this.boardToStockInfos.keySet());
+        } finally {
+            reader.unlock();
+        }
+    }
+
+    /**
+     * Returns list of all the stock industry of this database. Since a new list
+     * will be created each time, this method is rather time consuming. 
+     * 
+     * @return list of all the stock industry of this database
+     */
+    public List<Stock.Industry> getIndustries() {
+        reader.lock();
+        try {
+            // Construct a new list as StockInfoDatabase is a mutable class.
+            return new ArrayList<Stock.Industry>(this.industryToStockInfos.keySet());
+        } finally {
+            reader.unlock();
+        }
+    }
+
+    private Object readResolve() {
+        // Initialize all transient variables.
+        symbolToStockInfos = new HashMap<Symbol, List<StockInfo>>();
+        codeToStockInfo = new HashMap<Code, StockInfo>();
+
+        List<StockInfo> stockInfosWithSymbolAsString = new ArrayList<StockInfo>();
+        for (StockInfo stockInfo : stockInfos) {
+            stockInfosWithSymbolAsString.add(new StockInfoWithSymbolAsString(stockInfo.code, stockInfo.symbol));
+        }
+        // Initialize all search engines with correct list of stock info.
+        this.symbolPinyinSearchEngine = Utils.isPinyinTSTSearchEngineRequiredForSymbol() ? new PinyinTSTSearchEngine<StockInfo>(stockInfosWithSymbolAsString) : null;
+        this.symbolSearchEngine = new TSTSearchEngine<StockInfo>(stockInfosWithSymbolAsString);
+        this.codeSearchEngine = new TSTSearchEngine<StockInfo>(stockInfos);
+
+        java.util.concurrent.locks.ReadWriteLock readWriteLock = new java.util.concurrent.locks.ReentrantReadWriteLock();
+        reader = readWriteLock.readLock();
+        writer = readWriteLock.writeLock();
+
+        for (StockInfo stockInfo : stockInfos) {
+            codeToStockInfo.put(stockInfo.code, stockInfo);
+            List<StockInfo> s = symbolToStockInfos.get(stockInfo.symbol);
+            if (s == null) {
+                s = new ArrayList<StockInfo>();
+                symbolToStockInfos.put(stockInfo.symbol, s);
+            }
+            s.add(stockInfo);
+        }
+
+        return this;
     }
 
     // Entire stock info of this database.
@@ -382,10 +595,20 @@ public class StockInfoDatabase {
     // Stock board to list of stock info mapping.
     private final Map<Stock.Board, List<StockInfo>> boardToStockInfos = new EnumMap<Stock.Board, List<StockInfo>>(Stock.Board.class);
 
+    // Symbol to list of stock info mapping.
+    private transient Map<Symbol, List<StockInfo>> symbolToStockInfos = new HashMap<Symbol, List<StockInfo>>();
+    // Code to stock info mapping.
+    private transient Map<Code, StockInfo> codeToStockInfo = new HashMap<Code, StockInfo>();
+
     // Symbol String -> StockInfo (with its toString returns Symbol)
     private transient SearchEngine<StockInfo> symbolSearchEngine;
     // Pinyin String -> StockInfo (with its toString returns Symbol)
     private transient SearchEngine<StockInfo> symbolPinyinSearchEngine;
     // Code String -> StockInfo (with its toString returns Code)
     private transient SearchEngine<StockInfo> codeSearchEngine;
+
+    // Reader and writer locks, so that we can have a thread safe mutable
+    // stock info database.
+    private transient java.util.concurrent.locks.Lock reader;
+    private transient java.util.concurrent.locks.Lock writer;
 }
