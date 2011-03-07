@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -300,6 +300,40 @@ public class StockCodeAndSymbolDatabase {
         this.codeSearchEngine = new TSTSearchEngine<Code>(this.codes);
 
         return this;
+    }
+
+    /**
+     * Returns a copy of stock info database which represents this stock code
+     * symbol database.
+     *
+     * @return a copy of stock info database which represents this stock code
+     * symbol database
+     */
+    public StockInfoDatabase toStockInfoDatabase() {
+        Map<Code, Stock.Board> codeToBoard = new HashMap<Code, Stock.Board>();
+        Map<Code, Stock.Industry> codeToIndustry = new HashMap<Code, Stock.Industry>();
+        for (Map.Entry<Stock.Board, List<Code>> entry : boardToCodes.entrySet())
+        {
+            for (Code code : entry.getValue()) {
+                codeToBoard.put(code, entry.getKey());
+            }
+        }
+        for (Map.Entry<Stock.Industry, List<Code>> entry : industryToCodes.entrySet())
+        {
+            for (Code code : entry.getValue()) {
+                codeToIndustry.put(code, entry.getKey());
+            }
+        }
+        List<Stock> stocks = new ArrayList<Stock>();
+        for (int i = 0, size = codes.size(); i < size; i++) {
+            Code code = codes.get(i);
+            Symbol symbol = symbols.get(i);
+            Stock.Board board = codeToBoard.get(code);
+            Stock.Industry industry = codeToIndustry.get(code);
+            Stock stock = new Stock.Builder(code, symbol).industry(industry).board(board).build();
+            stocks.add(stock);
+        }
+        return new StockInfoDatabase(stocks);
     }
 
     /**
