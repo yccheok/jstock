@@ -781,7 +781,24 @@ public class Utils {
         // The directory is now empty so delete it
         return dir.delete();
     }
-    
+
+    /**
+     * Returns empty stock based on given stock info.
+     *
+     * @param stockInfo the stock info
+     * @return empty stock based on given stock info
+     */
+    public static Stock getEmptyStock(StockInfo stockInfo) {
+        return getEmptyStock(stockInfo.code, stockInfo.symbol);
+    }
+
+    /**
+     * Returns empty stock based on given code and symbol.
+     *
+     * @param code the code
+     * @param symbol the symbol
+     * @return empty stock based on given code and symbol
+     */
     public static Stock getEmptyStock(Code code, Symbol symbol) {
         return new Stock(   code,
                             symbol,
@@ -1579,7 +1596,7 @@ public class Utils {
     }
 
     @SuppressWarnings("unchecked")
-    public static <A> A fromXML(Class c, File file) {
+    public static <A> A fromXML(Class<A> c, File file) {
         // Don't ever try to use DomDriver. They are VERY slow.
         XStream xStream = new XStream();
         InputStream inputStream = null;
@@ -1606,8 +1623,8 @@ public class Utils {
     }
 
     @SuppressWarnings("unchecked")
-    public static <A> A fromXML(Class c, String filePath) {
-        return (A)fromXML(c, new File(filePath));
+    public static <A> A fromXML(Class<A> c, String filePath) {
+        return fromXML(c, new File(filePath));
     }
 
     public static boolean toXML(Object object, File file) {
