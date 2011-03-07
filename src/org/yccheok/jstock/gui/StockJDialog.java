@@ -1,23 +1,20 @@
 /*
- * StockJDialog.java
- *
- * Created on August 19, 2007, 12:14 AM
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- * Copyright (C) 2007 Cheok YanCheng <yccheok@yahoo.com>
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.yccheok.jstock.gui;
@@ -421,19 +418,16 @@ public class StockJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-// TODO add your handling code here:
-        final java.util.List<Code> codes = this.buildSelectedCode();
+        final java.util.List<StockInfo> stockInfos = this.buildSelectedStockInfos();
         final MainFrame m = MainFrame.getInstance();
 
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run() {
-                for(Code code : codes) {
-                    Symbol symbol = m.getStockCodeAndSymbolDatabase().codeToSymbol(code);
-                    assert(symbol != null);
-                    
-                    final Stock stock = org.yccheok.jstock.gui.Utils.getEmptyStock(code, symbol);
+                for (StockInfo stockInfo : stockInfos) {
+                    final Stock stock = org.yccheok.jstock.gui.Utils.getEmptyStock(stockInfo);
                     m.addStockToTable(stock);
-                    m.getRealTimeStockMonitor().addStockCode(code);
+                    m.getRealTimeStockMonitor().addStockCode(stock.getCode());
                 }
             }
         });
@@ -468,53 +462,54 @@ public class StockJDialog extends javax.swing.JDialog {
         updateCheckBoxesState();
     }//GEN-LAST:event_jRadioButton2ActionPerformed
     
-    public java.util.List<Code> buildSelectedCode() {
-        java.util.List<Code> selectedCodes = new java.util.ArrayList<Code>();
+    public java.util.List<StockInfo> buildSelectedStockInfos() {
+        java.util.List<StockInfo> selectedStockInfos = new java.util.ArrayList<StockInfo>();
         
         MainFrame m = MainFrame.getInstance();
         
-        if(m.getStockCodeAndSymbolDatabase() == null) {
+		StockInfoDatabase stock_info_database = m.getStockInfoDatabase();
+        if (stock_info_database == null) {
             log.error("Unable to locate MainFrame");
             return null;
         }
         
-        if(jRadioButton2.isSelected()) {
-            selectedCodes.addAll(m.getStockCodeAndSymbolDatabase().getCodes());
-            return selectedCodes;
+        if (jRadioButton2.isSelected()) {
+            selectedStockInfos.addAll(stock_info_database.getStockInfos());
+            return selectedStockInfos;
         }
         
-        if(jRadioButton3.isSelected()) {            
-            for(JCheckBox checkBox : boardCheckBoxes) {
-                if(checkBox.isSelected() == false) continue;
+        if (jRadioButton3.isSelected()) {
+            for (JCheckBox checkBox : boardCheckBoxes) {
+                if (checkBox.isSelected() == false) continue;
                     
                 final Stock.Board board = this.checkBoxToBoard.get(checkBox);
                                         
-                if(board == null) {
+                if (board == null) {
                     log.error("Wrong text in JCheckBox GUI : " + checkBox.getText());
                     continue;
                 }
                     
-                selectedCodes.addAll(m.getStockCodeAndSymbolDatabase().getCodes(board));
+                selectedStockInfos.addAll(stock_info_database.getStockInfos(board));
             }
             
-            return selectedCodes;
+            return selectedStockInfos;
         }
         
-        if(jRadioButton4.isSelected()) {            
-            for(JCheckBox checkBox : industryCheckBoxes) {
-                if(checkBox.isSelected() == false) continue;
+        if (jRadioButton4.isSelected()) {
+            for (JCheckBox checkBox : industryCheckBoxes) {
+                if (checkBox.isSelected() == false) continue;
                     
                 final Stock.Industry industry = this.checkBoxToIndustry.get(checkBox);
                     
-                if(industry == null) {
+                if (industry == null) {
                     log.error("Wrong text in JCheckBox GUI : " + checkBox.getText());
                     continue;
                 }
                     
-                selectedCodes.addAll(m.getStockCodeAndSymbolDatabase().getCodes(industry));                            
+                selectedStockInfos.addAll(stock_info_database.getStockInfos(industry));
             } 
                         
-            return selectedCodes;
+            return selectedStockInfos;
         }        
         
         return null;
@@ -522,7 +517,7 @@ public class StockJDialog extends javax.swing.JDialog {
     
     private void initBoardCheckBoxes() {
         final MainFrame m = MainFrame.getInstance();
-        final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = m.getStockCodeAndSymbolDatabase();
+        final StockInfoDatabase stockInfoDatabase = m.getStockInfoDatabase();
         
         boardCheckBoxes.add(jCheckBox1);
         boardCheckBoxes.add(jCheckBox2);
@@ -538,15 +533,13 @@ public class StockJDialog extends javax.swing.JDialog {
             checkBox.setVisible(false);
         }
         
-        Set<Stock.Board> boards = stockCodeAndSymbolDatabase.getBoards();
-        java.util.List<Stock.Board> sortedBoards = new ArrayList<Stock.Board>();
-        sortedBoards.addAll(boards);
+        java.util.List<Stock.Board> sortedBoards = stockInfoDatabase.getBoards();
         Collections.sort(sortedBoards);
         
         int count = 0;
         for (Stock.Board board : sortedBoards) {
             if (count >= boardCheckBoxes.size()) {
-                log.error("You do not have enough check box components (" + boardCheckBoxes.size() + ") to hold board (" + boards.size() + ")");
+                log.error("You do not have enough check box components (" + boardCheckBoxes.size() + ") to hold board (" + sortedBoards.size() + ")");
                 break;
             }
             
@@ -559,7 +552,7 @@ public class StockJDialog extends javax.swing.JDialog {
 
     private void initIndustryCheckBoxes() {
         final MainFrame m = MainFrame.getInstance();
-        final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = m.getStockCodeAndSymbolDatabase();
+        final StockInfoDatabase stockInfoDatabase = m.getStockInfoDatabase();
         
         industryCheckBoxes.add(jCheckBox5);
         industryCheckBoxes.add(jCheckBox7);
@@ -580,19 +573,17 @@ public class StockJDialog extends javax.swing.JDialog {
         industryCheckBoxes.add(jCheckBox20);
         industryCheckBoxes.add(jCheckBox24);
         
-        for(JCheckBox checkBox : industryCheckBoxes) {
+        for (JCheckBox checkBox : industryCheckBoxes) {
             checkBox.setVisible(false);
         }
         
-        Set<Stock.Industry> industries = stockCodeAndSymbolDatabase.getIndustries();
-        java.util.List<Stock.Industry> sortedIndustries = new ArrayList<Stock.Industry>();
-        sortedIndustries.addAll(industries);
+        java.util.List<Stock.Industry> sortedIndustries = stockInfoDatabase.getIndustries();
         Collections.sort(sortedIndustries);
         
         int count = 0;
-        for(Stock.Industry industry : sortedIndustries) {
-            if(count >= industryCheckBoxes.size()) {
-                log.error("You do not have enough check box components (" + industryCheckBoxes.size() + ") to hold industry (" + industries.size() + ")");
+        for (Stock.Industry industry : sortedIndustries) {
+            if (count >= industryCheckBoxes.size()) {
+                log.error("You do not have enough check box components (" + industryCheckBoxes.size() + ") to hold industry (" + sortedIndustries.size() + ")");
                 break;
             }
             
