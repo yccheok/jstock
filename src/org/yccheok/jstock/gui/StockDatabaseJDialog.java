@@ -29,7 +29,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -58,9 +57,9 @@ import org.jdesktop.jxlayer.JXLayer;
 import org.yccheok.jstock.engine.AjaxYahooSearchEngine;
 import org.yccheok.jstock.engine.AjaxYahooSearchEngine.ResultType;
 import org.yccheok.jstock.engine.Code;
-import org.yccheok.jstock.engine.MutableStockCodeAndSymbolDatabase;
 import org.yccheok.jstock.engine.Observer;
-import org.yccheok.jstock.engine.StockCodeAndSymbolDatabase;
+import org.yccheok.jstock.engine.StockInfo;
+import org.yccheok.jstock.engine.StockInfoDatabase;
 import org.yccheok.jstock.engine.Symbol;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.internationalization.MessagesBundle;
@@ -72,9 +71,9 @@ import org.yccheok.jstock.internationalization.MessagesBundle;
 public class StockDatabaseJDialog extends javax.swing.JDialog {
 
     /** Creates new form StockDatabaseJDialog */
-    public StockDatabaseJDialog(java.awt.Frame parent, StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase, boolean modal) {
+    public StockDatabaseJDialog(java.awt.Frame parent, StockInfoDatabase stockInfoDatabase, boolean modal) {
         super(parent, modal);
-        this.mutableStockCodeAndSymbolDatabase = new MutableStockCodeAndSymbolDatabase(stockCodeAndSymbolDatabase);
+        this.stockInfoDatabase = stockInfoDatabase;
         initComponents();
 
         initJXLayerOnJComboBox();
@@ -163,7 +162,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         jPanel1.setLayout(new java.awt.BorderLayout());
 
         jTable1.setAutoCreateRowSorter(true);
-        jTable1.setModel(getSystemDefinedCodeSymbolTableModel());
+        jTable1.setModel(getSystemDefinedStockInfoTableModel());
         this.jTable1.setDefaultRenderer(Symbol.class, new StockTableCellRenderer());
         this.jTable1.setDefaultRenderer(Code.class, new StockTableCellRenderer());
         jScrollPane1.setViewportView(jTable1);
@@ -195,7 +194,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
             this.jScrollPane2.addMouseListener(new TableRowPopupListener(true));
 
             jTable2.setAutoCreateRowSorter(true);
-            jTable2.setModel(getUserDefinedCodeSymbolTableModel());
+            jTable2.setModel(getUserDefinedStockInfoTableModel());
             this.jTable2.addMouseListener(new TableRowPopupListener());
             this.jTable2.setDefaultRenderer(Code.class, new StockTableCellRenderer());
             this.jTable2.setDefaultRenderer(Symbol.class, new StockTableCellRenderer());
@@ -282,7 +281,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_jTable2KeyPressed
 
-    public MutableStockCodeAndSymbolDatabase getMutableStockCodeAndSymbolDatabase()
+    public StockInfoDatabase getResult()
     {
         return result;
     }
@@ -313,39 +312,34 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
             }
         }
 
-        final CodeSymbolTableModel model = (CodeSymbolTableModel)(jTable2.getModel());
-        final List<Code> codes = model.getCodes();
-        final List<Symbol> symbols = model.getSymbols();
-        assert(codes.size() == symbols.size());
+        final StockInfoTableModel model = (StockInfoTableModel)(jTable2.getModel());
+        final List<StockInfo> stockInfos = model.getStockInfos();
 
         /* Shall we check the returned code? */
-        this.mutableStockCodeAndSymbolDatabase.removeAllUserDefinedCodeAndSymbol();
+        this.stockInfoDatabase.removeAllUserDefinedStockInfos();
 
-        final int size = codes.size();
-        for (int i = 0; i < size; i++) {
-            final Code code = codes.get(i);
+        for (StockInfo stockInfo : stockInfos) {
             // In fact, we shouldn't need to trim the string again, as
             // MyTableCellEditor has done that for us. The code is here to fix
             // old user-defined-database.xml, with possibility to have data
             // begin and end with white space. This is because old version of
             // JStock (1.0.5r) doesn't perform trimming.
-            final String codeStr = code.toString().trim();
+            final String codeStr = stockInfo.code.toString().trim();
             if (codeStr.length() <= 0) {
                 continue;
             }
-            final Symbol symbol = symbols.get(i);
-            String symbolStr = symbol.toString().trim();
+            String symbolStr = stockInfo.symbol.toString().trim();
             if (symbolStr.length() <= 0) {
                 /* We allow empty symbol to be entered by user. In 0 length
                  * symbol case, we will make it same as code.
                  */
                 symbolStr = codeStr;
             }
-            this.mutableStockCodeAndSymbolDatabase.addUserDefinedCodeAndSymbol(Code.newInstance(codeStr), Symbol.newInstance(symbolStr));
+            this.stockInfoDatabase.addUserDefinedStockInfo(new StockInfo(Code.newInstance(codeStr), Symbol.newInstance(symbolStr)));
         }
 
         
-        this.result = this.mutableStockCodeAndSymbolDatabase;
+        this.result = this.stockInfoDatabase;
         
         this.setVisible(false);
         this.dispose();    
@@ -439,11 +433,11 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
     private void deleteSelectedUserDefinedDatabase() {
         int rows[] = jTable2.getSelectedRows();
 
-        final CodeSymbolTableModel codeSymbolTableModel = (CodeSymbolTableModel)(jTable2.getModel());
+        final StockInfoTableModel codeSymbolTableModel = (StockInfoTableModel)(jTable2.getModel());
         
         Arrays.sort(rows);
 
-        for (int i = rows.length-1; i >= 0; i--) {
+        for (int i = rows.length - 1; i >= 0; i--) {
             int row = rows[i];
             if (row < 0) {
                 continue;
@@ -475,16 +469,16 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         JTableUtilities.scrollToVisible(jTable1, selectedViewIndex, 0);
     }
     
-    private void addNewSymbol()
+    private void addNewStockInfo()
     {
-        final CodeSymbolTableModel model = (CodeSymbolTableModel)jTable2.getModel();
-        final int selectedModelIndex = model.addNewCodeSymbol();
+        final StockInfoTableModel model = (StockInfoTableModel)jTable2.getModel();
+        final int selectedModelIndex = model.addNewStockInfo();
         selectUserDefinedDatabaseTable(selectedModelIndex);        
     }
 
-    private void addNewSymbol(ResultType result) {
-        final CodeSymbolTableModel model = (CodeSymbolTableModel)jTable2.getModel();
-        final int selectedModelIndex = model.addNewCodeSymbol(result);
+    private void addNewStockInfo(ResultType result) {
+        final StockInfoTableModel model = (StockInfoTableModel)jTable2.getModel();
+        final int selectedModelIndex = model.addNewStockInfo(result);
         selectUserDefinedDatabaseTable(selectedModelIndex);
     }
 
@@ -531,7 +525,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
                 }
 
                 // Everything just looks fine. Let's insert it into the table.
-                addNewSymbol(result);
+                addNewStockInfo(result);
             }
         };
     }
@@ -544,7 +538,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                addNewSymbol();
+                addNewStockInfo();
             }
         });
 
@@ -573,15 +567,15 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         return popup;
     }
 
-    private TableModel getUserDefinedCodeSymbolTableModel()
+    private TableModel getUserDefinedStockInfoTableModel()
     {
-        return new CodeSymbolTableModel(Type.UserDefined);
+        return new StockInfoTableModel(Type.UserDefined);
     }
 
     // For jTable1.
-    private TableModel getSystemDefinedCodeSymbolTableModel()
+    private TableModel getSystemDefinedStockInfoTableModel()
     {
-        return new CodeSymbolTableModel(Type.SystemDefined);
+        return new StockInfoTableModel(Type.SystemDefined);
     }
 
     @SuppressWarnings("unchecked")
@@ -590,9 +584,9 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         final String text = jTextField1.getText();
 
         // I really have no idea what the second parameter is.
-        final RowFilter<CodeSymbolTableModel, Integer> rf;
+        final RowFilter<StockInfoTableModel, Integer> rf;
         
-        //If current expression doesn't parse, don't update.
+        // If current expression doesn't parse, don't update.
         try {
             // (?i) is for case insensitive.
             rf = RowFilter.regexFilter("^(?i)" + Pattern.quote(text));
@@ -601,20 +595,20 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         }
 
         if (org.yccheok.jstock.engine.Utils.isPinyinTSTSearchEngineRequiredForSymbol() == false) {
-            ((TableRowSorter<CodeSymbolTableModel>)jTable1.getRowSorter()).setRowFilter(rf);
+            ((TableRowSorter<StockInfoTableModel>)jTable1.getRowSorter()).setRowFilter(rf);
         } else {
-            ((TableRowSorter<CodeSymbolTableModel>)jTable1.getRowSorter()).setRowFilter(new RowFilter<CodeSymbolTableModel, Integer>() {
+            ((TableRowSorter<StockInfoTableModel>)jTable1.getRowSorter()).setRowFilter(new RowFilter<StockInfoTableModel, Integer>() {
 
                 @Override
-                public boolean include(Entry<? extends CodeSymbolTableModel, ? extends Integer> entry) {
+                public boolean include(Entry<? extends StockInfoTableModel, ? extends Integer> entry) {
                     // Try regexFilter first.
                     if (rf.include(entry)) {
                         return true;
                     }
                     // Fail. Further try with pinyin. Pinyin is in lower case.
                     final String lower_text = text.toLowerCase();
-                    final CodeSymbolTableModel model = entry.getModel();
-                    final Symbol symbol = model.getSymbols().get(entry.getIdentifier());
+                    final StockInfoTableModel model = entry.getModel();
+                    final Symbol symbol = model.getStockInfos().get(entry.getIdentifier()).symbol;
                     List<String> pinyins = org.yccheok.jstock.gui.Utils.toHanyuPinyin(symbol.toString());
                     for (String pinyin : pinyins) {
                         if (pinyin.startsWith(lower_text)) {
@@ -637,24 +631,17 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         SystemDefined
     }
 
-    private class CodeSymbolTableModel extends AbstractTableModel {
+    private class StockInfoTableModel extends AbstractTableModel {
         // For fast access purpose.
-        /* The index for codes, must be associated with index for symbols.
-         */
-        private final List<Symbol> symbols;
-        private final List<Code> codes;
+        private final List<StockInfo> stockInfos;
         private final Type type;
 
         public Type getType() {
             return this.type;
         }
 
-        public List<Code> getCodes() {
-            return Collections.unmodifiableList(codes);
-        }
-
-        public List<Symbol> getSymbols() {
-            return Collections.unmodifiableList(symbols);
+        public List<StockInfo> getStockInfos() {
+            return Collections.unmodifiableList(stockInfos);
         }
 
         @Override
@@ -670,39 +657,24 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
             if (this.isReadOnly()) {
                 return;
             }
-            this.symbols.remove(index);
-            this.codes.remove(index);
+            this.stockInfos.remove(index);
             this.fireTableRowsDeleted(index, index);
         }
 
-        public CodeSymbolTableModel(Type type) {
+        public StockInfoTableModel(Type type) {
             this.type = type;
             
-            final MutableStockCodeAndSymbolDatabase database = new MutableStockCodeAndSymbolDatabase(StockDatabaseJDialog.this.mutableStockCodeAndSymbolDatabase);
-
             if (this.type == Type.UserDefined) {
-                this.codes = new ArrayList<Code>(StockDatabaseJDialog.this.mutableStockCodeAndSymbolDatabase.getUserDefinedCode());
-                /* No! Never use getUserDefinedSymbol here. The returned symbols'
-                 * index, are not guarantee to match with the index in codes.
-                 */
-                this.symbols = new ArrayList<Symbol>();
-                for (Code code : codes) {
-                    final Symbol symbol = StockDatabaseJDialog.this.mutableStockCodeAndSymbolDatabase.codeToSymbol(code);
-                    assert(null != symbol);
-                    this.symbols.add(symbol);
-                }
+                stockInfos = StockDatabaseJDialog.this.stockInfoDatabase.getUserDefinedStockInfos();
             }
             else {
-                database.removeAllUserDefinedCodeAndSymbol();
-                symbols = database.getSymbols();
-                codes = database.getCodes();
+                stockInfos = StockDatabaseJDialog.this.stockInfoDatabase.getNonUserDefinedStockInfos();
             }
         }
         
         @Override
         public int getRowCount() {
-            assert(codes.size() == symbols.size());
-            return codes.size();
+            return stockInfos.size();
         }
 
         @Override
@@ -712,12 +684,11 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
 
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
-            switch(columnIndex)
-            {
+            switch (columnIndex) {
                 case 0:
-                    return codes.get(rowIndex);
+                    return stockInfos.get(rowIndex).code;
                 case 1:
-                    return symbols.get(rowIndex);
+                    return stockInfos.get(rowIndex).symbol;
             }
             
             return null;
@@ -741,13 +712,13 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
             }
             if (value instanceof Symbol) {
                 final Symbol symbol = (Symbol)value;
-                symbols.remove(row);
-                symbols.add(row, symbol);
+                final Code code = stockInfos.remove(row).code;
+                stockInfos.add(row, new StockInfo(code, symbol));
             }
             else if (value instanceof Code) {
                 final Code code = (Code)value;
-                codes.remove(row);
-                codes.add(row, code);
+                final Symbol symbol = stockInfos.remove(row).symbol;
+                stockInfos.add(row, new StockInfo(code, symbol));
             }
             else {
                 assert(false);
@@ -756,60 +727,48 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         }
 
         // Make it as case-insensitive comparison.
-        public int findSymbol(String string) {
-            int symbolIndex = -1;
-            for (int i = 0, size = symbols.size(); i < size; i++) {
-                if (symbols.get(i).toString().equalsIgnoreCase(string)) {
-                    symbolIndex = i;
+        public int findStockInfoBySymbol(String string) {
+            int index = -1;
+            for (int i = 0, size = stockInfos.size(); i < size; i++) {
+                if (stockInfos.get(i).symbol.toString().equalsIgnoreCase(string)) {
+                    index = i;
                     break;
                 }
             }
-            return symbolIndex;
+            return index;
         }
 
         // Make it as case-insensitive comparison.
-        public int findCode(String string) {
-            int codeIndex = -1;
-            for (int i = 0, size = codes.size(); i < size; i++) {
-                if (codes.get(i).toString().equalsIgnoreCase(string)) {
-                    codeIndex = i;
+        public int findStockInfoByCode(String string) {
+            int index = -1;
+            for (int i = 0, size = stockInfos.size(); i < size; i++) {
+                if (stockInfos.get(i).code.toString().equalsIgnoreCase(string)) {
+                    index = i;
                     break;
                 }
             }
-            return codeIndex;
+            return index;
         }
 
-        public int findCodeOrSymbol(String string) {
-            final int symbolIndex = findSymbol(string);
-            if (symbolIndex >= 0) {
-                return symbolIndex;
-            }
-
-            final int codeIndex = findCode(string);
-            return codeIndex;
-        }
-
-        public int addNewCodeSymbol() {
+        public int addNewStockInfo() {
             final Code code = Code.newInstance("");
             final Symbol symbol = Symbol.newInstance("");
-            this.codes.add(code);
-            this.symbols.add(symbol);
+            this.stockInfos.add(new StockInfo(code, symbol));
 
-            final int index = symbols.size() - 1;
+            final int index = this.stockInfos.size() - 1;
             this.fireTableRowsInserted(index, index);
 
             return index;
         }
 
-        public int addNewCodeSymbol(ResultType result) {
+        public int addNewStockInfo(ResultType result) {
             // Symbol from Yahoo means Code in JStock.
             final Code code = Code.newInstance(result.symbol);
             // Name from Yahoo means Symbol in JStock.
             final Symbol symbol = Symbol.newInstance(result.name);
-            this.codes.add(code);
-            this.symbols.add(symbol);
+            this.stockInfos.add(new StockInfo(code, symbol));
 
-            final int index = symbols.size() - 1;
+            final int index = this.stockInfos.size() - 1;
             this.fireTableRowsInserted(index, index);
 
             return index;
@@ -912,7 +871,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
     }
 
     private String getTotalStockString() {
-        return MessageFormat.format(GUIBundle.getString("StockDatabaseJDialog_TotalStock_template"), mutableStockCodeAndSymbolDatabase.getCodes().size());
+        return MessageFormat.format(GUIBundle.getString("StockDatabaseJDialog_TotalStock_template"), stockInfoDatabase.size());
     }
 
     /**
@@ -925,7 +884,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
      * if not found
      */
     private IndexEx getIndexEx(String string, Class c) {
-        final CodeSymbolTableModel model1 = (CodeSymbolTableModel)(StockDatabaseJDialog.this.jTable1.getModel());
+        final StockInfoTableModel model1 = (StockInfoTableModel)(StockDatabaseJDialog.this.jTable1.getModel());
         /*
          * Shall we have a strict duplicated detection rule, (Do not allow a
          * newly inserted string to be same as Code or Symbol, regardless which
@@ -934,15 +893,14 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
          * Or, shall we have a loosen duplicated detection rule? (Do not allow
          * a newly inserted string to be same as its type).
          */
-        //final int modelIndex1 = model1.findCodeOrSymbol(string);
-        final int modelIndex1 = Code.class == c ? model1.findCode(string) : model1.findSymbol(string);
+        final int modelIndex1 = Code.class == c ? model1.findStockInfoByCode(string) : model1.findStockInfoBySymbol(string);
         if (modelIndex1 >= 0) {
             return IndexEx.newInstance(modelIndex1, jTable1);
         }
 
         // Perform further checking.
-        final CodeSymbolTableModel model2 = (CodeSymbolTableModel)(StockDatabaseJDialog.this.jTable2.getModel());
-        final int modelIndex2 = Code.class == c ? model2.findCode(string) : model2.findSymbol(string);
+        final StockInfoTableModel model2 = (StockInfoTableModel)(StockDatabaseJDialog.this.jTable2.getModel());
+        final int modelIndex2 = Code.class == c ? model2.findStockInfoByCode(string) : model2.findStockInfoBySymbol(string);
         if (modelIndex2 >= 0) {
             return IndexEx.newInstance(modelIndex2, jTable2);
         }
@@ -968,8 +926,8 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         public final JTable table;
     }
 
-    private MutableStockCodeAndSymbolDatabase mutableStockCodeAndSymbolDatabase = null;
-    private MutableStockCodeAndSymbolDatabase result = null;
+    private final StockInfoDatabase stockInfoDatabase;
+    private StockInfoDatabase result = null;
     
     private static final Log log = LogFactory.getLog(StockDatabaseJDialog.class);
     
