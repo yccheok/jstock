@@ -309,7 +309,7 @@ public class IndicatorPanel extends JPanel {
 
         jComboBox1.setEditable(true);
         jComboBox1.setPreferredSize(new java.awt.Dimension(150, 24));
-        ((AutoCompleteJComboBox)jComboBox1).attach(this.getAutoCompleteJComboBoxObserver());
+        ((AutoCompleteJComboBox)jComboBox1).attachStockInfoObserver(this.getStockInfoObserver());
         jPanel7.add(jComboBox1);
 
         jPanel5.add(jPanel7, java.awt.BorderLayout.NORTH);
@@ -402,7 +402,7 @@ public class IndicatorPanel extends JPanel {
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         final MainFrame m = MainFrame.getInstance();
         // stockCodeAndSymbolDatabase can be null, if we still haven't connected to server.
-        final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = m.getStockCodeAndSymbolDatabase();        
+        final StockInfoDatabase stockInfoDatabase = m.getStockInfoDatabase();
         final IndicatorDefaultDrawing indicatorDefaultDrawing = (IndicatorDefaultDrawing)this.view.getDrawing();
         final OperatorIndicator operatorIndicator = indicatorDefaultDrawing.getOperatorIndicator();
         
@@ -412,19 +412,11 @@ public class IndicatorPanel extends JPanel {
             final Object o = ((ObjectInspectorJPanel)this.objectInspectorJPanel).getBean();
             final MutableStock mutableStock = (MutableStock)o;
             stock = mutableStock.getStock();
-            final Code searchedStockCode = stockCodeAndSymbolDatabase.searchStockCode(stock.getCode().toString());
-            if (searchedStockCode == null) {
+			if (stock.getCode().toString().equals("")) {
                 JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_you_need_to_select_a_stock"), MessagesBundle.getString("warning_title_you_need_to_select_a_stock"), JOptionPane.WARNING_MESSAGE);
                 this.jComboBox1.requestFocus();
-                return;            
-            }
-            else {
-                if (searchedStockCode.equals(stock.getCode()) == false) {
-                    JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_you_need_to_select_a_stock"), MessagesBundle.getString("warning_title_you_need_to_select_a_stock"), JOptionPane.WARNING_MESSAGE);
-                    this.jComboBox1.requestFocus();
-                    return;                
-                }
-            }
+                return;
+			}
         }
 
         // Start button.
@@ -1103,7 +1095,6 @@ public class IndicatorPanel extends JPanel {
     }
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-// TODO add your handling code here:
         this.New();
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -1168,7 +1159,6 @@ public class IndicatorPanel extends JPanel {
     }//GEN-LAST:event_jList2ValueChanged
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
         Install();
     }//GEN-LAST:event_jButton2ActionPerformed
 
@@ -1316,59 +1306,22 @@ public class IndicatorPanel extends JPanel {
         return a;
     }
     
-    public void setStockCodeAndSymbolDatabase(StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase) {
-        ((AutoCompleteJComboBox)jComboBox1).setStockCodeAndSymbolDatabase(stockCodeAndSymbolDatabase);
+    public void setStockInfoDatabase(StockInfoDatabase stockInfoDatabase) {
+        ((AutoCompleteJComboBox)jComboBox1).setStockInfoDatabase(stockInfoDatabase);
     }
 
-    private org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, String> getAutoCompleteJComboBoxObserver() {
-        return new org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, String>() {
+    private org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, StockInfo> getStockInfoObserver() {
+        return new org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, StockInfo>() {
             @Override
-            public void update(AutoCompleteJComboBox subject, String arg) {
-                if (arg == null || arg.length() <= 0) {
-                    return;
+            public void update(AutoCompleteJComboBox subject, StockInfo stockInfo) {
+                assert(stockInfo != null);
+                final StockTask tmp = stockTask;
+                if (tmp != null) {
+                    tmp.cancel(true);
                 }
 
-                final String stock = arg;
-
-                MainFrame m = MainFrame.getInstance();
-
-                if (m == null) {
-                    return;
-                }
-
-                final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = m.getStockCodeAndSymbolDatabase();
-
-                if (stockCodeAndSymbolDatabase == null) {
-                    // Database is not ready yet. Shall we pop up a warning to
-                    // user?
-                    log.info("Database is not ready yet.");
-                    return;
-                }
-
-                Code code = stockCodeAndSymbolDatabase.searchStockCode(stock);
-                Symbol symbol = null;
-
-                if (code != null) {
-                    symbol = stockCodeAndSymbolDatabase.codeToSymbol(code);
-                }
-                else {
-                    symbol = stockCodeAndSymbolDatabase.searchStockSymbol(stock);
-
-                    if (symbol != null) {
-                        code = stockCodeAndSymbolDatabase.symbolToCode(symbol);
-                        assert(code != null);
-                    }
-                }
-
-                if (code != null && symbol != null) {
-                    final StockTask tmp = stockTask;
-                    if (tmp != null) {
-                        tmp.cancel(true);
-                    }
-
-                    stockTask = new StockTask(code, symbol);
-                    stockTask.execute();
-                }
+                stockTask = new StockTask(stockInfo.code, stockInfo.symbol);
+                stockTask.execute();
             }
         };
     }
@@ -1448,9 +1401,9 @@ public class IndicatorPanel extends JPanel {
                     // empty string for their symbol. We will fix it through
                     // offline database.
                     if (org.yccheok.jstock.engine.Utils.isSymbolImmutable() || new_stock.getSymbol().toString().isEmpty()) {
-                        final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = m.getStockCodeAndSymbolDatabase();
-                        if (stockCodeAndSymbolDatabase != null) {
-                            final Symbol _symbol = stockCodeAndSymbolDatabase.codeToSymbol(new_stock.getCode());
+                        final StockInfoDatabase stockInfoDatabase = m.getStockInfoDatabase();
+                        if (stockInfoDatabase != null) {
+                            final Symbol _symbol = stockInfoDatabase.codeToSymbol(new_stock.getCode());
                             if (_symbol != null) {
                                 new_stock = new_stock.deriveStock(_symbol);
                             }

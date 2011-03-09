@@ -358,7 +358,7 @@
                       </Properties>
                       <AuxValues>
                         <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new AutoCompleteJComboBox();"/>
-                        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="((AutoCompleteJComboBox)jComboBox1).attach(this.getAutoCompleteJComboBoxObserver());"/>
+                        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="((AutoCompleteJComboBox)jComboBox1).attachStockInfoObserver(this.getStockInfoObserver());"/>
                       </AuxValues>
                     </Component>
                   </SubComponents>
