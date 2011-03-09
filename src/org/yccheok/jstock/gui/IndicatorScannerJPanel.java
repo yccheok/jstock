@@ -139,7 +139,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
 
         final MainFrame m = MainFrame.getInstance();
         
-        if (m.getStockCodeAndSymbolDatabase() == null) {
+        if (m.getStockInfoDatabase() == null) {
             javax.swing.JOptionPane.showMessageDialog(this, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/messages").getString("info_message_we_havent_connected_to_stock_server"), java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/messages").getString("info_title_we_havent_connected_to_stock_server"), javax.swing.JOptionPane.INFORMATION_MESSAGE);
             return;
         }
@@ -228,25 +228,24 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         WizardSelectIndicatorJPanel wizardSelectIndicatorJPanel = (WizardSelectIndicatorJPanel)wizardPanelDescriptor1.getPanelComponent();
 
         final MainFrame m = MainFrame.getInstance();
-        final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = m.getStockCodeAndSymbolDatabase();
         final IndicatorProjectManager alertIndicatorProjectManager = m.getAlertIndicatorProjectManager();
         java.util.List<String> projects = wizardSelectIndicatorJPanel.getSelectedProjects();
-        java.util.List<Code> codes = wizardSelectStockJPanel.getSelectedCodes();
+        java.util.List<StockInfo> stockInfos = wizardSelectStockJPanel.getSelectedStockInfos();
 
-        for (final Code code : codes) {
+        for (final StockInfo stockInfo : stockInfos) {
             if (this.stop_button_pressed) {
                 return;
             }
 
             final java.util.List<OperatorIndicator> result = new java.util.ArrayList<OperatorIndicator>();
 
-            this.operatorIndicators.put(code, result);
+            this.operatorIndicators.put(stockInfo.code, result);
 
             for (String project : projects) {
                 final OperatorIndicator operatorIndicator = alertIndicatorProjectManager.getOperatorIndicator(project);
 
                 if (operatorIndicator != null) {
-                    final Stock stock = Utils.getEmptyStock(code, stockCodeAndSymbolDatabase.codeToSymbol(code));
+                    final Stock stock = Utils.getEmptyStock(stockInfo);
 
                     operatorIndicator.setStock(stock);
 
@@ -603,7 +602,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         
         // Quick hack. WizardSelectStockJPanel has no way to obtain MainFrame, during its construction
         // stage.
-        WizardPanelDescriptor wizardSelectStockDescriptor = new WizardSelectStockDescriptor(m.getStockCodeAndSymbolDatabase());
+        WizardPanelDescriptor wizardSelectStockDescriptor = new WizardSelectStockDescriptor(m.getStockInfoDatabase());
         wizard.registerWizardPanel(WizardSelectStockDescriptor.IDENTIFIER, wizardSelectStockDescriptor);
         
         wizard.setCurrentPanel(WizardSelectIndicatorDescriptor.IDENTIFIER); 
@@ -691,10 +690,10 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
 
         _failedCodes.remove(code);
 
-        Symbol symbol = m.getStockCodeAndSymbolDatabase().codeToSymbol(code);
+        Symbol symbol = m.getStockInfoDatabase().codeToSymbol(code);
 
         final String template = GUIBundle.getString("IndicatorScannerJPanel_IndicatorScannerFoundHistory_template");
-        final String message = MessageFormat.format(template, symbol, getCompleteScannedStocksPercentage());
+        final String message = MessageFormat.format(template, symbol != null ? symbol : code, getCompleteScannedStocksPercentage());
         this.updateStatusBarIfStopButtonIsNotPressed(message);
 
         for (OperatorIndicator operatorIndicator : indicators)
@@ -888,10 +887,10 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             // We will fix it through offline database.
             if (isSymbolImmutable || new_stock.getSymbol().toString().isEmpty()) {                
                 // Use local variable to ensure thread safety.
-                final StockCodeAndSymbolDatabase symbol_database = MainFrame.getInstance().getStockCodeAndSymbolDatabase();
+                final StockInfoDatabase stock_info_database = MainFrame.getInstance().getStockInfoDatabase();
 
-                if (symbol_database != null) {
-                    final Symbol symbol = symbol_database.codeToSymbol(stock.getCode());
+                if (stock_info_database != null) {
+                    final Symbol symbol = stock_info_database.codeToSymbol(stock.getCode());
                     if (symbol != null) {
                         new_stock = new_stock.deriveStock(symbol);
                     } else {
@@ -1147,7 +1146,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                 WizardPanelDescriptor wizardPanelDescriptor0 = wizardModel.getPanelDescriptor(WizardSelectStockDescriptor.IDENTIFIER);
                 WizardSelectStockJPanel wizardSelectStockJPanel = (WizardSelectStockJPanel)wizardPanelDescriptor0.getPanelComponent();
 
-                if (wizardSelectStockJPanel.buildSelectedCode() == false) {
+                if (wizardSelectStockJPanel.buildSelectedStockCodes() == false) {
                     // Unlikely.
                     log.error("Fail to build selected stock");
                     return;
