@@ -323,15 +323,15 @@ public class AutoCompleteJComboBox extends JComboBox {
                     // We are no longer busy.
                     busySubject.notify(AutoCompleteJComboBox.this, false);
                     
-                    String lastEnteredString = null;
+                    StockInfo lastEnteredStockInfo = null;
                     AjaxYahooSearchEngine.ResultType lastEnteredResultType = null;
 
                     if (AutoCompleteJComboBox.this.getItemCount() > 0) {
                         int index = AutoCompleteJComboBox.this.getSelectedIndex();
                         if (index == -1) {
                             Object object = AutoCompleteJComboBox.this.getItemAt(0);
-                            if (object instanceof String) {
-                                lastEnteredString = (String)object;
+                            if (object instanceof StockInfo) {
+                                lastEnteredStockInfo = (StockInfo)object;
                             } else {
                                 assert(object instanceof AjaxYahooSearchEngine.ResultType);
                                 lastEnteredResultType = (AjaxYahooSearchEngine.ResultType)object;
@@ -339,8 +339,8 @@ public class AutoCompleteJComboBox extends JComboBox {
                         }
                         else {
                             Object object = AutoCompleteJComboBox.this.getItemAt(index);
-                            if (object instanceof String) {
-                                lastEnteredString = (String)object;
+                            if (object instanceof StockInfo) {
+                                lastEnteredStockInfo = (StockInfo)object;
                             } else {
                                 assert(object instanceof AjaxYahooSearchEngine.ResultType);
                                 lastEnteredResultType = (AjaxYahooSearchEngine.ResultType)object;
@@ -351,25 +351,21 @@ public class AutoCompleteJComboBox extends JComboBox {
                         final Object object = AutoCompleteJComboBox.this.getEditor().getItem();
 
                         if (object instanceof String) {
-                            lastEnteredString = ((String)object).trim();
+                            String lastEnteredString = ((String)object).trim();
+                            lastEnteredStockInfo = AutoCompleteJComboBox.this.stockInfoDatabase.searchStockInfo(lastEnteredString);
                         }
                         else {
-                            // Do we really need to send across empty string?
-                            // AjaxAutoCompleteJComboBox doesn't have such behavior.
-                            // Should we remove this line?
-                            lastEnteredString = "";
+                            assert(false);
                         }
                     }
 
                     AutoCompleteJComboBox.this.removeAllItems();
-                    if (lastEnteredString != null) {
-                        StockInfo lastEnteredStockInfo = AutoCompleteJComboBox.this.stockInfoDatabase.searchStockInfo(lastEnteredString);
-                        if (lastEnteredStockInfo != null) {
-                            AutoCompleteJComboBox.this.stockInfoSubject.notify(AutoCompleteJComboBox.this, lastEnteredStockInfo);
-                        }
-                    } else {
-                        assert(lastEnteredResultType != null);
+                    if (lastEnteredStockInfo != null) {
+                        AutoCompleteJComboBox.this.stockInfoSubject.notify(AutoCompleteJComboBox.this, lastEnteredStockInfo);
+                    } else if (lastEnteredResultType != null) {
                         AutoCompleteJComboBox.this.resultSubject.notify(AutoCompleteJComboBox.this, lastEnteredResultType);
+                    } else {
+                        // Do nothing.
                     }
 
                     return;

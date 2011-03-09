@@ -760,9 +760,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         final MainFrame mainFrame = MainFrame.getInstance();
 
-        final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = mainFrame.getStockCodeAndSymbolDatabase();
+        final StockInfoDatabase stockInfoDatabase = mainFrame.getStockInfoDatabase();
         
-        if(stockCodeAndSymbolDatabase == null) {
+        if (stockInfoDatabase == null) {
             javax.swing.JOptionPane.showMessageDialog(this, MessagesBundle.getString("info_message_we_havent_connected_to_stock_server"), MessagesBundle.getString("info_title_we_havent_connected_to_stock_server"), javax.swing.JOptionPane.INFORMATION_MESSAGE);
             return;
         }
@@ -772,7 +772,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         newTransactionJDialog.setStock(stock);
         newTransactionJDialog.setPrice(lastPrice);
         newTransactionJDialog.setJComboBoxEnabled(JComboBoxEnabled);
-        newTransactionJDialog.setStockCodeAndSymbolDatabase(stockCodeAndSymbolDatabase);
+        newTransactionJDialog.setStockInfoDatabase(stockInfoDatabase);
 
         // If we are not in portfolio page, we shall provide user a hint, so that
         // user will know this transaction will go into which portfolio, without
