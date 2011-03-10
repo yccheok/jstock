@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,7 +33,8 @@ import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.SimpleDate;
 import org.yccheok.jstock.engine.Stock;
-import org.yccheok.jstock.engine.StockCodeAndSymbolDatabase;
+import org.yccheok.jstock.engine.StockInfo;
+import org.yccheok.jstock.engine.StockInfoDatabase;
 import org.yccheok.jstock.engine.Symbol;
 import org.yccheok.jstock.internationalization.MessagesBundle;
 import org.yccheok.jstock.portfolio.Broker;
@@ -292,7 +293,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
 
         jComboBox1.setEditable(true);
         jComboBox1.setPreferredSize(new java.awt.Dimension(110, 24));
-        ((AutoCompleteJComboBox)jComboBox1).attach(this.getAutoCompleteJComboBoxObserver());
+        ((AutoCompleteJComboBox)jComboBox1).attachStockInfoObserver(this.getStockInfoObserver());
         jPanel1.add(jComboBox1);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.NORTH);
@@ -384,9 +385,9 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
                         break;
                     }
 
-                    final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = m.getStockCodeAndSymbolDatabase();
+                    final StockInfoDatabase stockInfoDatabase = m.getStockInfoDatabase();
 
-                    if (stockCodeAndSymbolDatabase == null) {
+                    if (stockInfoDatabase == null) {
                         // Database is not ready yet. Shall we pop up a warning to
                         // user?
                         log.info("Database is not ready yet.");
@@ -394,23 +395,10 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
                     }
 
                     final String string = object.toString().trim();
-                    Code code = stockCodeAndSymbolDatabase.searchStockCode(string);
-                    Symbol symbol = null;
-
-                    if (code != null) {
-                        symbol = stockCodeAndSymbolDatabase.codeToSymbol(code);
-                    }
-                    else {
-                        symbol = stockCodeAndSymbolDatabase.searchStockSymbol(string);
-                        if (symbol != null) {
-                            code = stockCodeAndSymbolDatabase.symbolToCode(symbol);
-                            // Shouldn't be null. This is because symbol is obtained directly
-                            // from database. Even later user modifies symbol or code through Database -> Stock Database...,
-                            // it shouldn't have any side effect.
-                            assert(code != null);
-                        }
-                    }
-
+                    StockInfo stockInfo = stockInfoDatabase.searchStockInfo(string);
+                    assert(stockInfo != null);
+                    Code code = stockInfo.code;
+                    Symbol symbol = stockInfo.symbol;
                     assert(symbol != null);
                     assert(code != null);
                     NewBuyTransactionJDialog.this.stock = Utils.getEmptyStock(code, symbol);
@@ -592,59 +580,21 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         jComboBox1.setEnabled(flag);
     }
     
-    public void setStockCodeAndSymbolDatabase(StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase) {
-        ((AutoCompleteJComboBox)jComboBox1).setStockCodeAndSymbolDatabase(stockCodeAndSymbolDatabase);
+    public void setStockInfoDatabase(StockInfoDatabase stockInfoDatabase) {
+        ((AutoCompleteJComboBox)jComboBox1).setStockInfoDatabase(stockInfoDatabase);
     }
         
     public Transaction getTransaction() {
         return this.transaction;
     }
 
-    private org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, String> getAutoCompleteJComboBoxObserver() {
-        return new org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, String>() {
+    private org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, StockInfo> getStockInfoObserver() {
+        return new org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, StockInfo>() {
             @Override
-            public void update(AutoCompleteJComboBox subject, String arg) {
-                if (arg == null || arg.length() <= 0) {
-                    return;
-                }
-
-                MainFrame m = (MainFrame)NewBuyTransactionJDialog.this.getParent();
-
-                if (m == null) {
-                    return;
-                }
-
-                final StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = m.getStockCodeAndSymbolDatabase();
-
-                if (stockCodeAndSymbolDatabase == null) {
-                    // Database is not ready yet. Shall we pop up a warning to
-                    // user?
-                    log.info("Database is not ready yet.");
-                    return;
-                }
-
-                final String s = arg;
-                Code code = stockCodeAndSymbolDatabase.searchStockCode(s);
-                Symbol symbol = null;
-
-                if (code != null) {
-                    symbol = stockCodeAndSymbolDatabase.codeToSymbol(code);
-                }
-                else {
-                    symbol = stockCodeAndSymbolDatabase.searchStockSymbol(s);
-                    if (symbol != null) {
-                        code = stockCodeAndSymbolDatabase.symbolToCode(symbol);
-                        // Shouldn't be null. This is because symbol is obtained directly
-                        // from database. Even later user modifies symbol or code through Database -> Stock Database...,
-                        // it shouldn't have any side effect.
-                        assert(code != null);
-                    }
-                }
-
-                assert(symbol != null);
-                assert(code != null);
-                NewBuyTransactionJDialog.this.stock = Utils.getEmptyStock(code, symbol);
-                NewBuyTransactionJDialog.this.jTextField1.setText(symbol.toString());
+            public void update(AutoCompleteJComboBox subject, StockInfo stockInfo) {
+                assert(stockInfo != null);
+                NewBuyTransactionJDialog.this.stock = Utils.getEmptyStock(stockInfo);
+                NewBuyTransactionJDialog.this.jTextField1.setText(NewBuyTransactionJDialog.this.stock.getSymbol().toString());
             }
         };
     }

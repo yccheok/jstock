@@ -128,7 +128,7 @@
                           <Component id="jFormattedTextField5" linkSize="2" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
-                  <EmptySpace pref="41" max="32767" attributes="0"/>
+                  <EmptySpace pref="35" max="32767" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jLabel10" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jFormattedTextField6" linkSize="2" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -396,7 +396,7 @@
           </Properties>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new AutoCompleteJComboBox();"/>
-            <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="((AutoCompleteJComboBox)jComboBox1).attach(this.getAutoCompleteJComboBoxObserver());"/>
+            <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="((AutoCompleteJComboBox)jComboBox1).attachStockInfoObserver(this.getStockInfoObserver());"/>
           </AuxValues>
         </Component>
       </SubComponents>
