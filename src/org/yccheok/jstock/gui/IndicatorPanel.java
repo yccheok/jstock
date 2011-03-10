@@ -401,8 +401,6 @@ public class IndicatorPanel extends JPanel {
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         final MainFrame m = MainFrame.getInstance();
-        // stockCodeAndSymbolDatabase can be null, if we still haven't connected to server.
-        final StockInfoDatabase stockInfoDatabase = m.getStockInfoDatabase();
         final IndicatorDefaultDrawing indicatorDefaultDrawing = (IndicatorDefaultDrawing)this.view.getDrawing();
         final OperatorIndicator operatorIndicator = indicatorDefaultDrawing.getOperatorIndicator();
         
@@ -412,11 +410,11 @@ public class IndicatorPanel extends JPanel {
             final Object o = ((ObjectInspectorJPanel)this.objectInspectorJPanel).getBean();
             final MutableStock mutableStock = (MutableStock)o;
             stock = mutableStock.getStock();
-			if (stock.getCode().toString().equals("")) {
+            if (stock.getCode().toString().equals("")) {
                 JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_you_need_to_select_a_stock"), MessagesBundle.getString("warning_title_you_need_to_select_a_stock"), JOptionPane.WARNING_MESSAGE);
                 this.jComboBox1.requestFocus();
                 return;
-			}
+            }
         }
 
         // Start button.

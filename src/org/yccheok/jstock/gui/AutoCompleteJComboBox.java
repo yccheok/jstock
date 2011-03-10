@@ -280,7 +280,7 @@ public class AutoCompleteJComboBox extends JComboBox {
                         busySubject.notify(AutoCompleteJComboBox.this, true);
                         ajaxYahooSearchEngineMonitor.clearAndPut(string);
                     }   // if (shouldShowPopup)
-                }   // if (AutoCompleteJComboBox.this.stockCodeAndSymbolDatabase != null)
+                }   // if (AutoCompleteJComboBox.this.stockInfoDatabase != null)
 
                 // When we are in windows look n feel, the text will always be selected. We do not want that.
                 final Component component = AutoCompleteJComboBox.this.getEditor().getEditorComponent();
