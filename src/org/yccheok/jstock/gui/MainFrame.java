@@ -272,7 +272,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         jComboBox1.setEditable(true);
         jComboBox1.setPreferredSize(new java.awt.Dimension(150, 24));
-        ((AutoCompleteJComboBox)this.jComboBox1).attach(getAutoCompleteJComboBoxObserver());
+        ((AutoCompleteJComboBox)this.jComboBox1).attachStockInfoObserver(getStockInfoObserver());
         ((AutoCompleteJComboBox)this.jComboBox1).attachResultObserver(getResultObserver());
 
         buttonGroup3.add(jRadioButtonMenuItem3);
@@ -684,7 +684,7 @@ public class MainFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
-        if (this.getStockCodeAndSymbolDatabase() == null) {
+        if (this.getStockInfoDatabase() == null) {
             javax.swing.JOptionPane.showMessageDialog(this, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/messages").getString("info_message_we_havent_connected_to_stock_server"), java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/messages").getString("info_title_we_havent_connected_to_stock_server"), javax.swing.JOptionPane.INFORMATION_MESSAGE);
             return;
         }
@@ -1093,23 +1093,25 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void jMenuItem8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem8ActionPerformed
         // Use local variable to ensure thread safety.
-        final StockCodeAndSymbolDatabase symbol_database = this.stockCodeAndSymbolDatabase;
+        final StockInfoDatabase stock_info_database = this.stockInfoDatabase;
 
-        if (symbol_database == null) {
+        if (stock_info_database == null) {
             JOptionPane.showMessageDialog(this, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/messages").getString("info_message_there_are_no_database_ready_yet"), java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/messages").getString("info_title_there_are_no_database_ready_yet"), JOptionPane.INFORMATION_MESSAGE);
             return;
         }
 
-        StockDatabaseJDialog stockDatabaseJDialog = new StockDatabaseJDialog(this, symbol_database, true);
+        // stockDatabaseJDialog will be calling mutable methods of
+        // stock_info_database.
+        StockDatabaseJDialog stockDatabaseJDialog = new StockDatabaseJDialog(this, stock_info_database, true);
         stockDatabaseJDialog.setSize(540, 540);
         stockDatabaseJDialog.setLocationRelativeTo(this);
         stockDatabaseJDialog.setVisible(true); 
 
-        if (stockDatabaseJDialog.getMutableStockCodeAndSymbolDatabase() != null) {
-            this.stockCodeAndSymbolDatabase = stockDatabaseJDialog.getMutableStockCodeAndSymbolDatabase().toStockCodeAndSymbolDatabase();
-            ((AutoCompleteJComboBox)jComboBox1).setStockCodeAndSymbolDatabase(this.stockCodeAndSymbolDatabase);
-            indicatorPanel.setStockCodeAndSymbolDatabase(this.stockCodeAndSymbolDatabase);
-
+        if (stockDatabaseJDialog.getResult() != null) {
+            assert(stockDatabaseJDialog.getResult() == this.stockInfoDatabase);
+            this.stockInfoDatabase = stockDatabaseJDialog.getResult();
+            ((AutoCompleteJComboBox)jComboBox1).setStockInfoDatabase(this.stockInfoDatabase);
+            indicatorPanel.setStockInfoDatabase(this.stockInfoDatabase);
             log.info("saveStockCodeAndSymbolDatabase...");
             saveDatabase();
         }
@@ -1489,7 +1491,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         if (stockCodeHistoryGUI != null) {
             if (stockCodeHistoryGUI.isEmpty()) {
-                if (this.stockCodeAndSymbolDatabase != null) {
+                if (this.stockInfoDatabase != null) {
                     statusBar.setProgressBar(false);
                     statusBar.setMainMessage(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_Connected"));
                 }
@@ -1527,7 +1529,7 @@ public class MainFrame extends javax.swing.JFrame {
         this.updateDynamicChart(null);
 
         if (stockCodeHistoryGUI.isEmpty()) {
-            if (this.stockCodeAndSymbolDatabase != null) {
+            if (this.stockInfoDatabase != null) {
                 statusBar.setProgressBar(false);
                 statusBar.setMainMessage(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_Connected"));
             }
@@ -1609,8 +1611,8 @@ public class MainFrame extends javax.swing.JFrame {
         
         // Sequence are important. The AutoCompleteJComboBox itself should have the highest
         // priority.
-        ((AutoCompleteJComboBox)jComboBox1).setStockCodeAndSymbolDatabase(stockCodeAndSymbolDatabase);
-        this.indicatorPanel.setStockCodeAndSymbolDatabase(stockCodeAndSymbolDatabase);
+        ((AutoCompleteJComboBox)jComboBox1).setStockInfoDatabase(this.stockInfoDatabase);
+        this.indicatorPanel.setStockInfoDatabase(this.stockInfoDatabase);
     }
 
     private void createChatJPanel() {
@@ -1859,9 +1861,9 @@ public class MainFrame extends javax.swing.JFrame {
         // he will be having risk of losing other countries UserDefined codes.
         final Country country = jStockOptions.getCountry();
         if (false == Utils.isFileOrDirectoryExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database" + File.separator + "user-defined-database.xml")) {
-            final StockCodeAndSymbolDatabase symbol_database = this.stockCodeAndSymbolDatabase;            
-            if (symbol_database != null) {
-                saveUserDefinedDatabase(country, symbol_database);
+            final StockInfoDatabase stock_info_database = this.stockInfoDatabase;
+            if (stock_info_database != null) {
+                saveUserDefinedDatabase(country, stock_info_database);
             }
         }
 
@@ -2087,8 +2089,8 @@ public class MainFrame extends javax.swing.JFrame {
         };
     }
 
-    public StockCodeAndSymbolDatabase getStockCodeAndSymbolDatabase() {
-        return stockCodeAndSymbolDatabase;
+    public StockInfoDatabase getStockInfoDatabase() {
+        return this.stockInfoDatabase;
     }
 
     public StockNameDatabase getStockNameDatabase() {
@@ -2342,83 +2344,38 @@ public class MainFrame extends javax.swing.JFrame {
         JTableUtilities.scrollToVisible(this.jTable1, row, 0);
     }
 
-    private org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, String> getAutoCompleteJComboBoxObserver() {
-        return new org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, String>() {
+    private org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, StockInfo> getStockInfoObserver() {
+        return new org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, StockInfo>() {
             @Override
-            public void update(AutoCompleteJComboBox subject, String arg) {
-                if (arg == null || arg.length() <= 0) {
-                    return;
-                }
+            public void update(AutoCompleteJComboBox subject, StockInfo stockInfo) {
+                assert(stockInfo != null);
 
                 // Use local variable to ensure thread safety.
-                final StockCodeAndSymbolDatabase symbol_database = MainFrame.this.stockCodeAndSymbolDatabase;
-                if (symbol_database == null) {
+                final StockInfoDatabase stock_info_database = MainFrame.this.stockInfoDatabase;
+                if (stock_info_database == null) {
                     // Database is not ready yet. Shall we pop up a warning to
                     // user?
                     log.info("Database is not ready yet.");
                     return;
                 }
 
-                final String stock = arg;
-                
                 // When user try to enter a stock, and the stock is already in
                 // the table, the stock shall be highlighted. Stock will be
                 // selected and the table shall be scrolled to be visible.
                 final StockTableModel tableModel = (StockTableModel)MainFrame.this.jTable1.getModel();
                 int modelRowBeforeAdded = -1;
+                
+                final Stock emptyStock = Utils.getEmptyStock(stockInfo);
+                // Update rowBeforeAdded before calling addStockToTable
+                modelRowBeforeAdded = tableModel.findRow(emptyStock);
 
-                Code code = symbol_database.searchStockCode(stock);
-                Symbol symbol = null;
+                // First add the empty stock, so that the user will not have wrong perspective that
+                // our system is slow.
+                addStockToTable(emptyStock);
+                realTimeStockMonitor.addStockCode(stockInfo.code);
 
-                if (code != null) {
-                    symbol = symbol_database.codeToSymbol(code);
-
-                    // Update rowBeforeAdded before calling addStockToTable
-                    modelRowBeforeAdded = tableModel.findRow(Utils.getEmptyStock(code, symbol));
-
-                    // First add the empty stock, so that the user will not have wrong perspective that
-                    // our system is slow.
-                    addStockToTable(Utils.getEmptyStock(code, symbol));
-                    realTimeStockMonitor.addStockCode(code);
-                }
-                else {
-                    symbol = symbol_database.searchStockSymbol(stock);
-
-                    if (symbol != null) {
-                        code = symbol_database.symbolToCode(symbol);
-                        // Shouldn't be null. This is because symbol is obtained directly
-                        // from database. Even later user modifies symbol or code through Database -> Stock Database...,
-                        // it shouldn't have any side effect.
-                        assert(code != null);
-
-                        // Update rowBeforeAdded before calling addStockToTable
-                        modelRowBeforeAdded = tableModel.findRow(Utils.getEmptyStock(code, symbol));
-
-                        addStockToTable(Utils.getEmptyStock(code, symbol));
-                        // We allow user to modify user defined type stock code and symbol.
-                        // 1st rule is, modified code cannot crash with existing stock's code or stock's symbol.
-                        // 2nd rule is, modified symbol cannot crash with existing stock's code or stock's symbol.
-                        //
-                        // Please consider the following senario :
-                        // (1) A stock code "6012.KL" and symbol "MAXIS" already added.
-                        // (2) Users modify "MAXIS" to "MAXIS SDN BHD".
-                        // (3) Users try to add "6012.KL". RealTimeStockMonitor will prevent this from happen,
-                        //     as it detectes there is a duplicated code.
-                        // (4) Users try to add "MAXIS SDN BHD". RealTimeStockMonitor will prevent this from happen,
-                        //     as it detectes there is a duplicated code, regardless the value of symbol.
-                        //
-                        // Please consider another senario :
-                        // (1) A stock code "6012.KL" and symbol "MAXIS" already added.
-                        // (2) Users modify "6012.KL" to "6013.KL".
-                        // (3) Users try to add "6013.KL". RealTimeStockMonitor will allow.
-                        //     At the end, there are two rows with same symbol "MAXIS", but different codes.
-                        // (4) Users try to add "MAXIS". RealTimeStockMonitor will allow.
-                        //     At the end, there are two rows with same symbol "MAXIS", but different codes.
-                        realTimeStockMonitor.addStockCode(symbol_database.symbolToCode(symbol));
-                    }   // if (symbol != null)
-                }   // if (code != null)
                 MainFrame.this.highlightStock(modelRowBeforeAdded);
-            }   // public void update(AutoCompleteJComboBox subject, String arg)
+            }   // public void update(AutoCompleteJComboBox subject, StockInfo stockInfo)
         };
     }
 
@@ -2480,7 +2437,7 @@ public class MainFrame extends javax.swing.JFrame {
         menuItem.addActionListener(new ActionListener() {
             @Override
         	public void actionPerformed(ActionEvent evt) {
-                if (MainFrame.this.stockCodeAndSymbolDatabase == null)
+                if (MainFrame.this.stockInfoDatabase == null)
                 {
                     javax.swing.JOptionPane.showMessageDialog(MainFrame.this, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/messages").getString("info_message_we_havent_connected_to_stock_server"), java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/messages").getString("info_title_we_havent_connected_to_stock_server"), javax.swing.JOptionPane.INFORMATION_MESSAGE);
                     return;
@@ -2579,7 +2536,7 @@ public class MainFrame extends javax.swing.JFrame {
         }        
     }
 
-    // Task to initialize both stockCodeAndSymbolDatabase and stockNameDatabase.
+    // Task to initialize both stockInfoDatabase and stockNameDatabase.
     private class DatabaseTask extends SwingWorker<Boolean, Integer> implements org.yccheok.jstock.engine.Observer<StockServer, Integer>{
         private boolean readFromDisk = true;
 
@@ -2637,22 +2594,57 @@ public class MainFrame extends javax.swing.JFrame {
             final Country country = jStockOptions.getCountry();
             
             Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database");
+            final File stock_info_file = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database" + File.separator + "stock-info-database.xml");
+            // symbol_file is obsolote. It is being replaced by stock_info_file.
             final File symbol_file = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database" + File.separator + "stockcodeandsymboldatabase.xml");
             final File name_file = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database" + File.separator + "stock-name-database.xml");
 
             if (this.readFromDisk)
             {
-                // We try to first load from disk. The information may be outdated,
-                // but it is far more better than letting user to wait for several
-                // hours.
-                StockCodeAndSymbolDatabase tmp_symbol_database = org.yccheok.jstock.gui.Utils.fromXML(StockCodeAndSymbolDatabase.class, symbol_file);
+                boolean calledInitPreloadDatabase = false;
+                StockInfoDatabase tmp_stock_info_database = null;
+                do {
+                    // We try to first load from disk. The information may be outdated,
+                    // but it is far more better than letting user to wait for several
+                    // hours.
+                    tmp_stock_info_database = org.yccheok.jstock.gui.Utils.fromXML(StockInfoDatabase.class, stock_info_file);
 
-                if (tmp_symbol_database == null || tmp_symbol_database.isEmpty()) {
-                    // Perhaps we are having a corrupted database. We will
-                    // restore from database.zip.
-                    initPreloadDatabase(true);
-                    tmp_symbol_database = org.yccheok.jstock.gui.Utils.fromXML(StockCodeAndSymbolDatabase.class, symbol_file);
-                }
+                    if (tmp_stock_info_database == null || tmp_stock_info_database.isEmpty()) {
+                        // Is there any StockCodeAndSymbolDatabase for us to
+                        // perform conversion?
+                        StockCodeAndSymbolDatabase tmp_symbol_database = org.yccheok.jstock.gui.Utils.fromXML(StockCodeAndSymbolDatabase.class, symbol_file);
+                        if (tmp_symbol_database == null || tmp_symbol_database.isEmpty()) {
+                            if (!calledInitPreloadDatabase) {
+                                // Perhaps we are having a corrupted database. We will
+                                // restore from database.zip.
+                                initPreloadDatabase(true);
+                                calledInitPreloadDatabase = true;
+                            } else {
+                                // There is no way to recover the corrupted database.
+                                // Just give up.
+                                break;
+                            }
+                        } else {
+                            // Try to see whether we can convert from StockCodeAndSymbolDatabase
+                            // to StockInfoDatabase.
+                            tmp_stock_info_database = tmp_symbol_database.toStockInfoDatabase();
+                            // Do we success in conversion?
+                            if (tmp_stock_info_database.isEmpty() == false) {
+                                // Yes. Save it.
+                                if (Utils.toXML(tmp_stock_info_database, stock_info_file)) {
+                                    // and remove the old stockcodeandsymboldatabase.xml.
+                                    symbol_file.delete();
+                                }
+                                // Success!
+                                break;
+                            }
+                        }
+                    } else {
+                        // Success! Remove the old stockcodeandsymboldatabase.xml.
+                        symbol_file.delete();
+                        break;
+                    }
+                } while (true);
 
                 // StockNameDatabase is an optional item.
                 final StockNameDatabase tmp_name_database;
@@ -2662,22 +2654,21 @@ public class MainFrame extends javax.swing.JFrame {
                     tmp_name_database = null;
                 }
 
-                if (tmp_symbol_database != null && false == tmp_symbol_database.isEmpty()) {
-                    log.info("Stock code and symbol database loaded from " + symbol_file.toString() + " successfully.");
+                if (tmp_stock_info_database != null && false == tmp_stock_info_database.isEmpty()) {
+                    log.info("Stock info database loaded from " + stock_info_file.toString() + " successfully.");
 
-                    // Yes. We need to integrate "user-defined-database.xml" into tmp_symbol_database
+                    // Yes. We need to integrate "user-defined-database.xml" into tmp_stock_info_database
                     final java.util.List<Pair<Code, Symbol>> pairs = loadUserDefinedDatabase(country);
                     if (pairs.isEmpty() == false) {
-                        MutableStockCodeAndSymbolDatabase me = new MutableStockCodeAndSymbolDatabase(tmp_symbol_database);
                         // Remove the old user defined database. Legacy stockcodeandsymboldatabase.xml
                         // may contain user defined codes.
-                        me.removeAllUserDefinedCodeAndSymbol();
+                        tmp_stock_info_database.removeAllUserDefinedStockInfos();
+
                         // Insert with new user defined code.
                         for (Pair<Code, Symbol> pair : pairs) {
-                            me.addUserDefinedCodeAndSymbol(pair.getFirst(), pair.getSecond());
+                            tmp_stock_info_database.addUserDefinedStockInfo(new StockInfo(pair.getFirst(), pair.getSecond()));
                         }
-                        tmp_symbol_database = me.toStockCodeAndSymbolDatabase();
-                        log.info("User defined stock code and symbol database loaded successfully.");
+                        log.info("User defined stock info database loaded successfully.");
                     }
 
                     // Prepare proper synchronization for us to change country.
@@ -2685,11 +2676,11 @@ public class MainFrame extends javax.swing.JFrame {
                     {
                         if (this.isCancelled() == false)
                         {
-                            MainFrame.this.stockCodeAndSymbolDatabase = tmp_symbol_database;
+                            MainFrame.this.stockInfoDatabase = tmp_stock_info_database;
                             MainFrame.this.stockNameDatabase = tmp_name_database;
                             // Register the auto complete JComboBox with latest database.
-                            ((AutoCompleteJComboBox)MainFrame.this.jComboBox1).setStockCodeAndSymbolDatabase(MainFrame.this.stockCodeAndSymbolDatabase);
-                            MainFrame.this.indicatorPanel.setStockCodeAndSymbolDatabase(MainFrame.this.stockCodeAndSymbolDatabase);
+                            ((AutoCompleteJComboBox)MainFrame.this.jComboBox1).setStockInfoDatabase(MainFrame.this.stockInfoDatabase);
+                            MainFrame.this.indicatorPanel.setStockInfoDatabase(MainFrame.this.stockInfoDatabase);
                             
                             return true;
                         }
@@ -2698,7 +2689,7 @@ public class MainFrame extends javax.swing.JFrame {
                             return false;
                         }
                     }                
-                }
+                }   // if (tmp_stock_info_database != null && false == tmp_stock_info_database.isEmpty())
             }   // if(this.readFromDisk)
             
             // When we fall here, we either fail to read from disk or user
@@ -2709,7 +2700,7 @@ public class MainFrame extends javax.swing.JFrame {
             // If fail, we will continue to try on Yahoo Stock Server (Or other
             // stock servers).
             Boolean success = false;
-            StockCodeAndSymbolDatabase tmp_symbol_database = null;
+            StockInfoDatabase tmp_stock_info_database = null;
             StockNameDatabase tmp_name_database = null;
 
             final String location = org.yccheok.jstock.engine.Utils.getStocksCSVFileLocation(country);
@@ -2722,7 +2713,7 @@ public class MainFrame extends javax.swing.JFrame {
                 // Is the stocks good enough?
                 if (false == stocks.isEmpty()) {
                     // Let's make our database since we get a list of good stocks.
-                    tmp_symbol_database = new StockCodeAndSymbolDatabase(stocks);
+                    tmp_stock_info_database = new StockInfoDatabase(stocks);
 
                     // StockNameDatabase is an optional item.
                     if (org.yccheok.jstock.engine.Utils.isNameImmutable()) {
@@ -2731,19 +2722,18 @@ public class MainFrame extends javax.swing.JFrame {
                         tmp_name_database = null;
                     }
 
-                    // Yes. We need to integrate "user-defined-database.xml" into tmp_symbol_database
+                    // Yes. We need to integrate "user-defined-database.xml" into tmp_stock_info_database.
                     final java.util.List<Pair<Code, Symbol>> pairs = loadUserDefinedDatabase(country);
                     if (pairs.isEmpty() == false) {
-                        MutableStockCodeAndSymbolDatabase me = new MutableStockCodeAndSymbolDatabase(tmp_symbol_database);
                         // Remove the old user defined database. Legacy stockcodeandsymboldatabase.xml
                         // may contain user defined codes.
-                        me.removeAllUserDefinedCodeAndSymbol();
+                        tmp_stock_info_database.removeAllUserDefinedStockInfos();
+
                         // Insert with new user defined code.
                         for (Pair<Code, Symbol> pair : pairs) {
-                            me.addUserDefinedCodeAndSymbol(pair.getFirst(), pair.getSecond());
+                            tmp_stock_info_database.addUserDefinedStockInfo(new StockInfo(pair.getFirst(), pair.getSecond()));
                         }
-                        tmp_symbol_database = me.toStockCodeAndSymbolDatabase();
-                        log.info("User defined stock code and symbol database loaded successfully.");
+                        log.info("User defined stock info database loaded successfully.");
                     }
 
                     // Prepare proper synchronization for us to change country.
@@ -2751,12 +2741,12 @@ public class MainFrame extends javax.swing.JFrame {
                     {
                         if (this.isCancelled() == false)
                         {
-                            MainFrame.this.stockCodeAndSymbolDatabase = tmp_symbol_database;
+                            MainFrame.this.stockInfoDatabase = tmp_stock_info_database;
                             MainFrame.this.stockNameDatabase = tmp_name_database;
 
                             // Register the auto complete JComboBox with latest database.
-                            ((AutoCompleteJComboBox)MainFrame.this.jComboBox1).setStockCodeAndSymbolDatabase(MainFrame.this.stockCodeAndSymbolDatabase);
-                            MainFrame.this.indicatorPanel.setStockCodeAndSymbolDatabase(MainFrame.this.stockCodeAndSymbolDatabase);
+                            ((AutoCompleteJComboBox)MainFrame.this.jComboBox1).setStockInfoDatabase(MainFrame.this.stockInfoDatabase);
+                            MainFrame.this.indicatorPanel.setStockInfoDatabase(MainFrame.this.stockInfoDatabase);
                             // Yup. The entire operation is success. Do not return
                             // first. We need to save the database as XML.
                             success = true;
@@ -2789,7 +2779,7 @@ public class MainFrame extends javax.swing.JFrame {
                             // No result from this stock server. Try next server.
                             continue;
                         }
-                        tmp_symbol_database = new StockCodeAndSymbolDatabase(stocks);
+                        tmp_stock_info_database = new StockInfoDatabase(stocks);
                         // StockNameDatabase is an optional item.
                         if (org.yccheok.jstock.engine.Utils.isNameImmutable()) {
                             tmp_name_database = new StockNameDatabase(stocks);
@@ -2800,16 +2790,15 @@ public class MainFrame extends javax.swing.JFrame {
                         // Yes. We need to integrate "user-defined-database.xml" into tmp_symbol_database
                         final java.util.List<Pair<Code, Symbol>> pairs = loadUserDefinedDatabase(country);
                         if (pairs.isEmpty() == false) {
-                            MutableStockCodeAndSymbolDatabase me = new MutableStockCodeAndSymbolDatabase(tmp_symbol_database);
                             // Remove the old user defined database. Legacy stockcodeandsymboldatabase.xml
                             // may contain user defined codes.
-                            me.removeAllUserDefinedCodeAndSymbol();
+                            tmp_stock_info_database.removeAllUserDefinedStockInfos();
+
                             // Insert with new user defined code.
                             for (Pair<Code, Symbol> pair : pairs) {
-                                me.addUserDefinedCodeAndSymbol(pair.getFirst(), pair.getSecond());
+                                tmp_stock_info_database.addUserDefinedStockInfo(new StockInfo(pair.getFirst(), pair.getSecond()));
                             }
-                            tmp_symbol_database = me.toStockCodeAndSymbolDatabase();
-                            log.info("User defined stock code and symbol database loaded successfully.");
+                            log.info("User defined stock info database loaded successfully.");
                         }
 
                         // Prepare proper synchronization for us to change country.
@@ -2817,12 +2806,12 @@ public class MainFrame extends javax.swing.JFrame {
                         {
                             if (this.isCancelled() == false)
                             {
-                                stockCodeAndSymbolDatabase = tmp_symbol_database;
+                                stockInfoDatabase = tmp_stock_info_database;
                                 stockNameDatabase = tmp_name_database;
 
                                 // Register the auto complete JComboBox with latest database.
-                                ((AutoCompleteJComboBox)jComboBox1).setStockCodeAndSymbolDatabase(stockCodeAndSymbolDatabase);
-                                indicatorPanel.setStockCodeAndSymbolDatabase(stockCodeAndSymbolDatabase);
+                                ((AutoCompleteJComboBox)jComboBox1).setStockInfoDatabase(stockInfoDatabase);
+                                indicatorPanel.setStockInfoDatabase(stockInfoDatabase);
                                 
                                 success = true;
                             }
@@ -2853,8 +2842,8 @@ public class MainFrame extends javax.swing.JFrame {
              
             if (success == true)
             {
-                assert(tmp_symbol_database.isEmpty() == false);
-                org.yccheok.jstock.gui.Utils.toXML(tmp_symbol_database, symbol_file);
+                assert(tmp_stock_info_database.isEmpty() == false);
+                org.yccheok.jstock.gui.Utils.toXML(tmp_stock_info_database, stock_info_file);
                 if (tmp_name_database != null) {
                     org.yccheok.jstock.gui.Utils.toXML(tmp_name_database, name_file);
                 }
@@ -3282,7 +3271,7 @@ public class MainFrame extends javax.swing.JFrame {
         }
 
         // Use local variable to ensure thread safety.
-        final StockCodeAndSymbolDatabase symbol_database = this.stockCodeAndSymbolDatabase;
+        final StockInfoDatabase stock_info_database = this.stockInfoDatabase;
         final StockNameDatabase name_database = this.stockNameDatabase;
 
         boolean b0 = true;
@@ -3291,33 +3280,33 @@ public class MainFrame extends javax.swing.JFrame {
             b0 = org.yccheok.jstock.gui.Utils.toXML(name_database, org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database" + File.separator + "stock-name-database.xml");
         }
 
-        if (symbol_database == null)
+        if (stock_info_database == null)
         {
             return false;
         }
 
         // This could happen when OutOfMemoryException happen while fetching stock database information
         // from the server.
-        if (symbol_database.getCodes().size() <= 0)
+        if (stock_info_database.isEmpty())
         {
             log.info("Database was corrupted.");
             return false;
         }
 
-        final boolean b1 = saveUserDefinedDatabase(country, symbol_database);
+        final boolean b1 = saveUserDefinedDatabase(country, stock_info_database);
 
         // For optimization purpose.
         // symbol_database will always contain UserDefined code and non-UserDefined 
         // code. As we may always recover UserDefined code from
         // user-defined-database.xml, we will not save the duplicated information.
         //
-        // We will only do it, if stockcodeandsymboldatabase.xml is not available, 
+        // We will only do it, if stock-info-database.xml is not available,
         // which is very unlikely. Because during application startup, we will
-        // always check the existance of stockcodeandsymboldatabase.xml.
+        // always check the existance of stock-info-database.xml.
         boolean b2 = true;
-        final File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database" + File.separator + "stockcodeandsymboldatabase.xml");
+        final File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database" + File.separator + "stock-info-database.xml");
         if (f.exists() == false) {
-            b2 = Utils.toXML(symbol_database, f);
+            b2 = Utils.toXML(stock_info_database, f);
         }
 
         return b0 && b1 && b2;
@@ -3332,13 +3321,13 @@ public class MainFrame extends javax.swing.JFrame {
         return pairs;
     }
 
-    private boolean saveUserDefinedDatabase(Country country, StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase) {
+    private boolean saveUserDefinedDatabase(Country country, StockInfoDatabase stockInfoDatabase) {
         // Previously, we will store the entire stockcodeandsymboldatabase.xml
         // to cloud server if stockcodeandsymboldatabase.xml is containing
         // user defined code. Due to our server is running out of space, we will
         // only store UserDefined pair. user-defined-database.xml will be only
         // used for cloud storage purpose.
-        final java.util.List<Pair<Code, Symbol>> pairs = getUserDefinedPair(stockCodeAndSymbolDatabase);
+        final java.util.List<Pair<Code, Symbol>> pairs = getUserDefinedPair(stockInfoDatabase);
         // pairs can be empty. When it is empty, try to delete the file.
         // If deletion fail, we need to overwrite the file to reflect this.
         final File file = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database" + File.separator + "user-defined-database.xml");
@@ -3350,15 +3339,11 @@ public class MainFrame extends javax.swing.JFrame {
         return Utils.toXML(pairs, file);
     }
 
-    private java.util.List<Pair<Code, Symbol>> getUserDefinedPair(StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase) {
+    private java.util.List<Pair<Code, Symbol>> getUserDefinedPair(StockInfoDatabase stockInfoDatabase) {
         java.util.List<Pair<Code, Symbol>> pairs = new ArrayList<Pair<Code, Symbol>>();
-        java.util.List<Code> codes = stockCodeAndSymbolDatabase.getCodes(Board.UserDefined);
-        for (Code code : codes) {
-            final Symbol symbol = stockCodeAndSymbolDatabase.codeToSymbol(code);
-            if (symbol == null) {
-                continue;
-            }
-            pairs.add(new Pair(code, symbol));
+        java.util.List<StockInfo> stockInfos = stockInfoDatabase.getUserDefinedStockInfos();
+        for (StockInfo stockInfo : stockInfos) {
+            pairs.add(new Pair(stockInfo.code, stockInfo.symbol));
         }
         return pairs;
     }
@@ -3508,10 +3493,10 @@ public class MainFrame extends javax.swing.JFrame {
             if (this.databaseTask != null)
             {
                 this.databaseTask.cancel(true);
-                this.stockCodeAndSymbolDatabase = null;
+                this.stockInfoDatabase = null;
                 this.stockNameDatabase = null;
-                ((AutoCompleteJComboBox)this.jComboBox1).setStockCodeAndSymbolDatabase(null);
-                this.indicatorPanel.setStockCodeAndSymbolDatabase(null);
+                ((AutoCompleteJComboBox)this.jComboBox1).setStockInfoDatabase(null);
+                this.indicatorPanel.setStockInfoDatabase(null);
             }
             
             this.databaseTask = new DatabaseTask(readFromDisk);
@@ -3532,11 +3517,11 @@ public class MainFrame extends javax.swing.JFrame {
             // Sometimes server goes crazy by returning empty symbol.
             if (isSymbolImmutable || new_stock.getSymbol().toString().isEmpty()) {                
                 // Use local variable to ensure thread safety.
-                final StockCodeAndSymbolDatabase symbol_database = this.stockCodeAndSymbolDatabase;
+                final StockInfoDatabase stock_info_database = this.stockInfoDatabase;
                 //final StockNameDatabase name_database = this.stockNameDatabase;
                 
-                if (symbol_database != null) {
-                    final Symbol symbol = symbol_database.codeToSymbol(stock.getCode());
+                if (stock_info_database != null) {
+                    final Symbol symbol = stock_info_database.codeToSymbol(stock.getCode());
                     if (symbol != null) {
                         new_stock = new_stock.deriveStock(symbol);
                     } else {
@@ -3729,11 +3714,11 @@ public class MainFrame extends javax.swing.JFrame {
                 Symbol symbol = null;
 
                 // Use local variable to ensure thread safety.
-                final StockCodeAndSymbolDatabase symbol_database = MainFrame.this.stockCodeAndSymbolDatabase;
+                final StockInfoDatabase stock_info_database = MainFrame.this.stockInfoDatabase;
                 // Is the database ready?
-                if (symbol_database != null) {
+                if (stock_info_database != null) {
                     // Possible null if we are trying to get index history.
-                    symbol = symbol_database.codeToSymbol(code);
+                    symbol = stock_info_database.codeToSymbol(code);
                 }
                 final boolean shouldShowGUI = MainFrame.this.stockCodeHistoryGUI.remove(code);
                
@@ -4136,11 +4121,11 @@ public class MainFrame extends javax.swing.JFrame {
                     }
                     Symbol symbol = null;
                     // Use local variable to ensure thread safety.
-                    final StockCodeAndSymbolDatabase symbol_database = MainFrame.this.stockCodeAndSymbolDatabase;
+                    final StockInfoDatabase stock_info_database = MainFrame.this.stockInfoDatabase;
                     // Is the database ready?
-                    if (symbol_database != null) {
+                    if (stock_info_database != null) {
                         // Possible null if we are trying to get index history.
-                        symbol = symbol_database.codeToSymbol(stock.getCode());
+                        symbol = stock_info_database.codeToSymbol(stock.getCode());
                     }
                     final String template = GUIBundle.getString("MainFrame_IntradayMovementTemplate");
                     final String message = MessageFormat.format(template, symbol == null ? stock.getSymbol() : symbol);
@@ -4214,7 +4199,7 @@ public class MainFrame extends javax.swing.JFrame {
     // A set of stock history which we need to display GUI on them, when user request explicitly.
     private java.util.Set<Code> stockCodeHistoryGUI = new java.util.HashSet<Code>();
     
-    private volatile StockCodeAndSymbolDatabase stockCodeAndSymbolDatabase = null;
+    private volatile StockInfoDatabase stockInfoDatabase = null;
     // StockNameDatabase is an optional item.
     private volatile StockNameDatabase stockNameDatabase = null;
     
