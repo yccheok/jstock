@@ -313,11 +313,13 @@ public class StockInfoDatabase {
 
         this.stockInfos.remove(stockInfo);
 
+        StockInfoWithSymbolAsString stockInfoWithSymbolAsString = new StockInfoWithSymbolAsString(stockInfo.code, stockInfo.symbol);
+
         // Update search engine.
         if (this.symbolPinyinSearchEngine != null) {
-            ((PinyinTSTSearchEngine<StockInfo>)this.symbolPinyinSearchEngine).remove(stockInfo);
+            ((PinyinTSTSearchEngine<StockInfo>)this.symbolPinyinSearchEngine).remove(stockInfoWithSymbolAsString);
         }
-        ((TSTSearchEngine<StockInfo>)this.symbolSearchEngine).remove(stockInfo);
+        ((TSTSearchEngine<StockInfo>)this.symbolSearchEngine).remove(stockInfoWithSymbolAsString);
         ((TSTSearchEngine<StockInfo>)this.codeSearchEngine).remove(stockInfo);
 
         // Update board and industry mapping.

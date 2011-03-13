@@ -966,6 +966,12 @@ public class MainFrame extends javax.swing.JFrame {
             // save all the configuration files.
             this.save();
 
+            if (this.needToSaveUserDefinedDatabase) {
+                // We are having updated user database in memory.
+                // Save it to disk.
+                this.saveUserDefinedDatabase(jStockOptions.getCountry(), stockInfoDatabase);
+            }
+
             // Hide the icon immediately.
             if (trayIcon != null) {
                 SystemTray.getSystemTray().remove(trayIcon);
@@ -1945,8 +1951,15 @@ public class MainFrame extends javax.swing.JFrame {
         if (country == null) {
             return;
         }
+
         if (jStockOptions.getCountry() == country) {
             return;
+        }
+
+        if (needToSaveUserDefinedDatabase) {
+            // We are having updated user database in memory.
+            // Save it to disk.
+            this.saveUserDefinedDatabase(country, stockInfoDatabase);
         }
 
         /* Save the GUI look. */
@@ -2344,20 +2357,64 @@ public class MainFrame extends javax.swing.JFrame {
         JTableUtilities.scrollToVisible(this.jTable1, row, 0);
     }
 
+    /**
+     * Add user defined stock info.
+     *
+     * @param stockInfo the stock info
+     * @return true if success
+     */
+    public boolean addUserDefinedStockInfo(StockInfo stockInfo) {
+        StockInfoDatabase stock_info_database = this.stockInfoDatabase;
+        if (stock_info_database == null) {
+            return false;
+        }
+        boolean result = stock_info_database.addUserDefinedStockInfo(stockInfo);
+        if (result) {
+            needToSaveUserDefinedDatabase = true;
+        }
+        return result;
+    }
+
+    private org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType> getResultObserver() {
+        return new org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType>() {
+
+            @Override
+            public void update(AutoCompleteJComboBox subject, ResultType resultType) {
+                assert(resultType != null);
+                // Symbol from Yahoo means Code in JStock.
+                final Code code = Code.newInstance(resultType.symbol);
+                // Name from Yahoo means Symbol in JStock.
+                final Symbol symbol = Symbol.newInstance(resultType.name);
+                final StockInfo stockInfo = new StockInfo(code, symbol);
+
+                // When user try to enter a stock, and the stock is already in
+                // the table, the stock shall be highlighted. Stock will be
+                // selected and the table shall be scrolled to be visible.
+                final StockTableModel tableModel = (StockTableModel)MainFrame.this.jTable1.getModel();
+                int modelRowBeforeAdded = -1;
+
+                final Stock emptyStock = Utils.getEmptyStock(stockInfo);
+                // Update rowBeforeAdded before calling addStockToTable
+                modelRowBeforeAdded = tableModel.findRow(emptyStock);
+
+                // First add the empty stock, so that the user will not have wrong perspective that
+                // our system is slow.
+                addStockToTable(emptyStock);
+                realTimeStockMonitor.addStockCode(stockInfo.code);
+
+                MainFrame.this.highlightStock(modelRowBeforeAdded);
+
+                // Remember to update our offline database as well.
+                addUserDefinedStockInfo(stockInfo);
+            }
+        };
+    }
+
     private org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, StockInfo> getStockInfoObserver() {
         return new org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, StockInfo>() {
             @Override
             public void update(AutoCompleteJComboBox subject, StockInfo stockInfo) {
                 assert(stockInfo != null);
-
-                // Use local variable to ensure thread safety.
-                final StockInfoDatabase stock_info_database = MainFrame.this.stockInfoDatabase;
-                if (stock_info_database == null) {
-                    // Database is not ready yet. Shall we pop up a warning to
-                    // user?
-                    log.info("Database is not ready yet.");
-                    return;
-                }
 
                 // When user try to enter a stock, and the stock is already in
                 // the table, the stock shall be highlighted. Stock will be
@@ -3336,7 +3393,9 @@ public class MainFrame extends javax.swing.JFrame {
                 return true;
             }
         }
-        return Utils.toXML(pairs, file);
+        boolean result = Utils.toXML(pairs, file);
+        this.needToSaveUserDefinedDatabase = false;
+        return result;
     }
 
     private java.util.List<Pair<Code, Symbol>> getUserDefinedPair(StockInfoDatabase stockInfoDatabase) {
@@ -4163,32 +4222,6 @@ public class MainFrame extends javax.swing.JFrame {
             MainFrame.this.jTable1.getSelectionModel().clearSelection();
         }
     }
-
-    private org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType> getResultObserver() {
-        return new org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType>() {
-            @Override
-            public void update(AutoCompleteJComboBox subject, ResultType arg) {
-                assert(arg != null);
-                addResultTypeToDatabase(arg);
-            }
-        };
-    }
-
-    /**
-     * Added result from online database into offline database.
-     *
-     * @param resultType result from online database
-     * @return true if success
-     */
-    public boolean addResultTypeToDatabase(ResultType resultType) {
-        assert(resultType != null);
-        ResultType result = org.yccheok.jstock.engine.Utils.rectifyResult(resultType);
-        if (result == null) {
-            // Invalid result from online database.
-            return false;
-        }
-        return false;
-    }
     
     private TrayIcon trayIcon;
     
@@ -4265,6 +4298,10 @@ public class MainFrame extends javax.swing.JFrame {
      */
     private static final Indicator FALL_BELOW_INDICATOR = Utils.getLastPriceFallBelowIndicator(0.0);
     private static final Indicator RISE_ABOVE_INDICATOR = Utils.getLastPriceRiseAboveIndicator(0.0);
+
+    // Do we need to save user defined database when we switch country or close
+    // this application?
+    private volatile boolean needToSaveUserDefinedDatabase = false;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;

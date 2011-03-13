@@ -309,31 +309,6 @@ public class Utils {
         unitedStateIndices.add(Index.IXIC);        
     }
 
-    // Use to provide conversion between different server's database.
-    public static Code toCIMBFormat(Code code, Country country)
-    {
-        if(code == null || country == null)
-        {
-            throw new java.lang.IllegalArgumentException("Method parameters cannot be null in toYahooFormat");
-        }
-
-        Code result = code;
-
-        if(country == Country.Malaysia)
-        {
-            String _code = code.toString();
-            if(_code.endsWith(".KL") == true)
-            {
-                if(_code.length() > ".KL".length())
-                {
-                    result = Code.newInstance(_code.substring(0, _code.length() - ".KL".length()));
-                }
-            }
-        }
-        
-        return result;
-    }
-
     public static Code toYahooFormat(Code code, Country country)
     {
         if (code == null || country == null)
@@ -342,18 +317,6 @@ public class Utils {
         }
 
         Code result = code;
-
-        if (country == Country.Malaysia)
-        {
-            String _code = code.toString();
-            // Index's code start with ^. We will not intrude index's code.
-            if(_code.startsWith("^") == false && _code.endsWith(".KL") == false)
-            {
-                // This is not index's code, and it does not end with .KL.
-                // Let's intrude it!
-                result = Code.newInstance(_code + ".KL");
-            }
-        }
         
         return result;
     }
