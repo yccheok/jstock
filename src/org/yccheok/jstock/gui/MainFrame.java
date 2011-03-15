@@ -2387,22 +2387,7 @@ public class MainFrame extends javax.swing.JFrame {
                 final Symbol symbol = Symbol.newInstance(resultType.name);
                 final StockInfo stockInfo = new StockInfo(code, symbol);
 
-                // When user try to enter a stock, and the stock is already in
-                // the table, the stock shall be highlighted. Stock will be
-                // selected and the table shall be scrolled to be visible.
-                final StockTableModel tableModel = (StockTableModel)MainFrame.this.jTable1.getModel();
-                int modelRowBeforeAdded = -1;
-
-                final Stock emptyStock = Utils.getEmptyStock(stockInfo);
-                // Update rowBeforeAdded before calling addStockToTable
-                modelRowBeforeAdded = tableModel.findRow(emptyStock);
-
-                // First add the empty stock, so that the user will not have wrong perspective that
-                // our system is slow.
-                addStockToTable(emptyStock);
-                realTimeStockMonitor.addStockCode(stockInfo.code);
-
-                MainFrame.this.highlightStock(modelRowBeforeAdded);
+                addStockInfoFromAutoCompleteJComboBox(stockInfo);
 
                 // Remember to update our offline database as well.
                 addUserDefinedStockInfo(stockInfo);
@@ -2415,25 +2400,29 @@ public class MainFrame extends javax.swing.JFrame {
             @Override
             public void update(AutoCompleteJComboBox subject, StockInfo stockInfo) {
                 assert(stockInfo != null);
-
-                // When user try to enter a stock, and the stock is already in
-                // the table, the stock shall be highlighted. Stock will be
-                // selected and the table shall be scrolled to be visible.
-                final StockTableModel tableModel = (StockTableModel)MainFrame.this.jTable1.getModel();
-                int modelRowBeforeAdded = -1;
-                
-                final Stock emptyStock = Utils.getEmptyStock(stockInfo);
-                // Update rowBeforeAdded before calling addStockToTable
-                modelRowBeforeAdded = tableModel.findRow(emptyStock);
-
-                // First add the empty stock, so that the user will not have wrong perspective that
-                // our system is slow.
-                addStockToTable(emptyStock);
-                realTimeStockMonitor.addStockCode(stockInfo.code);
-
-                MainFrame.this.highlightStock(modelRowBeforeAdded);
+                addStockInfoFromAutoCompleteJComboBox(stockInfo);
             }   // public void update(AutoCompleteJComboBox subject, StockInfo stockInfo)
         };
+    }
+
+    // Shared code for getStockInfoObserver and getResultObserver.
+    private void addStockInfoFromAutoCompleteJComboBox(StockInfo stockInfo) {
+        // When user try to enter a stock, and the stock is already in
+        // the table, the stock shall be highlighted. Stock will be
+        // selected and the table shall be scrolled to be visible.
+        final StockTableModel tableModel = (StockTableModel)MainFrame.this.jTable1.getModel();
+        int modelRowBeforeAdded = -1;
+
+        final Stock emptyStock = Utils.getEmptyStock(stockInfo);
+        // Update rowBeforeAdded before calling addStockToTable
+        modelRowBeforeAdded = tableModel.findRow(emptyStock);
+
+        // First add the empty stock, so that the user will not have wrong perspective that
+        // our system is slow.
+        addStockToTable(emptyStock);
+        realTimeStockMonitor.addStockCode(stockInfo.code);
+
+        MainFrame.this.highlightStock(modelRowBeforeAdded);
     }
 
     private org.yccheok.jstock.engine.Observer<Indicator, Boolean> getAlertStateManagerObserver() {

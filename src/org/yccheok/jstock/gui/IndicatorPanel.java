@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
+ * Copyright (C) 2011 Yan Cheng Cheok <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,6 +43,7 @@ import org.yccheok.jstock.analysis.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.yccheok.jstock.engine.AjaxYahooSearchEngine.ResultType;
 import org.yccheok.jstock.gui.analysis.WizardSelectIndicatorDescriptor;
 import org.yccheok.jstock.gui.analysis.WizardDownloadIndicatorDescriptor;
 import org.yccheok.jstock.gui.analysis.WizardSelectInstallIndicatorMethodDescriptor;
@@ -1308,18 +1309,43 @@ public class IndicatorPanel extends JPanel {
         ((AutoCompleteJComboBox)jComboBox1).setStockInfoDatabase(stockInfoDatabase);
     }
 
+    // Shared code for getStockInfoObserver and getResultObserver.
+    private void addStockInfoFromAutoCompleteJComboBox(StockInfo stockInfo) {
+        final StockTask tmp = stockTask;
+        if (tmp != null) {
+            tmp.cancel(true);
+        }
+
+        stockTask = new StockTask(stockInfo.code, stockInfo.symbol);
+        stockTask.execute();
+    }
+
+    private org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType> getResultObserver() {
+        return new org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType>() {
+
+            @Override
+            public void update(AutoCompleteJComboBox subject, ResultType resultType) {
+                assert(resultType != null);
+                // Symbol from Yahoo means Code in JStock.
+                final Code code = Code.newInstance(resultType.symbol);
+                // Name from Yahoo means Symbol in JStock.
+                final Symbol symbol = Symbol.newInstance(resultType.name);
+                final StockInfo stockInfo = new StockInfo(code, symbol);
+
+                addStockInfoFromAutoCompleteJComboBox(stockInfo);
+
+                // Remember to update our offline database as well.
+                MainFrame.getInstance().addUserDefinedStockInfo(stockInfo);
+            }
+        };
+    }
+
     private org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, StockInfo> getStockInfoObserver() {
         return new org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, StockInfo>() {
             @Override
             public void update(AutoCompleteJComboBox subject, StockInfo stockInfo) {
                 assert(stockInfo != null);
-                final StockTask tmp = stockTask;
-                if (tmp != null) {
-                    tmp.cancel(true);
-                }
-
-                stockTask = new StockTask(stockInfo.code, stockInfo.symbol);
-                stockTask.execute();
+                addStockInfoFromAutoCompleteJComboBox(stockInfo);
             }
         };
     }

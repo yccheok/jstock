@@ -474,7 +474,7 @@ public class AutoCompleteJComboBox extends JComboBox {
         this.removeAllItems();
 
         if (mode == Mode.Offline) {
-			// TODO
+            // TODO
             // Check through JStockOptions, to determine which renderer to be
             // applied.
             this.setRenderer(offlineModeCellRenderer);

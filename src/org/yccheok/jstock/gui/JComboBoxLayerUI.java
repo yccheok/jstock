@@ -41,27 +41,29 @@ public class JComboBoxLayerUI<V extends JComboBox> extends AbstractLayerUI<V> im
     @Override
     public void update(V subject, Boolean arg) {
         final boolean _isBusy = arg;
-        Timer me = busyTimer;
-        if (me != null) {
-            // Stop previous timer from displaying busy indicator.
-            me.stop();
-        }
-        if (_isBusy == false) {
-            this.setBusy(_isBusy);
-        } else {
-            // Do not display busy indicator immediately to avoid from
-            // annoying the user. Wait for some time. 1 second should be
-            // good enough, as under normal network connection, the
-            // specified time shall be enough to obtain result from
-            // server.
-            busyTimer = new Timer(1000, new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    JComboBoxLayerUI.this.setBusy(_isBusy);
-                }
-            });
-            busyTimer.start();
-        }
+        // Display busy indicator immediately.
+        isBusy = _isBusy;
+//        Timer me = busyTimer;
+//        if (me != null) {
+//            // Stop previous timer from displaying busy indicator.
+//            me.stop();
+//        }
+//        if (_isBusy == false) {
+//            this.setBusy(_isBusy);
+//        } else {
+//            // Do not display busy indicator immediately to avoid from
+//            // annoying the user. Wait for some time. 1 second should be
+//            // good enough, as under normal network connection, the
+//            // specified time shall be enough to obtain result from
+//            // server.
+//            busyTimer = new Timer(1000, new ActionListener() {
+//                @Override
+//                public void actionPerformed(ActionEvent e) {
+//                    JComboBoxLayerUI.this.setBusy(_isBusy);
+//                }
+//            });
+//            busyTimer.start();
+//        }
     }
 
     public void setBusy(boolean isBusy) {

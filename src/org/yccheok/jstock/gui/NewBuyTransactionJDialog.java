@@ -30,6 +30,8 @@ import net.sf.nachocalendar.CalendarFactory;
 import net.sf.nachocalendar.components.DateField;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.yccheok.jstock.engine.AjaxYahooSearchEngine;
+import org.yccheok.jstock.engine.AjaxYahooSearchEngine.ResultType;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.SimpleDate;
 import org.yccheok.jstock.engine.Stock;
@@ -294,6 +296,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         jComboBox1.setEditable(true);
         jComboBox1.setPreferredSize(new java.awt.Dimension(110, 24));
         ((AutoCompleteJComboBox)jComboBox1).attachStockInfoObserver(this.getStockInfoObserver());
+        ((AutoCompleteJComboBox)jComboBox1).attachResultObserver(this.getResultObserver());
         jPanel1.add(jComboBox1);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.NORTH);
@@ -588,15 +591,39 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         return this.transaction;
     }
 
+    private org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType> getResultObserver() {
+        return new org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType>() {
+
+            @Override
+            public void update(AutoCompleteJComboBox subject, ResultType resultType) {
+                assert(resultType != null);
+                // Symbol from Yahoo means Code in JStock.
+                final Code code = Code.newInstance(resultType.symbol);
+                // Name from Yahoo means Symbol in JStock.
+                final Symbol symbol = Symbol.newInstance(resultType.name);
+                final StockInfo stockInfo = new StockInfo(code, symbol);
+
+                addStockInfoFromAutoCompleteJComboBox(stockInfo);
+
+                // Remember to update our offline database as well.
+                MainFrame.getInstance().addUserDefinedStockInfo(stockInfo);
+            }
+        };
+    }
+
     private org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, StockInfo> getStockInfoObserver() {
         return new org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, StockInfo>() {
             @Override
             public void update(AutoCompleteJComboBox subject, StockInfo stockInfo) {
                 assert(stockInfo != null);
-                NewBuyTransactionJDialog.this.stock = Utils.getEmptyStock(stockInfo);
-                NewBuyTransactionJDialog.this.jTextField1.setText(NewBuyTransactionJDialog.this.stock.getSymbol().toString());
+                addStockInfoFromAutoCompleteJComboBox(stockInfo);
             }
         };
+    }
+
+    private void addStockInfoFromAutoCompleteJComboBox(StockInfo stockInfo) {
+        NewBuyTransactionJDialog.this.stock = Utils.getEmptyStock(stockInfo);
+        NewBuyTransactionJDialog.this.jTextField1.setText(NewBuyTransactionJDialog.this.stock.getSymbol().toString());
     }
 
     private static final Log log = LogFactory.getLog(NewBuyTransactionJDialog.class);
