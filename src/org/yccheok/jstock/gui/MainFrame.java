@@ -803,11 +803,6 @@ public class MainFrame extends javax.swing.JFrame {
             this.jMenuItem2.setEnabled(true);   // Load
             this.jMenuItem9.setEnabled(true);   // Save
 
-            if (this.portfolioManagementJPanel != null) {
-                this.portfolioManagementJPanel.suspendRealTimeStockMonitor();
-                log.info("Suspend portfolio monitor.");
-            }
-
             if (this.currencyExchangeMonitor != null) {
                 this.currencyExchangeMonitor.suspend();
                 log.info("Suspend currency exchange monitor.");
@@ -816,11 +811,6 @@ public class MainFrame extends javax.swing.JFrame {
         else if (pane.getSelectedComponent() == this.indicatorPanel) {
             this.jMenuItem2.setEnabled(false);  // Load
             this.jMenuItem9.setEnabled(false);  // Save
-
-            if (this.portfolioManagementJPanel != null) {
-                this.portfolioManagementJPanel.suspendRealTimeStockMonitor();
-                log.info("Suspend portfolio monitor.");
-            }
 
             if (this.currencyExchangeMonitor != null) {
                 this.currencyExchangeMonitor.suspend();
@@ -831,11 +821,6 @@ public class MainFrame extends javax.swing.JFrame {
             this.jMenuItem2.setEnabled(false);  // Load
             this.jMenuItem9.setEnabled(true);   // Save
 
-            if (this.portfolioManagementJPanel != null) {
-                this.portfolioManagementJPanel.suspendRealTimeStockMonitor();
-                log.info("Suspend portfolio monitor.");
-            }
-
             if (this.currencyExchangeMonitor != null) {
                 this.currencyExchangeMonitor.suspend();
                 log.info("Suspend currency exchange monitor.");
@@ -845,11 +830,6 @@ public class MainFrame extends javax.swing.JFrame {
             this.jMenuItem2.setEnabled(true);   // Load
             this.jMenuItem9.setEnabled(true);   // Save
 
-            if (this.portfolioManagementJPanel != null) {
-                this.portfolioManagementJPanel.resumeRealTimeStockMonitor();
-                log.info("Resume portfolio monitor.");
-            }
-
             if (this.currencyExchangeMonitor != null) {
                 this.currencyExchangeMonitor.resume();
                 log.info("Resume currency exchange monitor.");
@@ -858,11 +838,6 @@ public class MainFrame extends javax.swing.JFrame {
         else if (pane.getSelectedComponent() == this.chatJPanel) {
             this.jMenuItem2.setEnabled(false);  // Save
             this.jMenuItem9.setEnabled(false);  // Load
-
-            if (this.portfolioManagementJPanel != null) {
-                this.portfolioManagementJPanel.suspendRealTimeStockMonitor();
-                log.info("Suspend portfolio monitor.");
-            }
 
             if (this.currencyExchangeMonitor != null) {
                 this.currencyExchangeMonitor.suspend();
