@@ -2457,13 +2457,7 @@ public class MainFrame extends javax.swing.JFrame {
         
         menuItem.addActionListener(new ActionListener() {
             @Override
-        	public void actionPerformed(ActionEvent evt) {
-                if (MainFrame.this.stockInfoDatabase == null)
-                {
-                    javax.swing.JOptionPane.showMessageDialog(MainFrame.this, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/messages").getString("info_message_we_havent_connected_to_stock_server"), java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/messages").getString("info_title_we_havent_connected_to_stock_server"), javax.swing.JOptionPane.INFORMATION_MESSAGE);
-                    return;
-                }
-
+            public void actionPerformed(ActionEvent evt) {
                 int rows[] = jTable1.getSelectedRows();
                 final StockTableModel tableModel = (StockTableModel)jTable1.getModel();
 

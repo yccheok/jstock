@@ -5,11 +5,13 @@ JStock 1.0.6 - ????-??-??
   Feature: Able to find new stock which is not included in offline database,
            through an easy way. We no longer need to open up Stock Databse
            dialog box.
+  Feature: We will allow user to view stock history, event though offline 
+           database isn't ready yet.
   Bugfix:  Although it will consume more network resource, portfolio will be
            updated although it is not being viewed. We want user able to view 
            his latest portfolio when he switches to portfolio page, without
            any waiting.
-           
+        
 JStock 1.0.5y - 2011-02-15
   Bugfix:  There is change in stock server policy. Stock server may return empty
            stock symbol for certain stocks, especially for United State stock
