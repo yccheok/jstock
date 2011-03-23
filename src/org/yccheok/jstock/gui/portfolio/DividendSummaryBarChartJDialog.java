@@ -39,7 +39,6 @@ import org.jfree.data.category.DefaultCategoryDataset;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.StockInfo;
-import org.yccheok.jstock.engine.Symbol;
 import org.yccheok.jstock.gui.JStockOptions;
 import org.yccheok.jstock.gui.MainFrame;
 import org.yccheok.jstock.internationalization.GUIBundle;

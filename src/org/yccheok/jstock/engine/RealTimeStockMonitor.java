@@ -81,7 +81,16 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
 
         return status;
     }
-    
+
+    /**
+     * Returns true if there is no stock code in this monitor.
+     * 
+     * @return true if there is no stock code in this monitor
+     */
+    public synchronized boolean isEmpty() {
+        return stockCodes.isEmpty();
+    }
+
     public synchronized int getNumOfStockCode() {
         return stockCodes.size();
     }

@@ -126,10 +126,11 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         final String gain_str = org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(gain);
         final String percentage_str = numberFormat.format(percentage);
 
+        final String SELECTED = this.investmentFlowChartJDialog.getCurrentSelectedString();
         final String INVEST = GUIBundle.getString("InvestmentFlowLayerUI_Invest");
         final String RETURN = GUIBundle.getString("InvestmentFlowLayerUI_Return");
-        final String GAIN = GUIBundle.getString("InvestmentFlowLayerUI_Gain");
-        final String LOSS = GUIBundle.getString("InvestmentFlowLayerUI_Loss");
+        final String GAIN = (SELECTED.length() > 0 ? SELECTED + " " : "") + GUIBundle.getString("InvestmentFlowLayerUI_Gain");
+        final String LOSS = (SELECTED.length() > 0 ? SELECTED + " " : "") + GUIBundle.getString("InvestmentFlowLayerUI_Loss");
 
         final int string_width = oldFontMetrics.stringWidth(INVEST + ": ") + titleFontMetrics.stringWidth(invest + " ") +
                 oldFontMetrics.stringWidth(RETURN + ": ") + titleFontMetrics.stringWidth(roi + " ") +
@@ -169,7 +170,7 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
                 g2.setColor(MainFrame.getInstance().getJStockOptions().getLowerNumericalValueForegroundColor());
             }
             g2.drawString(LOSS + ": ", x, y);
-            x += oldFontMetrics.stringWidth(GAIN + ": ");
+            x += oldFontMetrics.stringWidth(LOSS + ": ");
         }
         g2.setFont(titleFont);
         g2.drawString(gain_str + " (" + percentage_str + "%)", x, y);
@@ -694,7 +695,12 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         if (MouseEvent.MOUSE_DRAGGED == e.getID()) {
             return;
         }
-        
+
+        if (MouseEvent.MOUSE_CLICKED == e.getID()) {
+            // Transfer focus to chart if user clicks on the chart.
+            this.investmentFlowChartJDialog.getChartPanel().requestFocus();
+        }
+
         final Point mousePoint = SwingUtilities.convertPoint(e.getComponent(), e.getPoint(), layer);
 
         final boolean status0 = this.updateInvestPoint(mousePoint);

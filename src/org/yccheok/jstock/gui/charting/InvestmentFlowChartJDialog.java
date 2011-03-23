@@ -28,8 +28,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
@@ -43,10 +45,8 @@ import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.event.ChartChangeEvent;
 import org.jfree.chart.event.ChartChangeEventType;
 import org.jfree.chart.event.ChartChangeListener;
-import org.jfree.chart.labels.CustomXYToolTipGenerator;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.StandardXYItemRenderer;
-import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.data.time.Day;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
@@ -90,12 +90,6 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         // We need a stock price monitor, to update all the stocks value.
         initRealTimeStockMonitor();
 
-        initSummaries(this.portfolioManagementJPanel);
-
-        // Renderer must be assigned before calling createOrUpdateStockTimeSeries.
-        // createOrUpdateStockTimeSeries is going to access renderer at index 1.
-        this.ROIRenderer = new StandardXYItemRenderer();
-
         final JFreeChart freeChart = createChart();
         org.yccheok.jstock.charting.Utils.applyChartTheme(freeChart);
         this.chartPanel = new ChartPanel(freeChart, true, true, true, true, true);
@@ -123,17 +117,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         }, 15000);
 
         // Handle zoom-in.
-        this.chartPanel.getChart().addChangeListener(new ChartChangeListener() {
-            @Override
-            public void chartChanged(ChartChangeEvent event) {
-                if (event.getType() == ChartChangeEventType.GENERAL) {
-                    // Sequence is important. We will use invest information box as master.
-                    // ROI information box will be adjusted accordingly.
-                    investmentFlowLayerUI.updateInvestPoint();
-                    investmentFlowLayerUI.updateROIPoint();
-                }
-            }
-        });
+        addChangeListener(this.chartPanel);
 
         // Handle resize.
         this.addComponentListener(new java.awt.event.ComponentAdapter()
@@ -144,6 +128,21 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
                 // ROI information box will be adjusted accordingly.
                 investmentFlowLayerUI.updateInvestPoint();
                 investmentFlowLayerUI.updateROIPoint();
+            }
+        });
+    }
+
+    // Add change listener to chart panel to handle zoom-in.
+    private void addChangeListener(ChartPanel chartPanel) {
+        chartPanel.getChart().addChangeListener(new ChartChangeListener() {
+            @Override
+            public void chartChanged(ChartChangeEvent event) {
+                if (event.getType() == ChartChangeEventType.GENERAL) {
+                    // Sequence is important. We will use invest information box as master.
+                    // ROI information box will be adjusted accordingly.
+                    investmentFlowLayerUI.updateInvestPoint();
+                    investmentFlowLayerUI.updateROIPoint();
+                }
             }
         });
     }
@@ -204,17 +203,9 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
     }//GEN-LAST:event_formWindowClosing
 
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
-        this.lookUpCodes = null;
-        this.ROITimeSeries = null;
-        initSummaries(this.portfolioManagementJPanel);
         final JFreeChart freeChart = createChart();
         org.yccheok.jstock.charting.Utils.applyChartTheme(freeChart);
         this.chartPanel = new ChartPanel(freeChart, true, true, true, true, true);
-
-        // Make chartPanel able to receive key event.
-        // So that we may use arrow key to move around yellow information boxes.
-        this.chartPanel.setFocusable(true);
-        this.chartPanel.requestFocus();
 
         getContentPane().remove(this.layer);
 
@@ -225,7 +216,17 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         getContentPane().add(layer, java.awt.BorderLayout.CENTER);
         getContentPane().invalidate();
         getContentPane().validate();
-        this.chartPanel.updateUI();
+        
+        // Make chartPanel able to receive key event.
+        // So that we may use arrow key to move around yellow information boxes.
+        // We will not transfer the focus to the chart immediately. We will let
+        // the focus stay on combo box, so that user may use key to perform
+        // various stock selection. We will only focus on the chart, when user
+        // performs single mouse click on it.
+        this.chartPanel.setFocusable(true);
+
+        // Handle zoom-in.
+        addChangeListener(this.chartPanel);
     }//GEN-LAST:event_jComboBox1ActionPerformed
 
     private void saveDimension() {
@@ -240,23 +241,21 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         }
     }
 
-    private TimeSeries createOrUpdateROITimeSeries() {
-        if (this.ROITimeSeries == null) {
-            this.ROITimeSeries = new TimeSeries(GUIBundle.getString("InvestmentFlowChartJDialog_ReturnOfInvestment"));
-        }
+    // Use synchronized, as it will be accessed by monitor and createChart
+    // method simultaneously.
+    private synchronized void updateROITimeSeries() {
+        final boolean noCodeAddedToMonitor = this.realTimeStockMonitor.isEmpty();
 
-        final CustomXYToolTipGenerator stock_ttg = new CustomXYToolTipGenerator();
-        final ArrayList<String> toolTips = new ArrayList<String>();
-
-
-        final boolean firstTime = (this.lookUpCodes == null);
-        if (firstTime) {
-            this.lookUpCodes = new ArrayList<Code>();
-        }
+        // Use local variables for thread safe.
+        // I don't think we need local variables for thread safe purpose,
+        // as we already have synchronized keyword. However, it gives no harm
+        // for using local variables. We will just leave them.
+        final ActivitySummary _ROISummary = this.ROISummary;
+        final TimeSeries _ROITimeSeries = this.ROITimeSeries;
 
         double _totalROIValue = 0.0;
-        for (int i = 0, count = this.ROISummary.size(); i < count; i++) {
-            final Activities activities = this.ROISummary.get(i);
+        for (int i = 0, count = _ROISummary.size(); i < count; i++) {
+            final Activities activities = _ROISummary.get(i);
             double amount = 0.0;
             for (int j = 0, count2 = activities.size(); j < count2; j++) {
                 final Activity activity = activities.get(j);
@@ -265,10 +264,8 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
                 if (type == Activity.Type.Buy) {
                     final int quantity = (Integer)activity.get(Activity.Param.Quantity);
                     final Stock stock = (Stock)activity.get(Activity.Param.Stock);
-                    if (firstTime) {
-                        if (this.lookUpCodes.contains(stock.getCode()) == false) {
-                            this.lookUpCodes.add(stock.getCode());
-                        }
+                    if (noCodeAddedToMonitor) {
+                        this.lookUpCodes.add(stock.getCode());
                     }
                     final Double price = this.codeToPrice.get(stock.getCode());
                     if (price != null) {
@@ -294,30 +291,20 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
 
             final SimpleDate date = activities.getDate();
             final Date d = date.getTime();
-            this.ROITimeSeries.addOrUpdate(new Day(d), _totalROIValue);
-            final SimpleDateFormat dateFormat = new SimpleDateFormat("d-MMM-yyyy");
-            final java.text.NumberFormat numberFormat = java.text.NumberFormat.getInstance();
-            numberFormat.setMaximumFractionDigits(2);
-            numberFormat.setMinimumFractionDigits(2);
-            final String tips = "<html>Return: (" + dateFormat.format(d) + ", " + numberFormat.format(amount) + ")<br> " + activities.toSummary() + "</html>";
-            toolTips.add(tips);
-        }   // for (int i = 0, count = this.ROISummary.size(); i < count; i++)
+            _ROITimeSeries.addOrUpdate(new Day(d), _totalROIValue);
+        }   // for (int i = 0, count = _ROISummary.size(); i < count; i++)
 
         this.totalROIValue = _totalROIValue;
-
-        stock_ttg.addToolTipSeries(toolTips);
-        this.ROIRenderer.setBaseToolTipGenerator(stock_ttg);
 
         // We cannot iterate over this.lookUpCodes.
         // realTimeStockMonitor's callback may remove lookUpCodes item during
         // iterating process.
-        if (firstTime) {
+        if (noCodeAddedToMonitor) {
             final List<Code> codes = new ArrayList<Code>(this.lookUpCodes);
             for (Code code : codes) {
                 this.realTimeStockMonitor.addStockCode(code);
             }
         }
-        return this.ROITimeSeries;
     }
 
     private XYDataset createInvestDataset() {
@@ -361,11 +348,13 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
 
         }   // for (int i = 0, count = this.investSummary.size(); i < count; i++)
 
-        cash_ttg.addToolTipSeries(toolTips);
         return new TimeSeriesCollection(series);
     }
 
-    private JFreeChart createChart() {
+    // Synchronized against updateROITimeSeries.
+    private synchronized JFreeChart createChart() {
+        initSummaries(this.portfolioManagementJPanel);
+
         final XYDataset priceData = this.createInvestDataset();
 
         JFreeChart chart = ChartFactory.createTimeSeriesChart(
@@ -389,12 +378,11 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         // 0 decimal place, to save up some display area.
         final NumberFormat currencyFormat = new DecimalFormat("'" + currencySymbol.replace("'", "''") + "'#,##0");
         rangeAxis1.setNumberFormatOverride(currencyFormat);
-
-        XYItemRenderer renderer0 = plot.getRenderer();
-        renderer0.setBaseToolTipGenerator(cash_ttg);
         
-        plot.setRenderer(1, this.ROIRenderer);
-        plot.setDataset(1, new TimeSeriesCollection(this.createOrUpdateROITimeSeries()));
+        plot.setRenderer(1, new StandardXYItemRenderer());
+        this.ROITimeSeries = new TimeSeries(GUIBundle.getString("InvestmentFlowChartJDialog_ReturnOfInvestment"));
+        plot.setDataset(1, new TimeSeriesCollection(this.ROITimeSeries));
+        this.updateROITimeSeries();
 
         return chart;
     }
@@ -529,7 +517,16 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
             this.codeToPrice.put(stock.getCode(), stock.getLastPrice());
             this.lookUpCodes.remove(stock.getCode());
         }
-        this.createOrUpdateROITimeSeries();
+
+        final double beforeUpdateTotalROIValue = this.totalROIValue;
+        // Calling updateROITimeSeries will update this.totalROIValue.
+        this.updateROITimeSeries();
+        if (this.totalROIValue != beforeUpdateTotalROIValue) {
+            // We will update yellow information boxes, if there is update
+            // in ROI value.
+            investmentFlowLayerUI.updateInvestPoint();
+            investmentFlowLayerUI.updateROIPoint();
+        }
 
         if (this.lookUpCodes.isEmpty()) {
             this.finishLookUpPrice = true;
@@ -539,6 +536,20 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
             // real-time update?
             // this.initRealTimeStockMonitor();
         }
+    }
+
+    /**
+     * Returns current selected combo box string.
+     *
+     * @return current selected combo box string
+     */
+    public String getCurrentSelectedString() {
+        if (this.jComboBox1.getSelectedIndex() == 0) {
+            // Special case. We are not interested to display string for
+            // "All Stock(s)".
+            return "";
+        }
+        return this.jComboBox1.getSelectedItem().toString();
     }
 
     public double getTotalInvestValue() {
@@ -583,8 +594,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
     private ActivitySummary ROISummary = new ActivitySummary();
 
     /* For ROI charting information. */
-    private final XYItemRenderer ROIRenderer;
-    private volatile TimeSeries ROITimeSeries;
+    private volatile TimeSeries ROITimeSeries = null;
     private double totalROIValue = 0.0;
 
     /* For Invest charting information. */
@@ -592,14 +602,15 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
 
     private ChartPanel chartPanel;
     private final PortfolioManagementJPanel portfolioManagementJPanel;
-    private final CustomXYToolTipGenerator cash_ttg = new CustomXYToolTipGenerator();
 
     /* For real time stock information. */
     private RealTimeStockMonitor realTimeStockMonitor;    
     private final Map<Code, Double> codeToPrice = new ConcurrentHashMap<Code, Double>();
     /* Whether we had finished scan through all the BUY stocks. */
     private volatile boolean finishLookUpPrice = false;
-    private volatile List<Code> lookUpCodes = null;
+    // Use in conjuction with realTimeStockMonitor, to obtain current BUY stocks
+    // price.
+    private final Set<Code> lookUpCodes = new HashSet<Code>();
     
     /* Overlay layer. */
     private InvestmentFlowLayerUI<ChartPanel> investmentFlowLayerUI;

@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.SimpleDate;
 import org.yccheok.jstock.engine.Stock;
 
@@ -70,51 +69,6 @@ public class Activities {
         }
         java.util.Collections.sort(types);
         return types;
-    }
-
-    public String toSummary(Code code) {
-        Map<String, Double> datas = new HashMap<String, Double>();
-
-        for (Activity activity : activities) {
-            final Stock stock = (Stock)activity.get(Activity.Param.Stock);
-            String key = (stock != null ? stock.getSymbol().toString() : "") + activity.getType();
-            Double d = datas.get(key);
-            if (d != null) {
-                double total = d.doubleValue() + activity.getAmount();
-                datas.put(key, total);
-            }
-            else {
-                datas.put(key, activity.getAmount());
-            }
-        }
-
-        String message = "";
-        int count = 0;
-        final int size = activities.size();
-        for (Activity activity : activities) {
-            count++;
-            if (((Stock)activity.get(Activity.Param.Stock)).getCode().equals(code) == false) {
-                continue;
-            }
-            final Stock stock = (Stock)activity.get(Activity.Param.Stock);
-            final String who = stock != null ? stock.getSymbol().toString() : "";
-            final Activity.Type type = activity.getType();
-            String key = who + type;
-            Double d = datas.get(key);
-            /* Must not be null due to first loop. */
-            if (who.length() > 1) {
-                message = message + who + " " + type.toString().toLowerCase() + " " + Utils.toCurrencyWithSymbol(d);
-            }
-            else {
-                message = message + type.toString().toLowerCase() + " " + Utils.toCurrencyWithSymbol(d);
-            }
-
-            if (count < size) {
-                message = message + "<br>";
-            }
-        }
-        message = message + "";
-        return message;
     }
 
     public String toSummary() {

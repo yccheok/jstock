@@ -20,7 +20,6 @@
 package org.yccheok.jstock.portfolio;
 
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.Map;
 import javax.swing.ImageIcon;
 import org.yccheok.jstock.engine.Stock;
@@ -104,5 +103,5 @@ public class Activity {
 
     private final Type type;
     private final double amount;
-    private Map<Param, Object> paramToObject = new HashMap<Param, Object>();
+    private Map<Param, Object> paramToObject = new EnumMap<Param, Object>(Param.class);
 }
