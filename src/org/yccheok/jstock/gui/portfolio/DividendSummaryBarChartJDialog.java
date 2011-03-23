@@ -23,6 +23,7 @@ import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,7 @@ import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.Stock;
+import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.engine.Symbol;
 import org.yccheok.jstock.gui.JStockOptions;
 import org.yccheok.jstock.gui.MainFrame;
@@ -84,21 +86,27 @@ public class DividendSummaryBarChartJDialog extends javax.swing.JDialog {
 
     private void initJComboBox() {
         final int size = dividendSummary.size();
-        List<String> strings = new ArrayList<String>();
         for (int i = 0; i < size; i++) {
             final Dividend dividend = dividendSummary.get(i);
             final Stock stock = dividend.getStock();
-            if (false == this.symbolToCode.containsValue(stock.getCode())) {
-                this.symbolToCode.put(stock.getSymbol(), stock.getCode());
-                strings.add(stock.getSymbol().toString());
+            final StockInfo stockInfo = new StockInfo(stock.getCode(), stock.getSymbol());
+            if (stockInfos.contains(stockInfo) == false) {
+                stockInfos.add(stockInfo);
             }
         }
 
         // Ensure symbols are in alphabetical order.
-        java.util.Collections.sort(strings);
+        java.util.Collections.sort(stockInfos, new Comparator() {
 
-        for (String string : strings) {
-            this.jComboBox1.addItem(string);
+            @Override
+            public int compare(Object o1, Object o2) {
+                return ((StockInfo)o1).symbol.toString().compareTo(((StockInfo)o2).symbol.toString());
+            }
+
+        });
+
+        for (StockInfo stockInfo : stockInfos) {
+            this.jComboBox1.addItem(stockInfo.symbol.toString());
         }
     }
 
@@ -113,8 +121,10 @@ public class DividendSummaryBarChartJDialog extends javax.swing.JDialog {
 
         for (int i = 0; i < size; i++) {
             final Dividend dividend = this.dividendSummary.get(i);
-            if (this.jComboBox1.getSelectedIndex() != 0) {
-                final Code code = this.symbolToCode.get(Symbol.newInstance(this.jComboBox1.getSelectedItem().toString()));
+            int selectedIndex = this.jComboBox1.getSelectedIndex();
+            if (selectedIndex != 0) {
+                // selectedIndex - 1, as the first item in combo box is "All Stock(s)".
+                final Code code = this.stockInfos.get(selectedIndex - 1).code;
                 if (false == dividend.getStock().getCode().equals(code)) {
                     continue;
                 }
@@ -211,7 +221,7 @@ public class DividendSummaryBarChartJDialog extends javax.swing.JDialog {
         this.chartPanel.setChart(this.createBarChart(this.createDataset()));
     }//GEN-LAST:event_jComboBox1ActionPerformed
 
-    private final Map<Symbol, Code> symbolToCode = new java.util.HashMap<Symbol, Code>();
+    private final List<StockInfo> stockInfos = new ArrayList<StockInfo>();
     private final ChartPanel chartPanel;
     private final DividendSummary dividendSummary;
 

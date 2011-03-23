@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,12 +26,14 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
+import javax.swing.ComboBoxModel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jfree.chart.ChartFactory;
@@ -54,6 +56,7 @@ import org.yccheok.jstock.engine.Observer;
 import org.yccheok.jstock.engine.RealTimeStockMonitor;
 import org.yccheok.jstock.engine.SimpleDate;
 import org.yccheok.jstock.engine.Stock;
+import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.gui.JStockOptions;
 import org.yccheok.jstock.gui.MainFrame;
 import org.yccheok.jstock.gui.PortfolioManagementJPanel;
@@ -79,11 +82,14 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         super(parent, modal);
         initComponents();
 
+        // Initialize main data structures.
+        this.portfolioManagementJPanel = portfolioManagementJPanel;
+        
+        initJComboBox();
+
         // We need a stock price monitor, to update all the stocks value.
         initRealTimeStockMonitor();
 
-        // Initialize main data structures.
-        this.portfolioManagementJPanel = portfolioManagementJPanel;
         initSummaries(this.portfolioManagementJPanel);
 
         // Renderer must be assigned before calling createOrUpdateStockTimeSeries.
@@ -99,7 +105,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         this.chartPanel.setFocusable(true);
         this.chartPanel.requestFocus();
         
-        final org.jdesktop.jxlayer.JXLayer<ChartPanel> layer = new org.jdesktop.jxlayer.JXLayer<ChartPanel>(this.chartPanel);
+        this.layer = new org.jdesktop.jxlayer.JXLayer<ChartPanel>(this.chartPanel);
         this.investmentFlowLayerUI = new InvestmentFlowLayerUI<ChartPanel>(this);
         layer.setUI(this.investmentFlowLayerUI);
 
@@ -156,6 +162,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
     private void initComponents() {
 
         jPanel2 = new javax.swing.JPanel();
+        jComboBox1 = new javax.swing.JComboBox();
         jPanel1 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -167,6 +174,17 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
             }
         });
         getContentPane().setLayout(new java.awt.BorderLayout(0, 5));
+
+        jPanel2.setLayout(new java.awt.BorderLayout());
+
+        jComboBox1.setModel(getComboBoxModel());
+        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBox1ActionPerformed(evt);
+            }
+        });
+        jPanel2.add(jComboBox1, java.awt.BorderLayout.EAST);
+
         getContentPane().add(jPanel2, java.awt.BorderLayout.SOUTH);
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
@@ -184,6 +202,31 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         // With this, we are able to perform thread clean up.
         this.initRealTimeStockMonitor();
     }//GEN-LAST:event_formWindowClosing
+
+    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+        this.lookUpCodes = null;
+        this.ROITimeSeries = null;
+        initSummaries(this.portfolioManagementJPanel);
+        final JFreeChart freeChart = createChart();
+        org.yccheok.jstock.charting.Utils.applyChartTheme(freeChart);
+        this.chartPanel = new ChartPanel(freeChart, true, true, true, true, true);
+
+        // Make chartPanel able to receive key event.
+        // So that we may use arrow key to move around yellow information boxes.
+        this.chartPanel.setFocusable(true);
+        this.chartPanel.requestFocus();
+
+        getContentPane().remove(this.layer);
+
+        this.layer = new org.jdesktop.jxlayer.JXLayer<ChartPanel>(this.chartPanel);
+        this.investmentFlowLayerUI = new InvestmentFlowLayerUI<ChartPanel>(this);
+        layer.setUI(this.investmentFlowLayerUI);
+
+        getContentPane().add(layer, java.awt.BorderLayout.CENTER);
+        getContentPane().invalidate();
+        getContentPane().validate();
+        this.chartPanel.updateUI();
+    }//GEN-LAST:event_jComboBox1ActionPerformed
 
     private void saveDimension() {
         org.yccheok.jstock.gui.Utils.toXML(this.getSize(), org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "cashflowchartjdialog.xml");
@@ -356,15 +399,65 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         return chart;
     }
 
-    private void initSummaries(PortfolioManagementJPanel portfolioManagementJPanel) {
+    private void initJComboBox() {
         final List<TransactionSummary> transactionSummaries = portfolioManagementJPanel.getTransactionSummariesFromPortfolios();
         final DividendSummary dividendSummary = portfolioManagementJPanel.getDividendSummary();
 
+        for (TransactionSummary transactionSummary : transactionSummaries) {
+            for (int i = 0, count = transactionSummary.getChildCount(); i < count; i++) {
+                final Transaction transaction = (Transaction)transactionSummary.getChildAt(i);
+                final Contract contract = transaction.getContract();
+                StockInfo stockInfo = new StockInfo(contract.getStock().getCode(), contract.getStock().getSymbol());
+                if (stockInfos.contains(stockInfo) == false) {
+                    stockInfos.add(stockInfo);
+                }
+            }
+        }
+
+        for (int i = 0, size = dividendSummary.size(); i < size; i++) {
+            final Dividend dividend = dividendSummary.get(i);
+            final Stock stock = dividend.getStock();
+            final StockInfo stockInfo = new StockInfo(stock.getCode(), stock.getSymbol());
+            if (stockInfos.contains(stockInfo) == false) {
+                stockInfos.add(stockInfo);
+            }
+        }
+
+        // Ensure symbols are in alphabetical order.
+        java.util.Collections.sort(stockInfos, new Comparator() {
+
+            @Override
+            public int compare(Object o1, Object o2) {
+                return ((StockInfo)o1).symbol.toString().compareTo(((StockInfo)o2).symbol.toString());
+            }
+
+        });
+
+        for (StockInfo stockInfo : stockInfos) {
+            this.jComboBox1.addItem(stockInfo.symbol.toString());
+        }
+    }
+
+    private void initSummaries(PortfolioManagementJPanel portfolioManagementJPanel) {
+        final List<TransactionSummary> transactionSummaries = portfolioManagementJPanel.getTransactionSummariesFromPortfolios();
+        final DividendSummary dividendSummary = portfolioManagementJPanel.getDividendSummary();
+        final int selectedIndex = this.jComboBox1.getSelectedIndex();
+
+        investSummary = new ActivitySummary();
+        ROISummary = new ActivitySummary();
+        
         for (TransactionSummary transactionSummary : transactionSummaries) {
             final int count = transactionSummary.getChildCount();
             for (int i = 0; i < count; i++) {
                 final Transaction transaction = (Transaction)transactionSummary.getChildAt(i);
                 final Contract contract = transaction.getContract();
+                if (selectedIndex != 0) {
+                    // selectedIndex - 1, as the first item in combo box is "All Stock(s)".
+                    final Code code = this.stockInfos.get(selectedIndex - 1).code;
+                    if (false == contract.getStock().getCode().equals(code)) {
+                        continue;
+                    }
+                }
                 Contract.Type type = contract.getType();
                 if (type == Contract.Type.Buy) {
                     final Activity activity = new Activity.Builder(Activity.Type.Buy, transaction.getNetTotal()).
@@ -394,6 +487,15 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
 
         for (int i = 0, count = dividendSummary.size(); i < count; i++) {
             final Dividend dividend = dividendSummary.get(i);
+
+            if (selectedIndex != 0) {
+                // selectedIndex - 1, as the first item in combo box is "All Stock(s)".
+                final Code code = this.stockInfos.get(selectedIndex - 1).code;
+                if (false == dividend.getStock().getCode().equals(code)) {
+                    continue;
+                }
+            }
+
             final Activity activity = new Activity.Builder(Activity.Type.Dividend, dividend.getAmount()).
                     put(Activity.Param.Stock, dividend.getStock()).build();
             this.ROISummary.add(dividend.getDate(), activity);
@@ -429,7 +531,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         }
         this.createOrUpdateROITimeSeries();
 
-        if (this.lookUpCodes.size() == 0) {
+        if (this.lookUpCodes.isEmpty()) {
             this.finishLookUpPrice = true;
             // Clear the busy message box drawn by JXLayer.
             this.investmentFlowLayerUI.setDirty(true);
@@ -466,13 +568,19 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
     public Activities getROIActivities(int index) {
         return this.ROISummary.get(index);
     }
-    
+
+    private ComboBoxModel getComboBoxModel() {
+        return new javax.swing.DefaultComboBoxModel(new String[] { GUIBundle.getString("InvestmentFlowChartJDialog_AllStock(s)") });
+    }
+
+    private final List<StockInfo> stockInfos = new ArrayList<StockInfo>();
+
     /* How much I had invested. */
     /* Contains Buy, Sell. When Sell, it will pull down your investment value. */
-    private final ActivitySummary investSummary = new ActivitySummary();
+    private ActivitySummary investSummary = new ActivitySummary();
     /* Return of investment. */
     /* Contains Buy, Sell and Dividend. */
-    private final ActivitySummary ROISummary = new ActivitySummary();
+    private ActivitySummary ROISummary = new ActivitySummary();
 
     /* For ROI charting information. */
     private final XYItemRenderer ROIRenderer;
@@ -482,7 +590,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
     /* For Invest charting information. */
     private double totalInvestValue = 0.0;
 
-    private final ChartPanel chartPanel;
+    private ChartPanel chartPanel;
     private final PortfolioManagementJPanel portfolioManagementJPanel;
     private final CustomXYToolTipGenerator cash_ttg = new CustomXYToolTipGenerator();
 
@@ -494,11 +602,14 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
     private volatile List<Code> lookUpCodes = null;
     
     /* Overlay layer. */
-    private final InvestmentFlowLayerUI<ChartPanel> investmentFlowLayerUI;
+    private InvestmentFlowLayerUI<ChartPanel> investmentFlowLayerUI;
+
+    private org.jdesktop.jxlayer.JXLayer<ChartPanel> layer;
 
     private static final Log log = LogFactory.getLog(InvestmentFlowChartJDialog.class);
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JComboBox jComboBox1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     // End of variables declaration//GEN-END:variables

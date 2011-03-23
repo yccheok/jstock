@@ -53,7 +53,12 @@ public class ActivitySummary {
     }
 
     public Activities get(int index) {
-        return activitiesList.get(index);
+        // Use local variable for thread safety.
+        List<Activities> _activitiesList = this.activitiesList;
+        if (_activitiesList.size() <= index) {
+            return null;
+        }
+        return _activitiesList.get(index);
     }
 
     private List<Activities> activitiesList = new ArrayList<Activities>();

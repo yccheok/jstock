@@ -49,7 +49,6 @@ import org.yccheok.jstock.alert.SMSLimiter;
 import org.yccheok.jstock.analysis.Indicator;
 import org.yccheok.jstock.analysis.OperatorIndicator;
 import org.yccheok.jstock.engine.AjaxYahooSearchEngine.ResultType;
-import org.yccheok.jstock.engine.Stock.Board;
 import org.yccheok.jstock.file.Statement;
 import org.yccheok.jstock.file.Statements;
 import org.yccheok.jstock.gui.charting.DynamicChart;
@@ -68,7 +67,7 @@ import org.yccheok.jstock.network.Utils.Type;
 public class MainFrame extends javax.swing.JFrame {
 
     // Comment out, to avoid annoying log messages during debugging.
-    //static { System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.NoOpLog"); }
+    static { System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.NoOpLog"); }
     
     /** Creates new form MainFrame */
 
