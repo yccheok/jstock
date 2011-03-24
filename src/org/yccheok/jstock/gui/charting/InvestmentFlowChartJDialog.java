@@ -95,7 +95,9 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         this.chartPanel = new ChartPanel(freeChart, true, true, true, true, true);
 
         // Make chartPanel able to receive key event.
-        // So that we may use arrow key to move around yellow information boxes.
+        // So that we may use arrow left/right key to move around yellow
+        // information boxes. We may also use up/down key to perform combo box
+        // selection.
         this.chartPanel.setFocusable(true);
         this.chartPanel.requestFocus();
         
@@ -218,16 +220,41 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         getContentPane().validate();
         
         // Make chartPanel able to receive key event.
-        // So that we may use arrow key to move around yellow information boxes.
-        // We will not transfer the focus to the chart immediately. We will let
-        // the focus stay on combo box, so that user may use key to perform
-        // various stock selection. We will only focus on the chart, when user
-        // performs single mouse click on it.
+        // So that we may use arrow left/right key to move around yellow
+        // information boxes. We may also use up/down key to perform combo box
+        // selection.
         this.chartPanel.setFocusable(true);
+        this.chartPanel.requestFocus();
 
         // Handle zoom-in.
         addChangeListener(this.chartPanel);
     }//GEN-LAST:event_jComboBox1ActionPerformed
+
+    /**
+     * Select next item in the combo box. Do nothing if the current selection is
+     * the last item.
+     */
+    public void selectNextJComboBoxSelection() {
+        int index = this.jComboBox1.getSelectedIndex();
+        index++;
+        if (index >= this.jComboBox1.getItemCount()) {
+            return;
+        }
+        this.jComboBox1.setSelectedIndex(index);
+    }
+
+    /**
+     * Select previous item in the combo box. Do nothing if the current 
+     * selection is the first item.
+     */
+    public void selectPreviousJComboBoxSelection() {
+        int index = this.jComboBox1.getSelectedIndex();
+        index--;
+        if (index < 0) {
+            return;
+        }
+        this.jComboBox1.setSelectedIndex(index);
+    }
 
     private void saveDimension() {
         org.yccheok.jstock.gui.Utils.toXML(this.getSize(), org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "cashflowchartjdialog.xml");

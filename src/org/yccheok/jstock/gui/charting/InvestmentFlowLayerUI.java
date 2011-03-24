@@ -906,6 +906,14 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
             case KeyEvent.VK_RIGHT:
                 this.updatePointAndIndexIfPossible(+1);
                 break;
+            case KeyEvent.VK_UP:
+                // Switch to another stock.
+                this.investmentFlowChartJDialog.selectPreviousJComboBoxSelection();
+                break;
+            case KeyEvent.VK_DOWN:
+                // Switch to another stock.
+                this.investmentFlowChartJDialog.selectNextJComboBoxSelection();
+                break;
         }
     }
 
@@ -916,22 +924,24 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         Type updatedType = null;
 
         if (this.investPointIndex < 0) {
-            // Should be null.
-            assert(this.investPoint == null);
-            // Invest point is not being initialized yet. We will perform update
-            // on ROI.
-            if (this.ROIPointIndex < 0) {
-                // But ROI point is not being initialized yet. We will not
-                // update any of them.
-                return;
-            }
-            updatedType = Type.ROI;
+            // There is no invest point appear on this screen. We will make the
+            // invest point appear. We will do the following hacking to ensure
+            // investPointIndex is 0, before calling getPoint. Since dataOffset
+            // will be added to investPointIndex, assigning inverted value of
+            // dataOffset to investPointIndex, will ensure investPointIndex
+            // becoming 0 before calling getPoint.
+            this.investPointIndex = -dataOffset;
+            updatedType = Type.Invest;
         }
         else if (this.ROIPointIndex < 0) {
-            // Should be null.
-            assert(this.ROIPoint == null);
-            assert(this.investPointIndex >= 0);
-            updatedType = Type.Invest;
+            // There is no ROI point appear on this screen. We will make the ROI
+            // point appear. We will do the following hacking to ensure
+            // ROIPointIndex is 0, before calling getPoint. Since dataOffset
+            // will be added to ROIPointIndex, assigning inverted value of
+            // dataOffset to ROIPointIndex, will ensure ROIPointIndex becoming 0
+            // before calling getPoint.
+            this.ROIPointIndex = -dataOffset;
+            updatedType = Type.ROI;
         }
 
         int tmpROIPointIndex = -1;
