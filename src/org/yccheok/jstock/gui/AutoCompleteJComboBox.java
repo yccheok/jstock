@@ -466,23 +466,29 @@ public class AutoCompleteJComboBox extends JComboBox {
     }
 
     private void changeMode(Mode mode) {
-        if (this.mode == mode) {
-            return;
-        }
-        // When we change mode, the previous inserted item(s) no longer valid.
-        // Let's clear them up first, before we switch to a new renderer.
-        this.removeAllItems();
+        ListCellRenderer me = null;
 
         if (mode == Mode.Offline) {
-            // TODO
             // Check through JStockOptions, to determine which renderer to be
             // applied.
-            this.setRenderer(offlineModeCellRenderer);
+            if (MainFrame.getInstance().getJStockOptions().getStockInputSuggestionListOption() == JStockOptions.StockInputSuggestionListOption.OneColumn) {
+                me = oldListCellRenderer;
+            } else {
+                assert(MainFrame.getInstance().getJStockOptions().getStockInputSuggestionListOption() == JStockOptions.StockInputSuggestionListOption.TwoColumns);
+                me = offlineModeCellRenderer;
+            }
         } else {
             assert(mode == Mode.Online);
-            this.setRenderer(onlineModeCellRenderer);
+            me = onlineModeCellRenderer;
         }
-        this.mode = mode;
+
+        if (this.currentListCellRenderer != me) {
+            this.currentListCellRenderer = me;
+            this.setRenderer(this.currentListCellRenderer);
+            // When we change mode, the previous inserted item(s) no longer valid.
+            // Let's clear them up first, before we switch to a new renderer.
+            this.removeAllItems();
+        }
     }
 
     private Observer<AjaxYahooSearchEngineMonitor, AjaxYahooSearchEngine.ResultSetType> getMonitorObserver() {
@@ -597,10 +603,10 @@ public class AutoCompleteJComboBox extends JComboBox {
         ajaxYahooSearchEngineMonitor.stop();
     }
 
-    private Mode mode = null;
     private final ListCellRenderer offlineModeCellRenderer = new StockInfoCellRenderer();
     private final ListCellRenderer onlineModeCellRenderer = new ResultSetCellRenderer();
     private final ListCellRenderer oldListCellRenderer;
+    private ListCellRenderer currentListCellRenderer;
 
     // Online database.
     private final AjaxYahooSearchEngineMonitor ajaxYahooSearchEngineMonitor = new AjaxYahooSearchEngineMonitor();

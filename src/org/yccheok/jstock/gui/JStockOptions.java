@@ -135,6 +135,30 @@ public class JStockOptions {
         this.riseAboveAlertBackgroundColor = riseAboveAlertBackgroundColor;
     }
 
+    /**
+     * @return the stockInputSuggestionListOption
+     */
+    public StockInputSuggestionListOption getStockInputSuggestionListOption() {
+        return stockInputSuggestionListOption;
+    }
+
+    /**
+     * @param stockInputSuggestionListOption the stockInputSuggestionListOption to set
+     */
+    public void setStockInputSuggestionListOption(StockInputSuggestionListOption stockInputSuggestionListOption) {
+        this.stockInputSuggestionListOption = stockInputSuggestionListOption;
+    }
+
+    /**
+     * Option to let user chooses whether a single column stock information will
+     * be displayed, or double columns stock information will be displayed,
+     * while he is inputing to auto complete combo box.
+     */
+    public enum StockInputSuggestionListOption {
+        OneColumn,
+        TwoColumns
+    }
+
     public enum YellowInformationBoxOption {
         Stay,
         Follow,
@@ -159,7 +183,8 @@ public class JStockOptions {
     public static final java.awt.Color DEFAULT_CHAT_OTHER_MESSAGE_COLOR = new java.awt.Color(100, 149, 237);
 
     private static final YellowInformationBoxOption DEFAULT_YELLOW_INFORMATION_BOX_OPTION = YellowInformationBoxOption.Follow;
-    
+    private static final StockInputSuggestionListOption DEFAULT_STOCK_INPUT_SUGGESTION_LIST_OPTION = StockInputSuggestionListOption.OneColumn;
+
     private static final int DEFAULT_HISTORY_DURATION =  10;
 
     /** Creates a new instance of JStockOptions */
@@ -214,6 +239,8 @@ public class JStockOptions {
         this.chatOtherMessageColor = DEFAULT_CHAT_OTHER_MESSAGE_COLOR;
 
         this.yellowInformationBoxOption = DEFAULT_YELLOW_INFORMATION_BOX_OPTION;
+        this.stockInputSuggestionListOption = DEFAULT_STOCK_INPUT_SUGGESTION_LIST_OPTION;
+
         this.locale = Locale.getDefault();
     }
 
@@ -316,6 +343,8 @@ public class JStockOptions {
 
     private YellowInformationBoxOption yellowInformationBoxOption = YellowInformationBoxOption.Follow;
 
+    private StockInputSuggestionListOption stockInputSuggestionListOption = StockInputSuggestionListOption.OneColumn;
+    
     private Locale locale = Locale.getDefault();
 
     private Map<Country, String> currencies = new EnumMap<Country, String>(Country.class);
@@ -424,7 +453,9 @@ public class JStockOptions {
         this.watchlistName = jStockOptions.watchlistName;
 
         this.yellowInformationBoxOption = jStockOptions.yellowInformationBoxOption;
-        
+
+        this.stockInputSuggestionListOption = jStockOptions.stockInputSuggestionListOption;
+
         // We won't save locale into cloud. As to have effect on new locale,
         // restarting the entire application is required. We do not want user
         // to restart the application after loading from cloud.
@@ -529,6 +560,9 @@ public class JStockOptions {
         jStockOptions.watchlistName = this.watchlistName;
 
         jStockOptions.yellowInformationBoxOption = this.yellowInformationBoxOption;
+
+        jStockOptions.stockInputSuggestionListOption = this.stockInputSuggestionListOption;
+
         // We won't save locale into cloud. As to have effect on new locale,
         // restarting the entire application is required. We do not want user
         // to restart the application after loading from cloud.
@@ -654,6 +688,10 @@ public class JStockOptions {
 
         if (this.yellowInformationBoxOption == null) {
             this.yellowInformationBoxOption = YellowInformationBoxOption.Follow;
+        }
+
+        if (this.stockInputSuggestionListOption == null) {
+            this.stockInputSuggestionListOption = StockInputSuggestionListOption.OneColumn;
         }
 
         if (this.getCCEmail() == null) {

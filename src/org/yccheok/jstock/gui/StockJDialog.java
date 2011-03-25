@@ -412,7 +412,6 @@ public class StockJDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-// TODO add your handling code here:
         this.setVisible(false);
         this.dispose();        
     }//GEN-LAST:event_jButton2ActionPerformed
@@ -448,17 +447,14 @@ public class StockJDialog extends javax.swing.JDialog {
     }
     
     private void jRadioButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton4ActionPerformed
-// TODO add your handling code here:
         updateCheckBoxesState();
     }//GEN-LAST:event_jRadioButton4ActionPerformed
 
     private void jRadioButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton3ActionPerformed
-// TODO add your handling code here:
         updateCheckBoxesState();
     }//GEN-LAST:event_jRadioButton3ActionPerformed
 
     private void jRadioButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton2ActionPerformed
-// TODO add your handling code here:
         updateCheckBoxesState();
     }//GEN-LAST:event_jRadioButton2ActionPerformed
     

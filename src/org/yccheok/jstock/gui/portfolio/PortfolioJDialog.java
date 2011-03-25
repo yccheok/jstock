@@ -154,7 +154,6 @@ public class PortfolioJDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        // TODO add your handling code here:
         final int select = jList1.getSelectedIndex();
         if (select < 0 || select >= jList1.getModel().getSize()) {
             JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_you_must_select_portfolio"), MessagesBundle.getString("warning_title_you_must_select_portfolio"), JOptionPane.WARNING_MESSAGE);
@@ -249,7 +248,6 @@ public class PortfolioJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
         String newPortfolioName = null;
         while (true) {
             newPortfolioName = JOptionPane.showInputDialog(this, MessagesBundle.getString("info_message_enter_new_portfolio_name"));
@@ -287,13 +285,11 @@ public class PortfolioJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        // TODO add your handling code here:
         this.setVisible(false);
         this.dispose();
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jList1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jList1MouseClicked
-        // TODO add your handling code here:
         final JList list = (JList)evt.getSource();
         // Double-click
         if (evt.getClickCount() == 2) {          

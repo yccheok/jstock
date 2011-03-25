@@ -267,7 +267,6 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
         List<Stock> stocks = getSelectedStocks();
         if (stocks.size() == 1) {
             this.showNewBuyTransactionJDialog(stocks.get(0), this.getStockLastPrice(stocks.get(0)), true);
@@ -835,11 +834,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
     
     private void buyTreeTableValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_buyTreeTableValueChanged
-        // TODO add your handling code here:
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                if(buyTreeTable.getSelectedRowCount() > 0) {
+                if (buyTreeTable.getSelectedRowCount() > 0) {
                     sellTreeTable.clearSelection();
                 }
             }
@@ -847,11 +845,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_buyTreeTableValueChanged
 
     private void sellTreeTableValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_sellTreeTableValueChanged
-        // TODO add your handling code here:
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                if(sellTreeTable.getSelectedRowCount() > 0) {
+                if (sellTreeTable.getSelectedRowCount() > 0) {
                     buyTreeTable.clearSelection();
                 }
             }
@@ -859,12 +856,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_sellTreeTableValueChanged
 
     private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseClicked
-        // TODO add your handling code here:
         this.clearTableSelection();
     }//GEN-LAST:event_formMouseClicked
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        // TODO add your handling code here:
         final List<Stock> stocks = this.getSelectedStocks(buyTreeTable);
         if (stocks.size() != 1) {
             JOptionPane.showMessageDialog(this, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/messages").getString("info_message_you_need_to_select_only_single_stock_from_buy_portfolio_to_perform_sell_transaction"), java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/messages").getString("info_title_you_need_to_select_only_single_stock_from_buy_portfolio_to_perform_sell_transaction"), JOptionPane.INFORMATION_MESSAGE);
@@ -876,12 +871,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        // TODO add your handling code here:
         showDepositSummaryJDialog();
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-        // TODO add your handling code here:
         showDividendSummaryJDialog();
     }//GEN-LAST:event_jButton5ActionPerformed
 

@@ -5,6 +5,8 @@ JStock 1.0.6 - ????-??-??
   Feature: Able to find new stock which is not included in offline database,
            through an easy way. We no longer need to open up Stock Databse
            dialog box.
+  Feature: Able to choose either 1 columns stock suggestion list or 2 columns
+           stock suggestion list.
   Feature: We will allow user to view stock history, event though offline 
            database isn't ready yet.
   Feature: Investment flow chart able to show the investment activities of

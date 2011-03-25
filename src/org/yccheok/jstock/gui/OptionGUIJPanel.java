@@ -23,10 +23,10 @@ package org.yccheok.jstock.gui;
  *
  * @author yccheok
  */
-public class OptionsChartJPanel extends javax.swing.JPanel implements JStockOptionsObserver {
+public class OptionGUIJPanel extends javax.swing.JPanel implements JStockOptionsObserver {
 
     /** Creates new form OptionsChartJPanel */
-    public OptionsChartJPanel() {
+    public OptionGUIJPanel() {
         initComponents();
     }
 
@@ -40,31 +40,35 @@ public class OptionsChartJPanel extends javax.swing.JPanel implements JStockOpti
     private void initComponents() {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
+        buttonGroup2 = new javax.swing.ButtonGroup();
         jXHeader1 = new org.jdesktop.swingx.JXHeader();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jRadioButton1 = new javax.swing.JRadioButton();
         jRadioButton2 = new javax.swing.JRadioButton();
         jRadioButton3 = new javax.swing.JRadioButton();
+        jPanel3 = new javax.swing.JPanel();
+        jRadioButton4 = new javax.swing.JRadioButton();
+        jRadioButton5 = new javax.swing.JRadioButton();
 
         setLayout(new java.awt.BorderLayout());
 
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
-        jXHeader1.setDescription(bundle.getString("OptionsChartJPanel_Description")); // NOI18N
+        jXHeader1.setDescription(bundle.getString("OptionsGUIJPanel_Description")); // NOI18N
         jXHeader1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/32x32/kchart.png"))); // NOI18N
-        jXHeader1.setTitle(bundle.getString("OptionsChartJPanel_Chart")); // NOI18N
+        jXHeader1.setTitle(bundle.getString("OptionsGUIJPanel_Title")); // NOI18N
         add(jXHeader1, java.awt.BorderLayout.NORTH);
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsChartJPanel_YellowInformationBox"))); // NOI18N
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsGUIJPanel_YellowInformationBox"))); // NOI18N
 
         buttonGroup1.add(jRadioButton1);
-        jRadioButton1.setText(bundle.getString("OptionsChartJPanel_FollowTheBlueBall")); // NOI18N
+        jRadioButton1.setText(bundle.getString("OptionsGUIJPanel_FollowTheBlueBall")); // NOI18N
 
         buttonGroup1.add(jRadioButton2);
-        jRadioButton2.setText(bundle.getString("OptionsChartJPanel_OnTheTopOfChart")); // NOI18N
+        jRadioButton2.setText(bundle.getString("OptionsGUIJPanel_OnTheTopOfChart")); // NOI18N
 
         buttonGroup1.add(jRadioButton3);
-        jRadioButton3.setText(bundle.getString("OptionsChartJPanel_DoNotShow")); // NOI18N
+        jRadioButton3.setText(bundle.getString("OptionsGUIJPanel_DoNotShow")); // NOI18N
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -90,13 +94,44 @@ public class OptionsChartJPanel extends javax.swing.JPanel implements JStockOpti
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsGUIJPanel_StockInputSuggestionList"))); // NOI18N
+
+        buttonGroup2.add(jRadioButton4);
+        jRadioButton4.setText(bundle.getString("OptionsGUIJPanel_DisplayOneColumnsStockInfo")); // NOI18N
+
+        buttonGroup2.add(jRadioButton5);
+        jRadioButton5.setText(bundle.getString("OptionsGUIJPanel_DisplayTwoColumnsStockInfo")); // NOI18N
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jRadioButton4)
+                    .addComponent(jRadioButton5))
+                .addContainerGap(203, Short.MAX_VALUE))
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jRadioButton4)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jRadioButton5)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -104,7 +139,9 @@ public class OptionsChartJPanel extends javax.swing.JPanel implements JStockOpti
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(56, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         add(jPanel1, java.awt.BorderLayout.CENTER);
@@ -113,11 +150,15 @@ public class OptionsChartJPanel extends javax.swing.JPanel implements JStockOpti
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.ButtonGroup buttonGroup2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JRadioButton jRadioButton1;
     private javax.swing.JRadioButton jRadioButton2;
     private javax.swing.JRadioButton jRadioButton3;
+    private javax.swing.JRadioButton jRadioButton4;
+    private javax.swing.JRadioButton jRadioButton5;
     private org.jdesktop.swingx.JXHeader jXHeader1;
     // End of variables declaration//GEN-END:variables
 
@@ -125,13 +166,18 @@ public class OptionsChartJPanel extends javax.swing.JPanel implements JStockOpti
     public void set(JStockOptions jStockOptions) {
         if (jStockOptions.getYellowInformationBoxOption() == JStockOptions.YellowInformationBoxOption.Follow) {
             jRadioButton1.setSelected(true);
-        }
-        else if (jStockOptions.getYellowInformationBoxOption() == JStockOptions.YellowInformationBoxOption.Stay) {
+        } else if (jStockOptions.getYellowInformationBoxOption() == JStockOptions.YellowInformationBoxOption.Stay) {
             jRadioButton2.setSelected(true);
-        }
-        else {
+        } else {
             assert(jStockOptions.getYellowInformationBoxOption() == JStockOptions.YellowInformationBoxOption.Hide);
             jRadioButton3.setSelected(true);
+        }
+
+        if (jStockOptions.getStockInputSuggestionListOption() == JStockOptions.StockInputSuggestionListOption.OneColumn) {
+            jRadioButton4.setSelected(true);
+        } else {
+            assert(jStockOptions.getStockInputSuggestionListOption() == JStockOptions.StockInputSuggestionListOption.TwoColumns);
+            jRadioButton5.setSelected(true);
         }
     }
 
@@ -139,13 +185,18 @@ public class OptionsChartJPanel extends javax.swing.JPanel implements JStockOpti
     public boolean apply(JStockOptions jStockOptions) {
         if (jRadioButton1.isSelected()) {
             jStockOptions.setYellowInformationBoxOption(JStockOptions.YellowInformationBoxOption.Follow);
-        }
-        else if (jRadioButton2.isSelected()) {
+        } else if (jRadioButton2.isSelected()) {
             jStockOptions.setYellowInformationBoxOption(JStockOptions.YellowInformationBoxOption.Stay);
-        }
-        else {
+        } else {
             assert(jRadioButton3.isSelected());
             jStockOptions.setYellowInformationBoxOption(JStockOptions.YellowInformationBoxOption.Hide);
+        }
+
+        if (jRadioButton4.isSelected()) {
+            jStockOptions.setStockInputSuggestionListOption(JStockOptions.StockInputSuggestionListOption.OneColumn);
+        } else {
+            assert(jRadioButton5.isSelected());
+            jStockOptions.setStockInputSuggestionListOption(JStockOptions.StockInputSuggestionListOption.TwoColumns);
         }
         return true;
     }

@@ -94,14 +94,14 @@ public class OptionsJPanel extends javax.swing.JPanel implements JStockOptionsOb
         optionsBrokerJPanel = new OptionsBrokerJPanel();
         optionsSellAdvisorJPanel = new OptionsSellAdvisorJPanel();
         optionsChatJPanel = new OptionsChatJPanel();
-        optionsChartJPanel = new OptionsChartJPanel();
+        optionsGUIJPanel = new OptionGUIJPanel();
         optionsUpdateJPanel = new OptionsUpdateJPanel();
 
         // The size of OptionsJPanel, will be determined by the first added panel.
         addButton(GUIBundle.getString("OptionsJPanel_Broker"), "/images/32x32/calc.png", optionsBrokerJPanel, jButtonBar1, buttonGroup1);
         addButton(GUIBundle.getString("OptionsJPanel_Wealth"), "/images/32x32/money3.png", optionsSellAdvisorJPanel, jButtonBar1, buttonGroup1);
         addButton(GUIBundle.getString("OptionsJPanel_Alert"), "/images/32x32/bell.png", optionsAlertJPanel, jButtonBar1, buttonGroup1);
-        addButton(GUIBundle.getString("OptionsJPanel_Chart"), "/images/32x32/kchart.png", optionsChartJPanel, jButtonBar1, buttonGroup1);
+        addButton(GUIBundle.getString("OptionsJPanel_GUI"), "/images/32x32/kchart.png", optionsGUIJPanel, jButtonBar1, buttonGroup1);
         addButton(GUIBundle.getString("OptionsJPanel_Speed"), "/images/32x32/clock.png", optionsSpeedJPanel, jButtonBar1, buttonGroup1);
         addButton(GUIBundle.getString("OptionsJPanel_Color"), "/images/32x32/colors.png", optionsColorJPanel, jButtonBar1, buttonGroup1);
         addButton(GUIBundle.getString("OptionsJPanel_Network"), "/images/32x32/connect_to_network.png", optionsNetworkJPanel, jButtonBar1, buttonGroup1);
@@ -119,7 +119,7 @@ public class OptionsJPanel extends javax.swing.JPanel implements JStockOptionsOb
         optionsIndicatorJPanel.set(jStockOptions);
         optionsSpeedJPanel.set(jStockOptions);       
         optionsSellAdvisorJPanel.set(jStockOptions);
-        optionsChartJPanel.set(jStockOptions);
+        optionsGUIJPanel.set(jStockOptions);
         optionsChatJPanel.set(jStockOptions);
         optionsUpdateJPanel.set(jStockOptions);
     }
@@ -133,36 +133,36 @@ public class OptionsJPanel extends javax.swing.JPanel implements JStockOptionsOb
     @Override
     public boolean apply(JStockOptions jStockOptions) {
         /* FIXME : We should make use of JStockOptionsObserver interface. */
-        if(optionsBrokerJPanel.apply(jStockOptions) == false)
+        if (optionsBrokerJPanel.apply(jStockOptions) == false)
         {
-            final JToggleButton button = map.get("Broker");
+            final JToggleButton button = map.get(GUIBundle.getString("OptionsJPanel_Broker"));
             
             button.setSelected(true);
             button.doClick();
             return false;
         }
 
-        if(optionsChartJPanel.apply(jStockOptions) == false)
+        if (optionsGUIJPanel.apply(jStockOptions) == false)
         {
-            final JToggleButton button = map.get("Chart");
+            final JToggleButton button = map.get(GUIBundle.getString("OptionsJPanel_GUI"));
 
             button.setSelected(true);
             button.doClick();
             return false;
         }
 
-        if(optionsColorJPanel.apply(jStockOptions) == false)
+        if (optionsColorJPanel.apply(jStockOptions) == false)
         {
-            final JToggleButton button = map.get("Color");
+            final JToggleButton button = map.get(GUIBundle.getString("OptionsJPanel_Color"));
             
             button.setSelected(true);
             button.doClick();
             return false;
         }
         
-        if(optionsAlertJPanel.apply(jStockOptions) == false)
+        if (optionsAlertJPanel.apply(jStockOptions) == false)
         {
-            final JToggleButton button = map.get("Alert");
+            final JToggleButton button = map.get(GUIBundle.getString("OptionsJPanel_Alert"));
             
             button.setSelected(true);
             button.doClick();
@@ -171,34 +171,34 @@ public class OptionsJPanel extends javax.swing.JPanel implements JStockOptionsOb
 
         if (optionsIndicatorJPanel.apply(jStockOptions) == false)
         {
-            final JToggleButton button = map.get("Indicator");
+            final JToggleButton button = map.get(GUIBundle.getString("OptionsJPanel_Indicator"));
             
             button.setSelected(true);
             button.doClick();
             return false;
         }
         
-        if(optionsNetworkJPanel.apply(jStockOptions) == false)
+        if (optionsNetworkJPanel.apply(jStockOptions) == false)
         {
-            final JToggleButton button = map.get("Network");
+            final JToggleButton button = map.get(GUIBundle.getString("OptionsJPanel_Network"));
             
             button.setSelected(true);
             button.doClick();
             return false;
         }
         
-        if(optionsSpeedJPanel.apply(jStockOptions) == false)
+        if (optionsSpeedJPanel.apply(jStockOptions) == false)
         {
-            final JToggleButton button = map.get("Speed");
+            final JToggleButton button = map.get(GUIBundle.getString("OptionsJPanel_Speed"));
             
             button.setSelected(true);
             button.doClick();
             return false;
         }
         
-        if(optionsSellAdvisorJPanel.apply(jStockOptions) == false)
+        if (optionsSellAdvisorJPanel.apply(jStockOptions) == false)
         {
-            final JToggleButton button = map.get("Advisor");
+            final JToggleButton button = map.get(GUIBundle.getString("OptionsJPanel_Wealth"));
             
             button.setSelected(true);
             button.doClick();
@@ -207,7 +207,7 @@ public class OptionsJPanel extends javax.swing.JPanel implements JStockOptionsOb
 
         if(optionsChatJPanel.apply(jStockOptions) == false)
         {
-            final JToggleButton button = map.get("Chat");
+            final JToggleButton button = map.get(GUIBundle.getString("OptionsJPanel_Chat"));
 
             button.setSelected(true);
             button.doClick();
@@ -216,7 +216,7 @@ public class OptionsJPanel extends javax.swing.JPanel implements JStockOptionsOb
 
         if(optionsUpdateJPanel.apply(jStockOptions) == false)
         {
-            final JToggleButton button = map.get("Update");
+            final JToggleButton button = map.get(GUIBundle.getString("OptionsJPanel_Update"));
 
             button.setSelected(true);
             button.doClick();
@@ -235,7 +235,7 @@ public class OptionsJPanel extends javax.swing.JPanel implements JStockOptionsOb
     private OptionsBrokerJPanel optionsBrokerJPanel;
     private OptionsSellAdvisorJPanel optionsSellAdvisorJPanel;
     private OptionsChatJPanel optionsChatJPanel;
-    private OptionsChartJPanel optionsChartJPanel;
+    private OptionGUIJPanel optionsGUIJPanel;
     private OptionsUpdateJPanel optionsUpdateJPanel;
 
     private java.util.Map<String, JToggleButton> map = new java.util.HashMap<String, JToggleButton>();
