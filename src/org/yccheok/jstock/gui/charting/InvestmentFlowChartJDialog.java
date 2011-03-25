@@ -24,7 +24,6 @@ import java.awt.event.ComponentEvent;
 import java.io.File;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -207,10 +206,10 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
         final JFreeChart freeChart = createChart();
         org.yccheok.jstock.charting.Utils.applyChartTheme(freeChart);
-        this.chartPanel = new ChartPanel(freeChart, true, true, true, true, true);
-
+        
         getContentPane().remove(this.layer);
 
+        this.chartPanel = new ChartPanel(freeChart, true, true, true, true, true);        
         this.layer = new org.jdesktop.jxlayer.JXLayer<ChartPanel>(this.chartPanel);
         this.investmentFlowLayerUI = new InvestmentFlowLayerUI<ChartPanel>(this);
         layer.setUI(this.investmentFlowLayerUI);
@@ -336,7 +335,6 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
 
     private XYDataset createInvestDataset() {
         final TimeSeries series = new TimeSeries(GUIBundle.getString("InvestmentFlowChartJDialog_Invest"));
-        final ArrayList<String> toolTips = new ArrayList<String>();
         
         this.totalInvestValue = 0.0;
         for (int i = 0, count = this.investSummary.size(); i < count; i++) {
@@ -366,12 +364,6 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
             final SimpleDate date = activities.getDate();
             final Date d = date.getTime();
             series.add(new Day(d), this.totalInvestValue);
-            final SimpleDateFormat dateFormat = new SimpleDateFormat("d-MMM-yyyy");
-            final java.text.NumberFormat numberFormat = java.text.NumberFormat.getInstance();
-            numberFormat.setMaximumFractionDigits(2);
-            numberFormat.setMinimumFractionDigits(2);
-            final String tips = "<html>Invest: (" + dateFormat.format(d) + ", " + numberFormat.format(amount) + ")<br> " + activities.toSummary() + "</html>";
-            toolTips.add(tips);
 
         }   // for (int i = 0, count = this.investSummary.size(); i < count; i++)
 

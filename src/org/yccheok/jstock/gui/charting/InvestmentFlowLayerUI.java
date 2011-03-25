@@ -923,27 +923,27 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
     private void updatePointAndIndexIfPossible(int dataOffset) {
         Type updatedType = null;
 
+        boolean needToReturnEarly = false;
+
+        // If there is at least one point (Either ROI or Invest) absent from the
+        // screen, we will show them up and return early.
         if (this.investPointIndex < 0) {
-            // There is no invest point appear on this screen. We will make the
-            // invest point appear. We will do the following hacking to ensure
-            // investPointIndex is 0, before calling getPoint. Since dataOffset
-            // will be added to investPointIndex, assigning inverted value of
-            // dataOffset to investPointIndex, will ensure investPointIndex
-            // becoming 0 before calling getPoint.
-            this.investPointIndex = -dataOffset;
-            updatedType = Type.Invest;
+            this.investPointIndex = 0;
+            this.investPoint = getPoint(this.investPointIndex, Type.Invest);
+            this.updateInvestPoint();
+            needToReturnEarly = true;
         }
-        else if (this.ROIPointIndex < 0) {
-            // There is no ROI point appear on this screen. We will make the ROI
-            // point appear. We will do the following hacking to ensure
-            // ROIPointIndex is 0, before calling getPoint. Since dataOffset
-            // will be added to ROIPointIndex, assigning inverted value of
-            // dataOffset to ROIPointIndex, will ensure ROIPointIndex becoming 0
-            // before calling getPoint.
-            this.ROIPointIndex = -dataOffset;
-            updatedType = Type.ROI;
+        if (this.ROIPointIndex < 0) {
+            this.ROIPointIndex = dataOffset + this.ROIPointIndex;
+            this.ROIPoint = getPoint(this.ROIPointIndex, Type.ROI);
+            this.updateROIPoint();
+            needToReturnEarly = true;
         }
 
+        if (needToReturnEarly) {
+            return;
+        }
+        
         int tmpROIPointIndex = -1;
         int tmpInvestPointIndex = -1;
         Point2D tmpROIPoint = null;
