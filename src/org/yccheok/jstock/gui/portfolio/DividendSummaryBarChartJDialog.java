@@ -120,6 +120,13 @@ public class DividendSummaryBarChartJDialog extends javax.swing.JDialog {
 
         for (int i = 0; i < size; i++) {
             final Dividend dividend = this.dividendSummary.get(i);
+
+            // There might be newly added empty records in dividendSummary.
+            // Ignore them.
+            if (dividend.getAmount() <= 0) {
+                continue;
+            }
+
             int selectedIndex = this.jComboBox1.getSelectedIndex();
             if (selectedIndex != 0) {
                 // selectedIndex - 1, as the first item in combo box is "All Stock(s)".
