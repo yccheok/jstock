@@ -190,8 +190,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         getContentPane().add(jPanel1, java.awt.BorderLayout.EAST);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-750)/2, (screenSize.height-500)/2, 750, 500);
+        pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
@@ -260,10 +259,17 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
     }
 
     private void loadDimension() {
+        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
         Dimension dimension = org.yccheok.jstock.gui.Utils.fromXML(Dimension.class, org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "cashflowchartjdialog.xml");
-        if (dimension != null) {
-            java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        if (dimension != null) {            
             setBounds((screenSize.width-(int)dimension.getWidth())/2, (screenSize.height-(int)dimension.getHeight())/2, (int)dimension.getWidth(), (int)dimension.getHeight());
+        } else {
+            // There is a bit hack here. This line of code should be used within
+            // initComponents. However, currently, we are using pack. This is
+            // caused by x-axis scaling problem may occur in certain case, if we
+            // do not call pack. Hence, the hacking is, we will first call pack
+            // (to resolve x-axis scaling problem), followed by setBounds.
+            setBounds((screenSize.width-750)/2, (screenSize.height-500)/2, 750, 500);
         }
     }
 

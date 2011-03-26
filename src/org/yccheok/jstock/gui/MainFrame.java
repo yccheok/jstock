@@ -1434,14 +1434,14 @@ public class MainFrame extends javax.swing.JFrame {
 
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
-    public void run() {
+            public void run() {
                 final MainFrame mainFrame = MainFrame.getInstance();
                 mainFrame.init(getJStockOptions(_args));
                 mainFrame.setExtendedState(Frame.MAXIMIZED_BOTH);
                 mainFrame.setVisible(true);
                 mainFrame.updateDividerLocation();
-    }
-    });
+            }
+        });
     }
 
     // Restore the last saved divider location for portfolio management panel.

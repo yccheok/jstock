@@ -21,6 +21,7 @@
 package org.yccheok.jstock.gui;
 
 import java.awt.Color;
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -38,115 +39,29 @@ import org.yccheok.jstock.engine.Country;
 public class JStockOptions {
 
     /**
-     * @return the yellowInformationBoxOption
+     * Data structure to carry location, size and state of a JFrame.
      */
-    public YellowInformationBoxOption getYellowInformationBoxOption() {
-        return yellowInformationBoxOption;
-    }
+    public static class BoundsEx {
+        /**
+         * Location and size of JFrame.
+         */
+        public final Rectangle bounds;
+        /**
+         * JFrame extended state.
+         */
+        public final int extendedState;
 
-    /**
-     * @param yellowInformationBoxOption the yellowInformationBoxOption to set
-     */
-    public void setYellowInformationBoxOption(YellowInformationBoxOption yellowInformationBoxOption) {
-        this.yellowInformationBoxOption = yellowInformationBoxOption;
-    }
-
-    /**
-     * @return the CCEmail
-     */
-    public String getCCEmail() {
-        return CCEmail;
-    }
-
-    /**
-     * @param CCEmail the CCEmail to set
-     */
-    public void setCCEmail(String CCEmail) {
-        this.CCEmail = CCEmail;
-    }
-
-    /**
-     * @return the locale
-     */
-    public Locale getLocale() {
-        return locale;
-    }
-
-    /**
-     * @param locale the locale to set
-     */
-    public void setLocale(Locale locale) {
-        this.locale = locale;
-    }
-
-    /**
-     * @return the fallBelowAlertForegroundColor
-     */
-    public Color getFallBelowAlertForegroundColor() {
-        return fallBelowAlertForegroundColor;
-    }
-
-    /**
-     * @param fallBelowAlertForegroundColor the fallBelowAlertForegroundColor to set
-     */
-    public void setFallBelowAlertForegroundColor(Color fallBelowAlertForegroundColor) {
-        this.fallBelowAlertForegroundColor = fallBelowAlertForegroundColor;
-    }
-
-    /**
-     * @return the fallBelowAlertBackgroundColor
-     */
-    public Color getFallBelowAlertBackgroundColor() {
-        return fallBelowAlertBackgroundColor;
-    }
-
-    /**
-     * @param fallBelowAlertBackgroundColor the fallBelowAlertBackgroundColor to set
-     */
-    public void setFallBelowAlertBackgroundColor(Color fallBelowAlertBackgroundColor) {
-        this.fallBelowAlertBackgroundColor = fallBelowAlertBackgroundColor;
-    }
-
-    /**
-     * @return the riseAboveAlertForegroundColor
-     */
-    public Color getRiseAboveAlertForegroundColor() {
-        return riseAboveAlertForegroundColor;
-    }
-
-    /**
-     * @param riseAboveAlertForegroundColor the riseAboveAlertForegroundColor to set
-     */
-    public void setRiseAboveAlertForegroundColor(Color riseAboveAlertForegroundColor) {
-        this.riseAboveAlertForegroundColor = riseAboveAlertForegroundColor;
-    }
-
-    /**
-     * @return the riseAboveAlertBackgroundColor
-     */
-    public Color getRiseAboveAlertBackgroundColor() {
-        return riseAboveAlertBackgroundColor;
-    }
-
-    /**
-     * @param riseAboveAlertBackgroundColor the riseAboveAlertBackgroundColor to set
-     */
-    public void setRiseAboveAlertBackgroundColor(Color riseAboveAlertBackgroundColor) {
-        this.riseAboveAlertBackgroundColor = riseAboveAlertBackgroundColor;
-    }
-
-    /**
-     * @return the stockInputSuggestionListOption
-     */
-    public StockInputSuggestionListOption getStockInputSuggestionListOption() {
-        return stockInputSuggestionListOption;
-    }
-
-    /**
-     * @param stockInputSuggestionListOption the stockInputSuggestionListOption to set
-     */
-    public void setStockInputSuggestionListOption(StockInputSuggestionListOption stockInputSuggestionListOption) {
-        this.stockInputSuggestionListOption = stockInputSuggestionListOption;
+        /**
+         * Constructs a data structure to carry location, size and state of a
+         * JFrame.
+         * 
+         * @param bounds location and size of JFrame
+         * @param extendedState JFrame extended state
+         */
+        public BoundsEx(Rectangle bounds, int extendedState) {
+            this.bounds = bounds;
+            this.extendedState = extendedState;
+        }
     }
 
     /**
@@ -159,6 +74,10 @@ public class JStockOptions {
         TwoColumns
     }
 
+    /**
+     * GUI option to determine the behavior of history chart's yellow
+     * information box.
+     */
     public enum YellowInformationBoxOption {
         Stay,
         Follow,
@@ -242,6 +161,8 @@ public class JStockOptions {
         this.stockInputSuggestionListOption = DEFAULT_STOCK_INPUT_SUGGESTION_LIST_OPTION;
 
         this.locale = Locale.getDefault();
+
+        this.boundsEx = null;
     }
 
     private boolean soundEnabled;
@@ -347,6 +268,9 @@ public class JStockOptions {
     
     private Locale locale = Locale.getDefault();
 
+    // Possile be null in entire application life cycle.
+    private BoundsEx boundsEx;
+
     private Map<Country, String> currencies = new EnumMap<Country, String>(Country.class);
 
     private Map<Country, Boolean> currencyExchangeEnable = new EnumMap<Country, Boolean>(Country.class);
@@ -361,6 +285,7 @@ public class JStockOptions {
         this.isAutoBrokerFeeCalculationEnabled = isAutoBrokerFeeCalculationEnabled;
     }
 
+    // Will be used by LoadFromCloudDialog.
     public void insensitiveCopy(JStockOptions jStockOptions) {
         this.singleIndicatorAlert = jStockOptions.singleIndicatorAlert;
         this.popupMessage = jStockOptions.popupMessage;
@@ -460,6 +385,10 @@ public class JStockOptions {
         // restarting the entire application is required. We do not want user
         // to restart the application after loading from cloud.
         //this.locale = jStockOptions.locale;
+
+        // We are not interested in transfering MainFrame size from cloud to
+        // local.
+        //this.boundsEx = jStockOptions.boundsEx;
 
         this.currencies = new EnumMap<Country, String>(jStockOptions.currencies);
     }
@@ -568,6 +497,10 @@ public class JStockOptions {
         // to restart the application after loading from cloud.
         //jStockOptions.locale = this.locale;
 
+        // We are not interested in transfering MainFrame size from local to
+        // cloud.
+        //jStockOptions.boundsEx = this.boundsEx;
+        
         // Perform deep copy.
         jStockOptions.currencies = new EnumMap<Country, String>(this.currencies);
 
@@ -1398,5 +1331,132 @@ public class JStockOptions {
      */
     public void setLocalCurrencyCountry(Country country, Country localCurrencyCountry) {
         this.localCurrencyCountries.put(country, localCurrencyCountry);
+    }
+
+
+    /**
+     * @return the yellowInformationBoxOption
+     */
+    public YellowInformationBoxOption getYellowInformationBoxOption() {
+        return yellowInformationBoxOption;
+    }
+
+    /**
+     * @param yellowInformationBoxOption the yellowInformationBoxOption to set
+     */
+    public void setYellowInformationBoxOption(YellowInformationBoxOption yellowInformationBoxOption) {
+        this.yellowInformationBoxOption = yellowInformationBoxOption;
+    }
+
+    /**
+     * @return the CCEmail
+     */
+    public String getCCEmail() {
+        return CCEmail;
+    }
+
+    /**
+     * @param CCEmail the CCEmail to set
+     */
+    public void setCCEmail(String CCEmail) {
+        this.CCEmail = CCEmail;
+    }
+
+    /**
+     * @return the locale
+     */
+    public Locale getLocale() {
+        return locale;
+    }
+
+    /**
+     * @param locale the locale to set
+     */
+    public void setLocale(Locale locale) {
+        this.locale = locale;
+    }
+
+    /**
+     * @return the boundsEx
+     */
+    public BoundsEx getBoundsEx() {
+        return boundsEx;
+    }
+
+    /**
+     * @param boundsEx the boundsEx to set
+     */
+    public void setBoundsEx(BoundsEx boundsEx) {
+        this.boundsEx = boundsEx;
+    }
+    
+    /**
+     * @return the fallBelowAlertForegroundColor
+     */
+    public Color getFallBelowAlertForegroundColor() {
+        return fallBelowAlertForegroundColor;
+    }
+
+    /**
+     * @param fallBelowAlertForegroundColor the fallBelowAlertForegroundColor to set
+     */
+    public void setFallBelowAlertForegroundColor(Color fallBelowAlertForegroundColor) {
+        this.fallBelowAlertForegroundColor = fallBelowAlertForegroundColor;
+    }
+
+    /**
+     * @return the fallBelowAlertBackgroundColor
+     */
+    public Color getFallBelowAlertBackgroundColor() {
+        return fallBelowAlertBackgroundColor;
+    }
+
+    /**
+     * @param fallBelowAlertBackgroundColor the fallBelowAlertBackgroundColor to set
+     */
+    public void setFallBelowAlertBackgroundColor(Color fallBelowAlertBackgroundColor) {
+        this.fallBelowAlertBackgroundColor = fallBelowAlertBackgroundColor;
+    }
+
+    /**
+     * @return the riseAboveAlertForegroundColor
+     */
+    public Color getRiseAboveAlertForegroundColor() {
+        return riseAboveAlertForegroundColor;
+    }
+
+    /**
+     * @param riseAboveAlertForegroundColor the riseAboveAlertForegroundColor to set
+     */
+    public void setRiseAboveAlertForegroundColor(Color riseAboveAlertForegroundColor) {
+        this.riseAboveAlertForegroundColor = riseAboveAlertForegroundColor;
+    }
+
+    /**
+     * @return the riseAboveAlertBackgroundColor
+     */
+    public Color getRiseAboveAlertBackgroundColor() {
+        return riseAboveAlertBackgroundColor;
+    }
+
+    /**
+     * @param riseAboveAlertBackgroundColor the riseAboveAlertBackgroundColor to set
+     */
+    public void setRiseAboveAlertBackgroundColor(Color riseAboveAlertBackgroundColor) {
+        this.riseAboveAlertBackgroundColor = riseAboveAlertBackgroundColor;
+    }
+
+    /**
+     * @return the stockInputSuggestionListOption
+     */
+    public StockInputSuggestionListOption getStockInputSuggestionListOption() {
+        return stockInputSuggestionListOption;
+    }
+
+    /**
+     * @param stockInputSuggestionListOption the stockInputSuggestionListOption to set
+     */
+    public void setStockInputSuggestionListOption(StockInputSuggestionListOption stockInputSuggestionListOption) {
+        this.stockInputSuggestionListOption = stockInputSuggestionListOption;
     }
 }
