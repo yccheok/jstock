@@ -11,6 +11,7 @@ JStock 1.0.6 - ????-??-??
            database isn't ready yet.
   Feature: Investment flow chart able to show the investment activities of
            individual stock.  
+  Feature: Able to restore previous position and size of JStock. (#3178010)
   Bugfix:  Although it will consume more network resource, portfolio will be
            updated although it is not being viewed. We want user able to view 
            his latest portfolio when he switches to portfolio page, without

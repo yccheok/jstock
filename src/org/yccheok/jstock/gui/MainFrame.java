@@ -149,6 +149,19 @@ public class MainFrame extends javax.swing.JFrame {
         // CurrencyExchangeMonitor, in order to preserve network resource. Hence,
         // we need to call handleJTabbedPaneStateChanged explicitly.
         handleJTabbedPaneStateChanged(this.jTabbedPane1);
+
+        // Restore previous size and location.
+        JStockOptions.BoundsEx boundsEx = jStockOptions.getBoundsEx();
+        if (boundsEx == null) {
+            // First time. Maximize it.
+            this.setExtendedState(Frame.MAXIMIZED_BOTH);
+        } else {
+            if ((boundsEx.extendedState & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH) {
+                this.setExtendedState(Frame.MAXIMIZED_BOTH);
+            } else {
+                this.setBounds(boundsEx.bounds);
+            }
+        }
     }
 
     /**
@@ -903,6 +916,11 @@ public class MainFrame extends javax.swing.JFrame {
     public void save() {
         // Save the last viewed page.
         this.getJStockOptions().setLastSelectedPageIndex(this.jTabbedPane1.getSelectedIndex());
+
+        // Save current window size and position.
+        JStockOptions.BoundsEx boundsEx = new JStockOptions.BoundsEx(this.getBounds(), this.getExtendedState());
+        this.getJStockOptions().setBoundsEx(boundsEx);
+
         this.saveJStockOptions();
         this.saveGUIOptions();
         this.saveChartJDialogOptions();
@@ -1437,7 +1455,6 @@ public class MainFrame extends javax.swing.JFrame {
             public void run() {
                 final MainFrame mainFrame = MainFrame.getInstance();
                 mainFrame.init(getJStockOptions(_args));
-                mainFrame.setExtendedState(Frame.MAXIMIZED_BOTH);
                 mainFrame.setVisible(true);
                 mainFrame.updateDividerLocation();
             }
