@@ -17,6 +17,8 @@ JStock 1.0.6 - ????-??-??
            his latest portfolio when he switches to portfolio page, without
            any waiting.
   Bugfix:  Avoid empty record in dividend chart. (#3198728)
+  Bugfix:  Change Italy stock index from S&P/MIB to FTSE MIB. FTSE MIB replaces
+           S&P/MIB since June 2009. (#3106655)
   
 JStock 1.0.5y - 2011-02-15
   Bugfix:  There is change in stock server policy. Stock server may return empty

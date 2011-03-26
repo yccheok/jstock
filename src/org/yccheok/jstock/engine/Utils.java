@@ -291,7 +291,7 @@ public class Utils {
         indiaIndices.add(Index.BSESN);
         indiaIndices.add(Index.NSEI);
         indonesiaIndices.add(Index.JKSE);
-        italyIndices.add(Index.SPMIB);
+        italyIndices.add(Index.FTSEMIB);
         koreaIndices.add(Index.KS11);
         malaysiaIndices.add(Index.KLSE);
         malaysiaIndices.add(Index.Second);

@@ -34,7 +34,7 @@ public enum Index {
     OMXSPI("Stockholm General", Code.newInstance("^OMXSPI")),
     OMXC20CO("OMX Copenhagen 20", Code.newInstance("OMXC20.CO")),
     OSEAX("OSE All Share", Code.newInstance("^OSEAX")),
-    SPMIB("S&P/MIB", Code.newInstance("^SPMIB")),
+    FTSEMIB("FTSE MIB", Code.newInstance("FTSEMIB.MI")),
     SMSI("Madrid General", Code.newInstance("^SMSI")),
     FTSE("FTSE 100", Code.newInstance("^FTSE")),
     FCHI("CAC 40", Code.newInstance("^FCHI")),
