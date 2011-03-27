@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,13 +43,42 @@ public class Utils {
     }
 
     // Use ThreadLocal to ensure thread safety.
-    private static final ThreadLocal <NumberFormat> numberFormat = new ThreadLocal <NumberFormat>() {
+    private static final ThreadLocal <NumberFormat> currencyNumberFormat = new ThreadLocal <NumberFormat>() {
         @Override protected NumberFormat initialValue() {
             // Instead of limiting currency decimal places to 2 only, we allow
             // them to float between 2 to 3, to avoid from losing precision.
             return new DecimalFormat("#,##0.00#");
         }
     };
+
+    // Use ThreadLocal to ensure thread safety
+    private static final ThreadLocal <NumberFormat> quantityNumberFormat = new ThreadLocal <NumberFormat>() {
+        @Override protected NumberFormat initialValue() {
+            // Instead of limiting currency decimal places to 0 only, we allow
+            // them to float between 0 to 3, to avoid from losing precision.
+            return new DecimalFormat("#,##0.###");
+        }
+    };
+
+    /**
+     * Convert the value to stock quantity representation.
+     *
+     * @param value the value to be converted
+     * @return stock quantity representation
+     */
+    public static String toQuantity(Object value) {
+        return quantityNumberFormat.get().format(value);
+    }
+
+    /**
+     * Convert the value to stock quantity representation.
+     *
+     * @param value the value to be converted
+     * @return stock quantity representation
+     */
+    public static String toQuantity(double value) {
+        return quantityNumberFormat.get().format(value);
+    }
 
     /**
      * Convert the value to currency representation (without symbol).
@@ -58,7 +87,7 @@ public class Utils {
      * @return currency representation (without symbol)
      */
     public static String toCurrency(Object value) {
-        return numberFormat.get().format(value);
+        return currencyNumberFormat.get().format(value);
     }
 
     /**
@@ -68,7 +97,7 @@ public class Utils {
      * @return currency representation (without symbol)
      */
     public static String toCurrency(double value) {
-        return numberFormat.get().format(value);
+        return currencyNumberFormat.get().format(value);
     }
 
     /**
