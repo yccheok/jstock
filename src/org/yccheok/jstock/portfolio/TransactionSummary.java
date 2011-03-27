@@ -1,19 +1,20 @@
 /*
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- * Copyright (C) 2008 Cheok YanCheng <yccheok@yahoo.com>
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.yccheok.jstock.portfolio;
@@ -26,19 +27,19 @@ import org.jdesktop.swingx.treetable.*;
  */
 public class TransactionSummary extends DefaultMutableTreeTableNode implements Commentable {
 
-    public int getQuantity() {
-        int result = 0;
+    public double getQuantity() {
+        double result = 0;
         
         final int count = this.getChildCount();
         
-        for(int i=0; i<count; i++) {
+        for (int i=0; i<count; i++) {
             Object o = this.getChildAt(i);
             
             assert(o instanceof Transaction);
             
             final Transaction transaction = (Transaction)o;
             
-            int quantity = transaction.getQuantity();
+            double quantity = transaction.getQuantity();
             
             result += quantity;
         }

@@ -1,19 +1,20 @@
 /*
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- * Copyright (C) 2008 Cheok YanCheng <yccheok@yahoo.com>
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.yccheok.jstock.portfolio;
@@ -64,13 +65,32 @@ public class Transaction extends DefaultMutableTreeTableNode implements Commenta
         this.netTotal = transaction.netTotal;
     }
     
-    public Transaction setQuantity(int quantity) {
-        return new Transaction(contract.setQuantity(quantity), 
+    /**
+     * Derives a transaction with new quantity from this transaction.
+     * 
+     * @param quantity new quantity
+     * @return a transaction with new quantity derived from this transaction
+     */
+    public Transaction deriveWithQuantity(double quantity) {
+        return new Transaction(contract.deriveWithQuantity(quantity),
                 new SimpleBroker((SimpleBroker)broker), 
                 new SimpleStampDuty((SimpleStampDuty)stampDuty),
                 new SimpleClearingFee((SimpleClearingFee)clearingFee));
     }
-    
+
+    /**
+     * Derives a transaction with new price from this transaction.
+     * 
+     * @param price new price
+     * @return a transaction with new price derived from this transaction
+     */
+    public Transaction deriveWithPrice(double price) {
+        return new Transaction(contract.deriveWithPrice(price),
+                new SimpleBroker((SimpleBroker)broker),
+                new SimpleStampDuty((SimpleStampDuty)stampDuty),
+                new SimpleClearingFee((SimpleClearingFee)clearingFee));
+    }
+
     public Contract getContract() {
         return contract;
     }
@@ -103,7 +123,7 @@ public class Transaction extends DefaultMutableTreeTableNode implements Commenta
         return contract.getTotal();
     }
     
-    public int getQuantity() {
+    public double getQuantity() {
         return contract.getQuantity();
     }
     
