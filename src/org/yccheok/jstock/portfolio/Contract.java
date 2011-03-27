@@ -1,19 +1,20 @@
 /*
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.yccheok.jstock.portfolio;
@@ -32,7 +33,7 @@ public class Contract {
         
         // Optional parameters - initialized to default values
         private Type type = Type.Buy;
-        private int quantity = 0;
+        private double quantity = 0;
         private double price = 0.0;
         private double referencePrice = 0.0;
         private SimpleDate referenceDate = new SimpleDate();
@@ -47,7 +48,7 @@ public class Contract {
             return this;
         }
 
-        public ContractBuilder quantity(int val) {
+        public ContractBuilder quantity(double val) {
             this.quantity = val;
             return this;
         }
@@ -86,7 +87,7 @@ public class Contract {
         return type;
     }
 
-    public int getQuantity() {
+    public double getQuantity() {
         return quantity;
     }
 
@@ -130,11 +131,28 @@ public class Contract {
         this.referenceDate = builder.referenceDate;
     }
     
-    public Contract setQuantity(int quantity) {
+    /**
+     * Derives a contract with new quantity from this contract.
+     *
+     * @param quantity new quantity
+     * @return a contract with new quantity derived from this contract
+     */
+    public Contract deriveWithQuantity(double quantity) {
         ContractBuilder builder = new ContractBuilder(stock, date);
         return builder.type(type).quantity(quantity).price(price).referencePrice(referencePrice).build();
     }
-    
+
+    /**
+     * Derives a contract with new price from this contract.
+     * 
+     * @param price new price
+     * @return a contract with new price derived from this contract
+     */
+    public Contract deriveWithPrice(double price) {
+        ContractBuilder builder = new ContractBuilder(stock, date);
+        return builder.type(type).quantity(quantity).price(price).referencePrice(referencePrice).build();
+    }
+
     public Contract(Contract contract) {
         stock = new Stock(contract.stock);
         date = new SimpleDate(contract.date);
@@ -161,7 +179,7 @@ public class Contract {
     private final Stock stock;
     private final SimpleDate date;
     private final Type type;
-    private final int quantity;
+    private final double quantity;
     private final double price;
     private final double referencePrice;
     private final double total;
