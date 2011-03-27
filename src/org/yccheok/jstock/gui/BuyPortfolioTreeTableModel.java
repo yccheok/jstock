@@ -1,19 +1,20 @@
 /*
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.yccheok.jstock.gui;
@@ -23,6 +24,7 @@ import org.jdesktop.swingx.treetable.*;
 import org.yccheok.jstock.portfolio.*;
 import javax.swing.tree.TreePath;
 import org.yccheok.jstock.engine.Code;
+import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.internationalization.GUIBundle;
 
 /**
@@ -72,7 +74,7 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
     private static final Class[]  cTypes = { 
         TreeTableModel.class,
         org.yccheok.jstock.engine.SimpleDate.class,
-        Integer.class,
+        Double.class,
         Double.class,
         Double.class,
         Double.class,
@@ -88,7 +90,51 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
         Double.class,
         String.class
     };
-    
+
+    /**
+     * Performs stock splitting, or reverse splitting aka merging, on selected
+     * stock info, if ratio is less than 1.
+     *
+     * @param stockInfo the stock info
+     * @param ratio splitting ratio, or reverse splitting ratio if less than 1
+     * @return true if success
+     */
+    public boolean split(StockInfo stockInfo, double ratio) {
+        boolean status = false;
+
+        final Portfolio portfolio = (Portfolio)getRoot();
+        final int count = portfolio.getChildCount();
+
+        TransactionSummary transactionSummary = null;
+
+        for (int i = 0; i < count; i++) {
+            transactionSummary = (TransactionSummary)portfolio.getChildAt(i);
+
+            assert(transactionSummary.getChildCount() > 0);
+
+            final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
+
+            if (true == transaction.getContract().getStock().getCode().equals(stockInfo.code)) {
+                break;
+            }
+        }
+
+        if (null == transactionSummary) return status;
+
+        final int num = transactionSummary.getChildCount();
+
+        for (int i = 0; i < num; i++) {
+            final Transaction transaction = (Transaction)transactionSummary.getChildAt(i);
+            double quantity = transaction.getQuantity() * ratio;
+            // Remember to adjust the purchase price as well.
+            double price = transaction.getContract().getPrice() / ratio;
+            this.editTransaction(transaction.deriveWithQuantity(quantity).deriveWithPrice(price), transaction);
+            status = true;
+        }
+
+        return status;
+    }
+
     public boolean updateStockLastPrice(org.yccheok.jstock.engine.Stock stock) {
         boolean status = false;
 
@@ -104,23 +150,23 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
         
         TransactionSummary transactionSummary = null;
         
-        for(int i=0; i<count; i++) {
+        for (int i = 0; i < count; i++) {
             transactionSummary = (TransactionSummary)portfolio.getChildAt(i);
             
             assert(transactionSummary.getChildCount() > 0);
             
             final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
             
-            if(true == transaction.getContract().getStock().getCode().equals(stock.getCode())) {
+            if (true == transaction.getContract().getStock().getCode().equals(stock.getCode())) {
                 break;
             }
         }
         
-        if(null == transactionSummary) return status;
+        if (null == transactionSummary) return status;
         
         final int num = transactionSummary.getChildCount();
         
-        for(int i=0; i<num; i++) {
+        for (int i = 0; i < num; i++) {
             final Transaction transaction = (Transaction)transactionSummary.getChildAt(i);
                         
             this.modelSupport.fireChildChanged(new TreePath(getPathToRoot(transaction)), i, transaction);
@@ -250,7 +296,7 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
         
         double result = 0.0;
         
-        for(int i=0; i<count; i++) {
+        for (int i = 0; i < count; i++) {
             Object o = portfolio.getChildAt(i);
             
             assert(o instanceof TransactionSummary);
@@ -265,7 +311,7 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
             
             if (price == null) continue;
             
-            final int quantity = transactionSummary.getQuantity();
+            final double quantity = transactionSummary.getQuantity();
             
             result += (price * quantity);
         }
@@ -274,13 +320,17 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
     }
     
     public double getPurchasePrice(TransactionSummary transactionSummary) {
-        if(transactionSummary.getQuantity() == 0.0) return 0.0;
+        if (transactionSummary.getQuantity() == 0.0) {
+            return 0.0;
+        }
         
         return transactionSummary.getTotal() / transactionSummary.getQuantity();
     }
     
     public double getGainLossPrice(TransactionSummary transactionSummary) {
-        if(transactionSummary.getQuantity() == 0.0) return 0.0;
+        if (transactionSummary.getQuantity() == 0.0) {
+            return 0.0;
+        }
         
         return this.getCurrentPrice(transactionSummary) - (transactionSummary.getTotal() / transactionSummary.getQuantity());        
     }

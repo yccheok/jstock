@@ -299,7 +299,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
                 final Activity.Type type = activity.getType();
 
                 if (type == Activity.Type.Buy) {
-                    final int quantity = (Integer)activity.get(Activity.Param.Quantity);
+                    final double quantity = (Double)activity.get(Activity.Param.Quantity);
                     final Stock stock = (Stock)activity.get(Activity.Param.Stock);
                     if (noCodeAddedToMonitor) {
                         this.lookUpCodes.add(stock.getCode());

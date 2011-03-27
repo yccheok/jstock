@@ -48,7 +48,7 @@ public class SellPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel
     private static final Class[] cTypes = {
         TreeTableModel.class,
         org.yccheok.jstock.engine.SimpleDate.class,
-        Integer.class,
+        Double.class,
         Double.class,
         Double.class,
         Double.class,

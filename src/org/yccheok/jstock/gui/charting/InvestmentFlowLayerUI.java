@@ -289,17 +289,19 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
             final Activity activity = activities.get(i);
             // Buy, Sell or Dividend only.
             if (activity.getType() == Activity.Type.Buy) {
-                final int quantity = (Integer)activity.get(Activity.Param.Quantity);
+                final double quantity = (Double)activity.get(Activity.Param.Quantity);
                 final Stock stock = (Stock)activity.get(Activity.Param.Stock);
-                this.ROIParams.add(GUIBundle.getString("InvestmentFlowLayerUI_Own") + " " + quantity + " " + stock.getSymbol());
+                this.ROIParams.add(GUIBundle.getString("InvestmentFlowLayerUI_Own") + " " + 
+                        org.yccheok.jstock.portfolio.Utils.toQuantity(quantity) + " " + stock.getSymbol());
                 final double amount = quantity * this.investmentFlowChartJDialog.getStockPrice(stock.getCode());
                 this.totalROIValue += amount;
                 this.ROIValues.add(org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(amount));
             }
             else if (activity.getType() == Activity.Type.Sell) {
-                final int quantity = (Integer)activity.get(Activity.Param.Quantity);
+                final double quantity = (Double)activity.get(Activity.Param.Quantity);
                 final Stock stock = (Stock)activity.get(Activity.Param.Stock);
-                this.ROIParams.add(activity.getType() + " " + quantity + " " + stock.getSymbol());
+                this.ROIParams.add(activity.getType() + " " +
+                        org.yccheok.jstock.portfolio.Utils.toQuantity(quantity) + " " + stock.getSymbol());
                 this.totalROIValue += activity.getAmount();
                 this.ROIValues.add(org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(activity.getAmount()));
             }
@@ -399,7 +401,8 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         for (int i = 0, size = activities.size(); i < size; i++) {
             final Activity activity = activities.get(i);
             // Buy only.
-            this.investParams.add(activity.getType() + " " + activity.get(Activity.Param.Quantity) + " " + ((Stock)activity.get(Activity.Param.Stock)).getSymbol());
+            this.investParams.add(activity.getType() + " " + 
+                    org.yccheok.jstock.portfolio.Utils.toQuantity(activity.get(Activity.Param.Quantity)) + " " + ((Stock)activity.get(Activity.Param.Stock)).getSymbol());
 
             if (activity.getType() == Activity.Type.Buy) {
                 this.totalInvestValue += activity.getAmount();
