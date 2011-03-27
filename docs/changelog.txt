@@ -22,7 +22,9 @@ JStock 1.0.6 - ????-??-??
   Bugfix:  Avoid having java.util.ConcurrentModificationException in 
            AbstractCompositeFigure's removeAll. This happens when you try to
            delete more than 1 indicator at a time. (#3045128)
-           
+  Bugfix:  Remove splash screen for better simplicity user experience. 
+           (#3047943)
+  
 JStock 1.0.5y - 2011-02-15
   Bugfix:  There is change in stock server policy. Stock server may return empty
            stock symbol for certain stocks, especially for United State stock
