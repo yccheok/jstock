@@ -50,7 +50,7 @@ public abstract class AbstractPortfolioTreeTableModel extends DefaultTreeTableMo
     // transaction will not equal to newTransaction. We just copy it by value.
     //
     public void editTransaction(Transaction newTransaction, Transaction oldTransaction) {
-        if(isValidTransaction(newTransaction) == false) return;
+        if (isValidTransaction(newTransaction) == false) return;
         
         oldTransaction.copyFrom(newTransaction);
         fireTreeTableNodeChanged(oldTransaction);

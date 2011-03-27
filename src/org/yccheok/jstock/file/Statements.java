@@ -381,7 +381,7 @@ public class Statements {
                         // Code first. Follow by symbol.
                         atoms.add(new Atom(stock.getCode().toString(), GUIBundle.getString("MainFrame_Code")));
                         atoms.add(new Atom(stock.getSymbol().toString(), GUIBundle.getString("MainFrame_Symbol")));
-						// OK. I know. This breaks generalization.
+                        // OK. I know. This breaks generalization.
                         if (abstractPortfolioTreeTableModel instanceof SellPortfolioTreeTableModel) {
                             final SimpleDate simpleDate = transaction.getContract().getReferenceDate();
                             DateFormat dateFormat = DateFormat.getDateInstance();
