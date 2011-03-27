@@ -162,7 +162,6 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
     private void initComponents() {
 
         jPanel2 = new javax.swing.JPanel();
-        jComboBox1 = new javax.swing.JComboBox();
         jPanel1 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -203,29 +202,37 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
     }//GEN-LAST:event_formWindowClosing
 
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
-        final JFreeChart freeChart = createChart();
-        org.yccheok.jstock.charting.Utils.applyChartTheme(freeChart);
-        
-        getContentPane().remove(this.layer);
+        synchronized(jComboBox1) {
+            final JFreeChart freeChart = createChart();
+            org.yccheok.jstock.charting.Utils.applyChartTheme(freeChart);
 
-        this.chartPanel = new ChartPanel(freeChart, true, true, true, true, true);        
-        this.layer = new org.jdesktop.jxlayer.JXLayer<ChartPanel>(this.chartPanel);
-        this.investmentFlowLayerUI = new InvestmentFlowLayerUI<ChartPanel>(this);
-        layer.setUI(this.investmentFlowLayerUI);
+            getContentPane().remove(this.layer);
 
-        getContentPane().add(layer, java.awt.BorderLayout.CENTER);
-        getContentPane().invalidate();
-        getContentPane().validate();
-        
-        // Make chartPanel able to receive key event.
-        // So that we may use arrow left/right key to move around yellow
-        // information boxes. We may also use up/down key to perform combo box
-        // selection.
-        this.chartPanel.setFocusable(true);
-        this.chartPanel.requestFocus();
+            this.chartPanel = new ChartPanel(freeChart, true, true, true, true, true);
+            this.layer = new org.jdesktop.jxlayer.JXLayer<ChartPanel>(this.chartPanel);
+            this.investmentFlowLayerUI = new InvestmentFlowLayerUI<ChartPanel>(this);
+            layer.setUI(this.investmentFlowLayerUI);
 
-        // Handle zoom-in.
-        addChangeListener(this.chartPanel);
+            getContentPane().add(layer, java.awt.BorderLayout.CENTER);
+            getContentPane().invalidate();
+            getContentPane().validate();
+
+            // Make chartPanel able to receive key event.
+            // So that we may use arrow left/right key to move around yellow
+            // information boxes. We may also use up/down key to perform combo box
+            // selection.
+            this.chartPanel.setFocusable(true);
+            this.chartPanel.requestFocus();
+
+            // Handle zoom-in.
+            addChangeListener(this.chartPanel);
+
+            Dimension d = this.chartPanel.getSize();
+            //d.setSize(d.width - 1, d.height);
+            this.chartPanel.setPreferredSize(d);
+            this.pack();
+            this.loadDimension();
+        }   // synchronized(jComboBox1)
     }//GEN-LAST:event_jComboBox1ActionPerformed
 
     /**
@@ -273,9 +280,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         }
     }
 
-    // Use synchronized, as it will be accessed by monitor and createChart
-    // method simultaneously.
-    private synchronized void updateROITimeSeries() {
+    private void updateROITimeSeries() {
         final boolean noCodeAddedToMonitor = this.realTimeStockMonitor.isEmpty();
 
         // Use local variables for thread safe.
@@ -543,14 +548,20 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
             this.lookUpCodes.remove(stock.getCode());
         }
 
-        final double beforeUpdateTotalROIValue = this.totalROIValue;
-        // Calling updateROITimeSeries will update this.totalROIValue.
-        this.updateROITimeSeries();
-        if (this.totalROIValue != beforeUpdateTotalROIValue) {
-            // We will update yellow information boxes, if there is update
-            // in ROI value.
-            investmentFlowLayerUI.updateInvestPoint();
-            investmentFlowLayerUI.updateROIPoint();
+        // Mutual exclusive with combo box event. So that user thread and
+        // event dispatching thread will not be accessing the same variables
+        // through updateROITimeSeries, updateInvestPoint and updateROIPoint
+        // simultaneously.
+        synchronized(jComboBox1) {
+            final double beforeUpdateTotalROIValue = this.totalROIValue;
+            // Calling updateROITimeSeries will update this.totalROIValue.
+            this.updateROITimeSeries();
+            if (this.totalROIValue != beforeUpdateTotalROIValue) {
+                // We will update yellow information boxes, if there is update
+                // in ROI value.
+                investmentFlowLayerUI.updateInvestPoint();
+                investmentFlowLayerUI.updateROIPoint();
+            }
         }
 
         if (this.lookUpCodes.isEmpty()) {
@@ -645,7 +656,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
     private static final Log log = LogFactory.getLog(InvestmentFlowChartJDialog.class);
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox jComboBox1;
+    private final javax.swing.JComboBox jComboBox1 = new javax.swing.JComboBox();
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     // End of variables declaration//GEN-END:variables

@@ -19,7 +19,10 @@ JStock 1.0.6 - ????-??-??
   Bugfix:  Avoid empty record in dividend chart. (#3198728)
   Bugfix:  Change Italy stock index from S&P/MIB to FTSE MIB. FTSE MIB replaces
            S&P/MIB since June 2009. (#3106655)
-  
+  Bugfix:  Avoid having java.util.ConcurrentModificationException in 
+           AbstractCompositeFigure's removeAll. This happens when you try to
+           delete more than 1 indicator at a time. (#3045128)
+           
 JStock 1.0.5y - 2011-02-15
   Bugfix:  There is change in stock server policy. Stock server may return empty
            stock symbol for certain stocks, especially for United State stock
