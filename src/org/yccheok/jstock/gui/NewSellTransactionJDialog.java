@@ -126,7 +126,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
 
         jLabel2.setText(bundle.getString("NewBuyTransactionJDialog_Symbol")); // NOI18N
 
-        jSpinner1.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(100), Integer.valueOf(1), null, Integer.valueOf(100)));
+        jSpinner1.setModel(new javax.swing.SpinnerNumberModel(Double.valueOf(100.0d), Double.valueOf(1.0d), null, Double.valueOf(100.0d)));
         jSpinner1.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 jSpinner1StateChanged(evt);
@@ -405,7 +405,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         final Stock _stock = transaction.getContract().getStock();
         final Symbol symbol = _stock.getSymbol();
         final Date date = transaction.getContract().getDate().getCalendar().getTime();
-        final int quantity = transaction.getContract().getQuantity();
+        final double quantity = transaction.getContract().getQuantity();
         final double price = transaction.getContract().getPrice();
         final double value = transaction.getTotal();
         final double brokerFee = transaction.getCalculatedBroker();
@@ -441,7 +441,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         {
             final DateField dateField = (DateField)jPanel3;
             final SimpleDate date = new SimpleDate((Date)dateField.getValue());
-            final int unit = ((java.lang.Integer)this.jSpinner1.getValue());
+            final double unit = ((java.lang.Double)this.jSpinner1.getValue());
             final double price = ((Double)this.jFormattedTextField1.getValue());
             Contract.ContractBuilder builder = new Contract.ContractBuilder(stock, date);
             final Contract contract = builder.type(type).quantity(unit).price(price).referencePrice(this.sellTransaction.getContract().getReferencePrice()).referenceDate(this.sellTransaction.getContract().getReferenceDate()).build();
@@ -474,7 +474,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         else {
             final DateField dateField = (DateField)jPanel3;
             final SimpleDate date = new SimpleDate((Date)dateField.getValue());
-            final int unit = ((java.lang.Integer)this.jSpinner1.getValue());
+            final double unit = ((java.lang.Double)this.jSpinner1.getValue());
             final double price = ((Double)this.jFormattedTextField1.getValue());
 
             for (Transaction transaction : this.buyTransactions) {
@@ -573,7 +573,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
 
             SwingUtilities.invokeLater(new Runnable() {@Override public void run() {
                 final String name = jTextField1.getText();
-                final int unit = (Integer)jSpinner1.getValue();
+                final double unit = (Double)jSpinner1.getValue();
                 final double price = (Double)jFormattedTextField1.getValue();
                 final DateField dateField = (DateField)jPanel3;
                 final Date date = (Date)dateField.getValue();
@@ -604,13 +604,13 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         }
         else {
             SwingUtilities.invokeLater(new Runnable() {@Override public void run() {
-                final int unit = (Integer)jSpinner1.getValue();
+                final double unit = (Double)jSpinner1.getValue();
                 final double price = (Double)jFormattedTextField1.getValue();
                 final double brokerFee = (Double)jFormattedTextField4.getValue();
                 final double clearingFee = (Double)jFormattedTextField5.getValue();
                 final double stampDuty = (Double)jFormattedTextField7.getValue();
 
-                final double sellValue = price * (double)unit;
+                final double sellValue = price * unit;
                 final double buyValue = isBatchUpdate ? NewSellTransactionJDialog.this.buyValue : (buyPrice * (double)unit);
                 final double totalCost = buyValue + brokerFee + clearingFee + stampDuty;
                 final double netProfit = sellValue - totalCost;
@@ -698,9 +698,11 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
     public double suggestBestSellingPrice() {
         final double expectedProfitPercentage = MainFrame.getInstance().getJStockOptions().getExpectedProfitPercentage();
         
-        final int unit = (Integer)jSpinner1.getValue();
+        final double unit = (Double)jSpinner1.getValue();
         
-        if(unit <= 0) return 0.0;
+        if (unit <= 0.0) {
+            return 0.0;
+        }
         
         final double brokerFee = (Double)jFormattedTextField4.getValue();
         final double clearingFee = (Double)jFormattedTextField5.getValue();

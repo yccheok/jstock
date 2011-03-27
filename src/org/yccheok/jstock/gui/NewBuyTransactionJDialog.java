@@ -122,7 +122,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
 
         jLabel2.setText(bundle.getString("NewSellTransactionJDialog_Symbol")); // NOI18N
 
-        jSpinner1.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(100), Integer.valueOf(1), null, Integer.valueOf(100)));
+        jSpinner1.setModel(new javax.swing.SpinnerNumberModel(Double.valueOf(100.0d), Double.valueOf(1.0d), null, Double.valueOf(100.0d)));
         jSpinner1.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 jSpinner1StateChanged(evt);
@@ -314,7 +314,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         this.stock = transaction.getContract().getStock();
         final Symbol symbol = stock.getSymbol();
         final Date date = transaction.getContract().getDate().getCalendar().getTime();
-        final int quantity = transaction.getContract().getQuantity();
+        final double quantity = transaction.getContract().getQuantity();
         final double price = transaction.getContract().getPrice();
         final double value = transaction.getTotal();
         final double brokerFee = transaction.getCalculatedBroker();
@@ -339,7 +339,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         
         final SimpleDate date = new SimpleDate((Date)dateField.getValue());
         final Contract.Type type = Contract.Type.Buy;
-        final int unit = ((java.lang.Integer)this.jSpinner1.getValue());
+        final double unit = ((java.lang.Double)this.jSpinner1.getValue());
         final double price = ((Double)this.jFormattedTextField1.getValue());
         
         Contract.ContractBuilder builder = new Contract.ContractBuilder(this.stock, date);
@@ -473,7 +473,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
             jFormattedTextField5.commitEdit();
             jFormattedTextField6.commitEdit();
         } catch (ParseException ex) {
-            log.error("", ex);
+            log.error(null, ex);
         }
     }
     
@@ -489,7 +489,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
             
             SwingUtilities.invokeLater(new Runnable() { public void run() {
                 final String name = jTextField1.getText();
-                final int unit = (Integer)jSpinner1.getValue();
+                final double unit = (Double)jSpinner1.getValue();
                 final double price = (Double)jFormattedTextField1.getValue();
                 final DateField dateField = (DateField)jPanel3;
                 final Date date = (Date)dateField.getValue();
@@ -509,7 +509,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         }
         else {
             SwingUtilities.invokeLater(new Runnable() { public void run() {
-                final int unit = (Integer)jSpinner1.getValue();
+                final double unit = (Double)jSpinner1.getValue();
                 final double price = (Double)jFormattedTextField1.getValue();
                 final double brokerFee = (Double)jFormattedTextField3.getValue();
                 final double clearingFee = (Double)jFormattedTextField4.getValue();

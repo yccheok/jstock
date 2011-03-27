@@ -128,7 +128,7 @@
                           <Component id="jFormattedTextField5" linkSize="2" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
-                  <EmptySpace pref="35" max="32767" attributes="0"/>
+                  <EmptySpace pref="41" max="32767" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jLabel10" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jFormattedTextField6" linkSize="2" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -153,7 +153,7 @@
         <Component class="javax.swing.JSpinner" name="jSpinner1">
           <Properties>
             <Property name="model" type="javax.swing.SpinnerModel" editor="org.netbeans.modules.form.editors2.SpinnerModelEditor">
-              <SpinnerModel initial="100" minimum="1" numberType="java.lang.Integer" stepSize="100" type="number"/>
+              <SpinnerModel initial="100.0" minimum="1.0" numberType="java.lang.Double" stepSize="100.0" type="number"/>
             </Property>
           </Properties>
           <Events>
