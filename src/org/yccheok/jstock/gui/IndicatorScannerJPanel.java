@@ -166,7 +166,10 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         m.setStatusBar(true, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("IndicatorScannerJPanel_IndicatorScannerIsScanning..."));
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    private void initGUIOptions() {        
+    /**
+     * Initialize GUI options of this indicator scanner panel.
+     */
+    public void initGUIOptions() {
         File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "indicatorscannerjpanel.xml");
         GUIOptions guiOptions = org.yccheok.jstock.gui.Utils.fromXML(GUIOptions.class, f);
 

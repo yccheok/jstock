@@ -348,14 +348,20 @@ public class AutoCompleteJComboBox extends JComboBox {
                         }
                     }
                     else {
-                        final Object object = AutoCompleteJComboBox.this.getEditor().getItem();
-
-                        if (object instanceof String) {
-                            String lastEnteredString = ((String)object).trim();
-                            lastEnteredStockInfo = AutoCompleteJComboBox.this.stockInfoDatabase.searchStockInfo(lastEnteredString);
-                        }
-                        else {
-                            assert(false);
+                        // If item count is 0, this means stockInfoDatabase
+                        // unable provide us any result based on user query. I
+                        // suspect we still need to below code, as 
+                        // stockInfoDatabase will just return null. However, it
+                        // should make no harm at this moment.
+                        if (AutoCompleteJComboBox.this.stockInfoDatabase != null) {
+                            final Object object = AutoCompleteJComboBox.this.getEditor().getItem();
+                            if (object instanceof String) {
+                                String lastEnteredString = ((String)object).trim();
+                                lastEnteredStockInfo = AutoCompleteJComboBox.this.stockInfoDatabase.searchStockInfo(lastEnteredString);
+                            }
+                            else {
+                                assert(false);
+                            }
                         }
                     }
 

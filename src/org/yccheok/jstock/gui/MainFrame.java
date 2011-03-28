@@ -1934,8 +1934,11 @@ public class MainFrame extends javax.swing.JFrame {
             this.indicatorPanel.initModuleProjectManager();
         }
 
-        // Do we need to reload GUI settings, and chart dialog options?
-        // Will sudden change in GUI, give user a shock?
+        // I will try to reload the GUI settings for Stock Watchlist and Stock
+        // Indicator Scanner. I hope that the sudden change in GUI will not give
+        // user a shock.
+        this.initGUIOptions();
+        this.indicatorScannerJPanel.initGUIOptions();
     }
 
     private void changeCountry(Country country) {
