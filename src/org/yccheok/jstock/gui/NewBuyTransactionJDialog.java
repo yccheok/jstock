@@ -122,7 +122,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
 
         jLabel2.setText(bundle.getString("NewSellTransactionJDialog_Symbol")); // NOI18N
 
-        jSpinner1.setModel(new javax.swing.SpinnerNumberModel(Double.valueOf(100.0d), Double.valueOf(1.0d), null, Double.valueOf(100.0d)));
+        jSpinner1.setModel(new javax.swing.SpinnerNumberModel(Double.valueOf(100.0d), Double.valueOf(0.0010d), null, Double.valueOf(100.0d)));
         jSpinner1.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 jSpinner1StateChanged(evt);

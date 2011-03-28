@@ -64,7 +64,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         }
     }
 
-    private void setMaxSellQuantity(int maxSellQuantity) {
+    private void setMaxSellQuantity(double maxSellQuantity) {
         SpinnerNumberModel spinnerNumberModel = (SpinnerNumberModel)jSpinner1.getModel();
         spinnerNumberModel.setMaximum(maxSellQuantity);
     }
@@ -126,7 +126,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
 
         jLabel2.setText(bundle.getString("NewBuyTransactionJDialog_Symbol")); // NOI18N
 
-        jSpinner1.setModel(new javax.swing.SpinnerNumberModel(Double.valueOf(100.0d), Double.valueOf(1.0d), null, Double.valueOf(100.0d)));
+        jSpinner1.setModel(new javax.swing.SpinnerNumberModel(Double.valueOf(100.0d), Double.valueOf(0.0010d), null, Double.valueOf(100.0d)));
         jSpinner1.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 jSpinner1StateChanged(evt);
@@ -362,7 +362,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         final Stock _stock = transactions.get(0).getContract().getStock();
         final Symbol symbol = _stock.getSymbol();
         final Date date = java.util.Calendar.getInstance().getTime();
-        int quantity = 0;
+        double quantity = 0.0;
         this.buyValue = 0.0;
         for (Transaction transaction : transactions) {
             quantity += transaction.getQuantity();

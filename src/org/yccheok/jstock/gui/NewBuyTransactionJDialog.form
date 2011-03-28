@@ -153,7 +153,7 @@
         <Component class="javax.swing.JSpinner" name="jSpinner1">
           <Properties>
             <Property name="model" type="javax.swing.SpinnerModel" editor="org.netbeans.modules.form.editors2.SpinnerModelEditor">
-              <SpinnerModel initial="100.0" minimum="1.0" numberType="java.lang.Double" stepSize="100.0" type="number"/>
+              <SpinnerModel initial="100.0" minimum="0.0010" numberType="java.lang.Double" stepSize="100.0" type="number"/>
             </Property>
           </Properties>
           <Events>
