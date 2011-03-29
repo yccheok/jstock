@@ -14,6 +14,8 @@ JStock 1.0.6 - ????-??-??
   Feature: Able to restore previous position and size of JStock. (#3178010)
   Feature: Supports stock buy and sell units in floating point. (#3193411)
   Feature: Supports stock merging and splitting.
+  Feature: We will reload table GUI option from cloud, for Stock Watchlist and
+           Stock Indicator Scanner.  
   Bugfix:  Although it will consume more network resource, portfolio will be
            updated although it is not being viewed. We want user able to view 
            his latest portfolio when he switches to portfolio page, without
