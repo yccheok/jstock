@@ -714,9 +714,14 @@ public class Utils {
         return(AlphaComposite.getInstance(type, alpha));
     }
 
-    public static boolean migrateFrom104jTo105() {
+    /**
+     * Migrates configuration data from version 1.0.5y to 1.0.6.
+     *
+     * @return true if migration success
+     */
+    public static boolean migrateFrom105yTo106() {
         // File (or directory) with old name
-        final File oldDirectory = new File(System.getProperty("user.home") + File.separator + ".jstock" + File.separator + "1.0.4" + File.separator);
+        final File oldDirectory = new File(System.getProperty("user.home") + File.separator + ".jstock" + File.separator + "1.0.5" + File.separator);
 
         // File (or directory) with new name
         final File newDirectory = new File(getUserDataDirectory());
@@ -726,20 +731,14 @@ public class Utils {
             return true;
         }
 
-        // No 1.0.4j found?
+        // No 1.0.5y found?
         if (oldDirectory.isDirectory() == false || oldDirectory.exists() == false) {
             return true;
         }
 
         // Rename file (or directory)
-        boolean success = oldDirectory.renameTo(newDirectory);
-        if (!success) {
-            return false;
-        }
+        boolean status = oldDirectory.renameTo(newDirectory);
 
-        // Indicator directory no longer backward compataible.
-        final File indicatorDirectory = new File(getUserDataDirectory() + "indicator" + File.separator);
-        final boolean status = deleteDir(indicatorDirectory, true);
         return status;
     }
 
@@ -1242,7 +1241,7 @@ public class Utils {
         if (applicationVersionID == APPLICATION_VERSION_ID) {
             return true;
         }
-        else if (applicationVersionID >= 1051 && applicationVersionID <= 1073) {
+        else if (applicationVersionID >= 1051 && applicationVersionID <= 1074) {
             return true;
         }
       
@@ -2256,12 +2255,12 @@ public class Utils {
     private static volatile List<String> NTPServers = null;
 
     // We will use this as directory name. Do not have space or special characters.
-    private static final String APPLICATION_VERSION_STRING = "1.0.5";
+    private static final String APPLICATION_VERSION_STRING = "1.0.6";
 
     // For About box comparision on latest version purpose.
-    // 1.0.5y
+    // 1.0.6
     // Remember to update isCompatible method.
-    private static final int APPLICATION_VERSION_ID = 1074;
+    private static final int APPLICATION_VERSION_ID = 1075;
 
     private static Executor zombiePool = Executors.newFixedThreadPool(Utils.NUM_OF_THREADS_ZOMBIE_POOL);
 

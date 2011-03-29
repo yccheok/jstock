@@ -1428,12 +1428,12 @@ public class MainFrame extends javax.swing.JFrame {
      */
     public static void main(String args[]) {
         /* This ugly code shall be removed in next few release. */
-        if (false == Utils.migrateFrom104jTo105()) {
+        if (false == Utils.migrateFrom105yTo106()) {
             final int choice = JOptionPane.showConfirmDialog(null,
-                "JStock unable to read previous 1.0.4j portfolio and settings, continue?\n\nPress \"Yes\" to continue, BUT all your data will lost.\n\nOr, Press \"No\", restart your machine and try again.",
-                "JStock unable to read previous 1.0.4j portfolio and settings",
+                "JStock unable to read previous 1.0.5y portfolio and settings, continue?\n\nPress \"Yes\" to continue, BUT all your data will lost.\n\nOr, Press \"No\", restart your machine and try again.",
+                "JStock unable to read previous 1.0.5y portfolio and settings",
                 JOptionPane.YES_NO_OPTION);
-            log.error("Migration from 1.0.4j to 1.0.5 fail.");
+            log.error("Migration from 1.0.5y to 1.0.6 fail.");
 
             if (choice != JOptionPane.YES_OPTION) {
                 System.exit(0);
