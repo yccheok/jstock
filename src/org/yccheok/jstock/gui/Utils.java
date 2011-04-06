@@ -111,6 +111,7 @@ import org.apache.commons.lang.CharUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.net.TimeTCPClient;
+import org.jdesktop.jxlayer.JXLayer;
 import org.yccheok.jstock.analysis.Connection;
 import org.yccheok.jstock.analysis.DoubleConstantOperator;
 import org.yccheok.jstock.analysis.EqualityOperator;
@@ -2022,6 +2023,24 @@ public class Utils {
             }
         }
         return true;
+    }
+
+    /**
+     * Returns a JXLayer with busy indicator, which wraps around the auto
+     * complete combo box.
+     *
+     * @param autoCompleteJComboBox the auto complete combo box
+     * @return a JXLayer with busy indicator, which wraps around the auto
+     * complete combo box
+     */
+    public static JXLayer<JComboBox> getBusyJXLayer(AutoCompleteJComboBox autoCompleteJComboBox) {
+        // Wrap combo box.
+        final JXLayer<JComboBox> layer = new JXLayer<JComboBox>(autoCompleteJComboBox);
+        // Set our LayerUI.
+        JComboBoxLayerUI jComboBoxLayerUI = new JComboBoxLayerUI();
+        layer.setUI(jComboBoxLayerUI);
+        autoCompleteJComboBox.attachBusyObserver(jComboBoxLayerUI);
+        return layer;
     }
 
     /**

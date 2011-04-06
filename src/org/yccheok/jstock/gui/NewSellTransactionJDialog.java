@@ -40,9 +40,6 @@ import org.yccheok.jstock.portfolio.Broker;
 import org.yccheok.jstock.portfolio.BrokingFirm;
 import org.yccheok.jstock.portfolio.ClearingFee;
 import org.yccheok.jstock.portfolio.Contract;
-import org.yccheok.jstock.portfolio.SimpleBroker;
-import org.yccheok.jstock.portfolio.SimpleClearingFee;
-import org.yccheok.jstock.portfolio.SimpleStampDuty;
 import org.yccheok.jstock.portfolio.StampDuty;
 import org.yccheok.jstock.portfolio.Transaction;
 
@@ -56,7 +53,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         
-        if(shouldAutoCalculateBrokerFee())
+        if (shouldAutoCalculateBrokerFee())
         {
             this.jFormattedTextField4.setEditable(false);
             this.jFormattedTextField5.setEditable(false);
@@ -373,6 +370,8 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         double value = price * quantity;
 
         this.jTextField1.setText(symbol.toString());
+        // So that the 1st character is being displayed.
+        this.jTextField1.setCaretPosition(0);
         ((DateField)jPanel3).setValue(date);
         this.jSpinner1.setValue(quantity);
         this.jFormattedTextField1.setValue(price);

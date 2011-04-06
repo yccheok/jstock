@@ -55,7 +55,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
     public NewBuyTransactionJDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        
+        this.jPanel1.add(Utils.getBusyJXLayer((AutoCompleteJComboBox)this.jComboBox1));
         if (shouldAutoCalculateBrokerFee())
         {
             this.jFormattedTextField3.setEditable(false);
@@ -80,6 +80,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jComboBox1 = new AutoCompleteJComboBox();
         jPanel2 = new javax.swing.JPanel();
         jTextField1 = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
@@ -104,7 +105,11 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         jButton2 = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
-        jComboBox1 = new AutoCompleteJComboBox();
+
+        jComboBox1.setEditable(true);
+        jComboBox1.setPreferredSize(new java.awt.Dimension(110, 24));
+        ((AutoCompleteJComboBox)jComboBox1).attachStockInfoObserver(this.getStockInfoObserver());
+        ((AutoCompleteJComboBox)jComboBox1).attachResultObserver(this.getResultObserver());
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
@@ -257,7 +262,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jFormattedTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 41, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 49, Short.MAX_VALUE)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel10)
                     .addComponent(jFormattedTextField6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -292,12 +297,6 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
 
         jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/inbox.png"))); // NOI18N
         jPanel1.add(jLabel6);
-
-        jComboBox1.setEditable(true);
-        jComboBox1.setPreferredSize(new java.awt.Dimension(110, 24));
-        ((AutoCompleteJComboBox)jComboBox1).attachStockInfoObserver(this.getStockInfoObserver());
-        ((AutoCompleteJComboBox)jComboBox1).attachResultObserver(this.getResultObserver());
-        jPanel1.add(jComboBox1);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.NORTH);
 
@@ -624,6 +623,8 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
     private void addStockInfoFromAutoCompleteJComboBox(StockInfo stockInfo) {
         NewBuyTransactionJDialog.this.stock = Utils.getEmptyStock(stockInfo);
         NewBuyTransactionJDialog.this.jTextField1.setText(NewBuyTransactionJDialog.this.stock.getSymbol().toString());
+        // So that the 1st character is being displayed.
+        NewBuyTransactionJDialog.this.jTextField1.setCaretPosition(0);
     }
 
     private static final Log log = LogFactory.getLog(NewBuyTransactionJDialog.class);

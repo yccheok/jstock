@@ -44,7 +44,6 @@ import java.util.concurrent.Executors;
 import javax.imageio.ImageIO;
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
-import org.jdesktop.jxlayer.JXLayer;
 import org.yccheok.jstock.alert.SMSLimiter;
 import org.yccheok.jstock.analysis.Indicator;
 import org.yccheok.jstock.analysis.OperatorIndicator;
@@ -198,14 +197,8 @@ public class MainFrame extends javax.swing.JFrame {
     // Install JXLayer around JComboBox.
     // It is used to display busy indicator.
     private void initJXLayerOnJComboBox() {
-        // Wrap combo box.
-        final JXLayer<JComboBox> layer = new JXLayer<JComboBox>(this.jComboBox1);
-        // Set our LayerUI.
-        JComboBoxLayerUI jComboBoxLayerUI = new JComboBoxLayerUI();
-        layer.setUI(jComboBoxLayerUI);
-        ((AutoCompleteJComboBox)this.jComboBox1).attachBusyObserver(jComboBoxLayerUI);
         // Add the layer as usual combo box.
-        jPanel1.add(layer);
+        jPanel1.add(Utils.getBusyJXLayer((AutoCompleteJComboBox)this.jComboBox1));
     }
 
     /** This method is called from within the constructor to

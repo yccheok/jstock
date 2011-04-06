@@ -1,6 +1,12 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.6a - ????-??-??
+  Bugfix:  Better usability in auto complete combo box, by displaying busy
+           indicator in both indicator editor and buy dialog box.
+  Bugfix:  Better usability in buy dialog box, by making sure the first
+           character of stock symbol is always being displayed.
+  
 JStock 1.0.6 - 2011-03-30
   Feature: Able to find new stock which is not included in offline database,
            through an easy way. We no longer need to open up Stock Databse

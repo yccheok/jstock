@@ -64,6 +64,8 @@ public class IndicatorPanel extends JPanel {
     public IndicatorPanel() {    
         ResourceBundleUtil labels = ResourceBundleUtil.getBundle("org.jhotdraw.draw.Labels");
         initComponents();
+        this.jPanel7.add(Utils.getBusyJXLayer((AutoCompleteJComboBox)this.jComboBox1));
+        
         editor = new DefaultDrawingEditor();
         editor.add(view);
         
@@ -161,6 +163,7 @@ public class IndicatorPanel extends JPanel {
         jPanel10 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jList2 = new javax.swing.JList();
+        jComboBox1 = new AutoCompleteJComboBox();
         jSplitPane1 = new javax.swing.JSplitPane();
         jPanel4 = new javax.swing.JPanel();
         scrollPane = new javax.swing.JScrollPane();
@@ -182,7 +185,6 @@ public class IndicatorPanel extends JPanel {
         jButton4 = new javax.swing.JButton();
         jButton6 = new javax.swing.JButton();
         jPanel7 = new javax.swing.JPanel();
-        jComboBox1 = new AutoCompleteJComboBox();
         objectInspectorJPanel = new ObjectInspectorJPanel(new MutableStock(Utils.getEmptyStock(Code.newInstance(""), Symbol.newInstance(""))));
 
         jPanel10.setLayout(new java.awt.BorderLayout());
@@ -198,6 +200,11 @@ public class IndicatorPanel extends JPanel {
         jScrollPane2.setViewportView(jList2);
 
         jPanel10.add(jScrollPane2, java.awt.BorderLayout.CENTER);
+
+        jComboBox1.setEditable(true);
+        jComboBox1.setPreferredSize(new java.awt.Dimension(150, 24));
+        ((AutoCompleteJComboBox)jComboBox1).attachStockInfoObserver(this.getStockInfoObserver());
+        ((AutoCompleteJComboBox)jComboBox1).attachResultObserver(this.getResultObserver());
 
         setLayout(new java.awt.BorderLayout());
 
@@ -307,12 +314,6 @@ public class IndicatorPanel extends JPanel {
         jPanel6.add(jButton6);
 
         jPanel5.add(jPanel6, java.awt.BorderLayout.SOUTH);
-
-        jComboBox1.setEditable(true);
-        jComboBox1.setPreferredSize(new java.awt.Dimension(150, 24));
-        ((AutoCompleteJComboBox)jComboBox1).attachStockInfoObserver(this.getStockInfoObserver());
-        jPanel7.add(jComboBox1);
-
         jPanel5.add(jPanel7, java.awt.BorderLayout.NORTH);
         jPanel5.add(objectInspectorJPanel, java.awt.BorderLayout.CENTER);
 
