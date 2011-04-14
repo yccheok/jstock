@@ -2,6 +2,8 @@ This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
 JStock 1.0.6a - ????-??-??
+  Bugfix:  Fix on the wrong behavior and appearance of language buttons. 
+           Contributed by Vetsper Felix.
   Bugfix:  Better usability in auto complete combo box, by displaying busy
            indicator in both indicator editor and buy dialog box.
   Bugfix:  Better usability in buy dialog box, by making sure the first

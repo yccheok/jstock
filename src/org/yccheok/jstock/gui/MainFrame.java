@@ -1275,32 +1275,65 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem12ActionPerformed
 
     private void jRadioButtonMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonMenuItem1ActionPerformed
-        final Locale locale = new Locale(Locale.ENGLISH.getLanguage(), Locale.getDefault().getCountry(), Locale.getDefault().getVariant());
-        this.jStockOptions.setLocale(locale);
-        // Do not suprise user with sudden restart. Ask for their permission to do so.
-        final int result = JOptionPane.showConfirmDialog(this, MessagesBundle.getString("question_message_restart_now"), MessagesBundle.getString("question_title_restart_now"), JOptionPane.YES_NO_OPTION);
-        if (result == JOptionPane.YES_OPTION) {
-            org.yccheok.jstock.gui.Utils.restartApplication(this);
+        // Avoid from Confirm Dialog to pop up when user change to same language (i.e. english)
+        if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.ENGLISH.getLanguage()) != 0) {
+            // Do not suprise user with sudden restart. Ask for their permission to do so.
+            final int result = JOptionPane.showConfirmDialog(this, MessagesBundle.getString("question_message_restart_now"), MessagesBundle.getString("question_title_restart_now"), JOptionPane.YES_NO_OPTION);
+            if (result == JOptionPane.YES_OPTION) {
+                final Locale locale = new Locale(Locale.ENGLISH.getLanguage(), Locale.getDefault().getCountry(), Locale.getDefault().getVariant());
+                this.jStockOptions.setLocale(locale);
+                org.yccheok.jstock.gui.Utils.restartApplication(this);
+            } // return to the previous selection if the user press "no" in the dialog
+            else {
+                if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.SIMPLIFIED_CHINESE.getLanguage()) == 0) {
+                    this.jRadioButtonMenuItem2.setSelected(true);
+                }
+                if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.GERMAN.getLanguage()) == 0) {
+                    this.jRadioButtonMenuItem3.setSelected(true);
+                }
+            }
         }
     }//GEN-LAST:event_jRadioButtonMenuItem1ActionPerformed
 
     private void jRadioButtonMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonMenuItem2ActionPerformed
-        final Locale locale = new Locale(Locale.SIMPLIFIED_CHINESE.getLanguage(), Locale.getDefault().getCountry(), Locale.getDefault().getVariant());
-        this.jStockOptions.setLocale(locale);
-        // Do not suprise user with sudden restart. Ask for their permission to do so.
-        final int result = JOptionPane.showConfirmDialog(this, MessagesBundle.getString("question_message_restart_now"), MessagesBundle.getString("question_title_restart_now"), JOptionPane.YES_NO_OPTION);
-        if (result == JOptionPane.YES_OPTION) {
-            org.yccheok.jstock.gui.Utils.restartApplication(this);
+        // Avoid from Confirm Dialog to pop up when user change to same language (i.e. simplified chinese)
+        if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.SIMPLIFIED_CHINESE.getLanguage()) != 0) {
+            // Do not suprise user with sudden restart. Ask for their permission to do so.
+            final int result = JOptionPane.showConfirmDialog(this, MessagesBundle.getString("question_message_restart_now"), MessagesBundle.getString("question_title_restart_now"), JOptionPane.YES_NO_OPTION);
+            if (result == JOptionPane.YES_OPTION) {
+                final Locale locale = new Locale(Locale.SIMPLIFIED_CHINESE.getLanguage(), Locale.getDefault().getCountry(), Locale.getDefault().getVariant());
+                this.jStockOptions.setLocale(locale);
+                org.yccheok.jstock.gui.Utils.restartApplication(this);
+            } // return to the previous selection if the user press "no" in the dialog
+            else {
+                if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.ENGLISH.getLanguage()) == 0) {
+                    this.jRadioButtonMenuItem1.setSelected(true);
+                }
+                if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.GERMAN.getLanguage()) == 0) {
+                    this.jRadioButtonMenuItem3.setSelected(true);
+                }
+            }
         }
     }//GEN-LAST:event_jRadioButtonMenuItem2ActionPerformed
 
     private void jRadioButtonMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonMenuItem3ActionPerformed
-        final Locale locale = new Locale(Locale.GERMAN.getLanguage(), Locale.getDefault().getCountry(), Locale.getDefault().getVariant());
-        this.jStockOptions.setLocale(locale);
-        // Do not suprise user with sudden restart. Ask for their permission to do so.
-        final int result = JOptionPane.showConfirmDialog(this, MessagesBundle.getString("question_message_restart_now"), MessagesBundle.getString("question_title_restart_now"), JOptionPane.YES_NO_OPTION);
-        if (result == JOptionPane.YES_OPTION) {
-            org.yccheok.jstock.gui.Utils.restartApplication(this);
+        // Avoid from Confirm Dialog to pop up when user change to same language (i.e. german)
+        if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.GERMAN.getLanguage()) != 0) {
+            // Do not suprise user with sudden restart. Ask for their permission to do so.
+            final int result = JOptionPane.showConfirmDialog(this, MessagesBundle.getString("question_message_restart_now"), MessagesBundle.getString("question_title_restart_now"), JOptionPane.YES_NO_OPTION);
+            if (result == JOptionPane.YES_OPTION) {
+                final Locale locale = new Locale(Locale.GERMAN.getLanguage(), Locale.getDefault().getCountry(), Locale.getDefault().getVariant());
+                this.jStockOptions.setLocale(locale);
+                org.yccheok.jstock.gui.Utils.restartApplication(this);
+            }// return to the previous selection if the user press "no" in the dialog
+            else {
+                if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.ENGLISH.getLanguage()) == 0) {
+                    this.jRadioButtonMenuItem1.setSelected(true);
+                }
+                if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.SIMPLIFIED_CHINESE.getLanguage()) == 0) {
+                    this.jRadioButtonMenuItem2.setSelected(true);
+                }
+            }
         }
     }//GEN-LAST:event_jRadioButtonMenuItem3ActionPerformed
     
