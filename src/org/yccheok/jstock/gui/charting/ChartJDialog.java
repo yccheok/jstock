@@ -1410,17 +1410,21 @@ public class ChartJDialog extends javax.swing.JDialog {
                     log.error(null, ex);
                 }
             }
-    
-            final XYPlot price_volume_ta = price_volume_ta_map.get(taEx);
-            final XYPlot candlestick_ta = candlestick_ta_map.get(taEx);
+
+            if (this.activeTAExs.contains(taEx) == false)
+            {
+                // Avoid duplication.
+                final XYPlot price_volume_ta = price_volume_ta_map.get(taEx);
+                final XYPlot candlestick_ta = candlestick_ta_map.get(taEx);
 
 
-            final CombinedDomainXYPlot cplot0 = (CombinedDomainXYPlot)this.priceVolumeChart.getPlot();
-            final CombinedDomainXYPlot cplot1 = (CombinedDomainXYPlot)this.candlestickChart.getPlot();
-            if (price_volume_ta != null) cplot0.add(price_volume_ta, 1);    // weight is 1.
-            if (candlestick_ta != null) cplot1.add(candlestick_ta, 1);      // weight is 1.
-            org.yccheok.jstock.charting.Utils.applyChartTheme(this.priceVolumeChart);
-            org.yccheok.jstock.charting.Utils.applyChartTheme(this.candlestickChart);
+                final CombinedDomainXYPlot cplot0 = (CombinedDomainXYPlot)this.priceVolumeChart.getPlot();
+                final CombinedDomainXYPlot cplot1 = (CombinedDomainXYPlot)this.candlestickChart.getPlot();
+                if (price_volume_ta != null) cplot0.add(price_volume_ta, 1);    // weight is 1.
+                if (candlestick_ta != null) cplot1.add(candlestick_ta, 1);      // weight is 1.
+                org.yccheok.jstock.charting.Utils.applyChartTheme(this.priceVolumeChart);
+                org.yccheok.jstock.charting.Utils.applyChartTheme(this.candlestickChart);
+            }
         }
         else {
             final CombinedDomainXYPlot cplot0 = (CombinedDomainXYPlot)this.priceVolumeChart.getPlot();
@@ -1453,9 +1457,6 @@ public class ChartJDialog extends javax.swing.JDialog {
         final TAEx taEx = TAEx.newInstance(TA.MFI, new Integer(days));
 
         if (show) {
-            final CombinedDomainXYPlot cplot0 = (CombinedDomainXYPlot)this.priceVolumeChart.getPlot();
-            final CombinedDomainXYPlot cplot1 = (CombinedDomainXYPlot)this.candlestickChart.getPlot();
-
             if (price_volume_ta_map.containsKey(taEx) == false) {
                 final XYDataset dataset = org.yccheok.jstock.charting.TechnicalAnalysis.createMFI(this.chartDatas, getMFIKey(days), days);
                 NumberAxis rangeAxis1 = new NumberAxis(GUIBundle.getString("ChartJDialog_MFI"));
@@ -1492,13 +1493,19 @@ public class ChartJDialog extends javax.swing.JDialog {
                 }
             }
 
-            final XYPlot price_volume_ta = price_volume_ta_map.get(taEx);
-            final XYPlot candlestick_ta = candlestick_ta_map.get(taEx);
+            if (this.activeTAExs.contains(taEx) == false)
+            {
+                // Avoid duplication.
+                final XYPlot price_volume_ta = price_volume_ta_map.get(taEx);
+                final XYPlot candlestick_ta = candlestick_ta_map.get(taEx);
 
-            if (price_volume_ta != null) cplot0.add(price_volume_ta, 1);    // weight is 1.
-            if (candlestick_ta != null) cplot1.add(candlestick_ta, 1);      // weight is 1.
-            org.yccheok.jstock.charting.Utils.applyChartTheme(this.priceVolumeChart);
-            org.yccheok.jstock.charting.Utils.applyChartTheme(this.candlestickChart);
+                final CombinedDomainXYPlot cplot0 = (CombinedDomainXYPlot)this.priceVolumeChart.getPlot();
+                final CombinedDomainXYPlot cplot1 = (CombinedDomainXYPlot)this.candlestickChart.getPlot();
+                if (price_volume_ta != null) cplot0.add(price_volume_ta, 1);    // weight is 1.
+                if (candlestick_ta != null) cplot1.add(candlestick_ta, 1);      // weight is 1.
+                org.yccheok.jstock.charting.Utils.applyChartTheme(this.priceVolumeChart);
+                org.yccheok.jstock.charting.Utils.applyChartTheme(this.candlestickChart);
+            }
         }
         else {
             final CombinedDomainXYPlot cplot0 = (CombinedDomainXYPlot)this.priceVolumeChart.getPlot();
@@ -1566,16 +1573,20 @@ public class ChartJDialog extends javax.swing.JDialog {
                     log.error(null, ex);
                 }
             }
-            
-            final XYPlot price_volume_ta = price_volume_ta_map.get(taEx);
-            final XYPlot candlestick_ta = candlestick_ta_map.get(taEx);
-            final CombinedDomainXYPlot cplot0 = (CombinedDomainXYPlot)this.priceVolumeChart.getPlot();
-            final CombinedDomainXYPlot cplot1 = (CombinedDomainXYPlot)this.candlestickChart.getPlot();
 
-            if (price_volume_ta != null) cplot0.add(price_volume_ta, 1);    // weight is 1.
-            if (candlestick_ta != null) cplot1.add(candlestick_ta, 1);      // weight is 1.
-            org.yccheok.jstock.charting.Utils.applyChartTheme(this.priceVolumeChart);
-            org.yccheok.jstock.charting.Utils.applyChartTheme(this.candlestickChart);
+            if (this.activeTAExs.contains(taEx) == false)
+            {
+                // Avoid duplication.
+                final XYPlot price_volume_ta = price_volume_ta_map.get(taEx);
+                final XYPlot candlestick_ta = candlestick_ta_map.get(taEx);
+                final CombinedDomainXYPlot cplot0 = (CombinedDomainXYPlot)this.priceVolumeChart.getPlot();
+                final CombinedDomainXYPlot cplot1 = (CombinedDomainXYPlot)this.candlestickChart.getPlot();
+
+                if (price_volume_ta != null) cplot0.add(price_volume_ta, 1);    // weight is 1.
+                if (candlestick_ta != null) cplot1.add(candlestick_ta, 1);      // weight is 1.
+                org.yccheok.jstock.charting.Utils.applyChartTheme(this.priceVolumeChart);
+                org.yccheok.jstock.charting.Utils.applyChartTheme(this.candlestickChart);
+            }
         }
         else {
             final CombinedDomainXYPlot cplot0 = (CombinedDomainXYPlot)this.priceVolumeChart.getPlot();

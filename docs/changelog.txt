@@ -8,6 +8,7 @@ JStock 1.0.6a - ????-??-??
            indicator in both indicator editor and buy dialog box.
   Bugfix:  Better usability in buy dialog box, by making sure the first
            character of stock symbol is always being displayed.
+  Bugfix:  Avoid duplicated custom TA for CCI, RSI and MFI.
   
 JStock 1.0.6 - 2011-03-30
   Feature: Able to find new stock which is not included in offline database,
