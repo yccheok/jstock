@@ -510,7 +510,7 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
             }
         }
         
-        if(node instanceof Transaction) {
+        if (node instanceof Transaction) {
             final Transaction transaction = (Transaction)node;
             
             switch(column) {

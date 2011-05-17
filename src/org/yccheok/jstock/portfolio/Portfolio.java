@@ -48,7 +48,7 @@ public class Portfolio extends DefaultMutableTreeTableNode implements Commentabl
      
         final int count = this.getChildCount();
         
-        for(int i=0; i<count; i++) {
+        for (int i = 0; i < count; i++) {
             Object o = this.getChildAt(i);
             
             assert(o instanceof TransactionSummary);
@@ -65,7 +65,7 @@ public class Portfolio extends DefaultMutableTreeTableNode implements Commentabl
      
         final int count = this.getChildCount();
         
-        for(int i=0; i<count; i++) {
+        for (int i = 0; i < count; i++) {
             Object o = this.getChildAt(i);
             
             assert(o instanceof TransactionSummary);
