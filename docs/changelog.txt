@@ -1,7 +1,9 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
-JStock 1.0.6a - ????-??-??
+JStock 1.0.6a - 2011-05-18
+  Feature: Currency exchange rate feature. Able to display stock wealth in your 
+           local currency.
   Bugfix:  Fix on the wrong behavior and appearance of language buttons. 
            Contributed by Vetsper Felix.
   Bugfix:  Better usability in auto complete combo box, by displaying busy
