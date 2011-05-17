@@ -807,47 +807,22 @@ public class MainFrame extends javax.swing.JFrame {
         if (pane.getSelectedComponent() == this.jPanel8) {
             this.jMenuItem2.setEnabled(true);   // Load
             this.jMenuItem9.setEnabled(true);   // Save
-
-            if (this.currencyExchangeMonitor != null) {
-                this.currencyExchangeMonitor.suspend();
-                log.info("Suspend currency exchange monitor.");
-            }
         }
         else if (pane.getSelectedComponent() == this.indicatorPanel) {
             this.jMenuItem2.setEnabled(false);  // Load
             this.jMenuItem9.setEnabled(false);  // Save
-
-            if (this.currencyExchangeMonitor != null) {
-                this.currencyExchangeMonitor.suspend();
-                log.info("Suspend currency exchange monitor.");
-            }
         }
         else if(pane.getSelectedComponent() == this.indicatorScannerJPanel) {
             this.jMenuItem2.setEnabled(false);  // Load
             this.jMenuItem9.setEnabled(true);   // Save
-
-            if (this.currencyExchangeMonitor != null) {
-                this.currencyExchangeMonitor.suspend();
-                log.info("Suspend currency exchange monitor.");
-            }
         }
         else if(pane.getSelectedComponent() == this.portfolioManagementJPanel) {
             this.jMenuItem2.setEnabled(true);   // Load
             this.jMenuItem9.setEnabled(true);   // Save
-
-            if (this.currencyExchangeMonitor != null) {
-                this.currencyExchangeMonitor.resume();
-                log.info("Resume currency exchange monitor.");
-            }
         }
         else if (pane.getSelectedComponent() == this.chatJPanel) {
             this.jMenuItem2.setEnabled(false);  // Save
             this.jMenuItem9.setEnabled(false);  // Load
-
-            if (this.currencyExchangeMonitor != null) {
-                this.currencyExchangeMonitor.suspend();
-                log.info("Suspend currency exchange monitor.");
-            }
         }
 
         if (pane.getSelectedComponent() == this.chatJPanel)
@@ -1558,7 +1533,67 @@ public class MainFrame extends javax.swing.JFrame {
             }
         }
     }
-    
+
+    /**
+     * Set the exchange rate value on status bar.
+     *
+     * @param exchangeRate the exchange rate value. null to reset
+     */
+    public void setStatusBarExchangeRate(final Double exchangeRate) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            statusBar.setExchangeRate(exchangeRate);
+        } else {
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    statusBar.setExchangeRate(exchangeRate);
+                }
+            });
+        }
+    }
+
+    /**
+     * Set the visibility of exchange rate label on status bar.
+     *
+     * @param visible true to make the exchange rate label visible. Else false
+     */
+    public void setStatusBarExchangeRateVisible(final boolean visible) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            statusBar.setExchangeRateVisible(visible);
+        } else {
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    statusBar.setExchangeRateVisible(visible);
+                }
+            });
+        }
+    }
+
+    /**
+     * Set the tool tip text of exchange rate label on status bar.
+     *
+     * @param text the tool tip text
+     */
+    public void setStatusBarExchangeRateToolTipText(final String text) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            statusBar.setExchangeRateToolTipText(text);
+        } else {
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    statusBar.setExchangeRateToolTipText(text);
+                }
+            });
+        }
+    }
+
+    /**
+     * Update the status bar.
+     *
+     * @param progressBar true to make progress bar busy. Else false
+     * @param mainMessage message on the left
+     */
     public void setStatusBar(final boolean progressBar, final String mainMessage) {
         if (SwingUtilities.isEventDispatchThread())
         {
@@ -2945,25 +2980,12 @@ public class MainFrame extends javax.swing.JFrame {
         this.statusBar.addImageLabelMouseListener(mouseAdapter);
     }
 
-    private void initCurrencyExchangeMonitor() {
-        if (currencyExchangeMonitor != null) {
-            final CurrencyExchangeMonitor oldCurrencyExchangeMonitor = currencyExchangeMonitor;
-            zombiePool.execute(new Runnable() {
-                @Override
-                public void run() {
-                    log.info("Prepare to shut down " + oldCurrencyExchangeMonitor + "...");
-                    oldCurrencyExchangeMonitor.stop();
-                    log.info("Shut down " + oldCurrencyExchangeMonitor + " peacefully.");
-                }
-            });
-        }
-        final Country fromCountry = this.jStockOptions.getCountry();
-        final Country toCountry = this.jStockOptions.getLocalCurrencyCountry(fromCountry);
-        currencyExchangeMonitor = new CurrencyExchangeMonitor(fromCountry, toCountry);
-        if (this.jStockOptions.isCurrencyExchangeEnable(fromCountry)) {
-            // Start immediately.
-            currencyExchangeMonitor.start();
-        }
+    /**
+     * Initializes currency exchange monitor.
+     */
+    public void initCurrencyExchangeMonitor() {
+        final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactories();
+        this.portfolioManagementJPanel.initCurrencyExchangeMonitor(stockServerFactories);
     }
 
     private void initRealTimeStockMonitor() {
@@ -2988,8 +3010,8 @@ public class MainFrame extends javax.swing.JFrame {
 
         realTimeStockMonitor.attach(this.realTimeStockMonitorObserver);
 
-        this.indicatorScannerJPanel.initRealTimeStockMonitor(Collections.unmodifiableList(stockServerFactories));
-        this.portfolioManagementJPanel.initRealTimeStockMonitor(Collections.unmodifiableList(stockServerFactories));
+        this.indicatorScannerJPanel.initRealTimeStockMonitor(stockServerFactories);
+        this.portfolioManagementJPanel.initRealTimeStockMonitor(stockServerFactories);
     }
 
     // Only call after initJStockOptions.
@@ -4241,7 +4263,6 @@ public class MainFrame extends javax.swing.JFrame {
     
     private RealTimeStockMonitor realTimeStockMonitor = null;
     private StockHistoryMonitor stockHistoryMonitor = null;
-    private CurrencyExchangeMonitor currencyExchangeMonitor = null;
 
     private DatabaseTask databaseTask = null;
     private final Object databaseTaskMonitor = new Object();
@@ -4262,9 +4283,9 @@ public class MainFrame extends javax.swing.JFrame {
     private ExecutorService smsAlertPool = Executors.newFixedThreadPool(1);
     private ExecutorService systemTrayAlertPool = Executors.newFixedThreadPool(1);
 
-    private org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
-    private org.yccheok.jstock.engine.Observer<StockHistoryMonitor, StockHistoryMonitor.StockHistoryRunnable> stockHistoryMonitorObserver = this.getStockHistoryMonitorObserver();
-    private org.yccheok.jstock.engine.Observer<Indicator, Boolean> alertStateManagerObserver = this.getAlertStateManagerObserver();
+    private final org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
+    private final org.yccheok.jstock.engine.Observer<StockHistoryMonitor, StockHistoryMonitor.StockHistoryRunnable> stockHistoryMonitorObserver = this.getStockHistoryMonitorObserver();
+    private final org.yccheok.jstock.engine.Observer<Indicator, Boolean> alertStateManagerObserver = this.getAlertStateManagerObserver();
 
     private final javax.swing.ImageIcon smileIcon = this.getImageIcon("/images/16x16/smile.png");
     private final javax.swing.ImageIcon smileGrayIcon = this.getImageIcon("/images/16x16/smile-gray.png");

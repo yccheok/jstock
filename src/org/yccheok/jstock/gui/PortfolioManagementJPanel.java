@@ -1828,6 +1828,68 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         if (realTimeStockMonitor != null) {
             realTimeStockMonitor.setStockServerFactories(stockServerFactories);
         }
+        if (currencyExchangeMonitor != null) {
+            currencyExchangeMonitor.setStockServerFactories(stockServerFactories);
+        }
+    }
+
+    /**
+     * Initializes currency exchange monitor.
+     */
+    public void initCurrencyExchangeMonitor(java.util.List<StockServerFactory> stockServerFactories) {
+        final MainFrame mainFrame = MainFrame.getInstance();
+        final JStockOptions jStockOptions = mainFrame.getJStockOptions();
+
+        final Country fromCountry = jStockOptions.getCountry();
+        final Country toCountry = jStockOptions.getLocalCurrencyCountry(fromCountry);
+
+        // Should we show the exchange rate label on status bar?
+        mainFrame.setStatusBarExchangeRateVisible(jStockOptions.isCurrencyExchangeEnable(fromCountry));
+
+        if (currencyExchangeMonitor != null) {
+            // Can we re-use this currencyExchangeMonitor?
+            if (currencyExchangeMonitor.getFromCountry() == fromCountry && currencyExchangeMonitor.getToCountry() == toCountry) {
+                // Yes. We can re-use it. Should we resume or suspend it?
+                if (jStockOptions.isCurrencyExchangeEnable(fromCountry)) {
+                    // Start it first if we haven't do so.
+                    currencyExchangeMonitor.start();
+                    currencyExchangeMonitor.resume();
+                } else {
+                    currencyExchangeMonitor.suspend();
+                }
+                // Return early.
+                return;
+            }
+        }
+
+        if (currencyExchangeMonitor != null) {
+            final CurrencyExchangeMonitor oldCurrencyExchangeMonitor = currencyExchangeMonitor;
+            Utils.getZoombiePool().execute(new Runnable() {
+                @Override
+                public void run() {
+                    log.info("Prepare to shut down " + oldCurrencyExchangeMonitor + "...");
+                    oldCurrencyExchangeMonitor.dettachAll();
+                    oldCurrencyExchangeMonitor.stop();
+                    log.info("Shut down " + oldCurrencyExchangeMonitor + " peacefully.");
+                }
+            });
+        }
+
+        currencyExchangeMonitor = new CurrencyExchangeMonitor(fromCountry, toCountry);
+        currencyExchangeMonitor.setStockServerFactories(stockServerFactories);
+        currencyExchangeMonitor.attach(currencyExchangeMonitorObserver);
+
+        // Update the tool tip text.
+        final String text = MessageFormat.format(GUIBundle.getString("MyJXStatusBar_CurrencyExchangeRateFor"), currencyExchangeMonitor.getFromCurrency(), currencyExchangeMonitor.getToCurrency());
+        mainFrame.setStatusBarExchangeRateToolTipText(text);
+
+        // Everything is new. So, reset the displayed text first.
+        mainFrame.setStatusBarExchangeRate(null);
+
+        if (jStockOptions.isCurrencyExchangeEnable(fromCountry)) {
+            // Start immediately.
+            currencyExchangeMonitor.start();
+        }
     }
 
     public void initRealTimeStockMonitor(java.util.List<StockServerFactory> stockServerFactories) {
@@ -1852,7 +1914,16 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         
         updateRealTimeStockMonitorAccordingToBuyPortfolioTreeTableModel();
     }
-    
+
+    private org.yccheok.jstock.engine.Observer<CurrencyExchangeMonitor, Double> getCurrencyExchangeMonitorObserver() {
+        return new org.yccheok.jstock.engine.Observer<CurrencyExchangeMonitor, Double>() {
+            @Override
+            public void update(CurrencyExchangeMonitor subject, Double arg) {
+                MainFrame.getInstance().setStatusBarExchangeRate(arg);
+            }
+        };
+    }
+
     // This is the workaround to overcome Erasure by generics. We are unable to make MainFrame to
     // two observers at the same time.
     private org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> getRealTimeStockMonitorObserver() {
@@ -2109,7 +2180,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private DividendSummary dividendSummary = new DividendSummary();
 
     private RealTimeStockMonitor realTimeStockMonitor = null;
-    private org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
+    private CurrencyExchangeMonitor currencyExchangeMonitor = null;
+
+    private final org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
+    private final org.yccheok.jstock.engine.Observer<CurrencyExchangeMonitor, Double> currencyExchangeMonitorObserver = this.getCurrencyExchangeMonitorObserver();
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private org.jdesktop.swingx.JXTreeTable buyTreeTable;

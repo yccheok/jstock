@@ -367,6 +367,7 @@ public class Utils {
 
     // A value obtained from server, to ensure all JStock's users are getting
     // same value for same key.
+    // Note that, key "id" is a reserved word.
     public static String getUUIDValue(String url, String key) {
         final org.yccheok.jstock.gui.Utils.InputStreamAndMethod inputStreamAndMethod = org.yccheok.jstock.gui.Utils.getResponseBodyAsStreamBasedOnProxyAuthOption(url);
 
@@ -449,7 +450,8 @@ public class Utils {
         }
 
         for (Object key : properties.keySet()) {
-            if (key != null) {
+            // "id" is a reserved word. Ignore it!
+            if (key != null && !key.equals("id")) {
                 map.put(key.toString(), properties.getProperty(key.toString()));
             }
         }

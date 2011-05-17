@@ -60,6 +60,35 @@ public class Utils {
         }
     };
 
+    // Use ThreadLocal to ensure thread safety
+    private static final ThreadLocal <NumberFormat> exchangeRateNumberFormat = new ThreadLocal <NumberFormat>() {
+        @Override protected NumberFormat initialValue() {
+            // Instead of limiting currency decimal places to 0 only, we allow
+            // them to float between 0 to 6, to avoid from losing precision.
+            return new DecimalFormat("#,##0.######");
+        }
+    };
+    
+    /**
+     * Convert the value to exchange rate representation.
+     *
+     * @param value the value to be converted
+     * @return exchange rate representation
+     */
+    public static String toExchangeRate(Object value) {
+        return exchangeRateNumberFormat.get().format(value);
+    }
+
+    /**
+     * Convert the value to exchange rate representation.
+     *
+     * @param value the value to be converted
+     * @return exchange rate representation
+     */
+    public static String toExchangeRate(double value) {
+        return exchangeRateNumberFormat.get().format(value);
+    }
+    
     /**
      * Convert the value to stock quantity representation.
      *

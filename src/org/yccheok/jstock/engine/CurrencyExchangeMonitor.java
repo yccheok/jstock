@@ -109,6 +109,20 @@ public class CurrencyExchangeMonitor extends Subject<CurrencyExchangeMonitor, Do
     }
 
     /**
+     * @return the fromCountry's currency
+     */
+    public String getFromCurrency() {
+        return countryToCurrencyCode.get(fromCountry);
+    }
+
+    /**
+     * @return the toCountry's currency
+     */
+    public String getToCurrency() {
+        return countryToCurrencyCode.get(toCountry);
+    }
+    
+    /**
      * @return the fromCountry
      */
     public Country getFromCountry() {

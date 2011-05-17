@@ -80,8 +80,8 @@ public class Utils {
             return defaultServer;
         }
 
-		log.info("Google App Engine suggests us to use " + server);
-		return server;
+        log.info("Google App Engine suggests us to use " + server);
+        return server;
     }
 
     public static String getEmotesIconsDirectory() {
