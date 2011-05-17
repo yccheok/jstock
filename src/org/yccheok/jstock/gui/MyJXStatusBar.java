@@ -81,7 +81,16 @@ public class MyJXStatusBar extends JXStatusBar {
     public void addCountryLabelMouseListener(MouseListener l) {
         countryLabel.addMouseListener(l);
     }
-    
+
+    /**
+     * Add mouse listener to the exchange rate label.
+     * 
+     * @param l the mouse listener
+     */
+    public void addExchangeRateLabelMouseListener(MouseListener l) {
+        exchangeRateLabel.addMouseListener(l);
+    }
+
     public MyJXStatusBar setProgressBar(boolean newValue) {
         progressBar.setIndeterminate(newValue);
         progressBar.setVisible(newValue);

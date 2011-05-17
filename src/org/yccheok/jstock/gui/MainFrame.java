@@ -120,6 +120,7 @@ public class MainFrame extends javax.swing.JFrame {
         this.initStatusBar();
         this.initMarketJPanel();
         this.initTableHeaderToolTips();
+        this.initMyJXStatusBarExchangeRateLabelMouseAdapter();
         this.initMyJXStatusBarCountryLabelMouseAdapter();
         this.initMyJXStatusBarImageLabelMouseAdapter();
         this.initDatabase(true);
@@ -2066,10 +2067,25 @@ public class MainFrame extends javax.swing.JFrame {
                 m.setSelected(true);
                 break;                   
             }
-        }
-        
+        }        
     }
-    
+
+    private MouseAdapter getMyJXStatusBarExchangeRateLabelMouseAdapter() {
+        return new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    // Popup dialog to select currency exchange option.
+                    OptionsJDialog optionsJDialog = new OptionsJDialog(MainFrame.this, true);
+                    optionsJDialog.setLocationRelativeTo(MainFrame.this);
+                    optionsJDialog.set(jStockOptions);
+                    optionsJDialog.select(GUIBundle.getString("OptionsJPanel_Wealth"));
+                    optionsJDialog.setVisible(true);
+                }
+            }
+        };
+    }
+
     private MouseAdapter getMyJXStatusBarCountryLabelMouseAdapter() {
         return new MouseAdapter() {
             @Override
@@ -2969,7 +2985,12 @@ public class MainFrame extends javax.swing.JFrame {
             }
         }
     }
-    
+
+    private void initMyJXStatusBarExchangeRateLabelMouseAdapter() {
+        final MouseAdapter mouseAdapter = this.getMyJXStatusBarExchangeRateLabelMouseAdapter();
+        this.statusBar.addExchangeRateLabelMouseListener(mouseAdapter);
+    }
+
     private void initMyJXStatusBarCountryLabelMouseAdapter() {
         final MouseAdapter mouseAdapter = this.getMyJXStatusBarCountryLabelMouseAdapter();
         this.statusBar.addCountryLabelMouseListener(mouseAdapter);

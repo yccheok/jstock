@@ -225,7 +225,22 @@ public class OptionsJPanel extends javax.swing.JPanel implements JStockOptionsOb
         
         return true;
     }
-            
+
+    /**
+     * Selects the desired options page.
+     *
+     * @param buttonMapKey title of the page
+     */
+    public void select(String buttonMapKey) {
+        final JToggleButton button = map.get(buttonMapKey);
+        if (button == null) {
+            // Avoid null pointer.
+            return;
+        }
+        button.setSelected(true);
+        button.doClick();
+    }
+
     private Component currentComponent;
     private OptionsAlertJPanel optionsAlertJPanel;
     private OptionsNetworkJPanel optionsNetworkJPanel;

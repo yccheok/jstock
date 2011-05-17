@@ -109,6 +109,15 @@ public class OptionsJDialog extends javax.swing.JDialog implements JStockOptions
         return optionsJPanel.apply(jStockOptions);
     }
 
+    /**
+     * Selects the desired options page.
+     *
+     * @param buttonMapKey title of the page
+     */
+    public void select(String buttonMapKey) {
+        optionsJPanel.select(buttonMapKey);
+    }
+
     private OptionsJPanel optionsJPanel;
     private JStockOptions jStockOptions;
     
