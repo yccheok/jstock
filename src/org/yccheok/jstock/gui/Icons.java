@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
+ * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,4 +31,10 @@ public final class Icons {
     public static final Icon BUSY = new ImageIcon(Icons.class.getResource("/images/16x16/spinner.gif"));
     public static final Icon WARNING = new ImageIcon(Icons.class.getResource("/images/16x16/important.png"));
     public static final Icon ERROR = new ImageIcon(Icons.class.getResource("/images/16x16/stop.png"));
+
+    // These 4 icons will be used in status bar.
+    public static final Icon GREEN_UP = new ImageIcon(Icons.class.getResource("/images/10x10/green-up.png"));
+    public static final Icon GREEN_DOWN = new ImageIcon(Icons.class.getResource("/images/10x10/green-down.png"));
+    public static final Icon RED_UP = new ImageIcon(Icons.class.getResource("/images/10x10/red-down.png"));
+    public static final Icon RED_DOWN = new ImageIcon(Icons.class.getResource("/images/10x10/red-down.png"));
 }
