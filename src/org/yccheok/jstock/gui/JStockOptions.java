@@ -391,6 +391,8 @@ public class JStockOptions {
         //this.boundsEx = jStockOptions.boundsEx;
 
         this.currencies = new EnumMap<Country, String>(jStockOptions.currencies);
+        this.currencyExchangeEnable = new EnumMap<Country, Boolean>(jStockOptions.currencyExchangeEnable);
+        this.localCurrencyCountries = new EnumMap<Country, Country>(jStockOptions.localCurrencyCountries);
     }
 
     // User may not trust us to store their password in cloud server. To avoid
@@ -503,6 +505,8 @@ public class JStockOptions {
         
         // Perform deep copy.
         jStockOptions.currencies = new EnumMap<Country, String>(this.currencies);
+        jStockOptions.currencyExchangeEnable = new EnumMap<Country, Boolean>(this.currencyExchangeEnable);
+        jStockOptions.localCurrencyCountries = new EnumMap<Country, Country>(this.localCurrencyCountries);
 
         return jStockOptions;
     }
