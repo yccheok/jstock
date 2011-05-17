@@ -150,13 +150,6 @@ public class CurrencyExchangeMonitor extends Subject<CurrencyExchangeMonitor, Do
                 // Execute the while loop within try block to ensure fail safe.
                 try {
                     while (!executor.isShutdown()) {
-                        try {
-                            Thread.sleep(org.yccheok.jstock.gui.MainFrame.getInstance().getJStockOptions().getScanningSpeed());
-                        } catch (InterruptedException ex) {
-                            log.error(null, ex);
-                            // Usually triggered by executor.shutdownNow
-                            return;
-                        }
                         synchronized(this) {
                             while (suspend) {
                                 try {
@@ -213,6 +206,14 @@ public class CurrencyExchangeMonitor extends Subject<CurrencyExchangeMonitor, Do
                             }
                         }   // for
 
+                        try {
+                            Thread.sleep(org.yccheok.jstock.gui.MainFrame.getInstance().getJStockOptions().getScanningSpeed());
+                        } catch (InterruptedException ex) {
+                            log.error(null, ex);
+                            // Usually triggered by executor.shutdownNow
+                            return;
+                        }
+                        
                     }   // while (!executor.isShutdown())
                 } catch (Exception exp) {
                     // Our thread just recover from unexpected error.
