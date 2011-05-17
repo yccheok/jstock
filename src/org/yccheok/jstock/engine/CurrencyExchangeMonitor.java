@@ -33,7 +33,7 @@ import org.yccheok.jstock.network.Utils.Type;
  *
  * @author yccheok
  */
-public class CurrencyExchangeMonitor {
+public class CurrencyExchangeMonitor extends Subject<CurrencyExchangeMonitor, Double> {
 
     /**
      * Constructs an instance of CurrencyExchangeMonitor.
@@ -97,6 +97,31 @@ public class CurrencyExchangeMonitor {
         }
     }
 
+    /**
+     * Assign list of stock server factories to this currency monitor.
+     *
+     * @param factories list of stock server factories
+     * @return true if this list changed as a result of the call
+     */
+    public synchronized boolean setStockServerFactories(java.util.List<StockServerFactory> factories) {
+        stockServerFactories.clear();
+        return stockServerFactories.addAll(factories);
+    }
+
+    /**
+     * @return the fromCountry
+     */
+    public Country getFromCountry() {
+        return fromCountry;
+    }
+
+    /**
+     * @return the toCountry
+     */
+    public Country getToCountry() {
+        return toCountry;
+    }
+
     // CurrencyExchangeRunnable is doing 2 things:
     //
     // (1) Keep trying to fill in countryToCurrencyCode with latest
@@ -108,49 +133,100 @@ public class CurrencyExchangeMonitor {
         @Override
         public void run() {
             while (!executor.isShutdown()) {
+                // Execute the while loop within try block to ensure fail safe.
                 try {
-                    Thread.sleep(org.yccheok.jstock.gui.MainFrame.getInstance().getJStockOptions().getScanningSpeed());
-                } catch (InterruptedException ex) {
-                    log.error(null, ex);
-                    // Usually triggered by executor.shutdownNow
-                    return;
-                }
-
-                synchronized(this) {
-                    while (suspend) {
+                    while (!executor.isShutdown()) {
                         try {
-                            wait();
+                            Thread.sleep(org.yccheok.jstock.gui.MainFrame.getInstance().getJStockOptions().getScanningSpeed());
                         } catch (InterruptedException ex) {
                             log.error(null, ex);
                             // Usually triggered by executor.shutdownNow
                             return;
                         }
-                    }
-                }
-
-                if (successUpdatedCountryToCurrencyCode == false) {
-                    // Keep trying to fill in countryToCurrencyCode with latest
-                    // country -> currency information, until it successes at
-                    // least once.
-                    final String server = org.yccheok.jstock.network.Utils.getURL(Type.CURRENCY_CODE_TXT);
-                    Map<String, String> map = org.yccheok.jstock.gui.Utils.getUUIDValue(server);
-                    for (Entry<String, String> entry : map.entrySet()) {
-                        if (entry.getValue() != null) {
-                            try {
-                                countryToCurrencyCode.put(Country.valueOf(entry.getKey()), entry.getValue());
-                            } catch (java.lang.IllegalArgumentException ex) {
-                                // I am not sure whether I should set
-                                // successUpdatedCountryToCurrencyCode to false.
-                                log.error(null, ex);
+                        synchronized(this) {
+                            while (suspend) {
+                                try {
+                                    wait();
+                                } catch (InterruptedException ex) {
+                                    log.error(null, ex);
+                                    // Usually triggered by executor.shutdownNow
+                                    return;
+                                }
                             }
-                            // OK. We need not to contact CURRENCY_CODE_TXT's
-                            // server anymore.
-                            successUpdatedCountryToCurrencyCode = true;
                         }
-                    }
+
+                        if (successUpdatedCountryToCurrencyCode == false) {
+                            // Keep trying to fill in countryToCurrencyCode with latest
+                            // country -> currency information, until it successes at
+                            // least once.
+                            final String server = org.yccheok.jstock.network.Utils.getURL(Type.CURRENCY_CODE_TXT);
+                            Map<String, String> map = org.yccheok.jstock.gui.Utils.getUUIDValue(server);
+                            for (Entry<String, String> entry : map.entrySet()) {
+                                if (entry.getValue() != null) {
+                                    try {
+                                        countryToCurrencyCode.put(Country.valueOf(entry.getKey()), entry.getValue());
+                                    } catch (java.lang.IllegalArgumentException ex) {
+                                        // I am not sure whether I should set
+                                        // successUpdatedCountryToCurrencyCode to false.
+                                        log.error(null, ex);
+                                    }
+                                    // OK. We need not to contact CURRENCY_CODE_TXT's
+                                    // server anymore.
+                                    successUpdatedCountryToCurrencyCode = true;
+                                }   // if
+                            }   // for
+                        }   // if (successUpdatedCountryToCurrencyCode == false)
+
+                        // Let's do the job.
+                        for (StockServerFactory factory : stockServerFactories) {
+                            final StockServer stockServer = factory.getStockServer();
+                            Stock stock = null;
+                            try {
+                                stock = stockServer.getStock(getCode());
+                            } catch (StockNotFoundException ex) {
+                                log.error(null, ex);
+                                // Try with another server.
+                                continue;
+                            }
+
+                            if (stock.getLastPrice() > 0.0) {
+                                // Ensure we are always having a valid exchange rate.
+                                exchangeRate = stock.getLastPrice();
+                                // Inform listeners.
+                                CurrencyExchangeMonitor.this.notify(CurrencyExchangeMonitor.this, exchangeRate);
+                                // Done.
+                                break;
+                            }
+                        }   // for
+
+                    }   // while (!executor.isShutdown())
+                } catch (Exception exp) {
+                    // Our thread just recover from unexpected error.
+                    log.error(null, exp);
                 }
-            }
+            }   //  while (!executor.isShutdown())
         }
+    }
+
+    /**
+     * Returns currency code of this monitor.
+     *
+     * @return currency code of this monitor
+     */
+    public Code getCode() {
+        final String fromCurrencyCode = countryToCurrencyCode.get(this.getFromCountry());
+        final String toCurrencyCode = countryToCurrencyCode.get(this.getToCountry());
+        // Format used by Yahoo! Finance.
+        return Code.newInstance(fromCurrencyCode + toCurrencyCode + "=X");
+    }
+
+    /**
+     * Returns exchange rate of this monitor.
+     *
+     * @return exchange rate of this monitor
+     */
+    public double getExchangeRate() {
+        return exchangeRate;
     }
 
     // This map, is used to convert a country to its latest assiciated currency.
@@ -201,6 +277,14 @@ public class CurrencyExchangeMonitor {
      * Convert to this country's currency.
      */
     private final Country toCountry;
+
+    /**
+     * List of stock server factories.
+     */
+    private java.util.List<StockServerFactory> stockServerFactories = new java.util.concurrent.CopyOnWriteArrayList<StockServerFactory>();
+
+    // Use volatile, to make assignment operation on double atomic.
+    private volatile double exchangeRate = 1.0;
 
     // Doesn't require volatile, as this variable is being accessed within
     // synchronized block.
