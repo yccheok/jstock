@@ -71,7 +71,7 @@ public abstract class AbstractPortfolioTreeTableModel extends DefaultTreeTableMo
     }
     
     public void removeTransaction(Transaction transaction) {
-        if(isValidTransaction(transaction) == false) return;
+        if (isValidTransaction(transaction) == false) return;
         
         final Portfolio portfolio = (Portfolio)this.getRoot();
         
@@ -81,21 +81,21 @@ public abstract class AbstractPortfolioTreeTableModel extends DefaultTreeTableMo
         
         TransactionSummary transactionSummary = null;
         
-        for(int i=0; i<size; i++) {
+        for (int i = 0; i < size; i++) {
             TransactionSummary t = (TransactionSummary)portfolio.getChildAt(i);
             
-            if(((Transaction)t.getChildAt(0)).getContract().getStock().getCode().equals(code)) {
+            if (((Transaction)t.getChildAt(0)).getContract().getStock().getCode().equals(code)) {
                 transactionSummary = t;
                 break;
             }
         }
         
-        if(transactionSummary == null) {
+        if (transactionSummary == null) {
             return;
         }
         
         this.removeNodeFromParent(transaction);
-        if(transactionSummary.getChildCount() <= 0) {
+        if (transactionSummary.getChildCount() <= 0) {
             this.removeNodeFromParent(transactionSummary);
         }
         

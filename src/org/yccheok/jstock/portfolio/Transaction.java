@@ -38,10 +38,12 @@ public class Transaction extends DefaultMutableTreeTableNode implements Commenta
         this.calculatedStampDuty = stampDuty.calculate(contract);
         this.calculatdClearingFee = clearingFee.calculate(contract);
      
-        if(contract.getType() == Contract.Type.Buy)
+        if (contract.getType() == Contract.Type.Buy) {
             netTotal = this.contract.getTotal() + this.calculatedBroker + this.calculatedStampDuty + this.calculatdClearingFee;
-        else
-            netTotal = this.contract.getTotal() - this.calculatedBroker - this.calculatedStampDuty - this.calculatdClearingFee;            
+        }
+        else {
+            netTotal = this.contract.getTotal() - this.calculatedBroker - this.calculatedStampDuty - this.calculatdClearingFee;
+        }
     }
     
     private Contract contract;
@@ -157,7 +159,7 @@ public class Transaction extends DefaultMutableTreeTableNode implements Commenta
 
     private Object readResolve() {
         /* For backward compatible */
-        if(comment == null) {
+        if (comment == null) {
             comment = "";
         }
 

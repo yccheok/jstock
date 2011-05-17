@@ -371,10 +371,10 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
             menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("DividendSummary_Note..."), new javax.swing.ImageIcon(getClass().getResource("/images/16x16/sticky.png")));
 
             menuItem.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        showCommentJDialog(commentable, MessageFormat.format(GUIBundle.getString("DividendSummaryJDialog_NoteFor_template"), text));
-                    }
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    showCommentJDialog(commentable, MessageFormat.format(GUIBundle.getString("DividendSummaryJDialog_NoteFor_template"), text));
+                }
             });
 
             popup.add(menuItem);

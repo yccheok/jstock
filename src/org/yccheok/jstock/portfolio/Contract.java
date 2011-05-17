@@ -167,7 +167,7 @@ public class Contract {
 
     private Object readResolve() {
         /* For backward compatible. */
-        if(referenceDate == null) {
+        if (referenceDate == null) {
             /* May yield incorrect logic. */
             /* Make buy date same as sell date. */
             referenceDate = date;
