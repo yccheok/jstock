@@ -515,6 +515,48 @@ public class Stock {
     }
 
     /**
+     * Returns a clone copy of this stock with its board being modified to
+     * specified board. This stock remains unchanged, as it is designed as
+     * immutable class.
+     *
+     * @param name Specified board to be modified to
+     * @return A clone copy of this stock with its board being modified to
+     * specified board.
+     */
+    public Stock deriveStock(Board board) {
+        return new Stock(
+            this.code,
+            this.symbol,
+            this.name,
+            board,
+            this.industry,
+            this.prevPrice,
+            this.openPrice,
+            this.lastPrice,
+            this.highPrice,
+            this.lowPrice,
+            // TODO: CRITICAL LONG BUG REVISED NEEDED.
+            this.volume,
+            this.changePrice,
+            this.changePricePercentage,
+            this.lastVolume,
+            this.buyPrice,
+            this.buyQuantity,
+            this.sellPrice,
+            this.sellQuantity,
+            this.secondBuyPrice,
+            this.secondBuyQuantity,
+            this.secondSellPrice,
+            this.secondSellQuantity,
+            this.thirdBuyPrice,
+            this.thirdBuyQuantity,
+            this.thirdSellPrice,
+            this.thirdSellQuantity,
+            this.calendar
+        );
+    }
+
+    /**
      * Returns a clone copy of this stock with its name being modified to
      * specified name. This stock remains unchanged, as it is designed as
      * immutable class.
@@ -662,6 +704,11 @@ public class Stock {
         Taiwan("Taiwan"),                       // Taiwan
         Bombay("Bombay"),                       // India
         NSE("NSE"),
+
+        NZSX("NZ Stock Market"),                // New Zealand
+        NZDX("NZ Debt Market"),
+        NZAX("NZ Alternative Market"),
+        
         UserDefined("User Defined"),
         Unknown("Unknown");
         

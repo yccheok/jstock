@@ -1,6 +1,9 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.6b - 2011-05-24
+  Feature: Supports New Zealand stock market. (#3295570)
+  
 JStock 1.0.6a - 2011-05-18
   Feature: Currency exchange rate feature. Able to display stock wealth in your 
            local currency.

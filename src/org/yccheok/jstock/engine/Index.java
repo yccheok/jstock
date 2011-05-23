@@ -52,8 +52,9 @@ public enum Index {
     TWII("TSEC weighted index", Code.newInstance("^TWII")),
     SSMI("Swiss Market", Code.newInstance("^SSMI")),
     BVSP("Bovespa", Code.newInstance("^BVSP")),
-    SSEC("China Shanghai Composite", Code.newInstance("000001.SS"));
-    
+    SSEC("China Shanghai Composite", Code.newInstance("000001.SS")),
+    NZSX50("NZX 50 Index", Code.newInstance("^NZ50"));
+
     Index(String name, Code code) {
         this.name = name;
         this.code = code;

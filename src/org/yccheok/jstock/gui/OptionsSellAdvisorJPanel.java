@@ -261,31 +261,32 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
             }
 
             String[] countries = {
-                "AU",	// Austrialia
-                "AT",	// Austria
-                "BE",	// Belgium
-                "BR",	// Brazil
-                "CA",	// Canada
-                "CN",	// China
-                "DK",	// Denmark
-                "FR",	// France
-                "DE",	// Germany
-                "HK",	// HongKong
-                "IN",	// India
-                "ID",	// Indonesia
-                "IT",	// Italy
-                "KR",	// Korea
-                "MY",	// Malaysia
-                "NL",	// Netherlands
-                "NO",	// Norway
-                "PT",	// Portugal
-                "SG",	// Singapore
-                "ES",	// Spain
-                "SE",	// Sweden
-                "CH",	// Switzerland
-                "TW",	// Taiwan
-                "GB",	// Unitedkingdom
-                "US",	// UnitedState
+                "AU",   // Austrialia
+                "AT",   // Austria
+                "BE",   // Belgium
+                "BR",   // Brazil
+                "CA",   // Canada
+                "CN",   // China
+                "DK",   // Denmark
+                "FR",   // France
+                "DE",   // Germany
+                "HK",   // HongKong
+                "IN",   // India
+                "ID",   // Indonesia
+                "IT",   // Italy
+                "KR",   // Korea
+                "MY",   // Malaysia
+                "NL",   // Netherlands
+                "NZ",   // NewZealand
+                "NO",   // Norway
+                "PT",   // Portugal
+                "SG",   // Singapore
+                "ES",   // Spain
+                "SE",   // Sweden
+                "CH",   // Switzerland
+                "TW",   // Taiwan
+                "GB",   // Unitedkingdom
+                "US",   // UnitedState
             };
 
             final List<String> countryList = Arrays.asList(countries);

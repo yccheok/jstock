@@ -30,6 +30,7 @@ import org.apache.commons.httpclient.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.AjaxYahooSearchEngine.ResultType;
+import org.yccheok.jstock.engine.Stock.Board;
 import org.yccheok.jstock.gui.MainFrame;
 
 /**
@@ -194,6 +195,8 @@ public class Utils {
             int code_index = -1;
             int symbol_index = -1;
             int name_index = -1;
+            // Board information is optional.
+            int board_index = -1;
             boolean success_index = false;
             // Search for the indecies for code, symbol and name.
             for (int index = 0; index < types.length; index++) {
@@ -204,14 +207,18 @@ public class Utils {
                     symbol_index = index;
                 } else if (0 == type.compareToIgnoreCase("name")) {
                     name_index = index;
+                } else if (0 == type.compareToIgnoreCase("board")) {
+                    board_index = index;
                 }
 
-                if (code_index != -1 && symbol_index != -1 && name_index != -1) {
+                if (code_index != -1 && symbol_index != -1 && name_index != -1 && board_index != -1) {
                     // All found. Early quit.
-                    success_index = true;
                     break;
                 }
             }
+
+            // Ignore board_index, as it is optional.
+            success_index = (code_index != -1 && symbol_index != -1 && name_index != -1);
 
             // Are we having all the indecies?
             if (false == success_index) {
@@ -231,7 +238,16 @@ public class Utils {
                 final String code = nextLine[code_index];
                 final String symbol = nextLine[symbol_index];
                 final String name = nextLine[name_index];
-                final Stock stock = org.yccheok.jstock.gui.Utils.getEmptyStock(Code.newInstance(code), Symbol.newInstance(symbol)).deriveStock(name);
+                final String _board = board_index == -1 ? "Unknown" : nextLine[board_index];
+                Board board;
+                try {
+                    board = Board.valueOf(_board);
+                } catch (IllegalArgumentException exp) {
+                    log.error(null, exp);
+                    board = Board.Unknown;
+                }
+
+                final Stock stock = org.yccheok.jstock.gui.Utils.getEmptyStock(Code.newInstance(code), Symbol.newInstance(symbol)).deriveStock(name).deriveStock(board);
                 stocks.add(stock);
             }
         } catch (IOException ex) {
@@ -266,6 +282,7 @@ public class Utils {
     private static final List<Index> koreaIndices = new ArrayList<Index>();
     private static final List<Index> malaysiaIndices = new ArrayList<Index>();
     private static final List<Index> netherlandsIndices = new ArrayList<Index>();
+    private static final List<Index> newZealandIndices = new ArrayList<Index>();
     private static final List<Index> norwayIndices = new ArrayList<Index>();
     private static final List<Index> portugalIndices = new ArrayList<Index>();
     private static final List<Index> singaporeIndices = new ArrayList<Index>();
@@ -297,6 +314,7 @@ public class Utils {
         malaysiaIndices.add(Index.Second);
         malaysiaIndices.add(Index.Mesdaq);
         netherlandsIndices.add(Index.AEX);
+        newZealandIndices.add(Index.NZSX50);
         norwayIndices.add(Index.OSEAX);
         portugalIndices.add(Index.PSI20);
         singaporeIndices.add(Index.STI);
@@ -405,6 +423,8 @@ public class Utils {
                 return java.util.Collections.unmodifiableList(Utils.malaysiaIndices);
             case Netherlands:
                 return java.util.Collections.unmodifiableList(Utils.netherlandsIndices);
+            case NewZealand:
+                return java.util.Collections.unmodifiableList(Utils.newZealandIndices);
             case Norway:
                 return java.util.Collections.unmodifiableList(Utils.norwayIndices);
             case Portugal:

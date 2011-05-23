@@ -42,6 +42,7 @@ public enum Country {
     Korea("/images/16x16/kr.png"),
     Malaysia("/images/16x16/my.png"),
     Netherlands("/images/16x16/nl.png"),
+    NewZealand("/images/16x16/nz.png"),
     Norway("/images/16x16/no.png"),
     Portugal("/images/16x16/pt.png"),
     Singapore("/images/16x16/sg.png"),

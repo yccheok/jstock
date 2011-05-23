@@ -43,6 +43,9 @@ public class StockJDialog extends javax.swing.JDialog {
         initBoardCheckBoxes();
         initIndustryCheckBoxes();
         updateCheckBoxesState();
+
+        // Re-pack again after we modify label text.
+        pack();
     }
     
     /** This method is called from within the constructor to
@@ -195,10 +198,10 @@ public class StockJDialog extends javax.swing.JDialog {
                     .addComponent(jCheckBox2))
                 .addGap(35, 35, 35)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jCheckBox23)
-                    .addComponent(jCheckBox27)
-                    .addComponent(jCheckBox21))
-                .addContainerGap(21, Short.MAX_VALUE))
+                    .addComponent(jCheckBox27, javax.swing.GroupLayout.DEFAULT_SIZE, 86, Short.MAX_VALUE)
+                    .addComponent(jCheckBox23, javax.swing.GroupLayout.DEFAULT_SIZE, 86, Short.MAX_VALUE)
+                    .addComponent(jCheckBox21, javax.swing.GroupLayout.DEFAULT_SIZE, 86, Short.MAX_VALUE))
+                .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

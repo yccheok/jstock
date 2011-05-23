@@ -322,11 +322,11 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private String getSelectedFirstColumnString(JXTreeTable treeTable) {
         final TreePath[] treePaths = treeTable.getTreeSelectionModel().getSelectionPaths();
 
-        if(treePaths == null) {
+        if (treePaths == null) {
             return null;
         }
 
-        if(treePaths.length == 1) {
+        if (treePaths.length == 1) {
             return treePaths[0].getLastPathComponent().toString();
         }
 
