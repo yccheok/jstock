@@ -22,6 +22,7 @@ package org.yccheok.jstock.gui;
 import com.thoughtworks.xstream.XStream;
 import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Desktop;
 import java.awt.Dimension;
@@ -174,13 +175,15 @@ public class Utils {
      */
     private static int getScrollBarWidth(BasicComboPopup popup, JScrollPane scrollPane) {
         int scrollBarWidth = 0;
-        JComboBox comboBox = (JComboBox)popup.getInvoker();
+        Component component = popup.getInvoker();
+        if (component instanceof JComboBox) {
+            JComboBox comboBox = (JComboBox)component;
 
-        if (comboBox.getItemCount() > comboBox.getMaximumRowCount()) {
-            JScrollBar vertical = scrollPane.getVerticalScrollBar();
-            scrollBarWidth = vertical.getPreferredSize().width;
+            if (comboBox.getItemCount() > comboBox.getMaximumRowCount()) {
+                JScrollBar vertical = scrollPane.getVerticalScrollBar();
+                scrollBarWidth = vertical.getPreferredSize().width;
+            }
         }
-
         return scrollBarWidth;
     }
 
