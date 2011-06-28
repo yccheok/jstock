@@ -443,6 +443,15 @@ public class StockInfoDatabase {
         }
         _stockInfos.add(stockInfo);
 
+        // Initialize codeToStockInfo and symbolToStockInfos.
+        codeToStockInfo.put(stockInfo.code, stockInfo);
+        List<StockInfo> s = symbolToStockInfos.get(stockInfo.symbol);
+        if (s == null) {
+            s = new ArrayList<StockInfo>();
+            symbolToStockInfos.put(stockInfo.symbol, s);
+        }
+        s.add(stockInfo);
+
         return true;
     }
 
