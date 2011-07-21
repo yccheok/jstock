@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2009 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,6 +32,16 @@ import java.util.regex.Pattern;
 public class YahooStockFormat implements StockFormat {
 
     private YahooStockFormat() {}
+
+    // This function is used to resolve, random corrupted data returned from
+    // Yahoo! server. Once a while, we will receive complain from users as in
+    // http://sourceforge.net/projects/jstock/forums/forum/723855/topic/4611584
+    // 1048576 is just a random picked number. I assume in this world, there
+    // should be no stock's last price larger than 1048576.
+    // Note that, this is a very hacking way, and not reliable at all!
+    private boolean isCorruptedData(double price) {
+        return price > 1048576 || price < 0;
+    }
 
     // Update on 19 March 2009 : We cannot assume certain parameters will always
     // be float. They may become integer too. For example, in the case of Korea
@@ -227,7 +237,15 @@ public class YahooStockFormat implements StockFormat {
             if (code == null || symbol == null || name == null || board == null || industry == null) {
                 continue;
             }
-            
+
+            // This function is used to resolve, random corrupted data returned from
+            // Yahoo! server. Once a while, we will receive complain from users as in
+            // http://sourceforge.net/projects/jstock/forums/forum/723855/topic/4611584
+            // Note that, this is a very hacking way, and not reliable at all!
+            if (isCorruptedData(lastPrice)) {
+                continue;
+            }
+
             if (calendar == null) calendar = Calendar.getInstance();
             
             Stock stock = new Stock(

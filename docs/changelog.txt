@@ -1,6 +1,9 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.6d - 2011-07-21
+  Bugfix:  Filter corrupted data returned from Yahoo! server.
+  
 JStock 1.0.6c - 2011-06-27
   Bugfix:  Fix on blank stock combo box drop down. (#3325192)
   Bugfix:  Avoid having empty symbol being displayed for user defined stock.
