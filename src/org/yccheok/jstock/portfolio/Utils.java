@@ -228,18 +228,47 @@ public class Utils {
     }
 
     /**
-     * Returns true if the given file is a portfolio directory.
+     * Due to historical reason, we are storing portfolio information in XML
+     * files. Now, they are considered as obsolete. CSV files will become the
+     * replacement. Returns true if the given file is a XML portfolio directory.
      *
      * @param file The <code>File</code> to be checked against
-     * @return true if the given file is a portfolio directory
+     * @return true if the given file is a XML portfolio directory
      */
-    private static boolean isPortfolioDirectory(File file) {
+    private static boolean isXMLPortfolioDirectory(File file) {
         if (false == file.isDirectory()) {
+            // Returns false immediately if this is not a directory.
             return false;
         }
         String[] files = file.list();
         List<String> list = Arrays.asList(files);
         return list.contains("buyportfolio.xml") && list.contains("sellportfolio.xml") && list.contains("depositsummary.xml") && list.contains("dividendsummary.xml");
+    }
+
+    /**
+     * Returns true if the given file is a CSV portfolio directory.
+     *
+     * @param file The <code>File</code> to be checked against
+     * @return true if the given file is a CSV portfolio directory
+     */
+    public static boolean isCSVPortfolioDirectory(File file) {
+        if (false == file.isDirectory()) {
+            // Returns false immediately if this is not a directory.
+            return false;
+        }
+        String[] files = file.list();
+        List<String> list = Arrays.asList(files);
+        return list.contains("buyportfolio.csv") && list.contains("sellportfolio.csv") && list.contains("depositsummary.csv") && list.contains("dividendsummary.csv");
+    }
+
+    /**
+     * Returns true if the given file is a CSV or XML portfolio directory.
+     *
+     * @param file The <code>File</code> to be checked against
+     * @return true if the given file is a CSV or XML portfolio directory
+     */
+    private static boolean isPortfolioDirectory(File file) {
+        return isCSVPortfolioDirectory(file) || isXMLPortfolioDirectory(file);
     }
 
     /**

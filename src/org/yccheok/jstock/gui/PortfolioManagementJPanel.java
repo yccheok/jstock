@@ -1591,8 +1591,24 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         
         return Collections.unmodifiableList(stocks);
     }
-    
-    public final void initPortfolio() {
+
+    // TODO: XML to CSV migration.
+    // Initialize portfolios through CSV files. This is the preferable method,
+    // as it works well under Desktop platform and Android platform.
+    private boolean initCSVPortfolio() {        
+        return false;
+    }
+
+    // Initialize portfolios through XML files. This is an obsolete way to
+    // perform initialization. The method is still here, is for backward
+    // compatible purpose. The reason for not using XML files is that, it is
+    // very difficult to apply xstream library in Android platform. Instead, we
+    // will be using CSV files, to make portfolio information can be exchanged
+    // among Desktop platform and Android platform easily.
+    //
+    // It also seperates portfolio data out from DefaultTreeTableModel. This
+    // enables us to switch to a better tree table GUI.
+    private boolean initXMLPortfolio() {
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
 
         final Country country = jStockOptions.getCountry();
@@ -1772,6 +1788,23 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 }
             });
         }
+
+         return true;
+    }
+
+    public final void initPortfolio() {
+        // Try to read porfolio files in CSV format.
+        boolean isCSVSuccess = this.initCSVPortfolio();
+        if (false == isCSVSuccess) {
+            // Fail. We need to migrate from XML format to CSV format.
+            // The returned value for this method doesn't matter.
+            initXMLPortfolio();
+            // Save the portfolio in CSV format.
+            if (saveCSVPortfolio()) {
+                // And delete the portfolio in XML format. They are obsolete.
+                deleteXMLPortfolio();
+            }
+        }
     }
 
     private void updateTitledBorder() {
@@ -1791,12 +1824,19 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
     }
 
-    public boolean savePortfolio() {
+    // TODO: XML to CSV migration.
+    private boolean saveCSVPortfolio() {        
+        return false;
+    }
+    
+    // This is an obsolete way to save portfolio. It will soon be replaced by
+    // saveCSVPortfolio.
+    private boolean saveXMLPortfolio() {
         if (Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory()) == false)
         {
             return false;
-        }        
-        
+        }
+
         boolean status = true;
 
         String filePath = org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "buyportfolio.xml";
@@ -1822,6 +1862,17 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
 
         return status;
+    }
+
+    // TODO: XML to CSV migration.
+    public boolean savePortfolio() {
+        // Should soon be replaced by saveCSVPortfolio.
+        return saveXMLPortfolio();
+    }
+
+    // TODO: XML to CSV migration.
+    private boolean deleteXMLPortfolio() {
+        return false;
     }
 
     public void updatePrimaryStockServerFactory(java.util.List<StockServerFactory> stockServerFactories) {
