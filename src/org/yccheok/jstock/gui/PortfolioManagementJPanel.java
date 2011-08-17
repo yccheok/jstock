@@ -1595,7 +1595,29 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     // TODO: XML to CSV migration.
     // Initialize portfolios through CSV files. This is the preferable method,
     // as it works well under Desktop platform and Android platform.
-    private boolean initCSVPortfolio() {        
+    private boolean initCSVPortfolio() {
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+
+        final Country country = jStockOptions.getCountry();
+
+        final File buyPortfolioFile = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "buyportfolio.csv");
+        final File sellPortfolioFile = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "sellportfolio.csv");
+        final File depositSummaryFile = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "depositsummary.csv");
+        final File dividendSummaryFile = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "dividendsummary.csv");
+
+        if (openAsCSVFile(buyPortfolioFile) == false) {
+            return false;
+        }
+        if (openAsCSVFile(buyPortfolioFile) == false) {
+            return false;
+        }
+        if (openAsCSVFile(buyPortfolioFile) == false) {
+            return false;
+        }
+        if (openAsCSVFile(buyPortfolioFile) == false) {
+            return false;
+        }
+
         return false;
     }
 

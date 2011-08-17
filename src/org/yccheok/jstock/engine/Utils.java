@@ -106,24 +106,21 @@ public class Utils {
     } 
     
     // Refer to http://www.exampledepot.com/egs/java.util/CompDates.html
-    public static long getDifferenceInDays(Calendar calendar0, Calendar calendar1) {
-        // Determine which is earlier
-        boolean b = calendar0.after(calendar1);
-        
-        long diffMillis = 0;
-        
-        if (b) {
-            // Get difference in milliseconds
-            diffMillis = calendar0.getTimeInMillis()-calendar1.getTimeInMillis();
-        }
-        else {
-            diffMillis = calendar1.getTimeInMillis()-calendar0.getTimeInMillis();
-        }
-        
+    public static long getDifferenceInDays(long timeInMillis0, long timeInMillis1) {
+        long diffMillis = Math.abs(timeInMillis0 - timeInMillis1);
         // Get difference in days
         long diffDays = diffMillis/(24*60*60*1000);
+        return diffDays;        
+    }
+    
+    // Refer to http://www.exampledepot.com/egs/java.util/CompDates.html
+    public static long getDifferenceInDays(Date date0, Date date1) {
+        return getDifferenceInDays(date0.getTime(), date1.getTime());
+    }
 
-        return diffDays;
+    // Refer to http://www.exampledepot.com/egs/java.util/CompDates.html
+    public static long getDifferenceInDays(Calendar calendar0, Calendar calendar1) {
+        return getDifferenceInDays(calendar0.getTimeInMillis(), calendar1.getTimeInMillis());
     }
     
     public static String subString(String source, String begin, String end) {

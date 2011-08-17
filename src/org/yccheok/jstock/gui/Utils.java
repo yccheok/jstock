@@ -267,28 +267,18 @@ public class Utils {
         return true;
     }
 
-    public static java.util.Date getNTPDate() {
-        List<String> hosts = getNTPServers();
-
-        for (String host : hosts) {
-            TimeTCPClient client = new TimeTCPClient();
-            // We want to timeout if a response takes longer than 5 seconds
-            client.setDefaultTimeout(5000);
-            try {
-                client.connect(host);
-                java.util.Date ntpDate = client.getDate();
-                client.disconnect();
-                // Just to be extra caution.
-                if (ntpDate != null) {
-                    return ntpDate;
-                }
-            }
-            catch (java.net.SocketException exp) {
-                log.error(host, exp);
-            }
-            catch (java.io.IOException exp) {
-                log.error(host, exp);
-            }
+    // Get date information from Google server.
+    public static java.util.Date getGoogleServerDate() {
+        final String _time = org.yccheok.jstock.gui.Utils.getUUIDValue(org.yccheok.jstock.network.Utils.getURL(Type.GET_TIME), "time");
+        if (_time == null) {
+            return null;
+        }
+        try {
+            final long time = Long.parseLong(_time);
+            final Date date = new Date(time);
+            return date;
+        } catch (NumberFormatException exp) {
+            log.error(null, exp);
         }
         return null;
     }
@@ -2297,6 +2287,9 @@ public class Utils {
         multiThreadedHttpConnectionManager.getParams().setMaxTotalConnections(128);
         multiThreadedHttpConnectionManager.getParams().setDefaultMaxConnectionsPerHost(128);
         httpClient = new HttpClient(multiThreadedHttpConnectionManager);
+        // To prevent cookie warnings.
+        httpClient.getParams().setParameter("http.protocol.single-cookie-header", true);
+        httpClient.getParams().setCookiePolicy(org.apache.commons.httpclient.cookie.CookiePolicy.BROWSER_COMPATIBILITY);
         multiThreadedHttpConnectionManager.getParams().setMaxConnectionsPerHost(httpClient.getHostConfiguration(), 128);
     }
     private static final Log log = LogFactory.getLog(Utils.class);

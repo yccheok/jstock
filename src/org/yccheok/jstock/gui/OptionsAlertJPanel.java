@@ -112,8 +112,18 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         jLabel3.setEnabled(false);
 
         jTextField2.setEnabled(false);
+        jTextField2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField2ActionPerformed(evt);
+            }
+        });
 
         jPasswordField1.setEnabled(false);
+        jPasswordField1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jPasswordField1ActionPerformed(evt);
+            }
+        });
 
         jLabel2.setForeground(new java.awt.Color(0, 0, 255));
         jLabel2.setText("@gmail.com");
@@ -134,6 +144,11 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         jLabel11.setEnabled(false);
 
         jTextField1.setEnabled(false);
+        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField1ActionPerformed(evt);
+            }
+        });
 
         jLabel12.setFont(jLabel12.getFont().deriveFont(jLabel12.getFont().getSize()-1f));
         jLabel12.setText(bundle.getString("OptionsAlertJPanel_EmailExample")); // NOI18N
@@ -215,8 +230,18 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         jLabel5.setEnabled(false);
 
         jTextField3.setEnabled(false);
+        jTextField3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField3ActionPerformed(evt);
+            }
+        });
 
         jPasswordField2.setEnabled(false);
+        jPasswordField2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jPasswordField2ActionPerformed(evt);
+            }
+        });
 
         jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/sms_protocol.png"))); // NOI18N
         jButton2.setText(bundle.getString("OptionsAlertJPanel_TestSMS")); // NOI18N
@@ -453,6 +478,26 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         Utils.playAlertSound();
     }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
+        jButton1.doClick();
+    }//GEN-LAST:event_jTextField2ActionPerformed
+
+    private void jPasswordField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jPasswordField1ActionPerformed
+        jButton1.doClick();
+    }//GEN-LAST:event_jPasswordField1ActionPerformed
+
+    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+        jButton1.doClick();
+    }//GEN-LAST:event_jTextField1ActionPerformed
+
+    private void jTextField3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField3ActionPerformed
+        jButton2.doClick();
+    }//GEN-LAST:event_jTextField3ActionPerformed
+
+    private void jPasswordField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jPasswordField2ActionPerformed
+        jButton2.doClick();
+    }//GEN-LAST:event_jPasswordField2ActionPerformed
 
     public void cancel() {
         if (this.testSMSSwingWorker != null) {

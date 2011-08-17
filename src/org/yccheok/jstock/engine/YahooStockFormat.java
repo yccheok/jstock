@@ -22,6 +22,7 @@ package org.yccheok.jstock.engine;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -41,6 +42,32 @@ public class YahooStockFormat implements StockFormat {
     // Note that, this is a very hacking way, and not reliable at all!
     private boolean isCorruptedData(double price) {
         return price > 1048576 || price < 0;
+    }
+
+    // This function is used to resolve, random corrupted data returned from
+    // Yahoo! server. Once a while, we will receive complain from users as in
+    // http://sourceforge.net/projects/jstock/forums/forum/723855/topic/4647070
+    // 13 days is just a random picked number. I assume a stock should not be
+    // older than 13 days. If not, it is just too old.
+    private static Date now = null;
+    private boolean isTooOldCalendar(Calendar calendar) {
+        if (calendar == null) {
+            return false;
+        }
+        
+        // Ensure we have a correct "now" value.
+        if (now == null) {
+            Date localNow = org.yccheok.jstock.gui.Utils.getGoogleServerDate();
+            if (localNow != null) {
+                now = localNow;
+            } else {
+                now = new Date();
+            }
+        }
+
+        Date date = calendar.getTime();
+        // If more than 13 days old stock, we consider it as corrupted stock.
+        return (Utils.getDifferenceInDays(date, now) > 13);
     }
 
     // Update on 19 March 2009 : We cannot assume certain parameters will always
@@ -241,8 +268,9 @@ public class YahooStockFormat implements StockFormat {
             // This function is used to resolve, random corrupted data returned from
             // Yahoo! server. Once a while, we will receive complain from users as in
             // http://sourceforge.net/projects/jstock/forums/forum/723855/topic/4611584
+            // http://sourceforge.net/projects/jstock/forums/forum/723855/topic/4647070
             // Note that, this is a very hacking way, and not reliable at all!
-            if (isCorruptedData(lastPrice)) {
+            if (isCorruptedData(lastPrice) || isTooOldCalendar(calendar)) {
                 continue;
             }
 

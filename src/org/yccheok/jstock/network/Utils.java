@@ -45,6 +45,7 @@ public class Utils {
         PRIVACY_HTML,
         HELP_HTML,
         MA_INDICATOR_HTML,
+        GET_TIME,
     }
 
     private Utils() {
@@ -72,6 +73,7 @@ public class Utils {
     private static final Map<Type, String> map = new EnumMap<Type, String>(Type.class);
     private static final Map<Type, String> zh_map = new EnumMap<Type, String>(Type.class);
     private static final String JSTOCK_STATIC_SERVER = "http://jstock-static.appspot.com/";
+    private static final String JSTOCK_WEBAPP_SERVER = "http://jstock-webapp.appspot.com/";
 
     static {
         map.put(Type.X_MARKET_SERVERS_TXT, JSTOCK_STATIC_SERVER + "servers_information/x_market_servers.txt");
@@ -90,6 +92,7 @@ public class Utils {
         map.put(Type.PRIVACY_HTML, "http://jstock.sourceforge.net/privacy.html");
         map.put(Type.HELP_HTML, "http://jstock.sourceforge.net/help.html?utm_source=jstock&utm_medium=help_menu");
         map.put(Type.MA_INDICATOR_HTML, "http://jstock.sourceforge.net/ma_indicator.html?utm_source=jstock&utm_medium=chart_dialog");
+        map.put(Type.GET_TIME, JSTOCK_WEBAPP_SERVER + "get-time.py");
 
         zh_map.put(Type.X_MARKET_SERVERS_TXT, JSTOCK_STATIC_SERVER + "servers_information/x_market_servers.txt");
         zh_map.put(Type.X_STOCK_SERVERS_TXT, JSTOCK_STATIC_SERVER + "servers_information/x_stock_servers.txt");
@@ -107,6 +110,7 @@ public class Utils {
         zh_map.put(Type.PRIVACY_HTML, "http://jstock.sourceforge.net/zh/privacy.html");
         zh_map.put(Type.HELP_HTML, "http://jstock.sourceforge.net/zh/help.html?utm_source=jstock&utm_medium=help_menu");
         zh_map.put(Type.MA_INDICATOR_HTML, "http://jstock.sourceforge.net/zh/ma_indicator.html?utm_source=jstock&utm_medium=chart_dialog");
+        zh_map.put(Type.GET_TIME, JSTOCK_WEBAPP_SERVER + "get-time.py");
 
         assert(map.size() == Type.values().length);
         assert(zh_map.size() == Type.values().length);
