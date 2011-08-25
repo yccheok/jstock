@@ -1,6 +1,14 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.6e - ????-??-??
+  Bugfix:  Filter corrupted data returned from Yahoo! server.
+  Bugfix:  Fix on BuyPortfolioTreeTableModel's updateStockLastPrice, which may
+           cause redundant information being inserted.
+  Bugfix:  Introduce get-time.py from Google App Engine, which may yield 
+           accurate server timing compared to unstable public Network Time 
+           Server.
+           
 JStock 1.0.6d - 2011-07-21
   Bugfix:  Filter corrupted data returned from Yahoo! server.
   

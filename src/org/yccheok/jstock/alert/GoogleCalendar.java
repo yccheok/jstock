@@ -110,7 +110,7 @@ public class GoogleCalendar {
         // set the calendar with starting time as 2:00:59, Google Calendar will process it as
         // 2:00:00.
         final Calendar cstart = Calendar.getInstance();
-        Date now = Utils.getNTPDate();
+        Date now = Utils.getGoogleServerDate();
         if (now == null) {
             // Unable to retrieve server time. Try our own local machine time.
             // Not accurate. But better than none.

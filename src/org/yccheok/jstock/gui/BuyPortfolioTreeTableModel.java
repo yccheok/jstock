@@ -20,6 +20,9 @@
 package org.yccheok.jstock.gui;
 
 import java.text.DateFormat;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 import org.jdesktop.swingx.treetable.*;
 import org.yccheok.jstock.portfolio.*;
 import javax.swing.tree.TreePath;
@@ -136,15 +139,6 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
     }
 
     public boolean updateStockLastPrice(org.yccheok.jstock.engine.Stock stock) {
-        boolean status = false;
-
-        if (stock.getLastPrice() > 0.0) {
-            stockPrice.put(stock.getCode(), stock.getLastPrice());
-        }
-        else {
-            stockPrice.put(stock.getCode(), stock.getPrevPrice());
-        }
-
         final Portfolio portfolio = (Portfolio)getRoot();
         final int count = portfolio.getChildCount();
         
@@ -161,17 +155,36 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
                 break;
             }
         }
+
+        boolean status = false;
         
-        if (null == transactionSummary) return status;
+        if (null == transactionSummary) {
+            // This stock is not found in transaction records. Returns false
+            // early.
+            return status;
+        }
         
         final int num = transactionSummary.getChildCount();
-        
+
+        if (num == 0) {
+            return status;
+        }
+
+        status = true;
+
+        // Only update stockPrice map if this stock is found in transaction
+        // records.
+        if (stock.getLastPrice() > 0.0) {
+            stockPrice.put(stock.getCode(), stock.getLastPrice());
+        }
+        else {
+            stockPrice.put(stock.getCode(), stock.getPrevPrice());
+        }
+
         for (int i = 0; i < num; i++) {
             final Transaction transaction = (Transaction)transactionSummary.getChildAt(i);
                         
             this.modelSupport.fireChildChanged(new TreePath(getPathToRoot(transaction)), i, transaction);
-            
-            status = true;
         }
                 
         fireTreeTableNodeChanged(transactionSummary);
@@ -599,5 +612,35 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
     @Override
     public boolean isValidTransaction(Transaction transaction) {
         return (transaction.getContract().getType() == Contract.Type.Buy);
+    }
+
+    private Object readResolve() {
+        // Remove all invalid records found in stockPrice. This is caused by
+        // old bug introduced in updateStockLastPrice.
+
+        final Portfolio portfolio = (Portfolio)getRoot();
+        final int count = portfolio.getChildCount();
+        final Set<Code> set = new HashSet<Code>();
+
+        for (int i = 0; i < count; i++) {
+            TransactionSummary transactionSummary = (TransactionSummary)portfolio.getChildAt(i);
+
+            assert(transactionSummary.getChildCount() > 0);
+
+            final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
+
+            set.add(transaction.getContract().getStock().getCode());
+        }
+
+        // http://stackoverflow.com/questions/1884889/iterating-over-and-removing-from-a-map
+        Iterator<Code> it = stockPrice.keySet().iterator();
+        while (it.hasNext()) {
+            if (!set.contains(it.next())) {
+                // This stock is not found in transaction records. Remove it.
+                it.remove();
+            }
+        }
+
+        return this;
     }
 }

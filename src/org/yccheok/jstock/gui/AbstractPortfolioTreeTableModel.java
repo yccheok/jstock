@@ -115,16 +115,16 @@ public abstract class AbstractPortfolioTreeTableModel extends DefaultTreeTableMo
         
         TransactionSummary transactionSummary = null;
         
-        for(int i=0; i<size; i++) {
+        for (int i = 0; i < size; i++) {
             TransactionSummary t = (TransactionSummary)portfolio.getChildAt(i);
             
-            if(((Transaction)t.getChildAt(0)).getContract().getStock().getCode().equals(code)) {
+            if (((Transaction)t.getChildAt(0)).getContract().getStock().getCode().equals(code)) {
                 transactionSummary = t;
                 break;
             }
         }
         
-        if(transactionSummary == null) {
+        if (transactionSummary == null) {
             transactionSummary = new TransactionSummary();
             this.insertNodeInto(transactionSummary, portfolio, portfolio.getChildCount());
         }
