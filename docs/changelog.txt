@@ -8,7 +8,8 @@ JStock 1.0.6e - ????-??-??
   Bugfix:  Introduce get-time.py from Google App Engine, which may yield 
            accurate server timing compared to unstable public Network Time 
            Server.
-           
+  Bugfix:  Prevent NPE in ToolTipHighlighter.
+  
 JStock 1.0.6d - 2011-07-21
   Bugfix:  Filter corrupted data returned from Yahoo! server.
   

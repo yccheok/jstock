@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ public class ToolTipHighlighter extends AbstractHighlighter {
         final Object object = adapter.getValue(modelIndex);
         
         // Empty string. Nothing to be displayed.
-        if (object.toString().length() <= 0) {
+        if (object == null || object.toString().length() <= 0) {
             return component;
         }
 
