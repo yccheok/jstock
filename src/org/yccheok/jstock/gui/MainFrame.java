@@ -172,7 +172,10 @@ public class MainFrame extends javax.swing.JFrame {
         // Please revise Statement's construct code, when adding in new language.
         // So that its language guessing algorithm will work as it is.
 
-        if (Locale.getDefault().getLanguage().equals(Locale.SIMPLIFIED_CHINESE.getLanguage())) {
+        // Check for traditional chinese before simplified chinese.
+        if (Locale.getDefault().getLanguage().equals(Locale.TRADITIONAL_CHINESE.getLanguage()) && Locale.getDefault().getCountry().equals(Locale.TRADITIONAL_CHINESE.getCountry())) {
+            this.jRadioButtonMenuItem4.setSelected(true);
+        } else if (Locale.getDefault().getLanguage().equals(Locale.SIMPLIFIED_CHINESE.getLanguage())) {
             this.jRadioButtonMenuItem2.setSelected(true);
         } else if (Locale.getDefault().getLanguage().equals(Locale.GERMAN.getLanguage())) {
             this.jRadioButtonMenuItem3.setSelected(true);
@@ -217,7 +220,6 @@ public class MainFrame extends javax.swing.JFrame {
         buttonGroup2 = new javax.swing.ButtonGroup();
         buttonGroup3 = new javax.swing.ButtonGroup();
         jComboBox1 = new AutoCompleteJComboBox();
-        jRadioButtonMenuItem3 = new javax.swing.JRadioButtonMenuItem();
         jPanel6 = new javax.swing.JPanel();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel8 = new javax.swing.JPanel();
@@ -266,6 +268,8 @@ public class MainFrame extends javax.swing.JFrame {
         jMenu10 = new javax.swing.JMenu();
         jRadioButtonMenuItem1 = new javax.swing.JRadioButtonMenuItem();
         jRadioButtonMenuItem2 = new javax.swing.JRadioButtonMenuItem();
+        jRadioButtonMenuItem4 = new javax.swing.JRadioButtonMenuItem();
+        jRadioButtonMenuItem3 = new javax.swing.JRadioButtonMenuItem();
         jMenu7 = new javax.swing.JMenu();
         jMenuItem8 = new javax.swing.JMenuItem();
         jMenu9 = new javax.swing.JMenu();
@@ -283,14 +287,6 @@ public class MainFrame extends javax.swing.JFrame {
         jComboBox1.setPreferredSize(new java.awt.Dimension(150, 24));
         ((AutoCompleteJComboBox)this.jComboBox1).attachStockInfoObserver(getStockInfoObserver());
         ((AutoCompleteJComboBox)this.jComboBox1).attachResultObserver(getResultObserver());
-
-        buttonGroup3.add(jRadioButtonMenuItem3);
-        jRadioButtonMenuItem3.setText(Locale.GERMAN.getDisplayLanguage(Locale.getDefault()));
-        jRadioButtonMenuItem3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioButtonMenuItem3ActionPerformed(evt);
-            }
-        });
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
@@ -596,13 +592,31 @@ public class MainFrame extends javax.swing.JFrame {
         jMenu10.add(jRadioButtonMenuItem1);
 
         buttonGroup3.add(jRadioButtonMenuItem2);
-        jRadioButtonMenuItem2.setText(Locale.SIMPLIFIED_CHINESE.getDisplayLanguage(Locale.getDefault()));
+        jRadioButtonMenuItem2.setText(Locale.SIMPLIFIED_CHINESE.getDisplayName(Locale.getDefault()));
         jRadioButtonMenuItem2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jRadioButtonMenuItem2ActionPerformed(evt);
             }
         });
         jMenu10.add(jRadioButtonMenuItem2);
+
+        buttonGroup3.add(jRadioButtonMenuItem4);
+        jRadioButtonMenuItem4.setText(Locale.TRADITIONAL_CHINESE.getDisplayName(Locale.getDefault()));
+        jRadioButtonMenuItem4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButtonMenuItem4ActionPerformed(evt);
+            }
+        });
+        jMenu10.add(jRadioButtonMenuItem4);
+
+        buttonGroup3.add(jRadioButtonMenuItem3);
+        jRadioButtonMenuItem3.setText(Locale.GERMAN.getDisplayLanguage(Locale.getDefault()));
+        jRadioButtonMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButtonMenuItem3ActionPerformed(evt);
+            }
+        });
+        jMenu10.add(jRadioButtonMenuItem3);
 
         jMenuBar2.add(jMenu10);
 
@@ -1264,10 +1278,15 @@ public class MainFrame extends javax.swing.JFrame {
                 org.yccheok.jstock.gui.Utils.restartApplication(this);
             } // return to the previous selection if the user press "no" in the dialog
             else {
-                if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.SIMPLIFIED_CHINESE.getLanguage()) == 0) {
+                // Comparison on traditional chinese must be performed before
+                // simplified chinese.
+                if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.TRADITIONAL_CHINESE.getLanguage()) == 0 && this.jStockOptions.getLocale().getCountry().compareTo(Locale.TRADITIONAL_CHINESE.getCountry()) == 0) {
+                    this.jRadioButtonMenuItem4.setSelected(true);
+                }
+                else if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.SIMPLIFIED_CHINESE.getLanguage()) == 0) {
                     this.jRadioButtonMenuItem2.setSelected(true);
                 }
-                if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.GERMAN.getLanguage()) == 0) {
+                else if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.GERMAN.getLanguage()) == 0) {
                     this.jRadioButtonMenuItem3.setSelected(true);
                 }
             }
@@ -1276,11 +1295,12 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void jRadioButtonMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonMenuItem2ActionPerformed
         // Avoid from Confirm Dialog to pop up when user change to same language (i.e. simplified chinese)
-        if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.SIMPLIFIED_CHINESE.getLanguage()) != 0) {
+        if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.SIMPLIFIED_CHINESE.getLanguage()) != 0 || this.jStockOptions.getLocale().getCountry().compareTo(Locale.TRADITIONAL_CHINESE.getCountry()) == 0) {
             // Do not suprise user with sudden restart. Ask for their permission to do so.
             final int result = JOptionPane.showConfirmDialog(this, MessagesBundle.getString("question_message_restart_now"), MessagesBundle.getString("question_title_restart_now"), JOptionPane.YES_NO_OPTION);
             if (result == JOptionPane.YES_OPTION) {
-                final Locale locale = new Locale(Locale.SIMPLIFIED_CHINESE.getLanguage(), Locale.getDefault().getCountry(), Locale.getDefault().getVariant());
+                String country = Locale.TRADITIONAL_CHINESE.getCountry().equals(Locale.getDefault().getCountry()) ? Locale.SIMPLIFIED_CHINESE.getCountry() : Locale.getDefault().getCountry();
+                final Locale locale = new Locale(Locale.SIMPLIFIED_CHINESE.getLanguage(), country, Locale.getDefault().getVariant());
                 this.jStockOptions.setLocale(locale);
                 org.yccheok.jstock.gui.Utils.restartApplication(this);
             } // return to the previous selection if the user press "no" in the dialog
@@ -1288,7 +1308,10 @@ public class MainFrame extends javax.swing.JFrame {
                 if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.ENGLISH.getLanguage()) == 0) {
                     this.jRadioButtonMenuItem1.setSelected(true);
                 }
-                if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.GERMAN.getLanguage()) == 0) {
+                else if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.TRADITIONAL_CHINESE.getLanguage()) == 0 && this.jStockOptions.getLocale().getCountry().compareTo(Locale.TRADITIONAL_CHINESE.getCountry()) == 0) {
+                    this.jRadioButtonMenuItem4.setSelected(true);
+                }
+                else if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.GERMAN.getLanguage()) == 0) {
                     this.jRadioButtonMenuItem3.setSelected(true);
                 }
             }
@@ -1309,12 +1332,43 @@ public class MainFrame extends javax.swing.JFrame {
                 if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.ENGLISH.getLanguage()) == 0) {
                     this.jRadioButtonMenuItem1.setSelected(true);
                 }
-                if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.SIMPLIFIED_CHINESE.getLanguage()) == 0) {
+                // Comparison on traditional chinese must be performed before
+                // simplified chinese.
+                else if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.TRADITIONAL_CHINESE.getLanguage()) == 0 && this.jStockOptions.getLocale().getCountry().compareTo(Locale.TRADITIONAL_CHINESE.getCountry()) == 0) {
+                    this.jRadioButtonMenuItem4.setSelected(true);
+                }
+                else if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.SIMPLIFIED_CHINESE.getLanguage()) == 0) {
                     this.jRadioButtonMenuItem2.setSelected(true);
                 }
             }
         }
     }//GEN-LAST:event_jRadioButtonMenuItem3ActionPerformed
+
+    private void jRadioButtonMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonMenuItem4ActionPerformed
+        // Avoid from Confirm Dialog to pop up when user change to same language (i.e. german)
+        if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.TRADITIONAL_CHINESE.getLanguage()) != 0 || this.jStockOptions.getLocale().getCountry().compareTo(Locale.TRADITIONAL_CHINESE.getCountry()) != 0) {
+            // Do not suprise user with sudden restart. Ask for their permission to do so.
+            final int result = JOptionPane.showConfirmDialog(this, MessagesBundle.getString("question_message_restart_now"), MessagesBundle.getString("question_title_restart_now"), JOptionPane.YES_NO_OPTION);
+            if (result == JOptionPane.YES_OPTION) {
+                // Unline simplified chinese, we will not use Locale.getDefault().getCountry().
+                // Instead, we will be using Locale.TRADITIONAL_CHINESE.getCountry().
+                final Locale locale = new Locale(Locale.TRADITIONAL_CHINESE.getLanguage(), Locale.TRADITIONAL_CHINESE.getCountry(), Locale.getDefault().getVariant());
+                this.jStockOptions.setLocale(locale);
+                org.yccheok.jstock.gui.Utils.restartApplication(this);
+            }// return to the previous selection if the user press "no" in the dialog
+            else {
+                if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.ENGLISH.getLanguage()) == 0) {
+                    this.jRadioButtonMenuItem1.setSelected(true);
+                }
+                else if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.SIMPLIFIED_CHINESE.getLanguage()) == 0 && this.jStockOptions.getLocale().getCountry().compareTo(Locale.TRADITIONAL_CHINESE.getCountry()) != 0) {
+                    this.jRadioButtonMenuItem2.setSelected(true);
+                }
+                else if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.GERMAN.getLanguage()) == 0) {
+                    this.jRadioButtonMenuItem3.setSelected(true);
+                }
+            }
+        }
+    }//GEN-LAST:event_jRadioButtonMenuItem4ActionPerformed
     
     /**
      * Activate specified watchlist.
@@ -4411,6 +4465,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem1;
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem2;
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem3;
+    private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;

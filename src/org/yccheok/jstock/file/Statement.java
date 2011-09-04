@@ -56,7 +56,7 @@ public class Statement {
         // So that its language guessing algorithm will work as it is.
 
         // Language guessing algorithm.
-        Locale[] locales = {Locale.ENGLISH, Locale.SIMPLIFIED_CHINESE, Locale.GERMAN};
+        Locale[] locales = {Locale.ENGLISH, Locale.SIMPLIFIED_CHINESE, Locale.GERMAN, Locale.TRADITIONAL_CHINESE};
 
         for (Locale locale : locales) {
             l = locale;

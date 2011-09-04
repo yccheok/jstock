@@ -60,6 +60,16 @@ print "\n$init_counter resource keys being initiazlied.\n";
 print "$process_counter files being processed.\n";
 print "Validation on (zh) files done!\n\n\n";
 
+################################
+# Traditional Chinese Language #
+################################
+reset_global_variables();
+find(\&init_zh_tw, $dir);
+find(\&process, $dir);
+print "\n$init_counter resource keys being initiazlied.\n";
+print "$process_counter files being processed.\n";
+print "Validation on (zh_tw) files done!\n\n\n";
+
 ####################
 # Germany Language #
 ####################
@@ -128,6 +138,39 @@ sub init_zh
 
     my $hash = \%gui_bundle;
     if ($file =~ /(messages_zh\.properties$)/) {
+        $hash = \%messages_bundle;
+    }
+    open FILE, $file or die $!;
+    while (my $line = <FILE>) {
+        if ($line =~ /^#/) {
+            next;
+        }
+        chomp $line;
+
+        if ($line =~ /([^=]+)=(.+)/) {
+            my $key = $1;
+            my $value = $2;
+            if ($hash->{$key}) {
+                print "WARNING : conflict occurs for key '$key'\n";
+            }
+            $hash->{$key} = $value;
+            $init_counter++;
+        }
+    }
+    close(FILE);
+}
+
+sub init_zh_tw
+{
+    my $name = $_;
+    my $dir = $File::Find::dir;
+    my $file = $File::Find::name;
+    if ($file !~ /(gui_zh_TW\.properties$)|(messages_zh_TW\.properties$)/) {
+        return;
+    }
+
+    my $hash = \%gui_bundle;
+    if ($file =~ /(messages_zh_TW\.properties$)/) {
         $hash = \%messages_bundle;
     }
     open FILE, $file or die $!;
