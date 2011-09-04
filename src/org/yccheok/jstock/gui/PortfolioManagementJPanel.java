@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.Set;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -368,7 +369,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             return false;
         }
         if (statements.getType() == Statement.Type.PortfolioManagementBuy || statements.getType() == Statement.Type.PortfolioManagementSell || statements.getType() == Statement.Type.PortfolioManagementDeposit || statements.getType() == Statement.Type.PortfolioManagementDividend) {
-            final DateFormat dateFormat = DateFormat.getDateInstance();
+            final ResourceBundle resourceBundle = statements.getGUIResourceBundle();
+            final DateFormat dateFormat = statements.getDateFormat();
             final int size = statements.size();
             switch(statements.getType()) {
                 case PortfolioManagementBuy:
@@ -377,15 +379,15 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
                     for (int i = 0; i < size; i++) {
                         final Statement statement = statements.get(i);
-                        final String _code = statement.getValueAsString(GUIBundle.getString("MainFrame_Code"));
-                        final String _symbol = statement.getValueAsString(GUIBundle.getString("MainFrame_Symbol"));
-                        final String _date = statement.getValueAsString(GUIBundle.getString("PortfolioManagementJPanel_Date"));
-                        final Integer units = statement.getValueAsInteger(GUIBundle.getString("PortfolioManagementJPanel_Units"));
-                        final Double purchasePrice = statement.getValueAsDouble(GUIBundle.getString("PortfolioManagementJPanel_PurchasePrice"));
-                        final Double broker = statement.getValueAsDouble(GUIBundle.getString("PortfolioManagementJPanel_Broker"));
-                        final Double clearingFee = statement.getValueAsDouble(GUIBundle.getString("PortfolioManagementJPanel_ClearingFee"));
-                        final Double stampDuty = statement.getValueAsDouble(GUIBundle.getString("PortfolioManagementJPanel_StampDuty"));
-                        final String _comment = statement.getValueAsString(GUIBundle.getString("PortfolioManagementJPanel_Comment"));
+                        final String _code = statement.getValueAsString(resourceBundle.getString("MainFrame_Code"));
+                        final String _symbol = statement.getValueAsString(resourceBundle.getString("MainFrame_Symbol"));
+                        final String _date = statement.getValueAsString(resourceBundle.getString("PortfolioManagementJPanel_Date"));
+                        final Double units = statement.getValueAsDouble(resourceBundle.getString("PortfolioManagementJPanel_Units"));
+                        final Double purchasePrice = statement.getValueAsDouble(resourceBundle.getString("PortfolioManagementJPanel_PurchasePrice"));
+                        final Double broker = statement.getValueAsDouble(resourceBundle.getString("PortfolioManagementJPanel_Broker"));
+                        final Double clearingFee = statement.getValueAsDouble(resourceBundle.getString("PortfolioManagementJPanel_ClearingFee"));
+                        final Double stampDuty = statement.getValueAsDouble(resourceBundle.getString("PortfolioManagementJPanel_StampDuty"));
+                        final String _comment = statement.getValueAsString(resourceBundle.getString("PortfolioManagementJPanel_Comment"));
 
                         Stock stock = null;
                         if (_code.length() > 0 && _symbol.length() > 0) {
@@ -441,10 +443,15 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                             return true;
                         }
                     }
-                    this.buyTreeTable.setTreeTableModel(new BuyPortfolioTreeTableModel());
+                    this.buyTreeTable.setTreeTableModel(new BuyPortfolioTreeTableModel());                    
+
                     for (Transaction transaction : transactions) {
                         this.addBuyTransaction(transaction);
                     }
+
+                    // Only shows necessary columns.
+                    initGUIOptions();
+
                     updateRealTimeStockMonitorAccordingToBuyPortfolioTreeTableModel();
                 }
                 break;
@@ -455,17 +462,17 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
                     for (int i = 0; i < size; i++) {
                         final Statement statement = statements.get(i);
-                        final String _code = statement.getValueAsString(GUIBundle.getString("MainFrame_Code"));
-                        final String _symbol = statement.getValueAsString(GUIBundle.getString("MainFrame_Symbol"));
-                        final String _referenceDate = statement.getValueAsString(GUIBundle.getString("PortfolioManagementJPanel_ReferenceDate"));
-                        final String _date = statement.getValueAsString(GUIBundle.getString("PortfolioManagementJPanel_Date"));
-                        final Integer units = statement.getValueAsInteger(GUIBundle.getString("PortfolioManagementJPanel_Units"));
-                        final Double sellingPrice =  statement.getValueAsDouble(GUIBundle.getString("PortfolioManagementJPanel_SellingPrice"));
-                        final Double purchasePrice = statement.getValueAsDouble(GUIBundle.getString("PortfolioManagementJPanel_PurchasePrice"));
-                        final Double broker = statement.getValueAsDouble(GUIBundle.getString("PortfolioManagementJPanel_Broker"));
-                        final Double clearingFee = statement.getValueAsDouble(GUIBundle.getString("PortfolioManagementJPanel_ClearingFee"));
-                        final Double stampDuty = statement.getValueAsDouble(GUIBundle.getString("PortfolioManagementJPanel_StampDuty"));
-                        final String _comment = statement.getValueAsString(GUIBundle.getString("PortfolioManagementJPanel_Comment"));
+                        final String _code = statement.getValueAsString(resourceBundle.getString("MainFrame_Code"));
+                        final String _symbol = statement.getValueAsString(resourceBundle.getString("MainFrame_Symbol"));
+                        final String _referenceDate = statement.getValueAsString(resourceBundle.getString("PortfolioManagementJPanel_ReferenceDate"));
+                        final String _date = statement.getValueAsString(resourceBundle.getString("PortfolioManagementJPanel_Date"));
+                        final Double units = statement.getValueAsDouble(resourceBundle.getString("PortfolioManagementJPanel_Units"));
+                        final Double sellingPrice =  statement.getValueAsDouble(resourceBundle.getString("PortfolioManagementJPanel_SellingPrice"));
+                        final Double purchasePrice = statement.getValueAsDouble(resourceBundle.getString("PortfolioManagementJPanel_PurchasePrice"));
+                        final Double broker = statement.getValueAsDouble(resourceBundle.getString("PortfolioManagementJPanel_Broker"));
+                        final Double clearingFee = statement.getValueAsDouble(resourceBundle.getString("PortfolioManagementJPanel_ClearingFee"));
+                        final Double stampDuty = statement.getValueAsDouble(resourceBundle.getString("PortfolioManagementJPanel_StampDuty"));
+                        final String _comment = statement.getValueAsString(resourceBundle.getString("PortfolioManagementJPanel_Comment"));
 
                         Stock stock = null;
                         if (_code.length() > 0 && _symbol.length() > 0) {
@@ -523,10 +530,14 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                             return true;
                         }
                     }
-                    this.sellTreeTable.setTreeTableModel(new SellPortfolioTreeTableModel());
+                    this.sellTreeTable.setTreeTableModel(new SellPortfolioTreeTableModel());                    
+
                     for (Transaction transaction : transactions) {
                         this.addSellTransaction(transaction);
                     }
+
+                    // Only shows necessary columns.
+                    initGUIOptions();
                 }
                 break;
 
@@ -537,7 +548,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     for (int i = 0; i < size; i++) {
                         Date date = null;
                         final Statement statement = statements.get(i);
-                        final String object0 = statement.getValueAsString(GUIBundle.getString("PortfolioManagementJPanel_Date"));
+                        final String object0 = statement.getValueAsString(resourceBundle.getString("PortfolioManagementJPanel_Date"));
                         assert(object0 != null);
                         try {
                             date = dateFormat.parse(object0);
@@ -551,7 +562,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                             log.error("Unexpected wrong date. Ignore");
                             continue;
                         }
-                        final Double cash = statement.getValueAsDouble(GUIBundle.getString("PortfolioManagementJPanel_Cash"));
+                        final Double cash = statement.getValueAsDouble(resourceBundle.getString("PortfolioManagementJPanel_Cash"));
                         // Shall we continue to ignore, or shall we just return false to
                         // flag an error?
                         if (cash == null) {
@@ -590,7 +601,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                         Date date = null;
                         Stock stock = null;
                         final Statement statement = statements.get(i);
-                        final String object0 = statement.getValueAsString(GUIBundle.getString("PortfolioManagementJPanel_Date"));
+                        final String object0 = statement.getValueAsString(resourceBundle.getString("PortfolioManagementJPanel_Date"));
                         assert(object0 != null);
                         try {
                             date = dateFormat.parse((String)object0);
@@ -604,15 +615,15 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                             log.error("Unexpected wrong date. Ignore");
                             continue;
                         }
-                        final Double dividend = statement.getValueAsDouble(GUIBundle.getString("PortfolioManagementJPanel_Dividend"));
+                        final Double dividend = statement.getValueAsDouble(resourceBundle.getString("PortfolioManagementJPanel_Dividend"));
                         // Shall we continue to ignore, or shall we just return false to
                         // flag an error?
                         if (dividend == null) {
                             log.error("Unexpected wrong dividend. Ignore");
                             continue;
                         }
-                        final String codeStr = statement.getValueAsString(GUIBundle.getString("MainFrame_Code"));
-                        final String symbolStr = statement.getValueAsString(GUIBundle.getString("MainFrame_Symbol"));
+                        final String codeStr = statement.getValueAsString(resourceBundle.getString("MainFrame_Code"));
+                        final String symbolStr = statement.getValueAsString(resourceBundle.getString("MainFrame_Symbol"));
                         if (codeStr.length() > 0 && symbolStr.length() > 0) {
                             stock = Utils.getEmptyStock(Code.newInstance(codeStr), Symbol.newInstance(symbolStr));
                         }

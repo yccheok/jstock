@@ -169,6 +169,9 @@ public class MainFrame extends javax.swing.JFrame {
      * according to current default locale.
      */
     private void initLanguageMenuItemsSelection() {
+        // Please revise Statement's construct code, when adding in new language.
+        // So that its language guessing algorithm will work as it is.
+
         if (Locale.getDefault().getLanguage().equals(Locale.SIMPLIFIED_CHINESE.getLanguage())) {
             this.jRadioButtonMenuItem2.setSelected(true);
         } else if (Locale.getDefault().getLanguage().equals(Locale.GERMAN.getLanguage())) {

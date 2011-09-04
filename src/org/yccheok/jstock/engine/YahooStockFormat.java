@@ -245,9 +245,8 @@ public class YahooStockFormat implements StockFormat {
                 try { sellQuantity = Integer.parseInt(fields[28]); } catch (NumberFormatException exp) {}
                 
                 if (length < 32) break;
-                java.text.SimpleDateFormat dateFormat = (java.text.SimpleDateFormat)java.text.DateFormat.getInstance();
+                java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("MM/dd/yyyy hh:mmaa");
                 String data_and_time = quotePattern.matcher(fields[28]).replaceAll("").trim() + " " + quotePattern.matcher(fields[29]).replaceAll("").trim();
-                dateFormat.applyPattern("MM/dd/yyyy hh:mmaa");
                 java.util.Date serverDate;
                 try {
                     serverDate = dateFormat.parse(data_and_time);

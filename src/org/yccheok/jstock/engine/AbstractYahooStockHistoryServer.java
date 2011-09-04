@@ -65,8 +65,7 @@ public abstract class AbstractYahooStockHistoryServer implements StockHistorySer
         historyDatabase.clear();
         simpleDates.clear();
 
-        java.text.SimpleDateFormat dateFormat = (java.text.SimpleDateFormat)java.text.DateFormat.getInstance();
-        dateFormat.applyPattern("yyyy-MM-dd");
+        java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd");
         final Calendar calendar = Calendar.getInstance();
 
         String[] stockDatas = respond.split("\r\n|\r|\n");

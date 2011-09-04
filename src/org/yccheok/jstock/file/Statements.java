@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
+ * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.ResourceBundle;
 import javax.swing.table.TableModel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -551,6 +552,21 @@ public class Statements {
     public Statement.Type getType() {
         // statements.size() can never be 0.
         return statements.get(0).getType();
+    }
+
+    /**
+     * @return the org.yccheok.jstock.data.gui language file used by this
+     * statements.
+     */
+    public ResourceBundle getGUIResourceBundle() {
+        return statements.get(0).getGUIResourceBundle();
+    }
+
+    /**
+     * @return the DateFormat used by this statements.
+     */
+    public DateFormat getDateFormat() {
+        return statements.get(0).getDateFormat();
     }
 
     public int size() {
