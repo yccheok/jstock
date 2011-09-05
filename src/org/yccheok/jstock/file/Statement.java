@@ -19,7 +19,6 @@
 
 package org.yccheok.jstock.file;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -71,11 +70,9 @@ public class Statement {
         if (this.type == Type.Unknown) {
             // Use default.
             this.guiResourceBundle = ResourceBundle.getBundle("org.yccheok.jstock.data.gui");
-            this.dateFormat = DateFormat.getDateInstance();
         } else {
             // This is the best guess on what language file is being used.
             this.guiResourceBundle = r;
-            this.dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, l);
         }
 
         for (Atom atom : atoms) {
@@ -284,18 +281,9 @@ public class Statement {
         return guiResourceBundle;
     }
 
-    /**
-     * @return the DateFormat used by this statement.
-     */
-    public DateFormat getDateFormat() {
-        return dateFormat;
-    }
-
     // So that we know which org.yccheok.jstock.data.gui language file we should
     // refer to.
     private final ResourceBundle guiResourceBundle;
-    // So that we know which DateFormat we should refer to.
-    private final DateFormat dateFormat;
 
     private final Type type;
     private final List<Atom> atoms;

@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
 import javax.swing.ImageIcon;
@@ -370,7 +371,17 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
         if (statements.getType() == Statement.Type.PortfolioManagementBuy || statements.getType() == Statement.Type.PortfolioManagementSell || statements.getType() == Statement.Type.PortfolioManagementDeposit || statements.getType() == Statement.Type.PortfolioManagementDividend) {
             final ResourceBundle resourceBundle = statements.getGUIResourceBundle();
-            final DateFormat dateFormat = statements.getDateFormat();
+            // We will use a fixed date format (Locale.English), so that it will be
+            // easier for Android to process.
+            //
+            // "Sep 5, 2011"    -   Locale.ENGLISH
+            // "2011-9-5"       -   Locale.SIMPLIFIED_CHINESE
+            // "2011/9/5"       -   Locale.TRADITIONAL_CHINESE
+            // 05.09.2011       -   Locale.GERMAN
+            //
+            // However, for backward compatible purpose (Able to read old CSV),
+            // we perform a for loop to determine the best date format.
+            DateFormat dateFormat = null;
             final int size = statements.size();
             switch(statements.getType()) {
                 case PortfolioManagementBuy:
@@ -399,11 +410,32 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                             continue;
                         }
                         Date date = null;
-                        try {
-                            date = dateFormat.parse((String)_date);
-                        }
-                        catch (ParseException exp) {
-                            log.error(null, exp);
+
+                        if (dateFormat == null) {
+                            // However, for backward compatible purpose (Able to read old CSV),
+                            // we perform a for loop to determine the best date format.
+                            // For the latest CSV, it should be Locale.ENGLISH.
+                            Locale[] locales = {Locale.ENGLISH, Locale.SIMPLIFIED_CHINESE, Locale.GERMAN, Locale.TRADITIONAL_CHINESE};
+                            for (Locale locale : locales) {
+                                dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, locale);
+                                try {
+                                    date = dateFormat.parse((String)_date);
+                                } catch (ParseException exp) {
+                                    log.error(null, exp);
+                                    date = null;
+                                    dateFormat = null;
+                                    continue;
+                                }
+                                // We had found our best dateFormat. Early break.
+                                break;
+                            }
+                        } else {
+                            // We already determine our best dateFormat.
+                            try {
+                                date = dateFormat.parse((String)_date);
+                            } catch (ParseException exp) {
+                                log.error(null, exp);
+                            }
                         }
 
                         if (date == null) {
@@ -486,12 +518,35 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
                         Date date = null;
                         Date referenceDate = null;
-                        try {
-                            date = dateFormat.parse((String)_date);
-                            referenceDate = dateFormat.parse((String)_referenceDate);
-                        }
-                        catch (ParseException exp) {
-                            log.error(null, exp);
+
+                        if (dateFormat == null) {
+                            // However, for backward compatible purpose (Able to read old CSV),
+                            // we perform a for loop to determine the best date format.
+                            // For the latest CSV, it should be Locale.ENGLISH.
+                            Locale[] locales = {Locale.ENGLISH, Locale.SIMPLIFIED_CHINESE, Locale.GERMAN, Locale.TRADITIONAL_CHINESE};
+                            for (Locale locale : locales) {
+                                dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, locale);
+                                try {
+                                    date = dateFormat.parse((String)_date);
+                                    referenceDate = dateFormat.parse((String)_referenceDate);
+                                } catch (ParseException exp) {
+                                    log.error(null, exp);
+                                    date = null;
+                                    referenceDate = null;
+                                    dateFormat = null;
+                                    continue;
+                                }
+                                // We had found our best dateFormat. Early break.
+                                break;
+                            }
+                        } else {
+                            // We already determine our best dateFormat.
+                            try {
+                                date = dateFormat.parse((String)_date);
+                                referenceDate = dateFormat.parse((String)_referenceDate);
+                            } catch (ParseException exp) {
+                                log.error(null, exp);
+                            }
                         }
 
                         if (date == null || referenceDate == null) {
@@ -550,12 +605,34 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                         final Statement statement = statements.get(i);
                         final String object0 = statement.getValueAsString(resourceBundle.getString("PortfolioManagementJPanel_Date"));
                         assert(object0 != null);
-                        try {
-                            date = dateFormat.parse(object0);
+
+                        if (dateFormat == null) {
+                            // However, for backward compatible purpose (Able to read old CSV),
+                            // we will perform a for loop to determine the best date format.
+                            // For the latest CSV, it should be Locale.ENGLISH.
+                            Locale[] locales = {Locale.ENGLISH, Locale.SIMPLIFIED_CHINESE, Locale.GERMAN, Locale.TRADITIONAL_CHINESE};
+                            for (Locale locale : locales) {
+                                dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, locale);
+                                try {
+                                    date = dateFormat.parse(object0);
+                                } catch (ParseException exp) {
+                                    log.error(null, exp);
+                                    date = null;
+                                    dateFormat = null;
+                                    continue;
+                                }
+                                // We had found our best dateFormat. Early break.
+                                break;
+                            }
+                        } else {
+                            // We already determine our best dateFormat.
+                            try {
+                                date = dateFormat.parse(object0);
+                            } catch (ParseException exp) {
+                                log.error(null, exp);
+                            }
                         }
-                        catch (ParseException exp) {
-                            log.error(null, exp);
-                        }
+
                         // Shall we continue to ignore, or shall we just return false to
                         // flag an error?
                         if (date == null) {
@@ -603,12 +680,34 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                         final Statement statement = statements.get(i);
                         final String object0 = statement.getValueAsString(resourceBundle.getString("PortfolioManagementJPanel_Date"));
                         assert(object0 != null);
-                        try {
-                            date = dateFormat.parse((String)object0);
+                        
+                        if (dateFormat == null) {
+                            // However, for backward compatible purpose (Able to read old CSV),
+                            // we will perform a for loop to determine the best date format.
+                            // For the latest CSV, it should be Locale.ENGLISH.
+                            Locale[] locales = {Locale.ENGLISH, Locale.SIMPLIFIED_CHINESE, Locale.GERMAN, Locale.TRADITIONAL_CHINESE};
+                            for (Locale locale : locales) {
+                                dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, locale);
+                                try {
+                                    date = dateFormat.parse(object0);
+                                } catch (ParseException exp) {
+                                    log.error(null, exp);
+                                    date = null;
+                                    dateFormat = null;
+                                    continue;
+                                }
+                                // We had found our best dateFormat. Early break.
+                                break;
+                            }
+                        } else {
+                            // We already determine our best dateFormat.
+                            try {
+                                date = dateFormat.parse(object0);
+                            } catch (ParseException exp) {
+                                log.error(null, exp);
+                            }
                         }
-                        catch (ParseException exp) {
-                            log.error(null, exp);
-                        }
+
                         // Shall we continue to ignore, or shall we just return false to
                         // flag an error?
                         if (date == null) {

@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import javax.swing.table.TableModel;
 import org.apache.commons.logging.Log;
@@ -77,6 +78,7 @@ public class Statements {
     public static Statements newInstanceFromStockHistoryServer(StockHistoryServer server) {
         final Statements s = new Statements();
         final int size = server.getNumOfCalendar();
+        // Do we need to used a fixed date format as in newInstanceFromTableModel's?
         final DateFormat dateFormat = DateFormat.getDateInstance();
         for (int i = 0; i < size; i++) {
             final Calendar calendar = server.getCalendar(i);
@@ -327,7 +329,14 @@ public class Statements {
                     atoms.add(new Atom(stock.getSymbol().toString(), GUIBundle.getString("MainFrame_Symbol")));
                 }
                 else if (tableModel.getColumnClass(j).equals(Date.class)) {
-                    DateFormat dateFormat = DateFormat.getDateInstance();
+                    // We will use a fixed date format (Locale.English), so that it will be
+                    // easier for Android to process.
+                    //
+                    // "Sep 5, 2011"    -   Locale.ENGLISH
+                    // "2011-9-5"       -   Locale.SIMPLIFIED_CHINESE
+                    // "2011/9/5"       -   Locale.TRADITIONAL_CHINESE
+                    // 05.09.2011       -   Locale.GERMAN
+                    DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, Locale.ENGLISH);
                     atoms.add(new Atom(object != null ? dateFormat.format(((Date)object).getTime()) : "", type));
                 }
                 else {
@@ -385,12 +394,26 @@ public class Statements {
                         // OK. I know. This breaks generalization.
                         if (abstractPortfolioTreeTableModel instanceof SellPortfolioTreeTableModel) {
                             final SimpleDate simpleDate = transaction.getContract().getReferenceDate();
-                            DateFormat dateFormat = DateFormat.getDateInstance();
+                            // We will use a fixed date format (Locale.English), so that it will be
+                            // easier for Android to process.
+                            //
+                            // "Sep 5, 2011"    -   Locale.ENGLISH
+                            // "2011-9-5"       -   Locale.SIMPLIFIED_CHINESE
+                            // "2011/9/5"       -   Locale.TRADITIONAL_CHINESE
+                            // 05.09.2011       -   Locale.GERMAN
+                            DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, Locale.ENGLISH);
                             atoms.add(new Atom(object != null ? dateFormat.format(simpleDate.getTime().getTime()) : "", GUIBundle.getString("PortfolioManagementJPanel_ReferenceDate")));
                         }
                     }
                     else if (abstractPortfolioTreeTableModel.getColumnClass(k).equals(Date.class)) {
-                        DateFormat dateFormat = DateFormat.getDateInstance();
+                        // We will use a fixed date format (Locale.English), so that it will be
+                        // easier for Android to process.
+                        //
+                        // "Sep 5, 2011"    -   Locale.ENGLISH
+                        // "2011-9-5"       -   Locale.SIMPLIFIED_CHINESE
+                        // "2011/9/5"       -   Locale.TRADITIONAL_CHINESE
+                        // 05.09.2011       -   Locale.GERMAN
+                        DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, Locale.ENGLISH);
                         atoms.add(new Atom(object != null ? dateFormat.format(((Date)object).getTime()) : "", type));
                     }
                     else {
@@ -560,13 +583,6 @@ public class Statements {
      */
     public ResourceBundle getGUIResourceBundle() {
         return statements.get(0).getGUIResourceBundle();
-    }
-
-    /**
-     * @return the DateFormat used by this statements.
-     */
-    public DateFormat getDateFormat() {
-        return statements.get(0).getDateFormat();
     }
 
     public int size() {
