@@ -155,7 +155,8 @@ public class JTableUtilities {
         for (int i = 0; i < optionsCount; i++) {
             final String name = jTableOptions.getColumnName(i);
             final java.util.List<String> keys = getKeys(name, locale);
-            
+            assert(keys != null);
+
             int index = -1;
             for (int j = 0; j < tableCount; j++) {
                 // Try all the keys.
@@ -336,7 +337,11 @@ public class JTableUtilities {
     private static java.util.List<String> getKeys(String string, Locale locale) {
         if (string2KeyMap.containsKey(locale)) {
             final Map<String, java.util.List<String>> string2Key = string2KeyMap.get(locale);
-            return string2Key.get(string);
+            final java.util.List<String> result = string2Key.get(string);
+            if (result == null) {
+                return java.util.Collections.EMPTY_LIST;
+            }
+            return result;
         }
 
         final Map<String, java.util.List<String>> string2Key = new HashMap<String, java.util.List<String>>();
