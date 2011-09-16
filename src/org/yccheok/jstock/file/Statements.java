@@ -26,6 +26,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -240,17 +243,19 @@ public class Statements {
      * @return the constructed Statements. null if fail
      */
     public static Statements newInstanceFromCSVFile(File file) {
-        java.io.Reader reader = null;
-        try {
-            reader = new java.io.FileReader(file);
-        } catch (IOException ex) {
-            log.error(null, ex);
-            return null;
-        }
-        final CSVReader csvreader = new CSVReader(reader);
-        final List<String> types = new ArrayList<String>();
+        boolean status = false;
+
+        FileInputStream fileInputStream = null;
+        InputStreamReader inputStreamReader = null;
+        CSVReader csvreader = null;
         final Statements s = new Statements();
+
         try {
+            fileInputStream = new FileInputStream(file);
+            inputStreamReader = new InputStreamReader(fileInputStream,  Charset.forName("UTF-8"));
+            csvreader = new CSVReader(inputStreamReader);
+            final List<String> types = new ArrayList<String>();
+
             String [] nextLine;
             if ((nextLine = csvreader.readNext()) != null) {
                 types.addAll(Arrays.asList(nextLine));
@@ -286,23 +291,27 @@ public class Statements {
                 }
                 s.statements.add(statement);
             }
-        }
-        catch (IOException ex) {
+
+            status = true;
+        } catch (IOException ex) {
             log.error(null, ex);
-        }
-        finally {
-            try {
-                csvreader.close();
-            } catch (IOException ex) {
-                log.error(null, ex);
+        } finally {
+            if (csvreader != null) {
+                try {
+                    csvreader.close();
+                } catch (IOException ex) {
+                    log.error(null, ex);
+                }
             }
-            org.yccheok.jstock.gui.Utils.close(reader);
+            org.yccheok.jstock.gui.Utils.close(inputStreamReader);
+            org.yccheok.jstock.gui.Utils.close(fileInputStream);
         }
-        if (s.statements.isEmpty()) {
-            // No statement being found. Returns null.
-            return null;
+
+        if (status) {
+            return s;
         }
-        return s;
+
+        return null;
     }
     
     /**
@@ -442,41 +451,53 @@ public class Statements {
     }
 
     public boolean saveAsCSVFile(File file) {
-        java.io.Writer writer = null;
+        boolean status = false;
+
+        FileOutputStream fileOutputStream = null;
+        OutputStreamWriter outputStreamWriter = null;
+        CSVWriter csvwriter = null;
+
         try {
-            writer = new java.io.FileWriter(file);
-        } catch (IOException ex) {
-            log.error(null, ex);
-            return false;
-        }
-        final CSVWriter csvwriter = new CSVWriter(writer);
-        // statements.size() can never be 0.
-        final int columnCount = statements.get(0).size();
-        String[] datas = new String[columnCount];
+            fileOutputStream = new FileOutputStream(file);
+            outputStreamWriter = new OutputStreamWriter(fileOutputStream,  Charset.forName("UTF-8"));
+            csvwriter = new CSVWriter(outputStreamWriter);
+            // statements.size() can never be 0.
+            final int columnCount = statements.get(0).size();
+            String[] datas = new String[columnCount];
 
-        // First row. Print out table header.
-        for (int i = 0; i < columnCount; i++) {
-            datas[i] = statements.get(0).getAtom(i).getType();
-        }
-
-        csvwriter.writeNext(datas);
-
-        final int rowCount = statements.size();
-        for (int i = 0; i < rowCount; i++) {
-            for (int j = 0; j < columnCount; j++) {
-                // Value shouldn't be null, as we prevent atom with null value.
-                final String value = statements.get(i).getAtom(j).getValue().toString();
-                datas[j] = value;
+            // First row. Print out table header.
+            for (int i = 0; i < columnCount; i++) {
+                datas[i] = statements.get(0).getAtom(i).getType();
             }
+
             csvwriter.writeNext(datas);
-        }
-        try {
-            csvwriter.close();
-        } catch (IOException ex) {
+
+            final int rowCount = statements.size();
+            for (int i = 0; i < rowCount; i++) {
+                for (int j = 0; j < columnCount; j++) {
+                    // Value shouldn't be null, as we prevent atom with null value.
+                    final String value = statements.get(i).getAtom(j).getValue().toString();
+                    datas[j] = value;
+                }
+                csvwriter.writeNext(datas);
+            }
+            
+            status = true;
+        }  catch (IOException ex) {
             log.error(null, ex);
+        } finally {
+            if (csvwriter != null) {
+                try {
+                    csvwriter.close();
+                } catch (IOException ex) {
+                    log.error(null, ex);
+                }
+            }
+            org.yccheok.jstock.gui.Utils.close(outputStreamWriter);
+            org.yccheok.jstock.gui.Utils.close(fileOutputStream);
         }
-        org.yccheok.jstock.gui.Utils.close(writer);
-        return true;
+
+        return status;
     }
 
     public boolean saveAsExcelFile(File file, String title) {
