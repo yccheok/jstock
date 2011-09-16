@@ -291,8 +291,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 // Do not manipulate display for "Units". We do not want 100
                 // "units" displayed as 100.00 "units".
                 if (false == UNITS.equals(table.getColumnName(column))) {
-                    if (c instanceof JLabel) {
-                        if (value != null) {
+                    if (value != null) {
+                        if (c instanceof JLabel) {
                             // Re-define the displayed value.
                             ((JLabel)c).setText(org.yccheok.jstock.portfolio.Utils.toCurrency(value));
                         }
@@ -305,9 +305,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         treeTable.setDefaultRenderer(SimpleDate.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                final Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                if (c instanceof JLabel) {
-                    if (value != null) {
+                final Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);                
+                if (value != null) {
+                    if (c instanceof JLabel) {
                         DateFormat dateFormat = DateFormat.getDateInstance();
                         SimpleDate simpleDate = (SimpleDate)value;
                         ((JLabel)c).setText(dateFormat.format(simpleDate.getTime()));
