@@ -301,6 +301,21 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 return c;
             }
         });
+
+        treeTable.setDefaultRenderer(SimpleDate.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                final Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                if (c instanceof JLabel) {
+                    if (value != null) {
+                        DateFormat dateFormat = DateFormat.getDateInstance();
+                        SimpleDate simpleDate = (SimpleDate)value;
+                        ((JLabel)c).setText(dateFormat.format(simpleDate.getTime()));
+                    }
+                }
+                return c;
+            }
+        });
     }
 
     private boolean isValidTreeTableNode(TreeTableModel treeTableModel, Object node) {

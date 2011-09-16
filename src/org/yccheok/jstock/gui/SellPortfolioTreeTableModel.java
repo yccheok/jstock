@@ -5,7 +5,6 @@
 
 package org.yccheok.jstock.gui;
 
-import java.text.DateFormat;
 import org.jdesktop.swingx.treetable.TreeTableModel;
 import org.yccheok.jstock.portfolio.Contract;
 import org.yccheok.jstock.portfolio.Portfolio;
@@ -340,8 +339,7 @@ public class SellPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel
                     return (transaction).getContract().getStock().getSymbol();
 
                 case 1:
-                    DateFormat dateFormat = DateFormat.getDateInstance();
-                    return dateFormat.format(transaction.getContract().getDate().getCalendar().getTime());
+                    return transaction.getContract().getDate();
                     
                 case 2:
                     return transaction.getQuantity();

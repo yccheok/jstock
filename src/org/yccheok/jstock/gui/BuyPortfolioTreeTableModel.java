@@ -19,7 +19,6 @@
 
 package org.yccheok.jstock.gui;
 
-import java.text.DateFormat;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -442,7 +441,7 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
             }
         }
    
-        if(node instanceof TransactionSummary) {
+        if (node instanceof TransactionSummary) {
             final TransactionSummary transactionSummary = (TransactionSummary)node;
             
             if(transactionSummary.getChildCount() <= 0) return null;
@@ -531,8 +530,7 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
                     return (transaction).getContract().getStock().getSymbol();
 
                 case 1:
-                    DateFormat dateFormat = DateFormat.getDateInstance();
-                    return dateFormat.format(transaction.getContract().getDate().getCalendar().getTime());
+                    return transaction.getContract().getDate();
                     
                 case 2:
                     return transaction.getQuantity();

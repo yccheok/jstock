@@ -402,10 +402,10 @@ public class Statements {
                             // "2011/9/5"       -   Locale.TRADITIONAL_CHINESE
                             // 05.09.2011       -   Locale.GERMAN
                             DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, Locale.ENGLISH);
-                            atoms.add(new Atom(object != null ? dateFormat.format(simpleDate.getTime().getTime()) : "", GUIBundle.getString("PortfolioManagementJPanel_ReferenceDate")));
+                            atoms.add(new Atom(object != null ? dateFormat.format(simpleDate.getTime()) : "", GUIBundle.getString("PortfolioManagementJPanel_ReferenceDate")));
                         }
                     }
-                    else if (abstractPortfolioTreeTableModel.getColumnClass(k).equals(Date.class)) {
+                    else if (abstractPortfolioTreeTableModel.getColumnClass(k).equals(SimpleDate.class)) {
                         // We will use a fixed date format (Locale.English), so that it will be
                         // easier for Android to process.
                         //
@@ -414,7 +414,8 @@ public class Statements {
                         // "2011/9/5"       -   Locale.TRADITIONAL_CHINESE
                         // 05.09.2011       -   Locale.GERMAN
                         DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, Locale.ENGLISH);
-                        atoms.add(new Atom(object != null ? dateFormat.format(((Date)object).getTime()) : "", type));
+                        SimpleDate simpleDate = (SimpleDate)object;
+                        atoms.add(new Atom(object != null ? dateFormat.format(simpleDate.getTime()) : "", type));
                     }
                     else {
                         // For fall below and rise above, null value is permitted.
