@@ -172,12 +172,12 @@ public class MainFrame extends javax.swing.JFrame {
         // Please revise Statement's construct code, when adding in new language.
         // So that its language guessing algorithm will work as it is.
 
-        // Check for traditional chinese before simplified chinese.
-        if (Locale.getDefault().getLanguage().equals(Locale.TRADITIONAL_CHINESE.getLanguage()) && Locale.getDefault().getCountry().equals(Locale.TRADITIONAL_CHINESE.getCountry())) {
+        final Locale defaultLocale = Locale.getDefault();
+        if (Utils.isTraditionalChinese(defaultLocale)) {
             this.jRadioButtonMenuItem4.setSelected(true);
-        } else if (Locale.getDefault().getLanguage().equals(Locale.SIMPLIFIED_CHINESE.getLanguage())) {
+        } else if (Utils.isSimplifiedChinese(defaultLocale)) {
             this.jRadioButtonMenuItem2.setSelected(true);
-        } else if (Locale.getDefault().getLanguage().equals(Locale.GERMAN.getLanguage())) {
+        } else if (defaultLocale.getLanguage().equals(Locale.GERMAN.getLanguage())) {
             this.jRadioButtonMenuItem3.setSelected(true);
         } else {
             this.jRadioButtonMenuItem1.setSelected(true);
@@ -1269,7 +1269,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void jRadioButtonMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonMenuItem1ActionPerformed
         // Avoid from Confirm Dialog to pop up when user change to same language (i.e. english)
-        if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.ENGLISH.getLanguage()) != 0) {
+        if (false == this.jStockOptions.getLocale().getLanguage().equals(Locale.ENGLISH.getLanguage())) {
             // Do not suprise user with sudden restart. Ask for their permission to do so.
             final int result = JOptionPane.showConfirmDialog(this, MessagesBundle.getString("question_message_restart_now"), MessagesBundle.getString("question_title_restart_now"), JOptionPane.YES_NO_OPTION);
             if (result == JOptionPane.YES_OPTION) {
@@ -1278,12 +1278,10 @@ public class MainFrame extends javax.swing.JFrame {
                 org.yccheok.jstock.gui.Utils.restartApplication(this);
             } // return to the previous selection if the user press "no" in the dialog
             else {
-                // Comparison on traditional chinese must be performed before
-                // simplified chinese.
-                if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.TRADITIONAL_CHINESE.getLanguage()) == 0 && this.jStockOptions.getLocale().getCountry().compareTo(Locale.TRADITIONAL_CHINESE.getCountry()) == 0) {
+                if (Utils.isTraditionalChinese(this.jStockOptions.getLocale())) {
                     this.jRadioButtonMenuItem4.setSelected(true);
                 }
-                else if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.SIMPLIFIED_CHINESE.getLanguage()) == 0) {
+                else if (Utils.isSimplifiedChinese(this.jStockOptions.getLocale())) {
                     this.jRadioButtonMenuItem2.setSelected(true);
                 }
                 else if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.GERMAN.getLanguage()) == 0) {
@@ -1295,7 +1293,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void jRadioButtonMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonMenuItem2ActionPerformed
         // Avoid from Confirm Dialog to pop up when user change to same language (i.e. simplified chinese)
-        if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.SIMPLIFIED_CHINESE.getLanguage()) != 0 || this.jStockOptions.getLocale().getCountry().compareTo(Locale.TRADITIONAL_CHINESE.getCountry()) == 0) {
+        if (false == Utils.isSimplifiedChinese(this.jStockOptions.getLocale())) {
             // Do not suprise user with sudden restart. Ask for their permission to do so.
             final int result = JOptionPane.showConfirmDialog(this, MessagesBundle.getString("question_message_restart_now"), MessagesBundle.getString("question_title_restart_now"), JOptionPane.YES_NO_OPTION);
             if (result == JOptionPane.YES_OPTION) {
@@ -1308,7 +1306,7 @@ public class MainFrame extends javax.swing.JFrame {
                 if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.ENGLISH.getLanguage()) == 0) {
                     this.jRadioButtonMenuItem1.setSelected(true);
                 }
-                else if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.TRADITIONAL_CHINESE.getLanguage()) == 0 && this.jStockOptions.getLocale().getCountry().compareTo(Locale.TRADITIONAL_CHINESE.getCountry()) == 0) {
+                else if (Utils.isTraditionalChinese(this.jStockOptions.getLocale())) {
                     this.jRadioButtonMenuItem4.setSelected(true);
                 }
                 else if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.GERMAN.getLanguage()) == 0) {
@@ -1320,7 +1318,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void jRadioButtonMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonMenuItem3ActionPerformed
         // Avoid from Confirm Dialog to pop up when user change to same language (i.e. german)
-        if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.GERMAN.getLanguage()) != 0) {
+        if (false == this.jStockOptions.getLocale().getLanguage().equals(Locale.GERMAN.getLanguage())) {
             // Do not suprise user with sudden restart. Ask for their permission to do so.
             final int result = JOptionPane.showConfirmDialog(this, MessagesBundle.getString("question_message_restart_now"), MessagesBundle.getString("question_title_restart_now"), JOptionPane.YES_NO_OPTION);
             if (result == JOptionPane.YES_OPTION) {
@@ -1332,12 +1330,10 @@ public class MainFrame extends javax.swing.JFrame {
                 if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.ENGLISH.getLanguage()) == 0) {
                     this.jRadioButtonMenuItem1.setSelected(true);
                 }
-                // Comparison on traditional chinese must be performed before
-                // simplified chinese.
-                else if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.TRADITIONAL_CHINESE.getLanguage()) == 0 && this.jStockOptions.getLocale().getCountry().compareTo(Locale.TRADITIONAL_CHINESE.getCountry()) == 0) {
+                else if (Utils.isTraditionalChinese(this.jStockOptions.getLocale())) {
                     this.jRadioButtonMenuItem4.setSelected(true);
                 }
-                else if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.SIMPLIFIED_CHINESE.getLanguage()) == 0) {
+                else if (Utils.isSimplifiedChinese(this.jStockOptions.getLocale())) {
                     this.jRadioButtonMenuItem2.setSelected(true);
                 }
             }
@@ -1346,7 +1342,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void jRadioButtonMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonMenuItem4ActionPerformed
         // Avoid from Confirm Dialog to pop up when user change to same language (i.e. german)
-        if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.TRADITIONAL_CHINESE.getLanguage()) != 0 || this.jStockOptions.getLocale().getCountry().compareTo(Locale.TRADITIONAL_CHINESE.getCountry()) != 0) {
+        if (false == Utils.isTraditionalChinese(this.jStockOptions.getLocale())) {
             // Do not suprise user with sudden restart. Ask for their permission to do so.
             final int result = JOptionPane.showConfirmDialog(this, MessagesBundle.getString("question_message_restart_now"), MessagesBundle.getString("question_title_restart_now"), JOptionPane.YES_NO_OPTION);
             if (result == JOptionPane.YES_OPTION) {
@@ -1360,7 +1356,7 @@ public class MainFrame extends javax.swing.JFrame {
                 if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.ENGLISH.getLanguage()) == 0) {
                     this.jRadioButtonMenuItem1.setSelected(true);
                 }
-                else if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.SIMPLIFIED_CHINESE.getLanguage()) == 0 && this.jStockOptions.getLocale().getCountry().compareTo(Locale.TRADITIONAL_CHINESE.getCountry()) != 0) {
+                else if (Utils.isSimplifiedChinese(this.jStockOptions.getLocale())) {
                     this.jRadioButtonMenuItem2.setSelected(true);
                 }
                 else if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.GERMAN.getLanguage()) == 0) {

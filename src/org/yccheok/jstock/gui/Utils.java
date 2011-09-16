@@ -111,7 +111,6 @@ import org.apache.commons.httpclient.methods.multipart.StringPart;
 import org.apache.commons.lang.CharUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.net.TimeTCPClient;
 import org.jdesktop.jxlayer.JXLayer;
 import org.yccheok.jstock.analysis.Connection;
 import org.yccheok.jstock.analysis.DoubleConstantOperator;
@@ -889,6 +888,36 @@ public class Utils {
 
     public static String getJStockUUID() {
         return "fe78440e-e0fe-4efb-881d-264a01be483c";
+    }
+
+    /**
+     * Returns true if the given locale is simplified chinese.
+     *
+     * @param locale the locale
+     * @return true if the given locale is simplified chinese
+     */
+    public static boolean isSimplifiedChinese(Locale locale) {
+        // I assume every country in this world is using simplified chinese,
+        // except Taiwan (Locale.TRADITIONAL_CHINESE.getCountry). But, how
+        // about Hong Kong? Note that, we cannot just simply compare by using
+        // Locale.getLanguage, as both Locale.SIMPLIFIED_CHINESE.getLanguage
+        // and Locale.TRADITIONAL_CHINESE.getLanguage are having same value.
+        return locale.getLanguage().equals(Locale.SIMPLIFIED_CHINESE.getLanguage()) && !locale.getCountry().equals(Locale.TRADITIONAL_CHINESE.getCountry());
+    }
+
+    /**
+     * Returns true if given locale is traditional chinese.
+     * 
+     * @param locale the locale
+     * @return true if given locale is traditional chinese
+     */
+    public static boolean isTraditionalChinese(Locale locale) {
+        // I assume every country in this world is using simplified chinese,
+        // except Taiwan (Locale.TRADITIONAL_CHINESE.getCountry). But, how
+        // about Hong Kong? Note that, we cannot just simply compare by using
+        // Locale.getLanguage, as both Locale.SIMPLIFIED_CHINESE.getLanguage
+        // and Locale.TRADITIONAL_CHINESE.getLanguage are having same value.
+        return locale.getLanguage().equals(Locale.TRADITIONAL_CHINESE.getLanguage()) && locale.getCountry().equals(Locale.TRADITIONAL_CHINESE.getCountry());
     }
 
     public static boolean isWindows() {

@@ -57,7 +57,8 @@ public class Utils {
      * @return URL based on current locale language
      */
     public static String getURL(Type type) {
-        if (Locale.getDefault().getLanguage().equals(Locale.SIMPLIFIED_CHINESE.getLanguage())) {
+        final Locale defaultLocale = Locale.getDefault();
+        if (org.yccheok.jstock.gui.Utils.isSimplifiedChinese(defaultLocale)) {
             return zh_map.get(type);
         }
         return map.get(type);

@@ -283,7 +283,8 @@ public class Utils {
         
         // The default font used by JFreeChart unable to render Chinese properly.
         // We need to provide font which is able to support Chinese rendering.
-        if (Locale.getDefault().getLanguage().equals(Locale.SIMPLIFIED_CHINESE.getLanguage())) {
+        final Locale defaultLocale = Locale.getDefault();
+        if (org.yccheok.jstock.gui.Utils.isSimplifiedChinese(defaultLocale) || org.yccheok.jstock.gui.Utils.isTraditionalChinese(defaultLocale)) {
             final Font oldExtraLargeFont = chartTheme.getExtraLargeFont();
             final Font oldLargeFont = chartTheme.getLargeFont();
             final Font oldRegularFont = chartTheme.getRegularFont();
