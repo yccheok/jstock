@@ -11,6 +11,12 @@ Programmer:
 * Yan Cheng CHEOK <yccheok@yahoo.com>
 * Shuwn Yuan Tee <sytee@users.sourceforge.net>
 
+German Translator:
+* Stefan Angrick
+
+English Translator:
+* Stefan Angrick
+
 Web Designer:
 * Shuwn Yuan Tee <sytee@users.sourceforge.net>
 
