@@ -59,7 +59,7 @@ public abstract class AbstractPortfolioTreeTableModel extends DefaultTreeTableMo
     }
     
     public void removeTransactionSummary(TransactionSummary transactionSummary) {
-        if(transactionSummary == null) {
+        if (transactionSummary == null) {
             return;
         }
         

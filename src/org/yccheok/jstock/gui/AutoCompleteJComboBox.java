@@ -20,6 +20,7 @@
 package org.yccheok.jstock.gui;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import javax.swing.*;
 import java.awt.event.*;
 import javax.swing.event.DocumentEvent;
@@ -40,7 +41,7 @@ import org.yccheok.jstock.engine.AjaxYahooSearchEngine.ResultType;
  *
  * @author yccheok
  */
-public class AutoCompleteJComboBox extends JComboBox {
+public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAdjustable {
 
     // Use SubjectEx, in order to make notify method public.
     private static class SubjectEx<S, A> extends Subject<S, A> {
@@ -105,10 +106,14 @@ public class AutoCompleteJComboBox extends JComboBox {
 
             @Override
             public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+                // Reset popup width.
+                AutoCompleteJComboBox.this.setPopupWidth(-1);
             }
 
             @Override
             public void popupMenuCanceled(PopupMenuEvent e) {
+                // Reset popup width.
+                AutoCompleteJComboBox.this.setPopupWidth(-1);
             }
         };
     }
@@ -608,7 +613,7 @@ public class AutoCompleteJComboBox extends JComboBox {
     public void stop() {
         ajaxYahooSearchEngineMonitor.stop();
     }
-
+    
     private final ListCellRenderer offlineModeCellRenderer = new StockInfoCellRenderer();
     private final ListCellRenderer onlineModeCellRenderer = new ResultSetCellRenderer();
     private final ListCellRenderer oldListCellRenderer;
@@ -626,4 +631,72 @@ public class AutoCompleteJComboBox extends JComboBox {
     private final MyJComboBoxEditor jComboBoxEditor;
 
     private static final Log log = LogFactory.getLog(AutoCompleteJComboBox.class);
+    
+    /*
+     * =========================================================================
+     * START >>
+     * 
+     * Hacking code picked from
+     * http://javabyexample.wisdomplug.com/java-concepts/34-core-java/59-tips-and-tricks-for-jtree-jlist-and-jcombobox-part-i.html
+     *
+     */
+    
+    /**
+     * Set the combo box popup width.
+     * 
+     * @param popupWidth the combo box popup width
+     */
+    @Override
+    public void setPopupWidth(int popupWidth) {
+        this.popupWidth = popupWidth;
+    }
+
+    /**
+    * Override to handle the popup Size.
+    */
+    @Override
+    public void doLayout() {
+        try {
+            layingOut = true;
+            super.doLayout();
+        } finally {
+            layingOut = false;
+        }
+    }
+
+    /**
+    * Overriden to handle the popup Size
+    */
+    @Override
+    public Dimension getSize()
+    {
+        Dimension dim = super.getSize();
+        if (!layingOut && popupWidth != 0) {
+            // Ensure the popup size must be a least equal or larger than combo
+            // box size.
+            if (dim.width < popupWidth) {
+                dim.width = popupWidth;
+            }
+        }
+        return dim;
+    }
+    
+    /**
+     * Set the popup Width.
+     */
+    private int popupWidth = 0;
+
+    /**
+     * Keep track of whether layout is happening.
+     */
+    private boolean layingOut = false;
+    
+    /*
+     * 
+     * Hacking code picked from
+     * http://javabyexample.wisdomplug.com/java-concepts/34-core-java/59-tips-and-tricks-for-jtree-jlist-and-jcombobox-part-i.html
+     * 
+     * << END
+     * =========================================================================
+     */    
 }

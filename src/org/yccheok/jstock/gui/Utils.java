@@ -136,6 +136,20 @@ public class Utils {
      * http://forums.oracle.com/forums/thread.jspa?messageID=8037483&#8037483
      * http://www.camick.com/java/source/BoundsPopupMenuListener.java
      *
+     * Update : According to https://forums.oracle.com/forums/thread.jspa?messageID=9789603#9789603
+     * , the above techniques is longer workable.
+     * =========================================================================
+     * 6u25 changed when popupMenuWillBecomeVisible is called: it is now called 
+     * before the list is created so you can add items in that method and still 
+     * have the list size correctly.
+     * See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4743225
+     * So for your workaround: either it isn't needed anymore or you need to add 
+     * an extra hierarchy listener to check when the list is actually added.
+     * =========================================================================
+     * 
+     * I use a quick hack from
+     * http://javabyexample.wisdomplug.com/java-concepts/34-core-java/59-tips-and-tricks-for-jtree-jlist-and-jcombobox-part-i.html
+     * 
      * @param comboBox The combo box
      */
     public static void adjustPopupWidth(JComboBox comboBox) {
@@ -158,7 +172,7 @@ public class Utils {
         //  b) ensure width is not less than the scroll pane width
         int popupWidth = list.getPreferredSize().width
                         + 5  // make sure horizontal scrollbar doesn't appear
-                        + getScrollBarWidth(popup, scrollPane);
+                        + getScrollBarWidth(comboBox, scrollPane);
         Dimension scrollPaneSize = scrollPane.getPreferredSize();
         popupWidth = Math.max(popupWidth, scrollPaneSize.width);
 
@@ -166,22 +180,22 @@ public class Utils {
         scrollPaneSize.width = popupWidth;
         scrollPane.setPreferredSize(scrollPaneSize);
         scrollPane.setMaximumSize(scrollPaneSize);
+        
+        // The above workaround is no longer working. Use the below hack code!
+        if (comboBox instanceof JComboBoxPopupAdjustable) {
+            ((JComboBoxPopupAdjustable)comboBox).setPopupWidth(popupWidth);
+        }
     }
 
     /*
      *  I can't find any property on the scrollBar to determine if it will be
      *  displayed or not so use brute force to determine this.
      */
-    private static int getScrollBarWidth(BasicComboPopup popup, JScrollPane scrollPane) {
+    private static int getScrollBarWidth(JComboBox comboBox, JScrollPane scrollPane) {
         int scrollBarWidth = 0;
-        Component component = popup.getInvoker();
-        if (component instanceof JComboBox) {
-            JComboBox comboBox = (JComboBox)component;
-
-            if (comboBox.getItemCount() > comboBox.getMaximumRowCount()) {
-                JScrollBar vertical = scrollPane.getVerticalScrollBar();
-                scrollBarWidth = vertical.getPreferredSize().width;
-            }
+        if (comboBox.getItemCount() > comboBox.getMaximumRowCount()) {
+            JScrollBar vertical = scrollPane.getVerticalScrollBar();
+            scrollBarWidth = vertical.getPreferredSize().width;
         }
         return scrollBarWidth;
     }
