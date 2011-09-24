@@ -174,8 +174,12 @@ public class Utils {
                         + 5  // make sure horizontal scrollbar doesn't appear
                         + getScrollBarWidth(comboBox, scrollPane);
         Dimension scrollPaneSize = scrollPane.getPreferredSize();
-        popupWidth = Math.max(popupWidth, scrollPaneSize.width);
-
+        //popupWidth = Math.max(popupWidth, scrollPaneSize.width);
+        // Use comboBox.getSize(), since we realize under Linux's Java 6u25,
+        // After expanding, scrollPane.getPreferredSize() will return expanded
+        // size in the 2nd round, although no expand is required.
+        popupWidth = Math.max(popupWidth, comboBox.getSize().width);
+        
         //  Adjust the width
         scrollPaneSize.width = popupWidth;
         scrollPane.setPreferredSize(scrollPaneSize);
