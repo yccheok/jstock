@@ -1280,7 +1280,7 @@ public class Utils {
         if (applicationVersionID == APPLICATION_VERSION_ID) {
             return true;
         }
-        else if (applicationVersionID >= 1051 && applicationVersionID <= 1079) {
+        else if (applicationVersionID >= 1051 && applicationVersionID <= 1080) {
             return true;
         }
       
@@ -2315,9 +2315,9 @@ public class Utils {
     private static final String APPLICATION_VERSION_STRING = "1.0.6";
 
     // For About box comparision on latest version purpose.
-    // 1.0.6e
+    // 1.0.6f
     // Remember to update isCompatible method.
-    private static final int APPLICATION_VERSION_ID = 1080;
+    private static final int APPLICATION_VERSION_ID = 1081;
 
     private static Executor zombiePool = Executors.newFixedThreadPool(Utils.NUM_OF_THREADS_ZOMBIE_POOL);
 
