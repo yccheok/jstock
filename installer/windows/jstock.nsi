@@ -1,6 +1,6 @@
 ; Definitions for Java 1.6 Detection
 !define JRE_VERSION "1.6"
-!define JRE_URL "http://javadl.sun.com/webapps/download/AutoDL?BundleId=18714&/jre-6u5-windows-i586-p.exe"
+!define JRE_URL "http://javadl.sun.com/webapps/download/AutoDL?BundleId=24936&/jre-6u10-windows-i586-p.exe"
 !define PRODUCT_NAME "JStock"
 ; The name of the installer
 Name ${PRODUCT_NAME}
