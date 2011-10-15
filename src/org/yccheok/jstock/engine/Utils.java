@@ -337,6 +337,23 @@ public class Utils {
     }
 
     /**
+     * Returns code in non Yahoo! format, by stripping off ".KL" suffix.
+     * 
+     * @param code the code
+     * @return code in non Yahoo! format, by stripping off ".KL" suffix.
+     */
+    public static Code toNonYahooFormat(Code code)
+    {
+        final String tmp = code.toString();
+        final String TMP = tmp.toUpperCase();
+        int endIndex = TMP.lastIndexOf(".KL");
+        if (endIndex < 0) {
+            return code;
+        }
+        return Code.newInstance(tmp.substring(0, endIndex));
+    }
+    
+    /**
      * Returns best search engine based on current selected country.
      * 
      * @param list List of elements, to be inserted into search engine
