@@ -17,6 +17,9 @@ German Translator:
 English Translator:
 * Stefan Angrick
 
+Malaysia History Data Feed Sponsor:
+* http://www.klse.info/
+
 Web Designer:
 * Shuwn Yuan Tee <sytee@users.sourceforge.net>
 
