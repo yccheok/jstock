@@ -249,7 +249,12 @@ public class JStockOptions {
     private String lastFileNameExtensionDescription = "CSV Documents (*.csv)";
 
     private Map<Country, Class> primaryStockServerFactoryClasses = new EnumMap<Country, Class>(Country.class);
-
+    // If this flag is false, we should remove Malaysia's info from primaryStockServerFactoryClasses.
+    // As, we want our users to try out latest KLSEInfoStockHistoryServer,
+    // which provides better history information than Yahoo's.
+    // If this flag is true, just do nothing.
+    private Boolean primaryStockServerFactoryClassesIsValidForMalaysia = true;
+    
     // Remember the last view page.
     private int lastSelectedPageIndex = 0;
 
@@ -651,6 +656,12 @@ public class JStockOptions {
             this.localCurrencyCountries = new EnumMap<Country, Country>(Country.class);
         }
 
+        if (this.primaryStockServerFactoryClassesIsValidForMalaysia == null || this.primaryStockServerFactoryClassesIsValidForMalaysia == false) {
+            primaryStockServerFactoryClasses.remove(Country.Malaysia);
+            // Removal will be only done once. After that, reset the flag.
+            this.primaryStockServerFactoryClassesIsValidForMalaysia = true;
+        }
+        
         return this;
     }    
     

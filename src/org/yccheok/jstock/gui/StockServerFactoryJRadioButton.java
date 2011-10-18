@@ -93,6 +93,11 @@ public class StockServerFactoryJRadioButton extends JRadioButton {
         else if (c == org.yccheok.jstock.engine.GoogleStockServerFactory.class) {
             code = Code.newInstance("MSFT");
         }
+        else if (c == org.yccheok.jstock.engine.KLSEInfoStockServerFactory.class) {
+            // PBBANK.
+            code = Code.newInstance("1295.KL");
+        }
+
         try {
             stockServerFactory.getStockServer().getStock(code);
             health.stock = true;

@@ -1,13 +1,31 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+
 package org.yccheok.jstock.engine;
 
 import java.io.UnsupportedEncodingException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -18,7 +36,7 @@ import org.apache.commons.logging.LogFactory;
 public class KLSEInfoStockHistoryServer implements StockHistoryServer {
 
     // Use ThreadLocal to ensure thread safety.
-    private static final ThreadLocal <NumberFormat> dateFormat = new ThreadLocal <NumberFormat>() {
+    private static final ThreadLocal <NumberFormat> dateFormatThredLocal = new ThreadLocal <NumberFormat>() {
         @Override protected NumberFormat initialValue() {
             // Turns 1 ~ 31 to 01 ~ 31.
             return new DecimalFormat("00");
@@ -52,17 +70,18 @@ public class KLSEInfoStockHistoryServer implements StockHistoryServer {
     
     @Override
     public Stock getStock(Calendar calendar) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        SimpleDate simpleDate = new SimpleDate(calendar);
+        return historyDatabase.get(simpleDate);
     }
 
     @Override
     public Calendar getCalendar(int index) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return simpleDates.get(index).getCalendar();
     }
 
     @Override
     public int getNumOfCalendar() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return simpleDates.size();
     }
 
     @Override
@@ -88,11 +107,11 @@ public class KLSEInfoStockHistoryServer implements StockHistoryServer {
 
         stringBuilder.append(c);
 
-        final String endMonth = dateFormat.get().format(duration.getEndDate().getMonth());
-        final String endDate = dateFormat.get().format(duration.getEndDate().getDate());
+        final String endMonth = dateFormatThredLocal.get().format(duration.getEndDate().getMonth());
+        final String endDate = dateFormatThredLocal.get().format(duration.getEndDate().getDate());
         final int endYear = duration.getEndDate().getYear();
-        final String startMonth = dateFormat.get().format(duration.getStartDate().getMonth());
-        final String startDate = dateFormat.get().format(duration.getStartDate().getDate());
+        final String startMonth = dateFormatThredLocal.get().format(duration.getStartDate().getMonth());
+        final String startDate = dateFormatThredLocal.get().format(duration.getStartDate().getDate());
         final int startYear = duration.getStartDate().getYear();
 
         stringBuilder.append("&start=").append(endYear).append(endMonth).append(endDate).append("&end=").append(startYear).append(startMonth).append(startDate);
@@ -102,7 +121,7 @@ public class KLSEInfoStockHistoryServer implements StockHistoryServer {
         boolean success = false;
 
         for (int retry = 0; retry < NUM_OF_RETRY; retry++) {
-            final String respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(location);
+            final String respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOptionWithAgentInfo(location);
 
             if (respond == null) {
                 continue;
@@ -120,12 +139,135 @@ public class KLSEInfoStockHistoryServer implements StockHistoryServer {
         }
     }
     
+    private boolean parse(String respond)
+    {
+        historyDatabase.clear();
+        simpleDates.clear();
+
+        java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd");
+        final Calendar calendar = Calendar.getInstance();
+        
+        String[] stockDatas = respond.split("\r\n|\r|\n");
+
+        // There must be at least two lines : header information and history information.
+        final int length = stockDatas.length;
+
+        if (length <= 1) {
+            return false;
+        }
+
+        Symbol symbol = Symbol.newInstance(code.toString());
+        String name = symbol.toString();
+        Stock.Board board = Stock.Board.Unknown;
+        Stock.Industry industry = Stock.Industry.Unknown;
+
+        try {
+            Stock stock = stockServer.getStock(Code.newInstance(code.toString() + ".KL"));
+            symbol = stock.getSymbol();
+            name = stock.getName();
+            board = stock.getBoard();
+            industry = stock.getIndustry();
+        }
+        catch (StockNotFoundException exp) {
+            exp.printStackTrace();
+            log.error(null, exp);
+        }
+
+        double previousClosePrice = Double.MAX_VALUE;
+
+        for (int i = length - 1; i > 0; i--)
+        {
+            // Use > instead of >=, to avoid header information (Date,Open,High,Low,Close,Volume,Adj Close)
+            String[] fields = stockDatas[i].split(",");
+
+            // Date,Open,High,Low,Close,Volume,Adj Close
+            if (fields.length < 7) {
+                continue;
+            }
+
+            try {
+                calendar.setTime(dateFormat.parse(fields[0]));
+            } catch (ParseException ex) {
+                log.error(null, ex);
+                continue;
+            }
+
+            double prevPrice = 0.0;
+            double openPrice = 0.0;
+            double highPrice = 0.0;
+            double lowPrice = 0.0;
+            double closePrice = 0.0;
+            // TODO: CRITICAL LONG BUG REVISED NEEDED.
+            long volume = 0;
+            //double adjustedClosePrice = 0.0;
+
+            try {
+                prevPrice = (previousClosePrice == Double.MAX_VALUE) ? 0 : previousClosePrice;
+                openPrice = Double.parseDouble(fields[1]);
+                highPrice = Double.parseDouble(fields[2]);
+                lowPrice = Double.parseDouble(fields[3]);
+                closePrice = Double.parseDouble(fields[4]);
+                // TODO: CRITICAL LONG BUG REVISED NEEDED.
+                volume = Long.parseLong(fields[5]);
+                //adjustedClosePrice = Double.parseDouble(fields[6]);
+            }
+            catch(NumberFormatException exp) {
+                log.error(null, exp);
+            }
+
+            double changePrice = (previousClosePrice == Double.MAX_VALUE) ? 0 : closePrice - previousClosePrice;
+            double changePricePercentage = ((previousClosePrice == Double.MAX_VALUE) || (previousClosePrice == 0.0)) ? 0 : changePrice / previousClosePrice * 100.0;
+
+            SimpleDate simpleDate = new SimpleDate(calendar);
+
+            Stock stock = new Stock(
+                    code,
+                    symbol,
+                    name,
+                    board,
+                    industry,
+                    prevPrice,
+                    openPrice,
+                    closePrice, /* Last Price. */
+                    highPrice,
+                    lowPrice,
+                    volume,
+                    changePrice,
+                    changePricePercentage,
+                    0,
+                    0.0,
+                    0,
+                    0.0,
+                    0,
+                    0.0,
+                    0,
+                    0.0,
+                    0,
+                    0.0,
+                    0,
+                    0.0,
+                    0,
+                    simpleDate.getCalendar()
+                    );
+
+            historyDatabase.put(simpleDate, stock);
+            simpleDates.add(simpleDate);
+            previousClosePrice = closePrice;
+        }
+
+        return (historyDatabase.size() > 0);
+    }
+    
     private static final int NUM_OF_RETRY = 2;
     private static final Duration DEFAULT_HISTORY_DURATION =  Duration.getTodayDurationByYears(10);
     private static final String KLSE_INFO_BASED_URL = "http://www.klse.info/jstock/historical-prices?s=";
     
+    private final java.util.Map<SimpleDate, Stock> historyDatabase = new HashMap<SimpleDate, Stock>();
+    private final java.util.List<SimpleDate> simpleDates = new ArrayList<SimpleDate>();
+    
     private final Code code;
     private final Duration duration;
 
+    private final StockServer stockServer = new SingaporeYahooStockServer(Country.Malaysia);
     private static final Log log = LogFactory.getLog(KLSEInfoStockHistoryServer.class);    
 }

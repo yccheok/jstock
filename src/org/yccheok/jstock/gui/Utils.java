@@ -108,6 +108,7 @@ import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
+import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.lang.CharUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -1377,12 +1378,32 @@ public class Utils {
         return respond;
     }
 
+    /**
+     * Request server response by sending request together without agent info.
+     * 
+     * @param request the request
+     * @return server response. null if fail.
+     */
+    public static String getResponseBodyAsStringBasedOnProxyAuthOption(String request) {
+        return _getResponseBodyAsStringBasedOnProxyAuthOption(httpClient, request);
+    }
+    
+    /**
+     * Request server response by sending request together with agent info.
+     * 
+     * @param request the request
+     * @return server response. null if fail.
+     */
+    public static String getResponseBodyAsStringBasedOnProxyAuthOptionWithAgentInfo(String request) {
+        return _getResponseBodyAsStringBasedOnProxyAuthOption(httpClientWithAgentInfo, request);        
+    }
+    
     // We prefer to have this method in gui package instead of engine. This is because it requires
     // access to JStockOptions.
     // Returns null if fail.
-    public static String getResponseBodyAsStringBasedOnProxyAuthOption(String request) {
-        org.yccheok.jstock.engine.Utils.setHttpClientProxyFromSystemProperties(httpClient);
-        org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
+    private static String _getResponseBodyAsStringBasedOnProxyAuthOption(HttpClient client, String request) {
+        org.yccheok.jstock.engine.Utils.setHttpClientProxyFromSystemProperties(client);
+        org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(client);
 
         final HttpMethod method = new GetMethod(request);
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
@@ -1390,7 +1411,7 @@ public class Utils {
         try {
             if (jStockOptions.isProxyAuthEnabled()) {
                 method.setFollowRedirects(false);
-                httpClient.executeMethod(method);
+                client.executeMethod(method);
 
                 int statuscode = method.getStatusCode();
                 if ((statuscode == HttpStatus.SC_MOVED_TEMPORARILY) ||
@@ -1408,7 +1429,7 @@ public class Utils {
                     // exception free way to release RedirectMethod connection.
                     // #2836422
                     try {
-                        httpClient.executeMethod(RedirectMethod);
+                        client.executeMethod(RedirectMethod);
                         respond = RedirectMethod.getResponseBodyAsString();
                     }
                     catch (HttpException exp) {
@@ -1428,7 +1449,7 @@ public class Utils {
                 } // if statuscode = Redirect
             }
             else {
-                httpClient.executeMethod(method);
+                client.executeMethod(method);
                 respond = method.getResponseBodyAsString();
             } //  if jStockOptions.isProxyAuthEnabled()
         }
@@ -2328,7 +2349,8 @@ public class Utils {
     private static final int NUM_OF_THREADS_ZOMBIE_POOL = 4;
 
     private static final HttpClient httpClient;
-
+    private static final HttpClient httpClientWithAgentInfo;
+    
     static {
         MultiThreadedHttpConnectionManager multiThreadedHttpConnectionManager = new MultiThreadedHttpConnectionManager();
         multiThreadedHttpConnectionManager.getParams().setMaxTotalConnections(128);
@@ -2338,6 +2360,20 @@ public class Utils {
         httpClient.getParams().setParameter("http.protocol.single-cookie-header", true);
         httpClient.getParams().setCookiePolicy(org.apache.commons.httpclient.cookie.CookiePolicy.BROWSER_COMPATIBILITY);
         multiThreadedHttpConnectionManager.getParams().setMaxConnectionsPerHost(httpClient.getHostConfiguration(), 128);
+
     }
+    static {
+        MultiThreadedHttpConnectionManager multiThreadedHttpConnectionManager = new MultiThreadedHttpConnectionManager();
+        multiThreadedHttpConnectionManager.getParams().setMaxTotalConnections(128);
+        multiThreadedHttpConnectionManager.getParams().setDefaultMaxConnectionsPerHost(128);
+        httpClientWithAgentInfo = new HttpClient(multiThreadedHttpConnectionManager);
+        // Provide agent information, as requested by KLSEInfo owner.
+        httpClientWithAgentInfo.getParams().setParameter(HttpMethodParams.USER_AGENT, "JStock");
+        // To prevent cookie warnings.
+        httpClientWithAgentInfo.getParams().setParameter("http.protocol.single-cookie-header", true);
+        httpClientWithAgentInfo.getParams().setCookiePolicy(org.apache.commons.httpclient.cookie.CookiePolicy.BROWSER_COMPATIBILITY);
+        multiThreadedHttpConnectionManager.getParams().setMaxConnectionsPerHost(httpClientWithAgentInfo.getHostConfiguration(), 128);    
+    }
+    
     private static final Log log = LogFactory.getLog(Utils.class);
 }
