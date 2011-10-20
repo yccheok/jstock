@@ -3598,7 +3598,7 @@ public class MainFrame extends javax.swing.JFrame {
                 final String remove = org.yccheok.jstock.gui.Utils.getUUIDValue(org.yccheok.jstock.network.Utils.getURL(Type.OPTIONS), "remove_klse_info_stock_server_factory");
                 if (remove != null && remove.equals("1"))
                 {
-                    Factories.removeKLSEInfoStockServerFactory();
+                    Factories.INSTANCE.removeKLSEInfoStockServerFactory();
                 }
             }            
         };
