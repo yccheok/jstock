@@ -48,9 +48,12 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
         this.stockHistorySerializer = null;
     }
     
-    public boolean setStockServerFactories(java.util.List<StockServerFactory> factories) {
-        this.factories.clear();
-        return this.factories.addAll(factories);
+    public void setStockServerFactories(java.util.List<StockServerFactory> factories) {
+        // Do not use deep copy. If not, Factories's removeKLSEInfoStockServerFactory 
+        // effect won't propagate to here.
+        //this.factories.clear();
+        //return this.factories.addAll(factories);
+        this.factories = factories;
     }
     
     public boolean addStockCode(final Code code) {
@@ -374,7 +377,7 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
         }
     }
     
-    private final java.util.List<StockServerFactory> factories = new java.util.concurrent.CopyOnWriteArrayList<StockServerFactory>();
+    private java.util.List<StockServerFactory> factories = new java.util.concurrent.CopyOnWriteArrayList<StockServerFactory>();
     private final java.util.List<Code> stockCodes = new java.util.ArrayList<Code>();
     private final java.util.Map<Code, StockHistoryServer> histories = new java.util.HashMap<Code, StockHistoryServer>();
     private final java.util.concurrent.locks.ReadWriteLock readWriteLock;

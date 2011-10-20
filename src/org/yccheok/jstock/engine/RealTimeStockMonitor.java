@@ -49,21 +49,12 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
         stockCodesWriterLock = stockCodesReadWriteLock.writeLock();        
     }
     
-    public synchronized boolean setStockServerFactories(java.util.List<StockServerFactory> factories) {
-        stockServerFactories.clear();
-        return stockServerFactories.addAll(factories);
-    }
-
-    public synchronized StockServerFactory getStockServerFactory(int index) {
-        return stockServerFactories.get(index);
-    }
-    
-    public synchronized int getNumOfStockServerFactory() {
-        return stockServerFactories.size();
-    }
-    
-    public synchronized boolean removeStockServerFactory(StockServerFactory factory) {
-        return stockServerFactories.remove(factory);
+    public synchronized void setStockServerFactories(java.util.List<StockServerFactory> factories) {
+        // Do not use deep copy. If not, Factories's removeKLSEInfoStockServerFactory 
+        // effect won't propagate to here.
+        //stockServerFactories.clear();
+        //return stockServerFactories.addAll(factories);
+        stockServerFactories = factories;
     }
     
     // synchronized, to avoid addStockCode and removeStockCode at the same time.

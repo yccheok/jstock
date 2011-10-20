@@ -121,7 +121,7 @@ public class Duration {
         if (o == this)
             return true;
 
-        if(!(o instanceof Duration))
+        if (!(o instanceof Duration))
             return false;
 
         Duration duration = (Duration)o;

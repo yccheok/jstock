@@ -26,6 +26,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -58,10 +59,14 @@ public class KLSEInfoStockHistoryServer implements StockHistoryServer {
         // Ensure the code is in non-Yahoo format.
         this.code = Utils.toNonYahooFormat(code);
         this.duration = duration;
+        
+        final List<Duration> durations = this.toSmallerDurationPieces();
+        
         try {
-            buildHistory(this.code);
-        }
-        catch (java.lang.OutOfMemoryError exp) {
+            for (Duration d : durations) {
+                buildHistory(this.code, d);
+            }
+        } catch (java.lang.OutOfMemoryError exp) {
             // Thrown from method.getResponseBodyAsString
             log.error(null, exp);
             throw new StockHistoryNotFoundException("Out of memory", exp);
@@ -94,7 +99,36 @@ public class KLSEInfoStockHistoryServer implements StockHistoryServer {
         return 0;
     }
     
-    private void buildHistory(Code code) throws StockHistoryNotFoundException
+    private List<Duration> toSmallerDurationPieces() {
+        List<Duration> durations = new ArrayList<Duration>();
+        
+        // There are 52 weeks in a year, 5 workdays per week is 260 workdays a 
+        // year. KLSEInfo server is limiting 2000 rows per respond. So, we will
+        // make it 5 years (260 * 7 = 1820 < 2000) per request.
+        SimpleDate endDate = this.duration.getEndDate();
+        final SimpleDate startDate = this.duration.getStartDate();
+        
+        do {
+            SimpleDate tmpStartDate = new SimpleDate(endDate.getYear() - 7, endDate.getMonth(), endDate.getDate());
+            if (tmpStartDate.compareTo(startDate) >= 0) {
+                // Add to the front of the list.
+                durations.add(0, new Duration(tmpStartDate, endDate));
+            } else {
+                if (startDate.compareTo(endDate) <= 0) {
+                    // Add to the front of the list.
+                    durations.add(0, new Duration(startDate, endDate));
+                }
+                // Early break!
+                break;
+            }
+            Calendar newEndCalendar = tmpStartDate.getCalendar();
+            newEndCalendar.roll(Calendar.DAY_OF_YEAR, -1);
+            endDate = new SimpleDate(newEndCalendar);
+        } while (true);
+        return durations;
+    }
+    
+    private void buildHistory(Code code, Duration theDuration) throws StockHistoryNotFoundException
     {
         final StringBuilder stringBuilder = new StringBuilder(KLSE_INFO_BASED_URL);
 
@@ -107,12 +141,13 @@ public class KLSEInfoStockHistoryServer implements StockHistoryServer {
 
         stringBuilder.append(c);
 
-        final String endMonth = dateFormatThredLocal.get().format(duration.getEndDate().getMonth());
-        final String endDate = dateFormatThredLocal.get().format(duration.getEndDate().getDate());
-        final int endYear = duration.getEndDate().getYear();
-        final String startMonth = dateFormatThredLocal.get().format(duration.getStartDate().getMonth());
-        final String startDate = dateFormatThredLocal.get().format(duration.getStartDate().getDate());
-        final int startYear = duration.getStartDate().getYear();
+        // Do not use "duration". Use "theDuration".
+        final String endMonth = dateFormatThredLocal.get().format(theDuration.getEndDate().getMonth());
+        final String endDate = dateFormatThredLocal.get().format(theDuration.getEndDate().getDate());
+        final int endYear = theDuration.getEndDate().getYear();
+        final String startMonth = dateFormatThredLocal.get().format(theDuration.getStartDate().getMonth());
+        final String startDate = dateFormatThredLocal.get().format(theDuration.getStartDate().getDate());
+        final int startYear = theDuration.getStartDate().getYear();
 
         stringBuilder.append("&start=").append(endYear).append(endMonth).append(endDate).append("&end=").append(startYear).append(startMonth).append(startDate);
 
@@ -141,9 +176,6 @@ public class KLSEInfoStockHistoryServer implements StockHistoryServer {
     
     private boolean parse(String respond)
     {
-        historyDatabase.clear();
-        simpleDates.clear();
-
         java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd");
         final Calendar calendar = Calendar.getInstance();
         
@@ -169,11 +201,8 @@ public class KLSEInfoStockHistoryServer implements StockHistoryServer {
             industry = stock.getIndustry();
         }
         catch (StockNotFoundException exp) {
-            exp.printStackTrace();
             log.error(null, exp);
         }
-
-        double previousClosePrice = Double.MAX_VALUE;
 
         for (int i = length - 1; i > 0; i--)
         {
@@ -268,6 +297,9 @@ public class KLSEInfoStockHistoryServer implements StockHistoryServer {
     private final Code code;
     private final Duration duration;
 
+    // Use for internal calculation. Do not expose it.
+    private double previousClosePrice = Double.MAX_VALUE;
+        
     private final StockServer stockServer = new SingaporeYahooStockServer(Country.Malaysia);
     private static final Log log = LogFactory.getLog(KLSEInfoStockHistoryServer.class);    
 }

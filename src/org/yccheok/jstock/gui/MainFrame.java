@@ -126,6 +126,7 @@ public class MainFrame extends javax.swing.JFrame {
         this.initDatabase(true);
         this.initMarketThread();
         this.initLatestNewsTask();
+        this.initKLSEInfoStockServerFactoryThread();
         this.initCurrencyExchangeMonitor();
         this.initRealTimeStockMonitor();
         this.initRealTimeStocks();
@@ -3588,6 +3589,24 @@ public class MainFrame extends javax.swing.JFrame {
         stockHistoryMonitor.setDuration(Duration.getTodayDurationByYears(jStockOptions.getHistoryDuration()));
     }
 
+    // Determine whether we should make use of KLSEInfoStockServerFactory.
+    private void initKLSEInfoStockServerFactoryThread()
+    {
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                final String remove = org.yccheok.jstock.gui.Utils.getUUIDValue(org.yccheok.jstock.network.Utils.getURL(Type.OPTIONS), "remove_klse_info_stock_server_factory");
+                if (remove != null && remove.equals("1"))
+                {
+                    Factories.removeKLSEInfoStockServerFactory();
+                }
+            }            
+        };
+        
+        this.klseInfoStockServerFactoryThread = new Thread(runnable);
+        this.klseInfoStockServerFactoryThread.start();
+    }
+    
     public void initLatestNewsTask()
     {
         if (jStockOptions.isAutoUpdateNewsEnabled() == true)
@@ -4343,6 +4362,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private LatestNewsTask latestNewsTask = null;
     private volatile Thread marketThread = null;
+    private Thread klseInfoStockServerFactoryThread = null;
     private StockHistorySerializer stockHistorySerializer = null;        
     private JStockOptions jStockOptions;
     private ChartJDialogOptions chartJDialogOptions;

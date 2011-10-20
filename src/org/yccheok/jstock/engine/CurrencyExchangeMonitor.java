@@ -101,11 +101,14 @@ public class CurrencyExchangeMonitor extends Subject<CurrencyExchangeMonitor, Do
      * Assign list of stock server factories to this currency monitor.
      *
      * @param factories list of stock server factories
-     * @return true if this list changed as a result of the call
      */
-    public synchronized boolean setStockServerFactories(java.util.List<StockServerFactory> factories) {
-        stockServerFactories.clear();
-        return stockServerFactories.addAll(factories);
+    public synchronized void setStockServerFactories(java.util.List<StockServerFactory> factories) {
+        // Do not use deep copy. If not, Factories's removeKLSEInfoStockServerFactory 
+        // effect won't propagate to here.
+        //stockServerFactories.clear();
+        //return stockServerFactories.addAll(factories);
+
+        stockServerFactories = factories;
     }
 
     /**

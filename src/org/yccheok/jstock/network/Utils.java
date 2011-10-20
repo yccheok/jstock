@@ -46,6 +46,7 @@ public class Utils {
         HELP_HTML,
         MA_INDICATOR_HTML,
         GET_TIME,
+        OPTIONS
     }
 
     private Utils() {
@@ -94,7 +95,8 @@ public class Utils {
         map.put(Type.HELP_HTML, "http://jstock.sourceforge.net/help.html?utm_source=jstock&utm_medium=help_menu");
         map.put(Type.MA_INDICATOR_HTML, "http://jstock.sourceforge.net/ma_indicator.html?utm_source=jstock&utm_medium=chart_dialog");
         map.put(Type.GET_TIME, JSTOCK_WEBAPP_SERVER + "get-time.py");
-
+        map.put(Type.OPTIONS, JSTOCK_STATIC_SERVER + "options_information/options.txt");
+        
         zh_map.put(Type.X_MARKET_SERVERS_TXT, JSTOCK_STATIC_SERVER + "servers_information/x_market_servers.txt");
         zh_map.put(Type.X_STOCK_SERVERS_TXT, JSTOCK_STATIC_SERVER + "servers_information/x_stock_servers.txt");
         zh_map.put(Type.CIMB_MARKET_SERVERS_TXT, JSTOCK_STATIC_SERVER + "servers_information/cimb_market_servers.txt");
@@ -112,6 +114,7 @@ public class Utils {
         zh_map.put(Type.HELP_HTML, "http://jstock.sourceforge.net/zh/help.html?utm_source=jstock&utm_medium=help_menu");
         zh_map.put(Type.MA_INDICATOR_HTML, "http://jstock.sourceforge.net/zh/ma_indicator.html?utm_source=jstock&utm_medium=chart_dialog");
         zh_map.put(Type.GET_TIME, JSTOCK_WEBAPP_SERVER + "get-time.py");
+        zh_map.put(Type.OPTIONS, JSTOCK_STATIC_SERVER + "options_information/options.txt");
 
         assert(map.size() == Type.values().length);
         assert(zh_map.size() == Type.values().length);
