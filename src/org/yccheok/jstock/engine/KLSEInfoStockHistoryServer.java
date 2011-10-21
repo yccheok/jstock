@@ -142,10 +142,12 @@ public class KLSEInfoStockHistoryServer implements StockHistoryServer {
         stringBuilder.append(c);
 
         // Do not use "duration". Use "theDuration".
-        final String endMonth = dateFormatThredLocal.get().format(theDuration.getEndDate().getMonth());
+        // Month is based 1.
+        final String endMonth = dateFormatThredLocal.get().format(theDuration.getEndDate().getMonth() + 1);
         final String endDate = dateFormatThredLocal.get().format(theDuration.getEndDate().getDate());
         final int endYear = theDuration.getEndDate().getYear();
-        final String startMonth = dateFormatThredLocal.get().format(theDuration.getStartDate().getMonth());
+        // Month is based 1.
+        final String startMonth = dateFormatThredLocal.get().format(theDuration.getStartDate().getMonth() + 1);
         final String startDate = dateFormatThredLocal.get().format(theDuration.getStartDate().getDate());
         final int startYear = theDuration.getStartDate().getYear();
 
