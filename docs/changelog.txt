@@ -1,6 +1,10 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.6h - 2011-10-26
+  Bugfix:  Fix on incorrect Malaysia stock history, which listed for less than 
+           10 years.
+           
 JStock 1.0.6g - 2011-10-19
   Feature: History data feed sponsored by http://www.klse.info/. With this, we
            had overcame Yahoo! history data feed problem for Malaysia market.

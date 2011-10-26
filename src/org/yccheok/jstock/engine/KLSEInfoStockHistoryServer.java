@@ -63,8 +63,15 @@ public class KLSEInfoStockHistoryServer implements StockHistoryServer {
         final List<Duration> durations = this.toSmallerDurationPieces();
         
         try {
+            boolean flag = false;
             for (Duration d : durations) {
-                buildHistory(this.code, d);
+                // As long as one of the durations returns true will be good
+                // enough. One or more durations may return false, as a stock
+                // may listed in stock market less than 10 years.
+                flag = flag | buildHistory(this.code, d);
+            }
+            if (flag == false) {
+                throw new StockHistoryNotFoundException(code.toString());
             }
         } catch (java.lang.OutOfMemoryError exp) {
             // Thrown from method.getResponseBodyAsString
@@ -128,7 +135,7 @@ public class KLSEInfoStockHistoryServer implements StockHistoryServer {
         return durations;
     }
     
-    private void buildHistory(Code code, Duration theDuration) throws StockHistoryNotFoundException
+    private boolean buildHistory(Code code, Duration theDuration)
     {
         final StringBuilder stringBuilder = new StringBuilder(KLSE_INFO_BASED_URL);
 
@@ -136,7 +143,7 @@ public class KLSEInfoStockHistoryServer implements StockHistoryServer {
         try {
             c = java.net.URLEncoder.encode(code.toString(), "UTF-8");
         } catch (UnsupportedEncodingException ex) {
-            throw new StockHistoryNotFoundException("code.toString()=" + code.toString(), ex);
+            return false;
         }
 
         stringBuilder.append(c);
@@ -171,9 +178,7 @@ public class KLSEInfoStockHistoryServer implements StockHistoryServer {
             }
         }
 
-        if (success == false) {
-            throw new StockHistoryNotFoundException(code.toString());
-        }
+        return success;
     }
     
     private boolean parse(String respond)
