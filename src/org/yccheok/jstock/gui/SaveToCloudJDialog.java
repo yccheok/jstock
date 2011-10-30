@@ -289,17 +289,22 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jLabel5MouseExited
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        if (this.jTextField1.getText().trim().length() == 0)
+        String username = this.jTextField1.getText().trim();
+        if (username.length() == 0)
         {
             JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_username_cannot_be_empty"), MessagesBundle.getString("warning_title_username_cannot_be_empty"), JOptionPane.WARNING_MESSAGE);
             this.jTextField1.requestFocus();
             return;
         }
 
-        if (false == org.apache.commons.validator.EmailValidator.getInstance().isValid(this.jTextField1.getText().trim())) {
-            JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_invalid_email_address"), MessagesBundle.getString("warning_title_invalid_email_address"), JOptionPane.WARNING_MESSAGE);
-            this.jTextField1.requestFocus();
-            return;
+        if (false == org.apache.commons.validator.EmailValidator.getInstance().isValid(username)) {
+            // The default email is gmail.
+            username = username + "@gmail.com";
+            if (false == org.apache.commons.validator.EmailValidator.getInstance().isValid(username)) {
+                JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_invalid_email_address"), MessagesBundle.getString("warning_title_invalid_email_address"), JOptionPane.WARNING_MESSAGE);
+                this.jTextField1.requestFocus();
+                return;
+            }
         }
 
         if (this.jPasswordField1.getPassword().length == 0)
@@ -328,7 +333,7 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
         jLabel3.setVisible(true);
         jLabel4.setVisible(true);
 
-        this.saveToCloudTask = this.getSaveToCloudTask();
+        this.saveToCloudTask = this.getSaveToCloudTask(username);
         this.saveToCloudTask.execute();
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -367,7 +372,7 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
         }
     }
 
-    private SwingWorker<Boolean, Status> getSaveToCloudTask() {
+    private SwingWorker<Boolean, Status> getSaveToCloudTask(final String username) {
         SwingWorker<Boolean, Status> worker = new SwingWorker<Boolean, Status>() {
             @Override
             protected void done() {
@@ -402,7 +407,7 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
                     // Only save account information when cloud operation success.
                     if (jCheckBox1.isSelected() == true) {
                         jStockOptions.setRememberGoogleAccountEnabled(true);
-                        jStockOptions.setGoogleUsername(Utils.encrypt(jTextField1.getText().trim()));
+                        jStockOptions.setGoogleUsername(Utils.encrypt(username));
                         jStockOptions.setGooglePassword(Utils.encrypt(new String(jPasswordField1.getPassword())).trim());
                     }
                     // Close the dialog once cloud operation success.
@@ -459,7 +464,6 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
 
                 publish(Status.newInstance(GUIBundle.getString("SaveToCloudJDialog_VerifyGoogleAccount..."), Icons.BUSY));
 
-                final String username = jTextField1.getText().trim();
                 final String password = new String(jPasswordField1.getPassword()).trim();
                 if (false == Utils.saveToCloud(username, password, zipFile)) {
                     publish(Status.newInstance(GUIBundle.getString("SaveToCloudJDialog_VerifyGoogleAccountFail"), Icons.ERROR));
