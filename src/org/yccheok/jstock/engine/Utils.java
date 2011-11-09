@@ -308,8 +308,6 @@ public class Utils {
         italyIndices.add(Index.FTSEMIB);
         koreaIndices.add(Index.KS11);
         malaysiaIndices.add(Index.KLSE);
-        malaysiaIndices.add(Index.Second);
-        malaysiaIndices.add(Index.Mesdaq);
         netherlandsIndices.add(Index.AEX);
         newZealandIndices.add(Index.NZSX50);
         norwayIndices.add(Index.OSEAX);
@@ -324,6 +322,19 @@ public class Utils {
         unitedStateIndices.add(Index.IXIC);        
     }
 
+    /**
+     * Returns code in Google's format.
+     * 
+     * @param code the code
+     * @return code in Google's format
+     */
+    public static Code toGoogleFormat(Code code) {
+        if (code.toString().equals("^KLSE")) {
+            return Code.newInstance("INDEXFTSE:FBMKLCI");
+        }
+        return code;
+    }
+    
     public static Code toYahooFormat(Code code, Country country)
     {
         if (code == null || country == null)

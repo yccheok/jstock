@@ -25,8 +25,6 @@ package org.yccheok.jstock.engine;
  */
 public enum Index {
     KLSE("KLSE", Code.newInstance("^KLSE")),
-    Second("Second Board", Code.newInstance("Second")),
-    Mesdaq("Mesdaq", Code.newInstance("Mesdaq")),
     STI("Straits Times Index", Code.newInstance("^STI")),
     DJI("Dow Jones Industrial Average", Code.newInstance("^DJI")),
     IXIC("Nasdaq Composite", Code.newInstance("^IXIC")),

@@ -3,6 +3,7 @@ Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
 JStock 1.0.6i - ????-??-??
   Feature: Let Gmail as default email for cloud feaure.
+  Feature: Use Google server to retrieve Malaysia's index.
   
 JStock 1.0.6h - 2011-10-26
   Bugfix:  Fix on incorrect Malaysia stock history, which listed for less than 

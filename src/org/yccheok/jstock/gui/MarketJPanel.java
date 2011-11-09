@@ -79,10 +79,6 @@ public class MarketJPanel extends javax.swing.JPanel {
         numberFormat.setMinimumFractionDigits(2);
 
         for (Index index : indices) {
-            if (ignoreIndices.contains(index)) {
-                continue;
-            }
-
             final double _index = market.getIndex(index);
             final double change = market.getChange(index);
             final Color color = Utils.getColor(change, 0.0);
@@ -103,10 +99,6 @@ public class MarketJPanel extends javax.swing.JPanel {
     private void initAccordingToCountry(Country country) {
         List<Index> indices = org.yccheok.jstock.engine.Utils.getStockIndices(country);
         for (final Index index : indices) {
-            if (ignoreIndices.contains(index)) {
-                continue;
-            }
-
             JLabel name = new JLabel(index.toString() + " : ");
             leftPanel.add(name);
             JLabel value = new JLabel();
@@ -196,13 +188,6 @@ public class MarketJPanel extends javax.swing.JPanel {
     
     private Country country = null;
     private Map<String, JLabel> map = new HashMap<String, JLabel>();
-    
-    private static final List<Index> ignoreIndices = new ArrayList<Index>();
-    
-    static {
-        ignoreIndices.add(Index.Mesdaq);
-        ignoreIndices.add(Index.Second);
-    }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel leftPanel;

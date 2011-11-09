@@ -89,10 +89,10 @@ public class GoogleMarketServer implements MarketServer {
                 StringBuilder builder = new StringBuilder("http://www.google.com/finance/info?client=ig&q=");
                 // Exception will be thrown from apache httpclient, if we do not
                 // perform URL encoding.
-                builder.append(java.net.URLEncoder.encode(codes.get(0).toString(), "UTF-8"));
+                builder.append(java.net.URLEncoder.encode(Utils.toGoogleFormat(codes.get(0)).toString(), "UTF-8"));
                 for (int i = 1, size = codes.size(); i < size; i++) {
                     builder.append(",");
-                    builder.append(java.net.URLEncoder.encode(codes.get(i).toString(), "UTF-8"));
+                    builder.append(java.net.URLEncoder.encode(Utils.toGoogleFormat(codes.get(i)).toString(), "UTF-8"));
                 }
                 final String location = builder.toString();
                 final String respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(location);
@@ -102,8 +102,8 @@ public class GoogleMarketServer implements MarketServer {
                 final List<Stock> stocks = new ArrayList<Stock>();
                 for (int i = 0, size = jsonArray.size(); i < size; i++) {
                     final Map<String, String> jsonObject = jsonArray.get(i);
-                    final double l_curr = Double.parseDouble(jsonObject.get("l_cur").replace(",", ""));
-                    final double c = Double.parseDouble(jsonObject.get("c").replace(",", ""));
+                    final double l_curr = Double.parseDouble(jsonObject.get("l_cur").replaceAll("[^0-9\\.]", ""));
+                    final double c = Double.parseDouble(jsonObject.get("c").replaceAll("[^0-9\\.]", ""));
                     // We ignore changePricePercentage. GoogleMarket doesn't
                     // need to return this value.
                     final Stock stock = new Stock.Builder(codes.get(i), Symbol.newInstance(codes.get(i).toString())).lastPrice(l_curr).changePrice(c).build();
