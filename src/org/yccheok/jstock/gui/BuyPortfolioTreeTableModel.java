@@ -21,7 +21,9 @@ package org.yccheok.jstock.gui;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import org.jdesktop.swingx.treetable.*;
 import org.yccheok.jstock.portfolio.*;
 import javax.swing.tree.TreePath;
@@ -37,11 +39,11 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
     // Can be either stock last price or open price. If stock last price is 0
     // at current moment (Usually, this means no transaction has been done on
     // that day), open price will be applied.
-    private java.util.Map<Code, Double> stockPrice = new java.util.HashMap<Code, Double>();
+    private java.util.Map<Code, Double> stockPrice = new ConcurrentHashMap<Code, Double>();
     
     public double getLastPrice(Code code) {
         Object price = stockPrice.get(code);
-        if(price == null) return 0.0;
+        if (price == null) return 0.0;
                 
         return (Double)price;
     }
@@ -143,6 +145,10 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
         
         TransactionSummary transactionSummary = null;
         
+        // Possible to have index out of bound exception, as mutable operation
+        // may occur in between by another thread. But it should be fine at this
+        // moment, as this method will only be consumed by RealTimeStockMonitor,
+        // and it is fail safe.
         for (int i = 0; i < count; i++) {
             transactionSummary = (TransactionSummary)portfolio.getChildAt(i);
             
@@ -612,6 +618,15 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
         return (transaction.getContract().getType() == Contract.Type.Buy);
     }
 
+    /**
+     * Returns read only snap shot view of stock price map.
+     * 
+     * @return read only snap shot view of stock price map
+     */
+    public Map<Code, Double> getStockPrices() {
+        return java.util.Collections.unmodifiableMap(stockPrice);
+    }
+    
     private Object readResolve() {
         // Remove all invalid records found in stockPrice. This is caused by
         // old bug introduced in updateStockLastPrice.

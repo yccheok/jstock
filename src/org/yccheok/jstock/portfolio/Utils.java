@@ -258,7 +258,10 @@ public class Utils {
         }
         String[] files = file.list();
         List<String> list = Arrays.asList(files);
-        return list.contains("buyportfolio.csv") && list.contains("sellportfolio.csv") && list.contains("depositsummary.csv") && list.contains("dividendsummary.csv");
+        // The CSV files will not be saved if the record is empty. However, we
+        // can assure that stockprices.csv will be saved.
+        //return list.contains("buyportfolio.csv") && list.contains("sellportfolio.csv") && list.contains("depositsummary.csv") && list.contains("dividendsummary.csv");
+        return list.contains("stockprices.csv");
     }
 
     /**
