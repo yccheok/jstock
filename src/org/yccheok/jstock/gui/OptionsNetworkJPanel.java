@@ -161,6 +161,10 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
         boolean selected = false;
         StockServerFactoryJRadioButton first = null;
 
+        // First, ensure we have correct GUI layout.
+        // +1 for label.
+        jPanel5.setLayout(new java.awt.GridLayout(stockServerFactories.size() + 1, 1, 5, 5));
+        
         for (StockServerFactory stockServerFactory : stockServerFactories) {
             final StockServerFactoryJRadioButton stockServerJRadioButton = new StockServerFactoryJRadioButton(stockServerFactory);
             

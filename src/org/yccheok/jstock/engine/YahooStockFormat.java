@@ -246,10 +246,10 @@ public class YahooStockFormat implements StockFormat {
                 
                 if (length < 32) break;
                 java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("MM/dd/yyyy hh:mmaa");
-                String data_and_time = quotePattern.matcher(fields[28]).replaceAll("").trim() + " " + quotePattern.matcher(fields[29]).replaceAll("").trim();
+                String date_and_time = quotePattern.matcher(fields[30]).replaceAll("").trim() + " " + quotePattern.matcher(fields[31]).replaceAll("").trim();
                 java.util.Date serverDate;
                 try {
-                    serverDate = dateFormat.parse(data_and_time);
+                    serverDate = dateFormat.parse(date_and_time);
                     calendar = Calendar.getInstance();
                     calendar.setTime(serverDate);
                 } catch (ParseException exp) {

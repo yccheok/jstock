@@ -108,9 +108,9 @@ public enum Factories {
         indonesiaList.add(SingaporeYahooStockServerFactory.newInstance(Country.Indonesia));
         italyList.add(YahooStockServerFactory.newInstance(Country.Italy));
         koreaList.add(SingaporeYahooStockServerFactory.newInstance(Country.Korea));
-        malaysiaList.add(GoogleStockServerFactory.newInstance(Country.Malaysia));
         malaysiaList.add(klseInfoStockServerFactory);
         malaysiaList.add(SingaporeYahooStockServerFactory.newInstance(Country.Malaysia));
+        malaysiaList.add(GoogleStockServerFactory.newInstance(Country.Malaysia));
         netherlandsList.add(YahooStockServerFactory.newInstance(Country.Netherlands));
         newZealandList.add(YahooStockServerFactory.newInstance(Country.NewZealand));
         norwayList.add(YahooStockServerFactory.newInstance(Country.Norway));
