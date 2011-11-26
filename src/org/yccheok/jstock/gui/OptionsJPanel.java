@@ -62,7 +62,12 @@ public class OptionsJPanel extends javax.swing.JPanel implements JStockOptionsOb
             }
         };
 
-        JToggleButton button = new JToggleButton(action);
+        JToggleButton button = new JToggleButton(action); 
+        
+        // Specify text position to overcome display issue in all L&F.
+        button.setVerticalTextPosition(AbstractButton.BOTTOM);
+        button.setHorizontalTextPosition(AbstractButton.CENTER);
+    
         bar.add(button);
 
         map.put(title, button);
