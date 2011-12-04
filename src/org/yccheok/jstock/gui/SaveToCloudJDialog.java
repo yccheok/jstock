@@ -523,9 +523,9 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
                 } else {
                     // Flag a warning. We are going to tell user that his file
                     // will be ignored.
-					if (lastErrorCode != null) {
+                    if (lastErrorCode != null) {
                     	lastErrorCode.flag = true;
-					}
+                    }
                 }
             }
             else {

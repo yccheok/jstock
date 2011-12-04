@@ -56,7 +56,7 @@ RMDir /r $INSTDIR\config
 RMDir /r $INSTDIR\database
 RMDir /r $INSTDIR\chat
 RMDir /r $INSTDIR\extra
-RMDir /r $INSTDIR\doc
+RMDir /r $INSTDIR\docs
 Delete $INSTDIR\chart.ico
 Delete $INSTDIR\jstock.exe
 Delete $INSTDIR\Uninstall.exe
@@ -64,7 +64,8 @@ Delete "$SMPROGRAMS\${PRODUCT_NAME}\Uninstall ${PRODUCT_NAME}.lnk"
 Delete "$SMPROGRAMS\${PRODUCT_NAME}\${PRODUCT_NAME}.lnk"
 RMDIR /r "$SMPROGRAMS\${PRODUCT_NAME}"
 DeleteRegKey HKEY_LOCAL_MACHINE "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
-RMDir /r $INSTDIR
+# Do not user /r flag, to avoid from deleting entire system directory.
+RMDir $INSTDIR
 SectionEnd
 Function VersionCompare
 	!define VersionCompare `!insertmacro VersionCompareCall`
@@ -175,6 +176,21 @@ Function DetectJRE
   	
 	StrCmp $R0 0 done
 	StrCmp $R0 2 done
+    
+    # Try for 64 bit registry.
+    SetRegView 64
+	ReadRegStr $2 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment" \
+             "CurrentVersion"
+    SetRegView 32
+             
+	${VersionCompare} ${JRE_VERSION} $2 $R0
+	; $R0="0" if versions are equal
+	; $R0="1" if JRE_VERSION is newer
+	; $R0="2" if JRE_VERSION is older
+  	
+	StrCmp $R0 0 done
+	StrCmp $R0 2 done
+             
   	Call GetJRE
   
   	done:
