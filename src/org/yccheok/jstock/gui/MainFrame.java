@@ -1269,6 +1269,24 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem12ActionPerformed
 
     private void jRadioButtonMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonMenuItem1ActionPerformed
+        if (false == org.yccheok.jstock.gui.Utils.hasSpecifiedLanguageFile(this.jStockOptions.getLocale())) {
+            // User is currently using default langauge. English is our default
+            // langauge. Hence, do nothing and return early. This is because we 
+            // want to avoid from having the following locale.
+            //
+            // Locale(ENGLISH, FRANCE)
+            //
+            // This will yield incorrect behavior during currency formatting.
+            // We prefer to have
+            //
+            // Locale(FRANCE, FRANCE)
+            //
+            // English language will be displayed still, as we do not have 
+            // FRANCE language file yet.
+            //
+            return;
+        }
+        
         // Avoid from Confirm Dialog to pop up when user change to same language (i.e. english)
         if (false == this.jStockOptions.getLocale().getLanguage().equals(Locale.ENGLISH.getLanguage())) {
             // Do not suprise user with sudden restart. Ask for their permission to do so.

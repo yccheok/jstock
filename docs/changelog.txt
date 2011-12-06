@@ -6,6 +6,7 @@ JStock 1.0.6i - ????-??-??
   Feature: Use Google server to retrieve Malaysia's index.
   Bugfix:  GUI not being displayed correctly in OS X. Contributed by Peter Kane.
            (#3036822 and #2876960)
+  Bugfix:  Wrong displayed number format for France users. (#3437350)
   
 JStock 1.0.6h - 2011-10-26
   Bugfix:  Fix on incorrect Malaysia stock history, which listed for less than 

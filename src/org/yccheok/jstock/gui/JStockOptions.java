@@ -662,6 +662,11 @@ public class JStockOptions {
             this.primaryStockServerFactoryClassesIsValidForMalaysia = true;
         }
         
+        // Bug caused by change language menu method. We rectify it, after we 
+        // fix the change language menu method.
+        if (this.locale.getCountry().equals(Locale.FRANCE.getCountry()) && this.locale.getLanguage().equals(Locale.ENGLISH.getLanguage())) {
+            this.locale = Locale.FRANCE;
+        }
         return this;
     }    
     

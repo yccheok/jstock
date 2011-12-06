@@ -486,7 +486,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         {
             final BrokingFirm brokingFirm = MainFrame.getInstance().getJStockOptions().getSelectedBrokingFirm();
             
-            SwingUtilities.invokeLater(new Runnable() { public void run() {
+            SwingUtilities.invokeLater(new Runnable() {@Override public void run() {
                 final String name = jTextField1.getText();
                 final double unit = (Double)jSpinner1.getValue();
                 final double price = (Double)jFormattedTextField1.getValue();
@@ -507,7 +507,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
             }});
         }
         else {
-            SwingUtilities.invokeLater(new Runnable() { public void run() {
+            SwingUtilities.invokeLater(new Runnable() {@Override public void run() {
                 final double unit = (Double)jSpinner1.getValue();
                 final double price = (Double)jFormattedTextField1.getValue();
                 final double brokerFee = (Double)jFormattedTextField3.getValue();

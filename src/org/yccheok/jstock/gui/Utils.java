@@ -133,6 +133,30 @@ public class Utils {
     }
 
     /**
+     * Returns true if there are specified language files designed for this
+     * locale. As in Java, when there are no specified language files for a 
+     * locale, a default language file will be used.
+     * 
+     * @param locale the locale
+     * @return true if there are specified language files designed for this
+     * locale
+     */
+    public static boolean hasSpecifiedLanguageFile(Locale locale) {
+        // Please revise Statement's construct code, when adding in new language.
+        // So that its language guessing algorithm will work as it is.        
+        if (Utils.isTraditionalChinese(locale)) {
+            return true;
+        } else if (Utils.isSimplifiedChinese(locale)) {
+            return true;
+        } else if (locale.getLanguage().equals(Locale.GERMAN.getLanguage())) {
+            return true;
+        } else if (locale.getLanguage().equals(Locale.ENGLISH.getLanguage())) {
+            return true;
+        }
+        return false;
+    }
+    
+    /**
      * Adjust popup for combo box, so that horizontal scrollbar will not display.
      * http://forums.oracle.com/forums/thread.jspa?messageID=8037483&#8037483
      * http://www.camick.com/java/source/BoundsPopupMenuListener.java
