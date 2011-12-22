@@ -4,6 +4,7 @@ Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 JStock 1.0.6i - ????-??-??
   Feature: Let Gmail as default email for cloud feaure.
   Feature: Use Google server to retrieve Malaysia's index.
+  Feature: Immediate price update for investment flow chart. (#3463226)
   Bugfix:  GUI not being displayed correctly in OS X. Contributed by Peter Kane.
            (#3036822 and #2876960)
   Bugfix:  Wrong displayed number format for France users. (#3437350)

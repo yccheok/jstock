@@ -282,7 +282,8 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
 
     private void updateROITimeSeries() {
         final boolean noCodeAddedToMonitor = this.realTimeStockMonitor.isEmpty();
-
+        final List<Code> codesNeedToAddToRealTimeStockMonitor = new ArrayList<Code>();
+        
         // Use local variables for thread safe.
         // I don't think we need local variables for thread safe purpose,
         // as we already have synchronized keyword. However, it gives no harm
@@ -302,7 +303,18 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
                     final double quantity = (Double)activity.get(Activity.Param.Quantity);
                     final Stock stock = (Stock)activity.get(Activity.Param.Stock);
                     if (noCodeAddedToMonitor) {
-                        this.lookUpCodes.add(stock.getCode());
+                        // We might already have last price information in
+                        // PortfolioManagementJPanel, we will still request
+                        // stock monitor to provide continuous update.
+                        codesNeedToAddToRealTimeStockMonitor.add(stock.getCode());
+                        // If PortfolioManagementJPanel already has last price
+                        // information, just get it from there.
+                        final double lastPrice = this.portfolioManagementJPanel.getStockLastPrice(stock);
+                        if (lastPrice != 0.0) {
+                            this.codeToPrice.put(stock.getCode(), lastPrice);
+                        } else {
+                            this.lookUpCodes.add(stock.getCode());
+                        }
                     }
                     final Double price = this.codeToPrice.get(stock.getCode());
                     if (price != null) {
@@ -337,10 +349,13 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         // realTimeStockMonitor's callback may remove lookUpCodes item during
         // iterating process.
         if (noCodeAddedToMonitor) {
-            final List<Code> codes = new ArrayList<Code>(this.lookUpCodes);
-            for (Code code : codes) {
+            for (Code code : codesNeedToAddToRealTimeStockMonitor) {
                 this.realTimeStockMonitor.addStockCode(code);
             }
+            
+            if (this.lookUpCodes.isEmpty()) {
+                this.finishLookUpPrice = true;
+            }            
         }
     }
 
