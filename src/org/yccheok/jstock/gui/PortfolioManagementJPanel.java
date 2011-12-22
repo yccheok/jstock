@@ -1890,8 +1890,15 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             final DividendSummary _dividendSummary,
             final boolean oldData            
             ) {
-        PortfolioManagementJPanel.this.buyTreeTable.setTreeTableModel(buyPortfolioTreeTableModel);
-        PortfolioManagementJPanel.this.sellTreeTable.setTreeTableModel(sellPortfolioTreeTableModel);
+        // Without "if" checking, tree expand won't work. Weird!
+        if (PortfolioManagementJPanel.this.buyTreeTable.getTreeTableModel() != buyPortfolioTreeTableModel) {
+            PortfolioManagementJPanel.this.buyTreeTable.setTreeTableModel(buyPortfolioTreeTableModel);
+        }
+        
+        // Without "if" checking, tree expand won't work. Weird!
+        if (PortfolioManagementJPanel.this.sellTreeTable.getTreeTableModel() != sellPortfolioTreeTableModel) {
+            PortfolioManagementJPanel.this.sellTreeTable.setTreeTableModel(sellPortfolioTreeTableModel);
+        }
         PortfolioManagementJPanel.this.depositSummary = _depositSummary;
         PortfolioManagementJPanel.this.dividendSummary = _dividendSummary;
 
@@ -1932,7 +1939,11 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         // Every country is having different currency symbol. Remember to
         // refresh the currency symbol after we change the country.
-        PortfolioManagementJPanel.this.refreshCurrencySymbol();        
+        PortfolioManagementJPanel.this.refreshCurrencySymbol();
+        
+        // Expand the trees.
+        PortfolioManagementJPanel.this.buyTreeTable.expandRow(0);
+        PortfolioManagementJPanel.this.sellTreeTable.expandRow(0);
     }
     
     private void refershGUIAfterInitPortfolio(
