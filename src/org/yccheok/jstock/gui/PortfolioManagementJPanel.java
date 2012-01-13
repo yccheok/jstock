@@ -1967,16 +1967,16 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     // TODO : XML to CSV migration.
     public final void initPortfolio() {
         // Try to read porfolio files in CSV format.
-        boolean isCSVSuccess = this.initCSVPortfolio();
+        boolean isCSVSuccess = false;//this.initCSVPortfolio();
         if (false == isCSVSuccess) {
             // Fail. We need to migrate from XML format to CSV format.
             // The returned value for this method doesn't matter.
             if (initXMLPortfolio()) {
                 // Save the portfolio in CSV format.
-                if (saveCSVPortfolio()) {
+                //if (saveCSVPortfolio()) {
                     // And delete the portfolio in XML format. They are obsolete.
                     //deleteXMLPortfolio();
-                }
+                //}
             }
         }
     }
@@ -2148,7 +2148,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
 
     public boolean savePortfolio() {
-        return saveCSVPortfolio();
+        //return saveCSVPortfolio();
+        return saveXMLPortfolio();
     }
 
     private boolean deleteXMLPortfolio() {

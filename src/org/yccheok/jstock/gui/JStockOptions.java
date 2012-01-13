@@ -237,9 +237,6 @@ public class JStockOptions {
     private String proxyAuthUserName = "";
     private boolean isProxyAuthEnabled = false;
 
-    /* For UK client. */
-    private boolean penceToPoundConversionEnabled = false;
-
     private boolean rememberGoogleAccountEnabled = false;
     private String googleUsername = "";
     private String googlePassword = "";
@@ -282,6 +279,8 @@ public class JStockOptions {
 
     private Map<Country, Country> localCurrencyCountries = new EnumMap<Country, Country>(Country.class);
 
+    private Map<Country, Boolean> penceToPoundConversionEnabled = new EnumMap<Country, Boolean>(Country.class);
+    
     public boolean isAutoBrokerFeeCalculationEnabled() {
         return this.isAutoBrokerFeeCalculationEnabled;
     }
@@ -398,6 +397,7 @@ public class JStockOptions {
         this.currencies = new EnumMap<Country, String>(jStockOptions.currencies);
         this.currencyExchangeEnable = new EnumMap<Country, Boolean>(jStockOptions.currencyExchangeEnable);
         this.localCurrencyCountries = new EnumMap<Country, Country>(jStockOptions.localCurrencyCountries);
+        this.penceToPoundConversionEnabled = new EnumMap<Country, Boolean>(jStockOptions.penceToPoundConversionEnabled);
     }
 
     // User may not trust us to store their password in cloud server. To avoid
@@ -512,6 +512,7 @@ public class JStockOptions {
         jStockOptions.currencies = new EnumMap<Country, String>(this.currencies);
         jStockOptions.currencyExchangeEnable = new EnumMap<Country, Boolean>(this.currencyExchangeEnable);
         jStockOptions.localCurrencyCountries = new EnumMap<Country, Country>(this.localCurrencyCountries);
+        jStockOptions.penceToPoundConversionEnabled = new EnumMap<Country, Boolean>(jStockOptions.penceToPoundConversionEnabled);
 
         return jStockOptions;
     }
@@ -656,6 +657,14 @@ public class JStockOptions {
             this.localCurrencyCountries = new EnumMap<Country, Country>(Country.class);
         }
 
+        if (this.penceToPoundConversionEnabled == null) {
+            this.penceToPoundConversionEnabled = new EnumMap<Country, Boolean>(Country.class);
+        }
+        
+        if (false == this.penceToPoundConversionEnabled.containsKey(Country.UnitedKingdom)) {
+            this.penceToPoundConversionEnabled.put(Country.UnitedKingdom, true);
+        }
+        
         if (this.primaryStockServerFactoryClassesIsValidForMalaysia == null || this.primaryStockServerFactoryClassesIsValidForMalaysia == false) {
             primaryStockServerFactoryClasses.remove(Country.Malaysia);
             // Removal will be only done once. After that, reset the flag.
@@ -1212,15 +1221,21 @@ public class JStockOptions {
     /**
      * @return the penceToPoundConversionEnabled
      */
-    public boolean isPenceToPoundConversionEnabled() {
-        return penceToPoundConversionEnabled;
+    // Do we need country as parameter?
+    public boolean isPenceToPoundConversionEnabled(/*Country country*/) {
+        Boolean b = this.penceToPoundConversionEnabled.get(this.country);
+        if (b == null) {
+            return false;
+        }
+        return b;
     }
 
     /**
      * @param penceToPoundConversionEnabled the penceToPoundConversionEnabled to set
      */
-    public void setPenceToPoundConversionEnabled(boolean penceToPoundConversionEnabled) {
-        this.penceToPoundConversionEnabled = penceToPoundConversionEnabled;
+    // Do we need country as parameter?
+    public void setPenceToPoundConversionEnabled(/*Country country, */boolean penceToPoundConversionEnabled) {
+        this.penceToPoundConversionEnabled.put(this.country, penceToPoundConversionEnabled);
     }
 
     /**
