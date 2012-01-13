@@ -22,7 +22,6 @@ package org.yccheok.jstock.gui;
 import com.thoughtworks.xstream.XStream;
 import java.awt.AlphaComposite;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.Desktop;
 import java.awt.Dimension;
@@ -1309,7 +1308,7 @@ public class Utils {
         if (applicationVersionID == APPLICATION_VERSION_ID) {
             return true;
         }
-        else if (applicationVersionID >= 1051 && applicationVersionID <= 1082) {
+        else if (applicationVersionID >= 1051 && applicationVersionID <= 1083) {
             return true;
         }
       
@@ -2364,9 +2363,9 @@ public class Utils {
     private static final String APPLICATION_VERSION_STRING = "1.0.6";
 
     // For About box comparision on latest version purpose.
-    // 1.0.6h
+    // 1.0.6i
     // Remember to update isCompatible method.
-    private static final int APPLICATION_VERSION_ID = 1083;
+    private static final int APPLICATION_VERSION_ID = 1084;
 
     private static Executor zombiePool = Executors.newFixedThreadPool(Utils.NUM_OF_THREADS_ZOMBIE_POOL);
 
