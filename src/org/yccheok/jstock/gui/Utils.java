@@ -19,9 +19,15 @@
 
 package org.yccheok.jstock.gui;
 
+import com.google.gdata.client.DocumentQuery;
 import com.google.gdata.client.GoogleService.CaptchaRequiredException;
 import com.google.gdata.client.docs.DocsService;
+import com.google.gdata.data.MediaContent;
+import com.google.gdata.data.docs.DocumentListEntry;
+import com.google.gdata.data.docs.DocumentListFeed;
+import com.google.gdata.data.media.MediaSource;
 import com.google.gdata.util.AuthenticationException;
+import com.google.gdata.util.ServiceException;
 import com.thoughtworks.xstream.XStream;
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -67,6 +73,8 @@ import org.yccheok.jstock.engine.*;
 import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -940,6 +948,12 @@ public class Utils {
         return "JStock-" + APPLICATION_VERSION_ID;
     }
     
+    // Remember to revise googleDocFilenamePattern if we change the definition
+    // of this method.
+    private static String getGoogleDocFilename(long checksum, long date, int version) {
+        return "jstock-" + getJStockUUID() + "-checksum=" + checksum + "-date=" + date + "-version=" + version + ".zip";
+    }
+    
     /**
      * Returns true if the given locale is simplified chinese.
      *
@@ -1101,18 +1115,123 @@ public class Utils {
                 } else {
                     client.setUserCredentials(username, password, captchaRespond.logintoken, captchaRespond.logincaptcha);
                 }
+                break;
             } catch (CaptchaRequiredException ex) {
+                log.error(null, ex);
                 captchaRespond = Utils.getCapchaRespond(ex);
                 if (captchaRespond == null) {
-                        return null;
+                    return null;
                 }
             } catch (AuthenticationException ex) {
+                log.error(null, ex);
                 return null;
             }
         } while (true);
-        //return null;
+
+        // Login success. Let's find the cloud file.
+        URL feedUri = null;
+        try {
+            feedUri = new URL("https://docs.google.com/feeds/default/private/full/");
+        } catch (java.net.MalformedURLException ex) {
+            // Impossible.
+            log.error(null, ex);
+        }
+        assert(feedUri != null);
+        DocumentQuery query = new DocumentQuery(feedUri);
+        query.setTitleQuery("jstock-" + getJStockUUID() + "-checksum=");
+        query.setTitleExact(false);
+        query.setMaxResults(1);
+        
+        DocumentListFeed allEntries = null;
+        DocumentListEntry documentListEntry = null;
+        try {
+            allEntries = client.getFeed(query, DocumentListFeed.class);
+        } catch (IOException ex) {
+            log.error(null, ex);
+            return null;
+        } catch (ServiceException ex) {
+            log.error(null, ex);
+            return null;
+        }
+
+        List<DocumentListEntry> documentListEntries = allEntries.getEntries();
+        if (documentListEntries.isEmpty()) {
+            return null;
+        }
+        
+        documentListEntry = documentListEntries.get(0);
+        final String filename = documentListEntry.getFilename();
+        
+        // Retrieve checksum, date and version information from filename.
+        final Matcher matcher = googleDocFilenamePattern.matcher(filename);
+        String _checksum = null;
+        String _date = null;
+        String _version = null;
+        if (matcher.find()){
+            if (matcher.groupCount() == 3) {
+                _checksum = matcher.group(1);
+                _date = matcher.group(2);
+                _version = matcher.group(3);
+            }
+        }
+        if (_checksum == null || _date == null || _version == null) {
+            return null;
+        }
+
+        long checksum = 0;
+        long date = 0;
+        int version = 0;
+        
+        try {
+            checksum = Long.parseLong(_checksum);
+            date = Long.parseLong(_date);
+            version = Integer.parseInt(_version);
+        } catch (NumberFormatException ex) {
+            log.error(null, ex);
+            return null;
+        }
+        
+        try {
+            final File temp = File.createTempFile(Utils.getJStockUUID(), ".zip");
+            downloadFile(client, documentListEntry, temp);
+            return CloudFile.newInstance(temp, checksum, date, version);
+        } catch (IOException ex) {
+            log.error(null, ex);
+            return null;
+        } catch (ServiceException ex) {
+            log.error(null, ex);
+            return null;
+        }
     }
     
+    private static void downloadFile(DocsService client, DocumentListEntry entry, File file)
+        throws IOException, MalformedURLException, ServiceException {
+
+        MediaContent mc = (MediaContent) entry.getContent();
+        MediaSource ms = client.getMedia(mc);
+
+        InputStream inStream = null;
+        FileOutputStream outStream = null;
+
+        try {
+            inStream = ms.getInputStream();
+            outStream = new FileOutputStream(file);
+
+            int c;
+            while ((c = inStream.read()) != -1) {
+                outStream.write(c);
+            }
+        } finally {
+            if (inStream != null) {
+                inStream.close();
+            }
+            if (outStream != null) {
+                outStream.flush();
+                outStream.close();
+            }
+        }
+    }
+
     public static CloudFile loadFromCloud(String username, String password) {
         CaptchaRespond captchaRespond = null;
         do {
@@ -1199,7 +1318,7 @@ public class Utils {
                 log.error(null, ex);
                 return null;
             }
-            catch(NumberFormatException ex) {
+            catch (NumberFormatException ex) {
                 log.error(null, ex);
                 return null;
             }
@@ -2455,5 +2574,7 @@ public class Utils {
         multiThreadedHttpConnectionManager.getParams().setMaxConnectionsPerHost(httpClientWithAgentInfo.getHostConfiguration(), 128);    
     }
     
+    private static final Pattern googleDocFilenamePattern = Pattern.compile("jstock-" + getJStockUUID() +  "-checksum=([0-9]+)-date=([0-9]+)-version=([0-9]+)\\.zip" );
+        
     private static final Log log = LogFactory.getLog(Utils.class);
 }
