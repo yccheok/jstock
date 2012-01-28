@@ -22,9 +22,14 @@ package org.yccheok.jstock.gui;
 import com.google.gdata.client.DocumentQuery;
 import com.google.gdata.client.GoogleService.CaptchaRequiredException;
 import com.google.gdata.client.docs.DocsService;
+import com.google.gdata.client.media.ResumableGDataFileUploader;
+import com.google.gdata.client.uploader.FileUploadData;
+import com.google.gdata.client.uploader.ProgressListener;
+import com.google.gdata.client.uploader.ResumableHttpFileUploader;
 import com.google.gdata.data.MediaContent;
 import com.google.gdata.data.docs.DocumentListEntry;
 import com.google.gdata.data.docs.DocumentListFeed;
+import com.google.gdata.data.media.MediaFileSource;
 import com.google.gdata.data.media.MediaSource;
 import com.google.gdata.util.AuthenticationException;
 import com.google.gdata.util.ServiceException;
@@ -71,8 +76,11 @@ import java.text.MessageFormat;
 import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
 import org.yccheok.jstock.engine.*;
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -1415,6 +1423,153 @@ public class Utils {
         return null;
     }
 
+    private static class FileUploadProgressListener implements ProgressListener {
+
+        private final CountDownLatch countDownLatch = new CountDownLatch(1);
+        
+        @Override
+        public synchronized void progressChanged(ResumableHttpFileUploader uploader)
+        {
+            final String fileId = ((FileUploadData) uploader.getData()).getFileName();
+            switch(uploader.getUploadState()) {
+            case COMPLETE:
+            case CLIENT_ERROR:
+                countDownLatch.countDown();
+                log.info(fileId + ": Completed");
+                break;
+            
+            case IN_PROGRESS:
+                log.info(fileId + ":" + String.format("%3.0f", uploader.getProgress() * 100) + "%");
+                break;
+        
+            case NOT_STARTED:
+                log.info(fileId + ":" + "Not Started");
+                break;
+            }
+        }
+        
+        public void await() throws InterruptedException {
+            countDownLatch.await();
+        }
+    }
+    
+    public static boolean saveToGoogleDoc(String username, String password, File file) {
+        CaptchaRespond captchaRespond = null;
+        DocsService client = new DocsService(getApplicationName());
+        do {
+            try {
+                if (captchaRespond == null) {
+                    client.setUserCredentials(username, password);
+                } else {
+                    client.setUserCredentials(username, password, captchaRespond.logintoken, captchaRespond.logincaptcha);
+                }
+                break;
+            } catch (CaptchaRequiredException ex) {
+                log.error(null, ex);
+                captchaRespond = Utils.getCapchaRespond(ex);
+                if (captchaRespond == null) {
+                    return false;
+                }
+            } catch (AuthenticationException ex) {
+                log.error(null, ex);
+                return false;
+            }
+        } while (true);
+
+        // Login success. Determine whether we need to perform NEW or UPDATE
+        // operation.
+        URL feedUri = null;
+        try {
+            feedUri = new URL("https://docs.google.com/feeds/default/private/full/");
+        } catch (java.net.MalformedURLException ex) {
+            // Impossible.
+            log.error(null, ex);
+        }
+        assert(feedUri != null);
+        DocumentQuery query = new DocumentQuery(feedUri);
+        query.setTitleQuery("jstock-" + getJStockUUID() + "-checksum=");
+        query.setTitleExact(false);
+        query.setMaxResults(1);
+        
+        DocumentListFeed allEntries = null;
+        DocumentListEntry documentListEntry = null;
+        try {
+            allEntries = client.getFeed(query, DocumentListFeed.class);
+        } catch (IOException ex) {
+            log.error(null, ex);
+            return false;
+        } catch (ServiceException ex) {
+            log.error(null, ex);
+            return false;
+        }
+
+        List<DocumentListEntry> documentListEntries = allEntries.getEntries();
+        if (false == documentListEntries.isEmpty()) {
+            documentListEntry = documentListEntries.get(0);
+        }                
+        
+        final long checksum = org.yccheok.jstock.analysis.Utils.getChecksum(file);
+        final long date = new Date().getTime();
+        final int version = org.yccheok.jstock.gui.Utils.getApplicationVersionID();
+                        
+        // Login success. Let's upload the cloud file.
+        final int MAX_CONCURRENT_UPLOADS = 10;
+        final int PROGRESS_UPDATE_INTERVAL = 1000;
+        final int DEFAULT_CHUNK_SIZE = 10485760;
+
+        // Create a listener
+        FileUploadProgressListener listener = new FileUploadProgressListener();
+
+        // Pool for handling concurrent upload tasks
+        ExecutorService executor = Executors.newFixedThreadPool(MAX_CONCURRENT_UPLOADS);
+
+        String contentType = DocumentListEntry.MediaType.fromFileName(file.getName()).getMimeType();
+        MediaFileSource mediaFile = new MediaFileSource(file, contentType);
+        try {
+            URL createUploadUrl = new URL("https://docs.google.com/feeds/upload/create-session/default/private/full");
+            ResumableGDataFileUploader uploader = null;
+            if (documentListEntry == null) {
+                // New file.
+                uploader = new ResumableGDataFileUploader.Builder(client, createUploadUrl, mediaFile, null)
+                .title(getGoogleDocFilename(checksum, date, version))
+                .chunkSize(DEFAULT_CHUNK_SIZE).executor(executor)
+                .trackProgress(listener, PROGRESS_UPDATE_INTERVAL)
+                .build();
+            } else {
+                // Overwrite.
+                uploader = new ResumableGDataFileUploader.Builder(client, createUploadUrl, mediaFile, documentListEntry)
+                .title(getGoogleDocFilename(checksum, date, version))
+                .chunkSize(DEFAULT_CHUNK_SIZE).executor(executor)
+                .trackProgress(listener, PROGRESS_UPDATE_INTERVAL).requestType(ResumableGDataFileUploader.RequestType.UPDATE)
+                .build();            
+                System.out.println("overwrite");
+            }
+            uploader.start();
+
+            // Wait for completion.
+            listener.await();
+
+            // Thread clean up.
+            executor.shutdownNow();
+            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);            
+        } catch (java.net.MalformedURLException ex) {
+            // Impossible.
+            log.error(null, ex);
+            return false;
+        } catch (IOException ex) {
+            log.error(null, ex);
+            return false;            
+        } catch (ServiceException ex) {
+            log.error(null, ex);
+            return false;
+        } catch (InterruptedException ex) {
+            log.error(null, ex);
+            return false;            
+        }
+
+        return true;
+    }
+    
     public static boolean saveToCloud(String username, String password, File file) {
         CaptchaRespond captchaRespond = null;
 
