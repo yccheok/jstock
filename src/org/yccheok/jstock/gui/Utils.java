@@ -19,6 +19,9 @@
 
 package org.yccheok.jstock.gui;
 
+import com.google.gdata.client.GoogleService.CaptchaRequiredException;
+import com.google.gdata.client.docs.DocsService;
+import com.google.gdata.util.AuthenticationException;
 import com.thoughtworks.xstream.XStream;
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -932,6 +935,11 @@ public class Utils {
         return "fe78440e-e0fe-4efb-881d-264a01be483c";
     }
 
+    // Returns application name, used by Google Doc service.
+    private static String getApplicationName() {
+        return "JStock-" + APPLICATION_VERSION_ID;
+    }
+    
     /**
      * Returns true if the given locale is simplified chinese.
      *
@@ -1083,6 +1091,28 @@ public class Utils {
         }
     }
 
+    public static CloudFile loadFromGoogleDoc(String username, String password) {
+        CaptchaRespond captchaRespond = null;
+        DocsService client = new DocsService(getApplicationName());
+        do {
+            try {
+                if (captchaRespond == null) {
+                    client.setUserCredentials(username, password);
+                } else {
+                    client.setUserCredentials(username, password, captchaRespond.logintoken, captchaRespond.logincaptcha);
+                }
+            } catch (CaptchaRequiredException ex) {
+                captchaRespond = Utils.getCapchaRespond(ex);
+                if (captchaRespond == null) {
+                        return null;
+                }
+            } catch (AuthenticationException ex) {
+                return null;
+            }
+        } while (true);
+        //return null;
+    }
+    
     public static CloudFile loadFromCloud(String username, String password) {
         CaptchaRespond captchaRespond = null;
         do {
@@ -1190,6 +1220,33 @@ public class Utils {
         }
     }
 
+    private static CaptchaRespond getCapchaRespond(CaptchaRequiredException captchaRequiredException) {
+        final String CaptchaToken = captchaRequiredException.getCaptchaToken();
+        final String CaptchaUrl = captchaRequiredException.getCaptchaUrl();
+        try {
+            URL url = new URL("https://www.google.com/accounts/" + CaptchaUrl);
+            BufferedImage image = ImageIO.read(url);
+            final CaptchaInputJDialog dialog = new CaptchaInputJDialog(MainFrame.getInstance(), image, true);
+            // Possible deadlock?
+            // SwingUtilities.invokeAndWait(new Runnable() {
+            //    @Override
+            //    public void run() {                        
+            //        dialog.setLocationRelativeTo(MainFrame.getInstance());
+            //        dialog.setVisible(true);
+            //    }
+            //});
+            dialog.setLocationRelativeTo(MainFrame.getInstance());
+            dialog.setVisible(true);
+            if (dialog.getCaptcha() == null || dialog.getCaptcha().length() <= 0) {
+                return null;
+            }
+            return new CaptchaRespond(CaptchaToken, dialog.getCaptcha());
+        } catch (Exception exp) {
+            log.error(null, exp);
+            return null;
+        }        
+    }
+    
     private static CaptchaRespond getCapchaRespond(String respond) {
         assert(respond != null);
 
