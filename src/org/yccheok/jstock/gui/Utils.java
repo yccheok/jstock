@@ -577,29 +577,29 @@ public class Utils {
     public static void launchWebBrowser(javax.swing.event.HyperlinkEvent evt) {
         if (HyperlinkEvent.EventType.ACTIVATED.equals(evt.getEventType())) {
             URL url = evt.getURL();
-        if (Desktop.isDesktopSupported())
-        {
-            final Desktop desktop = Desktop.getDesktop();
-            if (desktop.isSupported(Desktop.Action.BROWSE))
+            if (Desktop.isDesktopSupported())
             {
-                if (url == null) {
-                    // www.yahoo.com considered an invalid URL. Hence, evt.getURL() returns null.
-                    String string = "http://" + evt.getDescription();
+                final Desktop desktop = Desktop.getDesktop();
+                if (desktop.isSupported(Desktop.Action.BROWSE))
+                {
+                    if (url == null) {
+                        // www.yahoo.com considered an invalid URL. Hence, evt.getURL() returns null.
+                        String string = "http://" + evt.getDescription();
+                        try {
+                            url = new URL(string);
+                        } catch (MalformedURLException ex) {
+                            return;
+                        }
+                    }
                     try {
-                        url = new URL(string);
-                    } catch (MalformedURLException ex) {
-                        return;
+                        desktop.browse(url.toURI());
+                    }
+                    catch (URISyntaxException ex) {
+                    }
+                    catch (IOException ex) {
                     }
                 }
-                try {
-                    desktop.browse(url.toURI());
-                }
-                catch (URISyntaxException ex) {
-                }
-                catch (IOException ex) {
-                }
             }
-        }
         }
     }
 

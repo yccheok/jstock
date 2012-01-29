@@ -21,6 +21,7 @@ package org.yccheok.jstock.gui;
 
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Font;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.MessageFormat;
@@ -31,8 +32,12 @@ import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import javax.swing.Icon;
+import javax.swing.JEditorPane;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.gui.analysis.MemoryLogJDialog;
@@ -413,10 +418,27 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
 
                 final String password = new String(jPasswordField1.getPassword()).trim();
 
-                final Utils.CloudFile cloudFile = Utils.loadFromGoogleDoc(username, password);
+                Utils.CloudFile cloudFile = Utils.loadFromGoogleDoc(username, password);
                 if (cloudFile == null) {
-                    publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_LoadingFromCloudFail"), Icons.ERROR));
-                    return false;
+                    // Perhaps we should load from legacy cloud server, and help
+                    // user to perform migration to Google Doc server.
+                    cloudFile = Utils.loadFromCloud(username, password);
+                    if (cloudFile == null) {                        
+                        publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_LoadingFromCloudFail"), Icons.ERROR));
+                        return false;
+                    } else {
+                        if (false == Utils.saveToGoogleDoc(username, password, cloudFile.file)) {
+                            // Migration fail.
+                            LoadFromCloudJDialog.this.showMessageBoxWithGoogleDocLink();
+                            
+                        } else {
+                            // Migration success.
+                            JOptionPane.showMessageDialog(LoadFromCloudJDialog.this, 
+                                    MessagesBundle.getString("info_message_migration_to_google_doc_server_success"), 
+                                    MessagesBundle.getString("info_title_migration_to_google_doc_server_success"), 
+                                    JOptionPane.INFORMATION_MESSAGE);
+                        }
+                    }
                 }
                 /* Check for checksum. */
                 if (cloudFile.checksum != org.yccheok.jstock.analysis.Utils.getChecksum(cloudFile.file)) {
@@ -490,6 +512,36 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
         this.memoryLog.add(s);
     }
 
+    private void showMessageBoxWithGoogleDocLink() {
+        // for copying style
+        JLabel label = new JLabel();
+        Font font = label.getFont();
+
+        // create some css from the label's font
+        StringBuffer style = new StringBuffer("font-family:" + font.getFamily() + ";");
+        style.append("font-weight:").append(font.isBold() ? "bold" : "normal").append(";");
+        style.append("font-size:").append(font.getSize()).append("pt;");
+
+        // html content
+        String html = MessageFormat.format(MessagesBundle.getString("info_message_register_google_doc"), style);
+        JEditorPane ep = new JEditorPane("text/html", html);
+
+        // handle link events
+        ep.addHyperlinkListener(new HyperlinkListener()
+        {
+            @Override
+            public void hyperlinkUpdate(HyperlinkEvent e)
+            {
+                Utils.launchWebBrowser(e);
+            }
+        });
+        ep.setEditable(false);
+        ep.setBackground(label.getBackground());
+
+        // show
+        JOptionPane.showMessageDialog(null, ep, MessagesBundle.getString("info_title_register_google_doc"), JOptionPane.INFORMATION_MESSAGE);        
+    }
+    
     private volatile SwingWorker<Boolean, Status> loadFromCloudTask = null;
     private final List<String> memoryLog = new ArrayList<String>();
     
