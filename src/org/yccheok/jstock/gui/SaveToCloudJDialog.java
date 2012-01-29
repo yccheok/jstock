@@ -297,14 +297,11 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
             return;
         }
 
-        if (false == org.apache.commons.validator.EmailValidator.getInstance().isValid(username)) {
-            // The default email is gmail.
-            username = username + "@gmail.com";
-            if (false == org.apache.commons.validator.EmailValidator.getInstance().isValid(username)) {
-                JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_invalid_email_address"), MessagesBundle.getString("warning_title_invalid_email_address"), JOptionPane.WARNING_MESSAGE);
-                this.jTextField1.requestFocus();
-                return;
-            }
+        username = Utils.toEmailIfPossible(username);
+        if (username == null) {
+            JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_invalid_email_address"), MessagesBundle.getString("warning_title_invalid_email_address"), JOptionPane.WARNING_MESSAGE);
+            this.jTextField1.requestFocus();
+            return;            
         }
 
         if (this.jPasswordField1.getPassword().length == 0)
@@ -465,7 +462,7 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
                 publish(Status.newInstance(GUIBundle.getString("SaveToCloudJDialog_VerifyGoogleAccount..."), Icons.BUSY));
 
                 final String password = new String(jPasswordField1.getPassword()).trim();
-                if (false == Utils.saveToCloud(username, password, zipFile)) {
+                if (false == Utils.saveToGoogleDoc(username, password, zipFile)) {
                     publish(Status.newInstance(GUIBundle.getString("SaveToCloudJDialog_VerifyGoogleAccountFail"), Icons.ERROR));
                     return false;
                 }

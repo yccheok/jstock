@@ -145,28 +145,18 @@ public class GoogleCalendar {
         calendarEventEntry.setTitle(new PlainTextConstruct(message));
         calendarEventEntry.setContent(new PlainTextConstruct(message));
         calendarEventEntry.addTime(when);
-
-        // Send the request and receive the response:
-        try {
-            calendarEventEntry = calendarService.insert(postUrl, calendarEventEntry);
-        }
-        catch(IOException exp) {
-            log.error(null, exp);
-            return false;
-        } catch (ServiceException exp) {
-            log.error(null, exp);
-            return false;
-        }
-
+        
         // 0 minute reminder
         Reminder reminder = new Reminder();
         reminder.setMinutes(0);
         reminder.setMethod(Method.SMS);
         List<Reminder> reminders = calendarEventEntry.getReminder();
         reminders.add(reminder);
+        
+        // Send the request and receive the response:
         try {
-            calendarEventEntry.update();
-        } catch (IOException exp) {
+            calendarEventEntry = calendarService.insert(postUrl, calendarEventEntry);
+        } catch(IOException exp) {
             log.error(null, exp);
             return false;
         } catch (ServiceException exp) {

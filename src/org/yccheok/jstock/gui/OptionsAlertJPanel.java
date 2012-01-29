@@ -716,7 +716,11 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         SwingWorker worker = new SwingWorker<Boolean, Void>() {
             @Override
             public Boolean doInBackground() {
-                final String username = jTextField3.getText().trim();
+                String username = jTextField3.getText().trim();
+                username = Utils.toEmailIfPossible(username);
+                if (username == null) {
+                    return false;
+                }                
                 final String password = new String(jPasswordField2.getPassword());
                 final boolean status = GoogleCalendar.SMS(username, password, MessagesBundle.getString("info_message_congratulation_sms_alert_system_is_working"));
                 return status;

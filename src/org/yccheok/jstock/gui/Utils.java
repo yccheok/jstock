@@ -21,18 +21,17 @@ package org.yccheok.jstock.gui;
 
 import com.google.gdata.client.DocumentQuery;
 import com.google.gdata.client.GoogleService.CaptchaRequiredException;
-import com.google.gdata.client.docs.DocsService;
+import com.google.gdata.client.docs.*;
+import com.google.gdata.data.docs.*;
+import com.google.gdata.util.*;
 import com.google.gdata.client.media.ResumableGDataFileUploader;
 import com.google.gdata.client.uploader.FileUploadData;
 import com.google.gdata.client.uploader.ProgressListener;
 import com.google.gdata.client.uploader.ResumableHttpFileUploader;
+import com.google.gdata.data.Link;
 import com.google.gdata.data.MediaContent;
-import com.google.gdata.data.docs.DocumentListEntry;
-import com.google.gdata.data.docs.DocumentListFeed;
 import com.google.gdata.data.media.MediaFileSource;
 import com.google.gdata.data.media.MediaSource;
-import com.google.gdata.util.AuthenticationException;
-import com.google.gdata.util.ServiceException;
 import com.thoughtworks.xstream.XStream;
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -1541,8 +1540,7 @@ public class Utils {
                 .title(getGoogleDocFilename(checksum, date, version))
                 .chunkSize(DEFAULT_CHUNK_SIZE).executor(executor)
                 .trackProgress(listener, PROGRESS_UPDATE_INTERVAL).requestType(ResumableGDataFileUploader.RequestType.UPDATE)
-                .build();            
-                System.out.println("overwrite");
+                .build();
             }
             uploader.start();
 
@@ -2504,6 +2502,25 @@ public class Utils {
         }
     }
 
+    /**
+     * Returns username in email format if possible. The default used email is
+     * GMail. Returns null if conversion is not possible.
+     * 
+     * @param username the username
+     * @return username in email format if possible. The default used email is
+     * GMail. Returns null if conversion is not possible
+     */
+    public static String toEmailIfPossible(String username) {
+        if (false == org.apache.commons.validator.EmailValidator.getInstance().isValid(username)) {
+            // The default email is gmail.
+            username = username + "@gmail.com";
+            if (false == org.apache.commons.validator.EmailValidator.getInstance().isValid(username)) {
+                return null;
+            }
+        }
+        return username;
+    }
+    
     /**
      * Performs download and save the download as temporary file.
      * 
