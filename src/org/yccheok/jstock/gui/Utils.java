@@ -30,6 +30,7 @@ import com.google.gdata.client.uploader.ProgressListener;
 import com.google.gdata.client.uploader.ResumableHttpFileUploader;
 import com.google.gdata.data.Link;
 import com.google.gdata.data.MediaContent;
+import com.google.gdata.data.PlainTextConstruct;
 import com.google.gdata.data.media.MediaFileSource;
 import com.google.gdata.data.media.MediaSource;
 import com.thoughtworks.xstream.XStream;
@@ -955,9 +956,9 @@ public class Utils {
         return "JStock-" + APPLICATION_VERSION_ID;
     }
     
-    // Remember to revise googleDocFilenamePattern if we change the definition
+    // Remember to revise googleDocTitlePattern if we change the definition
     // of this method.
-    private static String getGoogleDocFilename(long checksum, long date, int version) {
+    private static String getGoogleDocTitle(long checksum, long date, int version) {
         return "jstock-" + getJStockUUID() + "-checksum=" + checksum + "-date=" + date + "-version=" + version + ".zip";
     }
     
@@ -1136,72 +1137,63 @@ public class Utils {
         } while (true);
 
         // Login success. Let's find the cloud file.
-        URL feedUri = null;
         try {
-            feedUri = new URL("https://docs.google.com/feeds/default/private/full/");
-        } catch (java.net.MalformedURLException ex) {
-            // Impossible.
-            log.error(null, ex);
-        }
-        assert(feedUri != null);
-        DocumentQuery query = new DocumentQuery(feedUri);
-        query.setTitleQuery("jstock-" + getJStockUUID() + "-checksum=");
-        query.setTitleExact(false);
-        query.setMaxResults(1);
-        
-        DocumentListFeed allEntries = null;
-        DocumentListEntry documentListEntry = null;
-        try {
-            allEntries = client.getFeed(query, DocumentListFeed.class);
-        } catch (IOException ex) {
-            log.error(null, ex);
-            return null;
-        } catch (ServiceException ex) {
-            log.error(null, ex);
-            return null;
-        }
+            URL feedUri = new URL("https://docs.google.com/feeds/default/private/full/");
+            DocumentQuery query = new DocumentQuery(feedUri);
+            // Get Everything
+            DocumentListFeed allEntries = new DocumentListFeed();
+            DocumentListFeed tempFeed = client.getFeed(query, DocumentListFeed.class);
+            do {
+                allEntries.getEntries().addAll(tempFeed.getEntries());
+                Link nextLink = tempFeed.getNextLink();
+                if ((nextLink == null) || (tempFeed.getEntries().isEmpty())) {
+                  break;
+                }
+                tempFeed = client.getFeed(new URL(nextLink.getHref()), DocumentListFeed.class);
+            } while (true);
 
-        List<DocumentListEntry> documentListEntries = allEntries.getEntries();
-        if (documentListEntries.isEmpty()) {
-            return null;
-        }
-        
-        documentListEntry = documentListEntries.get(0);
-        final String filename = documentListEntry.getFilename();
-        
-        // Retrieve checksum, date and version information from filename.
-        final Matcher matcher = googleDocFilenamePattern.matcher(filename);
-        String _checksum = null;
-        String _date = null;
-        String _version = null;
-        if (matcher.find()){
-            if (matcher.groupCount() == 3) {
-                _checksum = matcher.group(1);
-                _date = matcher.group(2);
-                _version = matcher.group(3);
+            DocumentListEntry documentListEntry = null;
+
+            long checksum = 0;
+            long date = 0;
+            int version = 0;
+            
+            for (DocumentListEntry entry : allEntries.getEntries()) {
+                // Use title, not filename.
+                final String title = entry.getTitle().getPlainText();
+                if (title == null) {
+                    continue;
+                }
+                // Retrieve checksum, date and version information from filename.
+                final Matcher matcher = googleDocTitlePattern.matcher(title);
+                String _checksum = null;
+                String _date = null;
+                String _version = null;
+                if (matcher.find()){
+                    if (matcher.groupCount() == 3) {
+                        _checksum = matcher.group(1);
+                        _date = matcher.group(2);
+                        _version = matcher.group(3);
+                    }
+                }
+                if (_checksum == null || _date == null || _version == null) {
+                    continue;
+                }
+                
+                try {
+                    checksum = Long.parseLong(_checksum);
+                    date = Long.parseLong(_date);
+                    version = Integer.parseInt(_version);
+                } catch (NumberFormatException ex) {
+                    log.error(null, ex);
+                    continue;
+                } 
+                
+                documentListEntry = entry;
+                final File temp = File.createTempFile(Utils.getJStockUUID(), ".zip");
+                downloadFile(client, documentListEntry, temp);
+                return CloudFile.newInstance(temp, checksum, date, version);                
             }
-        }
-        if (_checksum == null || _date == null || _version == null) {
-            return null;
-        }
-
-        long checksum = 0;
-        long date = 0;
-        int version = 0;
-        
-        try {
-            checksum = Long.parseLong(_checksum);
-            date = Long.parseLong(_date);
-            version = Integer.parseInt(_version);
-        } catch (NumberFormatException ex) {
-            log.error(null, ex);
-            return null;
-        }
-        
-        try {
-            final File temp = File.createTempFile(Utils.getJStockUUID(), ".zip");
-            downloadFile(client, documentListEntry, temp);
-            return CloudFile.newInstance(temp, checksum, date, version);
         } catch (IOException ex) {
             log.error(null, ex);
             return null;
@@ -1209,6 +1201,7 @@ public class Utils {
             log.error(null, ex);
             return null;
         }
+        return null;
     }
     
     private static void downloadFile(DocsService client, DocumentListEntry entry, File file)
@@ -1475,69 +1468,90 @@ public class Utils {
             }
         } while (true);
 
-        // Login success. Determine whether we need to perform NEW or UPDATE
-        // operation.
-        URL feedUri = null;
         try {
-            feedUri = new URL("https://docs.google.com/feeds/default/private/full/");
-        } catch (java.net.MalformedURLException ex) {
-            // Impossible.
-            log.error(null, ex);
-        }
-        assert(feedUri != null);
-        DocumentQuery query = new DocumentQuery(feedUri);
-        query.setTitleQuery("jstock-" + getJStockUUID() + "-checksum=");
-        query.setTitleExact(false);
-        query.setMaxResults(1);
+            // Login success. Determine whether we need to perform NEW or UPDATE
+            // operation.
+            URL feedUri = new URL("https://docs.google.com/feeds/default/private/full/");
+            DocumentQuery query = new DocumentQuery(feedUri);
+            // Get Everything
+            DocumentListFeed allEntries = new DocumentListFeed();
+            DocumentListFeed tempFeed = client.getFeed(query, DocumentListFeed.class);
+            do {
+                allEntries.getEntries().addAll(tempFeed.getEntries());
+                Link nextLink = tempFeed.getNextLink();
+                if ((nextLink == null) || (tempFeed.getEntries().isEmpty())) {
+                  break;
+                }
+                tempFeed = client.getFeed(new URL(nextLink.getHref()), DocumentListFeed.class);
+            } while (true);
+
+            DocumentListEntry documentListEntry = null;
+
+            for (DocumentListEntry entry : allEntries.getEntries()) {
+                final String filename = entry.getFilename();
+                if (filename == null) {
+                    continue;
+                }
+                // Retrieve checksum, date and version information from filename.
+                final Matcher matcher = googleDocTitlePattern.matcher(filename);
+                String _checksum = null;
+                String _date = null;
+                String _version = null;
+                if (matcher.find()){
+                    if (matcher.groupCount() == 3) {
+                        _checksum = matcher.group(1);
+                        _date = matcher.group(2);
+                        _version = matcher.group(3);
+                    }
+                }
+                if (_checksum == null || _date == null || _version == null) {
+                    continue;
+                }
+                
+                try {
+                    Long.parseLong(_checksum);
+                    Long.parseLong(_date);
+                    Integer.parseInt(_version);
+                } catch (NumberFormatException ex) {
+                    log.error(null, ex);
+                    continue;
+                }
+                documentListEntry = entry;
+                break;
+            }
+
+            final long checksum = org.yccheok.jstock.analysis.Utils.getChecksum(file);
+            final long date = new Date().getTime();
+            final int version = org.yccheok.jstock.gui.Utils.getApplicationVersionID();
+
+            // Login success. Let's upload the cloud file.
+            final int MAX_CONCURRENT_UPLOADS = 10;
+            final int PROGRESS_UPDATE_INTERVAL = 1000;
+            final int DEFAULT_CHUNK_SIZE = 10485760;
+
+            // Create a listener
+            FileUploadProgressListener listener = new FileUploadProgressListener();
+
+            // Pool for handling concurrent upload tasks
+            ExecutorService executor = Executors.newFixedThreadPool(MAX_CONCURRENT_UPLOADS);
+
+            String contentType = DocumentListEntry.MediaType.fromFileName(file.getName()).getMimeType();
+            MediaFileSource mediaFile = new MediaFileSource(file, contentType);
         
-        DocumentListFeed allEntries = null;
-        DocumentListEntry documentListEntry = null;
-        try {
-            allEntries = client.getFeed(query, DocumentListFeed.class);
-        } catch (IOException ex) {
-            log.error(null, ex);
-            return false;
-        } catch (ServiceException ex) {
-            log.error(null, ex);
-            return false;
-        }
-
-        List<DocumentListEntry> documentListEntries = allEntries.getEntries();
-        if (false == documentListEntries.isEmpty()) {
-            documentListEntry = documentListEntries.get(0);
-        }                
-        
-        final long checksum = org.yccheok.jstock.analysis.Utils.getChecksum(file);
-        final long date = new Date().getTime();
-        final int version = org.yccheok.jstock.gui.Utils.getApplicationVersionID();
-                        
-        // Login success. Let's upload the cloud file.
-        final int MAX_CONCURRENT_UPLOADS = 10;
-        final int PROGRESS_UPDATE_INTERVAL = 1000;
-        final int DEFAULT_CHUNK_SIZE = 10485760;
-
-        // Create a listener
-        FileUploadProgressListener listener = new FileUploadProgressListener();
-
-        // Pool for handling concurrent upload tasks
-        ExecutorService executor = Executors.newFixedThreadPool(MAX_CONCURRENT_UPLOADS);
-
-        String contentType = DocumentListEntry.MediaType.fromFileName(file.getName()).getMimeType();
-        MediaFileSource mediaFile = new MediaFileSource(file, contentType);
-        try {
-            URL createUploadUrl = new URL("https://docs.google.com/feeds/upload/create-session/default/private/full");
+            URL createUploadUrl = new URL("https://docs.google.com/feeds/upload/create-session/default/private/full?convert=false");
             ResumableGDataFileUploader uploader = null;
             if (documentListEntry == null) {
                 // New file.
                 uploader = new ResumableGDataFileUploader.Builder(client, createUploadUrl, mediaFile, null)
-                .title(getGoogleDocFilename(checksum, date, version))
+                .title(getGoogleDocTitle(checksum, date, version))
                 .chunkSize(DEFAULT_CHUNK_SIZE).executor(executor)
                 .trackProgress(listener, PROGRESS_UPDATE_INTERVAL)
                 .build();
             } else {
-                // Overwrite.
+                // Rename and overwrite.
+                documentListEntry.setTitle(new PlainTextConstruct(getGoogleDocTitle(checksum, date, version)));
                 uploader = new ResumableGDataFileUploader.Builder(client, createUploadUrl, mediaFile, documentListEntry)
-                .title(getGoogleDocFilename(checksum, date, version))
+                .title(getGoogleDocTitle(checksum, date, version))
                 .chunkSize(DEFAULT_CHUNK_SIZE).executor(executor)
                 .trackProgress(listener, PROGRESS_UPDATE_INTERVAL).requestType(ResumableGDataFileUploader.RequestType.UPDATE)
                 .build();
@@ -2746,7 +2760,7 @@ public class Utils {
         multiThreadedHttpConnectionManager.getParams().setMaxConnectionsPerHost(httpClientWithAgentInfo.getHostConfiguration(), 128);    
     }
     
-    private static final Pattern googleDocFilenamePattern = Pattern.compile("jstock-" + getJStockUUID() +  "-checksum=([0-9]+)-date=([0-9]+)-version=([0-9]+)\\.zip" );
+    private static final Pattern googleDocTitlePattern = Pattern.compile("jstock-" + getJStockUUID() +  "-checksum=([0-9]+)-date=([0-9]+)-version=([0-9]+)\\.zip", Pattern.CASE_INSENSITIVE);
         
     private static final Log log = LogFactory.getLog(Utils.class);
 }

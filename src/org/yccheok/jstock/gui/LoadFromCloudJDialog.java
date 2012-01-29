@@ -413,7 +413,7 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
 
                 final String password = new String(jPasswordField1.getPassword()).trim();
 
-                final Utils.CloudFile cloudFile = Utils.loadFromCloud(username, password);
+                final Utils.CloudFile cloudFile = Utils.loadFromGoogleDoc(username, password);
                 if (cloudFile == null) {
                     publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_LoadingFromCloudFail"), Icons.ERROR));
                     return false;
