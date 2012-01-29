@@ -1,6 +1,10 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.6j - 2012-01-30
+  Feature: Migrating cloud storage to Google Doc. (#3474108)
+  Bugfix:  Fix SMS feature.
+  
 JStock 1.0.6i - 2012-01-15
   Feature: Let Gmail as default email for cloud feaure.
   Feature: Use Google server to retrieve Malaysia's index.
