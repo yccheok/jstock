@@ -1921,7 +1921,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 depositSummaryFile.delete();
                 dividendSummaryFile.delete();
                 final File config_directory = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config");
-                if (config_directory.list().length <= 0) {
+                final String[] list = config_directory.list();
+                if (list != null && list.length <= 0) {
                     // Empty directory. Remove it.
                     config_directory.delete();
                 }
