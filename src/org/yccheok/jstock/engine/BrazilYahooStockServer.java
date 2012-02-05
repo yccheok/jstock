@@ -44,9 +44,9 @@ public class BrazilYahooStockServer extends AbstractYahooStockServer {
     }
 
     @Override
-    public List<Stock> getStocksBySymbols(List<Symbol> symbols) throws StockNotFoundException
+    public List<Stock> getStocks(List<Code> codes) throws StockNotFoundException
     {
-        final List<Stock> tmp = super.getStocksBySymbols(symbols);
+        final List<Stock> tmp = super.getStocks(codes);
         final List<Stock> stocks = new ArrayList<Stock>();
         for (Stock stock : tmp) {
             // For Brazil Stock Market, change "Stock    Name" to "Stock Name".
@@ -87,9 +87,9 @@ public class BrazilYahooStockServer extends AbstractYahooStockServer {
     }
 
     @Override
-    public Stock getStock(Symbol symbol) throws StockNotFoundException
+    public Stock getStock(Code code) throws StockNotFoundException
     {
-        final Stock tmp = super.getStock(symbol);
+        final Stock tmp = super.getStock(code);
         // For Brazil Stock Market, change "Stock    Name" to "Stock Name".
         final String name = longSpacePattern.matcher(tmp.getName()).replaceAll("").trim();
         final String _symbol = longSpacePattern.matcher(tmp.getSymbol().toString()).replaceAll("").trim();
@@ -134,17 +134,17 @@ public class BrazilYahooStockServer extends AbstractYahooStockServer {
         }
     }
 
-    private Set<Symbol> getSymbols(String respond) {
-        Set<Symbol> symbols = new HashSet<Symbol>();
-        final Matcher matcher = symbolPattern.matcher(respond);
+    private Set<Code> getCodes(String respond) {
+        Set<Code> codes = new HashSet<Code>();
+        final Matcher matcher = codePattern.matcher(respond);
         while (matcher.find()){
             String group = matcher.group();
             for (int j = 1; j <= matcher.groupCount(); j++ ) {
                 final String string = matcher.group(j);
-                symbols.add(Symbol.newInstance(string));
+                codes.add(Code.newInstance(string));
             }
         }
-        return symbols;
+        return codes;
     }
 
     // The returned URLs, shouldn't have any duplication with visited,
@@ -180,7 +180,7 @@ public class BrazilYahooStockServer extends AbstractYahooStockServer {
         List<URL> visited = new ArrayList<URL>();
 
         // Use Set, for safety purpose to avoid duplication.
-        Set<Symbol> symbols = new HashSet<Symbol>();
+        Set<Code> codes = new HashSet<Code>();
 
         visited.add(baseURL);
 
@@ -193,24 +193,24 @@ public class BrazilYahooStockServer extends AbstractYahooStockServer {
                     continue;
                 }
                 List<URL> urls = getURLs(respond, visited);
-                Set<Symbol> tmpSymbols = getSymbols(respond);
+                Set<Code> tmpCodes = getCodes(respond);
 
                 // getURLs already ensure URLs are unique.
                 visited.addAll(urls);
-                symbols.addAll(tmpSymbols);
+                codes.addAll(tmpCodes);
 
                 break;
             }   // for(int retry = 0; retry < NUM_OF_RETRY; retry++)
 
-            this.notify(this, symbols.size());
+            this.notify(this, codes.size());
         }
 
-        if (symbols.size() == 0) {
+        if (codes.isEmpty()) {
             throw new StockNotFoundException();
         }
 
-        final List<Symbol> _symbols = new ArrayList<Symbol>(symbols);
-        return getStocksBySymbols(_symbols);
+        final List<Code> _codes = new ArrayList<Code>(codes);
+        return getStocks(_codes);
     }
 
     private final URL baseURL;
@@ -230,7 +230,7 @@ public class BrazilYahooStockServer extends AbstractYahooStockServer {
     //  <td class="yfnc_tabledata1" align="center"><img width="10" height="14" border="0" src="http://us.i1.yimg.com/us.yimg.com/i/us/fi/03rd/up_g.gif" alt="Up"> <b style="color:#008800;">0.60 (4.08%)</b></td>
     //  <td class="yfnc_tabledata1" align="right">4,552,400</td>
     //</tr>
-    private static final Pattern symbolPattern = Pattern.compile("<b><a\\s+href\\s*=\"/q\\?s=([^\"]+)\">[^<]+</a></b></td>", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+    private static final Pattern codePattern = Pattern.compile("<b><a\\s+href\\s*=\"/q\\?s=([^\"]+)\">[^<]+</a></b></td>", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
 
     private static final int NUM_OF_RETRY = 2;
 

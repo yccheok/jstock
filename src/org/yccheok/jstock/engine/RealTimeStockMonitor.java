@@ -304,7 +304,7 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
 
                                     List<Stock> stocks = null;
                                     try {
-                                        stocks = stockServer.getStocksByCodes(codes);
+                                        stocks = stockServer.getStocks(codes);
                                     }
                                     catch (StockNotFoundException exp) {
                                         log.error(codes, exp);

@@ -32,24 +32,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 public class YQLStockServer implements StockServer {
 
     /**
-     * Returns stock based on given symbol.
-     * @param symbol the symbol
-     * @return stock based on given symbol
-     * @throws StockNotFoundException if stock is not found based on given
-     * symbol
-     */
-    @Override
-    public Stock getStock(Symbol symbol) throws StockNotFoundException {
-        List<Symbol> symbols = new ArrayList<Symbol>();
-        symbols.add(symbol);
-        List<Stock> stocks = getStocksBySymbols(symbols);
-        if (stocks.size() == 1) {
-            return stocks.get(0);
-        }
-        throw new StockNotFoundException();
-    }
-
-    /**
      * Returns stock based on given code.
      * @param code the code
      * @return stock based on given code
@@ -60,29 +42,11 @@ public class YQLStockServer implements StockServer {
     public Stock getStock(Code code) throws StockNotFoundException {
         List<Code> codes = new ArrayList<Code>();
         codes.add(code);
-        List<Stock> stocks = getStocksByCodes(codes);
+        List<Stock> stocks = getStocks(codes);
         if (stocks.size() == 1) {
             return stocks.get(0);
         }
         throw new StockNotFoundException();
-    }
-
-    /**
-     * Returns list of stocks based on given list of symbols. The length of
-     * the returned stock list will be equal to the given symbol list.
-     *
-     * @param symbols list of symbols
-     * @return list of stocks based on given list of symbols
-     * @throws StockNotFoundException if list of stocks is not found based on
-     * given list of symbols
-     */
-    @Override
-    public List<Stock> getStocksBySymbols(List<Symbol> symbols) throws StockNotFoundException {
-        List<Code> codes = new ArrayList<Code>();
-        for (Symbol symbol : symbols) {
-            codes.add(Code.newInstance(symbol.toString()));
-        }
-        return getStocksByCodes(codes);
     }
 
     /**
@@ -95,7 +59,7 @@ public class YQLStockServer implements StockServer {
      * given list of codes
      */
     @Override
-    public List<Stock> getStocksByCodes(List<Code> codes) throws StockNotFoundException {
+    public List<Stock> getStocks(List<Code> codes) throws StockNotFoundException {
         // Generate a list of queries to be sent over to YQL server.
         StringBuilder builder = new StringBuilder("select symbol,Name,PreviousClose,LastTradePriceOnly,Open,DaysHigh,DaysLow,Volume,Change,PercentChange,BidRealtime,AskRealtime from yahoo.finance.quotes where symbol in (");
         List<Stock> stocks = new ArrayList<Stock>();

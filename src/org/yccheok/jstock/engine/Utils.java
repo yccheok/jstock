@@ -578,22 +578,12 @@ public class Utils {
 
     private static final StockServer EMPTY_STOCK_SERVER = new StockServer() {
         @Override
-        public Stock getStock(Symbol symbol) throws StockNotFoundException {
-            throw new StockNotFoundException();
-        }
-
-        @Override
         public Stock getStock(Code code) throws StockNotFoundException {
             throw new StockNotFoundException();
         }
 
         @Override
-        public List<Stock> getStocksBySymbols(List<Symbol> symbols) throws StockNotFoundException {
-            throw new StockNotFoundException();
-        }
-
-        @Override
-        public List<Stock> getStocksByCodes(List<Code> codes) throws StockNotFoundException {
+        public List<Stock> getStocks(List<Code> codes) throws StockNotFoundException {
             throw new StockNotFoundException();
         }
 

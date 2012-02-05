@@ -51,23 +51,6 @@ public class SingaporeYahooStockServer extends AbstractYahooStockServer {
         }
     }
 
-    @Override
-    public Stock getStock(Code code) throws StockNotFoundException {
-        final Code newCode = Utils.toYahooFormat(code, this.getCountry());
-        return getStock(Symbol.newInstance(newCode.toString()));
-    }
-
-    @Override
-    public List<Stock> getStocksByCodes(List<Code> codes) throws StockNotFoundException {
-        List<Symbol> symbols = new ArrayList<Symbol>();
-        for (Code code : codes) {
-            final Code newCode = Utils.toYahooFormat(code, this.getCountry());
-            symbols.add(Symbol.newInstance(newCode.toString()));
-        }
-
-        return getStocksBySymbols(symbols);
-    }
-
     // The returned URLs, shouldn't have any duplication with visited,
     // and they are unique. Although is more suitable that we use Set,
     // use List is more convinient for us to iterate.
@@ -96,10 +79,10 @@ public class SingaporeYahooStockServer extends AbstractYahooStockServer {
         return urls;
     }
 
-    private Set<Symbol> getSymbols(String respond) {
-        Set<Symbol> symbols = new HashSet<Symbol>();
+    private Set<Code> getCodes(String respond) {
+        Set<Code> codes = new HashSet<Code>();
 
-        final Matcher matcher = symbolPattern.matcher(respond);
+        final Matcher matcher = codePattern.matcher(respond);
 
         while (matcher.find()){
             for (int j = 1; j <= matcher.groupCount(); j++ ) {
@@ -107,15 +90,15 @@ public class SingaporeYahooStockServer extends AbstractYahooStockServer {
                 // [2909595] Incorrect Hong Kong Database
                 // https://sourceforge.net/tracker/?func=detail&aid=2909595&group_id=202896&atid=983418
                 if (this.getCountry() == Country.HongKong && string.length() > "-OL.HK".length() && string.endsWith("-OL.HK")) {
-                    symbols.add(Symbol.newInstance(string.substring(0, string.length() - "-OL.HK".length()) + ".HK"));
+                    codes.add(Code.newInstance(string.substring(0, string.length() - "-OL.HK".length()) + ".HK"));
                 }
                 else {
-                    symbols.add(Symbol.newInstance(string));
+                    codes.add(Code.newInstance(string));
                 }
             }
         }
 
-        return symbols;
+        return codes;
     }
     
     @Override
@@ -123,7 +106,7 @@ public class SingaporeYahooStockServer extends AbstractYahooStockServer {
         List<URL> visited = new ArrayList<URL>();
 
         // Use Set, for safety purpose to avoid duplication.
-        Set<Symbol> symbols = new HashSet<Symbol>();
+        Set<Code> codes = new HashSet<Code>();
 
         visited.add(baseURL);
 
@@ -136,24 +119,24 @@ public class SingaporeYahooStockServer extends AbstractYahooStockServer {
                     continue;
                 }
                 List<URL> urls = getURLs(respond, visited);
-                Set<Symbol> tmpSymbols = getSymbols(respond);
+                Set<Code> tmpCodes = getCodes(respond);
 
                 // getURLs already ensure URLs are unique.
                 visited.addAll(urls);
-                symbols.addAll(tmpSymbols);
+                codes.addAll(tmpCodes);
 
                 break;
             }   // for (int retry = 0; retry < NUM_OF_RETRY; retry++)
 
-            this.notify(this, symbols.size());
+            this.notify(this, codes.size());
         }
 
-        if (symbols.size() == 0) {
+        if (codes.isEmpty()) {
             throw new StockNotFoundException();
         }
 
-        final List<Symbol> _symbols = new ArrayList<Symbol>(symbols);
-        return getStocksBySymbols(_symbols);
+        final List<Code> _codes = new ArrayList<Code>(codes);
+        return getStocks(_codes);
     }
 
     private final URL baseURL;
@@ -162,7 +145,7 @@ public class SingaporeYahooStockServer extends AbstractYahooStockServer {
     private static final Map<Country, Pattern> patterns = new HashMap<Country, Pattern>();
     private static final Log log = LogFactory.getLog(SingaporeYahooStockServer.class);
 
-    private static final Pattern symbolPattern = Pattern.compile("<a\\s+href\\s*=[^>]+s=([^\">&]+)&d=t\"?>Quote");
+    private static final Pattern codePattern = Pattern.compile("<a\\s+href\\s*=[^>]+s=([^\">&]+)&d=t\"?>Quote");
 
     private static final int NUM_OF_RETRY = 2;
 

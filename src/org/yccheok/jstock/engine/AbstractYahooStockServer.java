@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2012 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,9 @@ package org.yccheok.jstock.engine;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -50,67 +52,66 @@ public abstract class AbstractYahooStockServer extends Subject<AbstractYahooStoc
     }
 
     @Override
-    public List<Stock> getStocksByCodes(List<Code> codes) throws StockNotFoundException {
-        List<Symbol> symbols = new ArrayList<Symbol>();
+    public List<Stock> getStocks(List<Code> codes) throws StockNotFoundException {
+        List<Code> c = new ArrayList<Code>();
         for (Code code : codes) {
             final Code newCode = Utils.toYahooFormat(code, this.country);
-            symbols.add(Symbol.newInstance(newCode.toString()));
+            c.add(newCode);
         }
-        return getStocksBySymbols(symbols);
+        return _getStocks(c);
     }
 
     @Override
     public Stock getStock(Code code) throws StockNotFoundException {
         final Code newCode = Utils.toYahooFormat(code, this.country);
-        return getStock(Symbol.newInstance(newCode.toString()));
+        return _getStock(newCode);
     }
 
-    @Override
-    public List<Stock> getStocksBySymbols(List<Symbol> symbols) throws StockNotFoundException {
+    private List<Stock> _getStocks(List<Code> codes) throws StockNotFoundException {
         List<Stock> stocks = new ArrayList<Stock>();
 
-        if (symbols.isEmpty()) {
+        if (codes.isEmpty()) {
             return stocks;
         }
 
-        final int time = symbols.size() / MAX_STOCK_PER_ITERATION;
-        final int remainder = symbols.size() % MAX_STOCK_PER_ITERATION;
+        final int time = codes.size() / MAX_STOCK_PER_ITERATION;
+        final int remainder = codes.size() % MAX_STOCK_PER_ITERATION;
 
         for (int i = 0; i < time; i++) {
             final int start = i * MAX_STOCK_PER_ITERATION;
             final int end = start + MAX_STOCK_PER_ITERATION;
 
             final StringBuilder stringBuilder = new StringBuilder(getYahooCSVBasedURL());
-            final StringBuilder symbolBuilder = new StringBuilder();
-            final List<Symbol> expectedSymbols = new ArrayList<Symbol>();
+            final StringBuilder codeBuilder = new StringBuilder();
+            final List<Code> expectedCodes = new ArrayList<Code>();
 
             final int endLoop = end - 1;
             for (int j = start; j < endLoop; j++) {
-                String symbolString = null;
+                String codeString = null;
 
                 try {
-                    symbolString = java.net.URLEncoder.encode(symbols.get(j).toString(), "UTF-8");
+                    codeString = java.net.URLEncoder.encode(codes.get(j).toString(), "UTF-8");
                 } catch (UnsupportedEncodingException ex) {
                     throw new StockNotFoundException(null, ex);
                 }
-                symbolBuilder.append(symbolString).append("+");
-                expectedSymbols.add(symbols.get(j));
+                codeBuilder.append(codeString).append("+");
+                expectedCodes.add(codes.get(j));
             }
 
-            String symbolString = null;
+            String codeString = null;
 
             try {
-                symbolString = java.net.URLEncoder.encode(symbols.get(end - 1).toString(), "UTF-8");
+                codeString = java.net.URLEncoder.encode(codes.get(end - 1).toString(), "UTF-8");
             } catch (UnsupportedEncodingException ex) {
                 throw new StockNotFoundException(null, ex);
             }
 
-            symbolBuilder.append(symbolString);
-            expectedSymbols.add(symbols.get(end - 1));
+            codeBuilder.append(codeString);
+            expectedCodes.add(codes.get(end - 1));
 
-            final String _symbol = symbolBuilder.toString();
+            final String _code = codeBuilder.toString();
 
-            stringBuilder.append(_symbol).append(YAHOO_STOCK_FORMAT);
+            stringBuilder.append(_code).append(YAHOO_STOCK_FORMAT);
 
             final String location = stringBuilder.toString();
 
@@ -126,32 +127,36 @@ public abstract class AbstractYahooStockServer extends Subject<AbstractYahooStoc
                 final List<Stock> tmpStocks = YahooStockFormat.getInstance().parse(respond);
                 if (tmpStocks.size() != MAX_STOCK_PER_ITERATION) {
                     if (retry == (NUM_OF_RETRY - 1)) {
-                        assert(expectedSymbols.size() == MAX_STOCK_PER_ITERATION);
+                        assert(expectedCodes.size() == MAX_STOCK_PER_ITERATION);
 
                         final int currSize = tmpStocks.size();
-                        final int expectedSize = expectedSymbols.size();
+                        final int expectedSize = expectedCodes.size();
 
                         if (this.isToleranceAllowed(currSize, expectedSize)) {
-                            List<Symbol> currSymbols = new ArrayList<Symbol>();
+                            Set<Code> currCodes = new HashSet<Code>();
                             List<Stock> emptyStocks = new ArrayList<Stock>();
 
                             for (Stock stock : tmpStocks) {
-                                currSymbols.add(stock.getSymbol());
+                                currCodes.add(stock.getCode());                                
                             }
 
-                            for (Symbol symbol : expectedSymbols) {
-                                if (currSymbols.contains(symbol) == false) {
-                                    emptyStocks.add(org.yccheok.jstock.gui.Utils.getEmptyStock(Code.newInstance(symbol.toString()), symbol));
+                            for (Code code : expectedCodes) {
+                                if (currCodes.contains(code) == false) {
+                                    emptyStocks.add(org.yccheok.jstock.gui.Utils.getEmptyStock(code, Symbol.newInstance(code.toString())));
                                 }
                             }
 
                             tmpStocks.addAll(emptyStocks);
+                            
+                            // Will fall to stocks.addAll(tmpStocks);
                         }
                         else {
                             throw new StockNotFoundException("Expect " + expectedSize + " stock(s), but only receive " + currSize + " stock(s) from " + location);
                         }
                     }   // if (retry == (NUM_OF_RETRY-1))
-                    continue;
+                    else {
+                        continue;
+                    }
                 }   // if (tmpStocks.size() != MAX_STOCK_PER_ITERATION)
 
                 stocks.addAll(tmpStocks);
@@ -161,45 +166,45 @@ public abstract class AbstractYahooStockServer extends Subject<AbstractYahooStoc
             }
 
             if (success == false) {
-                throw new StockNotFoundException("Stock size (" + stocks.size() + ") inconsistent with symbol size (" + symbols.size() + ")");
+                throw new StockNotFoundException("Stock size (" + stocks.size() + ") inconsistent with code size (" + codes.size() + ")");
             }
         }
 
-        final int start = symbols.size() - remainder;
+        final int start = codes.size() - remainder;
         final int end = start + remainder;
 
         final StringBuilder stringBuilder = new StringBuilder(getYahooCSVBasedURL());
-        final StringBuilder symbolBuilder = new StringBuilder();
-        final List<Symbol> expectedSymbols = new ArrayList<Symbol>();
+        final StringBuilder codeBuilder = new StringBuilder();
+        final List<Code> expectedCodes = new ArrayList<Code>();
 
         final int endLoop = end - 1;
         for (int i = start; i < endLoop; i++) {
-            String symbolString = null;
+            String codeString = null;
 
             try {
-                symbolString = java.net.URLEncoder.encode(symbols.get(i).toString(), "UTF-8");
+                codeString = java.net.URLEncoder.encode(codes.get(i).toString(), "UTF-8");
             } catch (UnsupportedEncodingException ex) {
                 throw new StockNotFoundException("", ex);
             }
 
-            symbolBuilder.append(symbolString).append("+");
-            expectedSymbols.add(symbols.get(i));
+            codeBuilder.append(codeString).append("+");
+            expectedCodes.add(codes.get(i));
         }
 
-        String symbolString = null;
+        String codeString = null;
 
         try {
-            symbolString = java.net.URLEncoder.encode(symbols.get(end-1).toString(), "UTF-8");
+            codeString = java.net.URLEncoder.encode(codes.get(end-1).toString(), "UTF-8");
         } catch (UnsupportedEncodingException ex) {
             throw new StockNotFoundException("", ex);
         }
 
-        symbolBuilder.append(symbolString);
-        expectedSymbols.add(symbols.get(end-1));
+        codeBuilder.append(codeString);
+        expectedCodes.add(codes.get(end-1));
 
-        final String _symbol = symbolBuilder.toString();
+        final String _code = codeBuilder.toString();
 
-        stringBuilder.append(_symbol).append(YAHOO_STOCK_FORMAT);
+        stringBuilder.append(_code).append(YAHOO_STOCK_FORMAT);
 
         final String location = stringBuilder.toString();
 
@@ -212,30 +217,33 @@ public abstract class AbstractYahooStockServer extends Subject<AbstractYahooStoc
             if (tmpStocks.size() != remainder) {
                 if (retry == (NUM_OF_RETRY - 1)) {
                     final int currSize = tmpStocks.size();
-                    final int expectedSize = expectedSymbols.size();
+                    final int expectedSize = expectedCodes.size();
 
                     if (this.isToleranceAllowed(currSize, expectedSize)) {
-                        List<Symbol> currSymbols = new ArrayList<Symbol>();
+                        Set<Code> currCodes = new HashSet<Code>();
                         List<Stock> emptyStocks = new ArrayList<Stock>();
 
                         for (Stock stock : tmpStocks) {
-                            currSymbols.add(stock.getSymbol());
+                            currCodes.add(stock.getCode());
                         }
 
-                        for (Symbol symbol : expectedSymbols) {
-                            if (currSymbols.contains(symbol) == false) {
-                                emptyStocks.add(org.yccheok.jstock.gui.Utils.getEmptyStock(Code.newInstance(symbol.toString()), symbol));
+                        for (Code code : expectedCodes) {
+                            if (currCodes.contains(code) == false) {
+                                emptyStocks.add(org.yccheok.jstock.gui.Utils.getEmptyStock(code, Symbol.newInstance(code.toString())));
                             }
                         }
 
                         tmpStocks.addAll(emptyStocks);
+                        
+                        // Will fall to stocks.addAll(tmpStocks);
                     }
                     else {
                         throw new StockNotFoundException("Expect " + expectedSize + " stock(s), but only receive " + currSize + " stock(s) from " + location);
                     }
                 }   // if (retry == (NUM_OF_RETRY-1))
-
-                continue;
+                else {
+                    continue;
+                }
             }   // if (tmpStocks.size() != remainder)
 
             stocks.addAll(tmpStocks);
@@ -243,25 +251,24 @@ public abstract class AbstractYahooStockServer extends Subject<AbstractYahooStoc
             break;
         }
 
-        if (stocks.size() != symbols.size()) {
-            throw new StockNotFoundException("Stock size (" + stocks.size() + ") inconsistent with symbol size (" + symbols.size() + ")");
+        if (stocks.size() != codes.size()) {
+            throw new StockNotFoundException("Stock size (" + stocks.size() + ") inconsistent with code size (" + codes.size() + ")");
         }
 
         return stocks;
     }
 
-    @Override
-    public Stock getStock(Symbol symbol) throws StockNotFoundException {
+    private Stock _getStock(Code code) throws StockNotFoundException {
         final StringBuilder stringBuilder = new StringBuilder(getYahooCSVBasedURL());
 
-        final String _symbol;
+        final String _code;
         try {
-            _symbol = java.net.URLEncoder.encode(symbol.toString(), "UTF-8");
+            _code = java.net.URLEncoder.encode(code.toString(), "UTF-8");
         } catch (UnsupportedEncodingException ex) {
-            throw new StockNotFoundException(symbol.toString(), ex);
+            throw new StockNotFoundException(code.toString(), ex);
         }
 
-        stringBuilder.append(_symbol).append(YAHOO_STOCK_FORMAT);
+        stringBuilder.append(_code).append(YAHOO_STOCK_FORMAT);
 
         final String location = stringBuilder.toString();
 
@@ -279,7 +286,7 @@ public abstract class AbstractYahooStockServer extends Subject<AbstractYahooStoc
             break;
         }
 
-        throw new StockNotFoundException(symbol.toString());
+        throw new StockNotFoundException(code.toString());
     }
 
     // Yahoo server limit is 200. We shorter, to avoid URL from being too long.
