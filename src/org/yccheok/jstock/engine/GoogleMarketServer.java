@@ -103,7 +103,7 @@ public class GoogleMarketServer implements MarketServer {
                 for (int i = 0, size = jsonArray.size(); i < size; i++) {
                     final Map<String, String> jsonObject = jsonArray.get(i);
                     final double l_curr = Double.parseDouble(jsonObject.get("l_cur").replaceAll("[^0-9\\.]", ""));
-                    final double c = Double.parseDouble(jsonObject.get("c").replaceAll("[^0-9\\.]", ""));
+                    final double c = Double.parseDouble(jsonObject.get("c").replaceAll("[^0-9\\.\\-]", ""));
                     // We ignore changePricePercentage. GoogleMarket doesn't
                     // need to return this value.
                     final Stock stock = new Stock.Builder(codes.get(i), Symbol.newInstance(codes.get(i).toString())).lastPrice(l_curr).changePrice(c).build();
