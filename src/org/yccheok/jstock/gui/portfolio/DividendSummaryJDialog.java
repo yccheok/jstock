@@ -27,11 +27,15 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.MessageFormat;
 import java.util.Arrays;
+import java.util.List;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
+import javax.swing.RowSorter;
+import javax.swing.RowSorter.SortKey;
 import javax.swing.SwingConstants;
 import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableModel;
 import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.gui.JTableUtilities;
 import org.yccheok.jstock.gui.MainFrame;
@@ -56,6 +60,18 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
         this.dividendSummary = new DividendSummary(dividendSummary);
         this.dividendSummaryAfterPressingOK = null;
         initComponents();
+        
+        // Sort by date, with latest comes first.
+        final RowSorter<? extends TableModel> rowSorter = this.jTable1.getRowSorter();
+        if (rowSorter != null) {
+            rowSorter.toggleSortOrder(0);
+            final List<? extends SortKey> sortKeys = rowSorter.getSortKeys();
+            if (sortKeys.size() > 0) {
+                if (sortKeys.get(0).getSortOrder() != javax.swing.SortOrder.DESCENDING) {
+                    rowSorter.toggleSortOrder(0);        
+                }
+            }
+        }        
     }
 
     /** This method is called from within the constructor to
@@ -206,6 +222,7 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
     private void jTable1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTable1KeyPressed
         if (KeyEvent.VK_DELETE == evt.getKeyCode()) {
             this.deleteSelectedDividend();
+            this.jLabel2.setText(this.getDividendSummaryText());
             return;
         }
     }//GEN-LAST:event_jTable1KeyPressed
@@ -245,6 +262,7 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         this.deleteSelectedDividend();
+        this.jLabel2.setText(this.getDividendSummaryText());
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jLabel2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel2MouseClicked
@@ -389,6 +407,7 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
                 @Override
                 public void actionPerformed(ActionEvent evt) {
                     deleteSelectedDividend();
+                    jLabel2.setText(getDividendSummaryText());
                 }
             });
 
