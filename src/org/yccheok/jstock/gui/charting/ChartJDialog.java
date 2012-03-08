@@ -1153,6 +1153,9 @@ public class ChartJDialog extends javax.swing.JDialog {
         JFreeChart chart = new JFreeChart(title, JFreeChart.DEFAULT_TITLE_FONT, cplot, true);
         org.yccheok.jstock.charting.Utils.applyChartTheme(chart);
 
+        // Only do it after applying chart theme.
+        org.yccheok.jstock.charting.Utils.setSeriesPaint(renderer1);
+
         // Handle zooming event.
         chart.addChangeListener(this.getChartChangeListner());
 

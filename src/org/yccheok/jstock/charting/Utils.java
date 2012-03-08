@@ -30,6 +30,7 @@ import org.jfree.chart.StandardChartTheme;
 import org.jfree.chart.plot.CombinedDomainXYPlot;
 import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.StockHistoryServer;
 
@@ -39,6 +40,10 @@ import org.yccheok.jstock.engine.StockHistoryServer;
  */
 public class Utils {
 
+    public static void setSeriesPaint(XYItemRenderer xyItemRenderer) {
+        // xyItemRenderer.setSeriesPaint(0, Color.black);
+    }
+    
     /**
      * Returns daily chart data based on given stock history server.
      *
