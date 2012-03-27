@@ -59,6 +59,7 @@ public class StockRelativeHistoryOperator extends AbstractOperator {
     /** Creates a new instance of StockHistoryOperator */
     public StockRelativeHistoryOperator() {
         day = 1;
+        skipDay = 0;
         value = null;
         this.function = Function.Max;
         this.type = Type.OpenPrice;
@@ -73,6 +74,10 @@ public class StockRelativeHistoryOperator extends AbstractOperator {
         return day;
     }
     
+    public int getSkipDay() {
+        return skipDay;
+    }
+    
     public void setDay(int day) {
         if (day < 0) return;
 
@@ -80,8 +85,19 @@ public class StockRelativeHistoryOperator extends AbstractOperator {
         this.day = day;
 
         if(oldDay != this.day) {
-            this.firePropertyChange("attribute", oldDay + "d " + this.function + " " + this.type, this.day + "d " + this.function + " " + this.type);
+            this.firePropertyChange("attribute", oldDay + "d " + getSkipDayAsString(skipDay) + this.function + " " + this.type, this.day + "d " + getSkipDayAsString(skipDay) + this.function + " " + this.type);
         }
+    }
+    
+    public void setSkipDay(int skipDay) {
+        if (skipDay < 0) return;
+
+        int oldSkipDay = this.skipDay;
+        this.skipDay = skipDay;
+
+        if(oldSkipDay != this.skipDay) {
+            this.firePropertyChange("attribute", this.day + "d " + getSkipDayAsString(oldSkipDay) + this.function + " " + this.type, this.day + "d " + getSkipDayAsString(skipDay) + this.function + " " + this.type);
+        }        
     }
     
     public void setFunction(Function function) {
@@ -89,7 +105,7 @@ public class StockRelativeHistoryOperator extends AbstractOperator {
         this.function = function;                
                 
         if(Utils.equals(oldFunction, this.function) == false) {
-            this.firePropertyChange("attribute", this.day + "d " + oldFunction + " " + this.type, this.day + "d " + this.function + " " + this.type);
+            this.firePropertyChange("attribute", this.day + "d " + getSkipDayAsString(skipDay) + oldFunction + " " + this.type, this.day + "d " + getSkipDayAsString(skipDay) + this.function + " " + this.type);
         }         
         
     }
@@ -112,7 +128,7 @@ public class StockRelativeHistoryOperator extends AbstractOperator {
         this.type = type;
                 
         if(Utils.equals(oldType, this.type) == false) {
-            this.firePropertyChange("attribute", this.day + "d " + this.function + " " + oldType, this.day + "d " + this.function + " " + this.type);
+            this.firePropertyChange("attribute", this.day + "d " + getSkipDayAsString(skipDay) + this.function + " " + oldType, this.day + "d " + getSkipDayAsString(skipDay) + this.function + " " + this.type);
         }         
     }
 
@@ -128,7 +144,7 @@ public class StockRelativeHistoryOperator extends AbstractOperator {
 
     public void calculate(StockHistoryServer stockHistoryServer)
     {
-        if (day <= 0) {
+        if (day <= 0 || skipDay < 0) {
             Object oldValue = this.value;
             this.value = null;
             if (Utils.equals(oldValue, value) == false) {
@@ -157,7 +173,7 @@ public class StockRelativeHistoryOperator extends AbstractOperator {
         else {
             start = (numOfCalendar - day) >= 0 ? numOfCalendar - day : 0;
         }
-        for (int i = start ; i < numOfCalendar; i++) {
+        for (int i = Math.max(0, start - skipDay), ei = Math.max(0, numOfCalendar - skipDay); i < ei; i++) {
             final Calendar calendar = stockHistoryServer.getCalendar(i);
             final Stock stock = stockHistoryServer.getStock(calendar);
             stocks.add(stock);
@@ -316,9 +332,16 @@ public class StockRelativeHistoryOperator extends AbstractOperator {
         return Double.class;
     }
 
+    private String getSkipDayAsString(int skipDay) {
+        if (skipDay <= 0) {
+            return "";
+        }
+        return "(-"+skipDay+") ";
+    }
     private Object value;
     private Function function;
     private Type type;    
-    private int day;   
+    private int day;
+    private int skipDay;
 }
 

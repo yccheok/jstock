@@ -26,18 +26,21 @@ public class StockRelativeHistoryOperatorBeanInfo extends SimpleBeanInfo {
     // Property identifiers//GEN-FIRST:Properties
     private static final int PROPERTY_day = 0;
     private static final int PROPERTY_function = 1;
-    private static final int PROPERTY_type = 2;
+    private static final int PROPERTY_skipDay = 2;
+    private static final int PROPERTY_type = 3;
 
     // Property array 
     /*lazy PropertyDescriptor*/
     private static PropertyDescriptor[] getPdescriptor(){
-        PropertyDescriptor[] properties = new PropertyDescriptor[3];
+        PropertyDescriptor[] properties = new PropertyDescriptor[4];
     
         try {
             properties[PROPERTY_day] = new PropertyDescriptor ( "day", org.yccheok.jstock.analysis.StockRelativeHistoryOperator.class, "getDay", "setDay" ); // NOI18N
             properties[PROPERTY_day].setShortDescription ( "Number of days of this stock history." );
             properties[PROPERTY_function] = new PropertyDescriptor ( "function", org.yccheok.jstock.analysis.StockRelativeHistoryOperator.class, "getFunction", "setFunction" ); // NOI18N
             properties[PROPERTY_function].setShortDescription ( "Analysis function on the stock history information." );
+            properties[PROPERTY_skipDay] = new PropertyDescriptor ( "skipDay", org.yccheok.jstock.analysis.StockRelativeHistoryOperator.class, "getSkipDay", "setSkipDay" ); // NOI18N
+            properties[PROPERTY_skipDay].setShortDescription ( "Skip N day(s) from today before calculation." );
             properties[PROPERTY_type] = new PropertyDescriptor ( "type", org.yccheok.jstock.analysis.StockRelativeHistoryOperator.class, "getType", "setType" ); // NOI18N
             properties[PROPERTY_type].setShortDescription ( "Type of information to be obtained from stock history." );
         }
