@@ -1,7 +1,7 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
-JStock 1.0.6m - xxxx-xx-xx
+JStock 1.0.6m - 2012-03-29
   Feature: Enhacement on stock indicator editor, by adding "N-days ago" feature
            on stock relative history information. (#3424813)
   Feature: Dividend dialog default sorted by date.
