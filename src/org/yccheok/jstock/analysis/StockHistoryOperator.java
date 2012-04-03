@@ -40,7 +40,10 @@ public class StockHistoryOperator extends AbstractOperator {
         MeanDeviation,
         RSI,
         EMA,
-        MFI
+        MFI,
+        MACD,
+        MACDSignal,
+        MACDHist        
     }
     
     public enum Type
@@ -100,9 +103,21 @@ public class StockHistoryOperator extends AbstractOperator {
             Core core = new Core();
             int lookback = core.mfiLookback(day);
             return ((lookback + 1) << 2);
+        } else if (this.function == Function.MACD) {
+            Core core = new Core();
+            int lookback = core.macdFixLookback(day);
+            return ((lookback + 1) << 2);
+        } else if (this.function == Function.MACDSignal) {
+            Core core = new Core();
+            int lookback = core.macdFixLookback(day);
+            return ((lookback + 1) << 2);
+        } else if (this.function == Function.MACDHist) {
+            Core core = new Core();
+            int lookback = core.macdFixLookback(day);
+            return ((lookback + 1) << 2);
         } else {
             return day;
-        }        
+        }       
     }
     
     public void calculate(StockHistoryServer stockHistoryServer)
@@ -332,6 +347,18 @@ public class StockHistoryOperator extends AbstractOperator {
                 v = TechnicalAnalysis.createMFI(highs, lows, closes, volumes, day);
                 break;
 
+            case MACD:
+                v = TechnicalAnalysis.createMACDFix(values, day).outMACD;
+                break;
+
+            case MACDSignal:
+                v = TechnicalAnalysis.createMACDFix(values, day).outMACDSignal;
+                break;
+                
+            case MACDHist:
+                v = TechnicalAnalysis.createMACDFix(values, day).outMACDHist;
+                break;
+                
             default:
                 assert(false);
         }                 
