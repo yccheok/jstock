@@ -1,27 +1,25 @@
 /*
- * StockHistoryOperator.java
- *
- * Created on May 25, 2007, 9:12 PM
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2012 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.yccheok.jstock.analysis;
 
+import com.tictactec.ta.lib.Core;
 import java.util.*;
 import org.yccheok.jstock.engine.*;
 import org.apache.commons.logging.Log;
@@ -81,7 +79,32 @@ public class StockHistoryOperator extends AbstractOperator {
         }
         return sum / size;
     }
-
+    
+    /**
+     * Returns minimum history size which is required by this operator based on
+     * given day duration.
+     * 
+     * @param day the day duration
+     * @return minimum history size which is required by this operator
+     */
+    public int getRequiredHistorySize(int day) {
+        if (this.function == Function.EMA) {
+            Core core = new Core();
+            int lookback = core.emaLookback(day);
+            return ((lookback + 1) << 2);
+        } else if (function == Function.RSI) {
+            Core core = new Core();
+            int lookback = core.rsiLookback(day);
+            return ((lookback + 1) << 2);
+        } else if (this.function == Function.MFI) {
+            Core core = new Core();
+            int lookback = core.mfiLookback(day);
+            return ((lookback + 1) << 2);
+        } else {
+            return day;
+        }        
+    }
+    
     public void calculate(StockHistoryServer stockHistoryServer)
     {   
         boolean valid = true;
@@ -106,6 +129,8 @@ public class StockHistoryOperator extends AbstractOperator {
         }
 
         java.util.List<Stock> stocks = new java.util.ArrayList<Stock>();
+        // To be added to end of "stocks" later.
+        java.util.List<Stock> tmpStocks = new java.util.ArrayList<Stock>();
         java.util.List<Double> values = new java.util.ArrayList<Double>();
 
         // For MFI usage.
@@ -120,35 +145,13 @@ public class StockHistoryOperator extends AbstractOperator {
         java.util.Calendar endCalendar = new java.util.GregorianCalendar();
         endCalendar.setTime(endDate);
 
-        // I am not sure MFI is depending on previous day data???
-        if (this.function == Function.RSI || this.function == Function.EMA || this.function == Function.MFI) {
-            java.util.Calendar oldCalendar = new java.util.GregorianCalendar();
-            oldCalendar.setTime(startDate);
-            oldCalendar.add(Calendar.DAY_OF_MONTH, -(int)org.yccheok.jstock.engine.Utils.getDifferenceInDays(endCalendar, startCalendar));
-            while (true) {
-                Stock stock = stockHistoryServer.getStock(oldCalendar);
-                if (stock != null) {
-                    stocks.add(stock);
-                }
-                oldCalendar.add(Calendar.DAY_OF_MONTH, 1);
-                if(
-                        startCalendar.get(Calendar.YEAR) == oldCalendar.get(Calendar.YEAR) &&
-                        startCalendar.get(Calendar.MONTH) == oldCalendar.get(Calendar.MONTH) &&
-                        startCalendar.get(Calendar.DATE) == oldCalendar.get(Calendar.DATE)
-                    )
-                {
-                    break;
-                }
-            }
-        }
-
         int day = 0;
 
         /* Fill up stocks. */
         while(true) {
             Stock stock = stockHistoryServer.getStock(startCalendar);
             if (stock != null) {
-                stocks.add(stock);
+                tmpStocks.add(stock);
                 day++;
             }
             
@@ -162,6 +165,42 @@ public class StockHistoryOperator extends AbstractOperator {
             }
             startCalendar.add(Calendar.DAY_OF_MONTH, 1);
         }
+        
+        if (day == 0) {
+            Object oldValue = this.value;
+            this.value = null;
+            if (Utils.equals(oldValue, value) == false) {
+                this.firePropertyChange("value", oldValue, this.value);
+            }
+            return;
+        }
+        
+        // We have correct "day" right now.
+        
+        // Reset.
+        startCalendar.setTime(startDate);
+        
+        int remainingHistorySize = Math.max(0, getRequiredHistorySize(day) - day);
+        
+        Calendar oldestHistoryCalendar = stockHistoryServer.getCalendar(0);
+        while (remainingHistorySize > 0) {
+            startCalendar.add(Calendar.DAY_OF_MONTH, -1);
+
+            if (startCalendar.before(oldestHistoryCalendar)) {
+                break;
+            }
+                
+            Stock stock = stockHistoryServer.getStock(startCalendar);
+            if (stock != null) {
+                stocks.add(stock);
+                remainingHistorySize--;
+            }
+        }
+
+        // Oldest comes first.
+        java.util.Collections.reverse(stocks);
+        // Stocks fill up completely!
+        stocks.addAll(tmpStocks);
 
         if (this.function == Function.MFI) {
             for (Stock stock : stocks) {

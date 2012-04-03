@@ -1,19 +1,20 @@
 /*
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2012 Yan Cheng CHEOK <yccheok@yahoo.com>
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- * Copyright (C) 2008 Yan Cheng Cheok <yccheok@yahoo.com>
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.yccheok.jstock.engine;
@@ -93,6 +94,26 @@ public class Duration {
         return new Duration(start, end);
     }
 
+    /**
+     * Constructs duration based on given end date, and its duration in days.
+     * 
+     * @param endDate end date of this duration
+     * @param durationInDays duration in days
+     * @return new instance of Duration
+     */
+    public static Duration getDurationByDays(Date endDate, int durationInDays) {
+        if (durationInDays < 0)
+        {
+            throw new java.lang.IllegalArgumentException("durationInDays must be a non-negative number");
+        }
+        final Calendar calendar = Calendar.getInstance();
+        calendar.setTime(endDate);
+        final SimpleDate end = new SimpleDate(calendar);
+        calendar.add(Calendar.DAY_OF_MONTH, -durationInDays);
+        final SimpleDate start = new SimpleDate(calendar);
+        return new Duration(start, end);        
+    }
+    
     public static Duration getTodayDurationByDays(int durationInDays)
     {
         if (durationInDays < 0)

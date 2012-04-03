@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2012 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,6 +35,22 @@ import org.yccheok.jstock.engine.Stock;
  * @author yccheok
  */
 public class TechnicalAnalysis {
+
+    public static class MACDResult {
+        public final double outMACD;
+        public final double outMACDSignal;
+        public final double outMACDHist;
+        
+        private MACDResult(double outMACD, double outMACDSignal, double outMACDHist) {
+            this.outMACD = outMACD;
+            this.outMACDSignal = outMACDSignal;
+            this.outMACDHist = outMACDHist;
+        }
+        
+        public static MACDResult newInstance(double outMACD, double outMACDSignal, double outMACDHist) {
+            return new MACDResult(outMACD, outMACDSignal, outMACDHist);
+        }
+    }
 
     /**
      * Returns the latest EMA.
@@ -137,6 +153,30 @@ public class TechnicalAnalysis {
         return output[outNbElement.value - 1];
     }
 
+    // Moving Average Convergence/Divergence Fix 12/26
+    public static MACDResult createMACDFix(List<Double> values, int period) {
+        if (period <= 0) {
+            throw new java.lang.IllegalArgumentException("period must be greater than 0");
+        }
+        final int size = values.size();
+        final Core core = new Core();
+        final int allocationSize = size - core.macdFixLookback(period);
+        if (allocationSize <= 0) {
+            return null;
+        }
+
+        final double[] outMACD = new double[allocationSize];
+        final double[] outMACDSignal = new double[allocationSize];
+        final double[] outMACDHist = new double[allocationSize];
+        final MInteger outBegIdx = new MInteger();
+        final MInteger outNbElement = new MInteger();
+        double[] _values = ArrayUtils.toPrimitive(values.toArray(new Double[0]));
+        
+        core.macdFix(0, values.size() - 1, _values, period, outBegIdx, outNbElement, outMACD, outMACDSignal, outMACDHist);
+        
+        return MACDResult.newInstance(outMACD[outNbElement.value - 1], outMACDSignal[outNbElement.value - 1], outMACDHist[outNbElement.value - 1]);
+    }
+    
     /**
      * Returns SMA time series for charting purpose.
      *

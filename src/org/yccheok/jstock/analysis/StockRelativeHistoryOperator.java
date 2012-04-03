@@ -1,27 +1,25 @@
 /*
- * StockRelativeHistoryOperator.java
- *
- * Created on June 18, 2007, 2:52 AM
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2012 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.yccheok.jstock.analysis;
 
+import com.tictactec.ta.lib.Core;
 import java.util.*;
 import org.yccheok.jstock.charting.TechnicalAnalysis;
 import org.yccheok.jstock.engine.*;
@@ -40,7 +38,10 @@ public class StockRelativeHistoryOperator extends AbstractOperator {
         MeanDeviation,
         RSI,
         EMA,
-        MFI
+        MFI,
+        MACD,
+        MACDSignal,
+        MACDHist
     }
     
     public enum Type
@@ -142,6 +143,41 @@ public class StockRelativeHistoryOperator extends AbstractOperator {
         return sum / size;
     }
 
+    /**
+     * Returns minimum history size which is required by this operator.
+     * 
+     * @return minimum history size which is required by this operator
+     */
+    public int getRequiredHistorySize() {
+        if (this.function == Function.EMA) {
+            Core core = new Core();
+            int lookback = core.emaLookback(day);
+            return ((lookback + 1) << 2);
+        } else if (function == Function.RSI) {
+            Core core = new Core();
+            int lookback = core.rsiLookback(day);
+            return ((lookback + 1) << 2);
+        } else if (this.function == Function.MFI) {
+            Core core = new Core();
+            int lookback = core.mfiLookback(day);
+            return ((lookback + 1) << 2);
+        } else if (this.function == Function.MACD) {
+            Core core = new Core();
+            int lookback = core.macdFixLookback(day);
+            return ((lookback + 1) << 2);
+        } else if (this.function == Function.MACDSignal) {
+            Core core = new Core();
+            int lookback = core.macdFixLookback(day);
+            return ((lookback + 1) << 2);
+        } else if (this.function == Function.MACDHist) {
+            Core core = new Core();
+            int lookback = core.macdFixLookback(day);
+            return ((lookback + 1) << 2);
+        } else {
+            return day;
+        }        
+    }
+    
     public void calculate(StockHistoryServer stockHistoryServer)
     {
         if (day <= 0 || skipDay < 0) {
@@ -165,14 +201,8 @@ public class StockRelativeHistoryOperator extends AbstractOperator {
 
         final int numOfCalendar = stockHistoryServer.getNumOfCalendar();
         /* Fill up stocks. */
-        final int start;
-        // I am not sure MFI is depending on previous day data???
-        if (this.function == Function.EMA || function == Function.RSI || this.function == Function.MFI) {
-            start = (numOfCalendar - (day << 1)) >= 0 ? numOfCalendar - (day << 1) : 0;
-        }
-        else {
-            start = (numOfCalendar - day) >= 0 ? numOfCalendar - day : 0;
-        }
+        final int start = Math.max(0, numOfCalendar - getRequiredHistorySize());
+
         for (int i = Math.max(0, start - skipDay), ei = Math.max(0, numOfCalendar - skipDay); i < ei; i++) {
             final Calendar calendar = stockHistoryServer.getCalendar(i);
             final Stock stock = stockHistoryServer.getStock(calendar);
@@ -210,7 +240,7 @@ public class StockRelativeHistoryOperator extends AbstractOperator {
                     break;
 
                 case LowPrice:
-                    for (Stock stock : stocks) {
+                    for (Stock stock : stocks) {                        
                         values.add(stock.getLowPrice());
                     }
                     break;
@@ -307,6 +337,18 @@ public class StockRelativeHistoryOperator extends AbstractOperator {
 
             case MFI:
                 v = TechnicalAnalysis.createMFI(highs, lows, closes, volumes, day);
+                break;
+                
+            case MACD:
+                v = TechnicalAnalysis.createMACDFix(values, day).outMACD;
+                break;
+
+            case MACDSignal:
+                v = TechnicalAnalysis.createMACDFix(values, day).outMACDSignal;
+                break;
+                
+            case MACDHist:
+                v = TechnicalAnalysis.createMACDFix(values, day).outMACDHist;
                 break;
                 
             default:
