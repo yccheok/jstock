@@ -1793,14 +1793,19 @@ public class MainFrame extends javax.swing.JFrame {
     public void createCountryMenuItem() {
         final Country[] countries = Country.values();
 
-        for (Country country : countries) {
-            final JMenuItem mi = (JRadioButtonMenuItem) jMenu6.add(new JRadioButtonMenuItem(country.toString(), country.getIcon()));
+        for (final Country country : countries) {
+            // Ugly fix on spelling mistake.
+            final JMenuItem mi;
+            if (country == Country.UnitedState) {
+                mi = (JRadioButtonMenuItem) jMenu6.add(new JRadioButtonMenuItem(country.toString() + "s", country.getIcon()));
+            } else {
+                mi = (JRadioButtonMenuItem) jMenu6.add(new JRadioButtonMenuItem(country.toString(), country.getIcon()));
+            }
             buttonGroup2.add(mi);
             mi.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    final Country selectedCountry = Country.valueOf(mi.getText());
-                    MainFrame.this.changeCountry(selectedCountry);
+                    MainFrame.this.changeCountry(country);
                 }                
             });
             
@@ -2056,7 +2061,13 @@ public class MainFrame extends javax.swing.JFrame {
         for (Enumeration<AbstractButton> e = this.buttonGroup2.getElements() ; e.hasMoreElements() ;) {
             AbstractButton button = e.nextElement();
             javax.swing.JRadioButtonMenuItem m = (javax.swing.JRadioButtonMenuItem)button;
-
+            
+            // Ugly fix on spelling mistake.
+            if (jStockOptions.getCountry() == Country.UnitedState && m.getText().equals(jStockOptions.getCountry().toString() + "s")) {
+                m.setSelected(true);
+                break;                
+            }
+            
             if(m.getText().equals(jStockOptions.getCountry().toString())) {
                 m.setSelected(true);
                 break;
@@ -2134,8 +2145,14 @@ public class MainFrame extends javax.swing.JFrame {
         for (Enumeration<AbstractButton> e = this.buttonGroup2.getElements() ; e.hasMoreElements() ;) {
             AbstractButton button = e.nextElement();
             javax.swing.JRadioButtonMenuItem m = (javax.swing.JRadioButtonMenuItem)button;
-                        
-            if(m.getText().equals(country.toString())) {
+             
+            // Ugly fix on spelling mistake.    
+            if (country == Country.UnitedState && m.getText().equals(country.toString() + "s")) {
+                m.setSelected(true);
+                break;                
+            }
+            
+            if (m.getText().equals(country.toString())) {
                 m.setSelected(true);
                 break;                   
             }
