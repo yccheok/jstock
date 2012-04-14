@@ -40,8 +40,62 @@ import org.yccheok.jstock.engine.StockHistoryServer;
  */
 public class Utils {
 
-    public static void setSeriesPaint(XYItemRenderer xyItemRenderer) {
-        // xyItemRenderer.setSeriesPaint(0, Color.black);
+    // http://stackoverflow.com/questions/470690/how-to-automatically-generate-n-distinct-colors
+    private static final List<Color> _kellysMaxContrastSet = new ArrayList<Color>();
+    private static final List<Color> _boyntonOptimized = new ArrayList<Color>();
+    static 
+    {
+        // _kellysMaxContrastSet.add(new Color(0xffffff));
+        _kellysMaxContrastSet.add(new Color(0x000000));
+        _kellysMaxContrastSet.add(new Color(0xFFB300)); //Vivid Yellow
+        _kellysMaxContrastSet.add(new Color(0x803E75)); //Strong Purple
+        _kellysMaxContrastSet.add(new Color(0xFF6800)); //Vivid Orange
+        _kellysMaxContrastSet.add(new Color(0xA6BDD7)); //Very Light Blue
+        _kellysMaxContrastSet.add(new Color(0xC10020)); //Vivid Red
+        _kellysMaxContrastSet.add(new Color(0xCEA262)); //Grayish Yellow
+        _kellysMaxContrastSet.add(new Color(0x817066)); //Medium Gray
+
+        //The following will not be good for people with defective color vision
+        _kellysMaxContrastSet.add(new Color(0x007D34)); //Vivid Green
+        _kellysMaxContrastSet.add(new Color(0xF6768E)); //Strong Purplish Pink
+        _kellysMaxContrastSet.add(new Color(0x00538A)); //Strong Blue
+        _kellysMaxContrastSet.add(new Color(0xFF7A5C)); //Strong Yellowish Pink
+        _kellysMaxContrastSet.add(new Color(0x53377A)); //Strong Violet
+        _kellysMaxContrastSet.add(new Color(0xFF8E00)); //Vivid Orange Yellow
+        _kellysMaxContrastSet.add(new Color(0xB32851)); //Strong Purplish Red
+        _kellysMaxContrastSet.add(new Color(0xF4C800)); //Vivid Greenish Yellow
+        _kellysMaxContrastSet.add(new Color(0x7F180D)); //Strong Reddish Brown
+        _kellysMaxContrastSet.add(new Color(0x93AA00)); //Vivid Yellowish Green
+        _kellysMaxContrastSet.add(new Color(0x593315)); //Deep Yellowish Brown
+        _kellysMaxContrastSet.add(new Color(0xF13A13)); //Vivid Reddish Orange
+        _kellysMaxContrastSet.add(new Color(0x232C16)); //Dark Olive Green           
+        
+        _boyntonOptimized.add(new Color(0, 0, 255));    //Blue
+        _boyntonOptimized.add(new Color(255, 0, 0));    //Red
+        _boyntonOptimized.add(new Color(0, 255, 0));    //Green
+        _boyntonOptimized.add(new Color(255, 255, 0));  //Yellow
+        _boyntonOptimized.add(new Color(255, 0, 255));  //Magenta
+        _boyntonOptimized.add(new Color(255, 128, 128));//Pink
+        _boyntonOptimized.add(new Color(128, 128, 128));//Gray
+        _boyntonOptimized.add(new Color(128, 0, 0));    //Brown
+        _boyntonOptimized.add(new Color(255, 128, 0));  //Orange        
+    };
+                      
+    public static void setPriceSeriesPaint(XYItemRenderer xyItemRenderer) {
+        //xyItemRenderer.setSeriesPaint(0, new Color(255, 85, 85));
+        //for (int i = 0, ei = _kellysMaxContrastSet.size(); i < ei; i++) {
+        //    xyItemRenderer.setSeriesPaint(i + 1, _kellysMaxContrastSet.get(i));
+        //}
+        //for (int i = 0, ei = _boyntonOptimized.size(); i < ei; i++) {
+        //    xyItemRenderer.setSeriesPaint(i + 1 + _kellysMaxContrastSet.size(), _boyntonOptimized.get(i));
+        //}        
+    }
+
+    public static void setVolumeSeriesPaint(XYItemRenderer xyItemRenderer) {
+        //xyItemRenderer.setSeriesPaint(0, new Color(85, 85, 255));        
+        //xyItemRenderer.setSeriesPaint(1, new Color(85, 85, 255));
+        //xyItemRenderer.setSeriesPaint(2, new Color(85, 85, 255));
+        //xyItemRenderer.setSeriesPaint(3, new Color(85, 85, 255));
     }
     
     /**
