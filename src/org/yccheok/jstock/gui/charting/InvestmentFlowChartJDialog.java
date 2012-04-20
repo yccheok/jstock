@@ -228,10 +228,14 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
             addChangeListener(this.chartPanel);
 
             Dimension d = this.chartPanel.getSize();
-            //d.setSize(d.width - 1, d.height);
+            
+            // setPreferredSize is to ensure that, this.pack will not resize 
+            // dialog suddenly.
             this.chartPanel.setPreferredSize(d);
+            
+            // http://www.jfree.org/phpBB2/viewtopic.php?f=3&t=38098&p=92773#p92773
+            // http://stackoverflow.com/questions/5420756/jfreechart-x-axis-scale-incorrect
             this.pack();
-            this.loadDimension();
         }   // synchronized(jComboBox1)
     }//GEN-LAST:event_jComboBox1ActionPerformed
 

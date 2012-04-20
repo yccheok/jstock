@@ -2,9 +2,11 @@ This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
 JStock 1.0.6o - 2012-xx-xx
-  Feature: Use Boolean.valueOf for minor optimization. Contributed by Mark 
+  Bugfix:  Use Boolean.valueOf for minor optimization. Contributed by Mark 
            DeSpain.
-		   
+  Bugfix:  Ensure during combo box selection, investment flow chart dialog will
+           not resize suddenly.
+           
 JStock 1.0.6n - 2012-04-05
   Feature: Added MACD to Stock Relative History Information and Stock History
            Information. (#3510973)
