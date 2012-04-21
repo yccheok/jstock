@@ -219,12 +219,22 @@ public class ChartJDialog extends javax.swing.JDialog {
         final int[] days = {14, 28, 50, 100, 200};
         final MACDPeriod[] macd_periods = {MACDPeriod.newInstance(12, 26, 9)};
         
+        // day_keys, week_keys and month_keys should be having same length as
+        // days.        
         final String[] day_keys = {"ChartJDialog_14Days", "ChartJDialog_28Days", "ChartJDialog_50Days", "ChartJDialog_100Days", "ChartJDialog_200Days" };
         final String[] week_keys = {"ChartJDialog_14Weeks", "ChartJDialog_28Weeks", "ChartJDialog_50Weeks", "ChartJDialog_100Weeks", "ChartJDialog_200Weeks" };
         final String[] month_keys = {"ChartJDialog_14Months", "ChartJDialog_28Months", "ChartJDialog_50Months", "ChartJDialog_100Months", "ChartJDialog_200Months" };
+        assert(days.length == day_keys.length);
+        assert(days.length == week_keys.length);
+        assert(days.length == week_keys.length);
+        // macd_day_keys, macd_week_keys and macd_month_keys should be having 
+        // same length as macd_periods.
         final String[] macd_day_keys = {"ChartJDialog_12_26_9Days"};
         final String[] macd_week_keys = {"ChartJDialog_12_26_9Weeks"};
         final String[] macd_month_keys = {"ChartJDialog_12_26_9Months"};
+        assert(macd_periods.length == macd_day_keys.length);
+        assert(macd_periods.length == macd_week_keys.length);
+        assert(macd_periods.length == macd_month_keys.length);
         
         String[] keys = null;
         String[] macd_keys = null;
@@ -1703,7 +1713,7 @@ public class ChartJDialog extends javax.swing.JDialog {
     }
     
     private void updateMACD(MACDPeriod period, boolean show) {  
-        final TAEx taEx = TAEx.newInstance(TA.EMA, period);
+        final TAEx taEx = TAEx.newInstance(TA.MACD, period);
         
         System.out.println("updateMACD");
         
