@@ -81,9 +81,10 @@ public class ChartJDialog extends javax.swing.JDialog {
     public enum TA {
         SMA,
         EMA,
-        MFI,
+        MACD,
         RSI,
-        CCI
+        MFI,        
+        CCI,        
     }
 
     public enum Type {
@@ -116,6 +117,45 @@ public class ChartJDialog extends javax.swing.JDialog {
         return this.currentType;
     }
 
+    public static class MACDPeriod {
+        public final int fastPeriod;
+        public final int slowPeriod;
+        public final int period;
+        
+        private MACDPeriod(int fastPeriod, int slowPeriod, int period) {
+            this.fastPeriod = fastPeriod;
+            this.slowPeriod = slowPeriod;
+            this.period = period;                    
+        }
+        
+        public static MACDPeriod newInstance(int fastPeriod, int slowPeriod, int period) {
+            return new MACDPeriod(fastPeriod, slowPeriod, period);
+        }
+        
+        @Override
+        public int hashCode() {
+            int result = 17;
+            result = 31 * result + fastPeriod;
+            result = 31 * result + slowPeriod;
+            result = 31 * result + period;            
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == this) {
+                return true;
+            }
+
+            if (!(o instanceof MACDPeriod)) {
+                return false;
+            }
+
+            MACDPeriod macdPeriod = (MACDPeriod)o;
+            return this.fastPeriod == macdPeriod.fastPeriod && this.slowPeriod == macdPeriod.slowPeriod && this.period == macdPeriod.period;
+        }        
+    }
+    
     /** Creates new form ChartJDialog */
     public ChartJDialog(java.awt.Frame parent, String title, boolean modal, StockHistoryServer stockHistoryServer) {
         super(parent, title, modal);
@@ -177,28 +217,38 @@ public class ChartJDialog extends javax.swing.JDialog {
      */
     private void buildTAMenuItems() {
         final int[] days = {14, 28, 50, 100, 200};
+        final MACDPeriod[] macd_periods = {MACDPeriod.newInstance(12, 26, 9)};
         
         final String[] day_keys = {"ChartJDialog_14Days", "ChartJDialog_28Days", "ChartJDialog_50Days", "ChartJDialog_100Days", "ChartJDialog_200Days" };
         final String[] week_keys = {"ChartJDialog_14Weeks", "ChartJDialog_28Weeks", "ChartJDialog_50Weeks", "ChartJDialog_100Weeks", "ChartJDialog_200Weeks" };
         final String[] month_keys = {"ChartJDialog_14Months", "ChartJDialog_28Months", "ChartJDialog_50Months", "ChartJDialog_100Months", "ChartJDialog_200Months" };
+        final String[] macd_day_keys = {"ChartJDialog_12_26_9Days"};
+        final String[] macd_week_keys = {"ChartJDialog_12_26_9Weeks"};
+        final String[] macd_month_keys = {"ChartJDialog_12_26_9Months"};
+        
         String[] keys = null;
+        String[] macd_keys = null;
         if (this.getCurrentInterval() == Interval.Daily) {
             keys = day_keys;
+            macd_keys = macd_day_keys;
         } else if (this.getCurrentInterval() == Interval.Weekly) {
             keys = week_keys;
+            macd_keys = macd_week_keys;
         } else if (this.getCurrentInterval() == Interval.Monthly) {
-            keys = month_keys;            
+            keys = month_keys;
+            macd_keys = macd_month_keys;
         } else {
             assert(false);
         }
         final TA[] tas = TA.values();
-        final String[] ta_keys = {"ChartJDialog_SMA", "ChartJDialog_EMA", "ChartJDialog_MFI", "ChartJDialog_RSI", "ChartJDialog_CCI" };
-        final String[] ta_tip_keys = {"ChartJDialog_SimpleMovingAverage", "ChartJDialog_ExponentialMovingAverage", "ChartJDialog_MoneyFlowIndex", "ChartJDialog_RelativeStrengthIndex", "ChartJDialog_CommodityChannelIndex" };
+        final String[] ta_keys = {"ChartJDialog_SMA", "ChartJDialog_EMA", "ChartJDialog_MACD", "ChartJDialog_RSI", "ChartJDialog_MFI", "ChartJDialog_CCI" };
+        final String[] ta_tip_keys = {"ChartJDialog_SimpleMovingAverage", "ChartJDialog_ExponentialMovingAverage", "ChartJDialog_MovingAverageConvergenceDivergence", "ChartJDialog_RelativeStrengthIndex", "ChartJDialog_MoneyFlowIndex", "ChartJDialog_CommodityChannelIndex" };
         final String[] custom_message_keys = {
             "info_message_please_enter_number_of_days_for_SMA",
             "info_message_please_enter_number_of_days_for_EMA",
-            "info_message_please_enter_number_of_days_for_MFI",
+            "dummy",
             "info_message_please_enter_number_of_days_for_RSI",
+            "info_message_please_enter_number_of_days_for_MFI",
             "info_message_please_enter_number_of_days_for_CCI"
         };
         final Map<TA, Set<Object>> m = new EnumMap<TA, Set<Object>>(TA.class);
@@ -217,38 +267,60 @@ public class ChartJDialog extends javax.swing.JDialog {
             menu.setText(GUIBundle.getString(ta_keys[i])); // NOI18N
             menu.setToolTipText(GUIBundle.getString(ta_tip_keys[i])); // NOI18N
 
-            for (int j = 0, length2 = days.length; j < length2; j++) {
-                final int _j = j;
-                final javax.swing.JCheckBoxMenuItem item = new javax.swing.JCheckBoxMenuItem();
-                item.setText(GUIBundle.getString(keys[j])); // NOI18N
-                if (m.containsKey(ta)) {
-                    if (m.get(ta).contains(days[_j])) {
-                        item.setSelected(true);
+            if (ta == TA.MACD) {
+                for (int j = 0, length2 = macd_periods.length; j < length2; j++) {
+                    final int _j = j;
+                    final javax.swing.JCheckBoxMenuItem item = new javax.swing.JCheckBoxMenuItem();
+                    item.setText(GUIBundle.getString(macd_keys[j]));
+                    if (m.containsKey(ta)) {
+                        if (m.get(ta).contains(macd_periods[_j])) {
+                            item.setSelected(true);
+                        }
                     }
+                    item.addActionListener(new java.awt.event.ActionListener() {
+                        @Override
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                            if (ta == TA.MACD) {
+                                updateMACD(macd_periods[_j], item.isSelected());
+                            }
+                        }   
+                    });
+                    menu.add(item);
                 }
-                item.addActionListener(new java.awt.event.ActionListener() {
-                    @Override
-                    public void actionPerformed(java.awt.event.ActionEvent evt) {
-                        if (ta == TA.SMA) {
-                            updateSMA(days[_j], item.isSelected());
-                        }
-                        else if (ta == TA.EMA) {
-                            updateEMA(days[_j], item.isSelected());
-                        }
-                        else if (ta == TA.MFI) {
-                            updateMFI(days[_j], item.isSelected());
-                        }
-                        else if (ta == TA.RSI) {
-                            updateRSI(days[_j], item.isSelected());
-                        }
-                        else if (ta == TA.CCI) {
-                            updateCCI(days[_j], item.isSelected());
+            } else {
+                for (int j = 0, length2 = days.length; j < length2; j++) {
+                    final int _j = j;
+                    final javax.swing.JCheckBoxMenuItem item = new javax.swing.JCheckBoxMenuItem();
+                    item.setText(GUIBundle.getString(keys[j])); // NOI18N
+                    if (m.containsKey(ta)) {
+                        if (m.get(ta).contains(days[_j])) {
+                            item.setSelected(true);
                         }
                     }
-                });
-                menu.add(item);
-            }   // for
-
+                    item.addActionListener(new java.awt.event.ActionListener() {
+                        @Override
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                            if (ta == TA.SMA) {
+                                updateSMA(days[_j], item.isSelected());
+                            }
+                            else if (ta == TA.EMA) {
+                                updateEMA(days[_j], item.isSelected());
+                            }
+                            else if (ta == TA.MFI) {
+                                updateMFI(days[_j], item.isSelected());
+                            }
+                            else if (ta == TA.RSI) {
+                                updateRSI(days[_j], item.isSelected());
+                            }
+                            else if (ta == TA.CCI) {
+                                updateCCI(days[_j], item.isSelected());
+                            }
+                        }
+                    });
+                    menu.add(item);
+                }   // for
+            }   // if (ta == TA.MACD)
+            
             menu.add(new javax.swing.JSeparator());
             javax.swing.JMenuItem item = new javax.swing.JMenuItem();
             item.setText(GUIBundle.getString("ChartJDialog_Custom...")); // NOI18N
@@ -256,26 +328,30 @@ public class ChartJDialog extends javax.swing.JDialog {
             item.addActionListener(new java.awt.event.ActionListener() {
                 @Override
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                   do {                        
-                        final String days_string = JOptionPane.showInputDialog(ChartJDialog.this, MessagesBundle.getString(custom_message_keys[_i]));
-                        if (days_string == null) {
-                            return;
-                        }
-                        try {
-                            final int days = Integer.parseInt(days_string);
-                            if (days <= 0) {
+                    if (ta == TA.MACD) {
+                        showMACDCustomDialog();
+                    } else {
+                        do {                        
+                            final String days_string = JOptionPane.showInputDialog(ChartJDialog.this, MessagesBundle.getString(custom_message_keys[_i]));
+                            if (days_string == null) {
+                                return;
+                            }
+                            try {
+                                final int days = Integer.parseInt(days_string);
+                                if (days <= 0) {
+                                    JOptionPane.showMessageDialog(ChartJDialog.this, MessagesBundle.getString("info_message_number_of_days_required"), MessagesBundle.getString("info_title_number_of_days_required"), JOptionPane.WARNING_MESSAGE);
+                                    continue;
+                                }
+                                ChartJDialog.this.updateTA(ta, days, true);
+                                return;
+                            }
+                            catch (java.lang.NumberFormatException exp) {
+                                log.error(null, exp);
                                 JOptionPane.showMessageDialog(ChartJDialog.this, MessagesBundle.getString("info_message_number_of_days_required"), MessagesBundle.getString("info_title_number_of_days_required"), JOptionPane.WARNING_MESSAGE);
                                 continue;
                             }
-                            ChartJDialog.this.updateTA(ta, days, true);
-                            return;
-                        }
-                        catch (java.lang.NumberFormatException exp) {
-                            log.error(null, exp);
-                            JOptionPane.showMessageDialog(ChartJDialog.this, MessagesBundle.getString("info_message_number_of_days_required"), MessagesBundle.getString("info_title_number_of_days_required"), JOptionPane.WARNING_MESSAGE);
-                            continue;
-                        }
-                    } while(true);
+                        } while(true);
+                    }
                 }
             });
             menu.add(item);
@@ -324,8 +400,13 @@ public class ChartJDialog extends javax.swing.JDialog {
         for (int i = 0; i < TAExSize; i++) {
             final TAEx taEx = chartJDialogOptions.getTAEx(i);
             final TA ta = taEx.getTA();
-            final Integer day = (Integer)taEx.getParameter();
-            ChartJDialog.this.updateTA(ta, day, true);
+            if (ta == TA.MACD) {
+                final MACDPeriod period = (MACDPeriod)taEx.getParameter();
+                ChartJDialog.this.updateMACD(period, true);                
+            } else {
+                final Integer day = (Integer)taEx.getParameter();
+                ChartJDialog.this.updateTA(ta, day, true);
+            }
         }
     }
 
@@ -763,6 +844,10 @@ public class ChartJDialog extends javax.swing.JDialog {
             else if (taEx.ta == TA.MFI) {
                 this.updateMFI((Integer)taEx.parameter, false);
                 i--;
+            }
+            else if (taEx.ta == TA.MACD) {
+                this.updateMACD((MACDPeriod)taEx.parameter, false);
+                i--;                
             }
             else {
                 assert(false);
@@ -1613,6 +1698,24 @@ public class ChartJDialog extends javax.swing.JDialog {
         }
     }
 
+    private void showMACDCustomDialog() {        
+        System.out.println("showMACDCustomDialog");
+    }
+    
+    private void updateMACD(MACDPeriod period, boolean show) {  
+        final TAEx taEx = TAEx.newInstance(TA.EMA, period);
+        
+        System.out.println("updateMACD");
+        
+        if (show && this.activeTAExs.contains(taEx) == false) {
+            this.activeTAExs.add(taEx);
+            MainFrame.getInstance().getChartJDialogOptions().add(taEx);
+        } else if (!show) {
+            this.activeTAExs.remove(taEx);
+            MainFrame.getInstance().getChartJDialogOptions().remove(taEx);
+        }        
+    }
+    
     private void updateEMA(int days, boolean show) {
         if (this.priceVolumeChart == null) {
             this.priceVolumeChart = this.createPriceVolumeChart(this.priceDataset, this.volumeDataset);
@@ -1680,8 +1783,7 @@ public class ChartJDialog extends javax.swing.JDialog {
         if (show && this.activeTAExs.contains(taEx) == false) {
             this.activeTAExs.add(taEx);
             MainFrame.getInstance().getChartJDialogOptions().add(taEx);
-        }
-        else if (!show) {
+        } else if (!show) {
             this.activeTAExs.remove(taEx);
             MainFrame.getInstance().getChartJDialogOptions().remove(taEx);
         }
