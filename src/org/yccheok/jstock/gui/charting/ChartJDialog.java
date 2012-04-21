@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2012 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -64,6 +64,7 @@ import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.time.TimeSeriesDataItem;
 import org.jfree.data.xy.*;
 import org.yccheok.jstock.charting.ChartData;
+import org.yccheok.jstock.charting.MACD;
 import org.yccheok.jstock.charting.TechnicalAnalysis;
 import org.yccheok.jstock.file.Statements;
 import org.yccheok.jstock.gui.JStockOptions;
@@ -115,45 +116,6 @@ public class ChartJDialog extends javax.swing.JDialog {
     
     private Type getCurrentType() {
         return this.currentType;
-    }
-
-    public static class MACDPeriod {
-        public final int fastPeriod;
-        public final int slowPeriod;
-        public final int period;
-        
-        private MACDPeriod(int fastPeriod, int slowPeriod, int period) {
-            this.fastPeriod = fastPeriod;
-            this.slowPeriod = slowPeriod;
-            this.period = period;                    
-        }
-        
-        public static MACDPeriod newInstance(int fastPeriod, int slowPeriod, int period) {
-            return new MACDPeriod(fastPeriod, slowPeriod, period);
-        }
-        
-        @Override
-        public int hashCode() {
-            int result = 17;
-            result = 31 * result + fastPeriod;
-            result = 31 * result + slowPeriod;
-            result = 31 * result + period;            
-            return result;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (o == this) {
-                return true;
-            }
-
-            if (!(o instanceof MACDPeriod)) {
-                return false;
-            }
-
-            MACDPeriod macdPeriod = (MACDPeriod)o;
-            return this.fastPeriod == macdPeriod.fastPeriod && this.slowPeriod == macdPeriod.slowPeriod && this.period == macdPeriod.period;
-        }        
     }
     
     /** Creates new form ChartJDialog */
@@ -217,7 +179,7 @@ public class ChartJDialog extends javax.swing.JDialog {
      */
     private void buildTAMenuItems() {
         final int[] days = {14, 28, 50, 100, 200};
-        final MACDPeriod[] macd_periods = {MACDPeriod.newInstance(12, 26, 9)};
+        final MACD.Period[] macd_periods = {MACD.Period.newInstance(12, 26, 9)};
         
         // day_keys, week_keys and month_keys should be having same length as
         // days.        
@@ -411,7 +373,7 @@ public class ChartJDialog extends javax.swing.JDialog {
             final TAEx taEx = chartJDialogOptions.getTAEx(i);
             final TA ta = taEx.getTA();
             if (ta == TA.MACD) {
-                final MACDPeriod period = (MACDPeriod)taEx.getParameter();
+                final MACD.Period period = (MACD.Period)taEx.getParameter();
                 ChartJDialog.this.updateMACD(period, true);                
             } else {
                 final Integer day = (Integer)taEx.getParameter();
@@ -856,7 +818,7 @@ public class ChartJDialog extends javax.swing.JDialog {
                 i--;
             }
             else if (taEx.ta == TA.MACD) {
-                this.updateMACD((MACDPeriod)taEx.parameter, false);
+                this.updateMACD((MACD.Period)taEx.parameter, false);
                 i--;                
             }
             else {
@@ -1712,7 +1674,7 @@ public class ChartJDialog extends javax.swing.JDialog {
         System.out.println("showMACDCustomDialog");
     }
     
-    private void updateMACD(MACDPeriod period, boolean show) {  
+    private void updateMACD(MACD.Period period, boolean show) {  
         final TAEx taEx = TAEx.newInstance(TA.MACD, period);
         
         System.out.println("updateMACD");

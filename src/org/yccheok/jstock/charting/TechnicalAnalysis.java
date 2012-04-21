@@ -36,22 +36,6 @@ import org.yccheok.jstock.engine.Stock;
  */
 public class TechnicalAnalysis {
 
-    public static class MACDResult {
-        public final double outMACD;
-        public final double outMACDSignal;
-        public final double outMACDHist;
-        
-        private MACDResult(double outMACD, double outMACDSignal, double outMACDHist) {
-            this.outMACD = outMACD;
-            this.outMACDSignal = outMACDSignal;
-            this.outMACDHist = outMACDHist;
-        }
-        
-        public static MACDResult newInstance(double outMACD, double outMACDSignal, double outMACDHist) {
-            return new MACDResult(outMACD, outMACDSignal, outMACDHist);
-        }
-    }
-
     /**
      * Returns the latest EMA.
      *
@@ -154,7 +138,7 @@ public class TechnicalAnalysis {
     }
 
     // Moving Average Convergence/Divergence Fix 12/26
-    public static MACDResult createMACDFix(List<Double> values, int period) {
+    public static MACD.Result createMACDFix(List<Double> values, int period) {
         if (period <= 0) {
             throw new java.lang.IllegalArgumentException("period must be greater than 0");
         }
@@ -174,7 +158,7 @@ public class TechnicalAnalysis {
         
         core.macdFix(0, values.size() - 1, _values, period, outBegIdx, outNbElement, outMACD, outMACDSignal, outMACDHist);
         
-        return MACDResult.newInstance(outMACD[outNbElement.value - 1], outMACDSignal[outNbElement.value - 1], outMACDHist[outNbElement.value - 1]);
+        return MACD.Result.newInstance(outMACD[outNbElement.value - 1], outMACDSignal[outNbElement.value - 1], outMACDHist[outNbElement.value - 1]);
     }
     
     /**
@@ -217,6 +201,10 @@ public class TechnicalAnalysis {
         return series;
     }
 
+    public static MACD.ChartResult createMACD(List<ChartData> chartDatas, String name, int period) {
+        return null;
+    }
+    
     /**
      * Returns EMA time series for charting purpose.
      *
