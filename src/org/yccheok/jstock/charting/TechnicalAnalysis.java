@@ -201,8 +201,43 @@ public class TechnicalAnalysis {
         return series;
     }
 
-    public static MACD.ChartResult createMACD(List<ChartData> chartDatas, String name, int period) {
-        return null;
+    public static MACD.ChartResult createMACD(List<ChartData> chartDatas, String name, MACD.Period period) {
+        final int num = chartDatas.size();
+        final Core core = new Core();
+        final int allocationSize = num - core.macdLookback(period.fastPeriod, period.slowPeriod, period.period);
+        if (allocationSize <= 0) {
+            return null;
+        }
+        
+        final double[] last = new double[num];
+        // Fill up last array.
+        for (int i = 0; i < num; i++) {
+            last[i] = chartDatas.get(i).getLastPrice();
+        }
+        
+        final double[] outMACD = new double[allocationSize];
+        final double[] outMACDSignal = new double[allocationSize];
+        final double[] outMACDHist = new double[allocationSize];
+        final MInteger outBegIdx = new MInteger();
+        final MInteger outNbElement = new MInteger();
+
+        core.macd(0, last.length - 1, last, period.fastPeriod, period.slowPeriod, period.period, outBegIdx, outNbElement, outMACD, outMACDSignal, outMACDHist);
+        
+        final TimeSeries macdTimeSeries = new TimeSeries(name);
+        final TimeSeries macdSignalTimeSeries = new TimeSeries(name);
+        final TimeSeries macdHistTimeSeries = new TimeSeries(name);
+        
+        for (int i = 0; i < outNbElement.value; i++) {
+            Day day = new Day(new Date(chartDatas.get(i + outBegIdx.value).getTimestamp()));
+            macdTimeSeries.add(day, outMACD[i]);
+            macdSignalTimeSeries.add(day, outMACDSignal[i]);
+            macdHistTimeSeries.add(day, outMACDHist[i]);
+        }
+        
+        return MACD.ChartResult.newInstance(
+                new TimeSeriesCollection(macdTimeSeries), 
+                new TimeSeriesCollection(macdSignalTimeSeries), 
+                new TimeSeriesCollection(macdHistTimeSeries));
     }
     
     /**

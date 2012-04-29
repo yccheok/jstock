@@ -1164,7 +1164,7 @@ public class ChartJDialog extends javax.swing.JDialog {
      *
      * @return a chart.
      */
-    private JFreeChart createPriceVolumeChart(XYDataset priceDataset, IntervalXYDataset volumeDataset) {
+    private JFreeChart createPriceVolumeChart(XYDataset priceDataset, XYDataset volumeDataset) {
         final String title = getBestStockName();
 
         final ValueAxis timeAxis = new DateAxis(GUIBundle.getString("ChartJDialog_Date"));
@@ -1235,7 +1235,7 @@ public class ChartJDialog extends javax.swing.JDialog {
      *
      * @return A sample dataset.
      */
-    private IntervalXYDataset getVolumeDataset(List<ChartData> chartDatas) {
+    private XYDataset getVolumeDataset(List<ChartData> chartDatas) {
 
         // create dataset 2...
         TimeSeries series1 = new TimeSeries(GUIBundle.getString("ChartJDialog_Volume"));
@@ -1403,6 +1403,10 @@ public class ChartJDialog extends javax.swing.JDialog {
         return days + c + " RSI";
     }
 
+    private String getMACDKey(MACD.Period period) {
+        
+    }
+    
     private String getCCIKey(int days) {
         Interval interval = this.getCurrentInterval();
         String c = "d";
@@ -1674,10 +1678,20 @@ public class ChartJDialog extends javax.swing.JDialog {
         System.out.println("showMACDCustomDialog");
     }
     
-    private void updateMACD(MACD.Period period, boolean show) {  
-        final TAEx taEx = TAEx.newInstance(TA.MACD, period);
+    private void updateMACD(MACD.Period period, boolean show) {
+        if (this.priceVolumeChart == null) {
+            this.priceVolumeChart = this.createPriceVolumeChart(this.priceDataset, this.volumeDataset);
+        }
+        if (this.candlestickChart == null) {
+            this.candlestickChart = this.createCandlestickChart(this.priceOHLCDataset);
+        }
         
-        System.out.println("updateMACD");
+        final TAEx taEx = TAEx.newInstance(TA.MACD, period);
+        if (show) {
+            
+        } else {
+            
+        }
         
         if (show && this.activeTAExs.contains(taEx) == false) {
             this.activeTAExs.add(taEx);
@@ -1973,7 +1987,7 @@ public class ChartJDialog extends javax.swing.JDialog {
     private final Map<TAEx, XYPlot> candlestick_ta_map = new HashMap<TAEx, XYPlot>();
 
     private XYDataset priceDataset;
-    private IntervalXYDataset volumeDataset;
+    private XYDataset volumeDataset;
     private TimeSeries priceTimeSeries;
     private OHLCDataset priceOHLCDataset;
     private JFreeChart priceVolumeChart;

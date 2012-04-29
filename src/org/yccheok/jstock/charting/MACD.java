@@ -62,23 +62,23 @@ public class MACD {
                 return false;
             }
 
-            Period period = (Period)o;
-            return this.fastPeriod == period.fastPeriod && this.slowPeriod == period.slowPeriod && this.period == period.period;
+            Period _period = (Period)o;
+            return this.fastPeriod == _period.fastPeriod && this.slowPeriod == _period.slowPeriod && this.period == _period.period;
         }        
     }
     
     public static class ChartResult {
         public final XYDataset outMACD;
         public final XYDataset outMACDSignal;
-        public final IntervalXYDataset outMACDHist;
+        public final XYDataset outMACDHist;
         
-        private ChartResult(XYDataset outMACD, XYDataset outMACDSignal, IntervalXYDataset outMACDHist) {
+        private ChartResult(XYDataset outMACD, XYDataset outMACDSignal, XYDataset outMACDHist) {
             this.outMACD = outMACD;
             this.outMACDSignal = outMACDSignal;
             this.outMACDHist = outMACDHist;            
         }
         
-        public ChartResult newInstance(XYDataset outMACD, XYDataset outMACDSignal, IntervalXYDataset outMACDHist) {
+        public static ChartResult newInstance(XYDataset outMACD, XYDataset outMACDSignal, XYDataset outMACDHist) {
             return new ChartResult(outMACD, outMACDSignal, outMACDHist);
         }
     }
