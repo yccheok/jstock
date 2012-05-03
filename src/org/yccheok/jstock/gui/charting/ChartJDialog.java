@@ -1404,7 +1404,14 @@ public class ChartJDialog extends javax.swing.JDialog {
     }
 
     private String getMACDKey(MACD.Period period) {
-        
+        Interval interval = this.getCurrentInterval();
+        String c = "d";
+        if (interval == Interval.Weekly) {
+            c = "w";
+        } else if (interval == Interval.Monthly) {
+            c = "m";
+        }
+        return "(" + period.fastPeriod + "," + period.slowPeriod + "," + period.period + ")";
     }
     
     private String getCCIKey(int days) {
@@ -1678,6 +1685,7 @@ public class ChartJDialog extends javax.swing.JDialog {
         System.out.println("showMACDCustomDialog");
     }
     
+    // VERY BUGGY CODE STILL! :p
     private void updateMACD(MACD.Period period, boolean show) {
         if (this.priceVolumeChart == null) {
             this.priceVolumeChart = this.createPriceVolumeChart(this.priceDataset, this.volumeDataset);
@@ -1688,7 +1696,75 @@ public class ChartJDialog extends javax.swing.JDialog {
         
         final TAEx taEx = TAEx.newInstance(TA.MACD, period);
         if (show) {
+            if (price_volume_ta_map.containsKey(taEx) == false) {                
+                final MACD.ChartResult macdChartResult = org.yccheok.jstock.charting.TechnicalAnalysis.createMACD(this.chartDatas, getMACDKey(period), period);
+                
+                // MACD SIGNAL!
+                NumberAxis rangeAxis1 = new NumberAxis(GUIBundle.getString("ChartJDialog_MACD"));
+                rangeAxis1.setAutoRangeIncludesZero(false);     // override default
+                rangeAxis1.setLowerMargin(0.40);                // to leave room for volume bars
+                DecimalFormat format = new DecimalFormat("0");
+                rangeAxis1.setNumberFormatOverride(format);
+
+                final ValueAxis timeAxis = new DateAxis(GUIBundle.getString("ChartJDialog_Date"));
+                timeAxis.setLowerMargin(0.02);                  // reduce the default margins
+                timeAxis.setUpperMargin(0.02);
+
+                XYPlot plot = new XYPlot(macdChartResult.outMACDSignal, timeAxis, rangeAxis1, null);
+
+                XYItemRenderer renderer1 = new XYLineAndShapeRenderer(true, false);
+                renderer1.setBaseToolTipGenerator(
+                    new StandardXYToolTipGenerator(
+                        StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT,
+                        new SimpleDateFormat("d-MMM-yyyy"), new DecimalFormat("0.00#")
+                    )
+                );
+                plot.setRenderer(0, renderer1);
+                org.yccheok.jstock.charting.Utils.setPriceSeriesPaint(renderer1);
+                
+                // VOLUME!
+                //plot.setRangeAxis(1, rangeAxis1);
+                plot.setDataset(1, macdChartResult.outMACDHist);
+                //plot.mapDatasetToRangeAxis(1, 1);
+
+                XYBarRenderer renderer2 = new XYBarRenderer(0.20);
+                renderer2.setBaseToolTipGenerator(
+                    new StandardXYToolTipGenerator(
+                        StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT,
+                        new SimpleDateFormat("d-MMM-yyyy"), new DecimalFormat("0,000.00")
+                    )
+                );
+                plot.setRenderer(1, renderer2);                
+                
+                
+                price_volume_ta_map.put(taEx, plot);
+            }   
             
+            if (candlestick_ta_map.containsKey(taEx) == false) {
+                try {
+                    /* Not sure why. I cannot make priceVolumeChart and candlestickChart sharing the same
+                     * plot. If not, this will inhibit incorrect zooming behavior.
+                     */
+                    candlestick_ta_map.put(taEx, (XYPlot)price_volume_ta_map.get(taEx).clone());
+                } catch (CloneNotSupportedException ex) {
+                    log.error(null, ex);
+                }
+            }
+            
+            if (this.activeTAExs.contains(taEx) == false)
+            {
+                // Avoid duplication.
+                final XYPlot price_volume_ta = price_volume_ta_map.get(taEx);
+                final XYPlot candlestick_ta = candlestick_ta_map.get(taEx);
+
+
+                final CombinedDomainXYPlot cplot0 = (CombinedDomainXYPlot)this.priceVolumeChart.getPlot();
+                final CombinedDomainXYPlot cplot1 = (CombinedDomainXYPlot)this.candlestickChart.getPlot();
+                if (price_volume_ta != null) cplot0.add(price_volume_ta, 1);    // weight is 1.
+                if (candlestick_ta != null) cplot1.add(candlestick_ta, 1);      // weight is 1.
+                org.yccheok.jstock.charting.Utils.applyChartTheme(this.priceVolumeChart);
+                org.yccheok.jstock.charting.Utils.applyChartTheme(this.candlestickChart);
+            }            
         } else {
             
         }
