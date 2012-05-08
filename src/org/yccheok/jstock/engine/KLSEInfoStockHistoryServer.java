@@ -173,9 +173,12 @@ public class KLSEInfoStockHistoryServer implements StockHistoryServer {
 
             success = parse(respond);
 
-            if (success) {
-                break;
-            }
+            // Do not continue even success is false. Just break. As if 
+            // networking (getResponseBodyAsStringBasedOnProxyAuthOptionWithAgentInfo) 
+            // is OK, parse should be OK too. If not, this is just an outdated stock
+            // code. We are just wasting our network resource, by keep trying on
+            // an outdated stock code.
+            break;
         }
 
         return success;
