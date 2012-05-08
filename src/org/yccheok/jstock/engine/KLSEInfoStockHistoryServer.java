@@ -57,7 +57,7 @@ public class KLSEInfoStockHistoryServer implements StockHistoryServer {
         }
 
         // Ensure the code is in non-Yahoo format.
-        this.code = Utils.toNonYahooFormat(code);
+        this.code = code;
         this.duration = duration;
         
         final List<Duration> durations = this.toSmallerDurationPieces();
@@ -141,7 +141,7 @@ public class KLSEInfoStockHistoryServer implements StockHistoryServer {
 
         final String c;
         try {
-            c = java.net.URLEncoder.encode(code.toString(), "UTF-8");
+            c = java.net.URLEncoder.encode(Utils.toNonYahooFormat(code).toString(), "UTF-8");
         } catch (UnsupportedEncodingException ex) {
             return false;
         }
@@ -201,7 +201,7 @@ public class KLSEInfoStockHistoryServer implements StockHistoryServer {
         Stock.Industry industry = Stock.Industry.Unknown;
 
         try {
-            Stock stock = stockServer.getStock(Code.newInstance(code.toString() + ".KL"));
+            Stock stock = stockServer.getStock(code);
             symbol = stock.getSymbol();
             name = stock.getName();
             board = stock.getBoard();
