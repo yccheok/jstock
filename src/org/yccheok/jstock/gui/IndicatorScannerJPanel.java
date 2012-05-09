@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2012 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -679,8 +679,9 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         {
             _failedCodes.add(code);
 
-            // Probably the network is down. Retry infinityly.
-            monitor.addStockCode(code);
+            // Probably the network is down. Do not ever retry infinityly. Go 
+            // green. :)
+            //monitor.addStockCode(code);
             return;
         }
 

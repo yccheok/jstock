@@ -165,6 +165,7 @@ public class KLSEInfoStockHistoryServer implements StockHistoryServer {
         boolean success = false;
 
         for (int retry = 0; retry < NUM_OF_RETRY; retry++) {
+            System.out.println(retry + " : " + location);
             final String respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOptionWithAgentInfo(location);
 
             if (respond == null) {
