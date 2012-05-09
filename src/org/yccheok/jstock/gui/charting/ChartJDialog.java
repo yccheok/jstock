@@ -1698,19 +1698,19 @@ public class ChartJDialog extends javax.swing.JDialog {
         if (show) {
             if (price_volume_ta_map.containsKey(taEx) == false) {                
                 final MACD.ChartResult macdChartResult = org.yccheok.jstock.charting.TechnicalAnalysis.createMACD(this.chartDatas, getMACDKey(period), period);
-                
-                // MACD SIGNAL!
+
+                // MACD!
                 NumberAxis rangeAxis1 = new NumberAxis(GUIBundle.getString("ChartJDialog_MACD"));
                 rangeAxis1.setAutoRangeIncludesZero(false);     // override default
                 rangeAxis1.setLowerMargin(0.40);                // to leave room for volume bars
-                DecimalFormat format = new DecimalFormat("0");
+                DecimalFormat format = new DecimalFormat("0.00#");
                 rangeAxis1.setNumberFormatOverride(format);
 
                 final ValueAxis timeAxis = new DateAxis(GUIBundle.getString("ChartJDialog_Date"));
                 timeAxis.setLowerMargin(0.02);                  // reduce the default margins
                 timeAxis.setUpperMargin(0.02);
 
-                XYPlot plot = new XYPlot(macdChartResult.outMACDSignal, timeAxis, rangeAxis1, null);
+                XYPlot plot = new XYPlot(macdChartResult.outMACD, timeAxis, rangeAxis1, null);
 
                 XYItemRenderer renderer1 = new XYLineAndShapeRenderer(true, false);
                 renderer1.setBaseToolTipGenerator(
@@ -1722,20 +1722,33 @@ public class ChartJDialog extends javax.swing.JDialog {
                 plot.setRenderer(0, renderer1);
                 org.yccheok.jstock.charting.Utils.setPriceSeriesPaint(renderer1);
                 
+                // MACD SIGNAL!
+                plot.setDataset(1, macdChartResult.outMACDSignal);
+                XYItemRenderer renderer2 = new XYLineAndShapeRenderer(true, false);
+                renderer2.setBaseToolTipGenerator(
+                    new StandardXYToolTipGenerator(
+                        StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT,
+                        new SimpleDateFormat("d-MMM-yyyy"), new DecimalFormat("0.00#")
+                    )
+                );                
+                plot.setRenderer(1, renderer2);
+                
                 // VOLUME!
                 //plot.setRangeAxis(1, rangeAxis1);
-                plot.setDataset(1, macdChartResult.outMACDHist);
+                plot.setDataset(2, macdChartResult.outMACDHist);
                 //plot.mapDatasetToRangeAxis(1, 1);
 
-                XYBarRenderer renderer2 = new XYBarRenderer(0.20);
-                renderer2.setBaseToolTipGenerator(
+                XYBarRenderer renderer3 = new XYBarRenderer(0.20);
+                
+                renderer3.setBaseToolTipGenerator(
                     new StandardXYToolTipGenerator(
                         StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT,
                         new SimpleDateFormat("d-MMM-yyyy"), new DecimalFormat("0,000.00")
                     )
                 );
-                plot.setRenderer(1, renderer2);                
+                plot.setRenderer(2, renderer3);                
                 
+
                 
                 price_volume_ta_map.put(taEx, plot);
             }   
@@ -1766,7 +1779,13 @@ public class ChartJDialog extends javax.swing.JDialog {
                 org.yccheok.jstock.charting.Utils.applyChartTheme(this.candlestickChart);
             }            
         } else {
-            
+            final CombinedDomainXYPlot cplot0 = (CombinedDomainXYPlot)this.priceVolumeChart.getPlot();
+            final CombinedDomainXYPlot cplot1 = (CombinedDomainXYPlot)this.candlestickChart.getPlot();
+            final XYPlot price_volume_ta = price_volume_ta_map.get(taEx);
+            final XYPlot candlestick_ta = candlestick_ta_map.get(taEx);
+
+            if (price_volume_ta != null) cplot0.remove(price_volume_ta);
+            if (candlestick_ta != null) cplot1.remove(candlestick_ta);            
         }
         
         if (show && this.activeTAExs.contains(taEx) == false) {
