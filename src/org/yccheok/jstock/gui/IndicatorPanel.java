@@ -1698,14 +1698,7 @@ public class IndicatorPanel extends JPanel {
 
         this.stockHistoryMonitor = new StockHistoryMonitor(NUM_OF_THREADS_HISTORY_MONITOR);
         stockHistoryMonitor.setStockServerFactories(stockServerFactories);
-
-        // No StockHistorySerializer at this moment, either read or write. This is because
-        // (1) Read - If the duration of the history selected in Real-Time panel is shorter than
-        // indicators's, we will be in trouble.
-        // (2) Write - If the duration of the indicator's is shorter than Real-Time panel, we will
-        // be in trouble again.
-        //
-        // Currently, we have no way but disable it.
+        stockHistoryMonitor.setStockHistorySerializer(new StockHistorySerializer(Utils.getHistoryDirectory()));
     }
 
     private JList getCurrentActiveJList() {

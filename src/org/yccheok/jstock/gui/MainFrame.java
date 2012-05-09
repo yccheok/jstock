@@ -3617,8 +3617,8 @@ public class MainFrame extends javax.swing.JFrame {
 
         removeOldHistoryData(country);
 
-        stockHistorySerializer = new StockHistorySerializer(Utils.getUserDataDirectory() + country + File.separator + "history");
-        
+        StockHistorySerializer stockHistorySerializer = new StockHistorySerializer(Utils.getHistoryDirectory());
+
         stockHistoryMonitor.setStockHistorySerializer(stockHistorySerializer);
 
         stockHistoryMonitor.setDuration(Duration.getTodayDurationByYears(jStockOptions.getHistoryDuration()));
@@ -4072,11 +4072,6 @@ public class MainFrame extends javax.swing.JFrame {
         }
     }
     
-    public StockHistorySerializer getStockHistorySerializer()
-    {
-        return stockHistorySerializer;
-    }
-    
     public IndicatorProjectManager getAlertIndicatorProjectManager()
     {
         return this.indicatorPanel.getAlertIndicatorProjectManager();
@@ -4397,8 +4392,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private LatestNewsTask latestNewsTask = null;
     private volatile Thread marketThread = null;
-    private Thread klseInfoStockServerFactoryThread = null;
-    private StockHistorySerializer stockHistorySerializer = null;        
+    private Thread klseInfoStockServerFactoryThread = null;   
     private JStockOptions jStockOptions;
     private ChartJDialogOptions chartJDialogOptions;
     

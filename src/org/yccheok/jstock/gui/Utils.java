@@ -71,6 +71,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
@@ -761,8 +762,21 @@ public class Utils {
         return true;
     }
     
+    /**
+     * Returns user data directory.
+     * @return user data directory
+     */
     public static String getUserDataDirectory() {
         return System.getProperty("user.home") + File.separator + ".jstock" + File.separator + getApplicationVersionString() + File.separator;
+    }
+
+    /**
+     * Returns cached history files directory.
+     * @return cached history files directory
+     */
+    public static String getHistoryDirectory() {
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        return Utils.getUserDataDirectory() + jStockOptions.getCountry() + File.separator + "history";
     }
 
     public static AlphaComposite makeComposite(float alpha) {
@@ -2668,6 +2682,17 @@ public class Utils {
     }
     
     /**
+     * Returns common used date format, which will be used by Statements. We need
+     * common used date format, as we need to perform data exchange across
+     * different platforms.
+     * 
+     * @return common used date format
+     */
+    public static DateFormat getCommonDateFormat() {
+        return commonDateFormat.get();
+    }
+    
+    /**
      * Represents latest application information. This is being used for
      * application upgrading.
      */
@@ -2712,6 +2737,21 @@ public class Utils {
         }
     }
 
+    // Use ThreadLocal to ensure thread safety.
+    private static final ThreadLocal <DateFormat> commonDateFormat = new ThreadLocal <DateFormat>() {
+        @Override protected DateFormat initialValue() {
+            // We will use a fixed date format (Locale.English), so that it will be
+            // easier for Android to process.
+            //
+            // "Sep 5, 2011"    -   Locale.ENGLISH
+            // "2011-9-5"       -   Locale.SIMPLIFIED_CHINESE
+            // "2011/9/5"       -   Locale.TRADITIONAL_CHINESE
+            // 05.09.2011       -   Locale.GERMAN
+            DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, Locale.ENGLISH);
+            return dateFormat;
+        }
+    };
+    
     private static final HanyuPinyinOutputFormat DEFAULT_HANYU_PINYIN_OUTPUT_FORMAT = new HanyuPinyinOutputFormat();
     static {
         DEFAULT_HANYU_PINYIN_OUTPUT_FORMAT.setCaseType(HanyuPinyinCaseType.LOWERCASE);
@@ -2753,7 +2793,7 @@ public class Utils {
         multiThreadedHttpConnectionManager.getParams().setDefaultMaxConnectionsPerHost(128);
         httpClientWithAgentInfo = new HttpClient(multiThreadedHttpConnectionManager);
         // Provide agent information, as requested by KLSEInfo owner.
-        httpClientWithAgentInfo.getParams().setParameter(HttpMethodParams.USER_AGENT, "JStock");
+        httpClientWithAgentInfo.getParams().setParameter(HttpMethodParams.USER_AGENT, "JStock-1.0.6o");
         // To prevent cookie warnings.
         httpClientWithAgentInfo.getParams().setParameter("http.protocol.single-cookie-header", true);
         httpClientWithAgentInfo.getParams().setCookiePolicy(org.apache.commons.httpclient.cookie.CookiePolicy.BROWSER_COMPATIBILITY);

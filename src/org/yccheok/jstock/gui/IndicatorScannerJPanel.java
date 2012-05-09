@@ -637,14 +637,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         stockHistoryMonitor.setStockServerFactories(stockServerFactories);
 
         stockHistoryMonitor.attach(stockHistoryMonitorObserver);
-
-        // No StockHistorySerializer at this moment, either read or write. This is because
-        // (1) Read - If the duration of the history selected in Real-Time panel is shorter than
-        // indicators's, we will be in trouble.
-        // (2) Write - If the duration of the indicator's is shorter than Real-Time panel, we will
-        // be in trouble again.
-        //
-        // Currently, we have no way but disable it.
+        stockHistoryMonitor.setStockHistorySerializer(new StockHistorySerializer(Utils.getHistoryDirectory()));
     }
 
     private void update(StockHistoryMonitor monitor, StockHistoryMonitor.StockHistoryRunnable runnable)

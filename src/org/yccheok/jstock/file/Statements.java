@@ -33,9 +33,12 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
 import javax.swing.table.TableModel;
 import org.apache.commons.logging.Log;
@@ -81,11 +84,13 @@ public class Statements {
     public static Statements newInstanceFromStockHistoryServer(StockHistoryServer server) {
         final Statements s = new Statements();
         final int size = server.getNumOfCalendar();
-        // Do we need to used a fixed date format as in newInstanceFromTableModel's?
-        final DateFormat dateFormat = DateFormat.getDateInstance();
+        
+        final DateFormat dateFormat = org.yccheok.jstock.gui.Utils.getCommonDateFormat();
+
+        Stock stock = null;
         for (int i = 0; i < size; i++) {
             final Calendar calendar = server.getCalendar(i);
-            final Stock stock = server.getStock(calendar);
+            stock = server.getStock(calendar);
             assert(calendar != null && stock != null);
             final List<Atom> atoms = new ArrayList<Atom>();
             final Atom atom0 = new Atom(dateFormat.format(calendar.getTime()), GUIBundle.getString("StockHistory_Date"));
@@ -103,6 +108,16 @@ public class Statements {
             atoms.add(atom5);
             s.statements.add(new Statement(atoms));
         }
+        
+        if (stock != null) {
+            // Metadata. Oh yeah...
+            s.metadatas.put("code", stock.getCode().toString());
+            s.metadatas.put("symbol", stock.getSymbol().toString());
+            s.metadatas.put("name", stock.getName());
+            s.metadatas.put("board", stock.getBoard().name());
+            s.metadatas.put("industry", stock.getIndustry().name());
+        }
+        
         return s;
     }
 
@@ -258,7 +273,28 @@ public class Statements {
 
             String [] nextLine;
             if ((nextLine = csvreader.readNext()) != null) {
-                types.addAll(Arrays.asList(nextLine));
+                
+                // Metadata handling.
+                while (nextLine != null && nextLine.length == 1) {
+                    String[] tokens = nextLine[0].split("=");
+                    if (tokens.length == 2) {
+                        String key = tokens[0].trim();
+                        String value = tokens[1].trim();
+                        if (key.length() > 0) {
+                            // Is OK for value to be empty.
+                            s.metadatas.put(key, value);
+                            nextLine = csvreader.readNext();
+                        } else {
+                            break;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+                
+                if (nextLine != null) {
+                    types.addAll(Arrays.asList(nextLine));
+                }
             }   /* if ((nextLine = csvreader.readNext()) != null) */
 
             if (types.isEmpty()) {
@@ -338,14 +374,7 @@ public class Statements {
                     atoms.add(new Atom(stock.getSymbol().toString(), GUIBundle.getString("MainFrame_Symbol")));
                 }
                 else if (tableModel.getColumnClass(j).equals(Date.class)) {
-                    // We will use a fixed date format (Locale.English), so that it will be
-                    // easier for Android to process.
-                    //
-                    // "Sep 5, 2011"    -   Locale.ENGLISH
-                    // "2011-9-5"       -   Locale.SIMPLIFIED_CHINESE
-                    // "2011/9/5"       -   Locale.TRADITIONAL_CHINESE
-                    // 05.09.2011       -   Locale.GERMAN
-                    DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, Locale.ENGLISH);
+                    DateFormat dateFormat = org.yccheok.jstock.gui.Utils.getCommonDateFormat();
                     atoms.add(new Atom(object != null ? dateFormat.format(((Date)object).getTime()) : "", type));
                 }
                 else {
@@ -403,26 +432,12 @@ public class Statements {
                         // OK. I know. This breaks generalization.
                         if (abstractPortfolioTreeTableModel instanceof SellPortfolioTreeTableModel) {
                             final SimpleDate simpleDate = transaction.getContract().getReferenceDate();
-                            // We will use a fixed date format (Locale.English), so that it will be
-                            // easier for Android to process.
-                            //
-                            // "Sep 5, 2011"    -   Locale.ENGLISH
-                            // "2011-9-5"       -   Locale.SIMPLIFIED_CHINESE
-                            // "2011/9/5"       -   Locale.TRADITIONAL_CHINESE
-                            // 05.09.2011       -   Locale.GERMAN
-                            DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, Locale.ENGLISH);
+                            DateFormat dateFormat = org.yccheok.jstock.gui.Utils.getCommonDateFormat();
                             atoms.add(new Atom(object != null ? dateFormat.format(simpleDate.getTime()) : "", GUIBundle.getString("PortfolioManagementJPanel_ReferenceDate")));
                         }
                     }
                     else if (abstractPortfolioTreeTableModel.getColumnClass(k).equals(SimpleDate.class)) {
-                        // We will use a fixed date format (Locale.English), so that it will be
-                        // easier for Android to process.
-                        //
-                        // "Sep 5, 2011"    -   Locale.ENGLISH
-                        // "2011-9-5"       -   Locale.SIMPLIFIED_CHINESE
-                        // "2011/9/5"       -   Locale.TRADITIONAL_CHINESE
-                        // 05.09.2011       -   Locale.GERMAN
-                        DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, Locale.ENGLISH);
+                        DateFormat dateFormat = org.yccheok.jstock.gui.Utils.getCommonDateFormat();
                         SimpleDate simpleDate = (SimpleDate)object;
                         atoms.add(new Atom(object != null ? dateFormat.format(simpleDate.getTime()) : "", type));
                     }
@@ -451,6 +466,10 @@ public class Statements {
     }
 
     public boolean saveAsCSVFile(File file) {
+        return saveAsCSVFile(file, false);
+    }
+    
+    public boolean saveAsCSVFile(File file, boolean metadataEnabled) {
         boolean status = false;
 
         FileOutputStream fileOutputStream = null;
@@ -461,6 +480,16 @@ public class Statements {
             fileOutputStream = new FileOutputStream(file);
             outputStreamWriter = new OutputStreamWriter(fileOutputStream,  Charset.forName("UTF-8"));
             csvwriter = new CSVWriter(outputStreamWriter);
+            
+            if (metadataEnabled) {
+                for (Map.Entry<String, String> metadata : metadatas.entrySet()) {
+                    String key = metadata.getKey();
+                    String value = metadata.getValue();
+                    String output = key + "=" + value;
+                    csvwriter.writeNext(new String[]{output});
+                }                
+            }
+            
             // statements.size() can never be 0.
             final int columnCount = statements.get(0).size();
             String[] datas = new String[columnCount];
@@ -611,10 +640,17 @@ public class Statements {
         return statements.size();
     }
     
+    public Map<String, String> getMetadatas() {
+        return Collections.unmodifiableMap(metadatas);
+    }
+    
     public Statement get(int index) {
         return statements.get(index);
     }
     
     private final List<Statement> statements = new ArrayList<Statement>();
+    // Use LinkedHashMap to ensure insertion order is maintained.
+    private final Map<String, String> metadatas = new LinkedHashMap<String, String>();
     private static final Log log = LogFactory.getLog(Statements.class);
+    
 }

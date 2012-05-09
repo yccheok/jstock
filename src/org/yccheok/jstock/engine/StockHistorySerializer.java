@@ -1,23 +1,20 @@
 /*
- * StockHistorySerializer.java
- *
- * Created on June 9, 2007, 2:18 AM
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2012 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- * Copyright (C) 2007 Cheok YanCheng <yccheok@yahoo.com>
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.yccheok.jstock.engine;
@@ -25,8 +22,7 @@ package org.yccheok.jstock.engine;
 import java.io.*;
 import java.util.*;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.yccheok.jstock.file.Statements;
 
 
 /**
@@ -34,43 +30,41 @@ import org.apache.commons.logging.LogFactory;
  * @author yccheok
  */
 public class StockHistorySerializer {
-    
-    /** Creates a new instance of StockHistorySerializer */
-    public StockHistorySerializer(String directory) {
-        this(directory, true);
-    }
 
-    public StockHistorySerializer(String directory, boolean writeEnable)
+    public StockHistorySerializer(String directory)
     {
         org.yccheok.jstock.gui.Utils.createCompleteDirectoryHierarchyIfDoesNotExist(directory);
 
         this.directory = directory;
-
-        this.writeEnable = writeEnable;
     }
 
-    public boolean save(StockHistoryServer stockHistoryServer)
+    public boolean save(StockHistoryServer stockHistoryServer, Duration duration)
     {
-        if (!writeEnable)
+        // If the history server doesn't contain any information, return early.
+        if (stockHistoryServer.getNumOfCalendar() == 0) {
             return false;
-
-        Calendar calendar = null;
+        }
         
-        if ((calendar = stockHistoryServer.getCalendar(0)) == null)
-            return false;
-        
-        Stock stock = stockHistoryServer.getStock(calendar);
-
-        return org.yccheok.jstock.gui.Utils.toXML(stockHistoryServer, directory + File.separator + stock.getCode() + ".xml");
+        final Calendar calendar = stockHistoryServer.getCalendar(0);
+        final Code code = stockHistoryServer.getStock(calendar).getCode();
+        final Statements statements = Statements.newInstanceFromStockHistoryServer(stockHistoryServer);
+        final File file = new File(getFileName(code, duration));
+        return statements.saveAsCSVFile(file, true);
     }
     
-    public StockHistoryServer load(Code code)
+    public StockHistoryServer load(Code code, Duration duration)
     {
-        File xStreamFile = new File(directory + File.separator + code + ".xml");
-        return org.yccheok.jstock.gui.Utils.fromXML(StockHistoryServer.class, xStreamFile);
+        final File file = new File(getFileName(code, duration));
+        final Statements statements = Statements.newInstanceFromCSVFile(file);                
+        return StatementsStockHistoryServer.newInstance(statements);
     }
     
-    private final String directory;
-    private final boolean writeEnable;
-    private static final Log log = LogFactory.getLog(StockHistorySerializer.class);       
+    private String getFileName(Code code, Duration duration) {
+        final long end = duration.getEndDate().getCalendar().getTimeInMillis() / 1000;
+        final long start = duration.getStartDate().getCalendar().getTimeInMillis() / 1000;
+        final String fileName = directory + File.separator + code + "-end=" + end + "-start=" + start + ".csv";        
+        return fileName;
+    }
+    
+    private final String directory;     
 }

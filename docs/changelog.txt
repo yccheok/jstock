@@ -6,10 +6,9 @@ JStock 1.0.6o - 2012-xx-xx
            DeSpain.
   Bugfix:  Ensure during combo box selection, investment flow chart dialog will
            not resize suddenly.
-  Bugfix:  We do not keep KLSEInfo server too busy. Ensure history serializer 
-           saves file as 1295.KL.xml instead of 1295.xml. Take note, we still
-           need to revise the code, so that in the end of the day, we are using
-           fast CSV instead of slow XML.
+  Bugfix:  We do not want to keep history server too busy. We implement a very 
+           efficient history data caching mechanism, to reduce history server 
+           load.
            
 JStock 1.0.6n - 2012-04-05
   Feature: Added MACD to Stock Relative History Information and Stock History

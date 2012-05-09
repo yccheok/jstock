@@ -186,7 +186,7 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
 
                             if (shouldUseSerializer) {
                                 if(StockHistoryMonitor.this.stockHistorySerializer != null) {
-                                    StockHistoryMonitor.this.stockHistorySerializer.save(history);
+                                    StockHistoryMonitor.this.stockHistorySerializer.save(history, duration);
                                 }
                                 else {
                                     log.error("Fail to perform serialization on stock history due to uninitialized serialization component.");
@@ -300,7 +300,7 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
             }
             else {
                 if (StockHistoryMonitor.this.stockHistorySerializer != null) {
-                    StockHistoryServer stockHistoryServer = StockHistoryMonitor.this.stockHistorySerializer.load(code);
+                    StockHistoryServer stockHistoryServer = StockHistoryMonitor.this.stockHistorySerializer.load(code, duration);
 
                     /* So that next time we won't read from the disk. */
                     if (stockHistoryServer != null && (this.DATABASE_SIZE > histories.size())) {
