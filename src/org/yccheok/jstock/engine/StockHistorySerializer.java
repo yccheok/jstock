@@ -20,6 +20,7 @@
 package org.yccheok.jstock.engine;
 
 import java.io.*;
+import java.text.DecimalFormat;
 import java.util.*;
 
 import org.yccheok.jstock.file.Statements;
@@ -55,14 +56,26 @@ public class StockHistorySerializer {
     public StockHistoryServer load(Code code, Duration duration)
     {
         final File file = new File(getFileName(code, duration));
-        final Statements statements = Statements.newInstanceFromCSVFile(file);                
+        final Statements statements = Statements.newInstanceFromCSVFile(file);
         return StatementsStockHistoryServer.newInstance(statements);
     }
     
     private String getFileName(Code code, Duration duration) {
-        final long end = duration.getEndDate().getCalendar().getTimeInMillis() / 1000;
-        final long start = duration.getStartDate().getCalendar().getTimeInMillis() / 1000;
-        final String fileName = directory + File.separator + code + "-end=" + end + "-start=" + start + ".csv";        
+        final int startYear = duration.getStartDate().getYear();
+        // +1, as we prefer based 1 month, for readability.
+        final int startMonth = duration.getStartDate().getMonth() + 1;
+        final int startDay = duration.getStartDate().getDate();
+        final int endYear = duration.getEndDate().getYear();
+        final int endMonth = duration.getEndDate().getMonth() + 1;
+        final int endDay = duration.getEndDate().getDate();
+
+        DecimalFormat decimalFormat = new DecimalFormat("00");
+
+        final String fileName = directory + File.separator + code + 
+                "-start_date=" + startYear + "-" + decimalFormat.format(startMonth) + "-" + decimalFormat.format(startDay) +
+                "-end_date=" + endYear + "-" + decimalFormat.format(endMonth) + "-" + decimalFormat.format(endDay) +
+                ".csv";
+
         return fileName;
     }
     

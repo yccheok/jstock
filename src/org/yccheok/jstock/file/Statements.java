@@ -276,7 +276,7 @@ public class Statements {
                 
                 // Metadata handling.
                 while (nextLine != null && nextLine.length == 1) {
-                    String[] tokens = nextLine[0].split("=");
+                    String[] tokens = nextLine[0].split("=", 2);
                     if (tokens.length == 2) {
                         String key = tokens[0].trim();
                         String value = tokens[1].trim();

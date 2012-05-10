@@ -308,14 +308,21 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
 
         if (indicators.size() > 0) {
             // All indicator in indicators, will be having same code.
+            final Code code = indicators.get(0).getStock().getCode();
             if (done)
             {
                 // Perform real time monitoring, for the code with history information.
-                realTimeStockMonitor.addStockCode(indicators.get(0).getStock().getCode());
+                realTimeStockMonitor.addStockCode(code);
             }
             else
             {
-                this.stockHistoryMonitor.addStockCode(indicators.get(0).getStock().getCode());
+                // Try to load history from disk first.
+                StockHistoryServer stockHistoryServer = this.stockHistoryMonitor.getStockHistoryServer(code);
+                if (stockHistoryServer == null) {
+                    this.stockHistoryMonitor.addStockCode(code);
+                } else {
+                    processHistory(code, stockHistoryServer);
+                }
             }
         }
     }
@@ -640,13 +647,11 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         stockHistoryMonitor.setStockHistorySerializer(new StockHistorySerializer(Utils.getHistoryDirectory()));
     }
 
-    private void update(StockHistoryMonitor monitor, StockHistoryMonitor.StockHistoryRunnable runnable)
-    {
+    private void processHistory(Code code, StockHistoryServer stockHistoryServer) {
         // Use local variables, to ensure we do not consume the newly
         // initialized variables after stop(). The code should be placed before
         // "if (this.stop_button_pressed)" check.
         Set<Code> _failedCodes = null;
-        StockHistoryMonitor _stockHistoryMonitor = null;
         RealTimeStockMonitor _realTimeStockMonitor = null;
 
         // There are 2 reasons why we are applying lock right here.
@@ -656,9 +661,8 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         reader.lock();
         try {
             _failedCodes = this.failedCodes;
-            _stockHistoryMonitor = this.stockHistoryMonitor;
             _realTimeStockMonitor = this.realTimeStockMonitor;
-            if (this.stop_button_pressed || _stockHistoryMonitor != monitor) {
+            if (this.stop_button_pressed) {
                 return;
             }
         } finally {
@@ -666,7 +670,6 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         }
 
         final MainFrame m = MainFrame.getInstance();
-        final Code code = runnable.getCode();
 
         List<OperatorIndicator> indicators = this.operatorIndicators.get(code);
         if (indicators == null)
@@ -674,7 +677,6 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             return;
         }
 
-        final StockHistoryServer stockHistoryServer = runnable.getStockHistoryServer();
         if (stockHistoryServer == null)
         {
             _failedCodes.add(code);
@@ -704,7 +706,14 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         }
 
         // Perform real time monitoring, for the code with history information.
-        _realTimeStockMonitor.addStockCode(code);
+        _realTimeStockMonitor.addStockCode(code);      
+    }
+    
+    private void update(StockHistoryMonitor monitor, StockHistoryMonitor.StockHistoryRunnable runnable)
+    {
+        final Code code = runnable.getCode();
+        final StockHistoryServer stockHistoryServer = runnable.getStockHistoryServer();
+        processHistory(code, stockHistoryServer);
     }
 
     private org.yccheok.jstock.engine.Observer<StockHistoryMonitor, StockHistoryMonitor.StockHistoryRunnable> getStockHistoryMonitorObserver() {

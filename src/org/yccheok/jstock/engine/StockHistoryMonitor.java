@@ -299,8 +299,9 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
                 return stockHistoryServer;
             }
             else {
-                if (StockHistoryMonitor.this.stockHistorySerializer != null) {
-                    StockHistoryServer stockHistoryServer = StockHistoryMonitor.this.stockHistorySerializer.load(code, duration);
+                final StockHistorySerializer shs = StockHistoryMonitor.this.stockHistorySerializer;
+                if (shs != null) {
+                    StockHistoryServer stockHistoryServer = shs.load(code, duration);
 
                     /* So that next time we won't read from the disk. */
                     if (stockHistoryServer != null && (this.DATABASE_SIZE > histories.size())) {
