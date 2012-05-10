@@ -229,6 +229,7 @@ public abstract class OperatorFigure extends GraphicalCompositeFigure implements
         throw new java.lang.UnsupportedOperationException();
     }
     
+    @Override
     public void read(DOMInput in) throws IOException {
         double x = in.getAttribute("x", 0d);
         double y = in.getAttribute("y", 0d);
@@ -259,6 +260,8 @@ public abstract class OperatorFigure extends GraphicalCompositeFigure implements
         
         in.closeElement();
     }
+    
+    @Override
     public void write(DOMOutput out) throws IOException {
         Rectangle2D.Double r = getBounds();
         out.addAttribute("x", r.x);

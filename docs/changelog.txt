@@ -1,14 +1,14 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
-JStock 1.0.6o - 2012-xx-xx
+JStock 1.0.6o - 2012-05-11
+  Bugfix:  We do not want to keep history server too busy. We implement a very 
+           efficient history data caching mechanism, to reduce history server 
+           load.
   Bugfix:  Use Boolean.valueOf for minor optimization. Contributed by Mark 
            DeSpain.
   Bugfix:  Ensure during combo box selection, investment flow chart dialog will
            not resize suddenly.
-  Bugfix:  We do not want to keep history server too busy. We implement a very 
-           efficient history data caching mechanism, to reduce history server 
-           load.
            
 JStock 1.0.6n - 2012-04-05
   Feature: Added MACD to Stock Relative History Information and Stock History

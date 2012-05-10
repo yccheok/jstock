@@ -328,7 +328,13 @@ public class ChartJDialog extends javax.swing.JDialog {
             });
             menu.add(item);
 
-            this.jMenu2.add(menu);
+            // TEMP DISABLE MACD
+            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            if (ta != TA.MACD) {
+                this.jMenu2.add(menu);
+            }
         }   // for
         this.jMenu2.add(new javax.swing.JSeparator());
         javax.swing.JMenuItem item = new javax.swing.JMenuItem();

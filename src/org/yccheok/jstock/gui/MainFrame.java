@@ -66,7 +66,7 @@ import org.yccheok.jstock.network.Utils.Type;
 public class MainFrame extends javax.swing.JFrame {
 
     // Comment out, to avoid annoying log messages during debugging.
-    static { System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.NoOpLog"); }
+    //static { System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.NoOpLog"); }
     
     /** Creates new form MainFrame */
 
