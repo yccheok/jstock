@@ -139,7 +139,7 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
         return status;
     }
 
-    public boolean updateStockLastPrice(org.yccheok.jstock.engine.Stock stock) {
+    public boolean updateStockLastPrice(Code code, double price) {
         final Portfolio portfolio = (Portfolio)getRoot();
         final int count = portfolio.getChildCount();
         
@@ -156,7 +156,7 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
             
             final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
             
-            if (true == transaction.getContract().getStock().getCode().equals(stock.getCode())) {
+            if (true == transaction.getContract().getStock().getCode().equals(code)) {
                 break;
             }
         }
@@ -179,12 +179,7 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
 
         // Only update stockPrice map if this stock is found in transaction
         // records.
-        if (stock.getLastPrice() > 0.0) {
-            stockPrice.put(stock.getCode(), stock.getLastPrice());
-        }
-        else {
-            stockPrice.put(stock.getCode(), stock.getPrevPrice());
-        }
+        stockPrice.put(code, price);
 
         for (int i = 0; i < num; i++) {
             final Transaction transaction = (Transaction)transactionSummary.getChildAt(i);
@@ -195,7 +190,15 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
         fireTreeTableNodeChanged(transactionSummary);
         fireTreeTableNodeChanged(getRoot());
                 
-        return status;
+        return status;        
+    }
+    
+    public boolean updateStockLastPrice(org.yccheok.jstock.engine.Stock stock) {
+        if (stock.getLastPrice() > 0.0) {
+            return updateStockLastPrice(stock.getCode(), stock.getLastPrice());
+        } else {
+            return updateStockLastPrice(stock.getCode(), stock.getPrevPrice());
+        }
     }
     
     private double getCurrentValue(Transaction transaction) {

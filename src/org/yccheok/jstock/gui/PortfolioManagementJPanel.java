@@ -19,6 +19,7 @@
 
 package org.yccheok.jstock.gui;
 
+import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 import java.awt.Color;
 import java.awt.Component;
@@ -27,8 +28,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.text.DateFormat;
@@ -39,6 +42,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -1782,6 +1786,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             }
         }
         
+        if (false == initCSVStockPrices()) {
+            return false;
+        }
+        
         refershGUIAfterInitPortfolio(
                 (BuyPortfolioTreeTableModel)PortfolioManagementJPanel.this.buyTreeTable.getTreeTableModel(), 
                 (SellPortfolioTreeTableModel)PortfolioManagementJPanel.this.sellTreeTable.getTreeTableModel(), 
@@ -1968,16 +1976,16 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     // TODO : XML to CSV migration.
     public final void initPortfolio() {
         // Try to read porfolio files in CSV format.
-        boolean isCSVSuccess = false;//this.initCSVPortfolio();
+        boolean isCSVSuccess = this.initCSVPortfolio();
         if (false == isCSVSuccess) {
             // Fail. We need to migrate from XML format to CSV format.
             // The returned value for this method doesn't matter.
             if (initXMLPortfolio()) {
                 // Save the portfolio in CSV format.
-                //if (saveCSVPortfolio()) {
+                if (saveCSVPortfolio()) {
                     // And delete the portfolio in XML format. They are obsolete.
-                    //deleteXMLPortfolio();
-                //}
+                    deleteXMLPortfolio();
+                }
             }
         }
     }
@@ -2068,6 +2076,81 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         return saveCSVStockPrices();
     }
 
+    private boolean initCSVStockPrices() {
+        final File stockPricesFile = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "stockprices.csv");
+        
+        if (stockPricesFile.exists() == false) {
+            return false;
+        }
+        
+        FileInputStream fileInputStream = null;
+        InputStreamReader inputStreamReader = null;
+        CSVReader csvreader = null;  
+        final Map<Code, Double> stockPrices = new LinkedHashMap<Code, Double>();
+        
+        try {
+            fileInputStream = new FileInputStream(stockPricesFile);
+            inputStreamReader = new InputStreamReader(fileInputStream,  Charset.forName("UTF-8"));
+            csvreader = new CSVReader(inputStreamReader);
+
+            String [] nextLine;
+            if ((nextLine = csvreader.readNext()) != null) {                
+                if (nextLine == null) {
+                    return false;
+                }
+                
+                if (nextLine.length != 2) {
+                    return false;
+                }
+                
+                if (nextLine[0].equals("code") == false || nextLine[1].equals("price") == false) {
+                    return false;
+                }                                                
+            }   /* if ((nextLine = csvreader.readNext()) != null) */
+            
+            while ((nextLine = csvreader.readNext()) != null) {
+                // Shall we continue to ignore, or shall we just return null to
+                // flag an error?
+                if (nextLine.length != 2) {
+                    return false;
+                }
+                
+                Code code = Code.newInstance(nextLine[0]);
+                Double price = null;
+                try {
+                    price = Double.parseDouble(nextLine[1]);
+                } catch (NumberFormatException ex) {
+                    log.error(null, ex);
+                    return false;
+                }
+                stockPrices.put(code, price);
+            }
+        } catch (IOException ex) {
+            log.error(null, ex);
+        } finally {
+            if (csvreader != null) {
+                try {
+                    csvreader.close();
+                } catch (IOException ex) {
+                    log.error(null, ex);
+                }
+            }
+            org.yccheok.jstock.gui.Utils.close(inputStreamReader);
+            org.yccheok.jstock.gui.Utils.close(fileInputStream);
+        }
+        
+        final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
+ 
+        // Initialization.
+        for (Map.Entry<Code, Double> entry : stockPrices.entrySet()) {
+            Code code = entry.getKey();
+            Double price = entry.getValue();
+            portfolioTreeTableModel.updateStockLastPrice(code, price);
+        }
+        
+        return true;
+    }
+    
     private boolean saveCSVStockPrices() {
         boolean status = false;
 
@@ -2149,8 +2232,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
 
     public boolean savePortfolio() {
-        //return saveCSVPortfolio();
-        return saveXMLPortfolio();
+        return saveCSVPortfolio();
+        //return saveXMLPortfolio();
     }
 
     private boolean deleteXMLPortfolio() {
@@ -2379,8 +2462,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
     public boolean saveAsExcelFile(File file) {
         org.yccheok.jstock.file.Statements.StatementsEx statementsEx0, statementsEx1, statementsEx2, statementsEx3;
-        statementsEx0 = new org.yccheok.jstock.file.Statements.StatementsEx(org.yccheok.jstock.file.Statements.newInstanceFromAbstractPortfolioTreeTableModel((BuyPortfolioTreeTableModel)this.buyTreeTable.getTreeTableModel()), GUIBundle.getString("PortfolioManagementJPanel_BuyPortfolio"));
-        statementsEx1 = new org.yccheok.jstock.file.Statements.StatementsEx(org.yccheok.jstock.file.Statements.newInstanceFromAbstractPortfolioTreeTableModel((SellPortfolioTreeTableModel)this.sellTreeTable.getTreeTableModel()), GUIBundle.getString("PortfolioManagementJPanel_SellPortfolio"));
+        statementsEx0 = new org.yccheok.jstock.file.Statements.StatementsEx(org.yccheok.jstock.file.Statements.newInstanceFromBuyPortfolioTreeTableModel((BuyPortfolioTreeTableModel)this.buyTreeTable.getTreeTableModel()), GUIBundle.getString("PortfolioManagementJPanel_BuyPortfolio"));
+        statementsEx1 = new org.yccheok.jstock.file.Statements.StatementsEx(org.yccheok.jstock.file.Statements.newInstanceFromSellPortfolioTreeTableModel((SellPortfolioTreeTableModel)this.sellTreeTable.getTreeTableModel()), GUIBundle.getString("PortfolioManagementJPanel_SellPortfolio"));
         statementsEx2 = new org.yccheok.jstock.file.Statements.StatementsEx(org.yccheok.jstock.file.Statements.newInstanceFromTableModel(new DividendSummaryTableModel(this.dividendSummary)), GUIBundle.getString("PortfolioManagementJPanel_DividendPortfolio"));
         statementsEx3 = new org.yccheok.jstock.file.Statements.StatementsEx(org.yccheok.jstock.file.Statements.newInstanceFromTableModel(new DepositSummaryTableModel(this.depositSummary)), GUIBundle.getString("PortfolioManagementJPanel_CashDepositPortfolio"));
         List<org.yccheok.jstock.file.Statements.StatementsEx> statementsExs = Arrays.asList(statementsEx0, statementsEx1, statementsEx2, statementsEx3);
@@ -2390,10 +2473,13 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     public boolean saveAsCSVFile(Utils.FileEx fileEx) {
         org.yccheok.jstock.file.Statements statements = null;
         if (fileEx.type == org.yccheok.jstock.file.Statement.Type.PortfolioManagementBuy) {
-            statements = org.yccheok.jstock.file.Statements.newInstanceFromAbstractPortfolioTreeTableModel((BuyPortfolioTreeTableModel)this.buyTreeTable.getTreeTableModel());
+            // For buy portfolio, need not save metadata information, as we have
+            // seperate "stockprices.csv" to handle it. However, I am not really
+            // sure that whether seperating them is a good idea.
+            statements = org.yccheok.jstock.file.Statements.newInstanceFromBuyPortfolioTreeTableModel((BuyPortfolioTreeTableModel)this.buyTreeTable.getTreeTableModel());
         }
         else if (fileEx.type == org.yccheok.jstock.file.Statement.Type.PortfolioManagementSell) {
-            statements = org.yccheok.jstock.file.Statements.newInstanceFromAbstractPortfolioTreeTableModel((SellPortfolioTreeTableModel)this.sellTreeTable.getTreeTableModel());
+            statements = org.yccheok.jstock.file.Statements.newInstanceFromSellPortfolioTreeTableModel((SellPortfolioTreeTableModel)this.sellTreeTable.getTreeTableModel());
         }
         else if (fileEx.type == org.yccheok.jstock.file.Statement.Type.PortfolioManagementDividend) {
             statements = org.yccheok.jstock.file.Statements.newInstanceFromTableModel(new DividendSummaryTableModel(this.dividendSummary));
@@ -2401,6 +2487,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         else if (fileEx.type == org.yccheok.jstock.file.Statement.Type.PortfolioManagementDeposit) {
             statements = org.yccheok.jstock.file.Statements.newInstanceFromTableModel(new DepositSummaryTableModel(this.depositSummary));
         }
+        // When statements is null, this could mean there is no data in our
+        // buy/sell/dividend/cash records.
         if (statements == null) {
             return false;
         }

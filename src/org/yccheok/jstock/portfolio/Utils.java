@@ -251,7 +251,7 @@ public class Utils {
      * @param file The <code>File</code> to be checked against
      * @return true if the given file is a CSV portfolio directory
      */
-    public static boolean isCSVPortfolioDirectory(File file) {
+    private static boolean isCSVPortfolioDirectory(File file) {
         if (false == file.isDirectory()) {
             // Returns false immediately if this is not a directory.
             return false;
@@ -259,7 +259,7 @@ public class Utils {
         String[] files = file.list();
         List<String> list = Arrays.asList(files);
         // The CSV files will not be saved if the record is empty. However, we
-        // can assure that stockprices.csv will be saved.
+        // can assure that stockprices.csv will always be saved.
         //return list.contains("buyportfolio.csv") && list.contains("sellportfolio.csv") && list.contains("depositsummary.csv") && list.contains("dividendsummary.csv");
         return list.contains("stockprices.csv");
     }

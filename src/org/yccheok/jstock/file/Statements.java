@@ -37,7 +37,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import javax.swing.table.TableModel;
@@ -50,10 +49,12 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.jdesktop.swingx.treetable.TreeTableModel;
+import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.SimpleDate;
 import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.StockHistoryServer;
 import org.yccheok.jstock.gui.AbstractPortfolioTreeTableModel;
+import org.yccheok.jstock.gui.BuyPortfolioTreeTableModel;
 import org.yccheok.jstock.gui.POIUtils;
 import org.yccheok.jstock.gui.SellPortfolioTreeTableModel;
 import org.yccheok.jstock.internationalization.GUIBundle;
@@ -81,6 +82,20 @@ public class Statements {
      */
     private Statements() {}
 
+    public static Statements newInstanceFromBuyPortfolioTreeTableModel(BuyPortfolioTreeTableModel buyPortfolioTreeTableModel) {
+        Statements statements = newInstanceFromAbstractPortfolioTreeTableModel(buyPortfolioTreeTableModel);
+        
+        // Preparing for metadata.
+        Map<Code, Double> stockPrices = buyPortfolioTreeTableModel.getStockPrices();
+        for (Map.Entry<Code, Double> stockPrice : stockPrices.entrySet()) {
+            Code key = stockPrice.getKey();
+            Double value = stockPrice.getValue();
+            statements.metadatas.put(key.toString(), value.toString());
+        }
+        
+        return statements;
+    }
+    
     public static Statements newInstanceFromStockHistoryServer(StockHistoryServer server) {
         final Statements s = new Statements();
         final int size = server.getNumOfCalendar();
@@ -400,13 +415,17 @@ public class Statements {
         return s;
     }
 
+    public static Statements newInstanceFromSellPortfolioTreeTableModel(SellPortfolioTreeTableModel sellPortfolioTreeTableModel) {
+        return newInstanceFromAbstractPortfolioTreeTableModel(sellPortfolioTreeTableModel);
+    }
+    
     /**
      * Construct Statements based on given AbstractPortfolioTreeTableModel.
      *
      * @param abstractPortfolioTreeTableModel Given AbstractPortfolioTreeTableModel
      * @return the constructed Statements. null if fail
      */
-    public static Statements newInstanceFromAbstractPortfolioTreeTableModel(AbstractPortfolioTreeTableModel abstractPortfolioTreeTableModel) {
+    private static Statements newInstanceFromAbstractPortfolioTreeTableModel(AbstractPortfolioTreeTableModel abstractPortfolioTreeTableModel) {
         final int column = abstractPortfolioTreeTableModel.getColumnCount();
         final Portfolio portfolio = (Portfolio)abstractPortfolioTreeTableModel.getRoot();
         final int summaryCount = portfolio.getChildCount();
