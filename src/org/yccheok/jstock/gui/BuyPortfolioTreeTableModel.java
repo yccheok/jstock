@@ -29,13 +29,11 @@ import org.yccheok.jstock.portfolio.*;
 import javax.swing.tree.TreePath;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.StockInfo;
+import org.yccheok.jstock.gui.treetable.BuyPortfolioTreeTableModelEx;
 import org.yccheok.jstock.internationalization.GUIBundle;
 
-/**
- *
- * @author Owner
- */
-public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel {
+@Deprecated
+public class BuyPortfolioTreeTableModel extends DeprecatedAbstractPortfolioTreeTableModel {
     // Can be either stock last price or open price. If stock last price is 0
     // at current moment (Usually, this means no transaction has been done on
     // that day), open price will be applied.
@@ -628,6 +626,21 @@ public class BuyPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel 
      */
     public Map<Code, Double> getStockPrices() {
         return java.util.Collections.unmodifiableMap(stockPrice);
+    }
+    
+    public BuyPortfolioTreeTableModelEx toBuyPortfolioTreeTableModelEx() {
+        BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModelEx = new BuyPortfolioTreeTableModelEx();
+        buyPortfolioTreeTableModelEx.setRoot(this.getRoot());
+        // Hacking. Pass TreeTableModel to portfolio, so that sorting would work.
+        ((Portfolio)buyPortfolioTreeTableModelEx.getRoot()).setTreeTableModel(buyPortfolioTreeTableModelEx);
+        
+        // Initialization.
+        for (Map.Entry<Code, Double> entry : stockPrice.entrySet()) {
+            Code code = entry.getKey();
+            Double price = entry.getValue();
+            buyPortfolioTreeTableModelEx.updateStockLastPrice(code, price);
+        }
+        return buyPortfolioTreeTableModelEx;
     }
     
     private Object readResolve() {

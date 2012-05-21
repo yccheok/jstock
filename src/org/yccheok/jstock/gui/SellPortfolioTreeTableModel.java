@@ -6,6 +6,7 @@
 package org.yccheok.jstock.gui;
 
 import org.jdesktop.swingx.treetable.TreeTableModel;
+import org.yccheok.jstock.gui.treetable.SellPortfolioTreeTableModelEx;
 import org.yccheok.jstock.portfolio.Contract;
 import org.yccheok.jstock.portfolio.Portfolio;
 import org.yccheok.jstock.portfolio.Transaction;
@@ -15,7 +16,8 @@ import org.yccheok.jstock.internationalization.GUIBundle;
  *
  * @author yccheok
  */
-public class SellPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel {
+@Deprecated
+public class SellPortfolioTreeTableModel extends DeprecatedAbstractPortfolioTreeTableModel {
     
     // Names of the columns.
     private static final String[] cNames;
@@ -391,6 +393,15 @@ public class SellPortfolioTreeTableModel extends AbstractPortfolioTreeTableModel
         return null;
     }
     
+    public SellPortfolioTreeTableModelEx toSellPortfolioTreeTableModelEx() {
+        SellPortfolioTreeTableModelEx sellPortfolioTreeTableModelEx = new SellPortfolioTreeTableModelEx();
+        sellPortfolioTreeTableModelEx.setRoot(this.getRoot());
+        // Hacking. Pass TreeTableModel to portfolio, so that sorting would work.
+        ((Portfolio)sellPortfolioTreeTableModelEx.getRoot()).setTreeTableModel(sellPortfolioTreeTableModelEx);
+
+        return sellPortfolioTreeTableModelEx;
+    }
+        
     @Override
     public boolean isValidTransaction(Transaction transaction) {
         return (transaction.getContract().getType() == Contract.Type.Sell);
