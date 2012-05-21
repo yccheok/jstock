@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2012 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,18 +19,23 @@
 
 package org.yccheok.jstock.portfolio;
 
+import au.com.bytecode.opencsv.CSVWriter;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.Country;
-import org.yccheok.jstock.gui.BuyPortfolioTreeTableModel;
 import org.yccheok.jstock.gui.JStockOptions;
 import org.yccheok.jstock.gui.MainFrame;
-import org.yccheok.jstock.gui.SellPortfolioTreeTableModel;
 
 /**
  *
@@ -195,24 +200,40 @@ public class Utils {
         if (false == org.yccheok.jstock.gui.Utils.createCompleteDirectoryHierarchyIfDoesNotExist(directory)) {
             return false;
         }
+        
+        final File stockPricesFile = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "stockprices.csv");
 
         // Do not allow to create empty portfolio, if the desired location already
         // contain portfolio files.
-        if (new File(directory + "buyportfolio.xml").exists() || new File(directory + "depositsummary.xml").exists() ||
-            new File(directory + "sellportfolio.xml").exists() || new File(directory + "dividendsummary.xml").exists()) {
+        if (stockPricesFile.exists()) {
             return false;
         }
-        
-        final BuyPortfolioTreeTableModel buyPortfolioTreeTableModel = new BuyPortfolioTreeTableModel();
-        final SellPortfolioTreeTableModel sellPortfolioTreeTableModel = new SellPortfolioTreeTableModel();
-        final DepositSummary depositSummary = new DepositSummary();
-        final DividendSummary dividendSummary = new DividendSummary();
 
-        return
-        org.yccheok.jstock.gui.Utils.toXML(buyPortfolioTreeTableModel, directory + "buyportfolio.xml") &&
-        org.yccheok.jstock.gui.Utils.toXML(sellPortfolioTreeTableModel, directory + "sellportfolio.xml") &&
-        org.yccheok.jstock.gui.Utils.toXML(depositSummary, directory + "depositsummary.xml") &&
-        org.yccheok.jstock.gui.Utils.toXML(dividendSummary, directory + "dividendsummary.xml");
+        FileOutputStream fileOutputStream = null;
+        OutputStreamWriter outputStreamWriter = null;
+        CSVWriter csvwriter = null;
+
+        try {
+            fileOutputStream = new FileOutputStream(stockPricesFile);
+            outputStreamWriter = new OutputStreamWriter(fileOutputStream,  Charset.forName("UTF-8"));
+            csvwriter = new CSVWriter(outputStreamWriter);
+            String[] datas = {"code", "price"};
+
+            csvwriter.writeNext(datas);
+        }  catch (IOException ex) {
+            log.error(null, ex);
+        } finally {
+            if (csvwriter != null) {
+                try {
+                    csvwriter.close();
+                } catch (IOException ex) {
+                    log.error(null, ex);
+                }
+            }
+            org.yccheok.jstock.gui.Utils.close(outputStreamWriter);
+            org.yccheok.jstock.gui.Utils.close(fileOutputStream);
+        }
+        return true;
     }
 
     /**
@@ -430,4 +451,6 @@ public class Utils {
     // 0.00000001 is a magic number. I have 0 idea what I should have for this
     // value.
     private static final double EPSILON = 0.00000001;
+    
+    private static final Log log = LogFactory.getLog(Utils.class);    
 }

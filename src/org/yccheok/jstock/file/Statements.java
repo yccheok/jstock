@@ -53,10 +53,10 @@ import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.SimpleDate;
 import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.StockHistoryServer;
-import org.yccheok.jstock.gui.AbstractPortfolioTreeTableModel;
-import org.yccheok.jstock.gui.BuyPortfolioTreeTableModel;
 import org.yccheok.jstock.gui.POIUtils;
-import org.yccheok.jstock.gui.SellPortfolioTreeTableModel;
+import org.yccheok.jstock.gui.treetable.AbstractPortfolioTreeTableModelEx;
+import org.yccheok.jstock.gui.treetable.BuyPortfolioTreeTableModelEx;
+import org.yccheok.jstock.gui.treetable.SellPortfolioTreeTableModelEx;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.portfolio.Portfolio;
 import org.yccheok.jstock.portfolio.Transaction;
@@ -82,7 +82,7 @@ public class Statements {
      */
     private Statements() {}
 
-    public static Statements newInstanceFromBuyPortfolioTreeTableModel(BuyPortfolioTreeTableModel buyPortfolioTreeTableModel) {
+    public static Statements newInstanceFromBuyPortfolioTreeTableModel(BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel) {
         Statements statements = newInstanceFromAbstractPortfolioTreeTableModel(buyPortfolioTreeTableModel);
         
         // Preparing for metadata.
@@ -415,7 +415,7 @@ public class Statements {
         return s;
     }
 
-    public static Statements newInstanceFromSellPortfolioTreeTableModel(SellPortfolioTreeTableModel sellPortfolioTreeTableModel) {
+    public static Statements newInstanceFromSellPortfolioTreeTableModel(SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel) {
         return newInstanceFromAbstractPortfolioTreeTableModel(sellPortfolioTreeTableModel);
     }
     
@@ -425,7 +425,7 @@ public class Statements {
      * @param abstractPortfolioTreeTableModel Given AbstractPortfolioTreeTableModel
      * @return the constructed Statements. null if fail
      */
-    private static Statements newInstanceFromAbstractPortfolioTreeTableModel(AbstractPortfolioTreeTableModel abstractPortfolioTreeTableModel) {
+    private static Statements newInstanceFromAbstractPortfolioTreeTableModel(AbstractPortfolioTreeTableModelEx abstractPortfolioTreeTableModel) {
         final int column = abstractPortfolioTreeTableModel.getColumnCount();
         final Portfolio portfolio = (Portfolio)abstractPortfolioTreeTableModel.getRoot();
         final int summaryCount = portfolio.getChildCount();
@@ -449,7 +449,7 @@ public class Statements {
                         atoms.add(new Atom(stock.getCode().toString(), GUIBundle.getString("MainFrame_Code")));
                         atoms.add(new Atom(stock.getSymbol().toString(), GUIBundle.getString("MainFrame_Symbol")));
                         // OK. I know. This breaks generalization.
-                        if (abstractPortfolioTreeTableModel instanceof SellPortfolioTreeTableModel) {
+                        if (abstractPortfolioTreeTableModel instanceof SellPortfolioTreeTableModelEx) {
                             final SimpleDate simpleDate = transaction.getContract().getReferenceDate();
                             DateFormat dateFormat = org.yccheok.jstock.gui.Utils.getCommonDateFormat();
                             atoms.add(new Atom(object != null ? dateFormat.format(simpleDate.getTime()) : "", GUIBundle.getString("PortfolioManagementJPanel_ReferenceDate")));
