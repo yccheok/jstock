@@ -1,34 +1,36 @@
 /*
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2012 Yan Cheng CHEOK <yccheok@yahoo.com>
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- * Copyright (C) 2008 Cheok YanCheng <yccheok@yahoo.com>
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.yccheok.jstock.portfolio;
 
-import org.jdesktop.swingx.treetable.*;
+import org.jdesktop.swingx.treetable.TreeTableModel;
+import org.yccheok.jstock.gui.treetable.DefaulSortabletMutableTreeTableNode;
 
 /**
  *
  * @author Owner
  */
-public class Portfolio extends DefaultMutableTreeTableNode implements Commentable {
+public class Portfolio extends DefaulSortabletMutableTreeTableNode implements Commentable {
 
     public double getNetTotal() {
         double result = 0.0;
-        
+
         final int count = this.getChildCount();
         
         for(int i=0; i<count; i++) {
@@ -151,6 +153,34 @@ public class Portfolio extends DefaultMutableTreeTableNode implements Commentabl
 
         return this;
     }
-
+    
     private String comment = "";
+    
+    // **************** HACKING CODE SO THAT SORTING COULD WORK ****************
+    
+    // Use transient, so that we still can load portfolio from obsolete XML file.
+    private transient TreeTableModel treeTableModel = null;
+    // In order for sorting to work, Portfolio must implement getValueAt correctly.
+    // In order for getValueAt to work correctly, it must obtain information from
+    // TreeTableModel.
+    public void setTreeTableModel(TreeTableModel treeTableModel) {
+        this.treeTableModel = treeTableModel;
+        
+        // Propogate TreeTableModel information to its children.
+        final int count = this.getChildCount();
+        
+        for (int i = 0; i < count; i++) {
+            Object o = this.getChildAt(i);
+            
+            assert(o instanceof TransactionSummary);
+            
+            final TransactionSummary transactionSummary = (TransactionSummary)o;
+            transactionSummary.setTreeTableModel(treeTableModel);
+        }        
+    }
+    
+    @Override
+    public Object getValueAt(int column) {
+        return treeTableModel.getValueAt(this, column);
+    }    
 }

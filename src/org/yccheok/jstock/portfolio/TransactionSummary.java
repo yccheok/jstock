@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2012 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,13 +19,14 @@
 
 package org.yccheok.jstock.portfolio;
 
-import org.jdesktop.swingx.treetable.*;
+import org.jdesktop.swingx.treetable.TreeTableModel;
+import org.yccheok.jstock.gui.treetable.DefaulSortabletMutableTreeTableNode;
 
 /**
  *
  * @author Owner
  */
-public class TransactionSummary extends DefaultMutableTreeTableNode implements Commentable {
+public class TransactionSummary extends DefaulSortabletMutableTreeTableNode implements Commentable {
 
     public double getQuantity() {
         double result = 0;
@@ -197,4 +198,32 @@ public class TransactionSummary extends DefaultMutableTreeTableNode implements C
     }
 
     private String comment = "";
+    
+    // **************** HACKING CODE SO THAT SORTING COULD WORK ****************
+    
+    // Use transient, so that we still can load portfolio from obsolete XML file.
+    private transient TreeTableModel treeTableModel = null;
+    // In order for sorting to work, Portfolio must implement getValueAt correctly.
+    // In order for getValueAt to work correctly, it must obtain information from
+    // TreeTableModel.
+    public void setTreeTableModel(TreeTableModel treeTableModel) {
+        this.treeTableModel = treeTableModel;
+        
+        // Propogate TreeTableModel information to its children.
+        final int count = this.getChildCount();
+        
+        for (int i = 0; i < count; i++) {
+            Object o = this.getChildAt(i);
+            
+            assert(o instanceof Transaction);
+            
+            final Transaction transaction = (Transaction)o;
+            transaction.setTreeTableModel(treeTableModel);
+        }        
+    }
+    
+    @Override
+    public Object getValueAt(int column) {
+        return treeTableModel.getValueAt(this, column);
+    }   
 }
