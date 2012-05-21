@@ -1,12 +1,26 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2012 Yan Cheng CHEOK <yccheok@yahoo.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package org.yccheok.jstock.gui;
+package org.yccheok.jstock.gui.treetable;
 
+import java.util.List;
 import javax.swing.tree.TreePath;
-import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.jdesktop.swingx.treetable.TreeTableNode;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.portfolio.Portfolio;
@@ -17,9 +31,16 @@ import org.yccheok.jstock.portfolio.TransactionSummary;
  *
  * @author yccheok
  */
-public abstract class AbstractPortfolioTreeTableModel extends DefaultTreeTableModel {
-    public AbstractPortfolioTreeTableModel() {
-        super(new Portfolio()) ;
+public abstract class AbstractPortfolioTreeTableModelEx extends SortableTreeTableModel {
+    public AbstractPortfolioTreeTableModelEx(List<?> columnNames) {
+        // SortableTreeTableModel is using columnIdentifiers, which is the 
+        // inherited member of DefaultTreeTableModel. In order for 
+        // SortableTreeTableModel to work correct, we must call its constructor
+        // SortableTreeTableModel(TreeTableNode root, List<?> columnNames) so 
+        // that columnIdentifiers will be initialized with correct value.        
+        super(new Portfolio(), columnNames);
+        // Hacking. Pass myself to portfolio, so that sorting would work.
+        ((Portfolio)this.getRoot()).setTreeTableModel(this);
     }
 
     public void fireTreeTableNodeChanged(TreeTableNode node) {
@@ -126,9 +147,13 @@ public abstract class AbstractPortfolioTreeTableModel extends DefaultTreeTableMo
         
         if (transactionSummary == null) {
             transactionSummary = new TransactionSummary();
+            // Hacking. Pass myself to portfolio, so that sorting would work.
+            transactionSummary.setTreeTableModel(this);
             this.insertNodeInto(transactionSummary, portfolio, portfolio.getChildCount());
         }
-       
+        
+        // Hacking. Pass myself to portfolio, so that sorting would work.
+        transaction.setTreeTableModel(this);       
         this.insertNodeInto(transaction, transactionSummary, transactionSummary.getChildCount());
         
         // Workaround to solve root is not being updated when children are not 
