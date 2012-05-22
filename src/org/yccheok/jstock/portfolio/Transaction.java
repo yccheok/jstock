@@ -164,6 +164,10 @@ public class Transaction extends DefaultSortableMutableTreeTableNode implements 
             comment = "";
         }
 
+        // If this Transaction is read from obsolete XML file, sortable value will
+        // be false. We need it to be true all the time.
+        this.setSortable(true);
+        
         return this;
     }
                

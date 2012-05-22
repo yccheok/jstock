@@ -147,10 +147,14 @@ public class Portfolio extends DefaultSortableMutableTreeTableNode implements Co
 
     private Object readResolve() {
         /* For backward compatible */
-        if(comment == null) {
+        if (comment == null) {
             comment = "";
         }
 
+        // If this Portfolio is read from obsolete XML file, sortable value will
+        // be false. We need it to be true all the time.
+        this.setSortable(true);
+        
         return this;
     }
     
