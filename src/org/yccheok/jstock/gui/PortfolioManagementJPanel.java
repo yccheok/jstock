@@ -77,6 +77,10 @@ import org.yccheok.jstock.gui.portfolio.DividendSummaryJDialog;
 import org.yccheok.jstock.gui.portfolio.DividendSummaryTableModel;
 import org.yccheok.jstock.gui.portfolio.SplitJDialog;
 import org.yccheok.jstock.gui.portfolio.ToolTipHighlighter;
+import org.yccheok.jstock.gui.treetable.AbstractPortfolioTreeTableModelEx;
+import org.yccheok.jstock.gui.treetable.BuyPortfolioTreeTableModelEx;
+import org.yccheok.jstock.gui.treetable.SellPortfolioTreeTableModelEx;
+import org.yccheok.jstock.gui.treetable.SortableTreeTable;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.internationalization.MessagesBundle;
 
@@ -115,7 +119,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         jLabel8 = new javax.swing.JLabel();
         jSplitPane1 = new javax.swing.JSplitPane();
         jScrollPane1 = new javax.swing.JScrollPane();
-        buyTreeTable = new org.jdesktop.swingx.JXTreeTable(new BuyPortfolioTreeTableModel());
+        buyTreeTable = new SortableTreeTable(new BuyPortfolioTreeTableModelEx());
         // We need to have a hack way, to have "Comment" in the model, but not visible to user.
         // So that our ToolTipHighlighter can work correctly.
         // setVisible should be called after JXTreeTable has been constructed. This is to avoid
@@ -125,7 +129,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         // Why? Don't ask me. Ask SwingX team.
         ((TableColumnExt)buyTreeTable.getColumn(GUIBundle.getString("PortfolioManagementJPanel_Comment"))).setVisible(false);
         jScrollPane2 = new javax.swing.JScrollPane();
-        sellTreeTable = new org.jdesktop.swingx.JXTreeTable(new SellPortfolioTreeTableModel());
+        sellTreeTable = new SortableTreeTable(new SellPortfolioTreeTableModelEx());
 
         // We need to have a hack way, to have "Comment" in the model, but not visible to user.
         // So that our ToolTipHighlighter can work correctly.
@@ -193,6 +197,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         buyTreeTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         buyTreeTable.setRootVisible(true);
+        // this must be before any sort instructions or get funny results
+        buyTreeTable.setAutoCreateColumnsFromModel(false);
+
         // We need to have a hack way, to have "Comment" in the model, but not visible to user.
         // So that our ToolTipHighlighter can work correctly.
         buyTreeTable.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(1, new String[]{GUIBundle.getString("PortfolioManagementJPanel_Comment")}));
@@ -217,6 +224,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         sellTreeTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         sellTreeTable.setRootVisible(true);
+        // this must be before any sort instructions or get funny results
+        sellTreeTable.setAutoCreateColumnsFromModel(false);
+
         // We need to have a hack way, to have "Comment" in the model, but not visible to user.
         // So that our ToolTipHighlighter can work correctly.
         sellTreeTable.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(1, new String[]{GUIBundle.getString("PortfolioManagementJPanel_Comment")}));
@@ -501,7 +511,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                             return true;
                         }
                     }
-                    this.buyTreeTable.setTreeTableModel(new BuyPortfolioTreeTableModel());                    
+                    this.buyTreeTable.setTreeTableModel(new BuyPortfolioTreeTableModelEx());                    
 
                     for (Transaction transaction : transactions) {
                         this.addBuyTransaction(transaction);
@@ -611,7 +621,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                             return true;
                         }
                     }
-                    this.sellTreeTable.setTreeTableModel(new SellPortfolioTreeTableModel());                    
+                    this.sellTreeTable.setTreeTableModel(new SellPortfolioTreeTableModelEx());                    
 
                     for (Transaction transaction : transactions) {
                         this.addSellTransaction(transaction);
@@ -820,7 +830,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
     
     public double getStockLastPrice(Stock stock) {
-        final BuyPortfolioTreeTableModel buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
+        final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
         return buyPortfolioTreeTableModel.getLastPrice(stock.getCode());
     }
 
@@ -848,7 +858,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             
             addSellTransaction(newSellTransaction);
             
-            final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
+            final BuyPortfolioTreeTableModelEx portfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
             
             if (remain <= 0) {
                 portfolioTreeTableModel.removeTransaction(buyTransaction);
@@ -940,7 +950,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
     
     private void deleteSelectedTreeTableRow(org.jdesktop.swingx.JXTreeTable treeTable) {
-        final AbstractPortfolioTreeTableModel portfolioTreeTableModel = (AbstractPortfolioTreeTableModel)treeTable.getTreeTableModel();
+        final AbstractPortfolioTreeTableModelEx portfolioTreeTableModel = (AbstractPortfolioTreeTableModelEx)treeTable.getTreeTableModel();
         final TreePath[] treePaths = treeTable.getTreeSelectionModel().getSelectionPaths();
         
         if (treePaths == null) {
@@ -1062,7 +1072,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         
         final Object o = treePaths[0].getLastPathComponent();
 
-        final AbstractPortfolioTreeTableModel portfolioTreeTableModel = (AbstractPortfolioTreeTableModel)treeTable.getTreeTableModel();
+        final AbstractPortfolioTreeTableModelEx portfolioTreeTableModel = (AbstractPortfolioTreeTableModelEx)treeTable.getTreeTableModel();
         
         return (portfolioTreeTableModel.getRoot() == o);
     }
@@ -1097,7 +1107,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
 
         double ratio = splitOrMergeJDialog.getRatio();
-        final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
+        final BuyPortfolioTreeTableModelEx portfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
         // Perform splitting. (Or merging)
         portfolioTreeTableModel.split(stockInfo, ratio);
         // Update the wealth. The value of wealth shall remain unchanged.
@@ -1217,7 +1227,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     
     private void showBuyPortfolioChartJDialog() {
         final MainFrame m = MainFrame.getInstance();
-        final BuyPortfolioTreeTableModel buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
+        final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
         BuyPortfolioChartJDialog buyPortfolioChartJDialog = new BuyPortfolioChartJDialog(m, false, buyPortfolioTreeTableModel, this.getDividendSummary());
         buyPortfolioChartJDialog.setVisible(true);                                    
     }
@@ -1230,7 +1240,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
     private void showSellPortfolioChartJDialog() {
         final MainFrame m = MainFrame.getInstance();
-        final SellPortfolioTreeTableModel sellPortfolioTreeTableModel = (SellPortfolioTreeTableModel)sellTreeTable.getTreeTableModel();
+        final SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel = (SellPortfolioTreeTableModelEx)sellTreeTable.getTreeTableModel();
         SellPortfolioChartJDialog sellPortfolioChartJDialog = new SellPortfolioChartJDialog(m, false, sellPortfolioTreeTableModel, this.getDividendSummary());
         sellPortfolioChartJDialog.setVisible(true);                                    
     }
@@ -1562,7 +1572,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         assert(newTransaction.getContract().getType() == Contract.Type.Sell);
         assert(oldTransaction.getContract().getType() == Contract.Type.Sell);
         
-        final SellPortfolioTreeTableModel portfolioTreeTableModel = (SellPortfolioTreeTableModel)sellTreeTable.getTreeTableModel();
+        final SellPortfolioTreeTableModelEx portfolioTreeTableModel = (SellPortfolioTreeTableModelEx)sellTreeTable.getTreeTableModel();
         portfolioTreeTableModel.editTransaction(newTransaction, oldTransaction);        
     }
     
@@ -1570,24 +1580,24 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         assert(newTransaction.getContract().getType() == Contract.Type.Buy);
         assert(oldTransaction.getContract().getType() == Contract.Type.Buy);
         
-        final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
+        final BuyPortfolioTreeTableModelEx portfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
         portfolioTreeTableModel.editTransaction(newTransaction, oldTransaction);        
     }
 
     private int getBuyTransactionSize() {
-        final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
+        final BuyPortfolioTreeTableModelEx portfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
         return portfolioTreeTableModel.getTransactionSize();
     }
 
     private int getSellTransactionSize() {
-        final SellPortfolioTreeTableModel portfolioTreeTableModel = (SellPortfolioTreeTableModel)sellTreeTable.getTreeTableModel();
+        final SellPortfolioTreeTableModelEx portfolioTreeTableModel = (SellPortfolioTreeTableModelEx)sellTreeTable.getTreeTableModel();
         return portfolioTreeTableModel.getTransactionSize();
     }
 
     private void addBuyTransaction(Transaction transaction) {
         assert(transaction.getContract().getType() == Contract.Type.Buy);
         
-        final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
+        final BuyPortfolioTreeTableModelEx portfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
         portfolioTreeTableModel.addTransaction(transaction);
 
         // This is to prevent NPE, during initPortfolio through constructor.
@@ -1599,8 +1609,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
 
     public List<TransactionSummary> getTransactionSummariesFromPortfolios() {
-        final BuyPortfolioTreeTableModel buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
-        final SellPortfolioTreeTableModel sellPortfolioTreeTableModel = (SellPortfolioTreeTableModel)sellTreeTable.getTreeTableModel();
+        final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
+        final SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel = (SellPortfolioTreeTableModelEx)sellTreeTable.getTreeTableModel();
         final Portfolio buyPortfolio = (Portfolio) buyPortfolioTreeTableModel.getRoot();
         final Portfolio sellPortfolio = (Portfolio) sellPortfolioTreeTableModel.getRoot();
         List<TransactionSummary> summaries = new ArrayList<TransactionSummary>();
@@ -1617,8 +1627,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
 
     public List<Stock> getStocksFromPortfolios() {
-        final BuyPortfolioTreeTableModel buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
-        final SellPortfolioTreeTableModel sellPortfolioTreeTableModel = (SellPortfolioTreeTableModel)sellTreeTable.getTreeTableModel();
+        final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
+        final SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel = (SellPortfolioTreeTableModelEx)sellTreeTable.getTreeTableModel();
         final Portfolio buyPortfolio = (Portfolio) buyPortfolioTreeTableModel.getRoot();
         final Portfolio sellPortfolio = (Portfolio) sellPortfolioTreeTableModel.getRoot();
 
@@ -1665,7 +1675,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private void addSellTransaction(Transaction transaction) {
         assert(transaction.getContract().getType() == Contract.Type.Sell);
         
-        final SellPortfolioTreeTableModel portfolioTreeTableModel = (SellPortfolioTreeTableModel)sellTreeTable.getTreeTableModel();
+        final SellPortfolioTreeTableModelEx portfolioTreeTableModel = (SellPortfolioTreeTableModelEx)sellTreeTable.getTreeTableModel();
         portfolioTreeTableModel.addTransaction(transaction);
     }
     
@@ -1674,7 +1684,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             return;
         }
         
-        final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
+        final BuyPortfolioTreeTableModelEx portfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
                 
         if (portfolioTreeTableModel != null) {
             this.buyTreeTable.setTreeTableModel(portfolioTreeTableModel);
@@ -1738,8 +1748,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     // as it works well under Desktop platform and Android platform.
     private boolean initCSVPortfolio() {
         // Clear the previous data structures.
-        PortfolioManagementJPanel.this.buyTreeTable.setTreeTableModel(new BuyPortfolioTreeTableModel());
-        PortfolioManagementJPanel.this.sellTreeTable.setTreeTableModel(new SellPortfolioTreeTableModel());
+        PortfolioManagementJPanel.this.buyTreeTable.setTreeTableModel(new BuyPortfolioTreeTableModelEx());
+        PortfolioManagementJPanel.this.sellTreeTable.setTreeTableModel(new SellPortfolioTreeTableModelEx());
         PortfolioManagementJPanel.this.depositSummary = new DepositSummary();
         PortfolioManagementJPanel.this.dividendSummary = new DividendSummary();
             
@@ -1791,8 +1801,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
         
         refershGUIAfterInitPortfolio(
-                (BuyPortfolioTreeTableModel)PortfolioManagementJPanel.this.buyTreeTable.getTreeTableModel(), 
-                (SellPortfolioTreeTableModel)PortfolioManagementJPanel.this.sellTreeTable.getTreeTableModel(), 
+                (BuyPortfolioTreeTableModelEx)PortfolioManagementJPanel.this.buyTreeTable.getTreeTableModel(), 
+                (SellPortfolioTreeTableModelEx)PortfolioManagementJPanel.this.sellTreeTable.getTreeTableModel(), 
                 this.depositSummary, 
                 this.dividendSummary, 
                 false);
@@ -1809,6 +1819,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     //
     // It also seperates portfolio data out from DefaultTreeTableModel. This
     // enables us to switch to a better tree table GUI.
+    @SuppressWarnings( "deprecation" )
     private boolean initXMLPortfolio() {
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
 
@@ -1886,14 +1897,17 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
          org.yccheok.jstock.portfolio.Utils.removeMeaninglessRecords(_depositSummary);
          org.yccheok.jstock.portfolio.Utils.removeMeaninglessRecords(_dividendSummary);
          
-         refershGUIAfterInitPortfolio(buyPortfolioTreeTableModel, sellPortfolioTreeTableModel, _depositSummary, _dividendSummary, oldData);
+         refershGUIAfterInitPortfolio(
+                 buyPortfolioTreeTableModel.toBuyPortfolioTreeTableModelEx(), 
+                 sellPortfolioTreeTableModel.toSellPortfolioTreeTableModelEx(), 
+                 _depositSummary, _dividendSummary, oldData);
          
          return true;
     }
 
     private void _refershGUIAfterInitPortfolio(
-            final BuyPortfolioTreeTableModel buyPortfolioTreeTableModel,
-            final SellPortfolioTreeTableModel sellPortfolioTreeTableModel,
+            final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel,
+            final SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel,
             final DepositSummary _depositSummary,
             final DividendSummary _dividendSummary,
             final boolean oldData            
@@ -1956,8 +1970,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
     
     private void refershGUIAfterInitPortfolio(
-            final BuyPortfolioTreeTableModel buyPortfolioTreeTableModel,
-            final SellPortfolioTreeTableModel sellPortfolioTreeTableModel,
+            final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel,
+            final SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel,
             final DepositSummary _depositSummary,
             final DividendSummary _dividendSummary,
             final boolean oldData) {
@@ -2020,7 +2034,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         if (false == this.saveAsCSVFile(buyPortfolioFileEx)) {            
             
-            final BuyPortfolioTreeTableModel buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModel)this.buyTreeTable.getTreeTableModel();
+            final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)this.buyTreeTable.getTreeTableModel();
             // org.yccheok.jstock.file.Statements is not good in handling empty 
             // case. Let us handle it seperately.
             int count = buyPortfolioTreeTableModel.getRoot().getChildCount();
@@ -2032,7 +2046,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
         
         if (false == this.saveAsCSVFile(sellPortfolioFileEx)) {            
-            final SellPortfolioTreeTableModel sellPortfolioTreeTableModel = (SellPortfolioTreeTableModel)this.sellTreeTable.getTreeTableModel();
+            final SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel = (SellPortfolioTreeTableModelEx)this.sellTreeTable.getTreeTableModel();
             
             // org.yccheok.jstock.file.Statements is not good in handling empty 
             // case. Let us handle it seperately.
@@ -2139,7 +2153,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             org.yccheok.jstock.gui.Utils.close(fileInputStream);
         }
         
-        final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
+        final BuyPortfolioTreeTableModelEx portfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
  
         // Initialization.
         for (Map.Entry<Code, Double> entry : stockPrices.entrySet()) {
@@ -2155,7 +2169,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         boolean status = false;
 
         final File stockPricesFile = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "stockprices.csv");
-        final BuyPortfolioTreeTableModel buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModel)this.buyTreeTable.getTreeTableModel();
+        final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)this.buyTreeTable.getTreeTableModel();
 
         FileOutputStream fileOutputStream = null;
         OutputStreamWriter outputStreamWriter = null;
@@ -2195,45 +2209,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         return status;        
     }
-    
-    // This is an obsolete way to save portfolio. It will soon be replaced by
-    // saveCSVPortfolio.
-    private boolean saveXMLPortfolio() {
-        if (Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory()) == false)
-        {
-            return false;
-        }
-
-        boolean status = true;
-
-        String filePath = org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "buyportfolio.xml";
-        final BuyPortfolioTreeTableModel buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
-        if (org.yccheok.jstock.gui.Utils.toXML(buyPortfolioTreeTableModel, filePath) == false) {
-            status = false;
-        }
-
-        filePath = org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "sellportfolio.xml";
-        final SellPortfolioTreeTableModel sellPortfolioTreeTableModel = (SellPortfolioTreeTableModel)sellTreeTable.getTreeTableModel();
-        if (org.yccheok.jstock.gui.Utils.toXML(sellPortfolioTreeTableModel, filePath) == false) {
-            status = false;
-        }
-
-        filePath = org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "depositsummary.xml";
-        if (org.yccheok.jstock.gui.Utils.toXML(this.getDepositSummary(), filePath) == false) {
-            status = false;
-        }
-
-        filePath = org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "dividendsummary.xml";
-        if (org.yccheok.jstock.gui.Utils.toXML(this.getDividendSummary(), filePath) == false) {
-            status = false;
-        }
-
-        return status;
-    }
 
     public boolean savePortfolio() {
         return saveCSVPortfolio();
-        //return saveXMLPortfolio();
     }
 
     private boolean deleteXMLPortfolio() {
@@ -2369,7 +2347,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
     
     public void update(RealTimeStockMonitor monitor, final java.util.List<Stock> stocks) {
-        final BuyPortfolioTreeTableModel portfolioTreeTableModel = (BuyPortfolioTreeTableModel)buyTreeTable.getTreeTableModel();
+        final BuyPortfolioTreeTableModelEx portfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
  
         for (Stock stock : stocks) {
             if (false == portfolioTreeTableModel.updateStockLastPrice(stock)) {
@@ -2462,8 +2440,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
     public boolean saveAsExcelFile(File file) {
         org.yccheok.jstock.file.Statements.StatementsEx statementsEx0, statementsEx1, statementsEx2, statementsEx3;
-        statementsEx0 = new org.yccheok.jstock.file.Statements.StatementsEx(org.yccheok.jstock.file.Statements.newInstanceFromBuyPortfolioTreeTableModel((BuyPortfolioTreeTableModel)this.buyTreeTable.getTreeTableModel()), GUIBundle.getString("PortfolioManagementJPanel_BuyPortfolio"));
-        statementsEx1 = new org.yccheok.jstock.file.Statements.StatementsEx(org.yccheok.jstock.file.Statements.newInstanceFromSellPortfolioTreeTableModel((SellPortfolioTreeTableModel)this.sellTreeTable.getTreeTableModel()), GUIBundle.getString("PortfolioManagementJPanel_SellPortfolio"));
+        statementsEx0 = new org.yccheok.jstock.file.Statements.StatementsEx(org.yccheok.jstock.file.Statements.newInstanceFromBuyPortfolioTreeTableModel((BuyPortfolioTreeTableModelEx)this.buyTreeTable.getTreeTableModel()), GUIBundle.getString("PortfolioManagementJPanel_BuyPortfolio"));
+        statementsEx1 = new org.yccheok.jstock.file.Statements.StatementsEx(org.yccheok.jstock.file.Statements.newInstanceFromSellPortfolioTreeTableModel((SellPortfolioTreeTableModelEx)this.sellTreeTable.getTreeTableModel()), GUIBundle.getString("PortfolioManagementJPanel_SellPortfolio"));
         statementsEx2 = new org.yccheok.jstock.file.Statements.StatementsEx(org.yccheok.jstock.file.Statements.newInstanceFromTableModel(new DividendSummaryTableModel(this.dividendSummary)), GUIBundle.getString("PortfolioManagementJPanel_DividendPortfolio"));
         statementsEx3 = new org.yccheok.jstock.file.Statements.StatementsEx(org.yccheok.jstock.file.Statements.newInstanceFromTableModel(new DepositSummaryTableModel(this.depositSummary)), GUIBundle.getString("PortfolioManagementJPanel_CashDepositPortfolio"));
         List<org.yccheok.jstock.file.Statements.StatementsEx> statementsExs = Arrays.asList(statementsEx0, statementsEx1, statementsEx2, statementsEx3);
@@ -2476,10 +2454,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             // For buy portfolio, need not save metadata information, as we have
             // seperate "stockprices.csv" to handle it. However, I am not really
             // sure that whether seperating them is a good idea.
-            statements = org.yccheok.jstock.file.Statements.newInstanceFromBuyPortfolioTreeTableModel((BuyPortfolioTreeTableModel)this.buyTreeTable.getTreeTableModel());
+            statements = org.yccheok.jstock.file.Statements.newInstanceFromBuyPortfolioTreeTableModel((BuyPortfolioTreeTableModelEx)this.buyTreeTable.getTreeTableModel());
         }
         else if (fileEx.type == org.yccheok.jstock.file.Statement.Type.PortfolioManagementSell) {
-            statements = org.yccheok.jstock.file.Statements.newInstanceFromSellPortfolioTreeTableModel((SellPortfolioTreeTableModel)this.sellTreeTable.getTreeTableModel());
+            statements = org.yccheok.jstock.file.Statements.newInstanceFromSellPortfolioTreeTableModel((SellPortfolioTreeTableModelEx)this.sellTreeTable.getTreeTableModel());
         }
         else if (fileEx.type == org.yccheok.jstock.file.Statement.Type.PortfolioManagementDividend) {
             statements = org.yccheok.jstock.file.Statements.newInstanceFromTableModel(new DividendSummaryTableModel(this.dividendSummary));
@@ -2496,8 +2474,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
 
     private void updateWealthHeader() {
-        final BuyPortfolioTreeTableModel buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModel)this.buyTreeTable.getTreeTableModel();
-        final SellPortfolioTreeTableModel sellPortfolioTreeTableModel = (SellPortfolioTreeTableModel)this.sellTreeTable.getTreeTableModel();
+        final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)this.buyTreeTable.getTreeTableModel();
+        final SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel = (SellPortfolioTreeTableModelEx)this.sellTreeTable.getTreeTableModel();
       
         // Get the currency exchange rate.
         double exchangeRate = 1.0;
@@ -2633,7 +2611,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private final org.yccheok.jstock.engine.Observer<CurrencyExchangeMonitor, Double> currencyExchangeMonitorObserver = this.getCurrencyExchangeMonitorObserver();
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private org.jdesktop.swingx.JXTreeTable buyTreeTable;
+    private org.yccheok.jstock.gui.treetable.SortableTreeTable buyTreeTable;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
@@ -2654,7 +2632,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSplitPane jSplitPane1;
-    private org.jdesktop.swingx.JXTreeTable sellTreeTable;
+    private org.yccheok.jstock.gui.treetable.SortableTreeTable sellTreeTable;
     // End of variables declaration//GEN-END:variables
 
 }

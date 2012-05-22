@@ -227,7 +227,11 @@ public abstract class AbstractSortableTreeTableNode extends
 		
 		@SuppressWarnings("unchecked")
 		public Row(Object key, int modelIndex, SortOrder order) {
-			this.key = (Comparable)key;
+                        if (key instanceof Comparable) {
+                            this.key = (Comparable)key;
+                        } else {
+                            this.key = key.toString();
+                        }
 			this.modelIndex = modelIndex;
 			this.order = order;
 		}
