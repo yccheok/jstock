@@ -231,10 +231,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         sellTreeTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         sellTreeTable.setRootVisible(true);
-        // We need to have a hack way, to have "Comment" in the model, but not visible to user.
         // this must be before any sort instructions or get funny results
         sellTreeTable.setAutoCreateColumnsFromModel(false);
 
+        // We need to have a hack way, to have "Comment" in the model, but not visible to user.
         // So that our ToolTipHighlighter can work correctly.
         sellTreeTable.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(1, new String[]{GUIBundle.getString("PortfolioManagementJPanel_Comment")}));
         sellTreeTable.addMouseListener(new SellTableRowPopupListener());
