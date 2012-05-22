@@ -60,6 +60,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.table.*;
 import javax.swing.tree.TreePath;
 import org.apache.commons.logging.*;
+import org.jdesktop.swingx.JXTableHeader;
 import org.jdesktop.swingx.JXTreeTable;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.yccheok.jstock.portfolio.*;
@@ -211,6 +212,12 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         buyTreeTable.addHighlighter(new ToolTipHighlighter());
 
         initTreeTableDefaultRenderer(buyTreeTable);
+
+        // Not sure why. Without this code, sorting won't work just after you resize 
+        // table header.
+        JTableHeader oldBuyTableHeader = buyTreeTable.getTableHeader();
+        JXTableHeader newBuyTableHeader = new JXTableHeader(oldBuyTableHeader.getColumnModel());
+        buyTreeTable.setTableHeader(newBuyTableHeader);
         buyTreeTable.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
             public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
                 buyTreeTableValueChanged(evt);
@@ -224,10 +231,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         sellTreeTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         sellTreeTable.setRootVisible(true);
+        // We need to have a hack way, to have "Comment" in the model, but not visible to user.
         // this must be before any sort instructions or get funny results
         sellTreeTable.setAutoCreateColumnsFromModel(false);
 
-        // We need to have a hack way, to have "Comment" in the model, but not visible to user.
         // So that our ToolTipHighlighter can work correctly.
         sellTreeTable.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(1, new String[]{GUIBundle.getString("PortfolioManagementJPanel_Comment")}));
         sellTreeTable.addMouseListener(new SellTableRowPopupListener());
@@ -238,6 +245,12 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         sellTreeTable.addHighlighter(new ToolTipHighlighter());
 
         initTreeTableDefaultRenderer(sellTreeTable);
+
+        // Not sure why. Without this code, sorting won't work just after you resize 
+        // table header.
+        JTableHeader oldSellTableHeader = sellTreeTable.getTableHeader();
+        JXTableHeader newSellTableHeader = new JXTableHeader(oldSellTableHeader.getColumnModel());
+        sellTreeTable.setTableHeader(newSellTableHeader);
         sellTreeTable.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
             public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
                 sellTreeTableValueChanged(evt);
