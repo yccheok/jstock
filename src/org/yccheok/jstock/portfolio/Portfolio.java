@@ -20,13 +20,13 @@
 package org.yccheok.jstock.portfolio;
 
 import org.jdesktop.swingx.treetable.TreeTableModel;
-import org.yccheok.jstock.gui.treetable.DefaulSortabletMutableTreeTableNode;
+import org.yccheok.jstock.gui.treetable.DefaultSortableMutableTreeTableNode;
 
 /**
  *
  * @author Owner
  */
-public class Portfolio extends DefaulSortabletMutableTreeTableNode implements Commentable {
+public class Portfolio extends DefaultSortableMutableTreeTableNode implements Commentable {
 
     public double getNetTotal() {
         double result = 0.0;

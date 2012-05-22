@@ -21,13 +21,13 @@ package org.yccheok.jstock.portfolio;
 
 import org.jdesktop.swingx.treetable.TreeTableModel;
 import org.yccheok.jstock.engine.*;
-import org.yccheok.jstock.gui.treetable.DefaulSortabletMutableTreeTableNode;
+import org.yccheok.jstock.gui.treetable.DefaultSortableMutableTreeTableNode;
 
 /**
  *
  * @author Owner
  */
-public class Transaction extends DefaulSortabletMutableTreeTableNode implements Commentable {
+public class Transaction extends DefaultSortableMutableTreeTableNode implements Commentable {
     public Transaction(Contract contract, Broker broker, StampDuty stampDuty, ClearingFee clearingFee)
     {
         this.contract = contract;
