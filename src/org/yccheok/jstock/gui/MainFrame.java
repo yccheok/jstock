@@ -1411,7 +1411,7 @@ public class MainFrame extends javax.swing.JFrame {
      *
      * @param portfolio Portfolio name
      */
-    public void selectActivePortfolio(String portfolio) {
+    private void selectActivePortfolio(String portfolio) {
         assert(SwingUtilities.isEventDispatchThread());
         // Save current portfolio.
         MainFrame.this.portfolioManagementJPanel.savePortfolio();

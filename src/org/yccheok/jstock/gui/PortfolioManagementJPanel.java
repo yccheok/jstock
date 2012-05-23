@@ -1977,6 +1977,15 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         // refresh the currency symbol after we change the country.
         PortfolioManagementJPanel.this.refreshCurrencySymbol();
         
+        // Due to bug in JXTreeTable?! After I change JStock to load portfolio
+        // from CSV, buyTreeTable expanding won't work anymore, during portfolio
+        // switching (Weird?! But sellTreeTable is working). I need to collapse, 
+        // then expand, only it will work. I suppose to apply this ugly hacking 
+        // to buyTreeTable only. To be consistent, I apply it to sellTreeTable 
+        // as well.
+        this.buyTreeTable.collapseRow(0);
+        this.sellTreeTable.collapseRow(0);
+        
         // Expand the trees.
         PortfolioManagementJPanel.this.buyTreeTable.expandRow(0);
         PortfolioManagementJPanel.this.sellTreeTable.expandRow(0);
