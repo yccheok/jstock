@@ -1129,7 +1129,7 @@ public class MainFrame extends javax.swing.JFrame {
                 if (Utils.getFileExtension(file).equals("csv"))
                 {
                     if (this.getSelectedComponent() == this.jPanel8) {
-                        status = this.saveAsCSVFile(file);
+                        status = this.saveAsCSVFile(file, false);
                     }
                     else if (this.getSelectedComponent() == this.indicatorScannerJPanel) {
                         status = this.indicatorScannerJPanel.saveAsCSVFile(file);
@@ -1441,9 +1441,13 @@ public class MainFrame extends javax.swing.JFrame {
         portfolioJDialog.setVisible(true);
     }
 
-    private boolean saveAsCSVFile(File file) {
+    private File getRealTimeStocksFile() {
+        return new File(org.yccheok.jstock.watchlist.Utils.getWatchlistDirectory(this.jStockOptions.getWatchlistName())  + "realtimestock.csv");
+    }
+    
+    private boolean saveAsCSVFile(File file, boolean languageIndependent) {
         final TableModel tableModel = jTable1.getModel();
-        final org.yccheok.jstock.file.Statements statements = org.yccheok.jstock.file.Statements.newInstanceFromTableModel(tableModel, false);
+        final org.yccheok.jstock.file.Statements statements = org.yccheok.jstock.file.Statements.newInstanceFromTableModel(tableModel, languageIndependent);
         if (statements == null) {
             return false;
         }
@@ -2290,16 +2294,36 @@ public class MainFrame extends javax.swing.JFrame {
     // queue?
     public void addStockToTable(final Stock stock, final StockAlert alert) {
         assert(java.awt.EventQueue.isDispatchThread());
-        
-        final StockTableModel tableModel = (StockTableModel)jTable1.getModel();
-        tableModel.addStock(stock, alert);
+        final JTable _jTable1 = this.jTable1;
+        if (java.awt.EventQueue.isDispatchThread()) {
+            final StockTableModel tableModel = (StockTableModel)_jTable1.getModel();
+            tableModel.addStock(stock, alert);
+        } else {
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    final StockTableModel tableModel = (StockTableModel)_jTable1.getModel();
+                    tableModel.addStock(stock, alert);                    
+                }
+            });
+        }
     }
 
     public void addStockToTable(final Stock stock) {
         assert(java.awt.EventQueue.isDispatchThread());
-
-        final StockTableModel tableModel = (StockTableModel)jTable1.getModel();
-        tableModel.addStock(stock);
+        final JTable _jTable1 = this.jTable1;
+        if (java.awt.EventQueue.isDispatchThread()) {
+            final StockTableModel tableModel = (StockTableModel)_jTable1.getModel();
+            tableModel.addStock(stock);
+        } else {
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    final StockTableModel tableModel = (StockTableModel)_jTable1.getModel();
+                    tableModel.addStock(stock);                    
+                }
+            });            
+        }
     }
 
     // Only will return true if the selected stock is the one and only one.
@@ -3262,7 +3286,50 @@ public class MainFrame extends javax.swing.JFrame {
         this.indicatorPanel.updatePrimaryStockServerFactory(Collections.unmodifiableList(this.getStockServerFactories()));
     }
 
-    private void initRealTimeStocks() {
+    public final void initRealTimeStocks() {
+        // openAsCSVFile will "append" stocks. We need to clear previous stocks
+        // explicitly.
+        clearAllStocks();
+        
+        // Try to read stock files in CSV format.                
+        boolean isCSVSuccess = this.initCSVRealTimeStocks();
+        if (false == isCSVSuccess) {
+            // Fail. We need to migrate from XML format to CSV format.
+            // The returned value for this method doesn't matter.
+            if (initXMLRealTimeStocks()) {
+                // Save the stocks in CSV format.
+                if (saveCSVRealTimeStocks()) {
+                    // And delete the portfolio in XML format. They are obsolete.
+                    deleteXMLRealTimeStocks();
+                }
+            }
+        }
+    }
+    
+    private boolean initCSVRealTimeStocks() {        
+        File realTimeStockFile = this.getRealTimeStocksFile();
+        return this.openAsCSVFile(realTimeStockFile);
+    }
+    
+    private boolean saveCSVRealTimeStocks() {
+        if (Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.watchlist.Utils.getWatchlistDirectory(this.jStockOptions.getWatchlistName())) == false)
+        {
+            return false;
+        }        
+        File realTimeStockFile = getRealTimeStocksFile();
+        return this.saveAsCSVFile(realTimeStockFile, true);
+    }
+    
+    private boolean deleteXMLRealTimeStocks() {
+        File realTimeStockFile = new File(org.yccheok.jstock.watchlist.Utils.getWatchlistDirectory(this.jStockOptions.getWatchlistName())  + "realtimestock.xml");
+        File realTimeStockAlertFile = new File(org.yccheok.jstock.watchlist.Utils.getWatchlistDirectory(this.jStockOptions.getWatchlistName())  + "realtimestockalert.xml");        
+        realTimeStockFile.delete();
+        realTimeStockAlertFile.delete();
+        return true;
+    }
+
+    
+    private boolean initXMLRealTimeStocks() {
         final Country country = this.jStockOptions.getCountry();
 
         // First, we need to determine what watchlist names are there for
@@ -3409,22 +3476,12 @@ public class MainFrame extends javax.swing.JFrame {
                 }   //  public void run()
             }); // SwingUtilities.invokeLater
         }   // if (SwingUtilities.isEventDispatchThread())
+
+        return true;
     }
 
     private boolean saveRealTimeStocks() {
-        if (Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.watchlist.Utils.getWatchlistDirectory(this.jStockOptions.getWatchlistName())) == false)
-        {
-            return false;
-        }
-        
-        final File realTimeStockFile = new File(org.yccheok.jstock.watchlist.Utils.getWatchlistDirectory(this.jStockOptions.getWatchlistName()) + "realtimestock.xml");
-        final boolean status0 = Utils.toXML(((StockTableModel)this.jTable1.getModel()).getStocks(), realTimeStockFile);
-        if (status0 == false) {
-            return status0;
-        }
-
-        final File realTimeStockAlertFile = new File(org.yccheok.jstock.watchlist.Utils.getWatchlistDirectory(this.jStockOptions.getWatchlistName()) + "realtimestockalert.xml");
-        return Utils.toXML(((StockTableModel)this.jTable1.getModel()).getAlerts(), realTimeStockAlertFile);
+        return this.saveCSVRealTimeStocks();
     }
     
     private boolean saveBrokingFirmLogos() {

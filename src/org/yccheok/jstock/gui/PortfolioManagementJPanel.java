@@ -2010,7 +2010,6 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
     }
     
-    // TODO : XML to CSV migration.
     public final void initPortfolio() {
         // Try to read porfolio files in CSV format.
         boolean isCSVSuccess = this.initCSVPortfolio();

@@ -616,8 +616,14 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
             extensions.add(".bmp");
         } else if (name.equals("portfolios")) {
             extensions.add(".csv");
+            // XML will be removed soon once we had perform data conversion
+            // during startup.
+            extensions.add(".xml");
         } else if (name.equals("watchlist")) {
             extensions.add(".csv");
+            // XML will be removed soon once we had perform data conversion
+            // during startup.
+            extensions.add(".xml");
         } else {
             assert(false);
             throw new java.lang.IllegalArgumentException(name);
