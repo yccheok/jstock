@@ -21,6 +21,8 @@ package org.yccheok.jstock.gui.treetable;
 
 import java.util.Arrays;
 import org.jdesktop.swingx.treetable.TreeTableModel;
+import org.yccheok.jstock.file.GUIBundleWrapper;
+import org.yccheok.jstock.file.GUIBundleWrapper.Language;
 import org.yccheok.jstock.gui.JStockOptions;
 import org.yccheok.jstock.gui.MainFrame;
 import org.yccheok.jstock.portfolio.Contract;
@@ -35,12 +37,14 @@ import org.yccheok.jstock.internationalization.GUIBundle;
 public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableModelEx {
     
     public SellPortfolioTreeTableModelEx() {
-        super(Arrays.asList(cNames));
+        super(Arrays.asList(columnNames));
     }
     
     // Names of the columns.
-    private static final String[] cNames;
-
+    private static final String[] columnNames;
+    // Unlike columnNames, LanguageIndependentColumnNames is language independent.
+    private static final String[] languageIndependentColumnNames;
+    
     static {
         final String[] tmp = {
             GUIBundle.getString("PortfolioManagementJPanel_Stock"),
@@ -61,7 +65,28 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
             GUIBundle.getString("PortfolioManagementJPanel_NetGainLossPercentage"),
             GUIBundle.getString("PortfolioManagementJPanel_Comment")
         };
-        cNames = tmp;
+        final GUIBundleWrapper guiBundleWrapper = GUIBundleWrapper.newInstance(Language.INDEPENDENT);
+        final String[] tmp2 = {
+            guiBundleWrapper.getString("PortfolioManagementJPanel_Stock"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_Date"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_Units"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_SellingPrice"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_PurchasePrice"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_SellingValue"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_PurchaseValue"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_GainLossPrice"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_GainLossValue"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_GainLossPercentage"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_Broker"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_ClearingFee"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_StampDuty"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_NetSellingValue"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_NetGainLossValue"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_NetGainLossPercentage"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_Comment")
+        };       
+        columnNames = tmp;
+        languageIndependentColumnNames = tmp2;
     }
 
     // Types of the columns.
@@ -87,21 +112,26 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
     
     @Override
     public int getColumnCount() {
-        assert(cNames.length == cTypes.length);
-        return cNames.length;
+        assert(columnNames.length == cTypes.length);
+        return columnNames.length;
     }
 
     @Override
     public Class getColumnClass(int column) {
-        assert(cNames.length == cTypes.length);        
+        assert(columnNames.length == cTypes.length);        
         return SellPortfolioTreeTableModelEx.cTypes[column];
     }
 
     @Override
     public String getColumnName(int column) {
-        return cNames[column];
+        return columnNames[column];
     }
 
+    @Override
+    public String getLanguageIndependentColumnName(int column) {
+        return languageIndependentColumnNames[column];
+    }
+    
     private double getGainLossPercentage(Portfolio portfolio) {
         if(portfolio.getReferenceTotal() == 0.0) return 0.0;
         

@@ -30,6 +30,8 @@ import org.yccheok.jstock.portfolio.*;
 import javax.swing.tree.TreePath;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.StockInfo;
+import org.yccheok.jstock.file.GUIBundleWrapper;
+import org.yccheok.jstock.file.GUIBundleWrapper.Language;
 import org.yccheok.jstock.gui.JStockOptions;
 import org.yccheok.jstock.gui.MainFrame;
 import org.yccheok.jstock.internationalization.GUIBundle;
@@ -45,7 +47,7 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
     private java.util.Map<Code, Double> stockPrice = new ConcurrentHashMap<Code, Double>();
     
     public BuyPortfolioTreeTableModelEx() {
-        super(Arrays.asList(cNames));
+        super(Arrays.asList(columnNames));
     }
     
     public double getLastPrice(Code code) {
@@ -56,8 +58,11 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
     }
     
     // Names of the columns.
-    private static final String[]  cNames;
-
+    private static final String[] columnNames;
+    // Unlike columnNames, languageIndependentColumnNames is language independent.
+    private static final String[] languageIndependentColumnNames;
+    
+    
     static {
         final String[] tmp = {
             GUIBundle.getString("PortfolioManagementJPanel_Stock"),
@@ -78,7 +83,28 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
             GUIBundle.getString("PortfolioManagementJPanel_NetGainLossPercentage"),
             GUIBundle.getString("PortfolioManagementJPanel_Comment")
         };
-        cNames = tmp;
+        final GUIBundleWrapper guiBundleWrapper = GUIBundleWrapper.newInstance(Language.INDEPENDENT);
+        final String[] tmp2 = {
+            guiBundleWrapper.getString("PortfolioManagementJPanel_Stock"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_Date"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_Units"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_PurchasePrice"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_CurrentPrice"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_PurchaseValue"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_CurrentValue"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_GainLossPrice"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_GainLossValue"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_GainLossPercentage"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_Broker"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_ClearingFee"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_StampDuty"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_NetPurchaseValue"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_NetGainLossValue"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_NetGainLossPercentage"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_Comment")
+        };        
+        columnNames = tmp;
+        languageIndependentColumnNames = tmp2;
     }
 
     // Types of the columns.
@@ -369,8 +395,8 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
 
     @Override
     public int getColumnCount() {
-        assert(cNames.length == cTypes.length);
-        return cNames.length;
+        assert(columnNames.length == cTypes.length);
+        return columnNames.length;
     }
 
     @Override
@@ -380,9 +406,14 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
 
     @Override
     public String getColumnName(int column) {
-        return cNames[column];  
+        return columnNames[column];  
     }
-
+    
+    @Override
+    public String getLanguageIndependentColumnName(int column) {
+        return languageIndependentColumnNames[column];
+    }
+    
     @Override
     public Object getValueAt(Object node, int column) {
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();

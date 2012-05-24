@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2012 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,6 +48,7 @@ import org.yccheok.jstock.alert.SMSLimiter;
 import org.yccheok.jstock.analysis.Indicator;
 import org.yccheok.jstock.analysis.OperatorIndicator;
 import org.yccheok.jstock.engine.AjaxYahooSearchEngine.ResultType;
+import org.yccheok.jstock.file.GUIBundleWrapper;
 import org.yccheok.jstock.file.Statement;
 import org.yccheok.jstock.file.Statements;
 import org.yccheok.jstock.gui.charting.DynamicChart;
@@ -732,14 +733,16 @@ public class MainFrame extends javax.swing.JFrame {
             return false;
         }
         
+        final GUIBundleWrapper guiBundleWrapper = statements.getGUIBundleWrapper();
+        
         if (statements.getType() == Statement.Type.RealtimeInfo) {
             final int size = statements.size();
             for (int i = 0; i < size; i++) {
                 final org.yccheok.jstock.file.Statement statement = statements.get(i);
-                final String codeStr = statement.getValueAsString(GUIBundle.getString("MainFrame_Code"));
-                final String symbolStr = statement.getValueAsString(GUIBundle.getString("MainFrame_Symbol"));
-                final Double fallBelowDouble = statement.getValueAsDouble(GUIBundle.getString("MainFrame_FallBelow"));
-                final Double riseAboveDouble = statement.getValueAsDouble(GUIBundle.getString("MainFrame_RiseAbove"));
+                final String codeStr = statement.getValueAsString(guiBundleWrapper.getString("MainFrame_Code"));
+                final String symbolStr = statement.getValueAsString(guiBundleWrapper.getString("MainFrame_Symbol"));
+                final Double fallBelowDouble = statement.getValueAsDouble(guiBundleWrapper.getString("MainFrame_FallBelow"));
+                final Double riseAboveDouble = statement.getValueAsDouble(guiBundleWrapper.getString("MainFrame_RiseAbove"));
                 if (codeStr.length() > 0 && symbolStr.length() > 0) {
                     final Stock stock = Utils.getEmptyStock(Code.newInstance(codeStr), Symbol.newInstance(symbolStr));
                     final StockAlert stockAlert = new StockAlert().setFallBelow(fallBelowDouble).setRiseAbove(riseAboveDouble);
@@ -753,8 +756,8 @@ public class MainFrame extends javax.swing.JFrame {
             final int size = statements.size();
             for (int i = 0; i < size; i++) {
                 final org.yccheok.jstock.file.Statement statement = statements.get(i);
-                final String codeStr = statement.getValueAsString(GUIBundle.getString("MainFrame_Code"));
-                final String symbolStr = statement.getValueAsString(GUIBundle.getString("MainFrame_Symbol"));
+                final String codeStr = statement.getValueAsString(guiBundleWrapper.getString("MainFrame_Code"));
+                final String symbolStr = statement.getValueAsString(guiBundleWrapper.getString("MainFrame_Symbol"));
                 if (codeStr.length() > 0 && symbolStr.length() > 0) {
                     final Stock stock = Utils.getEmptyStock(Code.newInstance(codeStr), Symbol.newInstance(symbolStr));
                     this.addStockToTable(stock);
@@ -1155,11 +1158,11 @@ public class MainFrame extends javax.swing.JFrame {
                 file = fileEx.file;
                 if (Utils.getFileExtension(fileEx.file).equals("csv"))
                 {
-                    status = this.portfolioManagementJPanel.saveAsCSVFile(fileEx);
+                    status = this.portfolioManagementJPanel.saveAsCSVFile(fileEx, false);
                 }
                 else if (Utils.getFileExtension(fileEx.file).equals("xls"))
                 {
-                    status = this.portfolioManagementJPanel.saveAsExcelFile(fileEx.file);
+                    status = this.portfolioManagementJPanel.saveAsExcelFile(fileEx.file, false);
                 }
             }
         }
@@ -1411,7 +1414,7 @@ public class MainFrame extends javax.swing.JFrame {
      *
      * @param portfolio Portfolio name
      */
-    private void selectActivePortfolio(String portfolio) {
+    public void selectActivePortfolio(String portfolio) {
         assert(SwingUtilities.isEventDispatchThread());
         // Save current portfolio.
         MainFrame.this.portfolioManagementJPanel.savePortfolio();
@@ -1440,7 +1443,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private boolean saveAsCSVFile(File file) {
         final TableModel tableModel = jTable1.getModel();
-        final org.yccheok.jstock.file.Statements statements = org.yccheok.jstock.file.Statements.newInstanceFromTableModel(tableModel);
+        final org.yccheok.jstock.file.Statements statements = org.yccheok.jstock.file.Statements.newInstanceFromTableModel(tableModel, false);
         if (statements == null) {
             return false;
         }
@@ -1449,7 +1452,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private boolean saveAsExcelFile(File file) {
         final TableModel tableModel = jTable1.getModel();
-        final org.yccheok.jstock.file.Statements statements = org.yccheok.jstock.file.Statements.newInstanceFromTableModel(tableModel);
+        final org.yccheok.jstock.file.Statements statements = org.yccheok.jstock.file.Statements.newInstanceFromTableModel(tableModel, false);
         if (statements == null) {
             return false;
         }
@@ -3128,7 +3131,7 @@ public class MainFrame extends javax.swing.JFrame {
     private void initBrokingFirmLogos() {
         final int size = jStockOptions.getBrokingFirmSize();
 
-        for(int i=0; i<size; i++) {
+        for (int i=0; i<size; i++) {
             try {
                 BufferedImage bufferedImage = ImageIO.read(new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "logos" + File.separator + i + ".png"));
 

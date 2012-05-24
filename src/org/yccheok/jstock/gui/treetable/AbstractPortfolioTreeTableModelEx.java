@@ -57,7 +57,9 @@ public abstract class AbstractPortfolioTreeTableModelEx extends SortableTreeTabl
     
     @Override
     public abstract String getColumnName(int column);
-
+    
+    public abstract String getLanguageIndependentColumnName(int column);
+    
     @Override
     public abstract Object getValueAt(Object node, int column);
 

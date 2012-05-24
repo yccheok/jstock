@@ -192,6 +192,7 @@ public class NewBrokingFirmJDialog extends javax.swing.JDialog {
         return this.brokingFirm;
     }
     
+    // Please refer to SaveToCloudJDialog's getExtensions
     private static boolean fileNameEndWithImageExtension(String filename) {
         return filename.endsWith(".jpg") || filename.endsWith(".jpeg") || filename.endsWith(".gif") || 
             filename.endsWith(".png") || filename.endsWith(".bmp");        
