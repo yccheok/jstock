@@ -66,6 +66,7 @@ import org.jdesktop.swingx.table.TableColumnExt;
 import org.yccheok.jstock.portfolio.*;
 import org.yccheok.jstock.engine.*;
 import org.jdesktop.swingx.treetable.*;
+import org.yccheok.jstock.file.GUIBundleWrapper;
 import org.yccheok.jstock.file.Statement;
 import org.yccheok.jstock.file.Statements;
 import org.yccheok.jstock.gui.Utils.FileEx;
@@ -419,7 +420,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             return false;
         }
         if (statements.getType() == Statement.Type.PortfolioManagementBuy || statements.getType() == Statement.Type.PortfolioManagementSell || statements.getType() == Statement.Type.PortfolioManagementDeposit || statements.getType() == Statement.Type.PortfolioManagementDividend) {
-            final ResourceBundle resourceBundle = statements.getGUIResourceBundle();
+            final GUIBundleWrapper guiBundleWrapper = statements.getGUIBundleWrapper();
             // We will use a fixed date format (Locale.English), so that it will be
             // easier for Android to process.
             //
@@ -439,15 +440,15 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
                     for (int i = 0; i < size; i++) {
                         final Statement statement = statements.get(i);
-                        final String _code = statement.getValueAsString(resourceBundle.getString("MainFrame_Code"));
-                        final String _symbol = statement.getValueAsString(resourceBundle.getString("MainFrame_Symbol"));
-                        final String _date = statement.getValueAsString(resourceBundle.getString("PortfolioManagementJPanel_Date"));
-                        final Double units = statement.getValueAsDouble(resourceBundle.getString("PortfolioManagementJPanel_Units"));
-                        final Double purchasePrice = statement.getValueAsDouble(resourceBundle.getString("PortfolioManagementJPanel_PurchasePrice"));
-                        final Double broker = statement.getValueAsDouble(resourceBundle.getString("PortfolioManagementJPanel_Broker"));
-                        final Double clearingFee = statement.getValueAsDouble(resourceBundle.getString("PortfolioManagementJPanel_ClearingFee"));
-                        final Double stampDuty = statement.getValueAsDouble(resourceBundle.getString("PortfolioManagementJPanel_StampDuty"));
-                        final String _comment = statement.getValueAsString(resourceBundle.getString("PortfolioManagementJPanel_Comment"));
+                        final String _code = statement.getValueAsString(guiBundleWrapper.getString("MainFrame_Code"));
+                        final String _symbol = statement.getValueAsString(guiBundleWrapper.getString("MainFrame_Symbol"));
+                        final String _date = statement.getValueAsString(guiBundleWrapper.getString("PortfolioManagementJPanel_Date"));
+                        final Double units = statement.getValueAsDouble(guiBundleWrapper.getString("PortfolioManagementJPanel_Units"));
+                        final Double purchasePrice = statement.getValueAsDouble(guiBundleWrapper.getString("PortfolioManagementJPanel_PurchasePrice"));
+                        final Double broker = statement.getValueAsDouble(guiBundleWrapper.getString("PortfolioManagementJPanel_Broker"));
+                        final Double clearingFee = statement.getValueAsDouble(guiBundleWrapper.getString("PortfolioManagementJPanel_ClearingFee"));
+                        final Double stampDuty = statement.getValueAsDouble(guiBundleWrapper.getString("PortfolioManagementJPanel_StampDuty"));
+                        final String _comment = statement.getValueAsString(guiBundleWrapper.getString("PortfolioManagementJPanel_Comment"));
 
                         Stock stock = null;
                         if (_code.length() > 0 && _symbol.length() > 0) {
@@ -543,17 +544,17 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
                     for (int i = 0; i < size; i++) {
                         final Statement statement = statements.get(i);
-                        final String _code = statement.getValueAsString(resourceBundle.getString("MainFrame_Code"));
-                        final String _symbol = statement.getValueAsString(resourceBundle.getString("MainFrame_Symbol"));
-                        final String _referenceDate = statement.getValueAsString(resourceBundle.getString("PortfolioManagementJPanel_ReferenceDate"));
-                        final String _date = statement.getValueAsString(resourceBundle.getString("PortfolioManagementJPanel_Date"));
-                        final Double units = statement.getValueAsDouble(resourceBundle.getString("PortfolioManagementJPanel_Units"));
-                        final Double sellingPrice =  statement.getValueAsDouble(resourceBundle.getString("PortfolioManagementJPanel_SellingPrice"));
-                        final Double purchasePrice = statement.getValueAsDouble(resourceBundle.getString("PortfolioManagementJPanel_PurchasePrice"));
-                        final Double broker = statement.getValueAsDouble(resourceBundle.getString("PortfolioManagementJPanel_Broker"));
-                        final Double clearingFee = statement.getValueAsDouble(resourceBundle.getString("PortfolioManagementJPanel_ClearingFee"));
-                        final Double stampDuty = statement.getValueAsDouble(resourceBundle.getString("PortfolioManagementJPanel_StampDuty"));
-                        final String _comment = statement.getValueAsString(resourceBundle.getString("PortfolioManagementJPanel_Comment"));
+                        final String _code = statement.getValueAsString(guiBundleWrapper.getString("MainFrame_Code"));
+                        final String _symbol = statement.getValueAsString(guiBundleWrapper.getString("MainFrame_Symbol"));
+                        final String _referenceDate = statement.getValueAsString(guiBundleWrapper.getString("PortfolioManagementJPanel_ReferenceDate"));
+                        final String _date = statement.getValueAsString(guiBundleWrapper.getString("PortfolioManagementJPanel_Date"));
+                        final Double units = statement.getValueAsDouble(guiBundleWrapper.getString("PortfolioManagementJPanel_Units"));
+                        final Double sellingPrice =  statement.getValueAsDouble(guiBundleWrapper.getString("PortfolioManagementJPanel_SellingPrice"));
+                        final Double purchasePrice = statement.getValueAsDouble(guiBundleWrapper.getString("PortfolioManagementJPanel_PurchasePrice"));
+                        final Double broker = statement.getValueAsDouble(guiBundleWrapper.getString("PortfolioManagementJPanel_Broker"));
+                        final Double clearingFee = statement.getValueAsDouble(guiBundleWrapper.getString("PortfolioManagementJPanel_ClearingFee"));
+                        final Double stampDuty = statement.getValueAsDouble(guiBundleWrapper.getString("PortfolioManagementJPanel_StampDuty"));
+                        final String _comment = statement.getValueAsString(guiBundleWrapper.getString("PortfolioManagementJPanel_Comment"));
 
                         Stock stock = null;
                         if (_code.length() > 0 && _symbol.length() > 0) {
@@ -652,7 +653,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     for (int i = 0; i < size; i++) {
                         Date date = null;
                         final Statement statement = statements.get(i);
-                        final String object0 = statement.getValueAsString(resourceBundle.getString("PortfolioManagementJPanel_Date"));
+                        final String object0 = statement.getValueAsString(guiBundleWrapper.getString("PortfolioManagementJPanel_Date"));
                         assert(object0 != null);
 
                         if (dateFormat == null) {
@@ -688,7 +689,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                             log.error("Unexpected wrong date. Ignore");
                             continue;
                         }
-                        final Double cash = statement.getValueAsDouble(resourceBundle.getString("PortfolioManagementJPanel_Cash"));
+                        final Double cash = statement.getValueAsDouble(guiBundleWrapper.getString("PortfolioManagementJPanel_Cash"));
                         // Shall we continue to ignore, or shall we just return false to
                         // flag an error?
                         if (cash == null) {
@@ -727,7 +728,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                         Date date = null;
                         Stock stock = null;
                         final Statement statement = statements.get(i);
-                        final String object0 = statement.getValueAsString(resourceBundle.getString("PortfolioManagementJPanel_Date"));
+                        final String object0 = statement.getValueAsString(guiBundleWrapper.getString("PortfolioManagementJPanel_Date"));
                         assert(object0 != null);
                         
                         if (dateFormat == null) {
@@ -763,15 +764,15 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                             log.error("Unexpected wrong date. Ignore");
                             continue;
                         }
-                        final Double dividend = statement.getValueAsDouble(resourceBundle.getString("PortfolioManagementJPanel_Dividend"));
+                        final Double dividend = statement.getValueAsDouble(guiBundleWrapper.getString("PortfolioManagementJPanel_Dividend"));
                         // Shall we continue to ignore, or shall we just return false to
                         // flag an error?
                         if (dividend == null) {
                             log.error("Unexpected wrong dividend. Ignore");
                             continue;
                         }
-                        final String codeStr = statement.getValueAsString(resourceBundle.getString("MainFrame_Code"));
-                        final String symbolStr = statement.getValueAsString(resourceBundle.getString("MainFrame_Symbol"));
+                        final String codeStr = statement.getValueAsString(guiBundleWrapper.getString("MainFrame_Code"));
+                        final String symbolStr = statement.getValueAsString(guiBundleWrapper.getString("MainFrame_Symbol"));
                         if (codeStr.length() > 0 && symbolStr.length() > 0) {
                             stock = Utils.getEmptyStock(Code.newInstance(codeStr), Symbol.newInstance(symbolStr));
                         }
@@ -2054,7 +2055,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         final FileEx depositSummaryFileEx = new FileEx(depositSummaryFile, org.yccheok.jstock.file.Statement.Type.PortfolioManagementDeposit);
         final FileEx dividendSummaryFileEx = new FileEx(dividendSummaryFile, org.yccheok.jstock.file.Statement.Type.PortfolioManagementDividend);
 
-        if (false == this.saveAsCSVFile(buyPortfolioFileEx)) {            
+        if (false == this.saveAsCSVFile(buyPortfolioFileEx, true)) {            
             
             final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)this.buyTreeTable.getTreeTableModel();
             // org.yccheok.jstock.file.Statements is not good in handling empty 
@@ -2067,7 +2068,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             }
         }
         
-        if (false == this.saveAsCSVFile(sellPortfolioFileEx)) {            
+        if (false == this.saveAsCSVFile(sellPortfolioFileEx, true)) {            
             final SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel = (SellPortfolioTreeTableModelEx)this.sellTreeTable.getTreeTableModel();
             
             // org.yccheok.jstock.file.Statements is not good in handling empty 
@@ -2081,7 +2082,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             }
         }
 
-        if (false == this.saveAsCSVFile(depositSummaryFileEx)) {
+        if (false == this.saveAsCSVFile(depositSummaryFileEx, true)) {
             // org.yccheok.jstock.file.Statements is not good in handling empty 
             // case. Let us handle it seperately.
             int count = this.depositSummary.size();
@@ -2094,7 +2095,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             }
         }
 
-        if (false == this.saveAsCSVFile(dividendSummaryFileEx)) {            
+        if (false == this.saveAsCSVFile(dividendSummaryFileEx, true)) {            
             // org.yccheok.jstock.file.Statements is not good in handling empty 
             // case. Let us handle it seperately.
             int count = this.dividendSummary.size();
@@ -2460,32 +2461,37 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         return org.yccheok.jstock.gui.Utils.toXML(guiOptions, f);
     }
 
-    public boolean saveAsExcelFile(File file) {
+    public boolean saveAsExcelFile(File file, boolean languageIndependent) {
         org.yccheok.jstock.file.Statements.StatementsEx statementsEx0, statementsEx1, statementsEx2, statementsEx3;
-        statementsEx0 = new org.yccheok.jstock.file.Statements.StatementsEx(org.yccheok.jstock.file.Statements.newInstanceFromBuyPortfolioTreeTableModel((BuyPortfolioTreeTableModelEx)this.buyTreeTable.getTreeTableModel()), GUIBundle.getString("PortfolioManagementJPanel_BuyPortfolio"));
-        statementsEx1 = new org.yccheok.jstock.file.Statements.StatementsEx(org.yccheok.jstock.file.Statements.newInstanceFromSellPortfolioTreeTableModel((SellPortfolioTreeTableModelEx)this.sellTreeTable.getTreeTableModel()), GUIBundle.getString("PortfolioManagementJPanel_SellPortfolio"));
-        statementsEx2 = new org.yccheok.jstock.file.Statements.StatementsEx(org.yccheok.jstock.file.Statements.newInstanceFromTableModel(new DividendSummaryTableModel(this.dividendSummary)), GUIBundle.getString("PortfolioManagementJPanel_DividendPortfolio"));
-        statementsEx3 = new org.yccheok.jstock.file.Statements.StatementsEx(org.yccheok.jstock.file.Statements.newInstanceFromTableModel(new DepositSummaryTableModel(this.depositSummary)), GUIBundle.getString("PortfolioManagementJPanel_CashDepositPortfolio"));
+        Statements statements0 = org.yccheok.jstock.file.Statements.newInstanceFromBuyPortfolioTreeTableModel((BuyPortfolioTreeTableModelEx)this.buyTreeTable.getTreeTableModel(), languageIndependent);
+        Statements statements1 = org.yccheok.jstock.file.Statements.newInstanceFromSellPortfolioTreeTableModel((SellPortfolioTreeTableModelEx)this.sellTreeTable.getTreeTableModel(), languageIndependent);
+        Statements statements2 = org.yccheok.jstock.file.Statements.newInstanceFromTableModel(new DividendSummaryTableModel(this.dividendSummary), languageIndependent);
+        Statements statements3 = org.yccheok.jstock.file.Statements.newInstanceFromTableModel(new DepositSummaryTableModel(this.depositSummary), languageIndependent);
+        
+        statementsEx0 = new org.yccheok.jstock.file.Statements.StatementsEx(statements0, GUIBundle.getString("PortfolioManagementJPanel_BuyPortfolio"));
+        statementsEx1 = new org.yccheok.jstock.file.Statements.StatementsEx(statements1, GUIBundle.getString("PortfolioManagementJPanel_SellPortfolio"));
+        statementsEx2 = new org.yccheok.jstock.file.Statements.StatementsEx(statements2, GUIBundle.getString("PortfolioManagementJPanel_DividendPortfolio"));
+        statementsEx3 = new org.yccheok.jstock.file.Statements.StatementsEx(statements3, GUIBundle.getString("PortfolioManagementJPanel_CashDepositPortfolio"));
         List<org.yccheok.jstock.file.Statements.StatementsEx> statementsExs = Arrays.asList(statementsEx0, statementsEx1, statementsEx2, statementsEx3);
         return Statements.saveAsExcelFile(file, statementsExs);
     }
 
-    public boolean saveAsCSVFile(Utils.FileEx fileEx) {
+    public boolean saveAsCSVFile(Utils.FileEx fileEx, boolean languageIndependent) {
         org.yccheok.jstock.file.Statements statements = null;
         if (fileEx.type == org.yccheok.jstock.file.Statement.Type.PortfolioManagementBuy) {
             // For buy portfolio, need not save metadata information, as we have
             // seperate "stockprices.csv" to handle it. However, I am not really
             // sure that whether seperating them is a good idea.
-            statements = org.yccheok.jstock.file.Statements.newInstanceFromBuyPortfolioTreeTableModel((BuyPortfolioTreeTableModelEx)this.buyTreeTable.getTreeTableModel());
+            statements = org.yccheok.jstock.file.Statements.newInstanceFromBuyPortfolioTreeTableModel((BuyPortfolioTreeTableModelEx)this.buyTreeTable.getTreeTableModel(), languageIndependent);
         }
         else if (fileEx.type == org.yccheok.jstock.file.Statement.Type.PortfolioManagementSell) {
-            statements = org.yccheok.jstock.file.Statements.newInstanceFromSellPortfolioTreeTableModel((SellPortfolioTreeTableModelEx)this.sellTreeTable.getTreeTableModel());
+            statements = org.yccheok.jstock.file.Statements.newInstanceFromSellPortfolioTreeTableModel((SellPortfolioTreeTableModelEx)this.sellTreeTable.getTreeTableModel(), languageIndependent);
         }
         else if (fileEx.type == org.yccheok.jstock.file.Statement.Type.PortfolioManagementDividend) {
-            statements = org.yccheok.jstock.file.Statements.newInstanceFromTableModel(new DividendSummaryTableModel(this.dividendSummary));
+            statements = org.yccheok.jstock.file.Statements.newInstanceFromTableModel(new DividendSummaryTableModel(this.dividendSummary), languageIndependent);
         }
         else if (fileEx.type == org.yccheok.jstock.file.Statement.Type.PortfolioManagementDeposit) {
-            statements = org.yccheok.jstock.file.Statements.newInstanceFromTableModel(new DepositSummaryTableModel(this.depositSummary));
+            statements = org.yccheok.jstock.file.Statements.newInstanceFromTableModel(new DepositSummaryTableModel(this.depositSummary), languageIndependent);
         }
         // When statements is null, this could mean there is no data in our
         // buy/sell/dividend/cash records.
