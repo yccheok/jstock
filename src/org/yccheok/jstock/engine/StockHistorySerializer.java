@@ -48,7 +48,7 @@ public class StockHistorySerializer {
         
         final Calendar calendar = stockHistoryServer.getCalendar(0);
         final Code code = stockHistoryServer.getStock(calendar).getCode();
-        final Statements statements = Statements.newInstanceFromStockHistoryServer(stockHistoryServer);
+        final Statements statements = Statements.newInstanceFromStockHistoryServer(stockHistoryServer, true);
         final File file = new File(getFileName(code, duration));
         return statements.saveAsCSVFile(file, true);
     }

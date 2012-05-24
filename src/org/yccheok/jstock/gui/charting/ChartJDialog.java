@@ -782,12 +782,12 @@ public class ChartJDialog extends javax.swing.JDialog {
         if (file != null) {
             if (org.yccheok.jstock.gui.Utils.getFileExtension(file).equals("csv"))
             {
-                final Statements statements = Statements.newInstanceFromStockHistoryServer(stockHistoryServer);
+                final Statements statements = Statements.newInstanceFromStockHistoryServer(stockHistoryServer, false);
                 statements.saveAsCSVFile(file);
             }
             else if (org.yccheok.jstock.gui.Utils.getFileExtension(file).equals("xls"))
             {
-                final Statements statements = Statements.newInstanceFromStockHistoryServer(stockHistoryServer);
+                final Statements statements = Statements.newInstanceFromStockHistoryServer(stockHistoryServer, false);
                 statements.saveAsExcelFile(file, stock.getCode().toString());
             }
             else
