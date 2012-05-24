@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2012 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -488,23 +488,32 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
     }
 
     // Version of getFileEx which ignores LastErrorCode.
-    private List<FileEx> getFileEx(List<FileEx> fileExs, String name) {
-        return getFileEx(fileExs, name, null);
+    private List<FileEx> getFileEx(List<FileEx> fileExs, String name, List<String> extensions) {
+        return getFileEx(fileExs, name, extensions, null);
     }
 
+    private boolean hasExtensions(String fileName, List<String> extensions) {
+        for (String extension : extensions) {
+            if (fileName.endsWith(extension)) {
+                return true;
+            }        
+        }
+        return false;
+    }
+    
     // name can be anything which is found under directory
     // C:\Users\yccheok\.jstock\1.0.5
     // For example, "Australia", "config", "chat"...
     // The returned FileEx list, will only contain files. No directories
     // will be included.
-    private List<FileEx> getFileEx(List<FileEx> fileExs, String name, LastErrorCode lastErrorCode) {
+    private List<FileEx> getFileEx(List<FileEx> fileExs, String name, List<String> extensions, LastErrorCode lastErrorCode) {
         final File dir = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + name);
 
         if (dir.isDirectory()) {
             String[] children = dir.list();
             for (String child : children) {
                 // Must call back method with lastErrorCode.
-                getFileEx(fileExs, name + File.separator + child, lastErrorCode);
+                getFileEx(fileExs, name + File.separator + child, extensions, lastErrorCode);
             }
         }
         else {
@@ -515,8 +524,10 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
                 // will be very large (around 50MB). We have no way, but ignore
                 // the file.
                 if (dir.length() < 1024 * 1024 * 24) {
-                    // Currently, we place 24MB as our limitation.
-                    fileExs.add(FileEx.newInstance(dir, name));
+                    if (hasExtensions(name, extensions)) {
+                        // Currently, we place 24MB as our limitation.
+                        fileExs.add(FileEx.newInstance(dir, name));
+                    }
                 } else {
                     // Flag a warning. We are going to tell user that his file
                     // will be ignored.
@@ -526,7 +537,9 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
                 }
             }
             else {
-                fileExs.add(FileEx.newInstance(dir, name));
+                if (hasExtensions(name, extensions)) {
+                    fileExs.add(FileEx.newInstance(dir, name));
+                }
             }
         }
         return fileExs;
@@ -587,6 +600,32 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
         return choice[0] == JOptionPane.YES_OPTION;
     }
 
+    // When we perform XML to CSV migration, this function needs to be revised.
+    private List<String> getExtensions(String name) {
+        List<String> extensions = new ArrayList<String>();
+        if (name.equals("config")) {
+            extensions.add(".xml");
+        } else if (name.equals("indicator")) {
+            extensions.add(".xml");
+        } else if (name.equals("logos")) {
+            // Please refer to NewBrokingFirmJDialog's fileNameEndWithImageExtension
+            extensions.add(".jpg");
+            extensions.add(".jpeg");
+            extensions.add(".gif");
+            extensions.add(".png");
+            extensions.add(".bmp");
+        } else if (name.equals("portfolios")) {
+            extensions.add(".csv");
+        } else if (name.equals("watchlist")) {
+            extensions.add(".csv");
+        } else {
+            assert(false);
+            throw new java.lang.IllegalArgumentException(name);
+        }        
+        
+        return java.util.Collections.unmodifiableList(extensions);
+    }
+    
     private File getJStockZipFile() {
         // Look for "user-defined-database.xml" for all countries.
         final List<File> files = getUserDefinedDatabaseFiles();
@@ -624,17 +663,17 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
         }
 
         final List<Country> countryWithWatchlistFilesBeingIgnored = new ArrayList<Country>();
-        getFileEx(fileExs, "config");
-        getFileEx(fileExs, "indicator");
-        getFileEx(fileExs, "logos");
+        getFileEx(fileExs, "config", getExtensions("config"));
+        getFileEx(fileExs, "indicator", getExtensions("indicator"));
+        getFileEx(fileExs, "logos", getExtensions("logos"));
         for (Country country : Country.values()) {
-            getFileEx(fileExs, country + File.separator + "portfolios");
+            getFileEx(fileExs, country + File.separator + "portfolios", getExtensions("portfolios"));
             // For legacy usage. Shall be removed after a few more release
             // later than 1.0.5k
-            getFileEx(fileExs, country + File.separator + "config");
+            getFileEx(fileExs, country + File.separator + "config", getExtensions("config"));
 
             LastErrorCode lastErrorCode = new LastErrorCode();
-            getFileEx(fileExs, country + File.separator + "watchlist", lastErrorCode);
+            getFileEx(fileExs, country + File.separator + "watchlist", getExtensions("watchlist"), lastErrorCode);
             if (lastErrorCode.flag) {
                 // Watchlist file(s) is being ignored due to too much stocks in
                 // the watchlist.
