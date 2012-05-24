@@ -20,6 +20,9 @@ package org.yccheok.jstock.gui.portfolio;
 
 import javax.swing.table.AbstractTableModel;
 import org.yccheok.jstock.engine.SimpleDate;
+import org.yccheok.jstock.file.CSVHelper;
+import org.yccheok.jstock.file.GUIBundleWrapper;
+import org.yccheok.jstock.file.GUIBundleWrapper.Language;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.portfolio.Commentable;
 import org.yccheok.jstock.portfolio.Deposit;
@@ -29,7 +32,7 @@ import org.yccheok.jstock.portfolio.DepositSummary;
  *
  * @author yccheok
  */
-public class DepositSummaryTableModel extends AbstractTableModel implements CommentableContainer {
+public class DepositSummaryTableModel extends AbstractTableModel implements CommentableContainer, CSVHelper {
 
     public DepositSummaryTableModel(DepositSummary depositSummary) {
         this.depositSummary = depositSummary;
@@ -121,6 +124,9 @@ public class DepositSummaryTableModel extends AbstractTableModel implements Comm
     }
     
     private static final String[] columnNames;
+    // Unlike cNames, languageIndependentColumnNames is language independent.
+    private static final String[] languageIndependentColumnNames;
+    
     private static final Class[] columnClasses = {
         java.util.Date.class,
         Double.class
@@ -132,6 +138,17 @@ public class DepositSummaryTableModel extends AbstractTableModel implements Comm
             GUIBundle.getString("PortfolioManagementJPanel_Date"),
             GUIBundle.getString("PortfolioManagementJPanel_Cash")
         };
+        final GUIBundleWrapper guiBundleWrapper = GUIBundleWrapper.newInstance(Language.INDEPENDENT);
+        final String[] tmp2 = {
+            guiBundleWrapper.getString("PortfolioManagementJPanel_Date"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_Cash")
+        };        
         columnNames = tmp;
+        languageIndependentColumnNames = tmp2;
+    }
+
+    @Override
+    public String getLanguageIndependentColumnName(int columnIndex) {
+        return languageIndependentColumnNames[columnIndex];
     }
 }

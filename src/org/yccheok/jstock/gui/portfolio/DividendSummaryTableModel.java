@@ -23,6 +23,9 @@ import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.SimpleDate;
 import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.Symbol;
+import org.yccheok.jstock.file.CSVHelper;
+import org.yccheok.jstock.file.GUIBundleWrapper;
+import org.yccheok.jstock.file.GUIBundleWrapper.Language;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.portfolio.Commentable;
 import org.yccheok.jstock.portfolio.Dividend;
@@ -32,7 +35,7 @@ import org.yccheok.jstock.portfolio.DividendSummary;
  *
  * @author yccheok
  */
-public class DividendSummaryTableModel extends AbstractTableModel implements CommentableContainer {
+public class DividendSummaryTableModel extends AbstractTableModel implements CommentableContainer, CSVHelper {
 
     public DividendSummaryTableModel(DividendSummary dividendSummary) {
         this.dividendSummary = dividendSummary;
@@ -135,6 +138,7 @@ public class DividendSummaryTableModel extends AbstractTableModel implements Com
     }
 
     private static final String[] columnNames;
+    private static final String[] languageIndependentColumnNames;
     private static final Class[] columnClasses = {
         java.util.Date.class,
         Stock.class,
@@ -148,6 +152,18 @@ public class DividendSummaryTableModel extends AbstractTableModel implements Com
             GUIBundle.getString("PortfolioManagementJPanel_Stock"),
             GUIBundle.getString("PortfolioManagementJPanel_Dividend")
         };
+        final GUIBundleWrapper guiBundleWrapper = GUIBundleWrapper.newInstance(Language.INDEPENDENT);
+        final String[] tmp2 = {
+            guiBundleWrapper.getString("PortfolioManagementJPanel_Date"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_Stock"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_Dividend")
+        };        
         columnNames = tmp;
+        languageIndependentColumnNames = tmp2;
+    }
+
+    @Override
+    public String getLanguageIndependentColumnName(int columnIndex) {
+        return languageIndependentColumnNames[columnIndex];
     }
 }

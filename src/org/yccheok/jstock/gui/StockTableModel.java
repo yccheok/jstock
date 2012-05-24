@@ -21,13 +21,16 @@ package org.yccheok.jstock.gui;
 
 import java.util.*;
 import org.yccheok.jstock.engine.*;
+import org.yccheok.jstock.file.CSVHelper;
+import org.yccheok.jstock.file.GUIBundleWrapper;
+import org.yccheok.jstock.file.GUIBundleWrapper.Language;
 import org.yccheok.jstock.internationalization.GUIBundle;
 
 /**
  *
  * @author yccheok
  */
-public class StockTableModel extends AbstractTableModelWithMemory {
+public class StockTableModel extends AbstractTableModelWithMemory implements CSVHelper {
     /** Creates a new instance of StockTableModel */
     public StockTableModel() {
         for (int i = 0; i < columnNames.length; i++) {
@@ -247,6 +250,7 @@ public class StockTableModel extends AbstractTableModelWithMemory {
     // Used to get row by Stock in fast way.
     private Map<Code, Integer> rowStockCodeMapping = new HashMap<Code, Integer>();
     private static final String[] columnNames;
+    private static final String[] languageIndependentColumnNames;
     private static final Class[] columnClasses = {
         Code.class,
         Symbol.class,
@@ -288,6 +292,33 @@ public class StockTableModel extends AbstractTableModelWithMemory {
             GUIBundle.getString("MainFrame_FallBelow"),
             GUIBundle.getString("MainFrame_RiseAbove")
         };
+        final GUIBundleWrapper guiBundleWrapper = GUIBundleWrapper.newInstance(Language.INDEPENDENT);        
+        final String[] tmp2 = {
+            guiBundleWrapper.getString("MainFrame_Code"),
+            guiBundleWrapper.getString("MainFrame_Symbol"),
+            guiBundleWrapper.getString("MainFrame_Prev"),
+            guiBundleWrapper.getString("MainFrame_Open"),
+            guiBundleWrapper.getString("MainFrame_Last"),
+            guiBundleWrapper.getString("MainFrame_High"),
+            guiBundleWrapper.getString("MainFrame_Low"),
+            guiBundleWrapper.getString("MainFrame_Vol"),
+            guiBundleWrapper.getString("MainFrame_Chg"),
+            guiBundleWrapper.getString("MainFrame_ChgPercentage"),
+            guiBundleWrapper.getString("MainFrame_LVol"),
+            guiBundleWrapper.getString("MainFrame_Buy"),
+            guiBundleWrapper.getString("MainFrame_BQty"),
+            guiBundleWrapper.getString("MainFrame_Sell"),
+            guiBundleWrapper.getString("MainFrame_SQty"),
+            guiBundleWrapper.getString("MainFrame_FallBelow"),
+            guiBundleWrapper.getString("MainFrame_RiseAbove")
+        };
+        
         columnNames = tmp;
-    }    
+        languageIndependentColumnNames = tmp2;
+    }
+
+    @Override
+    public String getLanguageIndependentColumnName(int columnIndex) {
+        return languageIndependentColumnNames[columnIndex];
+    }
 }
