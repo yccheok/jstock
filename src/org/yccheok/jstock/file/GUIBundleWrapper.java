@@ -28,7 +28,7 @@ import java.util.ResourceBundle;
  *
  * @author yccheok
  */
-public class GUIResourceBundle {
+public class GUIBundleWrapper {
     public enum Language {
         // INDEPENDENT must come first. This is important, especially when we 
         // want to loop through Language. The first member we want to access is
@@ -45,35 +45,35 @@ public class GUIResourceBundle {
     
     // So that we know which org.yccheok.jstock.data.gui language file we should
     // refer to.
-    private final ResourceBundle guiResourceBundle;
+    private final ResourceBundle guiBundleWrapper;
     private volatile Map<String, String> map = null;
     
-    public static GUIResourceBundle newInstance(Language language) {
-        return new GUIResourceBundle(language);
+    public static GUIBundleWrapper newInstance(Language language) {
+        return new GUIBundleWrapper(language);
     }
     
-    private GUIResourceBundle(Language type) {
+    private GUIBundleWrapper(Language type) {
         if (type == Language.INDEPENDENT) {
-            guiResourceBundle = null;
+            guiBundleWrapper = null;
         } else if (type == Language.ENGLISH) {
-            guiResourceBundle = ResourceBundle.getBundle("org.yccheok.jstock.data.gui", Locale.ENGLISH);
+            guiBundleWrapper = ResourceBundle.getBundle("org.yccheok.jstock.data.gui", Locale.ENGLISH);
         } else if (type == Language.SIMPLIFIED_CHINESE) {
-            guiResourceBundle = ResourceBundle.getBundle("org.yccheok.jstock.data.gui", Locale.SIMPLIFIED_CHINESE);
+            guiBundleWrapper = ResourceBundle.getBundle("org.yccheok.jstock.data.gui", Locale.SIMPLIFIED_CHINESE);
         } else if (type == Language.GERMAN) {
-            guiResourceBundle = ResourceBundle.getBundle("org.yccheok.jstock.data.gui", Locale.GERMAN);
+            guiBundleWrapper = ResourceBundle.getBundle("org.yccheok.jstock.data.gui", Locale.GERMAN);
         } else if (type == Language.TRADITIONAL_CHINESE) { 
-            guiResourceBundle = ResourceBundle.getBundle("org.yccheok.jstock.data.gui", Locale.TRADITIONAL_CHINESE);
+            guiBundleWrapper = ResourceBundle.getBundle("org.yccheok.jstock.data.gui", Locale.TRADITIONAL_CHINESE);
         } else {
             assert(type == Language.DEFAULT);
-            guiResourceBundle = ResourceBundle.getBundle("org.yccheok.jstock.data.gui");
+            guiBundleWrapper = ResourceBundle.getBundle("org.yccheok.jstock.data.gui");
         }
     }
     
     public String getString(String key) {
-        if (guiResourceBundle == null) {
+        if (guiBundleWrapper == null) {
             return getLanguageIndependentString(key);
         }
-        return guiResourceBundle.getString(key);
+        return guiBundleWrapper.getString(key);
     }
     
     private void initMap() {

@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2012 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,7 +38,6 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.ResourceBundle;
 import javax.swing.table.TableModel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -57,7 +56,6 @@ import org.yccheok.jstock.gui.POIUtils;
 import org.yccheok.jstock.gui.treetable.AbstractPortfolioTreeTableModelEx;
 import org.yccheok.jstock.gui.treetable.BuyPortfolioTreeTableModelEx;
 import org.yccheok.jstock.gui.treetable.SellPortfolioTreeTableModelEx;
-import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.portfolio.Portfolio;
 import org.yccheok.jstock.portfolio.Transaction;
 import org.yccheok.jstock.portfolio.TransactionSummary;
@@ -82,8 +80,8 @@ public class Statements {
      */
     private Statements() {}
 
-    public static Statements newInstanceFromBuyPortfolioTreeTableModel(BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel) {
-        Statements statements = newInstanceFromAbstractPortfolioTreeTableModel(buyPortfolioTreeTableModel);
+    public static Statements newInstanceFromBuyPortfolioTreeTableModel(BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel, boolean languageIndependent) {
+        Statements statements = newInstanceFromAbstractPortfolioTreeTableModel(buyPortfolioTreeTableModel, languageIndependent);
         
         // Preparing for metadata.
         Map<Code, Double> stockPrices = buyPortfolioTreeTableModel.getStockPrices();
@@ -96,25 +94,27 @@ public class Statements {
         return statements;
     }
     
-    public static Statements newInstanceFromStockHistoryServer(StockHistoryServer server) {
+    public static Statements newInstanceFromStockHistoryServer(StockHistoryServer server, boolean languageIndependent) {
         final Statements s = new Statements();
         final int size = server.getNumOfCalendar();
         
         final DateFormat dateFormat = org.yccheok.jstock.gui.Utils.getCommonDateFormat();
 
+        final GUIBundleWrapper guiBundleWrapper = GUIBundleWrapper.newInstance(languageIndependent ? GUIBundleWrapper.Language.INDEPENDENT : GUIBundleWrapper.Language.DEFAULT);
+        
         Stock stock = null;
         for (int i = 0; i < size; i++) {
             final Calendar calendar = server.getCalendar(i);
             stock = server.getStock(calendar);
             assert(calendar != null && stock != null);
             final List<Atom> atoms = new ArrayList<Atom>();
-            final Atom atom0 = new Atom(dateFormat.format(calendar.getTime()), GUIBundle.getString("StockHistory_Date"));
-            final Atom atom1 = new Atom(new Double(stock.getOpenPrice()), GUIBundle.getString("StockHistory_Open"));
-            final Atom atom2 = new Atom(new Double(stock.getHighPrice()), GUIBundle.getString("StockHistory_High"));
-            final Atom atom3 = new Atom(new Double(stock.getLowPrice()), GUIBundle.getString("StockHistory_Low"));
-            final Atom atom4 = new Atom(new Double(stock.getLastPrice()), GUIBundle.getString("StockHistory_Close"));
+            final Atom atom0 = new Atom(dateFormat.format(calendar.getTime()), guiBundleWrapper.getString("StockHistory_Date"));
+            final Atom atom1 = new Atom(new Double(stock.getOpenPrice()), guiBundleWrapper.getString("StockHistory_Open"));
+            final Atom atom2 = new Atom(new Double(stock.getHighPrice()), guiBundleWrapper.getString("StockHistory_High"));
+            final Atom atom3 = new Atom(new Double(stock.getLowPrice()), guiBundleWrapper.getString("StockHistory_Low"));
+            final Atom atom4 = new Atom(new Double(stock.getLastPrice()), guiBundleWrapper.getString("StockHistory_Close"));
             // TODO: CRITICAL LONG BUG REVISED NEEDED.
-            final Atom atom5 = new Atom(new Long(stock.getVolume()), GUIBundle.getString("StockHistory_Volume"));
+            final Atom atom5 = new Atom(new Long(stock.getVolume()), guiBundleWrapper.getString("StockHistory_Volume"));
             atoms.add(atom0);
             atoms.add(atom1);
             atoms.add(atom2);
@@ -371,28 +371,34 @@ public class Statements {
      * @param tableModel Given TableModel
      * @return the constructed Statements. null if fail
      */
-    public static Statements newInstanceFromTableModel(TableModel tableModel) {        
+    public static Statements newInstanceFromTableModel(TableModel tableModel, boolean languageIndependent) {
+        final CSVHelper csvHelper = (CSVHelper)tableModel;
+        final GUIBundleWrapper guiBundleWrapper = GUIBundleWrapper.newInstance(languageIndependent ? GUIBundleWrapper.Language.INDEPENDENT : GUIBundleWrapper.Language.DEFAULT);
+        
         final int column = tableModel.getColumnCount();
         final int row = tableModel.getRowCount();
         final Statements s = new Statements();
         for (int i = 0; i < row; i++) {
             final List<Atom> atoms = new ArrayList<Atom>();
             for (int j = 0; j < column; j++) {
-                final String type = tableModel.getColumnName(j);
+                final String type = languageIndependent ? csvHelper.getLanguageIndependentColumnName(j) : tableModel.getColumnName(j);
                 final Object object = tableModel.getValueAt(i, j);
                 if (tableModel.getColumnClass(j).equals(Stock.class)) {
                     final Stock stock = (Stock)object;
                     // There are no way to represent Stock in text form. We
                     // will represent them in Code and Symbol.
                     // Code first. Follow by symbol.
-                    atoms.add(new Atom(stock.getCode().toString(), GUIBundle.getString("MainFrame_Code")));
-                    atoms.add(new Atom(stock.getSymbol().toString(), GUIBundle.getString("MainFrame_Symbol")));
+                    
+                    final String code_string = guiBundleWrapper.getString("MainFrame_Code");
+                    final String symbol_string = guiBundleWrapper.getString("MainFrame_Symbol");
+
+                    atoms.add(new Atom(stock.getCode().toString(), code_string));
+                    atoms.add(new Atom(stock.getSymbol().toString(), symbol_string));
                 }
                 else if (tableModel.getColumnClass(j).equals(Date.class)) {
                     DateFormat dateFormat = org.yccheok.jstock.gui.Utils.getCommonDateFormat();
                     atoms.add(new Atom(object != null ? dateFormat.format(((Date)object).getTime()) : "", type));
-                }
-                else {
+                } else {
                     // For fall below and rise above, null value is permitted.
                     // Use empty string to represent null value.
                     atoms.add(new Atom(object != null ? object : "", type));
@@ -415,8 +421,8 @@ public class Statements {
         return s;
     }
 
-    public static Statements newInstanceFromSellPortfolioTreeTableModel(SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel) {
-        return newInstanceFromAbstractPortfolioTreeTableModel(sellPortfolioTreeTableModel);
+    public static Statements newInstanceFromSellPortfolioTreeTableModel(SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel, boolean languageIndependent) {
+        return newInstanceFromAbstractPortfolioTreeTableModel(sellPortfolioTreeTableModel, languageIndependent);
     }
     
     /**
@@ -425,7 +431,9 @@ public class Statements {
      * @param abstractPortfolioTreeTableModel Given AbstractPortfolioTreeTableModel
      * @return the constructed Statements. null if fail
      */
-    private static Statements newInstanceFromAbstractPortfolioTreeTableModel(AbstractPortfolioTreeTableModelEx abstractPortfolioTreeTableModel) {
+    private static Statements newInstanceFromAbstractPortfolioTreeTableModel(AbstractPortfolioTreeTableModelEx abstractPortfolioTreeTableModel, boolean languageIndependent) {
+        final GUIBundleWrapper guiBundleWrapper = GUIBundleWrapper.newInstance(languageIndependent ? GUIBundleWrapper.Language.INDEPENDENT : GUIBundleWrapper.Language.DEFAULT);
+
         final int column = abstractPortfolioTreeTableModel.getColumnCount();
         final Portfolio portfolio = (Portfolio)abstractPortfolioTreeTableModel.getRoot();
         final int summaryCount = portfolio.getChildCount();
@@ -439,28 +447,33 @@ public class Statements {
                 final Transaction transaction = (Transaction)transactionSummary.getChildAt(j);
                 final List<Atom> atoms = new ArrayList<Atom>();
                 for (int k = 0; k < column; k++) {
-                    final String type = abstractPortfolioTreeTableModel.getColumnName(k);
+                    final String type = languageIndependent ? abstractPortfolioTreeTableModel.getLanguageIndependentColumnName(k) : abstractPortfolioTreeTableModel.getColumnName(k);
                     final Object object = abstractPortfolioTreeTableModel.getValueAt(transaction, k);
                     if (abstractPortfolioTreeTableModel.getColumnClass(k).equals(TreeTableModel.class)) {
                         final Stock stock = transaction.getContract().getStock();
                         // There are no way to represent Stock in text form. We
                         // will represent them in Code and Symbol.
                         // Code first. Follow by symbol.
-                        atoms.add(new Atom(stock.getCode().toString(), GUIBundle.getString("MainFrame_Code")));
-                        atoms.add(new Atom(stock.getSymbol().toString(), GUIBundle.getString("MainFrame_Symbol")));
+
+                        final String code_string = guiBundleWrapper.getString("MainFrame_Code");
+                        final String symbol_string = guiBundleWrapper.getString("MainFrame_Symbol");
+                        final String reference_date_string = guiBundleWrapper.getString("PortfolioManagementJPanel_ReferenceDate");                            
+                        
+                        atoms.add(new Atom(stock.getCode().toString(), code_string));
+                        atoms.add(new Atom(stock.getSymbol().toString(), symbol_string));
+
                         // OK. I know. This breaks generalization.
                         if (abstractPortfolioTreeTableModel instanceof SellPortfolioTreeTableModelEx) {
                             final SimpleDate simpleDate = transaction.getContract().getReferenceDate();
                             DateFormat dateFormat = org.yccheok.jstock.gui.Utils.getCommonDateFormat();
-                            atoms.add(new Atom(object != null ? dateFormat.format(simpleDate.getTime()) : "", GUIBundle.getString("PortfolioManagementJPanel_ReferenceDate")));
+                            atoms.add(new Atom(object != null ? dateFormat.format(simpleDate.getTime()) : "", reference_date_string));
                         }
                     }
                     else if (abstractPortfolioTreeTableModel.getColumnClass(k).equals(SimpleDate.class)) {
                         DateFormat dateFormat = org.yccheok.jstock.gui.Utils.getCommonDateFormat();
                         SimpleDate simpleDate = (SimpleDate)object;
                         atoms.add(new Atom(object != null ? dateFormat.format(simpleDate.getTime()) : "", type));
-                    }
-                    else {
+                    } else {
                         // For fall below and rise above, null value is permitted.
                         // Use empty string to represent null value.
                         atoms.add(new Atom(object != null ? object : "", type));
@@ -648,11 +661,10 @@ public class Statements {
     }
 
     /**
-     * @return the org.yccheok.jstock.data.gui language file used by this
-     * statements.
+     * @return resource language file used by this statements.
      */
-    public ResourceBundle getGUIResourceBundle() {
-        return statements.get(0).getGUIResourceBundle();
+    public GUIBundleWrapper getGUIBundleWrapper() {
+        return statements.get(0).getGUIBundleWrapper();
     }
 
     public int size() {
