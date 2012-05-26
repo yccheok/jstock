@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2012 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -96,7 +96,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     public PortfolioManagementJPanel() {
         initComponents();        
         
-        this.initPortfolio();
+        this.initPortfolio(false);
     }
     
     /** This method is called from within the constructor to
@@ -2010,9 +2010,16 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
     }
     
-    public final void initPortfolio() {
+    public final void initPortfolio(boolean isPortfolioFilesInXML) {
+        // When isPortfolioFilesInXML is in true, this means we are getting old
+        // XML file from cloud storage. Hence, take XML files as first priority.
+        
         // Try to read porfolio files in CSV format.
-        boolean isCSVSuccess = this.initCSVPortfolio();
+        boolean isCSVSuccess = false;        
+        if (isPortfolioFilesInXML == false) {
+            isCSVSuccess = this.initCSVPortfolio();
+        }    
+
         if (false == isCSVSuccess) {
             // Fail. We need to migrate from XML format to CSV format.
             // The returned value for this method doesn't matter.

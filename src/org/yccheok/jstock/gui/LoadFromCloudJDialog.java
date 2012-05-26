@@ -491,7 +491,7 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
                     MainFrame.getInstance().getJStockOptions().insensitiveCopy(jStockOptions);
                 }
 
-                MainFrame.getInstance().reloadAfterDownloadFromCloud();
+                MainFrame.getInstance().reloadAfterDownloadFromCloud(cloudFile.version);
 
                 publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_Success"), Icons.OK));
 
