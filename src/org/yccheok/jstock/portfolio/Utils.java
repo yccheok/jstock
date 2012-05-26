@@ -201,7 +201,7 @@ public class Utils {
             return false;
         }
         
-        final File stockPricesFile = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "stockprices.csv");
+        final File stockPricesFile = new File(directory + "stockprices.csv");
 
         // Do not allow to create empty portfolio, if the desired location already
         // contain portfolio files.
