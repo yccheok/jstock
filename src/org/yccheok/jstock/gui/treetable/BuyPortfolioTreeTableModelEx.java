@@ -491,7 +491,7 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
         if (node instanceof TransactionSummary) {
             final TransactionSummary transactionSummary = (TransactionSummary)node;
             
-            if(transactionSummary.getChildCount() <= 0) return null;
+            if (transactionSummary.getChildCount() <= 0) return null;
             
             switch(column) {
                 case 0:

@@ -230,7 +230,11 @@ public abstract class AbstractSortableTreeTableNode extends
                         if (key instanceof Comparable) {
                             this.key = (Comparable)key;
                         } else {
-                            this.key = key.toString();
+                            if (key != null) {
+                                this.key = key.toString();
+                            } else {
+                                this.key = null;
+                            }
                         }
 			this.modelIndex = modelIndex;
 			this.order = order;
