@@ -33,7 +33,7 @@ public class TransactionSummary extends DefaultSortableMutableTreeTableNode impl
         
         final int count = this.getChildCount();
         
-        for (int i=0; i<count; i++) {
+        for (int i = 0; i < count; i++) {
             Object o = this.getChildAt(i);
             
             assert(o instanceof Transaction);
@@ -53,7 +53,7 @@ public class TransactionSummary extends DefaultSortableMutableTreeTableNode impl
         
         final int count = this.getChildCount();
         
-        for(int i=0; i<count; i++) {
+        for (int i = 0; i < count; i++) {
             Object o = this.getChildAt(i);
             
             assert(o instanceof Transaction);
@@ -73,7 +73,7 @@ public class TransactionSummary extends DefaultSortableMutableTreeTableNode impl
         
         final int count = this.getChildCount();
         
-        for(int i=0; i<count; i++) {
+        for (int i = 0; i < count; i++) {
             Object o = this.getChildAt(i);
             
             assert(o instanceof Transaction);
@@ -93,7 +93,7 @@ public class TransactionSummary extends DefaultSortableMutableTreeTableNode impl
         
         final int count = this.getChildCount();
         
-        for(int i=0; i<count; i++) {
+        for (int i = 0; i < count; i++) {
             Object o = this.getChildAt(i);
             
             assert(o instanceof Transaction);
@@ -113,7 +113,7 @@ public class TransactionSummary extends DefaultSortableMutableTreeTableNode impl
         
         final int count = this.getChildCount();
         
-        for(int i=0; i<count; i++) {
+        for (int i = 0; i < count; i++) {
             Object o = this.getChildAt(i);
             
             assert(o instanceof Transaction);
@@ -133,7 +133,7 @@ public class TransactionSummary extends DefaultSortableMutableTreeTableNode impl
         
         final int count = this.getChildCount();
         
-        for(int i=0; i<count; i++) {
+        for (int i = 0; i < count; i++) {
             Object o = this.getChildAt(i);
             
             assert(o instanceof Transaction);
@@ -153,7 +153,7 @@ public class TransactionSummary extends DefaultSortableMutableTreeTableNode impl
         
         final int count = this.getChildCount();
         
-        for(int i=0; i<count; i++) {
+        for (int i = 0; i < count; i++) {
             Object o = this.getChildAt(i);
             
             assert(o instanceof Transaction);
@@ -170,7 +170,7 @@ public class TransactionSummary extends DefaultSortableMutableTreeTableNode impl
        
     @Override
     public String toString() {
-        if(this.getChildCount() > 0) {
+        if (this.getChildCount() > 0) {
             return this.getChildAt(0).toString();
         }
         
