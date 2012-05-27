@@ -92,11 +92,31 @@ import org.yccheok.jstock.internationalization.MessagesBundle;
  */
 public class PortfolioManagementJPanel extends javax.swing.JPanel {
    
+    // For XML to CSV migration usage.
+    public static final class XMLPortfolio {
+        public final BuyPortfolioTreeTableModel buyPortfolioTreeTableModel;
+        public final SellPortfolioTreeTableModel sellPortfolioTreeTableModel;        
+        public final DepositSummary depositSummary;
+        public final DividendSummary dividendSummary;
+
+        @SuppressWarnings( "deprecation" )
+        private XMLPortfolio(BuyPortfolioTreeTableModel buyPortfolioTreeTableModel, SellPortfolioTreeTableModel sellPortfolioTreeTableModel, DepositSummary depositSummary, DividendSummary dividendSummary) {
+            this.buyPortfolioTreeTableModel = buyPortfolioTreeTableModel;
+            this.sellPortfolioTreeTableModel = sellPortfolioTreeTableModel;
+            this.depositSummary = depositSummary;
+            this.dividendSummary = dividendSummary;            
+        }
+        
+        public static XMLPortfolio newInstance(BuyPortfolioTreeTableModel buyPortfolioTreeTableModel, SellPortfolioTreeTableModel sellPortfolioTreeTableModel, DepositSummary depositSummary, DividendSummary dividendSummary) {
+            return new XMLPortfolio(buyPortfolioTreeTableModel, sellPortfolioTreeTableModel, depositSummary, dividendSummary);
+        }
+    }
+    
     /** Creates new form PortfoliioJPanel */
     public PortfolioManagementJPanel() {
         initComponents();        
         
-        this.initPortfolio(false);
+        this.initPortfolio();
     }
     
     /** This method is called from within the constructor to
@@ -1824,6 +1844,31 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         return true;
     }
 
+    @SuppressWarnings( "deprecation" )
+    public XMLPortfolio getXMLPortfolio(String directory) {
+        if (directory.endsWith(File.separator) == false) {
+            directory = directory + File.separator;
+        }
+        final File buyPortfolioFile;
+        final File sellPortfolioFile;
+        final File depositSummaryFile;
+        final File dividendSummaryFile;
+
+        // Determine the files to be loaded from disc.
+        buyPortfolioFile = new File(directory + "buyportfolio.xml");
+        sellPortfolioFile = new File(directory + "sellportfolio.xml");
+        depositSummaryFile = new File(directory + "depositsummary.xml");
+        dividendSummaryFile = new File(directory + "dividendsummary.xml");
+
+        // Try to load files from disc.
+        BuyPortfolioTreeTableModel buyPortfolioTreeTableModel = Utils.fromXML(BuyPortfolioTreeTableModel.class, buyPortfolioFile);
+        SellPortfolioTreeTableModel sellPortfolioTreeTableModel = Utils.fromXML(SellPortfolioTreeTableModel.class, sellPortfolioFile);
+        DepositSummary _depositSummary = Utils.fromXML(DepositSummary.class, depositSummaryFile);
+        DividendSummary _dividendSummary = Utils.fromXML(DividendSummary.class, dividendSummaryFile);
+        
+        return XMLPortfolio.newInstance(buyPortfolioTreeTableModel, sellPortfolioTreeTableModel, _depositSummary, _dividendSummary);
+    }
+    
     // Initialize portfolios through XML files. This is an obsolete way to
     // perform initialization. The method is still here, is for backward
     // compatible purpose. The reason for not using XML files is that, it is
@@ -1861,30 +1906,20 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             oldData = false;
         }
 
-        final File buyPortfolioFile;
-        final File sellPortfolioFile;
-        final File depositSummaryFile;
-        final File dividendSummaryFile;
-
+        final XMLPortfolio xmlPortfolio;
         // Determine the files to be loaded from disc.
         if (oldData) {
-            buyPortfolioFile = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "buyportfolio.xml");
-            sellPortfolioFile = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "sellportfolio.xml");
-            depositSummaryFile = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "depositsummary.xml");
-            dividendSummaryFile = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "dividendsummary.xml");
+            xmlPortfolio = getXMLPortfolio(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator);
         }
         else {
-            buyPortfolioFile = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "buyportfolio.xml");
-            sellPortfolioFile = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "sellportfolio.xml");
-            depositSummaryFile = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "depositsummary.xml");
-            dividendSummaryFile = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "dividendsummary.xml");
+            xmlPortfolio = getXMLPortfolio(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory());
         }
 
         // Try to load files from disc.
-        BuyPortfolioTreeTableModel buyPortfolioTreeTableModel = Utils.fromXML(BuyPortfolioTreeTableModel.class, buyPortfolioFile);
-        SellPortfolioTreeTableModel sellPortfolioTreeTableModel = Utils.fromXML(SellPortfolioTreeTableModel.class, sellPortfolioFile);
-        DepositSummary _depositSummary = Utils.fromXML(DepositSummary.class, depositSummaryFile);
-        DividendSummary _dividendSummary = Utils.fromXML(DividendSummary.class, dividendSummaryFile);
+        BuyPortfolioTreeTableModel buyPortfolioTreeTableModel = xmlPortfolio.buyPortfolioTreeTableModel;
+        SellPortfolioTreeTableModel sellPortfolioTreeTableModel = xmlPortfolio.sellPortfolioTreeTableModel;
+        DepositSummary _depositSummary = xmlPortfolio.depositSummary;
+        DividendSummary _dividendSummary = xmlPortfolio.dividendSummary;
 
         // Is XML files reading success? If not, initialize data structure with
         // empty data.
@@ -2010,15 +2045,12 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
     }
     
-    public final void initPortfolio(boolean isPortfolioFilesInXML) {
+    public final void initPortfolio() {
         // When isPortfolioFilesInXML is in true, this means we are getting old
         // XML file from cloud storage. Hence, take XML files as first priority.
         
         // Try to read porfolio files in CSV format.
-        boolean isCSVSuccess = false;        
-        if (isPortfolioFilesInXML == false) {
-            isCSVSuccess = this.initCSVPortfolio();
-        }    
+        boolean isCSVSuccess = this.initCSVPortfolio();
 
         if (false == isCSVSuccess) {
             // Fail. We need to migrate from XML format to CSV format.

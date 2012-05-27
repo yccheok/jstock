@@ -130,7 +130,7 @@ public class MainFrame extends javax.swing.JFrame {
         this.initKLSEInfoStockServerFactoryThread();
         this.initCurrencyExchangeMonitor();
         this.initRealTimeStockMonitor();
-        this.initRealTimeStocks(false);
+        this.initRealTimeStocks();
         this.initAlertStateManager();
         this.initDynamicCharts();
         this.initStockHistoryMonitor();
@@ -1403,7 +1403,7 @@ public class MainFrame extends javax.swing.JFrame {
         MainFrame.this._saveGUIOptions();
         // And switch to new portfolio.
         MainFrame.this.getJStockOptions().setWatchlistName(watchlist);
-        MainFrame.this.initRealTimeStocks(false);
+        MainFrame.this.initRealTimeStocks();
         // I guess user wants to watch the current active watchlist right now.
         // We will help him to turn to the stock watchlist page.
         MainFrame.this.jTabbedPane1.setSelectedIndex(0);
@@ -1423,7 +1423,7 @@ public class MainFrame extends javax.swing.JFrame {
         // And switch to new portfolio.
         final Country country = MainFrame.this.getJStockOptions().getCountry();
         MainFrame.this.getJStockOptions().setPortfolioName(country, portfolio);
-        MainFrame.this.portfolioManagementJPanel.initPortfolio(false);
+        MainFrame.this.portfolioManagementJPanel.initPortfolio();
         // I guess user wants to watch the current active portfolio right now.
         // We will help him to turn to the portfolio page.
         MainFrame.this.jTabbedPane1.setSelectedIndex(3);
@@ -2028,9 +2028,6 @@ public class MainFrame extends javax.swing.JFrame {
      * requirement.
      */
     public void reloadAfterDownloadFromCloud(int version) {
-        final boolean isWatchlistFilesInXML = Utils.isWatchlistFilesInXML(version);
-        final boolean isPortfolioFilesInXML = Utils.isPortfolioFilesInXML(version);
-
         /* These codes are very similar to clean up code during changing country.
          */
         MainFrame.this.statusBar.setCountryIcon(jStockOptions.getCountry().getIcon(), jStockOptions.getCountry().toString());
@@ -2041,7 +2038,7 @@ public class MainFrame extends javax.swing.JFrame {
         // interact with status bar. However, We are only most interest in stock symbol
         // database, as it will be the most busy. Hence, we let the stock symbol
         // database to be the last, so that its interaction will overwrite the others.
-        this.portfolioManagementJPanel.initPortfolio(isPortfolioFilesInXML);
+        this.portfolioManagementJPanel.initPortfolio();
         this.indicatorScannerJPanel.stop();
         this.indicatorScannerJPanel.clear();
         this.chatJPanel.stopChatServiceManager();
@@ -2064,7 +2061,7 @@ public class MainFrame extends javax.swing.JFrame {
         // Hence, after we load real time stocks from file, real time stock monitor
         // must be ready (initialized).
         this.initRealTimeStockMonitor();
-        this.initRealTimeStocks(isWatchlistFilesInXML);
+        this.initRealTimeStocks();
         this.initAlertStateManager();
         this.initDynamicCharts();
 
@@ -2128,7 +2125,7 @@ public class MainFrame extends javax.swing.JFrame {
         // interact with status bar. However, We are only most interest in stock symbol
         // database, as it will be the most busy. Hence, we let the stock symbol
         // database to be the last, so that its interaction will overwrite the others.
-        this.portfolioManagementJPanel.initPortfolio(false);
+        this.portfolioManagementJPanel.initPortfolio();
         this.indicatorScannerJPanel.stop();
         this.indicatorScannerJPanel.clear();
         this.chatJPanel.stopChatServiceManager();
@@ -2148,7 +2145,7 @@ public class MainFrame extends javax.swing.JFrame {
         // Hence, after we load real time stocks from file, real time stock monitor
         // must be ready (initialized).
         this.initRealTimeStockMonitor();
-        this.initRealTimeStocks(false);
+        this.initRealTimeStocks();
         this.initAlertStateManager();
         this.initDynamicCharts();
 
@@ -3289,7 +3286,7 @@ public class MainFrame extends javax.swing.JFrame {
         this.indicatorPanel.updatePrimaryStockServerFactory(Collections.unmodifiableList(this.getStockServerFactories()));
     }
 
-    public final void initRealTimeStocks(boolean isWatchlistFilesInXML) {
+    public final void initRealTimeStocks() {
         // When isPortfolioFilesInXML is in true, this means we are getting old
         // XML file from cloud storage. Hence, take XML files as first priority.
         
@@ -3298,10 +3295,7 @@ public class MainFrame extends javax.swing.JFrame {
         clearAllStocks();
         
         // Try to read stock files in CSV format.                
-        boolean isCSVSuccess = false;        
-        if (isWatchlistFilesInXML == false) {
-            isCSVSuccess = this.initCSVRealTimeStocks();
-        }
+        boolean isCSVSuccess = this.initCSVRealTimeStocks();
         
         if (false == isCSVSuccess) {
             // Fail. We need to migrate from XML format to CSV format.
@@ -3500,7 +3494,7 @@ public class MainFrame extends javax.swing.JFrame {
             return false;
         }
         
-        if(Utils.deleteDir(new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "logos"), false) == false) {
+        if (Utils.deleteDir(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "logos", false) == false) {
             return false;
         }
         
@@ -4169,7 +4163,7 @@ public class MainFrame extends javax.swing.JFrame {
         Country[] countries = Country.values();
         for (Country country : countries)
         {
-            Utils.deleteDir(new File(Utils.getUserDataDirectory() + country + File.separator + "history"), false);
+            Utils.deleteDir(Utils.getUserDataDirectory() + country + File.separator + "history", false);
         }
 
         // Avoid from using old history monitor. History monitor contains their own memory data.

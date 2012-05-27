@@ -23,6 +23,7 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
 import java.io.File;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
@@ -472,7 +473,9 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
                 }
 
                 publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_ExtractingData..."), Icons.BUSY));
-                final boolean status = Utils.extractZipFile(cloudFile.file, true);
+                final boolean status = Utils.isWatchlistAndPortfolioFilesInXML(cloudFile.version) ? 
+                        extractZipFileWithXMLToCSVCoversion(cloudFile.file) :
+                        Utils.extractZipFile(cloudFile.file, true);
 
                 // Place isCancelled check after time consuming operation.
                 // Not the best way, but perhaps the easiest way to cancel
@@ -501,6 +504,22 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
         return worker;
     }
 
+    private boolean extractZipFileWithXMLToCSVCoversion(File file) {
+        File tempDir = Utils.createTempDir();
+        String tempDirString = null;
+        try {
+            tempDirString = tempDir.getCanonicalPath();
+        } catch (IOException ex) {
+            log.error(null, ex);
+            return false;
+        }
+        Utils.extractZipFile(file, tempDirString, true);
+
+        // CODE?!?! CODE?!?! CODE?!?!
+
+        return Utils.deleteDir(tempDir, true);
+    }
+    
     private void writeToMemoryLog(String message) {
         // http://www.leepoint.net/notes-java/io/10file/sys-indep-newline.html
         // public static String newline = System.getProperty("line.separator");
