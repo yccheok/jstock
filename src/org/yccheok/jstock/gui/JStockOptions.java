@@ -281,6 +281,10 @@ public class JStockOptions {
 
     private Map<Country, Boolean> penceToPoundConversionEnabled = new EnumMap<Country, Boolean>(Country.class);
     
+    // So that in later time we know that, which version of JStock, is used to
+    // save this options.xml.
+    private int applicationVersionID = Utils.getApplicationVersionID();
+    
     public boolean isAutoBrokerFeeCalculationEnabled() {
         return this.isAutoBrokerFeeCalculationEnabled;
     }
@@ -1493,5 +1497,19 @@ public class JStockOptions {
      */
     public void setStockInputSuggestionListOption(StockInputSuggestionListOption stockInputSuggestionListOption) {
         this.stockInputSuggestionListOption = stockInputSuggestionListOption;
+    }
+    
+    /**
+     * @return the applicationVersionID
+     */
+    public int getApplicationVersionID() {
+        return applicationVersionID;
+    }
+    
+    /**
+     * @param applicationVersionID the applicationVersionID to set
+     */
+    public void setApplicationVersionID(int applicationVersionID) {
+        this.applicationVersionID = applicationVersionID;
     }
 }

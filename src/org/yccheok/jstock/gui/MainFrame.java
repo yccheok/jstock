@@ -79,9 +79,7 @@ public class MainFrame extends javax.swing.JFrame {
     /**
      * Initialize this MainFrame based on the JStockOptions.
      */
-    private void init(JStockOptions jStockOptions) {
-        /* Workaround to solve JXTreeTable look n feel cannot be changed on the fly. */
-        initJStockOptions(jStockOptions);
+    private void init() {
 
         Locale.setDefault(getJStockOptions().getLocale());
 
@@ -910,7 +908,10 @@ public class MainFrame extends javax.swing.JFrame {
         // Save current window size and position.
         JStockOptions.BoundsEx boundsEx = new JStockOptions.BoundsEx(this.getBounds(), this.getExtendedState());
         this.getJStockOptions().setBoundsEx(boundsEx);
-
+        
+        // So that later we know that this XML file is saved by which version of
+        // JStock.
+        jStockOptions.setApplicationVersionID(Utils.getApplicationVersionID());
         this.saveJStockOptions();
         this.saveGUIOptions();
         this.saveChartJDialogOptions();
@@ -1535,7 +1536,21 @@ public class MainFrame extends javax.swing.JFrame {
             @Override
             public void run() {
                 final MainFrame mainFrame = MainFrame.getInstance();
-                mainFrame.init(getJStockOptions(_args));
+                final JStockOptions jStockOptions = getJStockOptions(_args);
+                // We need to first assign jStockOptions to mainFrame, as during
+                // Utils.migrateXMLToCSVPortfolios, we will be accessing mainFrame's
+                // jStockOptions.
+                mainFrame.initJStockOptions(jStockOptions);
+                
+                if (Utils.isWatchlistAndPortfolioFilesInXML(jStockOptions.getApplicationVersionID())) {
+                    if (org.yccheok.jstock.portfolio.Utils.migrateXMLToCSVPortfolios(Utils.getUserDataDirectory(), Utils.getUserDataDirectory())) {
+                        System.out.println("XML to CSV portfolios migration done :)");
+                    } else {
+                        System.out.println("XML to CSV portfolios migration failed!");
+                    }                                        
+                }  
+                
+                mainFrame.init();
                 mainFrame.setVisible(true);
                 mainFrame.updateDividerLocation();
             }
@@ -2013,7 +2028,12 @@ public class MainFrame extends javax.swing.JFrame {
         /* These codes are very similar to clean up code during application
          * exit.
          */
+                
+        // So that later we know that this XML file is saved by which version of
+        // JStock.
+        jStockOptions.setApplicationVersionID(Utils.getApplicationVersionID());        
         this.saveJStockOptions();
+        
         this.saveGUIOptions();
         this.saveChartJDialogOptions();
         this.saveBrokingFirmLogos();
