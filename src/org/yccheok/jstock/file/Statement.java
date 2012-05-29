@@ -39,25 +39,31 @@ public class Statement {
         PortfolioManagementDividend,
         StockIndicatorScanner,
         StockHistory,
+        StockPrice,
         Unknown
     }
 
+    public static final class What {
+        public final Type type;
+        public final GUIBundleWrapper guiBundleWrapper;
+                
+        private What(Type type, GUIBundleWrapper guiBundleWrapper) {
+            this.type = type;
+            this.guiBundleWrapper = guiBundleWrapper;
+        }
+        
+        public static What newInstance(Type type, GUIBundleWrapper guiBundleWrapper) {
+            return new What(type, guiBundleWrapper);
+        }
+    }
+    
     public Statement(List<Atom> atoms) {
         this.atoms = new ArrayList<Atom>(atoms);
 
-        GUIBundleWrapper r = null;
-        Type t = Type.Unknown;
+        What what = whatAsAtoms(atoms);
 
-        for (GUIBundleWrapper.Language language : GUIBundleWrapper.Language.values()) {
-            r = GUIBundleWrapper.newInstance(language);
-            t = this.whatType(atoms, r);
-            if (t != Type.Unknown) {
-                break;
-            }
-        }
-
-        this.type = t;
-        this.guiBundleWrapper = r;
+        this.type = what.type;
+        this.guiBundleWrapper = what.guiBundleWrapper;
         
         for (Atom atom : atoms) {
             final Object oldObject = typeToValue.put(atom.getType(), atom.getValue());
@@ -106,7 +112,151 @@ public class Statement {
         return this.type;
     }
     
-    private Type whatType(List<Atom> atoms, GUIBundleWrapper guiBundleWrapper) {
+    private static What whatAsAtoms(List<Atom> atoms) {
+        List<String> strings = new ArrayList<String>();
+        for (Atom atom : atoms) {
+            strings.add(atom.getType());
+        }
+        return what(strings);
+    }
+    
+    /**
+     * Returns type and GUI resource bundle, based on given CSV header string.
+     * 
+     * @param strings CSV header string
+     * @return type and GUI resource bundle
+     */
+    public static What what(List<String> strings) {
+        List<Atom> atoms = new ArrayList<Atom>();
+        for (String string : strings) {
+            Atom atom = new Atom("", string);
+            atoms.add(atom);
+        }
+        
+        Type t = Type.Unknown;
+        GUIBundleWrapper r = null;
+        for (GUIBundleWrapper.Language language : GUIBundleWrapper.Language.values()) {
+            r = GUIBundleWrapper.newInstance(language);
+            t = whatType(atoms, r);
+            if (t != Type.Unknown) {
+                break;
+            }
+        }
+        return What.newInstance(t, r);
+    }
+    
+    /**
+     * Convert type to list of CSV header string.
+     * 
+     * @param type the type
+     * @param guiBundleWrapper GUI resource bundle used to perform type to string
+     * conversion
+     * @return list of CSV header string
+     */
+    public static List<String> typeToStrings(Type type, GUIBundleWrapper guiBundleWrapper) {
+  
+        List<String> strings = new ArrayList<String>();
+        if (type == Type.RealtimeInfo) {
+            strings.add(guiBundleWrapper.getString("MainFrame_Code"));
+            strings.add(guiBundleWrapper.getString("MainFrame_Symbol"));
+            strings.add(guiBundleWrapper.getString("MainFrame_Prev"));
+            strings.add(guiBundleWrapper.getString("MainFrame_Open"));
+            strings.add(guiBundleWrapper.getString("MainFrame_Last"));
+            strings.add(guiBundleWrapper.getString("MainFrame_High"));
+            strings.add(guiBundleWrapper.getString("MainFrame_Low"));
+            strings.add(guiBundleWrapper.getString("MainFrame_Vol"));
+            strings.add(guiBundleWrapper.getString("MainFrame_Chg"));
+            strings.add(guiBundleWrapper.getString("MainFrame_ChgPercentage"));
+            strings.add(guiBundleWrapper.getString("MainFrame_LVol"));
+            strings.add(guiBundleWrapper.getString("MainFrame_Buy"));
+            strings.add(guiBundleWrapper.getString("MainFrame_BQty"));
+            strings.add(guiBundleWrapper.getString("MainFrame_Sell"));
+            strings.add(guiBundleWrapper.getString("MainFrame_SQty"));
+            strings.add(guiBundleWrapper.getString("MainFrame_FallBelow"));
+            strings.add(guiBundleWrapper.getString("MainFrame_RiseAbove"));
+        } else if (type == Type.PortfolioManagementBuy) {
+            strings.add(guiBundleWrapper.getString("MainFrame_Code"));
+            strings.add(guiBundleWrapper.getString("MainFrame_Symbol"));
+            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_Date"));
+            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_Units"));
+            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_PurchasePrice"));
+            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_CurrentPrice"));
+            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_PurchaseValue"));
+            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_CurrentValue"));
+            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_GainLossPrice"));
+            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_GainLossValue"));
+            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_GainLossPercentage"));
+            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_Broker"));
+            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_ClearingFee"));
+            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_StampDuty"));
+            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_NetPurchaseValue"));
+            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_NetGainLossValue"));
+            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_NetGainLossPercentage"));
+            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_Comment"));            
+        } else if (type == Type.PortfolioManagementSell) {
+            strings.add(guiBundleWrapper.getString("MainFrame_Code"));
+            strings.add(guiBundleWrapper.getString("MainFrame_Symbol"));
+            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_ReferenceDate"));
+            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_Date"));
+            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_Units"));
+            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_SellingPrice"));
+            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_PurchasePrice"));
+            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_SellingValue"));
+            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_PurchaseValue"));
+            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_GainLossPrice"));
+            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_GainLossValue"));
+            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_GainLossPercentage"));
+            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_Broker"));
+            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_ClearingFee"));
+            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_StampDuty"));
+            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_NetSellingValue"));
+            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_NetGainLossValue"));
+            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_NetGainLossPercentage"));
+            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_Comment"));            
+        } else if (type == Type.PortfolioManagementDeposit) {
+            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_Date"));
+            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_Cash"));           
+        } else if (type == Type.PortfolioManagementDividend) {
+            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_Date"));
+            strings.add(guiBundleWrapper.getString("MainFrame_Code"));           
+            strings.add(guiBundleWrapper.getString("MainFrame_Symbol"));  
+            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_Dividend"));              
+        } else if (type == Type.StockIndicatorScanner) {
+            strings.add(guiBundleWrapper.getString("IndicatorScannerJPanel_Indicator"));
+            strings.add(guiBundleWrapper.getString("MainFrame_Code"));
+            strings.add(guiBundleWrapper.getString("MainFrame_Symbol"));
+            strings.add(guiBundleWrapper.getString("MainFrame_Prev"));
+            strings.add(guiBundleWrapper.getString("MainFrame_Open"));
+            strings.add(guiBundleWrapper.getString("MainFrame_Last"));
+            strings.add(guiBundleWrapper.getString("MainFrame_High"));
+            strings.add(guiBundleWrapper.getString("MainFrame_Low"));
+            strings.add(guiBundleWrapper.getString("MainFrame_Vol"));
+            strings.add(guiBundleWrapper.getString("MainFrame_Chg"));
+            strings.add(guiBundleWrapper.getString("MainFrame_ChgPercentage"));
+            strings.add(guiBundleWrapper.getString("MainFrame_LVol"));
+            strings.add(guiBundleWrapper.getString("MainFrame_Buy"));
+            strings.add(guiBundleWrapper.getString("MainFrame_BQty"));
+            strings.add(guiBundleWrapper.getString("MainFrame_Sell"));
+            strings.add(guiBundleWrapper.getString("MainFrame_SQty"));
+            strings.add(guiBundleWrapper.getString("IndicatorScannerJPanel_MCapital"));
+            strings.add(guiBundleWrapper.getString("IndicatorScannerJPanel_SIssued"));            
+        } else if (type == Type.StockHistory) {
+            strings.add(guiBundleWrapper.getString("StockHistory_Date"));
+            strings.add(guiBundleWrapper.getString("StockHistory_Open"));           
+            strings.add(guiBundleWrapper.getString("StockHistory_High"));  
+            strings.add(guiBundleWrapper.getString("StockHistory_Low"));             
+            strings.add(guiBundleWrapper.getString("StockHistory_Close")); 
+            strings.add(guiBundleWrapper.getString("StockHistory_Volume")); 
+        } else if (type == Type.StockPrice) {
+            strings.add(guiBundleWrapper.getString("MainFrame_Code")); 
+            strings.add(guiBundleWrapper.getString("MainFrame_Last"));             
+        } else {
+            assert(false);
+        }
+        return strings;
+    }
+    
+    private static Type whatType(List<Atom> atoms, GUIBundleWrapper guiBundleWrapper) {
         // Use if...if instead of if...else, as atoms may be having same size,
         // but their type may be different. Hence, we will just let them fall
         // through all size checking.
@@ -245,7 +395,15 @@ public class Statement {
                 return Type.StockHistory;
             }
         }
-
+        if (size == 2) {
+            /* Wow! */
+            if (
+            atoms.get(0).getType().equals(guiBundleWrapper.getString("MainFrame_Code")) &&
+            atoms.get(1).getType().equals(guiBundleWrapper.getString("MainFrame_Last"))
+            ) {
+                return Type.StockPrice;
+            }            
+        }
         return Type.Unknown;
     }
 
@@ -258,7 +416,7 @@ public class Statement {
     }
 
     /**
-     * @return resource language file used by this statement.
+     * @return GUI resource bundle used by this statement.
      */
     public GUIBundleWrapper getGUIBundleWrapper() {
         return guiBundleWrapper;
