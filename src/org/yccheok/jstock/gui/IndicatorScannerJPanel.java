@@ -1126,9 +1126,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         // model will be mutated during the middle of writting. Currently, we
         // do not have solution.
         final org.yccheok.jstock.file.Statements statements = org.yccheok.jstock.file.Statements.newInstanceFromTableModel(tableModel, false);
-        if (statements == null) {
-            return false;
-        }
+        assert(statements != null);
         return statements.saveAsCSVFile(file);
     }
 
@@ -1138,9 +1136,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         // model will be mutated during the middle of writting. Currently, we
         // do not have solution.
         final org.yccheok.jstock.file.Statements statements = org.yccheok.jstock.file.Statements.newInstanceFromTableModel(tableModel, false);
-        if (statements == null) {
-            return false;
-        }
+        assert(statements != null);
         return statements.saveAsExcelFile(file, GUIBundle.getString("IndicatorScannerJPanel_Title"));
     }
 

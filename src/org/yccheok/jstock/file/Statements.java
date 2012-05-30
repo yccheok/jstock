@@ -69,10 +69,12 @@ public class Statements {
     public static final Statements UNKNOWN_STATEMENTS = new Statements(Statement.Type.Unknown, GUIBundleWrapper.newInstance(Language.DEFAULT));
     
     public static class StatementsEx {
-        // Possible null for statements.
         public final Statements statements;
         public final String title;
         public StatementsEx(Statements statements, String title) {
+            if (statements == null || title == null) {
+                throw new java.lang.IllegalArgumentException();
+            }
             this.statements = statements;
             this.title = title;
         }
@@ -116,7 +118,6 @@ public class Statements {
         final int size = server.getNumOfCalendar();
         
         final DateFormat dateFormat = org.yccheok.jstock.gui.Utils.getCommonDateFormat();
-
         
         Stock stock = null;
         for (int i = 0; i < size; i++) {
@@ -586,6 +587,10 @@ public class Statements {
     }
     
     public boolean saveAsCSVFile(File file, boolean metadataEnabled) {
+        if (this.type == Statement.Type.Unknown) {
+            return false;
+        }
+        
         boolean status = false;
 
         FileOutputStream fileOutputStream = null;
@@ -648,6 +653,10 @@ public class Statements {
     }
 
     public boolean saveAsExcelFile(File file, String title) {
+        if (this.type == Statement.Type.Unknown) {
+            return false;
+        }
+        
         final HSSFWorkbook wb = new HSSFWorkbook();
         final HSSFSheet sheet = wb.createSheet(title);
 
@@ -697,7 +706,8 @@ public class Statements {
         for (StatementsEx statementsEx : statementsExs) {
             final String title = statementsEx.title;
             final Statements statements = statementsEx.statements;
-            if (statements == null) {
+            assert(statements != null);
+            if (statements.getType() == Statement.Type.Unknown) {
                 continue;
             }
             needToWrite = true;

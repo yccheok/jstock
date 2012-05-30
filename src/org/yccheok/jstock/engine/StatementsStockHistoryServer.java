@@ -86,9 +86,7 @@ public class StatementsStockHistoryServer implements StockHistoryServer {
     }
     
     public static StatementsStockHistoryServer newInstance(Statements statements) {
-        if (statements == null) {
-            return null;
-        }
+        assert(statements != null);
         
         if (statements.getType() != Statement.Type.StockHistory) {
             return null;

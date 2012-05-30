@@ -727,9 +727,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     public boolean openAsStatements(Statements statements, File file) {
-        if (statements == null) {
-            return false;
-        }
+        assert(statements != null);
         
         final GUIBundleWrapper guiBundleWrapper = statements.getGUIBundleWrapper();
         
@@ -1449,18 +1447,14 @@ public class MainFrame extends javax.swing.JFrame {
     private boolean saveAsCSVFile(File file, boolean languageIndependent) {
         final TableModel tableModel = jTable1.getModel();
         final org.yccheok.jstock.file.Statements statements = org.yccheok.jstock.file.Statements.newInstanceFromTableModel(tableModel, languageIndependent);
-        if (statements == null) {
-            return false;
-        }
+        assert(statements != null);
         return statements.saveAsCSVFile(file);
     }
 
     private boolean saveAsExcelFile(File file) {
         final TableModel tableModel = jTable1.getModel();
         final org.yccheok.jstock.file.Statements statements = org.yccheok.jstock.file.Statements.newInstanceFromTableModel(tableModel, false);
-        if (statements == null) {
-            return false;
-        }
+        assert(statements != null);
         return statements.saveAsExcelFile(file, GUIBundle.getString("MainFrame_Title"));
     }
 
