@@ -212,9 +212,6 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         // this must be before any sort instructions or get funny results
         buyTreeTable.setAutoCreateColumnsFromModel(false);
 
-        // We need to have a hack way, to have "Comment" in the model, but not visible to user.
-        // So that our ToolTipHighlighter can work correctly.
-        buyTreeTable.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(1, new String[]{GUIBundle.getString("PortfolioManagementJPanel_Comment")}));
         buyTreeTable.addMouseListener(new BuyTableRowPopupListener());
         buyTreeTable.addKeyListener(new TableKeyEventListener());
 
@@ -229,6 +226,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         JTableHeader oldBuyTableHeader = buyTreeTable.getTableHeader();
         JXTableHeader newBuyTableHeader = new JXTableHeader(oldBuyTableHeader.getColumnModel());
         buyTreeTable.setTableHeader(newBuyTableHeader);
+
+        // We need to have a hack way, to have "Comment" in the model, but not visible to user.
+        // So that our ToolTipHighlighter can work correctly.
+        buyTreeTable.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(1, new String[]{GUIBundle.getString("PortfolioManagementJPanel_Comment")}));
         buyTreeTable.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
             public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
                 buyTreeTableValueChanged(evt);
@@ -245,9 +246,6 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         // this must be before any sort instructions or get funny results
         sellTreeTable.setAutoCreateColumnsFromModel(false);
 
-        // We need to have a hack way, to have "Comment" in the model, but not visible to user.
-        // So that our ToolTipHighlighter can work correctly.
-        sellTreeTable.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(1, new String[]{GUIBundle.getString("PortfolioManagementJPanel_Comment")}));
         sellTreeTable.addMouseListener(new SellTableRowPopupListener());
         sellTreeTable.addKeyListener(new TableKeyEventListener());
 
@@ -262,6 +260,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         JTableHeader oldSellTableHeader = sellTreeTable.getTableHeader();
         JXTableHeader newSellTableHeader = new JXTableHeader(oldSellTableHeader.getColumnModel());
         sellTreeTable.setTableHeader(newSellTableHeader);
+
+        // We need to have a hack way, to have "Comment" in the model, but not visible to user.
+        // So that our ToolTipHighlighter can work correctly.
+        sellTreeTable.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(1, new String[]{GUIBundle.getString("PortfolioManagementJPanel_Comment")}));
         sellTreeTable.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
             public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
                 sellTreeTableValueChanged(evt);
@@ -522,10 +524,12 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                         transactions.add(t);
                     }
 
-                    if (transactions.size() <= 0) {
-                        return false;
-                    }
+                    // We allow empty portfolio.
+                    //if (transactions.size() <= 0) {
+                    //    return false;
+                    //}
 
+                    // Is there any exsiting displayed data?
                     if (this.getBuyTransactionSize() > 0) {
                         final String output = MessageFormat.format(MessagesBundle.getString("question_message_load_file_for_buy_portfolio_template"), file.getName());
                         final int result = javax.swing.JOptionPane.showConfirmDialog(MainFrame.getInstance(), output, MessagesBundle.getString("question_title_load_file_for_buy_portfolio"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
@@ -534,8 +538,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                             return true;
                         }
                     }
-                    this.buyTreeTable.setTreeTableModel(new BuyPortfolioTreeTableModelEx());                    
-
+                    this.buyTreeTable.setTreeTableModel(new BuyPortfolioTreeTableModelEx());
+                    
                     for (Transaction transaction : transactions) {
                         this.addBuyTransaction(transaction);
                     }
@@ -543,7 +547,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     // Only shows necessary columns.
                     initGUIOptions();
 
-                    updateRealTimeStockMonitorAccordingToBuyPortfolioTreeTableModel();
+                    expandTreeTable(this.buyTreeTable);
+                    
+                    updateRealTimeStockMonitorAccordingToBuyPortfolioTreeTableModel();                                        
                 }
                 break;
 
@@ -632,10 +638,13 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                         t.setComment(_comment);
                         transactions.add(t);
                     }
-                    if (transactions.size() <= 0) {
-                        return false;
-                    }
+                    
+                    // We allow empty portfolio.
+                    //if (transactions.size() <= 0) {
+                    //    return false;
+                    //}
 
+                    // Is there any exsiting displayed data?
                     if (this.getSellTransactionSize() > 0) {
                         final String output = MessageFormat.format(MessagesBundle.getString("question_message_load_file_for_sell_portfolio_template"), file.getName());
                         final int result = javax.swing.JOptionPane.showConfirmDialog(MainFrame.getInstance(), output, MessagesBundle.getString("question_title_load_file_for_sell_portfolio"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
@@ -645,13 +654,15 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                         }
                     }
                     this.sellTreeTable.setTreeTableModel(new SellPortfolioTreeTableModelEx());                    
-
+                    
                     for (Transaction transaction : transactions) {
                         this.addSellTransaction(transaction);
                     }
 
                     // Only shows necessary columns.
                     initGUIOptions();
+                    
+                    expandTreeTable(this.sellTreeTable);
                 }
                 break;
 
@@ -709,20 +720,23 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                         deposits.add(deposit);
                     }
 
-                    if (deposits.size() <= 0) {
-                        return false;
-                    }
+                    // We allow empty portfolio.
+                    //if (deposits.size() <= 0) {
+                    //    return false;
+                    //}
 
+                    // Is there any exsiting displayed data?
                     if (this.depositSummary.size() > 0) {
                         final String output = MessageFormat.format(MessagesBundle.getString("question_message_load_file_for_cash_deposit_template"), file.getName());
                         final int result = javax.swing.JOptionPane.showConfirmDialog(MainFrame.getInstance(), output, MessagesBundle.getString("question_title_load_file_for_cash_deposit"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
                         if (result != javax.swing.JOptionPane.YES_OPTION) {
                             // Assume success.
                             return true;
-                        }
-                        this.depositSummary = new DepositSummary();
+                        }                        
                     }
 
+                    this.depositSummary = new DepositSummary();
+                    
                     for (Deposit deposit : deposits) {
                         depositSummary.add(deposit);
                     }
@@ -794,9 +808,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                         dividends.add(d);
                     }
 
-                    if (dividends.size() <= 0) {
-                        return false;
-                    }
+                    // We allow empty portfolio.
+                    //if (dividends.size() <= 0) {
+                    //    return false;
+                    //}                    
 
                     if (this.dividendSummary.size() > 0) {
                         final String output = MessageFormat.format(MessagesBundle.getString("question_message_load_file_for_dividend_template"), file.getName());
@@ -804,10 +819,11 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                         if (result != javax.swing.JOptionPane.YES_OPTION) {
                             // Assume success.
                             return true;
-                        }
-                        this.dividendSummary = new DividendSummary();
+                        }                        
                     }
 
+                    this.dividendSummary = new DividendSummary();
+                    
                     for (Dividend dividend : dividends) {
                         dividendSummary.add(dividend);
                     }
@@ -1881,18 +1897,19 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         // refresh the currency symbol after we change the country.
         PortfolioManagementJPanel.this.refreshCurrencySymbol();
         
-        // Due to bug in JXTreeTable?! After I change JStock to load portfolio
-        // from CSV, buyTreeTable expanding won't work anymore, during portfolio
-        // switching (Weird?! But sellTreeTable is working). I need to collapse, 
-        // then expand, only it will work. I suppose to apply this ugly hacking 
-        // to buyTreeTable only. To be consistent, I apply it to sellTreeTable 
-        // as well.
-        this.buyTreeTable.collapseRow(0);
-        this.sellTreeTable.collapseRow(0);
-        
+        expandTreeTable(this.buyTreeTable);
+        expandTreeTable(this.sellTreeTable);
+    }
+    
+    private void expandTreeTable(JXTreeTable treeTable) {
+        // Due to bug in JXTreeTable, expandRow sometimes just won't work. Here
+        // is the hacking which makes it works.
+        if (treeTable.isExpanded(0)) {
+            treeTable.collapseRow(0);
+        }
+                
         // Expand the trees.
-        PortfolioManagementJPanel.this.buyTreeTable.expandRow(0);
-        PortfolioManagementJPanel.this.sellTreeTable.expandRow(0);
+        treeTable.expandRow(0);      
     }
     
     private void refershGUIAfterInitPortfolio(

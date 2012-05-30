@@ -544,6 +544,7 @@ public class Utils {
         return XMLPortfolio.newInstance(buyPortfolioTreeTableModel, sellPortfolioTreeTableModel, _dividendSummary, _depositSummary);
     }
     
+    // Never ever delete directory itself.
     private static boolean deleteXMLPortfolio(String directory) {
         final File buyPortfolioXMLFile = new File(directory + "buyportfolio.xml");
         final File sellPortfolioXMLFile = new File(directory + "sellportfolio.xml");

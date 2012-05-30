@@ -158,22 +158,21 @@ public class BuyPortfolioTreeTableModel extends DeprecatedAbstractPortfolioTreeT
                 break;
             }
         }
-
-        boolean status = false;
         
         if (null == transactionSummary) {
-            // This stock is not found in transaction records. Returns false
-            // early.
-            return status;
+            // This stock is not found in transaction records. Reduce memory 
+            // usage, and returns false early.
+            stockPrice.remove(code);
+            return false;
         }
         
         final int num = transactionSummary.getChildCount();
 
         if (num == 0) {
-            return status;
+            // Reduce memory usage, and returns false early.            
+            stockPrice.remove(code);
+            return false;
         }
-
-        status = true;
 
         // Only update stockPrice map if this stock is found in transaction
         // records.
@@ -188,7 +187,7 @@ public class BuyPortfolioTreeTableModel extends DeprecatedAbstractPortfolioTreeT
         fireTreeTableNodeChanged(transactionSummary);
         fireTreeTableNodeChanged(getRoot());
                 
-        return status;        
+        return true;        
     }
     
     public boolean updateStockLastPrice(org.yccheok.jstock.engine.Stock stock) {
