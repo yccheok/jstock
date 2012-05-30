@@ -46,7 +46,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.ResourceBundle;
 import java.util.Set;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -91,24 +90,23 @@ import org.yccheok.jstock.internationalization.MessagesBundle;
  * @author  Owner
  */
 public class PortfolioManagementJPanel extends javax.swing.JPanel {
-   
-    // For XML to CSV migration usage.
-    public static final class XMLPortfolio {
-        public final BuyPortfolioTreeTableModel buyPortfolioTreeTableModel;
-        public final SellPortfolioTreeTableModel sellPortfolioTreeTableModel;        
-        public final DepositSummary depositSummary;
+       
+    public static final class CSVPortfolio {
+        public final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel;
+        public final SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel;        
         public final DividendSummary dividendSummary;
+        public final DepositSummary depositSummary;
 
-        @SuppressWarnings( "deprecation" )
-        private XMLPortfolio(BuyPortfolioTreeTableModel buyPortfolioTreeTableModel, SellPortfolioTreeTableModel sellPortfolioTreeTableModel, DepositSummary depositSummary, DividendSummary dividendSummary) {
+
+        private CSVPortfolio(BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel, SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel, DividendSummary dividendSummary, DepositSummary depositSummary) {
             this.buyPortfolioTreeTableModel = buyPortfolioTreeTableModel;
             this.sellPortfolioTreeTableModel = sellPortfolioTreeTableModel;
-            this.depositSummary = depositSummary;
             this.dividendSummary = dividendSummary;            
+            this.depositSummary = depositSummary;
         }
         
-        public static XMLPortfolio newInstance(BuyPortfolioTreeTableModel buyPortfolioTreeTableModel, SellPortfolioTreeTableModel sellPortfolioTreeTableModel, DepositSummary depositSummary, DividendSummary dividendSummary) {
-            return new XMLPortfolio(buyPortfolioTreeTableModel, sellPortfolioTreeTableModel, depositSummary, dividendSummary);
+        public static CSVPortfolio newInstance(BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel, SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel, DividendSummary dividendSummary, DepositSummary depositSummary) {
+            return new CSVPortfolio(buyPortfolioTreeTableModel, sellPortfolioTreeTableModel, dividendSummary, depositSummary);
         }
     }
     
@@ -436,9 +434,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
 
     public boolean openAsStatements(Statements statements, File file) {
-        if (statements == null) {
-            return false;
-        }
+        assert(statements != null);
+        
         if (statements.getType() == Statement.Type.PortfolioManagementBuy || statements.getType() == Statement.Type.PortfolioManagementSell || statements.getType() == Statement.Type.PortfolioManagementDeposit || statements.getType() == Statement.Type.PortfolioManagementDividend) {
             final GUIBundleWrapper guiBundleWrapper = statements.getGUIBundleWrapper();
             // We will use a fixed date format (Locale.English), so that it will be
@@ -1781,6 +1778,25 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     // Initialize portfolios through CSV files. This is the preferable method,
     // as it works well under Desktop platform and Android platform.
     private boolean initCSVPortfolio() {
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+
+        final Country country = jStockOptions.getCountry();
+        
+        List<String> availablePortfolioNames = org.yccheok.jstock.portfolio.Utils.getPortfolioNames();
+        // Do we have any portfolio for this country?
+        if (availablePortfolioNames.size() <= 0) {
+            // If not, create an empty portfolio.
+            org.yccheok.jstock.portfolio.Utils.createEmptyPortfolio(org.yccheok.jstock.portfolio.Utils.getDefaultPortfolioName());
+            availablePortfolioNames = org.yccheok.jstock.portfolio.Utils.getPortfolioNames();
+        }
+        assert(availablePortfolioNames.isEmpty() == false);
+
+        // Is user selected portfolio name within current available portfolio names?
+        if (false == availablePortfolioNames.contains(jStockOptions.getPortfolioName(country))) {
+            // Nope. Reset user selected portfolio name to the first available name.
+            jStockOptions.setPortfolioName(country, availablePortfolioNames.get(0));
+        }
+        
         // Clear the previous data structures.
         PortfolioManagementJPanel.this.buyTreeTable.setTreeTableModel(new BuyPortfolioTreeTableModelEx());
         PortfolioManagementJPanel.this.sellTreeTable.setTreeTableModel(new SellPortfolioTreeTableModelEx());
@@ -1792,40 +1808,39 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         final File depositSummaryFile = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "depositsummary.csv");
         final File dividendSummaryFile = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "dividendsummary.csv");
 
-        final File buyPortfolioXMLFile = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "buyportfolio.xml");
-        final File sellPortfolioXMLFile = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "sellportfolio.xml");
-        final File depositSummaryXMLFile = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "depositsummary.xml");
-        final File dividendSummaryXMLFile = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "dividendsummary.xml");
-
         if (openAsCSVFile(buyPortfolioFile) == false) {
-            // If CSV and XML files are not there, consider this as empty record.
-            if (buyPortfolioFile.exists() || buyPortfolioXMLFile.exists()) {
-                // Either CSV format is corrupted, or XML to CSV migration is
-                // not done yet.
+            // If CSV file is not there, consider this as empty record. This is
+            // because in createEmptyPortfolio, we only create stockprices.csv,
+            // for space and speed optimization purpose.            
+            if (buyPortfolioFile.exists()) {
+                // Either CSV format is corrupted.
                 return false;
             }
         }
         if (openAsCSVFile(sellPortfolioFile) == false) {
-            // If CSV and XML files are not there, consider this as empty record.
-            if (sellPortfolioFile.exists() || sellPortfolioXMLFile.exists()) {
-                // Either CSV format is corrupted, or XML to CSV migration is
-                // not done yet.
-                return false;
-            }
-        }
-        if (openAsCSVFile(depositSummaryFile) == false) {
-            // If CSV and XML files are not there, consider this as empty record.
-            if (depositSummaryFile.exists() || depositSummaryXMLFile.exists()) {
-                // Either CSV format is corrupted, or XML to CSV migration is
-                // not done yet.
+            // If CSV file is not there, consider this as empty record. This is
+            // because in createEmptyPortfolio, we only create stockprices.csv,
+            // for space and speed optimization purpose.            
+            if (sellPortfolioFile.exists()) {
+                // Either CSV format is corrupted.
                 return false;
             }
         }
         if (openAsCSVFile(dividendSummaryFile) == false) {
-            // If CSV and XML files are not there, consider this as empty record.
-            if (dividendSummaryFile.exists() || dividendSummaryXMLFile.exists()) {
-                // Either CSV format is corrupted, or XML to CSV migration is
-                // not done yet.
+            // If CSV file is not there, consider this as empty record. This is
+            // because in createEmptyPortfolio, we only create stockprices.csv,
+            // for space and speed optimization purpose.            
+            if (dividendSummaryFile.exists()) {
+                // Either CSV format is corrupted.
+                return false;
+            }
+        }        
+        if (openAsCSVFile(depositSummaryFile) == false) {
+            // If CSV file is not there, consider this as empty record. This is
+            // because in createEmptyPortfolio, we only create stockprices.csv,
+            // for space and speed optimization purpose.            
+            if (depositSummaryFile.exists()) {
+                // Either CSV format is corrupted.
                 return false;
             }
         }
@@ -1837,129 +1852,17 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         refershGUIAfterInitPortfolio(
                 (BuyPortfolioTreeTableModelEx)PortfolioManagementJPanel.this.buyTreeTable.getTreeTableModel(), 
                 (SellPortfolioTreeTableModelEx)PortfolioManagementJPanel.this.sellTreeTable.getTreeTableModel(), 
-                this.depositSummary, 
-                this.dividendSummary, 
-                false);
+                this.dividendSummary,
+                this.depositSummary);
 
         return true;
-    }
-
-    @SuppressWarnings( "deprecation" )
-    public XMLPortfolio getXMLPortfolio(String directory) {
-        if (directory.endsWith(File.separator) == false) {
-            directory = directory + File.separator;
-        }
-        final File buyPortfolioFile;
-        final File sellPortfolioFile;
-        final File depositSummaryFile;
-        final File dividendSummaryFile;
-
-        // Determine the files to be loaded from disc.
-        buyPortfolioFile = new File(directory + "buyportfolio.xml");
-        sellPortfolioFile = new File(directory + "sellportfolio.xml");
-        depositSummaryFile = new File(directory + "depositsummary.xml");
-        dividendSummaryFile = new File(directory + "dividendsummary.xml");
-
-        // Try to load files from disc.
-        BuyPortfolioTreeTableModel buyPortfolioTreeTableModel = Utils.fromXML(BuyPortfolioTreeTableModel.class, buyPortfolioFile);
-        SellPortfolioTreeTableModel sellPortfolioTreeTableModel = Utils.fromXML(SellPortfolioTreeTableModel.class, sellPortfolioFile);
-        DepositSummary _depositSummary = Utils.fromXML(DepositSummary.class, depositSummaryFile);
-        DividendSummary _dividendSummary = Utils.fromXML(DividendSummary.class, dividendSummaryFile);
-        
-        return XMLPortfolio.newInstance(buyPortfolioTreeTableModel, sellPortfolioTreeTableModel, _depositSummary, _dividendSummary);
-    }
-    
-    // Initialize portfolios through XML files. This is an obsolete way to
-    // perform initialization. The method is still here, is for backward
-    // compatible purpose. The reason for not using XML files is that, it is
-    // very difficult to apply xstream library in Android platform. Instead, we
-    // will be using CSV files, to make portfolio information can be exchanged
-    // among Desktop platform and Android platform easily.
-    //
-    // It also seperates portfolio data out from DefaultTreeTableModel. This
-    // enables us to switch to a better tree table GUI.
-    @SuppressWarnings( "deprecation" )
-    private boolean initXMLPortfolio() {
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
-
-        final Country country = jStockOptions.getCountry();
-
-        // First, we need to determine what portfolio names are there for
-        // this country.
-        final List<String> availablePortfolioNames = org.yccheok.jstock.portfolio.Utils.getPortfolioNames();
-        final boolean oldData;
-        if (availablePortfolioNames.size() <= 0) {
-            // This is a fresh country selection without any portfolio.
-            // If we are switching from a country with portfolio, to another
-            // country without portfolio, the previous portfolio name will be
-            // carried over. By following Principle of least suprise, portfolio
-            // name will be reset to default.
-            jStockOptions.setPortfolioName(country, org.yccheok.jstock.portfolio.Utils.getDefaultPortfolioName());
-            oldData = true;
-        }
-        else {
-            // Is user selected portfolio name within current available portfolio names?
-            if (false == availablePortfolioNames.contains(jStockOptions.getPortfolioName(country))) {
-                // Nope. Reset user selected portfolio name to the first available name.
-                jStockOptions.setPortfolioName(country, availablePortfolioNames.get(0));
-            }
-            oldData = false;
-        }
-
-        final XMLPortfolio xmlPortfolio;
-        // Determine the files to be loaded from disc.
-        if (oldData) {
-            xmlPortfolio = getXMLPortfolio(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator);
-        }
-        else {
-            xmlPortfolio = getXMLPortfolio(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory());
-        }
-
-        // Try to load files from disc.
-        BuyPortfolioTreeTableModel buyPortfolioTreeTableModel = xmlPortfolio.buyPortfolioTreeTableModel;
-        SellPortfolioTreeTableModel sellPortfolioTreeTableModel = xmlPortfolio.sellPortfolioTreeTableModel;
-        DepositSummary _depositSummary = xmlPortfolio.depositSummary;
-        DividendSummary _dividendSummary = xmlPortfolio.dividendSummary;
-
-        // Is XML files reading success? If not, initialize data structure with
-        // empty data.
-        if (buyPortfolioTreeTableModel == null) {
-            buyPortfolioTreeTableModel = new BuyPortfolioTreeTableModel();
-        }
-        if (sellPortfolioTreeTableModel == null) {
-            sellPortfolioTreeTableModel = new SellPortfolioTreeTableModel();
-        }
-        if (_depositSummary == null) {
-            _depositSummary = new DepositSummary();
-        }
-        if (_dividendSummary == null) {
-            _dividendSummary = new DividendSummary();
-        }
-
-        /*
-         * Due to bug occurs at version 1.0.5L and earlier, _depositSummary
-         * and _dividendSummary may contains meaningless records. We will
-         * manually remove them. The below 2 code lines shall be removed as well,
-         * after a few more releases. During that time, most users shall already
-         * have a bug fixed xstream file.
-         */
-         org.yccheok.jstock.portfolio.Utils.removeMeaninglessRecords(_depositSummary);
-         org.yccheok.jstock.portfolio.Utils.removeMeaninglessRecords(_dividendSummary);
-         
-         refershGUIAfterInitPortfolio(
-                 buyPortfolioTreeTableModel.toBuyPortfolioTreeTableModelEx(), 
-                 sellPortfolioTreeTableModel.toSellPortfolioTreeTableModelEx(), 
-                 _depositSummary, _dividendSummary, oldData);
-         
-         return true;
     }
 
     private void _refershGUIAfterInitPortfolio(
             final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel,
             final SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel,
-            final DepositSummary _depositSummary,
             final DividendSummary _dividendSummary,
-            final boolean oldData            
+            final DepositSummary _depositSummary          
             ) {
         // Without "if" checking, tree expand won't work. Weird!
         if (PortfolioManagementJPanel.this.buyTreeTable.getTreeTableModel() != buyPortfolioTreeTableModel) {
@@ -1972,33 +1875,6 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
         PortfolioManagementJPanel.this.depositSummary = _depositSummary;
         PortfolioManagementJPanel.this.dividendSummary = _dividendSummary;
-
-        // New directory creation is needed, as we had moved the directory of portolio.
-        if (oldData) {
-            if (PortfolioManagementJPanel.this.savePortfolio()) {
-                final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
-
-                final Country country = jStockOptions.getCountry();
-
-                File buyPortfolioFile = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "buyportfolio.xml");
-                File sellPortfolioFile = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "sellportfolio.xml");
-                File depositSummaryFile = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "depositsummary.xml");
-                File dividendSummaryFile = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config" + File.separator + "dividendsummary.xml");
-
-                // OK. We have the saved portfolio in new directory structure.
-                // Let's remove all the files from old directory structure.
-                buyPortfolioFile.delete();
-                sellPortfolioFile.delete();
-                depositSummaryFile.delete();
-                dividendSummaryFile.delete();
-                final File config_directory = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "config");
-                final String[] list = config_directory.list();
-                if (list != null && list.length <= 0) {
-                    // Empty directory. Remove it.
-                    config_directory.delete();
-                }
-            }
-        }
 
         PortfolioManagementJPanel.this.updateRealTimeStockMonitorAccordingToBuyPortfolioTreeTableModel();
 
@@ -2030,39 +1906,22 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private void refershGUIAfterInitPortfolio(
             final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel,
             final SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel,
-            final DepositSummary _depositSummary,
             final DividendSummary _dividendSummary,
-            final boolean oldData) {
+            final DepositSummary _depositSummary) {
         if (SwingUtilities.isEventDispatchThread()) {
-            _refershGUIAfterInitPortfolio(buyPortfolioTreeTableModel, sellPortfolioTreeTableModel, _depositSummary, _dividendSummary, oldData);
+            _refershGUIAfterInitPortfolio(buyPortfolioTreeTableModel, sellPortfolioTreeTableModel, _dividendSummary, _depositSummary);
         } else {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    _refershGUIAfterInitPortfolio(buyPortfolioTreeTableModel, sellPortfolioTreeTableModel, _depositSummary, _dividendSummary, oldData);
+                    _refershGUIAfterInitPortfolio(buyPortfolioTreeTableModel, sellPortfolioTreeTableModel, _dividendSummary, _depositSummary);
                 }
             });            
         }
     }
     
     public final void initPortfolio() {
-        // When isPortfolioFilesInXML is in true, this means we are getting old
-        // XML file from cloud storage. Hence, take XML files as first priority.
-        
-        // Try to read porfolio files in CSV format.
-        boolean isCSVSuccess = this.initCSVPortfolio();
-
-        if (false == isCSVSuccess) {
-            // Fail. We need to migrate from XML format to CSV format.
-            // The returned value for this method doesn't matter.
-            if (initXMLPortfolio()) {
-                // Save the portfolio in CSV format.
-                if (saveCSVPortfolio()) {
-                    // And delete the portfolio in XML format. They are obsolete.
-                    deleteXMLPortfolio();
-                }
-            }
-        }
+        this.initCSVPortfolio();
     }
 
     private void updateTitledBorder() {
@@ -2082,20 +1941,22 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
     }
 
-    private boolean saveCSVPortfolio() {
-        final File buyPortfolioFile = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "buyportfolio.csv");
-        final File sellPortfolioFile = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "sellportfolio.csv");
-        final File depositSummaryFile = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "depositsummary.csv");
-        final File dividendSummaryFile = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "dividendsummary.csv");
+    public static boolean saveCSVPortfolio(String directory, CSVPortfolio csvPortfolio) {
+        assert(directory.endsWith(File.separator));
+        
+        final File buyPortfolioFile = new File(directory + "buyportfolio.csv");
+        final File sellPortfolioFile = new File(directory + "sellportfolio.csv");
+        final File dividendSummaryFile = new File(directory + "dividendsummary.csv");
+        final File depositSummaryFile = new File(directory + "depositsummary.csv");
 
         final FileEx buyPortfolioFileEx = new FileEx(buyPortfolioFile, org.yccheok.jstock.file.Statement.Type.PortfolioManagementBuy);
         final FileEx sellPortfolioFileEx = new FileEx(sellPortfolioFile, org.yccheok.jstock.file.Statement.Type.PortfolioManagementSell);
-        final FileEx depositSummaryFileEx = new FileEx(depositSummaryFile, org.yccheok.jstock.file.Statement.Type.PortfolioManagementDeposit);
         final FileEx dividendSummaryFileEx = new FileEx(dividendSummaryFile, org.yccheok.jstock.file.Statement.Type.PortfolioManagementDividend);
+        final FileEx depositSummaryFileEx = new FileEx(depositSummaryFile, org.yccheok.jstock.file.Statement.Type.PortfolioManagementDeposit);
 
-        if (false == this.saveAsCSVFile(buyPortfolioFileEx, true)) {            
+        if (false == saveAsCSVFile(csvPortfolio, buyPortfolioFileEx, true)) {            
             
-            final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)this.buyTreeTable.getTreeTableModel();
+            final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = csvPortfolio.buyPortfolioTreeTableModel;
             // org.yccheok.jstock.file.Statements is not good in handling empty 
             // case. Let us handle it seperately.
             int count = buyPortfolioTreeTableModel.getRoot().getChildCount();
@@ -2106,8 +1967,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             }
         }
         
-        if (false == this.saveAsCSVFile(sellPortfolioFileEx, true)) {            
-            final SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel = (SellPortfolioTreeTableModelEx)this.sellTreeTable.getTreeTableModel();
+        if (false == saveAsCSVFile(csvPortfolio, sellPortfolioFileEx, true)) {            
+            final SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel = csvPortfolio.sellPortfolioTreeTableModel;
             
             // org.yccheok.jstock.file.Statements is not good in handling empty 
             // case. Let us handle it seperately.
@@ -2120,23 +1981,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             }
         }
 
-        if (false == this.saveAsCSVFile(depositSummaryFileEx, true)) {
+        if (false == saveAsCSVFile(csvPortfolio, dividendSummaryFileEx, true)) {            
             // org.yccheok.jstock.file.Statements is not good in handling empty 
             // case. Let us handle it seperately.
-            int count = this.depositSummary.size();
-            if (count > 0) {
-                depositSummaryFileEx.file.delete();
-                sellPortfolioFileEx.file.delete();
-                buyPortfolioFileEx.file.delete();                
-                // Is not empty, but we fail to save it for unknown reason.
-                return false;
-            }
-        }
-
-        if (false == this.saveAsCSVFile(dividendSummaryFileEx, true)) {            
-            // org.yccheok.jstock.file.Statements is not good in handling empty 
-            // case. Let us handle it seperately.
-            int count = this.dividendSummary.size();
+            int count = csvPortfolio.dividendSummary.size();
             if (count > 0) {
                 dividendSummaryFileEx.file.delete();
                 depositSummaryFileEx.file.delete();
@@ -2147,71 +1995,51 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 return false;
             }
         }
+
+        if (false == saveAsCSVFile(csvPortfolio, depositSummaryFileEx, true)) {
+            // org.yccheok.jstock.file.Statements is not good in handling empty 
+            // case. Let us handle it seperately.
+            int count = csvPortfolio.depositSummary.size();
+            if (count > 0) {
+                depositSummaryFileEx.file.delete();
+                sellPortfolioFileEx.file.delete();
+                buyPortfolioFileEx.file.delete();                
+                // Is not empty, but we fail to save it for unknown reason.
+                return false;
+            }
+        }
         
-        return saveCSVStockPrices();
+        return saveCSVStockPrices(directory, csvPortfolio.buyPortfolioTreeTableModel);
+    }
+    
+    private boolean saveCSVPortfolio() {
+        return saveCSVPortfolio(
+            org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory(), 
+            CSVPortfolio.newInstance((BuyPortfolioTreeTableModelEx)this.buyTreeTable.getTreeTableModel(), (SellPortfolioTreeTableModelEx)this.sellTreeTable.getTreeTableModel(), this.dividendSummary, this.depositSummary)
+        );
     }
 
     private boolean initCSVStockPrices() {
         final File stockPricesFile = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "stockprices.csv");
         
-        if (stockPricesFile.exists() == false) {
-            return false;
-        }
-        
-        FileInputStream fileInputStream = null;
-        InputStreamReader inputStreamReader = null;
-        CSVReader csvreader = null;  
         final Map<Code, Double> stockPrices = new LinkedHashMap<Code, Double>();
         
-        try {
-            fileInputStream = new FileInputStream(stockPricesFile);
-            inputStreamReader = new InputStreamReader(fileInputStream,  Charset.forName("UTF-8"));
-            csvreader = new CSVReader(inputStreamReader);
-
-            String [] nextLine;
-            if ((nextLine = csvreader.readNext()) != null) {                
-                if (nextLine == null) {
-                    return false;
-                }
-                
-                if (nextLine.length != 2) {
-                    return false;
-                }
-                
-                if (nextLine[0].equals("code") == false || nextLine[1].equals("price") == false) {
-                    return false;
-                }                                                
-            }   /* if ((nextLine = csvreader.readNext()) != null) */
+        Statements statements = Statements.newInstanceFromCSVFile(stockPricesFile);
+        
+        if (statements.getType() == Statement.Type.StockPrice) {
+            final GUIBundleWrapper guiBundleWrapper = statements.getGUIBundleWrapper();
             
-            while ((nextLine = csvreader.readNext()) != null) {
-                // Shall we continue to ignore, or shall we just return null to
-                // flag an error?
-                if (nextLine.length != 2) {
-                    return false;
+            for (int i = 0, ei = statements.size(); i < ei; i++) {
+                Statement statement = statements.get(i);
+                String codeStr = statement.getValueAsString(guiBundleWrapper.getString("MainFrame_Code"));
+                Double price = statement.getValueAsDouble(guiBundleWrapper.getString("MainFrame_Last"));
+                if (codeStr == null || price == null) {
+                    continue;
                 }
                 
-                Code code = Code.newInstance(nextLine[0]);
-                Double price = null;
-                try {
-                    price = Double.parseDouble(nextLine[1]);
-                } catch (NumberFormatException ex) {
-                    log.error(null, ex);
-                    return false;
-                }
+                Code code = Code.newInstance(codeStr);
                 stockPrices.put(code, price);
             }
-        } catch (IOException ex) {
-            log.error(null, ex);
-        } finally {
-            if (csvreader != null) {
-                try {
-                    csvreader.close();
-                } catch (IOException ex) {
-                    log.error(null, ex);
-                }
-            }
-            org.yccheok.jstock.gui.Utils.close(inputStreamReader);
-            org.yccheok.jstock.gui.Utils.close(fileInputStream);
         }
         
         final BuyPortfolioTreeTableModelEx portfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
@@ -2226,67 +2054,18 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         return true;
     }
     
-    private boolean saveCSVStockPrices() {
-        boolean status = false;
-
-        final File stockPricesFile = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "stockprices.csv");
-        final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)this.buyTreeTable.getTreeTableModel();
-
-        FileOutputStream fileOutputStream = null;
-        OutputStreamWriter outputStreamWriter = null;
-        CSVWriter csvwriter = null;
-
-        try {
-            fileOutputStream = new FileOutputStream(stockPricesFile);
-            outputStreamWriter = new OutputStreamWriter(fileOutputStream,  Charset.forName("UTF-8"));
-            csvwriter = new CSVWriter(outputStreamWriter);
-            String[] datas = {"code", "price"};
-
-            csvwriter.writeNext(datas);
-
-            Map<Code, Double> stockPrices = buyPortfolioTreeTableModel.getStockPrices();
-            for (Map.Entry<Code, Double> entry : stockPrices.entrySet()) {
-                Code code = entry.getKey();
-                Double price = entry.getValue();
-                datas[0] = code.toString();
-                datas[1] = price.toString();
-                csvwriter.writeNext(datas);
-            }            
-            
-            status = true;
-        }  catch (IOException ex) {
-            log.error(null, ex);
-        } finally {
-            if (csvwriter != null) {
-                try {
-                    csvwriter.close();
-                } catch (IOException ex) {
-                    log.error(null, ex);
-                }
-            }
-            org.yccheok.jstock.gui.Utils.close(outputStreamWriter);
-            org.yccheok.jstock.gui.Utils.close(fileOutputStream);
-        }
-
-        return status;        
+    private static boolean saveCSVStockPrices(String directory, BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModelEx) {
+        assert(directory.endsWith(File.separator));
+        
+        Statements statements = Statements.newInstanceFromStockPrices(buyPortfolioTreeTableModelEx.getStockPrices());
+        
+        final File stockPricesFile = new File(directory + "stockprices.csv");
+        
+        return statements.saveAsCSVFile(stockPricesFile);
     }
 
     public boolean savePortfolio() {
         return saveCSVPortfolio();
-    }
-
-    private boolean deleteXMLPortfolio() {
-        final File buyPortfolioXMLFile = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "buyportfolio.xml");
-        final File sellPortfolioXMLFile = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "sellportfolio.xml");
-        final File depositSummaryXMLFile = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "depositsummary.xml");
-        final File dividendSummaryXMLFile = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "dividendsummary.xml");
-
-        buyPortfolioXMLFile.delete();
-        sellPortfolioXMLFile.delete();
-        depositSummaryXMLFile.delete();
-        dividendSummaryXMLFile.delete();
-        
-        return true;
     }
 
     public void updatePrimaryStockServerFactory(java.util.List<StockServerFactory> stockServerFactories) {
@@ -2514,29 +2293,33 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         return Statements.saveAsExcelFile(file, statementsExs);
     }
 
-    public boolean saveAsCSVFile(Utils.FileEx fileEx, boolean languageIndependent) {
+    private static boolean saveAsCSVFile(CSVPortfolio csvPortfolio, Utils.FileEx fileEx, boolean languageIndependent) {
         org.yccheok.jstock.file.Statements statements = null;
         if (fileEx.type == org.yccheok.jstock.file.Statement.Type.PortfolioManagementBuy) {
             // For buy portfolio, need not save metadata information, as we have
             // seperate "stockprices.csv" to handle it. However, I am not really
             // sure that whether seperating them is a good idea.
-            statements = org.yccheok.jstock.file.Statements.newInstanceFromBuyPortfolioTreeTableModel((BuyPortfolioTreeTableModelEx)this.buyTreeTable.getTreeTableModel(), languageIndependent);
+            statements = org.yccheok.jstock.file.Statements.newInstanceFromBuyPortfolioTreeTableModel(csvPortfolio.buyPortfolioTreeTableModel, languageIndependent);
         }
         else if (fileEx.type == org.yccheok.jstock.file.Statement.Type.PortfolioManagementSell) {
-            statements = org.yccheok.jstock.file.Statements.newInstanceFromSellPortfolioTreeTableModel((SellPortfolioTreeTableModelEx)this.sellTreeTable.getTreeTableModel(), languageIndependent);
+            statements = org.yccheok.jstock.file.Statements.newInstanceFromSellPortfolioTreeTableModel(csvPortfolio.sellPortfolioTreeTableModel, languageIndependent);
         }
         else if (fileEx.type == org.yccheok.jstock.file.Statement.Type.PortfolioManagementDividend) {
-            statements = org.yccheok.jstock.file.Statements.newInstanceFromTableModel(new DividendSummaryTableModel(this.dividendSummary), languageIndependent);
+            statements = org.yccheok.jstock.file.Statements.newInstanceFromTableModel(new DividendSummaryTableModel(csvPortfolio.dividendSummary), languageIndependent);
         }
         else if (fileEx.type == org.yccheok.jstock.file.Statement.Type.PortfolioManagementDeposit) {
-            statements = org.yccheok.jstock.file.Statements.newInstanceFromTableModel(new DepositSummaryTableModel(this.depositSummary), languageIndependent);
+            statements = org.yccheok.jstock.file.Statements.newInstanceFromTableModel(new DepositSummaryTableModel(csvPortfolio.depositSummary), languageIndependent);
         }
-        // When statements is null, this could mean there is no data in our
-        // buy/sell/dividend/cash records.
-        if (statements == null) {
-            return false;
-        }
-        return statements.saveAsCSVFile(fileEx.file);
+        return statements.saveAsCSVFile(fileEx.file);        
+    }
+    
+    public boolean saveAsCSVFile(Utils.FileEx fileEx, boolean languageIndependent) {
+        CSVPortfolio csvPortfolio = CSVPortfolio.newInstance(
+                    (BuyPortfolioTreeTableModelEx)this.buyTreeTable.getTreeTableModel(), 
+                    (SellPortfolioTreeTableModelEx)this.sellTreeTable.getTreeTableModel(), 
+                    this.dividendSummary, 
+                    this.depositSummary);
+        return saveAsCSVFile(csvPortfolio, fileEx, languageIndependent);
     }
 
     private void updateWealthHeader() {
