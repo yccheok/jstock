@@ -91,13 +91,14 @@ public class Statements {
     public static Statements newInstanceFromBuyPortfolioTreeTableModel(BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel, boolean languageIndependent) {
         Statements statements = newInstanceFromAbstractPortfolioTreeTableModel(buyPortfolioTreeTableModel, languageIndependent);
         
+        // (metadata is already reserved for TransactionSummary's comment)
         // Preparing for metadata.
-        Map<Code, Double> stockPrices = buyPortfolioTreeTableModel.getStockPrices();
-        for (Map.Entry<Code, Double> stockPrice : stockPrices.entrySet()) {
-            Code key = stockPrice.getKey();
-            Double value = stockPrice.getValue();
-            statements.metadatas.put(key.toString(), value.toString());
-        }
+        //Map<Code, Double> stockPrices = buyPortfolioTreeTableModel.getStockPrices();
+        //for (Map.Entry<Code, Double> stockPrice : stockPrices.entrySet()) {
+        //    Code key = stockPrice.getKey();
+        //    Double value = stockPrice.getValue();
+        //    statements.metadatas.put(key.toString(), value.toString());
+        //}
         
         return statements;
     }
@@ -530,6 +531,14 @@ public class Statements {
         for (int i = 0; i < summaryCount; i++) {
             Object o = portfolio.getChildAt(i);
             final TransactionSummary transactionSummary = (TransactionSummary)o;
+            
+            // Metadatas will be used to store TransactionSummary's comment.
+            final String comment = transactionSummary.getComment().trim();
+            if (comment.isEmpty() == false) {
+                final Stock stock = ((Transaction)transactionSummary.getChildAt(0)).getContract().getStock();
+                s.metadatas.put(stock.getCode().toString(), comment);
+            }
+            
             final int transactionCount = transactionSummary.getChildCount();
             for (int j = 0; j < transactionCount; j++)
             {

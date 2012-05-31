@@ -2319,7 +2319,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         else if (fileEx.type == org.yccheok.jstock.file.Statement.Type.PortfolioManagementDeposit) {
             statements = org.yccheok.jstock.file.Statements.newInstanceFromTableModel(new DepositSummaryTableModel(csvPortfolio.depositSummary), languageIndependent);
         }
-        return statements.saveAsCSVFile(fileEx.file);        
+        // Use metadata to store TransactionSummary's comment.
+        return statements.saveAsCSVFile(fileEx.file, true);
     }
     
     public boolean saveAsCSVFile(Utils.FileEx fileEx, boolean languageIndependent) {

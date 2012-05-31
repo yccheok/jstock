@@ -106,7 +106,7 @@ public abstract class DeprecatedAbstractPortfolioTreeTableModel extends DefaultT
     }
     
     public void addTransaction(Transaction transaction) {
-        if(isValidTransaction(transaction) == false) return;
+        if (isValidTransaction(transaction) == false) return;
         
         final Portfolio portfolio = (Portfolio)this.getRoot();
         
