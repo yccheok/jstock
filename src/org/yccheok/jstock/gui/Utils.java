@@ -1710,7 +1710,7 @@ public class Utils {
         if (applicationVersionID == APPLICATION_VERSION_ID) {
             return true;
         }
-        else if (applicationVersionID >= 1051 && applicationVersionID <= 1089) {
+        else if (applicationVersionID >= 1051 && applicationVersionID <= 1090) {
             return true;
         }
       

@@ -515,9 +515,24 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
         }
         Utils.extractZipFile(file, tempDirString, true);
 
-        // CODE?!?! CODE?!?! CODE?!?!
+        boolean status = true;
+        
+        if (org.yccheok.jstock.portfolio.Utils.migrateXMLToCSVPortfolios(tempDirString, Utils.getUserDataDirectory())) {
+            System.out.println("XML to CSV portfolios migration done :)");
+        } else {
+            System.out.println("XML to CSV portfolios migration failed!");
+            status = false;
+        } 
 
-        return Utils.deleteDir(tempDir, true);
+        if (org.yccheok.jstock.watchlist.Utils.migrateXMLToCSVWatchlists(tempDirString, Utils.getUserDataDirectory())) {
+            System.out.println("XML to CSV watchlists migration done :)");
+        } else {
+            System.out.println("XML to CSV watchlists migration failed!");
+            status = false;
+        } 
+                    
+        status = status & Utils.deleteDir(tempDir, true);
+        return status;
     }
     
     private void writeToMemoryLog(String message) {
