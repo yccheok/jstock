@@ -591,6 +591,18 @@ public class Statements {
                         atoms.add(new Atom(object != null ? object : "", type));
                     }
                 }
+                
+                // It is difficult to follow the technique used in TableModel, as
+                // it is difficult for AbstractPortfolioTreeTableModelEx to 
+                // implement CommentableContainer correctly. It doesn't have 
+                // "row" information. We have no other way, but to make "comment" 
+                // as part of AbstractPortfolioTreeTableModelEx's column.
+/*
+                // Comment handling.
+                if (commentableContainer != null) {
+                    atoms.add(new Atom(commentableContainer.getCommentable(i).getComment(), guiBundleWrapper.getString("PortfolioManagementJPanel_Comment")));
+                }                 
+*/
                 final Statement statement = new Statement(atoms);
                
                 if (s.getType() != statement.getType()) {
