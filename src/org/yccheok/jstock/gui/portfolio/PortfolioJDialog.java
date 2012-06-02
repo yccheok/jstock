@@ -169,7 +169,7 @@ public class PortfolioJDialog extends javax.swing.JDialog {
         boolean needToReload = false;
         final MainFrame mainFrame = MainFrame.getInstance();
         final JStockOptions jStockOptions = mainFrame.getJStockOptions();
-        if (jStockOptions.getPortfolioName(jStockOptions.getCountry()).equals(oldPortfolioName)) {
+        if (jStockOptions.getPortfolioName().equals(oldPortfolioName)) {
             needToReload = true;
         }
 
@@ -206,7 +206,7 @@ public class PortfolioJDialog extends javax.swing.JDialog {
             else
             {
                 if (needToReload) {
-                    jStockOptions.setPortfolioName(jStockOptions.getCountry(), newPortfolioName);
+                    jStockOptions.setPortfolioName(newPortfolioName);
                 }
                 init();
             }
@@ -228,7 +228,7 @@ public class PortfolioJDialog extends javax.swing.JDialog {
         }
         final MainFrame mainFrame = MainFrame.getInstance();
         final JStockOptions jStockOptions = mainFrame.getJStockOptions();
-        if (jStockOptions.getPortfolioName(jStockOptions.getCountry()).equals(selectedValue)) {
+        if (jStockOptions.getPortfolioName().equals(selectedValue)) {
             JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_cannot_delete_current_active_portflio"), MessagesBundle.getString("warning_title_cannot_delete_current_active_portflio"), JOptionPane.WARNING_MESSAGE);
             return;
         }
@@ -297,8 +297,7 @@ public class PortfolioJDialog extends javax.swing.JDialog {
             final int index = list.locationToIndex(evt.getPoint());
             final String portfolio = list.getModel().getElementAt(index).toString();
             final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
-            final Country country = jStockOptions.getCountry();
-            if (jStockOptions.getPortfolioName(country).equals(portfolio) == false) {
+            if (jStockOptions.getPortfolioName().equals(portfolio) == false) {
                 MainFrame.getInstance().selectActivePortfolio(portfolio);
                 // Ensure Bold effect on active portfolio.    
                 this.jList1.repaint();
@@ -323,7 +322,7 @@ public class PortfolioJDialog extends javax.swing.JDialog {
                 if (component != null && value != null) {
                     final MainFrame mainFrame = MainFrame.getInstance();
                     final JStockOptions jStockOptions = mainFrame.getJStockOptions();
-                    final String portfolioName = jStockOptions.getPortfolioName(jStockOptions.getCountry());
+                    final String portfolioName = jStockOptions.getPortfolioName();
 
                     if (value.toString().equals(portfolioName)) {
                         final Font oldFont = component.getFont();

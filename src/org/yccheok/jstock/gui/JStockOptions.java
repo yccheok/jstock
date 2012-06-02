@@ -262,8 +262,10 @@ public class JStockOptions {
     private transient String portfolioName = org.yccheok.jstock.portfolio.Utils.getDefaultPortfolioName();
     private Map<Country, String> portfolioNames = new EnumMap<Country, String>(Country.class);
 
-    private String watchlistName = org.yccheok.jstock.watchlist.Utils.getDefaultWatchlistName();
-
+    @Deprecated
+    private transient String watchlistName = org.yccheok.jstock.watchlist.Utils.getDefaultWatchlistName();
+    private Map<Country, String> watchlistNames = new EnumMap<Country, String>(Country.class);
+    
     private YellowInformationBoxOption yellowInformationBoxOption = YellowInformationBoxOption.Follow;
 
     private StockInputSuggestionListOption stockInputSuggestionListOption = StockInputSuggestionListOption.OneColumn;
@@ -621,8 +623,8 @@ public class JStockOptions {
             this.portfolioNames = new EnumMap<Country, String>(Country.class);
         }
 
-        if (this.watchlistName == null) {
-            this.watchlistName = org.yccheok.jstock.watchlist.Utils.getDefaultWatchlistName();
+        if (this.watchlistNames == null) {
+            this.watchlistNames = new EnumMap<Country, String>(Country.class);
         }
 
         if (this.maxSMSPerDay <= 0) {
@@ -1159,12 +1161,26 @@ public class JStockOptions {
     }
 
     /**
-     * @param c the country to get
-     * @return the portfolio name. If not portfolio name for the country, a
-     * default portfolio name will be returned
+     * Returns the watchlist name for current country. If there is no watchlist 
+     * name for current country, a default watchlist name will be returned.
+     * @return the watchlist name for current country
      */
-    public String getPortfolioName(Country c) {
-        final String p = this.portfolioNames.get(c);
+    public String getWatchlistName() {
+        final String p = this.watchlistNames.get(this.country);
+        if (p == null) {
+            // Not found. Returns default watchlist name.
+            return org.yccheok.jstock.watchlist.Utils.getDefaultWatchlistName();
+        }
+        return p;
+    }
+    
+    /**
+     * Returns the portfolio name for current country. If there is no portfolio 
+     * name for current country, a default portfolio name will be returned.
+     * @return the portfolio name for current country
+     */
+    public String getPortfolioName() {
+        final String p = this.portfolioNames.get(this.country);
         if (p == null) {
             // Not found. Returns default portfolio name.
             return org.yccheok.jstock.portfolio.Utils.getDefaultPortfolioName();
@@ -1173,25 +1189,17 @@ public class JStockOptions {
     }
 
     /**
-     * @param c the country to set
-     * @param s the portfolio name to set
+     * @param p the portfolio name to set
      */
-    public void setPortfolioName(Country c, String p) {
-        this.portfolioNames.put(c, p);
-    }
-
-    /**
-     * @return the watchlistName
-     */
-    public String getWatchlistName() {
-        return watchlistName;
+    public void setPortfolioName(String p) {
+        this.portfolioNames.put(this.country, p);
     }
 
     /**
      * @param watchlistName the watchlistName to set
      */
     public void setWatchlistName(String watchlistName) {
-        this.watchlistName = watchlistName;
+        this.watchlistNames.put(this.country, watchlistName);
     }
 
     /**

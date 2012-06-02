@@ -1002,8 +1002,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         // having to click on the Portfolio drop-down menu.
         if (mainFrame.getSelectedComponent() != this) {
             final JStockOptions jStockOptions = mainFrame.getJStockOptions();
-            final Country country = jStockOptions.getCountry();
-            final String title = newTransactionJDialog.getTitle() + " (" + jStockOptions.getPortfolioName(country) + ")";
+            final String title = newTransactionJDialog.getTitle() + " (" + jStockOptions.getPortfolioName() + ")";
             newTransactionJDialog.setTitle(title);
         }
 
@@ -1822,8 +1821,6 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     // as it works well under Desktop platform and Android platform.
     private boolean initCSVPortfolio() {
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
-
-        final Country country = jStockOptions.getCountry();
         
         List<String> availablePortfolioNames = org.yccheok.jstock.portfolio.Utils.getPortfolioNames();
         // Do we have any portfolio for this country?
@@ -1835,9 +1832,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         assert(availablePortfolioNames.isEmpty() == false);
 
         // Is user selected portfolio name within current available portfolio names?
-        if (false == availablePortfolioNames.contains(jStockOptions.getPortfolioName(country))) {
+        if (false == availablePortfolioNames.contains(jStockOptions.getPortfolioName())) {
             // Nope. Reset user selected portfolio name to the first available name.
-            jStockOptions.setPortfolioName(country, availablePortfolioNames.get(0));
+            jStockOptions.setPortfolioName(availablePortfolioNames.get(0));
         }
         
         // Clear the previous data structures.
@@ -1972,20 +1969,25 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
         if (SwingUtilities.isEventDispatchThread()) {
             final TitledBorder titledBorder = (TitledBorder)PortfolioManagementJPanel.this.jPanel1.getBorder();
-            titledBorder.setTitle(jStockOptions.getPortfolioName(jStockOptions.getCountry()));
+            titledBorder.setTitle(jStockOptions.getPortfolioName());
         }
         else {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     final TitledBorder titledBorder = (TitledBorder)PortfolioManagementJPanel.this.jPanel1.getBorder();
-                    titledBorder.setTitle(jStockOptions.getPortfolioName(jStockOptions.getCountry()));
+                    titledBorder.setTitle(jStockOptions.getPortfolioName());
                 }
             });
         }
     }
 
     public static boolean saveCSVPortfolio(String directory, CSVPortfolio csvPortfolio) {
+        if (Utils.createCompleteDirectoryHierarchyIfDoesNotExist(directory) == false)
+        {
+            return false;
+        }
+        
         assert(directory.endsWith(File.separator));
         
         final File buyPortfolioFile = new File(directory + "buyportfolio.csv");

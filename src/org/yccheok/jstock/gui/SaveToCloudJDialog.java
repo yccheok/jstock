@@ -519,7 +519,7 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
         else {
             if (name.equalsIgnoreCase("config" + File.separator + "options.xml")) {
                 // Special case. Skip it! We will handle it through insensitiveClone.
-            } else if (name.contains("watchlist") && name.endsWith("realtimestock.xml")) {
+            } else if (name.contains("watchlist") && name.endsWith("realtimestock.csv")) {
                 // Some users add all stocks into a watchlist. Since the file
                 // will be very large (around 50MB). We have no way, but ignore
                 // the file.
@@ -616,14 +616,8 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
             extensions.add(".bmp");
         } else if (name.equals("portfolios")) {
             extensions.add(".csv");
-            // XML will be removed soon once we had perform data conversion
-            // during startup.
-            extensions.add(".xml");
         } else if (name.equals("watchlist")) {
             extensions.add(".csv");
-            // XML will be removed soon once we had perform data conversion
-            // during startup.
-            extensions.add(".xml");
         } else {
             assert(false);
             throw new java.lang.IllegalArgumentException(name);
