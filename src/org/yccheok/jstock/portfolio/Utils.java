@@ -43,7 +43,7 @@ import org.yccheok.jstock.gui.SellPortfolioTreeTableModel;
 public class Utils {
 
     // For XML to CSV migration usage.
-    public static final class XMLPortfolio {
+    private static final class XMLPortfolio {
         public final BuyPortfolioTreeTableModel buyPortfolioTreeTableModel;
         public final SellPortfolioTreeTableModel sellPortfolioTreeTableModel;        
         public final DividendSummary dividendSummary;
@@ -52,6 +52,9 @@ public class Utils {
 
         @SuppressWarnings( "deprecation" )
         private XMLPortfolio(BuyPortfolioTreeTableModel buyPortfolioTreeTableModel, SellPortfolioTreeTableModel sellPortfolioTreeTableModel, DividendSummary dividendSummary, DepositSummary depositSummary) {
+            if (buyPortfolioTreeTableModel == null || sellPortfolioTreeTableModel == null || dividendSummary == null || depositSummary == null) {
+                throw new java.lang.IllegalArgumentException();
+            }
             this.buyPortfolioTreeTableModel = buyPortfolioTreeTableModel;
             this.sellPortfolioTreeTableModel = sellPortfolioTreeTableModel;
             this.dividendSummary = dividendSummary;
@@ -553,7 +556,11 @@ public class Utils {
         DepositSummary _depositSummary = org.yccheok.jstock.gui.Utils.fromXML(DepositSummary.class, depositSummaryFile);
         DividendSummary _dividendSummary = org.yccheok.jstock.gui.Utils.fromXML(DividendSummary.class, dividendSummaryFile);
         
-        return XMLPortfolio.newInstance(buyPortfolioTreeTableModel, sellPortfolioTreeTableModel, _dividendSummary, _depositSummary);
+        return XMLPortfolio.newInstance(
+                buyPortfolioTreeTableModel != null ? buyPortfolioTreeTableModel : new BuyPortfolioTreeTableModel(), 
+                sellPortfolioTreeTableModel != null ? sellPortfolioTreeTableModel : new SellPortfolioTreeTableModel(), 
+                _dividendSummary != null ? _dividendSummary : new DividendSummary(), 
+                _depositSummary != null ? _depositSummary : new DepositSummary());
     }
     
     // Never ever delete directory itself.
