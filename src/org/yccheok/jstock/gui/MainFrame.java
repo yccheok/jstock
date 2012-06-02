@@ -66,6 +66,21 @@ import org.yccheok.jstock.network.Utils.Type;
  */
 public class MainFrame extends javax.swing.JFrame {
 
+    public static final class CSVWatchlist {
+        public final TableModel tableModel;
+        
+        private CSVWatchlist(TableModel tableModel) {
+            if (tableModel == null) {
+                throw new java.lang.IllegalArgumentException();
+            }
+            this.tableModel = tableModel;
+        }
+        
+        public static CSVWatchlist newInstance(TableModel tableModel) {
+            return new CSVWatchlist(tableModel);
+        }
+    }
+    
     // Comment out, to avoid annoying log messages during debugging.
     //static { System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.NoOpLog"); }
     
@@ -128,7 +143,7 @@ public class MainFrame extends javax.swing.JFrame {
         this.initKLSEInfoStockServerFactoryThread();
         this.initCurrencyExchangeMonitor();
         this.initRealTimeStockMonitor();
-        this.initRealTimeStocks();
+        this.initWatchlist();
         this.initAlertStateManager();
         this.initDynamicCharts();
         this.initStockHistoryMonitor();
@@ -914,7 +929,7 @@ public class MainFrame extends javax.swing.JFrame {
         this.saveGUIOptions();
         this.saveChartJDialogOptions();
         this.saveBrokingFirmLogos();
-        this.saveRealTimeStocks();
+        this.saveWatchlist();
         this.indicatorPanel.saveAlertIndicatorProjectManager();
         this.indicatorPanel.saveModuleIndicatorProjectManager();
         this.portfolioManagementJPanel.savePortfolio();
@@ -1181,8 +1196,7 @@ public class MainFrame extends javax.swing.JFrame {
     private void jMenu8MenuSelected(javax.swing.event.MenuEvent evt) {//GEN-FIRST:event_jMenu8MenuSelected
         this.jMenu8.removeAll();
         final java.util.List<String> portfolioNames = org.yccheok.jstock.portfolio.Utils.getPortfolioNames();
-        final Country country = this.getJStockOptions().getCountry();
-        final String currentPortfolioName = this.getJStockOptions().getPortfolioName(country);
+        final String currentPortfolioName = this.getJStockOptions().getPortfolioName();
         final javax.swing.ButtonGroup buttonGroup = new javax.swing.ButtonGroup();
         for (String portfolioName : portfolioNames) {
             final JMenuItem mi = (JRadioButtonMenuItem) jMenu8.add(new JRadioButtonMenuItem(portfolioName));
@@ -1395,14 +1409,14 @@ public class MainFrame extends javax.swing.JFrame {
     public void selectActiveWatchlist(String watchlist) {
         assert(SwingUtilities.isEventDispatchThread());
         // Save current watchlist.
-        MainFrame.this.saveRealTimeStocks();
+        MainFrame.this.saveWatchlist();
         // Save current GUI options.
         // Do not call MainFrame.this.saveGUIOptions() (Pay note on the underscore)
         // , as that will save portfolio's and indicator scanner's as well.
         MainFrame.this._saveGUIOptions();
         // And switch to new portfolio.
         MainFrame.this.getJStockOptions().setWatchlistName(watchlist);
-        MainFrame.this.initRealTimeStocks();
+        MainFrame.this.initWatchlist();
         // I guess user wants to watch the current active watchlist right now.
         // We will help him to turn to the stock watchlist page.
         MainFrame.this.jTabbedPane1.setSelectedIndex(0);
@@ -1420,8 +1434,7 @@ public class MainFrame extends javax.swing.JFrame {
         // Save current GUI options.
         MainFrame.this.portfolioManagementJPanel.saveGUIOptions();
         // And switch to new portfolio.
-        final Country country = MainFrame.this.getJStockOptions().getCountry();
-        MainFrame.this.getJStockOptions().setPortfolioName(country, portfolio);
+        MainFrame.this.getJStockOptions().setPortfolioName(portfolio);
         MainFrame.this.portfolioManagementJPanel.initPortfolio();
         // I guess user wants to watch the current active portfolio right now.
         // We will help him to turn to the portfolio page.
@@ -1440,15 +1453,20 @@ public class MainFrame extends javax.swing.JFrame {
         portfolioJDialog.setVisible(true);
     }
 
-    private File getRealTimeStocksFile() {
-        return new File(org.yccheok.jstock.watchlist.Utils.getWatchlistDirectory(this.jStockOptions.getWatchlistName())  + "realtimestock.csv");
+    private static File getWatchlistFile(String directory) {
+        return new File(directory  + "realtimestock.csv");
     }
+    
+    private static boolean saveAsCSVFile(CSVWatchlist csvWatchlist, File file, boolean languageIndependent) {
+        final org.yccheok.jstock.file.Statements statements = org.yccheok.jstock.file.Statements.newInstanceFromTableModel(csvWatchlist.tableModel, languageIndependent);
+        assert(statements != null);
+        return statements.saveAsCSVFile(file);
+    }    
     
     private boolean saveAsCSVFile(File file, boolean languageIndependent) {
         final TableModel tableModel = jTable1.getModel();
-        final org.yccheok.jstock.file.Statements statements = org.yccheok.jstock.file.Statements.newInstanceFromTableModel(tableModel, languageIndependent);
-        assert(statements != null);
-        return statements.saveAsCSVFile(file);
+        CSVWatchlist csvWatchlist = CSVWatchlist.newInstance(tableModel);
+        return saveAsCSVFile(csvWatchlist, file, languageIndependent);
     }
 
     private boolean saveAsExcelFile(File file) {
@@ -1541,7 +1559,15 @@ public class MainFrame extends javax.swing.JFrame {
                         System.out.println("XML to CSV portfolios migration done :)");
                     } else {
                         System.out.println("XML to CSV portfolios migration failed!");
-                    }                                        
+                        System.exit(-1);
+                    } 
+                    
+                    if (org.yccheok.jstock.watchlist.Utils.migrateXMLToCSVWatchlists(Utils.getUserDataDirectory(), Utils.getUserDataDirectory())) {
+                        System.out.println("XML to CSV watchlists migration done :)");
+                    } else {
+                        System.out.println("XML to CSV watchlists migration failed!");
+                        System.exit(-1);
+                    }                    
                 }  
                 
                 mainFrame.init();
@@ -1556,8 +1582,9 @@ public class MainFrame extends javax.swing.JFrame {
         this.portfolioManagementJPanel.updateDividerLocation();
     }
 
-    private void clearAllStocks() {
+    private void _clearAllStocks() {
         assert(java.awt.EventQueue.isDispatchThread());
+        
         
         StockTableModel tableModel = (StockTableModel)jTable1.getModel();            
 
@@ -1583,6 +1610,21 @@ public class MainFrame extends javax.swing.JFrame {
                     statusBar.setMainMessage(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_Connected"));
                 }
             }        
+        }        
+    }
+    
+    private void clearAllStocks() {
+        if (java.awt.EventQueue.isDispatchThread()) {
+            _clearAllStocks();
+        } else {
+            SwingUtilities.invokeLater(new Runnable() {
+
+                @Override
+                public void run() {
+                    _clearAllStocks();
+                }
+                
+            });
         }
     }
     
@@ -2031,7 +2073,7 @@ public class MainFrame extends javax.swing.JFrame {
         this.saveGUIOptions();
         this.saveChartJDialogOptions();
         this.saveBrokingFirmLogos();
-        this.saveRealTimeStocks();
+        this.saveWatchlist();
         this.indicatorPanel.saveAlertIndicatorProjectManager();
         this.indicatorPanel.saveModuleIndicatorProjectManager();
         this.portfolioManagementJPanel.savePortfolio();
@@ -2075,7 +2117,7 @@ public class MainFrame extends javax.swing.JFrame {
         // Hence, after we load real time stocks from file, real time stock monitor
         // must be ready (initialized).
         this.initRealTimeStockMonitor();
-        this.initRealTimeStocks();
+        this.initWatchlist();
         this.initAlertStateManager();
         this.initDynamicCharts();
 
@@ -2127,7 +2169,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         /* Need to save chart dialog options? */
         
-        saveRealTimeStocks();
+        saveWatchlist();
         this.portfolioManagementJPanel.savePortfolio();
 
         jStockOptions.setCountry(country);
@@ -2159,7 +2201,7 @@ public class MainFrame extends javax.swing.JFrame {
         // Hence, after we load real time stocks from file, real time stock monitor
         // must be ready (initialized).
         this.initRealTimeStockMonitor();
-        this.initRealTimeStocks();
+        this.initWatchlist();
         this.initAlertStateManager();
         this.initDynamicCharts();
 
@@ -3300,42 +3342,50 @@ public class MainFrame extends javax.swing.JFrame {
         this.indicatorPanel.updatePrimaryStockServerFactory(Collections.unmodifiableList(this.getStockServerFactories()));
     }
 
-    public final void initRealTimeStocks() {
-        // When isPortfolioFilesInXML is in true, this means we are getting old
-        // XML file from cloud storage. Hence, take XML files as first priority.
+    public final void initWatchlist() {
+        initCSVWatchlist();
+    }
+    
+    private boolean initCSVWatchlist() {  
+        java.util.List<String> availableWatchlistNames = org.yccheok.jstock.watchlist.Utils.getWatchlistNames();
+        // Do we have any watchlist for this country?
+        if (availableWatchlistNames.size() <= 0) {
+            // If not, create an empty watchlist.
+            org.yccheok.jstock.watchlist.Utils.createEmptyWatchlist(org.yccheok.jstock.watchlist.Utils.getDefaultWatchlistName());
+            availableWatchlistNames = org.yccheok.jstock.watchlist.Utils.getWatchlistNames();
+        }
+        assert(availableWatchlistNames.isEmpty() == false);
+
+        // Is user selected watchlist name within current available watchlist names?
+        if (false == availableWatchlistNames.contains(jStockOptions.getWatchlistName())) {
+            // Nope. Reset user selected watchlist name to the first available name.
+            jStockOptions.setWatchlistName(availableWatchlistNames.get(0));
+        }
         
         // openAsCSVFile will "append" stocks. We need to clear previous stocks
         // explicitly.
+        
+        // Clear the previous data structures.
         clearAllStocks();
         
-        // Try to read stock files in CSV format.                
-        boolean isCSVSuccess = this.initCSVRealTimeStocks();
-        
-        if (false == isCSVSuccess) {
-            // Fail. We need to migrate from XML format to CSV format.
-            // The returned value for this method doesn't matter.
-            if (initXMLRealTimeStocks()) {
-                // Save the stocks in CSV format.
-                if (saveCSVRealTimeStocks()) {
-                    // And delete the portfolio in XML format. They are obsolete.
-                    deleteXMLRealTimeStocks();
-                }
-            }
-        }
-    }
-    
-    private boolean initCSVRealTimeStocks() {        
-        File realTimeStockFile = this.getRealTimeStocksFile();
+        File realTimeStockFile = getWatchlistFile(org.yccheok.jstock.watchlist.Utils.getWatchlistDirectory());
         return this.openAsCSVFile(realTimeStockFile);
     }
     
-    private boolean saveCSVRealTimeStocks() {
-        if (Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.watchlist.Utils.getWatchlistDirectory(this.jStockOptions.getWatchlistName())) == false)
+    public static boolean saveCSVWatchlist(String directory, CSVWatchlist csvWatchlist) {
+        assert(directory.endsWith(File.separator));
+        if (Utils.createCompleteDirectoryHierarchyIfDoesNotExist(directory) == false)
         {
             return false;
-        }        
-        File realTimeStockFile = getRealTimeStocksFile();
-        return this.saveAsCSVFile(realTimeStockFile, true);
+        } 
+        return MainFrame.saveAsCSVFile(csvWatchlist, getWatchlistFile(directory), true);
+    }
+    
+    private boolean saveCSVWathclist() {
+        final String directory = org.yccheok.jstock.watchlist.Utils.getWatchlistDirectory();
+        final TableModel tableModel = jTable1.getModel();
+        CSVWatchlist csvWatchlist = CSVWatchlist.newInstance(tableModel);
+        return MainFrame.saveCSVWatchlist(directory, csvWatchlist);
     }
     
     private boolean deleteXMLRealTimeStocks() {
@@ -3393,10 +3443,10 @@ public class MainFrame extends javax.swing.JFrame {
         // Is XML files reading success? If not, initialize data structure with
         // empty data.
         if (stocks == null) {
-            stocks = new java.util.ArrayList<Stock>();
+            stocks = java.util.Collections.<Stock>emptyList();
         }
         if (alerts == null) {
-            alerts = new java.util.ArrayList<StockAlert>();
+            alerts = java.util.Collections.<StockAlert>emptyList();
         }
 
         // Update GUI. Shall we?
@@ -3427,7 +3477,7 @@ public class MainFrame extends javax.swing.JFrame {
             // We are still having old directory structure.
             if (oldData) {
                 // Let's save the information into new directory structure.
-                if (MainFrame.this.saveRealTimeStocks()) {
+                if (MainFrame.this.saveWatchlist()) {
                     // OK. We have all the saved watchlist in new directory structure.
                     // Let's remove all the files in old directory structure.
                     realTimeStockFile.delete();
@@ -3475,7 +3525,7 @@ public class MainFrame extends javax.swing.JFrame {
                     // We are still having old directory structure.
                     if (oldData) {
                         // Let's save the information into new directory structure.
-                        if (MainFrame.this.saveRealTimeStocks()) {
+                        if (MainFrame.this.saveWatchlist()) {
                             // OK. We have all the saved watchlist in new directory structure.
                             // Let's remove all the files in old directory structure.
                             realTimeStockFile.delete();
@@ -3498,8 +3548,8 @@ public class MainFrame extends javax.swing.JFrame {
         return true;
     }
 
-    private boolean saveRealTimeStocks() {
-        return this.saveCSVRealTimeStocks();
+    private boolean saveWatchlist() {
+        return this.saveCSVWathclist();
     }
     
     private boolean saveBrokingFirmLogos() {
