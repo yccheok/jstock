@@ -215,12 +215,14 @@ public class Statement {
             strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_Comment"));            
         } else if (type == Type.PortfolioManagementDeposit) {
             strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_Date"));
-            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_Cash"));           
+            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_Cash"));
+            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_Comment"));
         } else if (type == Type.PortfolioManagementDividend) {
             strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_Date"));
             strings.add(guiBundleWrapper.getString("MainFrame_Code"));           
             strings.add(guiBundleWrapper.getString("MainFrame_Symbol"));  
-            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_Dividend"));              
+            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_Dividend"));
+            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_Comment"));
         } else if (type == Type.StockIndicatorScanner) {
             strings.add(guiBundleWrapper.getString("IndicatorScannerJPanel_Indicator"));
             strings.add(guiBundleWrapper.getString("MainFrame_Code"));
@@ -340,6 +342,8 @@ public class Statement {
             }
         }
         if (size == 2) {
+            // Legacy CSV file handling. As in version <=1.0.6p, comment
+            // is not being saved to CSV.
             if (
             atoms.get(0).getType().equals(guiBundleWrapper.getString("PortfolioManagementJPanel_Date")) &&
             atoms.get(1).getType().equals(guiBundleWrapper.getString("PortfolioManagementJPanel_Cash"))
@@ -347,7 +351,18 @@ public class Statement {
                 return Type.PortfolioManagementDeposit;
             }
         }
+        if (size == 3) {
+            if (
+            atoms.get(0).getType().equals(guiBundleWrapper.getString("PortfolioManagementJPanel_Date")) &&
+            atoms.get(1).getType().equals(guiBundleWrapper.getString("PortfolioManagementJPanel_Cash")) &&
+            atoms.get(2).getType().equals(guiBundleWrapper.getString("PortfolioManagementJPanel_Comment"))
+            ) {
+                return Type.PortfolioManagementDeposit;
+            }
+        }        
         if (size == 4) {
+            // Legacy CSV file handling. As in version <=1.0.6p, comment
+            // is not being saved to CSV.          
             if (
             atoms.get(0).getType().equals(guiBundleWrapper.getString("PortfolioManagementJPanel_Date")) &&
             atoms.get(1).getType().equals(guiBundleWrapper.getString("MainFrame_Code")) &&
@@ -357,6 +372,17 @@ public class Statement {
                 return Type.PortfolioManagementDividend;
             }
         }
+        if (size == 5) {           
+            if (
+            atoms.get(0).getType().equals(guiBundleWrapper.getString("PortfolioManagementJPanel_Date")) &&
+            atoms.get(1).getType().equals(guiBundleWrapper.getString("MainFrame_Code")) &&
+            atoms.get(2).getType().equals(guiBundleWrapper.getString("MainFrame_Symbol")) &&
+            atoms.get(3).getType().equals(guiBundleWrapper.getString("PortfolioManagementJPanel_Dividend")) &&
+            atoms.get(4).getType().equals(guiBundleWrapper.getString("PortfolioManagementJPanel_Comment"))                    
+            ) {
+                return Type.PortfolioManagementDividend;
+            }
+        }        
         if (size == 18) {
             /* Wow! */
             if (

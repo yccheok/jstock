@@ -54,6 +54,7 @@ import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.StockHistoryServer;
 import org.yccheok.jstock.file.GUIBundleWrapper.Language;
 import org.yccheok.jstock.gui.POIUtils;
+import org.yccheok.jstock.gui.portfolio.CommentableContainer;
 import org.yccheok.jstock.gui.treetable.AbstractPortfolioTreeTableModelEx;
 import org.yccheok.jstock.gui.treetable.BuyPortfolioTreeTableModelEx;
 import org.yccheok.jstock.gui.treetable.SellPortfolioTreeTableModelEx;
@@ -446,6 +447,13 @@ public class Statements {
             }
 
         }
+        
+        // Comment handling.
+        CommentableContainer commentableContainer = null;
+        if (tableModel instanceof CommentableContainer) {
+            commentableContainer = (CommentableContainer)tableModel;
+        }
+        
         Statement.What what = Statement.what(strings);
         final Statements s = new Statements(what.type, what.guiBundleWrapper);
         
@@ -475,6 +483,12 @@ public class Statements {
                     atoms.add(new Atom(object != null ? object : "", type));
                 }
             }
+            
+            // Comment handling.
+            if (commentableContainer != null) {
+                atoms.add(new Atom(commentableContainer.getCommentable(i).getComment(), guiBundleWrapper.getString("PortfolioManagementJPanel_Comment")));
+            }
+            
             final Statement statement = new Statement(atoms);
 
             if (s.getType() != statement.getType()) {

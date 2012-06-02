@@ -734,6 +734,14 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                             continue;
                         }
                         final Deposit deposit = new Deposit(cash, new SimpleDate(date));
+                        
+                        final String comment = statement.getValueAsString(guiBundleWrapper.getString("PortfolioManagementJPanel_Comment"));
+                        if (comment != null) {
+                            // Possible to be null. As in version <=1.0.6p, comment
+                            // is not being saved to CSV.
+                            deposit.setComment(org.yccheok.jstock.portfolio.Utils.replaceCSVLineFeedToSystemLineFeed(comment));
+                        }
+
                         deposits.add(deposit);
                     }
 
@@ -822,6 +830,14 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                             continue;
                         }
                         final Dividend d = new Dividend(stock, dividend, new SimpleDate(date));
+                        
+                        final String comment = statement.getValueAsString(guiBundleWrapper.getString("PortfolioManagementJPanel_Comment"));
+                        if (comment != null) {
+                            // Possible to be null. As in version <=1.0.6p, comment
+                            // is not being saved to CSV.
+                            d.setComment(org.yccheok.jstock.portfolio.Utils.replaceCSVLineFeedToSystemLineFeed(comment));
+                        }
+                        
                         dividends.add(d);
                     }
 
