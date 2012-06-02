@@ -590,12 +590,8 @@ public class Statements {
 
         return s;
     }
-
-    public boolean saveAsCSVFile(File file) {
-        return saveAsCSVFile(file, false);
-    }
     
-    public boolean saveAsCSVFile(File file, boolean metadataEnabled) {
+    public boolean saveAsCSVFile(File file) {
         if (this.type == Statement.Type.Unknown) {
             return false;
         }
@@ -611,13 +607,11 @@ public class Statements {
             outputStreamWriter = new OutputStreamWriter(fileOutputStream,  Charset.forName("UTF-8"));
             csvwriter = new CSVWriter(outputStreamWriter);
             
-            if (metadataEnabled) {
-                for (Map.Entry<String, String> metadata : metadatas.entrySet()) {
-                    String key = metadata.getKey();
-                    String value = metadata.getValue();
-                    String output = key + "=" + value;
-                    csvwriter.writeNext(new String[]{output});
-                }                
+            for (Map.Entry<String, String> metadata : metadatas.entrySet()) {
+                String key = metadata.getKey();
+                String value = metadata.getValue();
+                String output = key + "=" + value;
+                csvwriter.writeNext(new String[]{output});
             }
             
             // Do not obtain "type" through statements, as there is possible that 

@@ -95,6 +95,18 @@ public class Utils {
     };
     
     /**
+     * Replace CSV line feed to system dependent line feed.
+     * @param string the string
+     * @return String with system dependent line feed
+     */
+    public static String replaceCSVLineFeedToSystemLineFeed(String string) {
+        // OpenCSV is using "\n" as line feed.
+        final String CSVLineFeed = "\n";
+        final String systemLineFeed = System.getProperty("line.separator");
+        return string.replaceAll(CSVLineFeed, systemLineFeed);
+    }
+    
+    /**
      * Convert the value to exchange rate representation.
      *
      * @param value the value to be converted

@@ -127,8 +127,10 @@ public abstract class AbstractPortfolioTreeTableModelEx extends SortableTreeTabl
         fireTreeTableNodeChanged(getRoot());        
     }
     
-    public void addTransaction(Transaction transaction) {
-        if(isValidTransaction(transaction) == false) return;
+    public TransactionSummary addTransaction(Transaction transaction) {
+        if (isValidTransaction(transaction) == false) {
+            return null;
+        }
         
         final Portfolio portfolio = (Portfolio)this.getRoot();
         
@@ -161,5 +163,7 @@ public abstract class AbstractPortfolioTreeTableModelEx extends SortableTreeTabl
         // Workaround to solve root is not being updated when children are not 
         // being collapse.
         fireTreeTableNodeChanged(getRoot());
+        
+        return transactionSummary;
     }
 }

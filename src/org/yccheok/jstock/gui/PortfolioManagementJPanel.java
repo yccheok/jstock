@@ -520,7 +520,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                         final Contract.ContractBuilder builder = new Contract.ContractBuilder(stock, simpleDate);
                         final Contract contract = builder.type(type).quantity(units).price(purchasePrice).build();
                         final Transaction t = new Transaction(contract, org.yccheok.jstock.portfolio.Utils.getDummyBroker(broker), org.yccheok.jstock.portfolio.Utils.getDummyStampDuty(contract, stampDuty), org.yccheok.jstock.portfolio.Utils.getDummyClearingFee(clearingFee));
-                        t.setComment(_comment);
+                        t.setComment(org.yccheok.jstock.portfolio.Utils.replaceCSVLineFeedToSystemLineFeed(_comment));
                         transactions.add(t);
                     }
 
@@ -540,8 +540,16 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     }
                     this.buyTreeTable.setTreeTableModel(new BuyPortfolioTreeTableModelEx());
                     
+                    Map<String, String> metadatas = statements.getMetadatas();
                     for (Transaction transaction : transactions) {
-                        this.addBuyTransaction(transaction);
+                        final Code code = transaction.getContract().getStock().getCode();
+                        TransactionSummary transactionSummary = this.addBuyTransaction(transaction);
+                        if (transactionSummary != null) {
+                            String comment = metadatas.get(code.toString());
+                            if (comment != null) {
+                                transactionSummary.setComment(org.yccheok.jstock.portfolio.Utils.replaceCSVLineFeedToSystemLineFeed(comment));
+                            }
+                        }
                     }
 
                     // Only shows necessary columns.
@@ -635,7 +643,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                         final Contract.ContractBuilder builder = new Contract.ContractBuilder(stock, simpleDate);
                         final Contract contract = builder.type(type).quantity(units).price(sellingPrice).referencePrice(purchasePrice).referenceDate(simpleReferenceDate).build();
                         final Transaction t = new Transaction(contract, org.yccheok.jstock.portfolio.Utils.getDummyBroker(broker), org.yccheok.jstock.portfolio.Utils.getDummyStampDuty(contract, stampDuty), org.yccheok.jstock.portfolio.Utils.getDummyClearingFee(clearingFee));
-                        t.setComment(_comment);
+                        t.setComment(org.yccheok.jstock.portfolio.Utils.replaceCSVLineFeedToSystemLineFeed(_comment));
                         transactions.add(t);
                     }
                     
@@ -655,8 +663,17 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     }
                     this.sellTreeTable.setTreeTableModel(new SellPortfolioTreeTableModelEx());                    
                     
+                    Map<String, String> metadatas = statements.getMetadatas();
+
                     for (Transaction transaction : transactions) {
-                        this.addSellTransaction(transaction);
+                        final Code code = transaction.getContract().getStock().getCode();
+                        TransactionSummary transactionSummary = this.addSellTransaction(transaction);
+                        if (transactionSummary != null) {
+                            String comment = metadatas.get(code.toString());
+                            if (comment != null) {
+                                transactionSummary.setComment(org.yccheok.jstock.portfolio.Utils.replaceCSVLineFeedToSystemLineFeed(comment));
+                            }
+                        }
                     }
 
                     // Only shows necessary columns.
@@ -1633,11 +1650,11 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         return portfolioTreeTableModel.getTransactionSize();
     }
 
-    private void addBuyTransaction(Transaction transaction) {
+    private TransactionSummary addBuyTransaction(Transaction transaction) {
         assert(transaction.getContract().getType() == Contract.Type.Buy);
         
         final BuyPortfolioTreeTableModelEx portfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
-        portfolioTreeTableModel.addTransaction(transaction);
+        TransactionSummary transactionSummary = portfolioTreeTableModel.addTransaction(transaction);
 
         // This is to prevent NPE, during initPortfolio through constructor.
         // Information will be pumped in later to realTimeStockMonitor, through 
@@ -1645,6 +1662,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         if (this.realTimeStockMonitor != null) {
             this.realTimeStockMonitor.addStockCode(transaction.getContract().getStock().getCode());
         }
+        
+        return transactionSummary;
     }
 
     public List<TransactionSummary> getTransactionSummariesFromPortfolios() {
@@ -1711,11 +1730,11 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         return stocks;
     }
 
-    private void addSellTransaction(Transaction transaction) {
+    private TransactionSummary addSellTransaction(Transaction transaction) {
         assert(transaction.getContract().getType() == Contract.Type.Sell);
         
         final SellPortfolioTreeTableModelEx portfolioTreeTableModel = (SellPortfolioTreeTableModelEx)sellTreeTable.getTreeTableModel();
-        portfolioTreeTableModel.addTransaction(transaction);
+        return portfolioTreeTableModel.addTransaction(transaction);
     }
     
     private void updateRealTimeStockMonitorAccordingToBuyPortfolioTreeTableModel() {
@@ -2320,7 +2339,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             statements = org.yccheok.jstock.file.Statements.newInstanceFromTableModel(new DepositSummaryTableModel(csvPortfolio.depositSummary), languageIndependent);
         }
         // Use metadata to store TransactionSummary's comment.
-        return statements.saveAsCSVFile(fileEx.file, true);
+        return statements.saveAsCSVFile(fileEx.file);
     }
     
     public boolean saveAsCSVFile(Utils.FileEx fileEx, boolean languageIndependent) {
