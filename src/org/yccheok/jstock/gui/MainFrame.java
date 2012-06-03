@@ -96,8 +96,6 @@ public class MainFrame extends javax.swing.JFrame {
      */
     private void init() {
 
-        Locale.setDefault(getJStockOptions().getLocale());
-
         try {
             UIManager.setLookAndFeel(getJStockOptions().getLooknFeel());
         }
@@ -1584,6 +1582,10 @@ public class MainFrame extends javax.swing.JFrame {
             public void run() {
                 final MainFrame mainFrame = MainFrame.getInstance();
                 final JStockOptions jStockOptions = getJStockOptions(_args);
+                // This global effect, should just come before anything else, 
+                // after we get an instance of JStockOptions.
+                Locale.setDefault(jStockOptions.getLocale());
+                
                 // We need to first assign jStockOptions to mainFrame, as during
                 // Utils.migrateXMLToCSVPortfolios, we will be accessing mainFrame's
                 // jStockOptions.
