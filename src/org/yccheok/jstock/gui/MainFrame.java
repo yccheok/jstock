@@ -2360,7 +2360,6 @@ public class MainFrame extends javax.swing.JFrame {
     // Should we synchronized the jTable1, or post the job to GUI event dispatch
     // queue?
     public void addStockToTable(final Stock stock, final StockAlert alert) {
-        assert(java.awt.EventQueue.isDispatchThread());
         final JTable _jTable1 = this.jTable1;
         if (java.awt.EventQueue.isDispatchThread()) {
             final StockTableModel tableModel = (StockTableModel)_jTable1.getModel();
@@ -2377,7 +2376,6 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     public void addStockToTable(final Stock stock) {
-        assert(java.awt.EventQueue.isDispatchThread());
         final JTable _jTable1 = this.jTable1;
         if (java.awt.EventQueue.isDispatchThread()) {
             final StockTableModel tableModel = (StockTableModel)_jTable1.getModel();

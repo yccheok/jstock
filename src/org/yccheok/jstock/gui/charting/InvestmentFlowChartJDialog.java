@@ -324,14 +324,11 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
                     if (price != null) {
                         amount += (price * quantity);
                     }
-                }
-                if (type == Activity.Type.Sell) {
+                } else if (type == Activity.Type.Sell) {
                     amount += activity.getAmount();
-                }
-                else if (type == Activity.Type.Dividend) {
+                } else if (type == Activity.Type.Dividend) {
                     amount += activity.getAmount();
-                }
-                else {
+                } else {
                     assert(false);
                 }
             }   // for (int j = 0, count2 = activities.size(); j < count2; j++)
@@ -503,8 +500,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
                             build();
                     this.ROISummary.add(contract.getDate(), activity);
                     this.investSummary.add(contract.getDate(), activity);
-                }
-                else if (type == Contract.Type.Sell) {
+                } else if (type == Contract.Type.Sell) {
                     final Activity activity0 = new Activity.Builder(Activity.Type.Buy, transaction.getReferenceTotal()).
                             put(Activity.Param.Stock, contract.getStock()).
                             put(Activity.Param.Quantity, contract.getQuantity()).
