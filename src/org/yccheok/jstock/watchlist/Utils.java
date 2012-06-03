@@ -203,33 +203,58 @@ public class Utils {
         for (Country country : Country.values()) {
             List<String> names = getXMLWatchlistNames(srcBaseDirectory, country, false);
             final boolean oldData = names.size() <= 0;
-            if (oldData) {
-                names = getXMLWatchlistNames(srcBaseDirectory, country, true);
-            }
             
-            for (String name : names) {
-                final String oldDirectory = srcBaseDirectory + country + File.separator + "config" + File.separator + name + File.separator;
-                final String directory = srcBaseDirectory + country + File.separator + "watchlist" + File.separator + name + File.separator;
-                final String srcDirectory = oldData ? oldDirectory : directory;
-                
-                final String destDirectory = destBaseDirectory + country + File.separator + "watchlist" + File.separator + name + File.separator;
+            boolean localStatus = true;
+            
+            if (oldData) {
+                final String oldDirectory = srcBaseDirectory + country + File.separator + "config" + File.separator;
+                final String srcDirectory = oldDirectory;
+                final String destDirectory = destBaseDirectory + country + File.separator + "watchlist" + File.separator + getDefaultWatchlistName() + File.separator;
                 
                 XMLWatchlist xmlPortfolio = getXMLWatchlist(srcDirectory);
                 
                 MainFrame.CSVWatchlist csvWatchlist = MainFrame.CSVWatchlist.newInstance(xmlPortfolio.stockTableModel);
                 
-                boolean localStatus = MainFrame.saveCSVWatchlist(destDirectory, csvWatchlist);
+                localStatus = MainFrame.saveCSVWatchlist(destDirectory, csvWatchlist);
                 
                 if (localStatus) {
-                    // Just delete them regardless old or new directory. As we
-                    // have some legacy unremove data.
-                    deleteXMLWatchlist(oldDirectory);
-                    deleteXMLWatchlist(directory);
+                    deleteXMLWatchlist(srcDirectory);
                 }
-                
-                status = status & localStatus;
+            } else {
+
+                for (String name : names) {
+                    final String directory = srcBaseDirectory + country + File.separator + "watchlist" + File.separator + name + File.separator;
+                    final String srcDirectory = directory;
+                    final String destDirectory = destBaseDirectory + country + File.separator + "watchlist" + File.separator + name + File.separator;
+
+                    XMLWatchlist xmlPortfolio = getXMLWatchlist(srcDirectory);
+
+                    MainFrame.CSVWatchlist csvWatchlist = MainFrame.CSVWatchlist.newInstance(xmlPortfolio.stockTableModel);
+
+                    boolean _localStatus = MainFrame.saveCSVWatchlist(destDirectory, csvWatchlist);
+
+                    if (_localStatus) {
+                        deleteXMLWatchlist(directory);
+                    }
+
+                    localStatus = localStatus & _localStatus;
+                }
+            }   // if (oldData)
+            
+            if (localStatus) {
+                // Delete legacy old folder.
+                final String oldDirectory = srcBaseDirectory + country + File.separator + "config" + File.separator;
+                deleteXMLWatchlist(oldDirectory);
+                File dir = new File(oldDirectory);
+                if (dir.isDirectory()) {
+                    if (dir.list().length == 0) {
+                        dir.delete();
+                    }
+                }
             }
-        }
+            
+            status = status & localStatus;
+        }   // for (Country country : Country.values())
         
         return status;
     }

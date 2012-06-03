@@ -498,37 +498,65 @@ public class Utils {
         for (Country country : Country.values()) {
             List<String> names = getXMLPortfolioNames(srcBaseDirectory, country, false);
             final boolean oldData = names.size() <= 0;
-            if (oldData) {
-                names = getXMLPortfolioNames(srcBaseDirectory, country, true);
-            }
             
-            for (String name : names) {
-                final String oldDirectory = srcBaseDirectory + country + File.separator + "config" + File.separator + name + File.separator;
-                final String directory = srcBaseDirectory + country + File.separator + "portfolios" + File.separator + name + File.separator;
-                final String srcDirectory = oldData ? oldDirectory : directory;
-                                        
-                final String destDirectory = destBaseDirectory + country + File.separator + "portfolios" + File.separator + name + File.separator;
-                
+            boolean localStatus = true;
+            
+            if (oldData) {
+                final String oldDirectory = srcBaseDirectory + country + File.separator + "config" + File.separator;
+                final String srcDirectory = oldDirectory;
+                final String destDirectory = destBaseDirectory + country + File.separator + "portfolios" + File.separator + getDefaultPortfolioName() + File.separator;
+
                 XMLPortfolio xmlPortfolio = getXMLPortfolio(srcDirectory);
-                
+                    
                 PortfolioManagementJPanel.CSVPortfolio csvPortfolio = PortfolioManagementJPanel.CSVPortfolio.newInstance(
                     xmlPortfolio.buyPortfolioTreeTableModel.toBuyPortfolioTreeTableModelEx(), 
                     xmlPortfolio.sellPortfolioTreeTableModel.toSellPortfolioTreeTableModelEx(), 
                     xmlPortfolio.dividendSummary, 
                     xmlPortfolio.depositSummary);
-                
-                boolean localStatus = PortfolioManagementJPanel.saveCSVPortfolio(destDirectory, csvPortfolio);
+
+                localStatus = PortfolioManagementJPanel.saveCSVPortfolio(destDirectory, csvPortfolio);
                 
                 if (localStatus) {
-                    // Just delete them regardless old or new directory. As we
-                    // have some legacy unremove data.
-                    deleteXMLPortfolio(oldDirectory);
-                    deleteXMLPortfolio(directory);
+                    deleteXMLPortfolio(srcDirectory);
+                }  
+            } else {
+                for (String name : names) {
+                    final String directory = srcBaseDirectory + country + File.separator + "portfolios" + File.separator + name + File.separator;
+                    final String srcDirectory = directory;
+                    final String destDirectory = destBaseDirectory + country + File.separator + "portfolios" + File.separator + name + File.separator;
+
+                    XMLPortfolio xmlPortfolio = getXMLPortfolio(srcDirectory);
+
+                    PortfolioManagementJPanel.CSVPortfolio csvPortfolio = PortfolioManagementJPanel.CSVPortfolio.newInstance(
+                        xmlPortfolio.buyPortfolioTreeTableModel.toBuyPortfolioTreeTableModelEx(), 
+                        xmlPortfolio.sellPortfolioTreeTableModel.toSellPortfolioTreeTableModelEx(), 
+                        xmlPortfolio.dividendSummary, 
+                        xmlPortfolio.depositSummary);
+
+                    boolean _localStatus = PortfolioManagementJPanel.saveCSVPortfolio(destDirectory, csvPortfolio);
+
+                    if (_localStatus) {
+                        deleteXMLPortfolio(srcDirectory);
+                    }
+                    
+                    localStatus = localStatus & _localStatus;
+                }   // for (String name : names)
+            }   // if (oldData)
+            
+            if (localStatus) {
+                // Delete legacy old folder.
+                final String oldDirectory = srcBaseDirectory + country + File.separator + "config" + File.separator;
+                deleteXMLPortfolio(oldDirectory);
+                File dir = new File(oldDirectory);
+                if (dir.isDirectory()) {
+                    if (dir.list().length == 0) {
+                        dir.delete();
+                    }
                 }
-                
-                status = status & localStatus;
             }
-        }
+            
+            status = status & localStatus;
+        }   // for (Country country : Country.values())
         
         return status;
     }
