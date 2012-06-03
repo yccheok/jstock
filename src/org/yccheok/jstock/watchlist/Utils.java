@@ -195,12 +195,8 @@ public class Utils {
     // The directory format should be "C:\Users\yccheok\.jstock\1.0.6\", or
     // temporary directory holding the extracted cloud files.
     public static boolean migrateXMLToCSVWatchlists(String srcBaseDirectory, String destBaseDirectory) {
-        if (false == srcBaseDirectory.endsWith(File.separator)) {
-            srcBaseDirectory = srcBaseDirectory + File.separator;
-        }
-        if (false == destBaseDirectory.endsWith(File.separator)) {
-            destBaseDirectory = destBaseDirectory + File.separator;
-        }
+        assert(srcBaseDirectory.endsWith(File.separator));
+        assert(destBaseDirectory.endsWith(File.separator));
         
         boolean status = true;
         

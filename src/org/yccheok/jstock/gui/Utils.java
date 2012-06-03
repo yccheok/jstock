@@ -344,6 +344,13 @@ public class Utils {
         return null;
     }
 
+    public static String toEndWithFileSeperator(String string) {
+        if (string.endsWith(File.separator)) {
+            return string;
+        }
+        return string + File.separator;
+    }
+    
     public static boolean extractZipFile(String zipFilePath, boolean overwrite) {
         return extractZipFile(new File(zipFilePath), overwrite);
     }
@@ -353,6 +360,8 @@ public class Utils {
     }
     
     public static boolean extractZipFile(File zipFilePath, String destDirectory, boolean overwrite) {
+        assert(destDirectory.endsWith(File.separator));
+        
         InputStream inputStream = null;
         ZipInputStream zipInputStream = null;
         boolean status = true;

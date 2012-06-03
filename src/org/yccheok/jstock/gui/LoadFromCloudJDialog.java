@@ -508,7 +508,7 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
         File tempDir = Utils.createTempDir();
         String tempDirString = null;
         try {
-            tempDirString = tempDir.getCanonicalPath();
+            tempDirString = org.yccheok.jstock.gui.Utils.toEndWithFileSeperator(tempDir.getCanonicalPath());
         } catch (IOException ex) {
             log.error(null, ex);
             return false;

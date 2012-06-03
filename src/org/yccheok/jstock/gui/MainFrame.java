@@ -82,7 +82,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     // Comment out, to avoid annoying log messages during debugging.
-    //static { System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.NoOpLog"); }
+    static { System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.NoOpLog"); }
     
     /** Creates new form MainFrame */
 
@@ -1570,7 +1570,7 @@ public class MainFrame extends javax.swing.JFrame {
                         status = false;
                     }                    
                     
-                    if (true == status) {
+                    if (false == status) {
                         File destFile = new File(System.getProperty("user.home") + File.separator + "jstock.zip");
                         File file = SaveToCloudJDialog.getJStockZipFileForConversionErrorMessageJDialog(destFile);
                         // So that our ConversionErrorMessageJDialog is having correct locale.
