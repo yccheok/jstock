@@ -1060,6 +1060,10 @@ public class Utils {
         return locale.getLanguage().equals(Locale.TRADITIONAL_CHINESE.getLanguage()) && locale.getCountry().equals(Locale.TRADITIONAL_CHINESE.getCountry());
     }
 
+    public static boolean isMacOSX() {
+        return org.jdesktop.swingx.util.OS.isMacOSX();
+    }
+    
     public static boolean isWindows() {
         String windowsString = "Windows";
         String osName = System.getProperty("os.name");

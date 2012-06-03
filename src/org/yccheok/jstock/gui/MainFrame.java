@@ -177,8 +177,39 @@ public class MainFrame extends javax.swing.JFrame {
                 this.setBounds(boundsEx.bounds);
             }
         }
+        
+        installShutdownHookForMacOSX();
     }
 
+    // Register a hook to save app settings when quit via the app menu.
+    // This is in Mac OSX only.   
+    // http://sourceforge.net/tracker/?func=detail&aid=3490453&group_id=202896&atid=983418
+    private void installShutdownHookForMacOSX() {
+        if (Utils.isMacOSX()) {
+            Runnable runner = new Runnable() {
+                @Override
+                public void run() {
+                    if (isFormWindowClosedCalled) {
+                        return;
+                    }
+                    
+                    // Always be the first statement. As no matter what happen, we must
+                    // save all the configuration files.
+                    MainFrame.this.save();
+
+                    if (MainFrame.this.needToSaveUserDefinedDatabase) {
+                        // We are having updated user database in memory.
+                        // Save it to disk.
+                        MainFrame.this.saveUserDefinedDatabase(jStockOptions.getCountry(), stockInfoDatabase);
+                    }
+                    
+                    // Do not access any GUI related task in this runnable.
+                }
+            };
+            Runtime.getRuntime().addShutdownHook(new Thread(runner, "Window Prefs Hook"));
+        }        
+    }
+    
     /**
      * Initialize language menu items so that correct item is being selected
      * according to current default locale.
@@ -957,6 +988,8 @@ public class MainFrame extends javax.swing.JFrame {
      * to do so?
      */
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
+        isFormWindowClosedCalled = true;
+        
         try {
             // Always be the first statement. As no matter what happen, we must
             // save all the configuration files.
@@ -969,8 +1002,10 @@ public class MainFrame extends javax.swing.JFrame {
             }
 
             // Hide the icon immediately.
-            if (trayIcon != null) {
-                SystemTray.getSystemTray().remove(trayIcon);
+            TrayIcon _trayIcon = trayIcon;
+            if (_trayIcon != null) {
+                SystemTray.getSystemTray().remove(_trayIcon);
+                trayIcon = null;
             }
             
             dettachAllAndStopAutoCompleteJComboBox();
@@ -4587,6 +4622,8 @@ public class MainFrame extends javax.swing.JFrame {
     // this application?
     private volatile boolean needToSaveUserDefinedDatabase = false;
 
+    private volatile boolean isFormWindowClosedCalled = false;
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.ButtonGroup buttonGroup2;
