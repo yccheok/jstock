@@ -385,7 +385,7 @@ public class JStockOptions {
 
         this.portfolioNames = new EnumMap<Country, String>(jStockOptions.portfolioNames);
 
-        this.watchlistName = jStockOptions.watchlistName;
+        this.watchlistNames = new EnumMap<Country, String>(jStockOptions.watchlistNames);
 
         this.yellowInformationBoxOption = jStockOptions.yellowInformationBoxOption;
 
@@ -499,7 +499,7 @@ public class JStockOptions {
 
         jStockOptions.portfolioNames = new EnumMap<Country, String>(this.portfolioNames);
 
-        jStockOptions.watchlistName = this.watchlistName;
+        jStockOptions.watchlistNames = new EnumMap<Country, String>(this.watchlistNames);
 
         jStockOptions.yellowInformationBoxOption = this.yellowInformationBoxOption;
 

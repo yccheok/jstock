@@ -1555,21 +1555,32 @@ public class MainFrame extends javax.swing.JFrame {
                 mainFrame.initJStockOptions(jStockOptions);
                 
                 if (Utils.isWatchlistAndPortfolioFilesInXML(jStockOptions.getApplicationVersionID())) {
+                    boolean status = true;
                     if (org.yccheok.jstock.portfolio.Utils.migrateXMLToCSVPortfolios(Utils.getUserDataDirectory(), Utils.getUserDataDirectory())) {
                         System.out.println("XML to CSV portfolios migration done :)");
                     } else {
                         System.out.println("XML to CSV portfolios migration failed!");
-                        System.exit(-1);
+                        status = false;
                     } 
                     
                     if (org.yccheok.jstock.watchlist.Utils.migrateXMLToCSVWatchlists(Utils.getUserDataDirectory(), Utils.getUserDataDirectory())) {
                         System.out.println("XML to CSV watchlists migration done :)");
                     } else {
                         System.out.println("XML to CSV watchlists migration failed!");
-                        System.exit(-1);
+                        status = false;
                     }                    
-                }  
-                
+                    
+                    if (true == status) {
+                        File destFile = new File(System.getProperty("user.home") + File.separator + "jstock.zip");
+                        File file = SaveToCloudJDialog.getJStockZipFileForConversionErrorMessageJDialog(destFile);
+                        // So that our ConversionErrorMessageJDialog is having correct locale.
+                        Locale.setDefault(jStockOptions.getLocale());
+                        ConversionErrorMessageJDialog conversionErrorMessageJDialog = new ConversionErrorMessageJDialog(file);
+                        conversionErrorMessageJDialog.setVisible(true);
+                        System.exit(-1);
+                    }
+                }                                  
+                                                
                 mainFrame.init();
                 mainFrame.setVisible(true);
                 mainFrame.updateDividerLocation();

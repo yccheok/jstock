@@ -488,11 +488,11 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
     }
 
     // Version of getFileEx which ignores LastErrorCode.
-    private List<FileEx> getFileEx(List<FileEx> fileExs, String name, List<String> extensions) {
+    private static List<FileEx> getFileEx(List<FileEx> fileExs, String name, List<String> extensions) {
         return getFileEx(fileExs, name, extensions, null);
     }
 
-    private boolean hasExtensions(String fileName, List<String> extensions) {
+    private static boolean hasExtensions(String fileName, List<String> extensions) {
         for (String extension : extensions) {
             if (fileName.endsWith(extension)) {
                 return true;
@@ -506,7 +506,9 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
     // For example, "Australia", "config", "chat"...
     // The returned FileEx list, will only contain files. No directories
     // will be included.
-    private List<FileEx> getFileEx(List<FileEx> fileExs, String name, List<String> extensions, LastErrorCode lastErrorCode) {
+    // 
+    // When extensions is null, means that we will ignore extension rule.
+    private static List<FileEx> getFileEx(List<FileEx> fileExs, String name, List<String> extensions, LastErrorCode lastErrorCode) {
         final File dir = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + name);
 
         if (dir.isDirectory()) {
@@ -524,7 +526,7 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
                 // will be very large (around 50MB). We have no way, but ignore
                 // the file.
                 if (dir.length() < 1024 * 1024 * 24) {
-                    if (hasExtensions(name, extensions)) {
+                    if (extensions == null || hasExtensions(name, extensions)) {
                         // Currently, we place 24MB as our limitation.
                         fileExs.add(FileEx.newInstance(dir, name));
                     }
@@ -537,7 +539,7 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
                 }
             }
             else {
-                if (hasExtensions(name, extensions)) {
+                if (extensions == null || hasExtensions(name, extensions)) {
                     fileExs.add(FileEx.newInstance(dir, name));
                 }
             }
@@ -601,7 +603,7 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
     }
 
     // When we perform XML to CSV migration, this function needs to be revised.
-    private List<String> getExtensions(String name) {
+    private static List<String> getExtensions(String name) {
         List<String> extensions = new ArrayList<String>();
         if (name.equals("config")) {
             extensions.add(".xml");
@@ -624,6 +626,113 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
         }        
         
         return java.util.Collections.unmodifiableList(extensions);
+    }
+    
+    // Merely copy n paste code from getJStockZipFile
+    public static File getJStockZipFileForConversionErrorMessageJDialog(File destFile) {
+        // Look for "user-defined-database.xml" for all countries.
+        final List<File> files = getUserDefinedDatabaseFiles();
+        final List<FileEx> fileExs = new ArrayList<FileEx>();
+        for (File file : files) {
+            final String filename;
+            try {
+                filename = file.getCanonicalPath();
+            } catch (IOException ex) {
+                // Should we return null? As the saved information is not complete.
+                log.error(null, ex);
+                continue;
+            }
+            final int index = filename.indexOf(Utils.getApplicationVersionString());
+            if (index < 0) {
+                continue;
+            }
+            final String output = filename.substring(index + Utils.getApplicationVersionString().length() + File.separator.length());
+            fileExs.add(FileEx.newInstance(file, output));
+        }
+
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        // User will sue us, if we store their Google account information in our server.
+        // Let's get a copy of JStockOptions, without any sensitive data.
+        final JStockOptions insensitiveJStockOptions = jStockOptions.insensitiveClone();
+        try {
+            final File tempJStockOptions = File.createTempFile(Utils.getJStockUUID(), ".xml");
+            // Delete temp file when program exits.
+            tempJStockOptions.deleteOnExit();
+            org.yccheok.jstock.gui.Utils.toXML(insensitiveJStockOptions, tempJStockOptions);
+            fileExs.add(FileEx.newInstance(tempJStockOptions, "config" + File.separator + "options.xml"));
+        } catch (IOException ex) {
+            // Should we return null? As the saved information is not complete.
+            log.error(null, ex);
+        }
+
+        final List<Country> countryWithWatchlistFilesBeingIgnored = new ArrayList<Country>();
+        getFileEx(fileExs, "config", null);
+        getFileEx(fileExs, "indicator", null);
+        getFileEx(fileExs, "logos", null);
+        for (Country country : Country.values()) {
+            getFileEx(fileExs, country + File.separator + "portfolios", null);
+            // For legacy usage. Shall be removed after a few more release
+            // later than 1.0.5k
+            getFileEx(fileExs, country + File.separator + "config", null);
+
+            LastErrorCode lastErrorCode = new LastErrorCode();
+            getFileEx(fileExs, country + File.separator + "watchlist", null, lastErrorCode);
+            if (lastErrorCode.flag) {
+                // Watchlist file(s) is being ignored due to too much stocks in
+                // the watchlist.
+                countryWithWatchlistFilesBeingIgnored.add(country);
+            }
+        }
+
+        //if (false == promptUserToContinue(countryWithWatchlistFilesBeingIgnored)) {
+        //    return null;
+        //}
+
+        // Create a buffer for reading the files
+        final byte[] buf = new byte[1024];
+
+        ZipOutputStream out = null;
+        File temp = destFile;
+        
+        try {
+
+            out = new ZipOutputStream(new FileOutputStream(temp));
+
+            // Compress the files
+            for (FileEx fileEx : fileExs) {
+                FileInputStream in = null;
+                try {
+                    in = new FileInputStream(fileEx.input);
+                    final String zipEntryName = fileEx.output;
+                    // Add ZIP entry to output stream.
+                    out.putNextEntry(Utils.getZipEntry(zipEntryName));
+
+                    // Transfer bytes from the file to the ZIP file
+                    int len;
+                    while ((len = in.read(buf)) > 0) {
+                        out.write(buf, 0, len);
+                    }
+                }
+                catch (IOException exp) {
+                    log.error(null, exp);
+                    // Should we return null? As the saved information is not complete.
+                    continue;
+                }
+                finally {
+                    // Complete the entry
+                    Utils.closeEntry(out);
+                    Utils.close(in);
+                }
+            }
+        } 
+        catch (IOException exp) {
+            // Should we return null? As the saved information is not complete.
+            log.error(null, exp);
+        }
+        finally {
+            Utils.close(out);
+        }
+        return temp;        
     }
     
     private File getJStockZipFile() {
@@ -736,7 +845,7 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
         return temp;
     }
 
-    private List<File> getUserDefinedDatabaseFiles() {
+    private static List<File> getUserDefinedDatabaseFiles() {
         final List<File> files = new ArrayList<File>();
         for (Country country : Country.values()) {
             final File file = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database" + File.separator + "user-defined-database.xml");
