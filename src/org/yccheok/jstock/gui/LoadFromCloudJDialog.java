@@ -552,7 +552,7 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
         Font font = label.getFont();
 
         // create some css from the label's font
-        StringBuffer style = new StringBuffer("font-family:" + font.getFamily() + ";");
+        StringBuilder style = new StringBuilder("font-family:" + font.getFamily() + ";");
         style.append("font-weight:").append(font.isBold() ? "bold" : "normal").append(";");
         style.append("font-size:").append(font.getSize()).append("pt;");
 
