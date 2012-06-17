@@ -533,7 +533,7 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
                 port = Integer.parseInt(jFormattedTextField1.getText());
             }
             catch (NumberFormatException exp) {
-                log.error("", exp);
+                log.error(null, exp);
             }
         }
         

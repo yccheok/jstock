@@ -71,7 +71,7 @@ public class SingaporeYahooStockServer extends AbstractYahooStockServer {
                         urls.add(url);
                     }
                 } catch (MalformedURLException ex) {
-                    log.error("", ex);
+                    log.error(null, ex);
                 }
             }
         }

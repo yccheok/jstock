@@ -49,13 +49,13 @@ public class EnumComboBoxPropertyEditor extends ComboBoxPropertyEditor {
                 this.setAvailableValues(array);
             }
             catch(java.lang.NoSuchMethodException exp) {
-                log.error("", exp);
+                log.error(null, exp);
             }
             catch(java.lang.IllegalAccessException exp) {
-                log.error("", exp);
+                log.error(null, exp);
             }
             catch(java.lang.reflect.InvocationTargetException exp) {
-                log.error("", exp);
+                log.error(null, exp);
             }
 
         }

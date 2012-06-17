@@ -86,7 +86,7 @@ public class IndicatorProjectManager {
         }
         catch (IOException exp) {
             projects.remove(project);
-            log.error("", exp);
+            log.error(null, exp);
             return false;
         }
         

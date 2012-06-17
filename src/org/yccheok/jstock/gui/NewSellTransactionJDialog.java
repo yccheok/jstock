@@ -671,7 +671,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
             jFormattedTextField7.commitEdit();
             jFormattedTextField8.commitEdit();
         } catch (ParseException ex) {
-            log.error("", ex);
+            log.error(null, ex);
         }
     }
     

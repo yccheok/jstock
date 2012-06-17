@@ -143,7 +143,7 @@ public class ArithmeticOperator extends AbstractOperator {
             }
         }
         catch(NumberFormatException exp) {
-            log.error("", exp);
+            log.error(null, exp);
         }
         
         return null;        

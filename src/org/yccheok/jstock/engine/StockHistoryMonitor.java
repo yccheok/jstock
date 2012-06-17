@@ -374,7 +374,7 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
             threadPoolExecutor.awaitTermination(100, TimeUnit.DAYS);
         }
         catch (InterruptedException exp) {
-            log.error("", exp);
+            log.error(null, exp);
         }
     }
     

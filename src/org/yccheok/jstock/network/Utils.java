@@ -29,11 +29,6 @@ import java.util.Map;
  */
 public class Utils {
     public enum Type {
-        X_MARKET_SERVERS_TXT,
-        X_STOCK_SERVERS_TXT,
-        CIMB_MARKET_SERVERS_TXT,
-        CIMB_STOCK_SERVERS_TXT,
-        CIMB_HISTORY_SERVERS_TXT,
         NEWS_INFORMATION_TXT,
         CHAT_SERVER_TXT,
         NTP_SERVER_TXT,
@@ -78,11 +73,6 @@ public class Utils {
     private static final String JSTOCK_WEBAPP_SERVER = "http://jstock-webapp.appspot.com/";
 
     static {
-        map.put(Type.X_MARKET_SERVERS_TXT, JSTOCK_STATIC_SERVER + "servers_information/x_market_servers.txt");
-        map.put(Type.X_STOCK_SERVERS_TXT, JSTOCK_STATIC_SERVER + "servers_information/x_stock_servers.txt");
-        map.put(Type.CIMB_MARKET_SERVERS_TXT, JSTOCK_STATIC_SERVER + "servers_information/cimb_market_servers.txt");
-        map.put(Type.CIMB_STOCK_SERVERS_TXT, JSTOCK_STATIC_SERVER + "servers_information/cimb_stock_servers.txt");
-        map.put(Type.CIMB_HISTORY_SERVERS_TXT, JSTOCK_STATIC_SERVER + "servers_information/cimb_history_servers.txt");
         map.put(Type.CHAT_SERVER_TXT, JSTOCK_STATIC_SERVER + "servers_information/chat_server.txt");
         map.put(Type.NTP_SERVER_TXT, JSTOCK_STATIC_SERVER + "servers_information/ntp_server.txt");
         map.put(Type.NEWS_INFORMATION_TXT, JSTOCK_STATIC_SERVER + "news_information/index.txt");
@@ -97,11 +87,6 @@ public class Utils {
         map.put(Type.GET_TIME, JSTOCK_WEBAPP_SERVER + "get-time.py");
         map.put(Type.OPTIONS, JSTOCK_STATIC_SERVER + "options_information/options.txt");
         
-        zh_map.put(Type.X_MARKET_SERVERS_TXT, JSTOCK_STATIC_SERVER + "servers_information/x_market_servers.txt");
-        zh_map.put(Type.X_STOCK_SERVERS_TXT, JSTOCK_STATIC_SERVER + "servers_information/x_stock_servers.txt");
-        zh_map.put(Type.CIMB_MARKET_SERVERS_TXT, JSTOCK_STATIC_SERVER + "servers_information/cimb_market_servers.txt");
-        zh_map.put(Type.CIMB_STOCK_SERVERS_TXT, JSTOCK_STATIC_SERVER + "servers_information/cimb_stock_servers.txt");
-        zh_map.put(Type.CIMB_HISTORY_SERVERS_TXT, JSTOCK_STATIC_SERVER + "servers_information/cimb_history_servers.txt");
         zh_map.put(Type.CHAT_SERVER_TXT, JSTOCK_STATIC_SERVER + "servers_information/chat_server.txt");
         zh_map.put(Type.NTP_SERVER_TXT, JSTOCK_STATIC_SERVER + "servers_information/ntp_server.txt");
         zh_map.put(Type.NEWS_INFORMATION_TXT, JSTOCK_STATIC_SERVER + "news_information/zh/index.txt");

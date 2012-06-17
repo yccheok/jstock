@@ -251,7 +251,7 @@ public class NewBrokingFirmJDialog extends javax.swing.JDialog {
             imageIcon = new ImageIcon(file.getCanonicalPath());
         }
         catch(IOException exp) {
-            log.error("", exp);
+            log.error(null, exp);
             return;
         }
 

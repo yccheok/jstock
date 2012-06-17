@@ -95,7 +95,7 @@ public class StatementsStockHistoryServer implements StockHistoryServer {
         try {
             return new StatementsStockHistoryServer(statements);
         } catch (Exception ex) {
-            log.error("", ex);
+            log.error(null, ex);
             return null;
         }
     }

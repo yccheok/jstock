@@ -118,7 +118,7 @@ public class ObjectInspectorJPanel extends PropertySheetPanel {
         try {
             beanInfo = Introspector.getBeanInfo(bean.getClass());
         } catch (IntrospectionException exp) {
-            log.error("", exp);
+            log.error(null, exp);
         }
         
         this.setBeanInfo(beanInfo);        

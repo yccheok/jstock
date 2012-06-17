@@ -112,7 +112,7 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
                 stockMonitor.join();
             }
             catch(java.lang.InterruptedException exp) {
-                log.error("", exp);
+                log.error(null, exp);
             } 
              */           
         }
@@ -150,7 +150,7 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
                 stockMonitor.join();
             }
             catch(java.lang.InterruptedException exp) {
-                log.error("", exp);
+                log.error(null, exp);
             }
              */
             
