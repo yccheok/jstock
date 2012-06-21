@@ -21,6 +21,7 @@ package org.yccheok.jstock.engine;
 
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -31,8 +32,14 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author yccheok
  */
-public abstract class AbstractYahooStockHistoryServer implements StockHistoryServer {
-
+public abstract class AbstractYahooStockHistoryServer implements StockHistoryServer {        
+    // Use ThreadLocal to ensure thread safety.
+    private static final ThreadLocal <SimpleDateFormat> simpleDateFormatThreadLocal = new ThreadLocal <SimpleDateFormat>() {
+        @Override protected SimpleDateFormat initialValue() {
+            return new java.text.SimpleDateFormat("yyyy-MM-dd");
+        }
+    };
+    
     protected abstract StockServer getStockServer(Country country);
     
     public AbstractYahooStockHistoryServer(Country country, Code code) throws StockHistoryNotFoundException
@@ -65,7 +72,6 @@ public abstract class AbstractYahooStockHistoryServer implements StockHistorySer
         historyDatabase.clear();
         simpleDates.clear();
 
-        java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd");
         final Calendar calendar = Calendar.getInstance();
 
         String[] stockDatas = respond.split("\r\n|\r|\n");
@@ -106,7 +112,7 @@ public abstract class AbstractYahooStockHistoryServer implements StockHistorySer
             }
 
             try {
-                calendar.setTime(dateFormat.parse(fields[0]));
+                calendar.setTime(simpleDateFormatThreadLocal.get().parse(fields[0]));
             } catch (ParseException ex) {
                 log.error(null, ex);
                 continue;

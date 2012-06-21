@@ -40,7 +40,7 @@ public enum Factories {
         return java.util.Collections.emptyList();
     }
 
-    public void updatePrimaryStockServerFactory(Country country, Class c) {
+    public void updatePrimaryStockServerFactory(Country country, Class<?> c) {
         synchronized(klseInfoStockServerFactoryMonitor) {
             final List<StockServerFactory> stockServerFactories = map.get(country);
             int index = 0;

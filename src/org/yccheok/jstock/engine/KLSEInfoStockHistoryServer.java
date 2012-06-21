@@ -23,6 +23,7 @@ import java.io.UnsupportedEncodingException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -41,6 +42,13 @@ public class KLSEInfoStockHistoryServer implements StockHistoryServer {
         @Override protected NumberFormat initialValue() {
             // Turns 1 ~ 31 to 01 ~ 31.
             return new DecimalFormat("00");
+        }
+    };
+    
+    // Use ThreadLocal to ensure thread safety.
+    private static final ThreadLocal <SimpleDateFormat> simpleDateFormatThreadLocal = new ThreadLocal <SimpleDateFormat>() {
+        @Override protected SimpleDateFormat initialValue() {
+            return new java.text.SimpleDateFormat("yyyy-MM-dd");            
         }
     };
     
@@ -186,7 +194,6 @@ public class KLSEInfoStockHistoryServer implements StockHistoryServer {
     
     private boolean parse(String respond)
     {
-        java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd");
         final Calendar calendar = Calendar.getInstance();
         
         String[] stockDatas = respond.split("\r\n|\r|\n");
@@ -225,7 +232,7 @@ public class KLSEInfoStockHistoryServer implements StockHistoryServer {
             }
 
             try {
-                calendar.setTime(dateFormat.parse(fields[0]));
+                calendar.setTime(simpleDateFormatThreadLocal.get().parse(fields[0]));
             } catch (ParseException ex) {
                 log.error(null, ex);
                 continue;
@@ -249,8 +256,7 @@ public class KLSEInfoStockHistoryServer implements StockHistoryServer {
                 // TODO: CRITICAL LONG BUG REVISED NEEDED.
                 volume = Long.parseLong(fields[5]);
                 //adjustedClosePrice = Double.parseDouble(fields[6]);
-            }
-            catch(NumberFormatException exp) {
+            } catch (NumberFormatException exp) {
                 log.error(null, exp);
             }
 
