@@ -3371,7 +3371,7 @@ public class MainFrame extends javax.swing.JFrame {
         }
     }   
 
-    public void updatePrimaryStockServerFactory(Country country, Class c) {
+    public void updatePrimaryStockServerFactory(Country country, Class<? extends StockServerFactory> c) {
         // Same. Nothing to be updated.
         if (c == jStockOptions.getPrimaryStockServerFactoryClass(country)) {
             return;

@@ -379,20 +379,21 @@ public class Utils {
                 try {
                     zipEntry = zipInputStream.getNextEntry();
 
-                    if (zipEntry == null) break;
+                    if (zipEntry == null) {
+                        break;
+                    }
 
                     final String destination =  destDirectory + zipEntry.getName();
 
                     if (overwrite == false) {
-                        if (Utils.isFileOrDirectoryExist(destination)) continue;
+                        if (Utils.isFileOrDirectoryExist(destination)) {
+                            continue;
+                        }
                     }
 
-                    if (zipEntry.isDirectory())
-                    {
+                    if (zipEntry.isDirectory()) {
                         Utils.createCompleteDirectoryHierarchyIfDoesNotExist(destination);
-                    }
-                    else
-                    {
+                    } else {
                         final File file = new File(destination);
                         // Ensure directory is there before we write the file.
                         Utils.createCompleteDirectoryHierarchyIfDoesNotExist(file.getParentFile());
@@ -405,27 +406,23 @@ public class Utils {
                             do {
                                 outputStream.write(data, 0, size);
                                 size = zipInputStream.read(data);
-                            } while(size >= 0);
+                            } while (size >= 0);
                         }
                     }
-                }
-                catch (IOException exp) {
+                } catch (IOException exp) {
                     log.error(null, exp);
                     status = false;
                     break;
-                }
-                finally {
+                } finally {
                     close(outputStream);
                     closeEntry(zipInputStream);
                 }
 
             }   // while(true)
-        }
-        catch (IOException exp) {
+        } catch (IOException exp) {
             log.error(null, exp);
             status = false;
-        }
-        finally {
+        } finally {
             close(zipInputStream);
             close(inputStream);
         }
@@ -776,44 +773,12 @@ public class Utils {
     }
     
     private static boolean createCompleteDirectoryHierarchyIfDoesNotExist(File f) {
-        if (f == null) return true;
-                
-        if (false == createCompleteDirectoryHierarchyIfDoesNotExist(f.getParentFile())) {
-            return false;
-        }
-        
-        String path = null;
-        
-        try {
-            path = f.getCanonicalPath();
-        } catch (IOException ex) {
-            log.error(null, ex);
-            return false;
-        }
-        
-        return createDirectoryIfDoesNotExist(path);
+        return f.mkdirs();
     }
     
     public static boolean isFileOrDirectoryExist(String fileOrDirectory) {
         java.io.File f = new java.io.File(fileOrDirectory);
         return f.exists();
-    }
-    
-    public static boolean createDirectoryIfDoesNotExist(String directory) {
-        java.io.File f = new java.io.File(directory);
-        
-        if (f.exists() == false) {
-            if (f.mkdir())
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-        
-        return true;
     }
     
     /**
@@ -1234,6 +1199,7 @@ public class Utils {
                 // Use title, not filename.
                 final String title = entry.getTitle().getPlainText();
                 if (title == null) {
+                    // Do we really need to perform null checking?                    
                     continue;
                 }
                 // Retrieve checksum, date and version information from filename.
@@ -2866,6 +2832,7 @@ public class Utils {
         multiThreadedHttpConnectionManager.getParams().setMaxConnectionsPerHost(httpClientWithAgentInfo.getHostConfiguration(), 128);    
     }
     
+    // http://stackoverflow.com/questions/1360113/is-java-regex-thread-safe
     private static final Pattern googleDocTitlePattern = Pattern.compile("jstock-" + getJStockUUID() +  "-checksum=([0-9]+)-date=([0-9]+)-version=([0-9]+)\\.zip", Pattern.CASE_INSENSITIVE);
         
     private static final Log log = LogFactory.getLog(Utils.class);
