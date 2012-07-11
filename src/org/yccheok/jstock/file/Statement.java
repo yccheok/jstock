@@ -100,8 +100,7 @@ public class Statement {
         else if (o != null) {
             try {
                 return Double.parseDouble(o.toString());
-            }
-            catch (NumberFormatException ex) {
+            } catch (NumberFormatException ex) {
                 log.error(null, ex);
             }
         }
