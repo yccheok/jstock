@@ -2131,7 +2131,7 @@ public class MainFrame extends javax.swing.JFrame {
      * JStockOptions before and outside this method, due to insensitive data
      * requirement.
      */
-    public void reloadAfterDownloadFromCloud(int version) {
+    public void reloadAfterDownloadFromCloud() {
         /* These codes are very similar to clean up code during changing country.
          */
         MainFrame.this.statusBar.setCountryIcon(jStockOptions.getCountry().getIcon(), jStockOptions.getCountry().toString());

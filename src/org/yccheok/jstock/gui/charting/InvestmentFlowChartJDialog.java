@@ -322,20 +322,16 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
                     }
                     final Double price = this.codeToPrice.get(stock.getCode());
                     if (price != null) {
-                        amount += (price * quantity);
+                        amount += convertToPoundIfNecessary((price * quantity));
                     }
                 } else if (type == Activity.Type.Sell) {
-                    amount += activity.getAmount();
+                    amount += convertToPoundIfNecessary(activity.getAmount());
                 } else if (type == Activity.Type.Dividend) {
                     amount += activity.getAmount();
                 } else {
                     assert(false);
                 }
             }   // for (int j = 0, count2 = activities.size(); j < count2; j++)
-
-            if (MainFrame.getInstance().getJStockOptions().isPenceToPoundConversionEnabled() == true) {
-                amount = amount / 100.0;
-            }
 
             _totalROIValue += amount;
 
@@ -360,6 +356,13 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         }
     }
 
+    private double convertToPoundIfNecessary(double value) {
+        if (MainFrame.getInstance().getJStockOptions().isPenceToPoundConversionEnabled() == false) {
+            return value;
+        }
+        return value / 100.0;
+    }
+    
     private XYDataset createInvestDataset() {
         final TimeSeries series = new TimeSeries(GUIBundle.getString("InvestmentFlowChartJDialog_Invest"));
         
@@ -382,10 +385,8 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
                 }
             }   // for (int j = 0, count2 = activities.size(); j < count2; j++)
 
-            if (MainFrame.getInstance().getJStockOptions().isPenceToPoundConversionEnabled() == true) {
-                amount = amount / 100.0;
-            }
-            
+            amount = convertToPoundIfNecessary(amount);
+
             this.totalInvestValue += amount;
 
             final SimpleDate date = activities.getDate();
