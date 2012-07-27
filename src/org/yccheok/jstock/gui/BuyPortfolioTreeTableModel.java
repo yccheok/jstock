@@ -307,17 +307,9 @@ public class BuyPortfolioTreeTableModel extends DeprecatedAbstractPortfolioTreeT
             
             final TransactionSummary transactionSummary = (TransactionSummary)o;
                     
-            assert(transactionSummary.getChildCount() > 0);            
-
-            final Code code = ((Transaction)transactionSummary.getChildAt(0)).getContract().getStock().getCode();
+            assert(transactionSummary.getChildCount() > 0);                        
             
-            final Double price = this.stockPrice.get(code);
-            
-            if (price == null) continue;
-            
-            final double quantity = transactionSummary.getQuantity();
-            
-            result += (price * quantity);
+            result += this.getCurrentValue(transactionSummary);
         }
         
         return result;
