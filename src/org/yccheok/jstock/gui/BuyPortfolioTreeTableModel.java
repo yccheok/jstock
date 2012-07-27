@@ -202,14 +202,26 @@ public class BuyPortfolioTreeTableModel extends DeprecatedAbstractPortfolioTreeT
     }
     
     private double getCurrentValue(Transaction transaction) {
-        return getCurrentPrice(transaction) * transaction.getQuantity();
+        final Code code = transaction.getContract().getStock().getCode();
+        
+        final Double price = this.stockPrice.get(code);
+
+        if (price == null) return 0.0;
+        
+        return price * transaction.getQuantity();
     }
     
-    public double getCurrentValue(TransactionSummary transactionSummary) {
+    private double getCurrentValue(TransactionSummary transactionSummary) {
         final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
         
-        return getCurrentValue(transaction);
-    }   
+        final Code code = transaction.getContract().getStock().getCode();
+        
+        final Double price = this.stockPrice.get(code);
+
+        if (price == null) return 0.0;
+        
+        return price * transactionSummary.getQuantity();
+    }  
     
     private double getCurrentPrice(TransactionSummary transactionSummary) {
         final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
@@ -279,10 +291,6 @@ public class BuyPortfolioTreeTableModel extends DeprecatedAbstractPortfolioTreeT
         return (getCurrentValue(portfolio) - portfolio.getNetTotal()) / portfolio.getNetTotal() * 100.0;        
     }
     
-    public double getCurrentValue() {
-        return this.getCurrentValue((Portfolio)getRoot());        
-    }
-
     public double getNetPurchaseValue() {
         return ((Portfolio)getRoot()).getNetTotal();
     }
