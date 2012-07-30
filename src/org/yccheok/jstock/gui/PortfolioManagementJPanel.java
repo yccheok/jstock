@@ -1768,7 +1768,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             for (int i = 0; i < count; i++) {
                 TransactionSummary transactionSummary = (TransactionSummary)portfolio.getChildAt(i);
                 
-                if(transactionSummary.getChildCount() <= 0) continue;
+                if (transactionSummary.getChildCount() <= 0) continue;
                 
                 final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
 
@@ -2232,7 +2232,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         };
     }
     
-    public void update(RealTimeStockMonitor monitor, final java.util.List<Stock> stocks) {
+    private void update(RealTimeStockMonitor monitor, final java.util.List<Stock> stocks) {
         final BuyPortfolioTreeTableModelEx portfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
  
         for (Stock stock : stocks) {

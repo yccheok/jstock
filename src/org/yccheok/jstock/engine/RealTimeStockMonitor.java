@@ -222,11 +222,8 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
         return Math.min(numOfThreadRequired, maxThread);
     }
     
-    private class StockMonitor extends Thread {    
-        // Doesn't require volatile, as this variable is being accessed within
-        // synchronized block.
-        private boolean suspend = false;
-
+    private class StockMonitor extends Thread {
+        
         public StockMonitor(int index) {
             this.index = index;
             thread = this;
@@ -330,8 +327,7 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
 
                         try {
                             Thread.sleep(delay);
-                        }
-                        catch (java.lang.InterruptedException exp) {
+                        } catch (java.lang.InterruptedException exp) {
                             log.error("index=" + index, exp);
                             /* Exit the primary fail safe loop. */
                             thread = null;                            
@@ -351,6 +347,9 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
             interrupt();
         }
         
+        // Doesn't require volatile, as this variable is being accessed within
+        // synchronized block.
+        private boolean suspend = false;        
         private final int index;
         private volatile Thread thread;
     }
