@@ -779,7 +779,7 @@ public class Utils {
             return false;
         }
         
-        String path = f.getAbsolutePath();
+        final String path = f.getAbsolutePath();
         
         return createDirectoryIfDoesNotExist(path);
     }
