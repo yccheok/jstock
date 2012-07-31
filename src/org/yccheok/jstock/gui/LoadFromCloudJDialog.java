@@ -506,13 +506,7 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
 
     private boolean extractZipFileWithXMLToCSVCoversion(File file) {
         File tempDir = Utils.createTempDir();
-        String tempDirString = null;
-        try {
-            tempDirString = org.yccheok.jstock.gui.Utils.toEndWithFileSeperator(tempDir.getCanonicalPath());
-        } catch (IOException ex) {
-            log.error(null, ex);
-            return false;
-        }
+        final String tempDirString = org.yccheok.jstock.gui.Utils.toEndWithFileSeperator(tempDir.getAbsolutePath());
         Utils.extractZipFile(file, tempDirString, true);
 
         boolean status = true;

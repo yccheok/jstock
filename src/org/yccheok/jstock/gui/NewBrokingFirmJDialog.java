@@ -245,17 +245,9 @@ public class NewBrokingFirmJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jCheckBox1ItemStateChanged
     
     private void loadImage(File file) {
-        ImageIcon imageIcon;
-        
-        try {
-            imageIcon = new ImageIcon(file.getCanonicalPath());
-        }
-        catch(IOException exp) {
-            log.error(null, exp);
-            return;
-        }
+        ImageIcon imageIcon = new ImageIcon(file.getAbsolutePath());
 
-        if(imageIcon.getIconWidth() <= 0 || imageIcon.getIconHeight() <= 0) return;
+        if (imageIcon.getIconWidth() <= 0 || imageIcon.getIconHeight() <= 0) return;
         
         this.setLogo(imageIcon.getImage());        
     }

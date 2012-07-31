@@ -773,7 +773,32 @@ public class Utils {
     }
     
     private static boolean createCompleteDirectoryHierarchyIfDoesNotExist(File f) {
-        return f.mkdirs();
+        if (f == null) return true;
+                
+        if (false == createCompleteDirectoryHierarchyIfDoesNotExist(f.getParentFile())) {
+            return false;
+        }
+        
+        String path = f.getAbsolutePath();
+        
+        return createDirectoryIfDoesNotExist(path);
+    }
+    
+    public static boolean createDirectoryIfDoesNotExist(String directory) {
+        java.io.File f = new java.io.File(directory);
+        
+        if (f.exists() == false) {
+            if (f.mkdir())
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        
+        return true;
     }
     
     public static boolean isFileOrDirectoryExist(String fileOrDirectory) {
@@ -2203,18 +2228,10 @@ public class Utils {
             final String extension = Utils.getFileExtension(file);
             if (extension.equals("csv") == false && extension.equals("xls") == false) {
                 if (chooser.getFileFilter().getDescription().equals(csvFilter.getDescription())) {
-                    try {
-                        file = new File(file.getCanonicalPath() + ".csv");
-                    } catch (IOException ex) {
-                        log.error(null, ex);
-                    }
+                    file = new File(file.getAbsolutePath() + ".csv");
                 }
                 else if (chooser.getFileFilter().getDescription().equals(xlsFilter.getDescription())) {
-                    try {
-                        file = new File(file.getCanonicalPath() + ".xls");
-                    } catch (IOException ex) {
-                        log.error(null, ex);
-                    }
+                    file = new File(file.getAbsolutePath() + ".xls");
                 }
                 else {
                     // Impossible.
@@ -2406,15 +2423,11 @@ public class Utils {
                     }
                     final String e = extensions[0];
                     if (chooser.getFileFilter().getDescription().equals(fileNameExtensionFilter.getDescription())) {
-                        try {
-                            if (e.startsWith(".")) {
-                                file = new File(file.getCanonicalPath() + e);
-                            }
-                            else {
-                                file = new File(file.getCanonicalPath() + "." + e);
-                            }
-                        } catch (IOException ex) {
-                            log.error(null, ex);
+                        if (e.startsWith(".")) {
+                            file = new File(file.getAbsolutePath() + e);
+                        }
+                        else {
+                            file = new File(file.getAbsolutePath() + "." + e);
                         }
                         break;
                     }

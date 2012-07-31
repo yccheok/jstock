@@ -634,14 +634,7 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
         final List<File> files = getUserDefinedDatabaseFiles();
         final List<FileEx> fileExs = new ArrayList<FileEx>();
         for (File file : files) {
-            final String filename;
-            try {
-                filename = file.getCanonicalPath();
-            } catch (IOException ex) {
-                // Should we return null? As the saved information is not complete.
-                log.error(null, ex);
-                continue;
-            }
+            final String filename = file.getAbsolutePath();
             final int index = filename.indexOf(Utils.getApplicationVersionString());
             if (index < 0) {
                 continue;
@@ -740,14 +733,7 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
         final List<File> files = getUserDefinedDatabaseFiles();
         final List<FileEx> fileExs = new ArrayList<FileEx>();
         for (File file : files) {
-            final String filename;
-            try {
-                filename = file.getCanonicalPath();
-            } catch (IOException ex) {
-                // Should we return null? As the saved information is not complete.
-                log.error(null, ex);
-                continue;
-            }
+            final String filename = file.getAbsolutePath();
             final int index = filename.indexOf(Utils.getApplicationVersionString());
             if (index < 0) {
                 continue;
