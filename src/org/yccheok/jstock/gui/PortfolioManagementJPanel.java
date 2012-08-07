@@ -645,7 +645,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                         final Transaction t = new Transaction(contract, org.yccheok.jstock.portfolio.Utils.getDummyBroker(broker), org.yccheok.jstock.portfolio.Utils.getDummyStampDuty(contract, stampDuty), org.yccheok.jstock.portfolio.Utils.getDummyClearingFee(clearingFee));
                         t.setComment(org.yccheok.jstock.portfolio.Utils.replaceCSVLineFeedToSystemLineFeed(_comment));
                         transactions.add(t);
-                    }
+                    }   // for
                     
                     // We allow empty portfolio.
                     //if (transactions.size() <= 0) {
@@ -2403,23 +2403,13 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         final double paperProfitPercentage = buyPortfolioTreeTableModel.getNetGainLossPercentage();
         
         final double realizedProfitPercentage = sellPortfolioTreeTableModel.getNetGainLossPercentage();
-        
-        final java.text.NumberFormat numberFormat = java.text.NumberFormat.getInstance();
-        if (false == MainFrame.getInstance().getJStockOptions().isPenceToPoundConversionEnabled()) {
-            numberFormat.setMaximumFractionDigits(2);
-            numberFormat.setMinimumFractionDigits(2);
-        }
-        else {
-            numberFormat.setMaximumFractionDigits(4);
-            numberFormat.setMinimumFractionDigits(4);
-        }
 
-        final String _share = numberFormat.format(share);
-        final String _cash = numberFormat.format(cash);
-        final String _paperProfit = numberFormat.format(paperProfit);
-        final String _paperProfitPercentage = numberFormat.format(paperProfitPercentage);
-        final String _realizedProfit = numberFormat.format(realizedProfit);
-        final String _realizedProfitPercentage = numberFormat.format(realizedProfitPercentage);
+        final String _share = org.yccheok.jstock.portfolio.Utils.toWealthHeader(share);
+        final String _cash = org.yccheok.jstock.portfolio.Utils.toWealthHeader(cash);
+        final String _paperProfit = org.yccheok.jstock.portfolio.Utils.toWealthHeader(paperProfit);
+        final String _paperProfitPercentage = org.yccheok.jstock.portfolio.Utils.toWealthHeader(paperProfitPercentage);
+        final String _realizedProfit = org.yccheok.jstock.portfolio.Utils.toWealthHeader(realizedProfit);
+        final String _realizedProfitPercentage = org.yccheok.jstock.portfolio.Utils.toWealthHeader(realizedProfitPercentage);
         
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             @Override

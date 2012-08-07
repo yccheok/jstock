@@ -97,6 +97,14 @@ public class Utils {
         }
     };
     
+    // Use ThreadLocal to ensure thread safety
+    private static final ThreadLocal <NumberFormat> wealthHeaderNumberFormat = new ThreadLocal <NumberFormat>() {
+        @Override protected NumberFormat initialValue() {
+            final java.text.NumberFormat numberFormat = java.text.NumberFormat.getInstance();
+            return numberFormat;
+        }
+    };
+    
     /**
      * Replace CSV line feed to system dependent line feed.
      * @param string the string
@@ -193,6 +201,44 @@ public class Utils {
         return jStockOptions.getCurrencySymbol(country) + toCurrency(value);
     }
 
+    /**
+     * Convert the value to wealth header representation.
+     *
+     * @param value the value to be converted
+     * @return wealth header representation
+     */
+    public static String toWealthHeader(Object value) {
+        NumberFormat numberFormat = wealthHeaderNumberFormat.get();
+        if (false == MainFrame.getInstance().getJStockOptions().isPenceToPoundConversionEnabled()) {
+            numberFormat.setMaximumFractionDigits(2);
+            numberFormat.setMinimumFractionDigits(2);
+        }
+        else {
+            numberFormat.setMaximumFractionDigits(4);
+            numberFormat.setMinimumFractionDigits(4);
+        }        
+        return numberFormat.format(value);
+    }
+
+    /**
+     * Convert the value to wealth header representation.
+     *
+     * @param value the value to be converted
+     * @return wealth header representation
+     */
+    public static String toWealthHeader(double value) {
+        NumberFormat numberFormat = wealthHeaderNumberFormat.get();
+        if (false == MainFrame.getInstance().getJStockOptions().isPenceToPoundConversionEnabled()) {
+            numberFormat.setMaximumFractionDigits(2);
+            numberFormat.setMinimumFractionDigits(2);
+        }
+        else {
+            numberFormat.setMaximumFractionDigits(4);
+            numberFormat.setMinimumFractionDigits(4);
+        }        
+        return numberFormat.format(value);
+    }
+    
     public static boolean isTransactionWithEqualStockCode(Transaction t0, Transaction t1) {
         final Code c0 = t0.getContract().getStock().getCode();
         final Code c1 = t1.getContract().getStock().getCode();

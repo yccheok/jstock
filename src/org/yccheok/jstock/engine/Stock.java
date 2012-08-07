@@ -642,14 +642,7 @@ public class Stock {
 
     @Override
     public String toString() {
-        return Stock.class.getName() + "[code=" + code + ",symbol=" + symbol + ",name=" + name + ",board=" + board + ",industry=" + industry +
-                ",prevPrice=" + prevPrice + ",openPrice=" + openPrice + ",lastPrice=" + lastPrice + ",highPrice=" + highPrice + ",lowPrice=" + lowPrice +
-                ",volume=" + volume + ",changePrice=" + changePrice + ",changePricePercentage=" + changePricePercentage + ",lastVolume=" + lastVolume +
-                ",buyPrice=" + buyPrice + ",buyQuantity=" + buyQuantity + ",sellPrice=" + sellPrice + ",sellQuantity" + sellQuantity +
-                ",secondBuyPrice=" + secondBuyPrice + ",secondBuyQuantity=" + secondBuyQuantity + ",secondSellPrice=" + secondSellPrice + ",secondSellQuantity" + secondSellQuantity +
-                ",thirdBuyPrice=" + thirdBuyPrice + ",thirdBuyQuantity=" + thirdBuyQuantity + ",thirdSellPrice=" + thirdSellPrice + ",thirdSellQuantity" + thirdSellQuantity +
-                ",calendar=" + calendar + "]"
-                ;
+        return symbol.toString();
     }
     
     public enum Board {
