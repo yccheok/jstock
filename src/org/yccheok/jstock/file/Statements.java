@@ -128,12 +128,12 @@ public class Statements {
             assert(calendar != null && stock != null);
             final List<Atom> atoms = new ArrayList<Atom>();
             final Atom atom0 = new Atom(dateFormat.format(calendar.getTime()), guiBundleWrapper.getString("StockHistory_Date"));
-            final Atom atom1 = new Atom(new Double(stock.getOpenPrice()), guiBundleWrapper.getString("StockHistory_Open"));
-            final Atom atom2 = new Atom(new Double(stock.getHighPrice()), guiBundleWrapper.getString("StockHistory_High"));
-            final Atom atom3 = new Atom(new Double(stock.getLowPrice()), guiBundleWrapper.getString("StockHistory_Low"));
-            final Atom atom4 = new Atom(new Double(stock.getLastPrice()), guiBundleWrapper.getString("StockHistory_Close"));
+            final Atom atom1 = new Atom(Double.valueOf(stock.getOpenPrice()), guiBundleWrapper.getString("StockHistory_Open"));
+            final Atom atom2 = new Atom(Double.valueOf(stock.getHighPrice()), guiBundleWrapper.getString("StockHistory_High"));
+            final Atom atom3 = new Atom(Double.valueOf(stock.getLowPrice()), guiBundleWrapper.getString("StockHistory_Low"));
+            final Atom atom4 = new Atom(Double.valueOf(stock.getLastPrice()), guiBundleWrapper.getString("StockHistory_Close"));
             // TODO: CRITICAL LONG BUG REVISED NEEDED.
-            final Atom atom5 = new Atom(new Long(stock.getVolume()), guiBundleWrapper.getString("StockHistory_Volume"));
+            final Atom atom5 = new Atom(Long.valueOf(stock.getVolume()), guiBundleWrapper.getString("StockHistory_Volume"));
             atoms.add(atom0);
             atoms.add(atom1);
             atoms.add(atom2);

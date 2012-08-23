@@ -1629,13 +1629,8 @@ public class MainFrame extends javax.swing.JFrame {
     private void updateDividerLocation() {
         this.portfolioManagementJPanel.updateDividerLocation();
     }
-
-    private void _clearAllStocks() {
-        assert(java.awt.EventQueue.isDispatchThread());
-        
-        
-        StockTableModel tableModel = (StockTableModel)jTable1.getModel();            
-
+    
+    private void clearAllStocks() {
         if (stockCodeHistoryGUI != null) {
             stockCodeHistoryGUI.clear();
         }
@@ -1645,35 +1640,41 @@ public class MainFrame extends javax.swing.JFrame {
         if (stockHistoryMonitor != null) {
             stockHistoryMonitor.clearStockCodes();
         }
+        final StockTableModel tableModel = (StockTableModel)jTable1.getModel();                    
         tableModel.clearAllStocks();     
         this.initAlertStateManager();
 
-        updateBuyerSellerInformation(null);
-        this.updateDynamicChart(null);
+        if (java.awt.EventQueue.isDispatchThread()) {
+            updateBuyerSellerInformation(null);
+            updateDynamicChart(null);
+        } else {
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    updateBuyerSellerInformation(null);
+                    updateDynamicChart(null);
+                }                
+            });
+        }
 
         if (stockCodeHistoryGUI != null) {
             if (stockCodeHistoryGUI.isEmpty()) {
                 if (this.stockInfoDatabase != null) {
-                    statusBar.setProgressBar(false);
-                    statusBar.setMainMessage(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_Connected"));
+                    if (java.awt.EventQueue.isDispatchThread()) {
+                        statusBar.setProgressBar(false);
+                        statusBar.setMainMessage(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_Connected"));
+                    } else {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                statusBar.setProgressBar(false);
+                                statusBar.setMainMessage(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_Connected"));
+                            }                
+                        });
+                    }                    
                 }
             }        
         }        
-    }
-    
-    private void clearAllStocks() {
-        if (java.awt.EventQueue.isDispatchThread()) {
-            _clearAllStocks();
-        } else {
-            SwingUtilities.invokeLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    _clearAllStocks();
-                }
-                
-            });
-        }
     }
     
     // Should we synchronized the jTable1, or post the job at GUI event dispatch
@@ -3228,8 +3229,8 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     private void initRealTimeStockMonitor() {
-        if (realTimeStockMonitor != null) {
-            final RealTimeStockMonitor oldRealTimeStockMonitor = realTimeStockMonitor;
+        final RealTimeStockMonitor oldRealTimeStockMonitor = realTimeStockMonitor;
+        if (oldRealTimeStockMonitor != null) {            
             zombiePool.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -3766,8 +3767,8 @@ public class MainFrame extends javax.swing.JFrame {
     // only MainFrame's history monitor, when we change the history duration option. Other's history monitors
     // are not affected.
     private void initStockHistoryMonitor() {
-        if (stockHistoryMonitor != null) {
-            final StockHistoryMonitor oldStockHistoryMonitor = stockHistoryMonitor;
+        final StockHistoryMonitor oldStockHistoryMonitor = stockHistoryMonitor;
+        if (oldStockHistoryMonitor != null) {            
             zombiePool.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -3828,8 +3829,8 @@ public class MainFrame extends javax.swing.JFrame {
         }
         else
         {
-            if (latestNewsTask != null) {
-                final LatestNewsTask oldLatestNewsTask = latestNewsTask;
+            final LatestNewsTask oldLatestNewsTask = latestNewsTask;
+            if (oldLatestNewsTask != null) {                
                 zombiePool.execute(new Runnable() {
                     @Override
                     public void run() {
@@ -3892,8 +3893,8 @@ public class MainFrame extends javax.swing.JFrame {
         // We may hold a large database previously. Invoke garbage collector to perform cleanup.
         System.gc();
     }
-    
-    public void update(RealTimeStockMonitor monitor, final java.util.List<Stock> stocks) {        
+        
+    private void update(RealTimeStockMonitor monitor, final java.util.List<Stock> stocks) { 
         // We need to ignore symbol names given by stock server. Replace them
         // with database's.
         final boolean isSymbolImmutable = org.yccheok.jstock.engine.Utils.isSymbolImmutable();                

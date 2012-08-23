@@ -626,8 +626,8 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     }
 
     public final void initStockHistoryMonitor(java.util.List<StockServerFactory> stockServerFactories) {
-        if (stockHistoryMonitor != null) {
-            final StockHistoryMonitor oldStockHistoryMonitor = stockHistoryMonitor;
+        final StockHistoryMonitor oldStockHistoryMonitor = stockHistoryMonitor;
+        if (oldStockHistoryMonitor != null) {            
             Utils.getZoombiePool().execute(new Runnable() {
                 @Override
                 public void run() {
@@ -810,8 +810,8 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     }
 
     public final void initRealTimeStockMonitor(java.util.List<StockServerFactory> stockServerFactories) {
-        if (this.realTimeStockMonitor != null) {
-            final RealTimeStockMonitor oldRealTimeStockMonitor = this.realTimeStockMonitor;
+        final RealTimeStockMonitor oldRealTimeStockMonitor = this.realTimeStockMonitor;
+        if (oldRealTimeStockMonitor != null) {            
             Utils.getZoombiePool().execute(new Runnable() {
                 @Override
                 public void run() {

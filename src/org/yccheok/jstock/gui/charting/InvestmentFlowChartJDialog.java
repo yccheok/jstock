@@ -537,8 +537,8 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
     }
 
     private void initRealTimeStockMonitor() {
-        if (this.realTimeStockMonitor != null) {
-            final RealTimeStockMonitor oldRealTimeStockMonitor = this.realTimeStockMonitor;
+        final RealTimeStockMonitor oldRealTimeStockMonitor = this.realTimeStockMonitor;
+        if (oldRealTimeStockMonitor != null) {            
             org.yccheok.jstock.gui.Utils.getZoombiePool().execute(new Runnable() {
                 @Override
                 public void run() {

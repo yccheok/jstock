@@ -2154,8 +2154,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             }
         }
 
-        if (currencyExchangeMonitor != null) {
-            final CurrencyExchangeMonitor oldCurrencyExchangeMonitor = currencyExchangeMonitor;
+        final CurrencyExchangeMonitor oldCurrencyExchangeMonitor = currencyExchangeMonitor;
+        if (oldCurrencyExchangeMonitor != null) {            
             Utils.getZoombiePool().execute(new Runnable() {
                 @Override
                 public void run() {
@@ -2188,8 +2188,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
 
     public void initRealTimeStockMonitor(java.util.List<StockServerFactory> stockServerFactories) {
-        if (realTimeStockMonitor != null) {
-            final RealTimeStockMonitor oldRealTimeStockMonitor = realTimeStockMonitor;
+        final RealTimeStockMonitor oldRealTimeStockMonitor = realTimeStockMonitor;
+        if (oldRealTimeStockMonitor != null) {            
             Utils.getZoombiePool().execute(new Runnable() {
                 @Override
                 public void run() {

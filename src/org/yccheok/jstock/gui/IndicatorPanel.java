@@ -1682,8 +1682,8 @@ public class IndicatorPanel extends JPanel {
     }
 
     public void initStockHistoryMonitor(java.util.List<StockServerFactory> stockServerFactories) {
-        if (stockHistoryMonitor != null) {
-            final StockHistoryMonitor oldStockHistoryMonitor = stockHistoryMonitor;
+        final StockHistoryMonitor oldStockHistoryMonitor = stockHistoryMonitor;
+        if (oldStockHistoryMonitor != null) {            
             Utils.getZoombiePool().execute(new Runnable() {
                 @Override
                 public void run() {
