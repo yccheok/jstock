@@ -4,6 +4,7 @@ Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 JStock 1.0.6q - xxxx-xx-x?
   Bugfix:  Fix sort by stock bug in dividend dialog.
   Bugfix:  Fix on investment flow chart for UK pence to pound conversion.
+  Bugfix:  Stock price in watchlist is not updating after loading from cloud.
   
 JStock 1.0.6p - 2012-06-04
   Feature: Able to perform sorting on Stock Portfolio Management's buy and sell
