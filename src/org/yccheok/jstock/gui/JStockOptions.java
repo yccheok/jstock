@@ -84,6 +84,11 @@ public class JStockOptions {
         Hide
     }
 
+    public enum ChartTheme {
+        Light,
+        Dark
+    }
+    
     public static final java.awt.Color DEFAULT_NORMAL_TEXT_FOREGROUND_COLOR = Color.BLACK;
     public static final java.awt.Color DEFAULT_HIGHER_NUMERICAL_VALUE_FOREGROUND_COLOR = new java.awt.Color(50, 150, 0);
     public static final java.awt.Color DEFAULT_LOWER_NUMERICAL_VALUE_FOREGROUND_COLOR = new java.awt.Color(200, 0, 50);
@@ -287,6 +292,8 @@ public class JStockOptions {
     // save this options.xml.
     private int applicationVersionID = Utils.getApplicationVersionID();
     
+    private ChartTheme chartTheme = ChartTheme.Light;
+    
     public boolean isAutoBrokerFeeCalculationEnabled() {
         return this.isAutoBrokerFeeCalculationEnabled;
     }
@@ -404,6 +411,8 @@ public class JStockOptions {
         this.currencyExchangeEnable = new EnumMap<Country, Boolean>(jStockOptions.currencyExchangeEnable);
         this.localCurrencyCountries = new EnumMap<Country, Country>(jStockOptions.localCurrencyCountries);
         this.penceToPoundConversionEnabled = new EnumMap<Country, Boolean>(jStockOptions.penceToPoundConversionEnabled);
+        
+        this.chartTheme = jStockOptions.getChartTheme();
     }
 
     // User may not trust us to store their password in cloud server. To avoid
@@ -520,6 +529,8 @@ public class JStockOptions {
         jStockOptions.localCurrencyCountries = new EnumMap<Country, Country>(this.localCurrencyCountries);
         jStockOptions.penceToPoundConversionEnabled = new EnumMap<Country, Boolean>(jStockOptions.penceToPoundConversionEnabled);
 
+        jStockOptions.setChartTheme(this.chartTheme);
+        
         return jStockOptions;
     }
 
@@ -682,6 +693,11 @@ public class JStockOptions {
         if (this.locale.getCountry().equals(Locale.FRANCE.getCountry()) && this.locale.getLanguage().equals(Locale.ENGLISH.getLanguage())) {
             this.locale = Locale.FRANCE;
         }
+        
+        if (this.chartTheme == null) {
+            this.chartTheme = ChartTheme.Light;
+        }
+        
         return this;
     }    
     
@@ -1519,5 +1535,19 @@ public class JStockOptions {
      */
     public void setApplicationVersionID(int applicationVersionID) {
         this.applicationVersionID = applicationVersionID;
+    }
+
+    /**
+     * @return the chartTheme
+     */
+    public ChartTheme getChartTheme() {
+        return chartTheme;
+    }
+
+    /**
+     * @param chartTheme the chartTheme to set
+     */
+    public void setChartTheme(ChartTheme chartTheme) {
+        this.chartTheme = chartTheme;
     }
 }

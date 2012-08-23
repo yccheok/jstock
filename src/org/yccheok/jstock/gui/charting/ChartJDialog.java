@@ -172,6 +172,13 @@ public class ChartJDialog extends javax.swing.JDialog {
                 ChartJDialog.this.chartLayerUI.updateTraceInfos();
             }
         });
+        
+        // Update GUI.
+        if (MainFrame.getInstance().getJStockOptions().getChartTheme() == JStockOptions.ChartTheme.Light) {
+            this.jRadioButtonMenuItem3.setSelected(true);
+        } else {
+            this.jRadioButtonMenuItem4.setSelected(true);
+        }
     }
 
     /**
@@ -405,6 +412,7 @@ public class ChartJDialog extends javax.swing.JDialog {
     private void initComponents() {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
+        buttonGroup2 = new javax.swing.ButtonGroup();
         jPanel4 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
@@ -431,6 +439,9 @@ public class ChartJDialog extends javax.swing.JDialog {
         jMenu3 = new javax.swing.JMenu();
         jRadioButtonMenuItem1 = new javax.swing.JRadioButtonMenuItem();
         jRadioButtonMenuItem2 = new javax.swing.JRadioButtonMenuItem();
+        jMenu4 = new javax.swing.JMenu();
+        jRadioButtonMenuItem3 = new javax.swing.JRadioButtonMenuItem();
+        jRadioButtonMenuItem4 = new javax.swing.JRadioButtonMenuItem();
         jMenu8 = new javax.swing.JMenu();
         jMenuItem7 = new javax.swing.JMenuItem();
 
@@ -613,6 +624,29 @@ public class ChartJDialog extends javax.swing.JDialog {
 
         jMenuBar1.add(jMenu3);
 
+        jMenu4.setText(bundle.getString("ChartJDialog_Theme")); // NOI18N
+
+        buttonGroup2.add(jRadioButtonMenuItem3);
+        jRadioButtonMenuItem3.setSelected(true);
+        jRadioButtonMenuItem3.setText(bundle.getString("ChartJDialog_Light")); // NOI18N
+        jRadioButtonMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButtonMenuItem3ActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jRadioButtonMenuItem3);
+
+        buttonGroup2.add(jRadioButtonMenuItem4);
+        jRadioButtonMenuItem4.setText(bundle.getString("ChartJDialog_Dark")); // NOI18N
+        jRadioButtonMenuItem4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButtonMenuItem4ActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jRadioButtonMenuItem4);
+
+        jMenuBar1.add(jMenu4);
+
         jMenu8.setText(bundle.getString("ChartJDialog_Help")); // NOI18N
 
         jMenuItem7.setText(bundle.getString("ChartJDialog_TechnicalAnalysisTutorial")); // NOI18N
@@ -731,8 +765,7 @@ public class ChartJDialog extends javax.swing.JDialog {
             if (this.chartLayerUI != null) {
                 this.chartLayerUI.updateTraceInfos();
             }
-        }
-        else if (type == Type.Candlestick) {
+        } else if (type == Type.Candlestick) {
             if (this.candlestickChart == null) {
                 this.candlestickChart = this.createCandlestickChart(this.priceOHLCDataset);
             }
@@ -1164,6 +1197,26 @@ public class ChartJDialog extends javax.swing.JDialog {
     private void jLabel6MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel6MouseClicked
         this.zoom(Zoom.Year10);
     }//GEN-LAST:event_jLabel6MouseClicked
+
+    private void jRadioButtonMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonMenuItem3ActionPerformed
+        MainFrame.getInstance().getJStockOptions().setChartTheme(JStockOptions.ChartTheme.Light);
+        if (priceVolumeChart != null) {
+            org.yccheok.jstock.charting.Utils.applyChartThemeEx(priceVolumeChart);
+        }
+        if (candlestickChart != null) {
+            org.yccheok.jstock.charting.Utils.applyChartThemeEx(candlestickChart);
+        }
+    }//GEN-LAST:event_jRadioButtonMenuItem3ActionPerformed
+
+    private void jRadioButtonMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonMenuItem4ActionPerformed
+        MainFrame.getInstance().getJStockOptions().setChartTheme(JStockOptions.ChartTheme.Dark);
+        if (priceVolumeChart != null) {
+            org.yccheok.jstock.charting.Utils.applyChartThemeEx(priceVolumeChart);
+        }
+        if (candlestickChart != null) {
+            org.yccheok.jstock.charting.Utils.applyChartThemeEx(candlestickChart);
+        }
+    }//GEN-LAST:event_jRadioButtonMenuItem4ActionPerformed
    
     /**
      * Creates a chart.
@@ -1214,7 +1267,7 @@ public class ChartJDialog extends javax.swing.JDialog {
         cplot.setGap(8.0);
 
         JFreeChart chart = new JFreeChart(title, JFreeChart.DEFAULT_TITLE_FONT, cplot, true);
-        org.yccheok.jstock.charting.Utils.applyChartTheme(chart);
+        org.yccheok.jstock.charting.Utils.applyChartThemeEx(chart);
 
         // Only do it after applying chart theme.
         org.yccheok.jstock.charting.Utils.setPriceSeriesPaint(renderer1);
@@ -1322,7 +1375,7 @@ public class ChartJDialog extends javax.swing.JDialog {
 
         JFreeChart chart = new JFreeChart(title, JFreeChart.DEFAULT_TITLE_FONT, cplot, true);
 
-        org.yccheok.jstock.charting.Utils.applyChartTheme(chart);
+        org.yccheok.jstock.charting.Utils.applyChartThemeEx(chart);
 
         // Handle zooming event.
         chart.addChangeListener(this.getChartChangeListner());
@@ -1501,8 +1554,8 @@ public class ChartJDialog extends javax.swing.JDialog {
                 final CombinedDomainXYPlot cplot1 = (CombinedDomainXYPlot)this.candlestickChart.getPlot();
                 if (price_volume_ta != null) cplot0.add(price_volume_ta, 1);    // weight is 1.
                 if (candlestick_ta != null) cplot1.add(candlestick_ta, 1);      // weight is 1.
-                org.yccheok.jstock.charting.Utils.applyChartTheme(this.priceVolumeChart);
-                org.yccheok.jstock.charting.Utils.applyChartTheme(this.candlestickChart);
+                org.yccheok.jstock.charting.Utils.applyChartThemeEx(this.priceVolumeChart);
+                org.yccheok.jstock.charting.Utils.applyChartThemeEx(this.candlestickChart);
             }
         }
         else {
@@ -1582,8 +1635,8 @@ public class ChartJDialog extends javax.swing.JDialog {
                 final CombinedDomainXYPlot cplot1 = (CombinedDomainXYPlot)this.candlestickChart.getPlot();
                 if (price_volume_ta != null) cplot0.add(price_volume_ta, 1);    // weight is 1.
                 if (candlestick_ta != null) cplot1.add(candlestick_ta, 1);      // weight is 1.
-                org.yccheok.jstock.charting.Utils.applyChartTheme(this.priceVolumeChart);
-                org.yccheok.jstock.charting.Utils.applyChartTheme(this.candlestickChart);
+                org.yccheok.jstock.charting.Utils.applyChartThemeEx(this.priceVolumeChart);
+                org.yccheok.jstock.charting.Utils.applyChartThemeEx(this.candlestickChart);
             }
         }
         else {
@@ -1663,8 +1716,8 @@ public class ChartJDialog extends javax.swing.JDialog {
 
                 if (price_volume_ta != null) cplot0.add(price_volume_ta, 1);    // weight is 1.
                 if (candlestick_ta != null) cplot1.add(candlestick_ta, 1);      // weight is 1.
-                org.yccheok.jstock.charting.Utils.applyChartTheme(this.priceVolumeChart);
-                org.yccheok.jstock.charting.Utils.applyChartTheme(this.candlestickChart);
+                org.yccheok.jstock.charting.Utils.applyChartThemeEx(this.priceVolumeChart);
+                org.yccheok.jstock.charting.Utils.applyChartThemeEx(this.candlestickChart);
             }
         }
         else {
@@ -1781,8 +1834,8 @@ public class ChartJDialog extends javax.swing.JDialog {
                 final CombinedDomainXYPlot cplot1 = (CombinedDomainXYPlot)this.candlestickChart.getPlot();
                 if (price_volume_ta != null) cplot0.add(price_volume_ta, 1);    // weight is 1.
                 if (candlestick_ta != null) cplot1.add(candlestick_ta, 1);      // weight is 1.
-                org.yccheok.jstock.charting.Utils.applyChartTheme(this.priceVolumeChart);
-                org.yccheok.jstock.charting.Utils.applyChartTheme(this.candlestickChart);
+                org.yccheok.jstock.charting.Utils.applyChartThemeEx(this.priceVolumeChart);
+                org.yccheok.jstock.charting.Utils.applyChartThemeEx(this.candlestickChart);
             }            
         } else {
             final CombinedDomainXYPlot cplot0 = (CombinedDomainXYPlot)this.priceVolumeChart.getPlot();
@@ -2106,6 +2159,7 @@ public class ChartJDialog extends javax.swing.JDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.ButtonGroup buttonGroup2;
     private javax.swing.JComboBox jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
@@ -2122,6 +2176,7 @@ public class ChartJDialog extends javax.swing.JDialog {
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
+    private javax.swing.JMenu jMenu4;
     private javax.swing.JMenu jMenu8;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
@@ -2134,6 +2189,8 @@ public class ChartJDialog extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel6;
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem1;
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem2;
+    private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem3;
+    private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem4;
     // End of variables declaration//GEN-END:variables
     
 }

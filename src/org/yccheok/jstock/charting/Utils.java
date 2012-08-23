@@ -33,6 +33,8 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.StockHistoryServer;
+import org.yccheok.jstock.gui.JStockOptions;
+import org.yccheok.jstock.gui.MainFrame;
 
 /**
  *
@@ -331,6 +333,47 @@ public class Utils {
      *
      * @param chart the JFreeChart
      */
+    public static void applyChartThemeEx(JFreeChart chart) {
+        final StandardChartTheme chartTheme;
+        final JStockOptions.ChartTheme theme = MainFrame.getInstance().getJStockOptions().getChartTheme();
+        
+        if (theme == JStockOptions.ChartTheme.Light) {
+            applyChartTheme(chart);
+            return;
+        } else {
+            assert(theme == JStockOptions.ChartTheme.Dark);
+            chartTheme = (StandardChartTheme)org.jfree.chart.StandardChartTheme.createDarknessTheme();
+        }
+        
+        // The default font used by JFreeChart unable to render Chinese properly.
+        // We need to provide font which is able to support Chinese rendering.
+        final Locale defaultLocale = Locale.getDefault();
+        if (org.yccheok.jstock.gui.Utils.isSimplifiedChinese(defaultLocale) || org.yccheok.jstock.gui.Utils.isTraditionalChinese(defaultLocale)) {
+            final Font oldExtraLargeFont = chartTheme.getExtraLargeFont();
+            final Font oldLargeFont = chartTheme.getLargeFont();
+            final Font oldRegularFont = chartTheme.getRegularFont();
+            final Font oldSmallFont = chartTheme.getSmallFont();
+
+            final Font extraLargeFont = new Font("Sans-serif", oldExtraLargeFont.getStyle(), oldExtraLargeFont.getSize());
+            final Font largeFont = new Font("Sans-serif", oldLargeFont.getStyle(), oldLargeFont.getSize());
+            final Font regularFont = new Font("Sans-serif", oldRegularFont.getStyle(), oldRegularFont.getSize());
+            final Font smallFont = new Font("Sans-serif", oldSmallFont.getStyle(), oldSmallFont.getSize());
+
+            chartTheme.setExtraLargeFont(extraLargeFont);
+            chartTheme.setLargeFont(largeFont);
+            chartTheme.setRegularFont(regularFont);
+            chartTheme.setSmallFont(smallFont);
+        }
+
+        // Apply and return early.
+        chartTheme.apply(chart);
+    }
+
+    /**
+     * Applying chart theme based on given JFreeChart.
+     *
+     * @param chart the JFreeChart
+     */
     public static void applyChartTheme(JFreeChart chart) {
         final StandardChartTheme chartTheme = (StandardChartTheme)org.jfree.chart.StandardChartTheme.createJFreeTheme();
         chartTheme.setXYBarPainter(barPainter);
@@ -399,6 +442,7 @@ public class Utils {
 
         chartTheme.apply(chart);
     }
+
 
     private static final org.jfree.chart.renderer.xy.StandardXYBarPainter barPainter = new org.jfree.chart.renderer.xy.StandardXYBarPainter();
 }
