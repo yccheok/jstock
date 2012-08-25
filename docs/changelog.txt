@@ -3,6 +3,11 @@ Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
 JStock 1.0.6q - xxxx-xx-x?
   Feature: Provides new color dark theme option for history charting.
+  Bugfix:  Fix Dow Jones and Nasdaq index.
+  Bugfix:  Stock scanning becomes more responsive. Yet, we try to minimize
+           wastage of CPU and network resource.
+  Bugfix:  Go green, by increasing minimum scanning speed from 1 second to 2 
+           seconds.
   Bugfix:  Fix sort by stock bug in dividend dialog.
   Bugfix:  Fix on investment flow chart for UK pence to pound conversion.
   Bugfix:  Stock price in watchlist is not updating after loading from cloud.
