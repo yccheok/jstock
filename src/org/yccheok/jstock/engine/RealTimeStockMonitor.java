@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2012 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -206,6 +206,16 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
         stockMonitors.clear();
     }
     
+    // Trigger stock monitor to fetch stock price immediately. Although I am not
+    // sure whether we should make this method as synchronized, but it should
+    // be no harm to do so. Performance shouldn't be an issue, as this is not a
+    // frequent accessed method.
+    public synchronized void refresh() {
+        for (StockMonitor stockMonitor : stockMonitors) {
+            stockMonitor.refresh();
+        }        
+    }
+    
     public synchronized long getDelay() {
         return this.delay;
     }
@@ -274,6 +284,9 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
                             break;
                         }
 
+                        int pass = 0;
+                        int fail = 0;
+                        
                         for (int currIndex = index; thisThread == thread; currIndex += step) {
                             ListIterator<Code> listIterator = null;
 
@@ -295,6 +308,8 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
                                     codes.add(listIterator.next());
                                 }
 
+                                final int size = codes.size();
+                                fail += size;
                                 for (StockServerFactory factory : stockServerFactories)
                                 {
                                     final StockServer stockServer = factory.getStockServer();
@@ -302,8 +317,7 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
                                     List<Stock> stocks = null;
                                     try {
                                         stocks = stockServer.getStocks(codes);
-                                    }
-                                    catch (StockNotFoundException exp) {
+                                    } catch (StockNotFoundException exp) {
                                         log.error(codes, exp);
                                         // Try with another server.
                                         continue;
@@ -312,6 +326,10 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
                                     if (thisThread != thread) {
                                         break;
                                     }
+
+                                    pass += size;
+                                    fail -= size;
+                                    totalScanned = pass + fail;
 
                                     // Notify all the interested parties.
                                     RealTimeStockMonitor.this.notify(RealTimeStockMonitor.this, stocks);
@@ -325,13 +343,34 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
                             }
                         }   // for (int currIndex = index; thisThread == thread; curIndex += step)
 
+                        totalScanned = pass + fail;
+
                         try {
-                            Thread.sleep(delay);
+                            if (fail == 0) {
+                                Thread.sleep(delay);
+                            } else {
+                                if (minDelayCounter < MIN_DELAY_COUNTER) {
+                                    // Sleep as little as possible, to get the 1st reading
+                                    // as soon as possible. MIN_DELAY_COUNTER is used to avoid
+                                    // from getting our CPU and network too busy.
+                                    minDelayCounter++;
+                                    Thread.sleep(MIN_DELAY);
+                                } else {
+                                    Thread.sleep(delay);
+                                }
+                            }
                         } catch (java.lang.InterruptedException exp) {
                             log.error("index=" + index, exp);
-                            /* Exit the primary fail safe loop. */
-                            thread = null;                            
-                            break;
+                            if (isRefresh == false) {
+                                /* Exit the primary fail safe loop. */
+                                thread = null;                            
+                                break;
+                            } else {
+                                // User has requested to perform refresh explicitly.
+                                // Clear isRefresh flag, and continue with rest
+                                // of the work.
+                                isRefresh = false;
+                            }
                         }
                     }   /*  while (thisThread == thread) */
                 }
@@ -341,21 +380,50 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
             }	/* while (thisThread == thread) */
         }
         
+        // I guess we no longer need synchronized keyword here, as this method
+        // will only be consumed by synchronized method.
+        public void refresh() {
+            isRefresh = true;
+            minDelayCounter = 0;
+            totalScanned = 0;
+            interrupt();
+        }
+        
         public void _stop() {
             thread = null;
             // Wake up from sleep.
             interrupt();
         }
         
+        public int getTotalScanned() {
+            return totalScanned;
+        }
+        
         // Doesn't require volatile, as this variable is being accessed within
         // synchronized block.
         private boolean suspend = false;        
+        private volatile boolean isRefresh = false;
+        private volatile int minDelayCounter = 0;
+        private volatile int totalScanned = 0;
         private final int index;
         private volatile Thread thread;
     }
         
+    public int getTotalScanned() {
+        int totalScanned = 0;
+        for (StockMonitor stockMonitor : stockMonitors) {
+            totalScanned += stockMonitor.getTotalScanned();
+        }
+        return totalScanned;
+    }
+    
     // Delay in ms
     private volatile long delay;
+    
+    // 2 seconds.
+    private static final long MIN_DELAY = 2000;
+    private static final long MIN_DELAY_COUNTER = 3;
+    
     private final int maxThread;
     // Number of stock to be monitored per iteration.
     private final int numOfStockPerIteration;

@@ -89,6 +89,8 @@ public class OptionsJDialog extends javax.swing.JDialog implements JStockOptions
         if (apply(jStockOptions) == false) {
             return;
         }
+        // Refresh, as user might change scanning speed.
+        MainFrame.getInstance().refreshAllRealTimeStockMonitors();
         this.setVisible(false);
         this.dispose();        
     }//GEN-LAST:event_jButton1ActionPerformed

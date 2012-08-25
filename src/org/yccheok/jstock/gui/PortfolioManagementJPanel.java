@@ -1676,6 +1676,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         // initRealTimeStockMonitor.
         if (this.realTimeStockMonitor != null) {
             this.realTimeStockMonitor.addStockCode(transaction.getContract().getStock().getCode());
+            this.realTimeStockMonitor.refresh();
         }
         
         return transactionSummary;
@@ -1774,6 +1775,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
                 this.realTimeStockMonitor.addStockCode(transaction.getContract().getStock().getCode());
             }
+            this.realTimeStockMonitor.refresh();
         }
         
     }
@@ -2482,6 +2484,13 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         );
     }
 
+    public void refreshRealTimeStockMonitor() {
+        RealTimeStockMonitor _realTimeStockMonitor = this.realTimeStockMonitor;
+        if (_realTimeStockMonitor != null) {
+            _realTimeStockMonitor.refresh();
+        }
+    }
+    
     private static final Log log = LogFactory.getLog(PortfolioManagementJPanel.class);
 
     private int dividerLocation = -1;

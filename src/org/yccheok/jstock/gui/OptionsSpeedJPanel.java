@@ -68,7 +68,7 @@ public class OptionsSpeedJPanel extends javax.swing.JPanel implements JStockOpti
 
         jLabel1.setText(bundle.getString("OptionsSpeedJPanel_StockScanningSpeed")); // NOI18N
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "1", "5", "10", "20", "30", "40", "50", "60" }));
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "2", "5", "10", "20", "30", "40", "50", "60" }));
 
         jLabel2.setFont(jLabel2.getFont().deriveFont(jLabel2.getFont().getSize()-1f));
         jLabel2.setText(bundle.getString("OptionsSpeedJPanel_SmallerMeansFaster")); // NOI18N

@@ -313,6 +313,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             {
                 // Perform real time monitoring, for the code with history information.
                 realTimeStockMonitor.addStockCode(code);
+                realTimeStockMonitor.refresh();
             }
             else
             {
@@ -706,7 +707,8 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         }
 
         // Perform real time monitoring, for the code with history information.
-        _realTimeStockMonitor.addStockCode(code);      
+        _realTimeStockMonitor.addStockCode(code);
+        _realTimeStockMonitor.refresh();
     }
     
     private void update(StockHistoryMonitor monitor, StockHistoryMonitor.StockHistoryRunnable runnable)
@@ -1165,6 +1167,13 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         @Override
         public void keyTyped(java.awt.event.KeyEvent e) {
             IndicatorScannerJPanel.this.clearTableSelection();
+        }
+    }
+    
+    public void refreshRealTimeStockMonitor() {
+        RealTimeStockMonitor _realTimeStockMonitor = this.realTimeStockMonitor;
+        if (_realTimeStockMonitor != null) {
+            _realTimeStockMonitor.refresh();
         }
     }
     

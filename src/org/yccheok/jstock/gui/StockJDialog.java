@@ -431,6 +431,7 @@ public class StockJDialog extends javax.swing.JDialog {
                     m.addStockToTable(stock);
                     m.getRealTimeStockMonitor().addStockCode(stock.getCode());
                 }
+                m.getRealTimeStockMonitor().refresh();
             }
         });
         

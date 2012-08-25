@@ -698,6 +698,12 @@ public class JStockOptions {
             this.chartTheme = ChartTheme.Light;
         }
         
+        if (this.scanningSpeed <= 1000) {
+            // In previous version, it is possible for scanningSpeed <= 1000.
+            // This is some how wasting CPU and network resource. Let's go green.
+            this.scanningSpeed = 2000;
+        }
+        
         return this;
     }    
     
