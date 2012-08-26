@@ -1,7 +1,7 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
-JStock 1.0.6q - xxxx-xx-x?
+JStock 1.0.6q - 2012-08-28
   Feature: Provides new color dark theme option for history charting.
   Bugfix:  Fix Dow Jones and Nasdaq index.
   Bugfix:  Stock scanning becomes more responsive. Yet, we try to minimize
