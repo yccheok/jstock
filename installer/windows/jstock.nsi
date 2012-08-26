@@ -28,7 +28,6 @@ SetOutPath $INSTDIR
 File /r jstock\jstock.exe
 File /r jstock\config
 File /r jstock\database
-File /r jstock\chat
 File /r jstock\lib
 File /r jstock\docs
 File /r jstock\extra

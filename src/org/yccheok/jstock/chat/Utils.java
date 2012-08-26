@@ -148,50 +148,6 @@ public class Utils {
         return "<html><head></head><body style=\"font-size: 9px; font-family: Tahoma;\"></body></html>";
     }
 
-    public static String getHTMLAccordingToMessageMode(String who, String msg, ChatJPanel.Message.Mode mode)
-    {
-        final StringBuilder stringBuilder = new StringBuilder("<p>");
-
-        switch(mode)
-        {
-        case Mine:
-            stringBuilder.append("<span style=\"color:#");
-            stringBuilder.append(Utils.toCSSHTML(MainFrame.getInstance().getJStockOptions().getChatOwnMessageColor()));
-            stringBuilder.append(";font-weight:bold\">");
-            stringBuilder.append(who);
-            stringBuilder.append(": </span>");
-            stringBuilder.append(buildEmotionalTag(buildHyperLinkTag(escapeHTMLEntities(msg))));
-            break;
-
-        case Other:
-            stringBuilder.append("<span style=\"color:#");
-            stringBuilder.append(Utils.toCSSHTML(MainFrame.getInstance().getJStockOptions().getChatOtherMessageColor()));
-            stringBuilder.append(";font-weight:bold\">");
-            stringBuilder.append(who);
-            stringBuilder.append(": </span>");
-            stringBuilder.append(buildEmotionalTag(buildHyperLinkTag(escapeHTMLEntities(msg))));
-            break;
-
-        case System:
-            // Get today's date
-            Date date = new Date();
-            Format formatter = new SimpleDateFormat("h:mm:ss a");
-            stringBuilder.append("<span style=\"color:#");
-            stringBuilder.append(Utils.toCSSHTML(MainFrame.getInstance().getJStockOptions().getChatSystemMessageColor()));
-            stringBuilder.append(";font-weight: bold\">");
-            stringBuilder.append('(');
-            stringBuilder.append(formatter.format(date));
-            stringBuilder.append(") ");
-            stringBuilder.append(buildEmotionalTag(buildHyperLinkTag(escapeHTMLEntities(msg))));
-            stringBuilder.append("</span>");
-            break;
-        }
-
-        stringBuilder.append("</p>");
-
-        return stringBuilder.toString();
-    }
-
     private static String toCSSHTML(Color color) {
         return Integer.toHexString( color.getRGB() & 0x00ffffff );
     }

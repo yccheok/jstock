@@ -1054,6 +1054,12 @@ public class Utils {
         return org.jdesktop.swingx.util.OS.isMacOSX();
     }
     
+    public static boolean isWindows7() {
+        String osName = System.getProperty("os.name");
+        String osVersion = System.getProperty("os.version");
+        return "Windows 7".equals(osName) && "6.1".equals(osVersion);        
+    }
+    
     public static boolean isWindows() {
         String windowsString = "Windows";
         String osName = System.getProperty("os.name");
@@ -1714,7 +1720,7 @@ public class Utils {
         if (applicationVersionID == APPLICATION_VERSION_ID) {
             return true;
         }
-        else if (applicationVersionID >= 1051 && applicationVersionID <= 1090) {
+        else if (applicationVersionID >= 1051 && applicationVersionID <= 1091) {
             return true;
         }
       
@@ -2807,9 +2813,9 @@ public class Utils {
     private static final String APPLICATION_VERSION_STRING = "1.0.6";
 
     // For About box comparision on latest version purpose.
-    // 1.0.6p
+    // 1.0.6q
     // Remember to update isCompatible method.
-    private static final int APPLICATION_VERSION_ID = 1091;
+    private static final int APPLICATION_VERSION_ID = 1092;
 
     private static Executor zombiePool = Executors.newFixedThreadPool(Utils.NUM_OF_THREADS_ZOMBIE_POOL);
 

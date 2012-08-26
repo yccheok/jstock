@@ -120,14 +120,12 @@ public class MainFrame extends javax.swing.JFrame {
         createStockIndicatorEditor();
         createIndicatorScannerJPanel();
         createPortfolioManagementJPanel();
-        createChatJPanel();
 
         createIconsAndToolTipTextForJTabbedPane();
 
         this.createSystemTrayIcon();
 
         this.initPreloadDatabase(false);
-        this.initChatDatas();
         this.initExtraDatas();
         this.initStatusBar();
         this.initMarketJPanel();
@@ -153,7 +151,10 @@ public class MainFrame extends javax.swing.JFrame {
         this.initJXLayerOnJComboBox();
 
         // Turn to the last viewed page.
-        this.jTabbedPane1.setSelectedIndex(this.getJStockOptions().getLastSelectedPageIndex());
+        final int lastSelectedPageIndex = this.getJStockOptions().getLastSelectedPageIndex();
+        if (this.jTabbedPane1.getTabCount() > lastSelectedPageIndex) {
+            this.jTabbedPane1.setSelectedIndex(lastSelectedPageIndex);
+        }
 
         // setSelectedIndex will not always trigger jTabbedPane1StateChanged,
         // if the selected index is same as current page index. However, we are
@@ -884,27 +885,6 @@ public class MainFrame extends javax.swing.JFrame {
             this.jMenuItem2.setEnabled(true);   // Load
             this.jMenuItem9.setEnabled(true);   // Save
         }
-        else if (pane.getSelectedComponent() == this.chatJPanel) {
-            this.jMenuItem2.setEnabled(false);  // Save
-            this.jMenuItem9.setEnabled(false);  // Load
-        }
-
-        if (pane.getSelectedComponent() == this.chatJPanel)
-        {
-            if (timer != null)
-            {
-                timer.stop();
-                timer = null;
-            }
-
-            // Ensure at the end, we are using smile icon.
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    MainFrame.this.jTabbedPane1.setIconAt(4, smileIcon);
-                }
-            });
-        }
     }
 
     // Policy : Each pane should have their own real time stock monitoring.
@@ -1017,8 +997,6 @@ public class MainFrame extends javax.swing.JFrame {
             {
                 this.latestNewsTask.cancel(true);
             }
-
-            this.chatJPanel.stopChatServiceManager();
 
             // We suppose to call shutdownAll to clean up all network resources.
             // However, that will cause Exception in other threads if they are still using httpclient.
@@ -1855,15 +1833,6 @@ public class MainFrame extends javax.swing.JFrame {
         this.indicatorPanel.setStockInfoDatabase(this.stockInfoDatabase);
     }
 
-    private void createChatJPanel() {
-        chatJPanel = new org.yccheok.jstock.chat.ChatJPanel();
-        jTabbedPane1.addTab(GUIBundle.getString("ChatJPanel_Title"), chatJPanel);
-        if (jStockOptions.isChatEnabled())
-        {
-            chatJPanel.startChatServiceManager();
-        }
-    }
-
     public PortfolioManagementJPanel getPortfolioManagementJPanel() {
         return this.portfolioManagementJPanel;
     }
@@ -1891,12 +1860,10 @@ public class MainFrame extends javax.swing.JFrame {
         this.jTabbedPane1.setIconAt(1, this.getImageIcon("/images/16x16/color_line.png"));
         this.jTabbedPane1.setIconAt(2, this.getImageIcon("/images/16x16/find.png"));
         this.jTabbedPane1.setIconAt(3, this.getImageIcon("/images/16x16/calc.png"));
-        this.jTabbedPane1.setIconAt(4, this.getImageIcon("/images/16x16/smile.png"));
         this.jTabbedPane1.setToolTipTextAt(0, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_WatchYourFavoriteStockMovement"));
         this.jTabbedPane1.setToolTipTextAt(1, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_CustomizeYourOwnStockIndicatorForAlertPurpose"));
         this.jTabbedPane1.setToolTipTextAt(2, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_ScanThroughTheEntireStockMarketSoThatYouWillBeInformedWhatToSellOrBuy"));
         this.jTabbedPane1.setToolTipTextAt(3, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_ManageYourRealTimePortfolioWhichEnableYouToTrackBuyAndSellRecords"));
-        this.jTabbedPane1.setToolTipTextAt(4, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_ChitChatWithOtherJStockUsersRegardingTheHottestStockMarketNews"));
     }
       
     public void createCountryMenuItem() {
@@ -1967,13 +1934,21 @@ public class MainFrame extends javax.swing.JFrame {
 
     private Image getMyIconImage()
     {
+        if (Utils.isWindows7()) {
+            return new javax.swing.ImageIcon(getClass().getResource("/images/128x128/chart.png")).getImage();
+        }
         return new javax.swing.ImageIcon(getClass().getResource("/images/16x16/chart.png")).getImage();
     }
     
     private void createSystemTrayIcon() {
         if (SystemTray.isSupported()) {
             SystemTray tray = SystemTray.getSystemTray();
-            Image image = new javax.swing.ImageIcon(getClass().getResource("/images/16x16/chart.png")).getImage();
+            final Image image;
+            if (Utils.isWindows7()) {
+                image = new javax.swing.ImageIcon(getClass().getResource("/images/128x128/chart.png")).getImage();
+            } else {
+                image = new javax.swing.ImageIcon(getClass().getResource("/images/16x16/chart.png")).getImage();
+            }
 
             MouseListener mouseListener = new MouseListener() {
 
@@ -2148,11 +2123,6 @@ public class MainFrame extends javax.swing.JFrame {
         this.portfolioManagementJPanel.initPortfolio();
         this.indicatorScannerJPanel.stop();
         this.indicatorScannerJPanel.clear();
-        this.chatJPanel.stopChatServiceManager();
-        if (jStockOptions.isChatEnabled())
-        {
-            this.chatJPanel.startChatServiceManager();
-        }
 
         // Need to read user-defined-database.xml.
         // The user-defined-database.xml is extracted from cloud
@@ -2235,11 +2205,6 @@ public class MainFrame extends javax.swing.JFrame {
         this.portfolioManagementJPanel.initPortfolio();
         this.indicatorScannerJPanel.stop();
         this.indicatorScannerJPanel.clear();
-        this.chatJPanel.stopChatServiceManager();
-        if (jStockOptions.isChatEnabled())
-        {
-            this.chatJPanel.startChatServiceManager();
-        }
 
         this.initDatabase(true);
         this.initMarketThread();
@@ -2837,6 +2802,11 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     private class MarketRunnable implements Runnable {
+        // 2 seconds.
+        private static final long MIN_DELAY = 2000;
+        private static final long MIN_DELAY_COUNTER = 3;
+        private int minDelayCounter = 0;
+        
         public MarketRunnable() {
         }
         
@@ -2847,6 +2817,7 @@ public class MainFrame extends javax.swing.JFrame {
             // Do not rely on isInterrupted flag only. The flag can be cleared by 3rd party easily.
             // Check for current thread as well.
             while (!currentThread.isInterrupted()  && (marketThread == currentThread)) {
+                boolean success = false;
                 final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactories();
                 for (StockServerFactory factory : stockServerFactories) {
                     MarketServer server = factory.getMarketServer();
@@ -2855,12 +2826,25 @@ public class MainFrame extends javax.swing.JFrame {
                     
                     if (market != null) {
                         update(market);
+                        success = true;
                         break;
                     }
                 }
                 
                 try {
-                    Thread.sleep(jStockOptions.getScanningSpeed());
+                    if (success) {
+                        Thread.sleep(jStockOptions.getScanningSpeed());
+                    } else {
+                        if (minDelayCounter < MIN_DELAY_COUNTER) {
+                            // Sleep as little as possible, to get the 1st reading
+                            // as soon as possible. MIN_DELAY_COUNTER is used to avoid
+                            // from getting our CPU and network too busy.
+                            minDelayCounter++;
+                            Thread.sleep(MIN_DELAY);
+                        } else {
+                            Thread.sleep(jStockOptions.getScanningSpeed());
+                        }
+                    }                    
                 } catch (InterruptedException exp) {
                     log.error(null, exp);
                     break;
@@ -4234,45 +4218,6 @@ public class MainFrame extends javax.swing.JFrame {
         return this.jTabbedPane1.getSelectedComponent();
     }
 
-    public void flashChatTabIfNeeded()
-    {
-        if (jStockOptions.isChatFlashNotificationEnabled() == false) {
-            return;
-        }
-
-        if (this.getSelectedComponent() == this.chatJPanel) {
-            return;
-        }
-
-        if (timer != null) {
-            return;
-        }
-
-        timer = new javax.swing.Timer(TIMER_DELAY, this.getTimerActionListener());
-        timer.setInitialDelay(0);
-        timer.start();
-    }
-
-    public void stopChatServiceManager()
-    {
-        this.chatJPanel.stopChatServiceManager();
-    }
-
-    public void startChatServiceManager()
-    {
-        this.chatJPanel.startChatServiceManager();
-    }
-
-    public void updateChatJPanelUIAccordingToOptions()
-    {
-        this.chatJPanel.updateUIAccordingToOptions();
-    }
-
-    private void initChatDatas() {
-        /* No overwrite. */
-        Utils.extractZipFile("chat" + File.separator + "chat.zip", false);
-    }
-
     // Unlike a JButton, setIcon() does not add an icon to the text label. 
     // Rather, in a radio button, the method is used to customize the icons used
     // to depict its state. However, by using the HTML capabilities in a label, 
@@ -4298,20 +4243,6 @@ public class MainFrame extends javax.swing.JFrame {
                 }
             }
         };
-    }
-
-    public boolean isChatLogin() {
-        return this.chatJPanel.isLogin();
-    }
-
-    /**
-     * Changes the chat password.
-     *
-     * @param newPassword new password
-     * @return true if success
-     */
-    public boolean changeChatPassword(String newPassword) {
-        return this.chatJPanel.changePassword(newPassword);
     }
 
     private void initDynamicCharts()
@@ -4426,7 +4357,6 @@ public class MainFrame extends javax.swing.JFrame {
     private IndicatorPanel indicatorPanel;
     private IndicatorScannerJPanel indicatorScannerJPanel;
     private PortfolioManagementJPanel portfolioManagementJPanel;
-    private org.yccheok.jstock.chat.ChatJPanel chatJPanel;
 
     private final AlertStateManager alertStateManager = new AlertStateManager();
     private ExecutorService emailAlertPool = Executors.newFixedThreadPool(1);
