@@ -54,6 +54,7 @@ import java.awt.image.ColorModel;
 import java.awt.image.PixelGrabber;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.BufferedInputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
@@ -1060,6 +1061,11 @@ public class Utils {
         return "Windows 7".equals(osName) && "6.1".equals(osVersion);        
     }
     
+    public static boolean isWindows8() {
+        String osVersion = System.getProperty("os.version");
+        return "6.2".equals(osVersion);        
+    }
+    
     public static boolean isWindows() {
         String windowsString = "Windows";
         String osName = System.getProperty("os.name");
@@ -1720,7 +1726,7 @@ public class Utils {
         if (applicationVersionID == APPLICATION_VERSION_ID) {
             return true;
         }
-        else if (applicationVersionID >= 1051 && applicationVersionID <= 1091) {
+        else if (applicationVersionID >= 1051 && applicationVersionID <= 1092) {
             return true;
         }
       
@@ -2342,7 +2348,11 @@ public class Utils {
                             }
                         }
                     });
-                    AudioInputStream inputStream = AudioSystem.getAudioInputStream(Utils.class.getResourceAsStream("/sounds/doorbell.wav"));
+                    final InputStream audioSrc = Utils.class.getResourceAsStream("/sounds/doorbell.wav");
+                    // http://stackoverflow.com/questions/5529754/java-io-ioexception-mark-reset-not-supported
+                    // Add buffer for mark/reset support.
+                    final InputStream bufferedIn = new BufferedInputStream(audioSrc);                    
+                    AudioInputStream inputStream = AudioSystem.getAudioInputStream(bufferedIn);
                     clip.open(inputStream);
                     clip.start();
                 } catch (Exception e) {
@@ -2813,9 +2823,9 @@ public class Utils {
     private static final String APPLICATION_VERSION_STRING = "1.0.6";
 
     // For About box comparision on latest version purpose.
-    // 1.0.6q
+    // 1.0.6r
     // Remember to update isCompatible method.
-    private static final int APPLICATION_VERSION_ID = 1092;
+    private static final int APPLICATION_VERSION_ID = 1093;
 
     private static Executor zombiePool = Executors.newFixedThreadPool(Utils.NUM_OF_THREADS_ZOMBIE_POOL);
 

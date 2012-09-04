@@ -1934,7 +1934,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private Image getMyIconImage()
     {
-        if (Utils.isWindows7()) {
+        if (Utils.isWindows7() || Utils.isWindows8()) {
             return new javax.swing.ImageIcon(getClass().getResource("/images/128x128/chart.png")).getImage();
         }
         return new javax.swing.ImageIcon(getClass().getResource("/images/16x16/chart.png")).getImage();
@@ -1944,7 +1944,7 @@ public class MainFrame extends javax.swing.JFrame {
         if (SystemTray.isSupported()) {
             SystemTray tray = SystemTray.getSystemTray();
             final Image image;
-            if (Utils.isWindows7()) {
+            if (Utils.isWindows7() || Utils.isWindows8()) {
                 image = new javax.swing.ImageIcon(getClass().getResource("/images/128x128/chart.png")).getImage();
             } else {
                 image = new javax.swing.ImageIcon(getClass().getResource("/images/16x16/chart.png")).getImage();
