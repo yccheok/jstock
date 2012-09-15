@@ -344,29 +344,12 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         Contract.ContractBuilder builder = new Contract.ContractBuilder(this.stock, date);
         
         Contract contract = builder.type(type).quantity(unit).price(price).build();
+
+        final double brokerFeeValue = (Double)this.jFormattedTextField3.getValue();
+        final double stampDutyValue = (Double)jFormattedTextField5.getValue();
+        final double clearingFeeValue = (Double)this.jFormattedTextField4.getValue();        
         
-        Broker broker = null;
-        StampDuty stampDuty = null;
-        ClearingFee clearingFee = null;
-        
-        if(this.shouldAutoCalculateBrokerFee()) {
-            final BrokingFirm brokingFirm = MainFrame.getInstance().getJStockOptions().getSelectedBrokingFirm();
-            broker = brokingFirm.getBroker();
-            stampDuty = brokingFirm.getStampDuty();
-            clearingFee = brokingFirm.getClearingFee();
-        }
-        else {
-            final double brokerFeeValue = (Double)this.jFormattedTextField3.getValue();
-            final double clearingFeeValue = (Double)this.jFormattedTextField4.getValue();
-            final double stampDutyValue = (Double)jFormattedTextField5.getValue();
-            
-            broker = org.yccheok.jstock.portfolio.Utils.getDummyBroker(brokerFeeValue);
-            /* We are limit to ourselves, that the fraction calculation, is based on contract's total. */
-            stampDuty = org.yccheok.jstock.portfolio.Utils.getDummyStampDuty(contract, stampDutyValue);
-            clearingFee = org.yccheok.jstock.portfolio.Utils.getDummyClearingFee(clearingFeeValue);
-        }
-        
-        Transaction t = new Transaction(contract, broker, stampDuty, clearingFee);
+        Transaction t = new Transaction(contract, brokerFeeValue, stampDutyValue, clearingFeeValue);
         t.setComment(transactionComment);
 
         return t;
@@ -482,7 +465,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         // follow the formatter text field's.
         commitEdit();
         
-        if(shouldAutoCalculateBrokerFee())
+        if (shouldAutoCalculateBrokerFee())
         {
             final BrokingFirm brokingFirm = MainFrame.getInstance().getJStockOptions().getSelectedBrokingFirm();
             
@@ -503,7 +486,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
                 jFormattedTextField4.setValue(clearingFee);
                 jFormattedTextField5.setValue(stampDuty);
                 jFormattedTextField2.setValue(price * (double)unit);                
-                jFormattedTextField6.setValue(price * (double)unit + brokerFee + clearingFee + stampDuty);                
+                jFormattedTextField6.setValue(price * (double)unit + brokerFee + clearingFee + stampDuty);
             }});
         }
         else {

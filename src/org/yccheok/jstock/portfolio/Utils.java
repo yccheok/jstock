@@ -246,18 +246,6 @@ public class Utils {
         return c0.equals(c1);
     }
 
-    public static ClearingFee getDummyClearingFee(double clearingFee) {
-        return new SimpleClearingFee("SimpleClearingfee", Double.MAX_VALUE, clearingFee, 0);
-    }
-
-    public static Broker getDummyBroker(double broker) {
-        return new SimpleBroker("SimpleBroker", Double.MAX_VALUE, broker, 0);
-    }
-
-    public static StampDuty getDummyStampDuty(Contract contract, double stampDuty) {
-        return new SimpleStampDuty("SimpleStampDuty", Double.MAX_VALUE, contract.getTotal(), stampDuty);
-    }
-
     /**
      * Returns portfolio directory, based on given portfolio name. There is
      * chance where the returned directory doesn't exist. To verify against

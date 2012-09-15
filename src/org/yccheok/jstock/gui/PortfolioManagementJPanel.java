@@ -519,7 +519,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                         final Contract.Type type = Contract.Type.Buy;
                         final Contract.ContractBuilder builder = new Contract.ContractBuilder(stock, simpleDate);
                         final Contract contract = builder.type(type).quantity(units).price(purchasePrice).build();
-                        final Transaction t = new Transaction(contract, org.yccheok.jstock.portfolio.Utils.getDummyBroker(broker), org.yccheok.jstock.portfolio.Utils.getDummyStampDuty(contract, stampDuty), org.yccheok.jstock.portfolio.Utils.getDummyClearingFee(clearingFee));
+                        final Transaction t = new Transaction(contract, broker, stampDuty, clearingFee);
                         t.setComment(org.yccheok.jstock.portfolio.Utils.replaceCSVLineFeedToSystemLineFeed(_comment));
                         transactions.add(t);
                     }
@@ -642,7 +642,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                         final Contract.Type type = Contract.Type.Sell;
                         final Contract.ContractBuilder builder = new Contract.ContractBuilder(stock, simpleDate);
                         final Contract contract = builder.type(type).quantity(units).price(sellingPrice).referencePrice(purchasePrice).referenceDate(simpleReferenceDate).build();
-                        final Transaction t = new Transaction(contract, org.yccheok.jstock.portfolio.Utils.getDummyBroker(broker), org.yccheok.jstock.portfolio.Utils.getDummyStampDuty(contract, stampDuty), org.yccheok.jstock.portfolio.Utils.getDummyClearingFee(clearingFee));
+                        final Transaction t = new Transaction(contract, broker, stampDuty, clearingFee);
                         t.setComment(org.yccheok.jstock.portfolio.Utils.replaceCSVLineFeedToSystemLineFeed(_comment));
                         transactions.add(t);
                     }   // for
@@ -934,9 +934,14 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             
             if (remain <= 0) {
                 portfolioTreeTableModel.removeTransaction(buyTransaction);
-            }
-            else {
-                this.editBuyTransaction(buyTransaction.deriveWithQuantity(remain), buyTransaction);
+            } else {
+                final double newBroker = buyTransaction.getCalculatedBroker() / buyTransaction.getQuantity() * remain;
+                final double newStampDuty = buyTransaction.getCalculatedStampDuty() / buyTransaction.getQuantity() * remain;
+                final double newClearingFee = buyTransaction.getCalculatdClearingFee() / buyTransaction.getQuantity() * remain;
+                
+                this.editBuyTransaction(
+                        buyTransaction.deriveWithQuantity(remain).deriveWithBroker(newBroker).deriveWithStampDuty(newStampDuty).deriveWithClearingFee(newClearingFee), 
+                        buyTransaction);
             }                        
         }
 

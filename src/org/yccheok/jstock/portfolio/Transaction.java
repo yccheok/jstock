@@ -28,16 +28,16 @@ import org.yccheok.jstock.gui.treetable.DefaultSortableMutableTreeTableNode;
  * @author Owner
  */
 public class Transaction extends DefaultSortableMutableTreeTableNode implements Commentable {
-    public Transaction(Contract contract, Broker broker, StampDuty stampDuty, ClearingFee clearingFee)
+    public Transaction(Contract contract, double broker, double stampDuty, double clearingFee)
     {
         this.contract = contract;
-        this.broker = broker;
-        this.stampDuty = stampDuty;
-        this.clearingFee = clearingFee;
+        this.broker = null;
+        this.stampDuty = null;
+        this.clearingFee = null;
 
-        this.calculatedBroker = broker.calculate(contract);
-        this.calculatedStampDuty = stampDuty.calculate(contract);
-        this.calculatdClearingFee = clearingFee.calculate(contract);
+        this.calculatedBroker = broker;
+        this.calculatedStampDuty = stampDuty;
+        this.calculatdClearingFee = clearingFee;
      
         if (contract.getType() == Contract.Type.Buy) {
             netTotal = this.contract.getTotal() + this.calculatedBroker + this.calculatedStampDuty + this.calculatdClearingFee;
@@ -48,9 +48,11 @@ public class Transaction extends DefaultSortableMutableTreeTableNode implements 
     }
     
     private Contract contract;
-    private Broker broker;
-    private StampDuty stampDuty;
-    private ClearingFee clearingFee;
+    
+    /* They shall be removed. They are still here and marked as transient, for xstream backward compatible purpose. */
+    private transient Broker broker;
+    private transient StampDuty stampDuty;
+    private transient ClearingFee clearingFee;
     
     private double calculatedBroker;
     private double calculatedStampDuty;
@@ -59,9 +61,10 @@ public class Transaction extends DefaultSortableMutableTreeTableNode implements 
     
     public void copyFrom(Transaction transaction) {
         contract = new Contract(transaction.contract);
-        broker = new SimpleBroker((SimpleBroker)transaction.broker);
-        stampDuty = new SimpleStampDuty((SimpleStampDuty)transaction.stampDuty);
-        clearingFee = new SimpleClearingFee((SimpleClearingFee)transaction.clearingFee);
+        // No longer used. We already marked them as transient.
+        //broker = new SimpleBroker((SimpleBroker)transaction.broker);
+        //stampDuty = new SimpleStampDuty((SimpleStampDuty)transaction.stampDuty);
+        //clearingFee = new SimpleClearingFee((SimpleClearingFee)transaction.clearingFee);
         this.calculatedBroker = transaction.calculatedBroker;
         this.calculatedStampDuty = transaction.calculatedStampDuty;
         this.calculatdClearingFee = transaction.calculatdClearingFee;
@@ -76,9 +79,9 @@ public class Transaction extends DefaultSortableMutableTreeTableNode implements 
      */
     public Transaction deriveWithQuantity(double quantity) {
         return new Transaction(contract.deriveWithQuantity(quantity),
-                new SimpleBroker((SimpleBroker)broker), 
-                new SimpleStampDuty((SimpleStampDuty)stampDuty),
-                new SimpleClearingFee((SimpleClearingFee)clearingFee));
+                calculatedBroker, 
+                calculatedStampDuty,
+                calculatdClearingFee);
     }
 
     /**
@@ -89,25 +92,34 @@ public class Transaction extends DefaultSortableMutableTreeTableNode implements 
      */
     public Transaction deriveWithPrice(double price) {
         return new Transaction(contract.deriveWithPrice(price),
-                new SimpleBroker((SimpleBroker)broker),
-                new SimpleStampDuty((SimpleStampDuty)stampDuty),
-                new SimpleClearingFee((SimpleClearingFee)clearingFee));
+                calculatedBroker,
+                calculatedStampDuty,
+                calculatdClearingFee);
     }
 
+    public Transaction deriveWithBroker(double broker) {
+        return new Transaction(contract,
+                broker,
+                calculatedStampDuty,
+                calculatdClearingFee);
+    }
+
+    public Transaction deriveWithStampDuty(double stampDuty) {
+        return new Transaction(contract,
+                calculatedBroker,
+                stampDuty,
+                calculatdClearingFee);
+    }
+    
+    public Transaction deriveWithClearingFee(double clearingFee) {
+        return new Transaction(contract,
+                calculatedBroker,
+                calculatedStampDuty,
+                clearingFee);
+    }
+    
     public Contract getContract() {
         return contract;
-    }
-
-    public Broker getBroker() {
-        return broker;
-    }
-
-    public StampDuty getStampDuty() {
-        return stampDuty;
-    }
-
-    public ClearingFee getClearingFee() {
-        return clearingFee;
     }
 
     public double getCalculatedBroker() {
