@@ -40,6 +40,7 @@ public class Statement {
         StockIndicatorScanner,
         StockHistory,
         StockPrice,
+        StockInfoDatabase,
         Unknown
     }
 
@@ -251,6 +252,11 @@ public class Statement {
         } else if (type == Type.StockPrice) {
             strings.add(guiBundleWrapper.getString("MainFrame_Code")); 
             strings.add(guiBundleWrapper.getString("MainFrame_Last"));             
+        } else if (type == Type.StockInfoDatabase) {
+            strings.add(guiBundleWrapper.getString("MainFrame_Code")); 
+            strings.add(guiBundleWrapper.getString("MainFrame_Symbol"));             
+            strings.add(guiBundleWrapper.getString("StockJDialog_Industry")); 
+            strings.add(guiBundleWrapper.getString("StockJDialog_Board"));            
         } else {
             assert(false);
         }
@@ -429,6 +435,17 @@ public class Statement {
                 return Type.StockPrice;
             }            
         }
+        if (size == 4) {
+            /* Wow! */
+            if (
+            atoms.get(0).getType().equals(guiBundleWrapper.getString("MainFrame_Code")) &&
+            atoms.get(1).getType().equals(guiBundleWrapper.getString("MainFrame_Symbol")) &&
+            atoms.get(2).getType().equals(guiBundleWrapper.getString("StockJDialog_Industry")) &&
+            atoms.get(3).getType().equals(guiBundleWrapper.getString("StockJDialog_Board"))
+            ) {
+                return Type.StockInfoDatabase;
+            }            
+        }        
         return Type.Unknown;
     }
 

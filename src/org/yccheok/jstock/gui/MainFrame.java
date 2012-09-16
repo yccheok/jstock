@@ -2911,6 +2911,10 @@ public class MainFrame extends javax.swing.JFrame {
             final Country country = jStockOptions.getCountry();
             
             Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database");
+            
+            // stock_info_file.xml, symbol_file.xml and name_file.xml all are 
+            // obsolote.
+            
             final File stock_info_file = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database" + File.separator + "stock-info-database.xml");
             // symbol_file is obsolote. It is being replaced by stock_info_file.
             final File symbol_file = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database" + File.separator + "stockcodeandsymboldatabase.xml");

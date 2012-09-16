@@ -35,6 +35,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +52,11 @@ import org.jdesktop.swingx.treetable.TreeTableModel;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.SimpleDate;
 import org.yccheok.jstock.engine.Stock;
+import org.yccheok.jstock.engine.Stock.Board;
+import org.yccheok.jstock.engine.Stock.Industry;
 import org.yccheok.jstock.engine.StockHistoryServer;
+import org.yccheok.jstock.engine.StockInfo;
+import org.yccheok.jstock.engine.StockInfoDatabase;
 import org.yccheok.jstock.file.GUIBundleWrapper.Language;
 import org.yccheok.jstock.gui.POIUtils;
 import org.yccheok.jstock.gui.portfolio.CommentableContainer;
@@ -397,6 +402,64 @@ public class Statements {
         }
 
         return UNKNOWN_STATEMENTS;
+    }
+    
+    public static Statements newInstanceFromStockInfoDatabase(StockInfoDatabase stockInfoDatabase) {
+        GUIBundleWrapper guiBundleWrapper = GUIBundleWrapper.newInstance(GUIBundleWrapper.Language.INDEPENDENT);
+        Statements s = new Statements(Statement.Type.StockInfoDatabase, guiBundleWrapper);
+        
+        // Build mechanism, to retrieve StockInfo's Board and Industry.
+        Map<StockInfo, Industry> stockInfo2Industry = new HashMap<StockInfo, Industry>();
+        Map<StockInfo, Board> stockInfo2Board = new HashMap<StockInfo, Board>();
+        
+        List<Industry> industries = stockInfoDatabase.getIndustries();
+        List<Board> boards = stockInfoDatabase.getBoards();
+        
+        for (Industry industry : industries) {
+            List<StockInfo> stockInfos = stockInfoDatabase.getStockInfos(industry);
+            for (StockInfo stockInfo : stockInfos) {
+                stockInfo2Industry.put(stockInfo, industry);
+            }
+        }
+        
+        for (Board board : boards) {
+            List<StockInfo> stockInfos = stockInfoDatabase.getStockInfos(board);
+            for (StockInfo stockInfo : stockInfos) {
+                stockInfo2Board.put(stockInfo, board);
+            }
+        }   
+        
+        final String code_string = guiBundleWrapper.getString("MainFrame_Code");
+        final String symbol_string = guiBundleWrapper.getString("MainFrame_Symbol");
+        final String industry_string = guiBundleWrapper.getString("StockJDialog_Industry");
+        final String board_string = guiBundleWrapper.getString("StockJDialog_Board");
+        
+        List<StockInfo> stockInfos = stockInfoDatabase.getStockInfos();
+        for (StockInfo stockInfo : stockInfos) {
+            Industry industry = stockInfo2Industry.get(stockInfo);
+            Board board = stockInfo2Board.get(stockInfo);
+            if (industry == null) {
+                // Shouldn't happen.
+                industry = Industry.Unknown;
+            }
+            if (board == null) {
+                // Shouldn't happen.
+                board = Board.Unknown;
+            }            
+            final List<Atom> atoms = new ArrayList<Atom>();
+            atoms.add(new Atom(stockInfo.code, code_string));
+            atoms.add(new Atom(stockInfo.symbol, symbol_string));
+            atoms.add(new Atom(industry, industry_string));
+            atoms.add(new Atom(board, board_string)); 
+            Statement statement = new Statement(atoms);
+            
+            // They should be the same type. The checking just act as paranoid.
+            if (s.getType() != statement.getType()) {
+                throw new java.lang.RuntimeException("" + statement.getType());
+            }
+            s.statements.add(statement);            
+        }
+        return s;
     }
     
     public static Statements newInstanceFromStockPrices(Map<Code, Double> stockPrices) {
