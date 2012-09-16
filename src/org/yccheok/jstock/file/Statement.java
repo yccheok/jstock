@@ -41,6 +41,8 @@ public class Statement {
         StockHistory,
         StockPrice,
         StockInfoDatabase,
+        UserDefinedDatabase,
+        StockNameDatabase,
         Unknown
     }
 
@@ -255,8 +257,14 @@ public class Statement {
         } else if (type == Type.StockInfoDatabase) {
             strings.add(guiBundleWrapper.getString("MainFrame_Code")); 
             strings.add(guiBundleWrapper.getString("MainFrame_Symbol"));             
-            strings.add(guiBundleWrapper.getString("StockJDialog_Industry")); 
-            strings.add(guiBundleWrapper.getString("StockJDialog_Board"));            
+            strings.add(guiBundleWrapper.getString("MainFrame_Industry")); 
+            strings.add(guiBundleWrapper.getString("MainFrame_Board"));            
+        } else if (type == Type.UserDefinedDatabase) {
+            strings.add(guiBundleWrapper.getString("MainFrame_Code")); 
+            strings.add(guiBundleWrapper.getString("MainFrame_Symbol"));            
+        } else if (type == Type.StockNameDatabase) {
+            strings.add(guiBundleWrapper.getString("MainFrame_Code")); 
+            strings.add(guiBundleWrapper.getString("MainFrame_Name"));            
         } else {
             assert(false);
         }
@@ -440,10 +448,28 @@ public class Statement {
             if (
             atoms.get(0).getType().equals(guiBundleWrapper.getString("MainFrame_Code")) &&
             atoms.get(1).getType().equals(guiBundleWrapper.getString("MainFrame_Symbol")) &&
-            atoms.get(2).getType().equals(guiBundleWrapper.getString("StockJDialog_Industry")) &&
-            atoms.get(3).getType().equals(guiBundleWrapper.getString("StockJDialog_Board"))
+            atoms.get(2).getType().equals(guiBundleWrapper.getString("MainFrame_Industry")) &&
+            atoms.get(3).getType().equals(guiBundleWrapper.getString("MainFrame_Board"))
             ) {
                 return Type.StockInfoDatabase;
+            }            
+        }     
+        if (size == 2) {
+            /* Wow! */
+            if (
+            atoms.get(0).getType().equals(guiBundleWrapper.getString("MainFrame_Code")) &&
+            atoms.get(1).getType().equals(guiBundleWrapper.getString("MainFrame_Symbol"))
+            ) {
+                return Type.UserDefinedDatabase;
+            }            
+        }
+        if (size == 2) {
+            /* Wow! */
+            if (
+            atoms.get(0).getType().equals(guiBundleWrapper.getString("MainFrame_Code")) &&
+            atoms.get(1).getType().equals(guiBundleWrapper.getString("MainFrame_Name"))
+            ) {
+                return Type.StockNameDatabase;
             }            
         }        
         return Type.Unknown;

@@ -57,8 +57,11 @@ import org.yccheok.jstock.engine.Stock.Industry;
 import org.yccheok.jstock.engine.StockHistoryServer;
 import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.engine.StockInfoDatabase;
+import org.yccheok.jstock.engine.StockNameDatabase;
+import org.yccheok.jstock.engine.Symbol;
 import org.yccheok.jstock.file.GUIBundleWrapper.Language;
 import org.yccheok.jstock.gui.POIUtils;
+import org.yccheok.jstock.gui.Pair;
 import org.yccheok.jstock.gui.portfolio.CommentableContainer;
 import org.yccheok.jstock.gui.treetable.AbstractPortfolioTreeTableModelEx;
 import org.yccheok.jstock.gui.treetable.BuyPortfolioTreeTableModelEx;
@@ -404,6 +407,64 @@ public class Statements {
         return UNKNOWN_STATEMENTS;
     }
     
+    /**
+     * Construct Statements based on given stock pairs.
+     *
+     * @param tableModel give stock pairs
+     * @return the constructed Statements. UNKNOWN_STATEMENTS if fail
+     */        
+    public static Statements newInstanceFromUserDefinedDatabase(java.util.List<Pair<Code, Symbol>> pairs) {
+        GUIBundleWrapper guiBundleWrapper = GUIBundleWrapper.newInstance(GUIBundleWrapper.Language.INDEPENDENT);
+        Statements s = new Statements(Statement.Type.UserDefinedDatabase, guiBundleWrapper);
+        
+        final String code_string = guiBundleWrapper.getString("MainFrame_Code");
+        final String symbol_string = guiBundleWrapper.getString("MainFrame_Symbol");
+        
+        for (Pair<Code, Symbol> pair : pairs) {
+            final List<Atom> atoms = new ArrayList<Atom>();
+            atoms.add(new Atom(pair.getFirst(), code_string));
+            atoms.add(new Atom(pair.getSecond(), symbol_string));
+            Statement statement = new Statement(atoms);
+            
+            // They should be the same type. The checking just act as paranoid.
+            if (s.getType() != statement.getType()) {
+                throw new java.lang.RuntimeException("" + statement.getType());
+            }
+            s.statements.add(statement);            
+        }
+        return s;
+    }
+    
+    public static Statements newInstanceFromStockNameDatabase(StockNameDatabase stockNameDatabase) {
+        GUIBundleWrapper guiBundleWrapper = GUIBundleWrapper.newInstance(GUIBundleWrapper.Language.INDEPENDENT);
+        Statements s = new Statements(Statement.Type.StockNameDatabase, guiBundleWrapper);
+        
+        final String code_string = guiBundleWrapper.getString("MainFrame_Code");
+        final String name_string = guiBundleWrapper.getString("MainFrame_Name");
+        
+        for (Map.Entry<Code, String> entry : stockNameDatabase.getCodeToName().entrySet()) {
+            final Code code = entry.getKey();
+            final String name = entry.getValue();
+            final List<Atom> atoms = new ArrayList<Atom>();
+            atoms.add(new Atom(code, code_string));
+            atoms.add(new Atom(name, name_string));
+            Statement statement = new Statement(atoms);
+            
+            // They should be the same type. The checking just act as paranoid.
+            if (s.getType() != statement.getType()) {
+                throw new java.lang.RuntimeException("" + statement.getType());
+            }
+            s.statements.add(statement);            
+        }
+        return s;
+    }
+    
+    /**
+     * Construct Statements based on given stock info database.
+     *
+     * @param tableModel give stock info database
+     * @return the constructed Statements. UNKNOWN_STATEMENTS if fail
+     */    
     public static Statements newInstanceFromStockInfoDatabase(StockInfoDatabase stockInfoDatabase) {
         GUIBundleWrapper guiBundleWrapper = GUIBundleWrapper.newInstance(GUIBundleWrapper.Language.INDEPENDENT);
         Statements s = new Statements(Statement.Type.StockInfoDatabase, guiBundleWrapper);
@@ -431,8 +492,8 @@ public class Statements {
         
         final String code_string = guiBundleWrapper.getString("MainFrame_Code");
         final String symbol_string = guiBundleWrapper.getString("MainFrame_Symbol");
-        final String industry_string = guiBundleWrapper.getString("StockJDialog_Industry");
-        final String board_string = guiBundleWrapper.getString("StockJDialog_Board");
+        final String industry_string = guiBundleWrapper.getString("MainFrame_Industry");
+        final String board_string = guiBundleWrapper.getString("MainFrame_Board");
         
         List<StockInfo> stockInfos = stockInfoDatabase.getStockInfos();
         for (StockInfo stockInfo : stockInfos) {
@@ -465,6 +526,12 @@ public class Statements {
         return s;
     }
     
+    /**
+     * Construct Statements based on given stock price.
+     *
+     * @param tableModel give stock price
+     * @return the constructed Statements. UNKNOWN_STATEMENTS if fail
+     */
     public static Statements newInstanceFromStockPrices(Map<Code, Double> stockPrices) {
         GUIBundleWrapper guiBundleWrapper = GUIBundleWrapper.newInstance(GUIBundleWrapper.Language.INDEPENDENT);
         Statements s = new Statements(Statement.Type.StockPrice, guiBundleWrapper);
@@ -490,7 +557,7 @@ public class Statements {
     /**
      * Construct Statements based on given TableModel.
      *
-     * @param tableModel Given TableModel
+     * @param tableModel given TableModel
      * @return the constructed Statements. UNKNOWN_STATEMENTS if fail
      */
     public static Statements newInstanceFromTableModel(TableModel tableModel, boolean languageIndependent) {
@@ -576,7 +643,7 @@ public class Statements {
     /**
      * Construct Statements based on given AbstractPortfolioTreeTableModel.
      *
-     * @param abstractPortfolioTreeTableModel Given AbstractPortfolioTreeTableModel
+     * @param abstractPortfolioTreeTableModel given AbstractPortfolioTreeTableModel
      * @return the constructed Statements. UNKNOWN_STATEMENTS if fail
      */
     private static Statements newInstanceFromAbstractPortfolioTreeTableModel(AbstractPortfolioTreeTableModelEx abstractPortfolioTreeTableModel, boolean languageIndependent) {
