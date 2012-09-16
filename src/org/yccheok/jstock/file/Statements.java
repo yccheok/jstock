@@ -449,8 +449,11 @@ public class Statements {
             final List<Atom> atoms = new ArrayList<Atom>();
             atoms.add(new Atom(stockInfo.code, code_string));
             atoms.add(new Atom(stockInfo.symbol, symbol_string));
-            atoms.add(new Atom(industry, industry_string));
-            atoms.add(new Atom(board, board_string)); 
+            // Do not use toString, as we had overridden toString. Use 
+            // toOriginalString, as later we need to perfrom string to enum 
+            // conversion.
+            atoms.add(new Atom(industry.toOriginalString(), industry_string));
+            atoms.add(new Atom(board.toOriginalString(), board_string)); 
             Statement statement = new Statement(atoms);
             
             // They should be the same type. The checking just act as paranoid.

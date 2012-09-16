@@ -715,6 +715,10 @@ public class Stock {
         public String toString() {
             return name;
         }
+        
+        public String toOriginalString() {
+            return super.toString();
+        }        
     }
         
     public enum Industry {
@@ -747,6 +751,10 @@ public class Stock {
         @Override
         public String toString() {
             return name;
+        }
+        
+        public String toOriginalString() {
+            return super.toString();
         }
     }
             
