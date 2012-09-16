@@ -102,10 +102,11 @@ public class GUIBundleWrapper {
         _map.put("MainFrame_RiseAbove", "Rise Above");
         
         // For stock info.
-        _map.put("StockJDialog_Industry", "Industry");
-        _map.put("StockJDialog_Board", "Board");
-
-                
+        _map.put("MainFrame_Industry", "Industry");
+        _map.put("MainFrame_Board", "Board");
+        // For stock name.
+        _map.put("MainFrame_Name", "Name");
+        
         _map.put("PortfolioManagementJPanel_Stock", "Stock");      
         _map.put("PortfolioManagementJPanel_Date", "Date");
         _map.put("PortfolioManagementJPanel_Units", "Units");    

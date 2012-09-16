@@ -44,6 +44,10 @@ public class StockNameDatabase {
         }
     }
 
+    public Map<Code, String> getCodeToName() {
+        return java.util.Collections.unmodifiableMap(codeToName);
+    }
+    
     /**
      * Returns name based on the code.
      * 

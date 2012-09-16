@@ -117,7 +117,7 @@ public class StockInfoDatabase {
             _stockInfos.add(stockInfo);
 
             // Initialize codeToStockInfo and symbolToStockInfos.
-            codeToStockInfo.put(stockInfo.code, stockInfo);
+            codeToStockInfos.put(stockInfo.code, stockInfo);
             List<StockInfo> s = symbolToStockInfos.get(stockInfo.symbol);
             if (s == null) {
                 s = new ArrayList<StockInfo>();
@@ -400,7 +400,7 @@ public class StockInfoDatabase {
         }
 
         // We need to ensure there is no duplicated stock info being added.
-        if (this.stockInfos.contains(stockInfo)) {
+        if (symbolToStockInfos.containsKey(stockInfo.symbol) || codeToStockInfos.containsKey(stockInfo.code)) {
             return false;
         }
 
@@ -444,7 +444,7 @@ public class StockInfoDatabase {
         _stockInfos.add(stockInfo);
 
         // Initialize codeToStockInfo and symbolToStockInfos.
-        codeToStockInfo.put(stockInfo.code, stockInfo);
+        codeToStockInfos.put(stockInfo.code, stockInfo);
         List<StockInfo> s = symbolToStockInfos.get(stockInfo.symbol);
         if (s == null) {
             s = new ArrayList<StockInfo>();
@@ -510,7 +510,7 @@ public class StockInfoDatabase {
     public StockInfo codeToStockInfo(Code code) {
         reader.lock();
         try {
-            return codeToStockInfo.get(code);
+            return codeToStockInfos.get(code);
         } finally {
             reader.unlock();
         }
@@ -571,7 +571,7 @@ public class StockInfoDatabase {
     private Object readResolve() {
         // Initialize all transient variables.
         symbolToStockInfos = new HashMap<Symbol, List<StockInfo>>();
-        codeToStockInfo = new HashMap<Code, StockInfo>();
+        codeToStockInfos = new HashMap<Code, StockInfo>();
 
         List<StockInfo> stockInfosWithSymbolAsString = new ArrayList<StockInfo>();
         for (StockInfo stockInfo : stockInfos) {
@@ -587,7 +587,7 @@ public class StockInfoDatabase {
         writer = readWriteLock.writeLock();
 
         for (StockInfo stockInfo : stockInfos) {
-            codeToStockInfo.put(stockInfo.code, stockInfo);
+            codeToStockInfos.put(stockInfo.code, stockInfo);
             List<StockInfo> s = symbolToStockInfos.get(stockInfo.symbol);
             if (s == null) {
                 s = new ArrayList<StockInfo>();
@@ -609,7 +609,7 @@ public class StockInfoDatabase {
     // Symbol to list of stock info mapping.
     private transient Map<Symbol, List<StockInfo>> symbolToStockInfos = new HashMap<Symbol, List<StockInfo>>();
     // Code to stock info mapping.
-    private transient Map<Code, StockInfo> codeToStockInfo = new HashMap<Code, StockInfo>();
+    private transient Map<Code, StockInfo> codeToStockInfos = new HashMap<Code, StockInfo>();
 
     // Symbol String -> StockInfo (with its toString returns Symbol)
     private transient SearchEngine<StockInfo> symbolSearchEngine;
