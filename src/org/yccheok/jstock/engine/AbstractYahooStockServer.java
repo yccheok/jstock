@@ -47,8 +47,9 @@ public abstract class AbstractYahooStockServer extends Subject<AbstractYahooStoc
         if (expectedSize <= 0) {
             return true;
         }
-        double result = 100.0 - ((double)(expectedSize - currSize) / (double)expectedSize * 100.0);
-        return (result >= STABILITY_RATE);
+        //double result = 100.0 - ((double)(expectedSize - currSize) / (double)expectedSize * 100.0);
+        //return (result >= STABILITY_RATE);
+        return currSize > 0;
     }
 
     @Override
@@ -176,7 +177,7 @@ public abstract class AbstractYahooStockServer extends Subject<AbstractYahooStoc
         final StringBuilder stringBuilder = new StringBuilder(getYahooCSVBasedURL());
         final StringBuilder codeBuilder = new StringBuilder();
         final List<Code> expectedCodes = new ArrayList<Code>();
-
+        
         final int endLoop = end - 1;
         for (int i = start; i < endLoop; i++) {
             String codeString = null;
