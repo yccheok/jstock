@@ -285,19 +285,19 @@ public class Utils {
             final File userDefinedDatabaseCSVFile = new File(destBaseDirectory + country + File.separator + "database" + File.separator + "user-defined-database.csv");
             
             final java.util.List<Pair<Code, Symbol>> pairs = org.yccheok.jstock.gui.Utils.fromXML(java.util.List.class, userDefinedDatabaseXMLFile);            
-            if (pairs == null || pairs.isEmpty()) {
-                continue;
+            if (pairs != null && !pairs.isEmpty()) {
+                final Statements statements = Statements.newInstanceFromUserDefinedDatabase(pairs);
+                boolean r = statements.saveAsCSVFile(userDefinedDatabaseCSVFile);
+                if (r) {
+                    userDefinedDatabaseXMLFile.delete();
+                }  
+                result = r & result;
             }
-            final Statements statements = Statements.newInstanceFromUserDefinedDatabase(pairs);
-            boolean r = statements.saveAsCSVFile(userDefinedDatabaseCSVFile);
-            if (r) {
-                userDefinedDatabaseXMLFile.delete();
-            }  
-            result = r & result;
-            
+
+            // Delete these old XML files. We can re-generate new CSV from database.zip.
+            new File(srcBaseDirectory + country + File.separator + "database" + File.separator + "stock-name-database.xml").delete();
             new File(destBaseDirectory + country + File.separator + "database" + File.separator + "stock-info-database.xml").delete();
             new File(destBaseDirectory + country + File.separator + "database" + File.separator + "stockcodeandsymboldatabase.xml").delete();
-            new File(destBaseDirectory + country + File.separator + "database" + File.separator + "stock-name-database.xml").delete();            
         }
         return result;
     }

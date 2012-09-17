@@ -3092,9 +3092,7 @@ public class MainFrame extends javax.swing.JFrame {
             // explicitly doesn't allow us to read from disk. Let's perform
             // networking stuff.
             //
-            // For networking stuff, first, we will try on JStock static server.
-            // If fail, we will continue to try on Yahoo Stock Server (Or other
-            // stock servers).
+            // For networking stuff, we will try on JStock static server.
             Boolean success = false;
             StockInfoDatabase tmp_stock_info_database = null;
             StockNameDatabase tmp_name_database = null;
@@ -3464,7 +3462,9 @@ public class MainFrame extends javax.swing.JFrame {
         boolean b0 = true;
 
         if (name_database != null) {
-            b0 = org.yccheok.jstock.gui.Utils.toXML(name_database, org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database" + File.separator + "stock-name-database.xml");
+            final Statements statements = Statements.newInstanceFromStockNameDatabase(name_database);
+            final File stockNameDatabaseCSVFile = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database" + File.separator + "stock-name-database.csv");
+            b0 = statements.saveAsCSVFile(stockNameDatabaseCSVFile);
         }
 
         if (stock_info_database == null)
