@@ -3056,6 +3056,9 @@ public class MainFrame extends javax.swing.JFrame {
                 if (tmp_stock_info_database != null && false == tmp_stock_info_database.isEmpty()) {
                     // Yes. We need to integrate "user-defined-database.csv" into tmp_stock_info_database
                     final java.util.List<Pair<Code, Symbol>> pairs = loadUserDefinedDatabaseFromCSV(country);
+                    
+                    boolean addUserDefinedStockInfoSuccessAtLeastOnce = false;
+                    
                     if (pairs.isEmpty() == false) {
                         // Remove the old user defined database. Legacy stockcodeandsymboldatabase.xml
                         // may contain user defined codes.
@@ -3063,8 +3066,15 @@ public class MainFrame extends javax.swing.JFrame {
                         
                         // Insert with new user defined code.
                         for (Pair<Code, Symbol> pair : pairs) {
-                            tmp_stock_info_database.addUserDefinedStockInfo(new StockInfo(pair.getFirst(), pair.getSecond()));
+                            if (tmp_stock_info_database.addUserDefinedStockInfo(new StockInfo(pair.getFirst(), pair.getSecond()))) {
+                                addUserDefinedStockInfoSuccessAtLeastOnce = true;
+                            }
                         }
+                    }
+
+                    if (false == addUserDefinedStockInfoSuccessAtLeastOnce) {
+                        // user-defined-database.csv is no longer needed.
+                        new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database" + File.separator + "user-defined-database.csv").delete();
                     }
 
                     // Prepare proper synchronization for us to change country.
@@ -3491,9 +3501,9 @@ public class MainFrame extends javax.swing.JFrame {
         // which is very unlikely. Because during application startup, we will
         // always check the existance of stock-info-database.xml.
         boolean b2 = true;
-        final File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database" + File.separator + "stock-info-database.xml");
+        final File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database" + File.separator + "stock-info-database.csv");
         if (f.exists() == false) {
-            b2 = Utils.toXML(stock_info_database, f);
+            b2 = this.saveStockInfoDatabaseAsCSV(country, stock_info_database);
         }
 
         return b0 && b1 && b2;

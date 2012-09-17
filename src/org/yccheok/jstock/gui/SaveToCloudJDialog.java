@@ -834,7 +834,7 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
     private static List<File> getUserDefinedDatabaseFiles() {
         final List<File> files = new ArrayList<File>();
         for (Country country : Country.values()) {
-            final File file = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database" + File.separator + "user-defined-database.xml");
+            final File file = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database" + File.separator + "user-defined-database.csv");
             if (file.exists()) {
                 files.add(file);
             }

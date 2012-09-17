@@ -366,7 +366,9 @@ public class StockInfoDatabase {
         try {
             List<StockInfo> _stockInfos = this.industryToStockInfos.get(Stock.Industry.UserDefined);
             if (_stockInfos == null) {
-                return Collections.emptyList();
+                // Do not return Collections.emptyList(), as the returned list
+                // need to be a mutable list.
+                return new ArrayList<StockInfo>();
             }
             // Construct a new list as StockInfoDatabase is a mutable class.
             return new ArrayList<StockInfo>(_stockInfos);

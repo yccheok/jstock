@@ -292,6 +292,8 @@ public class Utils {
                     userDefinedDatabaseXMLFile.delete();
                 }  
                 result = r & result;
+            } else {
+                userDefinedDatabaseXMLFile.delete();
             }
 
             // Delete these old XML files. We can re-generate new CSV from database.zip.
