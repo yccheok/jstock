@@ -22,7 +22,6 @@ package org.yccheok.jstock.gui;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

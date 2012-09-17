@@ -2828,16 +2828,44 @@ public class MainFrame extends javax.swing.JFrame {
             while (!currentThread.isInterrupted()  && (marketThread == currentThread)) {
                 boolean success = false;
                 final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactories();
+                
+                int best = 0;
+                Market bestMarket = null;
+                                                
                 for (StockServerFactory factory : stockServerFactories) {
                     MarketServer server = factory.getMarketServer();
                     
                     final Market market = server.getMarket();
                     
                     if (market != null) {
-                        update(market);
-                        success = true;
-                        break;
+                        // Pretty hacking way to check how good is the returned
+                        // result. We should tighten rule for isToleranceAllowed.
+                        // However, that will create another set of problem.
+                        // Say in stock watchlist, we are having 1 bad stock and
+                        // 1 good stock within single request. Tighten rule for 
+                        // isToleranceAllowed will always fail the entire request
+                        // result.
+                        java.util.List<Index> indices = org.yccheok.jstock.engine.Utils.getStockIndices(market.getCountry());                
+                        int good = 0;
+                        for (Index index : indices) {
+                            final double _index = market.getIndex(index);
+                            if (_index != 0.0) {
+                                good++;
+                            }
+                        }
+                        if (good > best) {
+                            best = good;
+                            bestMarket = market;
+                            if (best == indices.size()) {
+                                break;
+                            }
+                        }                        
                     }
+                }
+                
+                if (bestMarket != null) {
+                    update(bestMarket);
+                    success = true;
                 }
                 
                 try {
