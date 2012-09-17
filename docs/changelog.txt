@@ -8,7 +8,9 @@ JStock 1.0.6s - xxxx-xx-xx
            Singapore and UnitedStates. Thanks to http://eoddata.com/
   Bugfix : Bug fixed on isToleranceAllowed. It may cause JStock failed to retrieve
            stock quote sometimes.
-           
+  Bugfix:  Bug fixed on unable to add user defined stock as we are using 
+           immutable list.
+  
 JStock 1.0.6r - 2012-09-04
   Bugfix:  Fix an old alert sound bug. Thanks for the testing effort by
            Kerry & Karen Reeves.
