@@ -32,7 +32,9 @@ import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.AjaxYahooSearchEngine.ResultType;
 import org.yccheok.jstock.engine.Stock.Board;
 import org.yccheok.jstock.engine.Stock.Industry;
+import org.yccheok.jstock.file.Statements;
 import org.yccheok.jstock.gui.MainFrame;
+import org.yccheok.jstock.gui.Pair;
 
 /**
  *
@@ -274,6 +276,30 @@ public class Utils {
             org.yccheok.jstock.gui.Utils.close(fileInputStream);
         }
         return stocks;
+    }
+    
+    public static boolean migrateXMLToCSVDatabases(String srcBaseDirectory, String destBaseDirectory) {
+        boolean result = true;
+        for (Country country : Country.values()) {
+            final File userDefinedDatabaseXMLFile = new File(srcBaseDirectory + country + File.separator + "database" + File.separator + "user-defined-database.xml");
+            final File userDefinedDatabaseCSVFile = new File(destBaseDirectory + country + File.separator + "database" + File.separator + "user-defined-database.csv");
+            
+            final java.util.List<Pair<Code, Symbol>> pairs = org.yccheok.jstock.gui.Utils.fromXML(java.util.List.class, userDefinedDatabaseXMLFile);            
+            if (pairs == null || pairs.isEmpty()) {
+                continue;
+            }
+            final Statements statements = Statements.newInstanceFromUserDefinedDatabase(pairs);
+            boolean r = statements.saveAsCSVFile(userDefinedDatabaseCSVFile);
+            if (r) {
+                userDefinedDatabaseXMLFile.delete();
+            }  
+            result = r & result;
+            
+            new File(destBaseDirectory + country + File.separator + "database" + File.separator + "stock-info-database.xml").delete();
+            new File(destBaseDirectory + country + File.separator + "database" + File.separator + "stockcodeandsymboldatabase.xml").delete();
+            new File(destBaseDirectory + country + File.separator + "database" + File.separator + "stock-name-database.xml").delete();            
+        }
+        return result;
     }
     
     private static final List<Index> australiaIndices = new ArrayList<Index>();

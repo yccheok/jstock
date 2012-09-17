@@ -2734,6 +2734,11 @@ public class Utils {
         return "$";
     }
     
+    public static boolean isDatabaseFilesInXML(int version) {
+        // 1093 = 1.0.6r
+        return version <= 1093;
+    }
+    
     public static boolean isWatchlistAndPortfolioFilesInXML(int version) {
         // 1090 = 1.0.6o
         return version <= 1090;

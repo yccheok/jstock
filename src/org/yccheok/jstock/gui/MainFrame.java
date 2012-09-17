@@ -1602,7 +1602,11 @@ public class MainFrame extends javax.swing.JFrame {
                         System.exit(-1);
                     }
                 }                                  
-                                                
+                    
+                if (Utils.isDatabaseFilesInXML(jStockOptions.getApplicationVersionID())) {
+                    org.yccheok.jstock.engine.Utils.migrateXMLToCSVDatabases(Utils.getUserDataDirectory(), Utils.getUserDataDirectory());
+                }
+                
                 mainFrame.init();
                 mainFrame.setVisible(true);
                 mainFrame.updateDividerLocation();
@@ -2893,15 +2897,6 @@ public class MainFrame extends javax.swing.JFrame {
         return result;
     }
     
-    private java.util.List<Pair<Code, Symbol>> loadUserDefinedDatabaseFromXML(Country country) {
-        final File userDefinedDatabaseXMLFile = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database" + File.separator + "user-defined-database.xml");        
-        final java.util.List<Pair<Code, Symbol>> pairs = org.yccheok.jstock.gui.Utils.fromXML(java.util.List.class, userDefinedDatabaseXMLFile);
-        if (pairs == null) {
-            return new ArrayList<Pair<Code, Symbol>>();
-        }
-        return pairs;        
-    }
-    
     private java.util.List<Pair<Code, Symbol>> loadUserDefinedDatabaseFromCSV(Country country) {
         final File userDefinedDatabaseCSVFile = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database" + File.separator + "user-defined-database.csv");
         
@@ -3038,12 +3033,6 @@ public class MainFrame extends javax.swing.JFrame {
             final Country country = jStockOptions.getCountry();
             
             Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database");
-            
-            // stock-info-database.xml, stock-name-database.xml and stockcodeandsymboldatabase.xml are all
-            // obsolote.
-            new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database" + File.separator + "stock-info-database.xml").delete();
-            new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database" + File.separator + "stockcodeandsymboldatabase.xml").delete();
-            new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database" + File.separator + "stock-name-database.xml").delete();
 
             if (this.readFromDisk)
             {

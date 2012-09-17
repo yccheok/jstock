@@ -473,10 +473,17 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
                 }
 
                 publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_ExtractingData..."), Icons.BUSY));
-                final boolean status = Utils.isWatchlistAndPortfolioFilesInXML(cloudFile.version) ? 
-                        extractZipFileWithXMLToCSVCoversion(cloudFile.file) :
-                        Utils.extractZipFile(cloudFile.file, true);
-
+                boolean status = Utils.extractZipFile(cloudFile.file, true);
+                
+                if (Utils.isWatchlistAndPortfolioFilesInXML(cloudFile.version)) {
+                    status = status & org.yccheok.jstock.portfolio.Utils.migrateXMLToCSVPortfolios(Utils.getUserDataDirectory(), Utils.getUserDataDirectory());
+                    status = status & org.yccheok.jstock.watchlist.Utils.migrateXMLToCSVWatchlists(Utils.getUserDataDirectory(), Utils.getUserDataDirectory());
+                }
+                    
+                if (Utils.isDatabaseFilesInXML(cloudFile.version)) {
+                    status = status & org.yccheok.jstock.engine.Utils.migrateXMLToCSVDatabases(Utils.getUserDataDirectory(), Utils.getUserDataDirectory());
+                }
+                
                 // Place isCancelled check after time consuming operation.
                 // Not the best way, but perhaps the easiest way to cancel
                 // the operation.
@@ -504,31 +511,6 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
         return worker;
     }
 
-    private boolean extractZipFileWithXMLToCSVCoversion(File file) {
-        File tempDir = Utils.createTempDir();
-        final String tempDirString = org.yccheok.jstock.gui.Utils.toEndWithFileSeperator(tempDir.getAbsolutePath());
-        Utils.extractZipFile(file, tempDirString, true);
-
-        boolean status = true;
-        
-        if (org.yccheok.jstock.portfolio.Utils.migrateXMLToCSVPortfolios(tempDirString, Utils.getUserDataDirectory())) {
-            System.out.println("XML to CSV portfolios migration done :)");
-        } else {
-            System.out.println("XML to CSV portfolios migration failed!");
-            status = false;
-        } 
-
-        if (org.yccheok.jstock.watchlist.Utils.migrateXMLToCSVWatchlists(tempDirString, Utils.getUserDataDirectory())) {
-            System.out.println("XML to CSV watchlists migration done :)");
-        } else {
-            System.out.println("XML to CSV watchlists migration failed!");
-            status = false;
-        } 
-                    
-        status = status & Utils.deleteDir(tempDir, true);
-        return status;
-    }
-    
     private void writeToMemoryLog(String message) {
         // http://www.leepoint.net/notes-java/io/10file/sys-indep-newline.html
         // public static String newline = System.getProperty("line.separator");
