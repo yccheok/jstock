@@ -935,9 +935,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             if (remain <= 0) {
                 portfolioTreeTableModel.removeTransaction(buyTransaction);
             } else {
-                final double newBroker = buyTransaction.getCalculatedBroker() / buyTransaction.getQuantity() * remain;
-                final double newStampDuty = buyTransaction.getCalculatedStampDuty() / buyTransaction.getQuantity() * remain;
-                final double newClearingFee = buyTransaction.getCalculatdClearingFee() / buyTransaction.getQuantity() * remain;
+                final double newBroker = remain / buyTransaction.getQuantity() * buyTransaction.getCalculatedBroker();
+                final double newStampDuty = remain / buyTransaction.getQuantity() * buyTransaction.getCalculatedStampDuty();
+                final double newClearingFee = remain / buyTransaction.getQuantity() * buyTransaction.getCalculatdClearingFee();
                 
                 this.editBuyTransaction(
                         buyTransaction.deriveWithQuantity(remain).deriveWithBroker(newBroker).deriveWithStampDuty(newStampDuty).deriveWithClearingFee(newClearingFee), 

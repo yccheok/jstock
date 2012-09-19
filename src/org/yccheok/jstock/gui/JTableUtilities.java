@@ -31,6 +31,8 @@ import javax.swing.*;
 import javax.swing.table.*;
 //import org.jdesktop.swingx.table.DatePickerCellEditor;
 import net.sf.nachocalendar.table.DateFieldTableEditor;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.gui.table.DateRendererDecoratorEx;
 import org.yccheok.jstock.internationalization.GUIBundle;
 

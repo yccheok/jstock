@@ -36,11 +36,8 @@ import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.SimpleDate;
 import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.Symbol;
-import org.yccheok.jstock.portfolio.Broker;
 import org.yccheok.jstock.portfolio.BrokingFirm;
-import org.yccheok.jstock.portfolio.ClearingFee;
 import org.yccheok.jstock.portfolio.Contract;
-import org.yccheok.jstock.portfolio.StampDuty;
 import org.yccheok.jstock.portfolio.Transaction;
 
 /**
@@ -390,7 +387,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
                 quantity -= transaction.getQuantity();
             } else {
                 if (org.yccheok.jstock.portfolio.Utils.definitelyGreaterThan(quantity, 0)) {
-                    _buyValue += (transaction.getNetTotal() / transaction.getQuantity() * quantity);
+                    _buyValue += (transaction.getNetPrice() * quantity);
                 }
                 quantity = 0;
                 break;
@@ -457,7 +454,8 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
             final double unit = ((java.lang.Double)this.jSpinner1.getValue());
             final double price = ((Double)this.jFormattedTextField1.getValue());
             Contract.ContractBuilder builder = new Contract.ContractBuilder(stock, date);
-            final Contract contract = builder.type(type).quantity(unit).price(price).referencePrice(this.sellTransaction.getContract().getReferencePrice()).referenceDate(this.sellTransaction.getContract().getReferenceDate()).build();
+            final Contract oldContract = this.sellTransaction.getContract();
+            final Contract contract = builder.type(type).quantity(unit).price(price).referencePrice(oldContract.getReferencePrice()).referenceFee(oldContract.getReferenceFee()).referenceDate(oldContract.getReferenceDate()).build();
                 
             final double brokerFeeValue = (Double)this.jFormattedTextField4.getValue();
             final double stampDutyValue = (Double)jFormattedTextField7.getValue();
@@ -476,15 +474,15 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
             double quantity = unit;
             boolean shouldBreakInNextRound = false;
             
-            for (Transaction transaction : this.buyTransactions) {
+            for (Transaction buyTransaction : this.buyTransactions) {
                 if (shouldBreakInNextRound) {
                     break;                    
                 }
                 
                 double realTransactionQuantity = 0.0;
-                if (quantity >= transaction.getQuantity()) {
-                    realTransactionQuantity = transaction.getQuantity();
-                    quantity -= transaction.getQuantity();                    
+                if (quantity >= buyTransaction.getQuantity()) {
+                    realTransactionQuantity = buyTransaction.getQuantity();
+                    quantity -= buyTransaction.getQuantity();                    
                 } else {
                     realTransactionQuantity = quantity;
                     quantity = 0;
@@ -497,14 +495,18 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
                 }
 
                 Contract.ContractBuilder builder = new Contract.ContractBuilder(stock, date);
-                final Contract contract = builder.type(type).quantity(realTransactionQuantity).price(price).referencePrice(transaction.getNetTotal() / (double)transaction.getQuantity()).referenceDate(transaction.getDate()).build();
+                final double fee = buyTransaction.getCalculatdClearingFee() + buyTransaction.getCalculatedBroker() + buyTransaction.getCalculatedStampDuty();
+                final Contract contract = builder.type(type).quantity(realTransactionQuantity).price(price)
+                        .referencePrice(buyTransaction.getPrice())
+                        .referenceFee(realTransactionQuantity / buyTransaction.getQuantity() * fee)
+                        .referenceDate(buyTransaction.getDate()).build();
                 
                 final double brokerFeeValue = (Double)this.jFormattedTextField4.getValue();
                 final double stampDutyValue = (Double)jFormattedTextField7.getValue();
                 final double clearingFeeValue = (Double)this.jFormattedTextField5.getValue();
 
                 Transaction t = new Transaction(contract, brokerFeeValue, stampDutyValue, clearingFeeValue);
-                t.setComment(transaction.getComment());
+                t.setComment(buyTransaction.getComment());
                 transactions.add(t);
             }
         }

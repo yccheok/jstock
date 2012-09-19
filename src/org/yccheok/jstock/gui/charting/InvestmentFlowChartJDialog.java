@@ -482,6 +482,8 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         investSummary = new ActivitySummary();
         ROISummary = new ActivitySummary();
         
+        final boolean isFeeCalculationEnabled = MainFrame.getInstance().getJStockOptions().isFeeCalculationEnabled();
+        
         for (TransactionSummary transactionSummary : transactionSummaries) {
             final int count = transactionSummary.getChildCount();
             for (int i = 0; i < count; i++) {
@@ -496,19 +498,22 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
                 }
                 Contract.Type type = contract.getType();
                 if (type == Contract.Type.Buy) {
-                    final Activity activity = new Activity.Builder(Activity.Type.Buy, transaction.getNetTotal()).
+                    final Activity activity = new Activity.Builder(Activity.Type.Buy, 
+                            isFeeCalculationEnabled ? transaction.getNetTotal() : transaction.getTotal()).
                             put(Activity.Param.Stock, contract.getStock()).
                             put(Activity.Param.Quantity, contract.getQuantity()).
                             build();
                     this.ROISummary.add(contract.getDate(), activity);
                     this.investSummary.add(contract.getDate(), activity);
                 } else if (type == Contract.Type.Sell) {
-                    final Activity activity0 = new Activity.Builder(Activity.Type.Buy, transaction.getReferenceTotal()).
+                    final Activity activity0 = new Activity.Builder(Activity.Type.Buy, 
+                            isFeeCalculationEnabled ? transaction.getNetReferenceTotal() : transaction.getReferenceTotal()).
                             put(Activity.Param.Stock, contract.getStock()).
                             put(Activity.Param.Quantity, contract.getQuantity()).
                             build();
                     this.investSummary.add(contract.getReferenceDate(), activity0);
-                    final Activity activity1 = new Activity.Builder(Activity.Type.Sell, transaction.getNetTotal()).
+                    final Activity activity1 = new Activity.Builder(Activity.Type.Sell, 
+                            isFeeCalculationEnabled ? transaction.getNetTotal() : transaction.getTotal()).
                             put(Activity.Param.Stock, contract.getStock()).
                             put(Activity.Param.Quantity, contract.getQuantity()).
                             build();

@@ -36,6 +36,7 @@ public class Contract {
         private double quantity = 0;
         private double price = 0.0;
         private double referencePrice = 0.0;
+        private double referenceFee = 0.0;
         private SimpleDate referenceDate = new SimpleDate();
 
         public ContractBuilder(Stock stock, SimpleDate date) {
@@ -63,6 +64,11 @@ public class Contract {
             return this;
         }
 
+        public ContractBuilder referenceFee(double val) {
+            this.referenceFee = val;
+            return this;
+        }
+        
         public ContractBuilder referenceDate(SimpleDate date) {
             this.referenceDate = date;
             return this;
@@ -99,6 +105,10 @@ public class Contract {
         return referencePrice;
     }
     
+    public double getReferenceFee() {
+        return referenceFee;
+    }
+    
     public double getTotal() {
         return total;
     }
@@ -125,6 +135,7 @@ public class Contract {
         this.quantity = builder.quantity;
         this.price = builder.price;
         this.referencePrice = builder.referencePrice;
+        this.referenceFee = builder.referenceFee;
         
         this.total = price * quantity;
         this.referenceTotal = referencePrice * quantity;
@@ -139,7 +150,7 @@ public class Contract {
      */
     public Contract deriveWithQuantity(double quantity) {
         ContractBuilder builder = new ContractBuilder(stock, date);
-        return builder.type(type).quantity(quantity).price(price).referencePrice(referencePrice).build();
+        return builder.type(type).quantity(quantity).price(price).referencePrice(referencePrice).referenceFee(referenceFee).build();
     }
 
     /**
@@ -150,7 +161,7 @@ public class Contract {
      */
     public Contract deriveWithPrice(double price) {
         ContractBuilder builder = new ContractBuilder(stock, date);
-        return builder.type(type).quantity(quantity).price(price).referencePrice(referencePrice).build();
+        return builder.type(type).quantity(quantity).price(price).referencePrice(referencePrice).referenceFee(referenceFee).build();
     }
 
     public Contract(Contract contract) {
@@ -160,6 +171,7 @@ public class Contract {
         quantity = contract.quantity;
         price = contract.price;
         referencePrice = contract.referencePrice;
+        referenceFee = contract.referenceFee;
         total = contract.total;
         referenceTotal = contract.referenceTotal;
         referenceDate = contract.referenceDate;
@@ -184,8 +196,11 @@ public class Contract {
     private final double referencePrice;
     private final double total;
     // Reference price for the contract. Only for selling type contract usage.
-    // It means cost for owning a stock.
+    // It means cost for owning a stock. (Not including buy broker fee, stamp 
+    // duty and clearing fee)
     private final double referenceTotal;
+    // Buy broker fee, stamp duty and clearing fee.
+    private final double referenceFee;
     // private final SimpleDate referenceDate;
     // Unalbe to make this as final, as we need backward compatible with xstream's readResolve
     private SimpleDate referenceDate;

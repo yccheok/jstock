@@ -542,7 +542,7 @@ public class BuyPortfolioTreeTableModel extends DeprecatedAbstractPortfolioTreeT
                     }
                     
                 case 7:
-                    return this.getCurrentPrice(transaction) - (transaction.getTotal() / transaction.getQuantity());
+                    return this.getCurrentPrice(transaction) - transaction.getPrice();
                     
                 case 8:
                     if (jStockOptions.isPenceToPoundConversionEnabled() == false) {

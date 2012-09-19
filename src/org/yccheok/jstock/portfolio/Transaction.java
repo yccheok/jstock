@@ -41,8 +41,7 @@ public class Transaction extends DefaultSortableMutableTreeTableNode implements 
      
         if (contract.getType() == Contract.Type.Buy) {
             netTotal = this.contract.getTotal() + this.calculatedBroker + this.calculatedStampDuty + this.calculatdClearingFee;
-        }
-        else {
+        } else {
             netTotal = this.contract.getTotal() - this.calculatedBroker - this.calculatedStampDuty - this.calculatdClearingFee;
         }
     }
@@ -133,6 +132,14 @@ public class Transaction extends DefaultSortableMutableTreeTableNode implements 
     public double getCalculatdClearingFee() {
         return calculatdClearingFee;
     }
+        
+    public double getReferenceTotal() {
+        return contract.getReferenceTotal();
+    }
+    
+    public double getPrice() {
+        return contract.getPrice();
+    }
     
     public double getTotal() {
         return contract.getTotal();
@@ -146,8 +153,12 @@ public class Transaction extends DefaultSortableMutableTreeTableNode implements 
         return contract.getDate();
     }
     
-    public double getReferenceTotal() {
-        return contract.getReferenceTotal();
+    public double getNetReferenceTotal() {
+        return contract.getReferenceTotal() + contract.getReferenceFee();
+    }
+    
+    public double getNetPrice() {
+        return netTotal / contract.getQuantity();
     }
     
     public double getNetTotal() {
