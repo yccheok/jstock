@@ -188,8 +188,18 @@ public class JTableUtilities {
     }
 
     public static void removeTableColumn(JTable jTable, Object identifier) {
-        jTable.removeColumn(jTable.getColumn(identifier));
-
+        TableColumn tableColumn = null;
+        // If we try to getColumn which its identifier doesn't exist, 
+        // IllegalArgumentException will be thrown.        
+        try {
+            tableColumn = jTable.getColumn(identifier);
+        } catch (IllegalArgumentException ex) {
+            log.error(null, ex);
+        }
+        
+        if (tableColumn != null) {
+            jTable.removeColumn(tableColumn);
+        }
     }
 
     
@@ -382,6 +392,7 @@ public class JTableUtilities {
         return result;
     }
 
+    private static final Log log = LogFactory.getLog(JTableUtilities.class);
     private static final Map<Locale, Map<String, java.util.List<String>>> string2KeyMap = new HashMap<Locale, Map<String, java.util.List<String>>>();
 }
 

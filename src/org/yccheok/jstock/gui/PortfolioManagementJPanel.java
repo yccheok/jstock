@@ -1905,6 +1905,45 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         return true;
     }
 
+    public void refreshGUIAfterFeeCalculationEnabledOptionsChanged() {
+        if (SwingUtilities.isEventDispatchThread()) {
+            _refreshGUIAfterFeeCalculationEnabledOptionsChanged();
+        } else {
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    _refreshGUIAfterFeeCalculationEnabledOptionsChanged();
+                }
+            });            
+        }        
+    }
+    
+    public void _refreshGUIAfterFeeCalculationEnabledOptionsChanged() {
+        this.buyTreeTable.repaint();
+        this.sellTreeTable.repaint();
+        this.updateWealthHeader();
+        
+        // Add/ remove columns based on user option.
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        JTable[] tables = {this.sellTreeTable, this.buyTreeTable};
+        String[] names = { 
+            GUIBundle.getString("PortfolioManagementJPanel_Broker"),
+            GUIBundle.getString("PortfolioManagementJPanel_ClearingFee"),            
+            GUIBundle.getString("PortfolioManagementJPanel_StampDuty")
+        };
+        
+        for (JTable table : tables) {
+            for (String name : names) {
+                if (jStockOptions.isFeeCalculationEnabled()) {
+                    final int columnCount = table.getColumnCount();
+                    JTableUtilities.insertTableColumnFromModel(table, name, columnCount);                      
+                } else {
+                  JTableUtilities.removeTableColumn(table, name);
+                }
+            }
+        }        
+    }
+    
     private void _refershGUIAfterInitPortfolio(
             final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel,
             final SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel,

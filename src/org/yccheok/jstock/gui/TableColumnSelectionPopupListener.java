@@ -100,7 +100,7 @@ public class TableColumnSelectionPopupListener extends MouseAdapter {
                 public void actionPerformed(ActionEvent evt) {
                     String name = evt.getActionCommand();
                     JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem)evt.getSource();
-                    if(menuItem.isSelected() == false) {
+                    if (menuItem.isSelected() == false) {
                         JTableUtilities.removeTableColumn(jTable1, name);
                     }
                     else {

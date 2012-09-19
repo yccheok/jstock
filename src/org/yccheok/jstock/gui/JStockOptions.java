@@ -294,6 +294,8 @@ public class JStockOptions {
     
     private ChartTheme chartTheme = ChartTheme.Light;
     
+    private boolean isFeeCalculationEnabled = false;
+    
     public boolean isAutoBrokerFeeCalculationEnabled() {
         return this.isAutoBrokerFeeCalculationEnabled;
     }
@@ -413,6 +415,8 @@ public class JStockOptions {
         this.penceToPoundConversionEnabled = new EnumMap<Country, Boolean>(jStockOptions.penceToPoundConversionEnabled);
         
         this.chartTheme = jStockOptions.getChartTheme();
+        
+        this.isFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled;
     }
 
     // User may not trust us to store their password in cloud server. To avoid
@@ -529,7 +533,9 @@ public class JStockOptions {
         jStockOptions.localCurrencyCountries = new EnumMap<Country, Country>(this.localCurrencyCountries);
         jStockOptions.penceToPoundConversionEnabled = new EnumMap<Country, Boolean>(jStockOptions.penceToPoundConversionEnabled);
 
-        jStockOptions.setChartTheme(this.chartTheme);
+        jStockOptions.chartTheme = this.chartTheme;
+        
+        jStockOptions.isFeeCalculationEnabled = this.isFeeCalculationEnabled;
         
         return jStockOptions;
     }
@@ -1555,5 +1561,20 @@ public class JStockOptions {
      */
     public void setChartTheme(ChartTheme chartTheme) {
         this.chartTheme = chartTheme;
+    }  
+    
+
+    /**
+     * @return the feeCalculationEnabled
+     */
+    public boolean isFeeCalculationEnabled() {
+        return isFeeCalculationEnabled;
     }
+
+    /**
+     * @param feeCalculationEnabled the feeCalculationEnabled to set
+     */
+    public void setFeeCalculationEnabled(boolean isFeeCalculationEnabled) {
+        this.isFeeCalculationEnabled = isFeeCalculationEnabled;
+    }    
 }
