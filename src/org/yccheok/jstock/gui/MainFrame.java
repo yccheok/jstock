@@ -1457,6 +1457,8 @@ public class MainFrame extends javax.swing.JFrame {
         // I guess user wants to watch the current active portfolio right now.
         // We will help him to turn to the portfolio page.
         MainFrame.this.jTabbedPane1.setSelectedIndex(3);
+        
+        MainFrame.this.portfolioManagementJPanel.updateTitledBorder();
     }
 
     private void multipleWatchlists() {

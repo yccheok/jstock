@@ -1972,7 +1972,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         this.initCSVPortfolio();
     }
 
-    private void updateTitledBorder() {
+    public void updateTitledBorder() {
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
         if (SwingUtilities.isEventDispatchThread()) {
             final TitledBorder titledBorder = (TitledBorder)PortfolioManagementJPanel.this.jPanel1.getBorder();
