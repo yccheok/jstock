@@ -58,10 +58,7 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
     }
     
     // Names of the columns.
-    private static final String[] columnNames;
-    // Unlike columnNames, languageIndependentColumnNames is language independent.
-    private static final String[] languageIndependentColumnNames;
-    
+    private static final String[] columnNames;   
     
     static {
         final String[] tmp = {
@@ -72,39 +69,13 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
             GUIBundle.getString("PortfolioManagementJPanel_CurrentPrice"),
             GUIBundle.getString("PortfolioManagementJPanel_PurchaseValue"),
             GUIBundle.getString("PortfolioManagementJPanel_CurrentValue"),
-            GUIBundle.getString("PortfolioManagementJPanel_GainLossPrice"),
             GUIBundle.getString("PortfolioManagementJPanel_GainLossValue"),
             GUIBundle.getString("PortfolioManagementJPanel_GainLossPercentage"),
             GUIBundle.getString("PortfolioManagementJPanel_Broker"),
             GUIBundle.getString("PortfolioManagementJPanel_ClearingFee"),
-            GUIBundle.getString("PortfolioManagementJPanel_StampDuty"),
-            GUIBundle.getString("PortfolioManagementJPanel_NetPurchaseValue"),
-            GUIBundle.getString("PortfolioManagementJPanel_NetGainLossValue"),
-            GUIBundle.getString("PortfolioManagementJPanel_NetGainLossPercentage"),
-            GUIBundle.getString("PortfolioManagementJPanel_Comment")
-        };
-        final GUIBundleWrapper guiBundleWrapper = GUIBundleWrapper.newInstance(Language.INDEPENDENT);
-        final String[] tmp2 = {
-            guiBundleWrapper.getString("PortfolioManagementJPanel_Stock"),
-            guiBundleWrapper.getString("PortfolioManagementJPanel_Date"),
-            guiBundleWrapper.getString("PortfolioManagementJPanel_Units"),
-            guiBundleWrapper.getString("PortfolioManagementJPanel_PurchasePrice"),
-            guiBundleWrapper.getString("PortfolioManagementJPanel_CurrentPrice"),
-            guiBundleWrapper.getString("PortfolioManagementJPanel_PurchaseValue"),
-            guiBundleWrapper.getString("PortfolioManagementJPanel_CurrentValue"),
-            guiBundleWrapper.getString("PortfolioManagementJPanel_GainLossPrice"),
-            guiBundleWrapper.getString("PortfolioManagementJPanel_GainLossValue"),
-            guiBundleWrapper.getString("PortfolioManagementJPanel_GainLossPercentage"),
-            guiBundleWrapper.getString("PortfolioManagementJPanel_Broker"),
-            guiBundleWrapper.getString("PortfolioManagementJPanel_ClearingFee"),
-            guiBundleWrapper.getString("PortfolioManagementJPanel_StampDuty"),
-            guiBundleWrapper.getString("PortfolioManagementJPanel_NetPurchaseValue"),
-            guiBundleWrapper.getString("PortfolioManagementJPanel_NetGainLossValue"),
-            guiBundleWrapper.getString("PortfolioManagementJPanel_NetGainLossPercentage"),
-            guiBundleWrapper.getString("PortfolioManagementJPanel_Comment")
-        };        
+            GUIBundle.getString("PortfolioManagementJPanel_StampDuty")
+        };      
         columnNames = tmp;
-        languageIndependentColumnNames = tmp2;
     }
 
     // Types of the columns.
@@ -120,12 +91,7 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
         Double.class,
         Double.class,
         Double.class,
-        Double.class,
-        Double.class,
-        Double.class,
-        Double.class,
-        Double.class,
-        String.class
+        Double.class
     };
 
     /**
@@ -384,6 +350,10 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
         return this.getCurrentValue(transactionSummary) - transactionSummary.getTotal();        
     }
 
+    private double getGainLossValue(Transaction transaction) {
+        return getCurrentValue(transaction) - transaction.getTotal();
+    }
+    
     @Override
     public int getColumnCount() {
         assert(columnNames.length == cTypes.length);
@@ -401,14 +371,11 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
     }
     
     @Override
-    public String getLanguageIndependentColumnName(int column) {
-        return languageIndependentColumnNames[column];
-    }
-    
-    @Override
     public Object getValueAt(Object node, int column) {
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
-
+        final boolean isFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
+        final boolean isPenceToPoundConversionEnabled = jStockOptions.isPenceToPoundConversionEnabled();
+        
         if (node instanceof Portfolio) {
             final Portfolio portfolio = (Portfolio)node;
             
@@ -417,63 +384,58 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
                     return GUIBundle.getString("PortfolioManagementJPanel_Buy");
         
                 case 5:
-                    if (jStockOptions.isPenceToPoundConversionEnabled() == false) {
-                        return portfolio.getTotal();
-                    }
-                    else {
-                        return portfolio.getTotal() / 100.0;
+                    if (isPenceToPoundConversionEnabled == false) {
+                        if (isFeeCalculationEnabled) {
+                            return portfolio.getNetTotal();
+                        } else {
+                            return portfolio.getTotal();
+                        }
+                    } else {
+                        if (isFeeCalculationEnabled) {
+                            return portfolio.getNetTotal() / 100.0;
+                        } else {
+                            return portfolio.getTotal() / 100.0;
+                        }
                     }
                     
                 case 6:
-                    if (jStockOptions.isPenceToPoundConversionEnabled() == false) {
+                    if (isPenceToPoundConversionEnabled == false) {
                         return getCurrentValue(portfolio);
-                    }
-                    else {
+                    } else {
                         return getCurrentValue(portfolio) / 100.0;
                     }
                     
-                case 8:
-                    if (jStockOptions.isPenceToPoundConversionEnabled() == false) {
-                        return this.getGainLossValue(portfolio);
-                    }
-                    else {
-                        return this.getGainLossValue(portfolio) / 100.00;
+                case 7:
+                    if (isPenceToPoundConversionEnabled == false) {
+                        if (isFeeCalculationEnabled) {
+                            return this.getNetGainLossValue(portfolio);
+                        } else {
+                            return this.getGainLossValue(portfolio);
+                        }                        
+                    } else {
+                        if (isFeeCalculationEnabled) {
+                            return this.getNetGainLossValue(portfolio) / 100.00;
+                        } else {
+                            return this.getGainLossValue(portfolio) / 100.00;
+                        }
                     }
                     
-                case 9:
-                    return this.getGainLossPercentage(portfolio);
+                case 8:
+                    if (isFeeCalculationEnabled) {
+                        return this.getNetGainLossPercentage(portfolio);
+                    } else {
+                        return this.getGainLossPercentage(portfolio);
+                    }
     
-                case 10:
+                case 9:
                     return portfolio.getCalculatedBroker();
                     
-                case 11:
+                case 10:
                     return portfolio.getCalculatedClearingFee();
                     
-                case 12:
+                case 11:
                     return portfolio.getCalculatedStampDuty();
                     
-                case 13:
-                    if (jStockOptions.isPenceToPoundConversionEnabled() == false) {
-                        return portfolio.getNetTotal();
-                    }
-                    else {
-                        return portfolio.getNetTotal() / 100.0;
-                    }
-                    
-                case 14:
-                    if (jStockOptions.isPenceToPoundConversionEnabled() == false) {
-                        return this.getNetGainLossValue(portfolio);
-                    }
-                    else {
-                        return this.getNetGainLossValue(portfolio) / 100.0;
-                    }
-                    
-                case 15:
-                    return this.getNetGainLossPercentage(portfolio);
-
-                case 16:
-                    return portfolio.getComment();
-
                 default:
                     return null;
             }
@@ -498,65 +460,57 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
                     return this.getCurrentPrice(transactionSummary);
                     
                 case 5:
-                    if (jStockOptions.isPenceToPoundConversionEnabled() == false) {
-                        return transactionSummary.getTotal();
-                    }
-                    else {
-                        return transactionSummary.getTotal() / 100.0;
+                    if (isPenceToPoundConversionEnabled == false) {
+                        if (isFeeCalculationEnabled) {
+                            return transactionSummary.getNetTotal();
+                        } else {
+                            return transactionSummary.getTotal();
+                        }
+                    } else {
+                        if (isFeeCalculationEnabled) {
+                            return transactionSummary.getNetTotal() / 100.0;
+                        } else {                        
+                            return transactionSummary.getTotal() / 100.0;
+                        }
                     }
                     
                 case 6:
-                    if (jStockOptions.isPenceToPoundConversionEnabled() == false) {
+                    if (isPenceToPoundConversionEnabled == false) {
                         return this.getCurrentValue(transactionSummary);
-                    }
-                    else {
+                    } else {
                         return this.getCurrentValue(transactionSummary) / 100.0;
-                    }
+                    }                    
                     
                 case 7:
-                    return this.getGainLossPrice(transactionSummary);
+                    if (isPenceToPoundConversionEnabled == false) {
+                        if (isFeeCalculationEnabled) {
+                            return this.getNetGainLossValue(transactionSummary);
+                        } else {
+                            return this.getGainLossValue(transactionSummary);
+                        }
+                    } else {
+                        if (isFeeCalculationEnabled) {
+                            return this.getNetGainLossValue(transactionSummary) / 100.0;
+                        } else {
+                            return this.getGainLossValue(transactionSummary) / 100.0;
+                        }
+                    }
                     
                 case 8:
-                    if (jStockOptions.isPenceToPoundConversionEnabled() == false) {
-                        return this.getGainLossValue(transactionSummary);
-                    }
-                    else {
-                        return this.getGainLossValue(transactionSummary) / 100.0;
+                    if (isFeeCalculationEnabled) {
+                        return this.getNetGainLossPercentage(transactionSummary);
+                    } else {
+                        return this.getGainLossPercentage(transactionSummary);
                     }
                     
                 case 9:
-                    return this.getGainLossPercentage(transactionSummary);
-                    
-                case 10:
                     return transactionSummary.getCalculatedBroker();
                     
-                case 11:
+                case 10:
                     return transactionSummary.getCalculatdClearingFee();
                     
-                case 12:
+                case 11:
                     return transactionSummary.getCalculatedStampDuty();
-                    
-                case 13:
-                    if (jStockOptions.isPenceToPoundConversionEnabled() == false) {
-                        return transactionSummary.getNetTotal();
-                    }
-                    else {
-                        return transactionSummary.getNetTotal() / 100.0;
-                    }
-                    
-                case 14:
-                    if (jStockOptions.isPenceToPoundConversionEnabled() == false) {
-                        return this.getNetGainLossValue(transactionSummary);
-                    }
-                    else {
-                        return this.getNetGainLossValue(transactionSummary) / 100.0;
-                    }
-                    
-                case 15:
-                    return this.getNetGainLossPercentage(transactionSummary);                    
-
-                case 16:
-                    return transactionSummary.getComment();
             }
         }
         
@@ -580,69 +534,61 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
                     return this.getCurrentPrice(transaction);
                     
                 case 5:
-                    if (jStockOptions.isPenceToPoundConversionEnabled() == false) {
-                        return transaction.getTotal();
-                    }
-                    else {
-                        return transaction.getTotal() / 100.0;
+                    if (isPenceToPoundConversionEnabled == false) {
+                        if (isFeeCalculationEnabled) {
+                            return transaction.getNetTotal();
+                        } else {
+                            return transaction.getTotal();
+                        }
+                    } else {
+                        if (isFeeCalculationEnabled) {
+                            return transaction.getNetTotal() / 100.0;
+                        } else {
+                            return transaction.getTotal() / 100.0;
+                        }
                     }
                     
                 case 6:
-                    if (jStockOptions.isPenceToPoundConversionEnabled() == false) {
+                    if (isPenceToPoundConversionEnabled == false) {
                         return this.getCurrentValue(transaction);
-                    }
-                    else {
+                    } else {
                         return this.getCurrentValue(transaction) / 100.0;
                     }
                     
                 case 7:
-                    return this.getCurrentPrice(transaction) - transaction.getPrice();
+                    if (isPenceToPoundConversionEnabled == false) {
+                        if (isFeeCalculationEnabled) {
+                            return this.getNetGainLossValue(transaction);
+                        } else {
+                            return this.getGainLossValue(transaction);
+                        }
+                    } else {
+                        if (isFeeCalculationEnabled) {
+                            return this.getNetGainLossValue(transaction) / 100.0;
+                        } else {
+                            return this.getGainLossValue(transaction) / 100.0;
+                        }
+                    }
                     
                 case 8:
-                    if (jStockOptions.isPenceToPoundConversionEnabled() == false) {
-                        return this.getCurrentValue(transaction) - transaction.getTotal();
-                    }
-                    else {
-                        return (this.getCurrentValue(transaction) - transaction.getTotal()) / 100.0;
+                    if (isFeeCalculationEnabled) {
+                        return this.getNetGainLossPercentage(transaction);
+                    } else {
+                        return this.getGainLossPercentage(transaction);
                     }
                     
                 case 9:
-                    return this.getGainLossPercentage(transaction);
-                    
-                case 10:
                     return transaction.getCalculatedBroker();
                     
-                case 11:
+                case 10:
                     return transaction.getCalculatdClearingFee();
                     
-                case 12:
+                case 11:
                     return transaction.getCalculatedStampDuty();
-                    
-                case 13:
-                    if (jStockOptions.isPenceToPoundConversionEnabled() == false) {
-                        return transaction.getNetTotal();
-                    }
-                    else {
-                        return transaction.getNetTotal() / 100.0;
-                    }
-                    
-                case 14:
-                    if (jStockOptions.isPenceToPoundConversionEnabled() == false) {
-                        return this.getNetGainLossValue(transaction);
-                    }
-                    else {
-                        return this.getNetGainLossValue(transaction) / 100.0;
-                    }
-                    
-                case 15:
-                    return this.getNetGainLossPercentage(transaction);                    
-
-                case 16:
-                    return transaction.getComment();
             }
         }
         
-		return null; 
+        return null; 
     }
 
     @Override
