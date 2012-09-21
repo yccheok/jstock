@@ -316,9 +316,9 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         final double quantity = transaction.getContract().getQuantity();
         final double price = transaction.getContract().getPrice();
         final double value = transaction.getTotal();
-        final double brokerFee = transaction.getCalculatedBroker();
-        final double clearingFee = transaction.getCalculatdClearingFee();
-        final double stampDuty = transaction.getCalculatedStampDuty();
+        final double brokerFee = transaction.getBroker();
+        final double clearingFee = transaction.getClearingFee();
+        final double stampDuty = transaction.getStampDuty();
         final double netValue = transaction.getNetTotal();
 
         this.transactionComment = transaction.getComment();

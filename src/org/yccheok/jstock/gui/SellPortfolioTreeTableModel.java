@@ -217,13 +217,13 @@ public class SellPortfolioTreeTableModel extends DeprecatedAbstractPortfolioTree
                     return getGainLossPercentage(portfolio);
     
                 case 10:
-                    return portfolio.getCalculatedBroker();
+                    return portfolio.getBroker();
                     
                 case 11:
-                    return portfolio.getCalculatedClearingFee();
+                    return portfolio.getClearingFee();
                     
                 case 12:
-                    return portfolio.getCalculatedStampDuty();
+                    return portfolio.getStampDuty();
                     
                 case 13:
                     if (jStockOptions.isPenceToPoundConversionEnabled() == false) {
@@ -301,13 +301,13 @@ public class SellPortfolioTreeTableModel extends DeprecatedAbstractPortfolioTree
                     return getGainLossPercentage(transactionSummary);
                     
                 case 10:
-                    return transactionSummary.getCalculatedBroker();
+                    return transactionSummary.getBroker();
                     
                 case 11:
-                    return transactionSummary.getCalculatdClearingFee();
+                    return transactionSummary.getClearingFee();
                     
                 case 12:
-                    return transactionSummary.getCalculatedStampDuty();
+                    return transactionSummary.getStampDuty();
                     
                 case 13:
                     if (jStockOptions.isPenceToPoundConversionEnabled() == false) {
@@ -368,13 +368,13 @@ public class SellPortfolioTreeTableModel extends DeprecatedAbstractPortfolioTree
                     return getGainLossPercentage(transaction);
                     
                 case 10:
-                    return transaction.getCalculatedBroker();
+                    return transaction.getBroker();
                     
                 case 11:
-                    return transaction.getCalculatdClearingFee();
+                    return transaction.getClearingFee();
                     
                 case 12:
-                    return transaction.getCalculatedStampDuty();
+                    return transaction.getStampDuty();
                     
                 case 13:
                     return transaction.getNetTotal();

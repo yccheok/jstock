@@ -416,9 +416,9 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         final double quantity = transaction.getContract().getQuantity();
         final double price = transaction.getContract().getPrice();
         final double value = transaction.getTotal();
-        final double brokerFee = transaction.getCalculatedBroker();
-        final double clearingFee = transaction.getCalculatdClearingFee();
-        final double stampDuty = transaction.getCalculatedStampDuty();
+        final double brokerFee = transaction.getBroker();
+        final double clearingFee = transaction.getClearingFee();
+        final double stampDuty = transaction.getStampDuty();
         final double netValue = transaction.getNetTotal();
         
         this.jTextField1.setText(symbol.toString());
@@ -495,7 +495,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
                 }
 
                 Contract.ContractBuilder builder = new Contract.ContractBuilder(stock, date);
-                final double fee = buyTransaction.getCalculatdClearingFee() + buyTransaction.getCalculatedBroker() + buyTransaction.getCalculatedStampDuty();
+                final double fee = buyTransaction.getClearingFee() + buyTransaction.getBroker() + buyTransaction.getStampDuty();
                 final Contract contract = builder.type(type).quantity(realTransactionQuantity).price(price)
                         .referencePrice(buyTransaction.getPrice())
                         .referenceFee(realTransactionQuantity / buyTransaction.getQuantity() * fee)

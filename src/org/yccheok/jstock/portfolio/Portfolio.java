@@ -62,6 +62,23 @@ public class Portfolio extends DefaultSortableMutableTreeTableNode implements Co
         return result;        
     }
 
+    public double getNetReferenceTotal() {
+        double result = 0.0;
+     
+        final int count = this.getChildCount();
+        
+        for (int i = 0; i < count; i++) {
+            Object o = this.getChildAt(i);
+            
+            assert(o instanceof TransactionSummary);
+            
+            final TransactionSummary transactionSummary = (TransactionSummary)o;
+            result += transactionSummary.getNetReferenceTotal();
+        }
+        
+        return result;        
+    }
+    
     public double getReferenceTotal() {
         double result = 0.0;
      
@@ -79,7 +96,7 @@ public class Portfolio extends DefaultSortableMutableTreeTableNode implements Co
         return result;        
     }
     
-    public double getCalculatedBroker() {
+    public double getBroker() {
         double result = 0.0;
      
         final int count = this.getChildCount();
@@ -90,13 +107,13 @@ public class Portfolio extends DefaultSortableMutableTreeTableNode implements Co
             assert(o instanceof TransactionSummary);
             
             final TransactionSummary transactionSummary = (TransactionSummary)o;
-            result += transactionSummary.getCalculatedBroker();
+            result += transactionSummary.getBroker();
         }
         
         return result;                
     }
 
-    public double getCalculatedClearingFee() {
+    public double getClearingFee() {
         double result = 0.0;
      
         final int count = this.getChildCount();
@@ -107,13 +124,13 @@ public class Portfolio extends DefaultSortableMutableTreeTableNode implements Co
             assert(o instanceof TransactionSummary);
             
             final TransactionSummary transactionSummary = (TransactionSummary)o;
-            result += transactionSummary.getCalculatdClearingFee();
+            result += transactionSummary.getClearingFee();
         }
         
         return result;                
     }
     
-    public double getCalculatedStampDuty() {
+    public double getStampDuty() {
         double result = 0.0;
      
         final int count = this.getChildCount();
@@ -124,7 +141,7 @@ public class Portfolio extends DefaultSortableMutableTreeTableNode implements Co
             assert(o instanceof TransactionSummary);
             
             final TransactionSummary transactionSummary = (TransactionSummary)o;
-            result += transactionSummary.getCalculatedStampDuty();
+            result += transactionSummary.getStampDuty();
         }
         
         return result;                

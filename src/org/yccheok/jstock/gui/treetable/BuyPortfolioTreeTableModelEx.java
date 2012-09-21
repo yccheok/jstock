@@ -73,7 +73,8 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
             GUIBundle.getString("PortfolioManagementJPanel_GainLossPercentage"),
             GUIBundle.getString("PortfolioManagementJPanel_Broker"),
             GUIBundle.getString("PortfolioManagementJPanel_ClearingFee"),
-            GUIBundle.getString("PortfolioManagementJPanel_StampDuty")
+            GUIBundle.getString("PortfolioManagementJPanel_StampDuty"),
+            GUIBundle.getString("PortfolioManagementJPanel_Comment")
         };      
         columnNames = tmp;
     }
@@ -91,7 +92,8 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
         Double.class,
         Double.class,
         Double.class,
-        Double.class
+        Double.class,
+        String.class
     };
 
     /**
@@ -199,7 +201,7 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
         }
     }
     
-    private double getCurrentValue(Transaction transaction) {
+    public double getCurrentValue(Transaction transaction) {
         final Code code = transaction.getContract().getStock().getCode();
         final Double price = this.stockPrice.get(code);
 
@@ -220,7 +222,7 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
         return price * transactionSummary.getQuantity();
     }
     
-    private double getCurrentPrice(Transaction transaction) {
+    public double getCurrentPrice(Transaction transaction) {
         final Code code = transaction.getContract().getStock().getCode();
         
         final Double price = this.stockPrice.get(code);
@@ -242,8 +244,16 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
         return price;
     }
     
+    public double getGainLossValue() {
+        return getGainLossValue((Portfolio)getRoot());
+    }
+    
     private double getGainLossValue(Portfolio portfolio) {
         return getCurrentValue(portfolio) - portfolio.getTotal();
+    }
+    
+    public double getGainLossPercentage() {
+        return getGainLossPercentage((Portfolio)getRoot());
     }
     
     private double getGainLossPercentage(Portfolio portfolio) {
@@ -268,17 +278,17 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
         return (getCurrentValue(transactionSummary) - transactionSummary.getNetTotal()) / transactionSummary.getNetTotal() * 100.0;        
     }
     
-    private double getGainLossPercentage(Transaction transaction) {
+    public double getGainLossPercentage(Transaction transaction) {
         if(transaction.getTotal() == 0) return 0.0;
         
         return (getCurrentValue(transaction) - transaction.getTotal()) / transaction.getTotal() * 100.0;        
     }
     
-    private double getNetGainLossValue(Transaction transaction) {
+    public double getNetGainLossValue(Transaction transaction) {
         return getCurrentValue(transaction) - transaction.getNetTotal();
     }
     
-    private double getNetGainLossPercentage(Transaction transaction) {
+    public double getNetGainLossPercentage(Transaction transaction) {
         if(transaction.getNetTotal() == 0) return 0.0;
         
         return (getCurrentValue(transaction) - transaction.getNetTotal()) / transaction.getNetTotal() * 100.0;        
@@ -310,6 +320,10 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
         return ((Portfolio)getRoot()).getNetTotal();
     }
 
+    public double getPurchaseValue() {
+        return ((Portfolio)getRoot()).getTotal();
+    }
+    
     private double getCurrentValue(Portfolio portfolio) {
         final int count = portfolio.getChildCount();
         
@@ -338,6 +352,10 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
         return transactionSummary.getTotal() / transactionSummary.getQuantity();
     }
     
+    public double getGainLossPrice(Transaction transaction) {
+        return this.getCurrentPrice(transaction) - transaction.getPrice();
+    }
+    
     public double getGainLossPrice(TransactionSummary transactionSummary) {
         if (transactionSummary.getQuantity() == 0.0) {
             return 0.0;
@@ -350,7 +368,7 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
         return this.getCurrentValue(transactionSummary) - transactionSummary.getTotal();        
     }
 
-    private double getGainLossValue(Transaction transaction) {
+    public double getGainLossValue(Transaction transaction) {
         return getCurrentValue(transaction) - transaction.getTotal();
     }
     
@@ -428,16 +446,16 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
                     }
     
                 case 9:
-                    return portfolio.getCalculatedBroker();
+                    return portfolio.getBroker();
                     
                 case 10:
-                    return portfolio.getCalculatedClearingFee();
+                    return portfolio.getClearingFee();
                     
                 case 11:
-                    return portfolio.getCalculatedStampDuty();
+                    return portfolio.getStampDuty();
                     
-                default:
-                    return null;
+                case 12:
+                    return portfolio.getComment();
             }
         }
    
@@ -504,13 +522,16 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
                     }
                     
                 case 9:
-                    return transactionSummary.getCalculatedBroker();
+                    return transactionSummary.getBroker();
                     
                 case 10:
-                    return transactionSummary.getCalculatdClearingFee();
+                    return transactionSummary.getClearingFee();
                     
                 case 11:
-                    return transactionSummary.getCalculatedStampDuty();
+                    return transactionSummary.getStampDuty();
+                    
+                case 12:
+                    return transactionSummary.getComment();                    
             }
         }
         
@@ -578,13 +599,16 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
                     }
                     
                 case 9:
-                    return transaction.getCalculatedBroker();
+                    return transaction.getBroker();
                     
                 case 10:
-                    return transaction.getCalculatdClearingFee();
+                    return transaction.getClearingFee();
                     
                 case 11:
-                    return transaction.getCalculatedStampDuty();
+                    return transaction.getStampDuty();
+                    
+                case 12:
+                    return transaction.getComment();
             }
         }
         

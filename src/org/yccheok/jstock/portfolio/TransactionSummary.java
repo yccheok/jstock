@@ -48,7 +48,7 @@ public class TransactionSummary extends DefaultSortableMutableTreeTableNode impl
         return result;        
     }
     
-    public double getCalculatedBroker() {
+    public double getBroker() {
         double result = 0.0;
         
         final int count = this.getChildCount();
@@ -60,7 +60,7 @@ public class TransactionSummary extends DefaultSortableMutableTreeTableNode impl
             
             final Transaction transaction = (Transaction)o;
             
-            double calculatedBroker = transaction.getCalculatedBroker();
+            double calculatedBroker = transaction.getBroker();
             
             result += calculatedBroker;
         }
@@ -68,7 +68,7 @@ public class TransactionSummary extends DefaultSortableMutableTreeTableNode impl
         return result;        
     }
 
-    public double getCalculatedStampDuty() {
+    public double getStampDuty() {
         double result = 0.0;
         
         final int count = this.getChildCount();
@@ -80,7 +80,7 @@ public class TransactionSummary extends DefaultSortableMutableTreeTableNode impl
             
             final Transaction transaction = (Transaction)o;
             
-            double calculatedStampDuty = transaction.getCalculatedStampDuty();
+            double calculatedStampDuty = transaction.getStampDuty();
             
             result += calculatedStampDuty;
         }
@@ -88,7 +88,7 @@ public class TransactionSummary extends DefaultSortableMutableTreeTableNode impl
         return result;        
     }
 
-    public double getCalculatdClearingFee() {
+    public double getClearingFee() {
         double result = 0.0;
         
         final int count = this.getChildCount();
@@ -100,7 +100,7 @@ public class TransactionSummary extends DefaultSortableMutableTreeTableNode impl
             
             final Transaction transaction = (Transaction)o;
             
-            double calculatedClearingFee = transaction.getCalculatdClearingFee();
+            double calculatedClearingFee = transaction.getClearingFee();
             
             result += calculatedClearingFee;
         }
@@ -121,6 +121,26 @@ public class TransactionSummary extends DefaultSortableMutableTreeTableNode impl
             final Transaction transaction = (Transaction)o;
             
             double total = transaction.getTotal();
+            
+            result += total;
+        }
+        
+        return result;
+    }
+
+    public double getNetReferenceTotal() {
+        double result = 0.0;
+        
+        final int count = this.getChildCount();
+        
+        for (int i = 0; i < count; i++) {
+            Object o = this.getChildAt(i);
+            
+            assert(o instanceof Transaction);
+            
+            final Transaction transaction = (Transaction)o;
+            
+            double total = transaction.getNetReferenceTotal();
             
             result += total;
         }

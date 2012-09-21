@@ -60,6 +60,8 @@ import org.yccheok.jstock.engine.StockInfoDatabase;
 import org.yccheok.jstock.engine.StockNameDatabase;
 import org.yccheok.jstock.engine.Symbol;
 import org.yccheok.jstock.file.GUIBundleWrapper.Language;
+import org.yccheok.jstock.gui.JStockOptions;
+import org.yccheok.jstock.gui.MainFrame;
 import org.yccheok.jstock.gui.POIUtils;
 import org.yccheok.jstock.gui.Pair;
 import org.yccheok.jstock.gui.portfolio.CommentableContainer;
@@ -98,17 +100,98 @@ public class Statements {
     }
 
     public static Statements newInstanceFromBuyPortfolioTreeTableModel(BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel, boolean languageIndependent) {
-        Statements statements = newInstanceFromAbstractPortfolioTreeTableModel(buyPortfolioTreeTableModel, languageIndependent);
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final boolean isPenceToPoundConversionEnabled = jStockOptions.isPenceToPoundConversionEnabled();
+
+        final GUIBundleWrapper guiBundleWrapper = GUIBundleWrapper.newInstance(languageIndependent ? GUIBundleWrapper.Language.INDEPENDENT : GUIBundleWrapper.Language.DEFAULT);
         
-        // (metadata is already reserved for TransactionSummary's comment)
-        // Preparing for metadata.
-        //Map<Code, Double> stockPrices = buyPortfolioTreeTableModel.getStockPrices();
-        //for (Map.Entry<Code, Double> stockPrice : stockPrices.entrySet()) {
-        //    Code key = stockPrice.getKey();
-        //    Double value = stockPrice.getValue();
-        //    statements.metadatas.put(key.toString(), value.toString());
-        //}
+        final String[] tmp = {
+            guiBundleWrapper.getString("MainFrame_Code"),
+            guiBundleWrapper.getString("MainFrame_Symbol"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_Date"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_Units"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_PurchasePrice"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_CurrentPrice"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_PurchaseValue"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_CurrentValue"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_GainLossPrice"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_GainLossValue"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_GainLossPercentage"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_Broker"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_ClearingFee"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_StampDuty"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_NetPurchaseValue"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_NetGainLossValue"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_NetGainLossPercentage"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_Comment")
+        };
         
+        Statement.What what = Statement.what(Arrays.asList(tmp));
+        final Statements statements = new Statements(what.type, what.guiBundleWrapper);
+
+        final Portfolio portfolio = (Portfolio)buyPortfolioTreeTableModel.getRoot();
+        final int summaryCount = portfolio.getChildCount();
+
+        for (int i = 0; i < summaryCount; i++) {
+            Object o = portfolio.getChildAt(i);
+            final TransactionSummary transactionSummary = (TransactionSummary)o;
+            
+            // Metadatas will be used to store TransactionSummary's comment.
+            final String comment = transactionSummary.getComment().trim();
+            if (comment.isEmpty() == false) {
+                final Stock stock = ((Transaction)transactionSummary.getChildAt(0)).getContract().getStock();
+                statements.metadatas.put(stock.getCode().toString(), comment);
+            }
+            
+            final int transactionCount = transactionSummary.getChildCount();
+            for (int j = 0; j < transactionCount; j++)
+            {
+                final Transaction transaction = (Transaction)transactionSummary.getChildAt(j);
+                final Stock stock = transaction.getContract().getStock();
+                final List<Atom> atoms = new ArrayList<Atom>();
+                atoms.add(new Atom(stock.getCode().toString(), tmp[0]));
+                atoms.add(new Atom(stock.getSymbol().toString(), tmp[1]));
+                
+                DateFormat dateFormat = org.yccheok.jstock.gui.Utils.getCommonDateFormat();
+                final String dateString = transaction.getDate() != null ? dateFormat.format(transaction.getDate()) : "";                        
+                atoms.add(new Atom(dateString, tmp[2]));
+                atoms.add(new Atom(transaction.getQuantity(), tmp[3]));
+                atoms.add(new Atom(transaction.getPrice(), tmp[4]));
+                atoms.add(new Atom(buyPortfolioTreeTableModel.getCurrentPrice(transaction), tmp[5]));
+                if (isPenceToPoundConversionEnabled == false) {
+                    atoms.add(new Atom(transaction.getTotal(), tmp[6]));
+                } else {
+                    atoms.add(new Atom(transaction.getTotal() / 100.0, tmp[6]));
+                }
+                atoms.add(new Atom(buyPortfolioTreeTableModel.getCurrentValue(transaction), tmp[7]));
+                atoms.add(new Atom(buyPortfolioTreeTableModel.getGainLossPrice(transaction), tmp[8]));
+                if (isPenceToPoundConversionEnabled == false) {
+                    atoms.add(new Atom(buyPortfolioTreeTableModel.getGainLossValue(transaction), tmp[9]));
+                } else {
+                    atoms.add(new Atom(buyPortfolioTreeTableModel.getGainLossValue(transaction) / 100.0, tmp[9]));
+                }                
+                atoms.add(new Atom(buyPortfolioTreeTableModel.getGainLossPercentage(transaction), tmp[10]));
+                atoms.add(new Atom(transaction.getBroker(), tmp[11]));
+                atoms.add(new Atom(transaction.getClearingFee(), tmp[12]));
+                atoms.add(new Atom(transaction.getStampDuty(), tmp[13]));
+                if (isPenceToPoundConversionEnabled == false) {
+                    atoms.add(new Atom(transaction.getNetTotal(), tmp[14]));
+                    atoms.add(new Atom(buyPortfolioTreeTableModel.getNetGainLossValue(transaction), tmp[15]));
+                } else {
+                    atoms.add(new Atom(transaction.getNetTotal() / 100.0, tmp[14]));
+                    atoms.add(new Atom(buyPortfolioTreeTableModel.getNetGainLossValue(transaction) / 100.0, tmp[15]));
+                }
+                atoms.add(new Atom(buyPortfolioTreeTableModel.getNetGainLossPercentage(transaction), tmp[16]));
+                atoms.add(new Atom(transaction.getComment(), tmp[16]));
+                
+                final Statement statement = new Statement(atoms);
+               
+                if (statements.getType() != statement.getType()) {
+                    return UNKNOWN_STATEMENTS;
+                }
+                statements.statements.add(statement);                
+            }
+        }
         return statements;
     }
 
@@ -666,9 +749,9 @@ public class Statements {
                 if (abstractPortfolioTreeTableModel instanceof SellPortfolioTreeTableModelEx) {
                     strings.add(reference_date_string);
                 }
-            }
-            else {
-                final String type = languageIndependent ? abstractPortfolioTreeTableModel.getLanguageIndependentColumnName(i) : abstractPortfolioTreeTableModel.getColumnName(i);
+            } else {
+                // TODO : ???
+                final String type = languageIndependent ? abstractPortfolioTreeTableModel.getColumnName(i) : abstractPortfolioTreeTableModel.getColumnName(i);
                 strings.add(type);
             }
         }
@@ -692,7 +775,8 @@ public class Statements {
                 final Transaction transaction = (Transaction)transactionSummary.getChildAt(j);
                 final List<Atom> atoms = new ArrayList<Atom>();
                 for (int k = 0; k < column; k++) {
-                    final String type = languageIndependent ? abstractPortfolioTreeTableModel.getLanguageIndependentColumnName(k) : abstractPortfolioTreeTableModel.getColumnName(k);
+                    // TODO : ???
+                    final String type = languageIndependent ? abstractPortfolioTreeTableModel.getColumnName(k) : abstractPortfolioTreeTableModel.getColumnName(k);
                     final Object object = abstractPortfolioTreeTableModel.getValueAt(transaction, k);
                     if (abstractPortfolioTreeTableModel.getColumnClass(k).equals(TreeTableModel.class)) {
                         final Stock stock = transaction.getContract().getStock();

@@ -121,15 +121,15 @@ public class Transaction extends DefaultSortableMutableTreeTableNode implements 
         return contract;
     }
 
-    public double getCalculatedBroker() {
+    public double getBroker() {
         return calculatedBroker;
     }
 
-    public double getCalculatedStampDuty() {
+    public double getStampDuty() {
         return calculatedStampDuty;
     }
 
-    public double getCalculatdClearingFee() {
+    public double getClearingFee() {
         return calculatdClearingFee;
     }
         

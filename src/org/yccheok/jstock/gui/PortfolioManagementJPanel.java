@@ -935,9 +935,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             if (remain <= 0) {
                 portfolioTreeTableModel.removeTransaction(buyTransaction);
             } else {
-                final double newBroker = remain / buyTransaction.getQuantity() * buyTransaction.getCalculatedBroker();
-                final double newStampDuty = remain / buyTransaction.getQuantity() * buyTransaction.getCalculatedStampDuty();
-                final double newClearingFee = remain / buyTransaction.getQuantity() * buyTransaction.getCalculatdClearingFee();
+                final double newBroker = remain / buyTransaction.getQuantity() * buyTransaction.getBroker();
+                final double newStampDuty = remain / buyTransaction.getQuantity() * buyTransaction.getStampDuty();
+                final double newClearingFee = remain / buyTransaction.getQuantity() * buyTransaction.getClearingFee();
                 
                 this.editBuyTransaction(
                         buyTransaction.deriveWithQuantity(remain).deriveWithBroker(newBroker).deriveWithStampDuty(newStampDuty).deriveWithClearingFee(newClearingFee), 
@@ -2416,12 +2416,15 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
 
     private void updateWealthHeader() {
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final boolean isFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
+        final boolean isPenceToPoundConversionEnabled = jStockOptions.isPenceToPoundConversionEnabled();
+        
         final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)this.buyTreeTable.getTreeTableModel();
         final SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel = (SellPortfolioTreeTableModelEx)this.sellTreeTable.getTreeTableModel();
       
         // Get the currency exchange rate.
         double exchangeRate = 1.0;
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
         if (jStockOptions.isCurrencyExchangeEnable(jStockOptions.getCountry())) {
             final CurrencyExchangeMonitor _currencyExchangeMonitor = this.currencyExchangeMonitor;
             if (_currencyExchangeMonitor != null) {
@@ -2433,17 +2436,30 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         final double cash;
         final double paperProfit;
         final double realizedProfit;
-        if (false == MainFrame.getInstance().getJStockOptions().isPenceToPoundConversionEnabled()) {
-            share = exchangeRate * buyPortfolioTreeTableModel.getCurrentValue();
-            cash = exchangeRate * (sellPortfolioTreeTableModel.getNetSellingValue() - ((Portfolio)sellPortfolioTreeTableModel.getRoot()).getReferenceTotal() - buyPortfolioTreeTableModel.getNetPurchaseValue() + this.getDepositSummary().getTotal() + this.getDividendSummary().getTotal());
-            paperProfit = exchangeRate * buyPortfolioTreeTableModel.getNetGainLossValue();
-            realizedProfit = exchangeRate * sellPortfolioTreeTableModel.getNetGainLossValue();
-        }
-        else {
-            share = exchangeRate * buyPortfolioTreeTableModel.getCurrentValue() / 100.0;
-            cash = exchangeRate * (sellPortfolioTreeTableModel.getNetSellingValue() / 100.0 - ((Portfolio)sellPortfolioTreeTableModel.getRoot()).getReferenceTotal() / 100.0 - buyPortfolioTreeTableModel.getNetPurchaseValue() / 100.0 + this.getDepositSummary().getTotal() + this.getDividendSummary().getTotal());
-            paperProfit = exchangeRate * buyPortfolioTreeTableModel.getNetGainLossValue() / 100.0;
-            realizedProfit = exchangeRate * sellPortfolioTreeTableModel.getNetGainLossValue() / 100.0;
+        if (false == isPenceToPoundConversionEnabled) {
+            if (isFeeCalculationEnabled) {
+                share = exchangeRate * buyPortfolioTreeTableModel.getCurrentValue();
+                cash = exchangeRate * (sellPortfolioTreeTableModel.getNetSellingValue() - ((Portfolio)sellPortfolioTreeTableModel.getRoot()).getNetReferenceTotal() - buyPortfolioTreeTableModel.getNetPurchaseValue() + this.getDepositSummary().getTotal() + this.getDividendSummary().getTotal());
+                paperProfit = exchangeRate * buyPortfolioTreeTableModel.getNetGainLossValue();
+                realizedProfit = exchangeRate * sellPortfolioTreeTableModel.getNetGainLossValue();
+            } else {
+                share = exchangeRate * buyPortfolioTreeTableModel.getCurrentValue();
+                cash = exchangeRate * (sellPortfolioTreeTableModel.getSellingValue() - ((Portfolio)sellPortfolioTreeTableModel.getRoot()).getReferenceTotal() - buyPortfolioTreeTableModel.getPurchaseValue() + this.getDepositSummary().getTotal() + this.getDividendSummary().getTotal());
+                paperProfit = exchangeRate * buyPortfolioTreeTableModel.getGainLossValue();
+                realizedProfit = exchangeRate * sellPortfolioTreeTableModel.getGainLossValue();                
+            }
+        } else {
+            if (isFeeCalculationEnabled) {
+                share = (exchangeRate * buyPortfolioTreeTableModel.getCurrentValue()) / 100.0;
+                cash = (exchangeRate * (sellPortfolioTreeTableModel.getNetSellingValue() - ((Portfolio)sellPortfolioTreeTableModel.getRoot()).getNetReferenceTotal() - buyPortfolioTreeTableModel.getNetPurchaseValue() + this.getDepositSummary().getTotal() + this.getDividendSummary().getTotal())) / 100.0;
+                paperProfit = (exchangeRate * buyPortfolioTreeTableModel.getNetGainLossValue()) / 100.0;
+                realizedProfit = (exchangeRate * sellPortfolioTreeTableModel.getNetGainLossValue()) / 100.0;
+            } else {
+                share = (exchangeRate * buyPortfolioTreeTableModel.getCurrentValue()) / 100.0;
+                cash = (exchangeRate * (sellPortfolioTreeTableModel.getSellingValue() - ((Portfolio)sellPortfolioTreeTableModel.getRoot()).getReferenceTotal() - buyPortfolioTreeTableModel.getPurchaseValue() + this.getDepositSummary().getTotal() + this.getDividendSummary().getTotal())) / 100.0;
+                paperProfit = (exchangeRate * buyPortfolioTreeTableModel.getGainLossValue()) / 100.0;
+                realizedProfit = (exchangeRate * sellPortfolioTreeTableModel.getGainLossValue()) / 100.0;                
+            }
         }
 
         final double paperProfitPercentage = buyPortfolioTreeTableModel.getNetGainLossPercentage();

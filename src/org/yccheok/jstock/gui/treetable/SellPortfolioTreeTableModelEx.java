@@ -110,8 +110,16 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
         return (portfolio.getTotal() - portfolio.getReferenceTotal()) / portfolio.getReferenceTotal() * 100.0;
     }
     
+    public double getGainLossValue() {
+        return getGainLossValue((Portfolio)getRoot());
+    }
+    
     private double getGainLossValue(Portfolio portfolio) {
         return portfolio.getTotal() - portfolio.getReferenceTotal();
+    }
+    
+    public double getSellingValue() {
+        return ((Portfolio)getRoot()).getTotal();
     }
     
     public double getNetSellingValue() {
@@ -238,13 +246,13 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
                     return getGainLossPercentage(portfolio);
     
                 case 10:
-                    return portfolio.getCalculatedBroker();
+                    return portfolio.getBroker();
                     
                 case 11:
-                    return portfolio.getCalculatedClearingFee();
+                    return portfolio.getClearingFee();
                     
                 case 12:
-                    return portfolio.getCalculatedStampDuty();
+                    return portfolio.getStampDuty();
                     
                 case 13:
                     if (jStockOptions.isPenceToPoundConversionEnabled() == false) {
@@ -322,13 +330,13 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
                     return getGainLossPercentage(transactionSummary);
                     
                 case 10:
-                    return transactionSummary.getCalculatedBroker();
+                    return transactionSummary.getBroker();
                     
                 case 11:
-                    return transactionSummary.getCalculatdClearingFee();
+                    return transactionSummary.getClearingFee();
                     
                 case 12:
-                    return transactionSummary.getCalculatedStampDuty();
+                    return transactionSummary.getStampDuty();
                     
                 case 13:
                     if (jStockOptions.isPenceToPoundConversionEnabled() == false) {
@@ -389,13 +397,13 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
                     return getGainLossPercentage(transaction);
                     
                 case 10:
-                    return transaction.getCalculatedBroker();
+                    return transaction.getBroker();
                     
                 case 11:
-                    return transaction.getCalculatdClearingFee();
+                    return transaction.getClearingFee();
                     
                 case 12:
-                    return transaction.getCalculatedStampDuty();
+                    return transaction.getStampDuty();
                     
                 case 13:
                     return transaction.getNetTotal();

@@ -208,13 +208,13 @@ public class SellPortfolioChartJDialog extends javax.swing.JDialog {
                 data.setValue(symbol.toString(), transactionSummary.getQuantity());                
             }
             else if(name.equals(cNames[17])) {
-                data.setValue(symbol.toString(), transactionSummary.getCalculatedBroker());                
+                data.setValue(symbol.toString(), transactionSummary.getBroker());                
             }
             else if(name.equals(cNames[18])) {
-                data.setValue(symbol.toString(), transactionSummary.getCalculatedStampDuty());                
+                data.setValue(symbol.toString(), transactionSummary.getStampDuty());                
             }
             else if(name.equals(cNames[19])) {
-                data.setValue(symbol.toString(), transactionSummary.getCalculatdClearingFee());                
+                data.setValue(symbol.toString(), transactionSummary.getClearingFee());                
             }            
         }
         
