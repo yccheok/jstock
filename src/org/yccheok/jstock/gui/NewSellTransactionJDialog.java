@@ -379,15 +379,26 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
     }
 
     private void updateBuyValueAfterSpinner(double spinnerQuantity) {
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final boolean isFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
+        
         double quantity = spinnerQuantity;
         double _buyValue = 0.0;
         for (Transaction transaction : buyTransactions) {
             if (quantity >= transaction.getQuantity()) {
-                _buyValue += transaction.getNetTotal();
+                if (isFeeCalculationEnabled) {
+                    _buyValue += transaction.getNetTotal();
+                } else {
+                    _buyValue += transaction.getTotal();
+                }
                 quantity -= transaction.getQuantity();
             } else {
                 if (org.yccheok.jstock.portfolio.Utils.definitelyGreaterThan(quantity, 0)) {
-                    _buyValue += (transaction.getNetPrice() * quantity);
+                    if (isFeeCalculationEnabled) {
+                        _buyValue += (transaction.getNetPrice() * quantity);
+                    } else {
+                        _buyValue += (transaction.getPrice() * quantity);
+                    }
                 }
                 quantity = 0;
                 break;
