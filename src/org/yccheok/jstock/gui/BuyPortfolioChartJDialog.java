@@ -146,8 +146,8 @@ public class BuyPortfolioChartJDialog extends javax.swing.JDialog {
             if(transactionSummary.getChildCount() <= 0) continue;
             
             Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
-            final Symbol symbol = transaction.getContract().getStock().getSymbol();
-            final Code code =  transaction.getContract().getStock().getCode();
+            final Symbol symbol = transaction.getStock().getSymbol();
+            final Code code =  transaction.getStock().getCode();
 
             /* Should use reflection technology. */
             if(name.equals(cNames[0])) {

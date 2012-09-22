@@ -240,8 +240,8 @@ public class Utils {
     }
     
     public static boolean isTransactionWithEqualStockCode(Transaction t0, Transaction t1) {
-        final Code c0 = t0.getContract().getStock().getCode();
-        final Code c1 = t1.getContract().getStock().getCode();
+        final Code c0 = t0.getStock().getCode();
+        final Code c1 = t1.getStock().getCode();
         
         return c0.equals(c1);
     }

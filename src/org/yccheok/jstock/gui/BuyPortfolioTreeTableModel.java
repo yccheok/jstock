@@ -109,7 +109,7 @@ public class BuyPortfolioTreeTableModel extends DeprecatedAbstractPortfolioTreeT
 
             final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
 
-            if (true == transaction.getContract().getStock().getCode().equals(stockInfo.code)) {
+            if (true == transaction.getStock().getCode().equals(stockInfo.code)) {
                 break;
             }
         }
@@ -122,7 +122,7 @@ public class BuyPortfolioTreeTableModel extends DeprecatedAbstractPortfolioTreeT
             final Transaction transaction = (Transaction)transactionSummary.getChildAt(i);
             double quantity = transaction.getQuantity() * ratio;
             // Remember to adjust the purchase price as well.
-            double price = transaction.getContract().getPrice() / ratio;
+            double price = transaction.getPrice() / ratio;
             this.editTransaction(transaction.deriveWithQuantity(quantity).deriveWithPrice(price), transaction);
             status = true;
         }
@@ -147,7 +147,7 @@ public class BuyPortfolioTreeTableModel extends DeprecatedAbstractPortfolioTreeT
             
             final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
             
-            if (true == transaction.getContract().getStock().getCode().equals(code)) {
+            if (true == transaction.getStock().getCode().equals(code)) {
                 break;
             }
         }
@@ -192,7 +192,7 @@ public class BuyPortfolioTreeTableModel extends DeprecatedAbstractPortfolioTreeT
     }
     
     private double getCurrentPrice(Transaction transaction) {
-        final Code code = transaction.getContract().getStock().getCode();
+        final Code code = transaction.getStock().getCode();
         
         final Double price = this.stockPrice.get(code);
 
@@ -202,7 +202,7 @@ public class BuyPortfolioTreeTableModel extends DeprecatedAbstractPortfolioTreeT
     }
     
     private double getCurrentValue(Transaction transaction) {
-        final Code code = transaction.getContract().getStock().getCode();
+        final Code code = transaction.getStock().getCode();
         
         final Double price = this.stockPrice.get(code);
 
@@ -214,7 +214,7 @@ public class BuyPortfolioTreeTableModel extends DeprecatedAbstractPortfolioTreeT
     private double getCurrentValue(TransactionSummary transactionSummary) {
         final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
         
-        final Code code = transaction.getContract().getStock().getCode();
+        final Code code = transaction.getStock().getCode();
         
         final Double price = this.stockPrice.get(code);
 
@@ -432,7 +432,7 @@ public class BuyPortfolioTreeTableModel extends DeprecatedAbstractPortfolioTreeT
             
             switch(column) {
                 case 0:
-                    return ((Transaction)transactionSummary.getChildAt(0)).getContract().getStock().getSymbol();
+                    return ((Transaction)transactionSummary.getChildAt(0)).getStock().getSymbol();
                     
                 case 2:
                     return transactionSummary.getQuantity();
@@ -511,16 +511,16 @@ public class BuyPortfolioTreeTableModel extends DeprecatedAbstractPortfolioTreeT
             
             switch(column) {
                 case 0:
-                    return (transaction).getContract().getStock().getSymbol();
+                    return (transaction).getStock().getSymbol();
 
                 case 1:
-                    return transaction.getContract().getDate();
+                    return transaction.getDate();
                     
                 case 2:
                     return transaction.getQuantity();
                     
                 case 3:
-                    return transaction.getContract().getPrice();
+                    return transaction.getPrice();
                     
                 case 4:
                     return this.getCurrentPrice(transaction);
@@ -593,7 +593,7 @@ public class BuyPortfolioTreeTableModel extends DeprecatedAbstractPortfolioTreeT
 
     @Override
     public boolean isValidTransaction(Transaction transaction) {
-        return (transaction.getContract().getType() == Contract.Type.Buy);
+        return (transaction.getType() == Contract.Type.Buy);
     }
 
     /**
@@ -635,7 +635,7 @@ public class BuyPortfolioTreeTableModel extends DeprecatedAbstractPortfolioTreeT
 
             final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
 
-            set.add(transaction.getContract().getStock().getCode());
+            set.add(transaction.getStock().getCode());
         }
 
         // http://stackoverflow.com/questions/1884889/iterating-over-and-removing-from-a-map

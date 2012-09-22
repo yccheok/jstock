@@ -139,7 +139,7 @@ public class Statements {
             // Metadatas will be used to store TransactionSummary's comment.
             final String comment = transactionSummary.getComment().trim();
             if (comment.isEmpty() == false) {
-                final Stock stock = ((Transaction)transactionSummary.getChildAt(0)).getContract().getStock();
+                final Stock stock = ((Transaction)transactionSummary.getChildAt(0)).getStock();
                 statements.metadatas.put(stock.getCode().toString(), comment);
             }
             
@@ -147,7 +147,7 @@ public class Statements {
             for (int j = 0; j < transactionCount; j++)
             {
                 final Transaction transaction = (Transaction)transactionSummary.getChildAt(j);
-                final Stock stock = transaction.getContract().getStock();
+                final Stock stock = transaction.getStock();
                 final List<Atom> atoms = new ArrayList<Atom>();
                 atoms.add(new Atom(stock.getCode().toString(), tmp[0]));
                 atoms.add(new Atom(stock.getSymbol().toString(), tmp[1]));
@@ -765,7 +765,7 @@ public class Statements {
             // Metadatas will be used to store TransactionSummary's comment.
             final String comment = transactionSummary.getComment().trim();
             if (comment.isEmpty() == false) {
-                final Stock stock = ((Transaction)transactionSummary.getChildAt(0)).getContract().getStock();
+                final Stock stock = ((Transaction)transactionSummary.getChildAt(0)).getStock();
                 s.metadatas.put(stock.getCode().toString(), comment);
             }
             
@@ -779,7 +779,7 @@ public class Statements {
                     final String type = languageIndependent ? abstractPortfolioTreeTableModel.getColumnName(k) : abstractPortfolioTreeTableModel.getColumnName(k);
                     final Object object = abstractPortfolioTreeTableModel.getValueAt(transaction, k);
                     if (abstractPortfolioTreeTableModel.getColumnClass(k).equals(TreeTableModel.class)) {
-                        final Stock stock = transaction.getContract().getStock();
+                        final Stock stock = transaction.getStock();
                         // There are no way to represent Stock in text form. We
                         // will represent them in Code and Symbol.
                         // Code first. Follow by symbol.
@@ -793,7 +793,7 @@ public class Statements {
 
                         // OK. I know. This breaks generalization.
                         if (abstractPortfolioTreeTableModel instanceof SellPortfolioTreeTableModelEx) {
-                            final SimpleDate simpleDate = transaction.getContract().getReferenceDate();
+                            final SimpleDate simpleDate = transaction.getReferenceDate();
                             DateFormat dateFormat = org.yccheok.jstock.gui.Utils.getCommonDateFormat();
                             atoms.add(new Atom(object != null ? dateFormat.format(simpleDate.getTime()) : "", reference_date_string));
                         }

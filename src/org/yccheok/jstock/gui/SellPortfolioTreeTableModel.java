@@ -154,7 +154,7 @@ public class SellPortfolioTreeTableModel extends DeprecatedAbstractPortfolioTree
     }
     
     private double getGainLossPrice(Transaction transaction) {
-        return (transaction.getContract().getPrice() - transaction.getContract().getReferencePrice());
+        return (transaction.getPrice() - transaction.getReferencePrice());
     }
     
     private double getGainLossValue(Transaction transaction) {
@@ -259,7 +259,7 @@ public class SellPortfolioTreeTableModel extends DeprecatedAbstractPortfolioTree
             
             switch(column) {
                 case 0:
-                    return ((Transaction)transactionSummary.getChildAt(0)).getContract().getStock().getSymbol();
+                    return ((Transaction)transactionSummary.getChildAt(0)).getStock().getSymbol();
                     
                 case 2:
                     return transactionSummary.getQuantity();
@@ -338,25 +338,25 @@ public class SellPortfolioTreeTableModel extends DeprecatedAbstractPortfolioTree
             
             switch(column) {
                 case 0:
-                    return (transaction).getContract().getStock().getSymbol();
+                    return (transaction).getStock().getSymbol();
 
                 case 1:
-                    return transaction.getContract().getDate();
+                    return transaction.getDate();
                     
                 case 2:
                     return transaction.getQuantity();
                     
                 case 3:
-                    return transaction.getContract().getPrice();
+                    return transaction.getPrice();
                     
                 case 4:
-                    return transaction.getContract().getReferencePrice();
+                    return transaction.getReferencePrice();
                     
                 case 5:
                     return transaction.getTotal();
                     
                 case 6:
-                    return transaction.getContract().getReferenceTotal();
+                    return transaction.getReferenceTotal();
                     
                 case 7:
                     return getGainLossPrice(transaction);
@@ -404,7 +404,7 @@ public class SellPortfolioTreeTableModel extends DeprecatedAbstractPortfolioTree
         
     @Override
     public boolean isValidTransaction(Transaction transaction) {
-        return (transaction.getContract().getType() == Contract.Type.Sell);
+        return (transaction.getType() == Contract.Type.Sell);
     }
 
 }

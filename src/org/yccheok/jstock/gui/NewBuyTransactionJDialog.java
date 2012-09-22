@@ -310,11 +310,11 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     public void setTransaction(Transaction transaction) {
-        this.stock = transaction.getContract().getStock();
+        this.stock = transaction.getStock();
         final Symbol symbol = stock.getSymbol();
-        final Date date = transaction.getContract().getDate().getCalendar().getTime();
-        final double quantity = transaction.getContract().getQuantity();
-        final double price = transaction.getContract().getPrice();
+        final Date date = transaction.getDate().getCalendar().getTime();
+        final double quantity = transaction.getQuantity();
+        final double price = transaction.getPrice();
         final double value = transaction.getTotal();
         final double brokerFee = transaction.getBroker();
         final double clearingFee = transaction.getClearingFee();

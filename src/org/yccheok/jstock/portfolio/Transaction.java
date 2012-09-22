@@ -22,6 +22,7 @@ package org.yccheok.jstock.portfolio;
 import org.jdesktop.swingx.treetable.TreeTableModel;
 import org.yccheok.jstock.engine.*;
 import org.yccheok.jstock.gui.treetable.DefaultSortableMutableTreeTableNode;
+import org.yccheok.jstock.portfolio.Contract.Type;
 
 /**
  *
@@ -116,10 +117,6 @@ public class Transaction extends DefaultSortableMutableTreeTableNode implements 
                 calculatedStampDuty,
                 clearingFee);
     }
-    
-    public Contract getContract() {
-        return contract;
-    }
 
     public double getBroker() {
         return calculatedBroker;
@@ -132,7 +129,23 @@ public class Transaction extends DefaultSortableMutableTreeTableNode implements 
     public double getClearingFee() {
         return calculatdClearingFee;
     }
-        
+      
+    public SimpleDate getReferenceDate() {
+        return contract.getReferenceDate();
+    }
+    
+    public Type getType() {
+        return contract.getType();
+    }
+    
+    public Stock getStock() {
+        return contract.getStock();
+    }
+    
+    public double getReferencePrice() {
+        return contract.getReferencePrice();
+    }
+    
     public double getReferenceTotal() {
         return contract.getReferenceTotal();
     }
@@ -152,7 +165,7 @@ public class Transaction extends DefaultSortableMutableTreeTableNode implements 
     public SimpleDate getDate() {
         return contract.getDate();
     }
-    
+        
     public double getNetReferenceTotal() {
         return contract.getReferenceTotal() + contract.getReferenceFee();
     }

@@ -542,7 +542,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     
                     Map<String, String> metadatas = statements.getMetadatas();
                     for (Transaction transaction : transactions) {
-                        final Code code = transaction.getContract().getStock().getCode();
+                        final Code code = transaction.getStock().getCode();
                         TransactionSummary transactionSummary = this.addBuyTransaction(transaction);
                         if (transactionSummary != null) {
                             String comment = metadatas.get(code.toString());
@@ -666,7 +666,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     Map<String, String> metadatas = statements.getMetadatas();
 
                     for (Transaction transaction : transactions) {
-                        final Code code = transaction.getContract().getStock().getCode();
+                        final Code code = transaction.getStock().getCode();
                         TransactionSummary transactionSummary = this.addSellTransaction(transaction);
                         if (transactionSummary != null) {
                             String comment = metadatas.get(code.toString());
@@ -951,12 +951,12 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private void showEditTransactionJDialog(Transaction transaction) {
         final MainFrame mainFrame = MainFrame.getInstance();
 
-        if (transaction.getContract().getType() == Contract.Type.Buy) {
+        if (transaction.getType() == Contract.Type.Buy) {
             NewBuyTransactionJDialog newTransactionJDialog = new NewBuyTransactionJDialog(mainFrame, true);
             newTransactionJDialog.setStockSelectionEnabled(false);
             newTransactionJDialog.setTransaction(transaction);
             final String template = GUIBundle.getString("PortfolioManagementJPanel_EditBuy_template");
-            newTransactionJDialog.setTitle(MessageFormat.format(template, transaction.getContract().getStock().getSymbol()));
+            newTransactionJDialog.setTitle(MessageFormat.format(template, transaction.getStock().getSymbol()));
             newTransactionJDialog.setLocationRelativeTo(this);
             newTransactionJDialog.setVisible(true);
 
@@ -967,12 +967,12 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             }        
         }
         else {
-            assert(transaction.getContract().getType() == Contract.Type.Sell);
+            assert(transaction.getType() == Contract.Type.Sell);
             
             NewSellTransactionJDialog newTransactionJDialog = new NewSellTransactionJDialog(mainFrame, true);
             newTransactionJDialog.setSellTransaction(transaction);
             final String template = GUIBundle.getString("PortfolioManagementJPanel_EditSell_template");
-            newTransactionJDialog.setTitle(MessageFormat.format(template, transaction.getContract().getStock().getSymbol()));
+            newTransactionJDialog.setTitle(MessageFormat.format(template, transaction.getStock().getSymbol()));
             newTransactionJDialog.setLocationRelativeTo(this);
             newTransactionJDialog.setVisible(true);
 
@@ -1645,16 +1645,16 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
 
     private void editSellTransaction(Transaction newTransaction, Transaction oldTransaction) {
-        assert(newTransaction.getContract().getType() == Contract.Type.Sell);
-        assert(oldTransaction.getContract().getType() == Contract.Type.Sell);
+        assert(newTransaction.getType() == Contract.Type.Sell);
+        assert(oldTransaction.getType() == Contract.Type.Sell);
         
         final SellPortfolioTreeTableModelEx portfolioTreeTableModel = (SellPortfolioTreeTableModelEx)sellTreeTable.getTreeTableModel();
         portfolioTreeTableModel.editTransaction(newTransaction, oldTransaction);        
     }
     
     private void editBuyTransaction(Transaction newTransaction, Transaction oldTransaction) {
-        assert(newTransaction.getContract().getType() == Contract.Type.Buy);
-        assert(oldTransaction.getContract().getType() == Contract.Type.Buy);
+        assert(newTransaction.getType() == Contract.Type.Buy);
+        assert(oldTransaction.getType() == Contract.Type.Buy);
         
         final BuyPortfolioTreeTableModelEx portfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
         portfolioTreeTableModel.editTransaction(newTransaction, oldTransaction);        
@@ -1671,7 +1671,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
 
     private TransactionSummary addBuyTransaction(Transaction transaction) {
-        assert(transaction.getContract().getType() == Contract.Type.Buy);
+        assert(transaction.getType() == Contract.Type.Buy);
         
         final BuyPortfolioTreeTableModelEx portfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
         TransactionSummary transactionSummary = portfolioTreeTableModel.addTransaction(transaction);
@@ -1680,7 +1680,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         // Information will be pumped in later to realTimeStockMonitor, through 
         // initRealTimeStockMonitor.
         if (this.realTimeStockMonitor != null) {
-            this.realTimeStockMonitor.addStockCode(transaction.getContract().getStock().getCode());
+            this.realTimeStockMonitor.addStockCode(transaction.getStock().getCode());
             this.realTimeStockMonitor.refresh();
         }
         
@@ -1723,7 +1723,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
             Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
 
-            Stock stock = transaction.getContract().getStock();
+            Stock stock = transaction.getStock();
 
             if (codes.contains(stock.getCode()) == false) {
                 codes.add(stock.getCode());
@@ -1740,7 +1740,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
             Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
 
-            Stock stock = transaction.getContract().getStock();
+            Stock stock = transaction.getStock();
 
             if (codes.contains(stock.getCode()) == false) {
                 codes.add(stock.getCode());
@@ -1752,7 +1752,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
 
     private TransactionSummary addSellTransaction(Transaction transaction) {
-        assert(transaction.getContract().getType() == Contract.Type.Sell);
+        assert(transaction.getType() == Contract.Type.Sell);
         
         final SellPortfolioTreeTableModelEx portfolioTreeTableModel = (SellPortfolioTreeTableModelEx)sellTreeTable.getTreeTableModel();
         return portfolioTreeTableModel.addTransaction(transaction);
@@ -1778,7 +1778,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 
                 final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
 
-                this.realTimeStockMonitor.addStockCode(transaction.getContract().getStock().getCode());
+                this.realTimeStockMonitor.addStockCode(transaction.getStock().getCode());
             }
             this.realTimeStockMonitor.refresh();
         }
@@ -1801,7 +1801,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 final TransactionSummary transactionSummary = (TransactionSummary)lastPathComponent;
                 assert(transactionSummary.getChildCount() > 0);
                 final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
-                final Stock stock = transaction.getContract().getStock();
+                final Stock stock = transaction.getStock();
                 final Code code = stock.getCode();
                 
                 if(c.contains(code)) continue;
@@ -1811,7 +1811,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             }
             else if (lastPathComponent instanceof Transaction) {
                 final Transaction transaction = (Transaction)lastPathComponent;
-                final Stock stock = transaction.getContract().getStock();
+                final Stock stock = transaction.getStock();
                 final Code code = stock.getCode();
                 
                 if(c.contains(code)) continue;

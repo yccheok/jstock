@@ -442,8 +442,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         for (TransactionSummary transactionSummary : transactionSummaries) {
             for (int i = 0, count = transactionSummary.getChildCount(); i < count; i++) {
                 final Transaction transaction = (Transaction)transactionSummary.getChildAt(i);
-                final Contract contract = transaction.getContract();
-                StockInfo stockInfo = new StockInfo(contract.getStock().getCode(), contract.getStock().getSymbol());
+                StockInfo stockInfo = new StockInfo(transaction.getStock().getCode(), transaction.getStock().getSymbol());
                 if (stockInfos.contains(stockInfo) == false) {
                     stockInfos.add(stockInfo);
                 }
@@ -488,38 +487,36 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
             final int count = transactionSummary.getChildCount();
             for (int i = 0; i < count; i++) {
                 final Transaction transaction = (Transaction)transactionSummary.getChildAt(i);
-                final Contract contract = transaction.getContract();
                 if (selectedIndex != 0) {
                     // selectedIndex - 1, as the first item in combo box is "All Stock(s)".
                     final Code code = this.stockInfos.get(selectedIndex - 1).code;
-                    if (false == contract.getStock().getCode().equals(code)) {
+                    if (false == transaction.getStock().getCode().equals(code)) {
                         continue;
                     }
                 }
-                Contract.Type type = contract.getType();
+                Contract.Type type = transaction.getType();
                 if (type == Contract.Type.Buy) {
                     final Activity activity = new Activity.Builder(Activity.Type.Buy, 
                             isFeeCalculationEnabled ? transaction.getNetTotal() : transaction.getTotal()).
-                            put(Activity.Param.Stock, contract.getStock()).
-                            put(Activity.Param.Quantity, contract.getQuantity()).
+                            put(Activity.Param.Stock, transaction.getStock()).
+                            put(Activity.Param.Quantity, transaction.getQuantity()).
                             build();
-                    this.ROISummary.add(contract.getDate(), activity);
-                    this.investSummary.add(contract.getDate(), activity);
+                    this.ROISummary.add(transaction.getDate(), activity);
+                    this.investSummary.add(transaction.getDate(), activity);
                 } else if (type == Contract.Type.Sell) {
                     final Activity activity0 = new Activity.Builder(Activity.Type.Buy, 
                             isFeeCalculationEnabled ? transaction.getNetReferenceTotal() : transaction.getReferenceTotal()).
-                            put(Activity.Param.Stock, contract.getStock()).
-                            put(Activity.Param.Quantity, contract.getQuantity()).
+                            put(Activity.Param.Stock, transaction.getStock()).
+                            put(Activity.Param.Quantity, transaction.getQuantity()).
                             build();
-                    this.investSummary.add(contract.getReferenceDate(), activity0);
+                    this.investSummary.add(transaction.getReferenceDate(), activity0);
                     final Activity activity1 = new Activity.Builder(Activity.Type.Sell, 
                             isFeeCalculationEnabled ? transaction.getNetTotal() : transaction.getTotal()).
-                            put(Activity.Param.Stock, contract.getStock()).
-                            put(Activity.Param.Quantity, contract.getQuantity()).
+                            put(Activity.Param.Stock, transaction.getStock()).
+                            put(Activity.Param.Quantity, transaction.getQuantity()).
                             build();
-                    this.ROISummary.add(contract.getDate(), activity1);
-                }
-                else {
+                    this.ROISummary.add(transaction.getDate(), activity1);
+                } else {
                     throw new java.lang.UnsupportedOperationException("Unsupported contract type " + type);
                 }
             }

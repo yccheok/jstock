@@ -348,7 +348,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         buyTransactions.clear();
         buyTransactions.addAll(transactions);
 
-        final Stock _stock = transactions.get(0).getContract().getStock();
+        final Stock _stock = transactions.get(0).getStock();
         final Symbol symbol = _stock.getSymbol();
         final Date date = java.util.Calendar.getInstance().getTime();
 
@@ -397,24 +397,24 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
     }
     
     public void setSellTransaction(Transaction transaction) {
-        assert(transaction.getContract().getType() == Contract.Type.Sell);
+        assert(transaction.getType() == Contract.Type.Sell);
 
         // Ensure we only edit.
         if (this.buyTransactions.size() > 0) {
             throw new java.lang.UnsupportedOperationException("You cannot sell transaction and edit transaction at the same time");
         }
 
-        if (transaction.getContract().getType() != Contract.Type.Sell) {
+        if (transaction.getType() != Contract.Type.Sell) {
             throw new java.lang.UnsupportedOperationException("You can only edit sell transaction");
         }
 
         this.sellTransaction = transaction;
 
-        final Stock _stock = transaction.getContract().getStock();
+        final Stock _stock = transaction.getStock();
         final Symbol symbol = _stock.getSymbol();
-        final Date date = transaction.getContract().getDate().getCalendar().getTime();
-        final double quantity = transaction.getContract().getQuantity();
-        final double price = transaction.getContract().getPrice();
+        final Date date = transaction.getDate().getCalendar().getTime();
+        final double quantity = transaction.getQuantity();
+        final double price = transaction.getPrice();
         final double value = transaction.getTotal();
         final double brokerFee = transaction.getBroker();
         final double clearingFee = transaction.getClearingFee();
@@ -431,9 +431,9 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         this.jFormattedTextField7.setValue(stampDuty);
         this.jFormattedTextField6.setValue(netValue);
 
-        this.stock = transaction.getContract().getStock();
+        this.stock = transaction.getStock();
         this.type = Contract.Type.Sell;
-        this.buyValue = transaction.getContract().getReferenceTotal();
+        this.buyValue = transaction.getReferenceTotal();
 
         update();
     }
