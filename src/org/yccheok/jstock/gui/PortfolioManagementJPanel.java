@@ -570,6 +570,13 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                         final String _code = statement.getValueAsString(guiBundleWrapper.getString("MainFrame_Code"));
                         final String _symbol = statement.getValueAsString(guiBundleWrapper.getString("MainFrame_Symbol"));
                         final String _referenceDate = statement.getValueAsString(guiBundleWrapper.getString("PortfolioManagementJPanel_ReferenceDate"));
+                        
+                        // Legacy file handling. PortfolioManagementJPanel_PurchaseFee is introduced starting from 1.0.6s
+                        Double referenceFee = statement.getValueAsDouble(guiBundleWrapper.getString("PortfolioManagementJPanel_PurchaseFee"));
+                        if (referenceFee == null) {
+                            referenceFee = new Double(0.0);
+                        }
+                        
                         final String _date = statement.getValueAsString(guiBundleWrapper.getString("PortfolioManagementJPanel_Date"));
                         final Double units = statement.getValueAsDouble(guiBundleWrapper.getString("PortfolioManagementJPanel_Units"));
                         final Double sellingPrice =  statement.getValueAsDouble(guiBundleWrapper.getString("PortfolioManagementJPanel_SellingPrice"));
@@ -641,7 +648,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                         final SimpleDate simpleReferenceDate = new SimpleDate(referenceDate);
                         final Contract.Type type = Contract.Type.Sell;
                         final Contract.ContractBuilder builder = new Contract.ContractBuilder(stock, simpleDate);
-                        final Contract contract = builder.type(type).quantity(units).price(sellingPrice).referencePrice(purchasePrice).referenceDate(simpleReferenceDate).build();
+                        final Contract contract = builder.type(type).quantity(units).price(sellingPrice).referencePrice(purchasePrice).referenceDate(simpleReferenceDate).referenceFee(referenceFee).build();
                         final Transaction t = new Transaction(contract, broker, stampDuty, clearingFee);
                         t.setComment(org.yccheok.jstock.portfolio.Utils.replaceCSVLineFeedToSystemLineFeed(_comment));
                         transactions.add(t);
@@ -2451,12 +2458,12 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         } else {
             if (isFeeCalculationEnabled) {
                 share = (exchangeRate * buyPortfolioTreeTableModel.getCurrentValue()) / 100.0;
-                cash = (exchangeRate * (sellPortfolioTreeTableModel.getNetSellingValue() - ((Portfolio)sellPortfolioTreeTableModel.getRoot()).getNetReferenceTotal() - buyPortfolioTreeTableModel.getNetPurchaseValue() + this.getDepositSummary().getTotal() + this.getDividendSummary().getTotal())) / 100.0;
+                cash = exchangeRate * (sellPortfolioTreeTableModel.getNetSellingValue() / 100.0 - ((Portfolio)sellPortfolioTreeTableModel.getRoot()).getNetReferenceTotal() / 100.0 - buyPortfolioTreeTableModel.getNetPurchaseValue() / 100.0 + this.getDepositSummary().getTotal() + this.getDividendSummary().getTotal());
                 paperProfit = (exchangeRate * buyPortfolioTreeTableModel.getNetGainLossValue()) / 100.0;
                 realizedProfit = (exchangeRate * sellPortfolioTreeTableModel.getNetGainLossValue()) / 100.0;
             } else {
                 share = (exchangeRate * buyPortfolioTreeTableModel.getCurrentValue()) / 100.0;
-                cash = (exchangeRate * (sellPortfolioTreeTableModel.getSellingValue() - ((Portfolio)sellPortfolioTreeTableModel.getRoot()).getReferenceTotal() - buyPortfolioTreeTableModel.getPurchaseValue() + this.getDepositSummary().getTotal() + this.getDividendSummary().getTotal())) / 100.0;
+                cash = exchangeRate * (sellPortfolioTreeTableModel.getSellingValue() / 100.0 - ((Portfolio)sellPortfolioTreeTableModel.getRoot()).getReferenceTotal() / 100.0 - buyPortfolioTreeTableModel.getPurchaseValue() / 100.0 + this.getDepositSummary().getTotal() + this.getDividendSummary().getTotal());
                 paperProfit = (exchangeRate * buyPortfolioTreeTableModel.getGainLossValue()) / 100.0;
                 realizedProfit = (exchangeRate * sellPortfolioTreeTableModel.getGainLossValue()) / 100.0;                
             }

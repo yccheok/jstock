@@ -205,6 +205,7 @@ public class Statement {
             strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_PurchasePrice"));
             strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_SellingValue"));
             strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_PurchaseValue"));
+            strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_PurchaseFee"));
             strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_GainLossPrice"));
             strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_GainLossValue"));
             strings.add(guiBundleWrapper.getString("PortfolioManagementJPanel_GainLossPercentage"));
@@ -328,6 +329,10 @@ public class Statement {
             }
         }
         if (size == 19) {
+            // Note, this code block is for legacy purpose. It should be removed
+            // after a while. The new code block should have PortfolioManagementJPanel_PurchaseFee.
+            // PortfolioManagementJPanel_PurchaseFee is introduced starting from 1.0.6s
+
             /* Wow! Beware, Stock will being translated into Code and Symbol */
             // GUIBundle.getString("PortfolioManagementJPanel_Stock")
             if (
@@ -354,6 +359,32 @@ public class Statement {
                 return Type.PortfolioManagementSell;
             }
         }
+        if (size == 20) {
+            if (
+            atoms.get(0).getType().equals(guiBundleWrapper.getString("MainFrame_Code")) &&
+            atoms.get(1).getType().equals(guiBundleWrapper.getString("MainFrame_Symbol")) &&
+            atoms.get(2).getType().equals(guiBundleWrapper.getString("PortfolioManagementJPanel_ReferenceDate")) &&
+            atoms.get(3).getType().equals(guiBundleWrapper.getString("PortfolioManagementJPanel_Date")) &&
+            atoms.get(4).getType().equals(guiBundleWrapper.getString("PortfolioManagementJPanel_Units")) &&
+            atoms.get(5).getType().equals(guiBundleWrapper.getString("PortfolioManagementJPanel_SellingPrice")) &&
+            atoms.get(6).getType().equals(guiBundleWrapper.getString("PortfolioManagementJPanel_PurchasePrice")) &&
+            atoms.get(7).getType().equals(guiBundleWrapper.getString("PortfolioManagementJPanel_SellingValue")) &&
+            atoms.get(8).getType().equals(guiBundleWrapper.getString("PortfolioManagementJPanel_PurchaseValue")) &&
+            atoms.get(9).getType().equals(guiBundleWrapper.getString("PortfolioManagementJPanel_PurchaseFee")) &&
+            atoms.get(10).getType().equals(guiBundleWrapper.getString("PortfolioManagementJPanel_GainLossPrice")) &&
+            atoms.get(11).getType().equals(guiBundleWrapper.getString("PortfolioManagementJPanel_GainLossValue")) &&
+            atoms.get(12).getType().equals(guiBundleWrapper.getString("PortfolioManagementJPanel_GainLossPercentage")) &&
+            atoms.get(13).getType().equals(guiBundleWrapper.getString("PortfolioManagementJPanel_Broker")) &&
+            atoms.get(14).getType().equals(guiBundleWrapper.getString("PortfolioManagementJPanel_ClearingFee")) &&
+            atoms.get(15).getType().equals(guiBundleWrapper.getString("PortfolioManagementJPanel_StampDuty")) &&
+            atoms.get(16).getType().equals(guiBundleWrapper.getString("PortfolioManagementJPanel_NetSellingValue")) &&
+            atoms.get(17).getType().equals(guiBundleWrapper.getString("PortfolioManagementJPanel_NetGainLossValue")) &&
+            atoms.get(18).getType().equals(guiBundleWrapper.getString("PortfolioManagementJPanel_NetGainLossPercentage")) &&
+            atoms.get(19).getType().equals(guiBundleWrapper.getString("PortfolioManagementJPanel_Comment"))
+            ) {
+                return Type.PortfolioManagementSell;
+            }
+        }                
         if (size == 2) {
             // Legacy CSV file handling. As in version <=1.0.6p, comment
             // is not being saved to CSV.

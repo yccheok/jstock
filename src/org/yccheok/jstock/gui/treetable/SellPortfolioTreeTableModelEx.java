@@ -166,21 +166,27 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
         return (transactionSummary.getNetTotal() - transactionSummary.getNetReferenceTotal()) / transactionSummary.getNetReferenceTotal() * 100.0;
     }
     
-    private double getGainLossValue(Transaction transaction) {
+    public double getGainLossPrice(Transaction transaction) {
+        if (transaction.getQuantity() == 0.0) return 0.0;
+        
+        return ((transaction.getTotal() - transaction.getReferenceTotal()) / transaction.getQuantity());        
+    }
+    
+    public double getGainLossValue(Transaction transaction) {
         return transaction.getTotal() - transaction.getReferenceTotal();
     }
 
-    private double getGainLossPercentage(Transaction transaction) {
-        if(transaction.getReferenceTotal() == 0.0) return 0.0;
+    public double getGainLossPercentage(Transaction transaction) {
+        if (transaction.getReferenceTotal() == 0.0) return 0.0;
         
         return (transaction.getTotal() - transaction.getReferenceTotal()) / transaction.getReferenceTotal() * 100.0;
     }
 
-    private double getNetGainLossValue(Transaction transaction) {
+    public double getNetGainLossValue(Transaction transaction) {
         return transaction.getNetTotal() - transaction.getNetReferenceTotal();
     }
 
-    private double getNetGainLossPercentage(Transaction transaction) {
+    public double getNetGainLossPercentage(Transaction transaction) {
         if (transaction.getNetReferenceTotal() == 0.0) return 0.0;
         
         return (transaction.getNetTotal() - transaction.getNetReferenceTotal()) / transaction.getNetReferenceTotal() * 100.0;

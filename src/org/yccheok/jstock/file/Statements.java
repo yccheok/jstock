@@ -153,7 +153,7 @@ public class Statements {
                 atoms.add(new Atom(stock.getSymbol().toString(), tmp[1]));
                 
                 DateFormat dateFormat = org.yccheok.jstock.gui.Utils.getCommonDateFormat();
-                final String dateString = transaction.getDate() != null ? dateFormat.format(transaction.getDate()) : "";                        
+                final String dateString = transaction.getDate() != null ? dateFormat.format(transaction.getDate().getTime()) : "";                        
                 atoms.add(new Atom(dateString, tmp[2]));
                 atoms.add(new Atom(transaction.getQuantity(), tmp[3]));
                 atoms.add(new Atom(transaction.getPrice(), tmp[4]));
@@ -182,7 +182,7 @@ public class Statements {
                     atoms.add(new Atom(buyPortfolioTreeTableModel.getNetGainLossValue(transaction) / 100.0, tmp[15]));
                 }
                 atoms.add(new Atom(buyPortfolioTreeTableModel.getNetGainLossPercentage(transaction), tmp[16]));
-                atoms.add(new Atom(transaction.getComment(), tmp[16]));
+                atoms.add(new Atom(transaction.getComment(), tmp[17]));
                 
                 final Statement statement = new Statement(atoms);
                
@@ -720,7 +720,111 @@ public class Statements {
     }
 
     public static Statements newInstanceFromSellPortfolioTreeTableModel(SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel, boolean languageIndependent) {
-        return newInstanceFromAbstractPortfolioTreeTableModel(sellPortfolioTreeTableModel, languageIndependent);
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final boolean isPenceToPoundConversionEnabled = jStockOptions.isPenceToPoundConversionEnabled();
+
+        final GUIBundleWrapper guiBundleWrapper = GUIBundleWrapper.newInstance(languageIndependent ? GUIBundleWrapper.Language.INDEPENDENT : GUIBundleWrapper.Language.DEFAULT);
+        
+        final String[] tmp = {            
+            guiBundleWrapper.getString("MainFrame_Code"),
+            guiBundleWrapper.getString("MainFrame_Symbol"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_ReferenceDate"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_Date"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_Units"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_SellingPrice"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_PurchasePrice"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_SellingValue"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_PurchaseValue"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_PurchaseFee"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_GainLossPrice"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_GainLossValue"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_GainLossPercentage"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_Broker"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_ClearingFee"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_StampDuty"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_NetSellingValue"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_NetGainLossValue"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_NetGainLossPercentage"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_Comment")
+        };
+        
+        Statement.What what = Statement.what(Arrays.asList(tmp));
+        final Statements statements = new Statements(what.type, what.guiBundleWrapper);
+
+        final Portfolio portfolio = (Portfolio)sellPortfolioTreeTableModel.getRoot();
+        final int summaryCount = portfolio.getChildCount();
+
+        for (int i = 0; i < summaryCount; i++) {
+            Object o = portfolio.getChildAt(i);
+            final TransactionSummary transactionSummary = (TransactionSummary)o;
+            
+            // Metadatas will be used to store TransactionSummary's comment.
+            final String comment = transactionSummary.getComment().trim();
+            if (comment.isEmpty() == false) {
+                final Stock stock = ((Transaction)transactionSummary.getChildAt(0)).getStock();
+                statements.metadatas.put(stock.getCode().toString(), comment);
+            }
+
+            final int transactionCount = transactionSummary.getChildCount();
+            for (int j = 0; j < transactionCount; j++)
+            {
+                final Transaction transaction = (Transaction)transactionSummary.getChildAt(j);
+                final Stock stock = transaction.getStock();
+                final List<Atom> atoms = new ArrayList<Atom>();
+                atoms.add(new Atom(stock.getCode().toString(), tmp[0]));
+                atoms.add(new Atom(stock.getSymbol().toString(), tmp[1]));
+                
+                DateFormat dateFormat = org.yccheok.jstock.gui.Utils.getCommonDateFormat();
+                final String referenceDateString = transaction.getReferenceDate() != null ? dateFormat.format(transaction.getReferenceDate().getTime()) : "";
+                atoms.add(new Atom(referenceDateString, tmp[2]));
+                final String dateString = transaction.getDate() != null ? dateFormat.format(transaction.getReferenceDate().getTime()) : "";
+                atoms.add(new Atom(dateString, tmp[3]));
+                atoms.add(new Atom(transaction.getQuantity(), tmp[4]));
+                atoms.add(new Atom(transaction.getPrice(), tmp[5]));
+                atoms.add(new Atom(transaction.getReferencePrice(), tmp[6]));
+                
+                if (isPenceToPoundConversionEnabled == false) {
+                    atoms.add(new Atom(transaction.getTotal(), tmp[7]));                
+                    atoms.add(new Atom(transaction.getReferenceTotal(), tmp[8]));
+                } else {
+                    atoms.add(new Atom(transaction.getTotal() / 100.0, tmp[7]));                
+                    atoms.add(new Atom(transaction.getReferenceTotal() / 100.0, tmp[8]));                    
+                }
+                
+                atoms.add(new Atom(transaction.getReferenceFee(), tmp[9]));
+                atoms.add(new Atom(sellPortfolioTreeTableModel.getGainLossPrice(transaction), tmp[10]));
+                
+                if (isPenceToPoundConversionEnabled == false) {
+                    atoms.add(new Atom(sellPortfolioTreeTableModel.getGainLossValue(transaction), tmp[11]));
+                } else {
+                    atoms.add(new Atom(sellPortfolioTreeTableModel.getGainLossValue(transaction) / 100.0, tmp[11]));
+                }
+                
+                atoms.add(new Atom(sellPortfolioTreeTableModel.getGainLossPercentage(transaction), tmp[12]));
+                atoms.add(new Atom(transaction.getBroker(), tmp[13]));
+                atoms.add(new Atom(transaction.getClearingFee(), tmp[14]));
+                atoms.add(new Atom(transaction.getStampDuty(), tmp[15]));
+                
+                if (isPenceToPoundConversionEnabled == false) {
+                    atoms.add(new Atom(transaction.getNetTotal(), tmp[16]));                
+                    atoms.add(new Atom(sellPortfolioTreeTableModel.getNetGainLossValue(transaction), tmp[17]));                    
+                } else {
+                    atoms.add(new Atom(transaction.getNetTotal() / 100.0, tmp[16]));                
+                    atoms.add(new Atom(sellPortfolioTreeTableModel.getNetGainLossValue(transaction) / 100.0, tmp[17]));                                        
+                }
+                
+                atoms.add(new Atom(sellPortfolioTreeTableModel.getNetGainLossPercentage(transaction), tmp[18]));
+                atoms.add(new Atom(transaction.getComment(), tmp[19]));
+                
+                final Statement statement = new Statement(atoms);
+               
+                if (statements.getType() != statement.getType()) {
+                    return UNKNOWN_STATEMENTS;
+                }
+                statements.statements.add(statement);                
+            }
+        }
+        return statements;
     }
     
     /**

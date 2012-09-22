@@ -150,6 +150,14 @@ public class Transaction extends DefaultSortableMutableTreeTableNode implements 
         return contract.getReferenceTotal();
     }
     
+    public Contract getContract() {
+        return contract;
+    }
+
+    public double getReferenceFee() {
+        return contract.getReferenceFee();
+    }
+
     public double getPrice() {
         return contract.getPrice();
     }

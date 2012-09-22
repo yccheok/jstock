@@ -20,7 +20,9 @@
 package org.yccheok.jstock.gui;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -42,22 +44,13 @@ import org.yccheok.jstock.portfolio.TransactionSummary;
 public class BuyPortfolioChartJDialog extends javax.swing.JDialog {
     
     private static final String[] cNames = {
-        GUIBundle.getString("BuyPortfolioTreeTableModel_NetGainValue"),
-        GUIBundle.getString("BuyPortfolioTreeTableModel_NetLossValue"),
         GUIBundle.getString("BuyPortfolioTreeTableModel_GainValue"),
         GUIBundle.getString("BuyPortfolioTreeTableModel_LossValue"),
-        GUIBundle.getString("BuyPortfolioTreeTableModel_NetGainPercentage"),
-        GUIBundle.getString("BuyPortfolioTreeTableModel_NetLossPercentage"),
         GUIBundle.getString("BuyPortfolioTreeTableModel_GainPercentage"),
         GUIBundle.getString("BuyPortfolioTreeTableModel_LossPercentage"),
         GUIBundle.getString("BuyPortfolioTreeTableModel_Dividend"),
-        GUIBundle.getString("BuyPortfolioTreeTableModel_NetPurchaseValue"),
         GUIBundle.getString("BuyPortfolioTreeTableModel_PurchaseValue"),
         GUIBundle.getString("BuyPortfolioTreeTableModel_CurrentValue"),
-        GUIBundle.getString("BuyPortfolioTreeTableModel_GainPrice"),
-        GUIBundle.getString("BuyPortfolioTreeTableModel_LossPrice"),
-        GUIBundle.getString("BuyPortfolioTreeTableModel_PurchasePrice"),
-        GUIBundle.getString("BuyPortfolioTreeTableModel_CurrentPrice"),
         GUIBundle.getString("BuyPortfolioTreeTableModel_Units"),
         GUIBundle.getString("BuyPortfolioTreeTableModel_Broker"),
         GUIBundle.getString("BuyPortfolioTreeTableModel_StampDuty"),
@@ -117,7 +110,19 @@ public class BuyPortfolioChartJDialog extends javax.swing.JDialog {
 
         jPanel1.setLayout(new java.awt.BorderLayout());
 
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final boolean isFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
+        Set<String> excludedStrings = new HashSet<String>();
+        excludedStrings.add(GUIBundle.getString("BuyPortfolioTreeTableModel_Broker"));
+        excludedStrings.add(GUIBundle.getString("BuyPortfolioTreeTableModel_StampDuty"));
+        excludedStrings.add(GUIBundle.getString("BuyPortfolioTreeTableModel_ClearingFee"));
         for(String cName : this.cNames) {
+            if (isFeeCalculationEnabled == false) {
+                if (excludedStrings.contains(cName)) {
+                    continue;
+                }
+            }
+
             this.jComboBox1.addItem(cName);
         }
         jComboBox1.addActionListener(new java.awt.event.ActionListener() {
@@ -136,6 +141,10 @@ public class BuyPortfolioChartJDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private JFreeChart createChart(String name) {
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final boolean isFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
+        final boolean isPenceToPoundConversionEnabled = jStockOptions.isPenceToPoundConversionEnabled();
+        
         final Portfolio portfolio = (Portfolio)portfolioTreeTableModel.getRoot();
         final int count = portfolio.getChildCount();
         DefaultPieDataset data = new DefaultPieDataset();
@@ -151,71 +160,81 @@ public class BuyPortfolioChartJDialog extends javax.swing.JDialog {
 
             /* Should use reflection technology. */
             if(name.equals(cNames[0])) {
-                data.setValue(symbol.toString(), portfolioTreeTableModel.getNetGainLossValue(transactionSummary));
-            }
-            if(name.equals(cNames[1])) {
-                data.setValue(symbol.toString(), -portfolioTreeTableModel.getNetGainLossValue(transactionSummary));
-            }            
-            else if(name.equals(cNames[2])) {
-                data.setValue(symbol.toString(), portfolioTreeTableModel.getGainLossValue(transactionSummary));
-            }
-            else if(name.equals(cNames[3])) {
-                data.setValue(symbol.toString(), -portfolioTreeTableModel.getGainLossValue(transactionSummary));
-            }            
-            else if(name.equals(cNames[4])) {
-                data.setValue(symbol.toString(), portfolioTreeTableModel.getNetGainLossPercentage(transactionSummary));
-            }
-            else if(name.equals(cNames[5])) {
-                data.setValue(symbol.toString(), -portfolioTreeTableModel.getNetGainLossPercentage(transactionSummary));
-            }
-            else if(name.equals(cNames[6])) {
-                data.setValue(symbol.toString(), portfolioTreeTableModel.getGainLossPercentage(transactionSummary));
-            }
-            else if(name.equals(cNames[7])) {
-                data.setValue(symbol.toString(), -portfolioTreeTableModel.getGainLossPercentage(transactionSummary));
-            }            
-            else if(name.equals(cNames[8])) {
+                if (isPenceToPoundConversionEnabled == false) {
+                    if (isFeeCalculationEnabled) {
+                        data.setValue(symbol.toString(), portfolioTreeTableModel.getNetGainLossValue(transactionSummary));
+                    } else {
+                        data.setValue(symbol.toString(), portfolioTreeTableModel.getGainLossValue(transactionSummary));
+                    }
+                } else {
+                    if (isFeeCalculationEnabled) {
+                        data.setValue(symbol.toString(), portfolioTreeTableModel.getNetGainLossValue(transactionSummary) / 100.0);
+                    } else {
+                        data.setValue(symbol.toString(), portfolioTreeTableModel.getGainLossValue(transactionSummary) / 100.0);
+                    }                    
+                }
+            } else if(name.equals(cNames[1])) {
+                if (isPenceToPoundConversionEnabled == false) {
+                    if (isFeeCalculationEnabled) {
+                        data.setValue(symbol.toString(), -portfolioTreeTableModel.getNetGainLossValue(transactionSummary));
+                    } else {
+                        data.setValue(symbol.toString(), -portfolioTreeTableModel.getGainLossValue(transactionSummary));
+                    }
+                } else {
+                    if (isFeeCalculationEnabled) {
+                        data.setValue(symbol.toString(), -portfolioTreeTableModel.getNetGainLossValue(transactionSummary) / 100.0);
+                    } else {
+                        data.setValue(symbol.toString(), -portfolioTreeTableModel.getGainLossValue(transactionSummary) / 100.0);
+                    }                    
+                }
+            } else if(name.equals(cNames[2])) {
+                if (isFeeCalculationEnabled) {
+                    data.setValue(symbol.toString(), portfolioTreeTableModel.getNetGainLossPercentage(transactionSummary));
+                } else {
+                    data.setValue(symbol.toString(), portfolioTreeTableModel.getGainLossPercentage(transactionSummary));
+                }
+            } else if(name.equals(cNames[3])) {
+                if (isFeeCalculationEnabled) {
+                    data.setValue(symbol.toString(), -portfolioTreeTableModel.getNetGainLossPercentage(transactionSummary));
+                } else {
+                    data.setValue(symbol.toString(), -portfolioTreeTableModel.getGainLossPercentage(transactionSummary));
+                }
+            } else if(name.equals(cNames[4])) {
                 Double value = this.codeToTotalDividend.get(code);
                 if (value != null) {
                     if (value.doubleValue() > 0.0) {
                         data.setValue(symbol.toString(), this.codeToTotalDividend.get(code));
                     }
                 }
-            }
-            else if(name.equals(cNames[9])) {
-                data.setValue(symbol.toString(), transactionSummary.getNetTotal());                
-            }
-            else if(name.equals(cNames[10])) {
-                data.setValue(symbol.toString(), transactionSummary.getTotal());                
-            }
-            else if(name.equals(cNames[11])) {
-                data.setValue(symbol.toString(), portfolioTreeTableModel.getCurrentValue(transactionSummary));                
-            }
-            else if(name.equals(cNames[12])) {
-                data.setValue(symbol.toString(), portfolioTreeTableModel.getGainLossPrice(transactionSummary));                
-            }
-            else if(name.equals(cNames[13])) {
-                data.setValue(symbol.toString(), -portfolioTreeTableModel.getGainLossPrice(transactionSummary));                
-            }            
-            else if(name.equals(cNames[14])) {
-                data.setValue(symbol.toString(), portfolioTreeTableModel.getPurchasePrice(transactionSummary));                
-            }
-            else if(name.equals(cNames[15])) {
-                data.setValue(symbol.toString(), portfolioTreeTableModel.getCurrentPrice(transactionSummary));                
-            }
-            else if(name.equals(cNames[16])) {
+            } else if(name.equals(cNames[5])) {
+                if (isPenceToPoundConversionEnabled == false) {
+                    if (isFeeCalculationEnabled) {
+                        data.setValue(symbol.toString(), transactionSummary.getNetTotal());
+                    } else {
+                        data.setValue(symbol.toString(), transactionSummary.getTotal());
+                    }
+                } else {
+                    if (isFeeCalculationEnabled) {
+                        data.setValue(symbol.toString(), transactionSummary.getNetTotal() / 100.0);
+                    } else {
+                        data.setValue(symbol.toString(), transactionSummary.getTotal() / 100.0);
+                    }                    
+                }
+            } else if(name.equals(cNames[6])) {
+                if (isPenceToPoundConversionEnabled == false) {
+                    data.setValue(symbol.toString(), portfolioTreeTableModel.getCurrentValue(transactionSummary));                
+                } else {
+                    data.setValue(symbol.toString(), portfolioTreeTableModel.getCurrentValue(transactionSummary) / 100.0);
+                }
+            } else if(name.equals(cNames[7])) {
                 data.setValue(symbol.toString(), transactionSummary.getQuantity());                
-            }
-            else if(name.equals(cNames[17])) {
+            } else if(name.equals(cNames[8])) {
                 data.setValue(symbol.toString(), transactionSummary.getBroker());                
-            }
-            else if(name.equals(cNames[18])) {
+            } else if(name.equals(cNames[9])) {
                 data.setValue(symbol.toString(), transactionSummary.getStampDuty());                
-            }
-            else if(name.equals(cNames[19])) {
+            } else if(name.equals(cNames[10])) {
                 data.setValue(symbol.toString(), transactionSummary.getClearingFee());                
-            }
-            
+            }            
         }
         
         // create a chart...
