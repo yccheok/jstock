@@ -320,9 +320,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         List<Stock> stocks = getSelectedStocks();
         if (stocks.size() == 1) {
             this.showNewBuyTransactionJDialog(stocks.get(0), this.getStockLastPrice(stocks.get(0)), true);
-        }
-        else {
-            this.showNewBuyTransactionJDialog(Utils.getEmptyStock(Code.newInstance(""), Symbol.newInstance("")), 0.0, true);
+        } else {
+            this.showNewBuyTransactionJDialog(null, 0.0, true);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 

@@ -597,6 +597,8 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
                     MainFrame m = (MainFrame)NewBuyTransactionJDialog.this.getParent();
 
                     if (m == null) {
+                        // Break and fall back to warning message box pop up 
+                        // code.                        
                         break;
                     }
 
@@ -606,6 +608,8 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
                         // Database is not ready yet. Shall we pop up a warning to
                         // user?
                         log.info("Database is not ready yet.");
+                        // Break and fall back to warning message box pop up 
+                        // code.
                         break;
                     }
 
@@ -616,12 +620,18 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
                     Symbol symbol = stockInfo.symbol;
                     assert(symbol != null);
                     assert(code != null);
+                    
                     NewBuyTransactionJDialog.this.stock = Utils.getEmptyStock(code, symbol);
-
                     this.jTextField2.setText(code.toString());
                     this.jTextField1.setText(symbol.toString());
+                    // text fields now contain necessary info. Don't proceed first.
+                    // We want to let user sees it clearly, and let him to press
+                    // OK again.
+                    return false;
                 }
-                break;
+                // Break and fall back to warning message box pop up 
+                // code.
+                break;                    
             } while (true);
         }
 
@@ -798,10 +808,15 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
     }
     
     public void setStock(Stock stock) {
-        Symbol symbol = stock.getSymbol();
-        Code code = stock.getCode();
-        this.jTextField1.setText(symbol.toString());
-        this.jTextField2.setText(code.toString());
+        if (stock != null) {
+            Symbol symbol = stock.getSymbol();
+            Code code = stock.getCode();
+            this.jTextField1.setText(symbol.toString());
+            this.jTextField2.setText(code.toString());
+        } else {
+            this.jTextField1.setText("");
+            this.jTextField2.setText("");            
+        }
         this.stock = stock;
     }
     
