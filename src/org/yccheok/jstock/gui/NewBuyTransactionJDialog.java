@@ -51,7 +51,16 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
     /** Creates new form NewBuyTransactionJDialog */
     public NewBuyTransactionJDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
-        initComponents();
+        
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final boolean isFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
+        
+        if (isFeeCalculationEnabled) {
+            initComponents();
+        } else {
+            initComponentsWithFeeCalculationDisabled();
+        }
+        
         this.jPanel1.add(Utils.getBusyJXLayer((AutoCompleteJComboBox)this.jComboBox1));
         if (shouldAutoCalculateBrokerFee())
         {
@@ -59,6 +68,215 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
             this.jFormattedTextField4.setEditable(false);
             this.jFormattedTextField5.setEditable(false);
         }
+    }
+    
+    private void initComponentsWithFeeCalculationDisabled() {
+
+        jComboBox1 = new AutoCompleteJComboBox();
+        jLabel7 = new javax.swing.JLabel();
+        jFormattedTextField3 = getCurrencyJFormattedTextField();
+        jFormattedTextField4 = getCurrencyJFormattedTextField();
+        jLabel8 = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
+        jFormattedTextField5 = getCurrencyJFormattedTextField();
+        jLabel10 = new javax.swing.JLabel();
+        jFormattedTextField6 = getCurrencyJFormattedTextField();
+        jPanel2 = new javax.swing.JPanel();
+        jTextField1 = new javax.swing.JTextField();
+        jLabel2 = new javax.swing.JLabel();
+        jSpinner1 = new javax.swing.JSpinner();
+        jPanel3 = CalendarFactory.createDateField();
+        jLabel4 = new javax.swing.JLabel();
+        jFormattedTextField1 = getCurrencyJFormattedTextField();
+        jFormattedTextField2 = getCurrencyJFormattedTextField();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
+        jTextField2 = new javax.swing.JTextField();
+        jPanel4 = new javax.swing.JPanel();
+        jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel6 = new javax.swing.JLabel();
+
+        jComboBox1.setEditable(true);
+        jComboBox1.setPreferredSize(new java.awt.Dimension(110, 24));
+        ((AutoCompleteJComboBox)jComboBox1).attachStockInfoObserver(this.getStockInfoObserver());
+        ((AutoCompleteJComboBox)jComboBox1).attachResultObserver(this.getResultObserver());
+
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
+        jLabel7.setText(bundle.getString("NewBuyTransactionJDialog_Broker")); // NOI18N
+
+        jFormattedTextField3.setValue(new Double(0.0));
+        jFormattedTextField3.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                jFormattedTextField3FocusLost(evt);
+            }
+        });
+
+        jFormattedTextField4.setValue(new Double(0.0));
+        jFormattedTextField4.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                jFormattedTextField4FocusLost(evt);
+            }
+        });
+
+        jLabel8.setText(bundle.getString("NewBuyTransactionJDialog_Clearing")); // NOI18N
+
+        jLabel9.setText(bundle.getString("NewBuyTransactionJDialog_StampDuty")); // NOI18N
+
+        jFormattedTextField5.setValue(new Double(0.0));
+        jFormattedTextField5.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                jFormattedTextField5FocusLost(evt);
+            }
+        });
+
+        jLabel10.setFont(jLabel10.getFont().deriveFont(jLabel10.getFont().getStyle() | java.awt.Font.BOLD));
+        jLabel10.setText(bundle.getString("NewBuyTransactionJDialog_NetValue")); // NOI18N
+
+        jFormattedTextField6.setEditable(false);
+        jFormattedTextField6.setFont(jFormattedTextField6.getFont().deriveFont(jFormattedTextField6.getFont().getStyle() | java.awt.Font.BOLD));
+        jFormattedTextField6.setValue(new Double(0.0));
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle(bundle.getString("NewBuyTransactionJDialog_Buy")); // NOI18N
+        setResizable(false);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                formWindowClosed(evt);
+            }
+        });
+
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("NewBuyTransactionJDialog_Transaction"))); // NOI18N
+
+        jLabel2.setText(bundle.getString("NewSellTransactionJDialog_Symbol")); // NOI18N
+
+        jSpinner1.setModel(new javax.swing.SpinnerNumberModel(Double.valueOf(100.0d), Double.valueOf(0.0010d), null, Double.valueOf(100.0d)));
+        jSpinner1.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                jSpinner1StateChanged(evt);
+            }
+        });
+
+        jPanel3.setBackground(new java.awt.Color(204, 255, 255));
+        jPanel3.setMaximumSize(new java.awt.Dimension(32767, 20));
+        jPanel3.setPreferredSize(new java.awt.Dimension(100, 20));
+
+        jLabel4.setText(bundle.getString("NewBuyTransactionJDialog_Date")); // NOI18N
+
+        jFormattedTextField1.setValue(new Double(0.0));
+        jFormattedTextField1.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                jFormattedTextField1FocusLost(evt);
+            }
+        });
+
+        jFormattedTextField2.setEditable(false);
+        jFormattedTextField2.setFont(jFormattedTextField2.getFont().deriveFont(jFormattedTextField2.getFont().getStyle() | java.awt.Font.BOLD));
+        jFormattedTextField2.setValue(new Double(0.0));
+
+        jLabel1.setText(bundle.getString("NewBuyTransactionJDialog_Unit")); // NOI18N
+
+        jLabel3.setText(bundle.getString("NewBuyTransactionJDialog_Price")); // NOI18N
+
+        jLabel5.setFont(jLabel5.getFont().deriveFont(jLabel5.getFont().getStyle() | java.awt.Font.BOLD));
+        jLabel5.setText(bundle.getString("NewBuyTransactionJDialog_Value")); // NOI18N
+
+        jLabel11.setText(bundle.getString("NewBuyTransactionJDialog_Code")); // NOI18N
+
+        jTextField2.setEditable(false);
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel2)
+                    .addComponent(jLabel3)
+                    .addComponent(jLabel5)
+                    .addComponent(jLabel1)
+                    .addComponent(jLabel4)
+                    .addComponent(jLabel11))
+                .addGap(26, 26, 26)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jTextField2, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
+                    .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
+                    .addComponent(jSpinner1, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
+                    .addComponent(jFormattedTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
+                    .addComponent(jFormattedTextField2, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+
+        jPanel2Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jFormattedTextField1, jFormattedTextField2, jPanel3, jSpinner1, jTextField1});
+
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(11, 11, 11)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel11)
+                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(12, 12, 12)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel4))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1))
+                .addGap(9, 9, 9)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jFormattedTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel3))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jFormattedTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel5))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanel2Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jFormattedTextField1, jFormattedTextField2, jPanel3, jSpinner1, jTextField1});
+
+        getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
+
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/apply.png"))); // NOI18N
+        jButton1.setText(bundle.getString("NewBuyTransactionJDialog_OK")); // NOI18N
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        jPanel4.add(jButton1);
+
+        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/button_cancel.png"))); // NOI18N
+        jButton2.setText(bundle.getString("NewBuyTransactionJDialog_Cancel")); // NOI18N
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+        jPanel4.add(jButton2);
+
+        getContentPane().add(jPanel4, java.awt.BorderLayout.SOUTH);
+
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("NewBuyTransactionJDialog_Stock"))); // NOI18N
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 15, 5));
+
+        jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/inbox.png"))); // NOI18N
+        jPanel1.add(jLabel6);
+
+        getContentPane().add(jPanel1, java.awt.BorderLayout.NORTH);
+
+        pack();
     }
     
     private boolean shouldAutoCalculateBrokerFee() {
@@ -483,7 +701,10 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         // follow the formatter text field's.
         commitEdit();
         
-        if (shouldAutoCalculateBrokerFee())
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final boolean isFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
+
+        if (isFeeCalculationEnabled && shouldAutoCalculateBrokerFee())
         {
             final BrokingFirm brokingFirm = MainFrame.getInstance().getJStockOptions().getSelectedBrokingFirm();
             
@@ -514,8 +735,12 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
                 final double brokerFee = (Double)jFormattedTextField3.getValue();
                 final double clearingFee = (Double)jFormattedTextField4.getValue();
                 final double stampDuty = (Double)jFormattedTextField5.getValue();
-                jFormattedTextField2.setValue(price * (double)unit);                
-                jFormattedTextField6.setValue(price * (double)unit + brokerFee + clearingFee + stampDuty);
+                jFormattedTextField2.setValue(price * (double)unit); 
+                if (isFeeCalculationEnabled) {
+                    jFormattedTextField6.setValue(price * (double)unit + brokerFee + clearingFee + stampDuty);
+                } else {
+                    jFormattedTextField6.setValue(price * (double)unit);
+                }
             }});            
         }
     }

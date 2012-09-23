@@ -578,7 +578,10 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         // follow the formatter text field's.
         commitEdit();
 
-        if (shouldAutoCalculateBrokerFee())
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final boolean isFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
+        
+        if (isFeeCalculationEnabled && shouldAutoCalculateBrokerFee())
         {
             final BrokingFirm brokingFirm = MainFrame.getInstance().getJStockOptions().getSelectedBrokingFirm();
 
@@ -612,8 +615,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
                 jFormattedTextField8.setValue(netProfit);
                 jFormattedTextField8.setForeground(Utils.getColor(netProfit, 0.0));
             }});
-        }
-        else {
+        } else {
             SwingUtilities.invokeLater(new Runnable() {@Override public void run() {
                 final double unit = (Double)jSpinner1.getValue();
                 final double price = (Double)jFormattedTextField1.getValue();
@@ -623,7 +625,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
 
                 final double sellValue = price * unit;
                 final double buyValue = NewSellTransactionJDialog.this.buyValue;
-                final double totalCost = buyValue + brokerFee + clearingFee + stampDuty;
+                final double totalCost = isFeeCalculationEnabled ? (buyValue + brokerFee + clearingFee + stampDuty) : buyValue;
                 final double netProfit = sellValue - totalCost;
                 final double netProfitPercentage = (totalCost == 0.0) ? 0.0 : netProfit / totalCost * 100.0;
 
