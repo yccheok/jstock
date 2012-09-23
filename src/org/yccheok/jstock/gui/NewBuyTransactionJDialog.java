@@ -39,11 +39,8 @@ import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.engine.StockInfoDatabase;
 import org.yccheok.jstock.engine.Symbol;
 import org.yccheok.jstock.internationalization.MessagesBundle;
-import org.yccheok.jstock.portfolio.Broker;
 import org.yccheok.jstock.portfolio.BrokingFirm;
-import org.yccheok.jstock.portfolio.ClearingFee;
 import org.yccheok.jstock.portfolio.Contract;
-import org.yccheok.jstock.portfolio.StampDuty;
 import org.yccheok.jstock.portfolio.Transaction;
 
 /**
@@ -100,6 +97,8 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
+        jTextField2 = new javax.swing.JTextField();
         jPanel4 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
@@ -122,8 +121,6 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         });
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("NewBuyTransactionJDialog_Transaction"))); // NOI18N
-
-        jTextField1.setEditable(false);
 
         jLabel2.setText(bundle.getString("NewSellTransactionJDialog_Symbol")); // NOI18N
 
@@ -190,6 +187,10 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
 
         jLabel9.setText(bundle.getString("NewBuyTransactionJDialog_StampDuty")); // NOI18N
 
+        jLabel11.setText(bundle.getString("NewBuyTransactionJDialog_Code")); // NOI18N
+
+        jTextField2.setEditable(false);
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -197,37 +198,46 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel10)
-                    .addComponent(jLabel9)
-                    .addComponent(jLabel2)
-                    .addComponent(jLabel3)
-                    .addComponent(jLabel5)
-                    .addComponent(jLabel7)
-                    .addComponent(jLabel8)
-                    .addComponent(jLabel1)
-                    .addComponent(jLabel4))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
-                    .addComponent(jSpinner1, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
-                    .addComponent(jFormattedTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
-                    .addComponent(jFormattedTextField2, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
-                    .addComponent(jFormattedTextField3, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
-                    .addComponent(jFormattedTextField4, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
-                    .addComponent(jFormattedTextField5, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
                     .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(jLabel10)
+                        .addGap(7, 7, 7)
                         .addComponent(jFormattedTextField6, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
-                        .addGap(1, 1, 1)))
-                .addContainerGap())
+                        .addGap(10, 10, 10))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel9)
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel5)
+                            .addComponent(jLabel7)
+                            .addComponent(jLabel8)
+                            .addComponent(jLabel1)
+                            .addComponent(jLabel4)
+                            .addComponent(jLabel11))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jTextField2, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
+                            .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
+                            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
+                            .addComponent(jSpinner1, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
+                            .addComponent(jFormattedTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
+                            .addComponent(jFormattedTextField2, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
+                            .addComponent(jFormattedTextField3, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
+                            .addComponent(jFormattedTextField4, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
+                            .addComponent(jFormattedTextField5, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE))
+                        .addContainerGap())))
         );
 
         jPanel2Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jFormattedTextField1, jFormattedTextField2, jFormattedTextField3, jFormattedTextField4, jFormattedTextField5, jFormattedTextField6, jPanel3, jSpinner1, jTextField1});
 
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addGap(11, 11, 11)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel11)
+                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -262,7 +272,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jFormattedTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 49, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel10)
                     .addComponent(jFormattedTextField6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -311,6 +321,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
 
     public void setTransaction(Transaction transaction) {
         this.stock = transaction.getStock();
+        final Code code = stock.getCode();
         final Symbol symbol = stock.getSymbol();
         final Date date = transaction.getDate().getCalendar().getTime();
         final double quantity = transaction.getQuantity();
@@ -322,6 +333,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         final double netValue = transaction.getNetTotal();
 
         this.transactionComment = transaction.getComment();
+        this.jTextField2.setText(code.toString());
         this.jTextField1.setText(symbol.toString());
         ((DateField)jPanel3).setValue(date);
         this.jSpinner1.setValue(quantity);
@@ -341,7 +353,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         final double unit = ((java.lang.Double)this.jSpinner1.getValue());
         final double price = ((Double)this.jFormattedTextField1.getValue());
         
-        Contract.ContractBuilder builder = new Contract.ContractBuilder(this.stock, date);
+        Contract.ContractBuilder builder = new Contract.ContractBuilder(this.stock.deriveStock(Symbol.newInstance(jTextField1.getText().trim())), date);
         
         Contract contract = builder.type(type).quantity(unit).price(price).build();
 
@@ -356,7 +368,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
     }
     
     private boolean isValidInput() {
-        if (this.jTextField1.getText().length() <= 0) {
+        if (NewBuyTransactionJDialog.this.stock == null) {
             do {
                 // Perhaps user forgets to press enter? Let us help him to transfer
                 // the stock to text field.
@@ -388,6 +400,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
                     assert(code != null);
                     NewBuyTransactionJDialog.this.stock = Utils.getEmptyStock(code, symbol);
 
+                    this.jTextField2.setText(code.toString());
                     this.jTextField1.setText(symbol.toString());
                 }
                 break;
@@ -395,10 +408,15 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         }
 
         // Has user key in any stock?
-        if (this.jTextField1.getText().length() <= 0)
+        if (NewBuyTransactionJDialog.this.stock == null)
         {
             this.jComboBox1.requestFocus();
             JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_please_enter_stock_symbol"), MessagesBundle.getString("warning_title_please_enter_stock_symbol"), JOptionPane.WARNING_MESSAGE);
+            return false;
+        }
+
+        if (this.jTextField1.getText().trim().length() <= 0) {
+            this.jTextField1.setText(this.stock.getSymbol().toString());
             return false;
         }
         
@@ -557,7 +575,9 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
     
     public void setStock(Stock stock) {
         Symbol symbol = stock.getSymbol();
+        Code code = stock.getCode();
         this.jTextField1.setText(symbol.toString());
+        this.jTextField2.setText(code.toString());
         this.stock = stock;
     }
     
@@ -606,8 +626,10 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
     private void addStockInfoFromAutoCompleteJComboBox(StockInfo stockInfo) {
         NewBuyTransactionJDialog.this.stock = Utils.getEmptyStock(stockInfo);
         NewBuyTransactionJDialog.this.jTextField1.setText(NewBuyTransactionJDialog.this.stock.getSymbol().toString());
+        NewBuyTransactionJDialog.this.jTextField2.setText(NewBuyTransactionJDialog.this.stock.getCode().toString());
         // So that the 1st character is being displayed.
         NewBuyTransactionJDialog.this.jTextField1.setCaretPosition(0);
+        NewBuyTransactionJDialog.this.jTextField2.setCaretPosition(0);
     }
 
     private static final Log log = LogFactory.getLog(NewBuyTransactionJDialog.class);
@@ -628,6 +650,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
     private javax.swing.JFormattedTextField jFormattedTextField6;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -642,6 +665,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JSpinner jSpinner1;
     private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField jTextField2;
     // End of variables declaration//GEN-END:variables
     
 }

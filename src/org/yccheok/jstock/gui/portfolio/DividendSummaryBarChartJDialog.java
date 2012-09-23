@@ -25,8 +25,10 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.swing.ComboBoxModel;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -85,13 +87,21 @@ public class DividendSummaryBarChartJDialog extends javax.swing.JDialog {
 
     private void initJComboBox() {
         final int size = dividendSummary.size();
-        for (int i = 0; i < size; i++) {
+        Set<Code> codes = new HashSet<Code>();
+        for (int i = size - 1; i >= 0; i--) {
             final Dividend dividend = dividendSummary.get(i);
-            final Stock stock = dividend.getStock();
-            final StockInfo stockInfo = new StockInfo(stock.getCode(), stock.getSymbol());
-            if (stockInfos.contains(stockInfo) == false) {
-                stockInfos.add(stockInfo);
+            final Stock stock = dividend.getStock();      
+            // We do not perform duplication detection through stock info
+            // comparison. This is because starting from version 1.0.6s, we enable
+            // user to change buy transaction's stock symbol. Hence, user may
+            // have dividend records with same stock code, but different stock
+            // symbol. We will loop from backward, and take the first detected 
+            // code.
+            if (false == codes.add(stock.getCode())) {
+                continue;
             }
+            final StockInfo stockInfo = new StockInfo(stock.getCode(), stock.getSymbol());
+            stockInfos.add(stockInfo);
         }
 
         // Ensure symbols are in alphabetical order.
