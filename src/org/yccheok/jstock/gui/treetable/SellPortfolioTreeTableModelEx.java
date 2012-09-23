@@ -116,6 +116,10 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
         return ((Portfolio)getRoot()).getNetTotal();
     }
 
+    public double getGainLossPercentage() {
+        return getGainLossPercentage((Portfolio)getRoot());
+    }
+    
     public double getNetGainLossPercentage() {
         return getNetGainLossPercentage((Portfolio)getRoot());
     }

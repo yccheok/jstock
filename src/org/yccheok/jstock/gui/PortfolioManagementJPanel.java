@@ -2468,10 +2468,17 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             }
         }
 
-        final double paperProfitPercentage = buyPortfolioTreeTableModel.getNetGainLossPercentage();
-        
-        final double realizedProfitPercentage = sellPortfolioTreeTableModel.getNetGainLossPercentage();
+        final double paperProfitPercentage;
+        final double realizedProfitPercentage;
 
+        if (isFeeCalculationEnabled) {
+            paperProfitPercentage = buyPortfolioTreeTableModel.getNetGainLossPercentage();
+            realizedProfitPercentage = sellPortfolioTreeTableModel.getNetGainLossPercentage();
+        } else {
+            paperProfitPercentage = buyPortfolioTreeTableModel.getGainLossPercentage();
+            realizedProfitPercentage = sellPortfolioTreeTableModel.getGainLossPercentage();            
+        }
+        
         final String _share = org.yccheok.jstock.portfolio.Utils.toWealthHeader(share);
         final String _cash = org.yccheok.jstock.portfolio.Utils.toWealthHeader(cash);
         final String _paperProfit = org.yccheok.jstock.portfolio.Utils.toWealthHeader(paperProfit);
