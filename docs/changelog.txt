@@ -1,7 +1,7 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
-JStock 1.0.6s - xxxx-xx-xx
+JStock 1.0.6s - 2012-09-24
   Feature: Able to change stock symbol, during stock purchasing.
   Feature: In order to make JStock further fun and easy, we decide to present
            broker fee/ stamp duty/ clearing fee in a better way. We will either
