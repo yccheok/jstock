@@ -689,7 +689,14 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
 
         this.stock = transaction.getStock();
         this.type = Contract.Type.Sell;
-        this.buyValue = transaction.getReferenceTotal();
+        
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final boolean isFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
+        if (isFeeCalculationEnabled) {
+            this.buyValue = transaction.getNetReferenceTotal();
+        } else {
+            this.buyValue = transaction.getReferenceTotal();
+        }
 
         update();
     }
