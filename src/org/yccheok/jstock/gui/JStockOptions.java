@@ -124,7 +124,7 @@ public class JStockOptions {
         this.singleIndicatorAlert = true;
         this.proxyServer = "";
         this.proxyPort = -1;
-        this.scanningSpeed = 5000;
+        this.scanningSpeed = 10000;
         this.alertSpeed = 5;
         this.looknFeel = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
         this.country = Country.Malaysia;
