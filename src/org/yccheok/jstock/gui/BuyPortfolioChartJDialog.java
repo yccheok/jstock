@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import javax.swing.SwingUtilities;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -68,7 +69,21 @@ public class BuyPortfolioChartJDialog extends javax.swing.JDialog {
         
         this.portfolioTreeTableModel = portfolioTreeTableModel;
         
-        final JFreeChart freeChart = createChart(cNames[0]);
+        final JFreeChart freeChart;
+        final int lastSelectedBuyPortfolioChartIndex = MainFrame.getInstance().getJStockOptions().getLastSelectedBuyPortfolioChartIndex();
+        if (lastSelectedBuyPortfolioChartIndex < this.jComboBox1.getItemCount() && lastSelectedBuyPortfolioChartIndex < cNames.length && lastSelectedBuyPortfolioChartIndex >= 0) {            
+            freeChart = createChart(cNames[lastSelectedBuyPortfolioChartIndex]);
+            // Put it in next queue, so that it won't trigger jComBox1's event
+            // when this.chartPanel is not ready yet.
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    jComboBox1.setSelectedIndex(lastSelectedBuyPortfolioChartIndex);                    
+                }
+            });
+        } else {
+            freeChart = createChart(cNames[0]);
+        }
 
         org.yccheok.jstock.charting.Utils.applyChartTheme(freeChart);
         
@@ -243,6 +258,9 @@ public class BuyPortfolioChartJDialog extends javax.swing.JDialog {
     
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
         String selected = ((javax.swing.JComboBox)evt.getSource()).getSelectedItem().toString();
+        
+        final int selectedIndex = ((javax.swing.JComboBox)evt.getSource()).getSelectedIndex();
+        MainFrame.getInstance().getJStockOptions().setLastSelectedBuyPortfolioChartIndex(selectedIndex);
         
         final JFreeChart freeChart = this.createChart(selected);
         org.yccheok.jstock.charting.Utils.applyChartTheme(freeChart);

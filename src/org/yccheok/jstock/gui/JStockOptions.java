@@ -259,7 +259,9 @@ public class JStockOptions {
     
     // Remember the last view page.
     private int lastSelectedPageIndex = 0;
-
+    private int lastSelectedSellPortfolioChartIndex = 0;
+    private int lastSelectedBuyPortfolioChartIndex = 0;
+    
     // Use -1 to indicate unlimited SMS per day.
     private int maxSMSPerDay = -1;
 
@@ -295,7 +297,7 @@ public class JStockOptions {
     private ChartTheme chartTheme = ChartTheme.Light;
     
     private boolean isFeeCalculationEnabled = false;
-    
+        
     public boolean isAutoBrokerFeeCalculationEnabled() {
         return this.isAutoBrokerFeeCalculationEnabled;
     }
@@ -388,7 +390,9 @@ public class JStockOptions {
 
         // Remember the last view page.
         this.lastSelectedPageIndex = jStockOptions.lastSelectedPageIndex;
-
+        this.lastSelectedSellPortfolioChartIndex = jStockOptions.lastSelectedSellPortfolioChartIndex;
+        this.lastSelectedBuyPortfolioChartIndex = jStockOptions.lastSelectedBuyPortfolioChartIndex;
+    
         // Use -1 to indicate unlimited SMS per day.
         this.maxSMSPerDay = jStockOptions.maxSMSPerDay;
 
@@ -506,7 +510,9 @@ public class JStockOptions {
 
         // Remember the last view page.
         jStockOptions.lastSelectedPageIndex = this.lastSelectedPageIndex;
-
+        jStockOptions.lastSelectedSellPortfolioChartIndex = this.lastSelectedSellPortfolioChartIndex;
+        jStockOptions.lastSelectedBuyPortfolioChartIndex = this.lastSelectedBuyPortfolioChartIndex;
+        
         // Use -1 to indicate unlimited SMS per day.
         jStockOptions.maxSMSPerDay = this.maxSMSPerDay;
 
@@ -546,6 +552,14 @@ public class JStockOptions {
             lastSelectedPageIndex = 0;
         }
 
+        if (lastSelectedSellPortfolioChartIndex < 0) {
+            lastSelectedSellPortfolioChartIndex = 0;
+        }
+        
+        if (lastSelectedBuyPortfolioChartIndex < 0) {
+            lastSelectedBuyPortfolioChartIndex = 0;
+        }
+        
         /* For backward compatible */
         if (brokingFirms == null) {
             brokingFirms = new ArrayList<BrokingFirm>();
@@ -1138,6 +1152,34 @@ public class JStockOptions {
         this.lastSelectedPageIndex = lastSelectedPageIndex;
     }
 
+    /**
+     * @return the lastSelectedBuyPortfolioChartIndex
+     */
+    public int getLastSelectedBuyPortfolioChartIndex() {
+        return lastSelectedBuyPortfolioChartIndex;
+    }
+
+    /**
+     * @param lastSelectedBuyPortfolioChartIndex the lastSelectedBuyPortfolioChartIndex to set
+     */
+    public void setLastSelectedBuyPortfolioChartIndex(int lastSelectedBuyPortfolioChartIndex) {
+        this.lastSelectedBuyPortfolioChartIndex = lastSelectedBuyPortfolioChartIndex;
+    }
+    
+    /**
+     * @return the lastSelectedSellPortfolioChartIndex
+     */
+    public int getLastSelectedSellPortfolioChartIndex() {
+        return lastSelectedSellPortfolioChartIndex;
+    }
+
+    /**
+     * @param lastSelectedSellPortfolioChartIndex the lastSelectedSellPortfolioChartIndex to set
+     */
+    public void setLastSelectedSellPortfolioChartIndex(int lastSelectedSellPortfolioChartIndex) {
+        this.lastSelectedSellPortfolioChartIndex = lastSelectedSellPortfolioChartIndex;
+    }
+    
     /**
      * @return the googleCalendarUsername
      */
