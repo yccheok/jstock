@@ -727,8 +727,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
                 jFormattedTextField2.setValue(price * (double)unit);                
                 jFormattedTextField6.setValue(price * (double)unit + brokerFee + clearingFee + stampDuty);
             }});
-        }
-        else {
+        } else {
             SwingUtilities.invokeLater(new Runnable() {@Override public void run() {
                 final double unit = (Double)jSpinner1.getValue();
                 final double price = (Double)jFormattedTextField1.getValue();
