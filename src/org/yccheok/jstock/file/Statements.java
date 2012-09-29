@@ -505,8 +505,8 @@ public class Statements {
         
         for (Pair<Code, Symbol> pair : pairs) {
             final List<Atom> atoms = new ArrayList<Atom>();
-            atoms.add(new Atom(pair.getFirst(), code_string));
-            atoms.add(new Atom(pair.getSecond(), symbol_string));
+            atoms.add(new Atom(pair.first, code_string));
+            atoms.add(new Atom(pair.second, symbol_string));
             Statement statement = new Statement(atoms);
             
             // They should be the same type. The checking just act as paranoid.

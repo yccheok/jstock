@@ -319,7 +319,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         List<Stock> stocks = getSelectedStocks();
         if (stocks.size() == 1) {
-            this.showNewBuyTransactionJDialog(stocks.get(0), this.getStockLastPrice(stocks.get(0)), true);
+            this.showNewBuyTransactionJDialog(stocks.get(0), this.getStockPrice(stocks.get(0)), true);
         } else {
             this.showNewBuyTransactionJDialog(null, 0.0, true);
         }
@@ -907,9 +907,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         return Collections.unmodifiableList(stocks);
     }
     
-    public double getStockLastPrice(Stock stock) {
+    public double getStockPrice(Stock stock) {
         final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
-        return buyPortfolioTreeTableModel.getLastPrice(stock.getCode());
+        return buyPortfolioTreeTableModel.getStockPrice(stock.getCode());
     }
 
     private void showNewSellTransactionJDialog(List<Transaction> buyTransactions) {
@@ -1476,7 +1476,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             public void actionPerformed(ActionEvent evt) {
                 List<Stock> stocks = getSelectedStocks();
                 if (stocks.size() == 1) {
-                    PortfolioManagementJPanel.this.showNewBuyTransactionJDialog(stocks.get(0), PortfolioManagementJPanel.this.getStockLastPrice(stocks.get(0)), true);
+                    PortfolioManagementJPanel.this.showNewBuyTransactionJDialog(stocks.get(0), PortfolioManagementJPanel.this.getStockPrice(stocks.get(0)), true);
                 }
                 else {
                     PortfolioManagementJPanel.this.showNewBuyTransactionJDialog(Utils.getEmptyStock(Code.newInstance(""), Symbol.newInstance("")), 0.0, true);

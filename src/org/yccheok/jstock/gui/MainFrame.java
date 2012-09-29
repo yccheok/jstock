@@ -3096,7 +3096,7 @@ public class MainFrame extends javax.swing.JFrame {
                         
                         // Insert with new user defined code.
                         for (Pair<Code, Symbol> pair : pairs) {
-                            if (tmp_stock_info_database.addUserDefinedStockInfo(new StockInfo(pair.getFirst(), pair.getSecond()))) {
+                            if (tmp_stock_info_database.addUserDefinedStockInfo(new StockInfo(pair.first, pair.second))) {
                                 addUserDefinedStockInfoSuccessAtLeastOnce = true;
                             }
                         }
@@ -3165,7 +3165,7 @@ public class MainFrame extends javax.swing.JFrame {
                         
                         // Insert with new user defined code.
                         for (Pair<Code, Symbol> pair : pairs) {
-                            tmp_stock_info_database.addUserDefinedStockInfo(new StockInfo(pair.getFirst(), pair.getSecond()));
+                            tmp_stock_info_database.addUserDefinedStockInfo(new StockInfo(pair.first, pair.second));
                         }
                     }
 

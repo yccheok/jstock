@@ -598,7 +598,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         final Date date = java.util.Calendar.getInstance().getTime();
 
         MainFrame mainFrame = MainFrame.getInstance();
-        double price = mainFrame.getPortfolioManagementJPanel().getStockLastPrice(_stock);
+        double price = mainFrame.getPortfolioManagementJPanel().getStockPrice(_stock);
 
         this.jTextField1.setText(symbol.toString());
         // So that the 1st character is being displayed.
@@ -981,7 +981,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         final double bestPrice = bestSellingValue / (double)unit;
 
         MainFrame mainFrame = MainFrame.getInstance();
-        double currentPrice = mainFrame.getPortfolioManagementJPanel().getStockLastPrice(stock);
+        double currentPrice = mainFrame.getPortfolioManagementJPanel().getStockPrice(stock);
 
         return bestPrice > currentPrice ? bestPrice : currentPrice;
     }

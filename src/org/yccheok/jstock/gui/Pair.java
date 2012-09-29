@@ -1,88 +1,76 @@
 /*
- * JStock - Free Stock Market Software
- * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2009 The Android Open Source Project
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License along
- * with this program; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.yccheok.jstock.gui;
 
 /**
- * This class is equivalent to C++ std::pair class. It is usually used to hold
- * Code and Symbol pair.
- * @author yccheok
- * @param <A> first element
- * @param <B> second element
+ * Container to ease passing around a tuple of two objects. This object provides a sensible
+ * implementation of equals(), returning true if equals() is true on each of the contained
+ * objects.
  */
-public final class Pair<A, B> {
-    private final A first;
-    private final B second;
+public class Pair<F, S> {
+    public final F first;
+    public final S second;
 
     /**
-     * Construct a pair for the given first and second elements.
-     * @param first first element
-     * @param second second element
+     * Constructor for a Pair. If either are null then equals() and hashCode() will throw
+     * a NullPointerException.
+     * @param first the first object in the Pair
+     * @param second the second object in the pair
      */
-    public Pair(A first, B second) {
-        super();
+    public Pair(F first, S second) {
         this.first = first;
         this.second = second;
     }
 
-    @Override
+    /**
+     * Checks the two objects for equality by delegating to their respective equals() methods.
+     * @param o the Pair to which this one is to be checked for equality
+     * @return true if the underlying objects of the Pair are both considered equals()
+     */
+    public boolean equals(Object o) {
+        if (o == this) return true;
+        if (!(o instanceof Pair)) return false;
+        final Pair<F, S> other;
+        try {
+            other = (Pair<F, S>) o;
+        } catch (ClassCastException e) {
+            return false;
+        }
+        return first.equals(other.first) && second.equals(other.second);
+    }
+
+    /**
+     * Compute a hash code using the hash codes of the underlying objects
+     * @return a hashcode of the Pair
+     */
     public int hashCode() {
-        int hash = 17;
-        hash = 31 * hash + (this.first != null ? this.first.hashCode() : 0);
-        hash = 31 * hash + (this.second != null ? this.second.hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (false == obj instanceof Pair) {
-            return false;
-        }
-        final Pair<A, B> other = (Pair<A, B>) obj;
-        if (this.first != other.first && (this.first == null || !this.first.equals(other.first))) {
-            return false;
-        }
-        if (this.second != other.second && (this.second == null || !this.second.equals(other.second))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString()
-    {
-           return "(" + first + ", " + second + ")";
+        int result = 17;
+        result = 31 * result + first.hashCode();
+        result = 31 * result + second.hashCode();
+        return result;
     }
 
     /**
-     * Returns first element.
-     * @return first element
+     * Convenience method for creating an appropriately typed pair.
+     * @param a the first object in the Pair
+     * @param b the second object in the pair
+     * @return a Pair that is templatized with the types of a and b
      */
-    public A getFirst() {
-        return first;
-    }
-
-    /**
-     * Returns second element.
-     * @return second element
-     */
-    public B getSecond() {
-        return second;
+    public static <A, B> Pair <A, B> create(A a, B b) {
+        return new Pair<A, B>(a, b);
     }
 }

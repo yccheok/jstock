@@ -313,7 +313,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
                         codesNeedToAddToRealTimeStockMonitor.add(stock.getCode());
                         // If PortfolioManagementJPanel already has last price
                         // information, just get it from there.
-                        final double lastPrice = this.portfolioManagementJPanel.getStockLastPrice(stock);
+                        final double lastPrice = this.portfolioManagementJPanel.getStockPrice(stock);
                         if (lastPrice != 0.0) {
                             this.codeToPrice.put(stock.getCode(), lastPrice);
                         } else {

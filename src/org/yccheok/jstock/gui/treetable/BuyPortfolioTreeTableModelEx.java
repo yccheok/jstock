@@ -48,7 +48,7 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
         super(Arrays.asList(columnNames));
     }
     
-    public double getLastPrice(Code code) {
+    public double getStockPrice(Code code) {
         Object price = stockPrice.get(code);
         if (price == null) return 0.0;
                 
