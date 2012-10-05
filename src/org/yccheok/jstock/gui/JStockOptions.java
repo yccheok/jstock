@@ -186,7 +186,7 @@ public class JStockOptions {
     private transient String indicatorPassword;
     private String proxyServer;
     private int proxyPort;
-    private int scanningSpeed;  /* In second. */
+    private int scanningSpeed;  /* In ms. */
     private int alertSpeed;
     private String looknFeel;
     

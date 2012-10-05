@@ -19,6 +19,7 @@
 
 package org.yccheok.jstock.gui;
 
+import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -716,7 +717,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
             final SimpleDate date = new SimpleDate((Date)dateField.getValue());
             final double unit = ((java.lang.Double)this.jSpinner1.getValue());
             final double price = ((Double)this.jFormattedTextField1.getValue());
-            Contract.ContractBuilder builder = new Contract.ContractBuilder(stock, date);
+            Contract.ContractBuilder builder = new Contract.ContractBuilder(this.sellTransaction.getStock(), date);
             final Contract oldContract = this.sellTransaction.getContract();
             final Contract contract = builder.type(type).quantity(unit).price(price).referencePrice(oldContract.getReferencePrice()).referenceFee(oldContract.getReferenceFee()).referenceDate(oldContract.getReferenceDate()).build();
                 
@@ -733,22 +734,37 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
             final SimpleDate date = new SimpleDate((Date)dateField.getValue());
             final double unit = ((java.lang.Double)this.jSpinner1.getValue());
             final double price = ((Double)this.jFormattedTextField1.getValue());
+            final double brokerFee = (Double)this.jFormattedTextField4.getValue();
+            final double stampDuty = (Double)jFormattedTextField7.getValue();
+            final double clearingFee = (Double)this.jFormattedTextField5.getValue();
 
-            double quantity = unit;
+            // Use BigDecimal, for precision purpose. Please refer to Effective Java,
+            // Item 48: Avoid float and double if exact answers are required            
+            BigDecimal quantity = new BigDecimal(unit);
             boolean shouldBreakInNextRound = false;
             
+            final NumberFormat format = NumberFormat.getNumberInstance();
+            
+            int i = 0;
+            BigDecimal totalBrokerFee = new BigDecimal(0);
+            BigDecimal totalStampDuty = new BigDecimal(0);
+            BigDecimal totalClearingFee = new BigDecimal(0);
+
+            
             for (Transaction buyTransaction : this.buyTransactions) {
+                i++;
+                
                 if (shouldBreakInNextRound) {
                     break;                    
                 }
                 
                 double realTransactionQuantity = 0.0;
-                if (quantity >= buyTransaction.getQuantity()) {
+                if (quantity.doubleValue() >= buyTransaction.getQuantity()) {
                     realTransactionQuantity = buyTransaction.getQuantity();
-                    quantity -= buyTransaction.getQuantity();                    
+                    quantity = quantity.subtract(new BigDecimal(buyTransaction.getQuantity()));
                 } else {
-                    realTransactionQuantity = quantity;
-                    quantity = 0;
+                    realTransactionQuantity = quantity.doubleValue();
+                    quantity = BigDecimal.ZERO;
                     shouldBreakInNextRound = true;
                     
                     // 0 quantity. Break early.
@@ -757,18 +773,44 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
                     }
                 }
 
-                Contract.ContractBuilder builder = new Contract.ContractBuilder(stock, date);
+                Contract.ContractBuilder builder = new Contract.ContractBuilder(buyTransaction.getStock(), date);
                 final double fee = buyTransaction.getClearingFee() + buyTransaction.getBroker() + buyTransaction.getStampDuty();
                 final Contract contract = builder.type(type).quantity(realTransactionQuantity).price(price)
                         .referencePrice(buyTransaction.getPrice())
                         .referenceFee(realTransactionQuantity / buyTransaction.getQuantity() * fee)
                         .referenceDate(buyTransaction.getDate()).build();
                 
-                final double brokerFeeValue = (Double)this.jFormattedTextField4.getValue();
-                final double stampDutyValue = (Double)jFormattedTextField7.getValue();
-                final double clearingFeeValue = (Double)this.jFormattedTextField5.getValue();
-
-                Transaction t = new Transaction(contract, brokerFeeValue, stampDutyValue, clearingFeeValue);
+                // Do not use the following code, as our objective is
+                // 1) Sum of individual transactions' fee must be equal to 
+                // transaction summary's fee.
+                // 2) Three decimal places.
+                // 
+                //final double brokerFeeValue = brokerFee * realTransactionQuantity / unit;
+                //final double stampDutyValue = stampDuty * realTransactionQuantity / unit;
+                //final double clearingFeeValue = clearingFee * realTransactionQuantity / unit;
+                       
+                // Use BigDecimal, for precision purpose. Please refer to Effective Java,
+                // Item 48: Avoid float and double if exact answers are required                
+                BigDecimal brokerFeeBigDecimal;
+                BigDecimal stampDutyBigDecimal;
+                BigDecimal clearingFeeBigDecimal;
+                // Is this last item?
+                if (i != buyTransactions.size()) {
+                    brokerFeeBigDecimal = new BigDecimal(Double.parseDouble(format.format(brokerFee * realTransactionQuantity / unit)));
+                    stampDutyBigDecimal = new BigDecimal(Double.parseDouble(format.format(stampDuty * realTransactionQuantity / unit)));
+                    clearingFeeBigDecimal = new BigDecimal(Double.parseDouble(format.format(clearingFee * realTransactionQuantity / unit)));
+                    totalBrokerFee = totalBrokerFee.add(brokerFeeBigDecimal);
+                    totalStampDuty = totalStampDuty.add(stampDutyBigDecimal);
+                    totalClearingFee = totalClearingFee.add(clearingFeeBigDecimal);
+                } else {
+                    // This is the last item.
+                    brokerFeeBigDecimal = new BigDecimal(brokerFee).subtract(totalBrokerFee).max(BigDecimal.ZERO);
+                    stampDutyBigDecimal = new BigDecimal(stampDuty).subtract(totalStampDuty).max(BigDecimal.ZERO);
+                    clearingFeeBigDecimal = new BigDecimal(clearingFee).subtract(totalClearingFee).max(BigDecimal.ZERO);
+                }
+                
+                // Do not pass in brokerFee, stampDuty and clearingFee.
+                Transaction t = new Transaction(contract, brokerFeeBigDecimal.doubleValue(), stampDutyBigDecimal.doubleValue(), clearingFeeBigDecimal.doubleValue());
                 t.setComment(buyTransaction.getComment());
                 transactions.add(t);
             }

@@ -47,7 +47,16 @@ public class StockTableModel extends AbstractTableModelWithMemory implements CSV
         
         return stockInfo.get(columnIndex);        
     }
-    
+
+    @Override    
+    public void clearOldValueAt(int rowIndex, int columnIndex) {
+        List<Object> stockInfo = oldTableModel.get(rowIndex);
+        
+        if (null == stockInfo) return;
+        
+        stockInfo.set(columnIndex, null);
+    }
+
     @Override
     public Object getValueAt(int rowIndex, int columnIndex)
     {

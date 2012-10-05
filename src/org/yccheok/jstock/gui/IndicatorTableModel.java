@@ -67,6 +67,15 @@ public class IndicatorTableModel extends AbstractTableModelWithMemory implements
         return indicatorInfo.get(columnIndex);        
     }
     
+    @Override    
+    public void clearOldValueAt(int rowIndex, int columnIndex) {
+        List<Object> indicatorInfo = oldTableModel.get(rowIndex);
+        
+        if (null == indicatorInfo) return;
+        
+        indicatorInfo.set(columnIndex, null);
+    }
+    
     @Override
     public String getColumnName(int col) {
         return columnNames[col];

@@ -1,6 +1,11 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.6t - xxxx-xx-xx
+  Bugfix:  Fix on color change mechanism when there is price change.
+  Bugfix:  Fix on broker fee, stamp duty and clearing fee calcuation, when
+           performing batch selling.
+           
 JStock 1.0.6s - 2012-09-24
   Feature: Able to change stock symbol, during stock purchasing.
   Feature: In order to make JStock further fun and easy, we decide to present

@@ -29,4 +29,5 @@ package org.yccheok.jstock.gui;
 public abstract class AbstractTableModelWithMemory extends javax.swing.table.AbstractTableModel {
     
     public abstract Object getOldValueAt(int rowIndex, int columnIndex);
+    public abstract void clearOldValueAt(int rowIndex, int columnIndex);
 }
