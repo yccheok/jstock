@@ -924,8 +924,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         newSellTransactionJDialog.setVisible(true);
         
         final List<Transaction> newSellTransactions = newSellTransactionJDialog.getTransactions();
-
-        assert(newSellTransactions.size() == buyTransactions.size());
+        
         for (int i = 0; i < newSellTransactions.size(); i++) {
             Transaction newSellTransaction = newSellTransactions.get(i);
             Transaction buyTransaction = buyTransactions.get(i);
