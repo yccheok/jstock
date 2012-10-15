@@ -777,7 +777,7 @@ public class Statements {
                 DateFormat dateFormat = org.yccheok.jstock.gui.Utils.getCommonDateFormat();
                 final String referenceDateString = transaction.getReferenceDate() != null ? dateFormat.format(transaction.getReferenceDate().getTime()) : "";
                 atoms.add(new Atom(referenceDateString, tmp[2]));
-                final String dateString = transaction.getDate() != null ? dateFormat.format(transaction.getReferenceDate().getTime()) : "";
+                final String dateString = transaction.getDate() != null ? dateFormat.format(transaction.getDate().getTime()) : "";
                 atoms.add(new Atom(dateString, tmp[3]));
                 atoms.add(new Atom(transaction.getQuantity(), tmp[4]));
                 atoms.add(new Atom(transaction.getPrice(), tmp[5]));
