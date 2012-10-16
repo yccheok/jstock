@@ -629,6 +629,18 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         final boolean isFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
         
         double quantity = spinnerQuantity;
+        
+        // Edit
+        if (this.sellTransaction != null) {
+            if (isFeeCalculationEnabled) {
+                this.buyValue = quantity * this.sellTransaction.getNetReferenceTotal() / this.sellTransaction.getQuantity();
+            } else {
+                this.buyValue = quantity * this.sellTransaction.getReferenceTotal() / this.sellTransaction.getQuantity();
+            }
+            // Return early.
+            return;
+        }
+        
         double _buyValue = 0.0;
         for (Transaction transaction : buyTransactions) {
             if (quantity >= transaction.getQuantity()) {
