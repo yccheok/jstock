@@ -4,7 +4,8 @@ Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 JStock 1.0.6v - ????-??-??
   Bugfix:  Bugfix on edit sell transaction. Buy cost should be adjusted after
            adjusting quantity.
-           
+  Feature: Added Italian language. Contributed by Maurizio Da Lio.
+  
 JStock 1.0.6u - 2012-10-15
   Bugfix:  Critical bugfix. JStock overwrites sell transactions' sell date to buy 
            date mistakenly. Affected users may need to edit their sell 

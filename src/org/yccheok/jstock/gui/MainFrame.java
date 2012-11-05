@@ -229,6 +229,8 @@ public class MainFrame extends javax.swing.JFrame {
             this.jRadioButtonMenuItem2.setSelected(true);
         } else if (defaultLocale.getLanguage().equals(Locale.GERMAN.getLanguage())) {
             this.jRadioButtonMenuItem3.setSelected(true);
+        } else if (defaultLocale.getLanguage().equals(Locale.ITALIAN.getLanguage())) {
+            this.jRadioButtonMenuItem5.setSelected(true);
         } else {
             this.jRadioButtonMenuItem1.setSelected(true);
         }
@@ -320,6 +322,7 @@ public class MainFrame extends javax.swing.JFrame {
         jRadioButtonMenuItem2 = new javax.swing.JRadioButtonMenuItem();
         jRadioButtonMenuItem4 = new javax.swing.JRadioButtonMenuItem();
         jRadioButtonMenuItem3 = new javax.swing.JRadioButtonMenuItem();
+        jRadioButtonMenuItem5 = new javax.swing.JRadioButtonMenuItem();
         jMenu7 = new javax.swing.JMenu();
         jMenuItem8 = new javax.swing.JMenuItem();
         jMenu9 = new javax.swing.JMenu();
@@ -670,6 +673,15 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
         jMenu10.add(jRadioButtonMenuItem3);
+
+        buttonGroup3.add(jRadioButtonMenuItem5);
+        jRadioButtonMenuItem5.setText(Locale.ITALIAN.getDisplayLanguage(Locale.getDefault()));
+        jRadioButtonMenuItem5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButtonMenuItem5ActionPerformed(evt);
+            }
+        });
+        jMenu10.add(jRadioButtonMenuItem5);
 
         jMenuBar2.add(jMenu10);
 
@@ -1357,12 +1369,12 @@ public class MainFrame extends javax.swing.JFrame {
             else {
                 if (Utils.isTraditionalChinese(this.jStockOptions.getLocale())) {
                     this.jRadioButtonMenuItem4.setSelected(true);
-                }
-                else if (Utils.isSimplifiedChinese(this.jStockOptions.getLocale())) {
+                } else if (Utils.isSimplifiedChinese(this.jStockOptions.getLocale())) {
                     this.jRadioButtonMenuItem2.setSelected(true);
-                }
-                else if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.GERMAN.getLanguage()) == 0) {
+                } else if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.GERMAN.getLanguage()) == 0) {
                     this.jRadioButtonMenuItem3.setSelected(true);
+                } else if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.ITALIAN.getLanguage()) == 0) {
+                    this.jRadioButtonMenuItem5.setSelected(true);
                 }
             }
         }
@@ -1382,12 +1394,12 @@ public class MainFrame extends javax.swing.JFrame {
             else {
                 if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.ENGLISH.getLanguage()) == 0) {
                     this.jRadioButtonMenuItem1.setSelected(true);
-                }
-                else if (Utils.isTraditionalChinese(this.jStockOptions.getLocale())) {
+                } else if (Utils.isTraditionalChinese(this.jStockOptions.getLocale())) {
                     this.jRadioButtonMenuItem4.setSelected(true);
-                }
-                else if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.GERMAN.getLanguage()) == 0) {
+                } else if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.GERMAN.getLanguage()) == 0) {
                     this.jRadioButtonMenuItem3.setSelected(true);
+                } else if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.ITALIAN.getLanguage()) == 0) {
+                    this.jRadioButtonMenuItem5.setSelected(true);
                 }
             }
         }
@@ -1406,12 +1418,12 @@ public class MainFrame extends javax.swing.JFrame {
             else {
                 if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.ENGLISH.getLanguage()) == 0) {
                     this.jRadioButtonMenuItem1.setSelected(true);
-                }
-                else if (Utils.isTraditionalChinese(this.jStockOptions.getLocale())) {
+                } else if (Utils.isTraditionalChinese(this.jStockOptions.getLocale())) {
                     this.jRadioButtonMenuItem4.setSelected(true);
-                }
-                else if (Utils.isSimplifiedChinese(this.jStockOptions.getLocale())) {
+                } else if (Utils.isSimplifiedChinese(this.jStockOptions.getLocale())) {
                     this.jRadioButtonMenuItem2.setSelected(true);
+                } else if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.ITALIAN.getLanguage()) == 0) {
+                    this.jRadioButtonMenuItem5.setSelected(true);
                 }
             }
         }
@@ -1432,12 +1444,12 @@ public class MainFrame extends javax.swing.JFrame {
             else {
                 if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.ENGLISH.getLanguage()) == 0) {
                     this.jRadioButtonMenuItem1.setSelected(true);
-                }
-                else if (Utils.isSimplifiedChinese(this.jStockOptions.getLocale())) {
+                } else if (Utils.isSimplifiedChinese(this.jStockOptions.getLocale())) {
                     this.jRadioButtonMenuItem2.setSelected(true);
-                }
-                else if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.GERMAN.getLanguage()) == 0) {
+                } else if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.GERMAN.getLanguage()) == 0) {
                     this.jRadioButtonMenuItem3.setSelected(true);
+                } else if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.ITALIAN.getLanguage()) == 0) {
+                    this.jRadioButtonMenuItem5.setSelected(true);
                 }
             }
         }
@@ -1450,6 +1462,30 @@ public class MainFrame extends javax.swing.JFrame {
     private void jMenuItem14ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem14ActionPerformed
         Utils.launchWebBrowser(org.yccheok.jstock.network.Utils.getURL(Type.CONTRIBUTE_HTML));
     }//GEN-LAST:event_jMenuItem14ActionPerformed
+
+    private void jRadioButtonMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonMenuItem5ActionPerformed
+        // Avoid from Confirm Dialog to pop up when user change to same language (i.e. german)
+        if (false == this.jStockOptions.getLocale().getLanguage().equals(Locale.ITALIAN.getLanguage())) {
+            // Do not suprise user with sudden restart. Ask for their permission to do so.
+            final int result = JOptionPane.showConfirmDialog(this, MessagesBundle.getString("question_message_restart_now"), MessagesBundle.getString("question_title_restart_now"), JOptionPane.YES_NO_OPTION);
+            if (result == JOptionPane.YES_OPTION) {
+                final Locale locale = new Locale(Locale.ITALIAN.getLanguage(), Locale.getDefault().getCountry(), Locale.getDefault().getVariant());
+                this.jStockOptions.setLocale(locale);
+                org.yccheok.jstock.gui.Utils.restartApplication(this);
+            }// return to the previous selection if the user press "no" in the dialog
+            else {
+                if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.ENGLISH.getLanguage()) == 0) {
+                    this.jRadioButtonMenuItem1.setSelected(true);
+                } else if (Utils.isTraditionalChinese(this.jStockOptions.getLocale())) {
+                    this.jRadioButtonMenuItem4.setSelected(true);
+                } else if (Utils.isSimplifiedChinese(this.jStockOptions.getLocale())) {
+                    this.jRadioButtonMenuItem2.setSelected(true);
+                } else if (this.jStockOptions.getLocale().getLanguage().compareTo(Locale.GERMAN.getLanguage()) == 0) {
+                    this.jRadioButtonMenuItem3.setSelected(true);
+                }
+            }
+        }
+    }//GEN-LAST:event_jRadioButtonMenuItem5ActionPerformed
     
     /**
      * Activate specified watchlist.
@@ -4509,6 +4545,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem2;
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem3;
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem4;
+    private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem5;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;

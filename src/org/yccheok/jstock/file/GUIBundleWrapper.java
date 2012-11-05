@@ -40,6 +40,7 @@ public class GUIBundleWrapper {
         SIMPLIFIED_CHINESE,
         GERMAN,
         TRADITIONAL_CHINESE,
+        ITALIAN,
         DEFAULT,
     };
     
@@ -63,6 +64,8 @@ public class GUIBundleWrapper {
             guiBundleWrapper = ResourceBundle.getBundle("org.yccheok.jstock.data.gui", Locale.GERMAN);
         } else if (type == Language.TRADITIONAL_CHINESE) { 
             guiBundleWrapper = ResourceBundle.getBundle("org.yccheok.jstock.data.gui", Locale.TRADITIONAL_CHINESE);
+        } else if (type == Language.ITALIAN) {
+            guiBundleWrapper = ResourceBundle.getBundle("org.yccheok.jstock.data.gui", Locale.ITALIAN);
         } else {
             assert(type == Language.DEFAULT);
             guiBundleWrapper = ResourceBundle.getBundle("org.yccheok.jstock.data.gui");

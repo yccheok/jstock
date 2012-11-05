@@ -475,7 +475,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                             // However, for backward compatible purpose (Able to read old CSV),
                             // we perform a for loop to determine the best date format.
                             // For the latest CSV, it should be Locale.ENGLISH.
-                            Locale[] locales = {Locale.ENGLISH, Locale.SIMPLIFIED_CHINESE, Locale.GERMAN, Locale.TRADITIONAL_CHINESE};
+                            Locale[] locales = {Locale.ENGLISH, Locale.SIMPLIFIED_CHINESE, Locale.GERMAN, Locale.TRADITIONAL_CHINESE, Locale.ITALIAN};
                             for (Locale locale : locales) {
                                 dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, locale);
                                 try {
@@ -602,7 +602,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                             // However, for backward compatible purpose (Able to read old CSV),
                             // we perform a for loop to determine the best date format.
                             // For the latest CSV, it should be Locale.ENGLISH.
-                            Locale[] locales = {Locale.ENGLISH, Locale.SIMPLIFIED_CHINESE, Locale.GERMAN, Locale.TRADITIONAL_CHINESE};
+                            Locale[] locales = {Locale.ENGLISH, Locale.SIMPLIFIED_CHINESE, Locale.GERMAN, Locale.TRADITIONAL_CHINESE, Locale.ITALIAN};
                             for (Locale locale : locales) {
                                 dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, locale);
                                 try {
@@ -703,7 +703,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                             // However, for backward compatible purpose (Able to read old CSV),
                             // we will perform a for loop to determine the best date format.
                             // For the latest CSV, it should be Locale.ENGLISH.
-                            Locale[] locales = {Locale.ENGLISH, Locale.SIMPLIFIED_CHINESE, Locale.GERMAN, Locale.TRADITIONAL_CHINESE};
+                            Locale[] locales = {Locale.ENGLISH, Locale.SIMPLIFIED_CHINESE, Locale.GERMAN, Locale.TRADITIONAL_CHINESE, Locale.ITALIAN};
                             for (Locale locale : locales) {
                                 dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, locale);
                                 try {
@@ -789,7 +789,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                             // However, for backward compatible purpose (Able to read old CSV),
                             // we will perform a for loop to determine the best date format.
                             // For the latest CSV, it should be Locale.ENGLISH.
-                            Locale[] locales = {Locale.ENGLISH, Locale.SIMPLIFIED_CHINESE, Locale.GERMAN, Locale.TRADITIONAL_CHINESE};
+                            Locale[] locales = {Locale.ENGLISH, Locale.SIMPLIFIED_CHINESE, Locale.GERMAN, Locale.TRADITIONAL_CHINESE, Locale.ITALIAN};
                             for (Locale locale : locales) {
                                 dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, locale);
                                 try {

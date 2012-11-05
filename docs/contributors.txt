@@ -17,6 +17,9 @@ German Translator:
 English Translator:
 * Stefan Angrick
 
+Italian Translator:
+* Maurizio Da Lio
+
 Malaysia History Data Feed Sponsor:
 * http://www.klse.info/
 

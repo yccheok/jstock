@@ -172,6 +172,8 @@ public class Utils {
             return true;
         } else if (locale.getLanguage().equals(Locale.ENGLISH.getLanguage())) {
             return true;
+        } else if (locale.getLanguage().equals(Locale.ITALIAN.getLanguage())) {
+            return true;
         }
         return false;
     }
