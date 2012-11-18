@@ -19,7 +19,6 @@
 
 package org.yccheok.jstock.gui;
 
-import au.com.bytecode.opencsv.CSVReader;
 import org.yccheok.jstock.gui.charting.ChartJDialog;
 import org.yccheok.jstock.gui.charting.ChartJDialogOptions;
 import org.yccheok.jstock.alert.GoogleMail;
@@ -32,7 +31,6 @@ import java.util.*;
 import org.yccheok.jstock.engine.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import javax.swing.*;
@@ -281,28 +279,6 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jPanel10 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
-        jPanel7 = new javax.swing.JPanel();
-        jLabel27 = new org.yccheok.jstock.gui.GradientJLabel(new Color(111, 148, 182), new Color(184, 207, 229), (float)0.9);
-        jLabel21 = new org.yccheok.jstock.gui.GradientJLabel(new Color(111, 148, 182), new Color(184, 207, 229), (float)0.9);
-        jLabel20 = new org.yccheok.jstock.gui.GradientJLabel(new Color(111, 148, 182), new Color(184, 207, 229), (float)0.9);
-        jLabel22 = new org.yccheok.jstock.gui.GradientJLabel(new Color(111, 148, 182), new Color(184, 207, 229), (float)0.9);
-        jLabel28 = new org.yccheok.jstock.gui.GradientJLabel(new Color(111, 148, 182), new Color(184, 207, 229), (float)0.9);
-        jLabel36 = new org.yccheok.jstock.gui.GradientJLabel(new Color(111, 148, 182), new Color(184, 207, 229), (float)0.9);
-        jLabel31 = new org.yccheok.jstock.gui.GradientJLabel(new Color(111, 148, 182), new Color(184, 207, 229), (float)0.9);
-        jLabel18 = new org.yccheok.jstock.gui.GradientJLabel(new Color(111, 148, 182), new Color(184, 207, 229), (float)0.9);
-        jLabel24 = new javax.swing.JLabel();
-        jLabel33 = new javax.swing.JLabel();
-        jLabel19 = new javax.swing.JLabel();
-        jLabel32 = new javax.swing.JLabel();
-        jLabel35 = new javax.swing.JLabel();
-        jLabel37 = new javax.swing.JLabel();
-        jLabel23 = new org.yccheok.jstock.gui.GradientJLabel(new Color(111, 148, 182), new Color(184, 207, 229), (float)0.9);
-        jLabel25 = new javax.swing.JLabel();
-        jLabel34 = new javax.swing.JLabel();
-        jLabel26 = new javax.swing.JLabel();
-        jLabel29 = new javax.swing.JLabel();
-        jLabel30 = new javax.swing.JLabel();
-        jLabel38 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jMenuBar2 = new javax.swing.JMenuBar();
         jMenu3 = new javax.swing.JMenu();
@@ -316,6 +292,8 @@ public class MainFrame extends javax.swing.JFrame {
         jMenu5 = new javax.swing.JMenu();
         jMenuItem4 = new javax.swing.JMenuItem();
         jMenuItem7 = new javax.swing.JMenuItem();
+        jSeparator4 = new javax.swing.JPopupMenu.Separator();
+        jMenuItem15 = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         jMenu10 = new javax.swing.JMenu();
         jRadioButtonMenuItem1 = new javax.swing.JRadioButtonMenuItem();
@@ -423,136 +401,6 @@ public class MainFrame extends javax.swing.JFrame {
         EMPTY_DYNAMIC_CHART.getChartPanel().addMouseListener(dynamicChartMouseAdapter);
         jPanel3.add(EMPTY_DYNAMIC_CHART.getChartPanel(), java.awt.BorderLayout.CENTER);
 
-        jPanel7.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel7.setBorder(new org.jdesktop.swingx.border.DropShadowBorder(true));
-        jPanel7.setLayout(new java.awt.GridLayout(3, 7, 2, 2));
-
-        jLabel27.setBackground(new java.awt.Color(184, 207, 229));
-        jLabel27.setForeground(new java.awt.Color(255, 255, 255));
-        jPanel7.add(jLabel27);
-
-        jLabel21.setBackground(new java.awt.Color(184, 207, 229));
-        jLabel21.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel21.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel21.setText(bundle.getString("MainFrame_3rdBuy")); // NOI18N
-        jLabel21.setBorder(javax.swing.BorderFactory.createEmptyBorder(2, 2, 2, 2));
-        jLabel21.setFocusTraversalPolicyProvider(true);
-        jLabel21.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jPanel7.add(jLabel21);
-
-        jLabel20.setBackground(new java.awt.Color(184, 207, 229));
-        jLabel20.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel20.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel20.setText(bundle.getString("MainFrame_2ndBuy")); // NOI18N
-        jLabel20.setBorder(javax.swing.BorderFactory.createEmptyBorder(2, 2, 2, 2));
-        jLabel20.setFocusTraversalPolicyProvider(true);
-        jLabel20.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jPanel7.add(jLabel20);
-
-        jLabel22.setBackground(new java.awt.Color(184, 207, 229));
-        jLabel22.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel22.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel22.setText(bundle.getString("MainFrame_1stBuy")); // NOI18N
-        jLabel22.setBorder(javax.swing.BorderFactory.createEmptyBorder(2, 2, 2, 2));
-        jLabel22.setFocusTraversalPolicyProvider(true);
-        jLabel22.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jPanel7.add(jLabel22);
-
-        jLabel28.setBackground(new java.awt.Color(184, 207, 229));
-        jLabel28.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel28.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel28.setText(bundle.getString("MainFrame_1stSell")); // NOI18N
-        jLabel28.setBorder(javax.swing.BorderFactory.createEmptyBorder(2, 2, 2, 2));
-        jPanel7.add(jLabel28);
-
-        jLabel36.setBackground(new java.awt.Color(184, 207, 229));
-        jLabel36.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel36.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel36.setText(bundle.getString("MainFrame_2ndSell")); // NOI18N
-        jLabel36.setBorder(javax.swing.BorderFactory.createEmptyBorder(2, 2, 2, 2));
-        jPanel7.add(jLabel36);
-
-        jLabel31.setBackground(new java.awt.Color(184, 207, 229));
-        jLabel31.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel31.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel31.setText(bundle.getString("MainFrame_3rdSell")); // NOI18N
-        jLabel31.setBorder(javax.swing.BorderFactory.createEmptyBorder(2, 2, 2, 2));
-        jPanel7.add(jLabel31);
-
-        jLabel18.setBackground(new java.awt.Color(184, 207, 229));
-        jLabel18.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel18.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel18.setText(bundle.getString("MainFrame_Price")); // NOI18N
-        jPanel7.add(jLabel18);
-
-        jLabel24.setBackground(new java.awt.Color(255, 255, 204));
-        jLabel24.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel24.setOpaque(true);
-        jPanel7.add(jLabel24);
-
-        jLabel33.setBackground(new java.awt.Color(255, 255, 204));
-        jLabel33.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel33.setOpaque(true);
-        jPanel7.add(jLabel33);
-
-        jLabel19.setBackground(new java.awt.Color(255, 255, 204));
-        jLabel19.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel19.setOpaque(true);
-        jPanel7.add(jLabel19);
-
-        jLabel32.setBackground(new java.awt.Color(255, 255, 204));
-        jLabel32.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel32.setOpaque(true);
-        jPanel7.add(jLabel32);
-
-        jLabel35.setBackground(new java.awt.Color(255, 255, 204));
-        jLabel35.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel35.setOpaque(true);
-        jPanel7.add(jLabel35);
-
-        jLabel37.setBackground(new java.awt.Color(255, 255, 204));
-        jLabel37.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel37.setOpaque(true);
-        jPanel7.add(jLabel37);
-
-        jLabel23.setBackground(new java.awt.Color(184, 207, 229));
-        jLabel23.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel23.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel23.setText(bundle.getString("MainFrame_Qty")); // NOI18N
-        jPanel7.add(jLabel23);
-
-        jLabel25.setBackground(new java.awt.Color(255, 255, 204));
-        jLabel25.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel25.setOpaque(true);
-        jPanel7.add(jLabel25);
-
-        jLabel34.setBackground(new java.awt.Color(255, 255, 204));
-        jLabel34.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel34.setOpaque(true);
-        jPanel7.add(jLabel34);
-
-        jLabel26.setBackground(new java.awt.Color(255, 255, 204));
-        jLabel26.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel26.setOpaque(true);
-        jPanel7.add(jLabel26);
-
-        jLabel29.setBackground(new java.awt.Color(255, 255, 204));
-        jLabel29.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel29.setOpaque(true);
-        jPanel7.add(jLabel29);
-
-        jLabel30.setBackground(new java.awt.Color(255, 255, 204));
-        jLabel30.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel30.setOpaque(true);
-        jPanel7.add(jLabel30);
-
-        jLabel38.setBackground(new java.awt.Color(255, 255, 204));
-        jLabel38.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel38.setOpaque(true);
-        jPanel7.add(jLabel38);
-
-        jPanel10.add(jPanel7);
-
         jPanel8.add(jPanel10, java.awt.BorderLayout.SOUTH);
 
         jTabbedPane1.addTab(bundle.getString("MainFrame_Title"), jPanel8); // NOI18N
@@ -629,6 +477,15 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
         jMenu5.add(jMenuItem7);
+        jMenu5.add(jSeparator4);
+
+        jMenuItem15.setText(bundle.getString("MainFrame_RefreshStockPrices")); // NOI18N
+        jMenuItem15.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem15ActionPerformed(evt);
+            }
+        });
+        jMenu5.add(jMenuItem15);
 
         jMenuBar2.add(jMenu5);
 
@@ -913,18 +770,30 @@ public class MainFrame extends javax.swing.JFrame {
         if (pane.getSelectedComponent() == this.jPanel8) {
             this.jMenuItem2.setEnabled(true);   // Load
             this.jMenuItem9.setEnabled(true);   // Save
+            this.jMenuItem4.setEnabled(true);   // Add Stocks...
+            this.jMenuItem7.setEnabled(true);   // Clear All Stocks...
+            this.jMenuItem15.setEnabled(true);  // Refresh Stock Prices
         }
         else if (pane.getSelectedComponent() == this.indicatorPanel) {
             this.jMenuItem2.setEnabled(false);  // Load
             this.jMenuItem9.setEnabled(false);  // Save
+            this.jMenuItem4.setEnabled(false);  // Add Stocks...
+            this.jMenuItem7.setEnabled(false);  // Clear All Stocks...
+            this.jMenuItem15.setEnabled(false); // Refresh Stock Prices
         }
         else if(pane.getSelectedComponent() == this.indicatorScannerJPanel) {
             this.jMenuItem2.setEnabled(false);  // Load
             this.jMenuItem9.setEnabled(true);   // Save
+            this.jMenuItem4.setEnabled(false);  // Add Stocks...
+            this.jMenuItem7.setEnabled(false);  // Clear All Stocks...
+            this.jMenuItem15.setEnabled(true);  // Refresh Stock Prices            
         }
         else if(pane.getSelectedComponent() == this.portfolioManagementJPanel) {
             this.jMenuItem2.setEnabled(true);   // Load
             this.jMenuItem9.setEnabled(true);   // Save
+            this.jMenuItem4.setEnabled(false);  // Add Stocks...
+            this.jMenuItem7.setEnabled(false);  // Clear All Stocks...
+            this.jMenuItem15.setEnabled(true);  // Refresh Stock Prices
         }
     }
 
@@ -1088,7 +957,6 @@ public class MainFrame extends javax.swing.JFrame {
         this.jTable1.getSelectionModel().clearSelection();
         this.indicatorScannerJPanel.clearTableSelection();
         this.portfolioManagementJPanel.clearTableSelection();
-        updateBuyerSellerInformation(null);
         updateDynamicChart(null);
     }//GEN-LAST:event_formMouseClicked
 
@@ -1131,11 +999,8 @@ public class MainFrame extends javax.swing.JFrame {
                 final StockTableModel tableModel = (StockTableModel)jTable1.getModel();
                 final int modelIndex = jTable1.convertRowIndexToModel(row);
                 final Stock stock = tableModel.getStock(modelIndex);
-                updateBuyerSellerInformation(stock);
                 this.updateDynamicChart(stock);
-            }
-            else {
-            	updateBuyerSellerInformation(null);
+            } else {
                 this.updateDynamicChart(null);
             }
 
@@ -1486,6 +1351,10 @@ public class MainFrame extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_jRadioButtonMenuItem5ActionPerformed
+
+    private void jMenuItem15ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem15ActionPerformed
+        refreshAllRealTimeStockMonitors();
+    }//GEN-LAST:event_jMenuItem15ActionPerformed
     
     /**
      * Activate specified watchlist.
@@ -1704,13 +1573,11 @@ public class MainFrame extends javax.swing.JFrame {
         this.initAlertStateManager();
 
         if (java.awt.EventQueue.isDispatchThread()) {
-            updateBuyerSellerInformation(null);
             updateDynamicChart(null);
         } else {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    updateBuyerSellerInformation(null);
                     updateDynamicChart(null);
                 }                
             });
@@ -1762,7 +1629,6 @@ public class MainFrame extends javax.swing.JFrame {
             this.alertStateManager.clearState(stock);
         }            
         
-        updateBuyerSellerInformation(null);
         this.updateDynamicChart(null);
 
         if (stockCodeHistoryGUI.isEmpty()) {
@@ -2104,41 +1970,6 @@ public class MainFrame extends javax.swing.JFrame {
         tips.setToolTip(jTable1.getColumn(GUIBundle.getString("MainFrame_RiseAbove")), java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_AlertUserWhenLastPriceFallAboveOrEqualToSpecifiedValue"));
 
         header.addMouseMotionListener(tips);        
-    }
-    
-    private void updateBuyerSellerInformation(Stock stock) {
-        assert(java.awt.EventQueue.isDispatchThread());
-
-        if (stock == null) {
-            jLabel24.setText("");
-            jLabel33.setText("");
-            jLabel19.setText("");
-            jLabel32.setText("");
-            jLabel35.setText("");
-            jLabel37.setText("");
-            jLabel25.setText("");
-            jLabel34.setText("");
-            jLabel26.setText("");
-            jLabel29.setText("");
-            jLabel30.setText("");
-            jLabel38.setText("");
-            return;
-        }
-        
-        final double prevPrice = stock.getPrevPrice();
-        
-        jLabel24.setText("" + stock.getThirdBuyPrice()); jLabel24.setForeground(Utils.getColor(stock.getThirdBuyPrice(), prevPrice));
-        jLabel33.setText("" + stock.getSecondBuyPrice()); jLabel33.setForeground(Utils.getColor(stock.getSecondBuyPrice(), prevPrice));
-        jLabel19.setText("" + stock.getBuyPrice()); jLabel19.setForeground(Utils.getColor(stock.getBuyPrice(), prevPrice));
-        jLabel32.setText("" + stock.getSellPrice()); jLabel32.setForeground(Utils.getColor(stock.getSellPrice(), prevPrice));
-        jLabel35.setText("" + stock.getSecondSellPrice()); jLabel35.setForeground(Utils.getColor(stock.getSecondSellPrice(), prevPrice));
-        jLabel37.setText("" + stock.getThirdSellPrice()); jLabel37.setForeground(Utils.getColor(stock.getThirdSellPrice(), prevPrice));
-        jLabel25.setText("" + stock.getThirdBuyQuantity());
-        jLabel34.setText("" + stock.getSecondBuyQuantity());
-        jLabel26.setText("" + stock.getBuyQuantity());
-        jLabel29.setText("" + stock.getSellQuantity());
-        jLabel30.setText("" + stock.getSecondSellQuantity());
-        jLabel38.setText("" + stock.getThirdSellQuantity());
     }
     
     /* Save everything to disc, before perform uploading. */
@@ -3865,7 +3696,6 @@ public class MainFrame extends javax.swing.JFrame {
                 for (Stock stock : stocks) {                    
                     updateStockToTable(stock);
                     if (isStockBeingSelected(stock)) {
-                        MainFrame.this.updateBuyerSellerInformation(stock);
                         MainFrame.this.updateDynamicChart(stock);
                     }
                 }               
@@ -4059,11 +3889,8 @@ public class MainFrame extends javax.swing.JFrame {
                 StockTableModel tableModel = (StockTableModel)jTable1.getModel();
                 int modelIndex = jTable1.convertRowIndexToModel(row);
                 Stock stock = tableModel.getStock(modelIndex);
-                updateBuyerSellerInformation(stock);
                 updateDynamicChart(stock);
-            }
-            else {
-                updateBuyerSellerInformation(null);
+            } else {
                 updateDynamicChart(null);
                 
             }
@@ -4487,27 +4314,6 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.ButtonGroup buttonGroup3;
     private javax.swing.JComboBox jComboBox1;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel18;
-    private javax.swing.JLabel jLabel19;
-    private javax.swing.JLabel jLabel20;
-    private javax.swing.JLabel jLabel21;
-    private javax.swing.JLabel jLabel22;
-    private javax.swing.JLabel jLabel23;
-    private javax.swing.JLabel jLabel24;
-    private javax.swing.JLabel jLabel25;
-    private javax.swing.JLabel jLabel26;
-    private javax.swing.JLabel jLabel27;
-    private javax.swing.JLabel jLabel28;
-    private javax.swing.JLabel jLabel29;
-    private javax.swing.JLabel jLabel30;
-    private javax.swing.JLabel jLabel31;
-    private javax.swing.JLabel jLabel32;
-    private javax.swing.JLabel jLabel33;
-    private javax.swing.JLabel jLabel34;
-    private javax.swing.JLabel jLabel35;
-    private javax.swing.JLabel jLabel36;
-    private javax.swing.JLabel jLabel37;
-    private javax.swing.JLabel jLabel38;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu10;
     private javax.swing.JMenu jMenu11;
@@ -4526,6 +4332,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem12;
     private javax.swing.JMenuItem jMenuItem13;
     private javax.swing.JMenuItem jMenuItem14;
+    private javax.swing.JMenuItem jMenuItem15;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
@@ -4539,7 +4346,6 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem1;
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem2;
@@ -4550,6 +4356,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
+    private javax.swing.JPopupMenu.Separator jSeparator4;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTable jTable1;
     // End of variables declaration//GEN-END:variables

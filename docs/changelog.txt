@@ -5,6 +5,8 @@ JStock 1.0.6v - ????-??-??
   Bugfix:  Bugfix on edit sell transaction. Buy cost should be adjusted after
            adjusting quantity.
   Feature: Added Italian language. Contributed by Maurizio Da Lio.
+  Feature: Added "Refresh Stock Prices". Please refer to 
+           http://jstock.sourceforge.net/help_real_time_info.html#scanning-speed
   
 JStock 1.0.6u - 2012-10-15
   Bugfix:  Critical bugfix. JStock overwrites sell transactions' sell date to buy 
