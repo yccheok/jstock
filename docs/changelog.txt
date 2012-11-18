@@ -1,12 +1,13 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
-JStock 1.0.6v - ????-??-??
-  Bugfix:  Bugfix on edit sell transaction. Buy cost should be adjusted after
-           adjusting quantity.
+JStock 1.0.6v - 2012-11-19
   Feature: Added Italian language. Contributed by Maurizio Da Lio.
   Feature: Added "Refresh Stock Prices". Please refer to 
            http://jstock.sourceforge.net/help_real_time_info.html#scanning-speed
+  Feature: UI cleanup, by removing unused buyer/seller information.
+  Bugfix:  Bugfix on edit sell transaction. Buy cost should be adjusted after
+           adjusting quantity.
   
 JStock 1.0.6u - 2012-10-15
   Bugfix:  Critical bugfix. JStock overwrites sell transactions' sell date to buy 
