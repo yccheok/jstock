@@ -276,12 +276,24 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
                     while (thisThread == thread) {
                         try {
                             _wait();
-                        }
-                        catch (InterruptedException exp) {
+                        } catch (InterruptedException exp) {
                             log.error(null, exp);
-                            /* Exit the primary fail safe loop. */
-                            thread = null;
-                            break;
+                            // If this monitor is suspended, refresh will not work, unless
+                            // resume is being called first. This is for simplicity purpose.
+                            // During _wait(), when InterruptedException being thrown, I have
+                            // no idea whether it is caused by thread termination, or refresh.
+                            // By placing "if (suspend)" constraint, I can more or less sure
+                            // InterruptedException during _wait() is caused by thread
+                            // termination. But, I can never 100% sure after resume() is called,
+                            // the thread is returned from wait(). So, problem still arise,
+                            // if the sequence is _resume() -> refresh() -> returned from _wait().
+                            // That's why we have "if (isRefresh == false)" check in exception
+                            // handling.
+                            if (isRefresh == false) {
+                                /* Exit the primary fail safe loop. */
+                                thread = null;
+                                break;
+                            }
                         }
 
                         int pass = 0;
@@ -380,9 +392,24 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
             }	/* while (thisThread == thread) */
         }
         
-        // I guess we no longer need synchronized keyword here, as this method
-        // will only be consumed by synchronized method.
-        public void refresh() {
+        // Need synchronized, to ensure refresh is mutually exclusive with
+        // _wait.
+        public synchronized void refresh() {
+            if (suspend) {
+                // If this monitor is suspended, refresh will not work, unless
+                // resume is being called first. This is for simplicity purpose.
+                // During _wait(), when InterruptedException being thrown, I have
+                // no idea whether it is caused by thread termination, or refresh.
+                // By placing "if (suspend)" constraint, I can more or less sure
+                // InterruptedException during _wait() is caused by thread
+                // termination. But, I can never 100% sure after resume() is called,
+                // the thread is returned from wait(). So, problem still arise,
+                // if the sequence is _resume() -> refresh() -> returned from _wait().
+                // That's why we have "if (isRefresh == false)" check in exception
+                // handling.
+                return;
+            }
+            
             isRefresh = true;
             minDelayCounter = 0;
             totalScanned = 0;
