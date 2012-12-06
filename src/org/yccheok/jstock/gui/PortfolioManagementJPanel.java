@@ -2293,6 +2293,11 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
         
         updateWealthHeader();
+        
+        // Update status bar with current time string.
+        final String time = Utils.getLastUpdateTimeFormat().format(new Date());        
+        final String message = MessageFormat.format(GUIBundle.getString("MainFrame_LastUpdate_template"), time);
+        MainFrame.getInstance().setStatusBar(false, message);        
     }  
 
     private void initGUIOptions() {
@@ -2556,6 +2561,13 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         );
     }
 
+    public void refreshCurrencyExchangeMonitor() {
+        CurrencyExchangeMonitor _currencyExchangeMonitor = this.currencyExchangeMonitor;
+        if (_currencyExchangeMonitor != null) {
+            _currencyExchangeMonitor.refresh();
+        }
+    }
+    
     public void refreshRealTimeStockMonitor() {
         RealTimeStockMonitor _realTimeStockMonitor = this.realTimeStockMonitor;
         if (_realTimeStockMonitor != null) {

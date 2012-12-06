@@ -75,6 +75,7 @@ import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
 import org.yccheok.jstock.engine.*;
 import java.util.*;
@@ -2758,6 +2759,15 @@ public class Utils {
     }
     
     /**
+     * Returns time format used in status bar.
+     * 
+     * @return time format used in status bar
+     */
+    public static DateFormat getLastUpdateTimeFormat() {
+        return lastUpdateTimeFormat.get();
+    }
+    
+    /**
      * Represents latest application information. This is being used for
      * application upgrading.
      */
@@ -2814,6 +2824,12 @@ public class Utils {
             // 05.09.2011       -   Locale.GERMAN
             DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, Locale.ENGLISH);
             return dateFormat;
+        }
+    };
+
+    private static final ThreadLocal<DateFormat> lastUpdateTimeFormat = new ThreadLocal <DateFormat>() {
+        @Override protected DateFormat initialValue() {
+            return new SimpleDateFormat("h:mm a");
         }
     };
     

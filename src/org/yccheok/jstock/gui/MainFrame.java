@@ -478,6 +478,7 @@ public class MainFrame extends javax.swing.JFrame {
         jMenu5.add(jMenuItem7);
         jMenu5.add(jSeparator4);
 
+        jMenuItem15.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R, java.awt.event.InputEvent.CTRL_MASK));
         jMenuItem15.setText(bundle.getString("MainFrame_RefreshStockPrices")); // NOI18N
         jMenuItem15.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1353,6 +1354,10 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void jMenuItem15ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem15ActionPerformed
         refreshAllRealTimeStockMonitors();
+        refreshCurrencyExchangeMonitor();
+        // Refresh stock index as well.
+        this.initMarketThread();
+        this.setStatusBar(true, GUIBundle.getString("MainFrame_RefreshStockPrices..."));
     }//GEN-LAST:event_jMenuItem15ActionPerformed
     
     /**
@@ -2786,7 +2791,7 @@ public class MainFrame extends javax.swing.JFrame {
                     log.error(null, exp);
                     break;
                 }
-            }
+            }   // while
         }            
     }
 
@@ -3684,6 +3689,11 @@ public class MainFrame extends javax.swing.JFrame {
             }   // if (isSymbolImmutable || new_stock.getSymbol().toString().isEmpty())
         }   // for (int i = 0, size = stocks.size(); i < size; i++)
         
+        // Update status bar with current time string.
+        final String time = Utils.getLastUpdateTimeFormat().format(new Date());        
+        final String message = MessageFormat.format(GUIBundle.getString("MainFrame_LastUpdate_template"), time);
+        this.setStatusBar(false, message);
+        
         // Do it in GUI event dispatch thread. Otherwise, we may face deadlock.
         // For example, we lock the jTable, and try to remove the stock from the
         // real time monitor. While we wait for the real time monitor to complete,
@@ -4218,6 +4228,10 @@ public class MainFrame extends javax.swing.JFrame {
         }
     }
     
+    private void refreshCurrencyExchangeMonitor() {
+        this.portfolioManagementJPanel.refreshCurrencyExchangeMonitor();
+    }
+    
     public void refreshAllRealTimeStockMonitors() {
         RealTimeStockMonitor _realTimeStockMonitor = this.realTimeStockMonitor;
         if (_realTimeStockMonitor != null) {
@@ -4267,8 +4281,6 @@ public class MainFrame extends javax.swing.JFrame {
 
     private final javax.swing.ImageIcon smileIcon = this.getImageIcon("/images/16x16/smile.png");
     private final javax.swing.ImageIcon smileGrayIcon = this.getImageIcon("/images/16x16/smile-gray.png");
-    private javax.swing.Timer timer = null;
-    private static final int TIMER_DELAY = 500;
 
     private Executor zombiePool = Utils.getZoombiePool();
     
@@ -4283,7 +4295,6 @@ public class MainFrame extends javax.swing.JFrame {
     private static final DynamicChart EMPTY_DYNAMIC_CHART = new DynamicChart();
     private final MouseAdapter dynamicChartMouseAdapter = getDynamicChartMouseAdapter();
     
-    private static final int NUM_OF_RETRY = 3;
     private static final int NUM_OF_THREADS_HISTORY_MONITOR = 4;
 
     /*
