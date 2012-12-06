@@ -19,12 +19,9 @@
 
 package org.yccheok.jstock.engine;
 
+import java.util.EnumMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.network.Utils.Type;
@@ -55,10 +52,23 @@ public class CurrencyExchangeMonitor extends Subject<CurrencyExchangeMonitor, Do
         if (has_started) {
             return;
         }
-        executor.submit(currencyExchangeRunnable);
+        currencyExchangeThread.start();
         has_started = true;
     }
 
+    public synchronized void refresh()
+    {
+        synchronized(currencyExchangeThread) {
+            if (suspend) {
+                // If this monitor is suspended, refresh will not work, unless
+                // resume is being called first.
+                return;
+            }
+            isRefresh = true;
+            this.currencyExchangeThread.interrupt();
+        }
+    }
+    
     /**
      * Stop all currency exchange monitoring activities. Once it is stopped, it
      * cannot be started again. This method will only return once it is being
@@ -66,9 +76,9 @@ public class CurrencyExchangeMonitor extends Subject<CurrencyExchangeMonitor, Do
      * with each others.
      */
     public synchronized void stop() {
-        executor.shutdownNow();
+        this.currencyExchangeThread._stop();
         try {
-            executor.awaitTermination(100, TimeUnit.DAYS);
+            this.currencyExchangeThread.join();
         } catch (InterruptedException ex) {
             log.error(null, ex);
         }
@@ -80,7 +90,7 @@ public class CurrencyExchangeMonitor extends Subject<CurrencyExchangeMonitor, Do
      * with each others.
      */
     public synchronized void suspend() {
-        synchronized(currencyExchangeRunnable) {
+        synchronized(currencyExchangeThread) {
             suspend = true;
         }
     }
@@ -91,9 +101,9 @@ public class CurrencyExchangeMonitor extends Subject<CurrencyExchangeMonitor, Do
      * each others.
      */
     public synchronized void resume() {
-        synchronized(currencyExchangeRunnable) {
+        synchronized(currencyExchangeThread) {
             suspend = false;
-            currencyExchangeRunnable.notify();
+            currencyExchangeThread.notify();
         }
     }
 
@@ -145,22 +155,32 @@ public class CurrencyExchangeMonitor extends Subject<CurrencyExchangeMonitor, Do
     // country -> currency information, until it successes at least once.
     // (2) Fetch the latest currency exchange information, according to given
     // fromCountry and toCountry.
-    private class CurrencyExchangeRunnable implements Runnable {
+    private class CurrencyExchangeThread extends Thread {
+
+        private volatile boolean isRunnable = true;
+        
+        public void _stop() {
+            isRunnable = false;
+            // Wake up from sleep.
+            interrupt();
+        }
 
         @Override
         public void run() {
-            while (!executor.isShutdown()) {
+            while (isRunnable) {
                 // Execute the while loop within try block to ensure fail safe.
                 try {
-                    while (!executor.isShutdown()) {
+                    while (isRunnable) {
                         synchronized(this) {
                             while (suspend) {
                                 try {
                                     wait();
                                 } catch (InterruptedException ex) {
                                     log.error(null, ex);
-                                    // Usually triggered by executor.shutdownNow
-                                    return;
+                                    if (isRefresh == false) {
+                                        isRunnable = false; 
+                                        break;
+                                    }
                                 }
                             }
                         }
@@ -213,8 +233,16 @@ public class CurrencyExchangeMonitor extends Subject<CurrencyExchangeMonitor, Do
                             Thread.sleep(org.yccheok.jstock.gui.MainFrame.getInstance().getJStockOptions().getScanningSpeed());
                         } catch (InterruptedException ex) {
                             log.error(null, ex);
-                            // Usually triggered by executor.shutdownNow
-                            return;
+                            if (isRefresh == false) {
+                                /* Exit the primary fail safe loop. */
+                                isRunnable = false;                            
+                                break;
+                            } else {
+                                // User has requested to perform refresh explicitly.
+                                // Clear isRefresh flag, and continue with rest
+                                // of the work.
+                                isRefresh = false;
+                            }
                         }
                         
                     }   // while (!executor.isShutdown())
@@ -252,7 +280,7 @@ public class CurrencyExchangeMonitor extends Subject<CurrencyExchangeMonitor, Do
     // CURRENCY_CODE_TXT's server. Even we are unable to obtain information
     // from CURRENCY_CODE_TXT's server, this map itself still able to provide
     // default information.
-    private static final Map<Country, String> countryToCurrencyCode =  new ConcurrentHashMap<Country, String>();
+    private static final Map<Country, String> countryToCurrencyCode =  new EnumMap<Country, String>(Country.class);
     // Whether we had updated countryToCurrencyCode at least once?
     // Do I have to use volatile here? As this flag may write by a thread, but
     // read by another thread later.
@@ -308,10 +336,13 @@ public class CurrencyExchangeMonitor extends Subject<CurrencyExchangeMonitor, Do
     // Doesn't require volatile, as this variable is being accessed within
     // synchronized block.
     private boolean suspend = false;
+    private volatile boolean isRefresh = false;
     // Doesn't require volatile, as this variable is being accessed within
     // synchronized block.
     private boolean has_started = false;
-    private final CurrencyExchangeRunnable currencyExchangeRunnable = new CurrencyExchangeRunnable();
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    // Note that, we no longer using executor. As, to implement refresh, we need 
+    // to perform interruption. It is easier to perform interruption on Thread, 
+    // rather on Future returned from executor.
+    private final CurrencyExchangeThread currencyExchangeThread = new CurrencyExchangeThread();
     private static final Log log = LogFactory.getLog(CurrencyExchangeMonitor.class);
 }
