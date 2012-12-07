@@ -2021,6 +2021,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         if (SwingUtilities.isEventDispatchThread()) {
             final TitledBorder titledBorder = (TitledBorder)PortfolioManagementJPanel.this.jPanel1.getBorder();
             titledBorder.setTitle(jStockOptions.getPortfolioName());
+            // So that title will refresh immediately.
+            PortfolioManagementJPanel.this.jPanel1.repaint();
         }
         else {
             SwingUtilities.invokeLater(new Runnable() {
@@ -2028,6 +2030,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 public void run() {
                     final TitledBorder titledBorder = (TitledBorder)PortfolioManagementJPanel.this.jPanel1.getBorder();
                     titledBorder.setTitle(jStockOptions.getPortfolioName());
+                    // So that title will refresh immediately.
+                    PortfolioManagementJPanel.this.jPanel1.repaint();
                 }
             });
         }

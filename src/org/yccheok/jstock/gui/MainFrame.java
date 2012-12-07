@@ -151,7 +151,8 @@ public class MainFrame extends javax.swing.JFrame {
         this.initChartJDialogOptions();
         this.initLanguageMenuItemsSelection();        
         this.initJXLayerOnJComboBox();
-
+        this.initKeyBindings();
+        
         // Turn to the last viewed page.
         final int lastSelectedPageIndex = this.getJStockOptions().getLastSelectedPageIndex();
         if (this.jTabbedPane1.getTabCount() > lastSelectedPageIndex) {
@@ -182,6 +183,66 @@ public class MainFrame extends javax.swing.JFrame {
         installShutdownHookForMacOSX();
     }
 
+    private void initKeyBindings() {
+        KeyStroke watchlistNavigationKeyStroke = KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_W, java.awt.event.InputEvent.CTRL_MASK);
+        KeyStroke portfolioNavigationKeyStroke = KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_E, java.awt.event.InputEvent.CTRL_MASK);
+        getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(watchlistNavigationKeyStroke, "watchlistNavigation");
+        getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(portfolioNavigationKeyStroke, "portfolioNavigation");
+        getRootPane().getActionMap().put("watchlistNavigation", new AbstractAction() {
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+                watchlistNavigation();
+            }
+        });
+        getRootPane().getActionMap().put("portfolioNavigation", new AbstractAction() {
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+                portfolioNavigation();
+            }
+        });        
+    }
+    
+    private void watchlistNavigation() {
+        final java.util.List<String> watchlistNames = org.yccheok.jstock.watchlist.Utils.getWatchlistNames();
+        final int size = watchlistNames.size();
+        if (size <= 1) {
+            // Nothing to navigate.
+            return;
+        }
+        final String currentWatchlistName = this.getJStockOptions().getWatchlistName();
+        
+        int index = 0;
+        
+        for (; index < size; index++) {
+            if (watchlistNames.get(index).equals(currentWatchlistName)) {
+                index++;
+                if (index >= size) index = 0;
+                break;
+            }
+        }
+        this.selectActiveWatchlist(watchlistNames.get(index));
+    }
+    
+    private void portfolioNavigation() {
+        final java.util.List<String> portfolioNames = org.yccheok.jstock.portfolio.Utils.getPortfolioNames();
+        final int size = portfolioNames.size();
+        if (size <= 1) {
+            // Nothing to navigate.
+            return;
+        }        
+        final String currentPortfolioName = this.getJStockOptions().getPortfolioName();
+        
+        int index = 0;        
+        for (; index < size; index++) {
+            if (portfolioNames.get(index).equals(currentPortfolioName)) {
+                index++;
+                if (index >= size) index = 0;
+                break;
+            }
+        }
+        this.selectActivePortfolio(portfolioNames.get(index));
+    }
+    
     // Register a hook to save app settings when quit via the app menu.
     // This is in Mac OSX only.   
     // http://sourceforge.net/tracker/?func=detail&aid=3490453&group_id=202896&atid=983418
