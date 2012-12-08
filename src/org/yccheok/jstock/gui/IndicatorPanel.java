@@ -333,7 +333,7 @@ public class IndicatorPanel extends JPanel {
         stop();
         
         MainFrame m = MainFrame.getInstance();
-        m.setStatusBar(false, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("IndicatorPanel_SimulationStopped"));
+        m.setStatusBar(false, GUIBundle.getString("IndicatorPanel_SimulationStopped"));
     }//GEN-LAST:event_jButton6ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
@@ -1373,7 +1373,7 @@ public class IndicatorPanel extends JPanel {
                 return success; 
             }
             
-            m.setStatusBar(true, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("IndicatorPanel_StockSampleDataRetrievingInProgress..."));
+            m.setStatusBar(true, GUIBundle.getString("IndicatorPanel_StockSampleDataRetrievingInProgress..."));
             
             java.util.List<StockServerFactory> stockServerFactories = m.getStockServerFactories();
             
@@ -1448,11 +1448,11 @@ public class IndicatorPanel extends JPanel {
                     ((ObjectInspectorJPanel)objectInspectorJPanel).setBean(new MutableStock(new_stock));
 
                     if (m != null) {
-                        m.setStatusBar(false, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("IndicatorPanel_StockSampleDataRetrievedSuccess"));
+                        m.setStatusBar(false, GUIBundle.getString("IndicatorPanel_StockSampleDataRetrievedSuccess"));
                     }
                 } else {
                     if (m != null) {
-                        m.setStatusBar(false, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("IndicatorPanel_StockSampleDataRetrievedFailed"));
+                        m.setStatusBar(false, GUIBundle.getString("IndicatorPanel_StockSampleDataRetrievedFailed"));
                     }
                 }
              }
