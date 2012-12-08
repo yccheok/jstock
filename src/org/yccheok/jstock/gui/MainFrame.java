@@ -185,7 +185,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void initKeyBindings() {
         KeyStroke watchlistNavigationKeyStroke = KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_W, java.awt.event.InputEvent.CTRL_MASK);
-        KeyStroke portfolioNavigationKeyStroke = KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_E, java.awt.event.InputEvent.CTRL_MASK);
+        KeyStroke portfolioNavigationKeyStroke = KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_P, java.awt.event.InputEvent.CTRL_MASK);
         getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(watchlistNavigationKeyStroke, "watchlistNavigation");
         getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(portfolioNavigationKeyStroke, "portfolioNavigation");
         getRootPane().getActionMap().put("watchlistNavigation", new AbstractAction() {
@@ -203,6 +203,12 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     private void watchlistNavigation() {
+        if (this.getSelectedComponent() != this.jPanel8) {
+            // The page is not active. Make it active.
+            MainFrame.this.jTabbedPane1.setSelectedIndex(0);
+            return;
+        }
+        
         final java.util.List<String> watchlistNames = org.yccheok.jstock.watchlist.Utils.getWatchlistNames();
         final int size = watchlistNames.size();
         if (size <= 1) {
@@ -224,6 +230,12 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     private void portfolioNavigation() {
+        if (this.getSelectedComponent() != this.portfolioManagementJPanel) {
+            // The page is not active. Make it active.
+            MainFrame.this.jTabbedPane1.setSelectedIndex(3);
+            return;
+        }
+        
         final java.util.List<String> portfolioNames = org.yccheok.jstock.portfolio.Utils.getPortfolioNames();
         final int size = portfolioNames.size();
         if (size <= 1) {
@@ -854,7 +866,11 @@ public class MainFrame extends javax.swing.JFrame {
             this.jMenuItem9.setEnabled(true);   // Save
             this.jMenuItem4.setEnabled(false);  // Add Stocks...
             this.jMenuItem7.setEnabled(false);  // Clear All Stocks...
-            this.jMenuItem15.setEnabled(true);  // Refresh Stock Prices
+            this.jMenuItem15.setEnabled(true);  // Refresh Stock Prices            
+        }   
+        
+        if (this.isStatusBarBusy == false) {
+            this.setStatusBar(false, this.getBestStatusBarMessage());
         }
     }
 
@@ -1419,6 +1435,7 @@ public class MainFrame extends javax.swing.JFrame {
         // Refresh stock index as well.
         this.initMarketThread();
         this.setStatusBar(true, GUIBundle.getString("MainFrame_RefreshStockPrices..."));
+        refreshPriceInProgress = true;
     }//GEN-LAST:event_jMenuItem15ActionPerformed
     
     /**
@@ -1440,6 +1457,9 @@ public class MainFrame extends javax.swing.JFrame {
         // I guess user wants to watch the current active watchlist right now.
         // We will help him to turn to the stock watchlist page.
         MainFrame.this.jTabbedPane1.setSelectedIndex(0);
+
+        // No matter how, just stop progress bar, and display best message.
+        this.setStatusBar(false, this.getBestStatusBarMessage());
     }
 
     /**
@@ -1461,6 +1481,9 @@ public class MainFrame extends javax.swing.JFrame {
         MainFrame.this.jTabbedPane1.setSelectedIndex(3);
         
         MainFrame.this.portfolioManagementJPanel.updateTitledBorder();
+
+        // No matter how, just stop progress bar, and display best message.
+        this.setStatusBar(false, this.getBestStatusBarMessage());
     }
 
     private void multipleWatchlists() {
@@ -1651,18 +1674,7 @@ public class MainFrame extends javax.swing.JFrame {
         if (stockCodeHistoryGUI != null) {
             if (stockCodeHistoryGUI.isEmpty()) {
                 if (this.stockInfoDatabase != null) {
-                    if (java.awt.EventQueue.isDispatchThread()) {
-                        statusBar.setProgressBar(false);
-                        statusBar.setMainMessage(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_Connected"));
-                    } else {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                statusBar.setProgressBar(false);
-                                statusBar.setMainMessage(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_Connected"));
-                            }                
-                        });
-                    }                    
+                    this.setStatusBar(false, this.getBestStatusBarMessage());
                 }
             }        
         }        
@@ -1698,8 +1710,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         if (stockCodeHistoryGUI.isEmpty()) {
             if (this.stockInfoDatabase != null) {
-                statusBar.setProgressBar(false);
-                statusBar.setMainMessage(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_Connected"));
+                this.setStatusBar(false, this.getBestStatusBarMessage());
             }
         }
     }
@@ -1767,6 +1778,7 @@ public class MainFrame extends javax.swing.JFrame {
     public void setStatusBar(final boolean progressBar, final String mainMessage) {
         if (SwingUtilities.isEventDispatchThread())
         {
+            isStatusBarBusy = progressBar;
             statusBar.setProgressBar(progressBar);
             statusBar.setMainMessage(mainMessage);
         }
@@ -1775,6 +1787,7 @@ public class MainFrame extends javax.swing.JFrame {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
+                    isStatusBarBusy = progressBar;
                     statusBar.setProgressBar(progressBar);
                     statusBar.setMainMessage(mainMessage);
                 }
@@ -2298,9 +2311,8 @@ public class MainFrame extends javax.swing.JFrame {
                                     MainFrame.this.databaseTask = null;
                                 }
                                 
-                                statusBar.setMainMessage(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_NetworkError"));
+                                setStatusBar(false, GUIBundle.getString("MainFrame_NetworkError"));
                                 statusBar.setImageIcon(getImageIcon("/images/16x16/network-error.png"), java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_DoubleClickedToTryAgain"));
-                                statusBar.setProgressBar(false);                                
                             }
                         }
                     }
@@ -2694,11 +2706,10 @@ public class MainFrame extends javax.swing.JFrame {
         final StockHistoryServer stockHistoryServer = stockHistoryMonitor.getStockHistoryServer(stock.getCode());
 
         if (stockHistoryServer == null) {
-            if (stockCodeHistoryGUI.add(stock.getCode()) && stockHistoryMonitor.addStockCode(stock.getCode())) {
-                statusBar.setProgressBar(true);
+            if (stockCodeHistoryGUI.add(stock.getCode()) && stockHistoryMonitor.addStockCode(stock.getCode())) {                                
                 final String template = GUIBundle.getString("MainFrame_LookingForHistory_template");
                 final String message = MessageFormat.format(template, stock.getSymbol(), stockCodeHistoryGUI.size());
-                statusBar.setMainMessage(message);
+                setStatusBar(true, message);
             }
         }
         else {
@@ -3011,14 +3022,12 @@ public class MainFrame extends javax.swing.JFrame {
             }
            
             if (success) {
-                statusBar.setMainMessage(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_Connected"));
+                setStatusBar(false, getBestStatusBarMessage());
                 statusBar.setImageIcon(getImageIcon("/images/16x16/network-transmit-receive.png"), java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_Connected"));
-                statusBar.setProgressBar(false);
             }
             else {
-                statusBar.setMainMessage(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_NetworkError"));
+                setStatusBar(false, GUIBundle.getString("MainFrame_NetworkError"));
                 statusBar.setImageIcon(getImageIcon("/images/16x16/network-error.png"), java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_DoubleClickedToTryAgain"));
-                statusBar.setProgressBar(false);
             }
        }
        
@@ -3180,9 +3189,8 @@ public class MainFrame extends javax.swing.JFrame {
                 }
                 final String template = GUIBundle.getString("MainFrame_StocksHasBeenDownloadedSoFar..._template");
                 final String message = MessageFormat.format(template, max);
-                statusBar.setMainMessage(message);
+                setStatusBar(true, message);
                 statusBar.setImageIcon(getImageIcon("/images/16x16/network-connecting.png"), java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_Connecting..."));
-                statusBar.setProgressBar(true);                    
             }
         }
     }
@@ -3371,7 +3379,9 @@ public class MainFrame extends javax.swing.JFrame {
         this.indicatorPanel.updatePrimaryStockServerFactory(Collections.unmodifiableList(this.getStockServerFactories()));
     }
 
-    public final void initWatchlist() {
+    private final void initWatchlist() {
+        // This is new watchlist. Reset last update date.
+        this.lastUpdateDate = null;
         initCSVWatchlist();
     }
     
@@ -3664,7 +3674,7 @@ public class MainFrame extends javax.swing.JFrame {
     
     private void initDatabase(boolean readFromDisk) {
         // Update GUI state.
-        this.setStatusBar(true, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_ConnectingToStockServerToRetrieveStockInformation..."));
+        this.setStatusBar(true, GUIBundle.getString("MainFrame_ConnectingToStockServerToRetrieveStockInformation..."));
         this.statusBar.setImageIcon(getImageIcon("/images/16x16/network-connecting.png"), java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_Connecting..."));
 
         // Stop any on-going activities.
@@ -3751,10 +3761,9 @@ public class MainFrame extends javax.swing.JFrame {
         }   // for (int i = 0, size = stocks.size(); i < size; i++)
         
         // Update status bar with current time string.
-        final String time = Utils.getLastUpdateTimeFormat().format(new Date());        
-        final String message = MessageFormat.format(GUIBundle.getString("MainFrame_LastUpdate_template"), time);
-        this.setStatusBar(false, message);
-        
+        this.lastUpdateDate = new Date();
+        MainFrame.getInstance().updateStatusBarWithLastUpdateDateMessageIfPossible();
+
         // Do it in GUI event dispatch thread. Otherwise, we may face deadlock.
         // For example, we lock the jTable, and try to remove the stock from the
         // real time monitor. While we wait for the real time monitor to complete,
@@ -3878,6 +3887,50 @@ public class MainFrame extends javax.swing.JFrame {
         }
     }
 
+    public void updateStatusBarWithLastUpdateDateMessageIfPossible() {
+        if (this.refreshPriceInProgress) {
+            // Stop refresh price in progress message.
+            this.setStatusBar(false, getBestStatusBarMessage());
+            this.refreshPriceInProgress = false;
+            return;
+        }
+        
+        if (this.isStatusBarBusy) {
+            return;
+        }
+        
+        if (this.getSelectedComponent() != this.jPanel8 && this.getSelectedComponent() != this.portfolioManagementJPanel) {
+            return;
+        }
+        
+        this.setStatusBar(false, getBestStatusBarMessage());
+    }
+    
+    // Connected
+    // [My Watchlist] Last update: Connected
+    // [My Watchlist] Last update: 10:40AM
+    public String getBestStatusBarMessage() {        
+        final String currentName;
+        final Date _lastUpdateDate;
+        // MainFrame
+        if (this.getSelectedComponent() == this.jPanel8) {
+            currentName = this.getJStockOptions().getWatchlistName();
+            _lastUpdateDate = this.lastUpdateDate;
+        } else if (this.getSelectedComponent() == this.portfolioManagementJPanel) {
+            currentName = this.getJStockOptions().getPortfolioName();
+            _lastUpdateDate = this.portfolioManagementJPanel.getLastUpdateDate();
+        } else {
+            return GUIBundle.getString("MainFrame_Connected");
+        }
+        
+        if (_lastUpdateDate == null) {
+            return MessageFormat.format(GUIBundle.getString("MainFrame_Connected_template"), currentName);            
+        }
+        
+        final String time = Utils.getLastUpdateTimeFormat().format(_lastUpdateDate);
+        return MessageFormat.format(GUIBundle.getString("MainFrame_LastUpdate_template"), currentName, time);
+    }
+    
     private void update(final Market market) {
         // We are only interested in current selected country.
         if (market.getCountry() != this.jStockOptions.getCountry()) {
@@ -3909,29 +3962,27 @@ public class MainFrame extends javax.swing.JFrame {
                 final boolean shouldShowGUI = MainFrame.this.stockCodeHistoryGUI.remove(code);
                
                 if (stockCodeHistoryGUI.isEmpty()) {
-                    statusBar.setProgressBar(false);
-
                     if (runnable.getStockHistoryServer() != null) {
                         final String template = GUIBundle.getString("MainFrame_HistorySuccess_template");
                         final String message = MessageFormat.format(template, (symbol != null ? symbol : code));
-                        statusBar.setMainMessage(message);
+                        setStatusBar(false, message);
                     }
                     else {
                         final String template = GUIBundle.getString("MainFrame_HistoryFailed_template");
                         final String message = MessageFormat.format(template, (symbol != null ? symbol : code));
-                        statusBar.setMainMessage(message);
+                        setStatusBar(false, message);
                     }
                 }
                 else {
                     if (runnable.getStockHistoryServer() != null) {
                         final String template = GUIBundle.getString("MainFrame_HistorySuccessStillWaitingForHistoryTotal_template");
                         final String message = MessageFormat.format(template, (symbol != null ? symbol : code), stockCodeHistoryGUI.size());
-                        statusBar.setMainMessage(message);
+                        setStatusBar(true, message);
                     }
                     else {
                         final String template = GUIBundle.getString("MainFrame_HistoryFailedStillWaitingForHistoryTotal_template");
                         final String message = MessageFormat.format(template, (symbol != null ? symbol : code), stockCodeHistoryGUI.size());
-                        statusBar.setMainMessage(message);
+                        setStatusBar(true, message);
                     }
                 }
                
@@ -4307,7 +4358,8 @@ public class MainFrame extends javax.swing.JFrame {
     private static final Log log = LogFactory.getLog(MainFrame.class);
         
     private MyJXStatusBar statusBar = new MyJXStatusBar();
-
+    private boolean isStatusBarBusy = false;
+    
     // A set of stock history which we need to display GUI on them, when user request explicitly.
     private java.util.Set<Code> stockCodeHistoryGUI = new java.util.HashSet<Code>();
     
@@ -4378,6 +4430,10 @@ public class MainFrame extends javax.swing.JFrame {
     private volatile boolean needToSaveUserDefinedDatabase = false;
 
     private volatile boolean isFormWindowClosedCalled = false;
+    
+    // The last time when we receive stock price update.
+    private Date lastUpdateDate = null;
+    private boolean refreshPriceInProgress = false;
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;

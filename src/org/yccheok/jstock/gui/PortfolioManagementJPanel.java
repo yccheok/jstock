@@ -2013,6 +2013,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
     
     public final void initPortfolio() {
+        // This is new portfolio. Reset last update date.
+        this.lastUpdateDate = null;
         this.initCSVPortfolio();
     }
 
@@ -2299,11 +2301,14 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         updateWealthHeader();
         
         // Update status bar with current time string.
-        final String time = Utils.getLastUpdateTimeFormat().format(new Date());        
-        final String message = MessageFormat.format(GUIBundle.getString("MainFrame_LastUpdate_template"), time);
-        MainFrame.getInstance().setStatusBar(false, message);        
+        this.lastUpdateDate = new Date();
+        MainFrame.getInstance().updateStatusBarWithLastUpdateDateMessageIfPossible();     
     }  
 
+    public Date getLastUpdateDate() {
+        return this.lastUpdateDate;
+    }
+    
     private void initGUIOptions() {
         File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "portfoliomanagementjpanel.xml");
         final GUIOptions guiOptions = Utils.fromXML(GUIOptions.class, f);
@@ -2593,6 +2598,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private final org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
     private final org.yccheok.jstock.engine.Observer<CurrencyExchangeMonitor, Double> currencyExchangeMonitorObserver = this.getCurrencyExchangeMonitorObserver();
 
+    private Date lastUpdateDate = null;
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private org.yccheok.jstock.gui.treetable.SortableTreeTable buyTreeTable;
     private javax.swing.JButton jButton1;
