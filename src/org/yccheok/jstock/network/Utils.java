@@ -43,7 +43,8 @@ public class Utils {
         GET_TIME,
         OPTIONS,
         DONATE_HTML,
-        CONTRIBUTE_HTML
+        CONTRIBUTE_HTML,
+        HELP_KEYBOARD_SHORTCUTS_HTML
     }
 
     private Utils() {
@@ -91,7 +92,8 @@ public class Utils {
         map.put(Type.DONATE_HTML,"http://jstock.sourceforge.net/donation.html?utm_source=jstock&utm_medium=support_menu");
         // http://webmasters.stackexchange.com/questions/35413/unable-to-use-anchor-hash-tag-if-using-google-analytics-utm
         map.put(Type.CONTRIBUTE_HTML, "http://jstock.sourceforge.net/help_faq.html?utm_source=jstock&utm_medium=support_menu#contribution");
-                
+        map.put(Type.HELP_KEYBOARD_SHORTCUTS_HTML, "http://jstock.sourceforge.net/help_faq.html?utm_source=jstock&utm_medium=help_menu#keyboard-shortcuts");
+        
         zh_map.put(Type.CHAT_SERVER_TXT, JSTOCK_STATIC_SERVER + "servers_information/chat_server.txt");
         zh_map.put(Type.NTP_SERVER_TXT, JSTOCK_STATIC_SERVER + "servers_information/ntp_server.txt");
         zh_map.put(Type.NEWS_INFORMATION_TXT, JSTOCK_STATIC_SERVER + "news_information/zh/index.txt");
@@ -108,6 +110,7 @@ public class Utils {
         zh_map.put(Type.DONATE_HTML,"http://jstock.sourceforge.net/zh/donation.html?utm_source=jstock&utm_medium=support_menu");
         // http://webmasters.stackexchange.com/questions/35413/unable-to-use-anchor-hash-tag-if-using-google-analytics-utm
         zh_map.put(Type.CONTRIBUTE_HTML, "http://jstock.sourceforge.net/zh/help_faq.html?utm_source=jstock&utm_medium=support_menu#contribution");
+        zh_map.put(Type.HELP_KEYBOARD_SHORTCUTS_HTML, "http://jstock.sourceforge.net/zh/help_faq.html?utm_source=jstock&utm_medium=help_menu#keyboard-shortcuts");
 
         assert(map.size() == Type.values().length);
         assert(zh_map.size() == Type.values().length);

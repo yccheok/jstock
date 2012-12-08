@@ -382,6 +382,7 @@ public class MainFrame extends javax.swing.JFrame {
         jMenu4 = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
         jMenuItem3 = new javax.swing.JMenuItem();
+        jMenuItem16 = new javax.swing.JMenuItem();
         jMenuItem12 = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JSeparator();
         jMenuItem5 = new javax.swing.JMenuItem();
@@ -675,6 +676,14 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
         jMenu2.add(jMenuItem3);
+
+        jMenuItem16.setText(bundle.getString("MainFrame_KeyboardShortcuts")); // NOI18N
+        jMenuItem16.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem16ActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMenuItem16);
 
         jMenuItem12.setText(bundle.getString("MainFrame_Calculator")); // NOI18N
         jMenuItem12.addActionListener(new java.awt.event.ActionListener() {
@@ -1437,6 +1446,10 @@ public class MainFrame extends javax.swing.JFrame {
         this.setStatusBar(true, GUIBundle.getString("MainFrame_RefreshStockPrices..."));
         refreshPriceInProgress = true;
     }//GEN-LAST:event_jMenuItem15ActionPerformed
+
+    private void jMenuItem16ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem16ActionPerformed
+        Utils.launchWebBrowser(org.yccheok.jstock.network.Utils.getURL(org.yccheok.jstock.network.Utils.Type.HELP_KEYBOARD_SHORTCUTS_HTML));
+    }//GEN-LAST:event_jMenuItem16ActionPerformed
     
     /**
      * Activate specified watchlist.
@@ -4460,6 +4473,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem13;
     private javax.swing.JMenuItem jMenuItem14;
     private javax.swing.JMenuItem jMenuItem15;
+    private javax.swing.JMenuItem jMenuItem16;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
