@@ -163,7 +163,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         jButton1.setEnabled(false);
         jButton2.setEnabled(true);
 
-        m.setStatusBar(true, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("IndicatorScannerJPanel_IndicatorScannerIsScanning..."));
+        m.setStatusBar(true, GUIBundle.getString("IndicatorScannerJPanel_IndicatorScannerIsScanning..."));
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
@@ -555,7 +555,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         
         removeAllIndicatorsFromTable();
 
-        m.setStatusBar(false, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("IndicatorScannerJPanel_Connected"));
+        m.setStatusBar(false, GUIBundle.getString("IndicatorScannerJPanel_Connected"));
     }
     
     public void stop()
@@ -831,7 +831,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         
         this.realTimeStockMonitor.attach(this.realTimeStockMonitorObserver);
     }
-    
+      
     // This is the workaround to overcome Erasure by generics. We are unable to make MainFrame to
     // two observers at the same time.
     private org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> getRealTimeStockMonitorObserver() {
