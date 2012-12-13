@@ -950,6 +950,11 @@ public class IndicatorPanel extends JPanel {
 
                 // Update the project.xml as well.
                 IndicatorPanel.this.saveAlertIndicatorProjectManager();
+                
+                // Update selection info as well.
+                if (this.listSelectionEx != null) {
+                    this.listSelectionEx = ListSelectionEx.newInstance(this.listSelectionEx.list, newProjectName);
+                }
             }
             else
             {
