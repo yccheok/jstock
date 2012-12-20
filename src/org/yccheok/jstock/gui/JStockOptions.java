@@ -298,6 +298,8 @@ public class JStockOptions {
     
     private boolean isFeeCalculationEnabled = false;
         
+    private boolean isDynamicChartVisible = false;
+    
     public boolean isAutoBrokerFeeCalculationEnabled() {
         return this.isAutoBrokerFeeCalculationEnabled;
     }
@@ -421,6 +423,8 @@ public class JStockOptions {
         this.chartTheme = jStockOptions.getChartTheme();
         
         this.isFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled;
+        
+        this.isDynamicChartVisible = jStockOptions.isDynamicChartVisible;
     }
 
     // User may not trust us to store their password in cloud server. To avoid
@@ -542,6 +546,8 @@ public class JStockOptions {
         jStockOptions.chartTheme = this.chartTheme;
         
         jStockOptions.isFeeCalculationEnabled = this.isFeeCalculationEnabled;
+        
+        jStockOptions.isDynamicChartVisible = this.isDynamicChartVisible;
         
         return jStockOptions;
     }
@@ -1605,18 +1611,31 @@ public class JStockOptions {
         this.chartTheme = chartTheme;
     }  
     
-
     /**
-     * @return the feeCalculationEnabled
+     * @return the isFeeCalculationEnabled
      */
     public boolean isFeeCalculationEnabled() {
         return isFeeCalculationEnabled;
     }
 
     /**
-     * @param feeCalculationEnabled the feeCalculationEnabled to set
+     * @return the isDynamicChartVisible
+     */    
+    public boolean isDynamicChartVisible() {
+        return isDynamicChartVisible;
+    }
+    
+    /**
+     * @param isFeeCalculationEnabled the isFeeCalculationEnabled to set
      */
     public void setFeeCalculationEnabled(boolean isFeeCalculationEnabled) {
         this.isFeeCalculationEnabled = isFeeCalculationEnabled;
-    }    
+    } 
+
+    /**
+     * @param isDynamicChartVisible the isDynamicChartVisible to set
+     */    
+    public void setDynamicChartVisible(boolean isDynamicChartVisible) {
+        this.isDynamicChartVisible = isDynamicChartVisible;
+    }
 }

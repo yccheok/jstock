@@ -88,6 +88,7 @@ public class OptionsJDialog extends javax.swing.JDialog implements JStockOptions
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         final int oldScanningSpeed = jStockOptions.getScanningSpeed();
         final boolean oldIsFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
+        final boolean oldIsDynamicChartVisible = jStockOptions.isDynamicChartVisible();
         
         if (apply(jStockOptions) == false) {
             return;
@@ -98,6 +99,9 @@ public class OptionsJDialog extends javax.swing.JDialog implements JStockOptions
         }
         if (oldIsFeeCalculationEnabled != jStockOptions.isFeeCalculationEnabled()) {
             MainFrame.getInstance().getPortfolioManagementJPanel().refreshGUIAfterFeeCalculationEnabledOptionsChanged();
+        }
+        if (oldIsDynamicChartVisible != jStockOptions.isDynamicChartVisible()) {
+            MainFrame.getInstance().initDynamicChartVisibility();
         }
         
         this.setVisible(false);

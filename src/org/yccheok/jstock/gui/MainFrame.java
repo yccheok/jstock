@@ -144,6 +144,7 @@ public class MainFrame extends javax.swing.JFrame {
         this.initWatchlist();
         this.initAlertStateManager();
         this.initDynamicCharts();
+        this.initDynamicChartVisibility();
         this.initStockHistoryMonitor();
         this.initOthersStockHistoryMonitor();
         this.initBrokingFirmLogos();
@@ -2142,6 +2143,7 @@ public class MainFrame extends javax.swing.JFrame {
         this.initWatchlist();
         this.initAlertStateManager();
         this.initDynamicCharts();
+        this.initDynamicChartVisibility();
 
         for (Enumeration<AbstractButton> e = this.buttonGroup2.getElements() ; e.hasMoreElements() ;) {
             AbstractButton button = e.nextElement();
@@ -2221,6 +2223,7 @@ public class MainFrame extends javax.swing.JFrame {
         this.initWatchlist();
         this.initAlertStateManager();
         this.initDynamicCharts();
+        // this.initDynamicChartVisibility();
 
         for (Enumeration<AbstractButton> e = this.buttonGroup2.getElements() ; e.hasMoreElements() ;) {
             AbstractButton button = e.nextElement();
@@ -4276,6 +4279,10 @@ public class MainFrame extends javax.swing.JFrame {
                 }
             }
         };
+    }
+    
+    public void initDynamicChartVisibility() {
+        jPanel10.setVisible(this.jStockOptions.isDynamicChartVisible());
     }
 
     private void initDynamicCharts()
