@@ -58,22 +58,15 @@ public class MarketJPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         leftPanel = new javax.swing.JPanel();
-        rightPanel = new javax.swing.JPanel();
 
         setLayout(new java.awt.BorderLayout());
         add(leftPanel, java.awt.BorderLayout.WEST);
-        add(rightPanel, java.awt.BorderLayout.EAST);
     }// </editor-fold>//GEN-END:initComponents
 
     public void update(Market market) {
         List<Index> indices = org.yccheok.jstock.engine.Utils.getStockIndices(country);
         final java.text.NumberFormat numberFormat = java.text.NumberFormat.getInstance();
         
-        map.get("volume").setText(numberFormat.format(market.getVolume()));
-        map.get("up").setText(numberFormat.format(market.getNumOfStockChange(Market.ChangeType.Up)));
-        map.get("down").setText(numberFormat.format(market.getNumOfStockChange(Market.ChangeType.Down)));
-        map.get("unchanged").setText(numberFormat.format(market.getNumOfStockChange(Market.ChangeType.Unchange)));
-
         numberFormat.setMaximumFractionDigits(2);
         numberFormat.setMinimumFractionDigits(2);
 
@@ -91,8 +84,6 @@ public class MarketJPanel extends javax.swing.JPanel {
             label.setText(numberFormat.format(_index) + " (" + numberFormat.format(change) + ")");
             label.setForeground(color);
         }                
-        
-        map.get("value").setText(numberFormat.format(market.getValue()));
     }
     
     private void initAccordingToCountry(Country country) {
@@ -127,51 +118,6 @@ public class MarketJPanel extends javax.swing.JPanel {
                 }
             });
         }
-        
-        JLabel volume = new JLabel(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MarketJPanel_Volume"));
-        leftPanel.add(volume);
-        JLabel volume_value = new JLabel();
-        volume_value.setName("volume");
-        map.put("volume", volume_value);
-        volume_value.setFont(Utils.getBoldFont(volume_value.getFont()));
-        volume_value.setForeground(new java.awt.Color(153, 102, 0));
-        leftPanel.add(volume_value);
-
-        JLabel value = new JLabel(this.getValueLabel());
-        leftPanel.add(value);
-        JLabel value_value = new JLabel();
-        value_value.setName("value");
-        map.put("value", value_value);
-        value_value.setFont(Utils.getBoldFont(value_value.getFont()));
-        value_value.setForeground(new java.awt.Color(153, 102, 0));
-        leftPanel.add(value_value);
-        
-        JLabel up = new JLabel(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MarketJPanel_Up"));
-        rightPanel.add(up);
-        JLabel up_value = new JLabel();
-        up_value.setName("up");
-        map.put("up", up_value);
-        up_value.setFont(Utils.getBoldFont(up_value.getFont()));
-        up_value.setForeground(new java.awt.Color(50, 150, 0));
-        rightPanel.add(up_value);
-
-        JLabel down = new JLabel(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MarketJPanel_Down"));
-        rightPanel.add(down);
-        JLabel down_value = new JLabel();
-        down_value.setName("down");
-        map.put("down", down_value);
-        down_value.setFont(Utils.getBoldFont(down_value.getFont()));
-        down_value.setForeground(new java.awt.Color(200, 0, 50));
-        rightPanel.add(down_value);
-
-        JLabel unchanged = new JLabel(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MarketJPanel_Unchanged"));
-        rightPanel.add(unchanged);
-        JLabel unchanged_value = new JLabel();
-        unchanged_value.setName("unchanged");
-        map.put("unchanged", unchanged_value);
-        unchanged_value.setFont(Utils.getBoldFont(unchanged_value.getFont()));
-        unchanged_value.setForeground(new java.awt.Color(0, 0, 0));
-        rightPanel.add(unchanged_value);      
     }
 
     private String getValueLabel() {
@@ -189,8 +135,7 @@ public class MarketJPanel extends javax.swing.JPanel {
     private Map<String, JLabel> map = new HashMap<String, JLabel>();
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel leftPanel;
-    private javax.swing.JPanel rightPanel;
+    javax.swing.JPanel leftPanel;
     // End of variables declaration//GEN-END:variables
 
 }

@@ -2,6 +2,8 @@ This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
 JStock 1.0.6x - ??????????
+  Bugfix:  Remove redundant dummy information (volume, value, up, down, unchanged)
+           out from top area.
   Bugfix:  Bugfix on indicator renaming.
   Bugfix:  It is common to use Open, High, Low, Close for history charting.
            Currently, we are using Prev, Last, High, Low, which is not correct.
