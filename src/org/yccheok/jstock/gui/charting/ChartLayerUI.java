@@ -121,11 +121,11 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
 
     private static final List<String> params = Collections.unmodifiableList(
             Arrays.asList(
-            GUIBundle.getString("MainFrame_Prev"),
-            GUIBundle.getString("MainFrame_Last"),
-            GUIBundle.getString("MainFrame_High"),
-            GUIBundle.getString("MainFrame_Low"),
-            GUIBundle.getString("MainFrame_Vol")
+            GUIBundle.getString("StockHistory_Open"),            
+            GUIBundle.getString("StockHistory_High"),
+            GUIBundle.getString("StockHistory_Low"),
+            GUIBundle.getString("StockHistory_Close"),
+            GUIBundle.getString("StockHistory_Volume")
             ));
 
     private static final String longDateString;
@@ -163,10 +163,12 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         // If multiple threads access a format concurrently, it must be synchronized externally.
         // http://stackoverflow.com/questions/2213410/usage-of-decimalformat-for-the-following-case
         final DecimalFormat integerFormat = new DecimalFormat("###,###");
-        values.add(org.yccheok.jstock.gui.Utils.stockPriceDecimalFormat(chartData.getPrevPrice()));
-        values.add(org.yccheok.jstock.gui.Utils.stockPriceDecimalFormat(chartData.getLastPrice()));
+        
+        // It is common to use OHLC for chat, instead of using PrevPrice.        
+        values.add(org.yccheok.jstock.gui.Utils.stockPriceDecimalFormat(chartData.getOpenPrice()));        
         values.add(org.yccheok.jstock.gui.Utils.stockPriceDecimalFormat(chartData.getHighPrice()));
         values.add(org.yccheok.jstock.gui.Utils.stockPriceDecimalFormat(chartData.getLowPrice()));
+        values.add(org.yccheok.jstock.gui.Utils.stockPriceDecimalFormat(chartData.getLastPrice()));
         values.add(integerFormat.format(chartData.getVolume()));
 
         final List<String> indicatorParams = new ArrayList<String>();
@@ -305,12 +307,13 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
 
         index = 0;
         yy += dateFontMetrics.getDescent() + dateInfoHeightMargin + valueFontMetrics.getAscent();
-        final String LAST_STR = GUIBundle.getString("MainFrame_Last");
+        final String CLOSE_STR = GUIBundle.getString("StockHistory_Close");
         for (String param : params) {
             final String value = values.get(index++);
             g2.setColor(Color.BLACK);
-            if (param.equals(LAST_STR)) {
-                final double changePrice = chartData.getLastPrice() - chartData.getPrevPrice();
+            if (param.equals(CLOSE_STR)) {
+                // It is common to use OHLC for chat, instead of using PrevPrice.
+                final double changePrice = chartData.getLastPrice() - chartData.getOpenPrice();
                 if (changePrice > 0.0) {
                     g2.setColor(JStockOptions.DEFAULT_HIGHER_NUMERICAL_VALUE_FOREGROUND_COLOR);
                 }

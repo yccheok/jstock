@@ -3,7 +3,9 @@ Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
 JStock 1.0.6x - ??????????
   Bugfix:  Bugfix on indicator renaming.
-  
+  Bugfix:  It is common to use Open, High, Low, Close for history charting.
+           Currently, we are using Prev, Last, High, Low, which is not correct.
+           
 JStock 1.0.6w - 2012-12-09
   Feature: Display "Last update" time information in status bar.
   Feature: Added Ctrl+R shortcut key for "Refresh Stock Prices".
