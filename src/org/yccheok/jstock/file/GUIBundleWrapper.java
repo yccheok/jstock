@@ -116,7 +116,17 @@ public class GUIBundleWrapper {
         _map.put("PortfolioManagementJPanel_PurchasePrice", "Purchase Price");
         _map.put("PortfolioManagementJPanel_CurrentPrice", "Current Price");
         _map.put("PortfolioManagementJPanel_PurchaseValue", "Purchase Value");
+        
+        // PortfolioManagementJPanel_PurchaseFee is obsolete. It is replaced by
+        // PortfolioManagementJPanel_PurchaseBroker, PortfolioManagementJPanel_PurchaseClearingFee
+        // and PortfolioManagementJPanel_PurchaseStampDuty. All works related to
+        // PortfolioManagementJPanel_PurchaseFee may be removed, after some 
+        // time.
         _map.put("PortfolioManagementJPanel_PurchaseFee", "Purchase Fee");
+        _map.put("PortfolioManagementJPanel_PurchaseBroker", "Purchase Broker");
+        _map.put("PortfolioManagementJPanel_PurchaseClearingFee", "Purchase Clearing Fee");
+        _map.put("PortfolioManagementJPanel_PurchaseStampDuty", "Purchase Stamp Duty");
+        
         _map.put("PortfolioManagementJPanel_CurrentValue", "Current Value");
         _map.put("PortfolioManagementJPanel_GainLossPrice", "Gain/Loss Price");
         _map.put("PortfolioManagementJPanel_GainLossValue", "Gain/Loss Value");
