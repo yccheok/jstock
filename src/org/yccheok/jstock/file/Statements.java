@@ -48,9 +48,7 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.jdesktop.swingx.treetable.TreeTableModel;
 import org.yccheok.jstock.engine.Code;
-import org.yccheok.jstock.engine.SimpleDate;
 import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.Stock.Board;
 import org.yccheok.jstock.engine.Stock.Industry;
@@ -65,7 +63,6 @@ import org.yccheok.jstock.gui.MainFrame;
 import org.yccheok.jstock.gui.POIUtils;
 import org.yccheok.jstock.gui.Pair;
 import org.yccheok.jstock.gui.portfolio.CommentableContainer;
-import org.yccheok.jstock.gui.treetable.AbstractPortfolioTreeTableModelEx;
 import org.yccheok.jstock.gui.treetable.BuyPortfolioTreeTableModelEx;
 import org.yccheok.jstock.gui.treetable.SellPortfolioTreeTableModelEx;
 import org.yccheok.jstock.portfolio.Portfolio;
@@ -735,7 +732,9 @@ public class Statements {
             guiBundleWrapper.getString("PortfolioManagementJPanel_PurchasePrice"),
             guiBundleWrapper.getString("PortfolioManagementJPanel_SellingValue"),
             guiBundleWrapper.getString("PortfolioManagementJPanel_PurchaseValue"),
-            guiBundleWrapper.getString("PortfolioManagementJPanel_PurchaseFee"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_PurchaseBroker"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_PurchaseClearingFee"),
+            guiBundleWrapper.getString("PortfolioManagementJPanel_PurchaseStampDuty"),
             guiBundleWrapper.getString("PortfolioManagementJPanel_GainLossPrice"),
             guiBundleWrapper.getString("PortfolioManagementJPanel_GainLossValue"),
             guiBundleWrapper.getString("PortfolioManagementJPanel_GainLossPercentage"),
@@ -791,30 +790,33 @@ public class Statements {
                     atoms.add(new Atom(transaction.getReferenceTotal() / 100.0, tmp[8]));                    
                 }
                 
-                atoms.add(new Atom(transaction.getReferenceFee(), tmp[9]));
-                atoms.add(new Atom(sellPortfolioTreeTableModel.getGainLossPrice(transaction), tmp[10]));
+                atoms.add(new Atom(transaction.getReferenceBroker(), tmp[9]));
+                atoms.add(new Atom(transaction.getReferenceClearingFee(), tmp[10]));
+                atoms.add(new Atom(transaction.getReferenceStampDuty(), tmp[11]));
+                
+                atoms.add(new Atom(sellPortfolioTreeTableModel.getGainLossPrice(transaction), tmp[12]));
                 
                 if (isPenceToPoundConversionEnabled == false) {
-                    atoms.add(new Atom(sellPortfolioTreeTableModel.getGainLossValue(transaction), tmp[11]));
+                    atoms.add(new Atom(sellPortfolioTreeTableModel.getGainLossValue(transaction), tmp[13]));
                 } else {
-                    atoms.add(new Atom(sellPortfolioTreeTableModel.getGainLossValue(transaction) / 100.0, tmp[11]));
+                    atoms.add(new Atom(sellPortfolioTreeTableModel.getGainLossValue(transaction) / 100.0, tmp[13]));
                 }
                 
-                atoms.add(new Atom(sellPortfolioTreeTableModel.getGainLossPercentage(transaction), tmp[12]));
-                atoms.add(new Atom(transaction.getBroker(), tmp[13]));
-                atoms.add(new Atom(transaction.getClearingFee(), tmp[14]));
-                atoms.add(new Atom(transaction.getStampDuty(), tmp[15]));
+                atoms.add(new Atom(sellPortfolioTreeTableModel.getGainLossPercentage(transaction), tmp[14]));
+                atoms.add(new Atom(transaction.getBroker(), tmp[15]));
+                atoms.add(new Atom(transaction.getClearingFee(), tmp[16]));
+                atoms.add(new Atom(transaction.getStampDuty(), tmp[17]));
                 
                 if (isPenceToPoundConversionEnabled == false) {
-                    atoms.add(new Atom(transaction.getNetTotal(), tmp[16]));                
-                    atoms.add(new Atom(sellPortfolioTreeTableModel.getNetGainLossValue(transaction), tmp[17]));                    
+                    atoms.add(new Atom(transaction.getNetTotal(), tmp[18]));                
+                    atoms.add(new Atom(sellPortfolioTreeTableModel.getNetGainLossValue(transaction), tmp[19]));
                 } else {
-                    atoms.add(new Atom(transaction.getNetTotal() / 100.0, tmp[16]));                
-                    atoms.add(new Atom(sellPortfolioTreeTableModel.getNetGainLossValue(transaction) / 100.0, tmp[17]));                                        
+                    atoms.add(new Atom(transaction.getNetTotal() / 100.0, tmp[18]));
+                    atoms.add(new Atom(sellPortfolioTreeTableModel.getNetGainLossValue(transaction) / 100.0, tmp[19]));
                 }
                 
-                atoms.add(new Atom(sellPortfolioTreeTableModel.getNetGainLossPercentage(transaction), tmp[18]));
-                atoms.add(new Atom(transaction.getComment(), tmp[19]));
+                atoms.add(new Atom(sellPortfolioTreeTableModel.getNetGainLossPercentage(transaction), tmp[20]));
+                atoms.add(new Atom(transaction.getComment(), tmp[21]));
                 
                 final Statement statement = new Statement(atoms);
                

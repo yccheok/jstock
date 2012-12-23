@@ -154,10 +154,18 @@ public class Transaction extends DefaultSortableMutableTreeTableNode implements 
         return contract;
     }
 
-    public double getReferenceFee() {
-        return contract.getReferenceFee();
+    public double getReferenceBroker() {
+        return contract.getReferenceBroker();
     }
 
+    public double getReferenceClearingFee() {
+        return contract.getReferenceClearingFee();
+    }
+    
+    public double getReferenceStampDuty() {
+        return contract.getReferenceStampDuty();
+    }
+    
     public double getPrice() {
         return contract.getPrice();
     }
@@ -175,7 +183,7 @@ public class Transaction extends DefaultSortableMutableTreeTableNode implements 
     }
         
     public double getNetReferenceTotal() {
-        return contract.getReferenceTotal() + contract.getReferenceFee();
+        return contract.getReferenceTotal() + contract.getReferenceBroker() + contract.getReferenceClearingFee() + contract.getReferenceStampDuty();
     }
     
     public double getNetPrice() {

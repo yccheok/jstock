@@ -570,12 +570,25 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                         final String _symbol = statement.getValueAsString(guiBundleWrapper.getString("MainFrame_Symbol"));
                         final String _referenceDate = statement.getValueAsString(guiBundleWrapper.getString("PortfolioManagementJPanel_ReferenceDate"));
                         
-                        // Legacy file handling. PortfolioManagementJPanel_PurchaseFee is introduced starting from 1.0.6s
-                        Double referenceFee = statement.getValueAsDouble(guiBundleWrapper.getString("PortfolioManagementJPanel_PurchaseFee"));
-                        if (referenceFee == null) {
-                            referenceFee = new Double(0.0);
+                        // Legacy file handling. PortfolioManagementJPanel_PurchaseBroker, PortfolioManagementJPanel_PurchaseClearingFee,
+                        // and PortfolioManagementJPanel_PurchaseStampDuty are introduced starting from 1.0.6x
+                        Double purchaseBroker = statement.getValueAsDouble(guiBundleWrapper.getString("PortfolioManagementJPanel_PurchaseBroker"));
+                        if (purchaseBroker == null) {
+                            // Legacy file handling. PortfolioManagementJPanel_PurchaseFee is introduced starting from 1.0.6s
+                            purchaseBroker = statement.getValueAsDouble(guiBundleWrapper.getString("PortfolioManagementJPanel_PurchaseFee"));
+                            if (purchaseBroker == null) {
+                                purchaseBroker = new Double(0.0);
+                            }
                         }
-                        
+                        Double purchaseClearingFee = statement.getValueAsDouble(guiBundleWrapper.getString("PortfolioManagementJPanel_PurchaseClearingFee"));
+                        if (purchaseClearingFee == null) {
+                            purchaseClearingFee = new Double(0.0);                            
+                        }
+                        Double purchaseStampDuty = statement.getValueAsDouble(guiBundleWrapper.getString("PortfolioManagementJPanel_PurchaseStampDuty"));
+                        if (purchaseStampDuty == null) {
+                            purchaseStampDuty = new Double(0.0);                            
+
+                        }                        
                         final String _date = statement.getValueAsString(guiBundleWrapper.getString("PortfolioManagementJPanel_Date"));
                         final Double units = statement.getValueAsDouble(guiBundleWrapper.getString("PortfolioManagementJPanel_Units"));
                         final Double sellingPrice =  statement.getValueAsDouble(guiBundleWrapper.getString("PortfolioManagementJPanel_SellingPrice"));
@@ -647,7 +660,11 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                         final SimpleDate simpleReferenceDate = new SimpleDate(referenceDate);
                         final Contract.Type type = Contract.Type.Sell;
                         final Contract.ContractBuilder builder = new Contract.ContractBuilder(stock, simpleDate);
-                        final Contract contract = builder.type(type).quantity(units).price(sellingPrice).referencePrice(purchasePrice).referenceDate(simpleReferenceDate).referenceFee(referenceFee).build();
+                        final Contract contract = builder.type(type).quantity(units).price(sellingPrice).referencePrice(purchasePrice).referenceDate(simpleReferenceDate)
+                                .referenceBroker(purchaseBroker)
+                                .referenceClearingFee(purchaseClearingFee)
+                                .referenceStampDuty(purchaseStampDuty)
+                                .build();
                         final Transaction t = new Transaction(contract, broker, stampDuty, clearingFee);
                         t.setComment(org.yccheok.jstock.portfolio.Utils.replaceCSVLineFeedToSystemLineFeed(_comment));
                         transactions.add(t);

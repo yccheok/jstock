@@ -731,7 +731,11 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
             final double price = ((Double)this.jFormattedTextField1.getValue());
             Contract.ContractBuilder builder = new Contract.ContractBuilder(this.sellTransaction.getStock(), date);
             final Contract oldContract = this.sellTransaction.getContract();
-            final Contract contract = builder.type(type).quantity(unit).price(price).referencePrice(oldContract.getReferencePrice()).referenceFee(oldContract.getReferenceFee()).referenceDate(oldContract.getReferenceDate()).build();
+            final Contract contract = builder.type(type).quantity(unit).price(price).referencePrice(oldContract.getReferencePrice())
+                    .referenceBroker(oldContract.getReferenceBroker())
+                    .referenceClearingFee(oldContract.getReferenceClearingFee())
+                    .referenceStampDuty(oldContract.getReferenceStampDuty())
+                    .referenceDate(oldContract.getReferenceDate()).build();
                 
             final double brokerFeeValue = (Double)this.jFormattedTextField4.getValue();
             final double stampDutyValue = (Double)jFormattedTextField7.getValue();
@@ -786,10 +790,15 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
                 }
 
                 Contract.ContractBuilder builder = new Contract.ContractBuilder(buyTransaction.getStock(), date);
-                final double fee = buyTransaction.getClearingFee() + buyTransaction.getBroker() + buyTransaction.getStampDuty();
+                final double referenceBroker = buyTransaction.getBroker();
+                final double referenceClearingFee = buyTransaction.getClearingFee();
+                final double referenceStampDuty = buyTransaction.getStampDuty();
+                final double ratio = realTransactionQuantity / buyTransaction.getQuantity();
                 final Contract contract = builder.type(type).quantity(realTransactionQuantity).price(price)
                         .referencePrice(buyTransaction.getPrice())
-                        .referenceFee(realTransactionQuantity / buyTransaction.getQuantity() * fee)
+                        .referenceBroker(ratio * referenceBroker)
+                        .referenceClearingFee(ratio * referenceClearingFee)
+                        .referenceStampDuty(ratio * referenceStampDuty)
                         .referenceDate(buyTransaction.getDate()).build();
                 
                 // Do not use the following code, as our objective is

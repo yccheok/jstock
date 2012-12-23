@@ -36,7 +36,9 @@ public class Contract {
         private double quantity = 0;
         private double price = 0.0;
         private double referencePrice = 0.0;
-        private double referenceFee = 0.0;
+        private double referenceBroker = 0.0;
+        private double referenceClearingFee = 0.0;
+        private double referenceStampDuty = 0.0;
         private SimpleDate referenceDate = new SimpleDate();
 
         public ContractBuilder(Stock stock, SimpleDate date) {
@@ -64,8 +66,18 @@ public class Contract {
             return this;
         }
 
-        public ContractBuilder referenceFee(double val) {
-            this.referenceFee = val;
+        public ContractBuilder referenceBroker(double val) {
+            this.referenceBroker = val;
+            return this;
+        }
+        
+        public ContractBuilder referenceClearingFee(double val) {
+            this.referenceClearingFee = val;
+            return this;
+        }
+        
+        public ContractBuilder referenceStampDuty(double val) {
+            this.referenceStampDuty = val;
             return this;
         }
         
@@ -105,10 +117,18 @@ public class Contract {
         return referencePrice;
     }
     
-    public double getReferenceFee() {
-        return referenceFee;
+    public double getReferenceBroker() {
+        return this.referenceBroker;
     }
     
+    public double getReferenceClearingFee() {
+        return this.referenceClearingFee;
+    }
+
+    public double getReferenceStampDuty() {
+        return this.referenceStampDuty;
+    }
+        
     public double getTotal() {
         return total;
     }
@@ -135,7 +155,9 @@ public class Contract {
         this.quantity = builder.quantity;
         this.price = builder.price;
         this.referencePrice = builder.referencePrice;
-        this.referenceFee = builder.referenceFee;
+        this.referenceBroker = builder.referenceBroker;
+        this.referenceClearingFee = builder.referenceClearingFee;
+        this.referenceStampDuty = builder.referenceStampDuty;
         
         this.total = price * quantity;
         this.referenceTotal = referencePrice * quantity;
@@ -150,7 +172,11 @@ public class Contract {
      */
     public Contract deriveWithQuantity(double quantity) {
         ContractBuilder builder = new ContractBuilder(stock, date);
-        return builder.type(type).quantity(quantity).price(price).referencePrice(referencePrice).referenceFee(referenceFee).build();
+        return builder.type(type).quantity(quantity).price(price).referencePrice(referencePrice)
+                .referenceBroker(referenceBroker)
+                .referenceClearingFee(referenceClearingFee)
+                .referenceStampDuty(referenceStampDuty)
+                .build();
     }
 
     /**
@@ -161,7 +187,11 @@ public class Contract {
      */
     public Contract deriveWithPrice(double price) {
         ContractBuilder builder = new ContractBuilder(stock, date);
-        return builder.type(type).quantity(quantity).price(price).referencePrice(referencePrice).referenceFee(referenceFee).build();
+        return builder.type(type).quantity(quantity).price(price).referencePrice(referencePrice)
+                .referenceBroker(referenceBroker)
+                .referenceClearingFee(referenceClearingFee)
+                .referenceStampDuty(referenceStampDuty)
+                .build();
     }
 
     public Contract(Contract contract) {
@@ -171,7 +201,9 @@ public class Contract {
         quantity = contract.quantity;
         price = contract.price;
         referencePrice = contract.referencePrice;
-        referenceFee = contract.referenceFee;
+        referenceBroker = contract.referenceBroker;
+        referenceClearingFee = contract.referenceClearingFee;
+        referenceStampDuty = contract.referenceStampDuty;
         total = contract.total;
         referenceTotal = contract.referenceTotal;
         referenceDate = contract.referenceDate;
@@ -200,7 +232,10 @@ public class Contract {
     // duty and clearing fee)
     private final double referenceTotal;
     // Buy broker fee, stamp duty and clearing fee.
-    private final double referenceFee;
+    private final double referenceBroker;    
+    private final double referenceClearingFee;
+    private final double referenceStampDuty;
+
     // private final SimpleDate referenceDate;
     // Unalbe to make this as final, as we need backward compatible with xstream's readResolve
     private SimpleDate referenceDate;
