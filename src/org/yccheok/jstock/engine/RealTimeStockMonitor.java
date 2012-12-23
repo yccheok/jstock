@@ -447,8 +447,8 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
     // Delay in ms
     private volatile long delay;
     
-    // 2 seconds.
-    private static final long MIN_DELAY = 2000;
+    // 5 seconds.
+    private static final long MIN_DELAY = 5000;
     private static final long MIN_DELAY_COUNTER = 3;
     
     private final int maxThread;
