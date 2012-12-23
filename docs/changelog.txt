@@ -13,6 +13,8 @@ JStock 1.0.6x - ??????????
            Currently, we are using Prev, Last, High, Low, which is not correct.
   Bugfix:  Use 5 seconds instead of 2 seconds for Yahoo! server retrying, in
            order to reduce server pressure.
+  Bugfix:  Further break down purchase fee to purchase broker, purchase clearing
+           fee and purchase stamp duty. 
            
 JStock 1.0.6w - 2012-12-09
   Feature: Display "Last update" time information in status bar.
