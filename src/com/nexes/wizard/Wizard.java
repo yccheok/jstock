@@ -164,7 +164,7 @@ public class Wizard extends WindowAdapter implements PropertyChangeListener {
      * @return Indicates how the dialog was closed. Compare this value against the RETURN_CODE
      * constants at the beginning of the class.
      */
-    public int showModalDialog(int width, int height) {
+    public int showModalDialog(int width, int height, boolean resizable) {
         wizardDialog.setModal(true);
         wizardDialog.pack();
 
@@ -173,19 +173,10 @@ public class Wizard extends WindowAdapter implements PropertyChangeListener {
 
         // Cheok : Display location should be relative to the owner.
         wizardDialog.setLocationRelativeTo(this.getOwner());
+        wizardDialog.setResizable(resizable);
         wizardDialog.setVisible(true);
-
+        
         return returnCode;
-    }
-
-    /**
-     * Convienence method that displays a modal wizard dialog and blocks until the dialog
-     * has completed.
-     * @return Indicates how the dialog was closed. Compare this value against the RETURN_CODE
-     * constants at the beginning of the class.
-     */    
-    public int showModalDialog() {
-        return showModalDialog(-1, -1);
     }
 
     public WizardController getController() {

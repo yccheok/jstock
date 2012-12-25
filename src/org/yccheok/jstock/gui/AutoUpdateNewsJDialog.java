@@ -50,7 +50,6 @@ public class AutoUpdateNewsJDialog extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("JStock News");
-        setResizable(false);
         getContentPane().setLayout(new java.awt.BorderLayout(5, 5));
 
         jPanel2.setLayout(new java.awt.BorderLayout(5, 5));

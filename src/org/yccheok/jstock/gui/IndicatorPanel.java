@@ -1172,7 +1172,7 @@ public class IndicatorPanel extends JPanel {
             return;
         }
         final Wizard wizard = this.getWizardDialog();
-        int ret = wizard.showModalDialog(650, 400);
+        int ret = wizard.showModalDialog(650, 400, true);
         if (ret != Wizard.FINISH_RETURN_CODE) {
             final JList jList = this.getCurrentActiveJList();
             // Although cancel button is pressed, possible some indicators had

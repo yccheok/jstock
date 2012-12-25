@@ -1,7 +1,7 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
-JStock 1.0.6x - ??????????
+JStock 1.0.6x - 2012-12-26
   Bugfix:  Only allow single instance of JStock to prevent data corruption. 
            (For Windows only)
   Bugfix:  Hide intraday chart by default, as it is not a popular feature. We
@@ -16,7 +16,9 @@ JStock 1.0.6x - ??????????
   Bugfix:  Further break down purchase fee to purchase broker, purchase clearing
            fee and purchase stamp duty. 
   Bugfix:  UI re-arrangement for Stock Indicator Scanner wizard.
-  
+  Bugfix:  Bugfix on sell dialog box's profit percentage calculation.
+  Bugfix:  Make news window and indicator install window resizable.
+
 JStock 1.0.6w - 2012-12-09
   Feature: Display "Last update" time information in status bar.
   Feature: Added Ctrl+R shortcut key for "Refresh Stock Prices".

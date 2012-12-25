@@ -150,7 +150,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         
         initWizardDialog();
         
-        int ret = wizard.showModalDialog(680, -1);
+        int ret = wizard.showModalDialog(680, -1, false);
 
         if (ret != Wizard.FINISH_RETURN_CODE)
             return;

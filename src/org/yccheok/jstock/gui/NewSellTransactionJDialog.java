@@ -688,7 +688,6 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         final double brokerFee = transaction.getBroker();
         final double clearingFee = transaction.getClearingFee();
         final double stampDuty = transaction.getStampDuty();
-        final double netValue = transaction.getNetTotal();
         
         this.jTextField1.setText(symbol.toString());
         ((DateField)jPanel3).setValue(date);
@@ -698,7 +697,6 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         this.jFormattedTextField4.setValue(brokerFee);
         this.jFormattedTextField5.setValue(clearingFee);
         this.jFormattedTextField7.setValue(stampDuty);
-        this.jFormattedTextField6.setValue(netValue);
 
         this.stock = transaction.getStock();
         this.type = Contract.Type.Sell;
@@ -940,10 +938,14 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
 
                 final double sellValue = price * unit;
                 final double buyValue = NewSellTransactionJDialog.this.buyValue;
-                final double totalCost = isFeeCalculationEnabled ? (buyValue + brokerFee + clearingFee + stampDuty) : buyValue;
-                final double netProfit = sellValue - totalCost;
-                final double netProfitPercentage = (totalCost == 0.0) ? 0.0 : netProfit / totalCost * 100.0;
-
+                final double netProfit;
+                if (isFeeCalculationEnabled) {
+                    netProfit = sellValue - brokerFee - clearingFee - stampDuty - buyValue;
+                } else {
+                    netProfit = sellValue - buyValue;
+                }
+                final double netProfitPercentage = (buyValue == 0.0) ? 0.0 : netProfit / buyValue * 100.0;
+                
                 jFormattedTextField2.setValue(sellValue);
                 jFormattedTextField3.setValue(buyValue);
                 jFormattedTextField6.setValue(netProfitPercentage);
