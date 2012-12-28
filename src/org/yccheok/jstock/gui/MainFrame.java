@@ -181,7 +181,7 @@ public class MainFrame extends javax.swing.JFrame {
             }
         }
         
-        installShutdownHookForMacOSX();
+        installShutdownHook();
     }
 
     private void initKeyBindings() {
@@ -259,7 +259,7 @@ public class MainFrame extends javax.swing.JFrame {
     // Register a hook to save app settings when quit via the app menu.
     // This is in Mac OSX only.   
     // http://sourceforge.net/tracker/?func=detail&aid=3490453&group_id=202896&atid=983418
-    private void installShutdownHookForMacOSX() {
+    private void installShutdownHook() {
         if (Utils.isMacOSX()) {
             Runnable runner = new Runnable() {
                 @Override
@@ -279,10 +279,20 @@ public class MainFrame extends javax.swing.JFrame {
                     }
                     
                     // Do not access any GUI related task in this runnable.
+                    
+                    AppLock.unlock();
                 }
             };
             Runtime.getRuntime().addShutdownHook(new Thread(runner, "Window Prefs Hook"));
-        }        
+        } else {
+            Runnable runner = new Runnable() {
+                @Override
+                public void run() {
+                    AppLock.unlock();
+                }
+            };
+            Runtime.getRuntime().addShutdownHook(new Thread(runner, "Window Prefs Hook"));
+        }
     }
     
     /**
@@ -1582,6 +1592,21 @@ public class MainFrame extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
+        if (false == AppLock.lock()) {
+            final int choice = JOptionPane.showOptionDialog(null, 
+                    MessagesBundle.getString("warning_message_running_2_jstock"),
+                    MessagesBundle.getString("warning_title_running_2_jstock"),
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.WARNING_MESSAGE,
+                    null,
+                    new String[] {MessagesBundle.getString("yes_button_running_2_jstock"), MessagesBundle.getString("no_button_running_2_jstock")}, 
+                    MessagesBundle.getString("no_button_running_2_jstock"));
+            if (choice != JOptionPane.YES_OPTION) {
+                System.exit(0);
+                return;
+            }
+        }
+        
         /* This ugly code shall be removed in next few release. */
         if (false == Utils.migrateFrom105yTo106()) {
             final int choice = JOptionPane.showConfirmDialog(null,
@@ -1642,6 +1667,7 @@ public class MainFrame extends javax.swing.JFrame {
                         Locale.setDefault(jStockOptions.getLocale());
                         ConversionErrorMessageJDialog conversionErrorMessageJDialog = new ConversionErrorMessageJDialog(file);
                         conversionErrorMessageJDialog.setVisible(true);
+                        AppLock.unlock();
                         System.exit(-1);
                     }
                 }                                  

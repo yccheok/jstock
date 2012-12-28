@@ -13,10 +13,6 @@
   <stayAlive>false</stayAlive>
   <manifest></manifest>
   <icon>C:\Projects\jstock\installer\windows\chart.ico</icon>
-  <singleInstance>
-    <mutexName>fe78440e-e0fe-4efb-881d-264a01be483c</mutexName>
-    <windowTitle>JStock - Free Stock Market Software</windowTitle>
-  </singleInstance>
   <jre>
     <path></path>
     <minVersion>1.6.0</minVersion>
@@ -37,11 +33,4 @@
     <internalName>jstock</internalName>
     <originalFilename>jstock.exe</originalFilename>
   </versionInfo>
-  <messages>
-    <startupErr>An error occurred while starting the application.</startupErr>
-    <bundledJreErr>This application was configured to use a bundled Java Runtime Environment but the runtime is missing or corrupted.</bundledJreErr>
-    <jreVersionErr>This application requires a Java Runtime Environment</jreVersionErr>
-    <launcherErr>The registry refers to a nonexistent Java Runtime Environment installation or the runtime is corrupted.</launcherErr>
-    <instanceAlreadyExistsMsg>Another JStock is already running.</instanceAlreadyExistsMsg>
-  </messages>
 </launch4jConfig>

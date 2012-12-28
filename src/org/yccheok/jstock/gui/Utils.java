@@ -315,6 +315,9 @@ public class Utils {
         // Before launching new JStock, save all the application settings.
         mainFrame.save();
 
+        // Before launching new JStock, remember to remove app lock.
+        AppLock.unlock();
+        
         try {
             Process p = Runtime.getRuntime().exec(toExec);
         }
@@ -326,7 +329,7 @@ public class Utils {
         // And close the old's if new JStock launched successfully.
         mainFrame.setVisible(false);
         mainFrame.dispose();
-
+        
         System.exit(0);
 
         return true;
@@ -788,7 +791,7 @@ public class Utils {
         return createDirectoryIfDoesNotExist(path);
     }
     
-    public static boolean createDirectoryIfDoesNotExist(String directory) {
+    private static boolean createDirectoryIfDoesNotExist(String directory) {
         java.io.File f = new java.io.File(directory);
         
         if (f.exists() == false) {
