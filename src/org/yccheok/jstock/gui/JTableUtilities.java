@@ -101,7 +101,9 @@ public class JTableUtilities {
         }
 
         final Locale locale = jTableOptions.getLocale();
-
+        // HACKING!
+        boolean first_column_hacking_required = false;
+        
     	// Remove unwanted column. MUST BE DONE FIRST!
         for (int i = 0; i < jTable.getColumnCount(); i++) {
             final String name = jTable.getColumnName(i);
@@ -140,8 +142,18 @@ public class JTableUtilities {
                 /* Remove any unwanted columns. */
                 if (found == false)
                 {
-                    removeTableColumn(jTable, name);
-                    i--;
+                    // HACKING!
+                    // Some customers complain their first column of Watchlist,
+                    // or Portfolio are being hidden. I'm not sure why that
+                    // happen. YES! I have really no idea why that happen!
+                    // This is a hacking way "if (i > 0)" to prevent such 
+                    // problem. Shh...
+                    if (i > 0) {
+                        removeTableColumn(jTable, name);
+                        i--;
+                    } else {
+                        first_column_hacking_required = true;
+                    }
                 }
             }
             finally {
@@ -152,7 +164,13 @@ public class JTableUtilities {
         final int optionsCount = jTableOptions.getColumnSize();
         final int tableCount = jTable.getColumnCount();
 
-        int target = 0;
+        // HACKING!
+        // jTableOptions doesn't have first column information if first_column_hacking_required
+        // is true. When perform column moving, we will start from 2nd column if
+        // first_column_hacking_required is true. Assume first column will always
+        // stay in first column.
+        int target = first_column_hacking_required ? 1 : 0;
+        
         /* Sort the columns according to user preference. */
         for (int i = 0; i < optionsCount; i++) {
             final String name = jTableOptions.getColumnName(i);
