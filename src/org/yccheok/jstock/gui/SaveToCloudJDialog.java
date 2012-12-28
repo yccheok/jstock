@@ -45,7 +45,6 @@ import org.yccheok.jstock.engine.Country;
 import org.yccheok.jstock.gui.analysis.MemoryLogJDialog;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.internationalization.MessagesBundle;
-import org.yccheok.jstock.network.Utils.Type;
 
 /**
  *
@@ -335,7 +334,7 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jLabel7MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel7MouseClicked
-        Utils.launchWebBrowser(org.yccheok.jstock.network.Utils.getURL(Type.PRIVACY_HTML));
+        Utils.launchWebBrowser(org.yccheok.jstock.network.Utils.getURL(org.yccheok.jstock.network.Utils.Type.PRIVACY_HTML));
     }//GEN-LAST:event_jLabel7MouseClicked
 
     private void jLabel7MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel7MouseEntered

@@ -349,6 +349,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
             for (Code code : codesNeedToAddToRealTimeStockMonitor) {
                 this.realTimeStockMonitor.addStockCode(code);
             }
+            this.realTimeStockMonitor.startNewThreadsIfNecessary();
             this.realTimeStockMonitor.refresh();
             
             if (this.lookUpCodes.isEmpty()) {

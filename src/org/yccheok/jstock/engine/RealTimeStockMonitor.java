@@ -68,8 +68,6 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
 
         boolean status = stockCodes.add(code);
 
-        start();
-
         return status;
     }
 
@@ -172,7 +170,21 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
         }
     }    
     
-    private synchronized void start() {
+    // Previously, this is a private method, and is being called automatically
+    // just after addCode. However, there's a problem when
+    //
+    // 1) I have 17 codes to be added
+    // 2) After I add the first code, thread started.
+    // 3) The thread thoughts only 1 code added, and performs server query.
+    // 4) Rest of the 16 codes are added then
+    // 5) Perform refresh() call from external.
+    // 6) 1 code result returned. The thread enters long sleep since everything
+    //    is success.
+    //
+    // To avoid such problem, we will only start new thread explicitly, after we
+    // have added all the codes. We will no longer start new thread, in the
+    // middle of adding new code.
+    public synchronized void startNewThreadsIfNecessary() {
         // Do we need to remove any old thread?
         final int numOfMonitorRequired = this.getNumOfRequiredThread();
         
@@ -213,7 +225,7 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
     public synchronized void refresh() {
         for (StockMonitor stockMonitor : stockMonitors) {
             stockMonitor.refresh();
-        }        
+        }     
     }
     
     public synchronized long getDelay() {

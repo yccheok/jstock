@@ -772,6 +772,7 @@ public class MainFrame extends javax.swing.JFrame {
                     realTimeStockMonitor.addStockCode(Code.newInstance(codeStr));
                 }
             }
+            realTimeStockMonitor.startNewThreadsIfNecessary();
             realTimeStockMonitor.refresh();
         } else if (statements.getType() == Statement.Type.StockIndicatorScanner) {
             // Some users request of having Stock Watchlist able to load stocks
@@ -787,6 +788,7 @@ public class MainFrame extends javax.swing.JFrame {
                     realTimeStockMonitor.addStockCode(Code.newInstance(codeStr));
                 }
             }
+            realTimeStockMonitor.startNewThreadsIfNecessary();
             realTimeStockMonitor.refresh();
         } else if (statements.getType() == Statement.Type.PortfolioManagementBuy || statements.getType() == Statement.Type.PortfolioManagementSell || statements.getType() == Statement.Type.PortfolioManagementDeposit || statements.getType() == Statement.Type.PortfolioManagementDividend) {
             /* Open using other tabs. */
@@ -2681,6 +2683,7 @@ public class MainFrame extends javax.swing.JFrame {
         // our system is slow.
         addStockToTable(emptyStock);
         realTimeStockMonitor.addStockCode(stockInfo.code);
+        realTimeStockMonitor.startNewThreadsIfNecessary();
         realTimeStockMonitor.refresh();
         
         MainFrame.this.highlightStock(modelRowBeforeAdded);

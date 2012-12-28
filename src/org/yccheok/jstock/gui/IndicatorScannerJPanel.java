@@ -313,6 +313,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             {
                 // Perform real time monitoring, for the code with history information.
                 realTimeStockMonitor.addStockCode(code);
+                realTimeStockMonitor.startNewThreadsIfNecessary();
                 realTimeStockMonitor.refresh();
             }
             else
@@ -708,6 +709,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
 
         // Perform real time monitoring, for the code with history information.
         _realTimeStockMonitor.addStockCode(code);
+        _realTimeStockMonitor.startNewThreadsIfNecessary();
         _realTimeStockMonitor.refresh();
     }
     

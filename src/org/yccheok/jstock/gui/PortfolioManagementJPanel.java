@@ -1703,6 +1703,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         // initRealTimeStockMonitor.
         if (this.realTimeStockMonitor != null) {
             this.realTimeStockMonitor.addStockCode(transaction.getStock().getCode());
+            this.realTimeStockMonitor.startNewThreadsIfNecessary();
             this.realTimeStockMonitor.refresh();
         }
         
@@ -1802,6 +1803,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
                 this.realTimeStockMonitor.addStockCode(transaction.getStock().getCode());
             }
+            this.realTimeStockMonitor.startNewThreadsIfNecessary();
             this.realTimeStockMonitor.refresh();
         }
         
