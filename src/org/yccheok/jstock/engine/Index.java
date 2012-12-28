@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2013 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,8 +51,9 @@ public enum Index {
     SSMI("Swiss Market", Code.newInstance("^SSMI")),
     BVSP("Bovespa", Code.newInstance("^BVSP")),
     SSEC("China Shanghai Composite", Code.newInstance("000001.SS")),
-    NZSX50("NZX 50 Index", Code.newInstance("^NZ50"));
-
+    NZSX50("NZX 50 Index", Code.newInstance("^NZ50")),
+    TA100("Tel Aviv 100", Code.newInstance("^TA100"));
+    
     Index(String name, Code code) {
         this.name = name;
         this.code = code;

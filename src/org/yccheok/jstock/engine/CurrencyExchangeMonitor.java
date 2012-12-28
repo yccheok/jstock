@@ -299,6 +299,7 @@ public class CurrencyExchangeMonitor extends Subject<CurrencyExchangeMonitor, Do
         countryToCurrencyCode.put(Country.HongKong, "HKD");
         countryToCurrencyCode.put(Country.India, "INR");
         countryToCurrencyCode.put(Country.Indonesia, "IDR");
+        countryToCurrencyCode.put(Country.Israel, "ILS");
         countryToCurrencyCode.put(Country.Italy, "EUR");
         countryToCurrencyCode.put(Country.Korea, "KPW");
         countryToCurrencyCode.put(Country.Malaysia, "MYR");

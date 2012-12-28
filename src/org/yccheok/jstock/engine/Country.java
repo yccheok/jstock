@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2013 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@ public enum Country {
     HongKong("/images/16x16/hk.png"),
     India("/images/16x16/in.png"),
     Indonesia("/images/16x16/id.png"),
+    Israel("/images/16x16/il.png"),
     Italy("/images/16x16/it.png"),
     Korea("/images/16x16/kr.png"),
     Malaysia("/images/16x16/my.png"),

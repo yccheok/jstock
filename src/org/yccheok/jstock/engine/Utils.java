@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2013 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -316,6 +316,7 @@ public class Utils {
     private static final List<Index> hongkongIndices = new ArrayList<Index>();
     private static final List<Index> indiaIndices = new ArrayList<Index>();
     private static final List<Index> indonesiaIndices = new ArrayList<Index>();
+    private static final List<Index> israelIndices = new ArrayList<Index>();
     private static final List<Index> italyIndices = new ArrayList<Index>();
     private static final List<Index> koreaIndices = new ArrayList<Index>();
     private static final List<Index> malaysiaIndices = new ArrayList<Index>();
@@ -346,6 +347,7 @@ public class Utils {
         indiaIndices.add(Index.BSESN);
         indiaIndices.add(Index.NSEI);
         indonesiaIndices.add(Index.JKSE);
+        israelIndices.add(Index.TA100);
         italyIndices.add(Index.FTSEMIB);
         koreaIndices.add(Index.KS11);
         malaysiaIndices.add(Index.KLSE);
@@ -485,6 +487,8 @@ public class Utils {
                 return java.util.Collections.unmodifiableList(Utils.indiaIndices);
             case Indonesia:
                 return java.util.Collections.unmodifiableList(Utils.indonesiaIndices);
+            case Israel:
+                return java.util.Collections.unmodifiableList(Utils.israelIndices);
             case Italy:
                 return java.util.Collections.unmodifiableList(Utils.italyIndices);
             case Korea:

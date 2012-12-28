@@ -660,6 +660,8 @@ public class Stock {
         NZDX("NZ Debt Market"),
         NZAX("NZ Alternative Market"),
         
+        TASE("Tel Aviv Stock Exchange"),        // Israel
+        
         UserDefined("User Defined"),
         Unknown("Unknown");
         
