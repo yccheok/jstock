@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2012 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2013 Yan Cheng CHEOK <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -182,6 +182,16 @@ public class MainFrame extends javax.swing.JFrame {
         }
         
         installShutdownHook();
+        
+        // Spain no longer supported. Sad...
+        if (this.jStockOptions.getCountry() == Country.Spain) {
+            JOptionPane.showMessageDialog(
+                null, 
+                MessagesBundle.getString("info_message_spain_not_supported"), 
+                MessagesBundle.getString("info_title_spain_not_supported"), 
+                JOptionPane.INFORMATION_MESSAGE
+            );
+        }        
     }
 
     private void initKeyBindings() {
@@ -2224,6 +2234,15 @@ public class MainFrame extends javax.swing.JFrame {
         saveWatchlist();
         this.portfolioManagementJPanel.savePortfolio();
 
+        // Spain no longer supported. Sad...
+        if (country == Country.Spain) {
+            JOptionPane.showMessageDialog(
+                null, 
+                MessagesBundle.getString("info_message_spain_not_supported"), 
+                MessagesBundle.getString("info_title_spain_not_supported"), 
+                JOptionPane.INFORMATION_MESSAGE
+            );
+        }        
         jStockOptions.setCountry(country);
         MainFrame.this.statusBar.setCountryIcon(country.getIcon(), country.toString());
 

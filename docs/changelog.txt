@@ -1,6 +1,13 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.6Y - 2012-12-31
+  Feature: Added Israel stock market.
+  Bugfix:  Added startNewThreadsIfNecessary.
+  Bugfix:  Better way to restrict 1 instance of JStock.
+  Bugfix:  Fix column missing bug.
+  Bugfix:  Spain stock market no longer supported.
+  
 JStock 1.0.6x - 2012-12-26
   Bugfix:  Only allow single instance of JStock to prevent data corruption. 
            (For Windows only)
