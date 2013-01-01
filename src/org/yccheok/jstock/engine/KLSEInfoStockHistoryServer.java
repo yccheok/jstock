@@ -137,7 +137,7 @@ public class KLSEInfoStockHistoryServer implements StockHistoryServer {
                 break;
             }
             Calendar newEndCalendar = tmpStartDate.getCalendar();
-            newEndCalendar.roll(Calendar.DAY_OF_YEAR, -1);
+            newEndCalendar.add(Calendar.DAY_OF_YEAR, -1);
             endDate = new SimpleDate(newEndCalendar);
         } while (true);
         return durations;
