@@ -1,6 +1,9 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+????????????? - ??????????
+  Feature: Added currency exchange on investment flow chart.
+  
 JStock 1.0.6z - 2012-01-02
   Bugfix:  Fix new year handling for Malaysia stock market.
   

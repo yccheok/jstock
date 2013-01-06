@@ -2453,14 +2453,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         return saveAsCSVFile(csvPortfolio, fileEx, languageIndependent);
     }
 
-    private void updateWealthHeader() {
+    public double getCurrencyExchangeRate() {
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
-        final boolean isFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
-        final boolean isPenceToPoundConversionEnabled = jStockOptions.isPenceToPoundConversionEnabled();
         
-        final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)this.buyTreeTable.getTreeTableModel();
-        final SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel = (SellPortfolioTreeTableModelEx)this.sellTreeTable.getTreeTableModel();
-      
         // Get the currency exchange rate.
         double exchangeRate = 1.0;
         if (jStockOptions.isCurrencyExchangeEnable(jStockOptions.getCountry())) {
@@ -2469,6 +2464,18 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 exchangeRate = _currencyExchangeMonitor.getExchangeRate();
             }
         }
+        return exchangeRate;
+    }
+    
+    private void updateWealthHeader() {
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final boolean isFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
+        final boolean isPenceToPoundConversionEnabled = jStockOptions.isPenceToPoundConversionEnabled();
+        
+        final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)this.buyTreeTable.getTreeTableModel();
+        final SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel = (SellPortfolioTreeTableModelEx)this.sellTreeTable.getTreeTableModel();
+      
+        final double exchangeRate = getCurrencyExchangeRate();
 
         final double share;
         final double cash;

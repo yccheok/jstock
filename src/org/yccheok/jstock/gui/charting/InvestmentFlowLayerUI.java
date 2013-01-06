@@ -119,10 +119,15 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         final java.text.NumberFormat numberFormat = java.text.NumberFormat.getInstance();
         numberFormat.setMaximumFractionDigits(2);
         numberFormat.setMinimumFractionDigits(2);
-        final String invest = org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(this.investmentFlowChartJDialog.getTotalInvestValue());
-        final String roi = org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(this.investmentFlowChartJDialog.getTotalROIValue());
-        final double gain = this.investmentFlowChartJDialog.getTotalROIValue() - this.investmentFlowChartJDialog.getTotalInvestValue();
-        final double percentage = this.investmentFlowChartJDialog.getTotalInvestValue() > 0.0 ? gain / this.investmentFlowChartJDialog.getTotalInvestValue() * 100.0 : 0.0;
+        
+        final double exchangeRate = MainFrame.getInstance().getPortfolioManagementJPanel().getCurrencyExchangeRate();
+        final double totalInvestValue = this.investmentFlowChartJDialog.getTotalInvestValue() * exchangeRate;
+        final double totalROIValue = this.investmentFlowChartJDialog.getTotalROIValue() * exchangeRate;
+                
+        final String invest = org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(totalInvestValue);
+        final String roi = org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(totalROIValue);
+        final double gain = totalROIValue - totalInvestValue;
+        final double percentage = totalInvestValue > 0.0 ? gain / totalInvestValue * 100.0 : 0.0;
         final String gain_str = org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(gain);
         final String percentage_str = numberFormat.format(percentage);
 
