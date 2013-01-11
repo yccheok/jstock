@@ -191,7 +191,11 @@ public class MainFrame extends javax.swing.JFrame {
                 MessagesBundle.getString("info_title_spain_not_supported"), 
                 JOptionPane.INFORMATION_MESSAGE
             );
-        }        
+        }
+    }
+
+    private void requestFocusOnJComboBox() {
+        this.jComboBox1.getEditor().getEditorComponent().requestFocus();
     }
 
     private void initKeyBindings() {
@@ -878,6 +882,8 @@ public class MainFrame extends javax.swing.JFrame {
             this.jMenuItem4.setEnabled(true);   // Add Stocks...
             this.jMenuItem7.setEnabled(true);   // Clear All Stocks...
             this.jMenuItem15.setEnabled(true);  // Refresh Stock Prices
+            
+            requestFocusOnJComboBox();
         }
         else if (pane.getSelectedComponent() == this.indicatorPanel) {
             this.jMenuItem2.setEnabled(false);  // Load
@@ -1689,6 +1695,7 @@ public class MainFrame extends javax.swing.JFrame {
                 mainFrame.init();
                 mainFrame.setVisible(true);
                 mainFrame.updateDividerLocation();
+                mainFrame.requestFocusOnJComboBox();
             }
         });
     }
