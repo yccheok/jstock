@@ -110,12 +110,14 @@ public class SimpleDate implements java.lang.Comparable<SimpleDate> {
     @Override
     public int compareTo(SimpleDate simpleDate) {
         final int yearDiff = year - simpleDate.year;
-        if(yearDiff != 0)
+        if (yearDiff != 0) {
             return yearDiff;
+        }
         
         final int monthDiff = month - simpleDate.month;
-        if(monthDiff != 0)
+        if (monthDiff != 0) {
             return monthDiff;
+        }
         
         return date - simpleDate.date;
     }
