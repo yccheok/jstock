@@ -23,7 +23,6 @@ import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -70,9 +69,9 @@ public abstract class AbstractYahooStockHistoryServer implements StockHistorySer
     private boolean parse(String respond)
     {
         historyDatabase.clear();
-        simpleDates.clear();
+        timestamps.clear();
 
-        final Calendar calendar = Calendar.getInstance();
+        long timestamp = System.currentTimeMillis();
 
         String[] stockDatas = respond.split("\r\n|\r|\n");
 
@@ -112,7 +111,7 @@ public abstract class AbstractYahooStockHistoryServer implements StockHistorySer
             }
 
             try {
-                calendar.setTime(simpleDateFormatThreadLocal.get().parse(fields[0]));
+                timestamp = simpleDateFormatThreadLocal.get().parse(fields[0]).getTime();
             } catch (ParseException ex) {
                 log.error(null, ex);
                 continue;
@@ -144,8 +143,6 @@ public abstract class AbstractYahooStockHistoryServer implements StockHistorySer
             double changePrice = (previousClosePrice == Double.MAX_VALUE) ? 0 : closePrice - previousClosePrice;
             double changePricePercentage = ((previousClosePrice == Double.MAX_VALUE) || (previousClosePrice == 0.0)) ? 0 : changePrice / previousClosePrice * 100.0;
 
-            SimpleDate simpleDate = new SimpleDate(calendar);
-
             Stock stock = new Stock(
                     code,
                     symbol,
@@ -173,11 +170,11 @@ public abstract class AbstractYahooStockHistoryServer implements StockHistorySer
                     0,
                     0.0,
                     0,
-                    simpleDate.getCalendar()
+                    timestamp
                     );
 
-            historyDatabase.put(simpleDate, stock);
-            simpleDates.add(simpleDate);
+            historyDatabase.put(timestamp, stock);
+            timestamps.add(timestamp);
             previousClosePrice = closePrice;
         }
 
@@ -231,19 +228,18 @@ public abstract class AbstractYahooStockHistoryServer implements StockHistorySer
     }
 
     @Override
-    public Stock getStock(Calendar calendar) {
-        SimpleDate simpleDate = new SimpleDate(calendar);
-        return historyDatabase.get(simpleDate);
+    public Stock getStock(long timestamp) {
+        return historyDatabase.get(timestamp);
     }
 
     @Override
-    public Calendar getCalendar(int index) {
-        return simpleDates.get(index).getCalendar();
+    public long getTimestamp(int index) {
+        return timestamps.get(index);
     }
 
     @Override
-    public int getNumOfCalendar() {
-        return simpleDates.size();
+    public int size() {
+        return timestamps.size();
     }
 
     @Override
@@ -278,8 +274,8 @@ public abstract class AbstractYahooStockHistoryServer implements StockHistorySer
     private static final Duration DEFAULT_HISTORY_DURATION =  Duration.getTodayDurationByYears(10);
     private static final String YAHOO_ICHART_BASED_URL = "http://ichart.yahoo.com/table.csv?s=";
 
-    private final java.util.Map<SimpleDate, Stock> historyDatabase = new HashMap<SimpleDate, Stock>();
-    private final java.util.List<SimpleDate> simpleDates = new ArrayList<SimpleDate>();
+    private final java.util.Map<Long, Stock> historyDatabase = new HashMap<Long, Stock>();
+    private final java.util.List<Long> timestamps = new ArrayList<Long>();
 
     private final Code code;
     private final Country country;

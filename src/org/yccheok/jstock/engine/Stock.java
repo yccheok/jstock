@@ -19,8 +19,6 @@
 
 package org.yccheok.jstock.engine;
 
-import java.util.Calendar;
-
 /**
  *
  * @author yccheok
@@ -62,8 +60,8 @@ public class Stock {
         private int thirdSellQuantity = 0;
         // We suppose to provide a default value for calendar. However, it may
         // seem expensive. We will do it later during build.
-        private java.util.Calendar calendar = null;
-        private volatile boolean hasCalendarInitialized = false;
+        private long timestamp = 0;
+        private volatile boolean hasTimestampInitialized = false;
 
         public Builder(Code code, Symbol symbol) {
             this.code = code;
@@ -263,18 +261,18 @@ public class Stock {
         }
 
         /**
-         * @param calendar the calendar to set
+         * @param timestamp the timestamp to set
          */
-        public Builder calendar(java.util.Calendar calendar) {
-            this.calendar = calendar;
-            this.hasCalendarInitialized = true;
+        public Builder timestamp(long timestamp) {
+            this.timestamp = timestamp;
+            this.hasTimestampInitialized = true;
             return this;
         }
 
         public Stock build() {
-            if (hasCalendarInitialized == false) {
-                // If we haven't initialized calendar before, do it right now.
-                this.calendar = Calendar.getInstance();
+            if (hasTimestampInitialized == false) {
+                // If we haven't initialized timestamp before, do it right now.
+                this.timestamp = System.currentTimeMillis();
             }
             return new Stock(this);
         }
@@ -309,7 +307,7 @@ public class Stock {
             builder.thirdBuyQuantity,
             builder.thirdSellPrice,
             builder.thirdSellQuantity,
-            builder.calendar
+            builder.timestamp
             );
     }
     
@@ -341,7 +339,7 @@ public class Stock {
         int thirdBuyQuantity,
         double thirdSellPrice,
         int thirdSellQuantity,
-        java.util.Calendar calendar
+        long timestamp
                 ) 
     {
         this.code = code;
@@ -370,7 +368,7 @@ public class Stock {
         this.thirdBuyQuantity = thirdBuyQuantity;
         this.thirdSellPrice = thirdSellPrice;
         this.thirdSellQuantity = thirdSellQuantity;
-        this.calendar = calendar;
+        this.timestamp = timestamp;
     }
 
     // I didn't make this construcotr private. As I would like to make user able
@@ -402,7 +400,7 @@ public class Stock {
         this.thirdBuyQuantity = stock.thirdBuyQuantity;
         this.thirdSellPrice = stock.thirdSellPrice;
         this.thirdSellQuantity = stock.thirdSellQuantity;
-        this.calendar = stock.calendar;
+        this.timestamp = stock.timestamp;
     }
     
     public Code getCode() {
@@ -510,8 +508,8 @@ public class Stock {
         return thirdSellQuantity;
     }
     
-    public java.util.Calendar getCalendar() {
-        return (java.util.Calendar)calendar.clone();        
+    public long getTimestamp() {
+        return timestamp;
     }
     
     /**
@@ -552,7 +550,7 @@ public class Stock {
             this.thirdBuyQuantity,
             this.thirdSellPrice,
             this.thirdSellQuantity,
-            this.calendar
+            this.timestamp
         );
     }
     
@@ -594,7 +592,7 @@ public class Stock {
             this.thirdBuyQuantity,
             this.thirdSellPrice,
             this.thirdSellQuantity,
-            this.calendar
+            this.timestamp
         );
     }
 
@@ -745,5 +743,7 @@ public class Stock {
     private final int thirdBuyQuantity;
     private final double thirdSellPrice;
     private final int thirdSellQuantity;
-    private final java.util.Calendar calendar;
+    // milliseconds. As timestamp in Java system always interpreted as 
+    // milliseconds. 
+    private final long timestamp;
 }
