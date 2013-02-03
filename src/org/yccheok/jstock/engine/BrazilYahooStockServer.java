@@ -22,7 +22,7 @@ package org.yccheok.jstock.engine;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -79,7 +79,7 @@ public class BrazilYahooStockServer extends AbstractYahooStockServer {
                     stock.getThirdBuyQuantity(),
                     stock.getThirdSellPrice(),
                     stock.getThirdSellQuantity(),
-                    stock.getCalendar()
+                    stock.getTimestamp()
                 );
             stocks.add(s);
         }
@@ -120,7 +120,7 @@ public class BrazilYahooStockServer extends AbstractYahooStockServer {
                 tmp.getThirdBuyQuantity(),
                 tmp.getThirdSellPrice(),
                 tmp.getThirdSellQuantity(),
-                tmp.getCalendar()
+                tmp.getTimestamp()
             );
         return stock;
     }
@@ -215,7 +215,7 @@ public class BrazilYahooStockServer extends AbstractYahooStockServer {
 
     private final URL baseURL;
 
-    private static final Map<Country, URL> servers = new HashMap<Country, URL>();
+    private static final Map<Country, URL> servers = new EnumMap<Country, URL>(Country.class);
 
     //<a href="/q/cp?s=^BVSP&c=1">Último</a>
     //      become ==>

@@ -107,7 +107,7 @@ public class Utils {
      * @return list of daily chart data
      */
     public static List<ChartData> getDailyChartData(StockHistoryServer stockHistoryServer) {
-        final int days = stockHistoryServer.getNumOfCalendar();
+        final int days = stockHistoryServer.size();
 
         List<ChartData> chartDatas = new ArrayList<ChartData>();
 
@@ -122,15 +122,15 @@ public class Utils {
         // Just perform simple one to one copy, without performing any
         // filtering.
         for (int i = 0; i < days; i++) {
-            Calendar calendar = stockHistoryServer.getCalendar(i);
-            Stock stock = stockHistoryServer.getStock(calendar);
+            final long t = stockHistoryServer.getTimestamp(i);
+            Stock stock = stockHistoryServer.getStock(t);
             prevPrice = stock.getPrevPrice();
             openPrice = stock.getOpenPrice();
             lastPrice = stock.getLastPrice();
             highPrice = stock.getHighPrice();
             lowPrice = stock.getLowPrice();
             volume = stock.getVolume();
-            timestamp = stock.getCalendar().getTimeInMillis();
+            timestamp = stock.getTimestamp();
             ChartData chartData = ChartData.newInstance(
                     prevPrice,
                     openPrice,
@@ -151,7 +151,7 @@ public class Utils {
      * @return list of weekly chart data
      */
     public static List<ChartData> getWeeklyChartData(StockHistoryServer stockHistoryServer) {
-        final int days = stockHistoryServer.getNumOfCalendar();
+        final int days = stockHistoryServer.size();
         Calendar prevCalendar = null;
 
         List<ChartData> chartDatas = new ArrayList<ChartData>();
@@ -169,9 +169,12 @@ public class Utils {
             // First, determine the current data is same week as the previous
             // data.
             boolean isSameWeek = false;
-            Calendar calendar = stockHistoryServer.getCalendar(i);
-            Stock stock = stockHistoryServer.getStock(calendar);
-
+            final long t = stockHistoryServer.getTimestamp(i);
+            Stock stock = stockHistoryServer.getStock(t);
+            
+            final Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(t);
+            
             if (prevCalendar != null) {
                 int weekOfYear = calendar.get(Calendar.WEEK_OF_YEAR);
                 int prevWeekOfYear = prevCalendar.get(Calendar.WEEK_OF_YEAR);
@@ -204,7 +207,7 @@ public class Utils {
                 highPrice = stock.getHighPrice();
                 lowPrice = stock.getLowPrice();
                 volume = stock.getVolume();
-                timestamp = stock.getCalendar().getTimeInMillis();
+                timestamp = stock.getTimestamp();
                 count = 1;
             } else {
                 // We will not update prevPrice and openPrice. They will remain
@@ -213,7 +216,7 @@ public class Utils {
                 highPrice = Math.max(highPrice, stock.getHighPrice());
                 lowPrice = Math.min(lowPrice, stock.getLowPrice());
                 volume += stock.getVolume();
-                timestamp = stock.getCalendar().getTimeInMillis();
+                timestamp = stock.getTimestamp();
                 count++;
             }
 
@@ -243,7 +246,7 @@ public class Utils {
      * @return list of monthly chart data
      */
     public static List<ChartData> getMonthlyChartData(StockHistoryServer stockHistoryServer) {
-        final int days = stockHistoryServer.getNumOfCalendar();
+        final int days = stockHistoryServer.size();
         Calendar prevCalendar = null;
 
         List<ChartData> chartDatas = new ArrayList<ChartData>();
@@ -261,9 +264,12 @@ public class Utils {
             // First, determine the current data is same month as the previous
             // data.
             boolean isSameMonth = false;
-            Calendar calendar = stockHistoryServer.getCalendar(i);
-            Stock stock = stockHistoryServer.getStock(calendar);
+            final long t = stockHistoryServer.getTimestamp(i);
+            Stock stock = stockHistoryServer.getStock(t);
 
+            final Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(t);
+            
             if (prevCalendar != null) {
                 int month = calendar.get(Calendar.MONTH);
                 int prevMonth = prevCalendar.get(Calendar.MONTH);
@@ -296,7 +302,7 @@ public class Utils {
                 highPrice = stock.getHighPrice();
                 lowPrice = stock.getLowPrice();
                 volume = stock.getVolume();
-                timestamp = stock.getCalendar().getTimeInMillis();
+                timestamp = stock.getTimestamp();
                 count = 1;
             } else {
                 // We will not update prevPrice and openPrice. They will remain
@@ -305,7 +311,7 @@ public class Utils {
                 highPrice = Math.max(highPrice, stock.getHighPrice());
                 lowPrice = Math.min(lowPrice, stock.getLowPrice());
                 volume += stock.getVolume();
-                timestamp = stock.getCalendar().getTimeInMillis();
+                timestamp = stock.getTimestamp();
                 count++;
             }
 

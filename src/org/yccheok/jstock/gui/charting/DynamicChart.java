@@ -137,7 +137,7 @@ public class DynamicChart {
         dialog.setVisible(true);
     }
 
-    public void addPriceObservation(Date date, double y) {
+    public void addPriceObservation(long timestamp, double y) {
         // There must be at least an item in price. If not, ArrayIndexOutOfBoundsException
         // will be thrown, when getNextTimePeriod is being called.
         final int count = this.price.getItemCount();
@@ -145,12 +145,12 @@ public class DynamicChart {
         if (count > 0) {
             final Date nextStartDate = this.price.getTimePeriod(count - 1).getStart();            
             // 10 seconds interval for every point.
-            if ((date.getTime() - nextStartDate.getTime()) < 10000) {
+            if ((timestamp - nextStartDate.getTime()) < 10000) {
                 return;
             }
         }
 
-        Second second = new Second(date);
+        Second second = new Second(new Date(timestamp));
 
         try {
             this.price.add(second, y);
