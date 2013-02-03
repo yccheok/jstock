@@ -89,19 +89,18 @@ public class KLSEInfoStockHistoryServer implements StockHistoryServer {
     }
     
     @Override
-    public Stock getStock(Calendar calendar) {
-        SimpleDate simpleDate = new SimpleDate(calendar);
-        return historyDatabase.get(simpleDate);
+    public Stock getStock(long timestamp) {
+        return historyDatabase.get(timestamp);
     }
 
     @Override
-    public Calendar getCalendar(int index) {
-        return simpleDates.get(index).getCalendar();
+    public long getTimestamp(int index) {
+        return timestamps.get(index);
     }
 
     @Override
-    public int getNumOfCalendar() {
-        return simpleDates.size();
+    public int size() {
+        return timestamps.size();
     }
 
     @Override
@@ -194,7 +193,7 @@ public class KLSEInfoStockHistoryServer implements StockHistoryServer {
     
     private boolean parse(String respond)
     {
-        final Calendar calendar = Calendar.getInstance();
+        long timestamp = System.currentTimeMillis();
         
         String[] stockDatas = respond.split("\r\n|\r|\n");
 
@@ -232,7 +231,7 @@ public class KLSEInfoStockHistoryServer implements StockHistoryServer {
             }
 
             try {
-                calendar.setTime(simpleDateFormatThreadLocal.get().parse(fields[0]));
+                timestamp = simpleDateFormatThreadLocal.get().parse(fields[0]).getTime();
             } catch (ParseException ex) {
                 log.error(null, ex);
                 continue;
@@ -263,8 +262,6 @@ public class KLSEInfoStockHistoryServer implements StockHistoryServer {
             double changePrice = (previousClosePrice == Double.MAX_VALUE) ? 0 : closePrice - previousClosePrice;
             double changePricePercentage = ((previousClosePrice == Double.MAX_VALUE) || (previousClosePrice == 0.0)) ? 0 : changePrice / previousClosePrice * 100.0;
 
-            SimpleDate simpleDate = new SimpleDate(calendar);
-
             Stock stock = new Stock(
                     code,
                     symbol,
@@ -292,11 +289,11 @@ public class KLSEInfoStockHistoryServer implements StockHistoryServer {
                     0,
                     0.0,
                     0,
-                    simpleDate.getCalendar()
+                    timestamp
                     );
 
-            historyDatabase.put(simpleDate, stock);
-            simpleDates.add(simpleDate);
+            historyDatabase.put(timestamp, stock);
+            timestamps.add(timestamp);
             previousClosePrice = closePrice;
         }
 
@@ -307,8 +304,8 @@ public class KLSEInfoStockHistoryServer implements StockHistoryServer {
     private static final Duration DEFAULT_HISTORY_DURATION =  Duration.getTodayDurationByYears(10);
     private static final String KLSE_INFO_BASED_URL = "http://www.klse.info/jstock/historical-prices?s=";
     
-    private final java.util.Map<SimpleDate, Stock> historyDatabase = new HashMap<SimpleDate, Stock>();
-    private final java.util.List<SimpleDate> simpleDates = new ArrayList<SimpleDate>();
+    private final java.util.Map<Long, Stock> historyDatabase = new HashMap<Long, Stock>();
+    private final java.util.List<Long> timestamps = new ArrayList<Long>();
     
     private final Code code;
     private final Duration duration;

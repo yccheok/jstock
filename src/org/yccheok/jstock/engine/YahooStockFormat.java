@@ -21,8 +21,6 @@ package org.yccheok.jstock.engine;
 
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -49,25 +47,24 @@ public class YahooStockFormat implements StockFormat {
     // http://sourceforge.net/projects/jstock/forums/forum/723855/topic/4647070
     // 13 days is just a random picked number. I assume a stock should not be
     // older than 13 days. If not, it is just too old.
-    private static Date now = null;
-    private boolean isTooOldCalendar(Calendar calendar) {
-        if (calendar == null) {
+    private static long now = 0;
+    private boolean isTooOldTimestamp(long timestamp) {
+        if (timestamp == 0) {
             return false;
         }
         
         // Ensure we have a correct "now" value.
-        if (now == null) {
-            Date localNow = org.yccheok.jstock.gui.Utils.getGoogleServerDate();
-            if (localNow != null) {
+        if (now == 0) {
+            long localNow = org.yccheok.jstock.gui.Utils.getGoogleServerTimestamp();
+            if (localNow != 0) {
                 now = localNow;
             } else {
-                now = new Date();
+                now = System.currentTimeMillis();
             }
         }
 
-        Date date = calendar.getTime();
         // If more than 13 days old stock, we consider it as corrupted stock.
-        return (Utils.getDifferenceInDays(date, now) > 13);
+        return (Utils.getDifferenceInDays(timestamp, now) > 13);
     }
 
     // Update on 19 March 2009 : We cannot assume certain parameters will always
@@ -181,7 +178,7 @@ public class YahooStockFormat implements StockFormat {
             int thirdBuyQuantity = 0;
             double thirdSellPrice = 0.0;
             int thirdSellQuantity = 0;
-            java.util.Calendar calendar = null;
+            long timestamp = 0;
             
             do {
                 if (length < 1) break; code = Code.newInstance(quotePattern.matcher(fields[0]).replaceAll("").trim());
@@ -250,8 +247,7 @@ public class YahooStockFormat implements StockFormat {
                 java.util.Date serverDate;
                 try {
                     serverDate = dateFormat.parse(date_and_time);
-                    calendar = Calendar.getInstance();
-                    calendar.setTime(serverDate);
+                    timestamp = serverDate.getTime();
                 } catch (ParseException exp) {
                     // Most of the time, we just obtain "N/A"
                     // log.error(fields[23] + ", " + fields[24] + ", " + data_and_time, exp);
@@ -269,11 +265,11 @@ public class YahooStockFormat implements StockFormat {
             // http://sourceforge.net/projects/jstock/forums/forum/723855/topic/4611584
             // http://sourceforge.net/projects/jstock/forums/forum/723855/topic/4647070
             // Note that, this is a very hacking way, and not reliable at all!
-            if (isCorruptedData(lastPrice) || isTooOldCalendar(calendar)) {
+            if (isCorruptedData(lastPrice) || isTooOldTimestamp(timestamp)) {
                 continue;
             }
 
-            if (calendar == null) calendar = Calendar.getInstance();
+            if (timestamp == 0) timestamp = System.currentTimeMillis();
             
             Stock stock = new Stock(
                     code,
@@ -302,7 +298,7 @@ public class YahooStockFormat implements StockFormat {
                     thirdBuyQuantity,
                     thirdSellPrice,
                     thirdSellQuantity,
-                    calendar                                        
+                    timestamp                                        
                     );
 
             stocks.add(stock);            

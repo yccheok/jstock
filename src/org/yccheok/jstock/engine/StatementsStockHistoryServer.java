@@ -7,7 +7,6 @@ package org.yccheok.jstock.engine;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.logging.Log;
@@ -20,8 +19,8 @@ import org.yccheok.jstock.file.Statements;
  * @author yccheok
  */
 public class StatementsStockHistoryServer implements StockHistoryServer {
-    private final java.util.Map<SimpleDate, Stock> historyDatabase = new HashMap<SimpleDate, Stock>();
-    private final java.util.List<SimpleDate> simpleDates = new ArrayList<SimpleDate>();
+    private final java.util.Map<Long, Stock> historyDatabase = new HashMap<Long, Stock>();
+    private final java.util.List<Long> timestamps = new ArrayList<Long>();
     
     private StatementsStockHistoryServer(Statements statements) throws ParseException {
         assert(statements.getType() == Statement.Type.StockHistory);
@@ -33,7 +32,7 @@ public class StatementsStockHistoryServer implements StockHistoryServer {
         for (int i = 0, ei = statements.size(); i < ei; i++) {
             Statement statement = statements.get(i);
             assert(statement.getType() == Statement.Type.StockHistory);
-            SimpleDate simpleDate = new SimpleDate(dateFormat.parse(statement.getAtom(0).getValue().toString()));
+            final long timestamp = dateFormat.parse(statement.getAtom(0).getValue().toString()).getTime();
             double openPrice = Double.parseDouble(statement.getAtom(1).getValue().toString());
             double highPrice = Double.parseDouble(statement.getAtom(2).getValue().toString());
             double lowPrice = Double.parseDouble(statement.getAtom(3).getValue().toString());
@@ -76,11 +75,11 @@ public class StatementsStockHistoryServer implements StockHistoryServer {
                     0,
                     0.0,
                     0,
-                    simpleDate.getCalendar()
+                    timestamp
                     );
 
-            historyDatabase.put(simpleDate, stock);
-            simpleDates.add(simpleDate);
+            historyDatabase.put(timestamp, stock);
+            timestamps.add(timestamp);
             previousClosePrice = closePrice;
         }
     }
@@ -101,19 +100,18 @@ public class StatementsStockHistoryServer implements StockHistoryServer {
     }
     
     @Override
-    public Stock getStock(Calendar calendar) {
-        SimpleDate simpleDate = new SimpleDate(calendar);
-        return historyDatabase.get(simpleDate);
+    public Stock getStock(long timestamp) {
+        return historyDatabase.get(timestamp);
     }
 
     @Override
-    public Calendar getCalendar(int index) {
-        return simpleDates.get(index).getCalendar();
+    public long getTimestamp(int index) {
+        return timestamps.get(index);
     }
 
     @Override
-    public int getNumOfCalendar() {
-        return simpleDates.size();
+    public int size() {
+        return timestamps.size();
     }
 
     @Override

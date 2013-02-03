@@ -808,8 +808,8 @@ public class ChartJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jComboBox1ActionPerformed
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        assert(this.stockHistoryServer.getNumOfCalendar() > 0);
-        final Stock stock = this.stockHistoryServer.getStock(this.stockHistoryServer.getCalendar(0));
+        assert(this.stockHistoryServer.size() > 0);
+        final Stock stock = this.stockHistoryServer.getStock(this.stockHistoryServer.getTimestamp(0));
         final File file = org.yccheok.jstock.gui.Utils.promptSaveCSVAndExcelJFileChooser(stock.getCode().toString());
 
         if (file != null) {
@@ -1307,8 +1307,8 @@ public class ChartJDialog extends javax.swing.JDialog {
     }
     
     private String getBestStockName() {
-        final int num = stockHistoryServer.getNumOfCalendar();
-        final Stock stock = stockHistoryServer.getStock(stockHistoryServer.getCalendar(num - 1));
+        final int num = stockHistoryServer.size();
+        final Stock stock = stockHistoryServer.getStock(stockHistoryServer.getTimestamp(num - 1));
 
         if (org.yccheok.jstock.engine.Utils.isNameImmutable()) {
             final StockNameDatabase stockNameDatabase = MainFrame.getInstance().getStockNameDatabase();

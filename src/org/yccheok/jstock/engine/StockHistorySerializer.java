@@ -21,7 +21,6 @@ package org.yccheok.jstock.engine;
 
 import java.io.*;
 import java.text.DecimalFormat;
-import java.util.*;
 
 import org.yccheok.jstock.file.Statements;
 
@@ -42,12 +41,12 @@ public class StockHistorySerializer {
     public boolean save(StockHistoryServer stockHistoryServer, Duration duration)
     {
         // If the history server doesn't contain any information, return early.
-        if (stockHistoryServer.getNumOfCalendar() == 0) {
+        if (stockHistoryServer.size() == 0) {
             return false;
         }
         
-        final Calendar calendar = stockHistoryServer.getCalendar(0);
-        final Code code = stockHistoryServer.getStock(calendar).getCode();
+        final long timestamp = stockHistoryServer.getTimestamp(0);
+        final Code code = stockHistoryServer.getStock(timestamp).getCode();
         final Statements statements = Statements.newInstanceFromStockHistoryServer(stockHistoryServer, true);
         final File file = new File(getFileName(code, duration));
         return statements.saveAsCSVFile(file);
