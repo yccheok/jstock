@@ -110,11 +110,11 @@ public class GoogleCalendar {
         // set the calendar with starting time as 2:00:59, Google Calendar will process it as
         // 2:00:00.
         final Calendar cstart = Calendar.getInstance();
-        Date now = Utils.getGoogleServerDate();
-        if (now == null) {
+        long now = Utils.getGoogleServerTimestamp();
+        if (now == 0) {
             // Unable to retrieve server time. Try our own local machine time.
             // Not accurate. But better than none.
-            now = new Date();
+            now = System.currentTimeMillis();
         }
 
         // Consider the following edge case.
@@ -122,7 +122,7 @@ public class GoogleCalendar {
         // Due to our assumption (1) and (2), we need to tell Google Calendar start
         // is 2:02. If We try to tell Google Calendar start is 2:01:59, Google Calendar
         // will interpret start time as 2:01:00 due to (2).
-        Date start = new Date(now.getTime() + 60000L);        
+        Date start = new Date(now + 60000L);        
         cstart.setTime(start);
 
         // If we are having start time 2:01:29, leave it.

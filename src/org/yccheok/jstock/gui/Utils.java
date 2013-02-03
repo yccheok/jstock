@@ -335,20 +335,20 @@ public class Utils {
         return true;
     }
 
-    // Get date information from Google server.
-    public static java.util.Date getGoogleServerDate() {
+    // Get timestamp (in ms) information from Google server. Returns 0 if
+    // invalid.
+    public static long getGoogleServerTimestamp() {
         final String _time = org.yccheok.jstock.gui.Utils.getUUIDValue(org.yccheok.jstock.network.Utils.getURL(Type.GET_TIME), "time");
         if (_time == null) {
-            return null;
+            return 0;
         }
         try {
             final long time = Long.parseLong(_time);
-            final Date date = new Date(time);
-            return date;
+            return time;
         } catch (NumberFormatException exp) {
             log.error(null, exp);
         }
-        return null;
+        return 0;
     }
 
     public static String toEndWithFileSeperator(String string) {
@@ -946,7 +946,7 @@ public class Utils {
                             0,
                             0.0,
                             0,
-                            Calendar.getInstance()                                        
+                            System.currentTimeMillis()                              
                             );                
     } 
 
