@@ -3888,7 +3888,7 @@ public class MainFrame extends javax.swing.JFrame {
             }
 
             if (this.isStockBeingSelected(stock)) {
-                dynamicChart.addPriceObservation(stock.getCalendar().getTime(), stock.getLastPrice());
+                dynamicChart.addPriceObservation(stock.getTimestamp(), stock.getLastPrice());
                 final Stock s = stock;
                 javax.swing.SwingUtilities.invokeLater(new Runnable() {
                     @Override
@@ -3900,7 +3900,7 @@ public class MainFrame extends javax.swing.JFrame {
             else {
                 // Although no one is watching at us, we still need to perform notification.
                 // Weird?
-                dynamicChart.addPriceObservation(stock.getCalendar().getTime(), stock.getLastPrice());
+                dynamicChart.addPriceObservation(stock.getTimestamp(), stock.getLastPrice());
             }
         }   /* for (Stock stock : stocks) */
 

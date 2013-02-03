@@ -20,7 +20,6 @@
 package org.yccheok.jstock.analysis;
 
 import com.tictactec.ta.lib.Core;
-import java.util.*;
 import org.yccheok.jstock.charting.TechnicalAnalysis;
 import org.yccheok.jstock.engine.*;
 
@@ -199,13 +198,13 @@ public class StockRelativeHistoryOperator extends AbstractOperator {
         // TODO: CRITICAL LONG BUG REVISED NEEDED.
         java.util.List<Long> volumes = new java.util.ArrayList<Long>();
 
-        final int numOfCalendar = stockHistoryServer.getNumOfCalendar();
+        final int size = stockHistoryServer.size();
         /* Fill up stocks. */
-        final int start = Math.max(0, numOfCalendar - getRequiredHistorySize());
+        final int start = Math.max(0, size - getRequiredHistorySize());
 
-        for (int i = Math.max(0, start - skipDay), ei = Math.max(0, numOfCalendar - skipDay); i < ei; i++) {
-            final Calendar calendar = stockHistoryServer.getCalendar(i);
-            final Stock stock = stockHistoryServer.getStock(calendar);
+        for (int i = Math.max(0, start - skipDay), ei = Math.max(0, size - skipDay); i < ei; i++) {
+            final long timestamp = stockHistoryServer.getTimestamp(i);
+            final Stock stock = stockHistoryServer.getStock(timestamp);
             stocks.add(stock);
         }
 

@@ -155,16 +155,19 @@ public class StockHistoryOperator extends AbstractOperator {
         // TODO: CRITICAL LONG BUG REVISED NEEDED.
         java.util.List<Long> volumes = new java.util.ArrayList<Long>();
 
-        java.util.Calendar startCalendar = new java.util.GregorianCalendar();
+        final Calendar startCalendar = Calendar.getInstance();  
+        final Calendar endCalendar = Calendar.getInstance();  
         startCalendar.setTime(startDate);
-        java.util.Calendar endCalendar = new java.util.GregorianCalendar();
         endCalendar.setTime(endDate);
+
+        final long startTimestamp = startDate.getTime();
+        final long endTimestamp = endDate.getTime();
 
         int day = 0;
 
         /* Fill up stocks. */
         while(true) {
-            Stock stock = stockHistoryServer.getStock(startCalendar);
+            Stock stock = stockHistoryServer.getStock(startTimestamp);
             if (stock != null) {
                 tmpStocks.add(stock);
                 day++;
@@ -197,7 +200,9 @@ public class StockHistoryOperator extends AbstractOperator {
         
         int remainingHistorySize = Math.max(0, getRequiredHistorySize(day) - day);
         
-        Calendar oldestHistoryCalendar = stockHistoryServer.getCalendar(0);
+        long oldestHistoryTimestamp = stockHistoryServer.getTimestamp(0);
+        Calendar oldestHistoryCalendar = Calendar.getInstance();
+        oldestHistoryCalendar.setTimeInMillis(oldestHistoryTimestamp);
         while (remainingHistorySize > 0) {
             startCalendar.add(Calendar.DAY_OF_MONTH, -1);
 
@@ -205,7 +210,7 @@ public class StockHistoryOperator extends AbstractOperator {
                 break;
             }
                 
-            Stock stock = stockHistoryServer.getStock(startCalendar);
+            Stock stock = stockHistoryServer.getStock(startTimestamp);
             if (stock != null) {
                 stocks.add(stock);
                 remainingHistorySize--;
