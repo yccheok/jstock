@@ -85,9 +85,7 @@ public class SimpleDate implements java.lang.Comparable<SimpleDate> {
     
     public Calendar getCalendar() {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(year, month, date, 0, 0, 0);
-        // Reset milli second as well.
-        calendar.set(Calendar.MILLISECOND, 0);
+        org.yccheok.jstock.engine.Utils.resetCalendarTime(calendar);
         return calendar;
     }
 

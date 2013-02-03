@@ -126,6 +126,15 @@ public class Utils {
         return getDifferenceInDays(calendar0.getTimeInMillis(), calendar1.getTimeInMillis());
     }
     
+    public static void resetCalendarTime(Calendar calendar) {
+        final int year = calendar.get(Calendar.YEAR);
+        final int month = calendar.get(Calendar.MONTH);
+        final int date = calendar.get(Calendar.DATE);
+        calendar.set(year, month, date, 0, 0, 0);
+        // Reset milli second as well.
+        calendar.set(Calendar.MILLISECOND, 0);        
+    }
+    
     public static String subString(String source, String begin, String end) {
         assert(begin.length() > 0 && end.length() > 0);
         

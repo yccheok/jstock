@@ -160,13 +160,15 @@ public class StockHistoryOperator extends AbstractOperator {
         startCalendar.setTime(startDate);
         endCalendar.setTime(endDate);
 
-        final long startTimestamp = startDate.getTime();
-        final long endTimestamp = endDate.getTime();
-
+        // Not sure why there is time information in startDate. Reset it.
+        org.yccheok.jstock.engine.Utils.resetCalendarTime(startCalendar);
+        org.yccheok.jstock.engine.Utils.resetCalendarTime(endCalendar);
+        
         int day = 0;
 
         /* Fill up stocks. */
         while(true) {
+            final long startTimestamp = startCalendar.getTimeInMillis();
             Stock stock = stockHistoryServer.getStock(startTimestamp);
             if (stock != null) {
                 tmpStocks.add(stock);
@@ -197,6 +199,7 @@ public class StockHistoryOperator extends AbstractOperator {
         
         // Reset.
         startCalendar.setTime(startDate);
+        org.yccheok.jstock.engine.Utils.resetCalendarTime(startCalendar);
         
         int remainingHistorySize = Math.max(0, getRequiredHistorySize(day) - day);
         
@@ -209,7 +212,8 @@ public class StockHistoryOperator extends AbstractOperator {
             if (startCalendar.before(oldestHistoryCalendar)) {
                 break;
             }
-                
+            
+            final long startTimestamp = startCalendar.getTimeInMillis();                
             Stock stock = stockHistoryServer.getStock(startTimestamp);
             if (stock != null) {
                 stocks.add(stock);
