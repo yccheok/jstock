@@ -22,7 +22,6 @@ package org.yccheok.jstock.engine;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
@@ -219,7 +218,7 @@ public class YahooStockServer extends AbstractYahooStockServer {
                         0,
                         0.0,
                         0,
-                        Calendar.getInstance()
+                        System.currentTimeMillis()
                         );
                 stocks.add(stock);
             }

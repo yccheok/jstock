@@ -32,7 +32,6 @@ import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -205,17 +204,17 @@ public class Statements {
 
         final Statements s = new Statements(Statement.Type.StockHistory, guiBundleWrapper);
         
-        final int size = server.getNumOfCalendar();
+        final int size = server.size();
         
         final DateFormat dateFormat = org.yccheok.jstock.gui.Utils.getCommonDateFormat();
         
         Stock stock = null;
         for (int i = 0; i < size; i++) {
-            final Calendar calendar = server.getCalendar(i);
-            stock = server.getStock(calendar);
-            assert(calendar != null && stock != null);
+            final long timestamp = server.getTimestamp(i);
+            stock = server.getStock(timestamp);
+            assert(timestamp != 0 && stock != null);
             final List<Atom> atoms = new ArrayList<Atom>();
-            final Atom atom0 = new Atom(dateFormat.format(calendar.getTime()), guiBundleWrapper.getString("StockHistory_Date"));
+            final Atom atom0 = new Atom(dateFormat.format(timestamp), guiBundleWrapper.getString("StockHistory_Date"));
             final Atom atom1 = new Atom(Double.valueOf(stock.getOpenPrice()), guiBundleWrapper.getString("StockHistory_Open"));
             final Atom atom2 = new Atom(Double.valueOf(stock.getHighPrice()), guiBundleWrapper.getString("StockHistory_High"));
             final Atom atom3 = new Atom(Double.valueOf(stock.getLowPrice()), guiBundleWrapper.getString("StockHistory_Low"));

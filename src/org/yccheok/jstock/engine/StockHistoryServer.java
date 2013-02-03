@@ -27,9 +27,9 @@ package org.yccheok.jstock.engine;
  * @author yccheok
  */
 public interface StockHistoryServer {
-    public Stock getStock(java.util.Calendar calendar);
-    public java.util.Calendar getCalendar(int index);
-    public int getNumOfCalendar();
+    public Stock getStock(long timestamp);
+    public long getTimestamp(int index);
+    public int size();
     
     // Currently, we didn't see the need for sharesIssued and marketCapital to
     // become the member variables of Stock. In order to avoid memory hungry
