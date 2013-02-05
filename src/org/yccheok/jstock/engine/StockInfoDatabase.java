@@ -206,7 +206,7 @@ public class StockInfoDatabase {
                 return Collections.emptyList();
             }
             // Create a new list as StockInfoDatabase is a mutable class.
-            return new ArrayList(list);
+            return new ArrayList<StockInfo>(list);
         } finally {
             reader.unlock();
         }
@@ -227,7 +227,7 @@ public class StockInfoDatabase {
                 return Collections.emptyList();
             }
             // Create a new list as StockInfoDatabase is a mutable class.
-            return new ArrayList(list);
+            return new ArrayList<StockInfo>(list);
         } finally {
             reader.unlock();
         }
@@ -243,7 +243,7 @@ public class StockInfoDatabase {
         reader.lock();
         try {
             // Construct a new list as StockInfoDatabase is a mutable class.
-            return new ArrayList(stockInfos);
+            return new ArrayList<StockInfo>(stockInfos);
         } finally {
             reader.unlock();
         }
