@@ -135,21 +135,6 @@ public class Utils {
         calendar.set(Calendar.MILLISECOND, 0);        
     }
     
-    public static String subString(String source, String begin, String end) {
-        assert(begin.length() > 0 && end.length() > 0);
-        
-        int beginIndex = source.indexOf(begin);
-        if(beginIndex == -1) return "";
-        
-        beginIndex += begin.length();
-        
-        int endIndex = source.indexOf(end);
-        
-        if(beginIndex > endIndex) return "";
-        
-        return source.substring(beginIndex, endIndex);
-    } 
-    
     public static boolean isValidPortNumber(int portNumber) {
         return (portNumber >= 0) && (portNumber <= 65534);
     }
