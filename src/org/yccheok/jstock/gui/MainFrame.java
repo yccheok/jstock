@@ -3052,7 +3052,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     // Task to initialize both stockInfoDatabase and stockNameDatabase.
-    private class DatabaseTask extends SwingWorker<Boolean, Integer> implements org.yccheok.jstock.engine.Observer<StockServer, Integer>{
+    private class DatabaseTask extends SwingWorker<Boolean, Void> {
         private boolean readFromDisk = true;
 
         public DatabaseTask(boolean readFromDisk)
@@ -3080,11 +3080,9 @@ public class MainFrame extends javax.swing.JFrame {
             
             try {
                 success = get();
-            }
-            catch (InterruptedException exp) {
+            } catch (InterruptedException exp) {
                 log.error(null, exp);
-            }
-            catch (java.util.concurrent.ExecutionException exp) {
+            } catch (java.util.concurrent.ExecutionException exp) {
                 log.error(null, exp);
             } catch (CancellationException ex) {
                 // Not sure. Some developers suggest to catch this exception as
@@ -3242,27 +3240,6 @@ public class MainFrame extends javax.swing.JFrame {
             }
             
             return success;
-        }
-
-        @Override
-        public void update(StockServer subject, Integer arg) {
-            publish(arg);
-        }
-
-        @Override
-        protected void process(java.util.List<Integer> chunks) {
-            if (this.isCancelled() == false)
-            {
-                int max = 0;
-                for (Integer integer : chunks) {
-                    if (max < integer.intValue())
-                        max = integer.intValue();
-                }
-                final String template = GUIBundle.getString("MainFrame_StocksHasBeenDownloadedSoFar..._template");
-                final String message = MessageFormat.format(template, max);
-                setStatusBar(true, message);
-                statusBar.setImageIcon(getImageIcon("/images/16x16/network-connecting.png"), java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_Connecting..."));
-            }
         }
     }
 
