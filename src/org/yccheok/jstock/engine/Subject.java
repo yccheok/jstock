@@ -29,8 +29,9 @@ import java.util.concurrent.*;
 public class Subject<S, A> {
     
     public void attach(Observer<S, A> observer) {
-        if (observers.contains(observer) == false)
+        if (observers.contains(observer) == false) {
             observers.add(observer);
+        }
     }
 
     public void dettach(Observer<S, A> observer) {

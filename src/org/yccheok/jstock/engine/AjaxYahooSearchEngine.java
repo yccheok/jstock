@@ -53,7 +53,7 @@ public class AjaxYahooSearchEngine implements SearchEngine<AjaxYahooSearchEngine
         } catch (Exception ex) {
             log.error(null, ex);
         }
-        return java.util.Collections.EMPTY_LIST;
+        return java.util.Collections.emptyList();
     }
 
     /**
