@@ -47,7 +47,7 @@ public class GUIBundleWrapper {
     // So that we know which org.yccheok.jstock.data.gui language file we should
     // refer to.
     private final ResourceBundle guiBundleWrapper;
-    private volatile Map<String, String> map = null;
+    private static volatile Map<String, String> map = null;
     
     public static GUIBundleWrapper newInstance(Language language) {
         return new GUIBundleWrapper(language);
@@ -79,8 +79,8 @@ public class GUIBundleWrapper {
         return guiBundleWrapper.getString(key);
     }
     
-    private void initMap() {
-        if (this.map != null) {
+    private static void initMap() {
+        if (GUIBundleWrapper.map != null) {
             return;
         }
         
@@ -159,13 +159,13 @@ public class GUIBundleWrapper {
         _map.put("StockHistory_Close", "Close");
         _map.put("StockHistory_Volume", "Volume");
         
-        this.map = _map;
+        GUIBundleWrapper.map = _map;
     }
     
-    private String getLanguageIndependentString(String key) {
+    private static String getLanguageIndependentString(String key) {
         initMap();
-        assert(this.map.containsKey(key));
-        String s = this.map.get(key);
+        assert(GUIBundleWrapper.map.containsKey(key));
+        String s = GUIBundleWrapper.map.get(key);
         if (s == null) {
             throw new java.lang.IllegalArgumentException(key);
         }
