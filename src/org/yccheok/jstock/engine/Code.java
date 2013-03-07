@@ -46,11 +46,13 @@ public class Code {
     
     @Override
     public boolean equals(Object o) {
-        if (o == this)
+        if (o == this) {
             return true;
+        }
 
-        if (!(o instanceof Code))
+        if (!(o instanceof Code)) {
             return false;
+        }
         
         return this.code.equals(((Code)o).code);
     }

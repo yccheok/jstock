@@ -159,6 +159,18 @@ public class GUIBundleWrapper {
         _map.put("StockHistory_Close", "Close");
         _map.put("StockHistory_Volume", "Volume");
         
+        // We need not to have WatchlistInfo_... and PortfolioInfo_... string
+        // in language files. As users from different localization will not save 
+        // those information explicitly. System will only save those info as
+        // Language.INDEPENDENT.
+        _map.put("WatchlistInfo_Country", "Country");
+        _map.put("WatchlistInfo_Name", "Watchlist Name");
+        _map.put("WatchlistInfo_Size", "Size");
+
+        _map.put("PortfolioInfo_Country", "Country");
+        _map.put("PortfolioInfo_Name", "Portfolio Name");
+        _map.put("PortfolioInfo_Size", "Size");
+        
         GUIBundleWrapper.map = _map;
     }
     
