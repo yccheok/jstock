@@ -1610,6 +1610,22 @@ public class MainFrame extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
+        // Make migrateFrom106zTo107 before AppLock, as AppLock depends on
+        // correct data directory.
+        
+        /* This ugly code shall be removed in next few release. */
+        if (false == Utils.migrateFrom106zTo107()) {
+            final int choice = JOptionPane.showConfirmDialog(null,
+                "JStock unable to read previous 1.0.6z portfolio and settings, continue?\n\nPress \"Yes\" to continue, BUT all your data will lost.\n\nOr, Press \"No\", restart your machine and try again.",
+                "JStock unable to read previous 1.0.6z portfolio and settings",
+                JOptionPane.YES_NO_OPTION);
+            log.error("Migration from 1.0.6z to 1.0.7 fail.");
+
+            if (choice != JOptionPane.YES_OPTION) {
+                System.exit(0);
+            }
+        }
+        
         if (false == AppLock.lock()) {
             final int choice = JOptionPane.showOptionDialog(null, 
                     MessagesBundle.getString("warning_message_running_2_jstock"),
@@ -1623,20 +1639,7 @@ public class MainFrame extends javax.swing.JFrame {
                 System.exit(0);
                 return;
             }
-        }
-        
-        /* This ugly code shall be removed in next few release. */
-        if (false == Utils.migrateFrom105yTo106()) {
-            final int choice = JOptionPane.showConfirmDialog(null,
-                "JStock unable to read previous 1.0.5y portfolio and settings, continue?\n\nPress \"Yes\" to continue, BUT all your data will lost.\n\nOr, Press \"No\", restart your machine and try again.",
-                "JStock unable to read previous 1.0.5y portfolio and settings",
-                JOptionPane.YES_NO_OPTION);
-            log.error("Migration from 1.0.5y to 1.0.6 fail.");
-
-            if (choice != JOptionPane.YES_OPTION) {
-                System.exit(0);
-            }
-        }
+        }        
 
         // As ProxyDetector is affected by system properties
         // http.proxyHost, we are forced to initialized ProxyDetector right here,
