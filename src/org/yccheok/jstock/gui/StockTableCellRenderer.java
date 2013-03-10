@@ -150,8 +150,6 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
         final int modelRow = table.convertRowIndexToModel(row);
         final double prevPrice = (Double)tableModel.getValueAt(modelRow, tableModel.findColumn(PREV));
         final double lastPrice = (Double)tableModel.getValueAt(modelRow, tableModel.findColumn(LAST));
-        Double riseAbove = null;
-        Double fallBelow = null;
         Alert alert = Alert.NoAlert;
 
         // Using lastPrice = 0 to compare against fall below and rise above
@@ -161,8 +159,8 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
         if (lastPrice > 0.0 && jStockOptions.isEnableColorAlert()) {
             final int riseAboveIndex = tableModel.findColumn(RISE_ABOVE);
             final int fallBelowIndex = tableModel.findColumn(FALL_BELOW);
-            riseAbove = riseAboveIndex >= 0 ? (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), riseAboveIndex) : null;
-            fallBelow = fallBelowIndex >= 0 ? (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), fallBelowIndex) : null;
+            final Double riseAbove = riseAboveIndex >= 0 ? (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), riseAboveIndex) : null;
+            final Double fallBelow = fallBelowIndex >= 0 ? (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), fallBelowIndex) : null;
 
             if (riseAbove != null) {
                 if (lastPrice >= riseAbove) {
@@ -333,6 +331,10 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             return c;
         }     
         else if (table.getColumnName(column).equalsIgnoreCase(RISE_ABOVE)) {
+            final int modelCol = tableModel.findColumn(RISE_ABOVE);
+            
+            final Double riseAbove = (Double)tableModel.getValueAt(modelRow, modelCol);
+            
             if (riseAbove != null) {            
                 if (c instanceof JLabel) {
                     JLabel jLabel = (JLabel)c;
@@ -344,6 +346,10 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             // No return.
         }
         else if (table.getColumnName(column).equalsIgnoreCase(FALL_BELOW)) {
+            final int modelCol = tableModel.findColumn(FALL_BELOW);
+            
+            final Double fallBelow = (Double)tableModel.getValueAt(modelRow, modelCol);
+            
             if (fallBelow != null) {            
                 if (c instanceof JLabel) {
                     JLabel jLabel = (JLabel)c;
@@ -393,8 +399,6 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
         final int modelRow = table.convertRowIndexToModel(row);
         final double prevPrice = (Double)tableModel.getValueAt(modelRow, tableModel.findColumn(PREV));
         final double lastPrice = (Double)tableModel.getValueAt(modelRow, tableModel.findColumn(LAST));
-        Double riseAbove = null;
-        Double fallBelow = null;
         Alert alert = Alert.NoAlert;
 
         // Using lastPrice = 0 to compare against fall below and rise above
@@ -405,8 +409,8 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             final int riseAboveIndex = tableModel.findColumn(RISE_ABOVE);
             final int fallBelowIndex = tableModel.findColumn(FALL_BELOW);
 
-            riseAbove = riseAboveIndex >= 0 ? (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), riseAboveIndex) : null;
-            fallBelow = fallBelowIndex >= 0 ? (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), fallBelowIndex) : null;
+            final Double riseAbove = riseAboveIndex >= 0 ? (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), riseAboveIndex) : null;
+            final Double fallBelow = fallBelowIndex >= 0 ? (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), fallBelowIndex) : null;
 
             if (riseAbove != null) {
                 if (lastPrice >= riseAbove) {
@@ -530,9 +534,13 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             }             
         }
         else if (table.getColumnName(column).equalsIgnoreCase(RISE_ABOVE)) {
+            final int modelCol = tableModel.findColumn(RISE_ABOVE);
+            
+            final Double riseAbove = (Double)tableModel.getValueAt(modelRow, modelCol);
+            
             if (!isSelected) {
                 c.setForeground(getNormalTextForegroundColor(alert));
-            }
+            }            
             
             if (riseAbove != null) {
                 if (c instanceof JLabel) {
@@ -542,6 +550,10 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             }
         }
         else if (table.getColumnName(column).equalsIgnoreCase(FALL_BELOW)) {
+            final int modelCol = tableModel.findColumn(FALL_BELOW);
+            
+            final Double fallBelow = (Double)tableModel.getValueAt(modelRow, modelCol);
+            
             if (!isSelected) {
                 c.setForeground(getNormalTextForegroundColor(alert));
             }
