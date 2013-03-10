@@ -465,9 +465,9 @@ public class MainFrame extends javax.swing.JFrame {
         jTable1.setFont(jTable1.getFont().deriveFont(jTable1.getFont().getStyle() | java.awt.Font.BOLD, jTable1.getFont().getSize()+1));
         jTable1.setModel(new StockTableModel());
         jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
-        this.jTable1.setDefaultRenderer(Number.class, new StockTableCellRenderer());
-        this.jTable1.setDefaultRenderer(Double.class, new StockTableCellRenderer());
-        this.jTable1.setDefaultRenderer(Object.class, new StockTableCellRenderer());
+        this.jTable1.setDefaultRenderer(Number.class, new StockTableCellRenderer(SwingConstants.RIGHT));
+        this.jTable1.setDefaultRenderer(Double.class, new StockTableCellRenderer(SwingConstants.RIGHT));
+        this.jTable1.setDefaultRenderer(Object.class, new StockTableCellRenderer(SwingConstants.LEFT));
 
         this.jTable1.setDefaultEditor(Double.class, new NonNegativeDoubleEditor());
 

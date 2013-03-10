@@ -112,9 +112,9 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         jTable1.setFont(jTable1.getFont().deriveFont(jTable1.getFont().getStyle() | java.awt.Font.BOLD, jTable1.getFont().getSize()+1));
         jTable1.setModel(new IndicatorTableModel());
         jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
-        this.jTable1.setDefaultRenderer(Number.class, new StockTableCellRenderer());
-        this.jTable1.setDefaultRenderer(Double.class, new StockTableCellRenderer());
-        this.jTable1.setDefaultRenderer(Object.class, new StockTableCellRenderer());
+        this.jTable1.setDefaultRenderer(Number.class, new StockTableCellRenderer(SwingConstants.RIGHT));
+        this.jTable1.setDefaultRenderer(Double.class, new StockTableCellRenderer(SwingConstants.RIGHT));
+        this.jTable1.setDefaultRenderer(Object.class, new StockTableCellRenderer(SwingConstants.LEFT));
 
         this.jTable1.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(2));
         this.jTable1.addMouseListener(new TableRowPopupListener());

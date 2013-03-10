@@ -101,7 +101,7 @@
                 <Property name="autoResizeMode" type="int" value="0"/>
               </Properties>
               <AuxValues>
-                <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="this.jTable1.setDefaultRenderer(Number.class, new StockTableCellRenderer());&#xa;this.jTable1.setDefaultRenderer(Double.class, new StockTableCellRenderer());&#xa;this.jTable1.setDefaultRenderer(Object.class, new StockTableCellRenderer());&#xa;        &#xa;this.jTable1.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(2));&#xa;this.jTable1.addMouseListener(new TableRowPopupListener());&#xa;this.jTable1.addKeyListener(new TableKeyEventListener());"/>
+                <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="this.jTable1.setDefaultRenderer(Number.class, new StockTableCellRenderer(SwingConstants.RIGHT));&#xa;this.jTable1.setDefaultRenderer(Double.class, new StockTableCellRenderer(SwingConstants.RIGHT));&#xa;this.jTable1.setDefaultRenderer(Object.class, new StockTableCellRenderer(SwingConstants.LEFT));&#xa;        &#xa;this.jTable1.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(2));&#xa;this.jTable1.addMouseListener(new TableRowPopupListener());&#xa;this.jTable1.addKeyListener(new TableKeyEventListener());"/>
               </AuxValues>
             </Component>
           </SubComponents>
