@@ -141,13 +141,14 @@ public class BuyPortfolioTreeTableModel extends DeprecatedAbstractPortfolioTreeT
         // moment, as this method will only be consumed by RealTimeStockMonitor,
         // and it is fail safe.
         for (int i = 0; i < count; i++) {
-            transactionSummary = (TransactionSummary)portfolio.getChildAt(i);
+            TransactionSummary ts = (TransactionSummary)portfolio.getChildAt(i);
             
-            assert(transactionSummary.getChildCount() > 0);
+            assert(ts.getChildCount() > 0);
             
-            final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
+            final Transaction transaction = (Transaction)ts.getChildAt(0);
             
             if (true == transaction.getStock().getCode().equals(code)) {
+                transactionSummary = ts;
                 break;
             }
         }

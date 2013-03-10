@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -2179,7 +2180,28 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private static boolean saveCSVStockPrices(String directory, BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModelEx) {
         assert(directory.endsWith(File.separator));
         
-        Statements statements = Statements.newInstanceFromStockPrices(buyPortfolioTreeTableModelEx.getStockPrices());
+        // Ensure our stock prices data structure doesn't contain too less or
+        // too much information. stockPrices might still contain redundant
+        // information, as we do not update stockPrices immediately during
+        // transaction summary deletion.
+        Map<Code, Double> stockPrices = buyPortfolioTreeTableModelEx.getStockPrices();
+        Map<Code, Double> goodStockPrices = new HashMap<Code, Double>();
+        final Portfolio portfolio = (Portfolio)buyPortfolioTreeTableModelEx.getRoot();
+        final int count = portfolio.getChildCount();
+        for (int i = 0; i < count; i++) {
+            TransactionSummary transactionSummary = (TransactionSummary)portfolio.getChildAt(i);
+            assert(transactionSummary.getChildCount() > 0);            
+            final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
+            final Code code = transaction.getStock().getCode();
+            final Double price = stockPrices.get(code);
+            if (price == null) {
+                goodStockPrices.put(code, 0.0);
+            } else {
+                goodStockPrices.put(code, price);
+            }
+        }
+        
+        Statements statements = Statements.newInstanceFromStockPrices(goodStockPrices);
         
         final File stockPricesFile = new File(directory + "stockprices.csv");
         
