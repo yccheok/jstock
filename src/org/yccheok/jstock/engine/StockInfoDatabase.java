@@ -291,7 +291,8 @@ public class StockInfoDatabase {
         // hit.
         final List<StockInfo> iStockInfos = this.industryToStockInfos.get(industry);
         final List<StockInfo> bStockInfos = this.boardToStockInfos.get(board);
-
+        final List<StockInfo> sStockInfos = this.symbolToStockInfos.get(stockInfo.symbol);
+                
         if (iStockInfos == null || false == iStockInfos.contains(stockInfo)) {
             return false;
         }
@@ -300,6 +301,10 @@ public class StockInfoDatabase {
             return false;
         }
 
+        if (sStockInfos == null || false == sStockInfos.contains(stockInfo)) {
+            return false;
+        }
+        
         if ((!(this.symbolSearchEngine instanceof TSTSearchEngine)) || (!(this.codeSearchEngine instanceof TSTSearchEngine)))
         {
             return false;
@@ -333,6 +338,13 @@ public class StockInfoDatabase {
             this.boardToStockInfos.remove(board);
         }
 
+        sStockInfos.remove(stockInfo);
+        if (sStockInfos.isEmpty()) {
+            this.symbolToStockInfos.remove(stockInfo.symbol);
+        }
+        
+        this.codeToStockInfos.remove(stockInfo.code);
+                
         return true;
     }
 
