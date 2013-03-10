@@ -60,9 +60,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
@@ -2608,6 +2610,29 @@ public class Utils {
         return username;
     }
     
+    /**
+     * Returns number of lines in a file.
+     * 
+     * @param file The file
+     * @return number of lines in a file
+     */
+    public static int numOfLines(File file) {
+        int line = 0;
+        
+        LineNumberReader lnr = null;
+        try {
+            lnr = new LineNumberReader(new FileReader(file));
+            lnr.skip(Long.MAX_VALUE);
+            line = lnr.getLineNumber();
+        } catch (IOException ex) {
+            log.error(null, ex);
+        } finally {
+            close(lnr);
+        }
+        
+        return line;
+    }
+
     /**
      * Performs download and save the download as temporary file.
      * 

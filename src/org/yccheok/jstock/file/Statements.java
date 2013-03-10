@@ -65,8 +65,10 @@ import org.yccheok.jstock.gui.portfolio.CommentableContainer;
 import org.yccheok.jstock.gui.treetable.BuyPortfolioTreeTableModelEx;
 import org.yccheok.jstock.gui.treetable.SellPortfolioTreeTableModelEx;
 import org.yccheok.jstock.portfolio.Portfolio;
+import org.yccheok.jstock.portfolio.PortfolioInfo;
 import org.yccheok.jstock.portfolio.Transaction;
 import org.yccheok.jstock.portfolio.TransactionSummary;
+import org.yccheok.jstock.watchlist.WatchlistInfo;
 
 /**
  *
@@ -537,6 +539,52 @@ public class Statements {
         }
         return s;
     }
+
+    public static Statements newInstanceFromWatchlistInfos(List<WatchlistInfo> wathclistInfos) {
+        GUIBundleWrapper guiBundleWrapper = GUIBundleWrapper.newInstance(GUIBundleWrapper.Language.INDEPENDENT);
+        Statements s = new Statements(Statement.Type.WatchlistInfos, guiBundleWrapper);
+        
+        final String country_string = guiBundleWrapper.getString("WatchlistInfo_Country");
+        final String name_string = guiBundleWrapper.getString("WatchlistInfo_Name");
+        final String size_string = guiBundleWrapper.getString("WatchlistInfo_Size");        
+        
+        for (WatchlistInfo watchlistInfo : wathclistInfos) {
+            final List<Atom> atoms = new ArrayList<Atom>();
+            atoms.add(new Atom(watchlistInfo.country, country_string));
+            atoms.add(new Atom(watchlistInfo.name, name_string));
+            atoms.add(new Atom(watchlistInfo.size, size_string)); 
+            Statement statement = new Statement(atoms);
+            // They should be the same type. The checking just act as paranoid.
+            if (s.getType() != statement.getType()) {
+                throw new java.lang.RuntimeException("" + statement.getType());
+            }
+            s.statements.add(statement);            
+        }
+        return s;
+    }
+    
+    public static Statements newInstanceFromPortfolioInfos(List<PortfolioInfo> portfolioInfos) {
+        GUIBundleWrapper guiBundleWrapper = GUIBundleWrapper.newInstance(GUIBundleWrapper.Language.INDEPENDENT);
+        Statements s = new Statements(Statement.Type.PortfolioInfos, guiBundleWrapper);
+        
+        final String country_string = guiBundleWrapper.getString("PortfolioInfo_Country");
+        final String name_string = guiBundleWrapper.getString("PortfolioInfo_Name");
+        final String size_string = guiBundleWrapper.getString("PortfolioInfo_Size");        
+        
+        for (PortfolioInfo portfolioInfo : portfolioInfos) {
+            final List<Atom> atoms = new ArrayList<Atom>();
+            atoms.add(new Atom(portfolioInfo.country, country_string));
+            atoms.add(new Atom(portfolioInfo.name, name_string));
+            atoms.add(new Atom(portfolioInfo.size, size_string)); 
+            Statement statement = new Statement(atoms);
+            // They should be the same type. The checking just act as paranoid.
+            if (s.getType() != statement.getType()) {
+                throw new java.lang.RuntimeException("" + statement.getType());
+            }
+            s.statements.add(statement);            
+        }
+        return s;
+    }
     
     /**
      * Construct Statements based on given stock info database.
@@ -600,7 +648,7 @@ public class Statements {
             if (s.getType() != statement.getType()) {
                 throw new java.lang.RuntimeException("" + statement.getType());
             }
-            s.statements.add(statement);            
+            s.statements.add(statement);
         }
         return s;
     }

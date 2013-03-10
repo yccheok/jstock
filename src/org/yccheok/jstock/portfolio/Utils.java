@@ -373,6 +373,31 @@ public class Utils {
         return directories;
     }    
     
+    public static List<PortfolioInfo> getPortfolioInfos() {
+        List<PortfolioInfo> portfolioInfos = new ArrayList<PortfolioInfo>();
+        for (Country country : Country.values()) {
+            final File file = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "portfolios" + File.separator);
+            File[] children = file.listFiles();
+            if (children == null) {
+                // Either dir does not exist or is not a directory
+                continue;
+            } else {
+                // Only seek for 1st level directory.
+                for (File child : children) {
+                    File stockPricesFile = new File(child, "stockprices.csv");
+                    int lines = org.yccheok.jstock.gui.Utils.numOfLines(stockPricesFile);
+                    // Skip CSV header.
+                    lines = lines - 1;
+                    if (lines > 0) {
+                        PortfolioInfo portfolioInfo = PortfolioInfo.newInstance(country, child.getName(), lines);
+                        portfolioInfos.add(portfolioInfo);
+                    }
+                }                
+            }
+        }
+        return portfolioInfos;
+    }
+    
     /**
      * Returns all available portfolio names for current selected country.
      *

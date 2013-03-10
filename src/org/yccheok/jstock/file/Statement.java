@@ -42,7 +42,9 @@ public class Statement {
         StockPrice,
         StockInfoDatabase,
         UserDefinedDatabase,
-        StockNameDatabase,
+        StockNameDatabase,        
+        WatchlistInfos,
+        PortfolioInfos,
         Unknown
     }
 
@@ -268,6 +270,14 @@ public class Statement {
         } else if (type == Type.StockNameDatabase) {
             strings.add(guiBundleWrapper.getString("MainFrame_Code")); 
             strings.add(guiBundleWrapper.getString("MainFrame_Name"));            
+        } else if (type == Type.WatchlistInfos) {
+            strings.add(guiBundleWrapper.getString("WatchlistInfo_Country")); 
+            strings.add(guiBundleWrapper.getString("WatchlistInfo_Name"));            
+            strings.add(guiBundleWrapper.getString("WatchlistInfo_Size"));             
+        } else if (type == Type.PortfolioInfos) {
+            strings.add(guiBundleWrapper.getString("PortfolioInfo_Country")); 
+            strings.add(guiBundleWrapper.getString("PortfolioInfo_Name"));            
+            strings.add(guiBundleWrapper.getString("PortfolioInfo_Size")); 
         } else {
             assert(false);
         }
@@ -537,7 +547,25 @@ public class Statement {
             ) {
                 return Type.StockNameDatabase;
             }            
-        }        
+        }    
+        if (size == 3) {
+            if (
+            atoms.get(0).getType().equals(guiBundleWrapper.getString("WatchlistInfo_Country")) &&
+            atoms.get(1).getType().equals(guiBundleWrapper.getString("WatchlistInfo_Name")) &&
+            atoms.get(2).getType().equals(guiBundleWrapper.getString("WatchlistInfo_Size"))  
+            ) {
+                return Type.WatchlistInfos;
+            }            
+        }
+        if (size == 3) {
+            if (
+            atoms.get(0).getType().equals(guiBundleWrapper.getString("PortfolioInfo_Country")) &&
+            atoms.get(1).getType().equals(guiBundleWrapper.getString("PortfolioInfo_Name")) &&
+            atoms.get(2).getType().equals(guiBundleWrapper.getString("PortfolioInfo_Size"))
+            ) {
+                return Type.PortfolioInfos;
+            }            
+        }
         return Type.Unknown;
     }
 

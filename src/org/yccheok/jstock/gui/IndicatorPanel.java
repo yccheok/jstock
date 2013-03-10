@@ -1624,7 +1624,25 @@ public class IndicatorPanel extends JPanel {
         }
         else {
             this.alertIndicatorProjectManager = new IndicatorProjectManager(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "indicator", OperatorIndicator.Type.AlertIndicator);
-        }                        
+        }         
+        
+        // Cleanup unused files.
+        Set<String> validFileNames = new HashSet<String>();
+        for (int i = 0, size = this.alertIndicatorProjectManager.getNumOfProject(); i < size; i++) {
+            String PROJECTNAME = this.alertIndicatorProjectManager.getProject(i).toUpperCase();
+            validFileNames.add(PROJECTNAME + ".XML");
+            validFileNames.add(PROJECTNAME + "-JHOTDRAW.XML");
+        }
+        validFileNames.add("PROJECT.XML");
+        
+        File[] files = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "indicator" + File.separator).listFiles();
+        for (File file : files) {
+            if (validFileNames.contains(file.getName().toUpperCase())) {
+                continue;
+            }
+            file.delete();
+        }
+        
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {

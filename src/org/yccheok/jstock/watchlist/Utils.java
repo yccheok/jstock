@@ -293,4 +293,29 @@ public class Utils {
 
         return MainFrame.saveCSVWatchlist(directory, csvWatchlist);
     }
+    
+    public static List<WatchlistInfo> getWatchlistInfos() {
+        List<WatchlistInfo> watchlistInfos = new ArrayList<WatchlistInfo>();
+        for (Country country : Country.values()) {
+            final File file = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "watchlist" + File.separator);
+            File[] children = file.listFiles();
+            if (children == null) {
+                // Either dir does not exist or is not a directory
+                continue;
+            } else {
+                // Only seek for 1st level directory.
+                for (File child : children) {
+                    File realTimeStockFile = new File(child, "realtimestock.csv");
+                    int lines = org.yccheok.jstock.gui.Utils.numOfLines(realTimeStockFile);
+                    // Skip CSV header.
+                    lines = lines - 1;
+                    if (lines > 0) {
+                        WatchlistInfo watchlistInfo = WatchlistInfo.newInstance(country, child.getName(), lines);
+                        watchlistInfos.add(watchlistInfo);
+                    }
+                }                
+            }
+        }
+        return watchlistInfos;
+    }    
 }

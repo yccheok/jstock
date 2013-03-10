@@ -61,6 +61,8 @@ import org.yccheok.jstock.gui.watchlist.WatchlistJDialog;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.internationalization.MessagesBundle;
 import org.yccheok.jstock.network.ProxyDetector;
+import org.yccheok.jstock.portfolio.PortfolioInfo;
+import org.yccheok.jstock.watchlist.WatchlistInfo;
 
 /**
  *
@@ -2150,8 +2152,27 @@ public class MainFrame extends javax.swing.JFrame {
         this.indicatorPanel.saveAlertIndicatorProjectManager();
         this.indicatorPanel.saveModuleIndicatorProjectManager();
         this.portfolioManagementJPanel.savePortfolio();
+        
+        saveWatchlistAndPortfolioInfos();
     }
 
+    // Only call this function after you had saved all the watchlists and
+    // portfolios.
+    private boolean saveWatchlistAndPortfolioInfos() {
+        if (Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "android") == false)
+        {
+            return false;
+        }
+
+        java.util.List<WatchlistInfo> watchlistInfos = org.yccheok.jstock.watchlist.Utils.getWatchlistInfos();
+        java.util.List<PortfolioInfo> portfolioInfos = org.yccheok.jstock.portfolio.Utils.getPortfolioInfos();
+        File watchlistInfosFile = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "android" + File.separator + "watchlistinfos.csv");
+        File portfolioInfosFile = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "android" + File.separator + "portfolioinfos.csv");
+        boolean result0 = Statements.newInstanceFromWatchlistInfos(watchlistInfos).saveAsCSVFile(watchlistInfosFile);
+        boolean result1 = Statements.newInstanceFromPortfolioInfos(portfolioInfos).saveAsCSVFile(portfolioInfosFile);
+        return result0 && result1;
+    }
+    
     /* Reload after downloading from cloud. Take note that we must reload
      * JStockOptions before and outside this method, due to insensitive data
      * requirement.

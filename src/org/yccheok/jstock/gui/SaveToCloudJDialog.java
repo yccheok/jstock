@@ -619,6 +619,8 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
             extensions.add(".csv");
         } else if (name.equals("watchlist")) {
             extensions.add(".csv");
+        } else if (name.equals("android")) {
+            extensions.add(".csv");
         } else {
             assert(false);
             throw new java.lang.IllegalArgumentException(name);
@@ -760,6 +762,8 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
         getFileEx(fileExs, "config", getExtensions("config"));
         getFileEx(fileExs, "indicator", getExtensions("indicator"));
         getFileEx(fileExs, "logos", getExtensions("logos"));
+        getFileEx(fileExs, "android", getExtensions("android"));
+        
         for (Country country : Country.values()) {
             getFileEx(fileExs, country + File.separator + "portfolios", getExtensions("portfolios"));
             // For legacy usage. Shall be removed after a few more release
