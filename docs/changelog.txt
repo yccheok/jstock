@@ -4,6 +4,9 @@ Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 ????????????? - ??????????
   Feature: Added currency exchange on investment flow chart.
   Feature: Request focus on combo box for Stock Watchlist.
+  Feature: Prepare watchlist and portfolio info for future Android usage.
+  Bugfix:  Cleanup unused XML indicator files.
+  Bugfix:  Bug fix on stockprices.csv.
   
 JStock 1.0.6z - 2012-01-02
   Bugfix:  Fix new year handling for Malaysia stock market.
