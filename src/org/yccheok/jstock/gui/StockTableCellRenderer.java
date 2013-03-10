@@ -20,10 +20,11 @@
 package org.yccheok.jstock.gui;
 
 import java.awt.*;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Date;
 import java.util.TimerTask;
 import javax.swing.*;
-import javax.swing.table.TableModel;
 import org.yccheok.jstock.internationalization.GUIBundle;
 
 
@@ -33,6 +34,14 @@ import org.yccheok.jstock.internationalization.GUIBundle;
  */
 public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRenderer {
 
+    // Use ThreadLocal to ensure thread safety.
+    private static final ThreadLocal <NumberFormat> stockPriceNumberFormat = new ThreadLocal <NumberFormat>() {
+        @Override protected NumberFormat initialValue() {
+            return new DecimalFormat("0.00##");
+        }
+    };
+    
+    
     private enum Alert {
         FallBelow,
         RiseAbove,
@@ -40,8 +49,9 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
     }
     
     /** Creates a new instance of StockTableCellRender */
-    public StockTableCellRenderer() {
+    public StockTableCellRenderer(int horizontalAlignment) {
         super();
+        this.setHorizontalAlignment(horizontalAlignment);
     }
     
     private void performCellBlinking(final Component cell, final double value, final double oldValue, final Color finalForegroundColor, final Color finalBackgroundColor, final AbstractTableModelWithMemory tableModel, final int modelRow, final int modelCol) {
@@ -131,6 +141,8 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
                             Component c, JTable table, Object color,
                             boolean isSelected, boolean hasFocus,
                             int row, int column) {        
+        assert(isSelected == false);
+        
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
         
         AbstractTableModelWithMemory tableModel = (AbstractTableModelWithMemory)table.getModel();
@@ -138,7 +150,8 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
         final int modelRow = table.convertRowIndexToModel(row);
         final double prevPrice = (Double)tableModel.getValueAt(modelRow, tableModel.findColumn(PREV));
         final double lastPrice = (Double)tableModel.getValueAt(modelRow, tableModel.findColumn(LAST));
-
+        Double riseAbove = null;
+        Double fallBelow = null;
         Alert alert = Alert.NoAlert;
 
         // Using lastPrice = 0 to compare against fall below and rise above
@@ -148,8 +161,8 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
         if (lastPrice > 0.0 && jStockOptions.isEnableColorAlert()) {
             final int riseAboveIndex = tableModel.findColumn(RISE_ABOVE);
             final int fallBelowIndex = tableModel.findColumn(FALL_BELOW);
-            final Double riseAbove = riseAboveIndex >= 0 ? (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), riseAboveIndex) : null;
-            final Double fallBelow = fallBelowIndex >= 0 ? (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), fallBelowIndex) : null;
+            riseAbove = riseAboveIndex >= 0 ? (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), riseAboveIndex) : null;
+            fallBelow = fallBelowIndex >= 0 ? (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), fallBelowIndex) : null;
 
             if (riseAbove != null) {
                 if (lastPrice >= riseAbove) {
@@ -169,6 +182,11 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             
             final double buyPrice = (Double)tableModel.getValueAt(modelRow, modelCol);
 
+            if (c instanceof JLabel) {
+                JLabel jLabel = (JLabel)c;
+                jLabel.setText(stockPriceNumberFormat.get().format(buyPrice));
+            }
+            
             final Object o = tableModel.getOldValueAt(modelRow, modelCol);
             final double oldBuyPrice = ((o == null) ? buyPrice : (Double)o);
             tableModel.clearOldValueAt(modelRow, modelCol);
@@ -180,6 +198,11 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             
             final double sellPrice = (Double)tableModel.getValueAt(modelRow, modelCol);
 
+            if (c instanceof JLabel) {
+                JLabel jLabel = (JLabel)c;
+                jLabel.setText(stockPriceNumberFormat.get().format(sellPrice));
+            }
+            
             final Object o = tableModel.getOldValueAt(modelRow, modelCol);
             final double oldSellPrice = ((o == null) ? sellPrice : (Double)o);
             tableModel.clearOldValueAt(modelRow, modelCol);
@@ -189,6 +212,11 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
         else if (table.getColumnName(column).equalsIgnoreCase(LAST)) {
             final int modelCol = tableModel.findColumn(LAST);            
 
+            if (c instanceof JLabel) {
+                JLabel jLabel = (JLabel)c;
+                jLabel.setText(stockPriceNumberFormat.get().format(lastPrice));
+            }
+            
             final Object o = tableModel.getOldValueAt(modelRow, modelCol);
             final double oldLastPrice = ((o == null) ? lastPrice : (Double)o);
             tableModel.clearOldValueAt(modelRow, modelCol);
@@ -200,6 +228,11 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             
             final double lowPrice = (Double)tableModel.getValueAt(modelRow, modelCol);
 
+            if (c instanceof JLabel) {
+                JLabel jLabel = (JLabel)c;
+                jLabel.setText(stockPriceNumberFormat.get().format(lowPrice));
+            }
+            
             final Object o = tableModel.getOldValueAt(modelRow, modelCol);
             final double oldLowPrice = ((o == null) ? lowPrice : (Double)o);
             tableModel.clearOldValueAt(modelRow, modelCol);
@@ -211,6 +244,11 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             
             final double highPrice = (Double)tableModel.getValueAt(modelRow, modelCol);
 
+            if (c instanceof JLabel) {
+                JLabel jLabel = (JLabel)c;
+                jLabel.setText(stockPriceNumberFormat.get().format(highPrice));
+            }
+            
             final Object o = tableModel.getOldValueAt(modelRow, modelCol);
             final double oldHighPrice = ((o == null) ? highPrice : (Double)o);
             tableModel.clearOldValueAt(modelRow, modelCol);
@@ -222,6 +260,11 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             
             final double changePrice = (Double)tableModel.getValueAt(modelRow, modelCol);
 
+            if (c instanceof JLabel) {
+                JLabel jLabel = (JLabel)c;
+                jLabel.setText(stockPriceNumberFormat.get().format(changePrice));
+            }
+            
             final Object o = tableModel.getOldValueAt(modelRow, modelCol);
             final double oldChangePrice = ((o == null) ? changePrice : (Double)o);
             tableModel.clearOldValueAt(modelRow, modelCol);
@@ -233,6 +276,11 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             
             final double changePricePercentage = (Double)tableModel.getValueAt(modelRow, modelCol);
 
+            if (c instanceof JLabel) {
+                JLabel jLabel = (JLabel)c;
+                jLabel.setText(stockPriceNumberFormat.get().format(changePricePercentage));
+            }
+            
             final Object o = tableModel.getOldValueAt(modelRow, modelCol);
             final double oldChangePricePercentage = ((o == null) ? changePricePercentage : (Double)o);
             tableModel.clearOldValueAt(modelRow, modelCol);
@@ -283,7 +331,38 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             tableModel.clearOldValueAt(modelRow, modelCol);
             this.performCellBlinking(c, sellQuantity, oldSellQuantity, getNormalTextForegroundColor(alert), getBackgroundColor(row, alert), tableModel, modelRow, modelCol);
             return c;
-        }      
+        }     
+        else if (table.getColumnName(column).equalsIgnoreCase(RISE_ABOVE)) {
+            if (riseAbove != null) {            
+                if (c instanceof JLabel) {
+                    JLabel jLabel = (JLabel)c;
+                    jLabel.setText(stockPriceNumberFormat.get().format(riseAbove));
+                }
+            }
+
+            c.setForeground(getNormalTextForegroundColor(alert));
+            // No return.
+        }
+        else if (table.getColumnName(column).equalsIgnoreCase(FALL_BELOW)) {
+            if (fallBelow != null) {            
+                if (c instanceof JLabel) {
+                    JLabel jLabel = (JLabel)c;
+                    jLabel.setText(stockPriceNumberFormat.get().format(fallBelow));
+                }
+            }
+
+            c.setForeground(getNormalTextForegroundColor(alert));
+            // No return.
+        }        
+        else if (table.getColumnName(column).equalsIgnoreCase(PREV)) {
+            if (c instanceof JLabel) {
+                JLabel jLabel = (JLabel)c;
+                jLabel.setText(stockPriceNumberFormat.get().format(prevPrice));
+            }
+
+            c.setForeground(getNormalTextForegroundColor(alert));
+            // No return.
+        }
         else if (table.getColumnName(column).equalsIgnoreCase(INDICATOR)) {
             c.setForeground(Color.BLUE);
         }
@@ -303,11 +382,9 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
                             int row, int column) {
         Component c = super.getTableCellRendererComponent(table, color, isSelected, hasFocus, row, column);
 
-        if (isSelected) return c;
-
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
         
-        if (jStockOptions.isEnableColorChange()) {
+        if (!isSelected && jStockOptions.isEnableColorChange()) {
             return getTableCellRendererComponentWithCellBlinking(c, table, color, isSelected, hasFocus, row, column);
         }
         
@@ -316,7 +393,8 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
         final int modelRow = table.convertRowIndexToModel(row);
         final double prevPrice = (Double)tableModel.getValueAt(modelRow, tableModel.findColumn(PREV));
         final double lastPrice = (Double)tableModel.getValueAt(modelRow, tableModel.findColumn(LAST));
-
+        Double riseAbove = null;
+        Double fallBelow = null;
         Alert alert = Alert.NoAlert;
 
         // Using lastPrice = 0 to compare against fall below and rise above
@@ -327,8 +405,8 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             final int riseAboveIndex = tableModel.findColumn(RISE_ABOVE);
             final int fallBelowIndex = tableModel.findColumn(FALL_BELOW);
 
-            final Double riseAbove = riseAboveIndex >= 0 ? (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), riseAboveIndex) : null;
-            final Double fallBelow = fallBelowIndex >= 0 ? (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), fallBelowIndex) : null;
+            riseAbove = riseAboveIndex >= 0 ? (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), riseAboveIndex) : null;
+            fallBelow = fallBelowIndex >= 0 ? (Double)tableModel.getValueAt(table.convertRowIndexToModel(row), fallBelowIndex) : null;
 
             if (riseAbove != null) {
                 if (lastPrice >= riseAbove) {
@@ -347,62 +425,158 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             final int modelCol = tableModel.findColumn(BUY);
             
             final double buyPrice = (Double)tableModel.getValueAt(modelRow, modelCol);
-
-            c.setForeground(this.getForegroundColor(buyPrice, prevPrice, alert));
+            
+            if (!isSelected) {
+                c.setForeground(this.getForegroundColor(buyPrice, prevPrice, alert));
+            }
+            
+            if (c instanceof JLabel) {
+                JLabel jLabel = (JLabel)c;
+                jLabel.setText(stockPriceNumberFormat.get().format(buyPrice));
+            }
         }                         
         else if (table.getColumnName(column).equalsIgnoreCase(SELL)) {
             final int modelCol = tableModel.findColumn(SELL);
             
             final double sellPrice = (Double)tableModel.getValueAt(modelRow, modelCol);
 
-            c.setForeground(this.getForegroundColor(sellPrice, prevPrice, alert));
+            if (!isSelected) {
+                c.setForeground(this.getForegroundColor(sellPrice, prevPrice, alert));
+            }
+            
+            if (c instanceof JLabel) {
+                JLabel jLabel = (JLabel)c;
+                jLabel.setText(stockPriceNumberFormat.get().format(sellPrice));
+            }            
         }
         else if (table.getColumnName(column).equalsIgnoreCase(OPEN)) {
             final int modelCol = tableModel.findColumn(OPEN);
 
             final double openPrice = (Double)tableModel.getValueAt(modelRow, modelCol);
 
-            c.setForeground(this.getForegroundColor(openPrice, prevPrice, alert));
+            if (!isSelected) {
+                c.setForeground(this.getForegroundColor(openPrice, prevPrice, alert));
+            }
+            
+            if (c instanceof JLabel) {
+                JLabel jLabel = (JLabel)c;
+                jLabel.setText(stockPriceNumberFormat.get().format(openPrice));
+            }            
         }
         else if (table.getColumnName(column).equalsIgnoreCase(LAST)) {
-            c.setForeground(this.getForegroundColor(lastPrice, prevPrice, alert));
+            if (!isSelected) {
+                c.setForeground(this.getForegroundColor(lastPrice, prevPrice, alert));
+            }
+            
+            if (c instanceof JLabel) {
+                JLabel jLabel = (JLabel)c;
+                jLabel.setText(stockPriceNumberFormat.get().format(lastPrice));
+            }            
         }      
         else if (table.getColumnName(column).equalsIgnoreCase(LOW)) {
             final int modelCol = tableModel.findColumn(LOW);
             
             final double lowPrice = (Double)tableModel.getValueAt(modelRow, modelCol);
 
-            c.setForeground(this.getForegroundColor(lowPrice, prevPrice, alert));
+            if (!isSelected) {
+                c.setForeground(this.getForegroundColor(lowPrice, prevPrice, alert));
+            }
+            
+            if (c instanceof JLabel) {
+                JLabel jLabel = (JLabel)c;
+                jLabel.setText(stockPriceNumberFormat.get().format(lowPrice));
+            }             
         } 
         else if (table.getColumnName(column).equalsIgnoreCase(HIGH)) {
             final int modelCol = tableModel.findColumn(HIGH);
             
             final double highPrice = (Double)tableModel.getValueAt(modelRow, modelCol);
 
-            c.setForeground(this.getForegroundColor(highPrice, prevPrice, alert));
+            if (!isSelected) {
+                c.setForeground(this.getForegroundColor(highPrice, prevPrice, alert));
+            }
+            
+            if (c instanceof JLabel) {
+                JLabel jLabel = (JLabel)c;
+                jLabel.setText(stockPriceNumberFormat.get().format(highPrice));
+            }            
         }
         else if (table.getColumnName(column).equalsIgnoreCase(CHG)) {
             final int modelCol = tableModel.findColumn(CHG);
             
             final double changePrice = (Double)tableModel.getValueAt(modelRow, modelCol);
 
-            c.setForeground(this.getForegroundColor(changePrice, 0.0, alert));
+            if (!isSelected) {
+                c.setForeground(this.getForegroundColor(changePrice, 0.0, alert));
+            }
+            
+            if (c instanceof JLabel) {
+                JLabel jLabel = (JLabel)c;
+                jLabel.setText(stockPriceNumberFormat.get().format(changePrice));
+            }            
         }
         else if (table.getColumnName(column).equalsIgnoreCase(CHG_PERCENTAGE)) {
             final int modelCol = tableModel.findColumn(CHG_PERCENTAGE);
             
             final double changePricePercentage = (Double)tableModel.getValueAt(modelRow, modelCol);
 
-            c.setForeground(this.getForegroundColor(changePricePercentage, 0.0, alert));
+            if (!isSelected) {
+                c.setForeground(this.getForegroundColor(changePricePercentage, 0.0, alert));
+            }
+            
+            if (c instanceof JLabel) {
+                JLabel jLabel = (JLabel)c;
+                jLabel.setText(stockPriceNumberFormat.get().format(changePricePercentage));
+            }             
         }
+        else if (table.getColumnName(column).equalsIgnoreCase(RISE_ABOVE)) {
+            if (!isSelected) {
+                c.setForeground(getNormalTextForegroundColor(alert));
+            }
+            
+            if (riseAbove != null) {
+                if (c instanceof JLabel) {
+                    JLabel jLabel = (JLabel)c;
+                    jLabel.setText(stockPriceNumberFormat.get().format(riseAbove));
+                }             
+            }
+        }
+        else if (table.getColumnName(column).equalsIgnoreCase(FALL_BELOW)) {
+            if (!isSelected) {
+                c.setForeground(getNormalTextForegroundColor(alert));
+            }
+            
+            if (fallBelow != null) {
+                if (c instanceof JLabel) {
+                    JLabel jLabel = (JLabel)c;                
+                    jLabel.setText(stockPriceNumberFormat.get().format(fallBelow));
+                }                
+            }                         
+        }
+        else if (table.getColumnName(column).equalsIgnoreCase(PREV)) {
+            if (!isSelected) {
+                c.setForeground(getNormalTextForegroundColor(alert));           
+            }
+            
+            if (c instanceof JLabel) {
+                JLabel jLabel = (JLabel)c;
+                jLabel.setText(stockPriceNumberFormat.get().format(prevPrice));
+            }
+        }        
         else if (table.getColumnName(column).equalsIgnoreCase(INDICATOR)) {
-            c.setForeground(Color.BLUE);
-        }
+            if (!isSelected) {
+                c.setForeground(Color.BLUE);
+            }
+        } 
         else {
-            c.setForeground(getNormalTextForegroundColor(alert));
+            if (!isSelected) {
+                c.setForeground(getNormalTextForegroundColor(alert));           
+            }
         }
         
-        c.setBackground(getBackgroundColor(row, alert));
+        if (!isSelected) {
+            c.setBackground(getBackgroundColor(row, alert));
+        }
 
         return c;
     } 
