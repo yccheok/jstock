@@ -74,5 +74,10 @@ public class PortfolioInfo {
         
         PortfolioInfo portfolioInfo = (PortfolioInfo)o;
         return this.country.equals(portfolioInfo.country) && this.name.equals(portfolioInfo.name) && this.size == portfolioInfo.size;
+    }
+    
+    @Override
+    public String toString() {
+        return PortfolioInfo.class.getSimpleName() + "[" + country + ", " + name + ", " + size + "]";
     }    
 }

@@ -74,5 +74,10 @@ public class WatchlistInfo {
         
         WatchlistInfo watchlistInfo = (WatchlistInfo)o;
         return this.country.equals(watchlistInfo.country) && this.name.equals(watchlistInfo.name) && this.size == watchlistInfo.size;
+    }
+    
+    @Override
+    public String toString() {
+        return WatchlistInfo.class.getSimpleName() + "[" + country + ", " + name + ", " + size + "]";
     }    
 }
