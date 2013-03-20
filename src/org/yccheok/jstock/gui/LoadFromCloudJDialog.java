@@ -23,7 +23,6 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
 import java.io.File;
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
