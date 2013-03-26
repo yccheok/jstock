@@ -19,7 +19,7 @@
 
 package org.yccheok.jstock.engine;
 
-import java.util.*;
+import java.util.List;
 
 /**
  * This class is used to suggest a list of items, which will be similar to a

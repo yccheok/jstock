@@ -23,7 +23,8 @@
 
 package org.yccheok.jstock.engine;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /** 
  * Implementation of ternary search tree. A Ternary Search Tree is a data structure that behaves

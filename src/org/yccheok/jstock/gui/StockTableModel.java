@@ -250,14 +250,14 @@ public class StockTableModel extends AbstractTableModelWithMemory implements CSV
         return -1;
     }
     
-    private List<List<Object>> tableModel = new ArrayList<List<Object>>();
-    private List<List<Object>> oldTableModel = new ArrayList<List<Object>>();
-    private List<Stock> stocks = new ArrayList<Stock>();
-    private List<StockAlert> alerts = new ArrayList<StockAlert>();
+    private final List<List<Object>> tableModel = new ArrayList<List<Object>>();
+    private final List<List<Object>> oldTableModel = new ArrayList<List<Object>>();
+    private final List<Stock> stocks = new ArrayList<Stock>();
+    private final List<StockAlert> alerts = new ArrayList<StockAlert>();
     // Used to get column by Name in fast way.
-    private Map<String, Integer> columnNameMapping = new HashMap<String, Integer>();
+    private final Map<String, Integer> columnNameMapping = new HashMap<String, Integer>();
     // Used to get row by Stock in fast way.
-    private Map<Code, Integer> rowStockCodeMapping = new HashMap<Code, Integer>();
+    private final Map<Code, Integer> rowStockCodeMapping = new HashMap<Code, Integer>();
     private static final String[] columnNames;
     private static final String[] languageIndependentColumnNames;
     private static final Class[] columnClasses = {

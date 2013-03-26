@@ -19,8 +19,8 @@
 
 package org.yccheok.jstock.engine;
 
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  *

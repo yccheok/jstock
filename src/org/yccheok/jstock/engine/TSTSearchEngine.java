@@ -19,7 +19,10 @@
 
 package org.yccheok.jstock.engine;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This class is used to suggest a list of items, which will be similar to a
