@@ -204,16 +204,6 @@ public class YQLStockServer implements StockServer {
         return stocks;
     }
 
-    /**
-     * Returns list of all stocks in this stock server.
-     * @return list of all stocks in this stock server
-     * @throws StockNotFoundException if the operation fails
-     */
-    @Override
-    public List<Stock> getAllStocks() throws StockNotFoundException {
-        throw new StockNotFoundException();
-    }
-
     // If I request currSize number of stock, and YQLStockServer only return
     // expectedSize number of stock, is it allowable?
     private boolean isToleranceAllowed(int currSize, int expectedSize) {

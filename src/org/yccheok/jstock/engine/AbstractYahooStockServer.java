@@ -294,11 +294,6 @@ public abstract class AbstractYahooStockServer extends Subject<AbstractYahooStoc
     // Yahoo sometimes does complain URL for being too long.
     private static final int MAX_STOCK_PER_ITERATION = 180;
     private static final int NUM_OF_RETRY = 2;
-
-    // Yahoo server's result is not stable. If we request for 100 stocks, it may only
-    // return 99 stocks to us. We allow stability rate in %. Higher rate means more
-    // stable.
-    private static final double STABILITY_RATE = 90.0;
     
     // Update on 19 March 2009 : We cannot assume certain parameters will always
     // be float. They may become integer too. For example, in the case of Korea

@@ -50,27 +50,6 @@ public class StockInfoDatabase {
     }
 
     /**
-     * Creates an instance of StockInfoDatabase, based on given stock server.
-     * We will get all stocks from the stock server, and build a stock info
-     * database based on the stocks.
-     * 
-     * @param stockServer the stock server
-     * @throws StockNotFoundException if stock is not found for the given stock
-     * server
-     */
-    public StockInfoDatabase(StockServer stockServer) throws StockNotFoundException {
-        List<Stock> stocks = null;
-
-        stocks = stockServer.getAllStocks();
-
-        java.util.concurrent.locks.ReadWriteLock readWriteLock = new java.util.concurrent.locks.ReentrantReadWriteLock();
-        reader = readWriteLock.readLock();
-        writer = readWriteLock.writeLock();
-
-        this.init(stocks);
-    }
-
-    /**
      * Creates an instance of StockInfoDatabase, based on given list of stocks.
      *
      * @param stocks list of stocks

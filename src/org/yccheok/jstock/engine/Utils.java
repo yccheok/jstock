@@ -629,11 +629,6 @@ public class Utils {
         public List<Stock> getStocks(List<Code> codes) throws StockNotFoundException {
             throw new StockNotFoundException();
         }
-
-        @Override
-        public List<Stock> getAllStocks() throws StockNotFoundException {
-            throw new StockNotFoundException();
-        }
     };
 
     private static final Log log = LogFactory.getLog(Utils.class);

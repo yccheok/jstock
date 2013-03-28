@@ -136,7 +136,7 @@ public abstract class AbstractYahooStockHistoryServer implements StockHistorySer
                 volume = Long.parseLong(fields[5]);
                 //adjustedClosePrice = Double.parseDouble(fields[6]);
             }
-            catch(NumberFormatException exp) {
+            catch (NumberFormatException exp) {
                 log.error(null, exp);
             }
 

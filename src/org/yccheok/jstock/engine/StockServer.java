@@ -26,5 +26,4 @@ package org.yccheok.jstock.engine;
 public interface StockServer {
     public Stock getStock(Code code) throws StockNotFoundException;
     public java.util.List<Stock> getStocks(java.util.List<Code> codes) throws StockNotFoundException;
-    public java.util.List<Stock> getAllStocks() throws StockNotFoundException;
 }

@@ -2431,11 +2431,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     public java.util.List<StockServerFactory> getStockServerFactories() {
-        return getStockServerFactories(this.jStockOptions.getCountry());
-    }
-
-    private java.util.List<StockServerFactory> getStockServerFactories(Country country) {
-        return Factories.INSTANCE.getStockServerFactories(country);
+        return Factories.INSTANCE.getStockServerFactories(this.jStockOptions.getCountry());
     }
     
     public java.util.List<Stock> getStocks() {

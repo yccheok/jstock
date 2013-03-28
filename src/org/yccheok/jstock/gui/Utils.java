@@ -1006,8 +1006,7 @@ public class Utils {
         pbeStringEncryptor.setPassword(getJStockUUID());
         try {
             return pbeStringEncryptor.decrypt(source);
-        }
-        catch(org.jasypt.exceptions.EncryptionOperationNotPossibleException exp) {
+        } catch (org.jasypt.exceptions.EncryptionOperationNotPossibleException exp) {
             log.error(null, exp);
         }
 

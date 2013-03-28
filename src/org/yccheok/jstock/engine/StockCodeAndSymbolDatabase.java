@@ -28,28 +28,6 @@ import org.yccheok.jstock.engine.Stock.Industry;
  */
 public class StockCodeAndSymbolDatabase {
 
-    /** 
-     * Initializes a newly created {@code StockCodeAndSymbolDatabase} object so 
-     * that it contains the available stock codes and symbols information for
-     * a stock market. The information is being retrieved from stock server.
-     *
-     * @param stockServer Stock server which provides stock information
-     * @throws StockNotFoundException If fail to retrieve stock information from
-     *         stock server
-     */
-    public StockCodeAndSymbolDatabase(StockServer stockServer) throws StockNotFoundException {
-        List<Stock> stocks = null;
-        
-        try {
-            stocks = stockServer.getAllStocks();
-        }
-        catch (StockNotFoundException exp) {
-            throw exp;
-        }
-
-        this.init(stocks);
-    }
-
     /**
      * Initializes a newly created {@code StockCodeAndSymbolDatabase} object so
      * that it contains the available stock codes and symbols information for

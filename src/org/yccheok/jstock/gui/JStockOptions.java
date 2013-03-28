@@ -727,7 +727,7 @@ public class JStockOptions {
         if (this.scanningSpeed <= 1000) {
             // In previous version, it is possible for scanningSpeed <= 1000.
             // This is some how wasting CPU and network resource. Let's go green.
-            this.scanningSpeed = 2000;
+            this.scanningSpeed = 10000;
         }
         
         return this;
