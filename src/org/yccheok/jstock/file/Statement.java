@@ -103,10 +103,13 @@ public class Statement {
             return d;
         }
         else if (o != null) {
-            try {
-                return Double.parseDouble(o.toString());
-            } catch (NumberFormatException ex) {
-                log.error(null, ex);
+            String s = o.toString();
+            if (s.isEmpty() == false) {
+                try {
+                    return Double.parseDouble(o.toString());
+                } catch (NumberFormatException ex) {
+                    log.error(null, ex);
+                }
             }
         }
         return null;

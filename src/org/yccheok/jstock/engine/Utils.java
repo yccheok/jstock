@@ -451,7 +451,7 @@ public class Utils {
      */
     public static boolean isFallBelowAndRiseAboveColorReverse() {
         final Country country = MainFrame.getInstance().getJStockOptions().getCountry();
-        return (country == Country.China);
+        return (country == Country.China || country == Country.Taiwan);
     }
 
     public static List<Index> getStockIndices(Country country) {
