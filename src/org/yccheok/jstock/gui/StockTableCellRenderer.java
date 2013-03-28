@@ -20,8 +20,6 @@
 package org.yccheok.jstock.gui;
 
 import java.awt.*;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.Date;
 import java.util.TimerTask;
 import javax.swing.*;
@@ -33,14 +31,6 @@ import org.yccheok.jstock.internationalization.GUIBundle;
  * @author yccheok
  */
 public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRenderer {
-
-    // Use ThreadLocal to ensure thread safety.
-    private static final ThreadLocal <NumberFormat> stockPriceNumberFormat = new ThreadLocal <NumberFormat>() {
-        @Override protected NumberFormat initialValue() {
-            return new DecimalFormat("0.00##");
-        }
-    };
-    
     
     private enum Alert {
         FallBelow,
@@ -182,7 +172,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
 
             if (c instanceof JLabel) {
                 JLabel jLabel = (JLabel)c;
-                jLabel.setText(stockPriceNumberFormat.get().format(buyPrice));
+                jLabel.setText(org.yccheok.jstock.watchlist.Utils.toStockPrice(buyPrice));
             }
             
             final Object o = tableModel.getOldValueAt(modelRow, modelCol);
@@ -198,7 +188,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
 
             if (c instanceof JLabel) {
                 JLabel jLabel = (JLabel)c;
-                jLabel.setText(stockPriceNumberFormat.get().format(sellPrice));
+                jLabel.setText(org.yccheok.jstock.watchlist.Utils.toStockPrice(sellPrice));
             }
             
             final Object o = tableModel.getOldValueAt(modelRow, modelCol);
@@ -212,7 +202,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
 
             if (c instanceof JLabel) {
                 JLabel jLabel = (JLabel)c;
-                jLabel.setText(stockPriceNumberFormat.get().format(lastPrice));
+                jLabel.setText(org.yccheok.jstock.watchlist.Utils.toStockPrice(lastPrice));
             }
             
             final Object o = tableModel.getOldValueAt(modelRow, modelCol);
@@ -228,7 +218,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
 
             if (c instanceof JLabel) {
                 JLabel jLabel = (JLabel)c;
-                jLabel.setText(stockPriceNumberFormat.get().format(lowPrice));
+                jLabel.setText(org.yccheok.jstock.watchlist.Utils.toStockPrice(lowPrice));
             }
             
             final Object o = tableModel.getOldValueAt(modelRow, modelCol);
@@ -244,7 +234,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
 
             if (c instanceof JLabel) {
                 JLabel jLabel = (JLabel)c;
-                jLabel.setText(stockPriceNumberFormat.get().format(highPrice));
+                jLabel.setText(org.yccheok.jstock.watchlist.Utils.toStockPrice(highPrice));
             }
             
             final Object o = tableModel.getOldValueAt(modelRow, modelCol);
@@ -260,7 +250,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
 
             if (c instanceof JLabel) {
                 JLabel jLabel = (JLabel)c;
-                jLabel.setText(stockPriceNumberFormat.get().format(changePrice));
+                jLabel.setText(org.yccheok.jstock.watchlist.Utils.toStockPrice(changePrice));
             }
             
             final Object o = tableModel.getOldValueAt(modelRow, modelCol);
@@ -276,7 +266,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
 
             if (c instanceof JLabel) {
                 JLabel jLabel = (JLabel)c;
-                jLabel.setText(stockPriceNumberFormat.get().format(changePricePercentage));
+                jLabel.setText(org.yccheok.jstock.watchlist.Utils.toStockPrice(changePricePercentage));
             }
             
             final Object o = tableModel.getOldValueAt(modelRow, modelCol);
@@ -338,7 +328,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             if (riseAbove != null) {            
                 if (c instanceof JLabel) {
                     JLabel jLabel = (JLabel)c;
-                    jLabel.setText(stockPriceNumberFormat.get().format(riseAbove));
+                    jLabel.setText(org.yccheok.jstock.watchlist.Utils.toStockPrice(riseAbove));
                 }
             }
 
@@ -353,7 +343,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             if (fallBelow != null) {            
                 if (c instanceof JLabel) {
                     JLabel jLabel = (JLabel)c;
-                    jLabel.setText(stockPriceNumberFormat.get().format(fallBelow));
+                    jLabel.setText(org.yccheok.jstock.watchlist.Utils.toStockPrice(fallBelow));
                 }
             }
 
@@ -363,7 +353,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
         else if (table.getColumnName(column).equalsIgnoreCase(PREV)) {
             if (c instanceof JLabel) {
                 JLabel jLabel = (JLabel)c;
-                jLabel.setText(stockPriceNumberFormat.get().format(prevPrice));
+                jLabel.setText(org.yccheok.jstock.watchlist.Utils.toStockPrice(prevPrice));
             }
 
             c.setForeground(getNormalTextForegroundColor(alert));
@@ -436,7 +426,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             
             if (c instanceof JLabel) {
                 JLabel jLabel = (JLabel)c;
-                jLabel.setText(stockPriceNumberFormat.get().format(buyPrice));
+                jLabel.setText(org.yccheok.jstock.watchlist.Utils.toStockPrice(buyPrice));
             }
         }                         
         else if (table.getColumnName(column).equalsIgnoreCase(SELL)) {
@@ -450,7 +440,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             
             if (c instanceof JLabel) {
                 JLabel jLabel = (JLabel)c;
-                jLabel.setText(stockPriceNumberFormat.get().format(sellPrice));
+                jLabel.setText(org.yccheok.jstock.watchlist.Utils.toStockPrice(sellPrice));
             }            
         }
         else if (table.getColumnName(column).equalsIgnoreCase(OPEN)) {
@@ -464,7 +454,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             
             if (c instanceof JLabel) {
                 JLabel jLabel = (JLabel)c;
-                jLabel.setText(stockPriceNumberFormat.get().format(openPrice));
+                jLabel.setText(org.yccheok.jstock.watchlist.Utils.toStockPrice(openPrice));
             }            
         }
         else if (table.getColumnName(column).equalsIgnoreCase(LAST)) {
@@ -474,7 +464,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             
             if (c instanceof JLabel) {
                 JLabel jLabel = (JLabel)c;
-                jLabel.setText(stockPriceNumberFormat.get().format(lastPrice));
+                jLabel.setText(org.yccheok.jstock.watchlist.Utils.toStockPrice(lastPrice));
             }            
         }      
         else if (table.getColumnName(column).equalsIgnoreCase(LOW)) {
@@ -488,7 +478,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             
             if (c instanceof JLabel) {
                 JLabel jLabel = (JLabel)c;
-                jLabel.setText(stockPriceNumberFormat.get().format(lowPrice));
+                jLabel.setText(org.yccheok.jstock.watchlist.Utils.toStockPrice(lowPrice));
             }             
         } 
         else if (table.getColumnName(column).equalsIgnoreCase(HIGH)) {
@@ -502,7 +492,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             
             if (c instanceof JLabel) {
                 JLabel jLabel = (JLabel)c;
-                jLabel.setText(stockPriceNumberFormat.get().format(highPrice));
+                jLabel.setText(org.yccheok.jstock.watchlist.Utils.toStockPrice(highPrice));
             }            
         }
         else if (table.getColumnName(column).equalsIgnoreCase(CHG)) {
@@ -516,7 +506,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             
             if (c instanceof JLabel) {
                 JLabel jLabel = (JLabel)c;
-                jLabel.setText(stockPriceNumberFormat.get().format(changePrice));
+                jLabel.setText(org.yccheok.jstock.watchlist.Utils.toStockPrice(changePrice));
             }            
         }
         else if (table.getColumnName(column).equalsIgnoreCase(CHG_PERCENTAGE)) {
@@ -530,7 +520,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             
             if (c instanceof JLabel) {
                 JLabel jLabel = (JLabel)c;
-                jLabel.setText(stockPriceNumberFormat.get().format(changePricePercentage));
+                jLabel.setText(org.yccheok.jstock.watchlist.Utils.toStockPrice(changePricePercentage));
             }             
         }
         else if (table.getColumnName(column).equalsIgnoreCase(RISE_ABOVE)) {
@@ -545,7 +535,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             if (riseAbove != null) {
                 if (c instanceof JLabel) {
                     JLabel jLabel = (JLabel)c;
-                    jLabel.setText(stockPriceNumberFormat.get().format(riseAbove));
+                    jLabel.setText(org.yccheok.jstock.watchlist.Utils.toStockPrice(riseAbove));
                 }             
             }
         }
@@ -561,7 +551,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             if (fallBelow != null) {
                 if (c instanceof JLabel) {
                     JLabel jLabel = (JLabel)c;                
-                    jLabel.setText(stockPriceNumberFormat.get().format(fallBelow));
+                    jLabel.setText(org.yccheok.jstock.watchlist.Utils.toStockPrice(fallBelow));
                 }                
             }                         
         }
@@ -572,7 +562,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             
             if (c instanceof JLabel) {
                 JLabel jLabel = (JLabel)c;
-                jLabel.setText(stockPriceNumberFormat.get().format(prevPrice));
+                jLabel.setText(org.yccheok.jstock.watchlist.Utils.toStockPrice(prevPrice));
             }
         }        
         else if (table.getColumnName(column).equalsIgnoreCase(INDICATOR)) {

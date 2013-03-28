@@ -20,6 +20,8 @@
 package org.yccheok.jstock.watchlist;
 
 import java.io.File;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -35,7 +37,13 @@ import org.yccheok.jstock.gui.StockTableModel;
  * @author yccheok
  */
 public class Utils {
-
+    // Use ThreadLocal to ensure thread safety.
+    private static final ThreadLocal <NumberFormat> stockPriceNumberFormat = new ThreadLocal <NumberFormat>() {
+        @Override protected NumberFormat initialValue() {
+            return new DecimalFormat("0.00##");
+        }
+    };
+    
     // For XML to CSV migration usage.
     private static final class XMLWatchlist {
         public final StockTableModel stockTableModel;
@@ -317,5 +325,15 @@ public class Utils {
             }
         }
         return watchlistInfos;
+    }
+
+    /**
+     * Convert the value to stock price representation.
+     *
+     * @param value the value to be converted
+     * @return stock price representation
+     */
+    public static String toStockPrice(double value) {
+        return stockPriceNumberFormat.get().format(value);
     }    
 }
