@@ -42,6 +42,7 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
         
         this.stockServerFactories = new java.util.concurrent.CopyOnWriteArrayList<StockServerFactory>();
         this.stockCodes = new java.util.concurrent.CopyOnWriteArrayList<Code>();
+        this.rowStockCodeMapping = new HashMap<Code, Integer>();
         this.stockMonitors = new java.util.ArrayList<StockMonitor>();
         
         stockCodesReadWriteLock = new java.util.concurrent.locks.ReentrantReadWriteLock();
@@ -62,12 +63,13 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
     public synchronized boolean addStockCode(Code code) {
         // Lock isn't required here. This is because increase the size of the 
         // list is not going to get IndexOutOfBoundException.
-        if (stockCodes.contains(code)) {
+        if (rowStockCodeMapping.containsKey(code)) {
             return false;
         }
 
         boolean status = stockCodes.add(code);
-
+        rowStockCodeMapping.put(code, stockCodes.size() - 1);
+        
         return status;
     }
 
@@ -95,6 +97,7 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
         stockCodesWriterLock.lock();
         try {
             stockCodes.clear();
+            rowStockCodeMapping.clear();
         } finally {
             stockCodesWriterLock.unlock();
         }
@@ -126,7 +129,12 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
         stockCodesWriterLock.lock();
         boolean status = false;
         try {
-            status = stockCodes.remove(code);
+            Integer row = rowStockCodeMapping.get(code);
+            if (row == null) {
+                return status;
+            }
+            status = (null != stockCodes.remove((int)row));
+            rowStockCodeMapping.remove(code);
         } finally {
             stockCodesWriterLock.unlock();
         }
@@ -467,8 +475,11 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
     // Number of stock to be monitored per iteration.
     private final int numOfStockPerIteration;
     private java.util.List<StockServerFactory> stockServerFactories;
-    private java.util.List<Code> stockCodes;
-    private java.util.List<StockMonitor> stockMonitors;
+    private final java.util.List<Code> stockCodes;
+    // Used for duplication check. We avoid using stockCodes.constains, as the
+    // complexity is O(n).
+    private final java.util.HashMap<Code, Integer> rowStockCodeMapping;
+    private final java.util.List<StockMonitor> stockMonitors;
     private final java.util.concurrent.locks.ReadWriteLock stockCodesReadWriteLock;
     private final java.util.concurrent.locks.Lock stockCodesReaderLock;
     private final java.util.concurrent.locks.Lock stockCodesWriterLock;

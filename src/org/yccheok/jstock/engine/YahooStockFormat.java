@@ -144,10 +144,10 @@ public class YahooStockFormat implements StockFormat {
         final String[] strings = source.split("\r\n|\r|\n");
         
         for (String string : strings) {
-            final String tmp = YahooStockFormat.digitPattern.matcher(string).replaceAll("$1");
-            // Some string contain comma, remove them as well. If not, we face problem during csv parsing.
-            final String stringDigitWithoutComma = stringCommaPattern.matcher(tmp).replaceAll("$1");
-
+            // ",123,456,"   -> ",123456,"
+            // ","abc,def"," -> ","abcdef","
+            // Please refer http://stackoverflow.com/questions/15692458/different-regular-expression-result-in-java-se-and-android-platform for more details.
+            final String stringDigitWithoutComma = commaNotBetweenQuotes.matcher(string).replaceAll("");
             String[] fields = stringDigitWithoutComma.split(",");
             final int length = fields.length;
             
@@ -312,19 +312,12 @@ public class YahooStockFormat implements StockFormat {
     }
     
     private static final StockFormat stockFormat = new YahooStockFormat();
-    // Used to remove the comma within an integer digit. The digit must be located
-    // in between two string. Replaced with $1.
-    //
-    // digitPattern will change
-    // ",100,000,"
-    // to
-    // ",100000,"
-    private static final Pattern digitPattern = Pattern.compile("(\",)|,(?=[\\d,]+,\")");
-    // stringCommaPattern will change
-    // ","abc,def","
-    // to
-    // ","abcdef","
-    private static final Pattern stringCommaPattern = Pattern.compile("(\",\")|,(?=[^\"[,]]*\",\")");
+    
+    // ",123,456,"   -> ",123456,"
+    // ","abc,def"," -> ","abcdef","
+    // Please refer http://stackoverflow.com/questions/15692458/different-regular-expression-result-in-java-se-and-android-platform for more details.
+    private static final Pattern commaNotBetweenQuotes = Pattern.compile("(?<!\"),(?!\")");
+
     private static final Pattern quotePattern = Pattern.compile("\"");
     private static final Pattern percentagePattern = Pattern.compile("%");
 }
