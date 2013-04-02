@@ -3,6 +3,8 @@ Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
 JStock 1.0.7a- ????-??-??
   Bugfix:  Taiwan uses red to indicate up. Same as China.
+  Bugfix:  Update warning_message_running_2_jstock to clearer message.
+  Bugfix:  Better UI. We will scroll and highlight the newly added stock.
   
 JStock 1.0.7 - 2013-03-10
   Feature: Added currency exchange on investment flow chart.

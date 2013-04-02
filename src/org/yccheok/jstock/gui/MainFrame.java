@@ -2745,20 +2745,18 @@ public class MainFrame extends javax.swing.JFrame {
         // the table, the stock shall be highlighted. Stock will be
         // selected and the table shall be scrolled to be visible.
         final StockTableModel tableModel = (StockTableModel)MainFrame.this.jTable1.getModel();
-        int modelRowBeforeAdded = -1;
 
         final Stock emptyStock = Utils.getEmptyStock(stockInfo);
-        // Update rowBeforeAdded before calling addStockToTable
-        modelRowBeforeAdded = tableModel.findRow(emptyStock);
-
+        
         // First add the empty stock, so that the user will not have wrong perspective that
         // our system is slow.
         addStockToTable(emptyStock);
+        int row = tableModel.findRow(emptyStock);
         realTimeStockMonitor.addStockCode(stockInfo.code);
         realTimeStockMonitor.startNewThreadsIfNecessary();
         realTimeStockMonitor.refresh();
         
-        MainFrame.this.highlightStock(modelRowBeforeAdded);
+        MainFrame.this.highlightStock(row);
     }
 
     private org.yccheok.jstock.engine.Observer<Indicator, Boolean> getAlertStateManagerObserver() {
