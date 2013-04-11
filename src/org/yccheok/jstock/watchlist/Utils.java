@@ -66,6 +66,10 @@ public class Utils {
     private Utils() {
     }
 
+    public static File getWatchlistFile(String directory) {
+        return new File(directory  + "realtimestock.csv");
+    }
+    
     /**
      * Returns watchlist directory, based on given watchlist name. There is
      * chance where the returned directory doesn't exist. To verify against

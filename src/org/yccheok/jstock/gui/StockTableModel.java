@@ -173,13 +173,13 @@ public class StockTableModel extends AbstractTableModelWithMemory implements CSV
     public Double getRiseAbove(Stock stock) {
         Integer row = this.rowStockCodeMapping.get(stock.getCode());
         if (row == null) return null;
-        return this.alerts.get(row).getRiseAbove();
+        return this.alerts.get(row).riseAbove;
     }
 
     public Double getFallBelow(Stock stock) {
         Integer row = this.rowStockCodeMapping.get(stock.getCode());
         if (row == null) return null;
-        return this.alerts.get(row).getFallBelow();
+        return this.alerts.get(row).fallBelow;
     }
 
     public List<StockAlert> getAlerts() {
@@ -224,8 +224,8 @@ public class StockTableModel extends AbstractTableModelWithMemory implements CSV
         list.add(stock.getBuyQuantity());
         list.add(stock.getSellPrice());
         list.add(stock.getSellQuantity());
-        list.add(alert.getFallBelow());
-        list.add(alert.getRiseAbove());
+        list.add(alert.fallBelow);
+        list.add(alert.riseAbove);
         return list;
     }
     

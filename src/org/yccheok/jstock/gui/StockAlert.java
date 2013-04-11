@@ -23,16 +23,8 @@ package org.yccheok.jstock.gui;
  * @author yccheok
  */
 public class StockAlert {
-    private final Double fallBelow;
-    private final Double riseAbove;
-
-    public Double getFallBelow() {
-        return fallBelow;
-    }
-
-    public Double getRiseAbove() {
-        return riseAbove;
-    }
+    public final Double fallBelow;
+    public final Double riseAbove;
 
     public StockAlert setRiseAbove(Double riseAbove) {
         return new StockAlert(this.fallBelow, riseAbove);
@@ -84,6 +76,6 @@ public class StockAlert {
 
     @Override
     public String toString() {
-        return "Alert with fallBelow=" + fallBelow + "and riseAbove=" + riseAbove;
+        return "Alert with fallBelow=" + fallBelow + " and riseAbove=" + riseAbove;
     }
 }

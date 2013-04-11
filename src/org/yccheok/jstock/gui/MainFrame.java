@@ -1541,10 +1541,6 @@ public class MainFrame extends javax.swing.JFrame {
         portfolioJDialog.setLocationRelativeTo(this);
         portfolioJDialog.setVisible(true);
     }
-
-    private static File getWatchlistFile(String directory) {
-        return new File(directory  + "realtimestock.csv");
-    }
     
     private static boolean saveAsCSVFile(CSVWatchlist csvWatchlist, File file, boolean languageIndependent) {
         final org.yccheok.jstock.file.Statements statements = org.yccheok.jstock.file.Statements.newInstanceFromTableModel(csvWatchlist.tableModel, languageIndependent);
@@ -3473,7 +3469,7 @@ public class MainFrame extends javax.swing.JFrame {
         // Clear the previous data structures.
         clearAllStocks();
         
-        File realTimeStockFile = getWatchlistFile(org.yccheok.jstock.watchlist.Utils.getWatchlistDirectory());
+        File realTimeStockFile = org.yccheok.jstock.watchlist.Utils.getWatchlistFile(org.yccheok.jstock.watchlist.Utils.getWatchlistDirectory());
         return this.openAsCSVFile(realTimeStockFile);
     }
     
@@ -3483,7 +3479,7 @@ public class MainFrame extends javax.swing.JFrame {
         {
             return false;
         } 
-        return MainFrame.saveAsCSVFile(csvWatchlist, getWatchlistFile(directory), true);
+        return MainFrame.saveAsCSVFile(csvWatchlist, org.yccheok.jstock.watchlist.Utils.getWatchlistFile(directory), true);
     }
     
     private boolean saveCSVWathclist() {
