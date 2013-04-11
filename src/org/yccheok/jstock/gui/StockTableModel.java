@@ -124,7 +124,7 @@ public class StockTableModel extends AbstractTableModelWithMemory implements CSV
     public void updateStock(Stock stock) {
         assert(SwingUtilities.isEventDispatchThread());
         
-        final Integer row = rowStockCodeMapping.get(stock.getCode());
+        final Integer row = codeToRow.get(stock.getCode());
 
         if (row != null) {
             oldTableModel.set(row, tableModel.get(row));
@@ -138,14 +138,14 @@ public class StockTableModel extends AbstractTableModelWithMemory implements CSV
     public void addStock(Stock stock, StockAlert alert) {
         assert(SwingUtilities.isEventDispatchThread());
         
-        Integer row = rowStockCodeMapping.get(stock.getCode());
+        Integer row = codeToRow.get(stock.getCode());
         if (row == null) {
             tableModel.add(stockToList(stock, alert));
             oldTableModel.add(null);
             stocks.add(stock);
             alerts.put(stock.getCode(), alert);
             final int rowIndex = tableModel.size() - 1;
-            rowStockCodeMapping.put(stock.getCode(), rowIndex);
+            codeToRow.put(stock.getCode(), rowIndex);
             fireTableRowsInserted(rowIndex, rowIndex);
         }
     }
@@ -167,7 +167,7 @@ public class StockTableModel extends AbstractTableModelWithMemory implements CSV
         oldTableModel.clear();
         stocks.clear();
         alerts.clear();
-        rowStockCodeMapping.clear();
+        codeToRow.clear();
             
         this.fireTableRowsDeleted(0, size - 1);
     }
@@ -207,12 +207,12 @@ public class StockTableModel extends AbstractTableModelWithMemory implements CSV
         final Code code = (Code)list.get(0);
         alerts.remove(code);
         // 0 is stock code.
-        rowStockCodeMapping.remove(code);
+        codeToRow.remove(code);
 
         int size = stocks.size();
         for (int i = row; i < size; i++) {
             Stock s = stocks.get(i);
-            rowStockCodeMapping.put(s.getCode(), i);
+            codeToRow.put(s.getCode(), i);
         }
         
         this.fireTableRowsDeleted(row, row);
@@ -254,7 +254,7 @@ public class StockTableModel extends AbstractTableModelWithMemory implements CSV
      * found.
      */
     public int findRow(Stock stock) {
-        Integer row = rowStockCodeMapping.get(stock.getCode());
+        Integer row = codeToRow.get(stock.getCode());
         if (row != null) {
             return row;
         }
@@ -268,7 +268,7 @@ public class StockTableModel extends AbstractTableModelWithMemory implements CSV
     // Used to get column by Name in fast way.
     private final Map<String, Integer> columnNameMapping = new ConcurrentHashMap<String, Integer>();
     // Used to get row by Stock in fast way.
-    private final Map<Code, Integer> rowStockCodeMapping = new ConcurrentHashMap<Code, Integer>();
+    private final Map<Code, Integer> codeToRow = new ConcurrentHashMap<Code, Integer>();
     private static final String[] columnNames;
     private static final String[] languageIndependentColumnNames;
     private static final Class[] columnClasses = {
