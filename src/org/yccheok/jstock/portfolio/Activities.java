@@ -76,7 +76,7 @@ public class Activities {
 
         for (Activity activity : activities) {
             final Stock stock = (Stock)activity.get(Activity.Param.Stock);
-            String key = (stock != null ? stock.getSymbol().toString() : "") + activity.getType();
+            String key = (stock != null ? stock.symbol.toString() : "") + activity.getType();
             Double d = datas.get(key);
             if (d != null) {
                 double total = d.doubleValue() + activity.getAmount();
@@ -93,7 +93,7 @@ public class Activities {
         for (Activity activity : activities) {
             count++;
             final Stock stock = (Stock)activity.get(Activity.Param.Stock);
-            final String who = stock != null ? stock.getSymbol().toString() : "";
+            final String who = stock != null ? stock.symbol.toString() : "";
             final Activity.Type type = activity.getType();
             String key = who + type;
             Double d = datas.get(key);

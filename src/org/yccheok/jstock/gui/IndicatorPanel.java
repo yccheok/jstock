@@ -1430,7 +1430,7 @@ public class IndicatorPanel extends JPanel {
                     // Also, sometimes for other countries, Yahoo will return
                     // empty string for their symbol. We will fix it through
                     // offline database.
-                    if (org.yccheok.jstock.engine.Utils.isSymbolImmutable() || new_stock.getSymbol().toString().isEmpty()) {
+                    if (org.yccheok.jstock.engine.Utils.isSymbolImmutable() || new_stock.symbol.toString().isEmpty()) {
                         final StockInfoDatabase stockInfoDatabase = m.getStockInfoDatabase();
                         if (stockInfoDatabase != null) {
                             final Symbol _symbol = stockInfoDatabase.codeToSymbol(new_stock.code);

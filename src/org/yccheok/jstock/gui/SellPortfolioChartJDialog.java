@@ -171,7 +171,7 @@ public class SellPortfolioChartJDialog extends javax.swing.JDialog {
             }
             
             Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
-            final Symbol symbol = transaction.getStock().getSymbol();
+            final Symbol symbol = transaction.getStock().symbol;
             final Code code = transaction.getStock().code;
 
             /* Should use reflection technology. */

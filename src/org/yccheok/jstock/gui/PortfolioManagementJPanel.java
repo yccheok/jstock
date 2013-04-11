@@ -979,7 +979,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             newTransactionJDialog.setStockSelectionEnabled(false);
             newTransactionJDialog.setTransaction(transaction);
             final String template = GUIBundle.getString("PortfolioManagementJPanel_EditBuy_template");
-            newTransactionJDialog.setTitle(MessageFormat.format(template, transaction.getStock().getSymbol()));
+            newTransactionJDialog.setTitle(MessageFormat.format(template, transaction.getStock().symbol));
             newTransactionJDialog.setLocationRelativeTo(this);
             newTransactionJDialog.setVisible(true);
 
@@ -995,7 +995,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             NewSellTransactionJDialog newTransactionJDialog = new NewSellTransactionJDialog(mainFrame, true);
             newTransactionJDialog.setSellTransaction(transaction);
             final String template = GUIBundle.getString("PortfolioManagementJPanel_EditSell_template");
-            newTransactionJDialog.setTitle(MessageFormat.format(template, transaction.getStock().getSymbol()));
+            newTransactionJDialog.setTitle(MessageFormat.format(template, transaction.getStock().symbol));
             newTransactionJDialog.setLocationRelativeTo(this);
             newTransactionJDialog.setVisible(true);
 

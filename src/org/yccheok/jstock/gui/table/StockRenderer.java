@@ -27,6 +27,6 @@ import org.yccheok.jstock.engine.Stock;
 public class StockRenderer extends GenericRenderer {
     @Override
     public void setValue(Object value) {
-        setText((value == null) ? "" : ((Stock)value).getSymbol().toString());
+        setText((value == null) ? "" : ((Stock)value).symbol.toString());
     }
 }

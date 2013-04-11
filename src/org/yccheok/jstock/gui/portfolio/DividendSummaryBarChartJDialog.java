@@ -100,7 +100,7 @@ public class DividendSummaryBarChartJDialog extends javax.swing.JDialog {
             if (false == codes.add(stock.code)) {
                 continue;
             }
-            final StockInfo stockInfo = new StockInfo(stock.code, stock.getSymbol());
+            final StockInfo stockInfo = new StockInfo(stock.code, stock.symbol);
             stockInfos.add(stockInfo);
         }
 

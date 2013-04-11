@@ -211,7 +211,7 @@ public class KLSEInfoStockHistoryServer implements StockHistoryServer {
 
         try {
             Stock stock = stockServer.getStock(code);
-            symbol = stock.getSymbol();
+            symbol = stock.symbol;
             name = stock.getName();
             board = stock.getBoard();
             industry = stock.getIndustry();

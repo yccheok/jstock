@@ -1323,7 +1323,7 @@ public class ChartJDialog extends javax.swing.JDialog {
         final String name = stock.getName();
         // For unknown reason, server may return us empty stock name.
         if (name.isEmpty()) {
-            final Symbol symbol = stock.getSymbol();
+            final Symbol symbol = stock.symbol;
             if (false == symbol.toString().isEmpty()) {
                 // Luckly. The symbol is not empty. Use it as replacement to
                 // name.

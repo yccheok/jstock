@@ -2536,16 +2536,16 @@ public class MainFrame extends javax.swing.JFrame {
                     if (((OperatorIndicator)indicator).getName().equalsIgnoreCase("fallbelow"))
                     {
                         final String template = GUIBundle.getString("MainFrame_FallBelow_template");
-                        message = MessageFormat.format(template, stock.getSymbol(), lastPrice, price);
+                        message = MessageFormat.format(template, stock.symbol, lastPrice, price);
                     }
                     else
                     {
                         final String template = GUIBundle.getString("MainFrame_RiseAbove_template");
-                        message = MessageFormat.format(template, stock.getSymbol(), lastPrice, price);
+                        message = MessageFormat.format(template, stock.symbol, lastPrice, price);
                     }
 
                     if (jStockOptions.isPopupMessage()) {
-                        displayPopupMessage(stock.getSymbol().toString(), message);
+                        displayPopupMessage(stock.symbol.toString(), message);
 
                         if (jStockOptions.isSoundEnabled()) {
                             /* Non-blocking. */
@@ -2606,12 +2606,12 @@ public class MainFrame extends javax.swing.JFrame {
                     if (((OperatorIndicator)indicator).getName().equalsIgnoreCase("fallbelow"))
                     {
                         final String template = GUIBundle.getString("MainFrame_FallBelow_template");
-                        title = MessageFormat.format(template, stock.getSymbol(), lastPrice, price);
+                        title = MessageFormat.format(template, stock.symbol, lastPrice, price);
                     }
                     else
                     {
                         final String template = GUIBundle.getString("MainFrame_RiseAbove_template");
-                        title = MessageFormat.format(template, stock.getSymbol(), lastPrice, price);
+                        title = MessageFormat.format(template, stock.symbol, lastPrice, price);
                     }
 
                     final String message = title + "\n(JStock)";
@@ -2644,12 +2644,12 @@ public class MainFrame extends javax.swing.JFrame {
                     if (((OperatorIndicator)indicator).getName().equalsIgnoreCase("fallbelow"))
                     {
                         final String template = GUIBundle.getString("MainFrame_FallBelow_template");
-                        message = MessageFormat.format(template, stock.getSymbol(), lastPrice, price);
+                        message = MessageFormat.format(template, stock.symbol, lastPrice, price);
                     }
                     else
                     {
                         final String template = GUIBundle.getString("MainFrame_RiseAbove_template");
-                        message = MessageFormat.format(template, stock.getSymbol(), lastPrice, price);
+                        message = MessageFormat.format(template, stock.symbol, lastPrice, price);
                     }
 
                     final String username = Utils.decrypt(jStockOptions.getGoogleCalendarUsername());
@@ -2794,12 +2794,12 @@ public class MainFrame extends javax.swing.JFrame {
         if (stockHistoryServer == null) {
             if (stockCodeHistoryGUI.add(stock.code) && stockHistoryMonitor.addStockCode(stock.code)) {                                
                 final String template = GUIBundle.getString("MainFrame_LookingForHistory_template");
-                final String message = MessageFormat.format(template, stock.getSymbol(), stockCodeHistoryGUI.size());
+                final String message = MessageFormat.format(template, stock.symbol, stockCodeHistoryGUI.size());
                 setStatusBar(true, message);
             }
         }
         else {
-            ChartJDialog chartJDialog = new ChartJDialog(MainFrame.this, stock.getSymbol() + " (" + stock.code + ")", false, stockHistoryServer);
+            ChartJDialog chartJDialog = new ChartJDialog(MainFrame.this, stock.symbol + " (" + stock.code + ")", false, stockHistoryServer);
             chartJDialog.setVisible(true);                            
         }        
     }
@@ -2849,7 +2849,7 @@ public class MainFrame extends javax.swing.JFrame {
                     // [2800598] buyportfolio.xml file not updated with code symbol
                     // [2790218] User unable to add new buy transaction in Spain
                     //
-                    // Say no to : portfolioManagementJPanel.showNewBuyTransactionJDialog(stock.getSymbol(), stock.getLastPrice(), false);
+                    // Say no to : portfolioManagementJPanel.showNewBuyTransactionJDialog(stock.symbol, stock.getLastPrice(), false);
                     portfolioManagementJPanel.showNewBuyTransactionJDialog(stock, stock.getLastPrice(), false);
                 }
             });  
@@ -3770,7 +3770,7 @@ public class MainFrame extends javax.swing.JFrame {
             final Stock stock = stocks.get(i);
             Stock new_stock = stock;
             // Sometimes server goes crazy by returning empty symbol.
-            if (isSymbolImmutable || new_stock.getSymbol().toString().isEmpty()) {                
+            if (isSymbolImmutable || new_stock.symbol.toString().isEmpty()) {                
                 // Use local variable to ensure thread safety.
                 final StockInfoDatabase stock_info_database = this.stockInfoDatabase;
                 //final StockNameDatabase name_database = this.stockNameDatabase;
@@ -3789,7 +3789,7 @@ public class MainFrame extends javax.swing.JFrame {
                     final StockTableModel tableModel = (StockTableModel)jTable1.getModel();
                     final int row = tableModel.findRow(stock);
                     if (row >= 0) {
-                        final Symbol symbol = tableModel.getStock(row).getSymbol();
+                        final Symbol symbol = tableModel.getStock(row).symbol;
                         new_stock = new_stock.deriveStock(symbol);
                     }
                 }   // if (symbol_database != null)
@@ -3820,7 +3820,7 @@ public class MainFrame extends javax.swing.JFrame {
                 if (stock != new_stock) {
                     stocks.set(i, new_stock);
                 }
-            }   // if (isSymbolImmutable || new_stock.getSymbol().toString().isEmpty())
+            }   // if (isSymbolImmutable || new_stock.symbol.toString().isEmpty())
         }   // for (int i = 0, size = stocks.size(); i < size; i++)
         
         // Update status bar with current time string.
@@ -4371,7 +4371,7 @@ public class MainFrame extends javax.swing.JFrame {
                         symbol = stock_info_database.codeToSymbol(stock.code);
                     }
                     final String template = GUIBundle.getString("MainFrame_IntradayMovementTemplate");
-                    final String message = MessageFormat.format(template, symbol == null ? stock.getSymbol() : symbol);
+                    final String message = MessageFormat.format(template, symbol == null ? stock.symbol : symbol);
                     dynamicChart.showNewJDialog(MainFrame.this, message);
                 }
             }

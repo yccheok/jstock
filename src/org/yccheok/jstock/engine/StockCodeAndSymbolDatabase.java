@@ -47,7 +47,7 @@ public class StockCodeAndSymbolDatabase {
      */
     private void init(List<Stock> stocks) {
         for (Stock stock : stocks) {
-            Symbol symbol = stock.getSymbol();
+            Symbol symbol = stock.symbol;
             Code code = stock.code;
             Stock.Industry industry = stock.getIndustry();
             Stock.Board board = stock.getBoard();

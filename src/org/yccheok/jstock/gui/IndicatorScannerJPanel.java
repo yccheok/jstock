@@ -375,10 +375,10 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                     final Stock stock = indicator.getStock();
                     final double price = stock.getLastPrice();
                     final String template = GUIBundle.getString("IndicatorScannerJPanel_Hit_template");
-                    final String message = MessageFormat.format(template, stock.getSymbol(), price, indicator.toString());
+                    final String message = MessageFormat.format(template, stock.symbol, price, indicator.toString());
 
                     if (jStockOptions.isPopupMessage()) {
-                        m.displayPopupMessage(stock.getSymbol().toString(), message);
+                        m.displayPopupMessage(stock.symbol.toString(), message);
 
                         if (jStockOptions.isSoundEnabled()) {
                             /* Non-blocking. */
@@ -436,7 +436,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                     final Stock stock = indicator.getStock();
                     final double price = stock.getLastPrice();
                     final String template = GUIBundle.getString("IndicatorScannerJPanel_Hit_template");
-                    final String title = MessageFormat.format(template, stock.getSymbol(), price, indicator.toString());
+                    final String title = MessageFormat.format(template, stock.symbol, price, indicator.toString());
                     final String message = title + "\n(JStock)";
 
                     try {
@@ -472,7 +472,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                     //final String template = GUIBundle.getString("IndicatorScannerJPanel_Hit_template");
                     final ResourceBundle bundle = ResourceBundle.getBundle("org.yccheok.jstock.data.gui", Locale.ENGLISH);
                     final String template = bundle.getString("IndicatorScannerJPanel_Hit_template");
-                    final String message = MessageFormat.format(template, stock.getSymbol(), price, indicator.toString());
+                    final String message = MessageFormat.format(template, stock.symbol, price, indicator.toString());
 
                     final String username = Utils.decrypt(jStockOptions.getGoogleCalendarUsername());
                     if (SMSLimiter.INSTANCE.isSMSAllowed()) {
@@ -895,7 +895,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             // Special handling for China stock market. Also, sometimes for
             // other countries, Yahoo will return empty string for their symbol.
             // We will fix it through offline database.
-            if (isSymbolImmutable || new_stock.getSymbol().toString().isEmpty()) {                
+            if (isSymbolImmutable || new_stock.symbol.toString().isEmpty()) {                
                 // Use local variable to ensure thread safety.
                 final StockInfoDatabase stock_info_database = MainFrame.getInstance().getStockInfoDatabase();
 
@@ -911,7 +911,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                         stocks.set(i, new_stock);
                     }
                 }   // if (symbol_database != null)
-            } // if (org.yccheok.jstock.engine.Utils.isSymbolImmutable() || new_stock.getSymbol().toString().isEmpty())
+            } // if (org.yccheok.jstock.engine.Utils.isSymbolImmutable() || new_stock.symbol.toString().isEmpty())
         }   // for (int i = 0, size = stocks.size(); i < size; i++)
 
         if (stocks.size() > 0)
@@ -919,7 +919,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             // We only print out the first stock, to avoid too many different
             // messages within a short duration.
             final String template = GUIBundle.getString("IndicatorScannerJPanel_IndicatorScannerIsScanning..._template");
-            final String message = MessageFormat.format(template, stocks.get(0).getSymbol(), getCompleteScannedStocksPercentage());
+            final String message = MessageFormat.format(template, stocks.get(0).symbol, getCompleteScannedStocksPercentage());
             updateStatusBarIfStopButtonIsNotPressed(message);
         }
 
@@ -957,7 +957,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         if (stocks.size() > 0)
         {
             final String template = GUIBundle.getString("IndicatorScannerJPanel_IndicatorScannerIsScanning..._template");
-            final String message = MessageFormat.format(template, stocks.get(0).getSymbol(), getCompleteScannedStocksPercentage());
+            final String message = MessageFormat.format(template, stocks.get(0).symbol, getCompleteScannedStocksPercentage());
             updateStatusBarIfStopButtonIsNotPressed(message);
         }
     }  

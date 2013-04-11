@@ -148,7 +148,7 @@ public class Statements {
                 final Stock stock = transaction.getStock();
                 final List<Atom> atoms = new ArrayList<Atom>();
                 atoms.add(new Atom(stock.code.toString(), tmp[0]));
-                atoms.add(new Atom(stock.getSymbol().toString(), tmp[1]));
+                atoms.add(new Atom(stock.symbol.toString(), tmp[1]));
                 
                 DateFormat dateFormat = org.yccheok.jstock.gui.Utils.getCommonDateFormat();
                 final String dateString = transaction.getDate() != null ? dateFormat.format(transaction.getDate().getTime()) : "";                        
@@ -241,7 +241,7 @@ public class Statements {
         if (stock != null) {
             // Metadata. Oh yeah...
             s.metadatas.put("code", stock.code.toString());
-            s.metadatas.put("symbol", stock.getSymbol().toString());
+            s.metadatas.put("symbol", stock.symbol.toString());
             s.metadatas.put("name", stock.getName());
             s.metadatas.put("board", stock.getBoard().name());
             s.metadatas.put("industry", stock.getIndustry().name());
@@ -732,7 +732,7 @@ public class Statements {
                     final String symbol_string = guiBundleWrapper.getString("MainFrame_Symbol");
 
                     atoms.add(new Atom(stock.code.toString(), code_string));
-                    atoms.add(new Atom(stock.getSymbol().toString(), symbol_string));
+                    atoms.add(new Atom(stock.symbol.toString(), symbol_string));
                 }
                 else if (tableModel.getColumnClass(j).equals(Date.class)) {
                     DateFormat dateFormat = org.yccheok.jstock.gui.Utils.getCommonDateFormat();
@@ -818,7 +818,7 @@ public class Statements {
                 final Stock stock = transaction.getStock();
                 final List<Atom> atoms = new ArrayList<Atom>();
                 atoms.add(new Atom(stock.code.toString(), tmp[0]));
-                atoms.add(new Atom(stock.getSymbol().toString(), tmp[1]));
+                atoms.add(new Atom(stock.symbol.toString(), tmp[1]));
                 
                 DateFormat dateFormat = org.yccheok.jstock.gui.Utils.getCommonDateFormat();
                 final String referenceDateString = transaction.getReferenceDate() != null ? dateFormat.format(transaction.getReferenceDate().getTime()) : "";

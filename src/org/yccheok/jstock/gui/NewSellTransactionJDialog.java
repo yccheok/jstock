@@ -595,7 +595,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         buyTransactions.addAll(transactions);
 
         final Stock _stock = transactions.get(0).getStock();
-        final Symbol symbol = _stock.getSymbol();
+        final Symbol symbol = _stock.symbol;
         final Date date = java.util.Calendar.getInstance().getTime();
 
         MainFrame mainFrame = MainFrame.getInstance();
@@ -680,7 +680,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         this.sellTransaction = transaction;
 
         final Stock _stock = transaction.getStock();
-        final Symbol symbol = _stock.getSymbol();
+        final Symbol symbol = _stock.symbol;
         final Date date = transaction.getDate().getCalendar().getTime();
         final double quantity = transaction.getQuantity();
         final double price = transaction.getPrice();

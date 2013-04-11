@@ -42,12 +42,12 @@ public class StockEditor extends DefaultCellEditor {
             @Override
             public int compare(Stock o1, Stock o2) {
                 // Ensure symbols are in alphabetical order.
-                return o1.getSymbol().toString().compareTo(o2.getSymbol().toString());
+                return o1.symbol.toString().compareTo(o2.symbol.toString());
             }            
         });
 
         for (Stock stock : this.stocks) {
-            comboBox.addItem(stock.getSymbol());
+            comboBox.addItem(stock.symbol);
         }
     }
 
@@ -60,7 +60,7 @@ public class StockEditor extends DefaultCellEditor {
                                                  int column) {
         JComboBox _comboBox = (JComboBox) super.getTableCellEditorComponent(table, value, isSelected, row, column);
         Stock stock = (Stock)value;
-        _comboBox.setSelectedItem(stock.getSymbol());
+        _comboBox.setSelectedItem(stock.symbol);
         return _comboBox;
     }
 

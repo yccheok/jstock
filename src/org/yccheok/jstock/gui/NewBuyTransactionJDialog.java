@@ -540,7 +540,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
     public void setTransaction(Transaction transaction) {
         this.stock = transaction.getStock();
         final Code code = stock.code;
-        final Symbol symbol = stock.getSymbol();
+        final Symbol symbol = stock.symbol;
         final Date date = transaction.getDate().getCalendar().getTime();
         final double quantity = transaction.getQuantity();
         final double price = transaction.getPrice();
@@ -644,7 +644,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         }
 
         if (this.jTextField1.getText().trim().length() <= 0) {
-            this.jTextField1.setText(this.stock.getSymbol().toString());
+            this.jTextField1.setText(this.stock.symbol.toString());
             return false;
         }
         
@@ -809,7 +809,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
     
     public void setStock(Stock stock) {
         if (stock != null) {
-            Symbol symbol = stock.getSymbol();
+            Symbol symbol = stock.symbol;
             Code code = stock.code;
             this.jTextField1.setText(symbol.toString());
             this.jTextField2.setText(code.toString());
@@ -864,7 +864,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
 
     private void addStockInfoFromAutoCompleteJComboBox(StockInfo stockInfo) {
         NewBuyTransactionJDialog.this.stock = Utils.getEmptyStock(stockInfo);
-        NewBuyTransactionJDialog.this.jTextField1.setText(NewBuyTransactionJDialog.this.stock.getSymbol().toString());
+        NewBuyTransactionJDialog.this.jTextField1.setText(NewBuyTransactionJDialog.this.stock.symbol.toString());
         NewBuyTransactionJDialog.this.jTextField2.setText(NewBuyTransactionJDialog.this.stock.code.toString());
         // So that the 1st character is being displayed.
         NewBuyTransactionJDialog.this.jTextField1.setCaretPosition(0);

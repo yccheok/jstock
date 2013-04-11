@@ -443,7 +443,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         for (TransactionSummary transactionSummary : transactionSummaries) {
             for (int i = 0, count = transactionSummary.getChildCount(); i < count; i++) {
                 final Transaction transaction = (Transaction)transactionSummary.getChildAt(i);
-                StockInfo stockInfo = new StockInfo(transaction.getStock().code, transaction.getStock().getSymbol());
+                StockInfo stockInfo = new StockInfo(transaction.getStock().code, transaction.getStock().symbol);
                 if (stockInfos.contains(stockInfo) == false) {
                     stockInfos.add(stockInfo);
                 }
@@ -453,7 +453,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         for (int i = 0, size = dividendSummary.size(); i < size; i++) {
             final Dividend dividend = dividendSummary.get(i);
             final Stock stock = dividend.getStock();
-            final StockInfo stockInfo = new StockInfo(stock.code, stock.getSymbol());
+            final StockInfo stockInfo = new StockInfo(stock.code, stock.symbol);
             if (stockInfos.contains(stockInfo) == false) {
                 stockInfos.add(stockInfo);
             }

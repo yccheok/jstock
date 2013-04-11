@@ -68,7 +68,7 @@ public class StockInfoDatabase {
 
         for (Stock stock : stocks) {
             final Code code = stock.code;
-            final Symbol symbol = stock.getSymbol();
+            final Symbol symbol = stock.symbol;
             final Stock.Industry industry = stock.getIndustry();
             final Stock.Board board = stock.getBoard();
 

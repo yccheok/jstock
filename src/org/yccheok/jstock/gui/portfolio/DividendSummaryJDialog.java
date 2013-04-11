@@ -440,7 +440,7 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
         }
 
         int viewIndex = this.jTable1.convertColumnIndexToView(1);
-        String string = ((Stock)jTable1.getValueAt(jTable1.getSelectedRow(), viewIndex)).getSymbol().toString();
+        String string = ((Stock)jTable1.getValueAt(jTable1.getSelectedRow(), viewIndex)).symbol.toString();
         return string;
     }
 

@@ -403,10 +403,6 @@ public class Stock {
         this.timestamp = stock.timestamp;
     }
 
-    public Symbol getSymbol() {
-        return symbol;
-    }
-
     public String getName() {
         return name;
     }
@@ -713,7 +709,7 @@ public class Stock {
     }
             
     public final Code code;
-    private final Symbol symbol;
+    public final Symbol symbol;
     private final String name;
     private final Board board;
     private final Industry industry;

@@ -143,7 +143,7 @@ public class IndicatorTableModel extends AbstractTableModelWithMemory implements
         assert(stock != null);
         
         list.add(stock.code);
-        list.add(stock.getSymbol());
+        list.add(stock.symbol);
         list.add(stock.getPrevPrice());
         list.add(stock.getOpenPrice());
         list.add(stock.getLastPrice());

@@ -196,7 +196,7 @@ public class Transaction extends DefaultSortableMutableTreeTableNode implements 
     
     @Override
     public String toString() {
-        return contract.getStock().getSymbol().toString();
+        return contract.getStock().symbol.toString();
     }
 
 

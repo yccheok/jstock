@@ -259,7 +259,7 @@ public class SellPortfolioTreeTableModel extends DeprecatedAbstractPortfolioTree
             
             switch(column) {
                 case 0:
-                    return ((Transaction)transactionSummary.getChildAt(0)).getStock().getSymbol();
+                    return ((Transaction)transactionSummary.getChildAt(0)).getStock().symbol;
                     
                 case 2:
                     return transactionSummary.getQuantity();
@@ -338,7 +338,7 @@ public class SellPortfolioTreeTableModel extends DeprecatedAbstractPortfolioTree
             
             switch(column) {
                 case 0:
-                    return (transaction).getStock().getSymbol();
+                    return (transaction).getStock().symbol;
 
                 case 1:
                     return transaction.getDate();

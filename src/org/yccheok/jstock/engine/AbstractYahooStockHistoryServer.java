@@ -89,7 +89,7 @@ public abstract class AbstractYahooStockHistoryServer implements StockHistorySer
 
         try {
             Stock stock = getStockServer(this.country).getStock(code);
-            symbol = stock.getSymbol();
+            symbol = stock.symbol;
             name = stock.getName();
             board = stock.getBoard();
             industry = stock.getIndustry();
