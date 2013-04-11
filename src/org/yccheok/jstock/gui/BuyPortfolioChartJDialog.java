@@ -97,7 +97,7 @@ public class BuyPortfolioChartJDialog extends javax.swing.JDialog {
         final int size = dividendSummary.size();
         for (int i = 0; i < size; i++) {
             Dividend dividend = dividendSummary.get(i);
-            Code code = dividend.getStock().getCode();
+            Code code = dividend.getStock().code;
             Double value = this.codeToTotalDividend.get(code);
             if (value != null) {
                 double total = value + dividend.getAmount();
@@ -171,7 +171,7 @@ public class BuyPortfolioChartJDialog extends javax.swing.JDialog {
             
             Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
             final Symbol symbol = transaction.getStock().getSymbol();
-            final Code code =  transaction.getStock().getCode();
+            final Code code =  transaction.getStock().code;
 
             /* Should use reflection technology. */
             if(name.equals(cNames[0])) {

@@ -412,7 +412,7 @@ public class IndicatorPanel extends JPanel {
             final Object o = ((ObjectInspectorJPanel)this.objectInspectorJPanel).getBean();
             final MutableStock mutableStock = (MutableStock)o;
             stock = mutableStock.getStock();
-            if (stock.getCode().toString().equals("")) {
+            if (stock.code.toString().equals("")) {
                 JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_you_need_to_select_a_stock"), MessagesBundle.getString("warning_title_you_need_to_select_a_stock"), JOptionPane.WARNING_MESSAGE);
                 this.jComboBox1.requestFocus();
                 return;
@@ -1433,7 +1433,7 @@ public class IndicatorPanel extends JPanel {
                     if (org.yccheok.jstock.engine.Utils.isSymbolImmutable() || new_stock.getSymbol().toString().isEmpty()) {
                         final StockInfoDatabase stockInfoDatabase = m.getStockInfoDatabase();
                         if (stockInfoDatabase != null) {
-                            final Symbol _symbol = stockInfoDatabase.codeToSymbol(new_stock.getCode());
+                            final Symbol _symbol = stockInfoDatabase.codeToSymbol(new_stock.code);
                             if (_symbol != null) {
                                 new_stock = new_stock.deriveStock(_symbol);
                             }
@@ -1443,7 +1443,7 @@ public class IndicatorPanel extends JPanel {
                     if (org.yccheok.jstock.engine.Utils.isNameImmutable()) {
                         final StockNameDatabase stockNameDatabase = m.getStockNameDatabase();
                         if (stockNameDatabase != null) {
-                            final String _name = stockNameDatabase.codeToName(new_stock.getCode());
+                            final String _name = stockNameDatabase.codeToName(new_stock.code);
                             if (_name != null) {
                                 new_stock = new_stock.deriveStock(_name);
                             }
@@ -1532,7 +1532,7 @@ public class IndicatorPanel extends JPanel {
             }
 
             // Action!
-            StockHistoryServer stockHistoryServer = this.stockHistoryMonitor.getStockHistoryServer(stock.getCode());
+            StockHistoryServer stockHistoryServer = this.stockHistoryMonitor.getStockHistoryServer(stock.code);
 
             if (stockHistoryServer == null) {
                 final java.util.concurrent.CountDownLatch countDownLatch = new java.util.concurrent.CountDownLatch(1);
@@ -1540,14 +1540,14 @@ public class IndicatorPanel extends JPanel {
                     @Override
                     public void update(StockHistoryMonitor monitor, StockHistoryMonitor.StockHistoryRunnable runnable)
                     {
-                        if (runnable.getCode().equals(stock.getCode())) {
+                        if (runnable.getCode().equals(stock.code)) {
                             countDownLatch.countDown();
                         }
                     }
                 };
 
                 this.stockHistoryMonitor.attach(observer);
-                this.stockHistoryMonitor.addStockCode(stock.getCode());
+                this.stockHistoryMonitor.addStockCode(stock.code);
                 try {
                     countDownLatch.await();
                 }
@@ -1556,7 +1556,7 @@ public class IndicatorPanel extends JPanel {
                     return;
                 }
                 this.stockHistoryMonitor.dettach(observer);
-                stockHistoryServer = this.stockHistoryMonitor.getStockHistoryServer(stock.getCode());
+                stockHistoryServer = this.stockHistoryMonitor.getStockHistoryServer(stock.code);
             }
 
             if (stockHistoryServer == null) {

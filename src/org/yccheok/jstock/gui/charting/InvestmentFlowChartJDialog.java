@@ -310,17 +310,17 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
                         // We might already have last price information in
                         // PortfolioManagementJPanel, we will still request
                         // stock monitor to provide continuous update.
-                        codesNeedToAddToRealTimeStockMonitor.add(stock.getCode());
+                        codesNeedToAddToRealTimeStockMonitor.add(stock.code);
                         // If PortfolioManagementJPanel already has last price
                         // information, just get it from there.
                         final double lastPrice = this.portfolioManagementJPanel.getStockPrice(stock);
                         if (lastPrice != 0.0) {
-                            this.codeToPrice.put(stock.getCode(), lastPrice);
+                            this.codeToPrice.put(stock.code, lastPrice);
                         } else {
-                            this.lookUpCodes.add(stock.getCode());
+                            this.lookUpCodes.add(stock.code);
                         }
                     }
-                    final Double price = this.codeToPrice.get(stock.getCode());
+                    final Double price = this.codeToPrice.get(stock.code);
                     if (price != null) {
                         amount += convertToPoundIfNecessary((price * quantity));
                     }
@@ -443,7 +443,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         for (TransactionSummary transactionSummary : transactionSummaries) {
             for (int i = 0, count = transactionSummary.getChildCount(); i < count; i++) {
                 final Transaction transaction = (Transaction)transactionSummary.getChildAt(i);
-                StockInfo stockInfo = new StockInfo(transaction.getStock().getCode(), transaction.getStock().getSymbol());
+                StockInfo stockInfo = new StockInfo(transaction.getStock().code, transaction.getStock().getSymbol());
                 if (stockInfos.contains(stockInfo) == false) {
                     stockInfos.add(stockInfo);
                 }
@@ -453,7 +453,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         for (int i = 0, size = dividendSummary.size(); i < size; i++) {
             final Dividend dividend = dividendSummary.get(i);
             final Stock stock = dividend.getStock();
-            final StockInfo stockInfo = new StockInfo(stock.getCode(), stock.getSymbol());
+            final StockInfo stockInfo = new StockInfo(stock.code, stock.getSymbol());
             if (stockInfos.contains(stockInfo) == false) {
                 stockInfos.add(stockInfo);
             }
@@ -491,7 +491,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
                 if (selectedIndex != 0) {
                     // selectedIndex - 1, as the first item in combo box is "All Stock(s)".
                     final Code code = this.stockInfos.get(selectedIndex - 1).code;
-                    if (false == transaction.getStock().getCode().equals(code)) {
+                    if (false == transaction.getStock().code.equals(code)) {
                         continue;
                     }
                 }
@@ -529,7 +529,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
             if (selectedIndex != 0) {
                 // selectedIndex - 1, as the first item in combo box is "All Stock(s)".
                 final Code code = this.stockInfos.get(selectedIndex - 1).code;
-                if (false == dividend.getStock().getCode().equals(code)) {
+                if (false == dividend.getStock().code.equals(code)) {
                     continue;
                 }
             }
@@ -564,8 +564,8 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
     @Override
     public void update(RealTimeStockMonitor subject, List<Stock> arg) {
         for (Stock stock : arg) {
-            this.codeToPrice.put(stock.getCode(), stock.getLastPrice());
-            this.lookUpCodes.remove(stock.getCode());
+            this.codeToPrice.put(stock.code, stock.getLastPrice());
+            this.lookUpCodes.remove(stock.code);
         }
 
         // Mutual exclusive with combo box event. So that user thread and

@@ -98,7 +98,7 @@ public class StockTableModel extends AbstractTableModelWithMemory implements CSV
         if (col == (columnClasses.length - 1))
         {
             final Double riseAbove = (Double)value;
-            final Code code = stocks.get(row).getCode();
+            final Code code = stocks.get(row).code;
             alerts.put(code, alerts.get(code).setRiseAbove(riseAbove));
             List<Object> oldInfos = oldTableModel.get(row);
             if (oldInfos != null) oldInfos.set(col, tableModel.get(row).get(col));
@@ -109,7 +109,7 @@ public class StockTableModel extends AbstractTableModelWithMemory implements CSV
         else if (col == (columnClasses.length - 2))
         {
             final Double fallBelow = (Double)value;
-            final Code code = stocks.get(row).getCode();
+            final Code code = stocks.get(row).code;
             alerts.put(code, alerts.get(code).setFallBelow(fallBelow));
             List<Object> oldInfos = oldTableModel.get(row);
             if (oldInfos != null) oldInfos.set(col, tableModel.get(row).get(col));
@@ -124,11 +124,11 @@ public class StockTableModel extends AbstractTableModelWithMemory implements CSV
     public void updateStock(Stock stock) {
         assert(SwingUtilities.isEventDispatchThread());
         
-        final Integer row = codeToRow.get(stock.getCode());
+        final Integer row = codeToRow.get(stock.code);
 
         if (row != null) {
             oldTableModel.set(row, tableModel.get(row));
-            final StockAlert alert = alerts.get(stock.getCode());
+            final StockAlert alert = alerts.get(stock.code);
             tableModel.set(row, stockToList(stock, alert));
             stocks.set(row, stock);
             this.fireTableRowsUpdated(row, row);            
@@ -138,14 +138,14 @@ public class StockTableModel extends AbstractTableModelWithMemory implements CSV
     public void addStock(Stock stock, StockAlert alert) {
         assert(SwingUtilities.isEventDispatchThread());
         
-        Integer row = codeToRow.get(stock.getCode());
+        Integer row = codeToRow.get(stock.code);
         if (row == null) {
             tableModel.add(stockToList(stock, alert));
             oldTableModel.add(null);
             stocks.add(stock);
-            alerts.put(stock.getCode(), alert);
+            alerts.put(stock.code, alert);
             final int rowIndex = tableModel.size() - 1;
-            codeToRow.put(stock.getCode(), rowIndex);
+            codeToRow.put(stock.code, rowIndex);
             fireTableRowsInserted(rowIndex, rowIndex);
         }
     }
@@ -183,13 +183,13 @@ public class StockTableModel extends AbstractTableModelWithMemory implements CSV
     }
 
     public Double getRiseAbove(Stock stock) {
-        StockAlert stockAlert = this.alerts.get(stock.getCode());
+        StockAlert stockAlert = this.alerts.get(stock.code);
         if (stockAlert == null) return null;
         return stockAlert.riseAbove;
     }
 
     public Double getFallBelow(Stock stock) {
-        StockAlert stockAlert = this.alerts.get(stock.getCode());
+        StockAlert stockAlert = this.alerts.get(stock.code);
         if (stockAlert == null) return null;
         return stockAlert.fallBelow;
     }
@@ -212,7 +212,7 @@ public class StockTableModel extends AbstractTableModelWithMemory implements CSV
         int size = stocks.size();
         for (int i = row; i < size; i++) {
             Stock s = stocks.get(i);
-            codeToRow.put(s.getCode(), i);
+            codeToRow.put(s.code, i);
         }
         
         this.fireTableRowsDeleted(row, row);
@@ -220,7 +220,7 @@ public class StockTableModel extends AbstractTableModelWithMemory implements CSV
     
     private List<Object> stockToList(Stock stock, StockAlert alert) {
         List<Object> list = new ArrayList<Object>();
-        list.add(stock.getCode());
+        list.add(stock.code);
         list.add(stock.getSymbol());
         list.add(stock.getPrevPrice());
         list.add(stock.getOpenPrice());
@@ -254,7 +254,7 @@ public class StockTableModel extends AbstractTableModelWithMemory implements CSV
      * found.
      */
     public int findRow(Stock stock) {
-        Integer row = codeToRow.get(stock.getCode());
+        Integer row = codeToRow.get(stock.code);
         if (row != null) {
             return row;
         }

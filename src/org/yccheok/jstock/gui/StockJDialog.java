@@ -429,7 +429,7 @@ public class StockJDialog extends javax.swing.JDialog {
                 for (StockInfo stockInfo : stockInfos) {
                     final Stock stock = org.yccheok.jstock.gui.Utils.getEmptyStock(stockInfo);
                     m.addStockToTable(stock);
-                    m.getRealTimeStockMonitor().addStockCode(stock.getCode());
+                    m.getRealTimeStockMonitor().addStockCode(stock.code);
                 }
                 m.getRealTimeStockMonitor().startNewThreadsIfNecessary();                
                 m.getRealTimeStockMonitor().refresh();

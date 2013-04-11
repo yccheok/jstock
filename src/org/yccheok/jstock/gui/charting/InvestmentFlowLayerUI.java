@@ -305,7 +305,7 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
                 final Stock stock = (Stock)activity.get(Activity.Param.Stock);
                 this.ROIParams.add(GUIBundle.getString("InvestmentFlowLayerUI_Own") + " " + 
                         org.yccheok.jstock.portfolio.Utils.toQuantity(quantity) + " " + stock.getSymbol());
-                final double amount = convertToPoundIfNecessary(quantity * this.investmentFlowChartJDialog.getStockPrice(stock.getCode()));
+                final double amount = convertToPoundIfNecessary(quantity * this.investmentFlowChartJDialog.getStockPrice(stock.code));
                 this.totalROIValue += amount;
                 this.ROIValues.add(org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(amount));
             }

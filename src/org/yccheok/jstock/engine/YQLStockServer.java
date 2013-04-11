@@ -184,7 +184,7 @@ public class YQLStockServer implements StockServer {
         if (isToleranceAllowed(stocks.size(), codes.size())) {
             List<Code> currentCodes = new ArrayList<Code>();
             for (Stock stock : stocks) {
-                currentCodes.add(stock.getCode());
+                currentCodes.add(stock.code);
             }
 
             for (Code code : codes) {

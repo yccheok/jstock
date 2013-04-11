@@ -138,7 +138,7 @@ public class Statements {
             final String comment = transactionSummary.getComment().trim();
             if (comment.isEmpty() == false) {
                 final Stock stock = ((Transaction)transactionSummary.getChildAt(0)).getStock();
-                statements.metadatas.put(stock.getCode().toString(), comment);
+                statements.metadatas.put(stock.code.toString(), comment);
             }
             
             final int transactionCount = transactionSummary.getChildCount();
@@ -147,7 +147,7 @@ public class Statements {
                 final Transaction transaction = (Transaction)transactionSummary.getChildAt(j);
                 final Stock stock = transaction.getStock();
                 final List<Atom> atoms = new ArrayList<Atom>();
-                atoms.add(new Atom(stock.getCode().toString(), tmp[0]));
+                atoms.add(new Atom(stock.code.toString(), tmp[0]));
                 atoms.add(new Atom(stock.getSymbol().toString(), tmp[1]));
                 
                 DateFormat dateFormat = org.yccheok.jstock.gui.Utils.getCommonDateFormat();
@@ -240,7 +240,7 @@ public class Statements {
         
         if (stock != null) {
             // Metadata. Oh yeah...
-            s.metadatas.put("code", stock.getCode().toString());
+            s.metadatas.put("code", stock.code.toString());
             s.metadatas.put("symbol", stock.getSymbol().toString());
             s.metadatas.put("name", stock.getName());
             s.metadatas.put("board", stock.getBoard().name());
@@ -731,7 +731,7 @@ public class Statements {
                     final String code_string = guiBundleWrapper.getString("MainFrame_Code");
                     final String symbol_string = guiBundleWrapper.getString("MainFrame_Symbol");
 
-                    atoms.add(new Atom(stock.getCode().toString(), code_string));
+                    atoms.add(new Atom(stock.code.toString(), code_string));
                     atoms.add(new Atom(stock.getSymbol().toString(), symbol_string));
                 }
                 else if (tableModel.getColumnClass(j).equals(Date.class)) {
@@ -808,7 +808,7 @@ public class Statements {
             final String comment = transactionSummary.getComment().trim();
             if (comment.isEmpty() == false) {
                 final Stock stock = ((Transaction)transactionSummary.getChildAt(0)).getStock();
-                statements.metadatas.put(stock.getCode().toString(), comment);
+                statements.metadatas.put(stock.code.toString(), comment);
             }
 
             final int transactionCount = transactionSummary.getChildCount();
@@ -817,7 +817,7 @@ public class Statements {
                 final Transaction transaction = (Transaction)transactionSummary.getChildAt(j);
                 final Stock stock = transaction.getStock();
                 final List<Atom> atoms = new ArrayList<Atom>();
-                atoms.add(new Atom(stock.getCode().toString(), tmp[0]));
+                atoms.add(new Atom(stock.code.toString(), tmp[0]));
                 atoms.add(new Atom(stock.getSymbol().toString(), tmp[1]));
                 
                 DateFormat dateFormat = org.yccheok.jstock.gui.Utils.getCommonDateFormat();

@@ -46,7 +46,7 @@ public class StockHistorySerializer {
         }
         
         final long timestamp = stockHistoryServer.getTimestamp(0);
-        final Code code = stockHistoryServer.getStock(timestamp).getCode();
+        final Code code = stockHistoryServer.getStock(timestamp).code;
         final Statements statements = Statements.newInstanceFromStockHistoryServer(stockHistoryServer, true);
         final File file = new File(getFileName(code, duration));
         return statements.saveAsCSVFile(file);

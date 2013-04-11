@@ -138,7 +138,7 @@ public abstract class AbstractYahooStockServer extends Subject<AbstractYahooStoc
                             List<Stock> emptyStocks = new ArrayList<Stock>();
 
                             for (Stock stock : tmpStocks) {
-                                currCodes.add(stock.getCode());                                
+                                currCodes.add(stock.code);                                
                             }
 
                             for (Code code : expectedCodes) {
@@ -225,7 +225,7 @@ public abstract class AbstractYahooStockServer extends Subject<AbstractYahooStoc
                         List<Stock> emptyStocks = new ArrayList<Stock>();
 
                         for (Stock stock : tmpStocks) {
-                            currCodes.add(stock.getCode());
+                            currCodes.add(stock.code);
                         }
 
                         for (Code code : expectedCodes) {

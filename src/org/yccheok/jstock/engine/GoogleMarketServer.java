@@ -55,8 +55,8 @@ public class GoogleMarketServer implements MarketServer {
             throw new java.lang.IllegalArgumentException(country.toString());
         }
         for (Index index : indicies) {
-            codes.add(index.getCode());
-            codeToIndexMap.put(index.getCode(), index);
+            codes.add(index.code);
+            codeToIndexMap.put(index.code, index);
         }
     }
     
@@ -111,7 +111,7 @@ public class GoogleMarketServer implements MarketServer {
                 }
                 // Store the result for later query purpose.
                 for (Stock stock : stocks) {
-                    map.put(codeToIndexMap.get(stock.getCode()), stock);
+                    map.put(codeToIndexMap.get(stock.code), stock);
                 }
             } catch (UnsupportedEncodingException ex) {
                 throw new StockNotFoundException(null, ex);

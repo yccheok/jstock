@@ -559,7 +559,7 @@ public class Utils {
      * @return converted stock info
      */
     public static StockInfo toStockInfo(Stock stock) {
-        return new StockInfo(stock.getCode(), stock.getSymbol());
+        return new StockInfo(stock.code, stock.getSymbol());
     }
 
     /**

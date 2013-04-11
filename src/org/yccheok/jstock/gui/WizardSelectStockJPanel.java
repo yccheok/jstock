@@ -549,7 +549,7 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
         if (jRadioButton4.isSelected()) {
             java.util.List<Stock> stocks = m.getStocks();
             for (Stock stock : stocks) {
-                selectedStockInfos.add(new StockInfo(stock.getCode(), stock.getSymbol()));
+                selectedStockInfos.add(new StockInfo(stock.code, stock.getSymbol()));
             }
 
 	    return true;

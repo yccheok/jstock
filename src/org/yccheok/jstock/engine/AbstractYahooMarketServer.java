@@ -49,7 +49,7 @@ public abstract class AbstractYahooMarketServer implements MarketServer {
         if (country == Country.Malaysia) {
             final List<Index> tmp = new ArrayList<Index>();
             for (Index index : Utils.getStockIndices(country)) {
-                if (index.getCode().toString().startsWith("^")) {
+                if (index.code.toString().startsWith("^")) {
                     tmp.add(index);
                 }
             }
@@ -62,8 +62,8 @@ public abstract class AbstractYahooMarketServer implements MarketServer {
             throw new java.lang.IllegalArgumentException(country.toString());
         }
         for (Index index : indicies) {
-            codes.add(index.getCode());
-            codeToIndexMap.put(index.getCode(), index);
+            codes.add(index.code);
+            codeToIndexMap.put(index.code, index);
         }
     }
 
@@ -92,7 +92,7 @@ public abstract class AbstractYahooMarketServer implements MarketServer {
             }
 
             for (Stock stock : stocks) {
-                map.put(codeToIndexMap.get(stock.getCode()), stock);
+                map.put(codeToIndexMap.get(stock.code), stock);
             }
         }
 

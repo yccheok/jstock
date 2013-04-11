@@ -1080,7 +1080,7 @@ public class MainFrame extends javax.swing.JFrame {
     private void updateDynamicChart(Stock stock) {
         assert(java.awt.EventQueue.isDispatchThread());
 
-        DynamicChart dynamicChart = stock != null ? this.dynamicCharts.get(stock.getCode()) : MainFrame.EMPTY_DYNAMIC_CHART;
+        DynamicChart dynamicChart = stock != null ? this.dynamicCharts.get(stock.code) : MainFrame.EMPTY_DYNAMIC_CHART;
         if (dynamicChart == null) {
             dynamicChart = MainFrame.EMPTY_DYNAMIC_CHART;
         }
@@ -1760,9 +1760,9 @@ public class MainFrame extends javax.swing.JFrame {
             }
             final int modelIndex = jTable1.getRowSorter().convertRowIndexToModel(row);
             Stock stock = tableModel.getStock(modelIndex);
-            stockCodeHistoryGUI.remove(stock.getCode());
-            realTimeStockMonitor.removeStockCode(stock.getCode());
-            stockHistoryMonitor.removeStockCode(stock.getCode());
+            stockCodeHistoryGUI.remove(stock.code);
+            realTimeStockMonitor.removeStockCode(stock.code);
+            stockHistoryMonitor.removeStockCode(stock.code);
             tableModel.removeRow(modelIndex);
             this.alertStateManager.clearState(stock);
         }            
@@ -2478,7 +2478,7 @@ public class MainFrame extends javax.swing.JFrame {
             final int row = rows[0];
             final StockTableModel tableModel = (StockTableModel)jTable1.getModel();
             final int modelIndex = jTable1.convertRowIndexToModel(row);
-            if (stock.getCode().equals(tableModel.getStock(modelIndex).getCode())) {
+            if (stock.code.equals(tableModel.getStock(modelIndex).code)) {
                 return true;
             }
         }
@@ -2789,17 +2789,17 @@ public class MainFrame extends javax.swing.JFrame {
     
     // Asynchronous call. Must be called by event dispatch thread.
     public void displayHistoryChart(Stock stock) {
-        final StockHistoryServer stockHistoryServer = stockHistoryMonitor.getStockHistoryServer(stock.getCode());
+        final StockHistoryServer stockHistoryServer = stockHistoryMonitor.getStockHistoryServer(stock.code);
 
         if (stockHistoryServer == null) {
-            if (stockCodeHistoryGUI.add(stock.getCode()) && stockHistoryMonitor.addStockCode(stock.getCode())) {                                
+            if (stockCodeHistoryGUI.add(stock.code) && stockHistoryMonitor.addStockCode(stock.code)) {                                
                 final String template = GUIBundle.getString("MainFrame_LookingForHistory_template");
                 final String message = MessageFormat.format(template, stock.getSymbol(), stockCodeHistoryGUI.size());
                 setStatusBar(true, message);
             }
         }
         else {
-            ChartJDialog chartJDialog = new ChartJDialog(MainFrame.this, stock.getSymbol() + " (" + stock.getCode() + ")", false, stockHistoryServer);
+            ChartJDialog chartJDialog = new ChartJDialog(MainFrame.this, stock.getSymbol() + " (" + stock.code + ")", false, stockHistoryServer);
             chartJDialog.setVisible(true);                            
         }        
     }
@@ -3776,12 +3776,12 @@ public class MainFrame extends javax.swing.JFrame {
                 //final StockNameDatabase name_database = this.stockNameDatabase;
                 
                 if (stock_info_database != null) {
-                    final Symbol symbol = stock_info_database.codeToSymbol(stock.getCode());
+                    final Symbol symbol = stock_info_database.codeToSymbol(stock.code);
                     if (symbol != null) {
                         new_stock = new_stock.deriveStock(symbol);
                     } else {
                         // Shouldn't be null. Let's give some warning on this.
-                        log.error("Wrong stock code " + stock.getCode() + " given by stock server.");
+                        log.error("Wrong stock code " + stock.code + " given by stock server.");
                     }
                 } else {
                     // stockCodeAndSymbolDatabase is not ready yet. Use the information
@@ -3798,12 +3798,12 @@ public class MainFrame extends javax.swing.JFrame {
                 // Need not to perform derive for speed optimization.
                 //if (org.yccheok.jstock.engine.Utils.isNameImmutable()) {
                 //    if (name_database != null) {
-                //        final String name = name_database.codeToName(stock.getCode());
+                //        final String name = name_database.codeToName(stock.code);
                 //        if (name != null) {
                 //            new_stock = new_stock.deriveStock(name);
                 //        } else {
                 //            // Shouldn't be null. Let's give some warning on this.
-                //            log.error("Wrong stock code " + stock.getCode() + " given by stock server.");
+                //            log.error("Wrong stock code " + stock.code + " given by stock server.");
                 //        }
                 //    } else {
                 //        // stockNameDatabase is not ready yet. Use the information
@@ -3846,7 +3846,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         // Dynamic charting. Intraday trader might love this.
         for (Stock stock : stocks) {
-            final Code code = stock.getCode();
+            final Code code = stock.code;
             DynamicChart dynamicChart = this.dynamicCharts.get(code);
             if (dynamicChart == null) {
                 // Not found. Try to create a new dynamic chart.
@@ -4358,7 +4358,7 @@ public class MainFrame extends javax.swing.JFrame {
                         return;
                     }
 
-                    final DynamicChart dynamicChart = MainFrame.this.dynamicCharts.get(stock.getCode());
+                    final DynamicChart dynamicChart = MainFrame.this.dynamicCharts.get(stock.code);
                     if (dynamicChart == null) {
                         return;
                     }
@@ -4368,7 +4368,7 @@ public class MainFrame extends javax.swing.JFrame {
                     // Is the database ready?
                     if (stock_info_database != null) {
                         // Possible null if we are trying to get index history.
-                        symbol = stock_info_database.codeToSymbol(stock.getCode());
+                        symbol = stock_info_database.codeToSymbol(stock.code);
                     }
                     final String template = GUIBundle.getString("MainFrame_IntradayMovementTemplate");
                     final String message = MessageFormat.format(template, symbol == null ? stock.getSymbol() : symbol);

@@ -72,7 +72,7 @@ public class AlertStateManager extends Subject<Indicator, Boolean> {
 
             if (indicator.getStock() != null)
             {
-                result = 31 * result + indicator.getStock().getCode().hashCode();
+                result = 31 * result + indicator.getStock().code.hashCode();
             }
 
             return result;
@@ -114,7 +114,7 @@ public class AlertStateManager extends Subject<Indicator, Boolean> {
 
             if (indicator.getStock() != null && dest.getStock() != null)
             {
-                result = indicator.getStock().getCode().equals(dest.getStock().getCode());
+                result = indicator.getStock().code.equals(dest.getStock().code);
             }
             else
             {
@@ -140,7 +140,7 @@ public class AlertStateManager extends Subject<Indicator, Boolean> {
     /* Re-start a particular stock from the initial state. */
     public synchronized void clearState(Stock stock)
     {
-        final Code code = stock.getCode();
+        final Code code = stock.code;
         final java.util.Set<Key> keys = stockCodeToAlertRecords.remove(code);
         if (keys == null) {
             return;
@@ -153,7 +153,7 @@ public class AlertStateManager extends Subject<Indicator, Boolean> {
 
     public synchronized void clearState(Indicator indicator, Stock stock)
     {
-        final Code code = stock.getCode();
+        final Code code = stock.code;
         final java.util.Set<Key> keys = stockCodeToAlertRecords.get(code);
 
         if (keys == null) {
@@ -189,7 +189,7 @@ public class AlertStateManager extends Subject<Indicator, Boolean> {
     private synchronized boolean add(Indicator indicator)
     {
         assert (indicator.getStock() != null);
-        final Code code = indicator.getStock().getCode();
+        final Code code = indicator.getStock().code;
         final Key key = Key.newInstance(indicator);
         final boolean result0 = alertRecords.add(key);
         if (result0 == false) {
@@ -211,7 +211,7 @@ public class AlertStateManager extends Subject<Indicator, Boolean> {
     private synchronized boolean remove(Indicator indicator)
     {
         assert (indicator.getStock() != null);
-        final Code code = indicator.getStock().getCode();
+        final Code code = indicator.getStock().code;
         final Key key = Key.newInstance(indicator);
         final boolean result0 = alertRecords.remove(key);
         if (result0 == false) {

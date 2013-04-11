@@ -542,7 +542,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     
                     Map<String, String> metadatas = statements.getMetadatas();
                     for (Transaction transaction : transactions) {
-                        final Code code = transaction.getStock().getCode();
+                        final Code code = transaction.getStock().code;
                         TransactionSummary transactionSummary = this.addBuyTransaction(transaction);
                         if (transactionSummary != null) {
                             String comment = metadatas.get(code.toString());
@@ -690,7 +690,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     Map<String, String> metadatas = statements.getMetadatas();
 
                     for (Transaction transaction : transactions) {
-                        final Code code = transaction.getStock().getCode();
+                        final Code code = transaction.getStock().code;
                         TransactionSummary transactionSummary = this.addSellTransaction(transaction);
                         if (transactionSummary != null) {
                             String comment = metadatas.get(code.toString());
@@ -909,15 +909,15 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         List<Stock> stocks = new ArrayList<Stock>();
 
         for (Stock stock : stocks0) {
-            if (c.contains(stock.getCode()) == false) {
-                c.add(stock.getCode());
+            if (c.contains(stock.code) == false) {
+                c.add(stock.code);
                 stocks.add(stock);
             }
         }
 
         for (Stock stock : stocks1) {
-            if (c.contains(stock.getCode()) == false) {
-                c.add(stock.getCode());
+            if (c.contains(stock.code) == false) {
+                c.add(stock.code);
                 stocks.add(stock);
             }
         }
@@ -927,7 +927,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     
     public double getStockPrice(Stock stock) {
         final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
-        return buyPortfolioTreeTableModel.getStockPrice(stock.getCode());
+        return buyPortfolioTreeTableModel.getStockPrice(stock.code);
     }
 
     private void showNewSellTransactionJDialog(List<Transaction> buyTransactions) {
@@ -1703,7 +1703,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         // Information will be pumped in later to realTimeStockMonitor, through 
         // initRealTimeStockMonitor.
         if (this.realTimeStockMonitor != null) {
-            this.realTimeStockMonitor.addStockCode(transaction.getStock().getCode());
+            this.realTimeStockMonitor.addStockCode(transaction.getStock().code);
             this.realTimeStockMonitor.startNewThreadsIfNecessary();
             this.realTimeStockMonitor.refresh();
         }
@@ -1749,8 +1749,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
             Stock stock = transaction.getStock();
 
-            if (codes.contains(stock.getCode()) == false) {
-                codes.add(stock.getCode());
+            if (codes.contains(stock.code) == false) {
+                codes.add(stock.code);
                 stocks.add(stock);
             }
         }
@@ -1766,8 +1766,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
             Stock stock = transaction.getStock();
 
-            if (codes.contains(stock.getCode()) == false) {
-                codes.add(stock.getCode());
+            if (codes.contains(stock.code) == false) {
+                codes.add(stock.code);
                 stocks.add(stock);
             }
         }
@@ -1802,7 +1802,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 
                 final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
 
-                this.realTimeStockMonitor.addStockCode(transaction.getStock().getCode());
+                this.realTimeStockMonitor.addStockCode(transaction.getStock().code);
             }
             this.realTimeStockMonitor.startNewThreadsIfNecessary();
             this.realTimeStockMonitor.refresh();
@@ -1827,7 +1827,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 assert(transactionSummary.getChildCount() > 0);
                 final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
                 final Stock stock = transaction.getStock();
-                final Code code = stock.getCode();
+                final Code code = stock.code;
                 
                 if(c.contains(code)) continue;
                 
@@ -1837,7 +1837,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             else if (lastPathComponent instanceof Transaction) {
                 final Transaction transaction = (Transaction)lastPathComponent;
                 final Stock stock = transaction.getStock();
-                final Code code = stock.getCode();
+                final Code code = stock.code;
                 
                 if(c.contains(code)) continue;
                 
@@ -2192,7 +2192,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             TransactionSummary transactionSummary = (TransactionSummary)portfolio.getChildAt(i);
             assert(transactionSummary.getChildCount() > 0);            
             final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
-            final Code code = transaction.getStock().getCode();
+            final Code code = transaction.getStock().code;
             final Double price = stockPrices.get(code);
             if (price == null) {
                 goodStockPrices.put(code, 0.0);
@@ -2335,7 +2335,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
  
         for (Stock stock : stocks) {
             if (false == portfolioTreeTableModel.updateStockLastPrice(stock)) {
-                this.realTimeStockMonitor.removeStockCode(stock.getCode());
+                this.realTimeStockMonitor.removeStockCode(stock.code);
             }
         }
         

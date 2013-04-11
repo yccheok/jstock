@@ -402,10 +402,6 @@ public class Stock {
         this.thirdSellQuantity = stock.thirdSellQuantity;
         this.timestamp = stock.timestamp;
     }
-    
-    public Code getCode() {
-        return code;
-    }
 
     public Symbol getSymbol() {
         return symbol;
@@ -716,7 +712,7 @@ public class Stock {
         }
     }
             
-    private final Code code;
+    public final Code code;
     private final Symbol symbol;
     private final String name;
     private final Board board;

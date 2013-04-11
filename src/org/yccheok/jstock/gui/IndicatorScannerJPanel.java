@@ -308,7 +308,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
 
         if (indicators.size() > 0) {
             // All indicator in indicators, will be having same code.
-            final Code code = indicators.get(0).getStock().getCode();
+            final Code code = indicators.get(0).getStock().code;
             if (done)
             {
                 // Perform real time monitoring, for the code with history information.
@@ -900,12 +900,12 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                 final StockInfoDatabase stock_info_database = MainFrame.getInstance().getStockInfoDatabase();
 
                 if (stock_info_database != null) {
-                    final Symbol symbol = stock_info_database.codeToSymbol(stock.getCode());
+                    final Symbol symbol = stock_info_database.codeToSymbol(stock.code);
                     if (symbol != null) {
                         new_stock = new_stock.deriveStock(symbol);
                     } else {
                         // Shouldn't be null. Let's give some warning on this.
-                        log.error("Wrong stock code " + stock.getCode() + " given by stock server.");
+                        log.error("Wrong stock code " + stock.code + " given by stock server.");
                     }
                     if (stock != new_stock) {
                         stocks.set(i, new_stock);
@@ -924,7 +924,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         }
 
         for (Stock stock : stocks) {
-            final java.util.List<OperatorIndicator> indicators = this.operatorIndicators.get(stock.getCode());
+            final java.util.List<OperatorIndicator> indicators = this.operatorIndicators.get(stock.code);
             
             if (indicators == null) {
                 continue;
@@ -949,7 +949,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             }
 
             // Indicates we has finished scanning this stock.
-            _successCodes.add(stock.getCode());
+            _successCodes.add(stock.code);
         }
         
         // Display the same message again, so that we will get the most updated

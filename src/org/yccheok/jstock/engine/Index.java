@@ -59,15 +59,11 @@ public enum Index {
         this.code = code;
     }
     
-    public Code getCode() {
-        return code;
-    }
-    
     @Override
     public String toString() {
         return name;
     }
         
-    private String name;
-    private Code code;
+    private final String name;
+    public final Code code;
 }

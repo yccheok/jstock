@@ -97,10 +97,10 @@ public class DividendSummaryBarChartJDialog extends javax.swing.JDialog {
             // have dividend records with same stock code, but different stock
             // symbol. We will loop from backward, and take the first detected 
             // code.
-            if (false == codes.add(stock.getCode())) {
+            if (false == codes.add(stock.code)) {
                 continue;
             }
-            final StockInfo stockInfo = new StockInfo(stock.getCode(), stock.getSymbol());
+            final StockInfo stockInfo = new StockInfo(stock.code, stock.getSymbol());
             stockInfos.add(stockInfo);
         }
 
@@ -141,7 +141,7 @@ public class DividendSummaryBarChartJDialog extends javax.swing.JDialog {
             if (selectedIndex != 0) {
                 // selectedIndex - 1, as the first item in combo box is "All Stock(s)".
                 final Code code = this.stockInfos.get(selectedIndex - 1).code;
-                if (false == dividend.getStock().getCode().equals(code)) {
+                if (false == dividend.getStock().code.equals(code)) {
                     continue;
                 }
             }

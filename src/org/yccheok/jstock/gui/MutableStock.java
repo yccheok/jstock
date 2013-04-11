@@ -37,7 +37,7 @@ public class MutableStock {
     }
     
     public Code getCode() {
-        return stock.getCode();
+        return stock.code;
     }
 
     public Symbol getSymbol() {
@@ -148,7 +148,7 @@ public class MutableStock {
 
     /*
         final Stock s = new Stock(
-                stock.getCode(),
+                stock.code,
                 stock.getSymbol(),
                 stock.getName(),
                 stock.getBoard(),
@@ -178,7 +178,7 @@ public class MutableStock {
      */
     public void setOpenPrice(double openPrice) {
         final Stock s = new Stock(
-                stock.getCode(),
+                stock.code,
                 stock.getSymbol(),
                 stock.getName(),
                 stock.getBoard(),
@@ -212,7 +212,7 @@ public class MutableStock {
 
     public void setPrevPrice(double prevPrice) {
         final Stock s = new Stock(
-                stock.getCode(),
+                stock.code,
                 stock.getSymbol(),
                 stock.getName(),
                 stock.getBoard(),
@@ -246,7 +246,7 @@ public class MutableStock {
     
     public void setLastPrice(double lastPrice) {
         final Stock s = new Stock(
-                stock.getCode(),
+                stock.code,
                 stock.getSymbol(),
                 stock.getName(),
                 stock.getBoard(),
@@ -280,7 +280,7 @@ public class MutableStock {
     
     public void setHighPrice(double highPrice) {
         final Stock s = new Stock(
-                stock.getCode(),
+                stock.code,
                 stock.getSymbol(),
                 stock.getName(),
                 stock.getBoard(),
@@ -314,7 +314,7 @@ public class MutableStock {
 
     public void setLowPrice(double lowPrice) {
         final Stock s = new Stock(
-                stock.getCode(),
+                stock.code,
                 stock.getSymbol(),
                 stock.getName(),
                 stock.getBoard(),
@@ -349,7 +349,7 @@ public class MutableStock {
     // TODO: CRITICAL LONG BUG REVISED NEEDED.
     public void setVolume(long volume) {
         final Stock s = new Stock(
-                stock.getCode(),
+                stock.code,
                 stock.getSymbol(),
                 stock.getName(),
                 stock.getBoard(),
@@ -383,7 +383,7 @@ public class MutableStock {
 
     public void setChangePrice(double changePrice) {
         final Stock s = new Stock(
-                stock.getCode(),
+                stock.code,
                 stock.getSymbol(),
                 stock.getName(),
                 stock.getBoard(),
@@ -417,7 +417,7 @@ public class MutableStock {
 
     public void setChangePricePercentage(double changePricePercentage) {
         final Stock s = new Stock(
-                stock.getCode(),
+                stock.code,
                 stock.getSymbol(),
                 stock.getName(),
                 stock.getBoard(),
@@ -451,7 +451,7 @@ public class MutableStock {
 
     public void setLastVolume(int lastVolume) {
         final Stock s = new Stock(
-                stock.getCode(),
+                stock.code,
                 stock.getSymbol(),
                 stock.getName(),
                 stock.getBoard(),
@@ -485,7 +485,7 @@ public class MutableStock {
 
     public void setBuyPrice(double buyPrice) {
         final Stock s = new Stock(
-                stock.getCode(),
+                stock.code,
                 stock.getSymbol(),
                 stock.getName(),
                 stock.getBoard(),
@@ -519,7 +519,7 @@ public class MutableStock {
 
     public void setBuyQuantity(int buyQuantity) {
         final Stock s = new Stock(
-                stock.getCode(),
+                stock.code,
                 stock.getSymbol(),
                 stock.getName(),
                 stock.getBoard(),
@@ -553,7 +553,7 @@ public class MutableStock {
 
     public void setSellPrice(double sellPrice) {
         final Stock s = new Stock(
-                stock.getCode(),
+                stock.code,
                 stock.getSymbol(),
                 stock.getName(),
                 stock.getBoard(),
@@ -587,7 +587,7 @@ public class MutableStock {
 
     public void setSellQuantity(int sellQuantity) {
         final Stock s = new Stock(
-                stock.getCode(),
+                stock.code,
                 stock.getSymbol(),
                 stock.getName(),
                 stock.getBoard(),
@@ -621,7 +621,7 @@ public class MutableStock {
     
     public void setSecondBuyPrice(double secondBuyPrice) {
         final Stock s = new Stock(
-                stock.getCode(),
+                stock.code,
                 stock.getSymbol(),
                 stock.getName(),
                 stock.getBoard(),
@@ -655,7 +655,7 @@ public class MutableStock {
     
     public void setSecondBuyQuantity(int secondBuyQuantity) {
         final Stock s = new Stock(
-                stock.getCode(),
+                stock.code,
                 stock.getSymbol(),
                 stock.getName(),
                 stock.getBoard(),
@@ -689,7 +689,7 @@ public class MutableStock {
     
     public void setSecondSellPrice(double secondSellPrice) {
         final Stock s = new Stock(
-                stock.getCode(),
+                stock.code,
                 stock.getSymbol(),
                 stock.getName(),
                 stock.getBoard(),
@@ -723,7 +723,7 @@ public class MutableStock {
     
     public void setSecondSellQuantity(int secondSellQuantity) {
         final Stock s = new Stock(
-                stock.getCode(),
+                stock.code,
                 stock.getSymbol(),
                 stock.getName(),
                 stock.getBoard(),
@@ -757,7 +757,7 @@ public class MutableStock {
     
     public void setThirdBuyPrice(double thirdBuyPrice) {
         final Stock s = new Stock(
-                stock.getCode(),
+                stock.code,
                 stock.getSymbol(),
                 stock.getName(),
                 stock.getBoard(),
@@ -791,7 +791,7 @@ public class MutableStock {
     
     public void setThirdBuyQuantity(int thirdBuyQuantity) {
         final Stock s = new Stock(
-                stock.getCode(),
+                stock.code,
                 stock.getSymbol(),
                 stock.getName(),
                 stock.getBoard(),
@@ -825,7 +825,7 @@ public class MutableStock {
     
     public void setThirdSellPrice(double thirdSellPrice) {
         final Stock s = new Stock(
-                stock.getCode(),
+                stock.code,
                 stock.getSymbol(),
                 stock.getName(),
                 stock.getBoard(),
@@ -859,7 +859,7 @@ public class MutableStock {
     
     public void setThirdSellQuantity(int thirdSellQuantity) {
         final Stock s = new Stock(
-                stock.getCode(),
+                stock.code,
                 stock.getSymbol(),
                 stock.getName(),
                 stock.getBoard(),

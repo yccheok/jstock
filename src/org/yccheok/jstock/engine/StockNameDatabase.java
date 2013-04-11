@@ -40,7 +40,7 @@ public class StockNameDatabase {
      */
     public StockNameDatabase(List<Stock> stocks) {
         for (Stock stock : stocks) {
-            codeToName.put(stock.getCode(), stock.getName());
+            codeToName.put(stock.code, stock.getName());
         }
     }
 

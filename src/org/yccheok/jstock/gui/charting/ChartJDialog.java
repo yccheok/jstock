@@ -810,7 +810,7 @@ public class ChartJDialog extends javax.swing.JDialog {
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
         assert(this.stockHistoryServer.size() > 0);
         final Stock stock = this.stockHistoryServer.getStock(this.stockHistoryServer.getTimestamp(0));
-        final File file = org.yccheok.jstock.gui.Utils.promptSaveCSVAndExcelJFileChooser(stock.getCode().toString());
+        final File file = org.yccheok.jstock.gui.Utils.promptSaveCSVAndExcelJFileChooser(stock.code.toString());
 
         if (file != null) {
             if (org.yccheok.jstock.gui.Utils.getFileExtension(file).equals("csv"))
@@ -821,7 +821,7 @@ public class ChartJDialog extends javax.swing.JDialog {
             else if (org.yccheok.jstock.gui.Utils.getFileExtension(file).equals("xls"))
             {
                 final Statements statements = Statements.newInstanceFromStockHistoryServer(stockHistoryServer, false);
-                statements.saveAsExcelFile(file, stock.getCode().toString());
+                statements.saveAsExcelFile(file, stock.code.toString());
             }
             else
             {
@@ -1313,7 +1313,7 @@ public class ChartJDialog extends javax.swing.JDialog {
         if (org.yccheok.jstock.engine.Utils.isNameImmutable()) {
             final StockNameDatabase stockNameDatabase = MainFrame.getInstance().getStockNameDatabase();
             if (stockNameDatabase != null) {
-                final String name = stockNameDatabase.codeToName(stock.getCode());
+                final String name = stockNameDatabase.codeToName(stock.code);
                 if (name != null) {
                     return name;
                 }
@@ -1333,14 +1333,14 @@ public class ChartJDialog extends javax.swing.JDialog {
             // database.
             final StockInfoDatabase stockInfoDatabase = MainFrame.getInstance().getStockInfoDatabase();
             if (stockInfoDatabase != null) {
-                final Symbol s = stockInfoDatabase.codeToSymbol(stock.getCode());
+                final Symbol s = stockInfoDatabase.codeToSymbol(stock.code);
                 if (s != null) {
                     // Use symbol as replacement if possible.
                     return s.toString();
                 }
             }
             // If not, we will just apply code as replacement.
-            return stock.getCode().toString();
+            return stock.code.toString();
         }
 
         return name;

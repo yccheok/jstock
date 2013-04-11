@@ -240,8 +240,8 @@ public class Utils {
     }
     
     public static boolean isTransactionWithEqualStockCode(Transaction t0, Transaction t1) {
-        final Code c0 = t0.getStock().getCode();
-        final Code c1 = t1.getStock().getCode();
+        final Code c0 = t0.getStock().code;
+        final Code c1 = t1.getStock().code;
         
         return c0.equals(c1);
     }
@@ -460,7 +460,7 @@ public class Utils {
     public static void removeMeaninglessRecords(DividendSummary dividendSummary) {
         for (int i = 0; i < dividendSummary.size(); i++) {
             Dividend dividend = dividendSummary.get(i);
-            if (dividend.getAmount() <= 0.0 || dividend.getStock().getCode().toString().length() <= 0) {
+            if (dividend.getAmount() <= 0.0 || dividend.getStock().code.toString().length() <= 0) {
                 // Remove meaningless record.
                 dividendSummary.remove(dividend);
                 i--;
