@@ -20,6 +20,8 @@
 package org.yccheok.jstock.gui;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import javax.swing.SwingUtilities;
 import org.yccheok.jstock.engine.*;
 import org.yccheok.jstock.file.CSVHelper;
 import org.yccheok.jstock.file.GUIBundleWrapper;
@@ -96,7 +98,8 @@ public class StockTableModel extends AbstractTableModelWithMemory implements CSV
         if (col == (columnClasses.length - 1))
         {
             final Double riseAbove = (Double)value;
-            alerts.set(row, alerts.get(row).setRiseAbove(riseAbove));
+            final Code code = stocks.get(row).getCode();
+            alerts.put(code, alerts.get(code).setRiseAbove(riseAbove));
             List<Object> oldInfos = oldTableModel.get(row);
             if (oldInfos != null) oldInfos.set(col, tableModel.get(row).get(col));
             tableModel.get(row).set(col, riseAbove);
@@ -106,7 +109,8 @@ public class StockTableModel extends AbstractTableModelWithMemory implements CSV
         else if (col == (columnClasses.length - 2))
         {
             final Double fallBelow = (Double)value;
-            alerts.set(row, alerts.get(row).setFallBelow(fallBelow));
+            final Code code = stocks.get(row).getCode();
+            alerts.put(code, alerts.get(code).setFallBelow(fallBelow));
             List<Object> oldInfos = oldTableModel.get(row);
             if (oldInfos != null) oldInfos.set(col, tableModel.get(row).get(col));
             tableModel.get(row).set(col, fallBelow);
@@ -118,11 +122,13 @@ public class StockTableModel extends AbstractTableModelWithMemory implements CSV
     }
     
     public void updateStock(Stock stock) {
+        assert(SwingUtilities.isEventDispatchThread());
+        
         final Integer row = rowStockCodeMapping.get(stock.getCode());
 
         if (row != null) {
             oldTableModel.set(row, tableModel.get(row));
-            final StockAlert alert = alerts.get(row);
+            final StockAlert alert = alerts.get(stock.getCode());
             tableModel.set(row, stockToList(stock, alert));
             stocks.set(row, stock);
             this.fireTableRowsUpdated(row, row);            
@@ -130,12 +136,14 @@ public class StockTableModel extends AbstractTableModelWithMemory implements CSV
     }
 
     public void addStock(Stock stock, StockAlert alert) {
+        assert(SwingUtilities.isEventDispatchThread());
+        
         Integer row = rowStockCodeMapping.get(stock.getCode());
         if (row == null) {
             tableModel.add(stockToList(stock, alert));
             oldTableModel.add(null);
             stocks.add(stock);
-            alerts.add(alert);
+            alerts.put(stock.getCode(), alert);
             final int rowIndex = tableModel.size() - 1;
             rowStockCodeMapping.put(stock.getCode(), rowIndex);
             fireTableRowsInserted(rowIndex, rowIndex);
@@ -143,10 +151,14 @@ public class StockTableModel extends AbstractTableModelWithMemory implements CSV
     }
 
     public void addStock(Stock stock) {
+        assert(SwingUtilities.isEventDispatchThread());
+        
         this.addStock(stock, new StockAlert());
     }
     
     public void clearAllStocks() {
+        assert(SwingUtilities.isEventDispatchThread());
+        
         final int size = stocks.size();
         
         if (size == 0) return;
@@ -171,19 +183,15 @@ public class StockTableModel extends AbstractTableModelWithMemory implements CSV
     }
 
     public Double getRiseAbove(Stock stock) {
-        Integer row = this.rowStockCodeMapping.get(stock.getCode());
-        if (row == null) return null;
-        return this.alerts.get(row).riseAbove;
+        StockAlert stockAlert = this.alerts.get(stock.getCode());
+        if (stockAlert == null) return null;
+        return stockAlert.riseAbove;
     }
 
     public Double getFallBelow(Stock stock) {
-        Integer row = this.rowStockCodeMapping.get(stock.getCode());
-        if (row == null) return null;
-        return this.alerts.get(row).fallBelow;
-    }
-
-    public List<StockAlert> getAlerts() {
-        return Collections.unmodifiableList(alerts);
+        StockAlert stockAlert = this.alerts.get(stock.getCode());
+        if (stockAlert == null) return null;
+        return stockAlert.fallBelow;
     }
 
     public List<Stock> getStocks() {
@@ -191,12 +199,15 @@ public class StockTableModel extends AbstractTableModelWithMemory implements CSV
     }
     
     public void removeRow(int row) {
+        assert(SwingUtilities.isEventDispatchThread());
+        
         oldTableModel.remove(row);
         List<Object> list = tableModel.remove(row);
         stocks.remove(row);
-        alerts.remove(row);
+        final Code code = (Code)list.get(0);
+        alerts.remove(code);
         // 0 is stock code.
-        rowStockCodeMapping.remove((Code)list.get(0));
+        rowStockCodeMapping.remove(code);
 
         int size = stocks.size();
         for (int i = row; i < size; i++) {
@@ -253,11 +264,11 @@ public class StockTableModel extends AbstractTableModelWithMemory implements CSV
     private final List<List<Object>> tableModel = new ArrayList<List<Object>>();
     private final List<List<Object>> oldTableModel = new ArrayList<List<Object>>();
     private final List<Stock> stocks = new ArrayList<Stock>();
-    private final List<StockAlert> alerts = new ArrayList<StockAlert>();
+    private final Map<Code, StockAlert> alerts = new ConcurrentHashMap<Code, StockAlert>();
     // Used to get column by Name in fast way.
-    private final Map<String, Integer> columnNameMapping = new HashMap<String, Integer>();
+    private final Map<String, Integer> columnNameMapping = new ConcurrentHashMap<String, Integer>();
     // Used to get row by Stock in fast way.
-    private final Map<Code, Integer> rowStockCodeMapping = new HashMap<Code, Integer>();
+    private final Map<Code, Integer> rowStockCodeMapping = new ConcurrentHashMap<Code, Integer>();
     private static final String[] columnNames;
     private static final String[] languageIndependentColumnNames;
     private static final Class[] columnClasses = {

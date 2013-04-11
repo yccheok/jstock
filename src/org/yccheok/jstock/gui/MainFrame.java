@@ -1716,16 +1716,17 @@ public class MainFrame extends javax.swing.JFrame {
         if (stockHistoryMonitor != null) {
             stockHistoryMonitor.clearStockCodes();
         }
-        final StockTableModel tableModel = (StockTableModel)jTable1.getModel();                    
-        tableModel.clearAllStocks();     
+        final StockTableModel tableModel = (StockTableModel)jTable1.getModel();                                 
         this.initAlertStateManager();
 
         if (java.awt.EventQueue.isDispatchThread()) {
+            tableModel.clearAllStocks();
             updateDynamicChart(null);
         } else {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
+                    tableModel.clearAllStocks();
                     updateDynamicChart(null);
                 }                
             });
