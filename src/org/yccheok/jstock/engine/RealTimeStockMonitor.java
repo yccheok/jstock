@@ -34,13 +34,13 @@ import org.apache.commons.logging.LogFactory;
 public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.util.List<Stock>> {
     
     /** Creates a new instance of RealTimeStockMonitor */
-    public RealTimeStockMonitor(int maxThread, int numOfStockPerIteration, long delay) {
-        if (maxThread <= 0 || numOfStockPerIteration <= 0 || delay <= 0) {
-            throw new IllegalArgumentException("maxThread : " + maxThread + ", numOfStockPerIteration : " + numOfStockPerIteration + ", delay : " + delay);
+    public RealTimeStockMonitor(int maxThread, int maxStockSizePerScan, long delay) {
+        if (maxThread <= 0 || maxStockSizePerScan <= 0 || delay <= 0) {
+            throw new IllegalArgumentException("maxThread : " + maxThread + ", maxStockSizePerScan : " + maxStockSizePerScan + ", delay : " + delay);
         }
         
         this.maxThread = maxThread;
-        this.numOfStockPerIteration = numOfStockPerIteration;
+        this.maxStockSizePerScan = maxStockSizePerScan;
         this.delay = delay;
         
         this.stockServerFactories = new java.util.concurrent.CopyOnWriteArrayList<StockServerFactory>();
@@ -204,7 +204,7 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
         for (int i = this.stockMonitors.size(); i < numOfMonitorRequired; i++) {
             log.info("Before adding : current thread size=" + this.stockMonitors.size() + ",numOfMonitorRequired=" + numOfMonitorRequired);
             
-            StockMonitor stockMonitor = new StockMonitor(i * numOfStockPerIteration);
+            StockMonitor stockMonitor = new StockMonitor(i * maxStockSizePerScan);
             stockMonitors.add(stockMonitor);
             stockMonitor.start();
             
@@ -249,8 +249,8 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
     
     private int getNumOfRequiredThread() {
         final int numOfThreadRequired = 
-            (stockCodes.size() / numOfStockPerIteration) + 
-            (((stockCodes.size() % numOfStockPerIteration) == 0) ? 0 : 1);
+            (stockCodes.size() / maxStockSizePerScan) + 
+            (((stockCodes.size() % maxStockSizePerScan) == 0) ? 0 : 1);
         
         return Math.min(numOfThreadRequired, maxThread);
     }
@@ -287,8 +287,8 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
         public void run() {
             final Thread thisThread = Thread.currentThread();
             
-            /* Will advance by numOfStockPerIteration * maxThread */            
-            final int step = numOfStockPerIteration * maxThread;
+            /* Will advance by maxStockSizePerScan * maxThread */            
+            final int step = maxStockSizePerScan * maxThread;
 
 
             while (thisThread == thread) {                
@@ -339,7 +339,7 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
                             if (listIterator != null) {
                                 List<Code> codes = new ArrayList<Code>();
 
-                                for (int i = 0; listIterator.hasNext() && i < numOfStockPerIteration && thisThread == thread; i++) {
+                                for (int i = 0; listIterator.hasNext() && i < maxStockSizePerScan && thisThread == thread; i++) {
                                     codes.add(listIterator.next());
                                 }
 
@@ -476,7 +476,7 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
     
     private final int maxThread;
     // Number of stock to be monitored per iteration.
-    private final int numOfStockPerIteration;
+    private final int maxStockSizePerScan;
     private java.util.List<StockServerFactory> stockServerFactories;
     private final java.util.List<Code> stockCodes;
     // Used for duplication check. We avoid using stockCodes.constains, as the
