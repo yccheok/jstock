@@ -165,11 +165,11 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         final DecimalFormat integerFormat = new DecimalFormat("###,###");
         
         // It is common to use OHLC for chat, instead of using PrevPrice.        
-        values.add(org.yccheok.jstock.gui.Utils.stockPriceDecimalFormat(chartData.getOpenPrice()));        
-        values.add(org.yccheok.jstock.gui.Utils.stockPriceDecimalFormat(chartData.getHighPrice()));
-        values.add(org.yccheok.jstock.gui.Utils.stockPriceDecimalFormat(chartData.getLowPrice()));
-        values.add(org.yccheok.jstock.gui.Utils.stockPriceDecimalFormat(chartData.getLastPrice()));
-        values.add(integerFormat.format(chartData.getVolume()));
+        values.add(org.yccheok.jstock.gui.Utils.stockPriceDecimalFormat(chartData.openPrice));        
+        values.add(org.yccheok.jstock.gui.Utils.stockPriceDecimalFormat(chartData.highPrice));
+        values.add(org.yccheok.jstock.gui.Utils.stockPriceDecimalFormat(chartData.lowPrice));
+        values.add(org.yccheok.jstock.gui.Utils.stockPriceDecimalFormat(chartData.lastPrice));
+        values.add(integerFormat.format(chartData.volume));
 
         final List<String> indicatorParams = new ArrayList<String>();
         final List<String> indicatorValues = new ArrayList<String>();
@@ -218,7 +218,7 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
             }
         }
 
-        final Date date =  new Date(chartData.getTimestamp());
+        final Date date =  new Date(chartData.timestamp);
         
         // Date formats are not synchronized. It is recommended to create separate format instances for each thread.
         // If multiple threads access a format concurrently, it must be synchronized externally.
@@ -313,7 +313,7 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
             g2.setColor(Color.BLACK);
             if (param.equals(CLOSE_STR)) {
                 // It is common to use OHLC for chat, instead of using PrevPrice.
-                final double changePrice = chartData.getLastPrice() - chartData.getOpenPrice();
+                final double changePrice = chartData.lastPrice - chartData.openPrice;
                 if (changePrice > 0.0) {
                     g2.setColor(JStockOptions.DEFAULT_HIGHER_NUMERICAL_VALUE_FOREGROUND_COLOR);
                 }

@@ -1284,7 +1284,7 @@ public class ChartJDialog extends javax.swing.JDialog {
         TimeSeries series1 = new TimeSeries(GUIBundle.getString("ChartJDialog_Price"));
         
         for (ChartData chartData : chartDatas) {
-            series1.add(new Day(new Date(chartData.getTimestamp())), chartData.getLastPrice());
+            series1.add(new Day(new Date(chartData.timestamp)), chartData.lastPrice);
         }
         return series1;
     }
@@ -1300,7 +1300,7 @@ public class ChartJDialog extends javax.swing.JDialog {
         TimeSeries series1 = new TimeSeries(GUIBundle.getString("ChartJDialog_Volume"));
 
         for (ChartData chartData : chartDatas) {
-            series1.add(new Day(new Date(chartData.getTimestamp())), chartData.getVolume());
+            series1.add(new Day(new Date(chartData.timestamp)), chartData.volume);
         }
 
         return new TimeSeriesCollection(series1);
@@ -1401,12 +1401,12 @@ public class ChartJDialog extends javax.swing.JDialog {
 
         int i = 0;
         for(ChartData chartData : chartDatas) {
-            date[i] = new Date(chartData.getTimestamp());
-            high[i] = chartData.getHighPrice();
-            low[i] = chartData.getLowPrice();
-            open[i] = chartData.getOpenPrice();
-            close[i] = chartData.getLastPrice();
-            volume[i] = chartData.getVolume();
+            date[i] = new Date(chartData.timestamp);
+            high[i] = chartData.highPrice;
+            low[i] = chartData.lowPrice;
+            open[i] = chartData.openPrice;
+            close[i] = chartData.lastPrice;
+            volume[i] = chartData.volume;
             i++;
         }
         

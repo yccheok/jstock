@@ -185,7 +185,7 @@ public class TechnicalAnalysis {
         final double[] last = new double[num];
         // Fill up last array.
         for (int i = 0; i < num; i++) {
-            last[i] = chartDatas.get(i).getLastPrice();
+            last[i] = chartDatas.get(i).lastPrice;
         }
 
         final double[] output = new double[allocationSize];
@@ -195,7 +195,7 @@ public class TechnicalAnalysis {
         core.sma(0, last.length - 1, last, period, outBegIdx, outNbElement, output);
 
         for (int i = 0; i < outNbElement.value; i++) {
-            series.add(new Day(new Date(chartDatas.get(i + outBegIdx.value).getTimestamp())), output[i]);
+            series.add(new Day(new Date(chartDatas.get(i + outBegIdx.value).timestamp)), output[i]);
         }
 
         return series;
@@ -212,7 +212,7 @@ public class TechnicalAnalysis {
         final double[] last = new double[num];
         // Fill up last array.
         for (int i = 0; i < num; i++) {
-            last[i] = chartDatas.get(i).getLastPrice();
+            last[i] = chartDatas.get(i).lastPrice;
         }
         
         final double[] outMACD = new double[allocationSize];
@@ -228,7 +228,7 @@ public class TechnicalAnalysis {
         final TimeSeries macdHistTimeSeries = new TimeSeries(name);
         
         for (int i = 0; i < outNbElement.value; i++) {
-            Day day = new Day(new Date(chartDatas.get(i + outBegIdx.value).getTimestamp()));
+            Day day = new Day(new Date(chartDatas.get(i + outBegIdx.value).timestamp));
             macdTimeSeries.add(day, outMACD[i]);
             macdSignalTimeSeries.add(day, outMACDSignal[i]);
             macdHistTimeSeries.add(day, outMACDHist[i]);
@@ -264,7 +264,7 @@ public class TechnicalAnalysis {
         final double[] last = new double[num];
         // Fill up last array.
         for (int i = 0; i < num; i++) {
-            last[i] = chartDatas.get(i).getLastPrice();
+            last[i] = chartDatas.get(i).lastPrice;
         }
 
         final double[] output = new double[allocationSize];
@@ -274,7 +274,7 @@ public class TechnicalAnalysis {
         core.ema(0, last.length - 1, last, period, outBegIdx, outNbElement, output);
 
         for (int i = 0; i < outNbElement.value; i++) {
-            series.add(new Day(new Date(chartDatas.get(i + outBegIdx.value).getTimestamp())), output[i]);
+            series.add(new Day(new Date(chartDatas.get(i + outBegIdx.value).timestamp)), output[i]);
         }
 
         return series;
@@ -307,9 +307,9 @@ public class TechnicalAnalysis {
         final double[] close = new double[num];
         // Fill up last array.
         for (int i = 0; i < num; i++) {
-            high[i] = chartDatas.get(i).getHighPrice();
-            low[i] = chartDatas.get(i).getLowPrice();
-            close[i] = chartDatas.get(i).getLastPrice();
+            high[i] = chartDatas.get(i).highPrice;
+            low[i] = chartDatas.get(i).lowPrice;
+            close[i] = chartDatas.get(i).lastPrice;
         }
 
         final double[] output = new double[allocationSize];
@@ -319,7 +319,7 @@ public class TechnicalAnalysis {
         core.cci(0, num - 1, high, low, close, period, outBegIdx, outNbElement, output);
 
         for (int i = 0; i < outNbElement.value; i++) {
-            series.add(new Day(new Date(chartDatas.get(i + outBegIdx.value).getTimestamp())), output[i]);
+            series.add(new Day(new Date(chartDatas.get(i + outBegIdx.value).timestamp)), output[i]);
         }
 
         return new TimeSeriesCollection(series);
@@ -350,7 +350,7 @@ public class TechnicalAnalysis {
         final double[] last = new double[num];
         // Fill up last array.
         for (int i = 0; i < num; i++) {
-            last[i] = chartDatas.get(i).getLastPrice();
+            last[i] = chartDatas.get(i).lastPrice;
         }
 
         final double[] output = new double[allocationSize];
@@ -360,7 +360,7 @@ public class TechnicalAnalysis {
         core.rsi(0, last.length - 1, last, period, outBegIdx, outNbElement, output);
 
         for (int i = 0; i < outNbElement.value; i++) {
-            series.add(new Day(new Date(chartDatas.get(i + outBegIdx.value).getTimestamp())), output[i]);
+            series.add(new Day(new Date(chartDatas.get(i + outBegIdx.value).timestamp)), output[i]);
         }
 
         return new TimeSeriesCollection(series);
@@ -394,10 +394,10 @@ public class TechnicalAnalysis {
         final double[] volume = new double[num];
         // Fill up last array.
         for (int i = 0; i < num; i++) {
-            high[i] = chartDatas.get(i).getHighPrice();
-            low[i] = chartDatas.get(i).getLowPrice();
-            close[i] = chartDatas.get(i).getLastPrice();
-            volume[i] = chartDatas.get(i).getVolume();
+            high[i] = chartDatas.get(i).highPrice;
+            low[i] = chartDatas.get(i).lowPrice;
+            close[i] = chartDatas.get(i).lastPrice;
+            volume[i] = chartDatas.get(i).volume;
         }
 
         final double[] output = new double[allocationSize];
@@ -407,7 +407,7 @@ public class TechnicalAnalysis {
         core.mfi(0, num - 1, high, low, close, volume,  period, outBegIdx, outNbElement, output);
 
         for (int i = 0; i < outNbElement.value; i++) {
-            series.add(new Day(new Date(chartDatas.get(i + outBegIdx.value).getTimestamp())), output[i]);
+            series.add(new Day(new Date(chartDatas.get(i + outBegIdx.value).timestamp)), output[i]);
         }
 
         return new TimeSeriesCollection(series);

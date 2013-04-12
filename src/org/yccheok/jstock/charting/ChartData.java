@@ -25,15 +25,15 @@ package org.yccheok.jstock.charting;
  * @author yccheok
  */
 public class ChartData {
-    private final double prevPrice;
-    private final double openPrice;
-    private final double lastPrice;
-    private final double highPrice;
-    private final double lowPrice;
-    private final long volume;
+    public final double prevPrice;
+    public final double openPrice;
+    public final double lastPrice;
+    public final double highPrice;
+    public final double lowPrice;
+    public final long volume;
     // We choose not to use either Calendar or Joda DateTime, as we feel is too
     // heavy weight. We do not need time zone information.
-    private final long timestamp;
+    public final long timestamp;
 
     private ChartData(double prevPrice, double openPrice, double lastPrice, double highPrice, double lowPrice, long volume, long timestamp) {
         this.prevPrice = prevPrice;
@@ -59,54 +59,5 @@ public class ChartData {
      */
     public static ChartData newInstance(double prevPrice, double openPrice, double lastPrice, double highPrice, double lowPrice, long volume, long timestamp) {
         return new ChartData(prevPrice, openPrice, lastPrice, highPrice, lowPrice, volume, timestamp);
-    }
-    
-    /**
-     * @return the prevPrice
-     */
-    public double getPrevPrice() {
-        return prevPrice;
-    }
-
-    /**
-     * @return the openPrice
-     */
-    public double getOpenPrice() {
-        return openPrice;
-    }
-
-    /**
-     * @return the lastPrice
-     */
-    public double getLastPrice() {
-        return lastPrice;
-    }
-
-    /**
-     * @return the highPrice
-     */
-    public double getHighPrice() {
-        return highPrice;
-    }
-
-    /**
-     * @return the lowPrice
-     */
-    public double getLowPrice() {
-        return lowPrice;
-    }
-
-    /**
-     * @return the volume
-     */
-    public long getVolume() {
-        return volume;
-    }
-
-    /**
-     * @return the timestamp
-     */
-    public long getTimestamp() {
-        return timestamp;
-    }
+    }    
 }
