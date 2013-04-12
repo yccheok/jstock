@@ -408,7 +408,7 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
                             }
                         }
                     }   /*  while (thisThread == thread) */
-                }
+                }   /* try */
                 catch (Exception exp) {
                     log.error("Our thread just recover from unexpected error", exp);
                 }   /* try */
