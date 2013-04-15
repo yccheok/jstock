@@ -642,7 +642,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             });
         }
 
-        this.stockHistoryMonitor = new StockHistoryMonitor(NUM_OF_THREADS_HISTORY_MONITOR);
+        this.stockHistoryMonitor = new StockHistoryMonitor(HISTORY_MONITOR_MAX_THREAD);
         stockHistoryMonitor.setStockServerFactories(stockServerFactories);
 
         stockHistoryMonitor.attach(stockHistoryMonitorObserver);
@@ -1218,7 +1218,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
 
     private static final Log log = LogFactory.getLog(IndicatorScannerJPanel.class);
 
-    private static final int NUM_OF_THREADS_HISTORY_MONITOR = 4;
+    private static final int HISTORY_MONITOR_MAX_THREAD = 4;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;

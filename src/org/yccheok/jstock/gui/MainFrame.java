@@ -3649,7 +3649,7 @@ public class MainFrame extends javax.swing.JFrame {
             });
         }
         
-        this.stockHistoryMonitor = new StockHistoryMonitor(NUM_OF_THREADS_HISTORY_MONITOR);
+        this.stockHistoryMonitor = new StockHistoryMonitor(HISTORY_MONITOR_MAX_THREAD);
         
         final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactories();
         stockHistoryMonitor.setStockServerFactories(stockServerFactories);
@@ -4475,7 +4475,7 @@ public class MainFrame extends javax.swing.JFrame {
     private static final DynamicChart EMPTY_DYNAMIC_CHART = new DynamicChart();
     private final MouseAdapter dynamicChartMouseAdapter = getDynamicChartMouseAdapter();
     
-    private static final int NUM_OF_THREADS_HISTORY_MONITOR = 4;
+    private static final int HISTORY_MONITOR_MAX_THREAD = 4;
 
     /*
      * Having FALL_BELOW_INDICATOR and RISE_ABOVE_INDICATOR, is to enable us

@@ -1719,7 +1719,7 @@ public class IndicatorPanel extends JPanel {
             });
         }
 
-        this.stockHistoryMonitor = new StockHistoryMonitor(NUM_OF_THREADS_HISTORY_MONITOR);
+        this.stockHistoryMonitor = new StockHistoryMonitor(HISTORY_MONITOR_MAX_THREAD);
         stockHistoryMonitor.setStockServerFactories(stockServerFactories);
         stockHistoryMonitor.setStockHistorySerializer(new StockHistorySerializer(Utils.getHistoryDirectory()));
     }
@@ -1830,7 +1830,7 @@ public class IndicatorPanel extends JPanel {
 
     private StockHistoryMonitor stockHistoryMonitor = null;
 
-    private static final int NUM_OF_THREADS_HISTORY_MONITOR = 1;
+    private static final int HISTORY_MONITOR_MAX_THREAD = 1;
 
     private IndicatorProjectManager alertIndicatorProjectManager;
     private IndicatorProjectManager moduleIndicatorProjectManager;

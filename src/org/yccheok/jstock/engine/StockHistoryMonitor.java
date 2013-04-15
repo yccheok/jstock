@@ -202,18 +202,20 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
                 }   // if (history != null)
             }   // for
             
-            if (historyServer == null) {
-                writerLock.lock();
-                try {
-                    stockCodes.remove(code);
-                } finally {
-                    writerLock.unlock();
-                }
-            }
-            
             // We need to notify the listener. Whether the history is success or
             // fail.
             StockHistoryMonitor.this.notify(StockHistoryMonitor.this, this);
+            
+            // The purpose of stockCodes, is to ensure there are no 2 
+            // StockHistoryRunnable with same codes in the queue. We already
+            // finish this runnable. So, is time for us to uplift such
+            // restriction so that next addStockCode can success.
+            writerLock.lock();
+            try {
+                stockCodes.remove(code);
+            } finally {
+                writerLock.unlock();
+            }            
         }
     
         @Override
@@ -379,6 +381,8 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
     }
     
     private java.util.List<StockServerFactory> factories = new java.util.concurrent.CopyOnWriteArrayList<StockServerFactory>();
+    // The purpose of stockCodes, is to ensure there are no 2 StockHistoryRunnable
+    // with same codes in the queue.
     private final java.util.List<Code> stockCodes = new java.util.ArrayList<Code>();
     private final java.util.Map<Code, StockHistoryServer> histories = new java.util.HashMap<Code, StockHistoryServer>();
     private final java.util.concurrent.locks.ReadWriteLock readWriteLock;
