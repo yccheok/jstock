@@ -128,14 +128,20 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
             GUIBundle.getString("StockHistory_Volume")
             ));
 
+    private static final ThreadLocal<SimpleDateFormat> simpleDataFormatThreadLocal = new ThreadLocal <SimpleDateFormat>() {
+        @Override protected SimpleDateFormat initialValue() {
+            return new SimpleDateFormat("EEE, MMM d, yyyy");
+        }
+    };
+    
     private static final String longDateString;
     static {
         Calendar c = Calendar.getInstance();
         c.set(2010, 8, 29);
         // Wednesday, September 29, 2010
-        final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, MMM d, yyyy");
-        longDateString = simpleDateFormat.format(c.getTime());
+        longDateString = simpleDataFormatThreadLocal.get().format(c.getTime());
     }
+    
     private int maxWidth = Integer.MIN_VALUE;
 
     public ChartLayerUI(ChartJDialog chartJDialog) {
@@ -222,7 +228,7 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         
         // Date formats are not synchronized. It is recommended to create separate format instances for each thread.
         // If multiple threads access a format concurrently, it must be synchronized externally.
-        final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, MMM d, yyyy");
+        final SimpleDateFormat simpleDateFormat = this.simpleDataFormatThreadLocal.get();
         final String dateString = simpleDateFormat.format(date);
         final int dateStringWidth = dateFontMetrics.stringWidth(dateString);
         final int dateStringHeight = dateFontMetrics.getHeight();
