@@ -41,7 +41,7 @@ public class DividendSummary extends AbstractSummary<Dividend> {
         double tmp = 0.0;
         final int size = size();
         for (int i = 0; i < size; i++) {
-            tmp += this.get(i).getAmount();
+            tmp += this.get(i).amount;
         }
         return tmp;
     }
@@ -51,8 +51,8 @@ public class DividendSummary extends AbstractSummary<Dividend> {
         final int size = size();
         for (int i = 0; i < size; i++) {
             final Dividend dividend = this.get(i);
-            if (dividend.getStock().code.equals(stock.code)) {
-                tmp += dividend.getAmount();
+            if (dividend.stock.code.equals(stock.code)) {
+                tmp += dividend.amount;
             }
         }
         return tmp;

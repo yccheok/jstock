@@ -845,14 +845,18 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                         }
                         final String codeStr = statement.getValueAsString(guiBundleWrapper.getString("MainFrame_Code"));
                         final String symbolStr = statement.getValueAsString(guiBundleWrapper.getString("MainFrame_Symbol"));
-                        if (codeStr.length() > 0 && symbolStr.length() > 0) {
+                        if (codeStr.isEmpty() == false && symbolStr.isEmpty() == false) {
                             stock = Utils.getEmptyStock(Code.newInstance(codeStr), Symbol.newInstance(symbolStr));
-                        }
-                        else {
+                        } else {
                             log.error("Unexpected wrong stock. Ignore");
                             // stock is null.
                             continue;
                         }
+                        
+                        assert(stock != null);
+                        assert(dividend != null);
+                        assert(date != null);
+                        
                         final Dividend d = new Dividend(stock, dividend, new SimpleDate(date));
                         
                         final String comment = statement.getValueAsString(guiBundleWrapper.getString("PortfolioManagementJPanel_Comment"));

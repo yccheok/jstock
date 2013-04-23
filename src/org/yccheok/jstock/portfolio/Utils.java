@@ -460,7 +460,7 @@ public class Utils {
     public static void removeMeaninglessRecords(DividendSummary dividendSummary) {
         for (int i = 0; i < dividendSummary.size(); i++) {
             Dividend dividend = dividendSummary.get(i);
-            if (dividend.getAmount() <= 0.0 || dividend.getStock().code.toString().length() <= 0) {
+            if (dividend.amount <= 0.0 || dividend.stock.code.toString().length() <= 0) {
                 // Remove meaningless record.
                 dividendSummary.remove(dividend);
                 i--;

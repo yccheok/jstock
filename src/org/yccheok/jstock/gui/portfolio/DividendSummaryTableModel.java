@@ -47,13 +47,13 @@ public class DividendSummaryTableModel extends AbstractTableModel implements Com
         final Dividend dividend = dividendSummary.get(rowIndex);
         switch(columnIndex) {
             case 0:
-                return dividend.getDate().getCalendar().getTime();
+                return dividend.date.getCalendar().getTime();
 
             case 1:
-                return dividend.getStock();
+                return dividend.stock;
                 
             case 2:
-                return dividend.getAmount();
+                return dividend.amount;
         }
 
         return null;

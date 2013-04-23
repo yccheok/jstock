@@ -90,7 +90,7 @@ public class DividendSummaryBarChartJDialog extends javax.swing.JDialog {
         Set<Code> codes = new HashSet<Code>();
         for (int i = size - 1; i >= 0; i--) {
             final Dividend dividend = dividendSummary.get(i);
-            final Stock stock = dividend.getStock();      
+            final Stock stock = dividend.stock;      
             // We do not perform duplication detection through stock info
             // comparison. This is because starting from version 1.0.6s, we enable
             // user to change buy transaction's stock symbol. Hence, user may
@@ -133,7 +133,7 @@ public class DividendSummaryBarChartJDialog extends javax.swing.JDialog {
 
             // There might be newly added empty records in dividendSummary.
             // Ignore them.
-            if (dividend.getAmount() <= 0) {
+            if (dividend.amount <= 0) {
                 continue;
             }
 
@@ -141,17 +141,17 @@ public class DividendSummaryBarChartJDialog extends javax.swing.JDialog {
             if (selectedIndex != 0) {
                 // selectedIndex - 1, as the first item in combo box is "All Stock(s)".
                 final Code code = this.stockInfos.get(selectedIndex - 1).code;
-                if (false == dividend.getStock().code.equals(code)) {
+                if (false == dividend.stock.code.equals(code)) {
                     continue;
                 }
             }
 
-            final int year = dividend.getDate().getYear();
+            final int year = dividend.date.getYear();
             if (m.containsKey(year)) {
-                m.put(year, m.get(year) + dividend.getAmount());
+                m.put(year, m.get(year) + dividend.amount);
             }
             else {
-                m.put(year, dividend.getAmount());
+                m.put(year, dividend.amount);
             }
         }
 

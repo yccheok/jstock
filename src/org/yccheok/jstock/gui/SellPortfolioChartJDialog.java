@@ -97,14 +97,14 @@ public class SellPortfolioChartJDialog extends javax.swing.JDialog {
         final int size = dividendSummary.size();
         for (int i = 0; i < size; i++) {
             Dividend dividend = dividendSummary.get(i);
-            Code code = dividend.getStock().code;
+            Code code = dividend.stock.code;
             Double value = this.codeToTotalDividend.get(code);
             if (value != null) {
-                double total = value + dividend.getAmount();
+                double total = value + dividend.amount;
                 this.codeToTotalDividend.put(code, total);
             }
             else {
-                this.codeToTotalDividend.put(code, dividend.getAmount());
+                this.codeToTotalDividend.put(code, dividend.amount);
             }
         }
     }

@@ -40,19 +40,19 @@ public class Dividend implements Commentable {
     }
 
     public Dividend setStock(Stock stock) {
-        Dividend dividend = new Dividend(stock,this.getAmount(), this.getDate());
+        Dividend dividend = new Dividend(stock, this.amount, this.date);
         dividend.setComment(this.comment);
         return dividend;
     }
 
     public Dividend setAmount(double amount) {
-        Dividend dividend = new Dividend(this.getStock(), amount, this.getDate());
+        Dividend dividend = new Dividend(this.stock, amount, this.date);
         dividend.setComment(this.comment);
         return dividend;
     }
 
     public Dividend setDate(SimpleDate date) {
-        Dividend dividend = new Dividend(this.getStock(), this.getAmount(), date);
+        Dividend dividend = new Dividend(this.stock, this.amount, date);
         dividend.setComment(this.comment);
         return dividend;
     }
@@ -67,29 +67,8 @@ public class Dividend implements Commentable {
         return this.comment;
     }
 
-    /**
-     * @return the stock
-     */
-    public Stock getStock() {
-        return stock;
-    }
-
-    /**
-     * @return the amount
-     */
-    public double getAmount() {
-        return amount;
-    }
-
-    /**
-     * @return the date
-     */
-    public SimpleDate getDate() {
-        return date;
-    }
-
-    private final Stock stock;
-    private final double amount;
-    private final SimpleDate date;
+    public final Stock stock;
+    public final double amount;
+    public final SimpleDate date;
     private String comment = "";
 }
