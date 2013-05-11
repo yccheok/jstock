@@ -553,16 +553,6 @@ public class Utils {
     }
 
     /**
-     * Converts stock to stock info.
-     *
-     * @param stock the stock
-     * @return converted stock info
-     */
-    public static StockInfo toStockInfo(Stock stock) {
-        return new StockInfo(stock.code, stock.symbol);
-    }
-
-    /**
      * Returns an empty StockServer, which does nothing but always throw
      * StockNotFoundException.
      *

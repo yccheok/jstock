@@ -72,7 +72,7 @@ public class StockInfoDatabase {
             final Stock.Industry industry = stock.getIndustry();
             final Stock.Board board = stock.getBoard();
 
-            StockInfo stockInfo = new StockInfo(code, symbol);
+            StockInfo stockInfo = StockInfo.newInstance(code, symbol);
             StockInfoWithSymbolAsString stockInfoWithSymbolAsString = new StockInfoWithSymbolAsString(code, symbol);
 
             // Initialize stockInfos.

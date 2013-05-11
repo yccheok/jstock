@@ -35,6 +35,15 @@ public class StockInfo {
      */
     public final Symbol symbol;
 
+    public static StockInfo newInstance(Stock stock) {
+        return new StockInfo(stock.code, stock.symbol);
+    }
+    
+    public static StockInfo newInstance(Code code, Symbol symbol) {
+        return new StockInfo(code, symbol);
+    }
+    
+    // Cannot be private, caused by inheritance requirement by StockInfoWithSymbolAsString
     /**
      * Constructs an instance of stock info.
      * @param code the code
