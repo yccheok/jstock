@@ -443,7 +443,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         for (TransactionSummary transactionSummary : transactionSummaries) {
             for (int i = 0, count = transactionSummary.getChildCount(); i < count; i++) {
                 final Transaction transaction = (Transaction)transactionSummary.getChildAt(i);
-                StockInfo stockInfo = new StockInfo(transaction.getStock().code, transaction.getStock().symbol);
+                StockInfo stockInfo = StockInfo.newInstance(transaction.getStock());
                 if (stockInfos.contains(stockInfo) == false) {
                     stockInfos.add(stockInfo);
                 }
@@ -452,8 +452,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
 
         for (int i = 0, size = dividendSummary.size(); i < size; i++) {
             final Dividend dividend = dividendSummary.get(i);
-            final Stock stock = dividend.stock;
-            final StockInfo stockInfo = new StockInfo(stock.code, stock.symbol);
+            final StockInfo stockInfo = dividend.stockInfo;
             if (stockInfos.contains(stockInfo) == false) {
                 stockInfos.add(stockInfo);
             }
@@ -529,13 +528,13 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
             if (selectedIndex != 0) {
                 // selectedIndex - 1, as the first item in combo box is "All Stock(s)".
                 final Code code = this.stockInfos.get(selectedIndex - 1).code;
-                if (false == dividend.stock.code.equals(code)) {
+                if (false == dividend.stockInfo.code.equals(code)) {
                     continue;
                 }
             }
 
             final Activity activity = new Activity.Builder(Activity.Type.Dividend, dividend.amount).
-                    put(Activity.Param.Stock, dividend.stock).build();
+                    put(Activity.Param.StockInfo, dividend.stockInfo).build();
             this.ROISummary.add(dividend.date, activity);
         }
     }

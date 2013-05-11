@@ -51,7 +51,7 @@ public class DividendSummary extends AbstractSummary<Dividend> {
         final int size = size();
         for (int i = 0; i < size; i++) {
             final Dividend dividend = this.get(i);
-            if (dividend.stock.code.equals(stock.code)) {
+            if (dividend.stockInfo.code.equals(stock.code)) {
                 tmp += dividend.amount;
             }
         }

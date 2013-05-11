@@ -48,6 +48,7 @@ import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.time.TimeSeriesDataItem;
 import org.jfree.ui.RectangleEdge;
 import org.yccheok.jstock.engine.Stock;
+import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.gui.JStockOptions;
 import org.yccheok.jstock.gui.MainFrame;
 import org.yccheok.jstock.gui.Utils;
@@ -319,8 +320,8 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
                 this.ROIValues.add(org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(amount));
             }
             else if (activity.getType() == Activity.Type.Dividend) {
-                final Stock stock = (Stock)activity.get(Activity.Param.Stock);
-                this.ROIParams.add(activity.getType() + " " + stock.symbol);
+                final StockInfo stockInfo = (StockInfo)activity.get(Activity.Param.StockInfo);
+                this.ROIParams.add(activity.getType() + " " + stockInfo.symbol);
                 final double amount = activity.getAmount();
                 this.totalROIValue += amount;
                 this.ROIValues.add(org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(amount));

@@ -37,10 +37,11 @@ import javax.swing.SwingConstants;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableModel;
 import org.yccheok.jstock.engine.Stock;
+import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.gui.JTableUtilities;
 import org.yccheok.jstock.gui.MainFrame;
 import org.yccheok.jstock.gui.PortfolioManagementJPanel;
-import org.yccheok.jstock.gui.table.StockRenderer;
+import org.yccheok.jstock.gui.table.StockInfoRenderer;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.portfolio.Commentable;
 import org.yccheok.jstock.portfolio.DividendSummary;
@@ -186,8 +187,8 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
         ((JTextField)currencyEditor.getComponent()).setHorizontalAlignment(SwingConstants.RIGHT);
         jTable1.setDefaultEditor(Double.class, currencyEditor);
         jTable1.setDefaultRenderer(Double.class, currencyRenderer);
-        jTable1.setDefaultEditor(Stock.class, new org.yccheok.jstock.gui.table.StockEditor(this.portfolioManagementJPanel.getStocksFromPortfolios()));
-        jTable1.setDefaultRenderer(Stock.class, new StockRenderer());
+        jTable1.setDefaultEditor(StockInfo.class, new org.yccheok.jstock.gui.table.StockInfoEditor(this.portfolioManagementJPanel.getStockInfosFromPortfolios()));
+        jTable1.setDefaultRenderer(StockInfo.class, new StockInfoRenderer());
 
         // JTableCustomizer.setEditorForRow(jTable1, 1);
         // Do not use JTableCustomizer. We need to have our own implementation to decide 
@@ -440,7 +441,7 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
         }
 
         int viewIndex = this.jTable1.convertColumnIndexToView(1);
-        String string = ((Stock)jTable1.getValueAt(jTable1.getSelectedRow(), viewIndex)).symbol.toString();
+        String string = ((StockInfo)jTable1.getValueAt(jTable1.getSelectedRow(), viewIndex)).symbol.toString();
         return string;
     }
 

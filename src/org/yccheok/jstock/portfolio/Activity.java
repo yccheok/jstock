@@ -31,7 +31,8 @@ import org.yccheok.jstock.engine.Stock;
 public class Activity {
     public enum Param {
         Stock,
-        Quantity
+        StockInfo,
+        Quantity        
     }
 
     public enum Type {

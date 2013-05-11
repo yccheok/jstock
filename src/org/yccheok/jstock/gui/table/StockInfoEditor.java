@@ -27,27 +27,27 @@ import java.util.List;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
 import javax.swing.JTable;
-import org.yccheok.jstock.engine.Stock;
+import org.yccheok.jstock.engine.StockInfo;
 
 /**
  *
  * @author yccheok
  */
-public class StockEditor extends DefaultCellEditor {
-    public StockEditor(List<Stock> stocks) {
+public class StockInfoEditor extends DefaultCellEditor {
+    public StockInfoEditor(List<StockInfo> stockInfos) {
         super(new JComboBox());
         comboBox = (JComboBox) this.getComponent();
-        this.stocks = new ArrayList<Stock>(stocks);
-        Collections.sort(this.stocks, new Comparator<Stock>() {
+        this.stockInfos = new ArrayList<StockInfo>(stockInfos);
+        Collections.sort(this.stockInfos, new Comparator<StockInfo>() {
             @Override
-            public int compare(Stock o1, Stock o2) {
+            public int compare(StockInfo o1, StockInfo o2) {
                 // Ensure symbols are in alphabetical order.
                 return o1.symbol.toString().compareTo(o2.symbol.toString());
             }            
         });
 
-        for (Stock stock : this.stocks) {
-            comboBox.addItem(stock.symbol);
+        for (StockInfo stockInfo : this.stockInfos) {
+            comboBox.addItem(stockInfo.symbol);
         }
     }
 
@@ -59,20 +59,20 @@ public class StockEditor extends DefaultCellEditor {
                                                  int row,
                                                  int column) {
         JComboBox _comboBox = (JComboBox) super.getTableCellEditorComponent(table, value, isSelected, row, column);
-        Stock stock = (Stock)value;
-        _comboBox.setSelectedItem(stock.symbol);
+        StockInfo stockInfo = (StockInfo)value;
+        _comboBox.setSelectedItem(stockInfo.symbol);
         return _comboBox;
     }
 
     @Override
     public Object getCellEditorValue() {
         int index = comboBox.getSelectedIndex();
-        if (index >= stocks.size() || index < 0) {
+        if (index >= stockInfos.size() || index < 0) {
             return null;
         }
-        return stocks.get(index);
+        return stockInfos.get(index);
     }
 
     private final JComboBox comboBox;
-    private final List<Stock> stocks;
+    private final List<StockInfo> stockInfos;
 }

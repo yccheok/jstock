@@ -21,7 +21,7 @@ package org.yccheok.jstock.gui.portfolio;
 import javax.swing.table.AbstractTableModel;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.SimpleDate;
-import org.yccheok.jstock.engine.Stock;
+import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.engine.Symbol;
 import org.yccheok.jstock.file.CSVHelper;
 import org.yccheok.jstock.file.GUIBundleWrapper;
@@ -50,7 +50,7 @@ public class DividendSummaryTableModel extends AbstractTableModel implements Com
                 return dividend.date.getCalendar().getTime();
 
             case 1:
-                return dividend.stock;
+                return dividend.stockInfo;
                 
             case 2:
                 return dividend.amount;
@@ -99,7 +99,7 @@ public class DividendSummaryTableModel extends AbstractTableModel implements Com
             }
 
             case 1: {
-                Dividend newDividend = dividendSummary.get(row).setStock((Stock)value);
+                Dividend newDividend = dividendSummary.get(row).setStock((StockInfo)value);
                 dividendSummary.remove(row);
                 dividendSummary.add(row, newDividend);
                 fireTableCellUpdated(row, col);
@@ -122,7 +122,7 @@ public class DividendSummaryTableModel extends AbstractTableModel implements Com
     }
 
     public int addNewDividend() {
-        dividendSummary.add(new Dividend(org.yccheok.jstock.gui.Utils.getEmptyStock(Code.newInstance(""), Symbol.newInstance("")), 0.0, new SimpleDate()));
+        dividendSummary.add(new Dividend(StockInfo.newInstance(Code.newInstance(""), Symbol.newInstance("")), 0.0, new SimpleDate()));
         final int index = dividendSummary.size() - 1;
         this.fireTableRowsInserted(index, index);
         return index;
@@ -141,7 +141,7 @@ public class DividendSummaryTableModel extends AbstractTableModel implements Com
     private static final String[] languageIndependentColumnNames;
     private static final Class[] columnClasses = {
         java.util.Date.class,
-        Stock.class,
+        StockInfo.class,
         Double.class
     };
     private final DividendSummary dividendSummary;

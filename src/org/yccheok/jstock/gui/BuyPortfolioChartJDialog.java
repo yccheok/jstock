@@ -97,7 +97,7 @@ public class BuyPortfolioChartJDialog extends javax.swing.JDialog {
         final int size = dividendSummary.size();
         for (int i = 0; i < size; i++) {
             Dividend dividend = dividendSummary.get(i);
-            Code code = dividend.stock.code;
+            Code code = dividend.stockInfo.code;
             Double value = this.codeToTotalDividend.get(code);
             if (value != null) {
                 double total = value + dividend.amount;

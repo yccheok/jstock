@@ -697,11 +697,17 @@ public class Statements {
         List<String> strings = new ArrayList<String>();
         for (int i = 0; i < column; i++) {
             final String type = languageIndependent ? csvHelper.getLanguageIndependentColumnName(i) : tableModel.getColumnName(i);
-            if (tableModel.getColumnClass(i).equals(Stock.class)) {                    
+            final Class c = tableModel.getColumnClass(i);
+            if (c.equals(Stock.class)) {                    
                 final String code_string = guiBundleWrapper.getString("MainFrame_Code");
                 final String symbol_string = guiBundleWrapper.getString("MainFrame_Symbol");
                 strings.add(code_string);
                 strings.add(symbol_string);
+            } if (c.equals(StockInfo.class)) {
+                final String code_string = guiBundleWrapper.getString("MainFrame_Code");
+                final String symbol_string = guiBundleWrapper.getString("MainFrame_Symbol");
+                strings.add(code_string);
+                strings.add(symbol_string);                
             } else {
                 strings.add(type);
             }
@@ -722,7 +728,8 @@ public class Statements {
             for (int j = 0; j < column; j++) {
                 final String type = languageIndependent ? csvHelper.getLanguageIndependentColumnName(j) : tableModel.getColumnName(j);
                 final Object object = tableModel.getValueAt(i, j);
-                if (tableModel.getColumnClass(j).equals(Stock.class)) {
+                final Class c = tableModel.getColumnClass(j);
+                if (c.equals(Stock.class)) {
                     final Stock stock = (Stock)object;
                     // There are no way to represent Stock in text form. We
                     // will represent them in Code and Symbol.
@@ -734,7 +741,16 @@ public class Statements {
                     atoms.add(new Atom(stock.code.toString(), code_string));
                     atoms.add(new Atom(stock.symbol.toString(), symbol_string));
                 }
-                else if (tableModel.getColumnClass(j).equals(Date.class)) {
+                else if (c.equals(StockInfo.class)) {
+                    final StockInfo stockInfo = (StockInfo)object;
+                    
+                    final String code_string = guiBundleWrapper.getString("MainFrame_Code");
+                    final String symbol_string = guiBundleWrapper.getString("MainFrame_Symbol");
+
+                    atoms.add(new Atom(stockInfo.code.toString(), code_string));
+                    atoms.add(new Atom(stockInfo.symbol.toString(), symbol_string));                    
+                }
+                else if (c.equals(Date.class)) {
                     DateFormat dateFormat = org.yccheok.jstock.gui.Utils.getCommonDateFormat();
                     atoms.add(new Atom(object != null ? dateFormat.format(((Date)object).getTime()) : "", type));
                 } else {
