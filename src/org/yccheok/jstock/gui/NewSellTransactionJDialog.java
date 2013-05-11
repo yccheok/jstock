@@ -653,7 +653,12 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
             } else {
                 if (org.yccheok.jstock.portfolio.Utils.definitelyGreaterThan(sellQuantity, 0)) {
                     if (isFeeCalculationEnabled) {
-                        _buyValue += (buyTransaction.getNetPrice() * sellQuantity);
+                        // Do not use getNetPrice, as it might return bad value
+                        // like 1.333... which is difficult to display in UI.
+                        _buyValue += (buyTransaction.getPrice() * sellQuantity) + 
+                                getGoodCurrencyDouble(buyTransaction.getBroker(), sellQuantity, buyTransaction.getQuantity()) +
+                                getGoodCurrencyDouble(buyTransaction.getClearingFee(), sellQuantity, buyTransaction.getQuantity()) +
+                                getGoodCurrencyDouble(buyTransaction.getStampDuty(), sellQuantity, buyTransaction.getQuantity());
                     } else {
                         _buyValue += (buyTransaction.getPrice() * sellQuantity);
                     }
@@ -663,6 +668,23 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
             }
         }        
         this.buyValue = _buyValue;
+    }
+    
+    // Instead of returning 1.3333..., we will return 1.333
+    private double getGoodCurrencyDouble(double value, double sellQuantity, double buyQuantity) {
+        assert(sellQuantity <= buyQuantity);
+        assert(org.yccheok.jstock.portfolio.Utils.definitelyGreaterThan(sellQuantity, 0));
+        assert(org.yccheok.jstock.portfolio.Utils.definitelyGreaterThan(buyQuantity, 0));
+
+        if (org.yccheok.jstock.portfolio.Utils.essentiallyEqual(sellQuantity, buyQuantity)) {
+            return value;
+        }
+        
+        return Double.parseDouble(org.yccheok.jstock.portfolio.Utils.toCurrency(sellQuantity /  buyQuantity * value));
+    }
+    
+    private BigDecimal getGoodCurrencyBigDecimal(double value, double sellQuantity, double buyQuantity) {
+        return new BigDecimal(getGoodCurrencyDouble(value, sellQuantity, buyQuantity));
     }
     
     public void setSellTransaction(Transaction transaction) {
@@ -757,8 +779,6 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
             BigDecimal quantity = new BigDecimal(unit);
             boolean shouldBreakInNextRound = false;
             
-            final NumberFormat format = NumberFormat.getNumberInstance();
-            
             int i = 0;
             BigDecimal totalBrokerFee = new BigDecimal(0);
             BigDecimal totalStampDuty = new BigDecimal(0);
@@ -791,12 +811,15 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
                 final double referenceBroker = buyTransaction.getBroker();
                 final double referenceClearingFee = buyTransaction.getClearingFee();
                 final double referenceStampDuty = buyTransaction.getStampDuty();
-                final double ratio = realTransactionQuantity / buyTransaction.getQuantity();
+                final double goodReferenceBroker = getGoodCurrencyDouble(referenceBroker, realTransactionQuantity, buyTransaction.getQuantity());
+                final double goodReferenceClearingFee = getGoodCurrencyDouble(referenceClearingFee, realTransactionQuantity, buyTransaction.getQuantity());
+                final double goodReferenceStampDuty = getGoodCurrencyDouble(referenceStampDuty, realTransactionQuantity, buyTransaction.getQuantity());
+                
                 final Contract contract = builder.type(type).quantity(realTransactionQuantity).price(price)
                         .referencePrice(buyTransaction.getPrice())
-                        .referenceBroker(ratio * referenceBroker)
-                        .referenceClearingFee(ratio * referenceClearingFee)
-                        .referenceStampDuty(ratio * referenceStampDuty)
+                        .referenceBroker(goodReferenceBroker)
+                        .referenceClearingFee(goodReferenceClearingFee)
+                        .referenceStampDuty(goodReferenceStampDuty)
                         .referenceDate(buyTransaction.getDate()).build();
                 
                 // Do not use the following code, as our objective is
@@ -814,10 +837,11 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
                 BigDecimal stampDutyBigDecimal;
                 BigDecimal clearingFeeBigDecimal;
                 // Is this last item?
-                if (i != buyTransactions.size()) {
-                    brokerFeeBigDecimal = new BigDecimal(Double.parseDouble(format.format(brokerFee * realTransactionQuantity / unit)));
-                    stampDutyBigDecimal = new BigDecimal(Double.parseDouble(format.format(stampDuty * realTransactionQuantity / unit)));
-                    clearingFeeBigDecimal = new BigDecimal(Double.parseDouble(format.format(clearingFee * realTransactionQuantity / unit)));
+                if (i != buyTransactions.size()) {                    
+                    brokerFeeBigDecimal = getGoodCurrencyBigDecimal(brokerFee, realTransactionQuantity, unit);
+                    stampDutyBigDecimal = getGoodCurrencyBigDecimal(stampDuty, realTransactionQuantity, unit);
+                    clearingFeeBigDecimal = getGoodCurrencyBigDecimal(clearingFee, realTransactionQuantity, unit);
+                    
                     totalBrokerFee = totalBrokerFee.add(brokerFeeBigDecimal);
                     totalStampDuty = totalStampDuty.add(stampDutyBigDecimal);
                     totalClearingFee = totalClearingFee.add(clearingFeeBigDecimal);
