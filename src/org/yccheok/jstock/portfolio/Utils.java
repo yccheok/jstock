@@ -314,6 +314,7 @@ public class Utils {
         return getPortfolioDirectory(jStockOptions.getPortfolioName());
     }
 
+    // TODO : Remove this code after some time.
     /**
      * Due to historical reason, we are storing portfolio information in XML
      * files. Now, they are considered as obsolete. CSV files will become the
@@ -421,7 +422,8 @@ public class Utils {
         }
         return portfolioNames;
     }
-
+    
+    // TODO : Remove this code after some time.
     private static List<String> getXMLPortfolioNames(String baseDirectory, Country country, boolean oldData) {
         List<String> portfolioNames = new ArrayList<String>();
         final File file = oldData ?
@@ -460,7 +462,7 @@ public class Utils {
     public static void removeMeaninglessRecords(DividendSummary dividendSummary) {
         for (int i = 0; i < dividendSummary.size(); i++) {
             Dividend dividend = dividendSummary.get(i);
-            if (dividend.amount <= 0.0 || dividend.stock.code.toString().length() <= 0) {
+            if (dividend.amount <= 0.0 || dividend.stockInfo.code.toString().length() <= 0) {
                 // Remove meaningless record.
                 dividendSummary.remove(dividend);
                 i--;
@@ -546,6 +548,7 @@ public class Utils {
         return (a - b) > ( (Math.abs(a) < Math.abs(b) ? Math.abs(b) : Math.abs(a)) * EPSILON);
     }
 
+    // TODO : Remove this code after some time.
     // The directory format should be "C:\Users\yccheok\.jstock\1.0.6\", or
     // temporary directory holding the extracted cloud files.
     public static boolean migrateXMLToCSVPortfolios(String srcBaseDirectory, String destBaseDirectory) {
@@ -620,6 +623,7 @@ public class Utils {
         return status;
     }
 
+    // TODO : Remove this code after some time.
     @SuppressWarnings( "deprecation" )
     private static XMLPortfolio getXMLPortfolio(String directory) {
         final File buyPortfolioFile;

@@ -798,7 +798,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
                     for (int i = 0; i < size; i++) {
                         Date date = null;
-                        Stock stock = null;
+                        StockInfo stockInfo = null;
                         final Statement statement = statements.get(i);
                         final String object0 = statement.getValueAsString(guiBundleWrapper.getString("PortfolioManagementJPanel_Date"));
                         assert(object0 != null);
@@ -846,18 +846,18 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                         final String codeStr = statement.getValueAsString(guiBundleWrapper.getString("MainFrame_Code"));
                         final String symbolStr = statement.getValueAsString(guiBundleWrapper.getString("MainFrame_Symbol"));
                         if (codeStr.isEmpty() == false && symbolStr.isEmpty() == false) {
-                            stock = Utils.getEmptyStock(Code.newInstance(codeStr), Symbol.newInstance(symbolStr));
+                            stockInfo = StockInfo.newInstance(Code.newInstance(codeStr), Symbol.newInstance(symbolStr));
                         } else {
                             log.error("Unexpected wrong stock. Ignore");
                             // stock is null.
                             continue;
                         }
                         
-                        assert(stock != null);
+                        assert(stockInfo != null);
                         assert(dividend != null);
                         assert(date != null);
                         
-                        final Dividend d = new Dividend(stock, dividend, new SimpleDate(date));
+                        final Dividend d = new Dividend(stockInfo, dividend, new SimpleDate(date));
                         
                         final String comment = statement.getValueAsString(guiBundleWrapper.getString("PortfolioManagementJPanel_Comment"));
                         if (comment != null) {
@@ -1592,7 +1592,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             menuItem.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent evt) {
-                    PortfolioManagementJPanel.this.showSplitOrMergeJDialog(org.yccheok.jstock.engine.Utils.toStockInfo(selectedStocks.get(0)));
+                    PortfolioManagementJPanel.this.showSplitOrMergeJDialog(StockInfo.newInstance(selectedStocks.get(0)));
                 }
             });
 
@@ -1733,14 +1733,14 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         return summaries;
     }
 
-    public List<Stock> getStocksFromPortfolios() {
+    public List<StockInfo> getStockInfosFromPortfolios() {
         final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
         final SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel = (SellPortfolioTreeTableModelEx)sellTreeTable.getTreeTableModel();
         final Portfolio buyPortfolio = (Portfolio) buyPortfolioTreeTableModel.getRoot();
         final Portfolio sellPortfolio = (Portfolio) sellPortfolioTreeTableModel.getRoot();
 
         Set<Code> codes = new HashSet<Code>();
-        List<Stock> stocks = new ArrayList<Stock>();
+        List<StockInfo> stockInfos = new ArrayList<StockInfo>();
 
         final int count = buyPortfolio.getChildCount();
         TransactionSummary transactionSummary = null;
@@ -1755,7 +1755,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
             if (codes.contains(stock.code) == false) {
                 codes.add(stock.code);
-                stocks.add(stock);
+                stockInfos.add(StockInfo.newInstance(stock));
             }
         }
 
@@ -1772,11 +1772,11 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
             if (codes.contains(stock.code) == false) {
                 codes.add(stock.code);
-                stocks.add(stock);
+                stockInfos.add(StockInfo.newInstance(stock));
             }
         }
 
-        return stocks;
+        return stockInfos;
     }
 
     private TransactionSummary addSellTransaction(Transaction transaction) {

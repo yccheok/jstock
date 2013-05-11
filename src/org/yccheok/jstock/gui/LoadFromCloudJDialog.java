@@ -474,6 +474,7 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
                 publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_ExtractingData..."), Icons.BUSY));
                 boolean status = Utils.extractZipFile(cloudFile.file, true);
                 
+                // TODO : Remove this code after some time.
                 if (Utils.isWatchlistAndPortfolioFilesInXML(cloudFile.version)) {
                     status = status & org.yccheok.jstock.portfolio.Utils.migrateXMLToCSVPortfolios(Utils.getUserDataDirectory(), Utils.getUserDataDirectory());
                     status = status & org.yccheok.jstock.watchlist.Utils.migrateXMLToCSVWatchlists(Utils.getUserDataDirectory(), Utils.getUserDataDirectory());

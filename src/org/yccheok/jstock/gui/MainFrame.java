@@ -1661,6 +1661,7 @@ public class MainFrame extends javax.swing.JFrame {
                 // jStockOptions.
                 mainFrame.initJStockOptions(jStockOptions);
                 
+                // TODO : Remove this code after some time.
                 if (Utils.isWatchlistAndPortfolioFilesInXML(jStockOptions.getApplicationVersionID())) {
                     boolean status = true;
                     if (org.yccheok.jstock.portfolio.Utils.migrateXMLToCSVPortfolios(Utils.getUserDataDirectory(), Utils.getUserDataDirectory())) {
@@ -2716,7 +2717,7 @@ public class MainFrame extends javax.swing.JFrame {
                 final Code code = Code.newInstance(resultType.symbol);
                 // Name from Yahoo means Symbol in JStock.
                 final Symbol symbol = Symbol.newInstance(resultType.name);
-                final StockInfo stockInfo = new StockInfo(code, symbol);
+                final StockInfo stockInfo = StockInfo.newInstance(code, symbol);
 
                 addStockInfoFromAutoCompleteJComboBox(stockInfo);
 
@@ -3153,7 +3154,7 @@ public class MainFrame extends javax.swing.JFrame {
                         
                         // Insert with new user defined code.
                         for (Pair<Code, Symbol> pair : pairs) {
-                            if (tmp_stock_info_database.addUserDefinedStockInfo(new StockInfo(pair.first, pair.second))) {
+                            if (tmp_stock_info_database.addUserDefinedStockInfo(StockInfo.newInstance(pair.first, pair.second))) {
                                 addUserDefinedStockInfoSuccessAtLeastOnce = true;
                             }
                         }
@@ -3222,7 +3223,7 @@ public class MainFrame extends javax.swing.JFrame {
                         
                         // Insert with new user defined code.
                         for (Pair<Code, Symbol> pair : pairs) {
-                            tmp_stock_info_database.addUserDefinedStockInfo(new StockInfo(pair.first, pair.second));
+                            tmp_stock_info_database.addUserDefinedStockInfo(StockInfo.newInstance(pair.first, pair.second));
                         }
                     }
 

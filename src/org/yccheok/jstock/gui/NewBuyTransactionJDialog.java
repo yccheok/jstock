@@ -842,7 +842,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
                 final Code code = Code.newInstance(resultType.symbol);
                 // Name from Yahoo means Symbol in JStock.
                 final Symbol symbol = Symbol.newInstance(resultType.name);
-                final StockInfo stockInfo = new StockInfo(code, symbol);
+                final StockInfo stockInfo = StockInfo.newInstance(code, symbol);
 
                 addStockInfoFromAutoCompleteJComboBox(stockInfo);
 

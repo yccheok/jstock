@@ -2769,6 +2769,7 @@ public class Utils {
         return version <= 1093;
     }
     
+    // TODO : Remove this code after some time.
     public static boolean isWatchlistAndPortfolioFilesInXML(int version) {
         // 1090 = 1.0.6o
         return version <= 1090;

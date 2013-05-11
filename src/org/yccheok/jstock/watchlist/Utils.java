@@ -204,6 +204,7 @@ public class Utils {
     }
     
 
+    // TODO : Remove this code after some time.
     // The directory format should be "C:\Users\yccheok\.jstock\1.0.6\", or
     // temporary directory holding the extracted cloud files.
     public static boolean migrateXMLToCSVWatchlists(String srcBaseDirectory, String destBaseDirectory) {
@@ -271,6 +272,7 @@ public class Utils {
         return status;
     }
     
+    // TODO : Remove this code after some time.
     // Never ever delete directory itself.
     private static boolean deleteXMLWatchlist(String directory) {
         final File realTimeStockFile = new File(directory  + "realtimestock.xml");

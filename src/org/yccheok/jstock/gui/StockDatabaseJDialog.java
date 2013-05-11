@@ -334,7 +334,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
                  */
                 symbolStr = codeStr;
             }
-            this.stockInfoDatabase.addUserDefinedStockInfo(new StockInfo(Code.newInstance(codeStr), Symbol.newInstance(symbolStr)));
+            this.stockInfoDatabase.addUserDefinedStockInfo(StockInfo.newInstance(Code.newInstance(codeStr), Symbol.newInstance(symbolStr)));
         }
 
         
@@ -712,12 +712,12 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
             if (value instanceof Symbol) {
                 final Symbol symbol = (Symbol)value;
                 final Code code = stockInfos.remove(row).code;
-                stockInfos.add(row, new StockInfo(code, symbol));
+                stockInfos.add(row, StockInfo.newInstance(code, symbol));
             }
             else if (value instanceof Code) {
                 final Code code = (Code)value;
                 final Symbol symbol = stockInfos.remove(row).symbol;
-                stockInfos.add(row, new StockInfo(code, symbol));
+                stockInfos.add(row, StockInfo.newInstance(code, symbol));
             }
             else {
                 assert(false);
@@ -752,7 +752,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         public int addNewStockInfo() {
             final Code code = Code.newInstance("");
             final Symbol symbol = Symbol.newInstance("");
-            this.stockInfos.add(new StockInfo(code, symbol));
+            this.stockInfos.add(StockInfo.newInstance(code, symbol));
 
             final int index = this.stockInfos.size() - 1;
             this.fireTableRowsInserted(index, index);
@@ -765,7 +765,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
             final Code code = Code.newInstance(result.symbol);
             // Name from Yahoo means Symbol in JStock.
             final Symbol symbol = Symbol.newInstance(result.name);
-            this.stockInfos.add(new StockInfo(code, symbol));
+            this.stockInfos.add(StockInfo.newInstance(code, symbol));
 
             final int index = this.stockInfos.size() - 1;
             this.fireTableRowsInserted(index, index);
