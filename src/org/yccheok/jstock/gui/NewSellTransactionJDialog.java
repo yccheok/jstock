@@ -628,37 +628,37 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
         final boolean isFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
         
-        double quantity = spinnerQuantity;
+        double sellQuantity = spinnerQuantity;
         
         // Edit
         if (this.sellTransaction != null) {
             if (isFeeCalculationEnabled) {
-                this.buyValue = quantity * this.sellTransaction.getNetReferenceTotal() / this.sellTransaction.getQuantity();
+                this.buyValue = sellQuantity * this.sellTransaction.getNetReferenceTotal() / this.sellTransaction.getQuantity();
             } else {
-                this.buyValue = quantity * this.sellTransaction.getReferenceTotal() / this.sellTransaction.getQuantity();
+                this.buyValue = sellQuantity * this.sellTransaction.getReferenceTotal() / this.sellTransaction.getQuantity();
             }
             // Return early.
             return;
         }
         
         double _buyValue = 0.0;
-        for (Transaction transaction : buyTransactions) {
-            if (quantity >= transaction.getQuantity()) {
+        for (Transaction buyTransaction : buyTransactions) {
+            if (sellQuantity >= buyTransaction.getQuantity()) {
                 if (isFeeCalculationEnabled) {
-                    _buyValue += transaction.getNetTotal();
+                    _buyValue += buyTransaction.getNetTotal();
                 } else {
-                    _buyValue += transaction.getTotal();
+                    _buyValue += buyTransaction.getTotal();
                 }
-                quantity -= transaction.getQuantity();
+                sellQuantity -= buyTransaction.getQuantity();
             } else {
-                if (org.yccheok.jstock.portfolio.Utils.definitelyGreaterThan(quantity, 0)) {
+                if (org.yccheok.jstock.portfolio.Utils.definitelyGreaterThan(sellQuantity, 0)) {
                     if (isFeeCalculationEnabled) {
-                        _buyValue += (transaction.getNetPrice() * quantity);
+                        _buyValue += (buyTransaction.getNetPrice() * sellQuantity);
                     } else {
-                        _buyValue += (transaction.getPrice() * quantity);
+                        _buyValue += (buyTransaction.getPrice() * sellQuantity);
                     }
                 }
-                quantity = 0;
+                sellQuantity = 0;
                 break;
             }
         }        
