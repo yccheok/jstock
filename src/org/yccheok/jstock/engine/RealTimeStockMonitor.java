@@ -136,8 +136,13 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
             if (row == null) {
                 return status;
             }
-            status = (null != stockCodes.remove((int)row));
+            
+            status = (null != stockCodes.remove((int)row));            
             rowStockCodeMapping.remove(code);
+            
+            for (int i = row, ei = stockCodes.size(); i < ei; i++) {
+                rowStockCodeMapping.put(stockCodes.get(i), i);
+            }
         } finally {
             stockCodesWriterLock.unlock();
         }

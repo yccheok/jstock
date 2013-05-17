@@ -69,6 +69,7 @@ public class Transaction extends DefaultSortableMutableTreeTableNode implements 
         this.calculatedStampDuty = transaction.calculatedStampDuty;
         this.calculatdClearingFee = transaction.calculatdClearingFee;
         this.netTotal = transaction.netTotal;
+        this.comment = transaction.comment;
     }
     
     /**

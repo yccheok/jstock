@@ -633,9 +633,11 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         // Edit
         if (this.sellTransaction != null) {
             if (isFeeCalculationEnabled) {
-                this.buyValue = sellQuantity * this.sellTransaction.getNetReferenceTotal() / this.sellTransaction.getQuantity();
+                // Do not use "sellQuantity * this.sellTransaction.getNetReferenceTotal() / this.sellTransaction.getQuantity();"
+                // It will create too many decimal places.
+                this.buyValue = sellQuantity * this.sellTransaction.getReferencePrice() + this.sellTransaction.getReferenceBroker() + this.sellTransaction.getReferenceClearingFee() + this.sellTransaction.getReferenceStampDuty();
             } else {
-                this.buyValue = sellQuantity * this.sellTransaction.getReferenceTotal() / this.sellTransaction.getQuantity();
+                this.buyValue = sellQuantity * this.sellTransaction.getReferencePrice();
             }
             // Return early.
             return;
