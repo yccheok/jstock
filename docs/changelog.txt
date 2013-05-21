@@ -1,7 +1,10 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
-JStock 1.0.7a- 2013-05-18
+JStock 1.0.7b - 2013-05-21
+  Bugfix:  Dividend dialog wouldn't pop up.
+  
+JStock 1.0.7a - 2013-05-18
   Feature: Support chinese stock name for Taiwan.
   Bugfix:  Critical bug fix during stock deletion.
   Bugfix:  Bug fix on edit sell transaction.

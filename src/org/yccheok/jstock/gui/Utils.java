@@ -2874,9 +2874,9 @@ public class Utils {
     private static final String APPLICATION_VERSION_STRING = "1.0.7";
 
     // For About box comparision on latest version purpose.
-    // 1.0.7a
+    // 1.0.7b
     // Remember to update isCompatible method.
-    private static final int APPLICATION_VERSION_ID = 1103;
+    private static final int APPLICATION_VERSION_ID = 1104;
 
     private static Executor zombiePool = Executors.newFixedThreadPool(Utils.NUM_OF_THREADS_ZOMBIE_POOL);
 

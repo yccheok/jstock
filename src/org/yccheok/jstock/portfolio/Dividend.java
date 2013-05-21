@@ -40,7 +40,7 @@ public class Dividend implements Commentable {
         this.comment = dividend.comment;
     }
 
-    public Dividend setStock(StockInfo stockInfo) {
+    public Dividend setStockInfo(StockInfo stockInfo) {
         Dividend dividend = new Dividend(stockInfo, this.amount, this.date);
         dividend.setComment(this.comment);
         return dividend;

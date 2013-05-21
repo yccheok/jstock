@@ -334,9 +334,9 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
         }
     }
 
-    public int addNewDividend(Stock stock) {
+    public int addNewDividend(StockInfo stockInfo) {
         final int modelIndex = addNewDividend();
-        ((DividendSummaryTableModel)jTable1.getModel()).setValueAt(stock, modelIndex, 1);
+        ((DividendSummaryTableModel)jTable1.getModel()).setValueAt(stockInfo, modelIndex, 1);
         return modelIndex;
     }
 

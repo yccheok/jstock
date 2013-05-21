@@ -99,7 +99,7 @@ public class DividendSummaryTableModel extends AbstractTableModel implements Com
             }
 
             case 1: {
-                Dividend newDividend = dividendSummary.get(row).setStock((StockInfo)value);
+                Dividend newDividend = dividendSummary.get(row).setStockInfo((StockInfo)value);
                 dividendSummary.remove(row);
                 dividendSummary.add(row, newDividend);
                 fireTableCellUpdated(row, col);

@@ -1187,7 +1187,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         List<Stock> stocks = this.getSelectedStocks();
         if (stocks.size() == 1) {
-            dividendSummaryJDialog.addNewDividend(stocks.get(0));
+            dividendSummaryJDialog.addNewDividend(org.yccheok.jstock.engine.StockInfo.newInstance(stocks.get(0)));
         }
         dividendSummaryJDialog.setVisible(true);
 

@@ -460,11 +460,7 @@ public class Statements {
             }
 
             // Pump in metadata.
-            for (Map.Entry<String, String> entry : metadatas.entrySet()) {
-                String key = entry.getKey();
-                String value = entry.getValue();
-                s.metadatas.put(key, value);
-            }
+            s.metadatas.putAll(metadatas);
             
             status = true;
         } catch (IOException ex) {
