@@ -266,9 +266,7 @@ public class Utils {
      */
     public static boolean createEmptyPortfolio(String name) {
         final String directory = getPortfolioDirectory(name);
-        if (false == org.yccheok.jstock.gui.Utils.createCompleteDirectoryHierarchyIfDoesNotExist(directory)) {
-            return false;
-        }
+
         // Note : Instead of creating multiple files, we will only create single 
         // file for space optimization purpose. This is important as we are 
         // going migrate to Android soon.
@@ -283,6 +281,10 @@ public class Utils {
         // contain portfolio files.
         //if (buyPortfolioFile.exists() || sellPortfolioFile.exists() || dividendSummaryFile.exists() || depositSummaryFile.exists() || stockPricesFile.exists()) {
         if (stockPricesFile.exists()) {
+            return false;
+        }
+        
+        if (false == org.yccheok.jstock.gui.Utils.createCompleteDirectoryHierarchyIfDoesNotExist(directory)) {
             return false;
         }
         

@@ -30,7 +30,10 @@ import java.awt.Component;
 import java.awt.Font;
 import java.io.File;
 import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
@@ -156,11 +159,13 @@ public class WatchlistJDialog extends javax.swing.JDialog {
             JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_you_must_select_watchlist"), MessagesBundle.getString("warning_title_you_must_select_watchlist"), JOptionPane.WARNING_MESSAGE);
             return;
         }
+        
         final String oldWatchlistName = (String)jList1.getSelectedValue();
         if (oldWatchlistName == null) {
             JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_title_you_must_select_watchlist"), MessagesBundle.getString("warning_title_you_must_select_watchlist"), JOptionPane.WARNING_MESSAGE);
             return;
         }
+        
         String newWatchlistName = null;
 
         boolean needToReload = false;
@@ -168,7 +173,8 @@ public class WatchlistJDialog extends javax.swing.JDialog {
         if (mainFrame.getJStockOptions().getWatchlistName().equals(oldWatchlistName)) {
             needToReload = true;
         }
-
+        
+        root:
         while (true) {
             newWatchlistName = JOptionPane.showInputDialog(this, MessagesBundle.getString("info_message_enter_rename_watchlist_name"), oldWatchlistName);
 
@@ -177,19 +183,40 @@ public class WatchlistJDialog extends javax.swing.JDialog {
                 return;
             }
 
-            if (newWatchlistName.length() <= 0) {
+            // Make it same rule as Android's
+            if (newWatchlistName.length() > 50) {
+                JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_invalid_watchlist_name"), MessagesBundle.getString("warning_title_invalid_watchlist_name"), JOptionPane.WARNING_MESSAGE);
+                continue;                
+            }
+                       
+            newWatchlistName = newWatchlistName.trim();
+            
+            if (newWatchlistName.isEmpty()) {
                 JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_you_need_to_specific_watchlist_name"), MessagesBundle.getString("warning_title_you_need_to_specific_watchlist_name"), JOptionPane.WARNING_MESSAGE);
                 continue;
             }
 
+            if (isValidFolderName(newWatchlistName) == false) {
+                JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_invalid_watchlist_name"), MessagesBundle.getString("warning_title_invalid_watchlist_name"), JOptionPane.WARNING_MESSAGE);
+                continue;
+            }
+            
             if (Utils.isFileOrDirectoryExist(org.yccheok.jstock.watchlist.Utils.getWatchlistDirectory(newWatchlistName))) {
                 JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_already_a_watchlist_with_same_name"), MessagesBundle.getString("warning_title_already_a_watchlist_with_same_name"), JOptionPane.WARNING_MESSAGE);
                 continue;
             }
 
-            if (newWatchlistName.contains(File.separator)) {
-                JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_invalid_watchlist_name"), MessagesBundle.getString("warning_title_invalid_watchlist_name"), JOptionPane.WARNING_MESSAGE);
-                continue;
+            // In Linux, creating "My Watchlist" and "my watchlist" are allowed. We
+            // want to prevent this from happening, as user might upload such 2 folders
+            // in Linux, and download into Windows.
+            final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+            final File file = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() +  jStockOptions.getCountry() + File.separator + "watchlist" + File.separator);
+            File[] children = file.listFiles();            
+            for (File f : children) {
+                if (newWatchlistName.equalsIgnoreCase(f.getName())) {
+                    JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_already_a_watchlist_with_same_name"), MessagesBundle.getString("warning_title_already_a_watchlist_with_same_name"), JOptionPane.WARNING_MESSAGE);
+                    continue root;
+                }
             }
 
             File oldFile = new File(org.yccheok.jstock.watchlist.Utils.getWatchlistDirectory(oldWatchlistName));
@@ -245,28 +272,50 @@ public class WatchlistJDialog extends javax.swing.JDialog {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         String newWatchlistName = null;
+        root:
         while (true) {
             newWatchlistName = JOptionPane.showInputDialog(this, MessagesBundle.getString("info_message_enter_new_watchlist_name"));
-
+            
             if (newWatchlistName == null) {
                 return;
             }
 
-            if (newWatchlistName.length() <= 0) {
+            // Make it same rule as Android's
+            if (newWatchlistName.length() > 50) {
+                JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_invalid_watchlist_name"), MessagesBundle.getString("warning_title_invalid_watchlist_name"), JOptionPane.WARNING_MESSAGE);
+                continue;                
+            }
+                
+            newWatchlistName = newWatchlistName.trim();
+            
+            if (newWatchlistName.isEmpty()) {
                 JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_you_need_to_specific_watchlist_name"), MessagesBundle.getString("warning_title_you_need_to_specific_watchlist_name"), JOptionPane.WARNING_MESSAGE);
                 continue;
             }
 
+            if (isValidFolderName(newWatchlistName) == false) {
+                JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_invalid_watchlist_name"), MessagesBundle.getString("warning_title_invalid_watchlist_name"), JOptionPane.WARNING_MESSAGE);
+                continue;
+            }
+            
             if (Utils.isFileOrDirectoryExist(org.yccheok.jstock.watchlist.Utils.getWatchlistDirectory(newWatchlistName))) {
                 JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_already_a_watchlist_with_same_name"), MessagesBundle.getString("warning_title_already_a_watchlist_with_same_name"), JOptionPane.WARNING_MESSAGE);
                 continue;
             }
-
-            if (newWatchlistName.contains(File.separator)) {
-                JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_invalid_watchlist_name"), MessagesBundle.getString("warning_title_invalid_watchlist_name"), JOptionPane.WARNING_MESSAGE);
-                continue;
+            
+            // In Linux, creating "My Watchlist" and "my watchlist" are allowed. We
+            // want to prevent this from happening, as user might upload such 2 folders
+            // in Linux, and download into Windows.
+            final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+            final File file = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() +  jStockOptions.getCountry() + File.separator + "watchlist" + File.separator);
+            File[] children = file.listFiles();            
+            for (File f : children) {
+                if (newWatchlistName.equalsIgnoreCase(f.getName())) {
+                    JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_already_a_watchlist_with_same_name"), MessagesBundle.getString("warning_title_already_a_watchlist_with_same_name"), JOptionPane.WARNING_MESSAGE);
+                    continue root;
+                }
             }
-
+            
             if (false == org.yccheok.jstock.watchlist.Utils.createEmptyWatchlist(newWatchlistName))
             {
                 JOptionPane.showMessageDialog(this, MessagesBundle.getString("error_message_unknown_error_during_new"), MessagesBundle.getString("error_title_unknown_error_during_new"), JOptionPane.ERROR_MESSAGE);
@@ -327,6 +376,20 @@ public class WatchlistJDialog extends javax.swing.JDialog {
             }
         };
     }
+    
+    private static boolean isValidFolderName(String folderName) {
+        char[] chars = folderName.toCharArray();
+        for (char c : chars) {
+            if (ILLEGAL_CHARACTERS.contains(c)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    // http://stackoverflow.com/questions/893977/java-how-to-find-out-whether-a-file-name-is-valid
+    private static final Set<Character> ILLEGAL_CHARACTERS = new HashSet<Character>(Arrays.asList('/', '\n', '\r', '\t', '\0', '\f', '`', '?', '*', '\\', '<', '>', '|', '\"', ':'));
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;

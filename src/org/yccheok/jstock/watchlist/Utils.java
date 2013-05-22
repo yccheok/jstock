@@ -291,13 +291,14 @@ public class Utils {
      */
     public static boolean createEmptyWatchlist(String name) {
         final String directory = getWatchlistDirectory(name);
-        if (false == org.yccheok.jstock.gui.Utils.createCompleteDirectoryHierarchyIfDoesNotExist(directory)) {
-            return false;
-        }
-
+        
         // Do not allow to create empty watchlist, if the desired location already
         // contain watchlist files.
         if (new File(directory + "realtimestock.csv").exists()) {
+            return false;
+        }
+        
+        if (false == org.yccheok.jstock.gui.Utils.createCompleteDirectoryHierarchyIfDoesNotExist(directory)) {
             return false;
         }
 

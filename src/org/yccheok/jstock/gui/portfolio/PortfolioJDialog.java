@@ -29,7 +29,10 @@ import java.awt.Component;
 import java.awt.Font;
 import java.io.File;
 import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
@@ -168,11 +171,11 @@ public class PortfolioJDialog extends javax.swing.JDialog {
 
         boolean needToReload = false;
         final MainFrame mainFrame = MainFrame.getInstance();
-        final JStockOptions jStockOptions = mainFrame.getJStockOptions();
-        if (jStockOptions.getPortfolioName().equals(oldPortfolioName)) {
+        if ( mainFrame.getJStockOptions().getPortfolioName().equals(oldPortfolioName)) {
             needToReload = true;
         }
 
+        root:
         while (true) {
             newPortfolioName = JOptionPane.showInputDialog(this, MessagesBundle.getString("info_message_enter_rename_portfolio_name"), oldPortfolioName);
 
@@ -180,19 +183,40 @@ public class PortfolioJDialog extends javax.swing.JDialog {
                 return;
             }
 
-            if (newPortfolioName.length() <= 0) {
+            // Make it same rule as Android's
+            if (newPortfolioName.length() > 50) {
+                JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_invalid_portfolio_name"), MessagesBundle.getString("warning_title_invalid_portfolio_name"), JOptionPane.WARNING_MESSAGE);
+                continue;                
+            }
+            
+            newPortfolioName = newPortfolioName.trim();
+            
+            if (newPortfolioName.isEmpty()) {
                 JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_you_need_to_specific_portfolio_name"), MessagesBundle.getString("warning_title_you_need_to_specific_portfolio_name"), JOptionPane.WARNING_MESSAGE);
                 continue;
             }
 
+            if (isValidFolderName(newPortfolioName) == false) {
+                JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_invalid_portfolio_name"), MessagesBundle.getString("warning_title_invalid_portfolio_name"), JOptionPane.WARNING_MESSAGE);
+                continue;
+            }
+            
             if (Utils.isFileOrDirectoryExist(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory(newPortfolioName))) {
                 JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_already_a_portfolio_with_same_name"), MessagesBundle.getString("warning_title_already_a_portfolio_with_same_name"), JOptionPane.WARNING_MESSAGE);
                 continue;
             }
 
-            if (newPortfolioName.contains(File.separator)) {
-                JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_invalid_portfolio_name"), MessagesBundle.getString("warning_title_invalid_portfolio_name"), JOptionPane.WARNING_MESSAGE);
-                continue;
+            // In Linux, creating "My Portfolio" and "my portfolio" are allowed. We
+            // want to prevent this from happening, as user might upload such 2 folders
+            // in Linux, and download into Windows.
+            final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+            final File file = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() +  jStockOptions.getCountry() + File.separator + "portfolios" + File.separator);
+            File[] children = file.listFiles();            
+            for (File f : children) {
+                if (newPortfolioName.equalsIgnoreCase(f.getName())) {
+                    JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_already_a_portfolio_with_same_name"), MessagesBundle.getString("warning_title_already_a_portfolio_with_same_name"), JOptionPane.WARNING_MESSAGE);
+                    continue root;
+                }
             }
 
             File oldFile = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory(oldPortfolioName));
@@ -249,6 +273,7 @@ public class PortfolioJDialog extends javax.swing.JDialog {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         String newPortfolioName = null;
+        root:
         while (true) {
             newPortfolioName = JOptionPane.showInputDialog(this, MessagesBundle.getString("info_message_enter_new_portfolio_name"));
 
@@ -256,21 +281,42 @@ public class PortfolioJDialog extends javax.swing.JDialog {
                 return;
             }
 
+            // Make it same rule as Android's
+            if (newPortfolioName.length() > 50) {
+                JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_invalid_portfolio_name"), MessagesBundle.getString("warning_title_invalid_portfolio_name"), JOptionPane.WARNING_MESSAGE);
+                continue;                
+            }
+                
+            newPortfolioName = newPortfolioName.trim();
+            
             if (newPortfolioName.length() <= 0) {
                 JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_you_need_to_specific_portfolio_name"), MessagesBundle.getString("warning_title_you_need_to_specific_portfolio_name"), JOptionPane.WARNING_MESSAGE);
                 continue;
             }
 
+            if (isValidFolderName(newPortfolioName) == false) {
+                JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_invalid_portfolio_name"), MessagesBundle.getString("warning_title_invalid_portfolio_name"), JOptionPane.WARNING_MESSAGE);
+                continue;
+            }
+            
             if (Utils.isFileOrDirectoryExist(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory(newPortfolioName))) {
                 JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_already_a_portfolio_with_same_name"), MessagesBundle.getString("warning_title_already_a_portfolio_with_same_name"), JOptionPane.WARNING_MESSAGE);
                 continue;
             }
 
-            if (newPortfolioName.contains(File.separator)) {
-                JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_invalid_portfolio_name"), MessagesBundle.getString("warning_title_invalid_portfolio_name"), JOptionPane.WARNING_MESSAGE);
-                continue;
+            // In Linux, creating "My Portfolio" and "my portfolio" are allowed. We
+            // want to prevent this from happening, as user might upload such 2 folders
+            // in Linux, and download into Windows.
+            final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+            final File file = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() +  jStockOptions.getCountry() + File.separator + "portfolios" + File.separator);
+            File[] children = file.listFiles();            
+            for (File f : children) {
+                if (newPortfolioName.equalsIgnoreCase(f.getName())) {
+                    JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_already_a_portfolio_with_same_name"), MessagesBundle.getString("warning_title_already_a_portfolio_with_same_name"), JOptionPane.WARNING_MESSAGE);
+                    continue root;
+                }
             }
-
+            
             if (false == org.yccheok.jstock.portfolio.Utils.createEmptyPortfolio(newPortfolioName))
             {
                 JOptionPane.showMessageDialog(this, MessagesBundle.getString("error_message_unknown_error_during_new"), MessagesBundle.getString("error_title_unknown_error_during_new"), JOptionPane.ERROR_MESSAGE);
@@ -333,6 +379,20 @@ public class PortfolioJDialog extends javax.swing.JDialog {
             }
         };
     }
+    
+    private static boolean isValidFolderName(String folderName) {
+        char[] chars = folderName.toCharArray();
+        for (char c : chars) {
+            if (ILLEGAL_CHARACTERS.contains(c)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    // http://stackoverflow.com/questions/893977/java-how-to-find-out-whether-a-file-name-is-valid
+    private static final Set<Character> ILLEGAL_CHARACTERS = new HashSet<Character>(Arrays.asList('/', '\n', '\r', '\t', '\0', '\f', '`', '?', '*', '\\', '<', '>', '|', '\"', ':'));
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
