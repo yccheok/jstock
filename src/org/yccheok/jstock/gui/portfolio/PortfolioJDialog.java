@@ -211,11 +211,13 @@ public class PortfolioJDialog extends javax.swing.JDialog {
             // in Linux, and download into Windows.
             final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
             final File file = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() +  jStockOptions.getCountry() + File.separator + "portfolios" + File.separator);
-            File[] children = file.listFiles();            
-            for (File f : children) {
-                if (newPortfolioName.equalsIgnoreCase(f.getName())) {
-                    JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_already_a_portfolio_with_same_name"), MessagesBundle.getString("warning_title_already_a_portfolio_with_same_name"), JOptionPane.WARNING_MESSAGE);
-                    continue root;
+            File[] children = file.listFiles();   
+            if (children != null) {
+                for (File f : children) {
+                    if (newPortfolioName.equalsIgnoreCase(f.getName())) {
+                        JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_already_a_portfolio_with_same_name"), MessagesBundle.getString("warning_title_already_a_portfolio_with_same_name"), JOptionPane.WARNING_MESSAGE);
+                        continue root;
+                    }
                 }
             }
 
@@ -309,11 +311,13 @@ public class PortfolioJDialog extends javax.swing.JDialog {
             // in Linux, and download into Windows.
             final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
             final File file = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() +  jStockOptions.getCountry() + File.separator + "portfolios" + File.separator);
-            File[] children = file.listFiles();            
-            for (File f : children) {
-                if (newPortfolioName.equalsIgnoreCase(f.getName())) {
-                    JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_already_a_portfolio_with_same_name"), MessagesBundle.getString("warning_title_already_a_portfolio_with_same_name"), JOptionPane.WARNING_MESSAGE);
-                    continue root;
+            File[] children = file.listFiles(); 
+            if (children != null) {
+                for (File f : children) {
+                    if (newPortfolioName.equalsIgnoreCase(f.getName())) {
+                        JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_already_a_portfolio_with_same_name"), MessagesBundle.getString("warning_title_already_a_portfolio_with_same_name"), JOptionPane.WARNING_MESSAGE);
+                        continue root;
+                    }
                 }
             }
             

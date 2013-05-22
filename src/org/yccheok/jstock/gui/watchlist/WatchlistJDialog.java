@@ -212,13 +212,15 @@ public class WatchlistJDialog extends javax.swing.JDialog {
             final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
             final File file = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() +  jStockOptions.getCountry() + File.separator + "watchlist" + File.separator);
             File[] children = file.listFiles();            
-            for (File f : children) {
-                if (newWatchlistName.equalsIgnoreCase(f.getName())) {
-                    JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_already_a_watchlist_with_same_name"), MessagesBundle.getString("warning_title_already_a_watchlist_with_same_name"), JOptionPane.WARNING_MESSAGE);
-                    continue root;
+            if (children != null) {
+                for (File f : children) {
+                    if (newWatchlistName.equalsIgnoreCase(f.getName())) {
+                        JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_already_a_watchlist_with_same_name"), MessagesBundle.getString("warning_title_already_a_watchlist_with_same_name"), JOptionPane.WARNING_MESSAGE);
+                        continue root;
+                    }
                 }
             }
-
+            
             File oldFile = new File(org.yccheok.jstock.watchlist.Utils.getWatchlistDirectory(oldWatchlistName));
             File newFile = new File(org.yccheok.jstock.watchlist.Utils.getWatchlistDirectory(newWatchlistName));
 
@@ -308,11 +310,13 @@ public class WatchlistJDialog extends javax.swing.JDialog {
             // in Linux, and download into Windows.
             final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
             final File file = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() +  jStockOptions.getCountry() + File.separator + "watchlist" + File.separator);
-            File[] children = file.listFiles();            
-            for (File f : children) {
-                if (newWatchlistName.equalsIgnoreCase(f.getName())) {
-                    JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_already_a_watchlist_with_same_name"), MessagesBundle.getString("warning_title_already_a_watchlist_with_same_name"), JOptionPane.WARNING_MESSAGE);
-                    continue root;
+            File[] children = file.listFiles();  
+            if (children != null) {
+                for (File f : children) {
+                    if (newWatchlistName.equalsIgnoreCase(f.getName())) {
+                        JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_already_a_watchlist_with_same_name"), MessagesBundle.getString("warning_title_already_a_watchlist_with_same_name"), JOptionPane.WARNING_MESSAGE);
+                        continue root;
+                    }
                 }
             }
             
