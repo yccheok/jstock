@@ -2216,7 +2216,7 @@ public class MainFrame extends javax.swing.JFrame {
                     String originalDirectory = org.yccheok.jstock.watchlist.Utils.getWatchlistDirectory(country, originalName);
                     String newDirectory = org.yccheok.jstock.watchlist.Utils.getWatchlistDirectory(country, newName);
                     
-                    if (originalDirectory.equalsIgnoreCase(newDirectory)) {
+                    if (false == originalDirectory.equalsIgnoreCase(newDirectory)) {
                         new File(originalDirectory).renameTo(new File(newDirectory));
                     }
                 }
