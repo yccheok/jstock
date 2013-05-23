@@ -2615,12 +2615,34 @@ public class Utils {
      * @param file The file
      * @return number of lines in a file
      */
-    public static int numOfLines(File file) {
+    public static int numOfLines(File file, boolean skipMetadata) {
         int line = 0;
+        int metaLineNumber = 0;
         
         LineNumberReader lnr = null;
         try {
             lnr = new LineNumberReader(new FileReader(file));
+            
+            if (skipMetadata) {
+                String nextLine = lnr.readLine();
+                // Metadata handling.
+                while (nextLine != null) {
+                    String[] tokens = nextLine.split("=", 2);
+                    if (tokens.length == 2) {
+                        String key = tokens[0].trim();
+                        if (key.length() > 0) {
+                            // Is OK for value to be empty.
+                            metaLineNumber++;
+                            nextLine = lnr.readLine();
+                        } else {
+                            break;
+                        }
+                    } else {
+                        break;
+                    }
+                }            
+            }
+
             lnr.skip(Long.MAX_VALUE);
             line = lnr.getLineNumber();
         } catch (IOException ex) {
@@ -2629,7 +2651,7 @@ public class Utils {
             close(lnr);
         }
         
-        return line;
+        return line - metaLineNumber;
     }
 
     /**

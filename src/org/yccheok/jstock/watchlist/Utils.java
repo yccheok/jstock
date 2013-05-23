@@ -80,9 +80,13 @@ public class Utils {
      */
     public static String getWatchlistDirectory(String name) {
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
-        return org.yccheok.jstock.gui.Utils.getUserDataDirectory() + jStockOptions.getCountry() + File.separator + "watchlist" + File.separator + name + File.separator;
+        return getWatchlistDirectory(jStockOptions.getCountry(), name);
     }
 
+    public static String getWatchlistDirectory(Country country, String name) {
+        return org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "watchlist" + File.separator + name + File.separator;
+    }
+    
     public static String getWatchlistDirectory() {
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
         return getWatchlistDirectory(jStockOptions.getWatchlistName());
@@ -133,15 +137,19 @@ public class Utils {
         return watchlistNames;
     }
     
+    public static List<String> getWatchlistNames() {
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        return getWatchlistNames(jStockOptions.getCountry());
+    }
+    
     /**
      * Returns all available watchlist names for current selected country.
      *
      * @return all available watchlist names for current selected country
      */
-    public static List<String> getWatchlistNames() {
-        List<String> watchlistNames = new ArrayList<String>();
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
-        final File file = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + jStockOptions.getCountry() + File.separator + "watchlist" + File.separator);
+    public static List<String> getWatchlistNames(Country country) {
+        List<String> watchlistNames = new ArrayList<String>();        
+        final File file = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "watchlist" + File.separator);
         File[] children = file.listFiles();
         if (children == null) {
             // Either dir does not exist or is not a directory
@@ -321,7 +329,7 @@ public class Utils {
                 // Only seek for 1st level directory.
                 for (File child : children) {
                     File realTimeStockFile = new File(child, "realtimestock.csv");
-                    int lines = org.yccheok.jstock.gui.Utils.numOfLines(realTimeStockFile);
+                    int lines = org.yccheok.jstock.gui.Utils.numOfLines(realTimeStockFile, true);
                     // Skip CSV header.
                     lines = lines - 1;
                     if (lines > 0) {

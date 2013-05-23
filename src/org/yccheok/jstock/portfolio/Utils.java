@@ -388,7 +388,7 @@ public class Utils {
                 // Only seek for 1st level directory.
                 for (File child : children) {
                     File stockPricesFile = new File(child, "stockprices.csv");
-                    int lines = org.yccheok.jstock.gui.Utils.numOfLines(stockPricesFile);
+                    int lines = org.yccheok.jstock.gui.Utils.numOfLines(stockPricesFile, true);
                     // Skip CSV header.
                     lines = lines - 1;
                     if (lines > 0) {
