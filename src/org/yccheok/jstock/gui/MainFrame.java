@@ -2154,9 +2154,76 @@ public class MainFrame extends javax.swing.JFrame {
         this.indicatorPanel.saveModuleIndicatorProjectManager();
         this.portfolioManagementJPanel.savePortfolio();
         
+        // In Linux, "My Portfolio" and "my portfolio" are 2 different folders.
+        // However, we cannot commit such folders to cloud. This will cause
+        // problem in Windows. This code was introduced since 1.0.7c. We should
+        // remove it after a while, as we do have 2557 changeset to prevent such
+        // incident in Linux.
+        solveCaseSensitiveFoldersIssue();
+        
         saveWatchlistAndPortfolioInfos();
     }
 
+    private void solveCaseSensitiveFoldersIssue() {
+        final Country currentCountry = this.jStockOptions.getCountry();
+        final String currentWatchlist = this.jStockOptions.getWatchlistName();
+        
+        for (Country country : Country.values()) {
+            java.util.List<String> watchlistNames = org.yccheok.jstock.watchlist.Utils.getWatchlistNames(country);
+            Map<String, java.util.List<String>> watchlistNamesMap = new HashMap<String, java.util.List<String>>();
+            java.util.List<java.util.List<String>> duplicatedNames = new ArrayList<java.util.List<String>>();
+            Set<String> lowerCaseNames = new HashSet<String>();
+            
+            for (String watchlistName : watchlistNames) {
+                String lowerCaseWatchlistName = watchlistName.toLowerCase();
+                lowerCaseNames.add(lowerCaseWatchlistName);
+                
+                java.util.List<String> names = watchlistNamesMap.get(lowerCaseWatchlistName);
+                if (names == null) {
+                    names = new ArrayList<String>();
+                    watchlistNamesMap.put(lowerCaseWatchlistName, names);
+                }
+                
+                names.add(watchlistName);
+                if (names.size() > 1) {
+                    duplicatedNames.add(names);
+                }
+            }
+            
+            for (java.util.List<String> names : duplicatedNames) {
+                int counter = 0;
+                boolean originalNameUsed = false;
+                for (int i = 0, ei = names.size(); i < ei; i++) {
+                    final String originalName = names.get(i);
+                    if (currentCountry == country && currentWatchlist.equals(originalName)) {
+                        originalNameUsed = true;
+                        continue;
+                    }
+                    
+                    String newName = originalName;
+                    if (originalNameUsed || i < (ei - 1)) {
+                        // Cannot use the original name.
+                        newName = originalName + counter++;
+                        while (lowerCaseNames.contains(newName.toLowerCase())) {
+                            newName = originalName + counter++;    
+                        }
+                        lowerCaseNames.add(newName.toLowerCase());
+                    } else {
+                        // Use original name.
+                        originalNameUsed = true;
+                    }
+                    
+                    String originalDirectory = org.yccheok.jstock.watchlist.Utils.getWatchlistDirectory(country, originalName);
+                    String newDirectory = org.yccheok.jstock.watchlist.Utils.getWatchlistDirectory(country, newName);
+                    
+                    if (originalDirectory.equalsIgnoreCase(newDirectory)) {
+                        new File(originalDirectory).renameTo(new File(newDirectory));
+                    }
+                }
+            }
+        }
+    }
+    
     // Only call this function after you had saved all the watchlists and
     // portfolios.
     private boolean saveWatchlistAndPortfolioInfos() {
