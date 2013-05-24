@@ -825,8 +825,8 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
             }
         } 
         catch (IOException exp) {
-            // Should we return null? As the saved information is not complete.
             log.error(null, exp);
+            return null;
         }
         finally {
             Utils.close(out);

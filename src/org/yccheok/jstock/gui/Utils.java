@@ -1273,6 +1273,7 @@ public class Utils {
                 
                 documentListEntry = entry;
                 final File temp = File.createTempFile(Utils.getJStockUUID(), ".zip");
+                temp.deleteOnExit();
                 downloadFile(client, documentListEntry, temp);
                 return CloudFile.newInstance(temp, checksum, date, version);                
             }
