@@ -442,7 +442,7 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
 
                 publish(Status.newInstance(GUIBundle.getString("SaveToCloudJDialog_PreparingData..."), Icons.BUSY));
 
-                MainFrame.getInstance().commitBeforeUploadToCloud();
+                MainFrame.getInstance().commitBeforeSaveToCloud();
                 
                 final File zipFile = getJStockZipFile();
                 

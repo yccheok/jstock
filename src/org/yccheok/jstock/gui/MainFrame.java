@@ -2113,7 +2113,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     /* Save everything to disc, before perform uploading. */
-    public void commitBeforeUploadToCloud() {
+    public void commitBeforeSaveToCloud() {
         // Previously, we will store the entire stockcodeandsymboldatabase.xml
         // to cloud server if stockcodeandsymboldatabase.xml is containing
         // user defined database. Due to our server is running out of space, we will
@@ -2167,7 +2167,11 @@ public class MainFrame extends javax.swing.JFrame {
     private void solveCaseSensitiveFoldersIssue() {
         final Country currentCountry = this.jStockOptions.getCountry();
         final String currentWatchlist = this.jStockOptions.getWatchlistName();
+        final String currentPortfolio = this.jStockOptions.getPortfolioName();
         
+        ////////////////////////////////////////////////////////////////////////
+        // WATCHLIST
+        ////////////////////////////////////////////////////////////////////////
         for (Country country : Country.values()) {
             java.util.List<String> watchlistNames = org.yccheok.jstock.watchlist.Utils.getWatchlistNames(country);
             Map<String, java.util.List<String>> watchlistNamesMap = new HashMap<String, java.util.List<String>>();
@@ -2222,6 +2226,64 @@ public class MainFrame extends javax.swing.JFrame {
                 }
             }
         }
+        
+        ////////////////////////////////////////////////////////////////////////
+        // PORTFOLIO
+        ////////////////////////////////////////////////////////////////////////        
+        for (Country country : Country.values()) {
+            java.util.List<String> portfolioNames = org.yccheok.jstock.portfolio.Utils.getPortfolioNames(country);
+            Map<String, java.util.List<String>> portfolioNamesMap = new HashMap<String, java.util.List<String>>();
+            java.util.List<java.util.List<String>> duplicatedNames = new ArrayList<java.util.List<String>>();
+            Set<String> lowerCaseNames = new HashSet<String>();
+
+            for (String portfolioName : portfolioNames) {
+                String lowerCasePortfolioName = portfolioName.toLowerCase();
+                lowerCaseNames.add(lowerCasePortfolioName);
+
+                java.util.List<String> names = portfolioNamesMap.get(lowerCasePortfolioName);
+                if (names == null) {
+                    names = new ArrayList<String>();
+                    portfolioNamesMap.put(lowerCasePortfolioName, names);
+                }
+
+                names.add(portfolioName);
+                if (names.size() > 1) {
+                    duplicatedNames.add(names);
+                }
+            }
+
+            for (java.util.List<String> names : duplicatedNames) {
+                int counter = 0;
+                boolean originalNameUsed = false;
+                for (int i = 0, ei = names.size(); i < ei; i++) {
+                    final String originalName = names.get(i);
+                    if (currentCountry == country && currentPortfolio.equals(originalName)) {
+                        originalNameUsed = true;
+                        continue;
+                    }
+
+                    String newName = originalName;
+                    if (originalNameUsed || i < (ei - 1)) {
+                        // Cannot use the original name.
+                        newName = originalName + counter++;
+                        while (lowerCaseNames.contains(newName.toLowerCase())) {
+                            newName = originalName + counter++;    
+                        }
+                        lowerCaseNames.add(newName.toLowerCase());
+                    } else {
+                        // Use original name.
+                        originalNameUsed = true;
+                    }
+
+                    String originalDirectory = org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory(country, originalName);
+                    String newDirectory = org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory(country, newName);
+
+                    if (false == originalDirectory.equalsIgnoreCase(newDirectory)) {
+                        new File(originalDirectory).renameTo(new File(newDirectory));
+                    }
+                }
+            }
+        }        
     }
     
     // Only call this function after you had saved all the watchlists and

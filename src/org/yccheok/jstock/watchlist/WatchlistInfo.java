@@ -56,8 +56,8 @@ public class WatchlistInfo {
     public int hashCode() {
         int result = 17;
         result = 31 * result + country.hashCode();
-        result = 31 * result + name.hashCode();
-        result = 31 * result + size;
+        result = 31 * result + name.toLowerCase().hashCode();
+        // Do not compare size.
         
         return result;
     }
@@ -73,7 +73,8 @@ public class WatchlistInfo {
         }
         
         WatchlistInfo watchlistInfo = (WatchlistInfo)o;
-        return this.country.equals(watchlistInfo.country) && this.name.equals(watchlistInfo.name) && this.size == watchlistInfo.size;
+        // Do not compare size.
+        return this.country.equals(watchlistInfo.country) && this.name.toLowerCase().equals(watchlistInfo.name.toLowerCase());
     }
     
     @Override

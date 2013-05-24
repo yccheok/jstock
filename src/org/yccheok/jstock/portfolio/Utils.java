@@ -256,9 +256,13 @@ public class Utils {
      */
     public static String getPortfolioDirectory(String name) {
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
-        return org.yccheok.jstock.gui.Utils.getUserDataDirectory() + jStockOptions.getCountry() + File.separator + "portfolios" + File.separator + name + File.separator;
+        return getPortfolioDirectory(jStockOptions.getCountry(), name);
     }
 
+    public static String getPortfolioDirectory(Country country, String name) {
+        return org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "portfolios" + File.separator + name + File.separator;
+    }
+    
     /**
      * Creates empty portfolio for current selected country.
      *
@@ -387,6 +391,7 @@ public class Utils {
             } else {
                 // Only seek for 1st level directory.
                 for (File child : children) {
+                    
                     File stockPricesFile = new File(child, "stockprices.csv");
                     int lines = org.yccheok.jstock.gui.Utils.numOfLines(stockPricesFile, true);
                     // Skip CSV header.
@@ -394,11 +399,48 @@ public class Utils {
                     if (lines > 0) {
                         PortfolioInfo portfolioInfo = PortfolioInfo.newInstance(country, child.getName(), lines);
                         portfolioInfos.add(portfolioInfo);
+                        continue;
+                    } 
+
+                    // We do not have buy record. Do we have sell record, dividend record or deposit record?
+                    File sellPortfolioFile = new File(child, "sellportfolio.csv");
+                    lines = org.yccheok.jstock.gui.Utils.numOfLines(sellPortfolioFile, true);
+                    // Skip CSV header.
+                    lines = lines - 1;
+                    if (lines > 0) {
+                        PortfolioInfo portfolioInfo = PortfolioInfo.newInstance(country, child.getName(), lines);
+                        portfolioInfos.add(portfolioInfo);
+                        continue;
                     }
+                    
+                    File dividendFile = new File(child, "dividendsummary.csv");
+                    lines = org.yccheok.jstock.gui.Utils.numOfLines(dividendFile, true);
+                    // Skip CSV header.
+                    lines = lines - 1;
+                    if (lines > 0) {
+                        PortfolioInfo portfolioInfo = PortfolioInfo.newInstance(country, child.getName(), lines);
+                        portfolioInfos.add(portfolioInfo);
+                        continue;
+                    }
+                    
+                    File depositFile = new File(child, "depositsummary.csv");
+                    lines = org.yccheok.jstock.gui.Utils.numOfLines(depositFile, true);
+                    // Skip CSV header.
+                    lines = lines - 1;
+                    if (lines > 0) {
+                        PortfolioInfo portfolioInfo = PortfolioInfo.newInstance(country, child.getName(), lines);
+                        portfolioInfos.add(portfolioInfo);
+                        continue;
+                    }                    
                 }                
             }
         }
         return portfolioInfos;
+    }
+    
+    public static List<String> getPortfolioNames() {
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        return getPortfolioNames(jStockOptions.getCountry());
     }
     
     /**
@@ -406,10 +448,9 @@ public class Utils {
      *
      * @return all available portfolio names for current selected country
      */
-    public static List<String> getPortfolioNames() {
+    public static List<String> getPortfolioNames(Country country) {
         List<String> portfolioNames = new ArrayList<String>();
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
-        final File file = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + jStockOptions.getCountry() + File.separator + "portfolios" + File.separator);
+        final File file = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "portfolios" + File.separator);
         File[] children = file.listFiles();
         if (children == null) {
             // Either dir does not exist or is not a directory

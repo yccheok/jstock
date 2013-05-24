@@ -56,8 +56,8 @@ public class PortfolioInfo {
     public int hashCode() {
         int result = 17;
         result = 31 * result + country.hashCode();
-        result = 31 * result + name.hashCode();
-        result = 31 * result + size;
+        result = 31 * result + name.toLowerCase().hashCode();
+        // Do not compare size.
         
         return result;
     }
@@ -73,7 +73,8 @@ public class PortfolioInfo {
         }
         
         PortfolioInfo portfolioInfo = (PortfolioInfo)o;
-        return this.country.equals(portfolioInfo.country) && this.name.equals(portfolioInfo.name) && this.size == portfolioInfo.size;
+        // Do not compare size.
+        return this.country.equals(portfolioInfo.country) && this.name.toLowerCase().equals(portfolioInfo.name.toLowerCase());
     }
     
     @Override
