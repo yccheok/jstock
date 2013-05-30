@@ -619,7 +619,7 @@ public class Utils {
                     xmlPortfolio.dividendSummary, 
                     xmlPortfolio.depositSummary);
 
-                localStatus = PortfolioManagementJPanel.saveCSVPortfolio(destDirectory, csvPortfolio);
+                localStatus = PortfolioManagementJPanel.saveCSVPortfolio(destDirectory, csvPortfolio, 0);
                 
                 if (localStatus) {
                     deleteXMLPortfolio(srcDirectory);
@@ -638,7 +638,7 @@ public class Utils {
                         xmlPortfolio.dividendSummary, 
                         xmlPortfolio.depositSummary);
 
-                    boolean _localStatus = PortfolioManagementJPanel.saveCSVPortfolio(destDirectory, csvPortfolio);
+                    boolean _localStatus = PortfolioManagementJPanel.saveCSVPortfolio(destDirectory, csvPortfolio, 0);
 
                     if (_localStatus) {
                         deleteXMLPortfolio(srcDirectory);

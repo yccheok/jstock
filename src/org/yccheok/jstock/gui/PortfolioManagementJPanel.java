@@ -1921,9 +1921,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             }
         }
         
-        if (false == initCSVStockPrices()) {
-            return false;
-        }
+        this.timestamp = initCSVStockPrices();
         
         refershGUIAfterInitPortfolio(
                 (BuyPortfolioTreeTableModelEx)PortfolioManagementJPanel.this.buyTreeTable.getTreeTableModel(), 
@@ -2038,7 +2036,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     
     public final void initPortfolio() {
         // This is new portfolio. Reset last update date.
-        this.lastUpdateDate = null;
+        this.timestamp = 0;
         this.initCSVPortfolio();
     }
 
@@ -2063,7 +2061,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
     }
 
-    public static boolean saveCSVPortfolio(String directory, CSVPortfolio csvPortfolio) {
+    public static boolean saveCSVPortfolio(String directory, CSVPortfolio csvPortfolio, long timestamp) {
         if (Utils.createCompleteDirectoryHierarchyIfDoesNotExist(directory) == false)
         {
             return false;
@@ -2136,17 +2134,18 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             }
         }
         
-        return saveCSVStockPrices(directory, csvPortfolio.buyPortfolioTreeTableModel);
+        return saveCSVStockPrices(directory, csvPortfolio.buyPortfolioTreeTableModel, timestamp);
     }
     
     private boolean saveCSVPortfolio() {
         return saveCSVPortfolio(
             org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory(), 
-            CSVPortfolio.newInstance((BuyPortfolioTreeTableModelEx)this.buyTreeTable.getTreeTableModel(), (SellPortfolioTreeTableModelEx)this.sellTreeTable.getTreeTableModel(), this.dividendSummary, this.depositSummary)
+            CSVPortfolio.newInstance((BuyPortfolioTreeTableModelEx)this.buyTreeTable.getTreeTableModel(), (SellPortfolioTreeTableModelEx)this.sellTreeTable.getTreeTableModel(), this.dividendSummary, this.depositSummary),
+            timestamp
         );
     }
 
-    private boolean initCSVStockPrices() {
+    private long initCSVStockPrices() {
         final File stockPricesFile = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "stockprices.csv");
         
         final Map<Code, Double> stockPrices = new LinkedHashMap<Code, Double>();
@@ -2177,11 +2176,18 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             Double price = entry.getValue();
             portfolioTreeTableModel.updateStockLastPrice(code, price);
         }
+
+        long _timestamp = 0;
+        try {
+            _timestamp = Long.parseLong(statements.getMetadatas().get("timestamp"));
+        } catch (NumberFormatException ex) {
+            log.error(null, ex);
+        }
         
-        return true;
+        return _timestamp;
     }
     
-    private static boolean saveCSVStockPrices(String directory, BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModelEx) {
+    private static boolean saveCSVStockPrices(String directory, BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModelEx, long timestamp) {
         assert(directory.endsWith(File.separator));
         
         // Ensure our stock prices data structure doesn't contain too less or
@@ -2205,7 +2211,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             }
         }
         
-        Statements statements = Statements.newInstanceFromStockPrices(goodStockPrices);
+        Statements statements = Statements.newInstanceFromStockPrices(goodStockPrices, timestamp);
         
         final File stockPricesFile = new File(directory + "stockprices.csv");
         
@@ -2346,12 +2352,13 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         updateWealthHeader();
         
         // Update status bar with current time string.
-        this.lastUpdateDate = new Date();
+        this.timestamp = System.currentTimeMillis();
+        
         MainFrame.getInstance().updateStatusBarWithLastUpdateDateMessageIfPossible();     
     }  
 
-    public Date getLastUpdateDate() {
-        return this.lastUpdateDate;
+    public long getTimestamp() {
+        return this.timestamp;
     }
     
     private void initGUIOptions() {
@@ -2650,7 +2657,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private final org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
     private final org.yccheok.jstock.engine.Observer<CurrencyExchangeMonitor, Double> currencyExchangeMonitorObserver = this.getCurrencyExchangeMonitorObserver();
 
-    private Date lastUpdateDate = null;
+    private long timestamp = 0;
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private org.yccheok.jstock.gui.treetable.SortableTreeTable buyTreeTable;

@@ -2809,13 +2809,29 @@ public class Utils {
         return commonDateFormat.get();
     }
     
+    public static boolean isToday(long timestamp) {
+        Calendar calendar = Calendar.getInstance();
+        int date = calendar.get(Calendar.DATE);
+        int month = calendar.get(Calendar.MONTH);
+        int year = calendar.get(Calendar.YEAR);
+        calendar.setTimeInMillis(timestamp);
+        int _date = calendar.get(Calendar.DATE);
+        int _month = calendar.get(Calendar.MONTH);
+        int _year = calendar.get(Calendar.YEAR);
+        return date == _date && month == _month && year == _year;
+    }
+    
     /**
      * Returns time format used in status bar.
      * 
      * @return time format used in status bar
      */
-    public static DateFormat getLastUpdateTimeFormat() {
-        return lastUpdateTimeFormat.get();
+    public static DateFormat getTodayLastUpdateTimeFormat() {
+        return todayLastUpdateTimeFormat.get();
+    }
+
+    public static DateFormat getOtherDayLastUpdateTimeFormat() {
+        return otherDayLastUpdateTimeFormat.get();
     }
     
     /**
@@ -2878,9 +2894,15 @@ public class Utils {
         }
     };
 
-    private static final ThreadLocal<DateFormat> lastUpdateTimeFormat = new ThreadLocal <DateFormat>() {
+    private static final ThreadLocal<DateFormat> todayLastUpdateTimeFormat = new ThreadLocal <DateFormat>() {
         @Override protected DateFormat initialValue() {
             return new SimpleDateFormat("h:mm a");
+        }
+    };
+
+    private static final ThreadLocal<DateFormat> otherDayLastUpdateTimeFormat = new ThreadLocal <DateFormat>() {
+        @Override protected DateFormat initialValue() {
+            return DateFormat.getDateInstance(DateFormat.SHORT);
         }
     };
     

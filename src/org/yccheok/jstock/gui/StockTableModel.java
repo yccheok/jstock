@@ -261,6 +261,16 @@ public class StockTableModel extends AbstractTableModelWithMemory implements CSV
         return -1;
     }
     
+    public long getTimestamp() {
+        return timestamp;
+    }
+    
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+    
+    private long timestamp = 0;
+    
     private final List<List<Object>> tableModel = new ArrayList<List<Object>>();
     private final List<List<Object>> oldTableModel = new ArrayList<List<Object>>();
     private final List<Stock> stocks = new ArrayList<Stock>();

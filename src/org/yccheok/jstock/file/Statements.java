@@ -61,6 +61,7 @@ import org.yccheok.jstock.gui.JStockOptions;
 import org.yccheok.jstock.gui.MainFrame;
 import org.yccheok.jstock.gui.POIUtils;
 import org.yccheok.jstock.gui.Pair;
+import org.yccheok.jstock.gui.StockTableModel;
 import org.yccheok.jstock.gui.portfolio.CommentableContainer;
 import org.yccheok.jstock.gui.treetable.BuyPortfolioTreeTableModelEx;
 import org.yccheok.jstock.gui.treetable.SellPortfolioTreeTableModelEx;
@@ -189,7 +190,8 @@ public class Statements {
                 }
                 statements.statements.add(statement);                
             }
-        }
+        }   
+        
         return statements;
     }
 
@@ -655,9 +657,10 @@ public class Statements {
      * @param tableModel give stock price
      * @return the constructed Statements. UNKNOWN_STATEMENTS if fail
      */
-    public static Statements newInstanceFromStockPrices(Map<Code, Double> stockPrices) {
+    public static Statements newInstanceFromStockPrices(Map<Code, Double> stockPrices, long timestamp) {
         GUIBundleWrapper guiBundleWrapper = GUIBundleWrapper.newInstance(GUIBundleWrapper.Language.INDEPENDENT);
         Statements s = new Statements(Statement.Type.StockPrice, guiBundleWrapper);
+        s.metadatas.put("timestamp", Long.toString(timestamp));
         
         final String code_string = guiBundleWrapper.getString("MainFrame_Code");
         final String last_string = guiBundleWrapper.getString("MainFrame_Last");
@@ -772,6 +775,11 @@ public class Statements {
             s.statements.add(statement);
         }
 
+        // Any metadata? This is special hack since Android introduction.
+        if (tableModel instanceof StockTableModel) {
+            s.metadatas.put("timestamp", Long.toString(((StockTableModel)tableModel).getTimestamp()));
+        }
+        
         return s;
     }
 

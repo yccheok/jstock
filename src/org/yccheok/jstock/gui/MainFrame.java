@@ -3574,7 +3574,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private final void initWatchlist() {
         // This is new watchlist. Reset last update date.
-        this.lastUpdateDate = null;
+        this.timestamp = 0;
         initCSVWatchlist();
     }
     
@@ -3954,7 +3954,9 @@ public class MainFrame extends javax.swing.JFrame {
         }   // for (int i = 0, size = stocks.size(); i < size; i++)
         
         // Update status bar with current time string.
-        this.lastUpdateDate = new Date();
+        this.timestamp = System.currentTimeMillis();
+        ((StockTableModel)jTable1.getModel()).setTimestamp(this.timestamp);
+        
         MainFrame.getInstance().updateStatusBarWithLastUpdateDateMessageIfPossible();
 
         // Do it in GUI event dispatch thread. Otherwise, we may face deadlock.
@@ -4104,23 +4106,30 @@ public class MainFrame extends javax.swing.JFrame {
     // [My Watchlist] Last update: 10:40AM
     public String getBestStatusBarMessage() {        
         final String currentName;
-        final Date _lastUpdateDate;
+        final long _timestamp;
         // MainFrame
         if (this.getSelectedComponent() == this.jPanel8) {
             currentName = this.getJStockOptions().getWatchlistName();
-            _lastUpdateDate = this.lastUpdateDate;
+            _timestamp = this.timestamp;
         } else if (this.getSelectedComponent() == this.portfolioManagementJPanel) {
             currentName = this.getJStockOptions().getPortfolioName();
-            _lastUpdateDate = this.portfolioManagementJPanel.getLastUpdateDate();
+            _timestamp = this.portfolioManagementJPanel.getTimestamp();
         } else {
             return GUIBundle.getString("MainFrame_Connected");
         }
         
-        if (_lastUpdateDate == null) {
+        if (_timestamp == 0) {
             return MessageFormat.format(GUIBundle.getString("MainFrame_Connected_template"), currentName);            
         }
-        
-        final String time = Utils.getLastUpdateTimeFormat().format(_lastUpdateDate);
+
+        Date date = new Date(_timestamp);
+        String time;
+        if (Utils.isToday(_timestamp)) {
+            time = Utils.getTodayLastUpdateTimeFormat().format(date);
+        } else {
+            time = Utils.getOtherDayLastUpdateTimeFormat().format(date);
+        }
+
         return MessageFormat.format(GUIBundle.getString("MainFrame_LastUpdate_template"), currentName, time);
     }
     
@@ -4629,7 +4638,7 @@ public class MainFrame extends javax.swing.JFrame {
     private volatile boolean isFormWindowClosedCalled = false;
     
     // The last time when we receive stock price update.
-    private Date lastUpdateDate = null;
+    private long timestamp = 0;
     private boolean refreshPriceInProgress = false;
     
     // Variables declaration - do not modify//GEN-BEGIN:variables

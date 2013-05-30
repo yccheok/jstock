@@ -94,19 +94,27 @@ public class Statement {
 
     public Double getValueAsDouble(String type) {
         Object o = typeToValue.get(type);
-        if (o instanceof Double) {
+        // In our case, mostly is String.
+        if (o instanceof String) {
+            String s = (String)o;
+            if (s.isEmpty() == false) {
+                try {
+                    return Double.parseDouble(s);
+                } catch (NumberFormatException ex) {
+                    log.error(null, ex);
+                }
+            }
+        } else if (o instanceof Double) {
             return (Double)o;
-        }
-        else if (o instanceof Integer) {
+        } else if (o instanceof Integer) {
             Integer i = (Integer)o;
             Double d = (double)i.intValue();
             return d;
-        }
-        else if (o != null) {
+        } else if (o != null) {
             String s = o.toString();
             if (s.isEmpty() == false) {
                 try {
-                    return Double.parseDouble(o.toString());
+                    return Double.parseDouble(s);
                 } catch (NumberFormatException ex) {
                     log.error(null, ex);
                 }
@@ -114,7 +122,7 @@ public class Statement {
         }
         return null;
     }
-
+    
     public Type getType() {
         return this.type;
     }
