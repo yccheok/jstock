@@ -296,7 +296,7 @@ public class Utils {
         //final Statements statements1 = Statements.newInstanceFromSellPortfolioTreeTableModel(new SellPortfolioTreeTableModelEx(), true);
         //final Statements statements2 = Statements.newInstanceFromTableModel(new DividendSummaryTableModel(new DividendSummary()), true);
         //final Statements statements3 = Statements.newInstanceFromTableModel(new DepositSummaryTableModel(new DepositSummary()), true);
-        final Statements statements4 = Statements.newInstanceFromStockPrices(java.util.Collections.<Code, Double> emptyMap());
+        final Statements statements4 = Statements.newInstanceFromStockPrices(java.util.Collections.<Code, Double> emptyMap(), 0);
         
         boolean status = true;
         //status = status & statements0.saveAsCSVFile(buyPortfolioFile);
