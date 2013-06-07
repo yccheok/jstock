@@ -621,6 +621,7 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
             extensions.add(".csv");
         } else if (name.equals("android")) {
             extensions.add(".csv");
+            extensions.add(".json");
         } else {
             assert(false);
             throw new java.lang.IllegalArgumentException(name);
