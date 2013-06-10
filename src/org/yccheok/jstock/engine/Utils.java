@@ -351,7 +351,7 @@ public class Utils {
         portugalIndices.add(Index.PSI20);
         singaporeIndices.add(Index.STI);
         spainIndices.add(Index.SMSI);
-        swedenIndices.add(Index.OMXSPI);
+        swedenIndices.add(Index.OMX30);
         switzerlandIndices.add(Index.SSMI);
         taiwanIndices.add(Index.TWII);
         unitedKingdomIndices.add(Index.FTSE);

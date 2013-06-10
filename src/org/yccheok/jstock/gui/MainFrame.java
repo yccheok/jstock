@@ -1474,8 +1474,12 @@ public class MainFrame extends javax.swing.JFrame {
         refreshCurrencyExchangeMonitor();
         // Refresh stock index as well.
         this.initMarketThread();
-        this.setStatusBar(true, GUIBundle.getString("MainFrame_RefreshStockPrices..."));
-        refreshPriceInProgress = true;
+        
+        // Only update UI when there is at least one stock.
+        if (this.getStocks().isEmpty() == false) {
+            this.setStatusBar(true, GUIBundle.getString("MainFrame_RefreshStockPrices..."));
+            refreshPriceInProgress = true;
+        }
     }//GEN-LAST:event_jMenuItem15ActionPerformed
 
     private void jMenuItem16ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem16ActionPerformed

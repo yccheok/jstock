@@ -3,7 +3,12 @@ Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
 JStock 1.0.7c - xxxx-xx-xx
   Bugfix:  Forget perform zip file cleanup after loadFromGoogleDoc.
-  
+  Bugfix:  Netherlands' AEX fixed.
+  Bugfix:  Portugal's PSI 20 fixed.
+  Bugfix:  Change Sweeden's Stockholm General to OMX 30.
+  Bugfix:  Slight improvement on our very core RealTimeStockMonitor.
+  Bugfix:  Avoid refreshing UI if there is no stock in the list.
+
 JStock 1.0.7b - 2013-05-21
   Bugfix:  Dividend dialog wouldn't pop up.
   

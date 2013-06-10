@@ -358,6 +358,10 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
                                     try {
                                         stocks = stockServer.getStocks(codes);
                                     } catch (StockNotFoundException exp) {
+                                        if (thisThread != thread) {
+                                            break;    
+                                        }
+                                        
                                         log.error(codes, exp);
                                         // Try with another server.
                                         continue;
