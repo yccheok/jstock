@@ -77,7 +77,7 @@ public class EqualityOperator extends AbstractOperator {
             }
 
         }
-        catch(NumberFormatException exp) {
+        catch (NumberFormatException exp) {
             log.error(null, exp);
         }
         

@@ -19,10 +19,14 @@
 
 package org.yccheok.jstock.engine;
 
+import au.com.bytecode.opencsv.CSVParser;
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  *
@@ -147,8 +151,27 @@ public class YahooStockFormat implements StockFormat {
             // ",123,456,"   -> ",123456,"
             // ","abc,def"," -> ","abcdef","
             // Please refer http://stackoverflow.com/questions/15692458/different-regular-expression-result-in-java-se-and-android-platform for more details.
+            //
+            // The idea is : If a comma doesn't have double quote on its left AND on its right, replace it with empty string.
+            // http://www.regular-expressions.info/lookaround.html
             final String stringDigitWithoutComma = commaNotBetweenQuotes.matcher(string).replaceAll("");
-            String[] fields = stringDigitWithoutComma.split(",");
+
+            // Do not use String.split although it might be faster.
+            // This is because after stringDigitWithoutComma regular expression, we have an edge case
+            //
+            // ","abcdef,","   -> ","abcdef","  <-- This is our expectation
+            // ","abcdef,","   -> ","abcdef,"," <-- This is what we get
+            //
+            // I think it is difficult to solve this through regular expression.
+            // We will use CSVParser to handle this.
+            final CSVParser csvParser = new CSVParser();
+            String[] fields;
+            try {
+                fields = csvParser.parseLine(stringDigitWithoutComma);
+            } catch (IOException ex) {
+                log.error(null, ex);
+                continue;
+            }
             final int length = fields.length;
             
             Code code = null;
@@ -316,8 +339,13 @@ public class YahooStockFormat implements StockFormat {
     // ",123,456,"   -> ",123456,"
     // ","abc,def"," -> ","abcdef","
     // Please refer http://stackoverflow.com/questions/15692458/different-regular-expression-result-in-java-se-and-android-platform for more details.
+    //
+    // The idea is : If a comma doesn't have double quote on its left AND on its right, replace it with empty string.
+    // http://www.regular-expressions.info/lookaround.html    
     private static final Pattern commaNotBetweenQuotes = Pattern.compile("(?<!\"),(?!\")");
 
     private static final Pattern quotePattern = Pattern.compile("\"");
     private static final Pattern percentagePattern = Pattern.compile("%");
+    
+    private static final Log log = LogFactory.getLog(YahooStockFormat.class);
 }

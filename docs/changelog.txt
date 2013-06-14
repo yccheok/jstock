@@ -8,7 +8,10 @@ JStock 1.0.7c - xxxx-xx-xx
   Bugfix:  Change Sweeden's Stockholm General to OMX 30.
   Bugfix:  Slight improvement on our very core RealTimeStockMonitor.
   Bugfix:  Avoid refreshing UI if there is no stock in the list.
-
+  Bugfix:  Fix on YahooStockFormat on edge case (LCC US stock). We use CSVParser 
+           to perform parsing. Although it might slower than String.split, it is 
+           more reliable.
+           
 JStock 1.0.7b - 2013-05-21
   Bugfix:  Dividend dialog wouldn't pop up.
   
