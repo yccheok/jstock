@@ -313,6 +313,6 @@ public class KLSEInfoStockHistoryServer implements StockHistoryServer {
     // Use for internal calculation. Do not expose it.
     private double previousClosePrice = Double.MAX_VALUE;
         
-    private final StockServer stockServer = new SingaporeYahooStockServer(Country.Malaysia);
+    private final StockServer stockServer = new YahooStockServer(Country.Malaysia);
     private static final Log log = LogFactory.getLog(KLSEInfoStockHistoryServer.class);    
 }

@@ -367,7 +367,7 @@ public class Utils {
      */
     public static Code toGoogleFormat(Code code) {
         if (code.toString().equals("^KLSE")) {
-            return Code.newInstance("INDEXFTSE:FBMKLCI");
+            //return Code.newInstance("INDEXFTSE:FBMKLCI");
         } else if (code.toString().equals("^DJI")) {
             return Code.newInstance("INDEXDJX:.DJI");
         } else if (code.toString().equals("^IXIC")) {

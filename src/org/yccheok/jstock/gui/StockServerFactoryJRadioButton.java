@@ -54,10 +54,7 @@ public class StockServerFactoryJRadioButton extends JRadioButton {
 
     public static String toReadableText(StockServerFactory stockServerFactory) {
         Class c = stockServerFactory.getClass();
-        if (c == org.yccheok.jstock.engine.SingaporeYahooStockServerFactory.class) {
-            return GUIBundle.getString("StockServerFactoryJRadioButton_SingaporeYahooStockServerFactory");
-        }
-        else if (c == org.yccheok.jstock.engine.BrazilYahooStockServerFactory.class) {
+        if (c == org.yccheok.jstock.engine.BrazilYahooStockServerFactory.class) {
             return GUIBundle.getString("StockServerFactoryJRadioButton_BrazilYahooStockServerFactory");
         }
         else if (c == org.yccheok.jstock.engine.YahooStockServerFactory.class) {
@@ -79,11 +76,7 @@ public class StockServerFactoryJRadioButton extends JRadioButton {
 
         // Microsoft.
         Code code = Code.newInstance("MSFT");
-        if (c == org.yccheok.jstock.engine.SingaporeYahooStockServer.class) {
-            // PBBANK.
-            code = Code.newInstance("1295.KL");
-        }
-        else if (c == org.yccheok.jstock.engine.BrazilYahooStockServer.class) {
+        if (c == org.yccheok.jstock.engine.BrazilYahooStockServer.class) {
             // ALL AMER LAT-UNT N2
             code = Code.newInstance("ALLL11.SA");
         }
