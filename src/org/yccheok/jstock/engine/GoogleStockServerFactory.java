@@ -49,7 +49,7 @@ public class GoogleStockServerFactory implements StockServerFactory {
      */
     @Override
     public StockServer getStockServer() {
-        return Utils.emptyStockServer();
+        return null;
     }
 
     /**

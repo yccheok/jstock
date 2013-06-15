@@ -210,6 +210,11 @@ public class CurrencyExchangeMonitor extends Subject<CurrencyExchangeMonitor, Do
                         // Let's do the job.
                         for (StockServerFactory factory : stockServerFactories) {
                             final StockServer stockServer = factory.getStockServer();
+                            
+                            if (stockServer == null) {
+                                continue;
+                            }
+                            
                             Stock stock = null;
                             try {
                                 stock = stockServer.getStock(getCode());

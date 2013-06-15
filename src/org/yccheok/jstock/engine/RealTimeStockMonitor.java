@@ -354,6 +354,10 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
                                 {
                                     final StockServer stockServer = factory.getStockServer();
 
+                                    if (stockServer == null) {
+                                        continue;
+                                    }
+                                    
                                     List<Stock> stocks = null;
                                     try {
                                         stocks = stockServer.getStocks(codes);

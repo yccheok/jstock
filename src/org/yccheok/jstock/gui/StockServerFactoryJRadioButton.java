@@ -27,6 +27,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.StockNotFoundException;
+import org.yccheok.jstock.engine.StockServer;
 import org.yccheok.jstock.engine.StockServerFactory;
 import org.yccheok.jstock.internationalization.GUIBundle;
 
@@ -72,15 +73,15 @@ public class StockServerFactoryJRadioButton extends JRadioButton {
         final Health health = new Health();
 
         /* Test For Stock */
-        Class c = stockServerFactory.getStockServer().getClass();
+        Class c = stockServerFactory.getClass();
 
         // Microsoft.
         Code code = Code.newInstance("MSFT");
-        if (c == org.yccheok.jstock.engine.BrazilYahooStockServer.class) {
+        if (c == org.yccheok.jstock.engine.BrazilYahooStockServerFactory.class) {
             // ALL AMER LAT-UNT N2
-            code = Code.newInstance("ALLL11.SA");
+            code = Code.newInstance("BBDC4.SA");
         }
-        else if (c == org.yccheok.jstock.engine.YahooStockServer.class) {
+        else if (c == org.yccheok.jstock.engine.YahooStockServerFactory.class) {
             code = Code.newInstance("MSFT");
         }
         else if (c == org.yccheok.jstock.engine.GoogleStockServerFactory.class) {
@@ -91,13 +92,17 @@ public class StockServerFactoryJRadioButton extends JRadioButton {
             code = Code.newInstance("1295.KL");
         }
 
-        try {
-            stockServerFactory.getStockServer().getStock(code);
-            health.stock = true;
-        } catch (StockNotFoundException ex) {
-            log.error(null, ex);
+        final StockServer stockServer = stockServerFactory.getStockServer();
+                
+        if (stockServer != null) {
+            try {
+                stockServer.getStock(code);
+                health.stock = true;
+            } catch (StockNotFoundException ex) {
+                log.error(null, ex);
+            }
         }
-
+        
         /* Test For History */
         if (null != stockServerFactory.getStockHistoryServer(code))
         {

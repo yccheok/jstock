@@ -553,17 +553,6 @@ public class Utils {
     }
 
     /**
-     * Returns an empty StockServer, which does nothing but always throw
-     * StockNotFoundException.
-     *
-     * @return an empty StockServer, which does nothing but always throw
-     * StockNotFoundException
-     */
-    public static StockServer emptyStockServer() {
-        return EMPTY_STOCK_SERVER;
-    }
-
-    /**
      * Returns a new double initialized to the value represented by the
      * specified String, as performed by the valueOf method of class Double.
      * If failed, 0.0 will be returned.
@@ -608,18 +597,6 @@ public class Utils {
         // This is an invalid value.
         return 0L;
     }
-
-    private static final StockServer EMPTY_STOCK_SERVER = new StockServer() {
-        @Override
-        public Stock getStock(Code code) throws StockNotFoundException {
-            throw new StockNotFoundException();
-        }
-
-        @Override
-        public List<Stock> getStocks(List<Code> codes) throws StockNotFoundException {
-            throw new StockNotFoundException();
-        }
-    };
 
     private static final Log log = LogFactory.getLog(Utils.class);
 }

@@ -1387,6 +1387,10 @@ public class IndicatorPanel extends JPanel {
                     
                     StockServer server = factory.getStockServer();
                     
+                    if (server == null) {
+                        continue;
+                    }
+                    
                     try {
                         s = server.getStock(code);
                         success = true;
