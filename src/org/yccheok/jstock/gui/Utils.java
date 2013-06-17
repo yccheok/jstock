@@ -1018,8 +1018,8 @@ public class Utils {
     }
 
     // Returns application name, used by Google Doc service.
-    private static String getApplicationName() {
-        return "JStock-" + APPLICATION_VERSION_ID;
+    private static String getCloudApplicationName() {
+        return "JStock-" + CLOUD_FILE_VERSION_ID;
     }
     
     // Remember to revise googleDocTitlePattern if we change the definition
@@ -1196,7 +1196,7 @@ public class Utils {
 
     public static CloudFile loadFromGoogleDoc(String username, String password) {
         CaptchaRespond captchaRespond = null;
-        DocsService client = new DocsService(getApplicationName());
+        DocsService client = new DocsService(getCloudApplicationName());
         do {
             try {
                 if (captchaRespond == null) {
@@ -1530,7 +1530,7 @@ public class Utils {
     
     public static boolean saveToGoogleDoc(String username, String password, File file) {
         CaptchaRespond captchaRespond = null;
-        DocsService client = new DocsService(getApplicationName());
+        DocsService client = new DocsService(getCloudApplicationName());
         do {
             try {
                 if (captchaRespond == null) {
@@ -1605,7 +1605,7 @@ public class Utils {
 
             final long checksum = org.yccheok.jstock.analysis.Utils.getChecksum(file);
             final long date = new Date().getTime();
-            final int version = org.yccheok.jstock.gui.Utils.getApplicationVersionID();
+            final int version = org.yccheok.jstock.gui.Utils.getCloudFileVersionID();
 
             // Login success. Let's upload the cloud file.
             final int MAX_CONCURRENT_UPLOADS = 10;
@@ -1682,7 +1682,7 @@ public class Utils {
                         new StringPart("Passwd", password),
                         new StringPart("Date", new Date().getTime() + ""),
                         new StringPart("Checksum", org.yccheok.jstock.analysis.Utils.getChecksum(file) + ""),
-                        new StringPart("Version", org.yccheok.jstock.gui.Utils.getApplicationVersionID() + ""),
+                        new StringPart("Version", org.yccheok.jstock.gui.Utils.getCloudFileVersionID() + ""),
                         new FilePart("file", file)
                     };
                 }
@@ -1692,7 +1692,7 @@ public class Utils {
                         new StringPart("Passwd", password),
                         new StringPart("Date", new Date().getTime() + ""),
                         new StringPart("Checksum", org.yccheok.jstock.analysis.Utils.getChecksum(file) + ""),
-                        new StringPart("Version", org.yccheok.jstock.gui.Utils.getApplicationVersionID() + ""),
+                        new StringPart("Version", org.yccheok.jstock.gui.Utils.getCloudFileVersionID() + ""),
                         new StringPart("logintoken", captchaRespond.logintoken),
                         new StringPart("logincaptcha", captchaRespond.logincaptcha),
                         new FilePart("file", file)
@@ -1730,11 +1730,11 @@ public class Utils {
         } while (true);
     }
 
-    public static boolean isCompatible(int applicationVersionID) {
-        if (applicationVersionID == APPLICATION_VERSION_ID) {
+    public static boolean isCloudFileCompatible(int cloudFileVersionId) {
+        if (cloudFileVersionId == CLOUD_FILE_VERSION_ID) {
             return true;
         }
-        else if (applicationVersionID >= 1051 && applicationVersionID <= (APPLICATION_VERSION_ID - 1)) {
+        else if (cloudFileVersionId >= 1051 && cloudFileVersionId <= (CLOUD_FILE_VERSION_ID - 1)) {
             return true;
         }
       
@@ -2079,6 +2079,10 @@ public class Utils {
 
     public static int getApplicationVersionID() {
         return Utils.APPLICATION_VERSION_ID;
+    }
+    
+    public static int getCloudFileVersionID() {
+        return Utils.CLOUD_FILE_VERSION_ID;
     }
 
     public static String toHTML(String plainText) {
@@ -2918,11 +2922,13 @@ public class Utils {
     // We will use this as directory name. Do not have space or special characters.
     private static final String APPLICATION_VERSION_STRING = "1.0.7";
 
-    // For About box comparision on latest version purpose.
-    // 1.0.7b
-    // Remember to update isCompatible method.
-    private static final int APPLICATION_VERSION_ID = 1104;
+    // 1.0.7c
+    // Remember to update isCloudFileCompatible method.
+    private static final int CLOUD_FILE_VERSION_ID = 1105;
 
+    // For About box comparision on latest version purpose.
+    private static final int APPLICATION_VERSION_ID = 1105;
+        
     private static Executor zombiePool = Executors.newFixedThreadPool(Utils.NUM_OF_THREADS_ZOMBIE_POOL);
 
     private static final int NUM_OF_THREADS_ZOMBIE_POOL = 4;

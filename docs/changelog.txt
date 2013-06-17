@@ -1,7 +1,7 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
-JStock 1.0.7c - xxxx-xx-xx
+JStock 1.0.7c - 2013-06-18
   Bugfix:  Forget perform zip file cleanup after loadFromGoogleDoc.
   Bugfix:  Netherlands' AEX fixed.
   Bugfix:  Portugal's PSI 20 fixed.
@@ -11,7 +11,8 @@ JStock 1.0.7c - xxxx-xx-xx
   Bugfix:  Fix on YahooStockFormat on edge case (LCC US stock). We use CSVParser 
            to perform parsing. Although it might slower than String.split, it is 
            more reliable.
-           
+  Bugfix:  Use new UK database contributed by user.
+ 
 JStock 1.0.7b - 2013-05-21
   Bugfix:  Dividend dialog wouldn't pop up.
   

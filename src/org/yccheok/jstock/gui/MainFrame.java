@@ -412,10 +412,12 @@ public class MainFrame extends javax.swing.JFrame {
         jMenuItem16 = new javax.swing.JMenuItem();
         jMenuItem12 = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JSeparator();
-        jMenuItem5 = new javax.swing.JMenuItem();
-        jMenu11 = new javax.swing.JMenu();
         jMenuItem13 = new javax.swing.JMenuItem();
         jMenuItem14 = new javax.swing.JMenuItem();
+        jSeparator5 = new javax.swing.JPopupMenu.Separator();
+        jMenuItem5 = new javax.swing.JMenuItem();
+        jMenu11 = new javax.swing.JMenu();
+        jMenuItem17 = new javax.swing.JMenuItem();
 
         jComboBox1.setEditable(true);
         jComboBox1.setPreferredSize(new java.awt.Dimension(150, 24));
@@ -721,6 +723,24 @@ public class MainFrame extends javax.swing.JFrame {
         jMenu2.add(jMenuItem12);
         jMenu2.add(jSeparator1);
 
+        jMenuItem13.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/smile2.png"))); // NOI18N
+        jMenuItem13.setText(bundle.getString("MainFrame_DonateToJStock")); // NOI18N
+        jMenuItem13.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem13ActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMenuItem13);
+
+        jMenuItem14.setText(bundle.getString("MainFrame_ContributeToJStock")); // NOI18N
+        jMenuItem14.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem14ActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMenuItem14);
+        jMenu2.add(jSeparator5);
+
         jMenuItem5.setText(bundle.getString("MainFrame_About...")); // NOI18N
         jMenuItem5.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -731,31 +751,23 @@ public class MainFrame extends javax.swing.JFrame {
 
         jMenuBar2.add(jMenu2);
 
-        jMenu11.setText(bundle.getString("MainFrame_SupportJStock")); // NOI18N
+        jMenu11.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/android-small.png"))); // NOI18N
+        jMenu11.setText(bundle.getString("MainFrame_Android")); // NOI18N
 
-        jMenuItem13.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/smile2.png"))); // NOI18N
-        jMenuItem13.setText(bundle.getString("MainFrame_DonateToJStock")); // NOI18N
-        jMenuItem13.addActionListener(new java.awt.event.ActionListener() {
+        jMenuItem17.setText(bundle.getString("MainFrame_DownloadJStockAndroid")); // NOI18N
+        jMenuItem17.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem13ActionPerformed(evt);
+                jMenuItem17ActionPerformed(evt);
             }
         });
-        jMenu11.add(jMenuItem13);
-
-        jMenuItem14.setText(bundle.getString("MainFrame_ContributeToJStock")); // NOI18N
-        jMenuItem14.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem14ActionPerformed(evt);
-            }
-        });
-        jMenu11.add(jMenuItem14);
+        jMenu11.add(jMenuItem17);
 
         jMenuBar2.add(jMenu11);
 
         setJMenuBar(jMenuBar2);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-952)/2, (screenSize.height-478)/2, 952, 478);
+        setSize(new java.awt.Dimension(952, 478));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
@@ -1485,6 +1497,10 @@ public class MainFrame extends javax.swing.JFrame {
     private void jMenuItem16ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem16ActionPerformed
         Utils.launchWebBrowser(org.yccheok.jstock.network.Utils.getURL(org.yccheok.jstock.network.Utils.Type.HELP_KEYBOARD_SHORTCUTS_HTML));
     }//GEN-LAST:event_jMenuItem16ActionPerformed
+
+    private void jMenuItem17ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem17ActionPerformed
+        Utils.launchWebBrowser(org.yccheok.jstock.network.Utils.getURL(org.yccheok.jstock.network.Utils.Type.ANDROID_HTML));
+    }//GEN-LAST:event_jMenuItem17ActionPerformed
     
     /**
      * Activate specified watchlist.
@@ -4671,6 +4687,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem14;
     private javax.swing.JMenuItem jMenuItem15;
     private javax.swing.JMenuItem jMenuItem16;
+    private javax.swing.JMenuItem jMenuItem17;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
@@ -4695,6 +4712,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JPopupMenu.Separator jSeparator4;
+    private javax.swing.JPopupMenu.Separator jSeparator5;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTable jTable1;
     // End of variables declaration//GEN-END:variables
