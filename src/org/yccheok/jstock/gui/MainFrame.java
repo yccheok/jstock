@@ -383,10 +383,10 @@ public class MainFrame extends javax.swing.JFrame {
         jMenu3 = new javax.swing.JMenu();
         jMenuItem2 = new javax.swing.JMenuItem();
         jMenuItem9 = new javax.swing.JMenuItem();
-        jSeparator2 = new javax.swing.JSeparator();
+        jSeparator7 = new javax.swing.JPopupMenu.Separator();
         jMenuItem11 = new javax.swing.JMenuItem();
         jMenuItem10 = new javax.swing.JMenuItem();
-        jSeparator3 = new javax.swing.JSeparator();
+        jSeparator8 = new javax.swing.JPopupMenu.Separator();
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenu5 = new javax.swing.JMenu();
         jMenuItem4 = new javax.swing.JMenuItem();
@@ -411,7 +411,7 @@ public class MainFrame extends javax.swing.JFrame {
         jMenuItem3 = new javax.swing.JMenuItem();
         jMenuItem16 = new javax.swing.JMenuItem();
         jMenuItem12 = new javax.swing.JMenuItem();
-        jSeparator1 = new javax.swing.JSeparator();
+        jSeparator6 = new javax.swing.JPopupMenu.Separator();
         jMenuItem13 = new javax.swing.JMenuItem();
         jMenuItem14 = new javax.swing.JMenuItem();
         jSeparator5 = new javax.swing.JPopupMenu.Separator();
@@ -531,7 +531,7 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
         jMenu3.add(jMenuItem9);
-        jMenu3.add(jSeparator2);
+        jMenu3.add(jSeparator7);
 
         jMenuItem11.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/download_from_cloud.png"))); // NOI18N
         jMenuItem11.setText(bundle.getString("MainFrame_OpenFromCloud...")); // NOI18N
@@ -550,7 +550,7 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
         jMenu3.add(jMenuItem10);
-        jMenu3.add(jSeparator3);
+        jMenu3.add(jSeparator8);
 
         jMenuItem1.setText(bundle.getString("MainFrame_Exit")); // NOI18N
         jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
@@ -721,7 +721,7 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
         jMenu2.add(jMenuItem12);
-        jMenu2.add(jSeparator1);
+        jMenu2.add(jSeparator6);
 
         jMenuItem13.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/smile2.png"))); // NOI18N
         jMenuItem13.setText(bundle.getString("MainFrame_DonateToJStock")); // NOI18N
@@ -4708,11 +4708,11 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem4;
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem5;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JSeparator jSeparator2;
-    private javax.swing.JSeparator jSeparator3;
     private javax.swing.JPopupMenu.Separator jSeparator4;
     private javax.swing.JPopupMenu.Separator jSeparator5;
+    private javax.swing.JPopupMenu.Separator jSeparator6;
+    private javax.swing.JPopupMenu.Separator jSeparator7;
+    private javax.swing.JPopupMenu.Separator jSeparator8;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTable jTable1;
     // End of variables declaration//GEN-END:variables
