@@ -90,11 +90,11 @@ public class Utils {
         map.put(Type.MA_INDICATOR_HTML, "http://jstock.sourceforge.net/ma_indicator.html?utm_source=jstock&utm_medium=chart_dialog");
         map.put(Type.GET_TIME, JSTOCK_WEBAPP_SERVER + "get-time.py");
         map.put(Type.OPTIONS, JSTOCK_STATIC_SERVER + "options_information/options.txt");
-        map.put(Type.DONATE_HTML,"http://jstock.sourceforge.net/donation.html?utm_source=jstock&utm_medium=support_menu");
+        map.put(Type.DONATE_HTML,"http://jstock.sourceforge.net/donation.html?utm_source=jstock&utm_medium=help_menu");
         // http://webmasters.stackexchange.com/questions/35413/unable-to-use-anchor-hash-tag-if-using-google-analytics-utm
-        map.put(Type.CONTRIBUTE_HTML, "http://jstock.sourceforge.net/help_faq.html?utm_source=jstock&utm_medium=support_menu#contribution");
+        map.put(Type.CONTRIBUTE_HTML, "http://jstock.sourceforge.net/help_faq.html?utm_source=jstock&utm_medium=help_menu#contribution");
         map.put(Type.HELP_KEYBOARD_SHORTCUTS_HTML, "http://jstock.sourceforge.net/help_faq.html?utm_source=jstock&utm_medium=help_menu#keyboard-shortcuts");
-        map.put(Type.ANDROID_HTML, "https://play.google.com/store/apps/details?id=org.yccheok.jstock.gui");
+        map.put(Type.ANDROID_HTML, "http://www.jstock.co/index.html?utm_source=jstock&utm_medium=android_menu");
         
         zh_map.put(Type.CHAT_SERVER_TXT, JSTOCK_STATIC_SERVER + "servers_information/chat_server.txt");
         zh_map.put(Type.NTP_SERVER_TXT, JSTOCK_STATIC_SERVER + "servers_information/ntp_server.txt");
@@ -109,11 +109,11 @@ public class Utils {
         zh_map.put(Type.MA_INDICATOR_HTML, "http://jstock.sourceforge.net/zh/ma_indicator.html?utm_source=jstock&utm_medium=chart_dialog");
         zh_map.put(Type.GET_TIME, JSTOCK_WEBAPP_SERVER + "get-time.py");
         zh_map.put(Type.OPTIONS, JSTOCK_STATIC_SERVER + "options_information/options.txt");
-        zh_map.put(Type.DONATE_HTML,"http://jstock.sourceforge.net/zh/donation.html?utm_source=jstock&utm_medium=support_menu");
+        zh_map.put(Type.DONATE_HTML,"http://jstock.sourceforge.net/zh/donation.html?utm_source=jstock&utm_medium=help_menu");
         // http://webmasters.stackexchange.com/questions/35413/unable-to-use-anchor-hash-tag-if-using-google-analytics-utm
-        zh_map.put(Type.CONTRIBUTE_HTML, "http://jstock.sourceforge.net/zh/help_faq.html?utm_source=jstock&utm_medium=support_menu#contribution");
+        zh_map.put(Type.CONTRIBUTE_HTML, "http://jstock.sourceforge.net/zh/help_faq.html?utm_source=jstock&utm_medium=help_menu#contribution");
         zh_map.put(Type.HELP_KEYBOARD_SHORTCUTS_HTML, "http://jstock.sourceforge.net/zh/help_faq.html?utm_source=jstock&utm_medium=help_menu#keyboard-shortcuts");
-        zh_map.put(Type.ANDROID_HTML, "https://play.google.com/store/apps/details?id=org.yccheok.jstock.gui");
+        zh_map.put(Type.ANDROID_HTML, "http://www.jstock.co/zh/index.html?utm_source=jstock&utm_medium=android_menu");
 
         assert(map.size() == Type.values().length);
         assert(zh_map.size() == Type.values().length);
