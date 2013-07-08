@@ -753,6 +753,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         jMenu11.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/android-small.png"))); // NOI18N
         jMenu11.setText(bundle.getString("MainFrame_Android")); // NOI18N
+        jMenu11.setFont(jMenu11.getFont().deriveFont(jMenu11.getFont().getStyle() | java.awt.Font.BOLD));
 
         jMenuItem17.setText(bundle.getString("MainFrame_DownloadJStockAndroid")); // NOI18N
         jMenuItem17.addActionListener(new java.awt.event.ActionListener() {
