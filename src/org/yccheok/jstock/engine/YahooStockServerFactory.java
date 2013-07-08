@@ -70,6 +70,10 @@ public class YahooStockServerFactory implements StockServerFactory {
         return marketServer;
     }
     
+    public Country getCountry() {
+        return country;
+    }
+    
     private final StockServer stockServer;
     private final MarketServer marketServer;
     private final Country country;

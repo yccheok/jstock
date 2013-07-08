@@ -24,6 +24,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.util.*;
 import org.apache.commons.httpclient.*;
@@ -366,14 +368,26 @@ public class Utils {
      * @return code in Google's format
      */
     public static Code toGoogleFormat(Code code) {
-        if (code.toString().equals("^KLSE")) {
+        String string = code.toString().trim().toUpperCase();
+        if (string.equals("^KLSE")) {
             //return Code.newInstance("INDEXFTSE:FBMKLCI");
-        } else if (code.toString().equals("^DJI")) {
+        } else if (string.equals("^DJI")) {
             return Code.newInstance("INDEXDJX:.DJI");
-        } else if (code.toString().equals("^IXIC")) {
+        } else if (string.equals("^IXIC")) {
             return Code.newInstance("INDEXNASDAQ:.IXIC");
+        } else if (string.equals("^BSESN")) {
+            return Code.newInstance("INDEXBOM:SENSEX");
+        } else if (string.equals("^NSEI")) {
+            return Code.newInstance("NSE:NIFTY");
+        } else if (string.endsWith(".NS")) {
+            // Resolving Yahoo server down for India NSE stock market. Note, we
+            // do not support Bombay stock market at this moment, due to the
+            // difficulty in converting "TATACHEM.BO" (Yahoo Finance) to 
+            // "BOM:500770" (Google Finance)
+            int index = string.indexOf(".NS");
+            return Code.newInstance("NSE:" + string.substring(0, index));
         }
-        return code;
+        return Code.newInstance(string);
     }
     
     public static Code toYahooFormat(Code code, Country country)
@@ -531,7 +545,19 @@ public class Utils {
         if (beginIndex > endIndex) {
             return "";
         }
-        return respond.substring(beginIndex, endIndex + 1);
+        String string = respond.substring(beginIndex, endIndex + 1);
+        // http://stackoverflow.com/questions/6067673/urldecoder-illegal-hex-characters-in-escape-pattern-for-input-string
+        string = string.replaceAll("%", "%25");
+        
+        // http://stackoverflow.com/questions/15518340/json-returned-by-google-maps-query-contains-encoded-characters-like-x26-how-to
+        // JSON returned by Google Maps Query contains encoded characters like \x26 (how to decode?)
+        try {
+            string = URLDecoder.decode(string.replace("\\x", "%"), "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            log.error(null, ex);
+        }
+        
+        return string;
     }
 
     /**

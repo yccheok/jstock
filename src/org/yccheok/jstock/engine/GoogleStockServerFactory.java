@@ -30,8 +30,18 @@ public class GoogleStockServerFactory implements StockServerFactory {
 
     private GoogleStockServerFactory(Country country) {
         marketServer = new GoogleMarketServer(country);
+        this.country = country;
+        if (country == Country.India) {
+            stockServer = new GoogleStockServer(country);
+        } else {
+            stockServer = null;
+        }        
     }
 
+    public Country getCountry() {
+        return country;
+    }
+    
     /**
      * Returns GoogleStockServerFactory based on given country.
      *
@@ -49,7 +59,7 @@ public class GoogleStockServerFactory implements StockServerFactory {
      */
     @Override
     public StockServer getStockServer() {
-        return null;
+        return stockServer;
     }
 
     /**
@@ -90,4 +100,6 @@ public class GoogleStockServerFactory implements StockServerFactory {
     }
 
     private final MarketServer marketServer;
+    private final StockServer stockServer;
+    private final Country country;
 }

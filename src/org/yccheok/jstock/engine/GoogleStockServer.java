@@ -6,7 +6,6 @@ package org.yccheok.jstock.engine;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,7 +28,13 @@ public class GoogleStockServer implements StockServer {
     
     @Override
     public Stock getStock(Code code) throws StockNotFoundException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        List<Code> codes = new ArrayList<Code>();
+        codes.add(code);
+        List<Stock> stocks = getStocks(codes);
+        if (stocks.size() == 1) {
+            return stocks.get(0);
+        }
+        throw new StockNotFoundException();
     }
 
     @Override
@@ -40,14 +45,10 @@ public class GoogleStockServer implements StockServer {
         for (Code code : codes) {
             map.put(code.toString().trim().toUpperCase(), code);
         }
-        
-        
-        //xxxxxxxxxxxxxxx
-        String respond = "";
                 
         // Use StringBuilder instead of StringBuffer. We do not concern on 
         // thread safety.
-        StringBuilder builder = new StringBuilder("https://www.google.com/finance/info?infotype=infoquoteall&q=");
+        final StringBuilder builder = new StringBuilder("https://www.google.com/finance/info?infotype=infoquoteall&q=");
         try {
             // Exception will be thrown from apache httpclient, if we do not
             // perform URL encoding.
@@ -59,7 +60,7 @@ public class GoogleStockServer implements StockServer {
             }
             
             final String location = builder.toString();
-            respond = Utils.GoogleRespondToJSON(org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(location));
+            final String respond = Utils.GoogleRespondToJSON(org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(location));
             // Google returns "// [ { "id": ... } ]".
             // We need to turn them into "[ { "id": ... } ]".
             final List<Map> jsonArray = mapper.readValue(respond, List.class);
@@ -68,16 +69,19 @@ public class GoogleStockServer implements StockServer {
             for (int i = 0, size = jsonArray.size(); i < size; i++) {
                 final Map<String, String> jsonObject = jsonArray.get(i);
                 final String name;
-                final String _code;
-
+                final String _code0;
+                final String _code1;
+                
                 try {
                     name = jsonObject.get("name");
 
                     if (country == Country.India) {
-                        _code = jsonObject.get("t").toUpperCase() + ".NS";
+                        _code0 = jsonObject.get("t").toUpperCase() + ".NS";
+                        _code1 = "NSE:" + jsonObject.get("t").toUpperCase();
                     } else {
                         assert(false);
-                        _code = jsonObject.get("t").toUpperCase();
+                        _code0 = jsonObject.get("t").toUpperCase();
+                        _code1 = _code0;
                     }
                 } catch (Exception ex) {
                     log.error(null, ex);
@@ -85,9 +89,16 @@ public class GoogleStockServer implements StockServer {
                 }
                 
                 // Code
-                final Code code = map.get(_code);
+                Code code = map.get(_code0);
                 if (code == null) {
-                    continue;
+                    // I know lah!
+                    if (_code0 != _code1) {
+                        code = map.get(_code1);
+                    }
+                    
+                    if (code == null) {
+                        continue;
+                    }
                 }
                 
                 double c = 0;
@@ -157,10 +168,8 @@ public class GoogleStockServer implements StockServer {
         } catch (UnsupportedEncodingException ex) {
             throw new StockNotFoundException(null, ex);
         } catch (IOException ex) {
-            System.out.println(ex + ":::::" + respond + "::::::" + builder.toString());
             throw new StockNotFoundException(null, ex);
         } catch (Exception ex) {
-            System.out.println(ex + ":::::" + respond + "::::::" + builder.toString());
             // Jackson library may cause runtime exception if there is error
             // in the JSON string.
             throw new StockNotFoundException(null, ex);
@@ -170,5 +179,5 @@ public class GoogleStockServer implements StockServer {
     // Will it be better if we make this as static?
     private final ObjectMapper mapper = new ObjectMapper(); 
     private final Country country;
-    private static final Log log = LogFactory.getLog(YahooStockFormat.class);
+    private static final Log log = LogFactory.getLog(GoogleStockServer.class);
 }

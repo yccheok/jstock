@@ -224,13 +224,13 @@ public class YahooStockFormat implements StockFormat {
                 
                 if (length < 5) break;
                 try { prevPrice = Double.parseDouble(fields[4]); } catch (NumberFormatException exp) {}
-
+                
                 if (length < 7) break;
                 try { openPrice = Double.parseDouble(fields[6]); } catch (NumberFormatException exp) {}
-
+                
                 if (length < 9) break;
                 try { lastPrice = Double.parseDouble(fields[8]); } catch (NumberFormatException exp) {}
-                
+
                 if (length < 11) break;
                 try { highPrice = Double.parseDouble(fields[10]); } catch (NumberFormatException exp) {}
 
@@ -254,13 +254,13 @@ public class YahooStockFormat implements StockFormat {
                 
                 if (length < 23) break;
                 try { buyPrice = Double.parseDouble(fields[22]); } catch (NumberFormatException exp) {}
-
+                
                 if (length < 25) break;
                 try { buyQuantity = Integer.parseInt(fields[24]); } catch (NumberFormatException exp) {}
                 
                 if (length < 27) break;
                 try { sellPrice = Double.parseDouble(fields[26]); } catch (NumberFormatException exp) {}
-
+                
                 if (length < 29) break;
                 try { sellQuantity = Integer.parseInt(fields[28]); } catch (NumberFormatException exp) {}
                 
@@ -290,6 +290,26 @@ public class YahooStockFormat implements StockFormat {
             // Note that, this is a very hacking way, and not reliable at all!
             if (isCorruptedData(lastPrice) || isTooOldTimestamp(timestamp)) {
                 continue;
+            }
+
+            if (length > 28) {
+                if (
+                    fields[28].equalsIgnoreCase("N/A") &&
+                    fields[26].equalsIgnoreCase("N/A") &&
+                    org.yccheok.jstock.portfolio.Utils.essentiallyEqual(lastPrice, 0.0) &&
+                    fields[24].equalsIgnoreCase("N/A") &&
+                    fields[22].equalsIgnoreCase("N/A") &&
+                    fields[20].equalsIgnoreCase("N/A") &&
+                    fields[18].equalsIgnoreCase("N/A") &&
+                    fields[16].equalsIgnoreCase("N/A") &&
+                    fields[14].equalsIgnoreCase("N/A") &&
+                    fields[12].equalsIgnoreCase("N/A") &&
+                    fields[10].equalsIgnoreCase("N/A") &&
+                    fields[6].equalsIgnoreCase("N/A") &&
+                    fields[4].equalsIgnoreCase("N/A")
+                ) {
+                    continue;
+                }
             }
 
             if (timestamp == 0) timestamp = System.currentTimeMillis();

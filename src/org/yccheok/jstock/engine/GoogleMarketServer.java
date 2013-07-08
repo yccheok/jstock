@@ -83,13 +83,15 @@ public class GoogleMarketServer implements MarketServer {
         private final ObjectMapper mapper = new ObjectMapper();
 
         public GoogleMarket() throws StockNotFoundException {            
+            // Use StringBuilder instead of StringBuffer. We do not concern
+            // on thread safety.
+            final StringBuilder builder = new StringBuilder("http://www.google.com/finance/info?client=ig&q=");
+
             try {
-                // Use StringBuilder instead of StringBuffer. We do not concern
-                // on thread safety.
-                StringBuilder builder = new StringBuilder("http://www.google.com/finance/info?client=ig&q=");
                 // Exception will be thrown from apache httpclient, if we do not
                 // perform URL encoding.
                 builder.append(java.net.URLEncoder.encode(Utils.toGoogleFormat(codes.get(0)).toString(), "UTF-8"));
+
                 for (int i = 1, size = codes.size(); i < size; i++) {
                     builder.append(",");
                     builder.append(java.net.URLEncoder.encode(Utils.toGoogleFormat(codes.get(i)).toString(), "UTF-8"));
@@ -102,10 +104,10 @@ public class GoogleMarketServer implements MarketServer {
                 final List<Stock> stocks = new ArrayList<Stock>();
                 for (int i = 0, size = jsonArray.size(); i < size; i++) {
                     final Map<String, String> jsonObject = jsonArray.get(i);
-                    final double l_curr = Double.parseDouble(jsonObject.get("l_cur").replaceAll("[^0-9\\.]", ""));
+                    final double l = Double.parseDouble(jsonObject.get("l").replaceAll("[^0-9\\.]", ""));
                     final double c = Double.parseDouble(jsonObject.get("c").replaceAll("[^0-9\\.\\-]", ""));
                     final double cp = Double.parseDouble(jsonObject.get("cp").replaceAll("[^0-9\\.\\-]", ""));
-                    final Stock stock = new Stock.Builder(codes.get(i), Symbol.newInstance(codes.get(i).toString())).lastPrice(l_curr).changePrice(c).changePricePercentage(cp).build();
+                    final Stock stock = new Stock.Builder(codes.get(i), Symbol.newInstance(codes.get(i).toString())).lastPrice(l).changePrice(c).changePricePercentage(cp).build();
                     stocks.add(stock);
                 }
                 // Store the result for later query purpose.

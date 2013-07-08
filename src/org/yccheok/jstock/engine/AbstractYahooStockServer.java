@@ -29,7 +29,7 @@ import java.util.Set;
  *
  * @author yccheok
  */
-public abstract class AbstractYahooStockServer extends Subject<AbstractYahooStockServer, Integer> implements StockServer {
+public abstract class AbstractYahooStockServer implements StockServer {
     protected abstract String getYahooCSVBasedURL();
 
     public AbstractYahooStockServer(Country country) {
@@ -120,7 +120,7 @@ public abstract class AbstractYahooStockServer extends Subject<AbstractYahooStoc
 
             for (int retry = 0; retry < NUM_OF_RETRY; retry++) {
                 final String respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(location);
-
+            
                 if (respond == null) {
                     continue;
                 }

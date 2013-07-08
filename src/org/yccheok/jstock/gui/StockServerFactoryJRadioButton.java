@@ -26,6 +26,7 @@ import javax.swing.SwingWorker;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.Code;
+import org.yccheok.jstock.engine.Country;
 import org.yccheok.jstock.engine.StockNotFoundException;
 import org.yccheok.jstock.engine.StockServer;
 import org.yccheok.jstock.engine.StockServerFactory;
@@ -82,10 +83,18 @@ public class StockServerFactoryJRadioButton extends JRadioButton {
             code = Code.newInstance("BBDC4.SA");
         }
         else if (c == org.yccheok.jstock.engine.YahooStockServerFactory.class) {
-            code = Code.newInstance("MSFT");
+            if (((org.yccheok.jstock.engine.YahooStockServerFactory)stockServerFactory).getCountry() == Country.India) {
+                code = Code.newInstance("TATAPOWER.NS");
+            } else {
+                code = Code.newInstance("MSFT");
+            }
         }
         else if (c == org.yccheok.jstock.engine.GoogleStockServerFactory.class) {
-            code = Code.newInstance("MSFT");
+            if (((org.yccheok.jstock.engine.GoogleStockServerFactory)stockServerFactory).getCountry() == Country.India) {
+                code = Code.newInstance("TATAPOWER.NS");
+            } else {
+                code = Code.newInstance("MSFT");
+            }
         }
         else if (c == org.yccheok.jstock.engine.KLSEInfoStockServerFactory.class) {
             // PBBANK.
