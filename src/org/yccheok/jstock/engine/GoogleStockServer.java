@@ -96,6 +96,27 @@ public class GoogleStockServer implements StockServer {
                         code = map.get(_code1);
                     }
                     
+                    if (country == Country.India) {
+                        if (code == null) {
+                            String googleResult = jsonObject.get("t").toUpperCase();
+                            for (Code c : codes) {
+                                String _c = withoutIndiaPrefixOrSufix(c.toString().toUpperCase());
+                                if (googleResult.length() >= _c.length()) {
+                                    if (googleResult.contains(_c)) {
+                                        code = c;
+                                        break;
+                                    }
+                                } else {
+                                    if (_c.contains(googleResult)) {
+                                        code = c;
+                                        break;
+                                    }
+                                }
+                            }
+                            
+                        }
+                    }
+                    
                     if (code == null) {
                         continue;
                     }
@@ -176,8 +197,22 @@ public class GoogleStockServer implements StockServer {
         }
     }
     
+    private String withoutIndiaPrefixOrSufix(String code) {
+        final int nse_length = "NES:".length();
+        
+        if (code.startsWith("NSE:") && code.length() > nse_length) {
+            return code.substring(nse_length);
+        }
+        
+        final int ns_length = ".NS".length();
+        if (code.endsWith(".NS") && code.length() > ns_length) {
+            return code.substring(0, code.length() - ns_length);
+        }
+        return code;
+    }
+    
     // Will it be better if we make this as static?
-    private final ObjectMapper mapper = new ObjectMapper(); 
+    private final ObjectMapper mapper = new ObjectMapper();
     private final Country country;
     private static final Log log = LogFactory.getLog(GoogleStockServer.class);
 }

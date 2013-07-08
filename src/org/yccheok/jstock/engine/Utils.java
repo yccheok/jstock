@@ -31,6 +31,7 @@ import java.util.*;
 import org.apache.commons.httpclient.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.yccheok.jstock.engine.AjaxYahooSearchEngine.ResultType;
 import org.yccheok.jstock.engine.Stock.Board;
 import org.yccheok.jstock.engine.Stock.Industry;
@@ -379,15 +380,47 @@ public class Utils {
             return Code.newInstance("INDEXBOM:SENSEX");
         } else if (string.equals("^NSEI")) {
             return Code.newInstance("NSE:NIFTY");
-        } else if (string.endsWith(".NS")) {
+        } else if (string.endsWith(".NS") && string.length() > ".NS".length()) {
             // Resolving Yahoo server down for India NSE stock market. Note, we
             // do not support Bombay stock market at this moment, due to the
             // difficulty in converting "TATACHEM.BO" (Yahoo Finance) to 
             // "BOM:500770" (Google Finance)
-            int index = string.indexOf(".NS");
-            return Code.newInstance("NSE:" + string.substring(0, index));
+            string = string.substring(0, string.length() - ".NS".length());
+            return Code.newInstance("NSE:" + toGoogleFormatThroughAutoComplete(string, "NSE"));
         }
         return Code.newInstance(string);
+    }
+    
+    private static String toGoogleFormatThroughAutoComplete(String code, String exchange) {
+        final StringBuilder builder = new StringBuilder("https://www.google.com/finance/match?matchtype=matchall&q=");
+        try {
+            // Exception will be thrown from apache httpclient, if we do not
+            // perform URL encoding.
+            builder.append(java.net.URLEncoder.encode(code, "UTF-8"));
+
+            final String location = builder.toString();
+            final String respond = Utils.GoogleRespondToJSON(org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(location));
+            // Google returns "// [ { "id": ... } ]".
+            // We need to turn them into "[ { "id": ... } ]".
+            final List<Map> jsonArray = mapper.readValue(respond, List.class);
+            for (int i = 0, size = jsonArray.size(); i < size; i++) {
+                final Map<String, String> jsonObject = jsonArray.get(i);
+                if (jsonObject.containsKey("e") && jsonObject.get("e").equalsIgnoreCase(exchange)) {
+                    if (jsonObject.containsKey("t")) {
+                        return jsonObject.get("t");
+                    }
+                }
+            }           
+        } catch (UnsupportedEncodingException ex) {
+            log.error(null, ex);
+        } catch (IOException ex) {
+            log.error(null, ex);
+        } catch (Exception ex) {
+            // Jackson library may cause runtime exception if there is error
+            // in the JSON string.
+            log.error(null, ex);
+        }        
+        return code;
     }
     
     public static Code toYahooFormat(Code code, Country country)
@@ -624,5 +657,6 @@ public class Utils {
         return 0L;
     }
 
+    private static final ObjectMapper mapper = new ObjectMapper();
     private static final Log log = LogFactory.getLog(Utils.class);
 }
