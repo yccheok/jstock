@@ -250,7 +250,7 @@ public class Utils {
                     board = Board.Unknown;
                 }
                 try {
-                    industry = Industry.valueOf(_board);
+                    industry = Industry.valueOf(_industry);
                 } catch (IllegalArgumentException exp) {
                     log.error(null, exp);
                     industry = Industry.Unknown;
