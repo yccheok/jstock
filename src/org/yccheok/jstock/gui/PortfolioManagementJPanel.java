@@ -341,7 +341,14 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     if (value != null) {
                         if (c instanceof JLabel) {
                             // Re-define the displayed value.
-                            ((JLabel)c).setText(org.yccheok.jstock.portfolio.Utils.toCurrency(value));
+                            
+                            // Ugly hacking.
+                            if (value instanceof DoubleWrapper) {
+                                DoubleWrapper v = (DoubleWrapper)value;
+                                ((JLabel)c).setText(org.yccheok.jstock.portfolio.Utils.toCurrency(v.decimalPlace, v.value));
+                            } else {
+                                ((JLabel)c).setText(org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlace.Four, value));
+                            }
                         }
                     }
                 }
@@ -1932,6 +1939,27 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         return true;
     }
 
+    // Different among refreshGUIAfterOptionsJDialog and refreshGUIAfterFeeCalculationEnabledOptionsChanged
+    // is that, refreshGUIAfterOptionsJDialog doesn't touch on column visibility.
+    public void refreshGUIAfterOptionsJDialog() {
+        if (SwingUtilities.isEventDispatchThread()) {
+            _refreshGUIAfterOptionsJDialog();
+        } else {
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    _refreshGUIAfterOptionsJDialog();
+                }
+            });            
+        }        
+    }
+    
+    private void _refreshGUIAfterOptionsJDialog() {
+        this.buyTreeTable.repaint();
+        this.sellTreeTable.repaint();
+        this.updateWealthHeader();        
+    }
+    
     public void refreshGUIAfterFeeCalculationEnabledOptionsChanged() {
         if (SwingUtilities.isEventDispatchThread()) {
             _refreshGUIAfterFeeCalculationEnabledOptionsChanged();
@@ -2551,12 +2579,12 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             realizedProfitPercentage = sellPortfolioTreeTableModel.getGainLossPercentage();            
         }
         
-        final String _share = org.yccheok.jstock.portfolio.Utils.toWealthHeader(share);
-        final String _cash = org.yccheok.jstock.portfolio.Utils.toWealthHeader(cash);
-        final String _paperProfit = org.yccheok.jstock.portfolio.Utils.toWealthHeader(paperProfit);
-        final String _paperProfitPercentage = org.yccheok.jstock.portfolio.Utils.toWealthHeader(paperProfitPercentage);
-        final String _realizedProfit = org.yccheok.jstock.portfolio.Utils.toWealthHeader(realizedProfit);
-        final String _realizedProfitPercentage = org.yccheok.jstock.portfolio.Utils.toWealthHeader(realizedProfitPercentage);
+        final String _share = org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlace.Two, share);
+        final String _cash = org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlace.Two, cash);
+        final String _paperProfit = org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlace.Two, paperProfit);
+        final String _paperProfitPercentage = org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlace.Two, paperProfitPercentage);
+        final String _realizedProfit = org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlace.Two, realizedProfit);
+        final String _realizedProfitPercentage = org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlace.Two, realizedProfitPercentage);
         
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             @Override

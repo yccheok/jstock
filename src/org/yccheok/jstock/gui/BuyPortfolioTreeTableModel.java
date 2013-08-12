@@ -388,7 +388,7 @@ public class BuyPortfolioTreeTableModel extends DeprecatedAbstractPortfolioTreeT
                     }
                     
                 case 9:
-                    return this.getGainLossPercentage(portfolio);
+                    return new DoubleWrapper(DecimalPlace.Two, this.getGainLossPercentage(portfolio));
     
                 case 10:
                     return portfolio.getBroker();
@@ -416,7 +416,7 @@ public class BuyPortfolioTreeTableModel extends DeprecatedAbstractPortfolioTreeT
                     }
                     
                 case 15:
-                    return this.getNetGainLossPercentage(portfolio);
+                    return new DoubleWrapper(DecimalPlace.Two, this.getNetGainLossPercentage(portfolio));
 
                 case 16:
                     return portfolio.getComment();
@@ -439,7 +439,11 @@ public class BuyPortfolioTreeTableModel extends DeprecatedAbstractPortfolioTreeT
                     return transactionSummary.getQuantity();
                     
                 case 3:
-                    return this.getPurchasePrice(transactionSummary);
+                    if (MainFrame.getInstance().getJStockOptions().isFourDecimalPlacesEnabled()) {
+                        return new DoubleWrapper(DecimalPlace.Four, this.getPurchasePrice(transactionSummary));
+                    } else {
+                        return new DoubleWrapper(DecimalPlace.Three, this.getPurchasePrice(transactionSummary));   
+                    }
                     
                 case 4:
                     return this.getCurrentPrice(transactionSummary);
@@ -472,7 +476,7 @@ public class BuyPortfolioTreeTableModel extends DeprecatedAbstractPortfolioTreeT
                     }
                     
                 case 9:
-                    return this.getGainLossPercentage(transactionSummary);
+                    return new DoubleWrapper(DecimalPlace.Two, this.getGainLossPercentage(transactionSummary));
                     
                 case 10:
                     return transactionSummary.getBroker();
@@ -500,7 +504,7 @@ public class BuyPortfolioTreeTableModel extends DeprecatedAbstractPortfolioTreeT
                     }
                     
                 case 15:
-                    return this.getNetGainLossPercentage(transactionSummary);                    
+                    return new DoubleWrapper(DecimalPlace.Two, this.getNetGainLossPercentage(transactionSummary));
 
                 case 16:
                     return transactionSummary.getComment();
@@ -554,7 +558,7 @@ public class BuyPortfolioTreeTableModel extends DeprecatedAbstractPortfolioTreeT
                     }
                     
                 case 9:
-                    return this.getGainLossPercentage(transaction);
+                    return new DoubleWrapper(DecimalPlace.Two, this.getGainLossPercentage(transaction));
                     
                 case 10:
                     return transaction.getBroker();
@@ -582,7 +586,7 @@ public class BuyPortfolioTreeTableModel extends DeprecatedAbstractPortfolioTreeT
                     }
                     
                 case 15:
-                    return this.getNetGainLossPercentage(transaction);                    
+                    return new DoubleWrapper(DecimalPlace.Two, this.getNetGainLossPercentage(transaction));
 
                 case 16:
                     return transaction.getComment();

@@ -80,6 +80,7 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
         jFormattedTextField1 = getPercentageJFormattedTextField();
         javax.swing.JPanel jPanel3 = new javax.swing.JPanel();
         jCheckBox1 = new javax.swing.JCheckBox();
+        jCheckBox3 = new javax.swing.JCheckBox();
         javax.swing.JPanel jPanel4 = new javax.swing.JPanel();
         javax.swing.JLabel jLabel2 = new javax.swing.JLabel();
         jComboBox1 = new javax.swing.JComboBox();
@@ -107,7 +108,7 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jFormattedTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(129, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -123,13 +124,17 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
 
         jCheckBox1.setText(bundle.getString("OptionsSellAdvisorJPanel_ShowStockValueInDollar")); // NOI18N
 
+        jCheckBox3.setText(bundle.getString("OptionsSellAdvisorJPanel_ShowStockPriceAndValueIn4DecimalPlaces")); // NOI18N
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jCheckBox1)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jCheckBox1)
+                    .addComponent(jCheckBox3))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
@@ -137,6 +142,8 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jCheckBox1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jCheckBox3)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -151,6 +158,7 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
         jComboBox2.setRenderer(new MyCellRenderer());
 
         jCheckBox2.setText(getConvertCurrencyString());
+        jCheckBox2.setEnabled(false);
         jCheckBox2.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 jCheckBox2ItemStateChanged(evt);
@@ -172,7 +180,7 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
                         .addComponent(jCheckBox2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(224, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -206,10 +214,10 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
                 .addContainerGap()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(59, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         add(jPanel1, java.awt.BorderLayout.CENTER);
@@ -322,7 +330,7 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
         this.jComboBox1.setSelectedItem(jStockOptions.getCurrencySymbol(jStockOptions.getCountry()));
         this.jCheckBox2.setSelected(jStockOptions.isCurrencyExchangeEnable(jStockOptions.getCountry()));
         this.jComboBox2.setSelectedItem(jStockOptions.getLocalCurrencyCountry(jStockOptions.getCountry()));
-
+        this.jCheckBox3.setSelected(jStockOptions.isFourDecimalPlacesEnabled());
         commitEdit();
         updateGUIState();
     }
@@ -339,7 +347,8 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
 
         jStockOptions.setCurrencyExchangeEnable(jStockOptions.getCountry(), jCheckBox2.isSelected());
         jStockOptions.setLocalCurrencyCountry(jStockOptions.getCountry(), (Country)jComboBox2.getSelectedItem());
-
+        jStockOptions.setFourDecimalPlacesEnabled(this.jCheckBox3.isSelected());
+        
         // Remember to refresh the GUIs as well.
         MainFrame.getInstance().getPortfolioManagementJPanel().refreshCurrencySymbol();
         // Update the new state of currency exchange monitor.
@@ -405,6 +414,7 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JCheckBox jCheckBox2;
+    javax.swing.JCheckBox jCheckBox3;
     private javax.swing.JComboBox jComboBox1;
     private javax.swing.JComboBox jComboBox2;
     private javax.swing.JFormattedTextField jFormattedTextField1;

@@ -290,6 +290,8 @@ public class JStockOptions {
 
     private Map<Country, Boolean> penceToPoundConversionEnabled = new EnumMap<Country, Boolean>(Country.class);
     
+    private Map<Country, Boolean> fourDecimalPlacesEnabled = new EnumMap<Country, Boolean>(Country.class);
+    
     // So that in later time we know that, which version of JStock, is used to
     // save this options.xml.
     private int applicationVersionID = Utils.getApplicationVersionID();
@@ -377,7 +379,9 @@ public class JStockOptions {
 
         /* For UK client. */
         this.penceToPoundConversionEnabled = jStockOptions.penceToPoundConversionEnabled;
-
+        
+        this.fourDecimalPlacesEnabled = jStockOptions.fourDecimalPlacesEnabled;
+        
         //this.rememberGoogleAccountEnabled = jStockOptions.rememberGoogleAccountEnabled;
         //this.googleUsername = jStockOptions.googleUsername;
         //this.googlePassword = jStockOptions.googlePassword;
@@ -419,6 +423,7 @@ public class JStockOptions {
         this.currencyExchangeEnable = new EnumMap<Country, Boolean>(jStockOptions.currencyExchangeEnable);
         this.localCurrencyCountries = new EnumMap<Country, Country>(jStockOptions.localCurrencyCountries);
         this.penceToPoundConversionEnabled = new EnumMap<Country, Boolean>(jStockOptions.penceToPoundConversionEnabled);
+        this.fourDecimalPlacesEnabled = new EnumMap<Country, Boolean>(jStockOptions.fourDecimalPlacesEnabled);
         
         this.chartTheme = jStockOptions.getChartTheme();
         
@@ -500,6 +505,8 @@ public class JStockOptions {
         /* For UK client. */
         jStockOptions.penceToPoundConversionEnabled = this.penceToPoundConversionEnabled;
 
+        jStockOptions.fourDecimalPlacesEnabled = this.fourDecimalPlacesEnabled;
+        
         //jStockOptions.rememberGoogleAccountEnabled = this.rememberGoogleAccountEnabled;
         //jStockOptions.googleUsername = this.googleUsername;
         //jStockOptions.googlePassword = this.googlePassword;
@@ -542,7 +549,8 @@ public class JStockOptions {
         jStockOptions.currencyExchangeEnable = new EnumMap<Country, Boolean>(this.currencyExchangeEnable);
         jStockOptions.localCurrencyCountries = new EnumMap<Country, Country>(this.localCurrencyCountries);
         jStockOptions.penceToPoundConversionEnabled = new EnumMap<Country, Boolean>(jStockOptions.penceToPoundConversionEnabled);
-
+        jStockOptions.fourDecimalPlacesEnabled = new EnumMap<Country, Boolean>(jStockOptions.fourDecimalPlacesEnabled);
+        
         jStockOptions.chartTheme = this.chartTheme;
         
         jStockOptions.isFeeCalculationEnabled = this.isFeeCalculationEnabled;
@@ -706,6 +714,10 @@ public class JStockOptions {
         
         if (false == this.penceToPoundConversionEnabled.containsKey(Country.UnitedKingdom)) {
             this.penceToPoundConversionEnabled.put(Country.UnitedKingdom, true);
+        }
+        
+        if (this.fourDecimalPlacesEnabled == null) {
+            this.fourDecimalPlacesEnabled = new EnumMap<Country, Boolean>(Country.class);
         }
         
         if (this.primaryStockServerFactoryClassesIsValidForMalaysia == null || this.primaryStockServerFactoryClassesIsValidForMalaysia == false) {
@@ -1318,6 +1330,14 @@ public class JStockOptions {
         return b;
     }
 
+    public boolean isFourDecimalPlacesEnabled(/*Country country*/) {
+        Boolean b = this.fourDecimalPlacesEnabled.get(this.country);
+        if (b == null) {
+            return false;
+        }
+        return b;
+    }
+    
     /**
      * @param penceToPoundConversionEnabled the penceToPoundConversionEnabled to set
      */
@@ -1326,6 +1346,11 @@ public class JStockOptions {
         this.penceToPoundConversionEnabled.put(this.country, penceToPoundConversionEnabled);
     }
 
+    // Do we need country as parameter?
+    public void setFourDecimalPlacesEnabled(/*Country country, */boolean fourDecimalPlacesEnabled) {
+        this.fourDecimalPlacesEnabled.put(this.country, fourDecimalPlacesEnabled);
+    }
+    
     /**
      * @return the rememberGoogleAccountEnabled
      */

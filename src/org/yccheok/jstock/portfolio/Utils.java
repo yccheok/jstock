@@ -41,7 +41,7 @@ import org.yccheok.jstock.gui.SellPortfolioTreeTableModel;
  * @author yccheok
  */
 public class Utils {
-
+    
     // For XML to CSV migration usage.
     private static final class XMLPortfolio {
         public final BuyPortfolioTreeTableModel buyPortfolioTreeTableModel;
@@ -71,7 +71,14 @@ public class Utils {
     }
 
     // Use ThreadLocal to ensure thread safety.
-    private static final ThreadLocal <NumberFormat> currencyNumberFormat = new ThreadLocal <NumberFormat>() {
+    private static final ThreadLocal <NumberFormat> twoDecimalPlacecurrencyNumberFormat = new ThreadLocal <NumberFormat>() {
+        @Override protected NumberFormat initialValue() {
+            return new DecimalFormat("#,##0.00");
+        }
+    };
+    
+    // Use ThreadLocal to ensure thread safety.
+    private static final ThreadLocal <NumberFormat> threeDecimalPlacecurrencyNumberFormat = new ThreadLocal <NumberFormat>() {
         @Override protected NumberFormat initialValue() {
             // Instead of limiting currency decimal places to 2 only, we allow
             // them to float between 2 to 3, to avoid from losing precision.
@@ -79,6 +86,15 @@ public class Utils {
         }
     };
 
+    // Use ThreadLocal to ensure thread safety.
+    private static final ThreadLocal <NumberFormat> fourDecimalPlaceCurrencyNumberFormat = new ThreadLocal <NumberFormat>() {
+        @Override protected NumberFormat initialValue() {
+            // Instead of limiting currency decimal places to 2 only, we allow
+            // them to float between 2 to 4, to avoid from losing precision.
+            return new DecimalFormat("#,##0.00##");
+        }
+    };
+    
     // Use ThreadLocal to ensure thread safety
     private static final ThreadLocal <NumberFormat> quantityNumberFormat = new ThreadLocal <NumberFormat>() {
         @Override protected NumberFormat initialValue() {
@@ -94,14 +110,6 @@ public class Utils {
             // Instead of limiting currency decimal places to 0 only, we allow
             // them to float between 0 to 6, to avoid from losing precision.
             return new DecimalFormat("#,##0.######");
-        }
-    };
-    
-    // Use ThreadLocal to ensure thread safety
-    private static final ThreadLocal <NumberFormat> wealthHeaderNumberFormat = new ThreadLocal <NumberFormat>() {
-        @Override protected NumberFormat initialValue() {
-            final java.text.NumberFormat numberFormat = java.text.NumberFormat.getInstance();
-            return numberFormat;
         }
     };
     
@@ -163,8 +171,14 @@ public class Utils {
      * @param value the value to be converted
      * @return currency representation (without symbol)
      */
-    public static String toCurrency(Object value) {
-        return currencyNumberFormat.get().format(value);
+    public static String toCurrency(DecimalPlace decimalPlace, Object value) {
+        if (decimalPlace == DecimalPlace.Two) {
+            return twoDecimalPlacecurrencyNumberFormat.get().format(value);
+        } else if (decimalPlace == DecimalPlace.Three) {
+            return threeDecimalPlacecurrencyNumberFormat.get().format(value);
+        }
+        assert(decimalPlace == DecimalPlace.Four);
+        return fourDecimalPlaceCurrencyNumberFormat.get().format(value);
     }
 
     /**
@@ -173,8 +187,26 @@ public class Utils {
      * @param value the value to be converted
      * @return currency representation (without symbol)
      */
-    public static String toCurrency(double value) {
-        return currencyNumberFormat.get().format(value);
+    public static String toCurrency(DecimalPlace decimalPlace, double value) {
+        if (decimalPlace == DecimalPlace.Two) {
+            return twoDecimalPlacecurrencyNumberFormat.get().format(value);
+        } else if (decimalPlace == DecimalPlace.Three) {
+            return threeDecimalPlacecurrencyNumberFormat.get().format(value);
+        }
+        assert(decimalPlace == DecimalPlace.Four);
+        return fourDecimalPlaceCurrencyNumberFormat.get().format(value);
+    }
+    
+    /**
+     * Convert the value to currency representation (with symbol).
+     * 
+     * @param value the value to be converted
+     * @return currency representation (with symbol)
+     */
+    public static String toCurrencyWithSymbol(DecimalPlace decimalPlace, Object value) {
+        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final Country country = jStockOptions.getCountry();
+        return jStockOptions.getCurrencySymbol(country) + toCurrency(decimalPlace, value);
     }
 
     /**
@@ -183,60 +215,10 @@ public class Utils {
      * @param value the value to be converted
      * @return currency representation (with symbol)
      */
-    public static String toCurrencyWithSymbol(Object value) {
+    public static String toCurrencyWithSymbol(DecimalPlace decimalPlace, double value) {
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
         final Country country = jStockOptions.getCountry();
-        return jStockOptions.getCurrencySymbol(country) + toCurrency(value);
-    }
-
-    /**
-     * Convert the value to currency representation (with symbol).
-     * 
-     * @param value the value to be converted
-     * @return currency representation (with symbol)
-     */
-    public static String toCurrencyWithSymbol(double value) {
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
-        final Country country = jStockOptions.getCountry();
-        return jStockOptions.getCurrencySymbol(country) + toCurrency(value);
-    }
-
-    /**
-     * Convert the value to wealth header representation.
-     *
-     * @param value the value to be converted
-     * @return wealth header representation
-     */
-    public static String toWealthHeader(Object value) {
-        NumberFormat numberFormat = wealthHeaderNumberFormat.get();
-        if (false == MainFrame.getInstance().getJStockOptions().isPenceToPoundConversionEnabled()) {
-            numberFormat.setMaximumFractionDigits(2);
-            numberFormat.setMinimumFractionDigits(2);
-        }
-        else {
-            numberFormat.setMaximumFractionDigits(4);
-            numberFormat.setMinimumFractionDigits(4);
-        }        
-        return numberFormat.format(value);
-    }
-
-    /**
-     * Convert the value to wealth header representation.
-     *
-     * @param value the value to be converted
-     * @return wealth header representation
-     */
-    public static String toWealthHeader(double value) {
-        NumberFormat numberFormat = wealthHeaderNumberFormat.get();
-        if (false == MainFrame.getInstance().getJStockOptions().isPenceToPoundConversionEnabled()) {
-            numberFormat.setMaximumFractionDigits(2);
-            numberFormat.setMinimumFractionDigits(2);
-        }
-        else {
-            numberFormat.setMaximumFractionDigits(4);
-            numberFormat.setMinimumFractionDigits(4);
-        }        
-        return numberFormat.format(value);
+        return jStockOptions.getCurrencySymbol(country) + toCurrency(decimalPlace, value);
     }
     
     public static boolean isTransactionWithEqualStockCode(Transaction t0, Transaction t1) {

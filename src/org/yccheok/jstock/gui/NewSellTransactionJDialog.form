@@ -1,4 +1,4 @@
-<?xml version="1.1" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 
 <Form version="1.5" maxVersion="1.5" type="org.netbeans.modules.form.forminfo.JDialogFormInfo">
   <Properties>
@@ -10,6 +10,7 @@
   </Properties>
   <SyntheticProperties>
     <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
+    <SyntheticProperty name="generateCenter" type="boolean" value="false"/>
   </SyntheticProperties>
   <AuxValues>
     <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
@@ -62,26 +63,19 @@
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="0" attributes="0">
-                          <Component id="jFormattedTextField6" linkSize="1" pref="109" max="32767" attributes="1"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                      </Group>
-                      <Group type="102" alignment="0" attributes="0">
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="jTextField1" linkSize="1" alignment="0" pref="109" max="32767" attributes="1"/>
-                              <Component id="jPanel3" linkSize="1" alignment="0" pref="109" max="32767" attributes="1"/>
-                              <Component id="jSpinner1" linkSize="1" alignment="0" pref="109" max="32767" attributes="1"/>
-                              <Component id="jFormattedTextField1" linkSize="1" alignment="0" pref="109" max="32767" attributes="1"/>
-                              <Component id="jFormattedTextField2" linkSize="1" alignment="0" pref="109" max="32767" attributes="1"/>
-                              <Component id="jFormattedTextField3" linkSize="1" alignment="0" pref="109" max="32767" attributes="1"/>
-                              <Component id="jFormattedTextField4" linkSize="1" alignment="0" pref="109" max="32767" attributes="1"/>
-                              <Component id="jFormattedTextField5" linkSize="1" alignment="0" pref="109" max="32767" attributes="1"/>
-                              <Component id="jFormattedTextField7" linkSize="1" alignment="0" min="-2" pref="101" max="-2" attributes="1"/>
-                              <Component id="jFormattedTextField8" linkSize="1" alignment="0" min="-2" pref="79" max="-2" attributes="1"/>
-                          </Group>
-                          <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
-                      </Group>
+                      <Component id="jFormattedTextField6" linkSize="1" alignment="0" pref="109" max="32767" attributes="1"/>
+                      <Component id="jTextField1" linkSize="1" alignment="0" pref="109" max="32767" attributes="1"/>
+                      <Component id="jPanel3" linkSize="1" alignment="0" pref="109" max="32767" attributes="1"/>
+                      <Component id="jSpinner1" linkSize="1" alignment="0" pref="109" max="32767" attributes="1"/>
+                      <Component id="jFormattedTextField1" linkSize="1" alignment="0" pref="109" max="32767" attributes="1"/>
+                      <Component id="jFormattedTextField2" linkSize="1" alignment="0" pref="109" max="32767" attributes="1"/>
+                      <Component id="jFormattedTextField3" linkSize="1" alignment="0" pref="109" max="32767" attributes="1"/>
+                      <Component id="jFormattedTextField4" linkSize="1" alignment="0" pref="109" max="32767" attributes="1"/>
+                      <Component id="jFormattedTextField5" linkSize="1" alignment="0" pref="109" max="32767" attributes="1"/>
+                      <Component id="jFormattedTextField7" linkSize="1" alignment="0" min="-2" pref="101" max="-2" attributes="1"/>
+                      <Component id="jFormattedTextField8" linkSize="1" alignment="0" min="-2" pref="79" max="-2" attributes="1"/>
                   </Group>
+                  <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>

@@ -44,6 +44,7 @@ import org.yccheok.jstock.gui.PortfolioManagementJPanel;
 import org.yccheok.jstock.gui.table.StockInfoRenderer;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.portfolio.Commentable;
+import org.yccheok.jstock.portfolio.DecimalPlace;
 import org.yccheok.jstock.portfolio.DividendSummary;
 import org.yccheok.jstock.portfolio.Utils;
 
@@ -310,7 +311,7 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
 
     private String getDividendSummaryText() {
         if (this.dividendSummary != null) {
-            return "<html><a href=\"\">" + org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(this.dividendSummary.getTotal()) + "</a></html>";
+            return "<html><a href=\"\">" + org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(DecimalPlace.Three, this.dividendSummary.getTotal()) + "</a></html>";
         }
         return "";
     }

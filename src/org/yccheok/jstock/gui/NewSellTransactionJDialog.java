@@ -19,6 +19,9 @@
 
 package org.yccheok.jstock.gui;
 
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -26,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.swing.JFormattedTextField;
+import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.text.NumberFormatter;
 import javax.swing.SwingUtilities;
@@ -39,6 +43,7 @@ import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.Symbol;
 import org.yccheok.jstock.portfolio.BrokingFirm;
 import org.yccheok.jstock.portfolio.Contract;
+import org.yccheok.jstock.portfolio.DecimalPlace;
 import org.yccheok.jstock.portfolio.Transaction;
 
 /**
@@ -682,7 +687,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
             return value;
         }
         
-        return Double.parseDouble(org.yccheok.jstock.portfolio.Utils.toCurrency(sellQuantity /  buyQuantity * value));
+        return Double.parseDouble(org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlace.Three, sellQuantity /  buyQuantity * value));
     }
     
     private BigDecimal getGoodCurrencyBigDecimal(double value, double sellQuantity, double buyQuantity) {
@@ -1035,6 +1040,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
     
     private JFormattedTextField getCurrencyJFormattedTextField(boolean isNegativeAllowed) {
         NumberFormat format= NumberFormat.getNumberInstance();
+        format.setMaximumFractionDigits(4);
         NumberFormatter formatter= new NumberFormatter(format);
         
         if (isNegativeAllowed == false)
@@ -1043,9 +1049,29 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
             formatter.setMinimum(null);
         
         formatter.setValueClass(Double.class);
-        JFormattedTextField field= new JFormattedTextField(formatter);
+        JFormattedTextField formattedTextField= new JFormattedTextField(formatter);
         
-        return field;
+        MouseListener ml = new MouseAdapter()
+        {
+            @Override
+            public void mousePressed(final MouseEvent e)
+            {
+                SwingUtilities.invokeLater(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        JTextField tf = (JTextField)e.getSource();
+                        int offset = tf.viewToModel(e.getPoint());
+                        tf.setCaretPosition(offset);
+                    }
+                });
+            }
+        };
+
+        formattedTextField.addMouseListener(ml);
+        
+        return formattedTextField;
     }
     
     public List<Transaction> getTransactions() {

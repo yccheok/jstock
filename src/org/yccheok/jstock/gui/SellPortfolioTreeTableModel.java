@@ -12,6 +12,8 @@ import org.yccheok.jstock.portfolio.Portfolio;
 import org.yccheok.jstock.portfolio.Transaction;
 import org.yccheok.jstock.portfolio.TransactionSummary;
 import org.yccheok.jstock.internationalization.GUIBundle;
+import org.yccheok.jstock.portfolio.DecimalPlace;
+import org.yccheok.jstock.portfolio.DoubleWrapper;
 /**
  *
  * @author yccheok
@@ -265,10 +267,18 @@ public class SellPortfolioTreeTableModel extends DeprecatedAbstractPortfolioTree
                     return transactionSummary.getQuantity();
                     
                 case 3:
-                    return getSellingPrice(transactionSummary);
+                    if (MainFrame.getInstance().getJStockOptions().isFourDecimalPlacesEnabled()) {
+                        return new DoubleWrapper(DecimalPlace.Four, this.getSellingPrice(transactionSummary));
+                    } else {
+                        return new DoubleWrapper(DecimalPlace.Three, this.getSellingPrice(transactionSummary));   
+                    }
                     
                 case 4:
-                    return getPurchasePrice(transactionSummary);
+                    if (MainFrame.getInstance().getJStockOptions().isFourDecimalPlacesEnabled()) {
+                        return new DoubleWrapper(DecimalPlace.Four, this.getPurchasePrice(transactionSummary));
+                    } else {
+                        return new DoubleWrapper(DecimalPlace.Three, this.getPurchasePrice(transactionSummary));   
+                    }
                     
                 case 5:
                     if (jStockOptions.isPenceToPoundConversionEnabled() == false) {

@@ -96,10 +96,10 @@ public class Activity {
         Stock stock = (Stock)this.get(Param.Stock);
 
         if (stock != null) {
-            return stock.symbol.toString() + " " + type.toString().toLowerCase() + " " + Utils.toCurrencyWithSymbol(amount);
+            return stock.symbol.toString() + " " + type.toString().toLowerCase() + " " + Utils.toCurrencyWithSymbol(DecimalPlace.Three, amount);
         }
 
-        return type.toString().toLowerCase() + " " + Utils.toCurrencyWithSymbol(amount);
+        return type.toString().toLowerCase() + " " + Utils.toCurrencyWithSymbol(DecimalPlace.Three, amount);
     }
 
     private final Type type;
