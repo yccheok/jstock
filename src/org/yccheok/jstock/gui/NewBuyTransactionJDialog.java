@@ -19,11 +19,17 @@
 
 package org.yccheok.jstock.gui;
 
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Date;
 import javax.swing.JFormattedTextField;
 import javax.swing.JOptionPane;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
 import javax.swing.text.NumberFormatter;
 import javax.swing.SwingUtilities;
 import net.sf.nachocalendar.CalendarFactory;
@@ -154,6 +160,10 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         jLabel2.setText(bundle.getString("NewSellTransactionJDialog_Symbol")); // NOI18N
 
         jSpinner1.setModel(new javax.swing.SpinnerNumberModel(Double.valueOf(100.0d), Double.valueOf(0.0010d), null, Double.valueOf(100.0d)));
+        JSpinner.NumberEditor numberEditor = (JSpinner.NumberEditor)jSpinner1.getEditor();
+        final DecimalFormat decimalFormat = numberEditor.getFormat();
+        decimalFormat.setMaximumFractionDigits(4);
+        numberEditor.getTextField().addMouseListener(getJFormattedTextFieldMouseListener());
         jSpinner1.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 jSpinner1StateChanged(evt);
@@ -343,6 +353,10 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         jLabel2.setText(bundle.getString("NewSellTransactionJDialog_Symbol")); // NOI18N
 
         jSpinner1.setModel(new javax.swing.SpinnerNumberModel(Double.valueOf(100.0d), Double.valueOf(0.0010d), null, Double.valueOf(100.0d)));
+        JSpinner.NumberEditor numberEditor = (JSpinner.NumberEditor)jSpinner1.getEditor();
+        final DecimalFormat decimalFormat = numberEditor.getFormat();
+        decimalFormat.setMaximumFractionDigits(4);
+        numberEditor.getTextField().addMouseListener(getJFormattedTextFieldMouseListener());
         jSpinner1.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 jSpinner1StateChanged(evt);
@@ -789,13 +803,41 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         dettachAllAndStopAutoCompleteJComboBox();
     }//GEN-LAST:event_formWindowClosed
         
+    private MouseListener getJFormattedTextFieldMouseListener() {
+        MouseListener ml = new MouseAdapter()
+        {
+            @Override
+            public void mousePressed(final MouseEvent e)
+            {
+                if (e.getClickCount() == 2) {
+                    // Ignore double click.
+                    return;
+                }
+                
+                SwingUtilities.invokeLater(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        JTextField tf = (JTextField)e.getSource();
+                        int offset = tf.viewToModel(e.getPoint());
+                        tf.setCaretPosition(offset);
+                    }
+                });
+            }
+        };
+        return ml;
+    }
+    
     private JFormattedTextField getCurrencyJFormattedTextField() {
         NumberFormat format= NumberFormat.getNumberInstance();
+        format.setMaximumFractionDigits(4);
         NumberFormatter formatter= new NumberFormatter(format);
         formatter.setMinimum(0.0);
         formatter.setValueClass(Double.class);
-        JFormattedTextField field = new JFormattedTextField(formatter);
-        return field;
+        JFormattedTextField formattedTextField = new JFormattedTextField(formatter);
+        formattedTextField.addMouseListener(getJFormattedTextFieldMouseListener());
+        return formattedTextField;
     }
 
     public void setPrice(double price) { 

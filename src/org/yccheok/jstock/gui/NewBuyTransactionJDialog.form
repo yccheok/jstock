@@ -186,6 +186,9 @@
           <Events>
             <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="jSpinner1StateChanged"/>
           </Events>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="JSpinner.NumberEditor numberEditor = (JSpinner.NumberEditor)jSpinner1.getEditor();&#xd;&#xa;final DecimalFormat decimalFormat = numberEditor.getFormat();&#xd;&#xa;decimalFormat.setMaximumFractionDigits(4);&#xd;&#xa;numberEditor.getTextField().addMouseListener(getJFormattedTextFieldMouseListener());"/>
+          </AuxValues>
         </Component>
         <Container class="javax.swing.JPanel" name="jPanel3">
           <Properties>
