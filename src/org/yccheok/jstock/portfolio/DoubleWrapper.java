@@ -10,9 +10,9 @@ package org.yccheok.jstock.portfolio;
  */
 public final class DoubleWrapper {
     public final Double value;
-    public final DecimalPlace decimalPlace;
+    public final DecimalPlaces decimalPlace;
     
-    public DoubleWrapper(DecimalPlace decimalPlace, Double value) {
+    public DoubleWrapper(DecimalPlaces decimalPlace, Double value) {
         this.value = value;
         this.decimalPlace = decimalPlace;
     }

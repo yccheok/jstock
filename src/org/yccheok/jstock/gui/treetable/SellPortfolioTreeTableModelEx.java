@@ -28,7 +28,7 @@ import org.yccheok.jstock.portfolio.Portfolio;
 import org.yccheok.jstock.portfolio.Transaction;
 import org.yccheok.jstock.portfolio.TransactionSummary;
 import org.yccheok.jstock.internationalization.GUIBundle;
-import org.yccheok.jstock.portfolio.DecimalPlace;
+import org.yccheok.jstock.portfolio.DecimalPlaces;
 import org.yccheok.jstock.portfolio.DoubleWrapper;
 /**
  *
@@ -259,9 +259,9 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
 
                 case 8:
                     if (isFeeCalculationEnabled) {
-                        return new DoubleWrapper(DecimalPlace.Two, getNetGainLossPercentage(portfolio));
+                        return new DoubleWrapper(DecimalPlaces.Two, getNetGainLossPercentage(portfolio));
                     } else {
-                        return new DoubleWrapper(DecimalPlace.Two, getGainLossPercentage(portfolio));
+                        return new DoubleWrapper(DecimalPlaces.Two, getGainLossPercentage(portfolio));
                     }
     
                 case 9:
@@ -343,9 +343,9 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
 
                 case 8:
                     if (isFeeCalculationEnabled) {
-                        return new DoubleWrapper(DecimalPlace.Two, getNetGainLossPercentage(transactionSummary));
+                        return new DoubleWrapper(DecimalPlaces.Two, getNetGainLossPercentage(transactionSummary));
                     } else {
-                        return new DoubleWrapper(DecimalPlace.Two, getGainLossPercentage(transactionSummary));
+                        return new DoubleWrapper(DecimalPlaces.Two, getGainLossPercentage(transactionSummary));
                     }
                     
                 case 9:
@@ -428,9 +428,9 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
                                         
                 case 8:
                     if (isFeeCalculationEnabled) {
-                        return new DoubleWrapper(DecimalPlace.Two, getNetGainLossPercentage(transaction));
+                        return new DoubleWrapper(DecimalPlaces.Two, getNetGainLossPercentage(transaction));
                     } else {
-                        return new DoubleWrapper(DecimalPlace.Two, getGainLossPercentage(transaction));
+                        return new DoubleWrapper(DecimalPlaces.Two, getGainLossPercentage(transaction));
                     }
                     
                 case 9:

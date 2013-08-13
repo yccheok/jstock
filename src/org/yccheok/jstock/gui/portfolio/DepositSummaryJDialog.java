@@ -36,7 +36,7 @@ import org.yccheok.jstock.gui.JTableUtilities;
 import org.yccheok.jstock.gui.MainFrame;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.portfolio.Commentable;
-import org.yccheok.jstock.portfolio.DecimalPlace;
+import org.yccheok.jstock.portfolio.DecimalPlaces;
 import org.yccheok.jstock.portfolio.DepositSummary;
 import org.yccheok.jstock.portfolio.Utils;
 
@@ -294,9 +294,9 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
         jLabel5.setForeground(org.yccheok.jstock.gui.Utils.getColor(totalDeposit, 0.0));
         jLabel3.setForeground(org.yccheok.jstock.gui.Utils.getColor(totalWithdraw, 0.0));
         jLabel6.setForeground(org.yccheok.jstock.gui.Utils.getColor(total, 0.0));
-        jLabel5.setText(Utils.toCurrencyWithSymbol(DecimalPlace.Three, totalDeposit));
-        jLabel3.setText(Utils.toCurrencyWithSymbol(DecimalPlace.Three, totalWithdraw));
-        jLabel6.setText(Utils.toCurrencyWithSymbol(DecimalPlace.Three, total));
+        jLabel5.setText(Utils.toCurrencyWithSymbol(DecimalPlaces.Three, totalDeposit));
+        jLabel3.setText(Utils.toCurrencyWithSymbol(DecimalPlaces.Three, totalWithdraw));
+        jLabel6.setText(Utils.toCurrencyWithSymbol(DecimalPlaces.Three, total));
     }//GEN-LAST:event_jTable1PropertyChange
 
     private void addNewDeposit() {
@@ -336,7 +336,7 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
         }
 
         int viewIndex = this.jTable1.convertColumnIndexToView(1);
-        String string = org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(DecimalPlace.Three, jTable1.getValueAt(jTable1.getSelectedRow(), viewIndex));
+        String string = org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(DecimalPlaces.Three, jTable1.getValueAt(jTable1.getSelectedRow(), viewIndex));
         return string;
     }
 
@@ -433,7 +433,7 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
 
     private String getDepositSummaryText() {
         if (this.depositSummary != null) {
-            return MessageFormat.format(GUIBundle.getString("DepositSummaryJDialog_TotalDepositIs_template"), org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(DecimalPlace.Three, this.depositSummary.getTotal()));
+            return MessageFormat.format(GUIBundle.getString("DepositSummaryJDialog_TotalDepositIs_template"), org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(DecimalPlaces.Three, this.depositSummary.getTotal()));
         }
         return "";
     }

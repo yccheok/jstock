@@ -8,7 +8,7 @@ package org.yccheok.jstock.portfolio;
  *
  * @author yccheok
  */
-public enum DecimalPlace {
+public enum DecimalPlaces {
     Two,
     Three,
     Four

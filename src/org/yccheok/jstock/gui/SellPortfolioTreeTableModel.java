@@ -12,7 +12,7 @@ import org.yccheok.jstock.portfolio.Portfolio;
 import org.yccheok.jstock.portfolio.Transaction;
 import org.yccheok.jstock.portfolio.TransactionSummary;
 import org.yccheok.jstock.internationalization.GUIBundle;
-import org.yccheok.jstock.portfolio.DecimalPlace;
+import org.yccheok.jstock.portfolio.DecimalPlaces;
 import org.yccheok.jstock.portfolio.DoubleWrapper;
 /**
  *
@@ -268,16 +268,16 @@ public class SellPortfolioTreeTableModel extends DeprecatedAbstractPortfolioTree
                     
                 case 3:
                     if (MainFrame.getInstance().getJStockOptions().isFourDecimalPlacesEnabled()) {
-                        return new DoubleWrapper(DecimalPlace.Four, this.getSellingPrice(transactionSummary));
+                        return new DoubleWrapper(DecimalPlaces.Four, this.getSellingPrice(transactionSummary));
                     } else {
-                        return new DoubleWrapper(DecimalPlace.Three, this.getSellingPrice(transactionSummary));   
+                        return new DoubleWrapper(DecimalPlaces.Three, this.getSellingPrice(transactionSummary));   
                     }
                     
                 case 4:
                     if (MainFrame.getInstance().getJStockOptions().isFourDecimalPlacesEnabled()) {
-                        return new DoubleWrapper(DecimalPlace.Four, this.getPurchasePrice(transactionSummary));
+                        return new DoubleWrapper(DecimalPlaces.Four, this.getPurchasePrice(transactionSummary));
                     } else {
-                        return new DoubleWrapper(DecimalPlace.Three, this.getPurchasePrice(transactionSummary));   
+                        return new DoubleWrapper(DecimalPlaces.Three, this.getPurchasePrice(transactionSummary));   
                     }
                     
                 case 5:

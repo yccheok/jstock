@@ -439,9 +439,9 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
                     
                 case 8:
                     if (isFeeCalculationEnabled) {
-                        return new DoubleWrapper(DecimalPlace.Two, this.getNetGainLossPercentage(portfolio));
+                        return new DoubleWrapper(DecimalPlaces.Two, this.getNetGainLossPercentage(portfolio));
                     } else {
-                        return new DoubleWrapper(DecimalPlace.Two, this.getGainLossPercentage(portfolio));
+                        return new DoubleWrapper(DecimalPlaces.Two, this.getGainLossPercentage(portfolio));
                     }
     
                 case 9:
@@ -472,9 +472,9 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
                     
                 case 3:
                     if (MainFrame.getInstance().getJStockOptions().isFourDecimalPlacesEnabled()) {
-                        return new DoubleWrapper(DecimalPlace.Four, this.getPurchasePrice(transactionSummary));
+                        return new DoubleWrapper(DecimalPlaces.Four, this.getPurchasePrice(transactionSummary));
                     } else {
-                        return new DoubleWrapper(DecimalPlace.Three, this.getPurchasePrice(transactionSummary));   
+                        return new DoubleWrapper(DecimalPlaces.Three, this.getPurchasePrice(transactionSummary));   
                     }
                     
                 case 4:
@@ -519,9 +519,9 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
                     
                 case 8:
                     if (isFeeCalculationEnabled) {
-                        return new DoubleWrapper(DecimalPlace.Two, this.getNetGainLossPercentage(transactionSummary));
+                        return new DoubleWrapper(DecimalPlaces.Two, this.getNetGainLossPercentage(transactionSummary));
                     } else {
-                        return new DoubleWrapper(DecimalPlace.Two, this.getGainLossPercentage(transactionSummary));
+                        return new DoubleWrapper(DecimalPlaces.Two, this.getGainLossPercentage(transactionSummary));
                     }
                     
                 case 9:
@@ -596,9 +596,9 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
                     
                 case 8:
                     if (isFeeCalculationEnabled) {
-                        return new DoubleWrapper(DecimalPlace.Two, this.getNetGainLossPercentage(transaction));
+                        return new DoubleWrapper(DecimalPlaces.Two, this.getNetGainLossPercentage(transaction));
                     } else {
-                        return new DoubleWrapper(DecimalPlace.Two, this.getGainLossPercentage(transaction));
+                        return new DoubleWrapper(DecimalPlaces.Two, this.getGainLossPercentage(transaction));
                     }
                     
                 case 9:

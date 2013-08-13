@@ -171,13 +171,13 @@ public class Utils {
      * @param value the value to be converted
      * @return currency representation (without symbol)
      */
-    public static String toCurrency(DecimalPlace decimalPlace, Object value) {
-        if (decimalPlace == DecimalPlace.Two) {
+    public static String toCurrency(DecimalPlaces decimalPlace, Object value) {
+        if (decimalPlace == DecimalPlaces.Two) {
             return twoDecimalPlacecurrencyNumberFormat.get().format(value);
-        } else if (decimalPlace == DecimalPlace.Three) {
+        } else if (decimalPlace == DecimalPlaces.Three) {
             return threeDecimalPlacecurrencyNumberFormat.get().format(value);
         }
-        assert(decimalPlace == DecimalPlace.Four);
+        assert(decimalPlace == DecimalPlaces.Four);
         return fourDecimalPlaceCurrencyNumberFormat.get().format(value);
     }
 
@@ -187,13 +187,13 @@ public class Utils {
      * @param value the value to be converted
      * @return currency representation (without symbol)
      */
-    public static String toCurrency(DecimalPlace decimalPlace, double value) {
-        if (decimalPlace == DecimalPlace.Two) {
+    public static String toCurrency(DecimalPlaces decimalPlace, double value) {
+        if (decimalPlace == DecimalPlaces.Two) {
             return twoDecimalPlacecurrencyNumberFormat.get().format(value);
-        } else if (decimalPlace == DecimalPlace.Three) {
+        } else if (decimalPlace == DecimalPlaces.Three) {
             return threeDecimalPlacecurrencyNumberFormat.get().format(value);
         }
-        assert(decimalPlace == DecimalPlace.Four);
+        assert(decimalPlace == DecimalPlaces.Four);
         return fourDecimalPlaceCurrencyNumberFormat.get().format(value);
     }
     
@@ -203,7 +203,7 @@ public class Utils {
      * @param value the value to be converted
      * @return currency representation (with symbol)
      */
-    public static String toCurrencyWithSymbol(DecimalPlace decimalPlace, Object value) {
+    public static String toCurrencyWithSymbol(DecimalPlaces decimalPlace, Object value) {
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
         final Country country = jStockOptions.getCountry();
         return jStockOptions.getCurrencySymbol(country) + toCurrency(decimalPlace, value);
@@ -215,7 +215,7 @@ public class Utils {
      * @param value the value to be converted
      * @return currency representation (with symbol)
      */
-    public static String toCurrencyWithSymbol(DecimalPlace decimalPlace, double value) {
+    public static String toCurrencyWithSymbol(DecimalPlaces decimalPlace, double value) {
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
         final Country country = jStockOptions.getCountry();
         return jStockOptions.getCurrencySymbol(country) + toCurrency(decimalPlace, value);

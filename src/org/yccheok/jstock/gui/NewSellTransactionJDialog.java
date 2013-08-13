@@ -43,7 +43,7 @@ import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.Symbol;
 import org.yccheok.jstock.portfolio.BrokingFirm;
 import org.yccheok.jstock.portfolio.Contract;
-import org.yccheok.jstock.portfolio.DecimalPlace;
+import org.yccheok.jstock.portfolio.DecimalPlaces;
 import org.yccheok.jstock.portfolio.Transaction;
 
 /**
@@ -687,7 +687,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
             return value;
         }
         
-        return Double.parseDouble(org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlace.Three, sellQuantity /  buyQuantity * value));
+        return Double.parseDouble(org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlaces.Three, sellQuantity /  buyQuantity * value));
     }
     
     private BigDecimal getGoodCurrencyBigDecimal(double value, double sellQuantity, double buyQuantity) {
