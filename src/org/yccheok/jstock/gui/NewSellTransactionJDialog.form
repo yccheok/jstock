@@ -280,7 +280,7 @@
             </Property>
           </Properties>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="getCurrencyJFormattedTextField(true);"/>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="getPercentageJFormattedTextField();"/>
           </AuxValues>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel1">

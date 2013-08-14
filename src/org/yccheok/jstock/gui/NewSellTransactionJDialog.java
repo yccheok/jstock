@@ -342,7 +342,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         jFormattedTextField4 = getCurrencyJFormattedTextField(false);
         jFormattedTextField5 = getCurrencyJFormattedTextField(false);
         jLabel10 = new javax.swing.JLabel();
-        jFormattedTextField6 = getCurrencyJFormattedTextField(true);
+        jFormattedTextField6 = getPercentageJFormattedTextField();
         jLabel1 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
@@ -466,22 +466,18 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
                     .addComponent(jLabel10))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jFormattedTextField6, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
-                        .addContainerGap())
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
-                            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
-                            .addComponent(jSpinner1, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
-                            .addComponent(jFormattedTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
-                            .addComponent(jFormattedTextField2, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
-                            .addComponent(jFormattedTextField3, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
-                            .addComponent(jFormattedTextField4, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
-                            .addComponent(jFormattedTextField5, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
-                            .addComponent(jFormattedTextField7, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jFormattedTextField8, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18))))
+                    .addComponent(jFormattedTextField6, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
+                    .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
+                    .addComponent(jSpinner1, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
+                    .addComponent(jFormattedTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
+                    .addComponent(jFormattedTextField2, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
+                    .addComponent(jFormattedTextField3, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
+                    .addComponent(jFormattedTextField4, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
+                    .addComponent(jFormattedTextField5, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
+                    .addComponent(jFormattedTextField7, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jFormattedTextField8, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18))
         );
 
         jPanel2Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jFormattedTextField1, jFormattedTextField2, jFormattedTextField3, jFormattedTextField4, jFormattedTextField5, jFormattedTextField6, jFormattedTextField7, jFormattedTextField8, jPanel3, jSpinner1, jTextField1});
@@ -687,6 +683,8 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
             return value;
         }
         
+        // Use Three instead of Four. The idea is, shorter is better.
+        // Is it good to use isFourDecimalPlacesEnabled right here???
         return Double.parseDouble(org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlaces.Three, sellQuantity /  buyQuantity * value));
     }
     
@@ -1036,6 +1034,16 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         } catch (ParseException ex) {
             log.error(null, ex);
         }
+    }
+
+    private JFormattedTextField getPercentageJFormattedTextField() {
+        NumberFormat format= NumberFormat.getNumberInstance();
+        format.setMaximumFractionDigits(2);
+        format.setMinimumFractionDigits(2);
+        NumberFormatter formatter= new NumberFormatter(format);        
+        formatter.setValueClass(Double.class);
+        JFormattedTextField formattedTextField= new JFormattedTextField(formatter);        
+        return formattedTextField;
     }
     
     private JFormattedTextField getCurrencyJFormattedTextField(boolean isNegativeAllowed) {
