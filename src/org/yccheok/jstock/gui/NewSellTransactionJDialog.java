@@ -23,12 +23,14 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.swing.JFormattedTextField;
+import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.text.NumberFormatter;
@@ -372,6 +374,10 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         jLabel2.setText(bundle.getString("NewBuyTransactionJDialog_Symbol")); // NOI18N
 
         jSpinner1.setModel(new javax.swing.SpinnerNumberModel(Double.valueOf(100.0d), Double.valueOf(0.0010d), null, Double.valueOf(100.0d)));
+        JSpinner.NumberEditor numberEditor = (JSpinner.NumberEditor)jSpinner1.getEditor();
+        final DecimalFormat decimalFormat = numberEditor.getFormat();
+        decimalFormat.setMaximumFractionDigits(4);
+        numberEditor.getTextField().addMouseListener(getJFormattedTextFieldMouseListener());
         jSpinner1.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 jSpinner1StateChanged(evt);
@@ -944,14 +950,16 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
                 jFormattedTextField5.setValue(clearingFee);
                 jFormattedTextField7.setValue(stampDuty);
 
-                final double sellValue = price * (double)unit;
-                final double buyValue =  NewSellTransactionJDialog.this.buyValue;
-                final double totalCost = buyValue + brokerFee + clearingFee + stampDuty;
+                double sellValue = price * (double)unit;
+                if (isFeeCalculationEnabled) {
+                    sellValue = sellValue - brokerFee - clearingFee - stampDuty;
+                }                
+                final double totalCost = NewSellTransactionJDialog.this.buyValue;
                 final double netProfit = sellValue - totalCost;
                 final double netProfitPercentage = (totalCost == 0.0) ? 0.0 : netProfit / totalCost * 100.0;
 
                 jFormattedTextField2.setValue(sellValue);
-                jFormattedTextField3.setValue(buyValue);
+                jFormattedTextField3.setValue(totalCost);
                 jFormattedTextField6.setValue(netProfitPercentage);
                 jFormattedTextField6.setForeground(Utils.getColor(netProfitPercentage, 0.0));
                 jFormattedTextField8.setValue(netProfit);
@@ -965,18 +973,16 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
                 final double clearingFee = (Double)jFormattedTextField5.getValue();
                 final double stampDuty = (Double)jFormattedTextField7.getValue();
 
-                final double sellValue = price * unit;
-                final double buyValue = NewSellTransactionJDialog.this.buyValue;
-                final double netProfit;
+                double sellValue = price * unit;
                 if (isFeeCalculationEnabled) {
-                    netProfit = sellValue - brokerFee - clearingFee - stampDuty - buyValue;
-                } else {
-                    netProfit = sellValue - buyValue;
+                    sellValue = sellValue - brokerFee - clearingFee - stampDuty;
                 }
-                final double netProfitPercentage = (buyValue == 0.0) ? 0.0 : netProfit / buyValue * 100.0;
+                final double totalCost = NewSellTransactionJDialog.this.buyValue;
+                final double netProfit = sellValue - totalCost;
+                final double netProfitPercentage = (totalCost == 0.0) ? 0.0 : netProfit / totalCost * 100.0;
                 
                 jFormattedTextField2.setValue(sellValue);
-                jFormattedTextField3.setValue(buyValue);
+                jFormattedTextField3.setValue(totalCost);
                 jFormattedTextField6.setValue(netProfitPercentage);
                 jFormattedTextField6.setForeground(Utils.getColor(netProfitPercentage, 0.0));
                 jFormattedTextField8.setValue(netProfit);
@@ -1046,24 +1052,17 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         return formattedTextField;
     }
     
-    private JFormattedTextField getCurrencyJFormattedTextField(boolean isNegativeAllowed) {
-        NumberFormat format= NumberFormat.getNumberInstance();
-        format.setMaximumFractionDigits(4);
-        NumberFormatter formatter= new NumberFormatter(format);
-        
-        if (isNegativeAllowed == false)
-            formatter.setMinimum(0.0);
-        else
-            formatter.setMinimum(null);
-        
-        formatter.setValueClass(Double.class);
-        JFormattedTextField formattedTextField= new JFormattedTextField(formatter);
-        
+    private MouseListener getJFormattedTextFieldMouseListener() {
         MouseListener ml = new MouseAdapter()
         {
             @Override
             public void mousePressed(final MouseEvent e)
             {
+                if (e.getClickCount() == 2) {
+                    // Ignore double click.
+                    return;
+                }
+                
                 SwingUtilities.invokeLater(new Runnable()
                 {
                     @Override
@@ -1076,9 +1075,22 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
                 });
             }
         };
-
-        formattedTextField.addMouseListener(ml);
+        return ml;
+    }
+    
+    private JFormattedTextField getCurrencyJFormattedTextField(boolean isNegativeAllowed) {
+        NumberFormat format= NumberFormat.getNumberInstance();
+        format.setMaximumFractionDigits(4);
+        NumberFormatter formatter= new NumberFormatter(format);
         
+        if (isNegativeAllowed == false)
+            formatter.setMinimum(0.0);
+        else
+            formatter.setMinimum(null);
+        
+        formatter.setValueClass(Double.class);
+        JFormattedTextField formattedTextField= new JFormattedTextField(formatter);
+        formattedTextField.addMouseListener(getJFormattedTextFieldMouseListener());
         return formattedTextField;
     }
     

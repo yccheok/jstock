@@ -351,6 +351,12 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                             }
                         }
                     }
+                } else {
+                    if (value != null) {
+                        if (c instanceof JLabel) {
+                            ((JLabel)c).setText(org.yccheok.jstock.portfolio.Utils.toUnits(value));
+                        }
+                    }                    
                 }
                 return c;
             }

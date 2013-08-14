@@ -291,10 +291,18 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
                     return transactionSummary.getQuantity();
                     
                 case 3:
-                    return getSellingPrice(transactionSummary);
+                    if (MainFrame.getInstance().getJStockOptions().isFourDecimalPlacesEnabled()) {
+                        return new DoubleWrapper(DecimalPlaces.Four, getSellingPrice(transactionSummary));
+                    } else {
+                        return new DoubleWrapper(DecimalPlaces.Three, getSellingPrice(transactionSummary));   
+                    }
                     
                 case 4:
-                    return getPurchasePrice(transactionSummary);
+                    if (MainFrame.getInstance().getJStockOptions().isFourDecimalPlacesEnabled()) {
+                        return new DoubleWrapper(DecimalPlaces.Four, getPurchasePrice(transactionSummary));
+                    } else {
+                        return new DoubleWrapper(DecimalPlaces.Three, getPurchasePrice(transactionSummary));   
+                    }                    
                     
                 case 5:
                     if (isPenceToPoundConversionEnabled == false) {

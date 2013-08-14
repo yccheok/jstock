@@ -70,6 +70,13 @@ public class Utils {
     private Utils() {
     }
 
+    private static final ThreadLocal <NumberFormat> unitsNumberFormat = new ThreadLocal <NumberFormat>() {
+        @Override protected NumberFormat initialValue() {
+            // Instead of limiting currency decimal places to 2 only.
+            return new DecimalFormat("#,##0.####");
+        }
+    };
+    
     // Use ThreadLocal to ensure thread safety.
     private static final ThreadLocal <NumberFormat> twoDecimalPlacecurrencyNumberFormat = new ThreadLocal <NumberFormat>() {
         @Override protected NumberFormat initialValue() {
@@ -348,6 +355,14 @@ public class Utils {
         return isCSVPortfolioDirectory(file);
     }
 
+    public static String toUnits(Object value) {
+        return unitsNumberFormat.get().format(value); 
+    }
+    
+    public static String toUnits(double value) {
+        return unitsNumberFormat.get().format(value); 
+    }
+    
     /**
      * Returns all available portfolio directories for current selected country.
      *
