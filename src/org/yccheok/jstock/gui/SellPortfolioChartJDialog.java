@@ -288,6 +288,11 @@ public class SellPortfolioChartJDialog extends javax.swing.JDialog {
         Collections.sort(dataExs);
         
         for (DataEx dataEx : dataExs) {
+            // Selling value can be negative sometimes.
+            if (dataEx.value <= 0) {
+                continue;
+            }
+            
             data.setValue(dataEx.data, dataEx.value);
         }
         
