@@ -19,8 +19,11 @@
 
 package org.yccheok.jstock.gui;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.swing.SwingUtilities;
@@ -154,6 +157,26 @@ public class SellPortfolioChartJDialog extends javax.swing.JDialog {
         setBounds((screenSize.width-750)/2, (screenSize.height-600)/2, 750, 600);
     }// </editor-fold>//GEN-END:initComponents
 
+    private static class DataEx implements Comparable<DataEx> {
+        public final String data;
+        public final double value;
+        
+        private DataEx(String data, double value) {
+            this.data = data;
+            this.value = value;
+        }
+        
+        public static DataEx newInstance(String data, double value) {
+            return new DataEx(data, value);
+        }
+
+        @Override
+        public int compareTo(DataEx o) {
+            return Double.compare(o.value, this.value);
+        }
+    }
+    
+    
     private JFreeChart createChart(String name) {
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
         final boolean isFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
@@ -162,7 +185,8 @@ public class SellPortfolioChartJDialog extends javax.swing.JDialog {
         final Portfolio portfolio = (Portfolio)portfolioTreeTableModel.getRoot();
         final int count = portfolio.getChildCount();
         DefaultPieDataset data = new DefaultPieDataset();
-
+        final List<DataEx> dataExs = new ArrayList<DataEx>();
+        
         for (int i = 0; i < count; i++) {
             TransactionSummary transactionSummary = (TransactionSummary)portfolio.getChildAt(i);
             
@@ -178,87 +202,93 @@ public class SellPortfolioChartJDialog extends javax.swing.JDialog {
             if(name.equals(cNames[0])) {
                 if (isPenceToPoundConversionEnabled == false) {
                     if (isFeeCalculationEnabled) {
-                        data.setValue(symbol.toString(), portfolioTreeTableModel.getNetGainLossValue(transactionSummary));
+                        dataExs.add(DataEx.newInstance(symbol.toString(), portfolioTreeTableModel.getNetGainLossValue(transactionSummary)));
                     } else {
-                        data.setValue(symbol.toString(), portfolioTreeTableModel.getGainLossValue(transactionSummary));
+                        dataExs.add(DataEx.newInstance(symbol.toString(), portfolioTreeTableModel.getGainLossValue(transactionSummary)));
                     }
                 } else {
                     if (isFeeCalculationEnabled) {
-                        data.setValue(symbol.toString(), portfolioTreeTableModel.getNetGainLossValue(transactionSummary) / 100.0);
+                        dataExs.add(DataEx.newInstance(symbol.toString(), portfolioTreeTableModel.getNetGainLossValue(transactionSummary) / 100.0));
                     } else {
-                        data.setValue(symbol.toString(), portfolioTreeTableModel.getGainLossValue(transactionSummary) / 100.0);
+                        dataExs.add(DataEx.newInstance(symbol.toString(), portfolioTreeTableModel.getGainLossValue(transactionSummary) / 100.0));
                     }                    
                 }
             } else if(name.equals(cNames[1])) {
                 if (isPenceToPoundConversionEnabled == false) {
                     if (isFeeCalculationEnabled) {
-                        data.setValue(symbol.toString(), -portfolioTreeTableModel.getNetGainLossValue(transactionSummary));
+                        dataExs.add(DataEx.newInstance(symbol.toString(), -portfolioTreeTableModel.getNetGainLossValue(transactionSummary)));
                     } else {
-                        data.setValue(symbol.toString(), -portfolioTreeTableModel.getGainLossValue(transactionSummary));
+                        dataExs.add(DataEx.newInstance(symbol.toString(), -portfolioTreeTableModel.getGainLossValue(transactionSummary)));
                     }
                 } else {
                     if (isFeeCalculationEnabled) {
-                        data.setValue(symbol.toString(), -portfolioTreeTableModel.getNetGainLossValue(transactionSummary) / 100.0);
+                        dataExs.add(DataEx.newInstance(symbol.toString(), -portfolioTreeTableModel.getNetGainLossValue(transactionSummary) / 100.0));
                     } else {
-                        data.setValue(symbol.toString(), -portfolioTreeTableModel.getGainLossValue(transactionSummary) / 100.0);
+                        dataExs.add(DataEx.newInstance(symbol.toString(), -portfolioTreeTableModel.getGainLossValue(transactionSummary) / 100.0));
                     }
                 }
             } else if(name.equals(cNames[2])) {
                 if (isFeeCalculationEnabled) {
-                    data.setValue(symbol.toString(), portfolioTreeTableModel.getNetGainLossPercentage(transactionSummary));
+                    dataExs.add(DataEx.newInstance(symbol.toString(), portfolioTreeTableModel.getNetGainLossPercentage(transactionSummary)));
                 } else {
-                    data.setValue(symbol.toString(), portfolioTreeTableModel.getGainLossPercentage(transactionSummary));
+                    dataExs.add(DataEx.newInstance(symbol.toString(), portfolioTreeTableModel.getGainLossPercentage(transactionSummary)));
                 }
             } else if(name.equals(cNames[3])) {
                 if (isFeeCalculationEnabled) {
-                    data.setValue(symbol.toString(), -portfolioTreeTableModel.getNetGainLossPercentage(transactionSummary));
+                    dataExs.add(DataEx.newInstance(symbol.toString(), -portfolioTreeTableModel.getNetGainLossPercentage(transactionSummary)));
                 } else {
-                    data.setValue(symbol.toString(), -portfolioTreeTableModel.getGainLossPercentage(transactionSummary));
+                    dataExs.add(DataEx.newInstance(symbol.toString(), -portfolioTreeTableModel.getGainLossPercentage(transactionSummary)));
                 }
             } else if(name.equals(cNames[4])) {
                 Double value = this.codeToTotalDividend.get(code);
                 if (value != null) {
                     if (value.doubleValue() > 0.0) {
-                        data.setValue(symbol.toString(), this.codeToTotalDividend.get(code));
+                        dataExs.add(DataEx.newInstance(symbol.toString(), this.codeToTotalDividend.get(code)));
                     }
                 }
             } else if(name.equals(cNames[5])) {
                 if (isPenceToPoundConversionEnabled == false) {
                     if (isFeeCalculationEnabled) {
-                        data.setValue(symbol.toString(), transactionSummary.getNetTotal());
+                        dataExs.add(DataEx.newInstance(symbol.toString(), transactionSummary.getNetTotal()));
                     } else {
-                        data.setValue(symbol.toString(), transactionSummary.getTotal());
+                        dataExs.add(DataEx.newInstance(symbol.toString(), transactionSummary.getTotal()));
                     }
                 } else {
                     if (isFeeCalculationEnabled) {
-                        data.setValue(symbol.toString(), transactionSummary.getNetTotal() / 100.0);
+                        dataExs.add(DataEx.newInstance(symbol.toString(), transactionSummary.getNetTotal() / 100.0));
                     } else {
-                        data.setValue(symbol.toString(), transactionSummary.getTotal() / 100.0);
+                        dataExs.add(DataEx.newInstance(symbol.toString(), transactionSummary.getTotal() / 100.0));
                     }                    
                 }
             } else if(name.equals(cNames[6])) {
                 if (isPenceToPoundConversionEnabled == false) {
                     if (isFeeCalculationEnabled) {
-                        data.setValue(symbol.toString(), transactionSummary.getNetReferenceTotal());
+                        dataExs.add(DataEx.newInstance(symbol.toString(), transactionSummary.getNetReferenceTotal()));
                     } else {
-                        data.setValue(symbol.toString(), transactionSummary.getReferenceTotal());
+                        dataExs.add(DataEx.newInstance(symbol.toString(), transactionSummary.getReferenceTotal()));
                     }
                 } else {
                     if (isFeeCalculationEnabled) {
-                        data.setValue(symbol.toString(), transactionSummary.getNetReferenceTotal() / 100.0);
+                        dataExs.add(DataEx.newInstance(symbol.toString(), transactionSummary.getNetReferenceTotal() / 100.0));
                     } else {
-                        data.setValue(symbol.toString(), transactionSummary.getReferenceTotal() / 100.0);
+                        dataExs.add(DataEx.newInstance(symbol.toString(), transactionSummary.getReferenceTotal() / 100.0));
                     }                    
                 }
             } else if(name.equals(cNames[7])) {
-                data.setValue(symbol.toString(), transactionSummary.getQuantity());                
+                dataExs.add(DataEx.newInstance(symbol.toString(), transactionSummary.getQuantity()));                
             } else if(name.equals(cNames[8])) {
-                data.setValue(symbol.toString(), transactionSummary.getBroker());                
+                dataExs.add(DataEx.newInstance(symbol.toString(), transactionSummary.getBroker()));                
             } else if(name.equals(cNames[9])) {
-                data.setValue(symbol.toString(), transactionSummary.getStampDuty());                
+                dataExs.add(DataEx.newInstance(symbol.toString(), transactionSummary.getStampDuty()));                
             } else if(name.equals(cNames[10])) {
-                data.setValue(symbol.toString(), transactionSummary.getClearingFee());                
+                dataExs.add(DataEx.newInstance(symbol.toString(), transactionSummary.getClearingFee()));                
             }            
+        }
+        
+        Collections.sort(dataExs);
+        
+        for (DataEx dataEx : dataExs) {
+            data.setValue(dataEx.data, dataEx.value);
         }
         
         // create a chart...

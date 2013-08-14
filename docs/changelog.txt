@@ -1,6 +1,9 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.7e - 2013-08-xx
+  Bugfix:  Summary chart data is now sorted.
+  
 JStock 1.0.7d - 2013-07-08
   Bugfix:  Use Google Finance as India stock market (NSE) backup feed.
   
