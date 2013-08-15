@@ -1,7 +1,8 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
-JStock 1.0.7e - 2013-08-xx
+JStock 1.0.7e - 2013-08-15
+  Feature: Supports up to 4 decimal places.
   Bugfix:  Summary chart data is now sorted.
   
 JStock 1.0.7d - 2013-07-08
