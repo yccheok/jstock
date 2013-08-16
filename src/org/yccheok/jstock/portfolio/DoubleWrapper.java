@@ -8,7 +8,7 @@ package org.yccheok.jstock.portfolio;
  *
  * @author yccheok
  */
-public final class DoubleWrapper {
+public final class DoubleWrapper implements Comparable<DoubleWrapper> {
     public final Double value;
     public final DecimalPlaces decimalPlace;
     
@@ -16,5 +16,11 @@ public final class DoubleWrapper {
         this.value = value;
         this.decimalPlace = decimalPlace;
     }
+
+    @Override
+    public int compareTo(DoubleWrapper o) {
+        return value.compareTo(o.value);
+    }
+
 }
 
