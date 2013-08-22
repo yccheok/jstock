@@ -115,7 +115,7 @@ public class QuantityQuery {
             Collections.sort(balances, new Comparator<Balance>() {
                 @Override
                 public int compare(Balance o1, Balance o2) {
-                    return o2.date.compareTo(o1.date);
+                    return -o1.date.compareTo(o2.date);
                 }
             });
             
