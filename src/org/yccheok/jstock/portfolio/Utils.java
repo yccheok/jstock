@@ -120,6 +120,25 @@ public class Utils {
         }
     };
     
+    // Get the latest dividend. If there are more than 1 latest dividend, we will
+    // simply pick up 1 of them. null if not found.
+    public static Dividend getLatestDividend(DividendSummary dividendSummary, Code code) {
+        Dividend latestDividend = null;
+        for (int i = 0, ei = dividendSummary.size(); i < ei; i++) {
+            Dividend dividend = dividendSummary.get(i);
+            if (dividend.stockInfo.code.equals(code)) {
+                if (latestDividend == null) {
+                    latestDividend = dividend;
+                } else {
+                    if (latestDividend.date.compareTo(dividend.date) < 0) {
+                        latestDividend = dividend;
+                    }
+                }
+            }
+        }
+        return latestDividend;
+    }
+    
     /**
      * Replace CSV line feed to system dependent line feed.
      * @param string the string
