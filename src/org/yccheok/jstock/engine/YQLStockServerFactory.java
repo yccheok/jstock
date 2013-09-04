@@ -90,6 +90,11 @@ public class YQLStockServerFactory implements StockServerFactory {
         return marketServer;
     }
 
+    @Override
+    public DividendServer getDividendServer() {
+        return null;
+    }
+    
     private final MarketServer marketServer;
     private final StockServer stockServer;
 }

@@ -69,6 +69,11 @@ public class KLSEInfoStockServerFactory implements StockServerFactory {
         return stockServerFactory.getMarketServer();
     }
     
+    @Override
+    public DividendServer getDividendServer() {
+        return null;
+    }
+    
     private final StockServerFactory stockServerFactory = YahooStockServerFactory.newInstance(Country.Malaysia);    
     private static final Log log = LogFactory.getLog(KLSEInfoStockServerFactory.class);    
 }

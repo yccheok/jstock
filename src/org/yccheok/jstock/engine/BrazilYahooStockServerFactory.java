@@ -32,6 +32,7 @@ public class BrazilYahooStockServerFactory implements StockServerFactory {
         this.country = country;
         stockServer = new BrazilYahooStockServer(country);
         marketServer = new BrazilYahooMarketServer(country);
+        dividendServer = new YahooDividendServer();
     }
 
     public static StockServerFactory newInstance(Country country) {
@@ -68,9 +69,15 @@ public class BrazilYahooStockServerFactory implements StockServerFactory {
         return marketServer;
     }
 
+    @Override
+    public DividendServer getDividendServer() {
+        return dividendServer;
+    }
+    
     private final StockServer stockServer;
     private final MarketServer marketServer;
+    private final DividendServer dividendServer;
     private final Country country;
-
+    
     private static final Log log = LogFactory.getLog(BrazilYahooStockServerFactory.class);
 }

@@ -99,6 +99,11 @@ public class GoogleStockServerFactory implements StockServerFactory {
         return marketServer;
     }
 
+    @Override
+    public DividendServer getDividendServer() {
+        return null;
+    }
+    
     private final MarketServer marketServer;
     private final StockServer stockServer;
     private final Country country;

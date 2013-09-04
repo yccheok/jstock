@@ -46,7 +46,7 @@ public class Duration {
     public Duration(Calendar start, Calendar end) {
         this(start.getTime(), end.getTime());
     }
-
+    
     public SimpleDate getStartDate()
     {
         return startDate;
@@ -72,6 +72,11 @@ public class Duration {
         return (this.startDate.compareTo(duration.startDate) <= 0) && (this.endDate.compareTo(duration.endDate) >= 0);
     }
 
+    public boolean isContains(SimpleDate date)
+    {
+        return (this.startDate.compareTo(date) <= 0) && (this.endDate.compareTo(date) >= 0);
+    }
+    
     public static Duration getTodayDurationByYears(int durationInYears)
     {
         if (durationInYears < 0)
