@@ -78,14 +78,14 @@ public class Utils {
     };
     
     // Use ThreadLocal to ensure thread safety.
-    private static final ThreadLocal <NumberFormat> twoDecimalPlacecurrencyNumberFormat = new ThreadLocal <NumberFormat>() {
+    private static final ThreadLocal <NumberFormat> twoDecimalPlaceCurrencyNumberFormat = new ThreadLocal <NumberFormat>() {
         @Override protected NumberFormat initialValue() {
             return new DecimalFormat("#,##0.00");
         }
     };
     
     // Use ThreadLocal to ensure thread safety.
-    private static final ThreadLocal <NumberFormat> threeDecimalPlacecurrencyNumberFormat = new ThreadLocal <NumberFormat>() {
+    private static final ThreadLocal <NumberFormat> threeDecimalPlaceCurrencyNumberFormat = new ThreadLocal <NumberFormat>() {
         @Override protected NumberFormat initialValue() {
             // Instead of limiting currency decimal places to 2 only, we allow
             // them to float between 2 to 3, to avoid from losing precision.
@@ -199,9 +199,9 @@ public class Utils {
      */
     public static String toCurrency(DecimalPlaces decimalPlace, Object value) {
         if (decimalPlace == DecimalPlaces.Two) {
-            return twoDecimalPlacecurrencyNumberFormat.get().format(value);
+            return twoDecimalPlaceCurrencyNumberFormat.get().format(value);
         } else if (decimalPlace == DecimalPlaces.Three) {
-            return threeDecimalPlacecurrencyNumberFormat.get().format(value);
+            return threeDecimalPlaceCurrencyNumberFormat.get().format(value);
         }
         assert(decimalPlace == DecimalPlaces.Four);
         return fourDecimalPlaceCurrencyNumberFormat.get().format(value);
@@ -215,9 +215,9 @@ public class Utils {
      */
     public static String toCurrency(DecimalPlaces decimalPlace, double value) {
         if (decimalPlace == DecimalPlaces.Two) {
-            return twoDecimalPlacecurrencyNumberFormat.get().format(value);
+            return twoDecimalPlaceCurrencyNumberFormat.get().format(value);
         } else if (decimalPlace == DecimalPlaces.Three) {
-            return threeDecimalPlacecurrencyNumberFormat.get().format(value);
+            return threeDecimalPlaceCurrencyNumberFormat.get().format(value);
         }
         assert(decimalPlace == DecimalPlaces.Four);
         return fourDecimalPlaceCurrencyNumberFormat.get().format(value);

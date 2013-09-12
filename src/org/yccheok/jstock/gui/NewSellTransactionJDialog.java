@@ -24,11 +24,13 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import javax.swing.JFormattedTextField;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
@@ -689,9 +691,13 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
             return value;
         }
         
+        // Do not use Utils.toCurrency(DecimalPlaces.Three, ...
+        // Double.parseDouble is not able to handle it well when localization is in french.
+        //
         // Use Three instead of Four. The idea is, shorter is better.
         // Is it good to use isFourDecimalPlacesEnabled right here???
-        return Double.parseDouble(org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlaces.Three, sellQuantity /  buyQuantity * value));
+        final String text = threeDecimalPlaceLocaleFreeCurrencyNumberFormat.get().format(sellQuantity /  buyQuantity * value);
+        return Double.parseDouble(text);
     }
     
     private BigDecimal getGoodCurrencyBigDecimal(double value, double sellQuantity, double buyQuantity) {
@@ -1122,6 +1128,15 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
 
         return bestPrice > currentPrice ? bestPrice : currentPrice;
     }
+    
+    // Use ThreadLocal to ensure thread safety.
+    private static final ThreadLocal <NumberFormat> threeDecimalPlaceLocaleFreeCurrencyNumberFormat = new ThreadLocal <NumberFormat>() {
+        @Override protected NumberFormat initialValue() {
+            DecimalFormat decimalFormat = new DecimalFormat("0.00#");
+            decimalFormat.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.UK));
+            return decimalFormat;
+        }
+    };
     
     private static final Log log = LogFactory.getLog(NewSellTransactionJDialog.class);
 

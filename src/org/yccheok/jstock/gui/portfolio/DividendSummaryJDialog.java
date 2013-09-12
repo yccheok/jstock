@@ -25,15 +25,20 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
+import javax.swing.ProgressMonitor;
 import javax.swing.RowSorter;
 import javax.swing.RowSorter.SortKey;
 import javax.swing.SwingConstants;
+import javax.swing.SwingWorker;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableModel;
 import org.yccheok.jstock.engine.StockInfo;
@@ -51,7 +56,7 @@ import org.yccheok.jstock.portfolio.Utils;
  *
  * @author yccheok
  */
-public class DividendSummaryJDialog extends javax.swing.JDialog {
+public class DividendSummaryJDialog extends javax.swing.JDialog implements PropertyChangeListener {
 
     /** Creates new form DividendSummaryJDialog */
     public DividendSummaryJDialog(java.awt.Frame parent, boolean modal, DividendSummary dividendSummary, PortfolioManagementJPanel portfolioManagementJPanel) {
@@ -300,9 +305,17 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
         final MainFrame mainFrame = MainFrame.getInstance();
-        AutoDividendJDialog autoDividendJDialog = new AutoDividendJDialog(mainFrame, true);
-        autoDividendJDialog.setLocationRelativeTo(this);
-        autoDividendJDialog.setVisible(true);
+        //AutoDividendJDialog autoDividendJDialog = new AutoDividendJDialog(mainFrame, true);
+        //autoDividendJDialog.setLocationRelativeTo(this);
+        //autoDividendJDialog.setVisible(true);
+        progressMonitor = new ProgressMonitor(DividendSummaryJDialog.this,
+                                  "Running a Long Task",
+                                  "", 0, 100);
+        progressMonitor.setProgress(0);
+        task = new Task();
+        task.addPropertyChangeListener(this);
+        task.execute();
+        this.jButton5.setEnabled(false);        
     }//GEN-LAST:event_jButton5ActionPerformed
 
     /**
@@ -330,6 +343,24 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
             return "<html><a href=\"\">" + org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(DecimalPlaces.Three, this.dividendSummary.getTotal()) + "</a></html>";
         }
         return "";
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+       if ("progress" == evt.getPropertyName() ) {
+            int progress = (Integer) evt.getNewValue();
+            progressMonitor.setProgress(progress);
+            String message =
+                String.format("Completed %d%%.\n", progress);
+            progressMonitor.setNote(message);
+            if (progressMonitor.isCanceled() || task.isDone()) {
+                if (progressMonitor.isCanceled()) {
+                    task.cancel(true);
+                } else {
+                }
+                jButton5.setEnabled(true);
+            }
+        }
     }
 
     private class TableRowPopupListener extends MouseAdapter {
@@ -472,6 +503,34 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
         return ((DividendSummaryTableModel)jTable1.getModel()).getDividend(index);
     }
 
+    private class Task extends SwingWorker<Void, Void> {
+        @Override
+        public Void doInBackground() {
+            Random random = new Random();
+            int progress = 0;
+            setProgress(0);
+            try {
+                Thread.sleep(1000);
+                while (progress < 100 && !isCancelled()) {
+                    //Sleep for up to one second.
+                    Thread.sleep(random.nextInt(1000));
+                    //Make random progress.
+                    progress += random.nextInt(10);
+                    setProgress(Math.min(progress, 100));
+                }
+            } catch (InterruptedException ignore) {}
+            return null;
+        }
+ 
+        @Override
+        public void done() {
+            jButton5.setEnabled(true);
+            progressMonitor.close();
+            System.out.println("DONE!!!");
+            //progressMonitor.setProgress(0);
+        }
+    }
+ 
     // Data structure hold by table.
     private DividendSummary dividendSummary;
     // Final dividend result after pressing OK button.
@@ -479,6 +538,9 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
     // We want to use getStocksFromPortfolios from PortfolioManagementJPanel.
     private final PortfolioManagementJPanel portfolioManagementJPanel;
 
+    private ProgressMonitor progressMonitor = null;
+    private Task task = null;
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
