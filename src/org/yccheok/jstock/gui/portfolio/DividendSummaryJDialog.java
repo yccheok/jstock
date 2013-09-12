@@ -89,6 +89,7 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jButton5 = new javax.swing.JButton();
         jXHeader1 = new org.jdesktop.swingx.JXHeader();
         jPanel2 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
@@ -97,15 +98,22 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
         jPanel3 = new javax.swing.JPanel();
         jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        jButton5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/auto-dividend.png"))); // NOI18N
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
+        jButton5.setText(bundle.getString("DividendSummaryJDialog_AutoDividend...")); // NOI18N
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(bundle.getString("DividendSummaryJDialog_DividendPayout")); // NOI18N
         setIconImage(null);
         setResizable(false);
@@ -160,15 +168,6 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
             }
         });
         jPanel3.add(jButton4);
-
-        jButton5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/auto-dividend.png"))); // NOI18N
-        jButton5.setText(bundle.getString("DividendSummaryJDialog_AutoDividend...")); // NOI18N
-        jButton5.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton5ActionPerformed(evt);
-            }
-        });
-        jPanel3.add(jButton5);
 
         jPanel1.add(jPanel3, java.awt.BorderLayout.NORTH);
 
@@ -227,8 +226,8 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-339)/2, (screenSize.height-373)/2, 339, 373);
+        setSize(new java.awt.Dimension(339, 373));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseClicked
