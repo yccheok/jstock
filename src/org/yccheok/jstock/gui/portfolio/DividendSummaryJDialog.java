@@ -36,7 +36,6 @@ import javax.swing.RowSorter.SortKey;
 import javax.swing.SwingConstants;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableModel;
-import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.gui.JTableUtilities;
 import org.yccheok.jstock.gui.MainFrame;
@@ -93,6 +92,7 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
         jPanel3 = new javax.swing.JPanel();
         jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
+        jButton5 = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
@@ -155,6 +155,15 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
             }
         });
         jPanel3.add(jButton4);
+
+        jButton5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/auto-dividend.png"))); // NOI18N
+        jButton5.setText(bundle.getString("DividendSummaryJDialog_AutoDividend...")); // NOI18N
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
+        jPanel3.add(jButton5);
 
         jPanel1.add(jPanel3, java.awt.BorderLayout.NORTH);
 
@@ -288,6 +297,13 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
     private void jLabel2MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel2MouseExited
         this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
     }//GEN-LAST:event_jLabel2MouseExited
+
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        final MainFrame mainFrame = MainFrame.getInstance();
+        AutoDividendJDialog autoDividendJDialog = new AutoDividendJDialog(mainFrame, true);
+        autoDividendJDialog.setLocationRelativeTo(this);
+        autoDividendJDialog.setVisible(true);
+    }//GEN-LAST:event_jButton5ActionPerformed
 
     /**
      * Returns dividend represented by this dialog.
@@ -468,6 +484,7 @@ public class DividendSummaryJDialog extends javax.swing.JDialog {
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
