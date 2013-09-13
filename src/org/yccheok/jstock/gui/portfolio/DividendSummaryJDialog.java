@@ -25,12 +25,18 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
@@ -41,6 +47,10 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableModel;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.yccheok.jstock.analysis.OperatorIndicator;
+import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.gui.JTableUtilities;
 import org.yccheok.jstock.gui.MainFrame;
@@ -49,7 +59,9 @@ import org.yccheok.jstock.gui.table.StockInfoRenderer;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.portfolio.Commentable;
 import org.yccheok.jstock.portfolio.DecimalPlaces;
+import org.yccheok.jstock.portfolio.Dividend;
 import org.yccheok.jstock.portfolio.DividendSummary;
+import org.yccheok.jstock.portfolio.TransactionSummary;
 import org.yccheok.jstock.portfolio.Utils;
 
 /**
@@ -78,6 +90,16 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
                 }
             }
         }        
+        
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                AutoDividendTask autoDividendTask = DividendSummaryJDialog.this.autoDividendTask;
+                if (autoDividendTask != null) {
+                    autoDividendTask.cancel(true);
+                }
+            }           
+        });        
     }
 
     /** This method is called from within the constructor to
@@ -89,7 +111,6 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jButton5 = new javax.swing.JButton();
         jXHeader1 = new org.jdesktop.swingx.JXHeader();
         jPanel2 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
@@ -98,22 +119,15 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
         jPanel3 = new javax.swing.JPanel();
         jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
+        jButton5 = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
 
-        jButton5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/auto-dividend.png"))); // NOI18N
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
-        jButton5.setText(bundle.getString("DividendSummaryJDialog_AutoDividend...")); // NOI18N
-        jButton5.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton5ActionPerformed(evt);
-            }
-        });
-
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
         setTitle(bundle.getString("DividendSummaryJDialog_DividendPayout")); // NOI18N
         setIconImage(null);
         setResizable(false);
@@ -168,6 +182,15 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
             }
         });
         jPanel3.add(jButton4);
+
+        jButton5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/auto-dividend.png"))); // NOI18N
+        jButton5.setText(bundle.getString("DividendSummaryJDialog_AutoDividend...")); // NOI18N
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
+        jPanel3.add(jButton5);
 
         jPanel1.add(jPanel3, java.awt.BorderLayout.NORTH);
 
@@ -303,18 +326,18 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
     }//GEN-LAST:event_jLabel2MouseExited
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-        final MainFrame mainFrame = MainFrame.getInstance();
-        //AutoDividendJDialog autoDividendJDialog = new AutoDividendJDialog(mainFrame, true);
-        //autoDividendJDialog.setLocationRelativeTo(this);
-        //autoDividendJDialog.setVisible(true);
+        if (transactionSummaries == null) {
+            transactionSummaries = this.portfolioManagementJPanel.getTransactionSummariesFromPortfolios();
+        }
         progressMonitor = new ProgressMonitor(DividendSummaryJDialog.this,
-                                  "Running a Long Task",
-                                  "", 0, 100);
+                                  GUIBundle.getString("DividendSummaryJDialog_AutoDividendCalculating..."),
+                                  "", 0, transactionSummaries.size());
         progressMonitor.setProgress(0);
-        task = new Task();
-        task.addPropertyChangeListener(this);
-        task.execute();
-        this.jButton5.setEnabled(false);        
+        progressMonitor.setMillisToPopup(1000);
+        autoDividendTask = new AutoDividendTask();
+        autoDividendTask.addPropertyChangeListener(this);
+        autoDividendTask.execute();
+        this.jButton5.setEnabled(false);
     }//GEN-LAST:event_jButton5ActionPerformed
 
     /**
@@ -349,12 +372,15 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
        if ("progress" == evt.getPropertyName() ) {
             int progress = (Integer) evt.getNewValue();
             progressMonitor.setProgress(progress);
-            String message =
-                String.format("Completed %d%%.\n", progress);
+            
+            int total = transactionSummaries.size();
+            int progressPercentage = total == 0 ? 0 : (int)(progress / (double)total * 100.);
+            String template = GUIBundle.getString("DividendSummaryJDialog_Completed_template");
+            String message = MessageFormat.format(template, progressPercentage);
             progressMonitor.setNote(message);
-            if (progressMonitor.isCanceled() || task.isDone()) {
+            if (progressMonitor.isCanceled() || autoDividendTask.isDone()) {
                 if (progressMonitor.isCanceled()) {
-                    task.cancel(true);
+                    autoDividendTask.cancel(true);
                 } else {
                 }
                 jButton5.setEnabled(true);
@@ -502,22 +528,20 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
         return ((DividendSummaryTableModel)jTable1.getModel()).getDividend(index);
     }
 
-    private class Task extends SwingWorker<Void, Void> {
+    private class AutoDividendTask extends SwingWorker<Map<Code, List<Dividend>>, Void> {
         @Override
-        public Void doInBackground() {
-            Random random = new Random();
-            int progress = 0;
-            setProgress(0);
-            try {
-                Thread.sleep(1000);
-                while (progress < 100 && !isCancelled()) {
-                    //Sleep for up to one second.
-                    Thread.sleep(random.nextInt(1000));
-                    //Make random progress.
-                    progress += random.nextInt(10);
-                    setProgress(Math.min(progress, 100));
+        public Map<Code, List<Dividend>> doInBackground() {
+            for (int i = 0, ei = transactionSummaries.size(); i < ei; i++) {
+                
+                System.out.println("" + i);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(DividendSummaryJDialog.class.getName()).log(Level.SEVERE, null, ex);
+                    break;
                 }
-            } catch (InterruptedException ignore) {}
+                this.setProgress(i + 1);
+            }
             return null;
         }
  
@@ -525,11 +549,21 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
         public void done() {
             jButton5.setEnabled(true);
             progressMonitor.close();
-            System.out.println("DONE!!!");
-            //progressMonitor.setProgress(0);
+            if (false == this.isCancelled()) {
+                try {
+                    Map<Code, List<Dividend>> dividends = get();
+                    AutoDividendJDialog autoDividendJDialog = new AutoDividendJDialog(MainFrame.getInstance(), true);
+                    autoDividendJDialog.setLocationRelativeTo(DividendSummaryJDialog.this);
+                    autoDividendJDialog.setVisible(true);
+                } catch (Exception ex) {
+                    log.error(null, ex);
+                } 
+            }
         }
     }
  
+    private List<TransactionSummary> transactionSummaries = null;
+    
     // Data structure hold by table.
     private DividendSummary dividendSummary;
     // Final dividend result after pressing OK button.
@@ -538,7 +572,9 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
     private final PortfolioManagementJPanel portfolioManagementJPanel;
 
     private ProgressMonitor progressMonitor = null;
-    private Task task = null;
+    private AutoDividendTask autoDividendTask = null;
+    
+    private static final Log log = LogFactory.getLog(DividendSummaryJDialog.class);
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
