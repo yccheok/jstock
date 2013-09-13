@@ -75,39 +75,83 @@ public class QuantityQuery {
     
     public QuantityQuery(List<TransactionSummary> transactionSummaries) {
         for (TransactionSummary transactionSummary : transactionSummaries) {
+            final Code code = ((Transaction)transactionSummary.getChildAt(0)).getStock().code;
             final int count = transactionSummary.getChildCount();
-            List<Transaction> transactions = new ArrayList<Transaction>();
-            
-            for (int i = 0; i < count; i++) {
-                Object o = transactionSummary.getChildAt(i);
+            final List<Balance> tmps = new ArrayList<Balance>();
 
-                assert(o instanceof Transaction);
-
-                final Transaction transaction = (Transaction)o;
-                transactions.add(transaction);
-            }
-            
-            // Sorting ascending
-            Collections.sort(transactions, new Comparator<Transaction>() {
-                @Override
-                public int compare(Transaction o1, Transaction o2) {
-                    return o1.getDate().compareTo(o1.getDate());
+            // BUILD TMPS.
+            {
+                for (int i = 0; i < count; i++) {
+                    Object o = transactionSummary.getChildAt(i);
+    
+                    assert(o instanceof Transaction);
+    
+                    final Transaction transaction = (Transaction)o;
+                    if (transaction.getType() == Contract.Type.Buy) {
+                        Balance balance = Balance.newInstance(transaction.getQuantity(), transaction.getDate());
+                        tmps.add(balance);
+                    } else {
+                        assert(transaction.getType() == Contract.Type.Sell);
+                        Balance balance0 = Balance.newInstance(transaction.getQuantity(), transaction.getReferenceDate());
+                        Balance balance1 = Balance.newInstance(-transaction.getQuantity(), transaction.getDate());
+                        tmps.add(balance0);
+                        tmps.add(balance1);
+                    }
                 }
-            });
+                
+                // Sorting ascending
+                Collections.sort(tmps, new Comparator<Balance>() {
+                    @Override
+                    public int compare(Balance o1, Balance o2) {
+                        return o1.date.compareTo(o2.date);
+                    }
+                });
+            }
+            // BUILD TMPS.
+
+            assert(tmps.isEmpty() == false);
             
-            assert(transactions.isEmpty() == false);
+            final List<Balance> mergedTmps = new ArrayList<Balance>();
             
+            // MERGE TMPS.
+            {
+                Balance balance = null;
+                for (int j = 0, ej = tmps.size() - 1; j < ej; j++) {
+                    Balance tmp0 = tmps.get(j);
+                    Balance tmp1 = tmps.get(j + 1);
+                    if (tmp0.date.equals(tmp1.date)) {
+                        if (balance == null) {
+                            balance = tmp0;
+                        } else {
+                            balance = Balance.newInstance(balance.quantity + tmp0.quantity, tmp0.date);
+                        }
+                    } else {
+                        if (balance == null) {
+                            mergedTmps.add(tmp0);
+                        } else {
+                            balance = Balance.newInstance(balance.quantity + tmp0.quantity, tmp0.date);
+                            mergedTmps.add(balance);
+                            balance = null;
+                        }
+                    }
+                }
+                
+                Balance lastTmp = tmps.get(tmps.size() - 1);
+                if (balance == null) {
+                    mergedTmps.add(lastTmp);
+                } else {
+                    balance = Balance.newInstance(balance.quantity + lastTmp.quantity, lastTmp.date);
+                    mergedTmps.add(balance);
+                    balance = null;
+                }
+            }
+            // MERGE TMPS.
+
             final List<Balance> balances = new ArrayList<Balance>();
             double quantity = 0;
-            for (Transaction transaction : transactions) {
-                if (transaction.getType() == Contract.Type.Buy) {
-                    quantity += transaction.getQuantity();
-                } else {
-                    assert(transaction.getType() == Contract.Type.Sell);
-                    quantity -= transaction.getQuantity();
-                }           
-
-                Balance balance = Balance.newInstance(quantity, transaction.getDate());
+            for (Balance mergeTmp : mergedTmps) {
+                quantity += mergeTmp.quantity;
+                Balance balance = Balance.newInstance(quantity, mergeTmp.date);
                 balances.add(balance);
             }
             
@@ -119,8 +163,10 @@ public class QuantityQuery {
                 }
             });
             
-            balancesMap.put(transactions.get(0).getStock().code, balances);
+            balancesMap.put(code, balances);
         }
+        
+        
     }
     
     public double getBalance(Code code, SimpleDate date) {
