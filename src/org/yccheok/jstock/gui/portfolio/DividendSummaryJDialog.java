@@ -30,7 +30,10 @@ import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -51,7 +54,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.analysis.OperatorIndicator;
 import org.yccheok.jstock.engine.Code;
+import org.yccheok.jstock.engine.DividendServer;
+import org.yccheok.jstock.engine.Duration;
+import org.yccheok.jstock.engine.SimpleDate;
 import org.yccheok.jstock.engine.StockInfo;
+import org.yccheok.jstock.engine.StockServerFactory;
 import org.yccheok.jstock.gui.JTableUtilities;
 import org.yccheok.jstock.gui.MainFrame;
 import org.yccheok.jstock.gui.PortfolioManagementJPanel;
@@ -61,6 +68,8 @@ import org.yccheok.jstock.portfolio.Commentable;
 import org.yccheok.jstock.portfolio.DecimalPlaces;
 import org.yccheok.jstock.portfolio.Dividend;
 import org.yccheok.jstock.portfolio.DividendSummary;
+import org.yccheok.jstock.portfolio.QuantityQuery;
+import org.yccheok.jstock.portfolio.Transaction;
 import org.yccheok.jstock.portfolio.TransactionSummary;
 import org.yccheok.jstock.portfolio.Utils;
 
@@ -531,18 +540,71 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
     private class AutoDividendTask extends SwingWorker<Map<Code, List<Dividend>>, Void> {
         @Override
         public Map<Code, List<Dividend>> doInBackground() {
+            final QuantityQuery quantityQuery = new QuantityQuery(DividendSummaryJDialog.this.transactionSummaries);
+            Map<Code, List<Dividend>> result = new HashMap<Code, List<Dividend>>();
+            
             for (int i = 0, ei = transactionSummaries.size(); i < ei; i++) {
                 
-                System.out.println("" + i);
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(DividendSummaryJDialog.class.getName()).log(Level.SEVERE, null, ex);
-                    break;
+                final TransactionSummary transactionSummary = transactionSummaries.get(i);
+                final Code code = ((Transaction)transactionSummary.getChildAt(0)).getStock().code;
+                Dividend latestDividend = org.yccheok.jstock.portfolio.Utils.getLatestDividend(dividendSummary, code);                
+
+                final Duration duration;
+
+                SimpleDate date = null;
+                
+                if (latestDividend == null) {
+                    for (int j = 0, ej = transactionSummary.getChildCount(); j < ej; j++) {
+                        Transaction transaction = (Transaction)transactionSummary.getChildAt(j);
+                        SimpleDate simpleDate = transaction.getContract().getDate();
+                        if (date == null) {
+                            date = simpleDate;
+                        } else {
+                            if (date.compareTo(simpleDate) > 0) {
+                                date = simpleDate;
+                            }
+                        }
+                    }
+                } else {
+                    date = latestDividend.date;
                 }
+                
+                Calendar c = date.getCalendar();
+                c.add(Calendar.DATE, 1);
+                SimpleDate startDate = new SimpleDate(c);
+                SimpleDate endDate = new SimpleDate();
+                if (startDate.compareTo(endDate) > 0) {
+                    this.setProgress(i + 1);
+                    continue;
+                }                
+                duration = new Duration(startDate, endDate);
+                
+                List<StockServerFactory> stockServerFactories = MainFrame.getInstance().getStockServerFactories();
+                List<Dividend> suggestedDividends = new ArrayList<Dividend>();
+                for (StockServerFactory stockServerFactory : stockServerFactories) {
+                    DividendServer dividendServer = stockServerFactory.getDividendServer();
+                    if (dividendServer != null) {
+                        List<Dividend> dividends = dividendServer.getDividends(code, duration);
+                        for (Dividend dividend : dividends) {
+                            double total = dividend.amount * quantityQuery.getBalance(code, dividend.date);
+                            if (total == 0) {
+                                continue;
+                            }
+                            Dividend suggestedDividend = new Dividend(dividend.stockInfo, total, dividend.date);
+                            System.out.println(suggestedDividend.stockInfo.code + " --> " + suggestedDividend.date + " --> " + suggestedDividend.amount);
+                            suggestedDividends.add(suggestedDividend);
+                        }
+                    }
+                }
+                
+                if (suggestedDividends.isEmpty() == false) {
+                    result.put(code, suggestedDividends);
+                }
+                
                 this.setProgress(i + 1);
             }
-            return null;
+            System.out.println("result = " + result.size());
+            return result;
         }
  
         @Override
