@@ -339,7 +339,8 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
                                   GUIBundle.getString("DividendSummaryJDialog_AutoDividendCalculating..."),
                                   "", 0, transactionSummaries.size());
         progressMonitor.setProgress(0);
-        progressMonitor.setMillisToPopup(1000);
+        progressMonitor.setMillisToDecideToPopup(50);
+        progressMonitor.setMillisToPopup(100);
         autoDividendTask = new AutoDividendTask();
         autoDividendTask.addPropertyChangeListener(this);
         autoDividendTask.execute();
@@ -375,7 +376,11 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-       if ("progress" == evt.getPropertyName() ) {
+        if ("progress" == evt.getPropertyName() ) {
+            if (progressMonitor == null) {
+                return;
+            }
+           
             int progress = (Integer) evt.getNewValue();
             progressMonitor.setProgress(progress);
             
@@ -540,7 +545,7 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
             final QuantityQuery quantityQuery = new QuantityQuery(DividendSummaryJDialog.this.transactionSummaries);
             Map<Code, List<Dividend>> result = new HashMap<Code, List<Dividend>>();
             
-            for (int i = 0, ei = transactionSummaries.size(); i < ei; i++) {
+            for (int i = 0, ei = transactionSummaries.size(); i < ei && !isCancelled(); i++) {
                 
                 final TransactionSummary transactionSummary = transactionSummaries.get(i);
                 final Code code = ((Transaction)transactionSummary.getChildAt(0)).getStock().code;
@@ -579,6 +584,10 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
                 List<StockServerFactory> stockServerFactories = MainFrame.getInstance().getStockServerFactories();
                 List<Dividend> suggestedDividends = new ArrayList<Dividend>();
                 for (StockServerFactory stockServerFactory : stockServerFactories) {
+                    if (isCancelled()) {
+                        break;
+                    }
+                    
                     DividendServer dividendServer = stockServerFactory.getDividendServer();
                     if (dividendServer != null) {
                         List<Dividend> dividends = dividendServer.getDividends(code, duration);
@@ -590,8 +599,8 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
                             if (total == 0) {
                                 continue;
                             }
-                            Dividend suggestedDividend = new Dividend(dividend.stockInfo, total, dividend.date);
-                            System.out.println(suggestedDividend.stockInfo.code + " --> " + suggestedDividend.date + " --> " + suggestedDividend.amount);
+                            StockInfo betterStockInfo = MainFrame.getInstance().getStockInfoDatabase().codeToStockInfo(dividend.stockInfo.code);
+                            Dividend suggestedDividend = new Dividend(betterStockInfo == null ? dividend.stockInfo : betterStockInfo, total, dividend.date);
                             suggestedDividends.add(suggestedDividend);
                         }
                     }
@@ -611,13 +620,14 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
         public void done() {
             jButton5.setEnabled(true);
             progressMonitor.close();
+            progressMonitor = null;
             if (false == this.isCancelled()) {
                 try {
-                    Map<Code, List<Dividend>> dividends = get();
+                    final Map<Code, List<Dividend>> dividends = get();
                     if (dividends.isEmpty()) {
                         JOptionPane.showMessageDialog(DividendSummaryJDialog.this, MessagesBundle.getString("info_message_no_dividend_found"), MessagesBundle.getString("info_title_no_dividend_found"), JOptionPane.INFORMATION_MESSAGE);
                     } else {
-                        AutoDividendJDialog autoDividendJDialog = new AutoDividendJDialog(MainFrame.getInstance(), true);
+                        AutoDividendJDialog autoDividendJDialog = new AutoDividendJDialog(MainFrame.getInstance(), true, dividends);
                         autoDividendJDialog.setLocationRelativeTo(DividendSummaryJDialog.this);
                         autoDividendJDialog.setVisible(true);
                     }

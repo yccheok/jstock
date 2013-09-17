@@ -5,10 +5,14 @@
 package org.yccheok.jstock.gui.portfolio;
 
 import java.awt.Dimension;
+import java.util.List;
+import java.util.Map;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import org.yccheok.jstock.engine.Code;
+import org.yccheok.jstock.portfolio.Dividend;
 
 /**
  *
@@ -19,7 +23,7 @@ public class AutoDividendJDialog extends javax.swing.JDialog {
     /**
      * Creates new form AutoDividendJDialog
      */
-    public AutoDividendJDialog(java.awt.Frame parent, boolean modal) {
+    public AutoDividendJDialog(java.awt.Frame parent, boolean modal, Map<Code, List<Dividend>> dividends) {
         super(parent, modal);
         initComponents();
         
