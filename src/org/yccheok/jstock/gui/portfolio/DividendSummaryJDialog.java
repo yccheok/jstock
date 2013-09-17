@@ -36,11 +36,8 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.ProgressMonitor;
@@ -52,7 +49,6 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableModel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.yccheok.jstock.analysis.OperatorIndicator;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.DividendServer;
 import org.yccheok.jstock.engine.Duration;
@@ -64,6 +60,7 @@ import org.yccheok.jstock.gui.MainFrame;
 import org.yccheok.jstock.gui.PortfolioManagementJPanel;
 import org.yccheok.jstock.gui.table.StockInfoRenderer;
 import org.yccheok.jstock.internationalization.GUIBundle;
+import org.yccheok.jstock.internationalization.MessagesBundle;
 import org.yccheok.jstock.portfolio.Commentable;
 import org.yccheok.jstock.portfolio.DecimalPlaces;
 import org.yccheok.jstock.portfolio.Dividend;
@@ -586,6 +583,9 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
                     if (dividendServer != null) {
                         List<Dividend> dividends = dividendServer.getDividends(code, duration);
                         for (Dividend dividend : dividends) {
+                            if (false == duration.isContains(dividend.date)) {
+                                continue;
+                            }
                             double total = dividend.amount * quantityQuery.getBalance(code, dividend.date);
                             if (total == 0) {
                                 continue;
@@ -614,9 +614,13 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
             if (false == this.isCancelled()) {
                 try {
                     Map<Code, List<Dividend>> dividends = get();
-                    AutoDividendJDialog autoDividendJDialog = new AutoDividendJDialog(MainFrame.getInstance(), true);
-                    autoDividendJDialog.setLocationRelativeTo(DividendSummaryJDialog.this);
-                    autoDividendJDialog.setVisible(true);
+                    if (dividends.isEmpty()) {
+                        JOptionPane.showMessageDialog(DividendSummaryJDialog.this, MessagesBundle.getString("info_message_no_dividend_found"), MessagesBundle.getString("info_title_no_dividend_found"), JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        AutoDividendJDialog autoDividendJDialog = new AutoDividendJDialog(MainFrame.getInstance(), true);
+                        autoDividendJDialog.setLocationRelativeTo(DividendSummaryJDialog.this);
+                        autoDividendJDialog.setVisible(true);
+                    }
                 } catch (Exception ex) {
                     log.error(null, ex);
                 } 
