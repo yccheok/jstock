@@ -4,6 +4,7 @@
  */
 package org.yccheok.jstock.gui.portfolio;
 
+import java.awt.event.ItemEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -24,9 +25,10 @@ public class AutoDividendRowJPanel extends javax.swing.JPanel {
     /**
      * Creates new form AutoDividendRowJPanel
      */
-    public AutoDividendRowJPanel(Dividend dividend) {
+    public AutoDividendRowJPanel(AutoDividendJPanel autoDividendJPanel, Dividend dividend) {
         initComponents();
         
+        this.autoDividendJPanel = autoDividendJPanel;
         final net.sf.nachocalendar.components.DateField dateField = (net.sf.nachocalendar.components.DateField)jPanel1;
         dateField.setValue(dividend.date.getTime());
         jFormattedTextField2.setValue(dividend.amount);
@@ -69,6 +71,26 @@ public class AutoDividendRowJPanel extends javax.swing.JPanel {
         return formattedTextField;
     }
     
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        jCheckBox1.setEnabled(enabled);
+        jFormattedTextField2.setEnabled(enabled && jCheckBox1.isSelected());
+        jPanel1.setEnabled(enabled && jCheckBox1.isSelected());
+    }
+    
+    public boolean isSelected() {
+        return jCheckBox1.isSelected();
+    }
+    
+    public double getAmount() {
+        Object value = jFormattedTextField2.getValue();
+        if (value instanceof Double) {
+            return (Double)value;
+        }
+        return 0.0;
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -87,6 +109,11 @@ public class AutoDividendRowJPanel extends javax.swing.JPanel {
         add(filler1);
 
         jCheckBox1.setSelected(true);
+        jCheckBox1.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jCheckBox1ItemStateChanged(evt);
+            }
+        });
         add(jCheckBox1);
 
         jPanel1.setMinimumSize(new java.awt.Dimension(80, 20));
@@ -97,6 +124,16 @@ public class AutoDividendRowJPanel extends javax.swing.JPanel {
         jFormattedTextField2.setPreferredSize(new java.awt.Dimension(80, 20));
         add(jFormattedTextField2);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jCheckBox1ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jCheckBox1ItemStateChanged
+        final boolean enabled = evt.getStateChange() == ItemEvent.SELECTED;
+        jFormattedTextField2.setEnabled(enabled);
+        jPanel1.setEnabled(enabled);
+        autoDividendJPanel.updateLabelColor();
+        autoDividendJPanel.updateTotalLabel();
+    }//GEN-LAST:event_jCheckBox1ItemStateChanged
+
+    private final AutoDividendJPanel autoDividendJPanel;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.Box.Filler filler1;
     private javax.swing.JCheckBox jCheckBox1;

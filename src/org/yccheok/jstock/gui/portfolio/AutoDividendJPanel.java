@@ -4,7 +4,10 @@
  */
 package org.yccheok.jstock.gui.portfolio;
 
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.ItemEvent;
+import java.util.ArrayList;
 import java.util.List;
 import org.yccheok.jstock.portfolio.Dividend;
 
@@ -17,15 +20,19 @@ public class AutoDividendJPanel extends javax.swing.JPanel {
     /**
      * Creates new form AutoDividendJPanel
      */
-    public AutoDividendJPanel(List<Dividend> dividends) {
+    public AutoDividendJPanel(AutoDividendJDialog autoDividendJDialog, List<Dividend> dividends) {
         initComponents();
         
         assert(false == dividends.isEmpty());
         
+        this.autoDividendJDialog = autoDividendJDialog;
+        
         jLabel1.setText(dividends.get(0).stockInfo.symbol.toString());
         
         for (Dividend dividend : dividends) {
-            this.jPanel2.add(new AutoDividendRowJPanel(dividend));
+            AutoDividendRowJPanel autoDividendRowJPanel = new AutoDividendRowJPanel(this, dividend);
+            autoDividendRowJPanels.add(autoDividendRowJPanel);;
+            this.jPanel2.add(autoDividendRowJPanel);
         }
     }
 
@@ -39,6 +46,56 @@ public class AutoDividendJPanel extends javax.swing.JPanel {
         return getPreferredSize();
     }
 
+    public double getSelectedAmount() {
+        if (false == jCheckBox2.isSelected()) {
+            return 0;
+        }
+        double amount = 0;
+        for (AutoDividendRowJPanel autoDividendRowJPanel : autoDividendRowJPanels) {
+            if (autoDividendRowJPanel.isSelected()) {
+                amount += autoDividendRowJPanel.getAmount();
+            }
+        }        
+        return amount;        
+    }
+    
+    public int getSelectedCount() {
+        if (false == jCheckBox2.isSelected()) {
+            return 0;
+        }
+        int count = 0;
+        for (AutoDividendRowJPanel autoDividendRowJPanel : autoDividendRowJPanels) {
+            if (autoDividendRowJPanel.isSelected()) {
+                count++;
+            }
+        }        
+        return count;
+    }
+    
+    public boolean isSelected() {
+        if (false == jCheckBox2.isSelected()) {
+            return false;
+        }
+        for (AutoDividendRowJPanel autoDividendRowJPanel : autoDividendRowJPanels) {
+            if (autoDividendRowJPanel.isSelected()) {
+                return true;
+            }
+        }        
+        return false;
+    }
+    
+    public void updateTotalLabel() {
+        this.autoDividendJDialog.updateTotalLabel();
+    }
+    
+    public void updateLabelColor() {
+        if (isSelected()) {
+            jLabel1.setBackground(GREEN);
+        } else {
+            jLabel1.setBackground(RED);
+        }
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -57,13 +114,20 @@ public class AutoDividendJPanel extends javax.swing.JPanel {
         setLayout(new java.awt.BorderLayout());
 
         jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jCheckBox2.setSelected(true);
+        jCheckBox2.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jCheckBox2ItemStateChanged(evt);
+            }
+        });
         jPanel1.add(jCheckBox2);
 
         jLabel1.setBackground(new java.awt.Color(140, 196, 116));
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("PBBANK");
-        jLabel1.setBorder(javax.swing.BorderFactory.createEmptyBorder(2, 2, 2, 2));
+        jLabel1.setBorder(javax.swing.BorderFactory.createEmptyBorder(2, 5, 2, 5));
         jLabel1.setOpaque(true);
         jPanel1.add(jLabel1);
 
@@ -72,6 +136,22 @@ public class AutoDividendJPanel extends javax.swing.JPanel {
         jPanel2.setLayout(new javax.swing.BoxLayout(jPanel2, javax.swing.BoxLayout.Y_AXIS));
         add(jPanel2, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jCheckBox2ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jCheckBox2ItemStateChanged
+        final boolean enabled = evt.getStateChange() == ItemEvent.SELECTED;
+        for (AutoDividendRowJPanel autoDividendRowJPanel : autoDividendRowJPanels) {
+            autoDividendRowJPanel.setEnabled(enabled);
+        }
+        updateLabelColor();
+        this.autoDividendJDialog.updateTotalLabel();
+    }//GEN-LAST:event_jCheckBox2ItemStateChanged
+
+    private final List<AutoDividendRowJPanel> autoDividendRowJPanels = new ArrayList<AutoDividendRowJPanel>();
+    private final AutoDividendJDialog autoDividendJDialog;
+    
+    private static final Color GREEN = new java.awt.Color(140, 196, 116);
+    private static final Color RED = new java.awt.Color(244, 129, 89);
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox jCheckBox2;
     private javax.swing.JLabel jLabel1;

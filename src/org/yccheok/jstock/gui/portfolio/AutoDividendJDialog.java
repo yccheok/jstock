@@ -5,16 +5,19 @@
 package org.yccheok.jstock.gui.portfolio;
 
 import java.awt.Dimension;
+import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import org.yccheok.jstock.engine.Code;
+import org.yccheok.jstock.internationalization.GUIBundle;
+import org.yccheok.jstock.portfolio.DecimalPlaces;
 import org.yccheok.jstock.portfolio.Dividend;
 
 /**
@@ -42,13 +45,36 @@ public class AutoDividendJDialog extends javax.swing.JDialog {
         });
         treeMap.putAll(dividends);
         for (Map.Entry<Code, List<Dividend>> entry : treeMap.entrySet()) {
-            panel.add(new AutoDividendJPanel(entry.getValue()));    
+            AutoDividendJPanel autoDividendJPanel = new AutoDividendJPanel(this, entry.getValue());
+            autoDividendJPanels.add(autoDividendJPanel);
+            panel.add(autoDividendJPanel);    
             panel.add(Box.createRigidArea(new Dimension(0, 5)));
         }
         
         this.jScrollPane1.setViewportView(panel);
+        
+        updateTotalLabel();
     }
 
+    public void updateTotalLabel() {
+        int selectedStock = 0;
+        int selectedDividend = 0;
+        double selectedAmount = 0.0;
+        for (AutoDividendJPanel autoDividendJPanel : autoDividendJPanels) {
+            if (autoDividendJPanel.isSelected()) {
+                selectedStock++;
+                selectedDividend += autoDividendJPanel.getSelectedCount();
+                selectedAmount += autoDividendJPanel.getSelectedAmount();
+            }
+        }
+        
+        String stock_text = selectedStock + " " + GUIBundle.getString(selectedStock <= 1 ? "AutoDividendJDialog_StockSingular" : "AutoDividendJDialog_StockPlural");
+        String dividend_text = selectedDividend + " " + GUIBundle.getString(selectedDividend <= 1 ? "AutoDividendJDialog_DividendSingular" : "AutoDividendJDialog_DividendPlural");
+        String total_text = org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(DecimalPlaces.Three, selectedAmount);
+        String message = MessageFormat.format(GUIBundle.getString("AutoDividendJDialog_Total_template"), stock_text, dividend_text, total_text);
+        this.jLabel4.setText(message);
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -165,6 +191,8 @@ public class AutoDividendJDialog extends javax.swing.JDialog {
         setBounds(0, 0, 301, 486);
     }// </editor-fold>//GEN-END:initComponents
 
+    private final List<AutoDividendJPanel> autoDividendJPanels = new ArrayList<AutoDividendJPanel>();
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
