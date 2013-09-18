@@ -27,7 +27,7 @@ public class AutoDividendJPanel extends javax.swing.JPanel {
         
         this.autoDividendJDialog = autoDividendJDialog;
         
-        jLabel1.setText(dividends.get(0).stockInfo.symbol.toString());
+        jCheckBox2.setText(dividends.get(0).stockInfo.symbol.toString());
         
         for (Dividend dividend : dividends) {
             AutoDividendRowJPanel autoDividendRowJPanel = new AutoDividendRowJPanel(this, dividend);
@@ -88,11 +88,11 @@ public class AutoDividendJPanel extends javax.swing.JPanel {
         this.autoDividendJDialog.updateTotalLabel();
     }
     
-    public void updateLabelColor() {
+    public void updateJCheckBoxColor() {
         if (isSelected()) {
-            jLabel1.setBackground(GREEN);
+            jCheckBox2.setBackground(GREEN);
         } else {
-            jLabel1.setBackground(RED);
+            jCheckBox2.setBackground(RED);
         }
     }
     
@@ -107,7 +107,6 @@ public class AutoDividendJPanel extends javax.swing.JPanel {
 
         jPanel1 = new javax.swing.JPanel();
         jCheckBox2 = new javax.swing.JCheckBox();
-        jLabel1 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
 
         setBorder(javax.swing.BorderFactory.createTitledBorder(""));
@@ -115,21 +114,17 @@ public class AutoDividendJPanel extends javax.swing.JPanel {
 
         jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
+        jCheckBox2.setBackground(new java.awt.Color(140, 196, 116));
+        jCheckBox2.setForeground(new java.awt.Color(255, 255, 255));
         jCheckBox2.setSelected(true);
+        jCheckBox2.setText("PBBANK");
+        jCheckBox2.setFocusPainted(false);
         jCheckBox2.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 jCheckBox2ItemStateChanged(evt);
             }
         });
         jPanel1.add(jCheckBox2);
-
-        jLabel1.setBackground(new java.awt.Color(140, 196, 116));
-        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("PBBANK");
-        jLabel1.setBorder(javax.swing.BorderFactory.createEmptyBorder(2, 5, 2, 5));
-        jLabel1.setOpaque(true);
-        jPanel1.add(jLabel1);
 
         add(jPanel1, java.awt.BorderLayout.NORTH);
 
@@ -142,10 +137,16 @@ public class AutoDividendJPanel extends javax.swing.JPanel {
         for (AutoDividendRowJPanel autoDividendRowJPanel : autoDividendRowJPanels) {
             autoDividendRowJPanel.setEnabled(enabled);
         }
-        updateLabelColor();
+        updateJCheckBoxColor();
         this.autoDividendJDialog.updateTotalLabel();
     }//GEN-LAST:event_jCheckBox2ItemStateChanged
 
+    public void updateTaxInfo(double tax, double taxRate) {
+        for (AutoDividendRowJPanel autoDividendRowJPanel : autoDividendRowJPanels) {
+            autoDividendRowJPanel.updateTaxInfo(tax, taxRate);
+        }
+    }
+    
     private final List<AutoDividendRowJPanel> autoDividendRowJPanels = new ArrayList<AutoDividendRowJPanel>();
     private final AutoDividendJDialog autoDividendJDialog;
     
@@ -154,7 +155,6 @@ public class AutoDividendJPanel extends javax.swing.JPanel {
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox jCheckBox2;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     // End of variables declaration//GEN-END:variables

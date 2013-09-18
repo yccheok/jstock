@@ -5,7 +5,12 @@
 package org.yccheok.jstock.gui.portfolio;
 
 import java.awt.Dimension;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.text.MessageFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -13,9 +18,16 @@ import java.util.Map;
 import java.util.TreeMap;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JFormattedTextField;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
+import javax.swing.text.NumberFormatter;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.Code;
+import org.yccheok.jstock.gui.NewBuyTransactionJDialog;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.portfolio.DecimalPlaces;
 import org.yccheok.jstock.portfolio.Dividend;
@@ -94,9 +106,9 @@ public class AutoDividendJDialog extends javax.swing.JDialog {
         jScrollPane1 = new javax.swing.JScrollPane();
         jPanel3 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        jFormattedTextField1 = new javax.swing.JFormattedTextField();
+        jFormattedTextField1 = getCurrencyJFormattedTextField();
         jLabel2 = new javax.swing.JLabel();
-        jFormattedTextField2 = new javax.swing.JFormattedTextField();
+        jFormattedTextField2 = getCurrencyJFormattedTextField();
         jTextArea1 = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -135,11 +147,21 @@ public class AutoDividendJDialog extends javax.swing.JDialog {
 
         jLabel1.setText(bundle.getString("AutoDividendJDialog_Tax")); // NOI18N
 
-        jFormattedTextField1.setText("20");
+        jFormattedTextField1.setText("0");
+        jFormattedTextField1.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jFormattedTextField1KeyTyped(evt);
+            }
+        });
 
         jLabel2.setText(bundle.getString("AutoDividendJDialog_TaxRate")); // NOI18N
 
-        jFormattedTextField2.setText("0.12");
+        jFormattedTextField2.setText("0");
+        jFormattedTextField2.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jFormattedTextField2KeyTyped(evt);
+            }
+        });
 
         jTextArea1.setEditable(false);
         jTextArea1.setColumns(20);
@@ -191,6 +213,78 @@ public class AutoDividendJDialog extends javax.swing.JDialog {
         setBounds(0, 0, 301, 486);
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jFormattedTextField1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jFormattedTextField1KeyTyped
+        update();
+    }//GEN-LAST:event_jFormattedTextField1KeyTyped
+
+    private void jFormattedTextField2KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jFormattedTextField2KeyTyped
+        update();
+    }//GEN-LAST:event_jFormattedTextField2KeyTyped
+
+    private void commitEdit() {
+        try {
+            jFormattedTextField1.commitEdit();
+            jFormattedTextField2.commitEdit();
+        } catch (ParseException ex) {
+            log.error(null, ex);
+        }
+    }
+    
+    private void update() {
+        SwingUtilities.invokeLater(new Runnable() {@Override public void run() {
+            _update();
+        }});
+    }
+    
+    private void _update() {
+        commitEdit();
+        double tax = (Double)jFormattedTextField1.getValue();
+        double taxRate = (Double)jFormattedTextField2.getValue();
+        for (AutoDividendJPanel autoDividendJPanel : autoDividendJPanels) {
+            autoDividendJPanel.updateTaxInfo(tax, taxRate);
+        }
+        updateTotalLabel();
+    }
+    
+    private MouseListener getJFormattedTextFieldMouseListener() {
+        MouseListener ml = new MouseAdapter()
+        {
+            @Override
+            public void mousePressed(final MouseEvent e)
+            {
+                if (e.getClickCount() == 2) {
+                    // Ignore double click.
+                    return;
+                }
+                
+                SwingUtilities.invokeLater(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        JTextField tf = (JTextField)e.getSource();
+                        int offset = tf.viewToModel(e.getPoint());
+                        tf.setCaretPosition(offset);
+                    }
+                });
+            }
+        };
+        return ml;
+    }
+    
+    private JFormattedTextField getCurrencyJFormattedTextField() {
+        NumberFormat format= NumberFormat.getNumberInstance();
+        format.setMaximumFractionDigits(3);
+        NumberFormatter formatter= new NumberFormatter(format);
+        formatter.setMinimum(0.0);
+        formatter.setValueClass(Double.class);
+        JFormattedTextField formattedTextField = new JFormattedTextField(formatter);
+        formattedTextField.addMouseListener(getJFormattedTextFieldMouseListener());
+        return formattedTextField;
+    }
+    
+    private static final Log log = LogFactory.getLog(AutoDividendJDialog.class);
+    
     private final List<AutoDividendJPanel> autoDividendJPanels = new ArrayList<AutoDividendJPanel>();
     
     // Variables declaration - do not modify//GEN-BEGIN:variables

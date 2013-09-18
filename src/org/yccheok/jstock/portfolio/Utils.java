@@ -21,6 +21,7 @@ package org.yccheok.jstock.portfolio;
 
 import java.io.File;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -117,6 +118,18 @@ public class Utils {
             // Instead of limiting currency decimal places to 0 only, we allow
             // them to float between 0 to 6, to avoid from losing precision.
             return new DecimalFormat("#,##0.######");
+        }
+    };
+    
+    private static final ThreadLocal <NumberFormat> editThreeCurrencyNumberFormat = new ThreadLocal <NumberFormat>() {
+        @Override protected NumberFormat initialValue() {
+            // Number of decimal places need to tally with threeDecimalPlaceCurrencyNumberFormat.
+            // Do not use Grouping separator
+            DecimalFormat decimalFormat = new DecimalFormat("0.###");
+            DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols();
+            decimalFormatSymbols.setDecimalSeparator('.');
+            decimalFormat.setDecimalFormatSymbols(decimalFormatSymbols);
+            return decimalFormat;
         }
     };
     
@@ -565,6 +578,15 @@ public class Utils {
         return totalDeposit;
     }
 
+    public static String toEditCurrency(DecimalPlaces decimalPlace, double value) {
+        if (decimalPlace == DecimalPlaces.Two) {
+            throw new java.lang.UnsupportedOperationException();
+        } else if (decimalPlace == DecimalPlaces.Three) {
+            return editThreeCurrencyNumberFormat.get().format(value);
+        }
+        throw new java.lang.UnsupportedOperationException();
+    }
+    
     /**
      * Returns total withdraw from cash summary.
      *

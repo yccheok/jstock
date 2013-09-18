@@ -9,11 +9,14 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.text.NumberFormat;
+import java.text.ParseException;
 import javax.swing.JFormattedTextField;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.text.NumberFormatter;
 import net.sf.nachocalendar.CalendarFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.portfolio.Dividend;
 
 /**
@@ -28,6 +31,7 @@ public class AutoDividendRowJPanel extends javax.swing.JPanel {
     public AutoDividendRowJPanel(AutoDividendJPanel autoDividendJPanel, Dividend dividend) {
         initComponents();
         
+        this.dividend = dividend;
         this.autoDividendJPanel = autoDividendJPanel;
         final net.sf.nachocalendar.components.DateField dateField = (net.sf.nachocalendar.components.DateField)jPanel1;
         dateField.setValue(dividend.date.getTime());
@@ -62,7 +66,7 @@ public class AutoDividendRowJPanel extends javax.swing.JPanel {
     
     private JFormattedTextField getCurrencyJFormattedTextField() {
         NumberFormat format= NumberFormat.getNumberInstance();
-        format.setMaximumFractionDigits(4);
+        format.setMaximumFractionDigits(3);
         NumberFormatter formatter= new NumberFormatter(format);
         formatter.setMinimum(0.0);
         formatter.setValueClass(Double.class);
@@ -122,6 +126,11 @@ public class AutoDividendRowJPanel extends javax.swing.JPanel {
 
         jFormattedTextField2.setMinimumSize(new java.awt.Dimension(80, 20));
         jFormattedTextField2.setPreferredSize(new java.awt.Dimension(80, 20));
+        jFormattedTextField2.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jFormattedTextField2KeyTyped(evt);
+            }
+        });
         add(jFormattedTextField2);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -129,10 +138,30 @@ public class AutoDividendRowJPanel extends javax.swing.JPanel {
         final boolean enabled = evt.getStateChange() == ItemEvent.SELECTED;
         jFormattedTextField2.setEnabled(enabled);
         jPanel1.setEnabled(enabled);
-        autoDividendJPanel.updateLabelColor();
+        autoDividendJPanel.updateJCheckBoxColor();
         autoDividendJPanel.updateTotalLabel();
     }//GEN-LAST:event_jCheckBox1ItemStateChanged
 
+    public void updateTaxInfo(double tax, double taxRate) {
+        double value = this.dividend.amount - tax - (this.dividend.amount * taxRate / 100.0);
+        value = Math.max(value, 0.0);
+        jFormattedTextField2.setValue(value);
+    }
+    
+    private void jFormattedTextField2KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jFormattedTextField2KeyTyped
+        SwingUtilities.invokeLater(new Runnable() {@Override public void run() {
+            try {
+                jFormattedTextField2.commitEdit();
+            } catch (ParseException ex) {
+                log.error(null, ex);
+            }            
+            autoDividendJPanel.updateTotalLabel();
+        }});
+    }//GEN-LAST:event_jFormattedTextField2KeyTyped
+
+    private static final Log log = LogFactory.getLog(AutoDividendRowJPanel.class);
+    
+    private final Dividend dividend;
     private final AutoDividendJPanel autoDividendJPanel;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.Box.Filler filler1;

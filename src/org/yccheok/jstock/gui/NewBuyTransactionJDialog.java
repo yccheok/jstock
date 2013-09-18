@@ -115,16 +115,18 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         jLabel7.setText(bundle.getString("NewBuyTransactionJDialog_Broker")); // NOI18N
 
         jFormattedTextField3.setValue(new Double(0.0));
-        jFormattedTextField3.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                jFormattedTextField3FocusLost(evt);
+        jFormattedTextField3.addKeyListener(new java.awt.event.KeyAdapter() {
+            @Override
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jFormattedTextField3KeyTyped(evt);
             }
         });
 
         jFormattedTextField4.setValue(new Double(0.0));
-        jFormattedTextField4.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                jFormattedTextField4FocusLost(evt);
+        jFormattedTextField4.addKeyListener(new java.awt.event.KeyAdapter() {
+            @Override
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jFormattedTextField4KeyTyped(evt);
             }
         });
 
@@ -133,9 +135,10 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         jLabel9.setText(bundle.getString("NewBuyTransactionJDialog_StampDuty")); // NOI18N
 
         jFormattedTextField5.setValue(new Double(0.0));
-        jFormattedTextField5.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                jFormattedTextField5FocusLost(evt);
+        jFormattedTextField5.addKeyListener(new java.awt.event.KeyAdapter() {
+            @Override
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jFormattedTextField5KeyTyped(evt);
             }
         });
 
@@ -177,9 +180,9 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         jLabel4.setText(bundle.getString("NewBuyTransactionJDialog_Date")); // NOI18N
 
         jFormattedTextField1.setValue(new Double(0.0));
-        jFormattedTextField1.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                jFormattedTextField1FocusLost(evt);
+        jFormattedTextField1.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jFormattedTextField1KeyTyped(evt);
             }
         });
 
@@ -370,9 +373,9 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         jLabel4.setText(bundle.getString("NewBuyTransactionJDialog_Date")); // NOI18N
 
         jFormattedTextField1.setValue(new Double(0.0));
-        jFormattedTextField1.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                jFormattedTextField1FocusLost(evt);
+        jFormattedTextField1.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jFormattedTextField1KeyTyped(evt);
             }
         });
 
@@ -380,23 +383,23 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         jFormattedTextField2.setValue(new Double(0.0));
 
         jFormattedTextField3.setValue(new Double(0.0));
-        jFormattedTextField3.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                jFormattedTextField3FocusLost(evt);
+        jFormattedTextField3.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jFormattedTextField3KeyTyped(evt);
             }
         });
 
         jFormattedTextField4.setValue(new Double(0.0));
-        jFormattedTextField4.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                jFormattedTextField4FocusLost(evt);
+        jFormattedTextField4.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jFormattedTextField4KeyTyped(evt);
             }
         });
 
         jFormattedTextField5.setValue(new Double(0.0));
-        jFormattedTextField5.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                jFormattedTextField5FocusLost(evt);
+        jFormattedTextField5.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jFormattedTextField5KeyTyped(evt);
             }
         });
 
@@ -720,6 +723,12 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
     }
     
     private void update() {
+        SwingUtilities.invokeLater(new Runnable() {@Override public void run() {
+            _update();
+        }});
+    }
+    
+    private void _update() {
         // Commit the value first before updating. This is to prevent
         // double rounding issue. We force the current value to
         // follow the formatter text field's.
@@ -732,61 +741,41 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         {
             final BrokingFirm brokingFirm = MainFrame.getInstance().getJStockOptions().getSelectedBrokingFirm();
             
-            SwingUtilities.invokeLater(new Runnable() {@Override public void run() {
-                final String name = jTextField1.getText();
-                final double unit = (Double)jSpinner1.getValue();
-                final double price = (Double)jFormattedTextField1.getValue();
-                final DateField dateField = (DateField)jPanel3;
-                final Date date = (Date)dateField.getValue();
-                // Stock and date information is not important at this moment.
-                Contract.ContractBuilder builder = new Contract.ContractBuilder(Utils.getEmptyStock(Code.newInstance(name), Symbol.newInstance(name)), new SimpleDate(date));        
-                Contract contract = builder.type(Contract.Type.Buy).quantity(unit).price(price).build();
-        
-                final double brokerFee = brokingFirm.brokerCalculate(contract);
-                final double clearingFee = brokingFirm.clearingFeeCalculate(contract);
-                final double stampDuty = brokingFirm.stampDutyCalculate(contract);
-                jFormattedTextField3.setValue(brokerFee);
-                jFormattedTextField4.setValue(clearingFee);
-                jFormattedTextField5.setValue(stampDuty);
-                jFormattedTextField2.setValue(price * (double)unit);                
-                jFormattedTextField6.setValue(price * (double)unit + brokerFee + clearingFee + stampDuty);
-            }});
+            final String name = jTextField1.getText();
+            final double unit = (Double)jSpinner1.getValue();
+            final double price = (Double)jFormattedTextField1.getValue();
+            final DateField dateField = (DateField)jPanel3;
+            final Date date = (Date)dateField.getValue();
+            // Stock and date information is not important at this moment.
+            Contract.ContractBuilder builder = new Contract.ContractBuilder(Utils.getEmptyStock(Code.newInstance(name), Symbol.newInstance(name)), new SimpleDate(date));        
+            Contract contract = builder.type(Contract.Type.Buy).quantity(unit).price(price).build();
+
+            final double brokerFee = brokingFirm.brokerCalculate(contract);
+            final double clearingFee = brokingFirm.clearingFeeCalculate(contract);
+            final double stampDuty = brokingFirm.stampDutyCalculate(contract);
+            jFormattedTextField3.setValue(brokerFee);
+            jFormattedTextField4.setValue(clearingFee);
+            jFormattedTextField5.setValue(stampDuty);
+            jFormattedTextField2.setValue(price * (double)unit);                
+            jFormattedTextField6.setValue(price * (double)unit + brokerFee + clearingFee + stampDuty);
         } else {
-            SwingUtilities.invokeLater(new Runnable() {@Override public void run() {
-                final double unit = (Double)jSpinner1.getValue();
-                final double price = (Double)jFormattedTextField1.getValue();
-                final double brokerFee = (Double)jFormattedTextField3.getValue();
-                final double clearingFee = (Double)jFormattedTextField4.getValue();
-                final double stampDuty = (Double)jFormattedTextField5.getValue();
-                jFormattedTextField2.setValue(price * (double)unit); 
-                if (isFeeCalculationEnabled) {
-                    jFormattedTextField6.setValue(price * (double)unit + brokerFee + clearingFee + stampDuty);
-                } else {
-                    jFormattedTextField6.setValue(price * (double)unit);
-                }
-            }});            
+            final double unit = (Double)jSpinner1.getValue();
+            final double price = (Double)jFormattedTextField1.getValue();
+            final double brokerFee = (Double)jFormattedTextField3.getValue();
+            final double clearingFee = (Double)jFormattedTextField4.getValue();
+            final double stampDuty = (Double)jFormattedTextField5.getValue();
+            jFormattedTextField2.setValue(price * (double)unit); 
+            if (isFeeCalculationEnabled) {
+                jFormattedTextField6.setValue(price * (double)unit + brokerFee + clearingFee + stampDuty);
+            } else {
+                jFormattedTextField6.setValue(price * (double)unit);
+            }
         }
     }
     
     private void jSpinner1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinner1StateChanged
         update();
     }//GEN-LAST:event_jSpinner1StateChanged
-
-    private void jFormattedTextField1FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jFormattedTextField1FocusLost
-        update();
-    }//GEN-LAST:event_jFormattedTextField1FocusLost
-
-    private void jFormattedTextField3FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jFormattedTextField3FocusLost
-        update();
-    }//GEN-LAST:event_jFormattedTextField3FocusLost
-
-    private void jFormattedTextField4FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jFormattedTextField4FocusLost
-        update();
-    }//GEN-LAST:event_jFormattedTextField4FocusLost
-
-    private void jFormattedTextField5FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jFormattedTextField5FocusLost
-        update();
-    }//GEN-LAST:event_jFormattedTextField5FocusLost
 
     /**
      * Dettach all and stop Ajax threading activity in combo box. Once stop,
@@ -802,6 +791,22 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
         dettachAllAndStopAutoCompleteJComboBox();
     }//GEN-LAST:event_formWindowClosed
+
+    private void jFormattedTextField1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jFormattedTextField1KeyTyped
+        update();        
+    }//GEN-LAST:event_jFormattedTextField1KeyTyped
+
+    private void jFormattedTextField3KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jFormattedTextField3KeyTyped
+        update();        
+    }//GEN-LAST:event_jFormattedTextField3KeyTyped
+
+    private void jFormattedTextField4KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jFormattedTextField4KeyTyped
+        update();
+    }//GEN-LAST:event_jFormattedTextField4KeyTyped
+
+    private void jFormattedTextField5KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jFormattedTextField5KeyTyped
+        update();
+    }//GEN-LAST:event_jFormattedTextField5KeyTyped
         
     private MouseListener getJFormattedTextFieldMouseListener() {
         MouseListener ml = new MouseAdapter()

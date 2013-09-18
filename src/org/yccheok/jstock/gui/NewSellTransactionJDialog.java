@@ -125,25 +125,28 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         jLabel8.setText(bundle.getString("NewSellTransactionJDialog_Broker")); // NOI18N
 
         jFormattedTextField4.setValue(new Double(0.0));
-        jFormattedTextField4.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                jFormattedTextField4FocusLost(evt);
+        jFormattedTextField4.addKeyListener(new java.awt.event.KeyAdapter() {
+            @Override
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jFormattedTextField4KeyTyped(evt);
             }
         });
 
         jLabel9.setText(bundle.getString("NewSellTransactionJDialog_Clearing")); // NOI18N
 
         jFormattedTextField5.setValue(new Double(0.0));
-        jFormattedTextField5.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                jFormattedTextField5FocusLost(evt);
+        jFormattedTextField5.addKeyListener(new java.awt.event.KeyAdapter() {
+            @Override
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jFormattedTextField5KeyTyped(evt);
             }
         });
 
         jFormattedTextField7.setValue(new Double(0.0));
-        jFormattedTextField7.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                jFormattedTextField7FocusLost(evt);
+        jFormattedTextField7.addKeyListener(new java.awt.event.KeyAdapter() {
+            @Override
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jFormattedTextField7KeyTyped(evt);
             }
         });
 
@@ -173,9 +176,10 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         jLabel4.setText(bundle.getString("NewBuyTransactionJDialog_Date")); // NOI18N
 
         jFormattedTextField1.setValue(new Double(0.0));
-        jFormattedTextField1.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                jFormattedTextField1FocusLost(evt);
+        jFormattedTextField1.addKeyListener(new java.awt.event.KeyAdapter() {
+            @Override
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jFormattedTextField1KeyTyped(evt);
             }
         });
 
@@ -393,9 +397,9 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         jLabel4.setText(bundle.getString("NewBuyTransactionJDialog_Date")); // NOI18N
 
         jFormattedTextField1.setValue(new Double(0.0));
-        jFormattedTextField1.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                jFormattedTextField1FocusLost(evt);
+        jFormattedTextField1.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jFormattedTextField1KeyTyped(evt);
             }
         });
 
@@ -406,16 +410,16 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         jFormattedTextField3.setValue(new Double(0.0));
 
         jFormattedTextField4.setValue(new Double(0.0));
-        jFormattedTextField4.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                jFormattedTextField4FocusLost(evt);
+        jFormattedTextField4.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jFormattedTextField4KeyTyped(evt);
             }
         });
 
         jFormattedTextField5.setValue(new Double(0.0));
-        jFormattedTextField5.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                jFormattedTextField5FocusLost(evt);
+        jFormattedTextField5.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jFormattedTextField5KeyTyped(evt);
             }
         });
 
@@ -439,9 +443,9 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         jLabel9.setText(bundle.getString("NewSellTransactionJDialog_Clearing")); // NOI18N
 
         jFormattedTextField7.setValue(new Double(0.0));
-        jFormattedTextField7.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                jFormattedTextField7FocusLost(evt);
+        jFormattedTextField7.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jFormattedTextField7KeyTyped(evt);
             }
         });
 
@@ -696,7 +700,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         //
         // Use Three instead of Four. The idea is, shorter is better.
         // Is it good to use isFourDecimalPlacesEnabled right here???
-        final String text = threeDecimalPlaceLocaleFreeCurrencyNumberFormat.get().format(sellQuantity /  buyQuantity * value);
+        final String text = org.yccheok.jstock.portfolio.Utils.toEditCurrency(DecimalPlaces.Three, sellQuantity /  buyQuantity * value);
         return Double.parseDouble(text);
     }
     
@@ -927,6 +931,12 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void update() {
+        SwingUtilities.invokeLater(new Runnable() {@Override public void run() {
+            _update();
+        }});
+    }
+    
+    private void _update() {
         // Commit the value first before updating. This is to prevent
         // double rounding issue. We force the current value to
         // follow the formatter text field's.
@@ -939,61 +949,57 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         {
             final BrokingFirm brokingFirm = MainFrame.getInstance().getJStockOptions().getSelectedBrokingFirm();
 
-            SwingUtilities.invokeLater(new Runnable() {@Override public void run() {
-                final String name = jTextField1.getText();
-                final double unit = (Double)jSpinner1.getValue();
-                final double price = (Double)jFormattedTextField1.getValue();
-                final DateField dateField = (DateField)jPanel3;
-                final Date date = (Date)dateField.getValue();
-                // Stock and date information is not important at this moment.
-                Contract.ContractBuilder builder = new Contract.ContractBuilder(Utils.getEmptyStock(Code.newInstance(name), Symbol.newInstance(name)), new SimpleDate(date));
-                Contract contract = builder.type(Contract.Type.Sell).quantity(unit).price(price).build();
+            final String name = jTextField1.getText();
+            final double unit = (Double)jSpinner1.getValue();
+            final double price = (Double)jFormattedTextField1.getValue();
+            final DateField dateField = (DateField)jPanel3;
+            final Date date = (Date)dateField.getValue();
+            // Stock and date information is not important at this moment.
+            Contract.ContractBuilder builder = new Contract.ContractBuilder(Utils.getEmptyStock(Code.newInstance(name), Symbol.newInstance(name)), new SimpleDate(date));
+            Contract contract = builder.type(Contract.Type.Sell).quantity(unit).price(price).build();
 
-                final double brokerFee = brokingFirm.brokerCalculate(contract);
-                final double clearingFee = brokingFirm.clearingFeeCalculate(contract);
-                final double stampDuty = brokingFirm.stampDutyCalculate(contract);
-                jFormattedTextField4.setValue(brokerFee);
-                jFormattedTextField5.setValue(clearingFee);
-                jFormattedTextField7.setValue(stampDuty);
+            final double brokerFee = brokingFirm.brokerCalculate(contract);
+            final double clearingFee = brokingFirm.clearingFeeCalculate(contract);
+            final double stampDuty = brokingFirm.stampDutyCalculate(contract);
+            jFormattedTextField4.setValue(brokerFee);
+            jFormattedTextField5.setValue(clearingFee);
+            jFormattedTextField7.setValue(stampDuty);
 
-                double sellValue = price * (double)unit;
-                if (isFeeCalculationEnabled) {
-                    sellValue = sellValue - brokerFee - clearingFee - stampDuty;
-                }                
-                final double totalCost = NewSellTransactionJDialog.this.buyValue;
-                final double netProfit = sellValue - totalCost;
-                final double netProfitPercentage = (totalCost == 0.0) ? 0.0 : netProfit / totalCost * 100.0;
+            double sellValue = price * (double)unit;
+            if (isFeeCalculationEnabled) {
+                sellValue = sellValue - brokerFee - clearingFee - stampDuty;
+            }                
+            final double totalCost = NewSellTransactionJDialog.this.buyValue;
+            final double netProfit = sellValue - totalCost;
+            final double netProfitPercentage = (totalCost == 0.0) ? 0.0 : netProfit / totalCost * 100.0;
 
-                jFormattedTextField2.setValue(sellValue);
-                jFormattedTextField3.setValue(totalCost);
-                jFormattedTextField6.setValue(netProfitPercentage);
-                jFormattedTextField6.setForeground(Utils.getColor(netProfitPercentage, 0.0));
-                jFormattedTextField8.setValue(netProfit);
-                jFormattedTextField8.setForeground(Utils.getColor(netProfit, 0.0));
-            }});
+            jFormattedTextField2.setValue(sellValue);
+            jFormattedTextField3.setValue(totalCost);
+            jFormattedTextField6.setValue(netProfitPercentage);
+            jFormattedTextField6.setForeground(Utils.getColor(netProfitPercentage, 0.0));
+            jFormattedTextField8.setValue(netProfit);
+            jFormattedTextField8.setForeground(Utils.getColor(netProfit, 0.0));
         } else {
-            SwingUtilities.invokeLater(new Runnable() {@Override public void run() {
-                final double unit = (Double)jSpinner1.getValue();
-                final double price = (Double)jFormattedTextField1.getValue();
-                final double brokerFee = (Double)jFormattedTextField4.getValue();
-                final double clearingFee = (Double)jFormattedTextField5.getValue();
-                final double stampDuty = (Double)jFormattedTextField7.getValue();
+            final double unit = (Double)jSpinner1.getValue();
+            final double price = (Double)jFormattedTextField1.getValue();
+            final double brokerFee = (Double)jFormattedTextField4.getValue();
+            final double clearingFee = (Double)jFormattedTextField5.getValue();
+            final double stampDuty = (Double)jFormattedTextField7.getValue();
 
-                double sellValue = price * unit;
-                if (isFeeCalculationEnabled) {
-                    sellValue = sellValue - brokerFee - clearingFee - stampDuty;
-                }
-                final double totalCost = NewSellTransactionJDialog.this.buyValue;
-                final double netProfit = sellValue - totalCost;
-                final double netProfitPercentage = (totalCost == 0.0) ? 0.0 : netProfit / totalCost * 100.0;
-                
-                jFormattedTextField2.setValue(sellValue);
-                jFormattedTextField3.setValue(totalCost);
-                jFormattedTextField6.setValue(netProfitPercentage);
-                jFormattedTextField6.setForeground(Utils.getColor(netProfitPercentage, 0.0));
-                jFormattedTextField8.setValue(netProfit);
-                jFormattedTextField8.setForeground(Utils.getColor(netProfit, 0.0));
-            }});
+            double sellValue = price * unit;
+            if (isFeeCalculationEnabled) {
+                sellValue = sellValue - brokerFee - clearingFee - stampDuty;
+            }
+            final double totalCost = NewSellTransactionJDialog.this.buyValue;
+            final double netProfit = sellValue - totalCost;
+            final double netProfitPercentage = (totalCost == 0.0) ? 0.0 : netProfit / totalCost * 100.0;
+
+            jFormattedTextField2.setValue(sellValue);
+            jFormattedTextField3.setValue(totalCost);
+            jFormattedTextField6.setValue(netProfitPercentage);
+            jFormattedTextField6.setForeground(Utils.getColor(netProfitPercentage, 0.0));
+            jFormattedTextField8.setValue(netProfit);
+            jFormattedTextField8.setForeground(Utils.getColor(netProfit, 0.0));
         }
     }
     
@@ -1002,26 +1008,6 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         updateBuyValueAfterSpinner((Double)jSpinner1.getValue());
         update();
     }//GEN-LAST:event_jSpinner1StateChanged
-
-    private void jFormattedTextField1FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jFormattedTextField1FocusLost
-        // TODO add your handling code here:
-        update();
-    }//GEN-LAST:event_jFormattedTextField1FocusLost
-
-    private void jFormattedTextField4FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jFormattedTextField4FocusLost
-        // TODO add your handling code here:
-        update();
-    }//GEN-LAST:event_jFormattedTextField4FocusLost
-
-    private void jFormattedTextField5FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jFormattedTextField5FocusLost
-        // TODO add your handling code here:
-        update();
-    }//GEN-LAST:event_jFormattedTextField5FocusLost
-
-    private void jFormattedTextField7FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jFormattedTextField7FocusLost
-        // TODO add your handling code here:
-        update();
-    }//GEN-LAST:event_jFormattedTextField7FocusLost
 
     private void setPrice(double price) {
         this.jFormattedTextField1.setValue(price);
@@ -1032,6 +1018,22 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
 		// TODO add your handling code here:
     	this.setPrice(this.suggestBestSellingPrice());
 	}//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jFormattedTextField1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jFormattedTextField1KeyTyped
+        update();
+    }//GEN-LAST:event_jFormattedTextField1KeyTyped
+
+    private void jFormattedTextField4KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jFormattedTextField4KeyTyped
+        update();
+    }//GEN-LAST:event_jFormattedTextField4KeyTyped
+
+    private void jFormattedTextField5KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jFormattedTextField5KeyTyped
+        update();
+    }//GEN-LAST:event_jFormattedTextField5KeyTyped
+
+    private void jFormattedTextField7KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jFormattedTextField7KeyTyped
+        update();
+    }//GEN-LAST:event_jFormattedTextField7KeyTyped
     
     private void commitEdit() {
         try {
@@ -1128,15 +1130,6 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
 
         return bestPrice > currentPrice ? bestPrice : currentPrice;
     }
-    
-    // Use ThreadLocal to ensure thread safety.
-    private static final ThreadLocal <NumberFormat> threeDecimalPlaceLocaleFreeCurrencyNumberFormat = new ThreadLocal <NumberFormat>() {
-        @Override protected NumberFormat initialValue() {
-            DecimalFormat decimalFormat = new DecimalFormat("0.00#");
-            decimalFormat.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.UK));
-            return decimalFormat;
-        }
-    };
     
     private static final Log log = LogFactory.getLog(NewSellTransactionJDialog.class);
 

@@ -612,7 +612,6 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
                 
                 this.setProgress(i + 1);
             }
-            System.out.println("result = " + result.size());
             return result;
         }
  
