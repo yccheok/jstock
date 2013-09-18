@@ -59,6 +59,8 @@ public class AutoDividendJDialog extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         
+        this.jTextArea1.setVisible(false);
+        
         JPanel panel = new JPanel();
         panel.setBorder(new EmptyBorder(10, 10, 10, 10) );
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -82,6 +84,20 @@ public class AutoDividendJDialog extends javax.swing.JDialog {
         updateTotalLabel();
     }
 
+    public void updateInstructionLabel() {
+        String template = GUIBundle.getString("AutoDividendJDialog_Intruction_template");
+        double tax = (Double)jFormattedTextField1.getValue();
+        double taxRate = (Double)jFormattedTextField2.getValue();        
+        final String text0 = org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlaces.Three, tax);
+        final String text1 = org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlaces.Three, taxRate);
+        double value = 100.0 - tax - (100.0 * taxRate / 100.0);
+        value = Math.max(value, 0.0);
+        final String text2 = org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(DecimalPlaces.Three, value);
+        String message = MessageFormat.format(template, text0, text1, text2);
+        jTextArea1.setText(message);
+        this.jTextArea1.setVisible(true);
+    }
+    
     public void updateTotalLabel() {
         int selectedStock = 0;
         int selectedDividend = 0;
@@ -182,7 +198,6 @@ public class AutoDividendJDialog extends javax.swing.JDialog {
         jTextArea1.setFont(new java.awt.Font("Tahoma", 2, 11)); // NOI18N
         jTextArea1.setLineWrap(true);
         jTextArea1.setRows(1);
-        jTextArea1.setText("For $100 dividend, net dividend = \n100 - 20 - (100 x 0.12%) = $98.34");
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -224,7 +239,7 @@ public class AutoDividendJDialog extends javax.swing.JDialog {
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        setBounds(0, 0, 301, 486);
+        setBounds(0, 0, 301, 502);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jFormattedTextField1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jFormattedTextField1KeyTyped
@@ -258,6 +273,7 @@ public class AutoDividendJDialog extends javax.swing.JDialog {
             autoDividendJPanel.updateTaxInfo(tax, taxRate);
         }
         updateTotalLabel();
+        updateInstructionLabel();
     }
     
     private MouseListener getJFormattedTextFieldMouseListener() {
