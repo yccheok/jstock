@@ -45,6 +45,7 @@ import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.portfolio.DecimalPlaces;
 import org.yccheok.jstock.portfolio.Dividend;
+import org.yccheok.jstock.portfolio.DividendSummary;
 
 /**
  *
@@ -149,10 +150,20 @@ public class AutoDividendJDialog extends javax.swing.JDialog {
 
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/apply.png"))); // NOI18N
         jButton1.setText(bundle.getString("AutoDividendJDialog_Apply")); // NOI18N
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
         jPanel1.add(jButton1);
 
         jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/button_cancel.png"))); // NOI18N
         jButton2.setText(bundle.getString("AutoDividendJDialog_Cancel")); // NOI18N
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
         jPanel1.add(jButton2);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
@@ -165,7 +176,6 @@ public class AutoDividendJDialog extends javax.swing.JDialog {
         jPanel2.setLayout(new java.awt.BorderLayout(5, 5));
 
         jLabel4.setForeground(new java.awt.Color(0, 0, 255));
-        jLabel4.setText("4 dividends selected. Total dividend is $105.65");
         jPanel4.add(jLabel4);
 
         jPanel2.add(jPanel4, java.awt.BorderLayout.SOUTH);
@@ -250,6 +260,25 @@ public class AutoDividendJDialog extends javax.swing.JDialog {
         update();
     }//GEN-LAST:event_jFormattedTextField2KeyTyped
 
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        this.dividendsPressingOK = null;
+        this.setVisible(false);
+        this.dispose();
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        dividendsPressingOK = new ArrayList<Dividend>();
+        for (AutoDividendJPanel autoDividendJPanel : autoDividendJPanels) {
+            dividendsPressingOK.addAll(autoDividendJPanel.getSelectedDividends());
+        }
+        this.setVisible(false);
+        this.dispose();        
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    public List<Dividend> getDividendsAfterPressingOK() {
+        return this.dividendsPressingOK;
+    }
+    
     private void commitEdit() {
         try {
             jFormattedTextField1.commitEdit();
@@ -316,6 +345,8 @@ public class AutoDividendJDialog extends javax.swing.JDialog {
     private static final Log log = LogFactory.getLog(AutoDividendJDialog.class);
     
     private final List<AutoDividendJPanel> autoDividendJPanels = new ArrayList<AutoDividendJPanel>();
+    
+    private List<Dividend> dividendsPressingOK = null;
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;

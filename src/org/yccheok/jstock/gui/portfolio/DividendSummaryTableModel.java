@@ -121,11 +121,15 @@ public class DividendSummaryTableModel extends AbstractTableModel implements Com
         this.fireTableRowsDeleted(index, index);
     }
 
-    public int addNewDividend() {
-        dividendSummary.add(new Dividend(StockInfo.newInstance(Code.newInstance(""), Symbol.newInstance("")), 0.0, new SimpleDate()));
+    public int add(Dividend dividend) {
+        dividendSummary.add(dividend);
         final int index = dividendSummary.size() - 1;
         this.fireTableRowsInserted(index, index);
-        return index;
+        return index;        
+    }
+    
+    public int addNewDividend() {
+        return this.add(new Dividend(StockInfo.newInstance(Code.newInstance(""), Symbol.newInstance("")), 0.0, new SimpleDate()));
     }
 
     public Dividend getDividend(int index) {

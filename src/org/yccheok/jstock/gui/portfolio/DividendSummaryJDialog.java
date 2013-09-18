@@ -629,6 +629,20 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
                         AutoDividendJDialog autoDividendJDialog = new AutoDividendJDialog(MainFrame.getInstance(), true, dividends);
                         autoDividendJDialog.setLocationRelativeTo(DividendSummaryJDialog.this);
                         autoDividendJDialog.setVisible(true);
+                        List<Dividend> dividendsAfterPressingOK = autoDividendJDialog.getDividendsAfterPressingOK();
+                        if (dividendsAfterPressingOK != null) {
+                            DividendSummaryTableModel dividendSummaryTableModel = (DividendSummaryTableModel)jTable1.getModel();
+                            for (Dividend dividend : dividendsAfterPressingOK) {
+                                dividendSummaryTableModel.add(dividend);
+                            }
+                            if (dividendsAfterPressingOK.isEmpty() == false) {
+                                jTable1.revalidate();
+                                JOptionPane.showMessageDialog(DividendSummaryJDialog.this, 
+                                    MessageFormat.format(MessagesBundle.getString("info_message_dividends_added_template"), dividendsAfterPressingOK.size()), 
+                                    MessagesBundle.getString("info_title_dividends_added"), 
+                                    JOptionPane.INFORMATION_MESSAGE);
+                            }
+                        }
                     }
                 } catch (Exception ex) {
                     log.error(null, ex);

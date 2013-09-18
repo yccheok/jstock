@@ -25,6 +25,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.util.Date;
 import javax.swing.JFormattedTextField;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
@@ -32,6 +33,7 @@ import javax.swing.text.NumberFormatter;
 import net.sf.nachocalendar.CalendarFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.yccheok.jstock.engine.SimpleDate;
 import org.yccheok.jstock.portfolio.DecimalPlaces;
 import org.yccheok.jstock.portfolio.Dividend;
 
@@ -101,6 +103,13 @@ public class AutoDividendRowJPanel extends javax.swing.JPanel {
     
     public boolean isSelected() {
         return jCheckBox1.isSelected();
+    }
+    
+    public Dividend getDividend() {
+        double value = getAmount();
+        net.sf.nachocalendar.components.DateField dateField = (net.sf.nachocalendar.components.DateField)jPanel1;
+        final SimpleDate date = new SimpleDate((Date)dateField.getValue());
+        return new Dividend(dividend.stockInfo, value, date);
     }
     
     public double getAmount() {

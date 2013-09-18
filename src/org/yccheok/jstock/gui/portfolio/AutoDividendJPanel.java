@@ -61,6 +61,21 @@ public class AutoDividendJPanel extends javax.swing.JPanel {
         return getPreferredSize();
     }
 
+    public List<Dividend> getSelectedDividends() {
+        if (false == jCheckBox2.isSelected()) {
+            return java.util.Collections.emptyList();
+        }
+        final List<Dividend> dividends = new ArrayList<Dividend>();
+        for (AutoDividendRowJPanel autoDividendRowJPanel : autoDividendRowJPanels) {
+            if (autoDividendRowJPanel.isSelected()) {
+                if (autoDividendRowJPanel.getAmount() > 0.0) {
+                    dividends.add(autoDividendRowJPanel.getDividend());
+                }
+            }
+        }
+        return dividends;
+    }
+    
     public double getSelectedAmount() {
         if (false == jCheckBox2.isSelected()) {
             return 0;
