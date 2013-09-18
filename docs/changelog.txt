@@ -1,6 +1,9 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.7h - 2013-09-19
+  Feature: Auto dividend calculation.
+
 JStock 1.0.7g - 2013-09-12
   Bugfix:  Fix on unable to perform sell when localization is in french.
   
