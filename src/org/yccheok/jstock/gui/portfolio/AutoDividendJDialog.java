@@ -34,6 +34,7 @@ import java.util.TreeMap;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JFormattedTextField;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
@@ -45,7 +46,6 @@ import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.portfolio.DecimalPlaces;
 import org.yccheok.jstock.portfolio.Dividend;
-import org.yccheok.jstock.portfolio.DividendSummary;
 
 /**
  *
@@ -59,9 +59,7 @@ public class AutoDividendJDialog extends javax.swing.JDialog {
     public AutoDividendJDialog(java.awt.Frame parent, boolean modal, Map<Code, List<Dividend>> dividends) {
         super(parent, modal);
         initComponents();
-        
-        this.jTextArea1.setVisible(false);
-        
+                
         JPanel panel = new JPanel();
         panel.setBorder(new EmptyBorder(10, 10, 10, 10) );
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -95,8 +93,23 @@ public class AutoDividendJDialog extends javax.swing.JDialog {
         value = Math.max(value, 0.0);
         final String text2 = org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(DecimalPlaces.Three, value);
         String message = MessageFormat.format(template, text0, text1, text2);
-        jTextArea1.setText(message);
-        this.jTextArea1.setVisible(true);
+        
+        if (jLabel3 == null) {
+            jLabel3 = new javax.swing.JLabel();
+            jLabel3.setText(GUIBundle.getString("AutoDividendJDialog_Intruction")); // NOI18N
+            jLabel3.setFont(jLabel3.getFont().deriveFont((jLabel3.getFont().getStyle() | java.awt.Font.ITALIC)));
+            jPanel6.add(jLabel3);
+        }
+        
+        if (jLabel5 == null) {
+            jLabel5 = new javax.swing.JLabel();
+            jLabel5.setFont(jLabel5.getFont().deriveFont((jLabel5.getFont().getStyle() | java.awt.Font.ITALIC)));
+            jPanel6.add(jLabel5);            
+        }
+        
+        this.jLabel5.setText(message);
+        this.jLabel3.setVisible(true);
+        this.jLabel5.setVisible(true);
     }
     
     public void updateTotalLabel() {
@@ -135,12 +148,13 @@ public class AutoDividendJDialog extends javax.swing.JDialog {
         jPanel4 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
+        jPanel5 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jFormattedTextField1 = getCurrencyJFormattedTextField();
         jLabel2 = new javax.swing.JLabel();
         jFormattedTextField2 = getCurrencyJFormattedTextField();
-        jTextArea1 = new javax.swing.JTextArea();
+        jPanel6 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
@@ -183,7 +197,8 @@ public class AutoDividendJDialog extends javax.swing.JDialog {
         jScrollPane1.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("AutoDividendJDialog_Dividend"))); // NOI18N
         jPanel2.add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
-        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("AutoDividendJDialog_DividendTax"))); // NOI18N
+        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("AutoDividendJDialog_DividendTax"))); // NOI18N
+        jPanel5.setLayout(new java.awt.BorderLayout());
 
         jLabel1.setText(bundle.getString("AutoDividendJDialog_Tax")); // NOI18N
 
@@ -203,12 +218,6 @@ public class AutoDividendJDialog extends javax.swing.JDialog {
             }
         });
 
-        jTextArea1.setEditable(false);
-        jTextArea1.setColumns(20);
-        jTextArea1.setFont(new java.awt.Font("Tahoma", 2, 11)); // NOI18N
-        jTextArea1.setLineWrap(true);
-        jTextArea1.setRows(1);
-
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -216,16 +225,13 @@ public class AutoDividendJDialog extends javax.swing.JDialog {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTextArea1, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jFormattedTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel1))
-                        .addGap(18, 18, 18)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2)
-                            .addComponent(jFormattedTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(64, Short.MAX_VALUE))
+                    .addComponent(jFormattedTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel2)
+                    .addComponent(jFormattedTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(93, Short.MAX_VALUE))
         );
 
         jPanel3Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jFormattedTextField1, jFormattedTextField2});
@@ -240,25 +246,20 @@ public class AutoDividendJDialog extends javax.swing.JDialog {
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jFormattedTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jFormattedTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jTextArea1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jPanel2.add(jPanel3, java.awt.BorderLayout.NORTH);
+        jPanel5.add(jPanel3, java.awt.BorderLayout.CENTER);
+
+        jPanel6.setLayout(new java.awt.GridLayout(2, 1, 5, 5));
+        jPanel5.add(jPanel6, java.awt.BorderLayout.SOUTH);
+
+        jPanel2.add(jPanel5, java.awt.BorderLayout.NORTH);
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
         setBounds(0, 0, 301, 502);
     }// </editor-fold>//GEN-END:initComponents
-
-    private void jFormattedTextField1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jFormattedTextField1KeyTyped
-        update();
-    }//GEN-LAST:event_jFormattedTextField1KeyTyped
-
-    private void jFormattedTextField2KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jFormattedTextField2KeyTyped
-        update();
-    }//GEN-LAST:event_jFormattedTextField2KeyTyped
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         this.dividendsPressingOK = null;
@@ -274,6 +275,14 @@ public class AutoDividendJDialog extends javax.swing.JDialog {
         this.setVisible(false);
         this.dispose();        
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jFormattedTextField2KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jFormattedTextField2KeyTyped
+        update();
+    }//GEN-LAST:event_jFormattedTextField2KeyTyped
+
+    private void jFormattedTextField1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jFormattedTextField1KeyTyped
+        update();
+    }//GEN-LAST:event_jFormattedTextField1KeyTyped
 
     public List<Dividend> getDividendsAfterPressingOK() {
         return this.dividendsPressingOK;
@@ -348,6 +357,9 @@ public class AutoDividendJDialog extends javax.swing.JDialog {
     
     private List<Dividend> dividendsPressingOK = null;
     
+    private JLabel jLabel3 = null;
+    private JLabel jLabel5 = null;
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
@@ -360,8 +372,9 @@ public class AutoDividendJDialog extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextArea jTextArea1;
     private org.jdesktop.swingx.JXHeader jXHeader1;
     // End of variables declaration//GEN-END:variables
 }
