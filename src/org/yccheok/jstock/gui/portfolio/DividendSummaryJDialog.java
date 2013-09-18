@@ -599,6 +599,9 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
                             if (total == 0) {
                                 continue;
                             }
+                            if (MainFrame.getInstance().getJStockOptions().isPenceToPoundConversionEnabled()) {
+                                total = total / 100.0;
+                            }
                             StockInfo betterStockInfo = MainFrame.getInstance().getStockInfoDatabase().codeToStockInfo(dividend.stockInfo.code);
                             Dividend suggestedDividend = new Dividend(betterStockInfo == null ? dividend.stockInfo : betterStockInfo, total, dividend.date);
                             suggestedDividends.add(suggestedDividend);
@@ -636,7 +639,7 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
                                 dividendSummaryTableModel.add(dividend);
                             }
                             if (dividendsAfterPressingOK.isEmpty() == false) {
-                                jTable1.revalidate();
+                                jLabel2.setText(getDividendSummaryText());
                                 JOptionPane.showMessageDialog(DividendSummaryJDialog.this, 
                                     MessageFormat.format(MessagesBundle.getString("info_message_dividends_added_template"), dividendsAfterPressingOK.size()), 
                                     MessagesBundle.getString("info_title_dividends_added"), 
