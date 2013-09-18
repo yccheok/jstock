@@ -126,7 +126,8 @@ public class Utils {
         Dividend latestDividend = null;
         for (int i = 0, ei = dividendSummary.size(); i < ei; i++) {
             Dividend dividend = dividendSummary.get(i);
-            if (dividend.stockInfo.code.equals(code)) {
+            // We will only consider non-zero dividend.
+            if (dividend.amount > 0.0 && dividend.stockInfo.code.equals(code)) {
                 if (latestDividend == null) {
                     latestDividend = dividend;
                 } else {

@@ -5,8 +5,11 @@
 package org.yccheok.jstock.gui.portfolio;
 
 import java.awt.Dimension;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
@@ -27,22 +30,23 @@ public class AutoDividendJDialog extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         
-        //getContentPane().add(new AutoDividendJPanel(), java.awt.BorderLayout.CENTER);
-        //this.jScrollPane1.add(new AutoDividendJPanel());
-        //this.jScrollPane1.add(new AutoDividendJPanel());        
-        
         JPanel panel = new JPanel();
         panel.setBorder(new EmptyBorder(10, 10, 10, 10) );
-        //panel.setBounds(61, 11, 81, 140);
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         
-        panel.add(new AutoDividendJPanel(0));
-        panel.add(Box.createRigidArea(new Dimension(0, 5)));
-        panel.add(new AutoDividendJPanel(1));
+        TreeMap<Code, List<Dividend>> treeMap = new TreeMap<Code, List<Dividend>>(new Comparator<Code>() {
+            @Override
+            public int compare(Code o1, Code o2) {
+                return o1.toString().compareTo(o2.toString());
+            }            
+        });
+        treeMap.putAll(dividends);
+        for (Map.Entry<Code, List<Dividend>> entry : treeMap.entrySet()) {
+            panel.add(new AutoDividendJPanel(entry.getValue()));    
+            panel.add(Box.createRigidArea(new Dimension(0, 5)));
+        }
         
         this.jScrollPane1.setViewportView(panel);
-
-        //getContentPane().add(panel, java.awt.BorderLayout.CENTER);
     }
 
     /**

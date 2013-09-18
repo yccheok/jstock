@@ -4,6 +4,17 @@
  */
 package org.yccheok.jstock.gui.portfolio;
 
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.text.NumberFormat;
+import javax.swing.JFormattedTextField;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.text.NumberFormatter;
+import net.sf.nachocalendar.CalendarFactory;
+import org.yccheok.jstock.portfolio.Dividend;
+
 /**
  *
  * @author yccheok
@@ -13,10 +24,51 @@ public class AutoDividendRowJPanel extends javax.swing.JPanel {
     /**
      * Creates new form AutoDividendRowJPanel
      */
-    public AutoDividendRowJPanel() {
+    public AutoDividendRowJPanel(Dividend dividend) {
         initComponents();
+        
+        final net.sf.nachocalendar.components.DateField dateField = (net.sf.nachocalendar.components.DateField)jPanel1;
+        dateField.setValue(dividend.date.getTime());
+        jFormattedTextField2.setValue(dividend.amount);
     }
 
+    private MouseListener getJFormattedTextFieldMouseListener() {
+        MouseListener ml = new MouseAdapter()
+        {
+            @Override
+            public void mousePressed(final MouseEvent e)
+            {
+                if (e.getClickCount() == 2) {
+                    // Ignore double click.
+                    return;
+                }
+                
+                SwingUtilities.invokeLater(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        JTextField tf = (JTextField)e.getSource();
+                        int offset = tf.viewToModel(e.getPoint());
+                        tf.setCaretPosition(offset);
+                    }
+                });
+            }
+        };
+        return ml;
+    }
+    
+    private JFormattedTextField getCurrencyJFormattedTextField() {
+        NumberFormat format= NumberFormat.getNumberInstance();
+        format.setMaximumFractionDigits(4);
+        NumberFormatter formatter= new NumberFormatter(format);
+        formatter.setMinimum(0.0);
+        formatter.setValueClass(Double.class);
+        JFormattedTextField formattedTextField = new JFormattedTextField(formatter);
+        formattedTextField.addMouseListener(getJFormattedTextFieldMouseListener());
+        return formattedTextField;
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -28,8 +80,8 @@ public class AutoDividendRowJPanel extends javax.swing.JPanel {
 
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0));
         jCheckBox1 = new javax.swing.JCheckBox();
-        jFormattedTextField1 = new javax.swing.JFormattedTextField();
-        jFormattedTextField2 = new javax.swing.JFormattedTextField();
+        jPanel1 = CalendarFactory.createDateField();
+        jFormattedTextField2 = getCurrencyJFormattedTextField();
 
         setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
         add(filler1);
@@ -37,10 +89,9 @@ public class AutoDividendRowJPanel extends javax.swing.JPanel {
         jCheckBox1.setSelected(true);
         add(jCheckBox1);
 
-        jFormattedTextField1.setText("11/09/03");
-        jFormattedTextField1.setMinimumSize(new java.awt.Dimension(80, 20));
-        jFormattedTextField1.setPreferredSize(new java.awt.Dimension(80, 20));
-        add(jFormattedTextField1);
+        jPanel1.setMinimumSize(new java.awt.Dimension(80, 20));
+        jPanel1.setPreferredSize(new java.awt.Dimension(80, 20));
+        add(jPanel1);
 
         jFormattedTextField2.setMinimumSize(new java.awt.Dimension(80, 20));
         jFormattedTextField2.setPreferredSize(new java.awt.Dimension(80, 20));
@@ -49,7 +100,7 @@ public class AutoDividendRowJPanel extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.Box.Filler filler1;
     private javax.swing.JCheckBox jCheckBox1;
-    private javax.swing.JFormattedTextField jFormattedTextField1;
     private javax.swing.JFormattedTextField jFormattedTextField2;
+    private javax.swing.JPanel jPanel1;
     // End of variables declaration//GEN-END:variables
 }

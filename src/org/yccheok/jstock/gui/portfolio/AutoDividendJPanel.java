@@ -5,6 +5,8 @@
 package org.yccheok.jstock.gui.portfolio;
 
 import java.awt.Dimension;
+import java.util.List;
+import org.yccheok.jstock.portfolio.Dividend;
 
 /**
  *
@@ -15,14 +17,15 @@ public class AutoDividendJPanel extends javax.swing.JPanel {
     /**
      * Creates new form AutoDividendJPanel
      */
-    public AutoDividendJPanel(int i) {
+    public AutoDividendJPanel(List<Dividend> dividends) {
         initComponents();
         
-        this.jPanel2.add(new AutoDividendRowJPanel());
-        this.jPanel2.add(new AutoDividendRowJPanel());
+        assert(false == dividends.isEmpty());
         
-        if (i == 0) {
-            jLabel1.setText("MAYBANK");
+        jLabel1.setText(dividends.get(0).stockInfo.symbol.toString());
+        
+        for (Dividend dividend : dividends) {
+            this.jPanel2.add(new AutoDividendRowJPanel(dividend));
         }
     }
 
