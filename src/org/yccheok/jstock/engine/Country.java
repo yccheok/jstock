@@ -26,41 +26,62 @@ import javax.swing.ImageIcon;
  * @author yccheok
  */
 public enum Country {
-    Australia("/images/16x16/au.png"),
-    Austria("/images/16x16/at.png"),
-    Belgium("/images/16x16/be.png"),
-    Brazil("/images/16x16/br.png"),
-    Canada("/images/16x16/ca.png"),
-    China("/images/16x16/cn.png"),
-    Denmark("/images/16x16/dk.png"),
-    France("/images/16x16/fr.png"),
-    Germany("/images/16x16/de.png"),
-    HongKong("/images/16x16/hk.png"),
-    India("/images/16x16/in.png"),
-    Indonesia("/images/16x16/id.png"),
-    Israel("/images/16x16/il.png"),
-    Italy("/images/16x16/it.png"),
-    Korea("/images/16x16/kr.png"),
-    Malaysia("/images/16x16/my.png"),
-    Netherlands("/images/16x16/nl.png"),
-    NewZealand("/images/16x16/nz.png"),
-    Norway("/images/16x16/no.png"),
-    Portugal("/images/16x16/pt.png"),
-    Singapore("/images/16x16/sg.png"),
-    Spain("/images/16x16/es.png"),            
-    Sweden("/images/16x16/se.png"),
-    Switzerland("/images/16x16/ch.png"),
-    Taiwan("/images/16x16/tw.png"),
-    UnitedKingdom("/images/16x16/gb.png"),
-    UnitedState("/images/16x16/us.png");
+    Australia("/images/16x16/au.png", "Australia"),
+    Austria("/images/16x16/at.png", "Austria"),
+    Belgium("/images/16x16/be.png", "Belgium"),
+    Brazil("/images/16x16/br.png", "Brazil"),
+    Canada("/images/16x16/ca.png", "Canada"),
+    China("/images/16x16/cn.png", "China"),
+    Denmark("/images/16x16/dk.png", "Denmark"),
+    France("/images/16x16/fr.png", "France"),
+    Germany("/images/16x16/de.png", "Germany"),
+    HongKong("/images/16x16/hk.png", "Hong Kong"),
+    India("/images/16x16/in.png", "India"),
+    Indonesia("/images/16x16/id.png", "Indonesia"),
+    Israel("/images/16x16/il.png", "Israel"),
+    Italy("/images/16x16/it.png", "Italy"),
+    Korea("/images/16x16/kr.png", "Korea"),
+    Malaysia("/images/16x16/my.png", "Malaysia"),
+    Netherlands("/images/16x16/nl.png", "Netherlands"),
+    NewZealand("/images/16x16/nz.png", "New Zealand"),
+    Norway("/images/16x16/no.png", "Norway"),
+    Portugal("/images/16x16/pt.png", "Portugal"),
+    Singapore("/images/16x16/sg.png", "Singapore"),
+    Spain("/images/16x16/es.png", "Spain"),            
+    Sweden("/images/16x16/se.png", "Sweden"),
+    Switzerland("/images/16x16/ch.png", "Switzerland"),
+    Taiwan("/images/16x16/tw.png", "Taiwan"),
+    UnitedKingdom("/images/16x16/gb.png", "United Kingdom"),
+    UnitedState("/images/16x16/us.png", "United States");
             
-    Country(String fileName) {
+    Country(String fileName, String humanReadableString) {
         this.icon = new javax.swing.ImageIcon(this.getClass().getResource(fileName));
+        this.humanReadableString = humanReadableString;
     }
     
     public ImageIcon getIcon() {
         return icon;
     }
     
+    public String toHumanReadableString() {
+        return humanReadableString;
+    }
+    
+    // For legacy reason, when generating path or operation, the following code
+    // should be used :
+    // String path = country.name() + File.separator
+    //
+    // However, we make a mistake by using
+    // String path = country + File.separator
+    //
+    // That's why we avoid from override toString. Instead, we provide
+    // toHumanReadableString
+    //
+    //@Override
+    //public String toString() {
+    //    return string;
+    //}
+    
     private ImageIcon icon;
+    private final String humanReadableString;    
 }

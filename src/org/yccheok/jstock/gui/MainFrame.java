@@ -1978,11 +1978,8 @@ public class MainFrame extends javax.swing.JFrame {
         for (final Country country : countries) {
             // Ugly fix on spelling mistake.
             final JMenuItem mi;
-            if (country == Country.UnitedState) {
-                mi = (JRadioButtonMenuItem) jMenu6.add(new JRadioButtonMenuItem(country.toString() + "s", country.getIcon()));
-            } else {
-                mi = (JRadioButtonMenuItem) jMenu6.add(new JRadioButtonMenuItem(country.toString(), country.getIcon()));
-            }
+            mi = (JRadioButtonMenuItem) jMenu6.add(new JRadioButtonMenuItem(country.toHumanReadableString(), country.getIcon()));
+
             buttonGroup2.add(mi);
             mi.addActionListener(new ActionListener() {
                 @Override
@@ -2366,13 +2363,7 @@ public class MainFrame extends javax.swing.JFrame {
             AbstractButton button = e.nextElement();
             javax.swing.JRadioButtonMenuItem m = (javax.swing.JRadioButtonMenuItem)button;
             
-            // Ugly fix on spelling mistake.
-            if (jStockOptions.getCountry() == Country.UnitedState && m.getText().equals(jStockOptions.getCountry().toString() + "s")) {
-                m.setSelected(true);
-                break;                
-            }
-            
-            if(m.getText().equals(jStockOptions.getCountry().toString())) {
+            if(m.getText().equals(jStockOptions.getCountry().toHumanReadableString())) {
                 m.setSelected(true);
                 break;
             }
