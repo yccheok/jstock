@@ -3766,7 +3766,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void removeOldHistoryData(Country country) {
         // We do not want "yesterday" history record. We will remove 1 day old files.
-        org.yccheok.jstock.gui.Utils.deleteAllOldFiles(new File(Utils.getUserDataDirectory() + country + File.separator + "history"), 1);
+        org.yccheok.jstock.gui.Utils.deleteAllOldFiles(new File(Utils.getHistoryDirectory(country)), 1);
     }
 
     private void initAlertStateManager() {
@@ -4344,7 +4344,7 @@ public class MainFrame extends javax.swing.JFrame {
         Country[] countries = Country.values();
         for (Country country : countries)
         {
-            Utils.deleteDir(Utils.getUserDataDirectory() + country + File.separator + "history", false);
+            Utils.deleteDir(Utils.getHistoryDirectory(country), false);
         }
 
         // Avoid from using old history monitor. History monitor contains their own memory data.

@@ -828,10 +828,13 @@ public class Utils {
      * @return cached history files directory
      */
     public static String getHistoryDirectory() {
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
-        return Utils.getUserDataDirectory() + jStockOptions.getCountry() + File.separator + "history";
+        return getHistoryDirectory(MainFrame.getInstance().getJStockOptions().getCountry());
     }
 
+    public static String getHistoryDirectory(Country country) {
+        return Utils.getUserDataDirectory() + country + File.separator + "history";
+    }
+    
     public static AlphaComposite makeComposite(float alpha) {
         int type = AlphaComposite.SRC_OVER;
         return(AlphaComposite.getInstance(type, alpha));
