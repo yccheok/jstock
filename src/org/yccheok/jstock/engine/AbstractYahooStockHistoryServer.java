@@ -39,22 +39,21 @@ public abstract class AbstractYahooStockHistoryServer implements StockHistorySer
         }
     };
     
-    protected abstract StockServer getStockServer(Country country);
+    protected abstract StockServer getStockServer();
     
-    public AbstractYahooStockHistoryServer(Country country, Code code) throws StockHistoryNotFoundException
+    public AbstractYahooStockHistoryServer(Code code) throws StockHistoryNotFoundException
     {
-        this(country, code, DEFAULT_HISTORY_DURATION);
+        this(code, DEFAULT_HISTORY_DURATION);
     }
 
-    public AbstractYahooStockHistoryServer(Country country, Code code, Duration duration) throws StockHistoryNotFoundException
+    public AbstractYahooStockHistoryServer(Code code, Duration duration) throws StockHistoryNotFoundException
     {
         if (code == null || duration == null)
         {
             throw new IllegalArgumentException("Code or duration cannot be null");
         }
 
-        this.country = country;
-        this.code = Utils.toYahooFormat(code, country);
+        this.code = code;
         this.duration = duration;
         try {
             buildHistory(this.code);
@@ -88,7 +87,7 @@ public abstract class AbstractYahooStockHistoryServer implements StockHistorySer
         Stock.Industry industry = Stock.Industry.Unknown;
 
         try {
-            Stock stock = getStockServer(this.country).getStock(code);
+            Stock stock = getStockServer().getStock(code);
             symbol = stock.symbol;
             name = stock.getName();
             board = stock.getBoard();
@@ -278,7 +277,6 @@ public abstract class AbstractYahooStockHistoryServer implements StockHistorySer
     private final java.util.List<Long> timestamps = new ArrayList<Long>();
 
     private final Code code;
-    private final Country country;
     private final Duration duration;
 
     private static final Log log = LogFactory.getLog(AbstractYahooStockHistoryServer.class);

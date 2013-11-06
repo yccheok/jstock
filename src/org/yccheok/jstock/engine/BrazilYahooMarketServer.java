@@ -25,12 +25,8 @@ package org.yccheok.jstock.engine;
  */
 public class BrazilYahooMarketServer extends AbstractYahooMarketServer {
 
-    public BrazilYahooMarketServer(Country country) {
-        super(country);
-    }
-
     @Override
-    protected StockServer getStockServer(Country country) {
-        return new BrazilYahooStockServer(country);
+    protected StockServer getStockServer() {
+        return new BrazilYahooStockServer();
     }
 }

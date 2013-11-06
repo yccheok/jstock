@@ -19,16 +19,12 @@
 
 package org.yccheok.jstock.engine;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * Retrieves stock market index information through Google Finance.
@@ -36,132 +32,46 @@ import org.codehaus.jackson.map.ObjectMapper;
  * @author yccheok
  */
 public class GoogleMarketServer implements MarketServer {
-    private final Country country;
-    private final List<Index> indicies;
-    private final List<Code> codes = new ArrayList<Code>();
-    private final Map<Code, Index> codeToIndexMap = new HashMap<Code, Index>();
-
-    private static final Log log = LogFactory.getLog(GoogleMarketServer.class);
-
-    /**
-     * Constructs a stock market index server based on country.
-     *
-     * @param country the country
-     */
-    public GoogleMarketServer(Country country) {
-        this.country = country;
-        this.indicies = Utils.getStockIndices(country);
-        if (this.indicies.isEmpty()) {
-            throw new java.lang.IllegalArgumentException(country.toString());
-        }
-        for (Index index : indicies) {
-            codes.add(index.code);
-            codeToIndexMap.put(index.code, index);
-        }
-    }
     
-    /**
-     * Returns current stock market index information.
-     *
-     * @return current stock market index information
-     */
     @Override
-    public Market getMarket() {
-        try {
-            return new GoogleMarket();
+    public Market getMarket(Index index) {
+        List<Index> indices = new ArrayList<Index>();
+        indices.add(index);
+        java.util.List<Market> markets = getMarkets(indices);
+        if (markets.size() == 1) {
+            return markets.get(0);
         }
-        catch (StockNotFoundException exp) {
-            log.error(null, exp);
-        }
-
         return null;
     }
+    
+    public java.util.List<Market> getMarkets(java.util.List<Index> indices) {
+        
+        Map<Code, Index> map = new HashMap<Code, Index>();
+        List<Code> codes = new ArrayList<Code>();
 
-    private final class GoogleMarket implements Market {
-        private final Map<Index, Stock> map = new EnumMap<Index, Stock>(Index.class);
-        // Will it be better if we make this as static?
-        private final ObjectMapper mapper = new ObjectMapper();
-
-        public GoogleMarket() throws StockNotFoundException {            
-            // Use StringBuilder instead of StringBuffer. We do not concern
-            // on thread safety.
-            final StringBuilder builder = new StringBuilder("http://www.google.com/finance/info?client=ig&q=");
-
-            try {
-                // Exception will be thrown from apache httpclient, if we do not
-                // perform URL encoding.
-                builder.append(java.net.URLEncoder.encode(Utils.toGoogleFormat(codes.get(0)).toString(), "UTF-8"));
-
-                for (int i = 1, size = codes.size(); i < size; i++) {
-                    builder.append(",");
-                    builder.append(java.net.URLEncoder.encode(Utils.toGoogleFormat(codes.get(i)).toString(), "UTF-8"));
-                }
-                final String location = builder.toString();
-                final String respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(location);
-                // Google returns "// [ { "id": ... } ]".
-                // We need to turn them into "[ { "id": ... } ]".
-                final List<Map> jsonArray = mapper.readValue(Utils.GoogleRespondToJSON(respond), List.class);
-                final List<Stock> stocks = new ArrayList<Stock>();
-                for (int i = 0, size = jsonArray.size(); i < size; i++) {
-                    final Map<String, String> jsonObject = jsonArray.get(i);
-                    final double l = Double.parseDouble(jsonObject.get("l").replaceAll("[^0-9\\.]", ""));
-                    final double c = Double.parseDouble(jsonObject.get("c").replaceAll("[^0-9\\.\\-]", ""));
-                    final double cp = Double.parseDouble(jsonObject.get("cp").replaceAll("[^0-9\\.\\-]", ""));
-                    final Stock stock = new Stock.Builder(codes.get(i), Symbol.newInstance(codes.get(i).toString())).lastPrice(l).changePrice(c).changePricePercentage(cp).build();
-                    stocks.add(stock);
-                }
-                // Store the result for later query purpose.
-                for (Stock stock : stocks) {
-                    map.put(codeToIndexMap.get(stock.code), stock);
-                }
-            } catch (UnsupportedEncodingException ex) {
-                throw new StockNotFoundException(null, ex);
-            } catch (IOException ex) {
-                throw new StockNotFoundException(null, ex);
-            } catch (Exception ex) {
-                // Jackson library may cause runtime exception if there is error
-                // in the JSON string.
-                throw new StockNotFoundException(null, ex);
-            }
+        for (Index index : indices) {
+            map.put(index.code, index);
+            codes.add(index.code);
         }
 
-        @Override
-        public double getIndex(Index index) {
-            final Stock stock = map.get(index);
-            if (stock == null) {
-                return 0.0;
-            }
-            return stock.getLastPrice();
+        List<Market> markets = new ArrayList<Market>();
+        
+        List<Stock> stocks;
+        try {
+            stocks = googleStockServer.getStocks(codes);
+        } catch (StockNotFoundException e) {
+            log.error(null, e);
+            return markets;
         }
-
-        @Override
-        public double getChange(Index index) {
-            final Stock stock = map.get(index);
-            if (stock == null) {
-                return 0.0;
-            }
-            return stock.getChangePrice();
+        
+        for (Stock stock : stocks) {
+            final Market market = Market.newInstance(stock, map.get(stock.code));
+            markets.add(market);
         }
-
-        @Override
-        public int getNumOfStockChange(ChangeType type) {
-            return 0;
-        }
-
-        @Override
-        public long getVolume() {
-            // Sad. Google doesn't give us volume information yet.
-            return 0;
-        }
-
-        @Override
-        public double getValue() {
-            return 0;
-        }
-
-        @Override
-        public Country getCountry() {
-            return country;
-        }
+        
+        return markets;
     }
+
+    private final GoogleStockServer googleStockServer = new GoogleStockServer();
+    private static final Log log = LogFactory.getLog(GoogleMarketServer.class);
 }

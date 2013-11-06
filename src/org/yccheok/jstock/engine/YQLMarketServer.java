@@ -28,8 +28,8 @@ public class YQLMarketServer extends AbstractYahooMarketServer {
      *
      * @param country the country
      */
-    public YQLMarketServer(Country country) {
-        super(country);
+    public YQLMarketServer() {
+        super();
     }
 
     /**
@@ -43,7 +43,7 @@ public class YQLMarketServer extends AbstractYahooMarketServer {
      * @return stock server based on given country
      */
     @Override
-    protected StockServer getStockServer(Country country) {
+    protected StockServer getStockServer() {
         // Do not store an instance of YQLStockServer to a member variable
         // during constructor call and return it. This is because this
         // overridden method will be consumed by the parent constructor of

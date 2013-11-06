@@ -25,18 +25,18 @@ package org.yccheok.jstock.engine;
  */
 public class YahooStockHistoryServer extends AbstractYahooStockHistoryServer {
 
-    public YahooStockHistoryServer(Country country, Code code) throws StockHistoryNotFoundException
+    public YahooStockHistoryServer(Code code) throws StockHistoryNotFoundException
     {
-        super(country, code);
+        super(code);
     }
 
-    public YahooStockHistoryServer(Country country, Code code, Duration duration) throws StockHistoryNotFoundException
+    public YahooStockHistoryServer(Code code, Duration duration) throws StockHistoryNotFoundException
     {
-        super(country, code, duration);
+        super(code, duration);
     }
 
     @Override
-    protected StockServer getStockServer(Country country) {
-        return new YahooStockServer(country);
+    protected StockServer getStockServer() {
+        return new YahooStockServer();
     }
 }

@@ -26,18 +26,16 @@ package org.yccheok.jstock.engine;
  *
  * @author yccheok
  */
-public interface Market {
-    public double getIndex(Index index);
-    public double getChange(Index index);
-    public int getNumOfStockChange(ChangeType type);
-    public long getVolume();
-    public double getValue();
-    public Country getCountry();
-    
-    public enum ChangeType
-    {
-        Up,
-        Down,
-        Unchange;
+public class Market {
+    public static Market newInstance(Stock stock, Index index) {
+        return new Market(stock, index);
     }
+    
+    private Market(Stock stock, Index index) {
+        this.stock = stock;
+        this.index = index;
+    }
+    
+    public final Stock stock;
+    public final Index index;
 }

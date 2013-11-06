@@ -28,15 +28,12 @@ import org.apache.commons.logging.LogFactory;
  */
 public class YahooStockServerFactory implements StockServerFactory {
 
-    private YahooStockServerFactory(Country country) {
-        this.country = country;
-        stockServer = new YahooStockServer(country);
-        marketServer = new YahooMarketServer(country);
+    private YahooStockServerFactory() {
         dividendServer = new YahooDividendServer();
     }
     
-    public static StockServerFactory newInstance(Country country) {
-        return new YahooStockServerFactory(country);
+    public static StockServerFactory newInstance() {
+        return new YahooStockServerFactory();
     }
 
     @Override
@@ -47,7 +44,7 @@ public class YahooStockServerFactory implements StockServerFactory {
     @Override
     public StockHistoryServer getStockHistoryServer(Code code) {
         try {
-            return new YahooStockHistoryServer(country, code);
+            return new YahooStockHistoryServer(code);
         }
         catch (StockHistoryNotFoundException exp) {
             log.error(null, exp);
@@ -58,7 +55,7 @@ public class YahooStockServerFactory implements StockServerFactory {
     @Override
     public StockHistoryServer getStockHistoryServer(Code code,org.yccheok.jstock.engine.Duration duration) {
         try {
-            return new YahooStockHistoryServer(country, code, duration);
+            return new YahooStockHistoryServer(code, duration);
         }
         catch (StockHistoryNotFoundException exp) {
             log.error(null, exp);
@@ -71,18 +68,13 @@ public class YahooStockServerFactory implements StockServerFactory {
         return marketServer;
     }
     
-    public Country getCountry() {
-        return country;
-    }
-    
     @Override
     public DividendServer getDividendServer() {
         return dividendServer;
     }
     
-    private final StockServer stockServer;
-    private final MarketServer marketServer;
-    private final Country country;
+    private final StockServer stockServer = new YahooStockServer();
+    private final MarketServer marketServer = new YahooMarketServer();
     private final DividendServer dividendServer;
     
     private static final Log log = LogFactory.getLog(YahooStockServerFactory.class);

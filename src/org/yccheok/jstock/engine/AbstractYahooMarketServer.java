@@ -20,7 +20,6 @@
 package org.yccheok.jstock.engine;
 
 import java.util.ArrayList;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,114 +31,55 @@ import org.apache.commons.logging.LogFactory;
  * @author yccheok
  */
 public abstract class AbstractYahooMarketServer implements MarketServer {
-    private final StockServer stockServer;
-    private final Country country;
-    private final List<Index> indicies;
-    private final List<Code> codes = new ArrayList<Code>();
-    private final Map<Code, Index> codeToIndexMap = new HashMap<Code, Index>();
-
-    private static final Log log = LogFactory.getLog(AbstractYahooMarketServer.class);
-
-    protected abstract StockServer getStockServer(Country country);
-
-    public AbstractYahooMarketServer(Country country) {
-        this.country = country;
-        this.stockServer = getStockServer(country);       
-        /* Hack on Malaysia Market! The format among Yahoo and CIMB are difference. */
-        if (country == Country.Malaysia) {
-            final List<Index> tmp = new ArrayList<Index>();
-            for (Index index : Utils.getStockIndices(country)) {
-                if (index.code.toString().startsWith("^")) {
-                    tmp.add(index);
-                }
-            }
-            this.indicies = java.util.Collections.unmodifiableList(tmp);
-        }
-        else {
-            this.indicies = Utils.getStockIndices(country);
-        }
-        if (this.indicies.isEmpty()) {
-            throw new java.lang.IllegalArgumentException(country.toString());
-        }
-        for (Index index : indicies) {
-            codes.add(index.code);
-            codeToIndexMap.put(index.code, index);
-        }
-    }
-
+    
+    protected abstract StockServer getStockServer();
+    
     @Override
-    public Market getMarket() {
-        try {
-            return new YahooMarket();
+    public Market getMarket(Index index) {
+        List<Index> indices = new ArrayList<Index>();
+        indices.add(index);
+        java.util.List<Market> markets = getMarkets(indices);
+        if (markets.size() == 1) {
+            return markets.get(0);
         }
-        catch (StockNotFoundException exp) {
-            log.error(null, exp);
-        }
-
         return null;
     }
-
-    private final class YahooMarket implements Market {
-        private final Map<Index, Stock> map = new EnumMap<Index, Stock>(Index.class);
+    
+    @Override
+    public java.util.List<Market> getMarkets(java.util.List<Index> indices) {
+        assert(false == indices.isEmpty());
         
-        public YahooMarket() throws StockNotFoundException {
-            List<Stock> stocks;
-
-            try {
-                stocks = AbstractYahooMarketServer.this.stockServer.getStocks(codes);
-            } catch (StockNotFoundException ex) {
-                throw ex;
+        StockServer stockServer = AbstractYahooMarketServer.this.getStockServer();
+        
+        List<Code> codes = new ArrayList<Code>();
+        for (Index index : indices) {
+            codes.add(index.code);
+        }
+        
+        List<Stock> stocks = null;
+        try {
+            stocks = stockServer.getStocks(codes);
+        } catch (StockNotFoundException e) {
+            log.error(null, e);
+            return java.util.Collections.emptyList();
+        }
+        
+        Map<Code, Stock> map = new HashMap<Code, Stock>();
+        for (Stock stock : stocks) {
+            map.put(stock.code, stock);
+        }
+        
+        List<Market> markets = new ArrayList<Market>();
+        for (Index index : indices) {
+            Stock stock = map.get(index.code);
+            if (stock != null) {
+                Market market = Market.newInstance(stock, index);
+                markets.add(market);
             }
-
-            for (Stock stock : stocks) {
-                map.put(codeToIndexMap.get(stock.code), stock);
-            }
         }
-
-        @Override
-        public double getIndex(Index index) {
-            final Stock stock = map.get(index);
-            if (stock == null) {
-                return 0.0;
-            }
-            return stock.getLastPrice();
-        }
-
-        @Override
-        public double getChange(Index index) {
-            final Stock stock = map.get(index);
-            if (stock == null) {
-                return 0.0;
-            }
-            return stock.getChangePrice();
-        }
-
-        @Override
-        public int getNumOfStockChange(ChangeType type) {
-            return 0;
-        }
-
-        @Override
-        public long getVolume() {
-            long total = 0;
-            for (Stock stock : map.values()) {
-                total += stock.getVolume();
-            }
-            return total;
-        }
-
-        @Override
-        public double getValue() {
-            double total = 0;
-            for (Stock stock : map.values()) {
-                total += stock.getLastPrice();
-            }
-            return total;
-        }
-
-        @Override
-        public Country getCountry() {
-            return country;
-        }
+        
+        return markets;
     }
+    
+    private static final Log log = LogFactory.getLog(AbstractYahooMarketServer.class);
 }

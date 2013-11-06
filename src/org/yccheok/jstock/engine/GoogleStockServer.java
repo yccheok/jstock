@@ -4,7 +4,7 @@
  */
 package org.yccheok.jstock.engine;
 
-import java.io.IOException;
+import com.google.gson.Gson;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  *
@@ -22,8 +21,7 @@ import org.codehaus.jackson.map.ObjectMapper;
  */
 public class GoogleStockServer implements StockServer {
 
-    public GoogleStockServer(Country country) {
-        this.country = country;
+    public GoogleStockServer() {
     }
     
     @Override
@@ -37,13 +35,61 @@ public class GoogleStockServer implements StockServer {
         throw new StockNotFoundException();
     }
 
+    private Code getOriginalCode(Map<String, Code> originalCodes, String googleTicker, String googleExchange) {
+        final Code googleCode = Code.newInstance(googleExchange + ":" + googleTicker);
+        Code result = originalCodes.get(googleCode.toString());
+        
+        if (result != null) {
+            return result;
+        }
+        
+        result = originalCodes.get(Utils.toYahooFormat(googleCode).toString());
+        
+        if (result != null) {
+            return result;
+        }
+        
+        // Special handling for India case.
+        final int googleTickerLength = googleTicker.length();
+        final int ns_length = ".NS".length();
+        for (Map.Entry<String, Code> entry : originalCodes.entrySet()) {
+            String key = entry.getKey();
+            final Code value = entry.getValue();
+            
+            if (key.endsWith(".NS") &&  key.length() > ns_length) {
+                key = key.substring(0, key.length() - ns_length);
+            }
+            
+            if (googleTickerLength >= key.length()) {
+                if (googleTicker.equals(key)) {
+                    result = value;
+                    // Early break.
+                    break;
+                }
+                if (googleTicker.contains(key)) {
+                    result = value;
+                    // Don't break. Keep searching. We might
+                    // have a better.
+                }
+            } else {
+                if (key.contains(googleTicker)) {
+                    result = value;
+                    // Don't break. Keep searching. We might
+                    // have a better.
+                }
+            } 
+        }
+      
+        return result;
+    }
+    
     @Override
     public List<Stock> getStocks(List<Code> codes) throws StockNotFoundException {
         assert(codes.isEmpty() == false);
         
-        Map<String, Code> map = new HashMap<String, Code>();
+        Map<String, Code> originalCodes = new HashMap<String, Code>();
         for (Code code : codes) {
-            map.put(code.toString().trim().toUpperCase(), code);
+            originalCodes.put(code.toString().trim().toUpperCase(), code);
         }
                 
         // Use StringBuilder instead of StringBuffer. We do not concern on 
@@ -60,66 +106,33 @@ public class GoogleStockServer implements StockServer {
             }
             
             final String location = builder.toString();
-            final String respond = Utils.GoogleRespondToJSON(org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(location));
+            final String _respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(location);
+            if (_respond == null) {
+                throw new StockNotFoundException();
+            }
+            final String respond = Utils.GoogleRespondToJSON(_respond);
             // Google returns "// [ { "id": ... } ]".
             // We need to turn them into "[ { "id": ... } ]".
-            final List<Map> jsonArray = mapper.readValue(respond, List.class);
-
+            final List<Map> jsonArray = gson.fromJson(respond, List.class);
             final List<Stock> stocks = new ArrayList<Stock>();
             for (int i = 0, size = jsonArray.size(); i < size; i++) {
                 final Map<String, String> jsonObject = jsonArray.get(i);
                 final String name;
-                final String _code0;
-                final String _code1;
+                final String ticker;
+                final String exchange;
                 
                 try {
                     name = jsonObject.get("name");
-
-                    if (country == Country.India) {
-                        _code0 = jsonObject.get("t").toUpperCase() + ".NS";
-                        _code1 = "NSE:" + jsonObject.get("t").toUpperCase();
-                    } else {
-                        assert(false);
-                        _code0 = jsonObject.get("t").toUpperCase();
-                        _code1 = _code0;
-                    }
+                    ticker = jsonObject.get("t").toUpperCase();
+                    exchange = jsonObject.get("e").toUpperCase();
                 } catch (Exception ex) {
                     log.error(null, ex);
                     continue;
                 }
                 
-                // Code
-                Code code = map.get(_code0);
+                Code code = getOriginalCode(originalCodes, ticker, exchange);
                 if (code == null) {
-                    // I know lah!
-                    if (_code0 != _code1) {
-                        code = map.get(_code1);
-                    }
-                    
-                    if (country == Country.India) {
-                        if (code == null) {
-                            String googleResult = jsonObject.get("t").toUpperCase();
-                            for (Code c : codes) {
-                                String _c = withoutIndiaPrefixOrSufix(c.toString().toUpperCase());
-                                if (googleResult.length() >= _c.length()) {
-                                    if (googleResult.contains(_c)) {
-                                        code = c;
-                                        break;
-                                    }
-                                } else {
-                                    if (_c.contains(googleResult)) {
-                                        code = c;
-                                        break;
-                                    }
-                                }
-                            }
-                            
-                        }
-                    }
-                    
-                    if (code == null) {
-                        continue;
-                    }
+                    continue;
                 }
                 
                 double c = 0;
@@ -188,8 +201,6 @@ public class GoogleStockServer implements StockServer {
             return stocks;                
         } catch (UnsupportedEncodingException ex) {
             throw new StockNotFoundException(null, ex);
-        } catch (IOException ex) {
-            throw new StockNotFoundException(null, ex);
         } catch (Exception ex) {
             // Jackson library may cause runtime exception if there is error
             // in the JSON string.
@@ -197,22 +208,7 @@ public class GoogleStockServer implements StockServer {
         }
     }
     
-    private String withoutIndiaPrefixOrSufix(String code) {
-        final int nse_length = "NES:".length();
-        
-        if (code.startsWith("NSE:") && code.length() > nse_length) {
-            return code.substring(nse_length);
-        }
-        
-        final int ns_length = ".NS".length();
-        if (code.endsWith(".NS") && code.length() > ns_length) {
-            return code.substring(0, code.length() - ns_length);
-        }
-        return code;
-    }
-    
     // Will it be better if we make this as static?
-    private final ObjectMapper mapper = new ObjectMapper();
-    private final Country country;
+    private final Gson gson = new Gson();
     private static final Log log = LogFactory.getLog(GoogleStockServer.class);
 }

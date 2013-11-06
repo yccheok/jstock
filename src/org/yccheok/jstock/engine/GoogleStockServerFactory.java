@@ -28,18 +28,12 @@ package org.yccheok.jstock.engine;
  */
 public class GoogleStockServerFactory implements StockServerFactory {
 
-    private GoogleStockServerFactory(Country country) {
-        marketServer = new GoogleMarketServer(country);
-        this.country = country;
-        if (country == Country.India) {
-            stockServer = new GoogleStockServer(country);
+    private GoogleStockServerFactory(boolean useStockServer) {
+        if (useStockServer) {
+            stockServer = new GoogleStockServer();
         } else {
             stockServer = null;
         }        
-    }
-
-    public Country getCountry() {
-        return country;
     }
     
     /**
@@ -48,8 +42,8 @@ public class GoogleStockServerFactory implements StockServerFactory {
      * @param country the country
      * @return GoogleStockServerFactory based on given country
      */
-    public static StockServerFactory newInstance(Country country) {
-        return new GoogleStockServerFactory(country);
+    public static StockServerFactory newInstance(boolean useStockServer) {
+        return new GoogleStockServerFactory(useStockServer);
     }
 
     /**
@@ -104,7 +98,6 @@ public class GoogleStockServerFactory implements StockServerFactory {
         return null;
     }
     
-    private final MarketServer marketServer;
     private final StockServer stockServer;
-    private final Country country;
+    private final MarketServer marketServer = new GoogleMarketServer();
 }

@@ -32,14 +32,9 @@ import java.util.Set;
 public abstract class AbstractYahooStockServer implements StockServer {
     protected abstract String getYahooCSVBasedURL();
 
-    public AbstractYahooStockServer(Country country) {
-        this.country = country;
+    public AbstractYahooStockServer() {
     }
-
-    public Country getCountry() {
-        return this.country;
-    }
-
+    
     private boolean isToleranceAllowed(int currSize, int expectedSize) {
         if (currSize >= expectedSize) {
             return true;
@@ -54,18 +49,12 @@ public abstract class AbstractYahooStockServer implements StockServer {
 
     @Override
     public List<Stock> getStocks(List<Code> codes) throws StockNotFoundException {
-        List<Code> c = new ArrayList<Code>();
-        for (Code code : codes) {
-            final Code newCode = Utils.toYahooFormat(code, this.country);
-            c.add(newCode);
-        }
-        return _getStocks(c);
+        return _getStocks(codes);
     }
 
     @Override
     public Stock getStock(Code code) throws StockNotFoundException {
-        final Code newCode = Utils.toYahooFormat(code, this.country);
-        return _getStock(newCode);
+        return _getStock(code);
     }
 
     private List<Stock> _getStocks(List<Code> codes) throws StockNotFoundException {
@@ -362,6 +351,4 @@ public abstract class AbstractYahooStockServer implements StockServer {
     //
     // "MAERSKB.CO","AP MOELLER-MAERS-","Copenhagen",32500.00,33700.00,34200.00,33400.00,660,"+1200.00","N/A - +3.69%",33,33500.00,54,33700.00,96,"11/10/2008","10:53am"
     private static final String YAHOO_STOCK_FORMAT = "&f=snxspsosl1shsgsvsc1sp2sk3sb3sb6sb2sa5sd1t1";
-
-    private final Country country;
 }

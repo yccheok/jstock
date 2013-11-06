@@ -28,9 +28,8 @@ package org.yccheok.jstock.engine;
  */
 public class YQLStockServerFactory implements StockServerFactory {
 
-    private YQLStockServerFactory(Country country) {
-        stockServer = new YQLStockServer();
-        marketServer = new YQLMarketServer(country);
+    private YQLStockServerFactory() {
+
     }
 
     /**
@@ -39,8 +38,8 @@ public class YQLStockServerFactory implements StockServerFactory {
      * @param country the country
      * @return GoogleStockServerFactory based on given country
      */
-    public static StockServerFactory newInstance(Country country) {
-        return new YQLStockServerFactory(country);
+    public static StockServerFactory newInstance() {
+        return new YQLStockServerFactory();
     }
 
     /**
@@ -95,6 +94,6 @@ public class YQLStockServerFactory implements StockServerFactory {
         return null;
     }
     
-    private final MarketServer marketServer;
-    private final StockServer stockServer;
+    private final StockServer stockServer = new YQLStockServer();
+    private final MarketServer marketServer = new YQLMarketServer();    
 }

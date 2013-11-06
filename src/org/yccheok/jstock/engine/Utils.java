@@ -369,10 +369,73 @@ public class Utils {
      * @return code in Google's format
      */
     public static Code toGoogleFormat(Code code) {
+        if (isYahooIndex(code)) {
+            return toGoogleIndex(code);
+        }
+        
         String string = code.toString().trim().toUpperCase();
-        if (string.equals("^KLSE")) {
-            //return Code.newInstance("INDEXFTSE:FBMKLCI");
-        } else if (string.equals("^DJI")) {
+        final int string_length = string.length();
+        if (string.endsWith(".NS") && string_length > ".NS".length()) {
+            // Resolving Yahoo server down for India NSE stock market. Note, we
+            // do not support Bombay stock market at this moment, due to the
+            // difficulty in converting "TATACHEM.BO" (Yahoo Finance) to 
+            // "BOM:500770" (Google Finance)
+            string = string.substring(0, string_length - ".NS".length());
+            return Code.newInstance("NSE:" + toGoogleFormatThroughAutoComplete(string, "NSE"));
+        } else if (string.endsWith(".SS") && string_length > ".SS".length()) {
+            string = "SHA:" + string.substring(0, string_length - ".SS".length());
+            return Code.newInstance(string);
+        } else if (string.endsWith(".SZ") && string_length > ".SZ".length()) {
+            string = "SHE:" + string.substring(0, string_length - ".SZ".length());
+            return Code.newInstance(string);
+        }
+        return Code.newInstance(string);
+    }
+    
+    public static Code toYahooFormat(Code code) {
+        String string = code.toString().trim().toUpperCase();
+        final int string_length = string.length();
+        if (string.startsWith("SHA:") && string_length > "SHA:".length()) {
+            string = string.substring("SHA:".length()) + ".SS";
+            return Code.newInstance(string);
+        } else if (string.startsWith("SHE:") && string_length > "SHE:".length()) {
+            string = string.substring("SHE:".length()) + ".SZ";
+            return Code.newInstance(string);
+        } else if (string.startsWith("NASDAQ:") && string_length > "NASDAQ:".length()) {
+            string = string.substring("NASDAQ:".length());
+            return Code.newInstance(string);
+        } else if (string.startsWith("NYSE:") && string_length > "NYSE:".length()) {
+            string = string.substring("NYSE:".length());
+            return Code.newInstance(string);
+        }
+        
+        Code newCode = toYahooIndex(code);
+        return newCode;
+    }
+    
+    public static boolean isYahooIndex(Code code) {
+        return code.toString().startsWith("^");
+    }
+    
+    public static Code toYahooIndex(Code code) {
+        String string = code.toString().trim().toUpperCase();
+        if (string.equals("INDEXDJX:.DJI")) {
+            return Code.newInstance("^DJI");
+        } else if (string.equals("INDEXNASDAQ:.IXIC")) {
+            return Code.newInstance("^IXIC");
+        } else if (string.equals("INDEXBOM:SENSEX")) {
+            return Code.newInstance("^BSESN");
+        } else if (string.equals("NSE:NIFTY")) {
+            return Code.newInstance("^NSEI");
+        } else if (string.equals("NSE:BANKNIFTY")) {
+            return Code.newInstance("^NSEBANK");
+        }
+        return code;        
+    }
+    
+    public static Code toGoogleIndex(Code code) {
+        String string = code.toString().trim().toUpperCase();
+        if (string.equals("^DJI")) {
             return Code.newInstance("INDEXDJX:.DJI");
         } else if (string.equals("^IXIC")) {
             return Code.newInstance("INDEXNASDAQ:.IXIC");
@@ -380,15 +443,10 @@ public class Utils {
             return Code.newInstance("INDEXBOM:SENSEX");
         } else if (string.equals("^NSEI")) {
             return Code.newInstance("NSE:NIFTY");
-        } else if (string.endsWith(".NS") && string.length() > ".NS".length()) {
-            // Resolving Yahoo server down for India NSE stock market. Note, we
-            // do not support Bombay stock market at this moment, due to the
-            // difficulty in converting "TATACHEM.BO" (Yahoo Finance) to 
-            // "BOM:500770" (Google Finance)
-            string = string.substring(0, string.length() - ".NS".length());
-            return Code.newInstance("NSE:" + toGoogleFormatThroughAutoComplete(string, "NSE"));
+        } else if (string.equals("^NSEBANK")) {
+            return Code.newInstance("NSE:BANKNIFTY");
         }
-        return Code.newInstance(string);
+        return code;
     }
     
     private static String toGoogleFormatThroughAutoComplete(String code, String exchange) {

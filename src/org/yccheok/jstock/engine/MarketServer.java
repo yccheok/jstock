@@ -24,5 +24,9 @@ package org.yccheok.jstock.engine;
  * @author yccheok
  */
 public interface MarketServer {
-    public Market getMarket();    
+    // Always returns non-empty list. If we are requesting for 3 indices, here
+    // is the possible size of the list. [0, 3].
+    public java.util.List<Market> getMarkets(java.util.List<Index> indices);
+    // Returns null or non-null.
+    public Market getMarket(Index index);
 }

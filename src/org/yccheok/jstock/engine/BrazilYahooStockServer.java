@@ -115,8 +115,8 @@ public class BrazilYahooStockServer extends AbstractYahooStockServer {
         return stock;
     }
 
-    public BrazilYahooStockServer(Country country) {
-        super(country);
+    public BrazilYahooStockServer() {
+        super();
     }
 
     private static final Pattern longSpacePattern = Pattern.compile("\\s\\s+");

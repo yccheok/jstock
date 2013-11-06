@@ -29,7 +29,7 @@ public class YahooStockServer extends AbstractYahooStockServer {
         return "http://finance.yahoo.com/d/quotes.csv?s=";
     }
     
-    public YahooStockServer(Country country) {
-        super(country);
+    public YahooStockServer() {
+        super();
     }
 }
