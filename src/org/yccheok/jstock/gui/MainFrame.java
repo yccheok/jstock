@@ -3074,53 +3074,47 @@ public class MainFrame extends javax.swing.JFrame {
         public void run() {
             final Thread currentThread = Thread.currentThread();
 
+            final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactories();
+            final java.util.List<Index> is = org.yccheok.jstock.engine.Utils.getStockIndices(jStockOptions.getCountry());
+            final int is_size = is.size();
+            
             // Do not rely on isInterrupted flag only. The flag can be cleared by 3rd party easily.
             // Check for current thread as well.
             while (!currentThread.isInterrupted()  && (marketThread == currentThread)) {
-                boolean success = false;
-                final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactories();
                 
-                int best = 0;
-                Market bestMarket = null;
-                                                
+                int fail = is_size;
+                
                 for (StockServerFactory factory : stockServerFactories) {
-                    MarketServer server = factory.getMarketServer();
+                    MarketServer marketServer = factory.getMarketServer();
                     
-                    final Market market = server.getMarket();
-                    
-                    if (market != null) {
-                        // Pretty hacking way to check how good is the returned
-                        // result. We should tighten rule for isToleranceAllowed.
-                        // However, that will create another set of problem.
-                        // Say in stock watchlist, we are having 1 bad stock and
-                        // 1 good stock within single request. Tighten rule for 
-                        // isToleranceAllowed will always fail the entire request
-                        // result.
-                        java.util.List<Index> indices = org.yccheok.jstock.engine.Utils.getStockIndices(market.getCountry());                
-                        int good = 0;
-                        for (Index index : indices) {
-                            final double _index = market.getIndex(index);
-                            if (_index != 0.0) {
-                                good++;
-                            }
-                        }
-                        if (good > best) {
-                            best = good;
-                            bestMarket = market;
-                            if (best == indices.size()) {
-                                break;
-                            }
-                        }                        
+                    if (marketServer == null) {
+                        continue;
                     }
-                }
-                
-                if (bestMarket != null) {
-                    update(bestMarket);
-                    success = true;
+                    
+                    java.util.List<Market> markets = marketServer.getMarkets(is);
+                    
+                                        
+                    if (marketThread != currentThread) {
+                        break;
+                    }
+
+                    final int market_size = markets.size();
+
+                    // Very strict rule.
+                    if (market_size != is_size) {
+                        continue;
+                    }
+
+                    fail -= market_size;
+
+                    // Notify all the interested parties.
+                    update(markets);
+
+                    break;
                 }
                 
                 try {
-                    if (success) {
+                    if (fail == 0) {
                         Thread.sleep(jStockOptions.getScanningSpeed());
                     } else {
                         if (minDelayCounter < MIN_DELAY_COUNTER) {
@@ -3132,8 +3126,8 @@ public class MainFrame extends javax.swing.JFrame {
                         } else {
                             Thread.sleep(jStockOptions.getScanningSpeed());
                         }
-                    }                    
-                } catch (InterruptedException exp) {
+                    }
+                } catch (java.lang.InterruptedException exp) {
                     log.error(null, exp);
                     break;
                 }
@@ -4191,16 +4185,13 @@ public class MainFrame extends javax.swing.JFrame {
         return MessageFormat.format(GUIBundle.getString("MainFrame_LastUpdate_template"), currentName, time);
     }
     
-    private void update(final Market market) {
-        // We are only interested in current selected country.
-        if (market.getCountry() != this.jStockOptions.getCountry()) {
-            return;
-        }
-
+    private void update(final java.util.List<Market> markets) {
+        assert(markets.isEmpty() == false);
+        
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-               marketJPanel.update(market);
+               marketJPanel.update(markets);
             }
         });
     }

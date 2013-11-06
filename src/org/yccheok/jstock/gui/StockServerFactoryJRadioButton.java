@@ -27,6 +27,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.Country;
+import org.yccheok.jstock.engine.Index;
 import org.yccheok.jstock.engine.StockNotFoundException;
 import org.yccheok.jstock.engine.StockServer;
 import org.yccheok.jstock.engine.StockServerFactory;
@@ -71,6 +72,8 @@ public class StockServerFactoryJRadioButton extends JRadioButton {
     // It is possible that we can avoid from hard coding?
     // MSFT and PBBANK were choosen, because they are the best stock in the town.
     private Health getServerHealth() {
+        final Country country = MainFrame.getInstance().getJStockOptions().getCountry();
+        
         final Health health = new Health();
 
         /* Test For Stock */
@@ -83,14 +86,14 @@ public class StockServerFactoryJRadioButton extends JRadioButton {
             code = Code.newInstance("BBDC4.SA");
         }
         else if (c == org.yccheok.jstock.engine.YahooStockServerFactory.class) {
-            if (((org.yccheok.jstock.engine.YahooStockServerFactory)stockServerFactory).getCountry() == Country.India) {
+            if (country == Country.India) {
                 code = Code.newInstance("TATAPOWER.NS");
             } else {
                 code = Code.newInstance("MSFT");
             }
         }
         else if (c == org.yccheok.jstock.engine.GoogleStockServerFactory.class) {
-            if (((org.yccheok.jstock.engine.GoogleStockServerFactory)stockServerFactory).getCountry() == Country.India) {
+            if (country == Country.India) {
                 code = Code.newInstance("TATAPOWER.NS");
             } else {
                 code = Code.newInstance("MSFT");
@@ -119,7 +122,9 @@ public class StockServerFactoryJRadioButton extends JRadioButton {
         }
 
         /* Test for Market */
-        if (null != stockServerFactory.getMarketServer().getMarket())
+        final java.util.List<Index> is = org.yccheok.jstock.engine.Utils.getStockIndices(country);
+        final int is_size = is.size();
+        if (is_size == stockServerFactory.getMarketServer().getMarkets(is).size())
         {
             health.market = true;
         }

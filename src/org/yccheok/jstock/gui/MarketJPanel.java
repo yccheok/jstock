@@ -63,19 +63,18 @@ public class MarketJPanel extends javax.swing.JPanel {
         add(leftPanel, java.awt.BorderLayout.WEST);
     }// </editor-fold>//GEN-END:initComponents
 
-    public void update(Market market) {
-        List<Index> indices = org.yccheok.jstock.engine.Utils.getStockIndices(country);
+    public void update(List<Market> markets) {
         final java.text.NumberFormat numberFormat = java.text.NumberFormat.getInstance();
         
         numberFormat.setMaximumFractionDigits(2);
         numberFormat.setMinimumFractionDigits(2);
 
-        for (Index index : indices) {
-            final double _index = market.getIndex(index);
-            final double change = market.getChange(index);
+        for (Market market : markets) {
+            final double _index = market.stock.getLastPrice();
+            final double change = market.stock.getChangePrice();
             final Color color = Utils.getColor(change, 0.0);
             
-            JLabel label = map.get(index.name());
+            JLabel label = map.get(market.index.name());
             
             if (label == null) {
                 continue;
