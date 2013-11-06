@@ -70,7 +70,7 @@ public abstract class AbstractYahooStockHistoryServer implements StockHistorySer
         historyDatabase.clear();
         timestamps.clear();
 
-        long timestamp = System.currentTimeMillis();
+        long timestamp = 0;
 
         String[] stockDatas = respond.split("\r\n|\r|\n");
 
