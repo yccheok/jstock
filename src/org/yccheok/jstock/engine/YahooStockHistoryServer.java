@@ -37,6 +37,8 @@ public class YahooStockHistoryServer extends AbstractYahooStockHistoryServer {
 
     @Override
     protected StockServer getStockServer() {
-        return new YahooStockServer();
+        return stockServer;
     }
+    
+    private final StockServer stockServer = new YahooStockServer();
 }

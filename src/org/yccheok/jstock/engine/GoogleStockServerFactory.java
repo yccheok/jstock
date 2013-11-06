@@ -19,6 +19,9 @@
 
 package org.yccheok.jstock.engine;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Provides all Google servers, by using abstract factory pattern. Currently,
  * we only support MarketServer. For rest of the servers, we will either return
@@ -66,7 +69,13 @@ public class GoogleStockServerFactory implements StockServerFactory {
      */
     @Override
     public StockHistoryServer getStockHistoryServer(Code code) {
-        return null;
+        try {
+            return new GoogleStockHistoryServer(code);
+        }
+        catch (StockHistoryNotFoundException exp) {
+            log.error(null, exp);
+            return null;
+        }
     }
 
     /**
@@ -80,7 +89,13 @@ public class GoogleStockServerFactory implements StockServerFactory {
      */
     @Override
     public StockHistoryServer getStockHistoryServer(Code code, Duration duration) {
-        return null;
+        try {
+            return new GoogleStockHistoryServer(code, duration);
+        }
+        catch (StockHistoryNotFoundException exp) {
+            log.error(null, exp);
+            return null;
+        }
     }
 
     /**
@@ -100,4 +115,6 @@ public class GoogleStockServerFactory implements StockServerFactory {
     
     private final StockServer stockServer;
     private final MarketServer marketServer = new GoogleMarketServer();
+    
+    private static final Log log = LogFactory.getLog(GoogleStockServerFactory.class);
 }
