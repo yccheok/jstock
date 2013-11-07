@@ -37,8 +37,9 @@ public class YahooStockHistoryServer extends AbstractYahooStockHistoryServer {
 
     @Override
     protected StockServer getStockServer() {
-        return stockServer;
+        // Don't return member variable, as NPE might occur. We do have case 
+        // where constructor calls abstract method.
+        // http://stackoverflow.com/questions/15327417/is-it-ok-to-call-abstract-method-from-constructor-in-java        
+        return new YahooStockServer();
     }
-    
-    private final StockServer stockServer = new YahooStockServer();
 }

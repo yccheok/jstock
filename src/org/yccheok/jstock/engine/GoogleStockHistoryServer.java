@@ -21,6 +21,7 @@ package org.yccheok.jstock.engine;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -109,8 +110,8 @@ public class GoogleStockHistoryServer implements StockHistoryServer {
         String name = symbol.toString();
         Stock.Board board = Stock.Board.Unknown;
         Stock.Industry industry = Stock.Industry.Unknown;
-
-        boolean alreadyGetStock = false;
+        Calendar calendar = null;
+        boolean initialized = false;
         
         for (String stockData : stockDatas) {
             if (stockData.isEmpty()) {
@@ -183,7 +184,7 @@ public class GoogleStockHistoryServer implements StockHistoryServer {
             double changePrice = (previousClosePrice == Double.MAX_VALUE) ? 0 : closePrice - previousClosePrice;
             double changePricePercentage = ((previousClosePrice == Double.MAX_VALUE) || (previousClosePrice == 0.0)) ? 0 : changePrice / previousClosePrice * 100.0;
 
-            if (alreadyGetStock == false) {
+            if (initialized == false) {
                 try {
                     Stock stock = stockServer.getStock(googleCode);
                     symbol = stock.symbol;
@@ -194,10 +195,22 @@ public class GoogleStockHistoryServer implements StockHistoryServer {
                 catch (StockNotFoundException exp) {
                     log.error(null, exp);
                 }
-                alreadyGetStock = true;
+                
+                calendar = Calendar.getInstance();
+                
+                initialized = true;
             }
             
-            final long currentTimeInMilli = currentTime*1000;
+            long currentTimeInMilli = currentTime*1000;
+            
+            // Remove time information, by resetting it to 00:00
+            currentTimeInMilli = currentTimeInMilli / 1000 / 24 / 60 / 60;
+            currentTimeInMilli = currentTimeInMilli * 60 * 60 * 24 * 1000;
+                        
+            // Make it as local timestamp.
+            calendar.setTimeInMillis(currentTimeInMilli);        
+            int offset = -(calendar.get(Calendar.ZONE_OFFSET) + calendar.get(Calendar.DST_OFFSET));
+            currentTimeInMilli = currentTimeInMilli + offset;
             
             Stock stock = new Stock(
                     code,
@@ -228,13 +241,13 @@ public class GoogleStockHistoryServer implements StockHistoryServer {
                     0,
                     currentTimeInMilli
                     );
-            
+
             historyDatabase.put(currentTimeInMilli, stock);
             timestamps.add(currentTimeInMilli);
             previousClosePrice = closePrice;                        
         } 
         
-        return false;
+        return (historyDatabase.size() > 0);
     }
     
     @Override
