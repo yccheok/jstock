@@ -1311,6 +1311,18 @@ public class IndicatorPanel extends JPanel {
         return a;
     }
     
+    public void initAjaxProvider() {        
+        JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        
+        Country country = jStockOptions.getCountry();
+        
+        if (country == Country.India) {
+            ((AutoCompleteJComboBox)this.jComboBox1).setAjaxProvider(AutoCompleteJComboBox.AjaxServiceProvider.Google, Arrays.asList("NSE", "BOM"));
+        } else {
+            ((AutoCompleteJComboBox)this.jComboBox1).setAjaxProvider(AutoCompleteJComboBox.AjaxServiceProvider.Yahoo, java.util.Collections.<String>emptyList());
+        }
+    }
+    
     public void setStockInfoDatabase(StockInfoDatabase stockInfoDatabase) {
         ((AutoCompleteJComboBox)jComboBox1).setStockInfoDatabase(stockInfoDatabase);
     }

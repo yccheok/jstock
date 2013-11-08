@@ -25,6 +25,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.List;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
@@ -43,7 +44,6 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.yccheok.jstock.engine.AjaxYahooSearchEngine;
 import org.yccheok.jstock.engine.ResultSetType;
 import org.yccheok.jstock.engine.ResultType;
 import org.yccheok.jstock.engine.AjaxYahooSearchEngineMonitor;
@@ -57,6 +57,10 @@ import org.yccheok.jstock.engine.Subject;
  * @author yccheok
  */
 public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAdjustable {
+    public enum AjaxServiceProvider {
+        Google,
+        Yahoo
+    }
 
     // Use SubjectEx, in order to make notify method public.
     private static class SubjectEx<S, A> extends Subject<S, A> {
@@ -314,6 +318,10 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
                 }
             }   /* public void keyReleased(KeyEvent e) */
         };
+    }
+
+    public void setAjaxProvider(AjaxServiceProvider ajaxServiceProvider, List<String> exchs) {
+        System.out.println(ajaxServiceProvider);
     }
 
     private Observer<AjaxYahooSearchEngineMonitor, ResultSetType> getMonitorObserver() {

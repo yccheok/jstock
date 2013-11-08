@@ -138,6 +138,7 @@ public class MainFrame extends javax.swing.JFrame {
         this.initMyJXStatusBarCountryLabelMouseAdapter();
         this.initMyJXStatusBarImageLabelMouseAdapter();
         this.initDatabase(true);
+        this.initAjaxProvider();
         this.initMarketThread();
         this.initLatestNewsTask();
         this.initKLSEInfoStockServerFactoryThread();
@@ -2390,6 +2391,7 @@ public class MainFrame extends javax.swing.JFrame {
         // The user-defined-database.xml is extracted from cloud
         // freshly.
         this.initDatabase(true);
+        this.initAjaxProvider();
         this.initMarketThread();
         this.initMarketJPanel();
         this.initStockHistoryMonitor();
@@ -2473,6 +2475,7 @@ public class MainFrame extends javax.swing.JFrame {
         this.indicatorScannerJPanel.clear();
 
         this.initDatabase(true);
+        this.initAjaxProvider();
         this.initMarketThread();
         this.initMarketJPanel();
         this.initStockHistoryMonitor();
@@ -3915,6 +3918,18 @@ public class MainFrame extends javax.swing.JFrame {
         
         this.marketThread = new Thread(new MarketRunnable());
         this.marketThread.start();
+    }
+    
+    private void initAjaxProvider() {
+        Country country = this.jStockOptions.getCountry();
+        
+        if (country == Country.India) {
+            ((AutoCompleteJComboBox)this.jComboBox1).setAjaxProvider(AutoCompleteJComboBox.AjaxServiceProvider.Google, Arrays.asList("NSE", "BOM"));
+        } else {
+            ((AutoCompleteJComboBox)this.jComboBox1).setAjaxProvider(AutoCompleteJComboBox.AjaxServiceProvider.Yahoo, java.util.Collections.<String>emptyList());
+        }
+        
+        this.indicatorPanel.initAjaxProvider();
     }
     
     private void initDatabase(boolean readFromDisk) {

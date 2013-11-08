@@ -54,9 +54,9 @@ import javax.swing.table.TableRowSorter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jdesktop.jxlayer.JXLayer;
-import org.yccheok.jstock.engine.AjaxYahooSearchEngine;
 import org.yccheok.jstock.engine.ResultType;
 import org.yccheok.jstock.engine.Code;
+import org.yccheok.jstock.engine.Country;
 import org.yccheok.jstock.engine.Observer;
 import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.engine.StockInfoDatabase;
@@ -82,8 +82,21 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         this.jComboBox1.requestFocus();
         ((AjaxAutoCompleteJComboBox)this.jComboBox1).attachResultObserver(getResultObserver());
         
+        initAjaxProvider();
     }
 
+    private void initAjaxProvider() {
+        JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        
+        Country country = jStockOptions.getCountry();
+        
+        if (country == Country.India) {
+            ((AjaxAutoCompleteJComboBox)this.jComboBox1).setAjaxProvider(AjaxAutoCompleteJComboBox.AjaxServiceProvider.Google, Arrays.asList("NSE", "BOM"));
+        } else {
+            ((AjaxAutoCompleteJComboBox)this.jComboBox1).setAjaxProvider(AjaxAutoCompleteJComboBox.AjaxServiceProvider.Yahoo, java.util.Collections.<String>emptyList());
+        }
+    }
+    
     // Install JXLayer around JComboBox.
     // It is used to display busy indicator.
     private void initJXLayerOnJComboBox() {

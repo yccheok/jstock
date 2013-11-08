@@ -74,8 +74,6 @@ public class GoogleStockHistoryServer implements StockHistoryServer {
         
         final String location = stringBuilder.toString();
         
-        System.out.println(location);
-        
         boolean success = false;
         
         for (int retry = 0; retry < NUM_OF_RETRY; retry++) {

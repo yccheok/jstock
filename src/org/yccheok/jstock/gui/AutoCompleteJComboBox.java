@@ -23,6 +23,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import javax.swing.*;
 import java.awt.event.*;
+import java.util.List;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.PopupMenuEvent;
@@ -43,6 +44,11 @@ import org.yccheok.jstock.engine.ResultType;
  */
 public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAdjustable {
 
+    public enum AjaxServiceProvider {
+        Google,
+        Yahoo
+    }
+    
     // Use SubjectEx, in order to make notify method public.
     private static class SubjectEx<S, A> extends Subject<S, A> {
         @Override
@@ -84,7 +90,8 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
             log.error("Unable to attach DocumentListener to AutoCompleteJComboBox.");
         }
 
-        this.ajaxYahooSearchEngineMonitor.attach(getMonitorObserver());
+        this.ajaxYahooSearchEngineMonitor.attach(getYahooMonitorObserver());
+        this.ajaxGoogleSearchEngineMonitor.attach(getGoogleMonitorObserver());
         
         this.addActionListener(getActionListener());
 
@@ -256,10 +263,11 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
                 // resized.
                 AutoCompleteJComboBox.this.hidePopup();
                 AutoCompleteJComboBox.this.removeAllItems();
+                
+                boolean shouldShowPopup = false;
+                
                 if (AutoCompleteJComboBox.this.stockInfoDatabase != null) {
                     java.util.List<StockInfo> stockInfos = stockInfoDatabase.searchStockInfos(string);
-
-                    boolean shouldShowPopup = false;
 
                     if (stockInfos.isEmpty() == false) {
                         // Change to offline mode before adding any item.
@@ -275,18 +283,26 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
                         AutoCompleteJComboBox.this.showPopup();
                     }
                     else {
-                        // OK. We found nothing from offline database. Let's
-                        // ask help from online database.
-                        // We are busy contacting server right now.
 
-                        // TODO
-                        // Only enable ajaxYahooSearchEngineMonitor, till we solve
-                        // http://sourceforge.net/apps/mediawiki/jstock/index.php?title=TechnicalDisability
-                        busySubject.notify(AutoCompleteJComboBox.this, true);
-                        ajaxYahooSearchEngineMonitor.clearAndPut(string);
                     }   // if (shouldShowPopup)
                 }   // if (AutoCompleteJComboBox.this.stockInfoDatabase != null)
 
+                if (shouldShowPopup == false) {
+                    // OK. We found nothing from offline database. Let's
+                    // ask help from online database.
+                    // We are busy contacting server right now.
+
+                    // TODO
+                    // Only enable ajaxYahooSearchEngineMonitor, till we solve
+                    // http://sourceforge.net/apps/mediawiki/jstock/index.php?title=TechnicalDisability
+                    busySubject.notify(AutoCompleteJComboBox.this, true);
+                    if (ajaxServiceProvider == AjaxServiceProvider.Yahoo) {
+                        ajaxYahooSearchEngineMonitor.clearAndPut(string);
+                    } else if (ajaxServiceProvider == AjaxServiceProvider.Google) {
+                        ajaxGoogleSearchEngineMonitor.clearAndPut(string);
+                    }                    
+                }
+                
                 // When we are in windows look n feel, the text will always be selected. We do not want that.
                 final Component component = AutoCompleteJComboBox.this.getEditor().getEditorComponent();
                 if (component instanceof JTextField) {
@@ -394,6 +410,13 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
         };
     } 
 
+    public void setAjaxProvider(AjaxServiceProvider ajaxServiceProvider, List<String> exchs) {
+        this.ajaxServiceProvider = ajaxServiceProvider;
+        if (this.ajaxServiceProvider == AjaxServiceProvider.Google) {
+            this.ajaxGoogleSearchEngineMonitor.setExchs(exchs);
+        }
+    }
+    
     private void adjustScrollBar() {
         final int max_search = 8;
         // i < max_search is just a safe guard when getAccessibleChildrenCount
@@ -502,7 +525,19 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
         }
     }
 
-    private Observer<AjaxYahooSearchEngineMonitor, ResultSetType> getMonitorObserver() {
+    private Observer<AjaxGoogleSearchEngineMonitor, MatchSetType> getGoogleMonitorObserver() {
+        return new Observer<AjaxGoogleSearchEngineMonitor, MatchSetType>() {
+
+            @Override
+            public void update(AjaxGoogleSearchEngineMonitor subject, MatchSetType arg) {
+                for (MatchType matchType : arg.Match) {
+                    System.out.println(matchType.e + ":" + matchType.t);
+                }
+            }
+        };
+    }
+    
+    private Observer<AjaxYahooSearchEngineMonitor, ResultSetType> getYahooMonitorObserver() {
         return new Observer<AjaxYahooSearchEngineMonitor, ResultSetType>() {
             @Override
             public void update(final AjaxYahooSearchEngineMonitor subject, final ResultSetType arg) {
@@ -612,6 +647,7 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
      */
     public void stop() {
         ajaxYahooSearchEngineMonitor.stop();
+        ajaxGoogleSearchEngineMonitor.stop();
     }
     
     private final ListCellRenderer offlineModeCellRenderer = new StockInfoCellRenderer();
@@ -620,7 +656,10 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
     private ListCellRenderer currentListCellRenderer;
 
     // Online database.
+    private AjaxServiceProvider ajaxServiceProvider;
     private final AjaxYahooSearchEngineMonitor ajaxYahooSearchEngineMonitor = new AjaxYahooSearchEngineMonitor();
+    private final AjaxGoogleSearchEngineMonitor ajaxGoogleSearchEngineMonitor = new AjaxGoogleSearchEngineMonitor();
+    
     /***************************************************************************
      * END OF ONLINE DATABASE FEATURE
      **************************************************************************/
