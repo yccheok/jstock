@@ -113,13 +113,27 @@ public class GoogleStockHistoryServer implements StockHistoryServer {
         Calendar calendar = null;
         boolean initialized = false;
         
+        long TIMEZONE_OFFSET = 0;
+
         for (String stockData : stockDatas) {
+            // NYSE : TIMEZONE_OFFSET=-300
+            
             if (stockData.isEmpty()) {
                 continue;
             }
             
             char c = stockData.charAt(0);
             if (c != 'a' && false == Character.isDigit(c)) {
+                if (stockData.startsWith("TIMEZONE_OFFSET")) {
+                    String[] fields = stockData.split("=");
+                    if (fields.length == 2) {
+                        try {
+                            TIMEZONE_OFFSET = Long.parseLong(fields[1]);
+                        } catch (NumberFormatException ex) {
+                            log.error(null, ex);
+                        }
+                    }
+                }
                 continue;
             }
             
@@ -203,11 +217,20 @@ public class GoogleStockHistoryServer implements StockHistoryServer {
             
             long currentTimeInMilli = currentTime*1000;
             
+            // Convert it to local time respect to stock exchange.
+            // TIMEZONE_OFFSET is in minute.
+            currentTimeInMilli = currentTimeInMilli + (TIMEZONE_OFFSET * 60 * 1000);
+            
             // Remove time information, by resetting it to 00:00
             currentTimeInMilli = currentTimeInMilli / 1000 / 24 / 60 / 60;
             currentTimeInMilli = currentTimeInMilli * 60 * 60 * 24 * 1000;
-                        
+            
             // Make it as local timestamp.
+            //
+            // For instance, Greenwich is 1:30pm right now.
+            // We want to make Malaysia 1:30pm right now.
+            //
+            // That's why we are having -ve.
             calendar.setTimeInMillis(currentTimeInMilli);        
             int offset = -(calendar.get(Calendar.ZONE_OFFSET) + calendar.get(Calendar.DST_OFFSET));
             currentTimeInMilli = currentTimeInMilli + offset;
@@ -243,7 +266,15 @@ public class GoogleStockHistoryServer implements StockHistoryServer {
                     );
 
             historyDatabase.put(currentTimeInMilli, stock);
-            timestamps.add(currentTimeInMilli);
+            
+            // Something we do not understand Google server.
+            //if (timestamps.isEmpty()) {
+                timestamps.add(currentTimeInMilli);
+            //} else {
+            //    if (timestamps.get(timestamps.size() - 1) != currentTimeInMilli) {
+            //        timestamps.add(currentTimeInMilli);
+            //    }
+            //}
             previousClosePrice = closePrice;                        
         } 
         
