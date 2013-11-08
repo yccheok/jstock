@@ -37,7 +37,7 @@ import net.sf.nachocalendar.components.DateField;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.AjaxYahooSearchEngine;
-import org.yccheok.jstock.engine.AjaxYahooSearchEngine.ResultType;
+import org.yccheok.jstock.engine.ResultType;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.SimpleDate;
 import org.yccheok.jstock.engine.Stock;
@@ -879,8 +879,8 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         return this.transaction;
     }
 
-    private org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType> getResultObserver() {
-        return new org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType>() {
+    private org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, ResultType> getResultObserver() {
+        return new org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, ResultType>() {
 
             @Override
             public void update(AutoCompleteJComboBox subject, ResultType resultType) {

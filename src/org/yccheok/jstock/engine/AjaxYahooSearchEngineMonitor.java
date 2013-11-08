@@ -27,14 +27,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.yccheok.jstock.engine.AjaxYahooSearchEngine.ResultType;
 
 /**
  * Provides asynchronous search based on AjaxYahooSearchEngine.
  *
  * @author yccheok
  */
-public class AjaxYahooSearchEngineMonitor extends Subject<AjaxYahooSearchEngineMonitor, AjaxYahooSearchEngine.ResultSetType> {
+public class AjaxYahooSearchEngineMonitor extends Subject<AjaxYahooSearchEngineMonitor, ResultSetType> {
     /**
      * Creates an instance of AjaxYahooSearchEngineMonitor.
      */
@@ -82,7 +81,7 @@ public class AjaxYahooSearchEngineMonitor extends Subject<AjaxYahooSearchEngineM
                 try {
                     string = blockingQueue.take();
                     List<ResultType> results = searchEngine.searchAll(string);
-                    final AjaxYahooSearchEngine.ResultSetType resultSet = AjaxYahooSearchEngine.ResultSetType.newInstance(string, results);
+                    final ResultSetType resultSet = ResultSetType.newInstance(string, results);
                     // Notify all observers.
                     AjaxYahooSearchEngineMonitor.this.notify(AjaxYahooSearchEngineMonitor.this, resultSet);
                 } catch (InterruptedException ex) {
@@ -93,7 +92,7 @@ public class AjaxYahooSearchEngineMonitor extends Subject<AjaxYahooSearchEngineM
             }
         }
     }
-    private final SearchEngine<AjaxYahooSearchEngine.ResultType> searchEngine = new AjaxYahooSearchEngine();
+    private final SearchEngine<ResultType> searchEngine = new AjaxYahooSearchEngine();
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     // 128 is just a magic number.
     private final BlockingQueue<String> blockingQueue = new ArrayBlockingQueue<String>(128);

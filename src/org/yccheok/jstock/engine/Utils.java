@@ -32,7 +32,6 @@ import org.apache.commons.httpclient.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.yccheok.jstock.engine.AjaxYahooSearchEngine.ResultType;
 import org.yccheok.jstock.engine.Stock.Board;
 import org.yccheok.jstock.engine.Stock.Industry;
 import org.yccheok.jstock.file.Statements;

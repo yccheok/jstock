@@ -43,7 +43,7 @@ import org.yccheok.jstock.analysis.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.yccheok.jstock.engine.AjaxYahooSearchEngine.ResultType;
+import org.yccheok.jstock.engine.ResultType;
 import org.yccheok.jstock.gui.analysis.WizardSelectIndicatorDescriptor;
 import org.yccheok.jstock.gui.analysis.WizardDownloadIndicatorDescriptor;
 import org.yccheok.jstock.gui.analysis.WizardSelectInstallIndicatorMethodDescriptor;
@@ -1326,8 +1326,8 @@ public class IndicatorPanel extends JPanel {
         stockTask.execute();
     }
 
-    private org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType> getResultObserver() {
-        return new org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType>() {
+    private org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, ResultType> getResultObserver() {
+        return new org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, ResultType>() {
 
             @Override
             public void update(AutoCompleteJComboBox subject, ResultType resultType) {

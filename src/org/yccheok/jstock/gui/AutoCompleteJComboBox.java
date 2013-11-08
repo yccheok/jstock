@@ -34,8 +34,8 @@ import javax.swing.text.JTextComponent;
 import org.yccheok.jstock.engine.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.yccheok.jstock.engine.AjaxYahooSearchEngine.ResultSetType;
-import org.yccheok.jstock.engine.AjaxYahooSearchEngine.ResultType;
+import org.yccheok.jstock.engine.ResultSetType;
+import org.yccheok.jstock.engine.ResultType;
 
 /**
  *
@@ -126,9 +126,9 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
                 if ((e.getModifiers() & java.awt.event.InputEvent.BUTTON1_MASK) == java.awt.event.InputEvent.BUTTON1_MASK) {
                     final Object object = AutoCompleteJComboBox.this.getEditor().getItem();
                     /* Let us be extra paranoid. */
-                    if (object instanceof AjaxYahooSearchEngine.ResultType) {
+                    if (object instanceof ResultType) {
                         // From Yahoo! Ajax result.
-                        AjaxYahooSearchEngine.ResultType lastEnteredResult = (AjaxYahooSearchEngine.ResultType)object;
+                        ResultType lastEnteredResult = (ResultType)object;
                         AutoCompleteJComboBox.this.resultSubject.notify(AutoCompleteJComboBox.this, lastEnteredResult);
                     } else if (object instanceof StockInfo) {
                         // From our offline database.
@@ -329,7 +329,7 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
                     busySubject.notify(AutoCompleteJComboBox.this, false);
                     
                     StockInfo lastEnteredStockInfo = null;
-                    AjaxYahooSearchEngine.ResultType lastEnteredResultType = null;
+                    ResultType lastEnteredResultType = null;
 
                     if (AutoCompleteJComboBox.this.getItemCount() > 0) {
                         int index = AutoCompleteJComboBox.this.getSelectedIndex();
@@ -338,8 +338,8 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
                             if (object instanceof StockInfo) {
                                 lastEnteredStockInfo = (StockInfo)object;
                             } else {
-                                assert(object instanceof AjaxYahooSearchEngine.ResultType);
-                                lastEnteredResultType = (AjaxYahooSearchEngine.ResultType)object;
+                                assert(object instanceof ResultType);
+                                lastEnteredResultType = (ResultType)object;
                             }
                         }
                         else {
@@ -347,8 +347,8 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
                             if (object instanceof StockInfo) {
                                 lastEnteredStockInfo = (StockInfo)object;
                             } else {
-                                assert(object instanceof AjaxYahooSearchEngine.ResultType);
-                                lastEnteredResultType = (AjaxYahooSearchEngine.ResultType)object;
+                                assert(object instanceof ResultType);
+                                lastEnteredResultType = (ResultType)object;
                             }
                         }
                     }
@@ -502,8 +502,8 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
         }
     }
 
-    private Observer<AjaxYahooSearchEngineMonitor, AjaxYahooSearchEngine.ResultSetType> getMonitorObserver() {
-        return new Observer<AjaxYahooSearchEngineMonitor, AjaxYahooSearchEngine.ResultSetType>() {
+    private Observer<AjaxYahooSearchEngineMonitor, ResultSetType> getMonitorObserver() {
+        return new Observer<AjaxYahooSearchEngineMonitor, ResultSetType>() {
             @Override
             public void update(final AjaxYahooSearchEngineMonitor subject, final ResultSetType arg) {
                 if (SwingUtilities.isEventDispatchThread()) {
@@ -564,7 +564,7 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
         };
     }
 
-    private final SubjectEx<AutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType> resultSubject = new SubjectEx<AutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType>();
+    private final SubjectEx<AutoCompleteJComboBox, ResultType> resultSubject = new SubjectEx<AutoCompleteJComboBox, ResultType>();
     private final SubjectEx<AutoCompleteJComboBox, StockInfo> stockInfoSubject = new SubjectEx<AutoCompleteJComboBox, StockInfo>();
     private final SubjectEx<AutoCompleteJComboBox, Boolean> busySubject = new SubjectEx<AutoCompleteJComboBox, Boolean>();
 
@@ -582,7 +582,7 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
      *
      * @param observer an observer to listen to ResultType available event
      */
-    public void attachResultObserver(Observer<AutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType> observer) {
+    public void attachResultObserver(Observer<AutoCompleteJComboBox, ResultType> observer) {
         resultSubject.attach(observer);
     }
 

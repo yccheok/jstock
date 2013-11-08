@@ -55,7 +55,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jdesktop.jxlayer.JXLayer;
 import org.yccheok.jstock.engine.AjaxYahooSearchEngine;
-import org.yccheok.jstock.engine.AjaxYahooSearchEngine.ResultType;
+import org.yccheok.jstock.engine.ResultType;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.Observer;
 import org.yccheok.jstock.engine.StockInfo;
@@ -481,8 +481,8 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         selectUserDefinedDatabaseTable(selectedModelIndex);
     }
 
-    private Observer<AjaxAutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType> getResultObserver() {
-        return new Observer<AjaxAutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType>() {
+    private Observer<AjaxAutoCompleteJComboBox, ResultType> getResultObserver() {
+        return new Observer<AjaxAutoCompleteJComboBox, ResultType>() {
             @Override
             public void update(AjaxAutoCompleteJComboBox subject, ResultType arg) {
                 assert(arg != null);

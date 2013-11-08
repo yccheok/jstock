@@ -24,7 +24,7 @@ import java.awt.Component;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 import javax.swing.UIManager;
-import org.yccheok.jstock.engine.AjaxYahooSearchEngine.ResultType;
+import org.yccheok.jstock.engine.ResultType;
 
 /**
  *

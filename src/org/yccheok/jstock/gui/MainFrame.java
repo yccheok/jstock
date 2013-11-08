@@ -47,7 +47,7 @@ import javax.mail.internet.AddressException;
 import org.yccheok.jstock.alert.SMSLimiter;
 import org.yccheok.jstock.analysis.Indicator;
 import org.yccheok.jstock.analysis.OperatorIndicator;
-import org.yccheok.jstock.engine.AjaxYahooSearchEngine.ResultType;
+import org.yccheok.jstock.engine.ResultType;
 import org.yccheok.jstock.engine.Stock.Board;
 import org.yccheok.jstock.engine.Stock.Industry;
 import org.yccheok.jstock.file.Atom;
@@ -2894,8 +2894,8 @@ public class MainFrame extends javax.swing.JFrame {
         return result;
     }
 
-    private org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType> getResultObserver() {
-        return new org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType>() {
+    private org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, ResultType> getResultObserver() {
+        return new org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, ResultType>() {
 
             @Override
             public void update(AutoCompleteJComboBox subject, ResultType resultType) {

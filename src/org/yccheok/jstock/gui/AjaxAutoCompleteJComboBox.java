@@ -44,8 +44,8 @@ import javax.swing.text.JTextComponent;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.AjaxYahooSearchEngine;
-import org.yccheok.jstock.engine.AjaxYahooSearchEngine.ResultSetType;
-import org.yccheok.jstock.engine.AjaxYahooSearchEngine.ResultType;
+import org.yccheok.jstock.engine.ResultSetType;
+import org.yccheok.jstock.engine.ResultType;
 import org.yccheok.jstock.engine.AjaxYahooSearchEngineMonitor;
 import org.yccheok.jstock.engine.Observer;
 import org.yccheok.jstock.engine.Subject;
@@ -66,7 +66,7 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
         }
     }
 
-    private final SubjectEx<AjaxAutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType> resultSubject = new SubjectEx<AjaxAutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType>();
+    private final SubjectEx<AjaxAutoCompleteJComboBox, ResultType> resultSubject = new SubjectEx<AjaxAutoCompleteJComboBox, ResultType>();
     private final SubjectEx<AjaxAutoCompleteJComboBox, Boolean> busySubject = new SubjectEx<AjaxAutoCompleteJComboBox, Boolean>();
 
     /**
@@ -74,7 +74,7 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
      *
      * @param observer An observer to listen to ResultType available event
      */
-    public void attachResultObserver(Observer<AjaxAutoCompleteJComboBox, AjaxYahooSearchEngine.ResultType> observer) {
+    public void attachResultObserver(Observer<AjaxAutoCompleteJComboBox, ResultType> observer) {
         resultSubject.attach(observer);
     }
 
@@ -150,8 +150,8 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
                     // If user keys in the item, editor's item will be String.
                     // If user clicks on the drop down list, editor's item will be
                     // AjaxYahooSearchEngine.ResultType.
-                    if (object instanceof AjaxYahooSearchEngine.ResultType) {
-                        AjaxYahooSearchEngine.ResultType lastEnteredResult = (AjaxYahooSearchEngine.ResultType)object;
+                    if (object instanceof ResultType) {
+                        ResultType lastEnteredResult = (ResultType)object;
                         AjaxAutoCompleteJComboBox.this.resultSubject.notify(AjaxAutoCompleteJComboBox.this, lastEnteredResult);
                     }
 
@@ -271,18 +271,18 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
                     // We are no longer busy.
                     busySubject.notify(AjaxAutoCompleteJComboBox.this, false);
 
-                    AjaxYahooSearchEngine.ResultType lastEnteredResult = null;
+                    ResultType lastEnteredResult = null;
 
                     if (AjaxAutoCompleteJComboBox.this.getItemCount() > 0) {
                         int index = AjaxAutoCompleteJComboBox.this.getSelectedIndex();
 
                         if (index == -1) {
-                            assert(AjaxAutoCompleteJComboBox.this.getItemAt(0) instanceof AjaxYahooSearchEngine.ResultType);
-                            lastEnteredResult = (AjaxYahooSearchEngine.ResultType)AjaxAutoCompleteJComboBox.this.getItemAt(0);
+                            assert(AjaxAutoCompleteJComboBox.this.getItemAt(0) instanceof ResultType);
+                            lastEnteredResult = (ResultType)AjaxAutoCompleteJComboBox.this.getItemAt(0);
                         }
                         else {
-                            assert(AjaxAutoCompleteJComboBox.this.getItemAt(index) instanceof AjaxYahooSearchEngine.ResultType);
-                            lastEnteredResult = (AjaxYahooSearchEngine.ResultType)AjaxAutoCompleteJComboBox.this.getItemAt(index);
+                            assert(AjaxAutoCompleteJComboBox.this.getItemAt(index) instanceof ResultType);
+                            lastEnteredResult = (ResultType)AjaxAutoCompleteJComboBox.this.getItemAt(index);
                         }
                     }
                     else {
@@ -292,7 +292,7 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
                             // All upper-case, if the result is not coming from server.
                             final String string = ((String)object).trim().toUpperCase();
                             if (string.length() > 0) {
-                                lastEnteredResult = new AjaxYahooSearchEngine.ResultType(string, string);
+                                lastEnteredResult = new ResultType(string, string);
                             }
                         }
                     }
@@ -316,8 +316,8 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
         };
     }
 
-    private Observer<AjaxYahooSearchEngineMonitor, AjaxYahooSearchEngine.ResultSetType> getMonitorObserver() {
-        return new Observer<AjaxYahooSearchEngineMonitor, AjaxYahooSearchEngine.ResultSetType>() {
+    private Observer<AjaxYahooSearchEngineMonitor, ResultSetType> getMonitorObserver() {
+        return new Observer<AjaxYahooSearchEngineMonitor, ResultSetType>() {
             @Override
             public void update(final AjaxYahooSearchEngineMonitor subject, final ResultSetType arg) {
                 if (SwingUtilities.isEventDispatchThread()) {
