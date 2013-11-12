@@ -41,4 +41,9 @@ public class MatchType {
         this.e = e;
         this.id = id;
     }
+    
+    @Override
+    public String toString() {
+        return t;
+    }    
 }

@@ -106,7 +106,6 @@ public enum Factories {
         franceList.add(YahooStockServerFactory.newInstance());
         germanyList.add(YahooStockServerFactory.newInstance());
         hongkongList.add(YahooStockServerFactory.newInstance());
-        indiaList.add(YahooStockServerFactory.newInstance());
         indiaList.add(GoogleStockServerFactory.newInstance(true));
         indonesiaList.add(YahooStockServerFactory.newInstance());
         israelList.add(YahooStockServerFactory.newInstance());
