@@ -1345,7 +1345,7 @@ public class IndicatorPanel extends JPanel {
             @Override
             public void update(AutoCompleteJComboBox subject, MatchType matchType) {
                 assert(matchType != null);
-                Code code = Code.newInstance(matchType.e + ":" + matchType.t);
+                Code code = matchType.getCode();
                 final Symbol symbol = Symbol.newInstance(matchType.n);
                 final StockInfo stockInfo = StockInfo.newInstance(code, symbol);
                 

@@ -141,6 +141,10 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
                         // From our offline database.
                         StockInfo lastEnteredStockInfo = (StockInfo)object;
                         AutoCompleteJComboBox.this.stockInfoSubject.notify(AutoCompleteJComboBox.this, lastEnteredStockInfo);
+                    } else {
+                        assert(object instanceof MatchType);
+                        MatchType lastEnteredMatch = (MatchType)object;
+                        AutoCompleteJComboBox.this.matchSubject.notify(AutoCompleteJComboBox.this, lastEnteredMatch);
                     }
 
                     SwingUtilities.invokeLater(new Runnable() {

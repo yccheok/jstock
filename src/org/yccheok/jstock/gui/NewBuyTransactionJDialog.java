@@ -902,7 +902,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
             @Override
             public void update(AutoCompleteJComboBox subject, MatchType matchType) {
                 assert(matchType != null);
-                Code code = Code.newInstance(matchType.e + ":" + matchType.t);
+                Code code = matchType.getCode();
                 final Symbol symbol = Symbol.newInstance(matchType.n);
                 final StockInfo stockInfo = StockInfo.newInstance(code, symbol);
 

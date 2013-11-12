@@ -42,6 +42,10 @@ public class MatchType {
         this.id = id;
     }
     
+    public Code getCode() {
+        return Code.newInstance(this.e + ":" + this.t);
+    }
+    
     @Override
     public String toString() {
         return t;
