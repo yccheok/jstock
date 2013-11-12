@@ -20,7 +20,7 @@
       </Properties>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new AutoCompleteJComboBox();"/>
-        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="((AutoCompleteJComboBox)this.jComboBox1).attachStockInfoObserver(getStockInfoObserver());&#xd;&#xa;((AutoCompleteJComboBox)this.jComboBox1).attachResultObserver(getResultObserver());"/>
+        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="((AutoCompleteJComboBox)this.jComboBox1).attachStockInfoObserver(getStockInfoObserver());&#xd;&#xa;((AutoCompleteJComboBox)this.jComboBox1).attachResultObserver(getResultObserver());&#xd;&#xa;((AutoCompleteJComboBox)this.jComboBox1).attachMatchObserver(getMatchObserver());"/>
       </AuxValues>
     </Component>
     <Menu class="javax.swing.JMenuBar" name="jMenuBar2">

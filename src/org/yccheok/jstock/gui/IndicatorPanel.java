@@ -205,6 +205,7 @@ public class IndicatorPanel extends JPanel {
         jComboBox1.setPreferredSize(new java.awt.Dimension(150, 24));
         ((AutoCompleteJComboBox)jComboBox1).attachStockInfoObserver(this.getStockInfoObserver());
         ((AutoCompleteJComboBox)jComboBox1).attachResultObserver(this.getResultObserver());
+        ((AutoCompleteJComboBox)jComboBox1).attachMatchObserver(this.getMatchObserver());
 
         setLayout(new java.awt.BorderLayout());
 
@@ -1338,6 +1339,24 @@ public class IndicatorPanel extends JPanel {
         stockTask.execute();
     }
 
+    private org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, MatchType> getMatchObserver() {
+        return new org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, MatchType>() {
+
+            @Override
+            public void update(AutoCompleteJComboBox subject, MatchType matchType) {
+                assert(matchType != null);
+                Code code = Code.newInstance(matchType.e + ":" + matchType.t);
+                final Symbol symbol = Symbol.newInstance(matchType.n);
+                final StockInfo stockInfo = StockInfo.newInstance(code, symbol);
+                
+                addStockInfoFromAutoCompleteJComboBox(stockInfo);
+
+                // Remember to update our offline database as well.
+                MainFrame.getInstance().addUserDefinedStockInfo(stockInfo);                
+            }                
+        };
+    }
+    
     private org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, ResultType> getResultObserver() {
         return new org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, ResultType>() {
 

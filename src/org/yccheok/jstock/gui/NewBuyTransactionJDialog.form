@@ -14,7 +14,7 @@
       </Properties>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new AutoCompleteJComboBox();"/>
-        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="((AutoCompleteJComboBox)jComboBox1).attachStockInfoObserver(this.getStockInfoObserver());&#xd;&#xa;((AutoCompleteJComboBox)jComboBox1).attachResultObserver(this.getResultObserver());"/>
+        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="((AutoCompleteJComboBox)jComboBox1).attachStockInfoObserver(this.getStockInfoObserver());&#xd;&#xa;((AutoCompleteJComboBox)jComboBox1).attachResultObserver(this.getResultObserver());&#xd;&#xa;((AutoCompleteJComboBox)jComboBox1).attachMatchObserver(this.getMatchObserver());"/>
       </AuxValues>
     </Component>
   </NonVisualComponents>

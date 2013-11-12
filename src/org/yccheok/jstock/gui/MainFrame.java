@@ -425,6 +425,7 @@ public class MainFrame extends javax.swing.JFrame {
         jComboBox1.setPreferredSize(new java.awt.Dimension(150, 24));
         ((AutoCompleteJComboBox)this.jComboBox1).attachStockInfoObserver(getStockInfoObserver());
         ((AutoCompleteJComboBox)this.jComboBox1).attachResultObserver(getResultObserver());
+        ((AutoCompleteJComboBox)this.jComboBox1).attachMatchObserver(getMatchObserver());
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
@@ -2897,6 +2898,24 @@ public class MainFrame extends javax.swing.JFrame {
         return result;
     }
 
+    private org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, MatchType> getMatchObserver() {
+        return new org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, MatchType>() {
+
+            @Override
+            public void update(AutoCompleteJComboBox subject, MatchType matchType) {
+                assert(matchType != null);
+                Code code = Code.newInstance(matchType.e + ":" + matchType.t);
+                final Symbol symbol = Symbol.newInstance(matchType.n);
+                final StockInfo stockInfo = StockInfo.newInstance(code, symbol);
+
+                addStockInfoFromAutoCompleteJComboBox(stockInfo);
+
+                // Remember to update our offline database as well.
+                addUserDefinedStockInfo(stockInfo);
+            }
+        };
+    }
+    
     private org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, ResultType> getResultObserver() {
         return new org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, ResultType>() {
 

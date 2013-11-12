@@ -40,6 +40,7 @@ import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.ResultType;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.Country;
+import org.yccheok.jstock.engine.MatchType;
 import org.yccheok.jstock.engine.SimpleDate;
 import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.StockInfo;
@@ -113,6 +114,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         jComboBox1.setPreferredSize(new java.awt.Dimension(110, 24));
         ((AutoCompleteJComboBox)jComboBox1).attachStockInfoObserver(this.getStockInfoObserver());
         ((AutoCompleteJComboBox)jComboBox1).attachResultObserver(this.getResultObserver());
+        ((AutoCompleteJComboBox)jComboBox1).attachMatchObserver(this.getMatchObserver());
 
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
         jLabel7.setText(bundle.getString("NewBuyTransactionJDialog_Broker")); // NOI18N
@@ -343,6 +345,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         jComboBox1.setPreferredSize(new java.awt.Dimension(110, 24));
         ((AutoCompleteJComboBox)jComboBox1).attachStockInfoObserver(this.getStockInfoObserver());
         ((AutoCompleteJComboBox)jComboBox1).attachResultObserver(this.getResultObserver());
+        ((AutoCompleteJComboBox)jComboBox1).attachMatchObserver(this.getMatchObserver());
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
@@ -894,6 +897,23 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         return this.transaction;
     }
 
+    private org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, MatchType> getMatchObserver() {
+        return new org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, MatchType>() {
+            @Override
+            public void update(AutoCompleteJComboBox subject, MatchType matchType) {
+                assert(matchType != null);
+                Code code = Code.newInstance(matchType.e + ":" + matchType.t);
+                final Symbol symbol = Symbol.newInstance(matchType.n);
+                final StockInfo stockInfo = StockInfo.newInstance(code, symbol);
+
+                addStockInfoFromAutoCompleteJComboBox(stockInfo);
+
+                // Remember to update our offline database as well.
+                MainFrame.getInstance().addUserDefinedStockInfo(stockInfo);
+            }
+        };
+    }
+    
     private org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, ResultType> getResultObserver() {
         return new org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, ResultType>() {
 
