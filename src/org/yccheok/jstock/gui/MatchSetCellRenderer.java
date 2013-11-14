@@ -55,7 +55,7 @@ public class MatchSetCellRenderer extends javax.swing.JPanel implements ListCell
         setLayout(new javax.swing.BoxLayout(this, javax.swing.BoxLayout.X_AXIS));
 
         jLabel1.setText("jLabel1");
-        jLabel1.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 2, 0, 0));
+        jLabel1.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 1, 0, 0));
         jLabel1.setMaximumSize(new java.awt.Dimension(88, 14));
         jLabel1.setMinimumSize(new java.awt.Dimension(88, 14));
         jLabel1.setPreferredSize(new java.awt.Dimension(88, 14));
