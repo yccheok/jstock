@@ -43,11 +43,6 @@ import org.yccheok.jstock.engine.ResultType;
  * @author yccheok
  */
 public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAdjustable {
-
-    public enum AjaxServiceProvider {
-        Google,
-        Yahoo
-    }
     
     // Use SubjectEx, in order to make notify method public.
     private static class SubjectEx<S, A> extends Subject<S, A> {

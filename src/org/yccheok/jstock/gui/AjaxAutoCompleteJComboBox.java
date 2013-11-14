@@ -44,9 +44,12 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.yccheok.jstock.engine.AjaxGoogleSearchEngineMonitor;
 import org.yccheok.jstock.engine.ResultSetType;
 import org.yccheok.jstock.engine.ResultType;
 import org.yccheok.jstock.engine.AjaxYahooSearchEngineMonitor;
+import org.yccheok.jstock.engine.MatchSetType;
+import org.yccheok.jstock.engine.MatchType;
 import org.yccheok.jstock.engine.Observer;
 import org.yccheok.jstock.engine.Subject;
 
@@ -71,6 +74,7 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
     }
 
     private final SubjectEx<AjaxAutoCompleteJComboBox, ResultType> resultSubject = new SubjectEx<AjaxAutoCompleteJComboBox, ResultType>();
+    private final SubjectEx<AjaxAutoCompleteJComboBox, MatchType> matchSubject = new SubjectEx<AjaxAutoCompleteJComboBox, MatchType>();
     private final SubjectEx<AjaxAutoCompleteJComboBox, Boolean> busySubject = new SubjectEx<AjaxAutoCompleteJComboBox, Boolean>();
 
     /**
@@ -82,6 +86,10 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
         resultSubject.attach(observer);
     }
 
+    public void attachMatchObserver(Observer<AjaxAutoCompleteJComboBox, MatchType> observer) {
+        matchSubject.attach(observer);
+    }
+    
     /**
      * Attach an observer to listen to busy state event.
      *
@@ -96,6 +104,7 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
      */
     public void dettachAll() {
         resultSubject.dettachAll();
+        matchSubject.dettachAll();
         busySubject.dettachAll();
     }
 
@@ -128,9 +137,8 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
             log.error("Unable to attach DocumentListener to AjaxAutoCompleteJComboBox.");
         }
 
-        ajaxYahooSearchEngineMonitor.attach(getMonitorObserver());
-
-        this.setRenderer(new ResultSetCellRenderer());
+        ajaxYahooSearchEngineMonitor.attach(getYahooMonitorObserver());
+        ajaxGoogleSearchEngineMonitor.attach(getGoogleMonitorObserver());
 
         this.addActionListener(getActionListener());
 
@@ -320,11 +328,65 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
         };
     }
 
-    public void setAjaxProvider(AjaxServiceProvider ajaxServiceProvider, List<String> exchs) {
-        System.out.println(ajaxServiceProvider);
-    }
+    private Observer<AjaxGoogleSearchEngineMonitor, MatchSetType> getGoogleMonitorObserver() {
+        return new Observer<AjaxGoogleSearchEngineMonitor, MatchSetType>() {
 
-    private Observer<AjaxYahooSearchEngineMonitor, ResultSetType> getMonitorObserver() {
+            @Override
+            public void update(final AjaxGoogleSearchEngineMonitor subject, final MatchSetType arg) {
+                if (SwingUtilities.isEventDispatchThread()) {
+                    _update(subject, arg);
+                } else {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            _update(subject, arg);
+                        }
+                    });
+                }
+            }
+            
+            public void _update(AjaxGoogleSearchEngineMonitor subject, MatchSetType arg)  {
+                final String string = AjaxAutoCompleteJComboBox.this.getEditor().getItem().toString().trim();
+                if (string.isEmpty() || false == string.equalsIgnoreCase(arg.Query)) {
+                    return;
+                }
+
+                // We are no longer busy.
+                busySubject.notify(AjaxAutoCompleteJComboBox.this, false);
+
+                // During _update operation, there will be a lot of ListDataListeners
+                // trying to modify the content of our text field. We will not allow
+                // them to do so.
+                //
+                // Without setReadOnly(true), when we type the first character "w", IME
+                // will suggest "我". However, when we call removeAllItems and addItem,
+                // JComboBox will "commit" this suggestion to JComboBox's text field.
+                // Hence, if we continue to type second character "m", the string displayed
+                // at JComboBox's text field will be "我我我".
+                //
+                AjaxAutoCompleteJComboBox.this.jComboBoxEditor.setReadOnly(true);
+
+                // Must hide popup. If not, the pop up windows will not be
+                // resized. But this causes flickering. :(
+                AjaxAutoCompleteJComboBox.this.hidePopup();
+                AjaxAutoCompleteJComboBox.this.removeAllItems();
+
+                boolean shouldShowPopup = false;
+                for (MatchType match : arg.Match) {
+                    AjaxAutoCompleteJComboBox.this.addItem(match);
+                    shouldShowPopup = true;
+                }
+                if (shouldShowPopup) {
+                    AjaxAutoCompleteJComboBox.this.showPopup();
+                }
+
+                // Restore.
+                AjaxAutoCompleteJComboBox.this.jComboBoxEditor.setReadOnly(false);
+            }            
+        };
+    }
+    
+    private Observer<AjaxYahooSearchEngineMonitor, ResultSetType> getYahooMonitorObserver() {
         return new Observer<AjaxYahooSearchEngineMonitor, ResultSetType>() {
             @Override
             public void update(final AjaxYahooSearchEngineMonitor subject, final ResultSetType arg) {
@@ -357,7 +419,7 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
                 // will suggest "我". However, when we call removeAllItems and addItem,
                 // JComboBox will "commit" this suggestion to JComboBox's text field.
                 // Hence, if we continue to type second character "m", the string displayed
-                // at JComboBox's text field will be "我我们".
+                // at JComboBox's text field will be "我我我".
                 //
                 AjaxAutoCompleteJComboBox.this.jComboBoxEditor.setReadOnly(true);
 
@@ -380,7 +442,18 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
             }
         };
     }
-
+    
+    public void setAjaxProvider(AjaxServiceProvider ajaxServiceProvider, List<String> exchs) {
+        this.ajaxServiceProvider = ajaxServiceProvider;
+        if (this.ajaxServiceProvider == AjaxServiceProvider.Google) {
+            this.ajaxGoogleSearchEngineMonitor.setExchs(exchs);
+            this.setRenderer(new MatchSetCellRenderer());
+        } else {
+            assert(this.ajaxServiceProvider == AjaxServiceProvider.Yahoo);
+            this.setRenderer(new ResultSetCellRenderer());
+        }
+    }
+    
     private void adjustScrollBar() {
         final int max_search = 8;
         // i < max_search is just a safe guard when getAccessibleChildrenCount
@@ -461,9 +534,14 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
      */
     public void stop() {
         ajaxYahooSearchEngineMonitor.stop();
+        ajaxGoogleSearchEngineMonitor.stop();
     }
 
+    // Online database.
+    private AjaxServiceProvider ajaxServiceProvider;    
     private final AjaxYahooSearchEngineMonitor ajaxYahooSearchEngineMonitor = new AjaxYahooSearchEngineMonitor();
+    private final AjaxGoogleSearchEngineMonitor ajaxGoogleSearchEngineMonitor = new AjaxGoogleSearchEngineMonitor();
+    
     private final MyJComboBoxEditor jComboBoxEditor;
     private final KeyAdapter keyAdapter;
     private static final Log log = LogFactory.getLog(AjaxAutoCompleteJComboBox.class);
