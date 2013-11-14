@@ -1318,9 +1318,9 @@ public class IndicatorPanel extends JPanel {
         Country country = jStockOptions.getCountry();
         
         if (country == Country.India) {
-            ((AutoCompleteJComboBox)this.jComboBox1).setAjaxProvider(AutoCompleteJComboBox.AjaxServiceProvider.Google, Arrays.asList("NSE", "BOM"));
+            ((AutoCompleteJComboBox)this.jComboBox1).setAjaxProvider(AjaxServiceProvider.Google, Arrays.asList("NSE", "BOM"));
         } else {
-            ((AutoCompleteJComboBox)this.jComboBox1).setAjaxProvider(AutoCompleteJComboBox.AjaxServiceProvider.Yahoo, java.util.Collections.<String>emptyList());
+            ((AutoCompleteJComboBox)this.jComboBox1).setAjaxProvider(AjaxServiceProvider.Yahoo, java.util.Collections.<String>emptyList());
         }
     }
     
