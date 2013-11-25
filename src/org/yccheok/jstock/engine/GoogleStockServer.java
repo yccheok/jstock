@@ -132,12 +132,13 @@ public class GoogleStockServer implements StockServer {
             final List<Stock> stocks = new ArrayList<Stock>();
             for (int i = 0, size = jsonArray.size(); i < size; i++) {
                 final Map<String, String> jsonObject = jsonArray.get(i);
-                final String name;
+                String name;
                 final String ticker;
                 final String exchange;
                 
                 try {
                     name = jsonObject.get("name");
+                    name = name.substring(0, Math.min(SYMBOL_MAX_LENGTH, name.length())).trim();
                     ticker = jsonObject.get("t").toUpperCase();
                     exchange = jsonObject.get("e").toUpperCase();
                 } catch (Exception ex) {
@@ -172,7 +173,17 @@ public class GoogleStockServer implements StockServer {
                 // Low
                 try { lo = Double.parseDouble(jsonObject.get("lo").replaceAll("[^0-9\\.]", "")); } catch (NumberFormatException ex) { log.error(null, ex); }
                 // Vol
-                try { vo = (long)Double.parseDouble(jsonObject.get("vo").replaceAll("[^0-9\\.]", "")); } catch (NumberFormatException ex) { log.error(null, ex); }
+                try { 
+                    String vo_string = jsonObject.get("vo");
+                    vo = (long)Double.parseDouble(vo_string.replaceAll("[^0-9\\.]", "")); 
+                    if (vo_string.endsWith("K")) {
+                        vo = vo * 1000;
+                    } else if (vo_string.endsWith("M")) {
+                        vo = vo * 1000000;
+                    } else if (vo_string.endsWith("B")) {
+                        vo = vo * 1000000000;
+                    }
+                } catch (NumberFormatException ex) { log.error(null, ex); }
                 // Change Percentage
                 try { cp = Double.parseDouble(jsonObject.get("cp").replaceAll("[^0-9\\.\\-]", "")); } catch (NumberFormatException ex) { log.error(null, ex); }
                 // No last volumne information for Google Finance.
@@ -222,6 +233,8 @@ public class GoogleStockServer implements StockServer {
             throw new StockNotFoundException(null, ex);
         }
     }
+    
+    private static final int SYMBOL_MAX_LENGTH = 17;
     
     // Will it be better if we make this as static?
     private final Gson gson = new Gson();
