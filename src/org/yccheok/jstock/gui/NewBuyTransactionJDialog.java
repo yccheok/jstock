@@ -866,6 +866,9 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
             Code code = stock.code;
             this.jTextField1.setText(symbol.toString());
             this.jTextField2.setText(code.toString());
+            // So that the 1st character is being displayed.
+            this.jTextField1.setCaretPosition(0);
+            this.jTextField2.setCaretPosition(0);       
         } else {
             this.jTextField1.setText("");
             this.jTextField2.setText("");            
