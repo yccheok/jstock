@@ -60,10 +60,6 @@ import org.yccheok.jstock.engine.Subject;
  * @author yccheok
  */
 public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAdjustable {
-    public enum AjaxServiceProvider {
-        Google,
-        Yahoo
-    }
 
     // Use SubjectEx, in order to make notify method public.
     private static class SubjectEx<S, A> extends Subject<S, A> {
@@ -268,7 +264,11 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
 
                 // We are busy contacting server right now.
                 busySubject.notify(AjaxAutoCompleteJComboBox.this, true);
-                ajaxYahooSearchEngineMonitor.clearAndPut(string);
+                if (ajaxServiceProvider == org.yccheok.jstock.gui.AjaxServiceProvider.Yahoo) {
+                    ajaxYahooSearchEngineMonitor.clearAndPut(string);
+                } else if (ajaxServiceProvider == org.yccheok.jstock.gui.AjaxServiceProvider.Google) {
+                    ajaxGoogleSearchEngineMonitor.clearAndPut(string);
+                }
             }
        };
     }
@@ -359,10 +359,10 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
                 // them to do so.
                 //
                 // Without setReadOnly(true), when we type the first character "w", IME
-                // will suggest "我". However, when we call removeAllItems and addItem,
+                // will suggest "�?. However, when we call removeAllItems and addItem,
                 // JComboBox will "commit" this suggestion to JComboBox's text field.
                 // Hence, if we continue to type second character "m", the string displayed
-                // at JComboBox's text field will be "我我我".
+                // at JComboBox's text field will be "我我�?.
                 //
                 AjaxAutoCompleteJComboBox.this.jComboBoxEditor.setReadOnly(true);
 
@@ -416,10 +416,10 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
                 // them to do so.
                 //
                 // Without setReadOnly(true), when we type the first character "w", IME
-                // will suggest "我". However, when we call removeAllItems and addItem,
+                // will suggest "�?. However, when we call removeAllItems and addItem,
                 // JComboBox will "commit" this suggestion to JComboBox's text field.
                 // Hence, if we continue to type second character "m", the string displayed
-                // at JComboBox's text field will be "我我我".
+                // at JComboBox's text field will be "我我�?.
                 //
                 AjaxAutoCompleteJComboBox.this.jComboBoxEditor.setReadOnly(true);
 
