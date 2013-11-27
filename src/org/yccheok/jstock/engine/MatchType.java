@@ -46,6 +46,18 @@ public class MatchType {
         return Code.newInstance(this.e + ":" + this.t);
     }
     
+    public MatchType deriveWithT(String t) {
+        return new MatchType(t, this.n, this.e, this.id);
+    }
+
+    public MatchType deriveWithN(String n) {
+        return new MatchType(this.t, n, this.e, this.id);
+    }
+
+    public MatchType deriveWithE(String e) {
+        return new MatchType(this.t, this.n, e, this.id);
+    }
+    
     @Override
     public String toString() {
         return t;

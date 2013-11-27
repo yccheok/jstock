@@ -161,6 +161,9 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
                     if (object instanceof ResultType) {
                         ResultType lastEnteredResult = (ResultType)object;
                         AjaxAutoCompleteJComboBox.this.resultSubject.notify(AjaxAutoCompleteJComboBox.this, lastEnteredResult);
+                    } else if (object instanceof MatchType) {
+                        MatchType lastEnteredMatch = (MatchType)object;
+                        AjaxAutoCompleteJComboBox.this.matchSubject.notify(AjaxAutoCompleteJComboBox.this, lastEnteredMatch);
                     }
 
                     SwingUtilities.invokeLater(new Runnable() {
@@ -283,18 +286,29 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
                     // We are no longer busy.
                     busySubject.notify(AjaxAutoCompleteJComboBox.this, false);
 
-                    ResultType lastEnteredResult = null;
+                    ResultType lastEnteredResultType = null;
+                    MatchType lastEnteredMatchType = null;
 
                     if (AjaxAutoCompleteJComboBox.this.getItemCount() > 0) {
                         int index = AjaxAutoCompleteJComboBox.this.getSelectedIndex();
 
                         if (index == -1) {
-                            assert(AjaxAutoCompleteJComboBox.this.getItemAt(0) instanceof ResultType);
-                            lastEnteredResult = (ResultType)AjaxAutoCompleteJComboBox.this.getItemAt(0);
+                            Object object = AjaxAutoCompleteJComboBox.this.getItemAt(0);
+                            if (object instanceof ResultType) {
+                                lastEnteredResultType = (ResultType)object;
+                            } else {
+                                assert(object instanceof MatchType);
+                                lastEnteredMatchType = (MatchType)object;
+                            }
                         }
                         else {
-                            assert(AjaxAutoCompleteJComboBox.this.getItemAt(index) instanceof ResultType);
-                            lastEnteredResult = (ResultType)AjaxAutoCompleteJComboBox.this.getItemAt(index);
+                            Object object = AjaxAutoCompleteJComboBox.this.getItemAt(index);
+                            if (object instanceof ResultType) {
+                                lastEnteredResultType = (ResultType)object;
+                            } else {
+                                assert(object instanceof MatchType);
+                                lastEnteredMatchType = (MatchType)object;
+                            }                            
                         }
                     }
                     else {
@@ -304,15 +318,17 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
                             // All upper-case, if the result is not coming from server.
                             final String string = ((String)object).trim().toUpperCase();
                             if (string.length() > 0) {
-                                lastEnteredResult = new ResultType(string, string);
+                                lastEnteredResultType = new ResultType(string, string);
                             }
                         }
                     }
 
                     AjaxAutoCompleteJComboBox.this.removeAllItems();
-                    if (lastEnteredResult != null) {
-                        AjaxAutoCompleteJComboBox.this.resultSubject.notify(AjaxAutoCompleteJComboBox.this, lastEnteredResult);
-                    }
+                    if (lastEnteredResultType != null) {
+                        AjaxAutoCompleteJComboBox.this.resultSubject.notify(AjaxAutoCompleteJComboBox.this, lastEnteredResultType);
+                    } else if (lastEnteredMatchType != null) {
+                        AjaxAutoCompleteJComboBox.this.matchSubject.notify(AjaxAutoCompleteJComboBox.this, lastEnteredMatchType);
+                    } 
                     return;
                 }   /* if(KeyEvent.VK_ENTER == e.getKeyCode()) */
 
@@ -359,10 +375,10 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
                 // them to do so.
                 //
                 // Without setReadOnly(true), when we type the first character "w", IME
-                // will suggest "�?. However, when we call removeAllItems and addItem,
+                // will suggest "我". However, when we call removeAllItems and addItem,
                 // JComboBox will "commit" this suggestion to JComboBox's text field.
                 // Hence, if we continue to type second character "m", the string displayed
-                // at JComboBox's text field will be "我我�?.
+                // at JComboBox's text field will be "我我我".
                 //
                 AjaxAutoCompleteJComboBox.this.jComboBoxEditor.setReadOnly(true);
 
@@ -416,10 +432,10 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
                 // them to do so.
                 //
                 // Without setReadOnly(true), when we type the first character "w", IME
-                // will suggest "�?. However, when we call removeAllItems and addItem,
+                // will suggest "我". However, when we call removeAllItems and addItem,
                 // JComboBox will "commit" this suggestion to JComboBox's text field.
                 // Hence, if we continue to type second character "m", the string displayed
-                // at JComboBox's text field will be "我我�?.
+                // at JComboBox's text field will be "我我我".
                 //
                 AjaxAutoCompleteJComboBox.this.jComboBoxEditor.setReadOnly(true);
 

@@ -57,6 +57,7 @@ import org.jdesktop.jxlayer.JXLayer;
 import org.yccheok.jstock.engine.ResultType;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.Country;
+import org.yccheok.jstock.engine.MatchType;
 import org.yccheok.jstock.engine.Observer;
 import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.engine.StockInfoDatabase;
@@ -81,6 +82,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         // Focus on our Ajax auto complete JComboBox.
         this.jComboBox1.requestFocus();
         ((AjaxAutoCompleteJComboBox)this.jComboBox1).attachResultObserver(getResultObserver());
+        ((AjaxAutoCompleteJComboBox)this.jComboBox1).attachMatchObserver(getMatchObserver());
         
         initAjaxProvider();
     }
@@ -494,6 +496,18 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         selectUserDefinedDatabaseTable(selectedModelIndex);
     }
 
+    private org.yccheok.jstock.engine.Observer<AjaxAutoCompleteJComboBox, MatchType> getMatchObserver() {
+        return new org.yccheok.jstock.engine.Observer<AjaxAutoCompleteJComboBox, MatchType>() {
+
+            @Override
+            public void update(AjaxAutoCompleteJComboBox subject, MatchType arg) {
+                ResultType resultType = new ResultType(arg.getCode().toString(), arg.n);
+                
+                getResultObserver().update(subject, resultType);
+            }                
+        };
+    }
+    
     private Observer<AjaxAutoCompleteJComboBox, ResultType> getResultObserver() {
         return new Observer<AjaxAutoCompleteJComboBox, ResultType>() {
             @Override

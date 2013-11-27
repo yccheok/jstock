@@ -643,7 +643,7 @@ public class Stock {
         Virt_X("Virt-X"),
         Switzerland("Switzerland"),
         Taiwan("Taiwan"),                       // Taiwan
-        Bombay("Bombay"),                       // India
+        BOM("Bombay"),                          // India
         NSE("NSE"),
 
         NZSX("NZ Stock Market"),                // New Zealand
