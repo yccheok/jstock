@@ -158,7 +158,6 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
         jComboBox2.setRenderer(new MyCellRenderer());
 
         jCheckBox2.setText(getConvertCurrencyString());
-        jCheckBox2.setEnabled(false);
         jCheckBox2.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 jCheckBox2ItemStateChanged(evt);
@@ -275,6 +274,7 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
                 "BR",   // Brazil
                 "CA",   // Canada
                 "CN",   // China
+                "CZ",   // Czech
                 "DK",   // Denmark
                 "FR",   // France
                 "DE",   // Germany

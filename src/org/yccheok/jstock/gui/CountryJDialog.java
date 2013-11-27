@@ -20,6 +20,8 @@
 package org.yccheok.jstock.gui;
 
 import java.awt.Component;
+import java.util.ArrayList;
+import java.util.Arrays;
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -136,10 +138,16 @@ public class CountryJDialog extends javax.swing.JDialog {
 
     private ListModel getMyListModel() {
         return new AbstractListModel() {
+            java.util.List<Country> countries = new ArrayList<Country>(Arrays.asList(Country.values()));
+            {        
+                // Czech is only for currency exchange purpose.
+                countries.remove(Country.Czech);                
+            }
+            
             @Override
-            public int getSize() { return Country.values().length; }
+            public int getSize() { return countries.size(); }
             @Override
-            public Object getElementAt(int index) { return Country.values()[index]; }
+            public Object getElementAt(int index) { return countries.get(index); }
         };
     }
     

@@ -32,6 +32,7 @@ public enum Country {
     Brazil("/images/16x16/br.png", "Brazil"),
     Canada("/images/16x16/ca.png", "Canada"),
     China("/images/16x16/cn.png", "China"),
+    Czech("/images/16x16/cz.png", "Czech Republic"),
     Denmark("/images/16x16/dk.png", "Denmark"),
     France("/images/16x16/fr.png", "France"),
     Germany("/images/16x16/de.png", "Germany"),

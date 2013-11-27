@@ -2021,7 +2021,9 @@ public class MainFrame extends javax.swing.JFrame {
     }
       
     public void createCountryMenuItem() {
-        final Country[] countries = Country.values();
+        java.util.List<Country> countries = new ArrayList<Country>(Arrays.asList(Country.values()));
+        // Czech is only for currency exchange purpose.
+        countries.remove(Country.Czech);
 
         for (final Country country : countries) {
             // Ugly fix on spelling mistake.

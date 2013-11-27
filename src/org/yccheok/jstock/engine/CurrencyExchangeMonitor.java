@@ -298,6 +298,7 @@ public class CurrencyExchangeMonitor extends Subject<CurrencyExchangeMonitor, Do
         countryToCurrencyCode.put(Country.Brazil, "BRL");
         countryToCurrencyCode.put(Country.Canada, "CAD");
         countryToCurrencyCode.put(Country.China, "CNY");
+        countryToCurrencyCode.put(Country.Czech, "CZK");
         countryToCurrencyCode.put(Country.Denmark, "DKK");
         countryToCurrencyCode.put(Country.France, "EUR");
         countryToCurrencyCode.put(Country.Germany, "EUR");
