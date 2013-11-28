@@ -51,12 +51,40 @@ public class GoogleStockServer implements StockServer {
     }
 
     private Code getOriginalCode(Map<String, Code> originalCodes, String googleTicker, String googleExchange) {
-        final Code googleCode = Code.newInstance(googleExchange + ":" + googleTicker);
-        Code result = originalCodes.get(googleCode.toString());
+        // 1st try...
+        final String googleCodeStr0 = googleExchange + ":" + googleTicker;
+        
+        Code result = originalCodes.get(googleCodeStr0);
         
         if (result != null) {
             return result;
         }
+        
+        // 2nd try...
+        final String googleCodeStr1 = googleTicker;
+
+        result = originalCodes.get(googleCodeStr1);
+
+        if (result != null) {
+            return result;
+        }
+
+        // 3rd try...
+        if (googleExchange.equals("NSE")) {
+            result = originalCodes.get(googleTicker + ".N");
+
+            if (result != null) {
+                return result;
+            }
+        } else if (googleExchange.equals("BOM")) {
+            result = originalCodes.get(googleTicker + ".B");
+
+            if (result != null) {
+                return result;
+            }
+        }
+
+        final Code googleCode = Code.newInstance(googleCodeStr0);
         
         result = originalCodes.get(Utils.toYahooFormat(googleCode).toString());
         
@@ -64,15 +92,19 @@ public class GoogleStockServer implements StockServer {
             return result;
         }
         
-        // Special handling for India case.
+        // Legacy code handling. In old India stock market, we are using Yahoo
+        // stock code format like TATAMOTORS.NS
         final int googleTickerLength = googleTicker.length();
         final int ns_length = ".NS".length();
         for (Map.Entry<String, Code> entry : originalCodes.entrySet()) {
             String key = entry.getKey();
             final Code value = entry.getValue();
             
-            if (key.endsWith(".NS") &&  key.length() > ns_length) {
-                key = key.substring(0, key.length() - ns_length);
+            final int key_length = key.length();
+            if (key.endsWith(".NS") && key_length > ns_length) {
+                key = key.substring(0, key_length - ns_length);
+            } else {
+                continue;
             }
             
             if (googleTickerLength >= key.length()) {

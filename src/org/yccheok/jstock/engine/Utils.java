@@ -374,7 +374,11 @@ public class Utils {
         
         String string = code.toString().trim().toUpperCase();
         final int string_length = string.length();
-        if (string.endsWith(".NS") && string_length > ".NS".length()) {
+        if (string.endsWith(".N") && string_length > ".N".length()) {
+            return Code.newInstance("NSE:" + string.substring(0, string_length - ".N".length()));
+        } else if (string.endsWith(".B") && string_length > ".B".length()) {
+            return Code.newInstance("BOM:" + string.substring(0, string_length - ".B".length()));
+        } else if (string.endsWith(".NS") && string_length > ".NS".length()) {
             // Resolving Yahoo server down for India NSE stock market. Note, we
             // do not support Bombay stock market at this moment, due to the
             // difficulty in converting "TATACHEM.BO" (Yahoo Finance) to 
@@ -416,7 +420,7 @@ public class Utils {
         return code.toString().startsWith("^");
     }
     
-    public static Code toYahooIndex(Code code) {
+    private static Code toYahooIndex(Code code) {
         String string = code.toString().trim().toUpperCase();
         if (string.equals("INDEXDJX:.DJI")) {
             return Code.newInstance("^DJI");
