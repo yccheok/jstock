@@ -20,6 +20,7 @@
 package org.yccheok.jstock.engine;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -111,6 +112,14 @@ public class AjaxGoogleSearchEngineMonitor extends Subject<AjaxGoogleSearchEngin
                             matchTypes.add(matchType);
                         }
                     }
+                    
+                    // Sorting.
+                    java.util.Collections.sort(matchTypes, new Comparator<MatchType>() {
+                        @Override
+                        public int compare(MatchType o1, MatchType o2) {
+                            return o1.t.compareTo(o2.t);
+                        }
+                    });
                     
                     final MatchSetType matchSet = MatchSetType.newInstance(string, matchTypes);
                     // Notify all observers.
