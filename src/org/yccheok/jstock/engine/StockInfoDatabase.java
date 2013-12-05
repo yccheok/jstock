@@ -21,8 +21,11 @@ package org.yccheok.jstock.engine;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -140,6 +143,32 @@ public class StockInfoDatabase {
         }
     }
 
+    private List<StockInfo> greedySearchStockInfos(String string) {
+        reader.lock();
+        try {
+            List<StockInfo> _stockInfos  = this.codeSearchEngine.searchAll(string);
+            if (_stockInfos.isEmpty()) {
+                if (this.symbolPinyinSearchEngine != null) {
+                    _stockInfos = this.symbolPinyinSearchEngine.searchAll(string);
+                }
+            }
+            _stockInfos.addAll(this.symbolSearchEngine.searchAll(string));
+            
+            // Add elements to al, including duplicates.
+            // Use LinkedHashSet to preserve order.
+            HashSet hs = new LinkedHashSet();
+            hs.addAll(_stockInfos);
+            _stockInfos.clear();
+            _stockInfos.addAll(hs);
+
+            // Sorting?
+            
+            return Collections.unmodifiableList(_stockInfos);
+        } finally {
+            reader.unlock();
+        }
+    }
+    
     /**
      * Search best matched stock info based on given searched string. Code will
      * be searched first. If nothing has been found, we will search based on
