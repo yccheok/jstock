@@ -23,7 +23,11 @@ import java.awt.Component;
 import java.awt.Dimension;
 import javax.swing.*;
 import java.awt.event.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.PopupMenuEvent;
@@ -264,8 +268,13 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
                 boolean shouldShowPopup = false;
                 
                 if (AutoCompleteJComboBox.this.stockInfoDatabase != null) {
-                    java.util.List<StockInfo> stockInfos = stockInfoDatabase.searchStockInfos(string);
+                    java.util.List<StockInfo> stockInfos = 
+                            greedyEnabled ?
+                            stockInfoDatabase.greedySearchStockInfos(string) :
+                            stockInfoDatabase.searchStockInfos(string);
 
+                    sortStockInfosIfPossible(stockInfos);
+                    
                     if (stockInfos.isEmpty() == false) {
                         // Change to offline mode before adding any item.
                         changeMode(Mode.Offline);
@@ -414,6 +423,15 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
         };
     } 
 
+    public boolean isGreedyEnabled() {
+        return this.greedyEnabled;
+    }
+    
+    public void setGreedyEnabled(boolean greedyEnabled, List<String> codeExtensionSortingOption) {
+        this.greedyEnabled = greedyEnabled;
+        this.codeExtensionSortingOption = codeExtensionSortingOption;
+    }
+    
     public void setAjaxProvider(AjaxServiceProvider ajaxServiceProvider, List<String> exchs) {
         this.ajaxServiceProvider = ajaxServiceProvider;
         if (this.ajaxServiceProvider == AjaxServiceProvider.Google) {
@@ -712,6 +730,57 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
         ajaxYahooSearchEngineMonitor.stop();
         ajaxGoogleSearchEngineMonitor.stop();
     }
+    
+    private void sortStockInfosIfPossible(List<StockInfo> stockInfos) {
+        if (!greedyEnabled) {
+            return;
+        }
+        
+        final Map<String, Integer> m = new HashMap<String, Integer>();
+        for (int i = 0, ei = codeExtensionSortingOption.size(); i < ei; i++) {
+            m.put(codeExtensionSortingOption.get(i), i);
+        }
+        
+        Collections.sort(stockInfos, new Comparator<StockInfo>() {
+
+            @Override
+            public int compare(StockInfo o1, StockInfo o2) {
+                String str1 = o1.code.toString();
+                String str2 = o2.code.toString();
+                String extension1 = null;
+                String extension2 = null;
+                int index1 = str1.lastIndexOf(".");
+                int index2 = str2.lastIndexOf(".");
+                if (index1 >= 0) {
+                    extension1 = str1.substring(index1 + 1);
+                }
+                if (index2 >= 0) {
+                    extension2 = str2.substring(index2 + 1);
+                }
+                
+                Integer order1 = m.get(extension1);
+                Integer order2 = m.get(extension2);
+                
+                if (order1 == order2) {
+                    return str1.compareTo(str2);
+                }
+                
+                // With extension comes first.
+                if (order1 != null && order2 == null) {
+                    return -1;
+                }
+                
+                if (order1 == null && order2 != null) {
+                    return 1;
+                } 
+                
+                return order1 - order2;
+            }      
+        });
+    }
+    
+    private boolean greedyEnabled = false;
+    private List<String> codeExtensionSortingOption = java.util.Collections.emptyList();
     
     private final ListCellRenderer offlineModeCellRenderer = new StockInfoCellRenderer();
     private final ListCellRenderer yahooOnlineModeCellRenderer = new ResultSetCellRenderer();

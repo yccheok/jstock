@@ -143,7 +143,7 @@ public class StockInfoDatabase {
         }
     }
 
-    private List<StockInfo> greedySearchStockInfos(String string) {
+    public List<StockInfo> greedySearchStockInfos(String string) {
         reader.lock();
         try {
             List<StockInfo> _stockInfos  = this.codeSearchEngine.searchAll(string);
@@ -160,10 +160,8 @@ public class StockInfoDatabase {
             hs.addAll(_stockInfos);
             _stockInfos.clear();
             _stockInfos.addAll(hs);
-
-            // Sorting?
             
-            return Collections.unmodifiableList(_stockInfos);
+            return _stockInfos;
         } finally {
             reader.unlock();
         }
