@@ -1,0 +1,58 @@
+CHANGELOG of pinyin4j
+
+version 2.5.0 (June 19, 2006)
+
+ADDED: convertion to Tongyong Pinyin, Wade-Giles, MPS2 (Mandarin Phonetic Symbols 2), Yale and Gwoyeu Romatzyh
+UPDATED: Declare one interface as deprecated; it will be removed in next release.
+
+// Main Features //
+1. Support convertion from Chinese (both Simplified and Tranditional) character into various Chinese Romanization representations
+1.1 Hanyu Pinyin
+1.2 Tongyong Pinyin
+1.3 Wade-Giles
+1.4 MPS2 (Mandarin Phonetic Symbols 2)
+1.5 Yale
+1.6 Gwoyeu Romatzyh
+
+2. Support multiple pronounciations of a single Chinese character
+
+3. Support several output format of Hanyu Pinyin
+3.1. Uppercase or lowercase
+3.2. v or u: or unicode ü
+3.3. unicode output with tone numbers, with tone marks or without tone
+
+version 2.0.0 (April 16, 2006)
+
+ADD: implement output format of unicode with tone marks. For example, now pinyin4j can output "lǚ"
+CHANGE: use a GUI demo to replace the command-line demo. GUI demo works well on most of platforms supporting Unicode font.
+
+// Main Features //
+1. Convert Simplified Chinese into Hanyu Pinyin representations
+2. Support multiple pronounciations
+3. Several output format 
+3.1. Uppercase or lowercase
+3.2. v or u: or unicode ü
+3.3. unicode output with tone numbers, with tone marks or without tone
+
+version 1.1.0 (April 6, 2006)
+
+ADD: add output unicode form 'ü' for character u:
+CHANGE: release the library using jar package file
+
+// Main Features //
+1. Convert simplified Chinese into Hanyu Pinyin representations
+2. Support multiple pronounciations
+3. Several output format 
+3.1. Uppercase or lowercase
+3.2. v or u: or unicode ü
+3.3. with tone numbers or without tone
+
+version 1.0.0 (March 27, 2006)
+
+// Main Features //
+1. Convert simplified Chinese into Hanyu Pinyin representations
+2. Support multiple pronounciations
+3. Several output format 
+3.1. Uppercase or lowercase
+3.2. v or u:
+3.3. with tone numbers or without tone

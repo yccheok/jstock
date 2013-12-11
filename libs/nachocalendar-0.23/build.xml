@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+    ANT build file for NachoCalendar
+    Written by Ignacio Merani
+
+    Created for ANT ver. 1.6.2 (it could work with earlier ANT versions)
+    
+    It has the following tasks:
+    
+    clean   -> Cleans build files
+    
+    compile -> Compiles source files
+    
+    jar     -> Creates all the needed jars
+    
+    source  -> Creates zipfile with only sources, can be used for daily snapshots
+    
+    javadoc -> Creates javadoc
+    
+    dist    -> Creates full distribution
+    
+    all     -> Default task, it does everything but javadoc and dist
+    
+    You can fine-tune some parameters editing the ant.properties file
+-->
+
+<project basedir="." default="all" name="NachoCalendar">
+    <property name="version" value="0.23"/>
+    
+    <!-- Load properties from resource file -->
+    <property file="ant.properties"/>
+    
+	<path id="class.path">
+		<fileset dir="${lib.dir}">
+			<include name="*.jar"/>
+		</fileset>
+	</path>
+    <target depends="clean,source,compile,jar" description="Default task, does everything but javadoc and dist" name="all"/>
+    
+    
+    <target description="Compiles everything" name="compile">
+        <mkdir dir="${build.dir}"/>
+        <javac debug="${debug}" deprecation="${deprecation}" classpathref="class.path"
+        	destdir="${build.dir}" includes="**/*.java" optimize="${optimize}" srcdir="${src.dir}/java"/>
+    </target>
+    
+    
+    <target description="Cleans everything" name="clean">
+        <delete includeemptydirs="true">
+            <fileset dir="." includes="${build.dir}/**/*.*"/>
+            <fileset dir="." includes="${doc.dir}/**/*.*"/>
+	    <fileset dir="." includes="${lib.dir}/**/*.*"/>
+        </delete>
+    </target>
+    
+    <target depends="compile" description="Creates all the jars" name="jar">
+        <mkdir dir="${lib.dir}"/>
+    	<copy todir="${build.dir}">
+    		<fileset dir="${src.dir}/resources">
+    			<include name="**/*.*"/>
+    		</fileset>
+		
+    	</copy>
+	<copy todir="${build.dir}/META-INF">
+		<fileset dir=".">
+			<include name="LICENSE.txt"/>
+		</fileset>
+		
+	</copy>
+        <jar compress="true" jarfile="${lib.dir}/nachocalendar-${version}.jar">
+	    <fileset dir="${build.dir}" includes="**/*.txt"/>
+            <fileset dir="${build.dir}" includes="**/*.properties"/>
+            <fileset dir="${build.dir}" includes="net/sf/nachocalendar/*.class"/>
+            <fileset dir="${build.dir}" includes="net/sf/nachocalendar/components/*.class"/>
+	    <fileset dir="${build.dir}" includes="net/sf/nachocalendar/customizer/*.class"/>
+            <fileset dir="${build.dir}" includes="net/sf/nachocalendar/event/*.class"/>
+            <fileset dir="${build.dir}" includes="net/sf/nachocalendar/model/*.class"/>
+            <fileset dir="${build.dir}" includes="net/sf/nachocalendar/holidays/*.class"/>
+            <fileset dir="${build.dir}" includes="net/sf/nachocalendar/table/*.class"/>
+            <fileset dir="${build.dir}" includes="net/sf/nachocalendar/tasks/*.class"/>
+        </jar>
+        
+        <jar compress="true" jarfile="${lib.dir}/nachocalendar-${version}-demo.jar">
+            <fileset dir="${build.dir}" includes="net/sf/nachocalendar/demo/*.class"/>
+            <manifest>
+                <attribute name="Main-Class" value="net.sf.nachocalendar.demo.CalendarDemo"/>
+                <attribute name="Class-Path" value="nachocalendar-${version}.jar"/>
+            </manifest>
+        </jar>
+    </target>
+    
+    <target description="Creates a zipfile with the source code" name="source">
+        <tstamp/>
+        <echo>Saving sources...</echo>
+        <zip destfile="nachocalendar-src-${DSTAMP}.zip">
+            <fileset dir="." includes="${src.dir}/**/*.*"/>
+            <fileset dir="." includes="build.xml"/>
+            <fileset dir="." includes="*.txt"/>
+            <fileset dir="." includes="*.pdf"/>
+        </zip>
+        <zip destfile="nachocalendar-web-${DSTAMP}.zip">
+            <fileset dir="." includes="web/**/*.*"/>
+        </zip>
+    </target>
+    
+    <target description="Creates javadoc for project" name="javadoc">
+         <javadoc destdir="${doc.dir}" verbose="false">
+            <fileset dir="${src.dir}/java" includes="**/*.java"/>
+         </javadoc>
+    </target>
+    
+    <target depends="clean,compile,jar,javadoc" name="dist">
+        <zip destfile="nachocalendar-src-${version}.zip">
+            <zipfileset dir="${src.dir}" includes="**/*.*" prefix="nachocalendar-${version}/src"/>
+            <zipfileset dir="${lib.dir}" includes="*.jar" prefix="nachocalendar-${version}/lib"/>
+            <zipfileset dir="${doc.dir}" includes="**/*.*" prefix="nachocalendar-${version}/doc"/>
+	    <zipfileset dir="${resources.dir}" includes="**/*.*" prefix="nachocalendar-${version}/resources"/>
+            <zipfileset dir="." includes="*.xml" prefix="nachocalendar-${version}/"/>
+            <zipfileset dir="." includes="*.properties" prefix="nachocalendar-${version}/"/>
+            <zipfileset dir="." includes="*.txt" prefix="nachocalendar-${version}/"/>
+            <zipfileset dir="." includes="manual-${version}.pdf" prefix="nachocalendar-${version}/"/>
+        </zip>
+        <zip destfile="nachocalendar-${version}.zip">
+            <zipfileset dir="${lib.dir}" includes="*.jar" prefix="nachocalendar-${version}/lib"/>
+            <zipfileset dir="${doc.dir}" includes="**/*.*" prefix="nachocalendar-${version}/doc"/>
+	    <zipfileset dir="${resources.dir}" includes="**/*.*" prefix="nachocalendar-${version}/resources"/>
+            <zipfileset dir="." includes="*.txt" prefix="nachocalendar-${version}/"/>
+            <zipfileset dir="." includes="manual-${version}.pdf" prefix="nachocalendar-${version}/"/>
+        </zip>
+        <tar destfile="nachocalendar-src-${version}.tar.bz2" compression="bzip2">
+            <tarfileset dir="${src.dir}" includes="**/*.*" prefix="nachocalendar-${version}/src"/>
+            <tarfileset dir="${lib.dir}" includes="*.jar" prefix="nachocalendar-${version}/lib"/>
+            <tarfileset dir="${doc.dir}" includes="**/*.*" prefix="nachocalendar-${version}/doc"/>
+	    <tarfileset dir="${resources.dir}" includes="**/*.*" prefix="nachocalendar-${version}/resources"/>
+            <tarfileset dir="." includes="*.xml" prefix="nachocalendar-${version}/"/>
+            <tarfileset dir="." includes="*.properties" prefix="nachocalendar-${version}/"/>
+            <tarfileset dir="." includes="*.txt" prefix="nachocalendar-${version}/"/>
+            <tarfileset dir="." includes="manual-${version}.pdf" prefix="nachocalendar-${version}/"/>
+        </tar>
+        <tar destfile="nachocalendar-${version}.tar.bz2" compression="bzip2">
+            <tarfileset dir="${lib.dir}" includes="*.jar" prefix="nachocalendar-${version}/lib"/>
+            <tarfileset dir="${doc.dir}" includes="**/*.*" prefix="nachocalendar-${version}/doc"/>
+	    <tarfileset dir="${resources.dir}" includes="**/*.*" prefix="nachocalendar-${version}/resources"/>
+            <tarfileset dir="." includes="*.txt" prefix="nachocalendar-${version}/"/>
+            <tarfileset dir="." includes="manual-${version}.pdf" prefix="nachocalendar-${version}/"/>
+        </tar>
+    </target>
+</project>

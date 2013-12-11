@@ -1,0 +1,329 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>JCalendar Java Bean, a Java Date Chooser</title>
+<link rel="stylesheet" href="style.css" type="text/css">
+</head>
+<body style="color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);">
+<table bordercolorlight="#CCCCCC" bordercolordark="#666666"
+	style="background-color: rgb(255, 255, 255); width: 589px; height: 1634px;"
+	border="0" bordercolor="#ffffff" cellpadding="1">
+	<tbody>
+		<tr>
+			<td colspan="4" align="center" bgcolor="#ffffff">
+			<h1><font color="#003366"><b>JCalendar</b></font></h1>
+			<p>&copy; Kai Toedter 1999 - 2009<br>
+			Version 1.3.3<br>
+			05/01/09<font face="Verdana, Arial, Helvetica, sans-serif"><br>
+			</font></p>
+			</td>
+		</tr>
+		<tr align="left">
+			<td colspan="4"
+				style="vertical-align: top; background-color: rgb(255, 255, 255);">
+			<p><font color="#003366"><br></br><b>Introduction<br>
+			</b></font>JCalendar is a Java date chooser bean for graphically picking a date.
+			JCalendar is composed of several other Java beans, a JDayChooser, a
+			JMonthChooser and a JYearChooser. All these beans have a locale
+			property, provide several icons (Color 16x16, Color 32x32, Mono 16x16
+			and Mono 32x32) and their own locale property editor. So they can
+			easily be used in GUI builders. Also part of the package is a
+			JDateChooser, a bean composed of an IDateEditor (for direct date
+			editing) and a button for opening a JCalendar for selecting the date.</p>
+			</font><font color="#003366"><b>License</b></font><b><font
+				color="#fabe0c"> </font></b><br>
+			This program is free software; you can redistribute it and/or modify
+			it under the terms of the <a href="license.html">GNU Lesser
+			General Public License</a> as published by the Free Software Foundation.
+			If you like and use it, just let me know. If you find any errors or
+			things you don't like, please contact <a
+				href="mailto:kai@toedter.com">Kai Toedter</a>.<br>
+			<font color="#003366"><b><br>
+			Installation</b></font> <br>
+			The installation is very easy, just put jcalendar.jar in your class
+			path. If you want to run the JCalendar demos (see below) or just use
+			the great <span style="text-decoration: underline;"></span>JGoodies
+			Looks Look and Feel, put also looks-1.3.2.jar in your class path.
+			Both are in the lib directory of this JCalendar distribution.<br>
+			<font color="#003366"><b><br>
+			Running the Demos</b></font><br>
+			To run the JCalendar demo applet in your browser, you must have
+			installed the <a href="http://java.sun.com/products/plugin">Java
+			Plug-in</a>. Click <a href="demo.html">here</a> to run the applet. If you
+			have the distribution installed locally on your computer, there's
+			several ways to run the demos. To start the JCalendar demo Windows
+			Vista/XP/2000/NT/98 users can just right click the jcalendar.jar and open
+			it with "javaw" or execute the "runJCalendarDemo.bat" batch file in
+			the bin directory of this distribution. For all other operating
+			systems, just put "jcalendar.jar" and looks-1.3.2.jar (both in the
+			lib directory of the distribution) in your class path and start Java
+			to execute the com.toedter.calendar.JCalendarDemo class. <b><br>
+			<br>
+			<font color="#003366">Components</font><br>
+			</b> The following table shows a list of used components (all Java
+			Beans). All the screen shots use the great Plastic 3D Look and Feel
+			(included in JGoodies Looks by <a href="http://www.jgoodies.com/">JGoodies</a>),
+			which is bundled with the JCalendar bean.</td>
+		</tr>
+		<tr bgcolor="#cccccc">
+			<td style="background-color: rgb(218, 216, 200);" align="center"
+				width="0">
+			<p><font color="#333333"><b>Icon 16x16</b></font></p>
+			</td>
+			<td style="background-color: rgb(218, 216, 200);" align="center"
+				width="0">
+			<p><font color="#333333"><b>Icon 32x32</b></font></p>
+			</td>
+			<td style="background-color: rgb(218, 216, 200);" align="center"
+				width="0">
+			<p><b><font color="#333333">Component</font></b></p>
+			</td>
+			<td style="background-color: rgb(218, 216, 200);" align="center"
+				width="0">
+			<p><b><font color="#333333">Description</font></b></p>
+			</td>
+		</tr>
+		<tr>
+			<td style="background-color: rgb(244, 243, 233);" align="center"
+				height="57" width="0">
+			<p><img src="images/JDateChooserColor16.gif" height="16"
+				width="16"></p>
+			</td>
+			<td style="background-color: rgb(244, 243, 233);" align="center"
+				height="57" width="0">
+			<p><img src="images/JDateChooserColor32.gif" height="32"
+				width="32"></p>
+			</td>
+			<td style="background-color: rgb(244, 243, 233);" align="center"
+				height="57" width="0">
+			<p><img src="images/JDateChooser.gif"></p>
+			</td>
+			<td
+				style="vertical-align: top; background-color: rgb(244, 243, 233);">JDateChooser
+			allows you to pick a date. You could either edit the date directly or
+			click the image to popup a JCalendar to choose the date. The default
+			date editor provides coloring of invalid dates as well as optional
+			showing a mask. Also a JSpinnerDateEditor is provided that uses a
+			JSpinner to display the date.<br>
+			</td>
+		</tr>
+		<tr>
+			<td align="center" bgcolor="#ffffff" height="57" width="0">
+			<p><img src="images/JCalendarColor16.gif" height="16" width="16"></p>
+			</td>
+			<td align="center" bgcolor="#ffffff" height="57" width="0">
+			<p><img src="images/JCalendarColor32.gif" height="32" width="32"></p>
+			</td>
+			<td align="center" bgcolor="#ffffff" height="57" width="0">
+			<p><img src="images/JCalendar.gif"></p>
+			</td>
+			<td bgcolor="#ffffff" height="57" valign="top" width="0">
+			<p>JCalendar allows you to choose a year, a month and a day.
+			Depending on the locale, the month names and the weekday names
+			change. The foreground of "today" is painted red. JCalendar is
+			composed of several other beans described below.</p>
+			</td>
+		</tr>
+		<tr>
+			<td style="background-color: rgb(244, 243, 233);" align="center"
+				height="55" width="0">
+			<p><img src="images/JYearChooserColor16.gif" height="16"
+				width="16"></p>
+			</td>
+			<td style="background-color: rgb(244, 243, 233);" align="center"
+				width="0">
+			<p><img src="images/JYearChooserColor32.gif" height="32"
+				width="32"></p>
+			</td>
+			<td style="background-color: rgb(244, 243, 233);" align="center"
+				width="0">
+			<p><img src="images/JYearChooser.gif"></p>
+			</td>
+			<td style="background-color: rgb(244, 243, 233);" valign="top"
+				width="0">
+			<p>JYearChooser is a JSpinField (see below) that allows you to
+			choose a year by either typing the year in or using the spin buttons
+			to increase or decrease the value.</p>
+			</td>
+		</tr>
+		<tr bgcolor="#ffffff">
+			<td align="center" width="0">
+			<p><img src="images/JMonthChooserColor16.gif" height="16"
+				width="16"></p>
+			</td>
+			<td align="center" width="0">
+			<p><img src="images/JMonthChooserColor32.gif" height="32"
+				width="32"></p>
+			</td>
+			<td align="center" width="0">
+			<p><img src="images/JMonthChooser.gif"></p>
+			</td>
+			<td valign="top" width="0">
+			<p>JMonthChooser is a JComboBox that allows you to choose a month
+			by either using the combo box or the spin buttons. The language of
+			the month names is defined by the locale property.</p>
+			</td>
+		</tr>
+		<tr bordercolor="#FFFFFF">
+			<td style="background-color: rgb(244, 243, 233);" align="center"
+				width="0">
+			<p><img src="images/JDayChooserColor16.gif" height="16"
+				width="16"></p>
+			</td>
+			<td style="background-color: rgb(244, 243, 233);" align="center"
+				width="0">
+			<p><img src="images/JDayChooserColor32.gif" height="32"
+				width="32"></p>
+			</td>
+			<td style="background-color: rgb(244, 243, 233);" align="center"
+				width="0">
+			<p><img src="images/JDayChooser.gif"></p>
+			</td>
+			<td style="background-color: rgb(244, 243, 233);" valign="top"
+				width="0">
+			<p>JDayChooser lets you choose a day by clicking on the day
+			number. Depending on the locale, the weekday names and the first days
+			of the week change. The foreground of "today" is painted red. For
+			navigation you can use the cursor and tab keys.</p>
+			</td>
+		</tr>
+		<tr>
+			<td align="center" width="0">
+			<p><img src="images/JSpinFieldColor16.gif" height="16" width="16"></p>
+			</td>
+			<td align="center" width="0">
+			<p><img src="images/JSpinFieldColor32.gif" height="32" width="32"></p>
+			</td>
+			<td align="center" width="0"><img src="images/JSpinField1.gif">
+			<br>
+			<img src="images/JSpinField2.gif"> <br>
+			<img src="images/JSpinField3.gif"> <br>
+			</td>
+			<td valign="top" width="0">
+			<p>JSpinField lets you choose a numeric value. Properties for
+			minimum and maximum values are provided. The value can be typed in
+			directly or increased and decreased by the spin buttons. If you have
+			typed in an incorrect value, the foreground color changes to red.
+			Correct values are displayed green. After pressing the enter key the
+			value will be set and displayed black. Since version 1.1.4 the
+			preferred with of the value field is adjusted to the maximum of the
+			width of minimum or maximum.</p>
+			</td>
+		</tr>
+		<tr>
+			<td style="background-color: rgb(244, 243, 233);" align="center"
+				height="61" width="0">
+			<p><img src="images/JLocaleChooserColor16.gif" height="16"
+				width="16"></p>
+			</td>
+			<td style="background-color: rgb(244, 243, 233);" align="center"
+				height="61" width="0">
+			<p><img src="images/JLocaleChooserColor32.gif" height="32"
+				width="32"></p>
+			</td>
+			<td style="background-color: rgb(244, 243, 233);" align="center"
+				height="61" width="0">
+			<p><img src="images/JLocaleChooser.gif"></p>
+			</td>
+			<td style="background-color: rgb(244, 243, 233);" height="61"
+				valign="top" width="0">
+			<p>JLocaleChooser is a JComboBox that allows you to choose a
+			locale. It can be used to test or set the locales of the beans above<span
+				style="font-weight: bold;">.</span></p>
+			</td>
+		</tr>
+		<tr bgcolor="#ffffff">
+			<td colspan="4" style="vertical-align: top; text-align: center;">
+			<p align="left"><font color="#003366"><b><br>
+			Requirements</b></font> <br>
+			All beans use Swing components, so you need to have the Java SE
+			installed. All beans also work with Java SE 1.4.x and 5.</p>
+			<p align="left"><font color="#003366"><b>Download and
+			Latest Version</b></font> <br>
+			You can download a zip file, containing all the sources, libs and
+			documentation at <a
+				href="http://www.toedter.com/download/jcalendar-1.3.3.zip">www.toedter.com/download/jcalendar-1.3.3.zip</a>
+			(600 KB). Version 1.1.4 is still available at <a
+				href="http://www.toedter.com/download/jcalendar-1.1.4.zip">www.toedter.com/download/jcalendar-1.1.4.zip</a>.
+			Version 1.1.4 works with J2SDK 1.2 and 1.3, since it does not use
+			JSpinner.</p>
+			<p align="left"><font color="#003366"><b>API
+			Documentation</b></font> <br>
+			The complete API documentation is generated with JavaDoc. The API
+			documentation is available <a href="api/index.html">with frames</a>
+			or <a href="api/overview-summary.html">without frames</a>.</p>
+
+			<p align="left"><font color="#003366"><b>Bugs and
+			FeatureRequests</b></font><br>
+			Please file bugs and feature requests at <a
+				href="http://max-server.myftp.org/trac/jcalendar">http://max-server.myftp.org/trac/jcalendar</a>.
+			</p>
+
+			<p align="left"><font color="#003366"><b>User Forum</b></font><br>
+			JCalendar has an active user forum: <a
+				href="http://www.toedter.com/forum/forum.php">http://www.toedter.com/forum/forum.php</a>.
+			</p>
+
+			<p align="left"><font color="#003366"><b>History</b></font><br>
+			1.3.3:<br>
+			- Bug fixed when browsing through last days of months <br>
+			1.3.2:<br>
+			- Many bug fixes (thanks to all forum posters)<br>
+			- Min/Max selectable dates now in the date editor interface<br>
+			- Improvements regarding property change listeners (better null date
+			support)<br>
+			- New method "cleanup" in JDateChooser <br>
+			1.3.1:<br>
+			- UI & Look & Feel improvements (especially Windows L&F)<br>
+			- JCalendar supports a date range of selectable dates<br>
+			- JDayChooser can now limit the number of characters in day Names
+			(e.g. Mo instead of Mon) <br>
+			1.3.0:<br>
+			- Many bug fixes (thanks to all forum posters)<br>
+			- Better handling of null dates in JDateChooser<br>
+			- Introduction of the interface IDateEditor<br>
+			- JTextFieldDateEditor (the default editor) supports custom date
+			patterns and masks<br>
+			- JSpinnerDateEditor is an implemantation of IDateEditor based on a
+			JSpinner<br>
+			- JDateChooser Table editor (including table demo)<br>
+			- Both the zip and the jar files contain the version in the name,
+			e.g. jcalendar-3.1.0.jar<br>
+			1.2.2:<br>
+			- Bug in DateChooser.setModel fixed (thanks to Martin Pietruschka)<br>
+			- NullPointer exception bug on DateChooser.setDate fixed (thanks to
+			Aleksey Gureev and others).<br>
+			1.2.1:<br>
+			- JDateChooser bug fixed (sometimes the date was 1 day ahead of the
+			selected date, many thanks<br>
+			&nbsp;&nbsp; to Mark Brown and all the others who reported this bug).<br>
+			- JDateChooser improvements for better usability in persistence
+			frameworks like Oracle's ADF/BC4J<br>
+			&nbsp;&nbsp; (thanks to Mark Brown).<br>
+			1.2:<br>
+			- Many small improvements and bug fixes, thanks to many comments of
+			JCalendar users<br>
+			- A new JDateChooser bean, which allows to be used as an editable
+			date field and a calendar image, &nbsp;&nbsp;&nbsp;that pops up a
+			JCalendar for choosing the date.<br>
+			- An optional "week of year" panel in JDayChooser<br>
+			- Better customization of most beans<br>
+			- Improvements in all BeanInfos<br>
+			- Bundling with my favorite Look and Feel: JGoodies Looks (<a
+				href="http://www.jgoodies.com/">www.jgoodies.com</a>)<br>
+			</p>
+			<p align="left"><font color="#003366"><b> Awards</b></font><br>
+			This bean won first prize in the beans contest of the International
+			Java Club. JCalendar was rated top25% by <a
+				href="http://jars.com/classes/jresout.cgi?resource=7682">JARS</a> (<img
+				src="images/3plusstars.gif" height="15" width="51">, 856 out
+			of 1000).<br>
+			<a href="http://jars.com/classes/jresout.cgi?resource=7682"><img
+				src="images/top25.gif" border="0" height="56" width="104"></a></p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+</body>
+</html>

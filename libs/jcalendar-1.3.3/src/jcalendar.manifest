@@ -1,0 +1,23 @@
+Manifest-Version: 1.0
+Main-Class: com.toedter.calendar.demo.JCalendarDemo
+
+Name: com/toedter/components/JLocaleChooser.class
+Java-Bean: True
+
+Name: com/toedter/calendar/JCalendar.class
+Java-Bean: True
+
+Name: com/toedter/calendar/JYearChooser.class
+Java-Bean: True
+
+Name: com/toedter/calendar/JMonthChooser.class
+Java-Bean: True
+
+Name: com/toedter/calendar/JDayChooser.class
+Java-Bean: True
+
+Name: com/toedter/calendar/JDateChooser.class
+Java-Bean: True
+
+Name: com/toedter/components/JSpinField.class
+Java-Bean: True

@@ -1,0 +1,98 @@
+NachoCalendar ChangeLog
+=========================
+
+
+Version 0.23, with release_0-0-1 tag
+2010/07/01   Having extra space around wording "Mon", "Tue", ... so that they
+             won't stick together.
+             Use light weighted color for "Mon", "Tue", ... labels background.
+             Bug fixed on HeaderPanel's getPreferredSize, so that in Chinese
+             locale, enough space will be reserved for "Mon", "Tue", ...
+             
+Version 0.23
+
+2005/12/28   Added customizers, fixed the event firing system
+
+2005/12/22	 Added baseDate property to dateField(contributed by Benoit Xhenseval)
+
+Version 0.22
+
+2005/6/18    JTableCustomizer: fixed DateRendererDecorator constructor
+             Added moon phase support (thanks to Leo Welsh)
+             Added "eternal scroll" to CalendarPanel (thanks to Leo Welsh)
+             Demos updated
+             Lots of small fixes
+             
+
+
+Version 0.21
+
+2005/01/02   DayPanel: fixed a bug that made paint "today" in other month
+		     DatePanel: fixed a startup bug. Added property change support.
+		     CalendarPanel: added property change support.
+
+2004/12/30   Added JTable support.
+
+Version 0.20
+
+2004/12/24   CalendarPanel: reimplemented layout functions.
+			 Added the interface DateSelectionModel, used to support multiple selection.
+			 Created the default implementation DefaultDateSelectionModel.
+			 CalendarPanel and DatePanel: now support multiple selection
+			 TaskRenderer and HolidayRenderer now implemented as a "Decorator".
+			 Now the current day is rounded with an red oval.
+
+2004/12/21   CalendarPanel, DatePanel, MonthPanel, DateField: added antialiasing
+             support
+             setFirstDayOfWeek now correctly fixed (thks to Knut Erik Hollund again)
+             MonthPanel: reimplemented layout functions, added multiple selection support
+             
+
+2004/12/14   DayPanel and MonthPanel now inherit from JComponent
+
+Version 0.13
+
+2004/12/11   DateField: Added constructor with DateFormat
+             DefaultRenderer, TaskRenderer, HoliDayRenderer: Fixed colors in other lnf's (thks to Jackie Manning)
+             DateField and DatePanel: setFirstDayOfWeek now works correctly (thks to Knut Erik Hollund)
+             DateField: added getJFormattedTextField.
+
+Version 0.12
+
+
+2004/10/22   DateField: setEnabled(boolean b) now works
+             CalendarPanel: setEnabled(boolean b) now works
+             DatePanel: setEnabled(boolean b) now works
+             DateField and DatePanel now support setValue(Object o), being o instances of
+             java.util.Date, java.sql.Date or a parseable String.
+2004/10/18   MonthScroller: added nextMonth() and previousMonth() methods
+             DatePanel: added mouselistener. Now months can be scrolled with the mouse wheel.
+2004/10/17   MonthPanel: added MonthChangeEvent firing methods.
+             CalendarPanel: added keylistener support.
+             DatePanel: added keylistener support.
+             Added MonthChangeEvent and MonthChangeListener.
+             CalendarPanel: fixed setDate variable setting (thanks to Phillip Mayer)
+2004/10/14   DatePanel: added workingDays
+             DateField: added workingDays
+2004/10/13   DateField: added firstDayOfWeek.
+             Jar lib: added the version number to jar, now is nachocalendar-0.12.jar. Also
+             added to the demo.
+2004/10/13   DateField: Added a allowsInvalid property.
+2004/10/01   All classes were checked with Checkstyle (checkstyle.sf.net) for style 
+             errors and fixed.
+             Factorys: now the factorys are final and have private constructors.
+             Checked with "checkstyle". Lots of semantics changed, but no new functionality.
+             Added missing javadocs.
+
+Version 0.11
+
+2004/09/03   General: added a TODO file
+             MonthScroller and YearScroller: fixed borders
+2004/09/02   DateField: changed the border, now outside the component. Some variables renamed
+             Added the posibility to show ok/cancel buttons or a simple click selection.
+2004/08/30   DateField: to pass the parent window to the constructor is not needed anymore.
+2004/08/29   Tasks: added a new DayRenderer that paints up to four dots, showing the quantity
+             of tasks assigned to the day.
+
+Version 0.1
+2004/08/22  First Public Release: 0.1

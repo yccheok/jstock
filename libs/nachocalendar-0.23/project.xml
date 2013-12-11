@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project>
+    <pomVersion>1</pomVersion>
+    <id>nachocalendar</id>
+    <name>NachoCalendar</name>
+    <currentVersion>0.12</currentVersion>
+    <inceptionYear>2004</inceptionYear>
+    <package>net.sf.nachocalendar</package>
+    
+    <description>This project aims to provide a flexible Calendar component to the Java Platform.
+    </description>
+    <shortDescription>Java Calendar Components</shortDescription>
+    
+    <url>http://nachocalendar.sf.net/</url>
+    
+    <developers>
+        <developer>
+            <name>Ignacio Merani</name>
+            <id>imerani</id>
+            <email>imerani@users.sourceforge.net</email>
+            <organization></organization>
+        </developer>
+    </developers>
+    
+    <build>
+        <sourceDirectory>src</sourceDirectory>
+    </build>
+</project>

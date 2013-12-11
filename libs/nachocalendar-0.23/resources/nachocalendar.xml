@@ -1,0 +1,77 @@
+<!-- 
+
+  NachoCalendar
+
+ Project Info:  http://nachocalendar.sf.net
+
+ This library is free software; you can redistribute it and/or modify it
+ under the terms of the GNU Lesser General Public License as published by the
+ Free Software Foundation;
+ either version 2.1 of the License, or (at your option) any later version.
+
+ This library is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY;
+ without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ PARTICULAR PURPOSE.
+ See the GNU Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General Public License
+ along with this library; if not, write to the Free Software Foundation, Inc.,
+ 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+ [Java is a trademark or registered trademark of Sun Microsystems, Inc.
+ in the United States and other countries.]
+
+
+ nachocalendar.xml
+
+ Created on Dec 28, 2005
+
+ -->
+<!DOCTYPE nachocalendar [<!ELEMENT property (#PCDATA)>
+<!ATTLIST property
+    name CDATA #IMPLIED>
+<!ELEMENT nachocalendar (property)*>]>
+<nachocalendar>
+	<!-- Valid values are SUNDAY and MONDAY	 -->
+	<property name="firstDayOfWeek">SUNDAY</property>
+	<property name="allowsInvalid">false</property>
+	<property name="antiAliased">false</property>
+	
+	<!-- Date Format for DateField, if not set will use local default -->
+	<!--  
+	<property name="dateFormat">dd/MM/yyyy</property>
+	<property name="dateFormat">MM/dd/yyyy</property>
+	<property name="dateFormat">yyyy/MM/dd</property>
+	-->
+	<property name="printMoon">false</property>
+	
+	<!-- Any class that implements net.sf.nachocalendar.components.HeaderRenderer -->
+	<property name="headerRenderer">net.sf.nachocalendar.components.DefaultHeaderRenderer</property>
+	
+	<!-- Any class that implements net.sf.nachocalendar.model.DataModel  -->
+	<property name="model">net.sf.nachocalendar.model.DefaultDataModel</property>
+	
+	<!-- Any class that implements net.sf.nachocalendar.components.DayRenderer -->
+	<property name="renderer">net.sf.nachocalendar.components.DefaultDayRenderer</property>
+	
+	<!-- Text to show on today button -->
+	<!--  <property name="todayCaption">Today</property> -->
+	
+	<property name="showOkCancel">true</property>
+	<property name="showToday">false</property>
+	<property name="workingDays">false,true,true,true,true,true,true</property>
+	
+	<!-- Valid values are MultipleInterval (default), SingleInterval and SingleSelection -->
+	<property name="selectionMode">MultipleInterval</property>
+	
+	<!-- For CalendarPanel only, valid values HORIZONTAL (default) and VERTICAL -->
+	<property name="orientation">HORIZONTAL</property>
+	
+	<!-- For CalendarPanel only, valid values LEFT (default) and RIGHT -->
+	<property name="scrollPosition">LEFT</property>
+	
+	<!-- For CalendarPanel only, valid values UP (default) and DOWN -->
+	<property name="yearPosition">UP</property>
+	
+</nachocalendar>

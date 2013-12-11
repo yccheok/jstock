@@ -1,0 +1,21 @@
+-classpath '/Users/hen/apache/commons-proper/lang/LANG_2_4_RC3/target/classes'
+ -encoding
+'iso-8859-1'
+-protected
+-source
+'1.3'
+-sourcepath
+'/Users/hen/apache/commons-proper/lang/LANG_2_4_RC3/src/java'
+-author
+-bottom
+'Copyright © 2001-2008 <a href="http://www.apache.org/">The Apache Software Foundation</a>. All Rights Reserved.'
+-charset
+'ISO-8859-1'
+-d
+'/Users/hen/apache/commons-proper/lang/LANG_2_4_RC3/target/site/apidocs'
+-doctitle
+'Commons Lang 2.4 API'
+-use
+-version
+-windowtitle
+'Commons Lang 2.4 API'

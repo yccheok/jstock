@@ -1,0 +1,6 @@
+TODO file for NachoCalendar
+-----------------------------
+
+- Better manual.
+- Time selector
+- Inprove speed...

@@ -1,0 +1,336 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<title>Smack Changelog</title>
+<style type="text/css">
+/* global font and body settings */
+body {
+	font-size : 100%;
+	background-color : #d3d6d9;
+	padding: 0;
+	margin: 0 0 30px 0;
+}
+body, td, th {
+	font-family : arial, helvetica, sans-serif;
+	font-size : 10pt;
+}
+pre, tt, code {
+	font-family : courier new, monospace;
+	font-size : 9pt;
+}
+#pageContainer {
+	display: block;
+	position: relative;
+	clear: both;
+	background-color: #fff;
+	border: 1px solid #999;
+	padding: 40px;
+	margin: 30px;
+	-moz-border-radius: 6px;
+}
+#pageHeader {
+	display: block;
+	position: relative;
+	height: 80px;
+	background-color: #e7eaee;
+	border: 1px solid #cccccc;
+	border-bottom: none;
+	-moz-border-radius: 5px 5px 0 0;
+	margin: 10px 0 0 0;
+}
+#pageBody {
+	margin: 0 18px 0 20px;
+}
+/* anchors */
+a:link {
+	color: #11568c;
+}
+a:visited {
+	color: #571c8d;
+}
+a:hover {
+	color: #7a1d42;
+	text-decoration : underline;
+}
+a:active {
+	color: #7a1d42;
+}
+/* page header elements (logo and navigation) */
+.navigation {
+	display: block;
+	position: relative;
+	height: 20px;
+	background-color: #335588;
+	border: 1px solid #cccccc;
+	border-top: none;
+	color: #ffffff;
+	font-size: 11px;
+	line-height: 18px;
+	padding: 0 0 0 0;
+	margin: 0 0 25px 0;
+	overflow: hidden;
+}
+.navigation a {
+	margin: 0 20px 0 20px;
+}
+.navigation a:link { color: #ffffff; }
+.navigation a:visited { color: #ffffff; }
+.navigation a:hover { color: #ffffff; }
+.navigation a:active { color: #ffffff; }
+/* headings */
+h1 {
+	display: block;
+	position: relative;
+	font-size : 1.7em;
+	font-weight : bold;
+	color: #670e15;
+	padding: 0;
+	margin: 30px 0 0 20px;
+}
+h2 {
+	font-size : 1.3em;
+	font-weight : bold;
+	margin: 40px 0 6px 0;
+	padding: 0;
+	color: #335588;
+}
+h3 {
+	font-size : 1.0em;
+	font-weight : bold;
+	margin: 25px 0 3px 0;
+	padding: 0;
+	color: #334466;
+}
+
+/* general elements */
+p {
+	margin: 0 0 15px 0;
+}
+
+ul {
+	margin: 5px 0 15px 15px;
+}
+li {
+	padding-bottom : 4px;
+}
+tt {
+	font-family : courier new, monospace;
+	font-weight : bold;
+	color : #060;
+}
+hr {
+	display: block;
+	height: 1px;
+	background-color: #999999;
+	border: none;
+	margin: 40px 0 20px 0;
+}
+</style>
+</head>
+<body>
+
+<div id="pageContainer">
+
+	<div id="pageHeader">
+		<h1>Smack Changelog</h1>
+	</div>
+	<div class="navigation">
+	<a href="README.html">Readme</a>|<a href="changelog.html"><strong>Changelog</strong></a>
+	</div>
+
+	<div id="pageBody">
+
+<h2>3.1.0 -- <span style="font-weight: normal;">November 20, 2008</span></h2>
+
+<h3>New Features</h3>
+<ul>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-142'>SMACK-142</a>] - Added support for Kerberos/NTLM. <b>(6 votes)</b></li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-210'>SMACK-210</a>] - Added support for MD5 SASL. <b>(1 vote)</b></li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-256'>SMACK-256</a>] - Added support for new sophisticated TLS mechanisms including SmartCard and Apple's KeychainStore.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-242'>SMACK-242</a>] - Added support for JEP-50: Ad-hoc commands.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-251'>SMACK-251</a>] - Added support for XEP-0163: Personal Eventing Protocol. <b>(1 vote)</b></li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-226'>SMACK-226</a>] - XMLConnection can now be used with an http/socks proxy. <b>(2 votes)</b></li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-254'>SMACK-254</a>] - Loading the Roster during login is now optional.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-255'>SMACK-255</a>] - Added ability to set mime type for avatar.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-235'>SMACK-235</a>] - Improved performance of Roster class.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-241'>SMACK-241</a>] - Updated Base64 implementation to match Openfire's.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-240'>SMACK-240</a>] - Updated Jingle implementation to newest version.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-246'>SMACK-246</a>] - Improve Jingle logging using commons-logging</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-244'>SMACK-244</a>] - Updated JSTUN to 0.7.2.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-259'>SMACK-259</a>] - Updated XPP library to latest version.</li>
+</ul>
+
+<h3>Bug Fixes</h3>
+<ul>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-231'>SMACK-231</a>] - IBB Outputstream was not being flushed before it was closed.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-236'>SMACK-236</a>] - Renamed stanza error &quot;unexpected-condition&quot; to &quot;unexpected-request&quot;.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-258'>SMACK-258</a>] - Fixed disconnection issue when parsing SASL success that contained a payload.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-175'>SMACK-175</a>] - Fixed typo in RosterPacket.ItemStatus constant.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-260'>SMACK-260</a>] - Added handling of error presence packets</li>
+</ul>
+
+<h2>3.0.3 -- <span style="font-weight: normal;">May 31, 2007</span></h2>
+
+<h3>New Features</h3>
+<ul>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-99'>SMACK-99</a>] - Added support for multiple message bodies and message body languages.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-218'>SMACK-218</a>] - Implemented GSSAPI for single-sign on.</li>
+</ul>
+
+<h3>Bug Fixes</h3>
+<ul>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-219'>SMACK-219</a>] - The getPresence method was not working correctly with offline presence.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-224'>SMACK-224</a>] - SASL authenticion was using the XMPP domain instead of the FQDN.</li>
+</ul>
+
+<h2>3.0.2 -- <span style="font-weight: normal;">May 3, 2007</span></h2>
+
+<h3>Bug Fixes</h3>
+<ul>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-212'>SMACK-212</a>] - Jingle can't establish session if only one side has a relay service</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-213'>SMACK-213</a>] - RTP Bridge Resolver get wrong localhost address in certain situations</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-214'>SMACK-214</a>] - Presences with a negative priority of -1 are not sending the priority to the server</li>
+</ul>
+
+<h2>3.0.1 -- <span style="font-weight: normal;">April 12, 2007</span></h2>
+
+<h3>Bug Fixes</h3>
+<ul>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-211'>SMACK-211</a>] - Jingle ICE with relay sometimes closed sessions.</li>
+    <li>Upgraded bundled version of JSTUN.</li>
+</ul>
+
+
+<h2>3.0.0 -- <span style="font-weight: normal;">March 31, 2007</span></h2>
+
+<h3>Important Changes</h3>
+<ul>
+    <li>Java 5 is now required.</li>
+    <li>Several API changes are not backwards compatible. In particular, connection handling has
+        been significantly updated, the GroupChat class has been dropped in favor of the standardized
+        MultiUserChat, and the Chat class has an updated API.</li>
+</ul>
+
+<h3>New Features</h3>
+<ul>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-74'>SMACK-74</a>] - Added support for unavailable presences with status text. <b>(4 votes)</b></li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-191'>SMACK-191</a>] - RosterListener API improvements.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-194'>SMACK-194</a>] - Roster.getPresence(String) now considers mode after priority to determine the presence value to return.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-195'>SMACK-195</a>] - Added the ability to disconnect with a custom presence value (for offline status).</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-200'>SMACK-200</a>] - Added convenience methods to Presence class.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-31'>SMACK-31</a>] - Added support for privacy lists. <b>(4 votes)</b></li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-94'>SMACK-94</a>] - Added support for last activity of online users. <b>(1 vote)</b></li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-121'>SMACK-121</a>] - Added support for stream errors.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-136'>SMACK-136</a>] - Added support for XEP-0048: bookmark storage.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-144'>SMACK-144</a>] - Added bookmark manager for central bookmark management.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-150'>SMACK-150</a>] - Added support for handling node features in disco.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-167'>SMACK-167</a>] - Added support for XEP-0106: JID Escaping</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-171'>SMACK-171</a>] - The presence of available contacts is now changed to offline when the connection is closed.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-172'>SMACK-172</a>] - Added support for re-connection when the connection is abruptly closed.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-182'>SMACK-182</a>] - ProviderManager is now pluggable (for Eclipse ECF).</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-185'>SMACK-185</a>] - Added the workgroup API to Smack.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-206'>SMACK-206</a>] - Added the option to specify the username to use for the automated test cases.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-208'>SMACK-208</a>] - Added a max queue size for outgoing packets to prevent memory issues during extreme load.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-209'>SMACK-209</a>] - Initial Jingle support implemented.</li>
+</ul>
+
+<h3>Bug Fixes</h3>
+<ul>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-6'>SMACK-6</a>] - Don't force use of collectors in Chat class.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-10'>SMACK-10</a>] - Flush pending packets before closing the connection. <b>(4 votes)</b></li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-51'>SMACK-51</a>] - Use unique Thread names among connections.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-54'>SMACK-54</a>] - Add #equals and #hashCode to Occupant.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-86'>SMACK-86</a>] - Made presence checks case in-sensitive.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-93'>SMACK-93</a>] - XHTML provider wasn't handling some tags correctly.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-138'>SMACK-138</a>] - Added caching to file transfer negotiation operations.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-143'>SMACK-143</a>] - Updated XMPPError to be compliant with RFC3920.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-145'>SMACK-145</a>] - XHTML parsing could fail in some cases.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-146'>SMACK-146</a>] - DNS lookups were failing with some DNS servers.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-147'>SMACK-147</a>] - Removed invisibility presence mode.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-148'>SMACK-148</a>] - Socks 5 listening thread was not cleaning up correctly. <b>(2 votes)</b></li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-149'>SMACK-149</a>] - Fixed possible memory leaking in PacketReader.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-151'>SMACK-151</a>] - Now use getBytes("UTF-8") instead of getBytes().</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-152'>SMACK-152</a>] - The FN field is duplicated when loading vCards from the server.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-153'>SMACK-153</a>] - Optimized performance by replacing StringBuffer with StringBuilder.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-154'>SMACK-154</a>] - Fixed roster test cases that were sometimes failing.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-155'>SMACK-155</a>] - Optimized MUC performance by reducing number of packet collectors and listeners.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-158'>SMACK-158</a>] - FileTransfer isDone() method was returning true even when the transfer was refused.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-159'>SMACK-159</a>] - Filenames were not escaped for file transfers.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-160'>SMACK-160</a>] - Now use stream:feature to discover registration support.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-161'>SMACK-161</a>] - Improved connection speed.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-162'>SMACK-162</a>] - Fixed NPE in SmackConfiguration.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-163'>SMACK-163</a>] - Fixed NPE in RoomInfo when subject was null.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-164'>SMACK-164</a>] - Contact name was not being escaped.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-165'>SMACK-165</a>] - Listeners were not being removed from PacketReader.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-166'>SMACK-166</a>] - Packet reader thread was freezing when parsing an error text with no description.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-168'>SMACK-168</a>] - Fixed possible delay in PacketReader when negotiating TLS.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-173'>SMACK-173</a>] - Renamed ConnectionEstablishedListener to ConnectionCreationListener.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-176'>SMACK-176</a>] - Fixed incorrect property initialization.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-177'>SMACK-177</a>] - Removed synchronization from Roster.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-178'>SMACK-178</a>] - Added NodeInformation#getNodeIdentities() to return identities of hosted nodes</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-181'>SMACK-181</a>] - Improved parsing of certificates to get signed domains.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-183'>SMACK-183</a>] - Documentation fixes.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-184'>SMACK-184</a>] - Simplified XMPPConnection constructors.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-203'>SMACK-203</a>] - NULL thread IDs would cause an error inside of the Chat Manager.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-205'>SMACK-205</a>] - Fixed PacketReader concurrency problems.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-188'>SMACK-188</a>] - Resources are now closed after reading the keystore.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-189'>SMACK-189</a>] - The listener was remaining blocked forever in some cases.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-190'>SMACK-190</a>] - Exceptions while notifying packet reader listeners was stopping the notification thread.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-192'>SMACK-192</a>] - Roster.getPresence(String) now forces use of the bare JID.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-193'>SMACK-193</a>] - New presence packets now default to a null presence mode.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-196'>SMACK-196</a>] - Now set closed to true at the start of the connection shutdown method and not the end.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-197'>SMACK-197</a>] - The source build was failing.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-198'>SMACK-198</a>] - File transfer streams were not being closed properly in some cases.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-199'>SMACK-199</a>] - MultiUserChat invitation listeners are no longer removed on disconnects.</li>
+    <li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-201'>SMACK-201</a>] - Roster no longer exposes that it implements ConnectionListener.</li>
+
+</ul>
+
+<h2>2.2.1 -- <span style="font-weight: normal;">June 12, 2006</span></h2>
+
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-141'>SMACK-141</a>] - Fixed SSL exception while creating new XMPPConnections. <b>(1 vote)</b></li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-127'>SMACK-127</a>] - Fixed incorrect file transfer progress.</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-130'>SMACK-130</a>] - Fixed VCard escaping problem that was crashing connections.</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-134'>SMACK-134</a>] - VCards were not being saved when avatar was the only element.</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-131'>SMACK-131</a>] - Illegal XML characters are now properly escaped in the presence status.</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-133'>SMACK-133</a>] - Illegal XML characters are now properly escaped in groups names.</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-132'>SMACK-132</a>] - Fixed IBB problem triggered when buffersize was increased.</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-135'>SMACK-135</a>] - Moved to new Base64 implementation to fix line break issue in old implementation.</li>
+</ul>
+
+<h2>2.2.0 -- <span style="font-weight: normal;">March 9, 2006</span></h2>
+<ul>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-122'>SMACK-122</a>] - Added support for JEP-96: File Transfer.  <b>(1 vote)</b></li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-72'>SMACK-72</a>] - Added support for JEP-47: In-Band Bytestreams. <b>(2 votes)</b></li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-122'>SMACK-122</a>] - Added support for JEP-65: SOCKS5 Bytestreams.  <b>(1 vote)</b></li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-112'>SMACK-112</a>] - Added support for JEP-38 Stream Compression.</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-117'>SMACK-117</a>] - Added support for JEP-33: Extended Stanza Addressing.</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-27'>SMACK-27</a>] - Certification validation is now pluggable.</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-118'>SMACK-118</a>] - Added methods to dynamically remove providers.</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-125'>SMACK-125</a>] - Added support for deaf occupant in MUC rooms.</li>
+
+<li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-109'>SMACK-109</a>] - Optimized client performance. <b>(1 vote)</b></li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-113'>SMACK-113</a>] - Added support for choosing if TLS should be used or not.</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-114'>SMACK-114</a>] - Added support for choosing if SASL should be used or not.</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-123'>SMACK-123</a>] - A thread is no longer used for packet writer listeners.</li>
+
+<li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-110'>SMACK-110</a>] - Resource binding and session establishment are now requested only if the server offered them.</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-111'>SMACK-111</a>] - Fixed concurrency issue with date formatter.</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-116'>SMACK-116</a>] - Fixed vCard issues.</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-119'>SMACK-119</a>] - Fixed AccessControlException when using vCard from an applet.</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-120'>SMACK-120</a>] - Listener thread was not being shutdown properly.</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-124'>SMACK-124</a>] - Parsing resource binding packets was requiring smackx.jar file to be in the classpath.</li>
+<li>[<a href='http://www.igniterealtime.org/issues/browse/SMACK-97'>SMACK-97</a>] - Fixed functional test failures in PresencePriorityTest and RosterTest.</li>
+</ul>
+
+    <div class="footer">
+    Copyright &copy; Jive Software, 2004-2008
+    </div>
+
+	</div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,18 @@
+/* CSS definition file containing sitestyle stylesheets */
+BODY { font-family: Verdana,Tahoma,Arial,Helvetica,sans-serif; font-size: 11px; text-decoration: none ; background-color: rgb(255,255,255);}
+ P { font-family: Verdana,Tahoma,Arial,Helvetica,sans-serif; font-size: 11px; text-decoration: none ;}
+ TD { font-family: Verdana,Tahoma,Arial,Helvetica,sans-serif; font-size: 11px; text-decoration: none ;}
+ A { color: rgb(51,103,153); text-decoration: none ;}
+ A:active { color: rgb(51,103,153); text-decoration: none ;}
+ A:link { color: rgb(42,95,170); text-decoration: none ;}
+ A:visited { color: rgb(51,103,153); text-decoration: none ;}
+ A:hover { color: rgb(51,103,153); text-decoration: none ;}
+ UL { font-family: Verdana,Tahoma,Arial,Helvetica,sans-serif; font-size: 11px; font-weight: normal; font-style: normal; text-decoration: none ;}
+ H1 { font-family: Verdana,Tahoma,Arial,Helvetica,sans-serif; font-size: 20px;}
+ H2 { font-family: Verdana,Tahoma,Arial,Helvetica,sans-serif; font-size: 18px; font-weight: bold;}
+ P { font-family: Verdana,Tahoma,Arial,Helvetica,sans-serif; font-size: 11px;}
+ H3 { font-family: Verdana,Tahoma,Arial,Helvetica,sans-serif; font-size: 12px; font-weight: bold;}
+ OL { font-family: Verdana,Tahoma,Arial,Helvetica,sans-serif; font-size: 11px; text-decoration: none ;}
+ .TextNavBar { font-family: Verdana,Tahoma,Arial,Helvetica,sans-serif; font-size: 9px; font-weight: normal; font-style: normal; text-decoration: none ;}
+ .TextObject { font-family: Verdana,Tahoma,Arial,Helvetica,sans-serif; font-size: 11px; text-decoration: none ;}
+ 
