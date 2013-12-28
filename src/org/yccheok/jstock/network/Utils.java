@@ -45,7 +45,8 @@ public class Utils {
         DONATE_HTML,
         CONTRIBUTE_HTML,
         HELP_KEYBOARD_SHORTCUTS_HTML,
-        ANDROID_HTML
+        ANDROID_HTML,
+        STOCK_INFO_DATABASE_META
     }
 
     private Utils() {
@@ -95,6 +96,7 @@ public class Utils {
         map.put(Type.CONTRIBUTE_HTML, "http://jstock.org/help_faq.html?utm_source=jstock&utm_medium=help_menu#contribution");
         map.put(Type.HELP_KEYBOARD_SHORTCUTS_HTML, "http://jstock.org/help_faq.html?utm_source=jstock&utm_medium=help_menu#keyboard-shortcuts");
         map.put(Type.ANDROID_HTML, "http://goo.gl/VAm6Mx");
+        map.put(Type.STOCK_INFO_DATABASE_META, JSTOCK_STATIC_SERVER + "stocks_information/stock-info-database-meta.json");
         
         zh_map.put(Type.CHAT_SERVER_TXT, JSTOCK_STATIC_SERVER + "servers_information/chat_server.txt");
         zh_map.put(Type.NTP_SERVER_TXT, JSTOCK_STATIC_SERVER + "servers_information/ntp_server.txt");
@@ -114,6 +116,7 @@ public class Utils {
         zh_map.put(Type.CONTRIBUTE_HTML, "http://jstock.org/zh/help_faq.html?utm_source=jstock&utm_medium=help_menu#contribution");
         zh_map.put(Type.HELP_KEYBOARD_SHORTCUTS_HTML, "http://jstock.org/zh/help_faq.html?utm_source=jstock&utm_medium=help_menu#keyboard-shortcuts");
         zh_map.put(Type.ANDROID_HTML, "http://goo.gl/VAm6Mx");
+        zh_map.put(Type.STOCK_INFO_DATABASE_META, JSTOCK_STATIC_SERVER + "stocks_information/stock-info-database-meta.json");
 
         assert(map.size() == Type.values().length);
         assert(zh_map.size() == Type.values().length);

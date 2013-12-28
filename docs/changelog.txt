@@ -4,6 +4,7 @@ Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 JStock 1.0.7i - 2013-xx-xx
   Feature: Support Czech Republic Koruna in currency exchange.
   Bugfix:  Enable back currency exchange option.
+  Bugfix:  Fix on AEX index.
 
 JStock 1.0.7h - 2013-09-19
   Feature: Auto dividend calculation.

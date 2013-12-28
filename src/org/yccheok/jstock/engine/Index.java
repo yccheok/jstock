@@ -45,7 +45,7 @@ public enum Index {
     HSI("Hang Seng", Code.newInstance("^HSI")),
     JKSE("Jakarta Composite", Code.newInstance("^JKSE")),
     KS11("Seoul Composite", Code.newInstance("^KS11")),
-    AEX("AEX", Code.newInstance("AEX.AS")),
+    AEX("AEX", Code.newInstance("^AEX")),
     PSI20("PSI 20", Code.newInstance("PSI20.LS")),
     TWII("TSEC weighted index", Code.newInstance("^TWII")),
     SSMI("Swiss Market", Code.newInstance("^SSMI")),
