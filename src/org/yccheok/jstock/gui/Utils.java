@@ -33,6 +33,10 @@ import com.google.gdata.data.MediaContent;
 import com.google.gdata.data.PlainTextConstruct;
 import com.google.gdata.data.media.MediaFileSource;
 import com.google.gdata.data.media.MediaSource;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.InstanceCreator;
+import com.google.gson.reflect.TypeToken;
 import com.thoughtworks.xstream.XStream;
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -55,6 +59,8 @@ import java.awt.image.PixelGrabber;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
@@ -810,6 +816,10 @@ public class Utils {
         }
         
         return true;
+    }
+    
+    public static File getStockInfoDatabaseFile(Country country) {
+        return new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database" + File.separator + "stock-info-database.csv");
     }
     
     public static boolean isFileOrDirectoryExist(String fileOrDirectory) {
@@ -2683,29 +2693,16 @@ public class Utils {
         }
     }
     
-    /**
-     * Performs download and save the download as temporary file.
-     * 
-     * @param location Download URL location
-     * @return The saved temporary file if download success. <code>null</code>
-     * if failed.
-     */
-    public static File downloadAsTempFile(String location) {
+    public static boolean downloadAsFile(File file, String location) {
         final Utils.InputStreamAndMethod inputStreamAndMethod = Utils.getResponseBodyAsStreamBasedOnProxyAuthOption(location);
         if (inputStreamAndMethod.inputStream == null) {
             inputStreamAndMethod.method.releaseConnection();
-            return null;
+            return false;
         }
         // Write to temp file.
         OutputStream out = null;
-        File temp = null;
         try {
-            // Create temp file.
-            temp = File.createTempFile(Utils.getJStockUUID(), null);
-            // Delete temp file when program exits.
-            temp.deleteOnExit();
-
-            out = new FileOutputStream(temp);
+            out = new FileOutputStream(file, false);
 
             // Transfer bytes from the ZIP file to the output file
             byte[] buf = new byte[1024];
@@ -2714,7 +2711,7 @@ public class Utils {
                 out.write(buf, 0, len);
             }
             // Success!
-            return temp;
+            return true;
         } catch (IOException ex) {
             log.error(null, ex);
         } finally {
@@ -2722,6 +2719,36 @@ public class Utils {
             close(inputStreamAndMethod.inputStream);
             inputStreamAndMethod.method.releaseConnection();
         }
+        return false;
+    }
+    
+    /**
+     * Performs download and save the download as temporary file.
+     * 
+     * @param location Download URL location
+     * @return The saved temporary file if download success. <code>null</code>
+     * if failed.
+     */
+    public static File downloadAsTempFile(String location) {
+        // Create temp file.
+        File temp = null;
+                
+        try {
+            temp = File.createTempFile(Utils.getJStockUUID(), null);
+        } catch (IOException ex) {
+            log.error(null, ex);
+            return null;
+        }
+        
+        // Delete temp file when program exits.
+        temp.deleteOnExit();
+
+        boolean status = downloadAsFile(temp, location);
+        
+        if (status) {
+            return temp;
+        }
+        
         return null;
     }
 
@@ -2849,6 +2876,76 @@ public class Utils {
         return date == _date && month == _month && year == _year;
     }
     
+    private static Gson getGsonForStockInfoDatabaseMeta() {
+        final Gson gson = new GsonBuilder()
+                .registerTypeAdapter(
+                new TypeToken<EnumMap<Country, Long>>() {}.getType(),
+                new EnumMapInstanceCreator<Country, Long>(Country.class))                
+                .create();
+        
+        return gson;
+    }
+    
+    public static Map<Country, Long> loadStockInfoDatabaseMeta(String json) {
+        final Gson gson = getGsonForStockInfoDatabaseMeta();
+        
+        Map<Country, Long> stockInfoDatabaseMeta = new EnumMap<Country, Long>(Country.class);
+        
+        try {
+            stockInfoDatabaseMeta = gson.fromJson(json, new TypeToken<EnumMap<Country, Long>>(){}.getType());
+        } catch (com.google.gson.JsonSyntaxException ex) {
+            log.error(null, ex);
+        }  
+        
+        return stockInfoDatabaseMeta;
+    }
+    
+    public static Map<Country, Long> loadStockInfoDatabaseMeta(File stockInfoDatabaseMetaFile) {
+        final Gson gson = getGsonForStockInfoDatabaseMeta();
+                
+        Map<Country, Long> stockInfoDatabaseMeta = new EnumMap<Country, Long>(Country.class);
+
+        try {
+            //If the constructor throws an exception, the finally block will NOT execute
+            //BufferedReader reader = new BufferedReader(new FileReader(file));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(stockInfoDatabaseMetaFile), "UTF-8"));            
+            try {
+                stockInfoDatabaseMeta = gson.fromJson(reader, new TypeToken<EnumMap<Country, Long>>(){}.getType());
+            } finally {
+                //no need to check for null
+                //any exceptions thrown here will be caught by 
+                //the outer catch block
+                reader.close();
+            }
+        } catch (IOException ex){
+            log.error(null, ex);
+        } catch (com.google.gson.JsonSyntaxException ex) {
+            log.error(null, ex);
+        }            
+
+        return stockInfoDatabaseMeta;
+    }
+    
+    public static boolean saveStockInfoDatabaseMeta(File stockInfoDatabaseMetaFile, Map<Country, Long> stockInfoDatabaseMeta) {
+        final Gson gson = getGsonForStockInfoDatabaseMeta();
+        String string = gson.toJson(stockInfoDatabaseMeta);
+        
+        try {
+            //If the constructor throws an exception, the finally block will NOT execute
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(stockInfoDatabaseMetaFile), "UTF-8"));
+            try {
+                writer.write(string);
+            } finally {
+                writer.close();
+            }
+        } catch (IOException ex){
+            log.error(null, ex);
+            return false;
+        }
+        
+        return true;        
+    }
+    
     /**
      * Returns time format used in status bar.
      * 
@@ -2860,6 +2957,21 @@ public class Utils {
 
     public static DateFormat getOtherDayLastUpdateTimeFormat() {
         return otherDayLastUpdateTimeFormat.get();
+    }
+    
+    private static class EnumMapInstanceCreator<K extends Enum<K>, V> implements
+            InstanceCreator<EnumMap<K, V>> {
+        private final Class<K> enumClazz;
+
+        public EnumMapInstanceCreator(final Class<K> enumClazz) {
+            super();
+            this.enumClazz = enumClazz;
+        }
+
+        @Override
+        public EnumMap<K, V> createInstance(final java.lang.reflect.Type type) {
+            return new EnumMap<K, V>(enumClazz);
+        }
     }
     
     /**

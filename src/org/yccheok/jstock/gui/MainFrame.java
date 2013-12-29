@@ -41,6 +41,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import javax.imageio.ImageIO;
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
@@ -137,6 +138,7 @@ public class MainFrame extends javax.swing.JFrame {
         this.initMyJXStatusBarExchangeRateLabelMouseAdapter();
         this.initMyJXStatusBarCountryLabelMouseAdapter();
         this.initMyJXStatusBarImageLabelMouseAdapter();
+        this.initStockInfoDatabaseMeta();
         this.initDatabase(true);
         this.initAjaxProvider();
         this.initMarketThread();
@@ -282,20 +284,11 @@ public class MainFrame extends javax.swing.JFrame {
                 @Override
                 public void run() {
                     if (isFormWindowClosedCalled) {
+                        AppLock.unlock();
                         return;
                     }
                     
-                    // Always be the first statement. As no matter what happen, we must
-                    // save all the configuration files.
-                    MainFrame.this.save();
-
-                    if (MainFrame.this.needToSaveUserDefinedDatabase) {
-                        // We are having updated user database in memory.
-                        // Save it to disk.
-                        MainFrame.this.saveUserDefinedDatabaseAsCSV(jStockOptions.getCountry(), stockInfoDatabase);
-                    }
-                    
-                    // Do not access any GUI related task in this runnable.
+                    formWindowClosed(null);
                     
                     AppLock.unlock();
                 }
@@ -1023,6 +1016,11 @@ public class MainFrame extends javax.swing.JFrame {
         isFormWindowClosedCalled = true;
         
         try {
+	        ExecutorService stockInfoDatabaseMetaPool = this.stockInfoDatabaseMetaPool;
+    	    this.stockInfoDatabaseMetaPool = null;
+        
+            stockInfoDatabaseMetaPool.shutdownNow();
+            
             // Always be the first statement. As no matter what happen, we must
             // save all the configuration files.
             this.save();
@@ -1050,6 +1048,8 @@ public class MainFrame extends javax.swing.JFrame {
                 this.latestNewsTask.cancel(true);
             }
 
+            stockInfoDatabaseMetaPool.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
+            
             // We suppose to call shutdownAll to clean up all network resources.
             // However, that will cause Exception in other threads if they are still using httpclient.
             // Exception in thread "Thread-4" java.lang.IllegalStateException: Connection factory has been shutdown.
@@ -3167,7 +3167,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     private boolean saveStockInfoDatabaseAsCSV(Country country, StockInfoDatabase stockInfoDatabase) {
-        final File stockInfoDatabaseCSVFile = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database" + File.separator + "stock-info-database.csv");
+        final File stockInfoDatabaseCSVFile = Utils.getStockInfoDatabaseFile(country);
         final Statements statements = Statements.newInstanceFromStockInfoDatabase(stockInfoDatabase);
         boolean result = statements.saveAsCSVFile(stockInfoDatabaseCSVFile);
         return result;
@@ -3237,7 +3237,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     private StockInfoDatabase loadStockInfoDatabaseFromCSV(Country country) {
-        final File stockInfoDatabaseCSVFile = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database" + File.separator + "stock-info-database.csv");
+        final File stockInfoDatabaseCSVFile = Utils.getStockInfoDatabaseFile(country);
         
         Statements statements = Statements.newInstanceFromCSVFile(stockInfoDatabaseCSVFile);
         if (statements.getType() != Statement.Type.StockInfoDatabase) {
@@ -3774,7 +3774,7 @@ public class MainFrame extends javax.swing.JFrame {
         // which is very unlikely. Because during application startup, we will
         // always check the existance of stock-info-database.xml.
         boolean b2 = true;
-        final File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database" + File.separator + "stock-info-database.csv");
+        final File f = Utils.getStockInfoDatabaseFile(country);
         if (f.exists() == false) {
             b2 = this.saveStockInfoDatabaseAsCSV(country, stock_info_database);
         }
@@ -3955,6 +3955,64 @@ public class MainFrame extends javax.swing.JFrame {
         }
         
         this.indicatorPanel.initAjaxProvider();
+    }
+    
+    private void initStockInfoDatabaseMeta() {
+
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                // Read existing stock-info-database-meta.json
+                final Map<Country, Long> localStockInfoDatabaseMeta = Utils.loadStockInfoDatabaseMeta(Utils.getStockInfoDatabaseMetaFile());
+                
+                final String location = org.yccheok.jstock.network.Utils.getURL(org.yccheok.jstock.network.Utils.Type.STOCK_INFO_DATABASE_META);
+                
+                final String json = Utils.downloadAsString(location);
+                
+                final Map<Country, Long> latestStockInfoDatabaseMeta = Utils.loadStockInfoDatabaseMeta(json);
+
+                final Map<Country, Long> successStockInfoDatabaseMeta = new EnumMap<Country, Long>(Country.class);
+                
+                // Build up list of stock-info-database.csv that needed to be
+                // updated.
+                for (Map.Entry<Country, Long> entry : latestStockInfoDatabaseMeta.entrySet()) {
+                    if (Thread.currentThread().isInterrupted() || stockInfoDatabaseMetaPool == null) {
+                        break;
+                    }
+                    
+                    Country country = entry.getKey();
+                    Long latest = entry.getValue();
+                    Long local = localStockInfoDatabaseMeta.get(country);
+                                        
+                    if (local != latest) {
+                        final File stockInfoDatabaseFile = Utils.getStockInfoDatabaseFile(country);
+                        final String stocksCSVFileLocation = org.yccheok.jstock.engine.Utils.getStocksCSVFileLocation(country);
+                        final boolean status = Utils.downloadAsFile(stockInfoDatabaseFile, stocksCSVFileLocation);
+                        if (status) {
+                            successStockInfoDatabaseMeta.put(country, latest);
+                        }
+                    }
+                }
+                
+                if (successStockInfoDatabaseMeta.isEmpty()) {
+                    return;
+                }
+                
+                // Retain old meta value.
+                for (Map.Entry<Country, Long> entry : localStockInfoDatabaseMeta.entrySet()) {
+                    Country country = entry.getKey();
+                    Long old = entry.getValue();
+                    
+                    if (false == successStockInfoDatabaseMeta.containsKey(country)) {
+                        successStockInfoDatabaseMeta.put(country, old);
+                    }
+                }
+                
+                Utils.saveStockInfoDatabaseMeta(Utils.getStockInfoDatabaseMetaFile(), successStockInfoDatabaseMeta);
+            }           
+        };
+        
+        stockInfoDatabaseMetaPool.execute(runnable);
     }
     
     private void initDatabase(boolean readFromDisk) {
@@ -4682,7 +4740,8 @@ public class MainFrame extends javax.swing.JFrame {
     private ExecutorService emailAlertPool = Executors.newFixedThreadPool(1);
     private ExecutorService smsAlertPool = Executors.newFixedThreadPool(1);
     private ExecutorService systemTrayAlertPool = Executors.newFixedThreadPool(1);
-
+    private volatile ExecutorService stockInfoDatabaseMetaPool = Executors.newFixedThreadPool(1);
+            
     private final org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
     private final org.yccheok.jstock.engine.Observer<StockHistoryMonitor, StockHistoryMonitor.StockHistoryRunnable> stockHistoryMonitorObserver = this.getStockHistoryMonitorObserver();
     private final org.yccheok.jstock.engine.Observer<Indicator, Boolean> alertStateManagerObserver = this.getAlertStateManagerObserver();
