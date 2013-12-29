@@ -2174,6 +2174,10 @@ public class Utils {
         return toXML(object, new File(filePath));
     }
 
+    public static File getStockInfoDatabaseMetaFile() {
+        return new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "stock-info-database-meta.json");
+    }
+    
     public static String getExtraDataDirectory() {
         return org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "extra" + File.separator;
     }
@@ -2664,6 +2668,21 @@ public class Utils {
         return line - metaLineNumber;
     }
 
+    public static String downloadAsString(String location) {    
+        final Utils.InputStreamAndMethod inputStreamAndMethod = Utils.getResponseBodyAsStreamBasedOnProxyAuthOption(location);
+        if (inputStreamAndMethod.inputStream == null) {
+            inputStreamAndMethod.method.releaseConnection();
+            return "";
+        }
+        try {
+            java.util.Scanner s = new java.util.Scanner(inputStreamAndMethod.inputStream, "UTF-8").useDelimiter("\\A");
+            return s.hasNext() ? s.next() : "";        
+        } finally {
+            close(inputStreamAndMethod.inputStream);
+            inputStreamAndMethod.method.releaseConnection();
+        }
+    }
+    
     /**
      * Performs download and save the download as temporary file.
      * 
