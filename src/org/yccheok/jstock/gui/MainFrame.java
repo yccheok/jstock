@@ -3379,6 +3379,10 @@ public class MainFrame extends javax.swing.JFrame {
                     // Prepare proper synchronization for us to change country.
                     synchronized (MainFrame.this.databaseTaskMonitor)
                     {
+                        if (this.isCancelled()) {
+                            return false;
+                        }
+                        
                         MainFrame.this.stockInfoDatabase = tmp_stock_info_database;
                         MainFrame.this.stockNameDatabase = tmp_name_database;
                         // Register the auto complete JComboBox with latest database.
@@ -3434,6 +3438,10 @@ public class MainFrame extends javax.swing.JFrame {
                 // Prepare proper synchronization for us to change country.
                 synchronized (MainFrame.this.databaseTaskMonitor)
                 {
+                    if (this.isCancelled()) {
+                        return false;
+                    }
+
                     MainFrame.this.stockInfoDatabase = stockDatabase.first;
                     MainFrame.this.stockNameDatabase = stockDatabase.second;
 
@@ -3958,6 +3966,8 @@ public class MainFrame extends javax.swing.JFrame {
 
                 final Map<Country, Long> successStockInfoDatabaseMeta = new EnumMap<Country, Long>(Country.class);
                 
+                boolean needToInitDatabase = false;
+                
                 // Build up list of stock-info-database.csv that needed to be
                 // updated.
                 for (Map.Entry<Country, Long> entry : latestStockInfoDatabaseMeta.entrySet()) {
@@ -3982,6 +3992,10 @@ public class MainFrame extends javax.swing.JFrame {
                                     MainFrame.this.saveStockNameDatabaseAsCSV(country, stockDatabase.second);
                                 }
                                 successStockInfoDatabaseMeta.put(country, latest);
+                                
+                                if (country == jStockOptions.getCountry()) {
+                                    needToInitDatabase = true;
+                                }
                             }
                         }
                     }
@@ -4002,6 +4016,10 @@ public class MainFrame extends javax.swing.JFrame {
                 }
                 
                 Utils.saveStockInfoDatabaseMeta(Utils.getStockInfoDatabaseMetaFile(), successStockInfoDatabaseMeta);
+                
+                if (needToInitDatabase) {
+                    initDatabase(true);
+                }
             }           
         };
         
