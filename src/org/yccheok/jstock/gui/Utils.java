@@ -818,10 +818,6 @@ public class Utils {
         return true;
     }
     
-    public static File getStockInfoDatabaseFile(Country country) {
-        return new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database" + File.separator + "stock-info-database.csv");
-    }
-    
     public static boolean isFileOrDirectoryExist(String fileOrDirectory) {
         java.io.File f = new java.io.File(fileOrDirectory);
         return f.exists();
@@ -2693,35 +2689,6 @@ public class Utils {
         }
     }
     
-    public static boolean downloadAsFile(File file, String location) {
-        final Utils.InputStreamAndMethod inputStreamAndMethod = Utils.getResponseBodyAsStreamBasedOnProxyAuthOption(location);
-        if (inputStreamAndMethod.inputStream == null) {
-            inputStreamAndMethod.method.releaseConnection();
-            return false;
-        }
-        // Write to temp file.
-        OutputStream out = null;
-        try {
-            out = new FileOutputStream(file, false);
-
-            // Transfer bytes from the ZIP file to the output file
-            byte[] buf = new byte[1024];
-            int len;
-            while ((len = inputStreamAndMethod.inputStream.read(buf)) > 0) {
-                out.write(buf, 0, len);
-            }
-            // Success!
-            return true;
-        } catch (IOException ex) {
-            log.error(null, ex);
-        } finally {
-            close(out);
-            close(inputStreamAndMethod.inputStream);
-            inputStreamAndMethod.method.releaseConnection();
-        }
-        return false;
-    }
-    
     /**
      * Performs download and save the download as temporary file.
      * 
@@ -2730,25 +2697,37 @@ public class Utils {
      * if failed.
      */
     public static File downloadAsTempFile(String location) {
-        // Create temp file.
-        File temp = null;
-                
-        try {
-            temp = File.createTempFile(Utils.getJStockUUID(), null);
-        } catch (IOException ex) {
-            log.error(null, ex);
+        final Utils.InputStreamAndMethod inputStreamAndMethod = Utils.getResponseBodyAsStreamBasedOnProxyAuthOption(location);
+        if (inputStreamAndMethod.inputStream == null) {
+            inputStreamAndMethod.method.releaseConnection();
             return null;
         }
-        
-        // Delete temp file when program exits.
-        temp.deleteOnExit();
+        // Write to temp file.
+        OutputStream out = null;
+        File temp = null;
+        try {
+            // Create temp file.
+            temp = File.createTempFile(Utils.getJStockUUID(), null);
+            // Delete temp file when program exits.
+            temp.deleteOnExit();
 
-        boolean status = downloadAsFile(temp, location);
-        
-        if (status) {
+            out = new FileOutputStream(temp);
+
+            // Transfer bytes from the ZIP file to the output file
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = inputStreamAndMethod.inputStream.read(buf)) > 0) {
+                out.write(buf, 0, len);
+            }
+            // Success!
             return temp;
+        } catch (IOException ex) {
+            log.error(null, ex);
+        } finally {
+            close(out);
+            close(inputStreamAndMethod.inputStream);
+            inputStreamAndMethod.method.releaseConnection();
         }
-        
         return null;
     }
 

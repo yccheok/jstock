@@ -3167,7 +3167,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     private boolean saveStockInfoDatabaseAsCSV(Country country, StockInfoDatabase stockInfoDatabase) {
-        final File stockInfoDatabaseCSVFile = Utils.getStockInfoDatabaseFile(country);
+        final File stockInfoDatabaseCSVFile = org.yccheok.jstock.engine.Utils.getStockInfoDatabaseFile(country);
         final Statements statements = Statements.newInstanceFromStockInfoDatabase(stockInfoDatabase);
         boolean result = statements.saveAsCSVFile(stockInfoDatabaseCSVFile);
         return result;
@@ -3237,7 +3237,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     private StockInfoDatabase loadStockInfoDatabaseFromCSV(Country country) {
-        final File stockInfoDatabaseCSVFile = Utils.getStockInfoDatabaseFile(country);
+        final File stockInfoDatabaseCSVFile = org.yccheok.jstock.engine.Utils.getStockInfoDatabaseFile(country);
         
         Statements statements = Statements.newInstanceFromCSVFile(stockInfoDatabaseCSVFile);
         if (statements.getType() != Statement.Type.StockInfoDatabase) {
@@ -3346,6 +3346,12 @@ public class MainFrame extends javax.swing.JFrame {
                     tmp_name_database = null;
                 }
 
+                // After time consuming operation, check whether we should 
+                // cancel.
+                if (this.isCancelled()) {
+                    return false;
+                }
+                
                 if (tmp_stock_info_database != null && false == tmp_stock_info_database.isEmpty()) {
                     // Yes. We need to integrate "user-defined-database.csv" into tmp_stock_info_database
                     final java.util.List<Pair<Code, Symbol>> pairs = loadUserDefinedDatabaseFromCSV(country);
@@ -3373,94 +3379,73 @@ public class MainFrame extends javax.swing.JFrame {
                     // Prepare proper synchronization for us to change country.
                     synchronized (MainFrame.this.databaseTaskMonitor)
                     {
-                        if (this.isCancelled() == false)
-                        {
-                            MainFrame.this.stockInfoDatabase = tmp_stock_info_database;
-                            MainFrame.this.stockNameDatabase = tmp_name_database;
-                            // Register the auto complete JComboBox with latest database.
-                            ((AutoCompleteJComboBox)MainFrame.this.jComboBox1).setStockInfoDatabase(MainFrame.this.stockInfoDatabase);
-                            MainFrame.this.indicatorPanel.setStockInfoDatabase(MainFrame.this.stockInfoDatabase);
-                            
-                            return true;
-                        }
-                        else
-                        {
-                            return false;
-                        }
+                        MainFrame.this.stockInfoDatabase = tmp_stock_info_database;
+                        MainFrame.this.stockNameDatabase = tmp_name_database;
+                        // Register the auto complete JComboBox with latest database.
+                        ((AutoCompleteJComboBox)MainFrame.this.jComboBox1).setStockInfoDatabase(MainFrame.this.stockInfoDatabase);
+                        MainFrame.this.indicatorPanel.setStockInfoDatabase(MainFrame.this.stockInfoDatabase);
+
+                        return true;
                     }                
                 }   // if (tmp_stock_info_database != null && false == tmp_stock_info_database.isEmpty())
             }   // if(this.readFromDisk)
-            
+                    
             // When we fall here, we either fail to read from disk or user
             // explicitly doesn't allow us to read from disk. Let's perform
             // networking stuff.
             //
             // For networking stuff, we will try on JStock static server.
-            Boolean success = false;
-            StockInfoDatabase tmp_stock_info_database = null;
-            StockNameDatabase tmp_name_database = null;
 
             final String location = org.yccheok.jstock.engine.Utils.getStocksCSVFileLocation(country);
             // Try to download the CSV file.
             final File file = Utils.downloadAsTempFile(location);
             // Is download success?
-            if (file != null) {
-                // Try to parse the CSV file.
-                final java.util.List<Stock> stocks = org.yccheok.jstock.engine.Utils.getStocksFromCSVFile(file);
-                // Is the stocks good enough?
-                if (false == stocks.isEmpty()) {
-                    // Let's make our database since we get a list of good stocks.
-                    tmp_stock_info_database = new StockInfoDatabase(stocks);
+            if (file == null) {
+                return false;
+            }
+            // Try to parse the CSV file.
+            final java.util.List<Stock> stocks = org.yccheok.jstock.engine.Utils.getStocksFromCSVFile(file);
+            // Is the stocks good enough?
+            if (false == stocks.isEmpty()) {
+                final Pair<StockInfoDatabase, StockNameDatabase> stockDatabase = org.yccheok.jstock.engine.Utils.toStockDatabase(stocks, country);
 
-                    // StockNameDatabase is an optional item.
-                    if (org.yccheok.jstock.engine.Utils.isNameImmutable()) {
-                        tmp_name_database = new StockNameDatabase(stocks);
-                    } else {
-                        tmp_name_database = null;
-                    }
+                // After time consuming operation, check whether we should
+                // cancel.
+                if (this.isCancelled()) {
+                    return false;
+                }
 
-                    // Yes. We need to integrate "user-defined-database.csv" into tmp_stock_info_database
-                    final java.util.List<Pair<Code, Symbol>> pairs = loadUserDefinedDatabaseFromCSV(country);
-                    if (pairs.isEmpty() == false) {
-                        // Remove the old user defined database. Legacy stockcodeandsymboldatabase.xml
-                        // may contain user defined codes.
-                        tmp_stock_info_database.removeAllUserDefinedStockInfos();
-                        
-                        // Insert with new user defined code.
-                        for (Pair<Code, Symbol> pair : pairs) {
-                            tmp_stock_info_database.addUserDefinedStockInfo(StockInfo.newInstance(pair.first, pair.second));
-                        }
-                    }
-
-                    // Prepare proper synchronization for us to change country.
-                    synchronized (MainFrame.this.databaseTaskMonitor)
-                    {
-                        if (this.isCancelled() == false)
-                        {
-                            MainFrame.this.stockInfoDatabase = tmp_stock_info_database;
-                            MainFrame.this.stockNameDatabase = tmp_name_database;
-
-                            // Register the auto complete JComboBox with latest database.
-                            ((AutoCompleteJComboBox)MainFrame.this.jComboBox1).setStockInfoDatabase(MainFrame.this.stockInfoDatabase);
-                            MainFrame.this.indicatorPanel.setStockInfoDatabase(MainFrame.this.stockInfoDatabase);
-                            // Yup. The entire operation is success. Do not return
-                            // first. We need to save the database as CSV.
-                            success = true;
-                        }
+                // Save to disk.
+                MainFrame.this.saveStockInfoDatabaseAsCSV(country, stockDatabase.first);
+                if (stockDatabase.second != null) {
+                    MainFrame.this.saveStockNameDatabaseAsCSV(country, stockDatabase.second);
+                }
+                
+                // Yes. We need to integrate "user-defined-database.csv" into tmp_stock_info_database
+                final java.util.List<Pair<Code, Symbol>> pairs = loadUserDefinedDatabaseFromCSV(country);
+                
+                if (pairs.isEmpty() == false) {
+                    // Insert with new user defined code.
+                    for (Pair<Code, Symbol> pair : pairs) {
+                        stockDatabase.first.addUserDefinedStockInfo(StockInfo.newInstance(pair.first, pair.second));
                     }
                 }
-            }
-             
-            if (success == true)
-            {
-                assert(tmp_stock_info_database.isEmpty() == false);
-                MainFrame.this.saveStockInfoDatabaseAsCSV(country, tmp_stock_info_database);
-                if (tmp_name_database != null) {
-                    MainFrame.this.saveStockNameDatabaseAsCSV(country, tmp_name_database);
+
+                // Prepare proper synchronization for us to change country.
+                synchronized (MainFrame.this.databaseTaskMonitor)
+                {
+                    MainFrame.this.stockInfoDatabase = stockDatabase.first;
+                    MainFrame.this.stockNameDatabase = stockDatabase.second;
+
+                    // Register the auto complete JComboBox with latest database.
+                    ((AutoCompleteJComboBox)MainFrame.this.jComboBox1).setStockInfoDatabase(MainFrame.this.stockInfoDatabase);
+                    MainFrame.this.indicatorPanel.setStockInfoDatabase(MainFrame.this.stockInfoDatabase);
+
+                    return true;
                 }
             }
             
-            return success;
+            return false;
         }
     }
 
@@ -3774,7 +3759,7 @@ public class MainFrame extends javax.swing.JFrame {
         // which is very unlikely. Because during application startup, we will
         // always check the existance of stock-info-database.xml.
         boolean b2 = true;
-        final File f = Utils.getStockInfoDatabaseFile(country);
+        final File f = org.yccheok.jstock.engine.Utils.getStockInfoDatabaseFile(country);
         if (f.exists() == false) {
             b2 = this.saveStockInfoDatabaseAsCSV(country, stock_info_database);
         }
@@ -3985,11 +3970,19 @@ public class MainFrame extends javax.swing.JFrame {
                     Long local = localStockInfoDatabaseMeta.get(country);
                                         
                     if (local != latest) {
-                        final File stockInfoDatabaseFile = Utils.getStockInfoDatabaseFile(country);
                         final String stocksCSVFileLocation = org.yccheok.jstock.engine.Utils.getStocksCSVFileLocation(country);
-                        final boolean status = Utils.downloadAsFile(stockInfoDatabaseFile, stocksCSVFileLocation);
-                        if (status) {
-                            successStockInfoDatabaseMeta.put(country, latest);
+                        final File file = Utils.downloadAsTempFile(stocksCSVFileLocation);
+                        if (file != null) {                            
+                            final java.util.List<Stock> stocks = org.yccheok.jstock.engine.Utils.getStocksFromCSVFile(file);
+                            
+                            if (false == stocks.isEmpty()) {
+                                final Pair<StockInfoDatabase, StockNameDatabase> stockDatabase = org.yccheok.jstock.engine.Utils.toStockDatabase(stocks, country);
+                                MainFrame.this.saveStockInfoDatabaseAsCSV(country, stockDatabase.first);
+                                if (stockDatabase.second != null) {
+                                    MainFrame.this.saveStockNameDatabaseAsCSV(country, stockDatabase.second);
+                                }
+                                successStockInfoDatabaseMeta.put(country, latest);
+                            }
                         }
                     }
                 }

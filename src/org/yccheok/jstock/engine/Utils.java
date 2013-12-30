@@ -151,7 +151,11 @@ public class Utils {
         
         return isValidPortNumber(port);
     }
-
+    
+    public static File getStockInfoDatabaseFile(Country country) {
+        return new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database" + File.separator + "stock-info-database.csv");
+    }
+    
     /**
      * Gets the CSV file, which will be used to construct 
      * {@code StockCodeAndSymbolDatabase} object.
@@ -272,6 +276,21 @@ public class Utils {
             org.yccheok.jstock.gui.Utils.close(fileInputStream);
         }
         return stocks;
+    }
+    
+    public static Pair<StockInfoDatabase, StockNameDatabase> toStockDatabase(List<Stock> stocks, Country country) {
+        assert(false == stocks.isEmpty());
+        
+        // Let's make our database since we get a list of good stocks.
+        StockInfoDatabase tmp_stock_info_database = new StockInfoDatabase(stocks);
+        
+        // StockNameDatabase is an optional item.
+        StockNameDatabase tmp_name_database = null;
+        if (org.yccheok.jstock.engine.Utils.isNameImmutable(country)) {
+            tmp_name_database = new StockNameDatabase(stocks);
+        }
+        
+        return Pair.create(tmp_stock_info_database, tmp_name_database);
     }
     
     public static boolean migrateXMLToCSVDatabases(String srcBaseDirectory, String destBaseDirectory) {
@@ -535,9 +554,13 @@ public class Utils {
      */
     public static boolean isNameImmutable() {
         final Country country = MainFrame.getInstance().getJStockOptions().getCountry();
-        return (country == Country.China || country == Country.Taiwan);
+        return isNameImmutable(country);
     }
 
+    private static boolean isNameImmutable(Country country) {
+        return (country == Country.China || country == Country.Taiwan);
+    }
+    
     /**
      * Returns <code>true</code> if we need to use red color to indicate "rise
      * above". Green color to indicate "fall below".
