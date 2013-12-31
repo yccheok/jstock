@@ -2926,9 +2926,9 @@ public class Utils {
     // Remember to update isCloudFileCompatible method.
     private static final int CLOUD_FILE_VERSION_ID = 1107;
 
-    // 1.0.7h
+    // 1.0.7h-fix
     // For About box comparision on latest version purpose.
-    private static final int APPLICATION_VERSION_ID = 1110;
+    private static final int APPLICATION_VERSION_ID = 1111;
         
     private static Executor zombiePool = Executors.newFixedThreadPool(Utils.NUM_OF_THREADS_ZOMBIE_POOL);
 

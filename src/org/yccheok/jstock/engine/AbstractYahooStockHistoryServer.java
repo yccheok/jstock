@@ -272,7 +272,7 @@ public abstract class AbstractYahooStockHistoryServer implements StockHistorySer
 
     private static final int NUM_OF_RETRY = 2;
     private static final Duration DEFAULT_HISTORY_DURATION =  Duration.getTodayDurationByYears(10);
-    private static final String YAHOO_ICHART_BASED_URL = "http://ichart.yahoo.com/table.csv?s=";
+    private static final String YAHOO_ICHART_BASED_URL = "http://ichart.finance.yahoo.com/table.csv?s=";
 
     private final java.util.Map<Long, Stock> historyDatabase = new HashMap<Long, Stock>();
     private final java.util.List<Long> timestamps = new ArrayList<Long>();

@@ -131,8 +131,7 @@ public class AboutJDialog extends javax.swing.JDialog {
         jLabel3 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
-        setTitle(bundle.getString("AboutJDialog_AboutJStock")); // NOI18N
+        setTitle(getVersionString());
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosed(java.awt.event.WindowEvent evt) {
@@ -140,6 +139,7 @@ public class AboutJDialog extends javax.swing.JDialog {
             }
         });
 
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
         jButton1.setText(bundle.getString("AboutJDialog_OK")); // NOI18N
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -275,6 +275,10 @@ public class AboutJDialog extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_jTabbedPane1StateChanged
 
+    private String getVersionString() {
+        return MessageFormat.format(GUIBundle.getString("AboutJDialog_AboutJStock_template"), "1.0.7h-fix");
+    }
+    
     private Controller controller = new Controller();
 
     private static final Log log = LogFactory.getLog(AboutJDialog.class);
@@ -302,5 +306,5 @@ public class AboutJDialog extends javax.swing.JDialog {
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTextArea jTextArea1;
     // End of variables declaration//GEN-END:variables
-    
+       
 }
