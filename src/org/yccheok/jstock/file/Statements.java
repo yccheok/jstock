@@ -28,7 +28,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.nio.channels.FileLock;
 import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -39,6 +38,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import javax.swing.table.TableModel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -390,6 +391,27 @@ public class Statements {
      * @return the constructed Statements. UNKNOWN_STATEMENTS if fail
      */
     public static Statements newInstanceFromCSVFile(File file) {
+        String canonicalPath;
+        try {
+            canonicalPath = file.getCanonicalPath();
+        } catch (IOException ex) {
+            log.error(null, ex);
+            return UNKNOWN_STATEMENTS;
+        }
+        
+        Pair<ReentrantReadWriteLock, AtomicInteger> pair;
+        synchronized(reentrantReadWriteLockMapMonitor) {
+            pair = reentrantReadWriteLockMap.get(canonicalPath);
+            if (pair == null) {
+                ReentrantReadWriteLock reentrantReadWriteLock = new ReentrantReadWriteLock();
+                AtomicInteger atomicInteger = new AtomicInteger(1);
+                pair = Pair.create(reentrantReadWriteLock, atomicInteger);
+                reentrantReadWriteLockMap.put(canonicalPath, pair);
+            } else {
+                pair.second.incrementAndGet();
+            }
+        }
+                
         boolean status = false;
 
         FileInputStream fileInputStream = null;
@@ -398,79 +420,78 @@ public class Statements {
         Statements s = null;
         
         try {
+            pair.first.readLock().lock();
+            
             fileInputStream = new FileInputStream(file);   
-            FileLock fileLock = fileInputStream.getChannel().lock(0L, Long.MAX_VALUE, true);
-            try {
-                inputStreamReader = new InputStreamReader(fileInputStream,  Charset.forName("UTF-8"));
-                csvreader = new CSVReader(inputStreamReader);
-                final List<String> types = new ArrayList<String>();
+                        
+            inputStreamReader = new InputStreamReader(fileInputStream,  Charset.forName("UTF-8"));
+            csvreader = new CSVReader(inputStreamReader);
+            final List<String> types = new ArrayList<String>();
 
-                String [] nextLine;
-                Map<String, String> metadatas = new LinkedHashMap<String, String>();
-                if ((nextLine = csvreader.readNext()) != null) {
+            String [] nextLine;
+            Map<String, String> metadatas = new LinkedHashMap<String, String>();
+            if ((nextLine = csvreader.readNext()) != null) {
 
-                    // Metadata handling.
-                    while (nextLine != null && nextLine.length == 1) {
-                        String[] tokens = nextLine[0].split("=", 2);
-                        if (tokens.length == 2) {
-                            String key = tokens[0].trim();
-                            String value = tokens[1].trim();
-                            if (key.length() > 0) {
-                                // Is OK for value to be empty.
-                                metadatas.put(key, value);
-                                nextLine = csvreader.readNext();
-                            } else {
-                                break;
-                            }
+                // Metadata handling.
+                while (nextLine != null && nextLine.length == 1) {
+                    String[] tokens = nextLine[0].split("=", 2);
+                    if (tokens.length == 2) {
+                        String key = tokens[0].trim();
+                        String value = tokens[1].trim();
+                        if (key.length() > 0) {
+                            // Is OK for value to be empty.
+                            metadatas.put(key, value);
+                            nextLine = csvreader.readNext();
                         } else {
                             break;
                         }
+                    } else {
+                        break;
                     }
-
-                    if (nextLine != null) {
-                        types.addAll(Arrays.asList(nextLine));
-                    }
-                }   /* if ((nextLine = csvreader.readNext()) != null) */
-
-                if (types.isEmpty()) {
-                    return UNKNOWN_STATEMENTS;
-                } else {
-                    Statement.What what = Statement.what(types);
-                    s = new Statements(what.type, what.guiBundleWrapper);
                 }
 
-                while ((nextLine = csvreader.readNext()) != null) {
-                    // Shall we continue to ignore, or shall we just return null to
-                    // flag an error?
-                    if (nextLine.length != types.size()) {
-                        // Give a warning message.
-                        log.error("Incorrect CSV format. There should be exactly " + types.size() + " item(s)");
-                        continue;
-                    }
-
-                    int i = 0;
-                    final List<Atom> atoms = new ArrayList<Atom>();
-                    for (String value : nextLine) {
-                        final String type = types.get(i++);
-                        final Atom atom = new Atom(value, type);
-                        atoms.add(atom);
-                    }
-                    final Statement statement = new Statement(atoms);
-                    if (s.getType() != statement.getType()) {
-                        // Doesn't not match.
-                        return UNKNOWN_STATEMENTS;
-                    }
-
-                    s.statements.add(statement);
+                if (nextLine != null) {
+                    types.addAll(Arrays.asList(nextLine));
                 }
+            }   /* if ((nextLine = csvreader.readNext()) != null) */
 
-                // Pump in metadata.
-                s.metadatas.putAll(metadatas);
-
-                status = true;
-            } finally {
-                fileLock.release();
+            if (types.isEmpty()) {
+                return UNKNOWN_STATEMENTS;
+            } else {
+                Statement.What what = Statement.what(types);
+                s = new Statements(what.type, what.guiBundleWrapper);
             }
+
+            while ((nextLine = csvreader.readNext()) != null) {
+                // Shall we continue to ignore, or shall we just return null to
+                // flag an error?
+                if (nextLine.length != types.size()) {
+                    // Give a warning message.
+                    log.error("Incorrect CSV format. There should be exactly " + types.size() + " item(s)");
+                    continue;
+                }
+
+                int i = 0;
+                final List<Atom> atoms = new ArrayList<Atom>();
+                for (String value : nextLine) {
+                    final String type = types.get(i++);
+                    final Atom atom = new Atom(value, type);
+                    atoms.add(atom);
+                }
+                final Statement statement = new Statement(atoms);
+                if (s.getType() != statement.getType()) {
+                    // Doesn't not match.
+                    return UNKNOWN_STATEMENTS;
+                }
+
+                s.statements.add(statement);
+            }
+
+            // Pump in metadata.
+            s.metadatas.putAll(metadatas);
+
+            status = true;
+
         } catch (IOException ex) {
             log.error(null, ex);
         } finally {
@@ -483,6 +504,15 @@ public class Statements {
             }
             org.yccheok.jstock.gui.Utils.close(inputStreamReader);
             org.yccheok.jstock.gui.Utils.close(fileInputStream);
+            
+            pair.first.readLock().unlock();
+            
+            synchronized(reentrantReadWriteLockMapMonitor) {
+                int counter = pair.second.decrementAndGet();
+                if (counter == 0) {
+                    reentrantReadWriteLockMap.remove(canonicalPath);
+                }
+            }            
         }
 
         if (status) {
@@ -907,6 +937,27 @@ public class Statements {
             return false;
         }
         
+        String canonicalPath;
+        try {
+            canonicalPath = file.getCanonicalPath();
+        } catch (IOException ex) {
+            log.error(null, ex);
+            return false;
+        }
+        
+        Pair<ReentrantReadWriteLock, AtomicInteger> pair;
+        synchronized(reentrantReadWriteLockMapMonitor) {
+            pair = reentrantReadWriteLockMap.get(canonicalPath);
+            if (pair == null) {
+                ReentrantReadWriteLock reentrantReadWriteLock = new ReentrantReadWriteLock();
+                AtomicInteger atomicInteger = new AtomicInteger(1);
+                pair = Pair.create(reentrantReadWriteLock, atomicInteger);
+                reentrantReadWriteLockMap.put(canonicalPath, pair);
+            } else {
+                pair.second.incrementAndGet();
+            }
+        }
+        
         boolean status = false;
 
         FileOutputStream fileOutputStream = null;
@@ -914,46 +965,45 @@ public class Statements {
         CSVWriter csvwriter = null;
 
         try {
+            pair.first.writeLock().lock();
+            
             fileOutputStream = new FileOutputStream(file);
-            FileLock fileLock = fileOutputStream.getChannel().lock();
-            try {
-                outputStreamWriter = new OutputStreamWriter(fileOutputStream,  Charset.forName("UTF-8"));
-                csvwriter = new CSVWriter(outputStreamWriter);
 
-                for (Map.Entry<String, String> metadata : metadatas.entrySet()) {
-                    String key = metadata.getKey();
-                    String value = metadata.getValue();
-                    String output = key + "=" + value;
-                    csvwriter.writeNext(new String[]{output});
-                }
+            outputStreamWriter = new OutputStreamWriter(fileOutputStream,  Charset.forName("UTF-8"));
+            csvwriter = new CSVWriter(outputStreamWriter);
 
-                // Do not obtain "type" through statements, as there is possible that 
-                // statements is empty.
-                final List<String> strings = Statement.typeToStrings(this.getType(), this.getGUIBundleWrapper());
-                final int columnCount = strings.size();
-                String[] datas = new String[columnCount];
-
-                // First row. Print out table header.
-                for (int i = 0; i < columnCount; i++) {
-                    datas[i] = strings.get(i);
-                }
-
-                csvwriter.writeNext(datas);
-
-                final int rowCount = statements.size();
-                for (int i = 0; i < rowCount; i++) {
-                    for (int j = 0; j < columnCount; j++) {
-                        // Value shouldn't be null, as we prevent atom with null value.
-                        final String value = statements.get(i).getAtom(j).getValue().toString();
-                        datas[j] = value;
-                    }
-                    csvwriter.writeNext(datas);
-                }
-
-                status = true;
-            } finally {
-                fileLock.release();
+            for (Map.Entry<String, String> metadata : metadatas.entrySet()) {
+                String key = metadata.getKey();
+                String value = metadata.getValue();
+                String output = key + "=" + value;
+                csvwriter.writeNext(new String[]{output});
             }
+
+            // Do not obtain "type" through statements, as there is possible that 
+            // statements is empty.
+            final List<String> strings = Statement.typeToStrings(this.getType(), this.getGUIBundleWrapper());
+            final int columnCount = strings.size();
+            String[] datas = new String[columnCount];
+
+            // First row. Print out table header.
+            for (int i = 0; i < columnCount; i++) {
+                datas[i] = strings.get(i);
+            }
+
+            csvwriter.writeNext(datas);
+
+            final int rowCount = statements.size();
+            for (int i = 0; i < rowCount; i++) {
+                for (int j = 0; j < columnCount; j++) {
+                    // Value shouldn't be null, as we prevent atom with null value.
+                    final String value = statements.get(i).getAtom(j).getValue().toString();
+                    datas[j] = value;
+                }
+                csvwriter.writeNext(datas);
+            }
+
+            status = true;
+
         }  catch (IOException ex) {
             log.error(null, ex);
         } finally {
@@ -966,6 +1016,15 @@ public class Statements {
             }
             org.yccheok.jstock.gui.Utils.close(outputStreamWriter);
             org.yccheok.jstock.gui.Utils.close(fileOutputStream);
+            
+            pair.first.writeLock().unlock();
+            
+            synchronized(reentrantReadWriteLockMapMonitor) {
+                int counter = pair.second.decrementAndGet();
+                if (counter == 0) {
+                    reentrantReadWriteLockMap.remove(canonicalPath);
+                }
+            }
         }
 
         return status;
@@ -1097,6 +1156,10 @@ public class Statements {
     public Statement get(int index) {
         return statements.get(index);
     }
+    
+    private static final Map<String, Pair<ReentrantReadWriteLock, AtomicInteger>> reentrantReadWriteLockMap
+            = new HashMap<String, Pair<ReentrantReadWriteLock, AtomicInteger>>();
+    private static final Object reentrantReadWriteLockMapMonitor = new Object();
     
     private final Statement.Type type;
     private final GUIBundleWrapper guiBundleWrapper;
