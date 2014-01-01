@@ -848,34 +848,6 @@ public class Utils {
         return(AlphaComposite.getInstance(type, alpha));
     }
 
-    /**
-     * Migrates configuration data from version 1.0.6z to 1.0.7.
-     *
-     * @return true if migration success
-     */
-    public static boolean migrateFrom106zTo107() {
-        // File (or directory) with old name
-        final File oldDirectory = new File(System.getProperty("user.home") + File.separator + ".jstock" + File.separator + "1.0.6" + File.separator);
-
-        // File (or directory) with new name
-        final File newDirectory = new File(getUserDataDirectory());
-
-        // Migrate already?
-        if (newDirectory.isDirectory() && newDirectory.exists()) {
-            return true;
-        }
-
-        // No 1.0.6z found?
-        if (oldDirectory.isDirectory() == false || oldDirectory.exists() == false) {
-            return true;
-        }
-
-        // Rename file (or directory)
-        boolean status = oldDirectory.renameTo(newDirectory);
-
-        return status;
-    }
-
     public static Color getColor(double price, double referencePrice) {
         final boolean reverse = org.yccheok.jstock.engine.Utils.isFallBelowAndRiseAboveColorReverse();
         if (price < referencePrice) {
@@ -3034,9 +3006,9 @@ public class Utils {
     // Remember to update isCloudFileCompatible method.
     private static final int CLOUD_FILE_VERSION_ID = 1107;
 
-    // 1.0.7h
+    // 1.0.7i
     // For About box comparision on latest version purpose.
-    private static final int APPLICATION_VERSION_ID = 1110;
+    private static final int APPLICATION_VERSION_ID = 1112;
         
     private static Executor zombiePool = Executors.newFixedThreadPool(Utils.NUM_OF_THREADS_ZOMBIE_POOL);
 

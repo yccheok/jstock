@@ -3,6 +3,8 @@ Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
 JStock 1.0.7i - 2013-xx-xx
   Feature: Support Czech Republic Koruna in currency exchange.
+  Feature: Migrate India stock market to Google Finance. (Remember to tackle
+           FIXME tag in the future)
   Bugfix:  Enable back currency exchange option.
   Bugfix:  Fix on AEX index.
 

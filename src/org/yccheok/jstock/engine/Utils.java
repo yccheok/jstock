@@ -731,6 +731,7 @@ public class Utils {
         return 0L;
     }
 
+    // FIXME
     public static boolean migrateIndiaYahooFinanceToIndiaGoogleFinance() {
         Map<String, String> dictionary = new HashMap<String, String>();
         
@@ -842,7 +843,7 @@ public class Utils {
             }            
         }
         
-        return false;
+        return Utils.toGoogleFormat(Code.newInstance("TATAMOTOR.NS")).equals(Code.newInstance("NSE:TATAMOTORS"));
     }
     
     private static final ObjectMapper mapper = new ObjectMapper();

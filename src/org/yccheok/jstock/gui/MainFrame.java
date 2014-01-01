@@ -978,9 +978,13 @@ public class MainFrame extends javax.swing.JFrame {
         JStockOptions.BoundsEx boundsEx = new JStockOptions.BoundsEx(this.getBounds(), this.getExtendedState());
         this.getJStockOptions().setBoundsEx(boundsEx);
         
-        // So that later we know that this XML file is saved by which version of
-        // JStock.
-        jStockOptions.setApplicationVersionID(Utils.getApplicationVersionID());
+        // FIXME : So that later we know that this XML file is saved by which 
+        // version of JStock.
+        if (MainFrame.migrationSuccess) {
+            jStockOptions.setApplicationVersionID(Utils.getApplicationVersionID());
+        } else {
+            jStockOptions.setApplicationVersionID(1111);
+        }
         this.saveJStockOptions();
         this.saveGUIOptions();
         this.saveChartJDialogOptions();
@@ -1674,23 +1678,7 @@ public class MainFrame extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        // Make migrateFrom106zTo107 before AppLock, as AppLock depends on
-        // correct data directory.
-        
-        /* This ugly code shall be removed in next few release. */
-        if (false == Utils.migrateFrom106zTo107()) {
-            final int choice = JOptionPane.showConfirmDialog(null,
-                "JStock unable to read previous 1.0.6z portfolio and settings, continue?\n\nPress \"Yes\" to continue, BUT all your data will lost.\n\nOr, Press \"No\", restart your machine and try again.",
-                "JStock unable to read previous 1.0.6z portfolio and settings",
-                JOptionPane.YES_NO_OPTION);
-            log.error("Migration from 1.0.6z to 1.0.7 fail.");
-
-            if (choice != JOptionPane.YES_OPTION) {
-                System.exit(0);
-            }
-        }
-        
+    public static void main(String args[]) {        
         if (false == AppLock.lock()) {
             final int choice = JOptionPane.showOptionDialog(null, 
                     MessagesBundle.getString("warning_message_running_2_jstock"),
@@ -1730,9 +1718,9 @@ public class MainFrame extends javax.swing.JFrame {
                 // jStockOptions.
                 mainFrame.initJStockOptions(jStockOptions);
                 
-                // TODO : Remove this code after some time.
+                // FIXME : Remove this code after some time.
                 if (Utils.isIndiaUsingYahooFinance(jStockOptions.getApplicationVersionID())) {
-                    org.yccheok.jstock.engine.Utils.migrateIndiaYahooFinanceToIndiaGoogleFinance();
+                    MainFrame.migrationSuccess = org.yccheok.jstock.engine.Utils.migrateIndiaYahooFinanceToIndiaGoogleFinance();
                 }
                 
                 mainFrame.init();
@@ -2181,9 +2169,14 @@ public class MainFrame extends javax.swing.JFrame {
          * exit.
          */
                 
-        // So that later we know that this XML file is saved by which version of
-        // JStock.
-        jStockOptions.setApplicationVersionID(Utils.getApplicationVersionID());        
+        // FIXME : So that later we know that this XML file is saved by which 
+        // version of JStock.
+        
+        if (MainFrame.migrationSuccess) {
+            jStockOptions.setApplicationVersionID(Utils.getApplicationVersionID());        
+        } else {
+            jStockOptions.setApplicationVersionID(1111);        
+        }
         this.saveJStockOptions();
         
         this.saveGUIOptions();
@@ -4688,6 +4681,9 @@ public class MainFrame extends javax.swing.JFrame {
         this.indicatorScannerJPanel.refreshRealTimeStockMonitor();
         this.portfolioManagementJPanel.refreshRealTimeStockMonitor();
     }
+    
+    // FIXME : Remove this code after some time.
+    public static boolean migrationSuccess = true;
     
     private TrayIcon trayIcon;
     
