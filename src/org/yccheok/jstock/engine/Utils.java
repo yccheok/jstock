@@ -34,6 +34,8 @@ import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.yccheok.jstock.engine.Stock.Board;
 import org.yccheok.jstock.engine.Stock.Industry;
+import org.yccheok.jstock.file.Atom;
+import org.yccheok.jstock.file.Statement;
 import org.yccheok.jstock.file.Statements;
 import org.yccheok.jstock.gui.MainFrame;
 import org.yccheok.jstock.gui.Pair;
@@ -730,6 +732,30 @@ public class Utils {
     }
 
     public static boolean migrateIndiaYahooFinanceToIndiaGoogleFinance() {
+        // WATCHLIST.
+
+        java.util.List<String> watchlistNames = org.yccheok.jstock.watchlist.Utils.getWatchlistNames(Country.India);
+        for (String watchlistName : watchlistNames) {
+            String watchlistDirectory = org.yccheok.jstock.watchlist.Utils.getWatchlistDirectory(Country.India, watchlistName);
+            File watchlistFile = org.yccheok.jstock.watchlist.Utils.getWatchlistFile(watchlistDirectory);
+            Statements statements = Statements.newInstanceFromCSVFile(watchlistFile);
+            if (statements.getType() == Statement.Type.RealtimeInfo) {
+                for (int i = 0, ei = statements.size(); i < ei; i++) {
+                    Statement statement = statements.get(i);
+                    String codeStr = statement.getValueAsString("Code");
+                    Code googleCode = Utils.toGoogleFormat(Code.newInstance(codeStr));
+                    String googleCodeStr = googleCode.toString();
+                    if (googleCodeStr.startsWith("NSE:") && googleCodeStr.length() > "NSE:".length()) {
+                        googleCodeStr = googleCodeStr.substring("NSE:".length()) + ".N";
+                    } else if (googleCodeStr.startsWith("BOM:") && googleCodeStr.length() > "BOM:".length()) {
+                        googleCodeStr = googleCodeStr.substring("BOM:".length()) + ".B";
+                    }                    
+                    statement._setAtom(0, new Atom(googleCodeStr, "Code"));                    
+                }
+                statements.saveAsCSVFile(watchlistFile);
+            }
+        }
+        
         return false;
     }
     

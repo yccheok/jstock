@@ -51,7 +51,7 @@ public class Atom {
         if (o == this) {
             return true;
         }
-        if(!(o instanceof Atom)) {
+        if (!(o instanceof Atom)) {
             return false;
         }
         Atom atom = (Atom)o;

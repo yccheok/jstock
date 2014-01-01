@@ -80,6 +80,13 @@ public class Statement {
         }
     }
 
+    // TODO : This is special function for migrateIndiaYahooFinanceToIndiaGoogleFinance
+    // Should be remove after a while...    
+    public void _setAtom(int index, Atom atom) {
+        this.atoms.set(index, atom);
+        typeToValue.put(atom.getType(), atom.getValue());
+    }
+    
     public Object getValue(String type) {
         return typeToValue.get(type);
     }
