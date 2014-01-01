@@ -1020,10 +1020,10 @@ public class MainFrame extends javax.swing.JFrame {
         isFormWindowClosedCalled = true;
         
         try {
-	        ExecutorService stockInfoDatabaseMetaPool = this.stockInfoDatabaseMetaPool;
-    	    this.stockInfoDatabaseMetaPool = null;
+            ExecutorService _stockInfoDatabaseMetaPool = this.stockInfoDatabaseMetaPool;
+            this.stockInfoDatabaseMetaPool = null;
         
-            stockInfoDatabaseMetaPool.shutdownNow();
+            _stockInfoDatabaseMetaPool.shutdownNow();
             
             // Always be the first statement. As no matter what happen, we must
             // save all the configuration files.
@@ -1052,7 +1052,7 @@ public class MainFrame extends javax.swing.JFrame {
                 this.latestNewsTask.cancel(true);
             }
 
-            stockInfoDatabaseMetaPool.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
+            _stockInfoDatabaseMetaPool.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
             
             // We suppose to call shutdownAll to clean up all network resources.
             // However, that will cause Exception in other threads if they are still using httpclient.
@@ -1149,8 +1149,6 @@ public class MainFrame extends javax.swing.JFrame {
             } else {
                 this.updateDynamicChart(null);
             }
-
-            return;
         }
     }//GEN-LAST:event_jTable1KeyPressed
 
@@ -3124,14 +3122,14 @@ public class MainFrame extends javax.swing.JFrame {
         }            
     }
 
-    private boolean saveStockNameDatabaseAsCSV(Country country, StockNameDatabase stockNameDatabase) {
+    private static boolean saveStockNameDatabaseAsCSV(Country country, StockNameDatabase stockNameDatabase) {
         final File stockNameDatabaseCSVFile = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database" + File.separator + "stock-name-database.csv");
         final Statements statements = Statements.newInstanceFromStockNameDatabase(stockNameDatabase);
         boolean result = statements.saveAsCSVFile(stockNameDatabaseCSVFile);
         return result;
     }
     
-    private boolean saveStockInfoDatabaseAsCSV(Country country, StockInfoDatabase stockInfoDatabase) {
+    private static boolean saveStockInfoDatabaseAsCSV(Country country, StockInfoDatabase stockInfoDatabase) {
         final File stockInfoDatabaseCSVFile = org.yccheok.jstock.engine.Utils.getStockInfoDatabaseFile(country);
         final Statements statements = Statements.newInstanceFromStockInfoDatabase(stockInfoDatabase);
         boolean result = statements.saveAsCSVFile(stockInfoDatabaseCSVFile);
@@ -3385,9 +3383,9 @@ public class MainFrame extends javax.swing.JFrame {
                 }
 
                 // Save to disk.
-                MainFrame.this.saveStockInfoDatabaseAsCSV(country, stockDatabase.first);
+                MainFrame.saveStockInfoDatabaseAsCSV(country, stockDatabase.first);
                 if (stockDatabase.second != null) {
-                    MainFrame.this.saveStockNameDatabaseAsCSV(country, stockDatabase.second);
+                    MainFrame.saveStockNameDatabaseAsCSV(country, stockDatabase.second);
                 }
                 
                 // Yes. We need to integrate "user-defined-database.csv" into tmp_stock_info_database
@@ -3606,7 +3604,7 @@ public class MainFrame extends javax.swing.JFrame {
         this.indicatorPanel.updatePrimaryStockServerFactory(Collections.unmodifiableList(this.getStockServerFactories()));
     }
 
-    private final void initWatchlist() {
+    private void initWatchlist() {
         // This is new watchlist. Reset last update date.
         this.timestamp = 0;
         initCSVWatchlist();
@@ -3734,13 +3732,13 @@ public class MainFrame extends javax.swing.JFrame {
         boolean b2 = true;
         final File f = org.yccheok.jstock.engine.Utils.getStockInfoDatabaseFile(country);
         if (f.exists() == false) {
-            b2 = this.saveStockInfoDatabaseAsCSV(country, stock_info_database);
+            b2 = saveStockInfoDatabaseAsCSV(country, stock_info_database);
         }
 
         return b0 && b1 && b2;
     }
 
-    private java.util.List<Pair<Code, Symbol>> getUserDefinedPair(StockInfoDatabase stockInfoDatabase) {
+    private static java.util.List<Pair<Code, Symbol>> getUserDefinedPair(StockInfoDatabase stockInfoDatabase) {
         java.util.List<Pair<Code, Symbol>> pairs = new ArrayList<Pair<Code, Symbol>>();
         java.util.List<StockInfo> stockInfos = stockInfoDatabase.getUserDefinedStockInfos();
         for (StockInfo stockInfo : stockInfos) {
@@ -3952,9 +3950,9 @@ public class MainFrame extends javax.swing.JFrame {
                             
                             if (false == stocks.isEmpty()) {
                                 final Pair<StockInfoDatabase, StockNameDatabase> stockDatabase = org.yccheok.jstock.engine.Utils.toStockDatabase(stocks, country);
-                                MainFrame.this.saveStockInfoDatabaseAsCSV(country, stockDatabase.first);
+                                MainFrame.saveStockInfoDatabaseAsCSV(country, stockDatabase.first);
                                 if (stockDatabase.second != null) {
-                                    MainFrame.this.saveStockNameDatabaseAsCSV(country, stockDatabase.second);
+                                    MainFrame.saveStockNameDatabaseAsCSV(country, stockDatabase.second);
                                 }
                                 successStockInfoDatabaseMeta.put(country, latest);
                                 

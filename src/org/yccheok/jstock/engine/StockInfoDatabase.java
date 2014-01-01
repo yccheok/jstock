@@ -137,7 +137,7 @@ public class StockInfoDatabase {
                     _stockInfos = this.symbolSearchEngine.searchAll(string);
                 }
             }
-            return Collections.unmodifiableList(_stockInfos);
+            return _stockInfos;
         } finally {
             reader.unlock();
         }
