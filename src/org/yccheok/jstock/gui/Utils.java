@@ -2821,15 +2821,8 @@ public class Utils {
         return "$";
     }
     
-    public static boolean isDatabaseFilesInXML(int version) {
-        // 1093 = 1.0.6r
-        return version <= 1093;
-    }
-    
-    // TODO : Remove this code after some time.
-    public static boolean isWatchlistAndPortfolioFilesInXML(int version) {
-        // 1090 = 1.0.6o
-        return version <= 1090;
+    public static boolean isIndiaUsingYahooFinance(int version) {
+        return version <= 1111;
     }
     
     /**

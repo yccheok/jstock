@@ -729,6 +729,10 @@ public class Utils {
         return 0L;
     }
 
+    public static boolean migrateIndiaYahooFinanceToIndiaGoogleFinance() {
+        return false;
+    }
+    
     private static final ObjectMapper mapper = new ObjectMapper();
     private static final Log log = LogFactory.getLog(Utils.class);
 }

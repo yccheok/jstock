@@ -1731,36 +1731,8 @@ public class MainFrame extends javax.swing.JFrame {
                 mainFrame.initJStockOptions(jStockOptions);
                 
                 // TODO : Remove this code after some time.
-                if (Utils.isWatchlistAndPortfolioFilesInXML(jStockOptions.getApplicationVersionID())) {
-                    boolean status = true;
-                    if (org.yccheok.jstock.portfolio.Utils.migrateXMLToCSVPortfolios(Utils.getUserDataDirectory(), Utils.getUserDataDirectory())) {
-                        System.out.println("XML to CSV portfolios migration done :)");
-                    } else {
-                        System.out.println("XML to CSV portfolios migration failed!");
-                        status = false;
-                    } 
-                    
-                    if (org.yccheok.jstock.watchlist.Utils.migrateXMLToCSVWatchlists(Utils.getUserDataDirectory(), Utils.getUserDataDirectory())) {
-                        System.out.println("XML to CSV watchlists migration done :)");
-                    } else {
-                        System.out.println("XML to CSV watchlists migration failed!");
-                        status = false;
-                    }                    
-                    
-                    if (false == status) {
-                        File destFile = new File(System.getProperty("user.home") + File.separator + "jstock.zip");
-                        File file = SaveToCloudJDialog.getJStockZipFileForConversionErrorMessageJDialog(destFile);
-                        // So that our ConversionErrorMessageJDialog is having correct locale.
-                        Locale.setDefault(jStockOptions.getLocale());
-                        ConversionErrorMessageJDialog conversionErrorMessageJDialog = new ConversionErrorMessageJDialog(file);
-                        conversionErrorMessageJDialog.setVisible(true);
-                        AppLock.unlock();
-                        System.exit(-1);
-                    }
-                }                                  
-                    
-                if (Utils.isDatabaseFilesInXML(jStockOptions.getApplicationVersionID())) {
-                    org.yccheok.jstock.engine.Utils.migrateXMLToCSVDatabases(Utils.getUserDataDirectory(), Utils.getUserDataDirectory());
+                if (Utils.isIndiaUsingYahooFinance(jStockOptions.getApplicationVersionID())) {
+                    org.yccheok.jstock.engine.Utils.migrateIndiaYahooFinanceToIndiaGoogleFinance();
                 }
                 
                 mainFrame.init();

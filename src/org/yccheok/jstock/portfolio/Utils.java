@@ -31,41 +31,14 @@ import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.Country;
 import org.yccheok.jstock.file.Statements;
-import org.yccheok.jstock.gui.BuyPortfolioTreeTableModel;
 import org.yccheok.jstock.gui.JStockOptions;
 import org.yccheok.jstock.gui.MainFrame;
-import org.yccheok.jstock.gui.PortfolioManagementJPanel;
-import org.yccheok.jstock.gui.SellPortfolioTreeTableModel;
 
 /**
  *
  * @author yccheok
  */
 public class Utils {
-    
-    // For XML to CSV migration usage.
-    private static final class XMLPortfolio {
-        public final BuyPortfolioTreeTableModel buyPortfolioTreeTableModel;
-        public final SellPortfolioTreeTableModel sellPortfolioTreeTableModel;        
-        public final DividendSummary dividendSummary;
-        public final DepositSummary depositSummary;
-
-
-        @SuppressWarnings( "deprecation" )
-        private XMLPortfolio(BuyPortfolioTreeTableModel buyPortfolioTreeTableModel, SellPortfolioTreeTableModel sellPortfolioTreeTableModel, DividendSummary dividendSummary, DepositSummary depositSummary) {
-            if (buyPortfolioTreeTableModel == null || sellPortfolioTreeTableModel == null || dividendSummary == null || depositSummary == null) {
-                throw new java.lang.IllegalArgumentException();
-            }
-            this.buyPortfolioTreeTableModel = buyPortfolioTreeTableModel;
-            this.sellPortfolioTreeTableModel = sellPortfolioTreeTableModel;
-            this.dividendSummary = dividendSummary;
-            this.depositSummary = depositSummary;
-        }
-        
-        public static XMLPortfolio newInstance(BuyPortfolioTreeTableModel buyPortfolioTreeTableModel, SellPortfolioTreeTableModel sellPortfolioTreeTableModel, DividendSummary dividendSummary, DepositSummary depositSummary) {
-            return new XMLPortfolio(buyPortfolioTreeTableModel, sellPortfolioTreeTableModel, dividendSummary, depositSummary);
-        }
-    }
 
     // Prevent from being instantiated.
     private Utils() {
@@ -628,123 +601,6 @@ public class Utils {
     public static boolean definitelyGreaterThan(double a, double b)
     {
         return (a - b) > ( (Math.abs(a) < Math.abs(b) ? Math.abs(b) : Math.abs(a)) * EPSILON);
-    }
-
-    // TODO : Remove this code after some time.
-    // The directory format should be "C:\Users\yccheok\.jstock\1.0.6\", or
-    // temporary directory holding the extracted cloud files.
-    public static boolean migrateXMLToCSVPortfolios(String srcBaseDirectory, String destBaseDirectory) {
-        assert(srcBaseDirectory.endsWith(File.separator));
-        assert(destBaseDirectory.endsWith(File.separator));
-        
-        boolean status = true;
-        
-        for (Country country : Country.values()) {
-            List<String> names = getXMLPortfolioNames(srcBaseDirectory, country, false);
-            final boolean oldData = names.size() <= 0;
-            
-            boolean localStatus = true;
-            
-            if (oldData) {
-                final String oldDirectory = srcBaseDirectory + country + File.separator + "config" + File.separator;
-                final String srcDirectory = oldDirectory;
-                final String destDirectory = destBaseDirectory + country + File.separator + "portfolios" + File.separator + getDefaultPortfolioName() + File.separator;
-
-                XMLPortfolio xmlPortfolio = getXMLPortfolio(srcDirectory);
-                    
-                PortfolioManagementJPanel.CSVPortfolio csvPortfolio = PortfolioManagementJPanel.CSVPortfolio.newInstance(
-                    xmlPortfolio.buyPortfolioTreeTableModel.toBuyPortfolioTreeTableModelEx(), 
-                    xmlPortfolio.sellPortfolioTreeTableModel.toSellPortfolioTreeTableModelEx(), 
-                    xmlPortfolio.dividendSummary, 
-                    xmlPortfolio.depositSummary);
-
-                localStatus = PortfolioManagementJPanel.saveCSVPortfolio(destDirectory, csvPortfolio, 0);
-                
-                if (localStatus) {
-                    deleteXMLPortfolio(srcDirectory);
-                }  
-            } else {
-                for (String name : names) {
-                    final String directory = srcBaseDirectory + country + File.separator + "portfolios" + File.separator + name + File.separator;
-                    final String srcDirectory = directory;
-                    final String destDirectory = destBaseDirectory + country + File.separator + "portfolios" + File.separator + name + File.separator;
-
-                    XMLPortfolio xmlPortfolio = getXMLPortfolio(srcDirectory);
-
-                    PortfolioManagementJPanel.CSVPortfolio csvPortfolio = PortfolioManagementJPanel.CSVPortfolio.newInstance(
-                        xmlPortfolio.buyPortfolioTreeTableModel.toBuyPortfolioTreeTableModelEx(), 
-                        xmlPortfolio.sellPortfolioTreeTableModel.toSellPortfolioTreeTableModelEx(), 
-                        xmlPortfolio.dividendSummary, 
-                        xmlPortfolio.depositSummary);
-
-                    boolean _localStatus = PortfolioManagementJPanel.saveCSVPortfolio(destDirectory, csvPortfolio, 0);
-
-                    if (_localStatus) {
-                        deleteXMLPortfolio(srcDirectory);
-                    }
-                    
-                    localStatus = localStatus & _localStatus;
-                }   // for (String name : names)
-            }   // if (oldData)
-            
-            if (localStatus) {
-                // Delete legacy old folder.
-                final String oldDirectory = srcBaseDirectory + country + File.separator + "config" + File.separator;
-                deleteXMLPortfolio(oldDirectory);
-                File dir = new File(oldDirectory);
-                if (dir.isDirectory()) {
-                    if (dir.list().length == 0) {
-                        dir.delete();
-                    }
-                }
-            }
-            
-            status = status & localStatus;
-        }   // for (Country country : Country.values())
-        
-        return status;
-    }
-
-    // TODO : Remove this code after some time.
-    @SuppressWarnings( "deprecation" )
-    private static XMLPortfolio getXMLPortfolio(String directory) {
-        final File buyPortfolioFile;
-        final File sellPortfolioFile;
-        final File depositSummaryFile;
-        final File dividendSummaryFile;
-
-        // Determine the files to be loaded from disc.
-        buyPortfolioFile = new File(directory + "buyportfolio.xml");
-        sellPortfolioFile = new File(directory + "sellportfolio.xml");
-        depositSummaryFile = new File(directory + "depositsummary.xml");
-        dividendSummaryFile = new File(directory + "dividendsummary.xml");
-
-        // Try to load files from disc.
-        BuyPortfolioTreeTableModel buyPortfolioTreeTableModel = org.yccheok.jstock.gui.Utils.fromXML(BuyPortfolioTreeTableModel.class, buyPortfolioFile);
-        SellPortfolioTreeTableModel sellPortfolioTreeTableModel = org.yccheok.jstock.gui.Utils.fromXML(SellPortfolioTreeTableModel.class, sellPortfolioFile);
-        DepositSummary _depositSummary = org.yccheok.jstock.gui.Utils.fromXML(DepositSummary.class, depositSummaryFile);
-        DividendSummary _dividendSummary = org.yccheok.jstock.gui.Utils.fromXML(DividendSummary.class, dividendSummaryFile);
-        
-        return XMLPortfolio.newInstance(
-                buyPortfolioTreeTableModel != null ? buyPortfolioTreeTableModel : new BuyPortfolioTreeTableModel(), 
-                sellPortfolioTreeTableModel != null ? sellPortfolioTreeTableModel : new SellPortfolioTreeTableModel(), 
-                _dividendSummary != null ? _dividendSummary : new DividendSummary(), 
-                _depositSummary != null ? _depositSummary : new DepositSummary());
-    }
-    
-    // Never ever delete directory itself.
-    private static boolean deleteXMLPortfolio(String directory) {
-        final File buyPortfolioXMLFile = new File(directory + "buyportfolio.xml");
-        final File sellPortfolioXMLFile = new File(directory + "sellportfolio.xml");
-        final File depositSummaryXMLFile = new File(directory + "depositsummary.xml");
-        final File dividendSummaryXMLFile = new File(directory + "dividendsummary.xml");
-
-        buyPortfolioXMLFile.delete();
-        sellPortfolioXMLFile.delete();
-        depositSummaryXMLFile.delete();
-        dividendSummaryXMLFile.delete();
-        
-        return true;
     }
     
     /**
