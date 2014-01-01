@@ -21,7 +21,6 @@ package org.yccheok.jstock.engine;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -156,7 +155,7 @@ public class StockInfoDatabase {
             
             // Add elements to al, including duplicates.
             // Use LinkedHashSet to preserve order.
-            HashSet hs = new LinkedHashSet();
+            HashSet<StockInfo> hs = new LinkedHashSet<StockInfo>();
             hs.addAll(_stockInfos);
             _stockInfos.clear();
             _stockInfos.addAll(hs);

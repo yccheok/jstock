@@ -3942,7 +3942,7 @@ public class MainFrame extends javax.swing.JFrame {
                     Long latest = entry.getValue();
                     Long local = localStockInfoDatabaseMeta.get(country);
                                         
-                    if (local != latest) {
+                    if (false == latest.equals(local)) {
                         final String stocksCSVFileLocation = org.yccheok.jstock.engine.Utils.getStocksCSVFileLocation(country);
                         final File file = Utils.downloadAsTempFile(stocksCSVFileLocation);
                         if (file != null) {                            
