@@ -481,7 +481,11 @@ public class Utils {
             builder.append(java.net.URLEncoder.encode(code, "UTF-8"));
 
             final String location = builder.toString();
-            final String respond = Utils.GoogleRespondToJSON(org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(location));
+            final String _respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsString(location);
+            if (_respond == null) {
+                return code;
+            }
+            final String respond = Utils.GoogleRespondToJSON(_respond);
             // Google returns "// [ { "id": ... } ]".
             // We need to turn them into "[ { "id": ... } ]".
             final List<Map> jsonArray = mapper.readValue(respond, List.class);
