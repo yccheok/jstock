@@ -141,6 +141,9 @@ public class MutableStock {
         return stock.getThirdSellQuantity();
     }   
     
+    public double getBookValuePerShare() {
+        return stock.getBookValuePerShare();
+    }
     @Override
     public String toString() {
         return stock.toString();
@@ -204,6 +207,7 @@ public class MutableStock {
                 stock.getThirdBuyQuantity(),
                 stock.getThirdSellPrice(),
                 stock.getThirdSellQuantity(),
+                stock.getBookValuePerShare(),
                 stock.getTimestamp()
                 );
         
@@ -238,6 +242,7 @@ public class MutableStock {
                 stock.getThirdBuyQuantity(),
                 stock.getThirdSellPrice(),
                 stock.getThirdSellQuantity(),
+                stock.getBookValuePerShare(),
                 stock.getTimestamp()
                 );
 
@@ -272,6 +277,7 @@ public class MutableStock {
                 stock.getThirdBuyQuantity(),
                 stock.getThirdSellPrice(),
                 stock.getThirdSellQuantity(),
+                stock.getBookValuePerShare(),
                 stock.getTimestamp()
                 );
         
@@ -306,6 +312,7 @@ public class MutableStock {
                 stock.getThirdBuyQuantity(),
                 stock.getThirdSellPrice(),
                 stock.getThirdSellQuantity(),
+                stock.getBookValuePerShare(),
                 stock.getTimestamp()
                 );
         
@@ -340,6 +347,7 @@ public class MutableStock {
                 stock.getThirdBuyQuantity(),
                 stock.getThirdSellPrice(),
                 stock.getThirdSellQuantity(),
+                stock.getBookValuePerShare(),
                 stock.getTimestamp()
                 );
         
@@ -375,6 +383,7 @@ public class MutableStock {
                 stock.getThirdBuyQuantity(),
                 stock.getThirdSellPrice(),
                 stock.getThirdSellQuantity(),
+                stock.getBookValuePerShare(),
                 stock.getTimestamp()
                 );
         
@@ -409,6 +418,7 @@ public class MutableStock {
                 stock.getThirdBuyQuantity(),
                 stock.getThirdSellPrice(),
                 stock.getThirdSellQuantity(),
+                stock.getBookValuePerShare(),
                 stock.getTimestamp()
                 );
         
@@ -443,6 +453,7 @@ public class MutableStock {
                 stock.getThirdBuyQuantity(),
                 stock.getThirdSellPrice(),
                 stock.getThirdSellQuantity(),
+                stock.getBookValuePerShare(),
                 stock.getTimestamp()
                 );
         
@@ -477,6 +488,7 @@ public class MutableStock {
                 stock.getThirdBuyQuantity(),
                 stock.getThirdSellPrice(),
                 stock.getThirdSellQuantity(),
+                stock.getBookValuePerShare(),
                 stock.getTimestamp()
                 );
         
@@ -511,6 +523,7 @@ public class MutableStock {
                 stock.getThirdBuyQuantity(),
                 stock.getThirdSellPrice(),
                 stock.getThirdSellQuantity(),
+                stock.getBookValuePerShare(),
                 stock.getTimestamp()
                 );
         
@@ -545,6 +558,7 @@ public class MutableStock {
                 stock.getThirdBuyQuantity(),
                 stock.getThirdSellPrice(),
                 stock.getThirdSellQuantity(),
+                stock.getBookValuePerShare(),
                 stock.getTimestamp()
                 );
         
@@ -579,6 +593,7 @@ public class MutableStock {
                 stock.getThirdBuyQuantity(),
                 stock.getThirdSellPrice(),
                 stock.getThirdSellQuantity(),
+                stock.getBookValuePerShare(),
                 stock.getTimestamp()
                 );
         
@@ -613,6 +628,7 @@ public class MutableStock {
                 stock.getThirdBuyQuantity(),
                 stock.getThirdSellPrice(),
                 stock.getThirdSellQuantity(),
+                stock.getBookValuePerShare(),
                 stock.getTimestamp()
                 );
         
@@ -647,6 +663,7 @@ public class MutableStock {
                 stock.getThirdBuyQuantity(),
                 stock.getThirdSellPrice(),
                 stock.getThirdSellQuantity(),
+                stock.getBookValuePerShare(),
                 stock.getTimestamp()
                 );
         
@@ -681,6 +698,7 @@ public class MutableStock {
                 stock.getThirdBuyQuantity(),
                 stock.getThirdSellPrice(),
                 stock.getThirdSellQuantity(),
+                stock.getBookValuePerShare(),
                 stock.getTimestamp()
                 );
         
@@ -715,6 +733,7 @@ public class MutableStock {
                 stock.getThirdBuyQuantity(),
                 stock.getThirdSellPrice(),
                 stock.getThirdSellQuantity(),
+                stock.getBookValuePerShare(),
                 stock.getTimestamp()
                 );
         
@@ -749,6 +768,7 @@ public class MutableStock {
                 stock.getThirdBuyQuantity(),
                 stock.getThirdSellPrice(),
                 stock.getThirdSellQuantity(),
+                stock.getBookValuePerShare(),
                 stock.getTimestamp()
                 );
         
@@ -783,6 +803,7 @@ public class MutableStock {
                 stock.getThirdBuyQuantity(),
                 stock.getThirdSellPrice(),
                 stock.getThirdSellQuantity(),
+                stock.getBookValuePerShare(),
                 stock.getTimestamp()
                 );
         
@@ -817,6 +838,7 @@ public class MutableStock {
                 thirdBuyQuantity,
                 stock.getThirdSellPrice(),
                 stock.getThirdSellQuantity(),
+                stock.getBookValuePerShare(),
                 stock.getTimestamp()
                 );
         
@@ -851,6 +873,7 @@ public class MutableStock {
                 stock.getThirdBuyQuantity(),
                 thirdSellPrice,
                 stock.getThirdSellQuantity(),
+                stock.getBookValuePerShare(),
                 stock.getTimestamp()
                 );
         
@@ -885,6 +908,42 @@ public class MutableStock {
                 stock.getThirdBuyQuantity(),
                 stock.getThirdSellPrice(),
                 thirdSellQuantity,
+                stock.getBookValuePerShare(),
+                stock.getTimestamp()
+                );
+        
+        this.stock = s;        
+    } 
+    
+        public void setBookValuePerShare(double bookValuePerShare) {
+        final Stock s = new Stock(
+                stock.code,
+                stock.symbol,
+                stock.getName(),
+                stock.getBoard(),
+                stock.getIndustry(),
+                stock.getPrevPrice(),
+                stock.getOpenPrice(),
+                stock.getLastPrice(),
+                stock.getHighPrice(),
+                stock.getLowPrice(),
+                stock.getVolume(),
+                stock.getChangePrice(),
+                stock.getChangePricePercentage(),
+                stock.getLastVolume(),
+                stock.getBuyPrice(),
+                stock.getBuyQuantity(),
+                stock.getSellPrice(),
+                stock.getSellQuantity(),
+                stock.getSecondBuyPrice(),
+                stock.getSecondBuyQuantity(),
+                stock.getSecondSellPrice(),
+                stock.getSecondSellQuantity(),
+                stock.getThirdBuyPrice(),
+                stock.getThirdBuyQuantity(),
+                stock.getThirdSellPrice(),
+                stock.getThirdSellQuantity(),
+                bookValuePerShare,
                 stock.getTimestamp()
                 );
         

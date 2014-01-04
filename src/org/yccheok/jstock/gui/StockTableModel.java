@@ -235,6 +235,7 @@ public class StockTableModel extends AbstractTableModelWithMemory implements CSV
         list.add(stock.getBuyQuantity());
         list.add(stock.getSellPrice());
         list.add(stock.getSellQuantity());
+        list.add(stock.getBookValuePerShare());
         list.add(alert.fallBelow);
         list.add(alert.riseAbove);
         return list;
@@ -299,6 +300,7 @@ public class StockTableModel extends AbstractTableModelWithMemory implements CSV
         Double.class,
         Integer.class,
         Double.class,
+        Double.class,
         Double.class
     };
 
@@ -319,6 +321,7 @@ public class StockTableModel extends AbstractTableModelWithMemory implements CSV
             GUIBundle.getString("MainFrame_BQty"),
             GUIBundle.getString("MainFrame_Sell"),
             GUIBundle.getString("MainFrame_SQty"),
+            GUIBundle.getString("MainFrame_BookVal"),
             GUIBundle.getString("MainFrame_FallBelow"),
             GUIBundle.getString("MainFrame_RiseAbove")
         };
@@ -339,6 +342,7 @@ public class StockTableModel extends AbstractTableModelWithMemory implements CSV
             guiBundleWrapper.getString("MainFrame_BQty"),
             guiBundleWrapper.getString("MainFrame_Sell"),
             guiBundleWrapper.getString("MainFrame_SQty"),
+            guiBundleWrapper.getString("MainFrame_BookVal"),
             guiBundleWrapper.getString("MainFrame_FallBelow"),
             guiBundleWrapper.getString("MainFrame_RiseAbove")
         };

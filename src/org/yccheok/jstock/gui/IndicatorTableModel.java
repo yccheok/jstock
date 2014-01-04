@@ -168,6 +168,8 @@ public class IndicatorTableModel extends AbstractTableModelWithMemory implements
             list.add(0);
         }
         
+        list.add(stock.getBookValuePerShare());
+        list.add(stock.getLastPrice()/stock.getBookValuePerShare());
         return list;
     }
     
@@ -254,7 +256,9 @@ public class IndicatorTableModel extends AbstractTableModelWithMemory implements
         Double.class,
         Integer.class,
         Long.class,
-        Long.class
+        Long.class,
+        Double.class,
+        Double.class
     };
 
     static {
@@ -276,7 +280,9 @@ public class IndicatorTableModel extends AbstractTableModelWithMemory implements
             GUIBundle.getString("MainFrame_Sell"),
             GUIBundle.getString("MainFrame_SQty"),
             GUIBundle.getString("IndicatorScannerJPanel_MCapital"),
-            GUIBundle.getString("IndicatorScannerJPanel_SIssued")
+            GUIBundle.getString("IndicatorScannerJPanel_SIssued"),
+            GUIBundle.getString("MainFrame_BookVal"),
+            GUIBundle.getString("MainFrame_LastBookVal")
         };
         final GUIBundleWrapper guiBundleWrapper = GUIBundleWrapper.newInstance(Language.INDEPENDENT);        
         final String[] tmp2 = {
@@ -297,7 +303,9 @@ public class IndicatorTableModel extends AbstractTableModelWithMemory implements
             guiBundleWrapper.getString("MainFrame_Sell"),
             guiBundleWrapper.getString("MainFrame_SQty"),
             guiBundleWrapper.getString("IndicatorScannerJPanel_MCapital"),
-            guiBundleWrapper.getString("IndicatorScannerJPanel_SIssued")
+            guiBundleWrapper.getString("IndicatorScannerJPanel_SIssued"),
+            guiBundleWrapper.getString("MainFrame_BookVal"),
+            GUIBundle.getString("MainFrame_LastBookVal")
         };
         
         columnNames = tmp;

@@ -25,39 +25,41 @@ public class MutableStockBeanInfo extends SimpleBeanInfo {
 
     // Property identifiers//GEN-FIRST:Properties
     private static final int PROPERTY_board = 0;
-    private static final int PROPERTY_buyPrice = 1;
-    private static final int PROPERTY_buyQuantity = 2;
-    private static final int PROPERTY_changePrice = 3;
-    private static final int PROPERTY_changePricePercentage = 4;
-    private static final int PROPERTY_code = 5;
-    private static final int PROPERTY_highPrice = 6;
-    private static final int PROPERTY_industry = 7;
-    private static final int PROPERTY_lastPrice = 8;
-    private static final int PROPERTY_lastVolume = 9;
-    private static final int PROPERTY_lowPrice = 10;
-    private static final int PROPERTY_name = 11;
-    private static final int PROPERTY_openPrice = 12;
-    private static final int PROPERTY_prevPrice = 13;
-    private static final int PROPERTY_secondBuyPrice = 14;
-    private static final int PROPERTY_secondBuyQuantity = 15;
-    private static final int PROPERTY_secondSellPrice = 16;
-    private static final int PROPERTY_secondSellQuantity = 17;
-    private static final int PROPERTY_sellPrice = 18;
-    private static final int PROPERTY_sellQuantity = 19;
-    private static final int PROPERTY_symbol = 20;
-    private static final int PROPERTY_thirdBuyPrice = 21;
-    private static final int PROPERTY_thirdBuyQuantity = 22;
-    private static final int PROPERTY_thirdSellPrice = 23;
-    private static final int PROPERTY_thirdSellQuantity = 24;
-    private static final int PROPERTY_volume = 25;
+    private static final int PROPERTY_bookValuePerShare = 1;
+    private static final int PROPERTY_buyPrice = 2;
+    private static final int PROPERTY_buyQuantity = 3;
+    private static final int PROPERTY_changePrice = 4;
+    private static final int PROPERTY_changePricePercentage = 5;
+    private static final int PROPERTY_code = 6;
+    private static final int PROPERTY_highPrice = 7;
+    private static final int PROPERTY_industry = 8;
+    private static final int PROPERTY_lastPrice = 9;
+    private static final int PROPERTY_lastVolume = 10;
+    private static final int PROPERTY_lowPrice = 11;
+    private static final int PROPERTY_name = 12;
+    private static final int PROPERTY_openPrice = 13;
+    private static final int PROPERTY_prevPrice = 14;
+    private static final int PROPERTY_secondBuyPrice = 15;
+    private static final int PROPERTY_secondBuyQuantity = 16;
+    private static final int PROPERTY_secondSellPrice = 17;
+    private static final int PROPERTY_secondSellQuantity = 18;
+    private static final int PROPERTY_sellPrice = 19;
+    private static final int PROPERTY_sellQuantity = 20;
+    private static final int PROPERTY_symbol = 21;
+    private static final int PROPERTY_thirdBuyPrice = 22;
+    private static final int PROPERTY_thirdBuyQuantity = 23;
+    private static final int PROPERTY_thirdSellPrice = 24;
+    private static final int PROPERTY_thirdSellQuantity = 25;
+    private static final int PROPERTY_volume = 26;
 
     // Property array 
     /*lazy PropertyDescriptor*/
     private static PropertyDescriptor[] getPdescriptor(){
-        PropertyDescriptor[] properties = new PropertyDescriptor[26];
+        PropertyDescriptor[] properties = new PropertyDescriptor[27];
     
         try {
             properties[PROPERTY_board] = new PropertyDescriptor ( "board", org.yccheok.jstock.gui.MutableStock.class, "getBoard", null ); // NOI18N
+            properties[PROPERTY_bookValuePerShare] = new PropertyDescriptor ( "bookValuePerShare", org.yccheok.jstock.gui.MutableStock.class, "getBookValuePerShare", "setBookValuePerShare" ); // NOI18N
             properties[PROPERTY_buyPrice] = new PropertyDescriptor ( "buyPrice", org.yccheok.jstock.gui.MutableStock.class, "getBuyPrice", "setBuyPrice" ); // NOI18N
             properties[PROPERTY_buyQuantity] = new PropertyDescriptor ( "buyQuantity", org.yccheok.jstock.gui.MutableStock.class, "getBuyQuantity", "setBuyQuantity" ); // NOI18N
             properties[PROPERTY_changePrice] = new PropertyDescriptor ( "changePrice", org.yccheok.jstock.gui.MutableStock.class, "getChangePrice", "setChangePrice" ); // NOI18N

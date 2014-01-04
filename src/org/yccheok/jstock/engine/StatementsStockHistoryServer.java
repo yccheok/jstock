@@ -75,6 +75,7 @@ public class StatementsStockHistoryServer implements StockHistoryServer {
                     0,
                     0.0,
                     0,
+                    0.0,
                     timestamp
                     );
 

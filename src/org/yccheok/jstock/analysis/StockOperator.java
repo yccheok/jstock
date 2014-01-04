@@ -51,7 +51,8 @@ public class StockOperator extends AbstractOperator {
         ThirdBuyPrice,
         ThridBuyQuantity,
         ThridSellPrice,
-        ThirdSellQuantity
+        ThirdSellQuantity,
+        BookValuePerShare
     }
         
     /** Creates a new instance of StockOperator */
@@ -148,6 +149,8 @@ public class StockOperator extends AbstractOperator {
                 return new Double(stock.getThirdSellPrice());
             case ThirdSellQuantity:
                 return new Integer(stock.getThirdSellQuantity());
+            case BookValuePerShare:
+                return new Double(stock.getBookValuePerShare());
         }
         
         return null;

@@ -69,6 +69,7 @@ public class BrazilYahooStockServer extends AbstractYahooStockServer {
                     stock.getThirdBuyQuantity(),
                     stock.getThirdSellPrice(),
                     stock.getThirdSellQuantity(),
+                    stock.getBookValuePerShare(),
                     stock.getTimestamp()
                 );
             stocks.add(s);
@@ -110,6 +111,7 @@ public class BrazilYahooStockServer extends AbstractYahooStockServer {
                 tmp.getThirdBuyQuantity(),
                 tmp.getThirdSellPrice(),
                 tmp.getThirdSellQuantity(),
+                tmp.getBookValuePerShare(),
                 tmp.getTimestamp()
             );
         return stock;

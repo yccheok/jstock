@@ -289,6 +289,7 @@ public class KLSEInfoStockHistoryServer implements StockHistoryServer {
                     0,
                     0.0,
                     0,
+                    0.0,
                     timestamp
                     );
 
