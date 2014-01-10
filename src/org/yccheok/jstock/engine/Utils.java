@@ -481,7 +481,7 @@ public class Utils {
             builder.append(java.net.URLEncoder.encode(code, "UTF-8"));
 
             final String location = builder.toString();
-            final String _respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsString(location);
+            final String _respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(location);
             if (_respond == null) {
                 return code;
             }

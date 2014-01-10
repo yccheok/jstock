@@ -2650,11 +2650,11 @@ public class Utils {
         final Utils.InputStreamAndMethod inputStreamAndMethod = Utils.getResponseBodyAsStreamBasedOnProxyAuthOption(location);
         if (inputStreamAndMethod.inputStream == null) {
             inputStreamAndMethod.method.releaseConnection();
-            return "";
+            return null;
         }
         try {
             java.util.Scanner s = new java.util.Scanner(inputStreamAndMethod.inputStream, "UTF-8").useDelimiter("\\A");
-            return s.hasNext() ? s.next() : "";        
+            return s.hasNext() ? s.next() : null;        
         } finally {
             close(inputStreamAndMethod.inputStream);
             inputStreamAndMethod.method.releaseConnection();
