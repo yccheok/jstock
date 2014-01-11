@@ -5,7 +5,6 @@
 package org.yccheok.jstock.gui;
 
 import java.io.File;
-import org.yccheok.jstock.engine.Code;
 
 /**
  *
