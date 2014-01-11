@@ -962,6 +962,10 @@ public class Utils {
         }
     }
 
+    public static String getAboutBoxVersionString() {
+        return ABOUT_BOX_VERSION_STRING;
+    }
+    
     public static String getApplicationVersionString() {
         return APPLICATION_VERSION_STRING;
     }
@@ -3006,6 +3010,8 @@ public class Utils {
     // We will use this as directory name. Do not have space or special characters.
     private static final String APPLICATION_VERSION_STRING = "1.0.7";
 
+    private static final String ABOUT_BOX_VERSION_STRING = "1.0.7i";
+    
     // 1.0.7e
     // Remember to update isCloudFileCompatible method.
     private static final int CLOUD_FILE_VERSION_ID = 1107;

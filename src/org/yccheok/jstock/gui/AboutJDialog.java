@@ -276,7 +276,7 @@ public class AboutJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jTabbedPane1StateChanged
 
     private String getVersionString() {
-        return MessageFormat.format(GUIBundle.getString("AboutJDialog_AboutJStock_template"), "1.0.7h-fix");
+        return MessageFormat.format(GUIBundle.getString("AboutJDialog_AboutJStock_template"), Utils.getAboutBoxVersionString());
     }
     
     private Controller controller = new Controller();
