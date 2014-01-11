@@ -38,10 +38,19 @@ public class SimpleBroker implements Broker {
         this.rate = simpleBroker.getRate();
     }
     
+    @Override
     public double calculate(Contract contact) {
         final double result = contact.getTotal() * getRate() / 100.0;
-        if(result < getMinimumRate()) return getMinimumRate();
-        if(result > getMaximumRate()) return getMaximumRate();
+        if (result < this.minimumRate) {
+            return this.minimumRate;
+        }
+        
+        // 0 in maximum rate means ignore.
+        if (false == Utils.essentiallyEqual(this.maximumRate, 0.0)) {
+            if (result > this.maximumRate) {
+                return this.maximumRate;
+            }
+        }
         
         return result;
     }
