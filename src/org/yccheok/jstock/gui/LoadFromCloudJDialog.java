@@ -474,12 +474,6 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
                 publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_ExtractingData..."), Icons.BUSY));
                 boolean status = Utils.extractZipFile(cloudFile.file, true);
                 
-                // FIXME : Remove this code after some time.
-                if (Utils.isIndiaUsingYahooFinance(cloudFile.version)) {
-                    status = status & org.yccheok.jstock.engine.Utils.migrateIndiaYahooFinanceToIndiaGoogleFinance();
-                    MainFrame.migrationSuccess = status;
-                }
-                
                 // Place isCancelled check after time consuming operation.
                 // Not the best way, but perhaps the easiest way to cancel
                 // the operation.

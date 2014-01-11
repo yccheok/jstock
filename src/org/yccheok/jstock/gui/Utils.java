@@ -2793,10 +2793,6 @@ public class Utils {
         return "$";
     }
     
-    public static boolean isIndiaUsingYahooFinance(int version) {
-        return version <= 1111;
-    }
-    
     /**
      * Returns common used date format, which will be used by Statements. We need
      * common used date format, as we need to perform data exchange across

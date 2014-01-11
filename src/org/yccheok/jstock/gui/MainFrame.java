@@ -978,13 +978,8 @@ public class MainFrame extends javax.swing.JFrame {
         JStockOptions.BoundsEx boundsEx = new JStockOptions.BoundsEx(this.getBounds(), this.getExtendedState());
         this.getJStockOptions().setBoundsEx(boundsEx);
         
-        // FIXME : So that later we know that this XML file is saved by which 
-        // version of JStock.
-        if (MainFrame.migrationSuccess) {
-            jStockOptions.setApplicationVersionID(Utils.getApplicationVersionID());
-        } else {
-            jStockOptions.setApplicationVersionID(1111);
-        }
+        jStockOptions.setApplicationVersionID(Utils.getApplicationVersionID());
+
         this.saveJStockOptions();
         this.saveGUIOptions();
         this.saveChartJDialogOptions();
@@ -1716,11 +1711,6 @@ public class MainFrame extends javax.swing.JFrame {
                 // jStockOptions.
                 mainFrame.initJStockOptions(jStockOptions);
                 
-                // FIXME : Remove this code after some time.
-                if (Utils.isIndiaUsingYahooFinance(jStockOptions.getApplicationVersionID())) {
-                    MainFrame.migrationSuccess = org.yccheok.jstock.engine.Utils.migrateIndiaYahooFinanceToIndiaGoogleFinance();
-                }
-                
                 mainFrame.init();
                 mainFrame.setVisible(true);
                 mainFrame.updateDividerLocation();
@@ -2167,14 +2157,8 @@ public class MainFrame extends javax.swing.JFrame {
          * exit.
          */
                 
-        // FIXME : So that later we know that this XML file is saved by which 
-        // version of JStock.
-        
-        if (MainFrame.migrationSuccess) {
-            jStockOptions.setApplicationVersionID(Utils.getApplicationVersionID());        
-        } else {
-            jStockOptions.setApplicationVersionID(1111);        
-        }
+        jStockOptions.setApplicationVersionID(Utils.getApplicationVersionID());        
+
         this.saveJStockOptions();
         
         this.saveGUIOptions();
@@ -4679,9 +4663,6 @@ public class MainFrame extends javax.swing.JFrame {
         this.indicatorScannerJPanel.refreshRealTimeStockMonitor();
         this.portfolioManagementJPanel.refreshRealTimeStockMonitor();
     }
-    
-    // FIXME : Remove this code after some time.
-    public static boolean migrationSuccess = true;
     
     private TrayIcon trayIcon;
     
