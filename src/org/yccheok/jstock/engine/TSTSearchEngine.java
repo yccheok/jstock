@@ -116,9 +116,17 @@ public class TSTSearchEngine<E> implements SearchEngine<E> {
      */
     public void remove(E value) {
         final String mapKey = value.toString().toUpperCase();
-        final String key = tst.remove(mapKey);
-        if (key != null) {
-            map.remove(key);
+        
+        List<E> list = map.get(mapKey);
+        if (list == null) {
+            return;
+        }
+        
+        list.remove(value);
+        
+        if (list.isEmpty()) {
+            tst.remove(mapKey);
+            map.remove(mapKey);
         }
     }
     

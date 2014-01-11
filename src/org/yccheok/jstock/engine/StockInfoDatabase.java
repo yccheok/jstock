@@ -419,7 +419,7 @@ public class StockInfoDatabase {
         }
 
         // We need to ensure there is no duplicated stock info being added.
-        if (symbolToStockInfos.containsKey(stockInfo.symbol) || codeToStockInfos.containsKey(stockInfo.code)) {
+        if (codeToStockInfos.containsKey(stockInfo.code)) {
             return false;
         }
 
@@ -585,37 +585,6 @@ public class StockInfoDatabase {
         } finally {
             reader.unlock();
         }
-    }
-
-    private Object readResolve() {
-        // Initialize all transient variables.
-        symbolToStockInfos = new HashMap<Symbol, List<StockInfo>>();
-        codeToStockInfos = new HashMap<Code, StockInfo>();
-
-        List<StockInfo> stockInfosWithSymbolAsString = new ArrayList<StockInfo>();
-        for (StockInfo stockInfo : stockInfos) {
-            stockInfosWithSymbolAsString.add(new StockInfoWithSymbolAsString(stockInfo.code, stockInfo.symbol));
-        }
-        // Initialize all search engines with correct list of stock info.
-        this.symbolPinyinSearchEngine = Utils.isPinyinTSTSearchEngineRequiredForSymbol() ? new PinyinTSTSearchEngine<StockInfo>(stockInfosWithSymbolAsString) : null;
-        this.symbolSearchEngine = new TSTSearchEngine<StockInfo>(stockInfosWithSymbolAsString);
-        this.codeSearchEngine = new TSTSearchEngine<StockInfo>(stockInfos);
-
-        java.util.concurrent.locks.ReadWriteLock readWriteLock = new java.util.concurrent.locks.ReentrantReadWriteLock();
-        reader = readWriteLock.readLock();
-        writer = readWriteLock.writeLock();
-
-        for (StockInfo stockInfo : stockInfos) {
-            codeToStockInfos.put(stockInfo.code, stockInfo);
-            List<StockInfo> s = symbolToStockInfos.get(stockInfo.symbol);
-            if (s == null) {
-                s = new ArrayList<StockInfo>();
-                symbolToStockInfos.put(stockInfo.symbol, s);
-            }
-            s.add(stockInfo);
-        }
-
-        return this;
     }
 
     // Entire stock info of this database.

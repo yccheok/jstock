@@ -45,7 +45,7 @@ public class MatchType {
     public Code getCode() {
         if (this.e.equals("NSE")) {
             return Code.newInstance(this.t + ".N");
-        } else if (this.e.equals("BSE")) {
+        } else if (this.e.equals("BOM")) {
             return Code.newInstance(this.t + ".B");
         }
         return Code.newInstance(this.e + ":" + this.t);

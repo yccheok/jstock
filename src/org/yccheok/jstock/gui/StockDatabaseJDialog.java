@@ -291,7 +291,6 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
     private void jTable2KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTable2KeyPressed
         if(KeyEvent.VK_DELETE == evt.getKeyCode()) {
             this.deleteSelectedUserDefinedDatabase();
-            return;
         }
     }//GEN-LAST:event_jTable2KeyPressed
 
@@ -525,11 +524,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
                 // Symbol from Yahoo means Code in JStock.
                 String message_string = result.symbol;
                 IndexEx indexEx = getIndexEx(result.symbol, Code.class);
-                if (indexEx == null) {
-                    message_string = result.name;
-                    // Name from Yahoo means Symbol in JStock.
-                    indexEx = getIndexEx(result.name, Symbol.class);
-                }
+
                 if (indexEx != null) {
                     if (indexEx.table == jTable1) {
                         selectStockExchangeServerDatabaseTable(indexEx.index);
