@@ -59,6 +59,7 @@ import org.yccheok.jstock.engine.StockInfoDatabase;
 import org.yccheok.jstock.engine.StockNameDatabase;
 import org.yccheok.jstock.engine.Symbol;
 import org.yccheok.jstock.file.GUIBundleWrapper.Language;
+import org.yccheok.jstock.gui.BackwardCompatible;
 import org.yccheok.jstock.gui.JStockOptions;
 import org.yccheok.jstock.gui.MainFrame;
 import org.yccheok.jstock.gui.POIUtils;
@@ -399,6 +400,10 @@ public class Statements {
             return UNKNOWN_STATEMENTS;
         }
         
+        // FIXME :
+        final boolean needToPerformBackwardCompatible = BackwardCompatible.needToPerformBackwardCompatible(file);
+        final boolean needToHandleMetadata = BackwardCompatible.needToHandleMetadata(file);
+        
         Pair<ReentrantReadWriteLock, AtomicInteger> pair;
         synchronized(reentrantReadWriteLockMapMonitor) {
             pair = reentrantReadWriteLockMap.get(canonicalPath);
@@ -438,6 +443,12 @@ public class Statements {
                     if (tokens.length == 2) {
                         String key = tokens[0].trim();
                         String value = tokens[1].trim();
+                        
+                        // FIXME :
+                        if (needToHandleMetadata) {
+                            key = BackwardCompatible.toGoogleCodeIfPossible(key);
+                        }                       
+                        
                         if (key.length() > 0) {
                             // Is OK for value to be empty.
                             metadatas.put(key, value);
@@ -475,6 +486,12 @@ public class Statements {
                 final List<Atom> atoms = new ArrayList<Atom>();
                 for (String value : nextLine) {
                     final String type = types.get(i++);
+                    
+                    // FIXME :
+                    if (needToPerformBackwardCompatible && type.equals("Code")) {
+                        value = BackwardCompatible.toGoogleCodeIfPossible(value);
+                    }
+                    
                     final Atom atom = new Atom(value, type);
                     atoms.add(atom);
                 }

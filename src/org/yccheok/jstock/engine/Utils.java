@@ -473,7 +473,8 @@ public class Utils {
         return code;
     }
     
-    private static String toGoogleFormatThroughAutoComplete(String code, String exchange) {
+    // FIXME : Make it private.
+    public static String toGoogleFormatThroughAutoComplete(String code, String exchange) {
         final StringBuilder builder = new StringBuilder("https://www.google.com/finance/match?matchtype=matchall&q=");
         try {
             // Exception will be thrown from apache httpclient, if we do not
