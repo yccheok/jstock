@@ -19,7 +19,6 @@ public class BackwardCompatible {
         if (string.endsWith(".NS") && string_length > ".NS".length()) {
             string = string.substring(0, string_length - ".NS".length());
             String newString = org.yccheok.jstock.engine.Utils.toGoogleFormatThroughAutoComplete(string, "NSE");
-            System.out.println("newString : " + newString);
             if (false == newString.endsWith(".NS")) {
                  return newString + ".N";
             }
@@ -31,7 +30,6 @@ public class BackwardCompatible {
     public static boolean needToPerformBackwardCompatible(File file) {
         String name = file.getName();
         if (name.contains("realtimestock.csv") || name.contains("buyportfolio.csv") || name.contains("sellportfolio.csv") || name.contains("dividendsummary.csv")) {
-            System.out.println("needToPerformBackwardCompatible : " + file);
             return true;            
         }
         return false;
@@ -40,7 +38,6 @@ public class BackwardCompatible {
     public static boolean needToHandleMetadata(File file) {
         String name = file.getName();
         if (name.contains("buyportfolio.csv") || name.contains("sellportfolio.csv")) {
-            System.out.println("needToHandleMetadata : " + name);
             return true;            
         }
         return false;
