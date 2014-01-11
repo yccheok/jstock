@@ -20,7 +20,6 @@
 package org.yccheok.jstock.engine;
 
 import com.google.gson.Gson;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Collections;
 import java.util.List;
@@ -51,11 +50,11 @@ public class AjaxGoogleSearchEngine implements SearchEngine<MatchType> {
             
             final Holder value = gson.fromJson(respond, Holder.class);
             
-            // Shall I check value.ResultSet.Query against prefix?
-            return Collections.unmodifiableList(value.matches);       
+            if (value != null) {
+                // Shall I check value.ResultSet.Query against prefix?
+                return Collections.unmodifiableList(value.matches);       
+            }
         } catch (UnsupportedEncodingException ex) {
-            log.error(null, ex);
-        } catch (IOException ex) {
             log.error(null, ex);
         } catch (Exception ex) {
             // Jackson library may cause runtime exception if there is error

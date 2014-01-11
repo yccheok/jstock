@@ -161,6 +161,11 @@ public class GoogleStockServer implements StockServer {
             // Google returns "// [ { "id": ... } ]".
             // We need to turn them into "[ { "id": ... } ]".
             final List<Map> jsonArray = gson.fromJson(respond, List.class);
+            
+            if (jsonArray == null) {
+                throw new StockNotFoundException();
+            }
+            
             final List<Stock> stocks = new ArrayList<Stock>();
             for (int i = 0, size = jsonArray.size(); i < size; i++) {
                 final Map<String, String> jsonObject = jsonArray.get(i);

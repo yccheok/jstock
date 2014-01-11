@@ -2833,7 +2833,7 @@ public class Utils {
     public static Map<Country, Long> loadStockInfoDatabaseMeta(String json) {
         final Gson gson = getGsonForStockInfoDatabaseMeta();
         
-        Map<Country, Long> stockInfoDatabaseMeta = new EnumMap<Country, Long>(Country.class);
+        Map<Country, Long> stockInfoDatabaseMeta = null;
         
         try {
             stockInfoDatabaseMeta = gson.fromJson(json, new TypeToken<EnumMap<Country, Long>>(){}.getType());
@@ -2841,13 +2841,17 @@ public class Utils {
             log.error(null, ex);
         }  
         
+        if (stockInfoDatabaseMeta == null) {
+            return java.util.Collections.emptyMap();
+        }
+        
         return stockInfoDatabaseMeta;
     }
     
     public static Map<Country, Long> loadStockInfoDatabaseMeta(File stockInfoDatabaseMetaFile) {
         final Gson gson = getGsonForStockInfoDatabaseMeta();
                 
-        Map<Country, Long> stockInfoDatabaseMeta = new EnumMap<Country, Long>(Country.class);
+        Map<Country, Long> stockInfoDatabaseMeta = null;
 
         try {
             //If the constructor throws an exception, the finally block will NOT execute
@@ -2867,6 +2871,10 @@ public class Utils {
             log.error(null, ex);
         }            
 
+        if (stockInfoDatabaseMeta == null) {
+            return java.util.Collections.emptyMap();
+        }
+        
         return stockInfoDatabaseMeta;
     }
     
