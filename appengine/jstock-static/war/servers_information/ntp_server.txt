@@ -1,0 +1,2 @@
+id=ltsgi4R41y6x9GucPlNn5ls5HPDzKBIgRezXRcuYF/AjqV9XZCmyDJ9wl+KWaTed
+server=time-a.nist.gov,time-b.nist.gov,time-nw.nist.gov

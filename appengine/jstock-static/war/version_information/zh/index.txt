@@ -1,0 +1,5 @@
+applicationVersionID=1111
+windowsDownloadLink=http://downloads.sourceforge.net/jstock/jstock-1.0.7h-fix-setup.exe
+linuxDownloadLink=http://downloads.sourceforge.net/jstock/jstock-1.0.7h-fix-bin.zip
+macDownloadLink=http://downloads.sourceforge.net/jstock/jstock-1.0.7h-fix-bin.zip
+solarisDownloadLink=http://downloads.sourceforge.net/jstock/jstock-1.0.7h-fix-bin.zip

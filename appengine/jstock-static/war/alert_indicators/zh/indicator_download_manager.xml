@@ -1,0 +1,67 @@
+<org.yccheok.jstock.gui.analysis.IndicatorDownloadManager>
+  <indicatorDownloadInfos>
+    <org.yccheok.jstock.gui.analysis.IndicatorDownloadManager_-Info>
+      <projectName>MACD Down Trend Signal</projectName>
+      <type>AlertIndicator</type>
+      <checksum>2370775778</checksum>
+      <fileURL>http://jstock-static.appspot.com/alert_indicators/zh/MACDDownTrendSignal.zip</fileURL>
+      <descriptionURL>http://jstock-static.appspot.com/alert_indicators/zh/MACDDownTrendSignal.html</descriptionURL>
+    </org.yccheok.jstock.gui.analysis.IndicatorDownloadManager_-Info>
+    <org.yccheok.jstock.gui.analysis.IndicatorDownloadManager_-Info>
+      <projectName>MACD Up Trend Signal</projectName>
+      <type>AlertIndicator</type>
+      <checksum>1619995991</checksum>
+      <fileURL>http://jstock-static.appspot.com/alert_indicators/zh/MACDUpTrendSignal.zip</fileURL>
+      <descriptionURL>http://jstock-static.appspot.com/alert_indicators/zh/MACDUpTrendSignal.html</descriptionURL>
+    </org.yccheok.jstock.gui.analysis.IndicatorDownloadManager_-Info>
+    <org.yccheok.jstock.gui.analysis.IndicatorDownloadManager_-Info>
+      <projectName>MFI Down Trend Signal</projectName>
+      <type>AlertIndicator</type>
+      <checksum>3845223846</checksum>
+      <fileURL>http://jstock-static.appspot.com/alert_indicators/zh/MFIDownTrendSignal.zip</fileURL>
+      <descriptionURL>http://jstock-static.appspot.com/alert_indicators/zh/MFIDownTrendSignal.html</descriptionURL>
+    </org.yccheok.jstock.gui.analysis.IndicatorDownloadManager_-Info>
+    <org.yccheok.jstock.gui.analysis.IndicatorDownloadManager_-Info>
+      <projectName>MFI Up Trend Signal</projectName>
+      <type>AlertIndicator</type>
+      <checksum>3484317259</checksum>
+      <fileURL>http://jstock-static.appspot.com/alert_indicators/zh/MFIUpTrendSignal.zip</fileURL>
+      <descriptionURL>http://jstock-static.appspot.com/alert_indicators/zh/MFIUpTrendSignal.html</descriptionURL>
+    </org.yccheok.jstock.gui.analysis.IndicatorDownloadManager_-Info>
+    <org.yccheok.jstock.gui.analysis.IndicatorDownloadManager_-Info>
+      <projectName>RSI Sell Signal</projectName>
+      <type>AlertIndicator</type>
+      <checksum>3103406186</checksum>
+      <fileURL>http://jstock-static.appspot.com/alert_indicators/zh/RSISellSignal.zip</fileURL>
+      <descriptionURL>http://jstock-static.appspot.com/alert_indicators/zh/RSISellSignal.html</descriptionURL>
+    </org.yccheok.jstock.gui.analysis.IndicatorDownloadManager_-Info>
+    <org.yccheok.jstock.gui.analysis.IndicatorDownloadManager_-Info>
+      <projectName>RSI Buy Signal</projectName>
+      <type>AlertIndicator</type>
+      <checksum>3500813660</checksum>
+      <fileURL>http://jstock-static.appspot.com/alert_indicators/zh/RSIBuySignal.zip</fileURL>
+      <descriptionURL>http://jstock-static.appspot.com/alert_indicators/zh/RSIBuySignal.html</descriptionURL>
+    </org.yccheok.jstock.gui.analysis.IndicatorDownloadManager_-Info>
+    <org.yccheok.jstock.gui.analysis.IndicatorDownloadManager_-Info>
+      <projectName>CCI Sell Signal</projectName>
+      <type>AlertIndicator</type>
+      <checksum>2330634378</checksum>
+      <fileURL>http://jstock-static.appspot.com/alert_indicators/zh/CCISellSignal.zip</fileURL>
+      <descriptionURL>http://jstock-static.appspot.com/alert_indicators/zh/CCISellSignal.html</descriptionURL>
+    </org.yccheok.jstock.gui.analysis.IndicatorDownloadManager_-Info>
+    <org.yccheok.jstock.gui.analysis.IndicatorDownloadManager_-Info>
+      <projectName>CCI Buy Signal</projectName>
+      <type>AlertIndicator</type>
+      <checksum>260618798</checksum>
+      <fileURL>http://jstock-static.appspot.com/alert_indicators/zh/CCIBuySignal.zip</fileURL>
+      <descriptionURL>http://jstock-static.appspot.com/alert_indicators/zh/CCIBuySignal.html</descriptionURL>
+    </org.yccheok.jstock.gui.analysis.IndicatorDownloadManager_-Info>
+    <org.yccheok.jstock.gui.analysis.IndicatorDownloadManager_-Info>
+      <projectName>Doji</projectName>
+      <type>AlertIndicator</type>
+      <checksum>793116174</checksum>
+      <fileURL>http://jstock-static.appspot.com/alert_indicators/zh/Doji.zip</fileURL>
+      <descriptionURL>http://jstock-static.appspot.com/alert_indicators/zh/Doji.html</descriptionURL>
+    </org.yccheok.jstock.gui.analysis.IndicatorDownloadManager_-Info>
+  </indicatorDownloadInfos>
+</org.yccheok.jstock.gui.analysis.IndicatorDownloadManager>
