@@ -11,15 +11,15 @@ import java.io.File;
  * @author yccheok
  */
 public class BackwardCompatible {
-    public static final String toGoogleCodeIfPossible(String code) {
+    public static String toGoogleCodeIfPossible(String code) {
         String string = code.toString().trim().toUpperCase();
         final int string_length = string.length();
         
         if (string.endsWith(".NS") && string_length > ".NS".length()) {
             string = string.substring(0, string_length - ".NS".length());
             String newString = org.yccheok.jstock.engine.Utils.toGoogleFormatThroughAutoComplete(string, "NSE");
-            if (false == newString.endsWith(".NS")) {
-                 return newString + ".N";
+            if (newString != null) {
+                return newString + ".N";
             }
         }
         

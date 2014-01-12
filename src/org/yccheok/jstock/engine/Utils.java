@@ -20,6 +20,7 @@
 package org.yccheok.jstock.engine;
 
 import au.com.bytecode.opencsv.CSVReader;
+import com.google.gson.Gson;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -31,11 +32,8 @@ import java.util.*;
 import org.apache.commons.httpclient.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.yccheok.jstock.engine.Stock.Board;
 import org.yccheok.jstock.engine.Stock.Industry;
-import org.yccheok.jstock.file.Atom;
-import org.yccheok.jstock.file.Statement;
 import org.yccheok.jstock.file.Statements;
 import org.yccheok.jstock.gui.MainFrame;
 import org.yccheok.jstock.gui.Pair;
@@ -405,7 +403,10 @@ public class Utils {
             // difficulty in converting "TATACHEM.BO" (Yahoo Finance) to 
             // "BOM:500770" (Google Finance)
             string = string.substring(0, string_length - ".NS".length());
-            return Code.newInstance("NSE:" + toGoogleFormatThroughAutoComplete(string, "NSE"));
+            String googleFormat = toGoogleFormatThroughAutoComplete(string, "NSE");
+            if (googleFormat != null) {
+                return Code.newInstance("NSE:" + googleFormat);
+            }
         } else if (string.endsWith(".SS") && string_length > ".SS".length()) {
             string = "SHA:" + string.substring(0, string_length - ".SS".length());
             return Code.newInstance(string);
@@ -413,7 +414,7 @@ public class Utils {
             string = "SHE:" + string.substring(0, string_length - ".SZ".length());
             return Code.newInstance(string);
         }
-        return Code.newInstance(string);
+        return code;
     }
     
     public static Code toYahooFormat(Code code) {
@@ -484,12 +485,17 @@ public class Utils {
             final String location = builder.toString();
             final String _respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(location);
             if (_respond == null) {
-                return code;
+                return null;
             }
             final String respond = Utils.GoogleRespondToJSON(_respond);
             // Google returns "// [ { "id": ... } ]".
             // We need to turn them into "[ { "id": ... } ]".
-            final List<Map> jsonArray = mapper.readValue(respond, List.class);
+            final List<Map> jsonArray = gson.fromJson(respond, List.class);
+            
+            if (jsonArray == null) {
+                return null;
+            }
+            
             for (int i = 0, size = jsonArray.size(); i < size; i++) {
                 final Map<String, String> jsonObject = jsonArray.get(i);
                 if (jsonObject.containsKey("e") && jsonObject.get("e").equalsIgnoreCase(exchange)) {
@@ -500,14 +506,12 @@ public class Utils {
             }           
         } catch (UnsupportedEncodingException ex) {
             log.error(null, ex);
-        } catch (IOException ex) {
-            log.error(null, ex);
         } catch (Exception ex) {
             // Jackson library may cause runtime exception if there is error
             // in the JSON string.
             log.error(null, ex);
         }        
-        return code;
+        return null;
     }
     
     /**
@@ -736,6 +740,6 @@ public class Utils {
         return 0L;
     }
     
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final Gson gson = new Gson();
     private static final Log log = LogFactory.getLog(Utils.class);
 }
