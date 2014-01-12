@@ -4,7 +4,7 @@ Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 JStock 1.0.7i - 2014-01-12
   Feature: Migrate India stock market to Google Finance. (Remember to tackle
            FIXME tag in the future)
-  Feature:  Added absolute and square functions for indicator editor.
+  Feature: Added absolute and square functions for indicator editor.
   Feature: Support Czech Republic Koruna in currency exchange.
   Feature: Auto update JStock internal stock database.  
   Bugfix:  Enable back currency exchange option.
