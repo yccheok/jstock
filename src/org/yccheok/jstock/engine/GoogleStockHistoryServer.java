@@ -38,6 +38,7 @@ public class GoogleStockHistoryServer implements StockHistoryServer {
     
     public GoogleStockHistoryServer(Code code, Duration duration) throws StockHistoryNotFoundException {
         this.code = code;
+        this.duration = duration;
         this.googleCode = Utils.toGoogleFormat(code);
         
         final StringBuilder stringBuilder = new StringBuilder("http://www.google.com/finance/getprices?f=d,c,v,o,h,l&i=86400&p=");
@@ -98,6 +99,9 @@ public class GoogleStockHistoryServer implements StockHistoryServer {
     private boolean parse(String respond) {
         historyDatabase.clear();
         timestamps.clear();
+        
+        final long startTimeInMilli = this.duration.getStartDate().getTime().getTime();
+        final long endTimeInMilli = this.duration.getEndDate().getTime().getTime();
         
         String[] stockDatas = respond.split("\r\n|\r|\n");
         
@@ -169,33 +173,6 @@ public class GoogleStockHistoryServer implements StockHistoryServer {
                 currentTime = time + (index * 60*60*24);
             }
             
-            double closePrice = 0.0;
-            double highPrice = 0.0;
-            double lowPrice = 0.0;
-            double prevPrice = 0.0;
-            double openPrice = 0.0;            
-            // TODO: CRITICAL LONG BUG REVISED NEEDED.
-            long volume = 0;
-            //double adjustedClosePrice = 0.0;
-
-            try {
-                closePrice = Double.parseDouble(fields[1]);
-                highPrice = Double.parseDouble(fields[2]);
-                lowPrice = Double.parseDouble(fields[3]);
-                openPrice = Double.parseDouble(fields[4]);
-                prevPrice = (previousClosePrice == Double.MAX_VALUE) ? 0 : previousClosePrice;
-                
-                // TODO: CRITICAL LONG BUG REVISED NEEDED.
-                volume = Long.parseLong(fields[5]);
-                //adjustedClosePrice = Double.parseDouble(fields[6]);
-            }
-            catch (NumberFormatException exp) {
-                log.error(null, exp);
-            }
-            
-            double changePrice = (previousClosePrice == Double.MAX_VALUE) ? 0 : closePrice - previousClosePrice;
-            double changePricePercentage = ((previousClosePrice == Double.MAX_VALUE) || (previousClosePrice == 0.0)) ? 0 : changePrice / previousClosePrice * 100.0;
-
             if (initialized == false) {
                 try {
                     Stock stock = stockServer.getStock(googleCode);
@@ -232,6 +209,40 @@ public class GoogleStockHistoryServer implements StockHistoryServer {
             calendar.setTimeInMillis(currentTimeInMilli);        
             int offset = -(calendar.get(Calendar.ZONE_OFFSET) + calendar.get(Calendar.DST_OFFSET));
             currentTimeInMilli = currentTimeInMilli + offset;
+            
+            if (currentTimeInMilli < startTimeInMilli) {
+                continue;
+            }
+            if (currentTimeInMilli > endTimeInMilli) {
+                break;
+            }
+            
+            double closePrice = 0.0;
+            double highPrice = 0.0;
+            double lowPrice = 0.0;
+            double prevPrice = 0.0;
+            double openPrice = 0.0;            
+            // TODO: CRITICAL LONG BUG REVISED NEEDED.
+            long volume = 0;
+            //double adjustedClosePrice = 0.0;
+
+            try {
+                closePrice = Double.parseDouble(fields[1]);
+                highPrice = Double.parseDouble(fields[2]);
+                lowPrice = Double.parseDouble(fields[3]);
+                openPrice = Double.parseDouble(fields[4]);
+                prevPrice = (previousClosePrice == Double.MAX_VALUE) ? 0 : previousClosePrice;
+                
+                // TODO: CRITICAL LONG BUG REVISED NEEDED.
+                volume = Long.parseLong(fields[5]);
+                //adjustedClosePrice = Double.parseDouble(fields[6]);
+            }
+            catch (NumberFormatException exp) {
+                log.error(null, exp);
+            }
+            
+            double changePrice = (previousClosePrice == Double.MAX_VALUE) ? 0 : closePrice - previousClosePrice;
+            double changePricePercentage = ((previousClosePrice == Double.MAX_VALUE) || (previousClosePrice == 0.0)) ? 0 : changePrice / previousClosePrice * 100.0;
             
             Stock stock = new Stock(
                     code,
@@ -312,6 +323,7 @@ public class GoogleStockHistoryServer implements StockHistoryServer {
     private final Code code;
     private final Code googleCode;
     private final StockServer stockServer = new GoogleStockServer();
+    private final Duration duration;
     
     private static final Log log = LogFactory.getLog(GoogleStockHistoryServer.class);
 }
