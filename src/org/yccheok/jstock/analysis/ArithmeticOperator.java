@@ -1,23 +1,20 @@
 /*
- * PlusOperand.java
- *
- * Created on May 10, 2007, 12:24 AM
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2014 Yan Cheng Cheok <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
- * your option) any later version.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- * Copyright (C) 2009 Yan Cheng Cheok <yccheok@yahoo.com>
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.yccheok.jstock.analysis;
@@ -53,7 +50,7 @@ public class ArithmeticOperator extends AbstractOperator {
     {
         Double result = null;
         
-        switch(arithmetic) 
+        switch (arithmetic) 
         {
         case Addition:
             result = addition();
@@ -85,8 +82,8 @@ public class ArithmeticOperator extends AbstractOperator {
             BigDecimal result = d0.add(d1);
             return result.doubleValue();
         }
-        catch(NumberFormatException exp) {
-            exp.printStackTrace();
+        catch (NumberFormatException exp) {
+            log.error(null, exp);
         }
         
         return null;
@@ -102,9 +99,8 @@ public class ArithmeticOperator extends AbstractOperator {
             
             BigDecimal result = d0.subtract(d1);
             return result.doubleValue();
-        }
-        catch(NumberFormatException exp) {
-            exp.printStackTrace();
+        } catch (NumberFormatException exp) {
+            log.error(null, exp);
         }
         
         return null;        
@@ -120,9 +116,8 @@ public class ArithmeticOperator extends AbstractOperator {
             
             BigDecimal result = d0.multiply(d1);
             return result.doubleValue();
-        }
-        catch(NumberFormatException exp) {
-            exp.printStackTrace();
+        } catch (NumberFormatException exp) {
+            log.error(null, exp);
         }
         
         return null;        
@@ -141,8 +136,7 @@ public class ArithmeticOperator extends AbstractOperator {
                 BigDecimal result = d0.divide(d1, MathContext.DECIMAL64);
                 return result.doubleValue();
             }
-        }
-        catch(NumberFormatException exp) {
+        } catch (NumberFormatException exp) {
             log.error(null, exp);
         }
         

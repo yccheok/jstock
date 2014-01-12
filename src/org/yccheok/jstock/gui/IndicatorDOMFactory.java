@@ -27,6 +27,7 @@ import org.jhotdraw.draw.*;
 import org.jhotdraw.xml.*;
 import org.yccheok.jstock.analysis.*;
 import org.yccheok.jstock.gui.analysis.DiodeOperatorFigure;
+import org.yccheok.jstock.gui.analysis.FunctionOperatorFigure;
 
 /**
  * PertFactory.
@@ -42,6 +43,7 @@ public class IndicatorDOMFactory extends DefaultDOMFactory {
         { StockRelativeHistoryOperatorFigure.class, "stockRelativeHistoryOperatorFigure" },
         { SinkOperatorFigure.class, "sinkOperatorFigure" },
         { ArithmeticOperatorFigure.class, "arithmeticOperatorFigure" },
+        { FunctionOperatorFigure.class, "functionOperatorFigure" },
         { DoubleConstantOperatorFigure.class, "doubleConstantOperatorFigure" },
         { LogicalOperatorFigure.class, "logicalOperatorFigure" },
         { EqualityOperatorFigure.class, "equalityOperatorFigure" },

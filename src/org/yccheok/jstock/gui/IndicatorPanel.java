@@ -1281,6 +1281,7 @@ public class IndicatorPanel extends JPanel {
         ButtonFactory.addToolTo(tb, editor, new OperatorFigureCreationTool("org.yccheok.jstock.gui.analysis.LogicalOperatorFigure", attributes), "createLogical", labels);
         ButtonFactory.addToolTo(tb, editor, new OperatorFigureCreationTool("org.yccheok.jstock.gui.analysis.EqualityOperatorFigure", attributes), "createEquality", labels);
         ButtonFactory.addToolTo(tb, editor, new OperatorFigureCreationTool("org.yccheok.jstock.gui.analysis.ArithmeticOperatorFigure", attributes), "createArithmetic", labels);
+        ButtonFactory.addToolTo(tb, editor, new OperatorFigureCreationTool("org.yccheok.jstock.gui.analysis.FunctionOperatorFigure", attributes), "createFunction", labels);
         ButtonFactory.addToolTo(tb, editor, new OperatorFigureCreationTool("org.yccheok.jstock.gui.analysis.DoubleConstantOperatorFigure", attributes), "createDoubleConstant", labels);
         tb.addSeparator();
         ButtonFactory.addToolTo(tb, editor, new OperatorFigureCreationTool("org.yccheok.jstock.gui.analysis.StockRelativeHistoryOperatorFigure", attributes), "createStockRelativeHistory", labels);
