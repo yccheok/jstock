@@ -103,6 +103,7 @@ public class GUIBundleWrapper {
         _map.put("MainFrame_SQty", "S.Qty");
         _map.put("MainFrame_FallBelow", "Fall Below");
         _map.put("MainFrame_RiseAbove", "Rise Above");
+        _map.put("MainFrame_BookVal", "Book Value");
         
         // For stock info.
         _map.put("MainFrame_Industry", "Industry");

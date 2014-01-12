@@ -321,7 +321,8 @@ public abstract class AbstractYahooStockServer implements StockServer {
     // (28) Ask Size
     // (29) Symbol
     // (30) Last Trade Date
-    // (31) Last Trade Time.
+    // (31) Last Trade Time
+    // (32) Book Value Per Share
     //
     // s = Symbol
     // n = Name
@@ -345,10 +346,11 @@ public abstract class AbstractYahooStockServer implements StockServer {
     // a5 = Ask Size        <-- We need to take special care on this, it may give us 1,234...
     // d1 = Last Trade Date
     // t1 = Last Trade Time
+    // b4 = Book Value Per Share
     //
     // c6k2c1p2c -> Change (Real-time), Change Percent (Real-time), Change, Change in Percent, Change & Percent Change
     // "+1400.00","N/A - +4.31%",+1400.00,"+4.31%","+1400.00 - +4.31%"
     //
     // "MAERSKB.CO","AP MOELLER-MAERS-","Copenhagen",32500.00,33700.00,34200.00,33400.00,660,"+1200.00","N/A - +3.69%",33,33500.00,54,33700.00,96,"11/10/2008","10:53am"
-    private static final String YAHOO_STOCK_FORMAT = "&f=snxspsosl1shsgsvsc1sp2sk3sb3sb6sb2sa5sd1t1";
+    private static final String YAHOO_STOCK_FORMAT = "&f=snxspsosl1shsgsvsc1sp2sk3sb3sb6sb2sa5sd1t1b4";
 }

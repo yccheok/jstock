@@ -169,6 +169,7 @@ public abstract class AbstractYahooStockHistoryServer implements StockHistorySer
                     0,
                     0.0,
                     0,
+                    0.0,
                     timestamp
                     );
 

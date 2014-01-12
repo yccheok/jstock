@@ -109,6 +109,7 @@ public class YahooStockFormat implements StockFormat {
     // (29) Symbol
     // (30) Last Trade Date
     // (31) Last Trade Time.
+    // (32) Book Value Per Share
     //
     // s = Symbol
     // n = Name
@@ -132,6 +133,7 @@ public class YahooStockFormat implements StockFormat {
     // a5 = Ask Size        <-- We need to take special care on this, it may give us 1,234...
     // d1 = Last Trade Date
     // t1 = Last Trade Time
+    // b4 = Book Value Per Share
     //
     // c6k2c1p2c -> Change (Real-time), Change Percent (Real-time), Change, Change in Percent, Change & Percent Change
     // "+1400.00","N/A - +4.31%",+1400.00,"+4.31%","+1400.00 - +4.31%"
@@ -201,6 +203,7 @@ public class YahooStockFormat implements StockFormat {
             int thirdBuyQuantity = 0;
             double thirdSellPrice = 0.0;
             int thirdSellQuantity = 0;
+            double bookValuePerShare = 0.0;
             long timestamp = 0;
             
             do {
@@ -276,6 +279,8 @@ public class YahooStockFormat implements StockFormat {
                     // log.error(fields[23] + ", " + fields[24] + ", " + data_and_time, exp);
                 }
                 
+                if (length < 33) break;
+                try { bookValuePerShare = Double.parseDouble(fields[32]); } catch (NumberFormatException exp) {}
                 break;
             } while(true);
             
@@ -341,6 +346,7 @@ public class YahooStockFormat implements StockFormat {
                     thirdBuyQuantity,
                     thirdSellPrice,
                     thirdSellQuantity,
+                    bookValuePerShare,
                     timestamp                                        
                     );
 

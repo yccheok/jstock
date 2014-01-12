@@ -58,6 +58,7 @@ public class Stock {
         private int thirdBuyQuantity = 0;
         private double thirdSellPrice = 0.0;
         private int thirdSellQuantity = 0;
+        private double bookValuePerShare = 0.0;
         // We suppose to provide a default value for calendar. However, it may
         // seem expensive. We will do it later during build.
         private long timestamp = 0;
@@ -261,6 +262,14 @@ public class Stock {
         }
 
         /**
+         * @param bookValuePerShare the bookValuePerShare to set
+         */
+        public Builder bookValuePerShare(double bookValuePerShare) {
+            this.bookValuePerShare = bookValuePerShare;
+            return this;
+        }
+
+        /**
          * @param timestamp the timestamp to set
          */
         public Builder timestamp(long timestamp) {
@@ -307,6 +316,7 @@ public class Stock {
             builder.thirdBuyQuantity,
             builder.thirdSellPrice,
             builder.thirdSellQuantity,
+            builder.bookValuePerShare,
             builder.timestamp
             );
     }
@@ -339,6 +349,7 @@ public class Stock {
         int thirdBuyQuantity,
         double thirdSellPrice,
         int thirdSellQuantity,
+        double bookValuePerShare,
         long timestamp
                 ) 
     {
@@ -368,6 +379,7 @@ public class Stock {
         this.thirdBuyQuantity = thirdBuyQuantity;
         this.thirdSellPrice = thirdSellPrice;
         this.thirdSellQuantity = thirdSellQuantity;
+        this.bookValuePerShare = bookValuePerShare;
         this.timestamp = timestamp;
     }
 
@@ -400,6 +412,7 @@ public class Stock {
         this.thirdBuyQuantity = stock.thirdBuyQuantity;
         this.thirdSellPrice = stock.thirdSellPrice;
         this.thirdSellQuantity = stock.thirdSellQuantity;
+        this.bookValuePerShare = stock.bookValuePerShare;
         this.timestamp = stock.timestamp;
     }
 
@@ -500,6 +513,9 @@ public class Stock {
         return thirdSellQuantity;
     }
     
+    public double getBookValuePerShare() {
+        return bookValuePerShare;
+    }
     public long getTimestamp() {
         return timestamp;
     }
@@ -542,6 +558,7 @@ public class Stock {
             this.thirdBuyQuantity,
             this.thirdSellPrice,
             this.thirdSellQuantity,
+            this.bookValuePerShare,
             this.timestamp
         );
     }
@@ -584,6 +601,7 @@ public class Stock {
             this.thirdBuyQuantity,
             this.thirdSellPrice,
             this.thirdSellQuantity,
+            this.bookValuePerShare,
             this.timestamp
         );
     }
@@ -735,6 +753,7 @@ public class Stock {
     private final int thirdBuyQuantity;
     private final double thirdSellPrice;
     private final int thirdSellQuantity;
+    private final double bookValuePerShare;
     // milliseconds. As timestamp in Java system always interpreted as 
     // milliseconds. 
     private final long timestamp;

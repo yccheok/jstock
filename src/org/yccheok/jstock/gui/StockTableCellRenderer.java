@@ -140,6 +140,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
         final int modelRow = table.convertRowIndexToModel(row);
         final double prevPrice = (Double)tableModel.getValueAt(modelRow, tableModel.findColumn(PREV));
         final double lastPrice = (Double)tableModel.getValueAt(modelRow, tableModel.findColumn(LAST));
+        final double bookValuePerShare = (Double)tableModel.getValueAt(modelRow, tableModel.findColumn(BOOKVAL));
         Alert alert = Alert.NoAlert;
 
         // Using lastPrice = 0 to compare against fall below and rise above
@@ -359,6 +360,25 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
             c.setForeground(getNormalTextForegroundColor(alert));
             // No return.
         }
+        else if (table.getColumnName(column).equalsIgnoreCase(BOOKVAL)) {
+            if (c instanceof JLabel) {
+                JLabel jLabel = (JLabel)c;
+                jLabel.setText(org.yccheok.jstock.watchlist.Utils.toStockPrice(bookValuePerShare));
+            }
+
+            c.setForeground(getNormalTextForegroundColor(alert));
+            // No return.
+        }
+        else if (table.getColumnName(column).equalsIgnoreCase(LASTBOOKVAL)) {
+            if (!isSelected) {
+                c.setForeground(getNormalTextForegroundColor(alert));           
+            }
+            
+            if (c instanceof JLabel) {
+                JLabel jLabel = (JLabel)c;
+                jLabel.setText(org.yccheok.jstock.watchlist.Utils.toStockPrice(lastPrice/bookValuePerShare));
+            }
+        }        
         else if (table.getColumnName(column).equalsIgnoreCase(INDICATOR)) {
             c.setForeground(Color.BLUE);
         }
@@ -389,6 +409,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
         final int modelRow = table.convertRowIndexToModel(row);
         final double prevPrice = (Double)tableModel.getValueAt(modelRow, tableModel.findColumn(PREV));
         final double lastPrice = (Double)tableModel.getValueAt(modelRow, tableModel.findColumn(LAST));
+        final double bookValuePerShare = (Double)tableModel.getValueAt(modelRow, tableModel.findColumn(BOOKVAL));
         Alert alert = Alert.NoAlert;
 
         // Using lastPrice = 0 to compare against fall below and rise above
@@ -565,6 +586,26 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
                 jLabel.setText(org.yccheok.jstock.watchlist.Utils.toStockPrice(prevPrice));
             }
         }        
+        else if (table.getColumnName(column).equalsIgnoreCase(BOOKVAL)) {
+            if (!isSelected) {
+                c.setForeground(getNormalTextForegroundColor(alert));           
+            }
+            
+            if (c instanceof JLabel) {
+                JLabel jLabel = (JLabel)c;
+                jLabel.setText(org.yccheok.jstock.watchlist.Utils.toStockPrice(bookValuePerShare));
+            }
+        }        
+        else if (table.getColumnName(column).equalsIgnoreCase(LASTBOOKVAL)) {
+            if (!isSelected) {
+                c.setForeground(getNormalTextForegroundColor(alert));           
+            }
+            
+            if (c instanceof JLabel) {
+                JLabel jLabel = (JLabel)c;
+                jLabel.setText(org.yccheok.jstock.watchlist.Utils.toStockPrice(lastPrice/bookValuePerShare));
+            }
+        }        
         else if (table.getColumnName(column).equalsIgnoreCase(INDICATOR)) {
             if (!isSelected) {
                 c.setForeground(Color.BLUE);
@@ -599,6 +640,8 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
     private static final String BQTY;
     private static final String SQTY;
     private static final String INDICATOR;
+    private static final String BOOKVAL;
+    private static final String LASTBOOKVAL;
 
     static {
         PREV = GUIBundle.getString("MainFrame_Prev");
@@ -617,5 +660,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
         BQTY = GUIBundle.getString("MainFrame_BQty");
         SQTY = GUIBundle.getString("MainFrame_SQty");
         INDICATOR = GUIBundle.getString("IndicatorScannerJPanel_Indicator");
+        BOOKVAL = GUIBundle.getString("MainFrame_BookVal");
+        LASTBOOKVAL = GUIBundle.getString("MainFrame_LastBookVal");
     }
 }
