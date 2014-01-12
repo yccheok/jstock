@@ -107,7 +107,7 @@ public class JStockOptions {
     public static final java.awt.Color DEFAULT_CHAT_OTHER_MESSAGE_COLOR = new java.awt.Color(100, 149, 237);
 
     private static final YellowInformationBoxOption DEFAULT_YELLOW_INFORMATION_BOX_OPTION = YellowInformationBoxOption.Follow;
-    private static final StockInputSuggestionListOption DEFAULT_STOCK_INPUT_SUGGESTION_LIST_OPTION = StockInputSuggestionListOption.OneColumn;
+    private static final StockInputSuggestionListOption DEFAULT_STOCK_INPUT_SUGGESTION_LIST_OPTION = StockInputSuggestionListOption.TwoColumns;
 
     private static final int DEFAULT_HISTORY_DURATION =  10;
 
