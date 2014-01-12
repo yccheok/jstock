@@ -420,7 +420,7 @@ public class MainFrame extends javax.swing.JFrame {
         ((AutoCompleteJComboBox)this.jComboBox1).attachResultObserver(getResultObserver());
         ((AutoCompleteJComboBox)this.jComboBox1).attachMatchObserver(getMatchObserver());
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
         setTitle(bundle.getString("MainFrame_Application_Title")); // NOI18N
         setIconImage(getMyIconImage());
@@ -1148,7 +1148,9 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jTable1KeyPressed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-        log.info("Widnow is closing.");     
+        if (this.indicatorPanel.promptToSaveSignificantEdits()) {
+            this.dispose();
+        }
     }//GEN-LAST:event_formWindowClosing
 
     private void jMenuItem8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem8ActionPerformed

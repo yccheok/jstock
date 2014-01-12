@@ -561,7 +561,7 @@ public class IndicatorPanel extends JPanel {
     }
 
     // Return false, if user selects cancel. Else, return true.
-    private boolean promptToSaveSignificantEdits() {
+    public boolean promptToSaveSignificantEdits() {
         final boolean hasSignificantEdits = ((IndicatorDefaultDrawing)this.view.getDrawing()).hasSignificantEdits();
         if (false == hasSignificantEdits) {
             return true;
