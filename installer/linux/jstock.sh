@@ -8,7 +8,7 @@
 #JAVA_HOME=/usr/lib/java
 
 if [ -n $JAVA_HOME ] ; then
-_JAVA_EXEC="type -p java"
+_JAVA_EXEC=`type -p java`
 else
 _JAVA_EXEC="$JAVA_HOME/java"
 fi
