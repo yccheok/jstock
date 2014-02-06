@@ -51,6 +51,8 @@ public class SellPortfolioTimeChartJDialog extends javax.swing.JDialog {
     private static final String[] cNames = {
         GUIBundle.getString("SellPortfolioTreeTableModel_GainValue"),
         GUIBundle.getString("SellPortfolioTreeTableModel_LossValue"),
+        GUIBundle.getString("SellPortfolioTreeTableModel_CumulativeGainValue"),
+        GUIBundle.getString("SellPortfolioTreeTableModel_CumulativeLossValue"),
     };
 
     /**
@@ -124,9 +126,9 @@ public class SellPortfolioTimeChartJDialog extends javax.swing.JDialog {
 
         @Override
         public int compareTo(DataEx o) {
-            if(o.date.before(this.date)) {
+            if(o.date.after(this.date)) {
                 return -1;
-            } else if(o.date.after(this.date)) {
+            } else if(o.date.before(this.date)) {
                 return 1;
             } else {
                 return 0;
@@ -154,8 +156,14 @@ public class SellPortfolioTimeChartJDialog extends javax.swing.JDialog {
             Transaction transaction = (Transaction) transactionSummary.getChildAt(0);
             final Date date = transaction.getDate().getTime();
 
+            if (name.equals(cNames[2]) || name.equals(cNames[3])) {
+                this.isCumulativeChart = true;
+            } else {
+                this.isCumulativeChart = false;
+            }
+            
             /* Should use reflection technology. */
-            if (name.equals(cNames[0])) {
+            if (name.equals(cNames[0]) || name.equals(cNames[2])) {
                 if (isPenceToPoundConversionEnabled == false) {
                     if (isFeeCalculationEnabled) {
                         dataExs.add(DataEx.newInstance(date, portfolioTreeTableModel.getNetGainLossValue(transactionSummary)));
@@ -169,7 +177,7 @@ public class SellPortfolioTimeChartJDialog extends javax.swing.JDialog {
                         dataExs.add(DataEx.newInstance(date, portfolioTreeTableModel.getGainLossValue(transactionSummary) / 100.0));
                     }
                 }
-            } else if (name.equals(cNames[1])) {
+            } else if (name.equals(cNames[1]) || name.equals(cNames[3])) {
                 if (isPenceToPoundConversionEnabled == false) {
                     if (isFeeCalculationEnabled) {
                         dataExs.add(DataEx.newInstance(date, -portfolioTreeTableModel.getNetGainLossValue(transactionSummary)));
@@ -190,12 +198,20 @@ public class SellPortfolioTimeChartJDialog extends javax.swing.JDialog {
             
         Collections.sort(dataExs);
         TimeSeries series = new TimeSeries(name);
+        double totalValue = 0;
         for (DataEx dataEx : dataExs) {
             double value = dataEx.value;
-            if(series.getValue(new Day(dataEx.date)) != null) {
+            if(!this.isCumulativeChart && series.getValue(new Day(dataEx.date)) != null) {
                 value += series.getValue(new Day(dataEx.date)).doubleValue();
             }
-            series.addOrUpdate(new Day(dataEx.date), value);
+            
+            if(this.isCumulativeChart) {
+                totalValue += value;
+                series.addOrUpdate(new Day(dataEx.date), totalValue);
+            } else {
+                series.addOrUpdate(new Day(dataEx.date), value);
+            }
+            
         }
         
         TimeSeriesCollection dataset = new TimeSeriesCollection();
@@ -225,6 +241,7 @@ public class SellPortfolioTimeChartJDialog extends javax.swing.JDialog {
     private SellPortfolioTreeTableModelEx portfolioTreeTableModel;
     private ChartPanel chartPanel;
     private Map<Code, Double> codeToTotalDividend = new HashMap<Code, Double>();
+    private boolean isCumulativeChart = false;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox jComboBox1;
