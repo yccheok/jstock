@@ -26,7 +26,7 @@ package org.yccheok.jstock.engine;
 public class YahooStockServer extends AbstractYahooStockServer {
     @Override
     protected String getYahooCSVBasedURL() {
-        return "http://finance.yahoo.com/d/quotes.csv?s=";
+        return "http://download.finance.yahoo.com/d/quotes.csv?s=";
     }
     
     public YahooStockServer() {

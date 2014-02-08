@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
 public class BrazilYahooStockServer extends AbstractYahooStockServer {
     @Override
     protected String getYahooCSVBasedURL() {
-        return "http://br.finance.yahoo.com/d/quotes.csv?s=";
+        return "http://download.finance.yahoo.com/d/quotes.csv?s=";
     }
 
     @Override
