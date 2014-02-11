@@ -153,47 +153,50 @@ public class SellPortfolioTimeChartJDialog extends javax.swing.JDialog {
                 continue;
             }
 
-            Transaction transaction = (Transaction) transactionSummary.getChildAt(0);
-            final Date date = transaction.getDate().getTime();
-
-            if (name.equals(cNames[2]) || name.equals(cNames[3])) {
-                this.isCumulativeChart = true;
-            } else {
-                this.isCumulativeChart = false;
-            }
+            final int childCount = transactionSummary.getChildCount();
             
-            /* Should use reflection technology. */
-            if (name.equals(cNames[0]) || name.equals(cNames[2])) {
-                if (isPenceToPoundConversionEnabled == false) {
-                    if (isFeeCalculationEnabled) {
-                        dataExs.add(DataEx.newInstance(date, portfolioTreeTableModel.getNetGainLossValue(transactionSummary)));
-                    } else {
-                        dataExs.add(DataEx.newInstance(date, portfolioTreeTableModel.getGainLossValue(transactionSummary)));
-                    }
+            for (int j = 0; j < childCount; j++) {
+                Transaction transaction = (Transaction) transactionSummary.getChildAt(j);
+                final Date date = transaction.getDate().getTime();
+
+                if (name.equals(cNames[2]) || name.equals(cNames[3])) {
+                    this.isCumulativeChart = true;
                 } else {
-                    if (isFeeCalculationEnabled) {
-                        dataExs.add(DataEx.newInstance(date, portfolioTreeTableModel.getNetGainLossValue(transactionSummary) / 100.0));
-                    } else {
-                        dataExs.add(DataEx.newInstance(date, portfolioTreeTableModel.getGainLossValue(transactionSummary) / 100.0));
-                    }
+                    this.isCumulativeChart = false;
                 }
-            } else if (name.equals(cNames[1]) || name.equals(cNames[3])) {
-                if (isPenceToPoundConversionEnabled == false) {
-                    if (isFeeCalculationEnabled) {
-                        dataExs.add(DataEx.newInstance(date, -portfolioTreeTableModel.getNetGainLossValue(transactionSummary)));
+
+                /* Should use reflection technology. */
+                if (name.equals(cNames[0]) || name.equals(cNames[2])) {
+                    if (isPenceToPoundConversionEnabled == false) {
+                        if (isFeeCalculationEnabled) {
+                            dataExs.add(DataEx.newInstance(date, portfolioTreeTableModel.getNetGainLossValue(transaction)));
+                        } else {
+                            dataExs.add(DataEx.newInstance(date, portfolioTreeTableModel.getGainLossValue(transaction)));
+                        }
                     } else {
-                        dataExs.add(DataEx.newInstance(date, -portfolioTreeTableModel.getGainLossValue(transactionSummary)));
+                        if (isFeeCalculationEnabled) {
+                            dataExs.add(DataEx.newInstance(date, portfolioTreeTableModel.getNetGainLossValue(transaction) / 100.0));
+                        } else {
+                            dataExs.add(DataEx.newInstance(date, portfolioTreeTableModel.getGainLossValue(transaction) / 100.0));
+                        }
                     }
-                } else {
-                    if (isFeeCalculationEnabled) {
-                        dataExs.add(DataEx.newInstance(date, -portfolioTreeTableModel.getNetGainLossValue(transactionSummary) / 100.0));
+                } else if (name.equals(cNames[1]) || name.equals(cNames[3])) {
+                    if (isPenceToPoundConversionEnabled == false) {
+                        if (isFeeCalculationEnabled) {
+                            dataExs.add(DataEx.newInstance(date, -portfolioTreeTableModel.getNetGainLossValue(transaction)));
+                        } else {
+                            dataExs.add(DataEx.newInstance(date, -portfolioTreeTableModel.getGainLossValue(transaction)));
+                        }
                     } else {
-                        dataExs.add(DataEx.newInstance(date, -portfolioTreeTableModel.getGainLossValue(transactionSummary) / 100.0));
+                        if (isFeeCalculationEnabled) {
+                            dataExs.add(DataEx.newInstance(date, -portfolioTreeTableModel.getNetGainLossValue(transaction) / 100.0));
+                        } else {
+                            dataExs.add(DataEx.newInstance(date, -portfolioTreeTableModel.getGainLossValue(transaction) / 100.0));
+                        }
                     }
                 }
             }
         }
-        
         
             
         Collections.sort(dataExs);
