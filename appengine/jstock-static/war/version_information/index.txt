@@ -1,5 +1,5 @@
-applicationVersionID=1112
-windowsDownloadLink=http://downloads.sourceforge.net/jstock/jstock-1.0.7i-setup.exe
-linuxDownloadLink=http://downloads.sourceforge.net/jstock/jstock-1.0.7i-bin.zip
-macDownloadLink=http://downloads.sourceforge.net/jstock/jstock-1.0.7i-bin.zip
-solarisDownloadLink=http://downloads.sourceforge.net/jstock/jstock-1.0.7i-bin.zip
+applicationVersionID=1113
+windowsDownloadLink=http://downloads.sourceforge.net/jstock/jstock-1.0.7j-setup.exe
+linuxDownloadLink=http://downloads.sourceforge.net/jstock/jstock-1.0.7j-bin.zip
+macDownloadLink=http://downloads.sourceforge.net/jstock/jstock-1.0.7j-bin.zip
+solarisDownloadLink=http://downloads.sourceforge.net/jstock/jstock-1.0.7j-bin.zip
