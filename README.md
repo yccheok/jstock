@@ -28,11 +28,11 @@ These steps can be run separately.  What they each do is:
     mvn compile // creates the target directory, compiles the source and copies the resource files
     mvn exec:java   // runs the application specifying the main class to be 'org.yccheok.jstock.gui.MainFrame'
     
-JStock can also be packaged into a jar to be distributed and run with a 'java -jar jstock.jar'
+JStock can also be packaged into a jar to be distributed and run with a 'java -jar jstock.jar'.  The jar is created under the target directory.
 
-    mvn packaged    // it will run the compile stage first if required
+    mvn package    // it will run the compile stage first if required
 
-To create a Maven artifact in the local repository:
+To create a Maven artifact in the local repository.  It will be under `~/.m2/repository/org/yccheok/jstock`:
 
     mvn install 
 
@@ -46,10 +46,12 @@ Eclipse can create native projects from Maven projects.
 
 #### Prerequisites
 * Eclipse needs to have the `m2e` plugin installed.
+
 1. The dependencies in `libs/` that have no external counterpart need to be installed in the local Maven repository so they can be referenced as dependencies in the `pom.xml` file.
 1. In a command window (Linux, MacOSX or Windows DOS) run the `installLocalDependenciesToMaven.sh` or `installLocalDependenciesToMaven.bat` file.
 
 To setup Eclipse with the Maven project:
+
 1. Checkout / Clone JStock to a separate directory to where the Eclipse Workspace is (you don't want to commit Eclipse project files).  Such as `~/jstock`
 1. Open Eclipse and use a workspace directory that isn't under the jstock that was checked out / cloned.  Such as `~/(My )Documents/JStock`
 1. Right-click on the project area and select `Import > Maven > Existing Maven project`
@@ -57,6 +59,7 @@ To setup Eclipse with the Maven project:
 1. Select the `pom.xml` and hit import
 
 Now to make a Run Configuration to start JStock:
+
 1. Click on the jstock Maven project you just imported
 1. Right Click > Run As > Run Configurations 
 1. Click on `Maven build` and hit the `New Launch Configuration` button just above the list box
