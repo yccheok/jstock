@@ -68,4 +68,6 @@ Now to make a Run Configuration to start JStock:
 1. In the `Goals:` text box write `exec:java`
 1. Click `Apply` and then `Run`
 1. The JStock GUI should launch showing any data that had already been setup
+1. Thereafter you just need to go `Run Toolbar icon > Jstocck exec:java`
+
 
