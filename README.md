@@ -2,22 +2,20 @@ JStock is a free stock market software for 26 countries. It provides Stock watch
 
 JStock long term product roadmap can be found from http://goo.gl/55gGQS and http://goo.gl/ClN7zT
 
-=== Development / Running ===
+# Development / Running
 
-== Netbeans ==
+## Netbeans
 JStock comes as a native Netbeans project with the dependendencies in `libs/` directory.  Simply open JStock directly and build and run.
 
-== Maven ==
+## Maven
 JStock is also a Maven project with a `pom.xml` allowing it to manage its dependendencies externally (those in the `libs/` directory aren't all used though some are as there are no external counterparts).  You can also use any IDE with maven projects and instructions are given below for Eclipse.
 
-= Command-Line =
+### Command-Line
 Maven can be installed as a command-line application in Linux, MacOSX and Windows (DOS).
 
-Prerequisites:
+#### Prerequisites
 * The dependencies in `libs/` that have no external counterpart need to be installed in the local Maven repository so they can be referenced as dependencies in the `pom.xml` file.
 # In a command window (Linux, MacOSX or Windows DOS) run the `installLocalDependenciesToMaven.sh` or `installLocalDependenciesToMaven.bat` file.
-
-TODO - the `installLocalDependenciesToMaven.bat` needs to be written :)
 
 To run JStock directly from the class files:
     cd jstock
@@ -34,19 +32,18 @@ JStock can also be packaged into a jar to be distributed and run with a 'java -j
 To create a Maven artifact in the local repository:
     mvn install 
 
-TODO - 
+#### TODO
+# the `installLocalDependenciesToMaven.bat` needs to be written
 # create windows and linux executables through Maven.  
 # Currently the 'package' stage creates a Macintosh app however that doesn't work due to how Apple / Oracle have changed how Java runs under OSX.  This needs to be fixed.
 
-= Eclipse =
+### Eclipse
 Eclipse can create native projects from Maven projects.  
 
-Prerequisites:
+#### Prerequisites
 * Eclipse needs to have the `m2e` plugin installed.
 # The dependencies in `libs/` that have no external counterpart need to be installed in the local Maven repository so they can be referenced as dependencies in the `pom.xml` file.
 # In a command window (Linux, MacOSX or Windows DOS) run the `installLocalDependenciesToMaven.sh` or `installLocalDependenciesToMaven.bat` file.
-
-TODO - the `installLocalDependenciesToMaven.bat` needs to be written :)
 
 To setup Eclipse with the Maven project:
 # Checkout / Clone JStock to a separate directory to where the Eclipse Workspace is (you don't want to commit Eclipse project files).  Such as `~/jstock`
@@ -65,3 +62,5 @@ Now to make a Run Configuration to start JStock:
 # Click `Apply` and then `Run`
 # The JStock GUI should launch showing any data that had already been setup
 
+#### TODO 
+* the `installLocalDependenciesToMaven.bat` needs to be written :)
