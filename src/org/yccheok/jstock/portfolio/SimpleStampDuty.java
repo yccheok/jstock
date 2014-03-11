@@ -39,18 +39,24 @@ public class SimpleStampDuty implements StampDuty {
     
     @Override
     public double calculate(Contract contract) {
-        if(fraction <= 0.0) return 0.0;
+        if (fraction <= 0.0) {
+            return 0.0;
+        }
         
         int numOfFraction = (int)(contract.getTotal() / fraction);
         double remainder = contract.getTotal() - (numOfFraction * fraction);
         
         double total = rate * (double)numOfFraction;
-        if(remainder > 0.0) {
+        if (remainder > 0.0) {
             total += (double)rate;
         }
         
-        if(total > maximumRate)
-            return maximumRate;
+        // 0 in maximum rate means ignore.
+        if (false == Utils.essentiallyEqual(this.maximumRate, 0.0)) {
+            if (total > this.maximumRate) {
+                return this.maximumRate;
+            }
+        }
         
         return total;
     }
