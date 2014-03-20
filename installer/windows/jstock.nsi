@@ -2,8 +2,8 @@
 
 ; Definitions for Java 1.7 Detection
 !define JRE_VERSION "1.7"
-!define JRE_URL "http://download.oracle.com/otn-pub/java/jdk/7u51-b13/jre-7u51-windows-i586.exe"
-!define JRE_64_URL "http://download.oracle.com/otn-pub/java/jdk/7u51-b13/jre-7u51-windows-x64.exe"
+!define JRE_32_URL "http://javadl.sun.com/webapps/download/AutoDL?BundleId=80812"
+!define JRE_64_URL "http://javadl.sun.com/webapps/download/AutoDL?BundleId=80814"
 !define PRODUCT_NAME "JStock"
 ; The name of the installer
 Name ${PRODUCT_NAME}
@@ -163,7 +163,7 @@ Function GetJRE
     ${Else}
         MessageBox MB_OK "${PRODUCT_NAME} uses 32-bit Java ${JRE_VERSION}, it will now \
                          be downloaded and installed"        
-        nsisdl::download /TIMEOUT=30000 ${JRE_URL} $2    
+        nsisdl::download /TIMEOUT=30000 ${JRE_32_URL} $2
     ${EndIf}
     Pop $R0 ;Get the return value
         StrCmp $R0 "success" +3
