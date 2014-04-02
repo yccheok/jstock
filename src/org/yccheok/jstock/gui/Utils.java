@@ -3010,17 +3010,17 @@ public class Utils {
     // We will use this as directory name. Do not have space or special characters.
     private static final String APPLICATION_VERSION_STRING = "1.0.7";
 
-    private static final String ABOUT_BOX_VERSION_STRING = "1.0.7j";
+    private static final String ABOUT_BOX_VERSION_STRING = "1.0.7k";
     
     // 1.0.7e
     // Remember to update isCloudFileCompatible method.
     private static final int CLOUD_FILE_VERSION_ID = 1107;
 
-    // 1.0.7j
+    // 1.0.7k
     // For About box comparision on latest version purpose.
-    private static final int APPLICATION_VERSION_ID = 1113;
+    private static final int APPLICATION_VERSION_ID = 1114;
         
-    private static Executor zombiePool = Executors.newFixedThreadPool(Utils.NUM_OF_THREADS_ZOMBIE_POOL);
+    private static final Executor zombiePool = Executors.newFixedThreadPool(Utils.NUM_OF_THREADS_ZOMBIE_POOL);
 
     private static final int NUM_OF_THREADS_ZOMBIE_POOL = 4;
 

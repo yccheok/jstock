@@ -99,14 +99,15 @@ public enum Factories {
         austriaList.add(YahooStockServerFactory.newInstance());
         belgiumList.add(YahooStockServerFactory.newInstance());
         brazilList.add(BrazilYahooStockServerFactory.newInstance());
+        brazilList.add(GoogleStockServerFactory.newInstance(false, false));
         canadaList.add(YahooStockServerFactory.newInstance());
-        chinaList.add(GoogleStockServerFactory.newInstance(true));
+        chinaList.add(GoogleStockServerFactory.newInstance(true, true));
         chinaList.add(YahooStockServerFactory.newInstance());
         denmarkList.add(YahooStockServerFactory.newInstance());
         franceList.add(YahooStockServerFactory.newInstance());
         germanyList.add(YahooStockServerFactory.newInstance());
         hongkongList.add(YahooStockServerFactory.newInstance());
-        indiaList.add(GoogleStockServerFactory.newInstance(true));
+        indiaList.add(GoogleStockServerFactory.newInstance(true, true));
         indonesiaList.add(YahooStockServerFactory.newInstance());
         israelList.add(YahooStockServerFactory.newInstance());
         italyList.add(YahooStockServerFactory.newInstance());
@@ -123,7 +124,7 @@ public enum Factories {
         switzerlandList.add(YahooStockServerFactory.newInstance());
         taiwanList.add(YahooStockServerFactory.newInstance());
         unitedKingdomList.add(YahooStockServerFactory.newInstance());
-        unitedStateList.add(GoogleStockServerFactory.newInstance(false));
+        unitedStateList.add(GoogleStockServerFactory.newInstance(false, true));
         unitedStateList.add(YahooStockServerFactory.newInstance());
 
         map.put(Country.Australia, australiaList);
