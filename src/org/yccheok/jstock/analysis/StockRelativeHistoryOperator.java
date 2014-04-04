@@ -35,6 +35,8 @@ public class StockRelativeHistoryOperator extends AbstractOperator {
         Min,
         Average,
         MeanDeviation,
+        Median,
+        Mode,
         RSI,
         EMA,
         MFI,
@@ -142,6 +144,39 @@ public class StockRelativeHistoryOperator extends AbstractOperator {
         return sum / size;
     }
 
+    /** Median is the "middle number" (in a sorted list of numbers) */
+    private double median(java.util.List<Double> values) {
+        final int size = values.size();
+        java.util.Collections.sort(values);
+        int middle = size/2;
+        if (size%2 == 1) {
+            return values.get(middle);
+        } else {
+            return (values.get(middle-1) + values.get(middle)) / 2.0;
+        }
+    }
+    
+    /** Mode is the number which appears most often */
+    private double mode(java.util.List<Double> values) {
+        double maxValue = 0;
+        int maxCount = 0;
+        for (Double v1 : values) {
+            int count = 0;
+            for (Double v2 : values) {
+                if (v1.equals(maxValue)) {
+                    break;
+                } else if(v1.equals(v2)) {
+                    count++;
+                }
+            }
+            if (count > maxCount) {
+                maxCount = count;
+                maxValue = v1.doubleValue();
+            }
+        }
+        return maxValue;
+    }
+    
     /**
      * Returns minimum history size which is required by this operator.
      * 
@@ -325,7 +360,15 @@ public class StockRelativeHistoryOperator extends AbstractOperator {
                 tmp_v = tmp_v / (double)dataSize;
                 v = tmp_v;
                 break;
+                
+            case Median:
+                v = median(values);
+                break;
 
+            case Mode:
+                v = mode(values);
+                break;
+                
             case RSI:
                 v = TechnicalAnalysis.createRSI(values, day);
                 break;
