@@ -31,22 +31,16 @@ import org.apache.commons.logging.LogFactory;
  */
 public class GoogleStockServerFactory implements StockServerFactory {
 
-    private GoogleStockServerFactory(boolean useStockServer, boolean useMarketServer) {
+    private GoogleStockServerFactory(boolean useStockServer) {
         if (useStockServer) {
             stockServer = new GoogleStockServer();
         } else {
             stockServer = null;
         }        
-        
-        if (useMarketServer) {
-             marketServer = new GoogleMarketServer();
-        } else {
-            marketServer = null;
-        }
     }
     
-    public static StockServerFactory newInstance(boolean useStockServer, boolean useMarketServer) {
-        return new GoogleStockServerFactory(useStockServer, useMarketServer);
+    public static StockServerFactory newInstance(boolean useStockServer) {
+        return new GoogleStockServerFactory(useStockServer);
     }
 
     /**
@@ -114,7 +108,7 @@ public class GoogleStockServerFactory implements StockServerFactory {
     }
     
     private final StockServer stockServer;
-    private final MarketServer marketServer;
+    private final MarketServer marketServer = new GoogleMarketServer();
     
     private static final Log log = LogFactory.getLog(GoogleStockServerFactory.class);
 }

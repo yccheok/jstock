@@ -416,6 +416,9 @@ public class Utils {
         } else if (string.endsWith(".SA") && string_length > ".SA".length()) {
             string = "BVMF:" + string.substring(0, string_length - ".SA".length());
             return Code.newInstance(string);
+        } else if (string.endsWith(".VI") && string_length > ".VI".length()) {
+            string = "VIE:" + string.substring(0, string_length - ".VI".length());
+            return Code.newInstance(string);
         }
         return code;
     }
@@ -437,6 +440,9 @@ public class Utils {
             return Code.newInstance(string);
         } else if (string.startsWith("BVMF:") && string_length > "BVMF:".length()) {
             string = string.substring("BVMF:".length()) + ".SA";
+            return Code.newInstance(string);
+        } else if (string.startsWith("VIE:") && string_length > "VIE:".length()) {
+            string = string.substring("VIE:".length()) + ".VI";
             return Code.newInstance(string);
         }
         
@@ -462,7 +468,9 @@ public class Utils {
             return Code.newInstance("^NSEBANK");
         } else if (string.equals("INDEXBVMF:IBOV")) {
             return Code.newInstance("^BVSP");
-        }        
+        } else if (string.equals("INDEXVIE:ATX")) {
+            return Code.newInstance("^ATX");
+        }
         return code;        
     }
     
@@ -480,6 +488,8 @@ public class Utils {
             return Code.newInstance("NSE:BANKNIFTY");
         } else if (string.equals("^BVSP")) {
             return Code.newInstance("INDEXBVMF:IBOV");
+        } else if (string.equals("^ATX")) {
+            return Code.newInstance("INDEXVIE:ATX");
         }
         return code;
     }
