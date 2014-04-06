@@ -1233,7 +1233,7 @@ public class ChartJDialog extends javax.swing.JDialog {
         final NumberAxis rangeAxis1 = new NumberAxis(GUIBundle.getString("ChartJDialog_Price"));
         rangeAxis1.setAutoRangeIncludesZero(false);     // override default
         rangeAxis1.setLowerMargin(0.40);                // to leave room for volume bars
-        DecimalFormat format = new DecimalFormat("00.00");
+        DecimalFormat format = new DecimalFormat("0.00#");
         rangeAxis1.setNumberFormatOverride(format);
 
         XYPlot plot = new XYPlot(priceDataset, timeAxis, rangeAxis1, null);
