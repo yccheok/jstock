@@ -19,12 +19,12 @@
 
 package org.yccheok.jstock.engine;
 
+import com.google.gson.Gson;
 import java.io.UnsupportedEncodingException;
 import java.util.Collections;
 import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * This class is used to suggest a list of items, which will be similar to a
@@ -47,9 +47,12 @@ public class AjaxYahooSearchEngine implements SearchEngine<ResultType> {
         final String respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(getURL(prefix));
         final String json = Utils.YahooRespondToJSON(respond);
         try {
-            final Holder value = mapper.readValue(json, Holder.class);
-            // Shall I check value.ResultSet.Query against prefix?
-            return Collections.unmodifiableList(value.ResultSet.Result);
+            final Holder value = gson.fromJson(json, Holder.class);
+            
+            if (value != null) {
+                // Shall I check value.ResultSet.Query against prefix?
+                return Collections.unmodifiableList(value.ResultSet.Result);
+            }
         } catch (Exception ex) {
             log.error(null, ex);
         }
@@ -89,6 +92,6 @@ public class AjaxYahooSearchEngine implements SearchEngine<ResultType> {
     }
 
     // Will it be better if we make this as static?
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final Gson gson = new Gson();
     private static final Log log = LogFactory.getLog(AjaxYahooSearchEngine.class);
 }
