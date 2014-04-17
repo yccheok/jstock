@@ -49,7 +49,7 @@ public class StockServerFactoryJRadioButton extends JRadioButton {
             // Hacking from preventing GoogleStockServerFactory being selected
             // as primary server. This is because GoogleStockServerFactory is
             // not fully completed yet.
-            this.setEnabled(false);
+            //this.setEnabled(false);
         }
 
         initSwingWorker();
