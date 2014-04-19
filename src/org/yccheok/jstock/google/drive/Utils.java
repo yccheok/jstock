@@ -4,10 +4,9 @@
  * and open the template in the editor.
  */
 
-package org.yccheok.jstock.google;
+package org.yccheok.jstock.google.drive;
 
 import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
@@ -24,12 +23,13 @@ import java.util.HashSet;
 import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.yccheok.jstock.google.MyAuthorizationCodeInstalledApp;
 
 /**
  *
  * @author yccheok
  */
-public class DriveUtils {
+public class Utils {
     /**
      * Global instance of the {@link DataStoreFactory}. The best practice is to make it a single
      * globally shared instance across your application.
@@ -42,7 +42,7 @@ public class DriveUtils {
     /** Global instance of the HTTP transport. */
     private static HttpTransport httpTransport;
 
-    private static final Log log = LogFactory.getLog(DriveUtils.class);
+    private static final Log log = LogFactory.getLog(Utils.class);
     
     static {
         try {
@@ -62,11 +62,13 @@ public class DriveUtils {
         return new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "authentication");
     }
     
-    /** Authorizes the installed application to access user's protected data. */
+    /** Authorizes the installed application to access user's protected data.
+     * @return 
+     * @throws java.lang.Exception */
     public static Credential authorize() throws Exception {
         // load client secrets
-        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(DriveUtils.JSON_FACTORY,
-            new InputStreamReader(DriveUtils.class.getResourceAsStream("/resources/drive_client_secrets.json")));
+        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(Utils.JSON_FACTORY,
+            new InputStreamReader(Utils.class.getResourceAsStream("/resources/drive_client_secrets.json")));
         // Set up authorization code flow.
         // Ask for only the permissions you need. Asking for more permissions will
         // reduce the number of users who finish the process for giving you access
@@ -82,6 +84,6 @@ public class DriveUtils {
             .setDataStoreFactory(dataStoreFactory)
             .build();
         // authorize
-        return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
+        return new MyAuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
     }
 }
