@@ -419,6 +419,9 @@ public class Utils {
         } else if (string.endsWith(".VI") && string_length > ".VI".length()) {
             string = "VIE:" + string.substring(0, string_length - ".VI".length());
             return Code.newInstance(string);
+        } else if (string.endsWith(".L") && string_length > ".L".length()) {
+            string = "LON:" + string.substring(0, string_length - ".L".length());
+            return Code.newInstance(string);
         }
         return code;
     }
@@ -443,6 +446,9 @@ public class Utils {
             return Code.newInstance(string);
         } else if (string.startsWith("VIE:") && string_length > "VIE:".length()) {
             string = string.substring("VIE:".length()) + ".VI";
+            return Code.newInstance(string);
+        } else if (string.startsWith("LON:") && string_length > "LON:".length()) {
+            string = string.substring("LON:".length()) + ".L";
             return Code.newInstance(string);
         }
         
@@ -470,6 +476,8 @@ public class Utils {
             return Code.newInstance("^BVSP");
         } else if (string.equals("INDEXVIE:ATX")) {
             return Code.newInstance("^ATX");
+        } else if (string.equals("INDEXFTSE:UKX")) {
+            return Code.newInstance("^FTSE");
         }
         return code;        
     }
@@ -490,6 +498,8 @@ public class Utils {
             return Code.newInstance("INDEXBVMF:IBOV");
         } else if (string.equals("^ATX")) {
             return Code.newInstance("INDEXVIE:ATX");
+        } else if (string.equals("^FTSE")) {
+            return Code.newInstance("INDEXFTSE:UKX");
         }
         return code;
     }
