@@ -6,23 +6,21 @@
 
 package org.yccheok.jstock.google;
 
+import java.awt.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Set;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener;
+import static javafx.concurrent.Worker.State.FAILED;
 import javafx.embed.swing.JFXPanel;
-import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebEvent;
 import javafx.scene.web.WebView;
- 
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.net.MalformedURLException;
-import java.net.URL;
- 
-import static javafx.concurrent.Worker.State.FAILED;
   
 public class SimpleSwingBrowser extends JFrame {
  
@@ -44,10 +42,8 @@ public class SimpleSwingBrowser extends JFrame {
         
         getContentPane().add(panel);
         
-        setPreferredSize(new Dimension(1024, 600));
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        pack();
-
+        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        setBounds((screenSize.width-460)/2, (screenSize.height-630)/2, 460, 630);
     }
  
     private void createScene() {
@@ -56,7 +52,7 @@ public class SimpleSwingBrowser extends JFrame {
             @Override 
             public void run() {
  
-                WebView view = new WebView();
+                final WebView view = new WebView();
                 engine = view.getEngine();
  
                 engine.titleProperty().addListener(new ChangeListener<String>() {
@@ -91,7 +87,19 @@ public class SimpleSwingBrowser extends JFrame {
                                 }
                             }
                         });
-
+                
+                // http://stackoverflow.com/questions/11206942/how-to-hide-scrollbars-in-the-javafx-webview
+                // hide webview scrollbars whenever they appear.
+                view.getChildrenUnmodifiable().addListener(new ListChangeListener<Node>() {
+                    @Override 
+                    public void onChanged(Change<? extends Node> change) {
+                        Set<Node> deadSeaScrolls = view.lookupAll(".scroll-bar");
+                        for (Node scroll : deadSeaScrolls) {
+                            scroll.setVisible(false);
+                        }
+                    }
+                });
+                
                 jfxPanel.setScene(new Scene(view));
             }
         });
