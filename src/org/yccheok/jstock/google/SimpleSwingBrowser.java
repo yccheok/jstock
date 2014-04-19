@@ -30,12 +30,6 @@ public class SimpleSwingBrowser extends JFrame {
     private WebEngine engine;
  
     private final JPanel panel = new JPanel(new BorderLayout());
-    private final JLabel lblStatus = new JLabel();
-
-
-    private final JButton btnGo = new JButton("Go");
-    private final JTextField txtURL = new JTextField();
-    private final JProgressBar progressBar = new JProgressBar();
  
     public SimpleSwingBrowser() {
         super();
@@ -45,33 +39,8 @@ public class SimpleSwingBrowser extends JFrame {
     
     private void initComponents() {
         createScene();
- 
-        ActionListener al = new ActionListener() {
-            @Override 
-            public void actionPerformed(ActionEvent e) {
-                loadURL(txtURL.getText());
-            }
-        };
- 
-        btnGo.addActionListener(al);
-        txtURL.addActionListener(al);
   
-        progressBar.setPreferredSize(new Dimension(150, 18));
-        progressBar.setStringPainted(true);
-  
-        JPanel topBar = new JPanel(new BorderLayout(5, 0));
-        topBar.setBorder(BorderFactory.createEmptyBorder(3, 5, 3, 5));
-        topBar.add(txtURL, BorderLayout.CENTER);
-        topBar.add(btnGo, BorderLayout.EAST);
- 
-        JPanel statusBar = new JPanel(new BorderLayout(5, 0));
-        statusBar.setBorder(BorderFactory.createEmptyBorder(3, 5, 3, 5));
-        statusBar.add(lblStatus, BorderLayout.CENTER);
-        statusBar.add(progressBar, BorderLayout.EAST);
- 
-        panel.add(topBar, BorderLayout.NORTH);
         panel.add(jfxPanel, BorderLayout.CENTER);
-        panel.add(statusBar, BorderLayout.SOUTH);
         
         getContentPane().add(panel);
         
@@ -102,42 +71,6 @@ public class SimpleSwingBrowser extends JFrame {
                     }
                 });
  
-                engine.setOnStatusChanged(new EventHandler<WebEvent<String>>() {
-                    @Override 
-                    public void handle(final WebEvent<String> event) {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            @Override 
-                            public void run() {
-                                lblStatus.setText(event.getData());
-                            }
-                        });
-                    }
-                });
- 
-                engine.locationProperty().addListener(new ChangeListener<String>() {
-                    @Override
-                    public void changed(ObservableValue<? extends String> ov, String oldValue, final String newValue) {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            @Override 
-                            public void run() {
-                                txtURL.setText(newValue);
-                            }
-                        });
-                    }
-                });
- 
-                engine.getLoadWorker().workDoneProperty().addListener(new ChangeListener<Number>() {
-                    @Override
-                    public void changed(ObservableValue<? extends Number> observableValue, Number oldValue, final Number newValue) {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            @Override 
-                            public void run() {
-                                progressBar.setValue(newValue.intValue());
-                            }
-                        });
-                    }
-                });
-
                 engine.getLoadWorker()
                         .exceptionProperty()
                         .addListener(new ChangeListener<Throwable>() {
@@ -185,18 +118,5 @@ public class SimpleSwingBrowser extends JFrame {
         } catch (MalformedURLException exception) {
                 return null;
         }
-    }
-
-   
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-
-            public void run() {
-                SimpleSwingBrowser browser = new SimpleSwingBrowser();
-                browser.setVisible(true);
-                browser.loadURL("http://oracle.com");
-           }     
-       });
     }
 }
