@@ -43,7 +43,7 @@ public class SimpleSwingBrowser extends JFrame {
         getContentPane().add(panel);
         
         java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-460)/2, (screenSize.height-630)/2, 460, 630);
+        setBounds((screenSize.width-460)/2, (screenSize.height-680)/2, 460, 680);
     }
  
     private void createScene() {
