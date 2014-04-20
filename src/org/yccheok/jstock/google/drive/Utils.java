@@ -6,6 +6,8 @@
 
 package org.yccheok.jstock.google.drive;
 
+
+
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
@@ -15,6 +17,8 @@ import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.drive.DriveScopes;
+import com.google.api.services.oauth2.Oauth2;
+import com.google.api.services.oauth2.model.Userinfoplus;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -62,6 +66,21 @@ public class Utils {
         return new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "authentication");
     }
     
+    /**
+     * Send a request to the UserInfo API to retrieve the user's information.
+     *
+     * @param credentials OAuth 2.0 credentials to authorize the request.
+     * @return User's information.
+     * @throws java.io.IOException
+     */
+    public static Userinfoplus getUserInfo(Credential credentials) throws IOException
+    {
+        Oauth2 userInfoService =
+            new Oauth2.Builder(httpTransport, JSON_FACTORY, credentials).setApplicationName("JStock").build();
+        Userinfoplus userInfo  = userInfoService.userinfo().get().execute();
+        return userInfo;
+    }
+  
     /** Authorizes the installed application to access user's protected data.
      * @return 
      * @throws java.lang.Exception */
@@ -77,6 +96,8 @@ public class Utils {
         // Here we are listing all of the available scopes. You should remove scopes
         // that you are not actually using.
         Set<String> scopes = new HashSet<String>();
+        scopes.add("email");
+        scopes.add("profile");
         scopes.add(DriveScopes.DRIVE_APPDATA);
 
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
