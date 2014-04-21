@@ -16,6 +16,7 @@ import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
+import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.oauth2.Oauth2;
 import com.google.api.services.oauth2.model.Userinfoplus;
@@ -106,5 +107,10 @@ public class Utils {
             .build();
         // authorize
         return new MyAuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
+    }
+    
+    public static Drive getDrive(Credential credential) {
+        Drive service = new Drive.Builder(httpTransport, JSON_FACTORY, credential).setApplicationName("JStock").build();
+        return service;
     }
 }
