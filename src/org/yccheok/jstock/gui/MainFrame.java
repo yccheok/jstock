@@ -3015,6 +3015,30 @@ public class MainFrame extends javax.swing.JFrame {
                 }
             });  
             
+             //Company news
+            popup.add(menuItem);            
+            
+            popup.addSeparator();
+            
+            menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_News"), this.getImageIcon("/images/16x16/internet.png"));
+
+            menuItem.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent evt) {
+                    final int row = jTable1.getSelectedRow();
+                    final int modelIndex = jTable1.getRowSorter().convertRowIndexToModel(row);
+                    final Stock stock = ((StockTableModel)tableModel).getStock(modelIndex);
+                    
+                    String coTicker = stock.code.toString();
+                    String coName = stock.symbol.toString();
+                    
+                    CompanyNews coNews = new CompanyNews(coTicker, coName);
+                    coNews.getCoNews();
+                    coNews.setVisible(true);  
+                }
+            });
+         
+            
             popup.add(menuItem);            
             
             popup.addSeparator();

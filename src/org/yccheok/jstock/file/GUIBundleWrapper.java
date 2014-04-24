@@ -171,6 +171,11 @@ public class GUIBundleWrapper {
         _map.put("PortfolioInfo_Name", "Portfolio Name");
         _map.put("PortfolioInfo_Size", "Size");
         
+        //company news related
+        _map.put("MainFrame_News", "News");
+        _map.put("News_Time", "Time");
+        _map.put("News_Title", "Title (Click for story)");
+        
         GUIBundleWrapper.map = _map;
     }
     
