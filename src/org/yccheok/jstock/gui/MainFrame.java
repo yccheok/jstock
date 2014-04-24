@@ -283,12 +283,12 @@ public class MainFrame extends javax.swing.JFrame {
             Runnable runner = new Runnable() {
                 @Override
                 public void run() {
-                    if (isFormWindowClosedCalled) {
+                    if (isFormWindowClosingCalled) {
                         AppLock.unlock();
                         return;
                     }
                     
-                    formWindowClosed(null);
+                    formWindowClosing(null);
                     
                     AppLock.unlock();
                 }
@@ -1012,7 +1012,6 @@ public class MainFrame extends javax.swing.JFrame {
      * to do so?
      */
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
-        isFormWindowClosedCalled = true;
         
         try {
             ExecutorService _stockInfoDatabaseMetaPool = this.stockInfoDatabaseMetaPool;
@@ -1148,6 +1147,8 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jTable1KeyPressed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        isFormWindowClosingCalled = true;
+        
         if (this.indicatorPanel.promptToSaveSignificantEdits()) {
             this.dispose();
         }
@@ -4743,7 +4744,7 @@ public class MainFrame extends javax.swing.JFrame {
     // this application?
     private volatile boolean needToSaveUserDefinedDatabase = false;
 
-    private volatile boolean isFormWindowClosedCalled = false;
+    private volatile boolean isFormWindowClosingCalled = false;
     
     // The last time when we receive stock price update.
     private long timestamp = 0;
