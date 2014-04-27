@@ -21,8 +21,9 @@ import javafx.scene.Scene;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javax.swing.*;
+import org.yccheok.jstock.gui.MainFrame;
   
-public class SimpleSwingBrowser extends JFrame {
+public class SimpleSwingBrowser extends JDialog {
  
     private final JFXPanel jfxPanel = new JFXPanel();
     private WebEngine engine;
@@ -30,7 +31,7 @@ public class SimpleSwingBrowser extends JFrame {
     private final JPanel panel = new JPanel(new BorderLayout());
  
     public SimpleSwingBrowser() {
-        super();
+        super(MainFrame.getInstance(), JDialog.ModalityType.APPLICATION_MODAL);
         initComponents();
     }
 
@@ -45,7 +46,7 @@ public class SimpleSwingBrowser extends JFrame {
         java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
         setBounds((screenSize.width-460)/2, (screenSize.height-680)/2, 460, 680);
     }
- 
+    
     private void createScene() {
  
         Platform.runLater(new Runnable() {
