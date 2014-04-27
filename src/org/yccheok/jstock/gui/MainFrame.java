@@ -282,6 +282,7 @@ public class MainFrame extends javax.swing.JFrame {
     // http://sourceforge.net/tracker/?func=detail&aid=3490453&group_id=202896&atid=983418
     private void installShutdownHook() {
         if (Utils.isMacOSX()) {
+            // Triggered by command + Q
             Runnable runner = new Runnable() {
                 @Override
                 public void run() {
@@ -290,7 +291,16 @@ public class MainFrame extends javax.swing.JFrame {
                         return;
                     }
                     
-                    formWindowClosed(null);
+                    // 1) Do not call formWindowClosed directly, as accessing UI
+                    // will cause "hang".
+                    // 2) Calling system.exit will cause "hang" too.
+                    MainFrame.this.save();
+
+                    if (MainFrame.this.needToSaveUserDefinedDatabase) {
+                        // We are having updated user database in memory.
+                        // Save it to disk.
+                        MainFrame.this.saveUserDefinedDatabaseAsCSV(jStockOptions.getCountry(), stockInfoDatabase);
+                    }
                     
                     AppLock.unlock();
                 }
@@ -1013,6 +1023,8 @@ public class MainFrame extends javax.swing.JFrame {
      * to give user perspective that our system is slow. But, is it safe
      * to do so?
      */
+    
+    // Remember to revise installShutdownHook
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
         isFormWindowClosedCalled = true;
         
