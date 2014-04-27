@@ -19,22 +19,14 @@
 
 package org.yccheok.jstock.gui;
 
-import org.yccheok.jstock.gui.charting.ChartJDialog;
-import org.yccheok.jstock.gui.charting.ChartJDialogOptions;
-import org.yccheok.jstock.alert.GoogleMail;
-import org.yccheok.jstock.alert.GoogleCalendar;
-import javax.swing.table.*;
+import com.google.api.client.auth.oauth2.Credential;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.*;
-import java.util.*;
-import org.yccheok.jstock.engine.*;
 import java.awt.image.BufferedImage;
+import java.io.*;
 import java.io.IOException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import javax.swing.*;
 import java.text.MessageFormat;
+import java.util.*;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -42,12 +34,20 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import javafx.application.Platform;
 import javax.imageio.ImageIO;
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
+import javax.swing.*;
+import javax.swing.table.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.yccheok.jstock.alert.GoogleCalendar;
+import org.yccheok.jstock.alert.GoogleMail;
 import org.yccheok.jstock.alert.SMSLimiter;
 import org.yccheok.jstock.analysis.Indicator;
 import org.yccheok.jstock.analysis.OperatorIndicator;
+import org.yccheok.jstock.engine.*;
 import org.yccheok.jstock.engine.ResultType;
 import org.yccheok.jstock.engine.Stock.Board;
 import org.yccheok.jstock.engine.Stock.Industry;
@@ -55,6 +55,8 @@ import org.yccheok.jstock.file.Atom;
 import org.yccheok.jstock.file.GUIBundleWrapper;
 import org.yccheok.jstock.file.Statement;
 import org.yccheok.jstock.file.Statements;
+import org.yccheok.jstock.gui.charting.ChartJDialog;
+import org.yccheok.jstock.gui.charting.ChartJDialogOptions;
 import org.yccheok.jstock.gui.charting.DynamicChart;
 import org.yccheok.jstock.gui.portfolio.PortfolioJDialog;
 import org.yccheok.jstock.gui.table.NonNegativeDoubleEditor;
@@ -1061,6 +1063,8 @@ public class MainFrame extends javax.swing.JFrame {
             log.error("Unexpected error while trying to quit application", exp);
         }
 
+        Platform.exit();
+        
         // All the above operations are done within try block, to ensure
         // System.exit(0) will always be called.
         //
@@ -1287,8 +1291,33 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenu8MenuSelected
 
     private void jMenuItem11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem11ActionPerformed
-        final LoadFromCloudJDialog dialog = new LoadFromCloudJDialog(this, true);
-        dialog.setVisible(true);
+        SwingWorker swingWorker = new SwingWorker<Credential, Void>() {
+
+            @Override
+            protected Credential doInBackground() throws Exception {
+                Credential credential = org.yccheok.jstock.google.drive.Utils.authorize();
+                return credential;
+            }
+            
+            @Override
+            public void done() {  
+                Credential credential = null;
+                
+                try {
+                    credential = this.get();
+                } catch (InterruptedException ex) {
+                    log.error(null, ex);
+                } catch (ExecutionException ex) {
+                    log.error(null, ex);
+                }
+                
+                if (credential == null) {
+                    return;
+                }
+            }
+        };
+        
+        swingWorker.execute();
     }//GEN-LAST:event_jMenuItem11ActionPerformed
 
     private void jMenuItem10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem10ActionPerformed
@@ -1689,6 +1718,10 @@ public class MainFrame extends javax.swing.JFrame {
             }
         }        
 
+        // Avoid "JavaFX IllegalStateException when disposing JFXPanel in Swing"
+        // http://stackoverflow.com/questions/16867120/javafx-illegalstateexception-when-disposing-jfxpanel-in-swing
+        Platform.setImplicitExit(false);
+        
         // As ProxyDetector is affected by system properties
         // http.proxyHost, we are forced to initialized ProxyDetector right here,
         // before we manually change the system properties according to
@@ -4670,11 +4703,11 @@ public class MainFrame extends javax.swing.JFrame {
     
     private static final Log log = LogFactory.getLog(MainFrame.class);
         
-    private MyJXStatusBar statusBar = new MyJXStatusBar();
+    private final MyJXStatusBar statusBar = new MyJXStatusBar();
     private boolean isStatusBarBusy = false;
     
     // A set of stock history which we need to display GUI on them, when user request explicitly.
-    private java.util.Set<Code> stockCodeHistoryGUI = new java.util.HashSet<Code>();
+    private final java.util.Set<Code> stockCodeHistoryGUI = new java.util.HashSet<Code>();
     
     private volatile StockInfoDatabase stockInfoDatabase = null;
     // StockNameDatabase is an optional item.
