@@ -109,11 +109,17 @@ public class MyAuthorizationCodeInstalledApp {
                     @Override
                     public void windowClosed(java.awt.event.WindowEvent evt) {
 
-                        if (redirectUri == null) {
+                        String uri = redirectUri;
+                        
+                        if (uri == null) {
                             return;
                         }
                         
-                        String url = redirectUri + "?error=windowClosed";
+                        // Avoid redirectUri being called twice.
+                        // http://stackoverflow.com/questions/23319579/why-formwindowclosed-is-being-triggered-twice-in-jdialog-after-dispose
+                        redirectUri = null;
+                        
+                        String url = uri + "?error=windowClosed";
                         org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(url);
                     }
                     
@@ -134,9 +140,9 @@ public class MyAuthorizationCodeInstalledApp {
                     }
                 });
                 
-                _browser.setVisible(true);
-                _browser.loadURL(url);
                 browser = _browser;
+                _browser.loadURL(url);
+                _browser.setVisible(true);
            }     
        });       
        
