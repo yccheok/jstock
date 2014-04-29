@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package org.yccheok.jstock.google.drive;
+package org.yccheok.jstock.google;
 
 
 
@@ -28,7 +28,7 @@ import java.util.HashSet;
 import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.yccheok.jstock.google.MyAuthorizationCodeInstalledApp;
+import org.yccheok.jstock.gui.Pair;
 
 /**
  *
@@ -39,7 +39,8 @@ public class Utils {
      * Global instance of the {@link DataStoreFactory}. The best practice is to make it a single
      * globally shared instance across your application.
      */
-    private static FileDataStoreFactory dataStoreFactory;
+    private static FileDataStoreFactory driveDataStoreFactory;
+    private static FileDataStoreFactory calendarDataStoreFactory;
 
     /** Global instance of the JSON factory. */
     private static final GsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
@@ -55,7 +56,8 @@ public class Utils {
             httpTransport = GoogleNetHttpTransport.newTrustedTransport();
             
             // initialize the data store factory
-            dataStoreFactory = new FileDataStoreFactory(getDataDirectory());
+            driveDataStoreFactory = new FileDataStoreFactory(getDriveDataDirectory());
+            calendarDataStoreFactory = new FileDataStoreFactory(getCalendarDataDirectory());
         } catch (IOException ex) {
             log.error(null, ex);
         } catch (GeneralSecurityException ex) {
@@ -63,8 +65,12 @@ public class Utils {
         }
     }
     
-    public static File getDataDirectory() {
-        return new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "authentication");
+    private static File getDriveDataDirectory() {
+        return new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "authentication" + File.separator + "drive");
+    }
+
+    private static File getCalendarDataDirectory() {
+        return new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "authentication" + File.separator + "calendar");
     }
     
     /**
@@ -82,14 +88,7 @@ public class Utils {
         return userInfo;
     }
   
-    /** Authorizes the installed application to access user's protected data.
-     * @return 
-     * @throws java.lang.Exception */
-    public static Credential authorize() throws Exception {
-        // load client secrets
-        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(Utils.JSON_FACTORY,
-            new InputStreamReader(Utils.class.getResourceAsStream("/resources/drive_client_secrets.json")));
-        // Set up authorization code flow.
+    public static Pair<Credential, Userinfoplus> authorizeDrive() throws Exception {
         // Ask for only the permissions you need. Asking for more permissions will
         // reduce the number of users who finish the process for giving you access
         // to their accounts. It will also increase the amount of effort you will
@@ -99,7 +98,19 @@ public class Utils {
         Set<String> scopes = new HashSet<String>();
         scopes.add("email");
         scopes.add("profile");
-        scopes.add(DriveScopes.DRIVE_APPDATA);
+        scopes.add(DriveScopes.DRIVE_APPDATA);  
+        
+        return authorize(scopes, driveDataStoreFactory);
+    }
+    
+    /** Authorizes the installed application to access user's protected data.
+     * @return 
+     * @throws java.lang.Exception */
+    private static Pair<Credential, Userinfoplus> authorize(Set<String> scopes, FileDataStoreFactory dataStoreFactory) throws Exception {
+        // load client secrets
+        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(Utils.JSON_FACTORY,
+            new InputStreamReader(Utils.class.getResourceAsStream("/resources/drive_client_secrets.json")));
+        // Set up authorization code flow.
 
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
             httpTransport, JSON_FACTORY, clientSecrets, scopes)

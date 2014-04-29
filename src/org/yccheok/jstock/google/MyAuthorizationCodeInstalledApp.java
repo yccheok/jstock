@@ -12,8 +12,10 @@ import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.auth.oauth2.TokenResponse;
 import com.google.api.client.extensions.java6.auth.oauth2.VerificationCodeReceiver;
 import com.google.api.client.repackaged.com.google.common.base.Preconditions;
+import com.google.api.services.oauth2.model.Userinfoplus;
 import java.io.IOException;
 import javax.swing.SwingUtilities;
+import org.yccheok.jstock.gui.Pair;
 
 /**
  *
@@ -46,12 +48,13 @@ public class MyAuthorizationCodeInstalledApp {
      * @param userId user ID or {@code null} if not using a persisted credential store
      * @return credential
      */
-    public Credential authorize(String userId) throws IOException {
+    public Pair<Credential, Userinfoplus> authorize(String userId) throws IOException {
         try {
             Credential credential = flow.loadCredential(userId);
             if (credential != null
                 && (credential.getRefreshToken() != null || credential.getExpiresInSeconds() > 60)) {
-                return credential;
+                Userinfoplus userinfoplus = org.yccheok.jstock.google.Utils.getUserInfo(credential);
+                return new Pair<Credential, Userinfoplus>(credential, userinfoplus);
             }
             // open in browser
             redirectUri = receiver.getRedirectUri();
@@ -62,7 +65,9 @@ public class MyAuthorizationCodeInstalledApp {
             String code = receiver.waitForCode();
             TokenResponse response = flow.newTokenRequest(code).setRedirectUri(redirectUri).execute();
             // store credential and return it
-            return flow.createAndStoreCredential(response, userId);
+            credential = flow.createAndStoreCredential(response, userId);
+            Userinfoplus userinfoplus = org.yccheok.jstock.google.Utils.getUserInfo(credential);
+            return new Pair<Credential, Userinfoplus>(credential, userinfoplus);
         } finally {        
             receiver.stop();
             SimpleSwingBrowser _browser = this.browser;

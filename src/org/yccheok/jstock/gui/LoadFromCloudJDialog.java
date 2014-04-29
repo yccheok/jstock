@@ -19,6 +19,8 @@
 
 package org.yccheok.jstock.gui;
 
+import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.services.oauth2.model.Userinfoplus;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
@@ -51,7 +53,7 @@ import org.yccheok.jstock.internationalization.MessagesBundle;
 public class LoadFromCloudJDialog extends javax.swing.JDialog {
 
     /** Creates new form LoadFromCloudJDialog */
-    public LoadFromCloudJDialog(java.awt.Frame parent, boolean modal) {
+    public LoadFromCloudJDialog(java.awt.Frame parent, boolean modal, Pair<Credential, Userinfoplus> pair) {
         super(parent, modal);
         initComponents();
         this.jLabel3.setVisible(false);

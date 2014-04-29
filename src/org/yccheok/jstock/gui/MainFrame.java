@@ -20,6 +20,7 @@
 package org.yccheok.jstock.gui;
 
 import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.services.oauth2.model.Userinfoplus;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
@@ -1303,29 +1304,39 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenu8MenuSelected
 
     private void jMenuItem11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem11ActionPerformed
-        SwingWorker swingWorker = new SwingWorker<Credential, Void>() {
+        jMenu3.setEnabled(false);
+        
+        SwingWorker swingWorker = new SwingWorker<Pair<Credential, Userinfoplus>, Void>() {
 
             @Override
-            protected Credential doInBackground() throws Exception {
-                Credential credential = org.yccheok.jstock.google.drive.Utils.authorize();
-                return credential;
+            protected Pair<Credential, Userinfoplus> doInBackground() throws Exception {
+                final Pair<Credential, Userinfoplus> pair = org.yccheok.jstock.google.Utils.authorizeDrive();
+                if (pair == null) {
+                    return null;
+                }
+                return pair;
             }
             
             @Override
-            public void done() {  
-                Credential credential = null;
+            public void done() { 
+                jMenu3.setEnabled(true);
+                
+                Pair<Credential, Userinfoplus> pair = null;
                 
                 try {
-                    credential = this.get();
+                    pair = this.get();
                 } catch (InterruptedException ex) {
                     log.error(null, ex);
                 } catch (ExecutionException ex) {
                     log.error(null, ex);
                 }
                 
-                if (credential == null) {
+                if (pair == null) {
                     return;
                 }
+                
+                LoadFromCloudJDialog loadFromCloudJDialog = new LoadFromCloudJDialog(MainFrame.this, true, pair);
+                loadFromCloudJDialog.setVisible(true);
             }
         };
         
@@ -4690,7 +4701,7 @@ public class MainFrame extends javax.swing.JFrame {
             */
         };
     }
-
+    
     private class TableKeyEventListener extends java.awt.event.KeyAdapter {
         @Override
         public void keyTyped(java.awt.event.KeyEvent e) {
@@ -4742,9 +4753,9 @@ public class MainFrame extends javax.swing.JFrame {
     private PortfolioManagementJPanel portfolioManagementJPanel;
 
     private final AlertStateManager alertStateManager = new AlertStateManager();
-    private ExecutorService emailAlertPool = Executors.newFixedThreadPool(1);
-    private ExecutorService smsAlertPool = Executors.newFixedThreadPool(1);
-    private ExecutorService systemTrayAlertPool = Executors.newFixedThreadPool(1);
+    private final ExecutorService emailAlertPool = Executors.newFixedThreadPool(1);
+    private final ExecutorService smsAlertPool = Executors.newFixedThreadPool(1);
+    private final ExecutorService systemTrayAlertPool = Executors.newFixedThreadPool(1);
     private volatile ExecutorService stockInfoDatabaseMetaPool = Executors.newFixedThreadPool(1);
             
     private final org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
