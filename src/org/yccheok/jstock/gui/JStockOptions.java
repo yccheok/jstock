@@ -242,9 +242,12 @@ public class JStockOptions {
     private String proxyAuthUserName = "";
     private boolean isProxyAuthEnabled = false;
 
-    private boolean rememberGoogleAccountEnabled = false;
-    private String googleUsername = "";
-    private String googlePassword = "";
+    @Deprecated
+    private transient boolean rememberGoogleAccountEnabled = false;
+    @Deprecated
+    private transient String googleUsername = "";
+    @Deprecated
+    private transient String googlePassword = "";
 
     // Remember where we save/open the last file.
     private String lastFileIODirectory = System.getProperty("user.home");
@@ -630,14 +633,6 @@ public class JStockOptions {
 
         if (this.proxyAuthPassword == null) {
             this.proxyAuthPassword = "";
-        }
-
-        if (this.getGoogleUsername() == null) {
-            this.setGoogleUsername("");
-        }
-
-        if (this.getGooglePassword() == null) {
-            this.setGooglePassword("");
         }
     
         setCredentials(new NTCredentials(this.proxyAuthUserName, Utils.decrypt(this.proxyAuthPassword), "", ""));
@@ -1349,48 +1344,6 @@ public class JStockOptions {
     // Do we need country as parameter?
     public void setFourDecimalPlacesEnabled(/*Country country, */boolean fourDecimalPlacesEnabled) {
         this.fourDecimalPlacesEnabled.put(this.country, fourDecimalPlacesEnabled);
-    }
-    
-    /**
-     * @return the rememberGoogleAccountEnabled
-     */
-    public boolean isRememberGoogleAccountEnabled() {
-        return rememberGoogleAccountEnabled;
-    }
-
-    /**
-     * @param rememberGoogleAccountEnabled the rememberGoogleAccountEnabled to set
-     */
-    public void setRememberGoogleAccountEnabled(boolean rememberGoogleAccountEnabled) {
-        this.rememberGoogleAccountEnabled = rememberGoogleAccountEnabled;
-    }
-
-    /**
-     * @return the googleUsername
-     */
-    public String getGoogleUsername() {
-        return googleUsername;
-    }
-
-    /**
-     * @param googleUsername the googleUsername to set
-     */
-    public void setGoogleUsername(String googleUsername) {
-        this.googleUsername = googleUsername;
-    }
-
-    /**
-     * @return the googlePassword
-     */
-    public String getGooglePassword() {
-        return googlePassword;
-    }
-
-    /**
-     * @param googlePassword the googlePassword to set
-     */
-    public void setGooglePassword(String googlePassword) {
-        this.googlePassword = googlePassword;
     }
 
     /**

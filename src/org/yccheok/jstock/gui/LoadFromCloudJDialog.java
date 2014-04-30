@@ -59,13 +59,6 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
         this.jLabel3.setVisible(false);
         this.jLabel4.setVisible(false);
         this.jLabel5.setVisible(false);
-
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
-        if (jStockOptions.isRememberGoogleAccountEnabled()) {
-            this.jCheckBox1.setSelected(true);
-            this.jTextField1.setText(Utils.decrypt(jStockOptions.getGoogleUsername()));
-            this.jPasswordField1.setText(Utils.decrypt(jStockOptions.getGooglePassword()));
-        }
     }
 
     /** This method is called from within the constructor to
@@ -239,14 +232,6 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
         cancel();
-        // No matter Cancel or OK, once user untick, we will remove account
-        // information.
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
-        if (this.jCheckBox1.isSelected() == false) {
-            jStockOptions.setRememberGoogleAccountEnabled(false);
-            jStockOptions.setGoogleUsername("");
-            jStockOptions.setGooglePassword("");
-        }
     }//GEN-LAST:event_formWindowClosed
 
     private void cancel() {
@@ -374,15 +359,6 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
 
                 if (result == true) {
                     JOptionPane.showMessageDialog(LoadFromCloudJDialog.this, GUIBundle.getString("LoadFromCloudJDialog_Success"));
-
-                    final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
-                    // Only save account information when cloud operation success.
-                    if (jCheckBox1.isSelected() == true) {
-                        jStockOptions.setRememberGoogleAccountEnabled(true);
-                        jStockOptions.setGoogleUsername(Utils.encrypt(username));
-                        jStockOptions.setGooglePassword(Utils.encrypt(new String(jPasswordField1.getPassword())).trim());
-                    }
-                    // Close the dialog once cloud operation success.
                     setVisible(false);
                     dispose();
                 }
