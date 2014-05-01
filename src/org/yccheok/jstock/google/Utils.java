@@ -109,7 +109,7 @@ public class Utils {
     private static Pair<Credential, Userinfoplus> authorize(Set<String> scopes, FileDataStoreFactory dataStoreFactory) throws Exception {
         // load client secrets
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(Utils.JSON_FACTORY,
-            new InputStreamReader(Utils.class.getResourceAsStream("/resources/drive_client_secrets.json")));
+            new InputStreamReader(Utils.class.getResourceAsStream("/assets/authentication/drive_client_secrets.json")));
         // Set up authorization code flow.
 
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(

@@ -1815,7 +1815,7 @@ public class Utils {
                             }
                         }
                     });
-                    final InputStream audioSrc = Utils.class.getResourceAsStream("/sounds/doorbell.wav");
+                    final InputStream audioSrc = Utils.class.getResourceAsStream("/assets/sounds/doorbell.wav");
                     // http://stackoverflow.com/questions/5529754/java-io-ioexception-mark-reset-not-supported
                     // Add buffer for mark/reset support.
                     final InputStream bufferedIn = new BufferedInputStream(audioSrc);                    
