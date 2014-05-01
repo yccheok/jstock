@@ -155,7 +155,7 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("LoadFromCloudJDialog_GoogleAccount"))); // NOI18N
 
         jLabel1.setBackground(new java.awt.Color(140, 196, 116));
-        jLabel1.setFont(new java.awt.Font("Roboto Light", 0, 18)); // NOI18N
+        jLabel1.setFont(getRobotoLightFont());
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("username@email.com");
@@ -389,6 +389,10 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
         this.memoryLog.add(s);
     }
 
+    private Font getRobotoLightFont() {
+        return Utils.getRobotoLightFont().deriveFont((float)18);
+    }
+    
     private void showMessageBoxWithGoogleDocLink() {
         // for copying style
         JLabel label = new JLabel();

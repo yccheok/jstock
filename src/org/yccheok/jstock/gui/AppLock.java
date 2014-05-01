@@ -51,9 +51,9 @@ public class AppLock {
                 return false;
             }
         } catch (FileNotFoundException ex) {            
-            log.error("", ex);
+            log.error(null, ex);
         } catch (IOException ex) {
-            log.error("", ex);
+            log.error(null, ex);
         }
         return true;
     }
@@ -67,7 +67,7 @@ public class AppLock {
                 f.delete();
             }
         } catch(IOException e) {
-            log.error("", e);
+            log.error(null, e);
         }        
     }
     

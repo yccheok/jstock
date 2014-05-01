@@ -30,6 +30,7 @@ import java.awt.Container;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.FontFormatException;
 import java.awt.Graphics;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
@@ -69,8 +70,6 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
-import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
-import org.yccheok.jstock.engine.*;
 import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -101,6 +100,7 @@ import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
 import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
 import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
 import net.sourceforge.pinyin4j.format.HanyuPinyinVCharType;
+import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
@@ -124,6 +124,7 @@ import org.yccheok.jstock.analysis.Indicator;
 import org.yccheok.jstock.analysis.OperatorIndicator;
 import org.yccheok.jstock.analysis.SinkOperator;
 import org.yccheok.jstock.analysis.StockOperator;
+import org.yccheok.jstock.engine.*;
 import org.yccheok.jstock.internationalization.MessagesBundle;
 import org.yccheok.jstock.network.Utils.Type;
 
@@ -2342,6 +2343,31 @@ public class Utils {
         return stockInfoDatabaseMeta;
     }
     
+    public static Font getRobotoLightFont() {
+        if (ROBOTO_LIGHT_FONT == null) {
+            ROBOTO_LIGHT_FONT = _getRobotoLightFont();
+        }
+        return ROBOTO_LIGHT_FONT;
+    }
+    
+    private static Font _getRobotoLightFont() {
+        InputStream inputStream = Utils.class.getResourceAsStream("/assets/fonts/Roboto-Light.ttf");
+        try {
+            Font font = Font.createFont(Font.TRUETYPE_FONT, inputStream);
+            if (font != null) {
+                return font;
+            }
+        } catch (FontFormatException ex) {
+            log.error(null, ex);
+        } catch (IOException ex) {
+            log.error(null, ex);
+        } finally {
+            close(inputStream);
+        }
+        Font oldLabelFont = UIManager.getFont("Label.font");
+        return oldLabelFont;
+    }
+    
     public static boolean saveStockInfoDatabaseMeta(File stockInfoDatabaseMetaFile, Map<Country, Long> stockInfoDatabaseMeta) {
         final Gson gson = getGsonForStockInfoDatabaseMeta();
         String string = gson.toJson(stockInfoDatabaseMeta);
@@ -2462,6 +2488,8 @@ public class Utils {
         }
     };
     
+    public static Font ROBOTO_LIGHT_FONT = null;
+            
     private static final HanyuPinyinOutputFormat DEFAULT_HANYU_PINYIN_OUTPUT_FORMAT = new HanyuPinyinOutputFormat();
     static {
         DEFAULT_HANYU_PINYIN_OUTPUT_FORMAT.setCaseType(HanyuPinyinCaseType.LOWERCASE);
