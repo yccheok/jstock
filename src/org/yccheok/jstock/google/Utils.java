@@ -83,7 +83,7 @@ public class Utils {
         file.delete();
     }
     
-    public static Pair<Credential, Userinfoplus> authorizeDrive() throws Exception {
+    public static Pair<Pair<Credential, Userinfoplus>, Boolean> authorizeDrive() throws Exception {
         // Ask for only the permissions you need. Asking for more permissions will
         // reduce the number of users who finish the process for giving you access
         // to their accounts. It will also increase the amount of effort you will
@@ -101,7 +101,7 @@ public class Utils {
     /** Authorizes the installed application to access user's protected data.
      * @return 
      * @throws java.lang.Exception */
-    private static Pair<Credential, Userinfoplus> authorize(Set<String> scopes, FileDataStoreFactory dataStoreFactory) throws Exception {
+    private static Pair<Pair<Credential, Userinfoplus>, Boolean> authorize(Set<String> scopes, FileDataStoreFactory dataStoreFactory) throws Exception {
         // load client secrets
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(Utils.JSON_FACTORY,
             new InputStreamReader(Utils.class.getResourceAsStream("/assets/authentication/drive_client_secrets.json")));

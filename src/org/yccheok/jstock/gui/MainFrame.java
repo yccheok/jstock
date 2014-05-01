@@ -1310,11 +1310,11 @@ public class MainFrame extends javax.swing.JFrame {
     public void loadFromCloud() {
         jMenu3.setEnabled(false);
         
-        SwingWorker swingWorker = new SwingWorker<Pair<Credential, Userinfoplus>, Void>() {
+        SwingWorker swingWorker = new SwingWorker<Pair<Pair<Credential, Userinfoplus>, Boolean>, Void>() {
 
             @Override
-            protected Pair<Credential, Userinfoplus> doInBackground() throws Exception {
-                final Pair<Credential, Userinfoplus> pair = org.yccheok.jstock.google.Utils.authorizeDrive();
+            protected Pair<Pair<Credential, Userinfoplus>, Boolean> doInBackground() throws Exception {
+                final Pair<Pair<Credential, Userinfoplus>, Boolean> pair = org.yccheok.jstock.google.Utils.authorizeDrive();
                 if (pair == null) {
                     return null;
                 }
@@ -1325,7 +1325,7 @@ public class MainFrame extends javax.swing.JFrame {
             public void done() { 
                 jMenu3.setEnabled(true);
                 
-                Pair<Credential, Userinfoplus> pair = null;
+                Pair<Pair<Credential, Userinfoplus>, Boolean> pair = null;
                 
                 try {
                     pair = this.get();
@@ -1341,7 +1341,7 @@ public class MainFrame extends javax.swing.JFrame {
                     return;
                 }
                 
-                LoadFromCloudJDialog loadFromCloudJDialog = new LoadFromCloudJDialog(MainFrame.this, true, pair);
+                LoadFromCloudJDialog loadFromCloudJDialog = new LoadFromCloudJDialog(MainFrame.this, true, pair.first, pair.second);
                 loadFromCloudJDialog.setVisible(true);
             }
         };

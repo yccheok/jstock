@@ -53,13 +53,17 @@ import org.yccheok.jstock.internationalization.MessagesBundle;
 public class LoadFromCloudJDialog extends javax.swing.JDialog {
 
     /** Creates new form LoadFromCloudJDialog */
-    public LoadFromCloudJDialog(java.awt.Frame parent, boolean modal, Pair<Credential, Userinfoplus> pair) {
+    public LoadFromCloudJDialog(java.awt.Frame parent, boolean modal, Pair<Credential, Userinfoplus> credentialEx, boolean credentialFromDisk) {
         super(parent, modal);
         initComponents();
-        this.pair = pair;
-        this.jLabel1.setText(pair.second.getEmail());
+        this.credentialEx = credentialEx;
+        this.jLabel1.setText(credentialEx.second.getEmail());
         this.jLabel4.setVisible(false);
         this.jLabel5.setVisible(false);
+        
+        if (false == credentialFromDisk) {
+            jButton1.doClick();
+        }
     }
 
     /** This method is called from within the constructor to
@@ -212,7 +216,8 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         this.jButton1.setEnabled(false);
-
+        this.jButton3.setEnabled(false);
+        
         // Update GUI immediately. So that user will not feel our app is slow.
         jLabel3.setText(GUIBundle.getString("LoadFromCloudJDialog_LoadingFromCloud..."));
         jLabel4.setIcon(Icons.BUSY);
@@ -271,6 +276,7 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
                 }
 
                 jButton1.setEnabled(true);
+                jButton3.setEnabled(true);
 
                 if (result == true) {
                     JOptionPane.showMessageDialog(LoadFromCloudJDialog.this, GUIBundle.getString("LoadFromCloudJDialog_Success"));
@@ -437,7 +443,7 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
         JOptionPane.showMessageDialog(null, ep, MessagesBundle.getString("info_title_register_google_doc"), JOptionPane.INFORMATION_MESSAGE);        
     }
     
-    private final Pair<Credential, Userinfoplus> pair;
+    private final Pair<Credential, Userinfoplus> credentialEx;
     
     private volatile SwingWorker<Boolean, Status> loadFromCloudTask = null;
     private final List<String> memoryLog = new ArrayList<String>();

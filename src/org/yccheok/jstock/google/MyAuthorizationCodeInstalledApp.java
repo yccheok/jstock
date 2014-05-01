@@ -50,13 +50,13 @@ public class MyAuthorizationCodeInstalledApp {
      * @param userId user ID or {@code null} if not using a persisted credential store
      * @return credential
      */
-    public Pair<Credential, Userinfoplus> authorize(String userId) throws IOException {
+    public Pair<Pair<Credential, Userinfoplus>, Boolean> authorize(String userId) throws IOException {
         try {
             Credential credential = flow.loadCredential(userId);
             if (credential != null
                 && (credential.getRefreshToken() != null || credential.getExpiresInSeconds() > 60)) {
                 Userinfoplus userinfoplus = org.yccheok.jstock.google.Utils.getUserInfo(credential);
-                return new Pair<Credential, Userinfoplus>(credential, userinfoplus);
+                return new Pair<Pair<Credential, Userinfoplus>, Boolean>(new Pair<Credential, Userinfoplus>(credential, userinfoplus), true);
             }
             // open in browser
             redirectUri = receiver.getRedirectUri();
@@ -72,7 +72,7 @@ public class MyAuthorizationCodeInstalledApp {
             // store credential and return it
             credential = flow.createAndStoreCredential(response, userId);
             Userinfoplus userinfoplus = org.yccheok.jstock.google.Utils.getUserInfo(credential);
-            return new Pair<Credential, Userinfoplus>(credential, userinfoplus);
+            return new Pair<Pair<Credential, Userinfoplus>, Boolean>(new Pair<Credential, Userinfoplus>(credential, userinfoplus), false);
         } finally {        
             receiver.stop();
             SimpleSwingBrowser _browser = this.browser;
