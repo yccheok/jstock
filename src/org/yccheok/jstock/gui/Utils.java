@@ -20,6 +20,11 @@
 package org.yccheok.jstock.gui;
 
 import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.http.GenericUrl;
+import com.google.api.client.http.HttpResponse;
+import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.Drive.Files;
+import com.google.api.services.drive.model.FileList;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
@@ -74,6 +79,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -1158,12 +1164,124 @@ public class Utils {
         }
     }
 
+    
     public static CloudFile loadFromGoogleDrive(Credential credential) {
         return null;
     }
 
+    // Legacy. Shall be removed after a while...
     public static CloudFile loadFromLegacyGoogleDrive(Credential credential) {
-        return null;
+        Drive drive = org.yccheok.jstock.google.Utils.getDrive(credential);
+
+        List<com.google.api.services.drive.model.File> files = new ArrayList<com.google.api.services.drive.model.File>();
+        
+        // 25 is based on experiment. Might changed by Google in the future.
+        final String titleName = ("jstock-" + Utils.getJStockUUID() + "-checksum=").substring(0, 25);
+        final String qString = "title contains '" + titleName + "' and trashed = false";
+
+        try {
+            Files.List request = drive.files().list().setQ(qString);
+            
+            do {                
+                FileList fileList = request.execute();
+                List<com.google.api.services.drive.model.File> tmp = fileList.getItems();
+                files.addAll(tmp);
+                request.setPageToken(fileList.getNextPageToken());
+            } while (request.getPageToken() != null && request.getPageToken().length() > 0);
+        } catch (IOException ex) {
+            log.error(null, ex);
+            return null;
+        }
+        
+        long checksum = 0;
+        long date = 0;
+        int version = 0;
+        com.google.api.services.drive.model.File file = null;
+        
+        for (com.google.api.services.drive.model.File f : files) {
+
+            final String title = f.getTitle();
+            
+            if (title == null) {
+                continue;
+            }
+            
+            // Retrieve checksum, date and version information from filename.
+            final Matcher matcher = googleDocTitlePattern.matcher(title);
+            String _checksum = null;
+            String _date = null;
+            String _version = null;
+            if (matcher.find()){
+                if (matcher.groupCount() == 3) {
+                    _checksum = matcher.group(1);
+                    _date = matcher.group(2);
+                    _version = matcher.group(3);
+                }
+            }
+            if (_checksum == null || _date == null || _version == null) {
+                continue;
+            }
+            
+            try {
+                checksum = Long.parseLong(_checksum);
+                date = Long.parseLong(_date);
+                version = Integer.parseInt(_version);
+            } catch (NumberFormatException ex) {
+                log.error(null, ex);
+                continue;
+            }  
+            
+            file = f;
+            // Found.
+            break;
+        }
+        
+        if (file == null) {
+            return null;
+        }
+        
+        if (file.getDownloadUrl() == null || file.getDownloadUrl().length() <= 0) {
+            return null;
+        }        
+        
+        HttpResponse resp = null;
+        InputStream inputStream = null;
+        java.io.File outputFile = null;
+        OutputStream outputStream = null;
+        
+        try {
+            resp = drive.getRequestFactory().buildGetRequest(new GenericUrl(file.getDownloadUrl())).execute();
+            inputStream = resp.getContent();
+            outputFile = java.io.File.createTempFile(Utils.getJStockUUID(), ".zip");
+            outputFile.deleteOnExit();
+            outputStream = new FileOutputStream(outputFile);
+            
+            int read = 0;
+            byte[] bytes = new byte[1024];
+         
+            while ((read = inputStream.read(bytes)) != -1) {
+                outputStream.write(bytes, 0, read);
+            }            
+        } catch (IOException ex) {
+            log.error(null, ex);
+        } finally {
+            Utils.close(outputStream);
+            Utils.close(inputStream);
+            if (resp != null) {
+                try {
+                    resp.disconnect();
+                } catch (IOException ex) {
+                    log.error(null, ex);
+                }
+            }
+        }
+        
+        if (outputFile == null) {
+            return null;
+        }
+        
+        return CloudFile.newInstance(outputFile, checksum, date, version);                
+        
     }
 
     private static class CaptchaRespond {

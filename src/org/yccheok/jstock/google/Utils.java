@@ -93,7 +93,9 @@ public class Utils {
         Set<String> scopes = new HashSet<String>();
         scopes.add("email");
         scopes.add("profile");
-        scopes.add(DriveScopes.DRIVE_APPDATA);  
+        //scopes.add(DriveScopes.DRIVE_APPDATA);  
+        // Legacy. Shall be removed after a while...
+        scopes.add(DriveScopes.DRIVE);
         
         return authorize(scopes, new FileDataStoreFactory(getDriveDataDirectory()));
     }

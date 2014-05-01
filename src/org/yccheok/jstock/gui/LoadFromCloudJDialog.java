@@ -324,10 +324,7 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
                         publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_LoadingFromCloudFail"), Icons.ERROR));
                         return false;
                     } else {
-                        if (false == Utils.saveToGoogleDoc(username, "", cloudFile.file)) {
-                            // Migration fail.
-                            LoadFromCloudJDialog.this.showMessageBoxWithGoogleDocLink();
-                            
+                        if (false == Utils.saveToGoogleDoc(username, "", cloudFile.file)) {                            
                         } else {
                             // Migration success.
                             JOptionPane.showMessageDialog(LoadFromCloudJDialog.this, 
@@ -412,37 +409,7 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
     private Font getRobotoLightFont() {
         return Utils.getRobotoLightFont().deriveFont((float)18);
     }
-    
-    private void showMessageBoxWithGoogleDocLink() {
-        // for copying style
-        JLabel label = new JLabel();
-        Font font = label.getFont();
-
-        // create some css from the label's font
-        StringBuilder style = new StringBuilder("font-family:" + font.getFamily() + ";");
-        style.append("font-weight:").append(font.isBold() ? "bold" : "normal").append(";");
-        style.append("font-size:").append(font.getSize()).append("pt;");
-
-        // html content
-        String html = MessageFormat.format(MessagesBundle.getString("info_message_register_google_doc"), style);
-        JEditorPane ep = new JEditorPane("text/html", html);
-
-        // handle link events
-        ep.addHyperlinkListener(new HyperlinkListener()
-        {
-            @Override
-            public void hyperlinkUpdate(HyperlinkEvent e)
-            {
-                Utils.launchWebBrowser(e);
-            }
-        });
-        ep.setEditable(false);
-        ep.setBackground(label.getBackground());
-
-        // show
-        JOptionPane.showMessageDialog(null, ep, MessagesBundle.getString("info_title_register_google_doc"), JOptionPane.INFORMATION_MESSAGE);        
-    }
-    
+       
     private final Pair<Credential, Userinfoplus> credentialEx;
     
     private volatile SwingWorker<Boolean, Status> loadFromCloudTask = null;
