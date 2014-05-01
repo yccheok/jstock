@@ -1164,20 +1164,12 @@ public class Utils {
         }
     }
 
-    
-    public static CloudFile loadFromGoogleDrive(Credential credential) {
-        return null;
-    }
-
-    // Legacy. Shall be removed after a while...
-    public static CloudFile loadFromLegacyGoogleDrive(Credential credential) {
+    private static CloudFile _loadFromGoogleDrive(Credential credential, String qString) {
         Drive drive = org.yccheok.jstock.google.Utils.getDrive(credential);
 
         List<com.google.api.services.drive.model.File> files = new ArrayList<com.google.api.services.drive.model.File>();
         
-        // 25 is based on experiment. Might changed by Google in the future.
-        final String titleName = ("jstock-" + Utils.getJStockUUID() + "-checksum=").substring(0, 25);
-        final String qString = "title contains '" + titleName + "' and trashed = false";
+
 
         try {
             Files.List request = drive.files().list().setQ(qString);
@@ -1280,17 +1272,19 @@ public class Utils {
             return null;
         }
         
-        return CloudFile.newInstance(outputFile, checksum, date, version);                
-        
+        return CloudFile.newInstance(outputFile, checksum, date, version);
+    }
+    
+    public static CloudFile loadFromGoogleDrive(Credential credential) {
+        return _loadFromGoogleDrive(credential, "'appdata' in parents");
     }
 
-    private static class CaptchaRespond {
-        public final String logintoken;
-        public final String logincaptcha;
-        public CaptchaRespond(String logintoken, String logincaptcha) {
-            this.logintoken = logintoken;
-            this.logincaptcha = logincaptcha;
-        }
+    // Legacy. Shall be removed after a while...
+    public static CloudFile loadFromLegacyGoogleDrive(Credential credential) {
+        // 25 is based on experiment. Might changed by Google in the future.
+        final String titleName = ("jstock-" + Utils.getJStockUUID() + "-checksum=").substring(0, 25);
+        final String qString = "title contains '" + titleName + "' and trashed = false";
+        return _loadFromGoogleDrive(credential, qString);
     }
     
     public static boolean saveToGoogleDoc(String username, String password, File file) {
