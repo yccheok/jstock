@@ -164,6 +164,11 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
         jPanel2.add(jLabel1);
 
         jButton3.setText(bundle.getString("LoadFromCloudJDialog_SignOut")); // NOI18N
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
         jPanel2.add(jButton3);
 
         jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
@@ -217,6 +222,10 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
         this.loadFromCloudTask = this.getLoadFromCloudTask("");
         this.loadFromCloudTask.execute();
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        org.yccheok.jstock.google.Utils.logoutDrive();
+    }//GEN-LAST:event_jButton3ActionPerformed
 
     private static class Status {
         public final String message;

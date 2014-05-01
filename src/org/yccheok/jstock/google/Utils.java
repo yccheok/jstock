@@ -35,13 +35,6 @@ import org.yccheok.jstock.gui.Pair;
  * @author yccheok
  */
 public class Utils {
-    /**
-     * Global instance of the {@link DataStoreFactory}. The best practice is to make it a single
-     * globally shared instance across your application.
-     */
-    private static FileDataStoreFactory driveDataStoreFactory;
-    private static FileDataStoreFactory calendarDataStoreFactory;
-
     /** Global instance of the JSON factory. */
     private static final GsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
   
@@ -55,9 +48,6 @@ public class Utils {
             // initialize the transport
             httpTransport = GoogleNetHttpTransport.newTrustedTransport();
             
-            // initialize the data store factory
-            driveDataStoreFactory = new FileDataStoreFactory(getDriveDataDirectory());
-            calendarDataStoreFactory = new FileDataStoreFactory(getCalendarDataDirectory());
         } catch (IOException ex) {
             log.error(null, ex);
         } catch (GeneralSecurityException ex) {
@@ -88,6 +78,11 @@ public class Utils {
         return userInfo;
     }
   
+    public static void logoutDrive() {
+        File file = new File(getDriveDataDirectory(), "StoredCredential");
+        file.delete();
+    }
+    
     public static Pair<Credential, Userinfoplus> authorizeDrive() throws Exception {
         // Ask for only the permissions you need. Asking for more permissions will
         // reduce the number of users who finish the process for giving you access
@@ -100,7 +95,7 @@ public class Utils {
         scopes.add("profile");
         scopes.add(DriveScopes.DRIVE_APPDATA);  
         
-        return authorize(scopes, driveDataStoreFactory);
+        return authorize(scopes, new FileDataStoreFactory(getDriveDataDirectory()));
     }
     
     /** Authorizes the installed application to access user's protected data.
