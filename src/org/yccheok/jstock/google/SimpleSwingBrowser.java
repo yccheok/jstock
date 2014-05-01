@@ -7,6 +7,8 @@
 package org.yccheok.jstock.google;
 
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Set;
@@ -39,6 +41,17 @@ public class SimpleSwingBrowser extends JDialog {
     private void initComponents() {
         createScene();
   
+        // http://stackoverflow.com/questions/11269632/javafx-hmtleditor-doesnt-react-on-return-key
+        jfxPanel.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                if (e.getKeyChar() == 10) {
+                    e.setKeyChar((char) 13);
+                    Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(e);
+                }
+            }
+        });
+
         panel.add(jfxPanel, BorderLayout.CENTER);
         
         getContentPane().add(panel);
@@ -111,7 +124,7 @@ public class SimpleSwingBrowser extends JDialog {
             @Override 
             public void run() {
                 String tmp = toURL(url);
- 
+                
                 if (tmp == null) {
                     tmp = toURL("http://" + url);
                 }
