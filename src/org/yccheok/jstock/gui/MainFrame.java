@@ -1304,6 +1304,10 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenu8MenuSelected
 
     private void jMenuItem11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem11ActionPerformed
+        loadFromCloud();
+    }//GEN-LAST:event_jMenuItem11ActionPerformed
+
+    public void loadFromCloud() {
         jMenu3.setEnabled(false);
         
         SwingWorker swingWorker = new SwingWorker<Pair<Credential, Userinfoplus>, Void>() {
@@ -1340,9 +1344,9 @@ public class MainFrame extends javax.swing.JFrame {
             }
         };
         
-        swingWorker.execute();
-    }//GEN-LAST:event_jMenuItem11ActionPerformed
-
+        swingWorker.execute();        
+    }
+    
     private void jMenuItem10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem10ActionPerformed
         final SaveToCloudJDialog dialog = new SaveToCloudJDialog(this, true);
         dialog.setVisible(true);
