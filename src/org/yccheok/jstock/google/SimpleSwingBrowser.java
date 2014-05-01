@@ -81,26 +81,24 @@ public class SimpleSwingBrowser extends JDialog {
                     }
                 });
  
-                engine.getLoadWorker()
-                        .exceptionProperty()
-                        .addListener(new ChangeListener<Throwable>() {
- 
-                            public void changed(ObservableValue<? extends Throwable> o, Throwable old, final Throwable value) {
-                                if (engine.getLoadWorker().getState() == FAILED) {
-                                    SwingUtilities.invokeLater(new Runnable() {
-                                        @Override public void run() {
-                                            JOptionPane.showMessageDialog(
-                                                    panel,
-                                                    (value != null) ?
-                                                    engine.getLocation() + "\n" + value.getMessage() :
-                                                    engine.getLocation() + "\nUnexpected error.",
-                                                    "Loading error...",
-                                                    JOptionPane.ERROR_MESSAGE);
-                                        }
-                                    });
+                engine.getLoadWorker().exceptionProperty().addListener(new ChangeListener<Throwable>() {
+
+                    public void changed(ObservableValue<? extends Throwable> o, Throwable old, final Throwable value) {
+                        if (engine.getLoadWorker().getState() == FAILED) {
+                            SwingUtilities.invokeLater(new Runnable() {
+                                @Override public void run() {
+                                    JOptionPane.showMessageDialog(
+                                        panel,
+                                        (value != null) ?
+                                        engine.getLocation() + "\n" + value.getMessage() :
+                                        engine.getLocation() + "\nUnexpected error.",
+                                        "Loading error...",
+                                        JOptionPane.ERROR_MESSAGE);
                                 }
-                            }
-                        });
+                            });
+                        }
+                    }
+                });
                 
                 // http://stackoverflow.com/questions/11206942/how-to-hide-scrollbars-in-the-javafx-webview
                 // hide webview scrollbars whenever they appear.
