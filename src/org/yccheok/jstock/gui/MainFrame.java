@@ -1330,8 +1330,10 @@ public class MainFrame extends javax.swing.JFrame {
                 try {
                     pair = this.get();
                 } catch (InterruptedException ex) {
+                    JOptionPane.showMessageDialog(MainFrame.this, ex.getMessage(), GUIBundle.getString("LoadFromCloudJDialog_Title"), JOptionPane.ERROR_MESSAGE);
                     log.error(null, ex);
                 } catch (ExecutionException ex) {
+                    JOptionPane.showMessageDialog(MainFrame.this, ex.getMessage(), GUIBundle.getString("LoadFromCloudJDialog_Title"), JOptionPane.ERROR_MESSAGE);
                     log.error(null, ex);
                 }
                 

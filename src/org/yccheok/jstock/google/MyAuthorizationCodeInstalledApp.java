@@ -124,8 +124,14 @@ public class MyAuthorizationCodeInstalledApp {
                         // http://stackoverflow.com/questions/23319579/why-formwindowclosed-is-being-triggered-twice-in-jdialog-after-dispose
                         redirectUri = null;
                         
-                        String url = uri + "?error=windowClosed";
-                        org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(url);
+                        final String url = uri + "?error=windowClosed";
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(url);
+                            }
+                            
+                        }).start();
                     }
                     
                     @Override
