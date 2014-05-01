@@ -19,6 +19,7 @@
 
 package org.yccheok.jstock.gui;
 
+import com.google.api.client.auth.oauth2.Credential;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
@@ -1157,11 +1158,11 @@ public class Utils {
         }
     }
 
-    public static CloudFile loadFromGoogleDoc(String username, String password) {
+    public static CloudFile loadFromGoogleDrive(Credential credential) {
         return null;
     }
 
-    public static CloudFile loadFromCloud(String username, String password) {
+    public static CloudFile loadFromLegacyGoogleDrive(Credential credential) {
         return null;
     }
 

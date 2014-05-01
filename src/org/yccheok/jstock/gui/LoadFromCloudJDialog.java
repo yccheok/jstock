@@ -315,11 +315,11 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
 
                 publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_LoadingFromCloud..."), Icons.BUSY));
 
-                Utils.CloudFile cloudFile = Utils.loadFromGoogleDoc(username, "");
+                Utils.CloudFile cloudFile = Utils.loadFromGoogleDrive(credentialEx.first);
                 if (cloudFile == null) {
                     // Perhaps we should load from legacy cloud server, and help
                     // user to perform migration to Google Doc server.
-                    cloudFile = Utils.loadFromCloud(username, "");
+                    cloudFile = Utils.loadFromLegacyGoogleDrive(credentialEx.first);
                     if (cloudFile == null) {                        
                         publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_LoadingFromCloudFail"), Icons.ERROR));
                         return false;
