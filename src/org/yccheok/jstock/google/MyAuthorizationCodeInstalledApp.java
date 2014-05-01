@@ -23,6 +23,8 @@ import org.yccheok.jstock.gui.Pair;
  */
 public class MyAuthorizationCodeInstalledApp {
 
+    private static final String CODE = "org.yccheok.jstock.google.MyAuthorizationCodeInstalledApp";
+    
     private SimpleSwingBrowser browser;  
     private String redirectUri;
     
@@ -63,6 +65,9 @@ public class MyAuthorizationCodeInstalledApp {
             onAuthorization(authorizationUrl);
             // receive authorization code and exchange it for an access token
             String code = receiver.waitForCode();
+            if (code.equals(CODE)) {
+                return null;
+            }
             TokenResponse response = flow.newTokenRequest(code).setRedirectUri(redirectUri).execute();
             // store credential and return it
             credential = flow.createAndStoreCredential(response, userId);
@@ -124,7 +129,7 @@ public class MyAuthorizationCodeInstalledApp {
                         // http://stackoverflow.com/questions/23319579/why-formwindowclosed-is-being-triggered-twice-in-jdialog-after-dispose
                         redirectUri = null;
                         
-                        final String url = uri + "?error=windowClosed";
+                        final String url = uri + "?code=" + CODE;
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
