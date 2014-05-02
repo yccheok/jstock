@@ -1164,77 +1164,99 @@ public class Utils {
         }
     }
 
-    private static CloudFile _loadFromGoogleDrive(Credential credential, String qString) {
-        Drive drive = org.yccheok.jstock.google.Utils.getDrive(credential);
+    private static class GoogleCloudFile {
+        public final com.google.api.services.drive.model.File file;
+        public final long checksum;
+        public final long date;
+        public final int version;
+        private GoogleCloudFile(com.google.api.services.drive.model.File file, long checksum, long date, int version) {
+            this.file = file;
+            this.checksum = checksum;
+            this.date = date;
+            this.version = version;
+        }
 
-        List<com.google.api.services.drive.model.File> files = new ArrayList<com.google.api.services.drive.model.File>();
-        
+        public static GoogleCloudFile newInstance(com.google.api.services.drive.model.File file, long checksum, long date, int version) {
+            return new GoogleCloudFile(file, checksum, date, version);
+        }
+    }
 
-
+    private static GoogleCloudFile searchFromGoogleDrive(Drive drive, String qString) {
         try {
             Files.List request = drive.files().list().setQ(qString);
             
             do {                
                 FileList fileList = request.execute();
-                List<com.google.api.services.drive.model.File> tmp = fileList.getItems();
-                files.addAll(tmp);
+                
+                long checksum = 0;
+                long date = 0;
+                int version = 0;
+                com.google.api.services.drive.model.File file = null;
+
+                for (com.google.api.services.drive.model.File f : fileList.getItems()) {
+
+                    final String title = f.getTitle();
+
+                    if (title == null || f.getDownloadUrl() == null || f.getDownloadUrl().length() <= 0) {
+                        continue;
+                    }
+
+                    // Retrieve checksum, date and version information from filename.
+                    final Matcher matcher = googleDocTitlePattern.matcher(title);
+                    String _checksum = null;
+                    String _date = null;
+                    String _version = null;
+                    if (matcher.find()){
+                        if (matcher.groupCount() == 3) {
+                            _checksum = matcher.group(1);
+                            _date = matcher.group(2);
+                            _version = matcher.group(3);
+                        }
+                    }
+                    if (_checksum == null || _date == null || _version == null) {
+                        continue;
+                    }
+
+                    try {
+                        checksum = Long.parseLong(_checksum);
+                        date = Long.parseLong(_date);
+                        version = Integer.parseInt(_version);
+                    } catch (NumberFormatException ex) {
+                        log.error(null, ex);
+                        continue;
+                    }  
+
+                    file = f;
+
+                    break;
+                }
+
+                if (file != null) {
+                    return GoogleCloudFile.newInstance(file, checksum, date, version);
+                }
+                
                 request.setPageToken(fileList.getNextPageToken());
             } while (request.getPageToken() != null && request.getPageToken().length() > 0);
         } catch (IOException ex) {
             log.error(null, ex);
             return null;
         }
-        
-        long checksum = 0;
-        long date = 0;
-        int version = 0;
-        com.google.api.services.drive.model.File file = null;
-        
-        for (com.google.api.services.drive.model.File f : files) {
+        return null;
+    }
 
-            final String title = f.getTitle();
-            
-            if (title == null) {
-                continue;
-            }
-            
-            // Retrieve checksum, date and version information from filename.
-            final Matcher matcher = googleDocTitlePattern.matcher(title);
-            String _checksum = null;
-            String _date = null;
-            String _version = null;
-            if (matcher.find()){
-                if (matcher.groupCount() == 3) {
-                    _checksum = matcher.group(1);
-                    _date = matcher.group(2);
-                    _version = matcher.group(3);
-                }
-            }
-            if (_checksum == null || _date == null || _version == null) {
-                continue;
-            }
-            
-            try {
-                checksum = Long.parseLong(_checksum);
-                date = Long.parseLong(_date);
-                version = Integer.parseInt(_version);
-            } catch (NumberFormatException ex) {
-                log.error(null, ex);
-                continue;
-            }  
-            
-            file = f;
-            // Found.
-            break;
-        }
+    private static CloudFile _loadFromGoogleDrive(Credential credential, String qString) {
+        Drive drive = org.yccheok.jstock.google.Utils.getDrive(credential);        
         
-        if (file == null) {
+        GoogleCloudFile googleCloudFile = searchFromGoogleDrive(drive, qString);
+        
+        if (googleCloudFile == null) {
             return null;
         }
         
-        if (file.getDownloadUrl() == null || file.getDownloadUrl().length() <= 0) {
-            return null;
-        }        
+        final com.google.api.services.drive.model.File file = googleCloudFile.file;
+        final long checksum = googleCloudFile.checksum;
+        final long date = googleCloudFile.date;
+        final int version = googleCloudFile.version;
         
         HttpResponse resp = null;
         InputStream inputStream = null;
@@ -1286,12 +1308,12 @@ public class Utils {
         final String qString = "title contains '" + titleName + "' and trashed = false";
         return _loadFromGoogleDrive(credential, qString);
     }
-    
-    public static boolean saveToGoogleDoc(String username, String password, File file) {
+
+    public static boolean saveToGoogleDrive(Credential credential, File file) {
         return false;
     }
     
-    public static boolean saveToCloud(String username, String password, File file) {
+    public static boolean saveToLegacyGoogleDrive(Credential credential, File file) {
         return false;
     }
 

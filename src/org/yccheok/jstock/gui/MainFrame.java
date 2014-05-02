@@ -1307,6 +1307,48 @@ public class MainFrame extends javax.swing.JFrame {
         loadFromCloud();
     }//GEN-LAST:event_jMenuItem11ActionPerformed
 
+    public void saveToCloud() {
+        jMenu3.setEnabled(false);
+        
+        SwingWorker swingWorker = new SwingWorker<Pair<Pair<Credential, Userinfoplus>, Boolean>, Void>() {
+
+            @Override
+            protected Pair<Pair<Credential, Userinfoplus>, Boolean> doInBackground() throws Exception {
+                final Pair<Pair<Credential, Userinfoplus>, Boolean> pair = org.yccheok.jstock.google.Utils.authorizeDrive();
+                if (pair == null) {
+                    return null;
+                }
+                return pair;
+            }
+            
+            @Override
+            public void done() { 
+                jMenu3.setEnabled(true);
+                
+                Pair<Pair<Credential, Userinfoplus>, Boolean> pair = null;
+                
+                try {
+                    pair = this.get();
+                } catch (InterruptedException ex) {
+                    JOptionPane.showMessageDialog(MainFrame.this, ex.getMessage(), GUIBundle.getString("SaveToCloudJDialog_Title"), JOptionPane.ERROR_MESSAGE);
+                    log.error(null, ex);
+                } catch (ExecutionException ex) {
+                    JOptionPane.showMessageDialog(MainFrame.this, ex.getMessage(), GUIBundle.getString("SaveToCloudJDialog_Title"), JOptionPane.ERROR_MESSAGE);
+                    log.error(null, ex);
+                }
+                
+                if (pair == null) {
+                    return;
+                }
+                
+                SaveToCloudJDialog saveToCloudJDialog = new SaveToCloudJDialog(MainFrame.this, true, pair.first, pair.second);
+                saveToCloudJDialog.setVisible(true);
+            }
+        };
+        
+        swingWorker.execute();
+    }
+    
     public void loadFromCloud() {
         jMenu3.setEnabled(false);
         
@@ -1350,8 +1392,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     private void jMenuItem10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem10ActionPerformed
-        final SaveToCloudJDialog dialog = new SaveToCloudJDialog(this, true);
-        dialog.setVisible(true);
+        saveToCloud();
     }//GEN-LAST:event_jMenuItem10ActionPerformed
 
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed

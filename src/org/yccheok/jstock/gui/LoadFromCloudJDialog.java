@@ -220,7 +220,7 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
         jLabel3.setVisible(true);
         jLabel4.setVisible(true);
 
-        this.loadFromCloudTask = this.getLoadFromCloudTask("");
+        this.loadFromCloudTask = this.getLoadFromCloudTask();
         this.loadFromCloudTask.execute();
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -248,7 +248,7 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
         }
     }
     
-    private SwingWorker<Boolean, Status> getLoadFromCloudTask(final String username) {
+    private SwingWorker<Boolean, Status> getLoadFromCloudTask() {
         SwingWorker<Boolean, Status> worker = new SwingWorker<Boolean, Status>() {
             @Override
             protected void done() {
@@ -320,7 +320,7 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
                         publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_LoadingFromCloudFail"), Icons.ERROR));
                         return false;
                     } else {
-                        if (false == Utils.saveToGoogleDoc(username, "", cloudFile.file)) {                            
+                        if (false == Utils.saveToGoogleDrive(credentialEx.first, cloudFile.file)) {                            
                         } else {
                             // Migration success.
                             JOptionPane.showMessageDialog(LoadFromCloudJDialog.this, 
