@@ -20,11 +20,13 @@
 package org.yccheok.jstock.gui;
 
 import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.http.FileContent;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpResponse;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.Drive.Files;
 import com.google.api.services.drive.model.FileList;
+import com.google.api.services.drive.model.ParentReference;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
@@ -994,7 +996,7 @@ public class Utils {
     
     // Remember to revise googleDocTitlePattern if we change the definition
     // of this method.
-    private static String getGoogleDocTitle(long checksum, long date, int version) {
+    private static String getGoogleDriveTitle(long checksum, long date, int version) {
         return "jstock-" + getJStockUUID() + "-checksum=" + checksum + "-date=" + date + "-version=" + version + ".zip";
     }
     
@@ -1245,7 +1247,7 @@ public class Utils {
     }
 
     private static CloudFile _loadFromGoogleDrive(Credential credential, String qString) {
-        Drive drive = org.yccheok.jstock.google.Utils.getDrive(credential);        
+        Drive drive = org.yccheok.jstock.google.Utils.getDrive(credential);
         
         GoogleCloudFile googleCloudFile = searchFromGoogleDrive(drive, qString);
         
@@ -1310,9 +1312,92 @@ public class Utils {
     }
 
     public static boolean saveToGoogleDrive(Credential credential, File file) {
-        return false;
+        Drive drive = org.yccheok.jstock.google.Utils.getDrive(credential);
+        
+        // Should we new or replace?
+        GoogleCloudFile googleCloudFile = searchFromGoogleDrive(drive, "'appdata' in parents");
+        
+        final long checksum = org.yccheok.jstock.analysis.Utils.getChecksum(file);
+        final long date = new Date().getTime();
+        final int version = org.yccheok.jstock.gui.Utils.getCloudFileVersionID();
+        final String title = getGoogleDriveTitle(checksum, date, version);    
+
+        if (googleCloudFile == null) {
+            com.google.api.services.drive.model.File appData;
+            try {
+                appData = drive.files().get("appdata").execute();
+            } catch (IOException ex) {
+                log.error(null, ex);
+                return false;
+            }
+            return null != insertFile(drive, title, appData.getId(), file);
+        } else {
+            final com.google.api.services.drive.model.File oldFile = googleCloudFile.file;
+            return null != updateFile(drive, oldFile.getId(), title, file);
+        }
     }
     
+    /**
+     * Insert new file.
+     *
+     * @param service Drive API service instance.
+     * @param title Title of the file to insert, including the extension.
+     * @param parentId Optional parent folder's ID.
+     * @param mimeType MIME type of the file to insert.
+     * @param filename Filename of the file to insert.
+     * @return Inserted file metadata if successful, {@code null} otherwise.
+     */
+    private static com.google.api.services.drive.model.File insertFile(Drive service, String title, String parentId, java.io.File fileContent) {
+        // File's metadata.
+        com.google.api.services.drive.model.File body = new com.google.api.services.drive.model.File();
+        body.setTitle(title);
+
+        // Set the parent folder.
+        if (parentId != null && parentId.length() > 0) {
+            body.setParents(
+                Arrays.asList(new ParentReference().setId(parentId)));
+        }
+
+        // File's content.
+        FileContent mediaContent = new FileContent("", fileContent);
+        try {
+            com.google.api.services.drive.model.File file = service.files().insert(body, mediaContent).execute();
+            return file;
+        } catch (IOException e) {
+            log.error(null, e);
+            return null;
+        }
+    }
+
+    /**
+     * Update an existing file's metadata and content.
+     *
+     * @param service Drive API service instance.
+     * @param fileId ID of the file to update.
+     * @param newTitle New title for the file.
+     * @param newFilename Filename of the new content to upload.
+     * @return Updated file metadata if successful, {@code null} otherwise.
+     */
+    private static com.google.api.services.drive.model.File updateFile(Drive service, String fileId, String newTitle, java.io.File fileContent) {
+        try {
+            // First retrieve the file from the API.
+            com.google.api.services.drive.model.File file = service.files().get(fileId).execute();
+
+            // File's new metadata.
+            file.setTitle(newTitle);
+
+            FileContent mediaContent = new FileContent("", fileContent);
+            
+            // Send the request to the API.
+            com.google.api.services.drive.model.File updatedFile = service.files().update(fileId, file, mediaContent).execute();
+
+            return updatedFile;
+        } catch (IOException e) {
+            log.error(null, e);
+            return null;
+        }
+    }
+
     public static boolean saveToLegacyGoogleDrive(Credential credential, File file) {
         return false;
     }
