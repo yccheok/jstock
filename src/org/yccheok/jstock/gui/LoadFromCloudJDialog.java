@@ -320,14 +320,7 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
                         publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_LoadingFromCloudFail"), Icons.ERROR));
                         return false;
                     } else {
-                        if (false == Utils.saveToGoogleDrive(credentialEx.first, cloudFile.file)) {                            
-                        } else {
-                            // Migration success.
-                            JOptionPane.showMessageDialog(LoadFromCloudJDialog.this, 
-                                    MessagesBundle.getString("info_message_migration_to_google_doc_server_success"), 
-                                    MessagesBundle.getString("info_title_migration_to_google_doc_server_success"), 
-                                    JOptionPane.INFORMATION_MESSAGE);
-                        }
+                        Utils.saveToGoogleDrive(credentialEx.first, cloudFile.file);
                     }
                 }
                 /* Check for checksum. */

@@ -19,6 +19,8 @@
 
 package org.yccheok.jstock.gui;
 
+import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.services.oauth2.model.Userinfoplus;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
@@ -54,11 +56,17 @@ import org.yccheok.jstock.internationalization.MessagesBundle;
 public class SaveToCloudJDialog extends javax.swing.JDialog {
 
     /** Creates new form LoadFromCloudJDialog */
-    public SaveToCloudJDialog(java.awt.Frame parent, boolean modal) {
+    public SaveToCloudJDialog(java.awt.Frame parent, boolean modal, Pair<Credential, Userinfoplus> credentialEx, boolean credentialFromDisk) {
         super(parent, modal);
         initComponents();
+        this.credentialEx = credentialEx;
+        this.jLabel10.setText(credentialEx.second.getEmail());        
         this.jLabel4.setVisible(false);
         this.jLabel5.setVisible(false);
+        
+        if (false == credentialFromDisk) {
+            jButton1.doClick();
+        }        
     }
 
     /** This method is called from within the constructor to
@@ -203,6 +211,11 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
         jPanel8.add(jLabel10);
 
         jButton3.setText(bundle.getString("SaveToCloudJDialog_SignOut")); // NOI18N
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
         jPanel8.add(jButton3);
 
         jPanel2.add(jPanel8, java.awt.BorderLayout.CENTER);
@@ -282,6 +295,15 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
     private void jLabel9MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel9MouseExited
         this.setCursor(Cursor.getDefaultCursor());
     }//GEN-LAST:event_jLabel9MouseExited
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        org.yccheok.jstock.google.Utils.logoutDrive();
+        
+        this.setVisible(false);
+        this.dispose();
+        
+        MainFrame.getInstance().saveToCloud();
+    }//GEN-LAST:event_jButton3ActionPerformed
 
     private static class Status {
         public final String message;
@@ -380,7 +402,13 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
 
                 publish(Status.newInstance(GUIBundle.getString("SaveToCloudJDialog_VerifyGoogleAccount..."), Icons.BUSY));
 
-                if (false == Utils.saveToGoogleDoc(username, "", zipFile)) {
+                if (false == Utils.saveToGoogleDrive(credentialEx.first, zipFile)) {
+                    publish(Status.newInstance(GUIBundle.getString("SaveToCloudJDialog_VerifyGoogleAccountFail"), Icons.ERROR));
+                    return false;
+                }
+
+                // To serve legacy Android app.
+                if (false == Utils.saveToLegacyGoogleDrive(credentialEx.first, zipFile)) {
                     publish(Status.newInstance(GUIBundle.getString("SaveToCloudJDialog_VerifyGoogleAccountFail"), Icons.ERROR));
                     return false;
                 }
@@ -779,6 +807,8 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
     private Font getRobotoLightFont() {
         return Utils.getRobotoLightFont().deriveFont((float)18);
     }
+    
+    private final Pair<Credential, Userinfoplus> credentialEx;
     
     private volatile SwingWorker<Boolean, Status> saveToCloudTask = null;
     private final List<String> memoryLog = new ArrayList<String>();
