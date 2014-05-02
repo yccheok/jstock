@@ -1300,14 +1300,17 @@ public class Utils {
     }
     
     public static CloudFile loadFromGoogleDrive(Credential credential) {
-        return _loadFromGoogleDrive(credential, "'appdata' in parents");
+        // 25 is based on experiment. Might changed by Google in the future.
+        final String titleName = ("jstock-" + Utils.getJStockUUID() + "-checksum=").substring(0, 25);        
+        final String qString = "title contains '" + titleName + "' and trashed = false and 'appdata' in parents";
+        return _loadFromGoogleDrive(credential, qString);
     }
 
     // Legacy. Shall be removed after a while...
     public static CloudFile loadFromLegacyGoogleDrive(Credential credential) {
         // 25 is based on experiment. Might changed by Google in the future.
         final String titleName = ("jstock-" + Utils.getJStockUUID() + "-checksum=").substring(0, 25);
-        final String qString = "title contains '" + titleName + "' and trashed = false";
+        final String qString = "title contains '" + titleName + "' and trashed = false and not 'appdata' in parents";
         return _loadFromGoogleDrive(credential, qString);
     }
 
@@ -1315,7 +1318,11 @@ public class Utils {
         Drive drive = org.yccheok.jstock.google.Utils.getDrive(credential);
         
         // Should we new or replace?
-        GoogleCloudFile googleCloudFile = searchFromGoogleDrive(drive, "'appdata' in parents");
+        
+        // 25 is based on experiment. Might changed by Google in the future.
+        final String titleName = ("jstock-" + Utils.getJStockUUID() + "-checksum=").substring(0, 25);        
+        final String qString = "title contains '" + titleName + "' and trashed = false and 'appdata' in parents";        
+        GoogleCloudFile googleCloudFile = searchFromGoogleDrive(drive, qString);
         
         final long checksum = org.yccheok.jstock.analysis.Utils.getChecksum(file);
         final long date = new Date().getTime();
