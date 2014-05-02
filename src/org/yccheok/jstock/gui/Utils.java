@@ -1315,13 +1315,24 @@ public class Utils {
     }
 
     public static boolean saveToGoogleDrive(Credential credential, File file) {
+        // 25 is based on experiment. Might changed by Google in the future.
+        final String titleName = ("jstock-" + Utils.getJStockUUID() + "-checksum=").substring(0, 25);        
+        final String qString = "title contains '" + titleName + "' and trashed = false and 'appdata' in parents";        
+        return _saveToGoogleDrive(credential, file, qString, "appdata");
+    }
+    
+    public static boolean saveToLegacyGoogleDrive(Credential credential, File file) {
+        // 25 is based on experiment. Might changed by Google in the future.
+        final String titleName = ("jstock-" + Utils.getJStockUUID() + "-checksum=").substring(0, 25);
+        final String qString = "title contains '" + titleName + "' and trashed = false and not 'appdata' in parents";       
+        return _saveToGoogleDrive(credential, file, qString, null);
+    }
+    
+    private static boolean _saveToGoogleDrive(Credential credential, File file, String qString, String folder) {
         Drive drive = org.yccheok.jstock.google.Utils.getDrive(credential);
         
         // Should we new or replace?
         
-        // 25 is based on experiment. Might changed by Google in the future.
-        final String titleName = ("jstock-" + Utils.getJStockUUID() + "-checksum=").substring(0, 25);        
-        final String qString = "title contains '" + titleName + "' and trashed = false and 'appdata' in parents";        
         GoogleCloudFile googleCloudFile = searchFromGoogleDrive(drive, qString);
         
         final long checksum = org.yccheok.jstock.analysis.Utils.getChecksum(file);
@@ -1330,14 +1341,18 @@ public class Utils {
         final String title = getGoogleDriveTitle(checksum, date, version);    
 
         if (googleCloudFile == null) {
-            com.google.api.services.drive.model.File appData;
-            try {
-                appData = drive.files().get("appdata").execute();
-            } catch (IOException ex) {
-                log.error(null, ex);
-                return false;
+            String id = null;
+            if (folder != null) {
+                com.google.api.services.drive.model.File appData;
+                try {
+                    appData = drive.files().get(folder).execute();
+                    id = appData.getId();
+                } catch (IOException ex) {
+                    log.error(null, ex);
+                    return false;
+                }
             }
-            return null != insertFile(drive, title, appData.getId(), file);
+            return null != insertFile(drive, title, id, file);
         } else {
             final com.google.api.services.drive.model.File oldFile = googleCloudFile.file;
             return null != updateFile(drive, oldFile.getId(), title, file);
@@ -1403,10 +1418,6 @@ public class Utils {
             log.error(null, e);
             return null;
         }
-    }
-
-    public static boolean saveToLegacyGoogleDrive(Credential credential, File file) {
-        return false;
     }
 
     public static boolean isCloudFileCompatible(int cloudFileVersionId) {
