@@ -21,6 +21,7 @@ package org.yccheok.jstock.gui;
 
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Font;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -56,7 +57,6 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
     public SaveToCloudJDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        this.jLabel3.setVisible(false);
         this.jLabel4.setVisible(false);
         this.jLabel5.setVisible(false);
     }
@@ -82,15 +82,13 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jLabel2 = new javax.swing.JLabel();
-        jPasswordField1 = new javax.swing.JPasswordField();
-        jLabel6 = new javax.swing.JLabel();
-        jCheckBox1 = new javax.swing.JCheckBox();
+        jPanel7 = new javax.swing.JPanel();
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
+        jPanel8 = new javax.swing.JPanel();
+        jLabel10 = new javax.swing.JLabel();
+        jButton3 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
@@ -135,14 +133,14 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
         jLabel3.setForeground(new java.awt.Color(0, 0, 255));
-        jLabel3.setText(bundle.getString("SaveToCloudJDialog_SavingToCloud...")); // NOI18N
+        jLabel3.setText(" ");
+        jLabel3.setToolTipText("");
         jPanel4.add(jLabel3);
 
         jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/spinner.gif"))); // NOI18N
         jPanel4.add(jLabel4);
 
         jLabel5.setText(bundle.getString("WizardDownloadlIndicatorJPanel_ViewLog")); // NOI18N
-        this.jLabel3.setVisible(false);
         jLabel5.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jLabel5MouseClicked(evt);
@@ -159,30 +157,11 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
         jPanel1.add(jPanel4, java.awt.BorderLayout.SOUTH);
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("SaveToCloudJDialog_GoogleAccount"))); // NOI18N
+        jPanel2.setLayout(new java.awt.BorderLayout());
 
-        jLabel1.setText(bundle.getString("SaveToCloudJDialog_Username")); // NOI18N
-
-        jTextField1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField1ActionPerformed(evt);
-            }
-        });
-
-        jLabel2.setText(bundle.getString("SaveToCloudJDialog_Password")); // NOI18N
-
-        jPasswordField1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jPasswordField1ActionPerformed(evt);
-            }
-        });
-
-        jLabel6.setFont(jLabel6.getFont().deriveFont(jLabel6.getFont().getSize()-1f));
-        jLabel6.setText(bundle.getString("SaveToCloudJDialog_EmailExample")); // NOI18N
-
-        jCheckBox1.setText(bundle.getString("SaveToCloudJDialog_KeepMeSignedIn")); // NOI18N
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
         jLabel7.setText(bundle.getString("SaveToCloudJDialog_ViewPrivacyInformation")); // NOI18N
-        this.jLabel3.setVisible(false);
         jLabel7.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jLabel7MouseClicked(evt);
@@ -194,8 +173,10 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
                 jLabel7MouseExited(evt);
             }
         });
+        jPanel7.add(jLabel7);
 
         jLabel8.setText(bundle.getString("SaveToCloudJDialog_Or")); // NOI18N
+        jPanel7.add(jLabel8);
 
         jLabel9.setText(bundle.getString("SaveToCloudJDialog_DownloadJStockAndroid")); // NOI18N
         jLabel9.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -209,63 +190,28 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
                 jLabel9MouseExited(evt);
             }
         });
+        jPanel7.add(jLabel9);
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1)
-                            .addComponent(jLabel2))
-                        .addGap(10, 10, 10)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jPasswordField1, javax.swing.GroupLayout.DEFAULT_SIZE, 177, Short.MAX_VALUE)
-                            .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 177, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel6))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jCheckBox1)
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel8)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel6))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(jPasswordField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel8)
-                    .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jCheckBox1)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+        jPanel2.add(jPanel7, java.awt.BorderLayout.SOUTH);
+
+        jLabel10.setBackground(new java.awt.Color(140, 196, 116));
+        jLabel10.setFont(getRobotoLightFont());
+        jLabel10.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel10.setText("username@email.com");
+        jLabel10.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        jLabel10.setOpaque(true);
+        jPanel8.add(jLabel10);
+
+        jButton3.setText(bundle.getString("SaveToCloudJDialog_SignOut")); // NOI18N
+        jPanel8.add(jButton3);
+
+        jPanel2.add(jPanel8, java.awt.BorderLayout.CENTER);
 
         jPanel1.add(jPanel2, java.awt.BorderLayout.CENTER);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
-        setSize(new java.awt.Dimension(420, 331));
+        setSize(new java.awt.Dimension(420, 271));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -301,40 +247,7 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jLabel5MouseExited
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        String username = this.jTextField1.getText().trim();
-        if (username.length() == 0)
-        {
-            JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_username_cannot_be_empty"), MessagesBundle.getString("warning_title_username_cannot_be_empty"), JOptionPane.WARNING_MESSAGE);
-            this.jTextField1.requestFocus();
-            return;
-        }
-
-        username = Utils.toEmailIfPossible(username);
-        if (username == null) {
-            JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_invalid_email_address"), MessagesBundle.getString("warning_title_invalid_email_address"), JOptionPane.WARNING_MESSAGE);
-            this.jTextField1.requestFocus();
-            return;            
-        }
-
-        if (this.jPasswordField1.getPassword().length == 0)
-        {
-            JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_password_cannot_be_empty"), MessagesBundle.getString("warning_title_password_cannot_be_empty"), JOptionPane.WARNING_MESSAGE);
-            this.jPasswordField1.requestFocus();
-            return;
-        }
-
-        final String password = new String(jPasswordField1.getPassword()).trim();
-        if (password.length() == 0)
-        {
-            JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_password_cannot_be_empty"), MessagesBundle.getString("warning_title_password_cannot_be_empty"), JOptionPane.WARNING_MESSAGE);
-            this.jPasswordField1.requestFocus();
-            return;
-        }
-
         this.jButton1.setEnabled(false);
-        this.jTextField1.setEnabled(false);
-        this.jPasswordField1.setEnabled(false);
-        this.jCheckBox1.setEnabled(false);
 
         // Update GUI immediately. So that user will not feel our app is slow.
         jLabel3.setText(GUIBundle.getString("SaveToCloudJDialog_PreparingData..."));
@@ -342,7 +255,7 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
         jLabel3.setVisible(true);
         jLabel4.setVisible(true);
 
-        this.saveToCloudTask = this.getSaveToCloudTask(username);
+        this.saveToCloudTask = this.getSaveToCloudTask("");
         this.saveToCloudTask.execute();
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -357,14 +270,6 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
     private void jLabel7MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel7MouseExited
         this.setCursor(Cursor.getDefaultCursor());
     }//GEN-LAST:event_jLabel7MouseExited
-
-    private void jPasswordField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jPasswordField1ActionPerformed
-        jButton1ActionPerformed(evt);
-    }//GEN-LAST:event_jPasswordField1ActionPerformed
-
-    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
-        jButton1ActionPerformed(evt);
-    }//GEN-LAST:event_jTextField1ActionPerformed
 
     private void jLabel9MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel9MouseClicked
         Utils.launchWebBrowser(org.yccheok.jstock.network.Utils.getURL(org.yccheok.jstock.network.Utils.Type.ANDROID_HTML));
@@ -417,9 +322,6 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
                 }
 
                 jButton1.setEnabled(true);
-                jTextField1.setEnabled(true);
-                jPasswordField1.setEnabled(true);
-                jCheckBox1.setEnabled(true);
 
                 if (result == true) {
                     JOptionPane.showMessageDialog(SaveToCloudJDialog.this, GUIBundle.getString("SaveToCloudJDialog_Success"));
@@ -478,8 +380,7 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
 
                 publish(Status.newInstance(GUIBundle.getString("SaveToCloudJDialog_VerifyGoogleAccount..."), Icons.BUSY));
 
-                final String password = new String(jPasswordField1.getPassword()).trim();
-                if (false == Utils.saveToGoogleDoc(username, password, zipFile)) {
+                if (false == Utils.saveToGoogleDoc(username, "", zipFile)) {
                     publish(Status.newInstance(GUIBundle.getString("SaveToCloudJDialog_VerifyGoogleAccountFail"), Icons.ERROR));
                     return false;
                 }
@@ -875,6 +776,10 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
         this.memoryLog.add(s);
     }
 
+    private Font getRobotoLightFont() {
+        return Utils.getRobotoLightFont().deriveFont((float)18);
+    }
+    
     private volatile SwingWorker<Boolean, Status> saveToCloudTask = null;
     private final List<String> memoryLog = new ArrayList<String>();
 
@@ -883,13 +788,11 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
-    private javax.swing.JCheckBox jCheckBox1;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
+    private javax.swing.JButton jButton3;
+    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
@@ -899,8 +802,8 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
-    private javax.swing.JPasswordField jPasswordField1;
-    private javax.swing.JTextField jTextField1;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
     private org.jdesktop.swingx.JXHeader jXHeader1;
     // End of variables declaration//GEN-END:variables
 
