@@ -16,6 +16,8 @@ import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
+import com.google.api.services.calendar.Calendar;
+import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.oauth2.Oauth2;
@@ -82,6 +84,19 @@ public class Utils {
         File file = new File(getDriveDataDirectory(), "StoredCredential");
         file.delete();
     }
+
+    public static Pair<Pair<Credential, Userinfoplus>, Boolean> authorizeCalendar() throws Exception {
+        Set<String> scopes = new HashSet<String>();
+        scopes.add("email");
+        scopes.add("profile");
+        scopes.add(CalendarScopes.CALENDAR);  
+
+        // load client secrets
+        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(Utils.JSON_FACTORY,
+            new InputStreamReader(Utils.class.getResourceAsStream("/assets/authentication/calendar/client_secrets.json")));
+        
+        return authorize(clientSecrets, scopes, new FileDataStoreFactory(getCalendarDataDirectory()));
+    }
     
     public static Pair<Pair<Credential, Userinfoplus>, Boolean> authorizeDrive() throws Exception {
         // Ask for only the permissions you need. Asking for more permissions will
@@ -122,4 +137,9 @@ public class Utils {
         Drive service = new Drive.Builder(httpTransport, JSON_FACTORY, credential).setApplicationName("JStock").build();
         return service;
     }
+    
+    public static Calendar getCalendar(Credential credential) {
+        Calendar service = new Calendar.Builder(httpTransport, JSON_FACTORY, credential).setApplicationName("JStock").build();
+        return service;
+    }    
 }
