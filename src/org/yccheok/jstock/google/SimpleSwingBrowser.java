@@ -16,6 +16,7 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
+import javafx.concurrent.Worker.State;
 import static javafx.concurrent.Worker.State.FAILED;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Node;
@@ -24,12 +25,13 @@ import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javax.swing.*;
 import org.yccheok.jstock.gui.MainFrame;
+import org.yccheok.jstock.internationalization.MessagesBundle;
   
 public class SimpleSwingBrowser extends JDialog {
  
     private final JFXPanel jfxPanel = new JFXPanel();
     private WebEngine engine;
- 
+    private String loadedURL = null;
     private final JPanel panel = new JPanel(new BorderLayout());
  
     public SimpleSwingBrowser() {
@@ -81,21 +83,22 @@ public class SimpleSwingBrowser extends JDialog {
                     }
                 });
  
-                engine.getLoadWorker().exceptionProperty().addListener(new ChangeListener<Throwable>() {
+                engine.getLoadWorker().stateProperty().addListener(new ChangeListener<State>() {
 
-                    public void changed(ObservableValue<? extends Throwable> o, Throwable old, final Throwable value) {
-                        if (engine.getLoadWorker().getState() == FAILED) {
-                            SwingUtilities.invokeLater(new Runnable() {
-                                @Override public void run() {
-                                    JOptionPane.showMessageDialog(
-                                        panel,
-                                        (value != null) ?
-                                        engine.getLocation() + "\n" + value.getMessage() :
-                                        engine.getLocation() + "\nUnexpected error.",
-                                        "Loading error...",
-                                        JOptionPane.ERROR_MESSAGE);
+                    @Override
+                    public void changed(ObservableValue<? extends State> observable, State oldValue, final State newValue) {
+                        if (newValue == FAILED) {
+                            final int result = JOptionPane.showConfirmDialog(
+                                panel,
+                                MessagesBundle.getString("error_message_unable_connect_to_internet"),
+                                MessagesBundle.getString("error_title_unable_connect_to_internet"),
+                                JOptionPane.YES_NO_OPTION);
+                            
+                            if (result == JOptionPane.YES_OPTION) {
+                                if (loadedURL != null) {
+                                    engine.load(loadedURL);
                                 }
-                            });
+                            }
                         }
                     }
                 });
@@ -127,6 +130,7 @@ public class SimpleSwingBrowser extends JDialog {
                     tmp = toURL("http://" + url);
                 }
  
+                loadedURL = tmp;
                 engine.load(tmp);
             }
         });
@@ -136,7 +140,7 @@ public class SimpleSwingBrowser extends JDialog {
         try {
             return new URL(str).toExternalForm();
         } catch (MalformedURLException exception) {
-                return null;
+            return null;
         }
     }
 }
