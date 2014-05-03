@@ -390,20 +390,6 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
     }//GEN-LAST:event_jCheckBox3ItemStateChanged
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        if (jTextField3.getText().trim().length() == 0)
-        {
-            JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_sms_username_cannot_be_empty"), MessagesBundle.getString("warning_title_sms_username_cannot_be_empty"), JOptionPane.WARNING_MESSAGE);
-            jTextField3.requestFocus();
-            return;
-        }
-
-        if (jPasswordField2.getPassword().length == 0)
-        {
-            JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_sms_password_cannot_be_empty"), MessagesBundle.getString("warning_title_sms_password_cannot_be_empty"), JOptionPane.WARNING_MESSAGE);
-            jPasswordField2.requestFocus();
-            return;
-        }
-
         this.testSMSSwingWorker = getTestSMSSwingWorker();
         this.updateGUIState();
         this.jButton2.requestFocus();
@@ -453,8 +439,6 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         jTextField2.setText(Utils.decrypt(jStockOptions.getEmail()));
         jTextField1.setText(Utils.decrypt(jStockOptions.getCCEmail()));
         jPasswordField1.setText(Utils.decrypt(jStockOptions.getEmailPassword()));
-        jTextField3.setText(Utils.decrypt(jStockOptions.getGoogleCalendarUsername()));
-        jPasswordField2.setText(Utils.decrypt(jStockOptions.getGoogleCalendarPassword()));
 
         if (jStockOptions.getMaxSMSPerDay() <= 0) {
             jComboBox1.setSelectedItem(GUIBundle.getString("OptionsAlertJPanel_Unlimited"));
@@ -485,19 +469,6 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         }
 
         if (jCheckBox3.isSelected()) {
-            if (jTextField3.getText().trim().length() == 0)
-            {
-                JOptionPane.showMessageDialog(this, "SMS username cannot be empty", "Empty SMS username", JOptionPane.WARNING_MESSAGE);
-                jTextField3.requestFocus();
-                return false;
-            }
-
-            if (jPasswordField2.getPassword().length == 0)
-            {
-                JOptionPane.showMessageDialog(this, "SMS password cannot be empty", "Empty SMS password", JOptionPane.WARNING_MESSAGE);
-                jPasswordField2.requestFocus();
-                return false;
-            }
         }
 
         jStockOptions.setSoundEnabled(jCheckBox4.isSelected());
@@ -507,8 +478,6 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         jStockOptions.setCCEmail(Utils.encrypt(jTextField1.getText().trim()));
         jStockOptions.setEmailPassword(Utils.encrypt(new String(jPasswordField1.getPassword())));
         jStockOptions.setSMSEnabled(jCheckBox3.isSelected());
-        jStockOptions.setGoogleCalendarUsername(Utils.encrypt(jTextField3.getText().trim()));
-        jStockOptions.setGoogleCalendarPassword(Utils.encrypt(new String(jPasswordField2.getPassword())));
 
         int maxSMSPerDay = -1;
         try {
@@ -549,13 +518,8 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         jCheckBox2.setEnabled(isTestEmailDone);
         jLabel7.setVisible(!isTestEmailDone);
 
-        jLabel4.setEnabled(smsState);
-        jLabel5.setEnabled(smsState);
         jButton2.setEnabled(smsState && isTestSMSDone);
-        jTextField3.setEnabled(smsState && isTestSMSDone);
-        jPasswordField2.setEnabled(smsState && isTestSMSDone);
         jCheckBox3.setEnabled(isTestSMSDone);
-        jLabel6.setEnabled(smsState);
         jEditorPane3.setEnabled(smsState);
         jLabel8.setVisible(!isTestSMSDone);
         jLabel9.setEnabled(smsState);
@@ -647,14 +611,7 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         SwingWorker worker = new SwingWorker<Boolean, Void>() {
             @Override
             public Boolean doInBackground() {
-                String username = jTextField3.getText().trim();
-                username = Utils.toEmailIfPossible(username);
-                if (username == null) {
-                    return false;
-                }                
-                final String password = new String(jPasswordField2.getPassword());
-                final boolean status = GoogleCalendar.SMS(username, password, MessagesBundle.getString("info_message_congratulation_sms_alert_system_is_working"));
-                return status;
+                return false;
             }
 
             @Override

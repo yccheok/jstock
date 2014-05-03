@@ -474,9 +474,8 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                     final String template = bundle.getString("IndicatorScannerJPanel_Hit_template");
                     final String message = MessageFormat.format(template, stock.symbol, price, indicator.toString());
 
-                    final String username = Utils.decrypt(jStockOptions.getGoogleCalendarUsername());
                     if (SMSLimiter.INSTANCE.isSMSAllowed()) {
-                        final boolean status = GoogleCalendar.SMS(username, Utils.decrypt(jStockOptions.getGoogleCalendarPassword()), message);
+                        final boolean status = GoogleCalendar.SMS("", "", message);
                         if (status) {
                             SMSLimiter.INSTANCE.inc();
                         }

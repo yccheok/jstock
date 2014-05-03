@@ -177,8 +177,10 @@ public class JStockOptions {
     private String email;
     private String emailPassword;
     private String CCEmail;
-    private String googleCalendarUsername;
-    private String googleCalendarPassword;
+    @Deprecated
+    private transient String googleCalendarUsername;
+    @Deprecated
+    private transient String googleCalendarPassword;
     private boolean SMSEnabled;
     @Deprecated
     private transient boolean passwordProtectedIndicator;
@@ -643,16 +645,6 @@ public class JStockOptions {
 
         if (this.getLastSavedFileNameExtensionDescription() == null) {
             this.setLastFileNameExtensionDescription("CSV Documents (*.csv)");
-        }
-
-        if (this.getGoogleCalendarUsername() == null) {
-            this.setGoogleCalendarUsername("");
-            this.setSMSEnabled(false);
-        }
-
-        if (this.getGoogleCalendarPassword() == null) {
-            setGoogleCalendarPassword("");
-            this.setSMSEnabled(false);
         }
 
         if (this.primaryStockServerFactoryClasses == null) {
@@ -1193,34 +1185,6 @@ public class JStockOptions {
         this.lastSelectedSellPortfolioChartIndex = lastSelectedSellPortfolioChartIndex;
     }
     
-    /**
-     * @return the googleCalendarUsername
-     */
-    public String getGoogleCalendarUsername() {
-        return googleCalendarUsername;
-    }
-
-    /**
-     * @param googleCalendarUsername the googleCalendarUsername to set
-     */
-    public void setGoogleCalendarUsername(String googleCalendarUsername) {
-        this.googleCalendarUsername = googleCalendarUsername;
-    }
-
-    /**
-     * @return the googleCalendarPassword
-     */
-    public String getGoogleCalendarPassword() {
-        return googleCalendarPassword;
-    }
-
-    /**
-     * @param googleCalendarPassword the googleCalendarPassword to set
-     */
-    public void setGoogleCalendarPassword(String googleCalendarPassword) {
-        this.googleCalendarPassword = googleCalendarPassword;
-    }
-
     /**
      * @return the SMSEnabled
      */
