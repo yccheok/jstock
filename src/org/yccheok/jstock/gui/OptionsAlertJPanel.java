@@ -51,7 +51,6 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
             @Override
             protected Pair<Credential, String> doInBackground() throws Exception {
                 final Pair<Credential, String> pair = org.yccheok.jstock.google.Utils.authorizeCalendarOffline();
-                System.out.println("pair is " + pair);
                 return pair;
             }
             
@@ -67,14 +66,13 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
                     log.error(null, ex);
                 }
                 
-                System.out.println("2 pair is " + pair);
-                
                 if (pair == null) {
                     jLabel13.setVisible(false);
                     jButton4.setText(GUIBundle.getString("OptionsAlertJPanel_SignIn"));
                 } else {
                     jLabel13.setText(pair.second);
                     jLabel13.setVisible(true);
+                    credentialEx = pair;
                 }
             }
         };
