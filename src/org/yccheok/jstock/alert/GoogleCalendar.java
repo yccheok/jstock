@@ -102,11 +102,21 @@ public class GoogleCalendar {
         
         // Previous JStock calendar not found. Let's create a new one.
         if (calendarListEntry == null) {
-            
-           // Create the calendar
+            com.google.api.services.calendar.model.Calendar calendar = new com.google.api.services.calendar.model.Calendar();
+            calendar.setSummary("JStock");
+            try {
+                calendar = service.calendars().insert(calendar).execute();
+            } catch (IOException ex) {
+                log.error(null, ex);
+                return false;
+            }
+
+            // http://stackoverflow.com/questions/17865302/error-404-when-creating-a-calendar-with-google-calendar-api-v3-using-c-sharp-ne
+            // Insert the ID of the calendar created in step 1 and insert it into the calendarList:
             calendarListEntry = new CalendarListEntry();
             calendarListEntry.setSummary("JStock");
-
+            calendarListEntry.setId(calendar.getId());
+            
             try {
                 calendarListEntry = service.calendarList().insert(calendarListEntry).execute();
             } catch (IOException ex) {
