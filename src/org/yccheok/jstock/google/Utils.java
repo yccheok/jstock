@@ -95,7 +95,7 @@ public class Utils {
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(Utils.JSON_FACTORY,
             new InputStreamReader(Utils.class.getResourceAsStream("/assets/authentication/calendar/client_secrets.json")));
         
-        return authorize(clientSecrets, scopes, new FileDataStoreFactory(getCalendarDataDirectory()));
+        return authorize(clientSecrets, scopes, getCalendarDataDirectory());
     }
     
     public static Pair<Pair<Credential, String>, Boolean> authorizeDrive() throws Exception {
@@ -116,18 +116,18 @@ public class Utils {
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(Utils.JSON_FACTORY,
             new InputStreamReader(Utils.class.getResourceAsStream("/assets/authentication/drive/client_secrets.json")));
         
-        return authorize(clientSecrets, scopes, new FileDataStoreFactory(getDriveDataDirectory()));
+        return authorize(clientSecrets, scopes, getDriveDataDirectory());
     }
     
     /** Authorizes the installed application to access user's protected data.
      * @return 
      * @throws java.lang.Exception */
-    private static Pair<Pair<Credential, String>, Boolean> authorize(GoogleClientSecrets clientSecrets, Set<String> scopes, FileDataStoreFactory dataStoreFactory) throws Exception {
+    private static Pair<Pair<Credential, String>, Boolean> authorize(GoogleClientSecrets clientSecrets, Set<String> scopes, File dataStoreDirectory) throws Exception {
         // Set up authorization code flow.
 
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
             httpTransport, JSON_FACTORY, clientSecrets, scopes)
-            .setDataStoreFactory(dataStoreFactory)
+            .setDataStoreFactory(new FileDataStoreFactory(dataStoreDirectory))
             .build();
         // authorize
         return new MyAuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
