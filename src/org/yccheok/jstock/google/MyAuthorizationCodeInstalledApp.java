@@ -53,11 +53,18 @@ public class MyAuthorizationCodeInstalledApp {
     public Pair<Pair<Credential, Userinfoplus>, Boolean> authorize(String userId) throws IOException {
         try {
             Credential credential = flow.loadCredential(userId);
-            if (credential != null
-                && (credential.getRefreshToken() != null || credential.getExpiresInSeconds() > 60)) {
-                Userinfoplus userinfoplus = org.yccheok.jstock.google.Utils.getUserInfo(credential);
-                return new Pair<Pair<Credential, Userinfoplus>, Boolean>(new Pair<Credential, Userinfoplus>(credential, userinfoplus), true);
+            if (credential != null && credential.getRefreshToken() != null) {
+                if (credential.getExpiresInSeconds() <= 60) {
+                    if (credential.refreshToken()) {
+                        Userinfoplus userinfoplus = org.yccheok.jstock.google.Utils.getUserInfo(credential);
+                        return new Pair<Pair<Credential, Userinfoplus>, Boolean>(new Pair<Credential, Userinfoplus>(credential, userinfoplus), true);
+                    }
+                } else {
+                    Userinfoplus userinfoplus = org.yccheok.jstock.google.Utils.getUserInfo(credential);
+                    return new Pair<Pair<Credential, Userinfoplus>, Boolean>(new Pair<Credential, Userinfoplus>(credential, userinfoplus), true);
+                }
             }
+            
             // open in browser
             redirectUri = receiver.getRedirectUri();
             AuthorizationCodeRequestUrl authorizationUrl =
