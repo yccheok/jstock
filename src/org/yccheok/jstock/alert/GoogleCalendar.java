@@ -99,7 +99,7 @@ public class GoogleCalendar {
                 break;
             }
         } while (pageToken != null);
-        
+                
         // Previous JStock calendar not found. Let's create a new one.
         if (calendarListEntry == null) {
             com.google.api.services.calendar.model.Calendar calendar = new com.google.api.services.calendar.model.Calendar();
@@ -157,6 +157,7 @@ public class GoogleCalendar {
             cstart.add(java.util.Calendar.SECOND, 60 - second);
             start = cstart.getTime();
         }
+        
         final java.util.Date end = new java.util.Date(start.getTime() + 60000L);
         final DateTime startTime = new DateTime(start.getTime());
         final DateTime endTime = new DateTime(end.getTime());
@@ -182,7 +183,7 @@ public class GoogleCalendar {
         //event.getReminders().setOverrides(listEventReminder);
         
         try {
-            Event createdEvent = service.events().insert(calendarListEntry.getId(), event).execute();
+            event = service.events().insert(calendarListEntry.getId(), event).execute();
         } catch (IOException ex) {
             log.error(null, ex);
             return false;
