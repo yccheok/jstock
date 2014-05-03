@@ -19,6 +19,7 @@
 
 package org.yccheok.jstock.gui;
 
+import java.awt.Font;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.concurrent.CancellationException;
@@ -213,7 +214,7 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         );
 
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsAlertJPanel_SMS"))); // NOI18N
-        jPanel4.setLayout(new java.awt.BorderLayout());
+        jPanel4.setLayout(new java.awt.BorderLayout(5, 5));
 
         jCheckBox3.setText(bundle.getString("OptionsAlertJPanel_SMSThroughGoogleCalendar")); // NOI18N
         jCheckBox3.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 0, 0));
@@ -270,10 +271,17 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
 
         jPanel4.add(jPanel6, java.awt.BorderLayout.SOUTH);
 
-        jLabel13.setText("jLabel13");
+        jPanel7.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsAlertJPanel_GoogleAccount"))); // NOI18N
+
+        jLabel13.setBackground(new java.awt.Color(140, 196, 116));
+        jLabel13.setFont(getRobotoLightFont());
+        jLabel13.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel13.setText("username@email.com");
+        jLabel13.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        jLabel13.setOpaque(true);
         jPanel7.add(jLabel13);
 
-        jButton4.setText("jButton4");
+        jButton4.setText(bundle.getString("OptionsAlertJPanel_SignOut")); // NOI18N
         jPanel7.add(jButton4);
 
         jPanel4.add(jPanel7, java.awt.BorderLayout.CENTER);
@@ -527,6 +535,10 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         jComboBox1.setEnabled(smsState);
     }
 
+    private Font getRobotoLightFont() {
+        return Utils.getRobotoLightFont().deriveFont((float)16);
+    }
+    
     /**
      * Get Swing worker thread which performs email testing task.
      * @return Swing wroker thread which performs email testing task
