@@ -153,6 +153,46 @@ public class Utils {
         return authorize(clientSecrets, scopes, getDriveDataDirectory());
     }
     
+    public static Pair<Credential, String> authorizeCalendarOffline() throws Exception {
+        Set<String> scopes = new HashSet<String>();
+        scopes.add("email");
+        scopes.add("profile");
+        scopes.add(CalendarScopes.CALENDAR);  
+        
+        // load client secrets
+        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(Utils.JSON_FACTORY,
+            new InputStreamReader(Utils.class.getResourceAsStream("/assets/authentication/calendar/client_secrets.json")));
+
+        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
+            httpTransport, JSON_FACTORY, clientSecrets, scopes)
+            .setDataStoreFactory(new FileDataStoreFactory(getCalendarDataDirectory()))
+            .build();
+        
+        Credential credential = flow.loadCredential("user");
+        if (credential != null && credential.getRefreshToken() != null) {
+            boolean success = false;
+            if (credential.getExpiresInSeconds() <= 60) {
+                if (credential.refreshToken()) {
+                    success = true;
+                }
+            } else {
+                success = true;
+            }
+
+            if (success) {
+                FileDataStoreFactory fileDataStoreFactory = (FileDataStoreFactory)flow.getCredentialDataStore().getDataStoreFactory();
+                String email = Utils.loadEmail(fileDataStoreFactory.getDataDirectory());
+                if (email == null) {
+                    Userinfoplus userinfoplus = org.yccheok.jstock.google.Utils.getUserInfo(credential);
+                    email = userinfoplus.getEmail();
+                }                    
+                return new Pair<Credential, String>(credential, email);
+            }
+        }
+        
+        return null;
+    }
+    
     /** Authorizes the installed application to access user's protected data.
      * @return 
      * @throws java.lang.Exception */

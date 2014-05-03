@@ -1315,9 +1315,6 @@ public class MainFrame extends javax.swing.JFrame {
             @Override
             protected Pair<Pair<Credential, String>, Boolean> doInBackground() throws Exception {
                 final Pair<Pair<Credential, String>, Boolean> pair = org.yccheok.jstock.google.Utils.authorizeDrive();
-                if (pair == null) {
-                    return null;
-                }
                 return pair;
             }
             

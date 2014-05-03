@@ -19,12 +19,10 @@
 
 package org.yccheok.jstock.gui;
 
+import com.google.api.client.auth.oauth2.Credential;
 import java.awt.Font;
-import java.util.Locale;
-import java.util.ResourceBundle;
 import java.util.concurrent.CancellationException;
 import org.yccheok.jstock.alert.GoogleMail;
-import org.yccheok.jstock.alert.GoogleCalendar;
 import java.util.concurrent.ExecutionException;
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
@@ -44,6 +42,44 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
     /** Creates new form OptionsAlertJPanel */
     public OptionsAlertJPanel() {
         initComponents();
+        initCredentialEx();
+    }
+    
+    private void initCredentialEx() {
+        SwingWorker swingWorker = new SwingWorker<Pair<Credential, String>, Void>() {
+
+            @Override
+            protected Pair<Credential, String> doInBackground() throws Exception {
+                final Pair<Credential, String> pair = org.yccheok.jstock.google.Utils.authorizeCalendarOffline();
+                System.out.println("pair is " + pair);
+                return pair;
+            }
+            
+            @Override
+            public void done() { 
+                Pair<Credential, String> pair = null;
+                
+                try {
+                    pair = this.get();
+                } catch (InterruptedException ex) {
+                    log.error(null, ex);
+                } catch (ExecutionException ex) {
+                    log.error(null, ex);
+                }
+                
+                System.out.println("2 pair is " + pair);
+                
+                if (pair == null) {
+                    jLabel13.setVisible(false);
+                    jButton4.setText(GUIBundle.getString("OptionsAlertJPanel_SignIn"));
+                } else {
+                    jLabel13.setText(pair.second);
+                    jLabel13.setVisible(true);
+                }
+            }
+        };
+        
+        swingWorker.execute();
     }
     
     /** This method is called from within the constructor to
@@ -674,6 +710,8 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         return worker;
     }
 
+    private Pair<Credential, String> credentialEx;
+    
     private volatile SwingWorker testSMSSwingWorker = null;
     private volatile SwingWorker testEmailSwingWorker = null;
 
