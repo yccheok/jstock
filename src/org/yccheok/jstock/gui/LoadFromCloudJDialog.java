@@ -49,11 +49,11 @@ import org.yccheok.jstock.internationalization.MessagesBundle;
 public class LoadFromCloudJDialog extends javax.swing.JDialog {
 
     /** Creates new form LoadFromCloudJDialog */
-    public LoadFromCloudJDialog(java.awt.Frame parent, boolean modal, Pair<Credential, Userinfoplus> credentialEx, boolean credentialFromDisk) {
+    public LoadFromCloudJDialog(java.awt.Frame parent, boolean modal, Pair<Credential, String> credentialEx, boolean credentialFromDisk) {
         super(parent, modal);
         initComponents();
         this.credentialEx = credentialEx;
-        this.jLabel1.setText(credentialEx.second.getEmail());
+        this.jLabel1.setText(credentialEx.second);
         this.jLabel4.setVisible(false);
         this.jLabel5.setVisible(false);
         
@@ -399,7 +399,7 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
         return Utils.getRobotoLightFont().deriveFont((float)18);
     }
        
-    private final Pair<Credential, Userinfoplus> credentialEx;
+    private final Pair<Credential, String> credentialEx;
     
     private volatile SwingWorker<Boolean, Status> loadFromCloudTask = null;
     private final List<String> memoryLog = new ArrayList<String>();

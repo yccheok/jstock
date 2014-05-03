@@ -85,7 +85,7 @@ public class Utils {
         file.delete();
     }
 
-    public static Pair<Pair<Credential, Userinfoplus>, Boolean> authorizeCalendar() throws Exception {
+    public static Pair<Pair<Credential, String>, Boolean> authorizeCalendar() throws Exception {
         Set<String> scopes = new HashSet<String>();
         scopes.add("email");
         scopes.add("profile");
@@ -98,7 +98,7 @@ public class Utils {
         return authorize(clientSecrets, scopes, new FileDataStoreFactory(getCalendarDataDirectory()));
     }
     
-    public static Pair<Pair<Credential, Userinfoplus>, Boolean> authorizeDrive() throws Exception {
+    public static Pair<Pair<Credential, String>, Boolean> authorizeDrive() throws Exception {
         // Ask for only the permissions you need. Asking for more permissions will
         // reduce the number of users who finish the process for giving you access
         // to their accounts. It will also increase the amount of effort you will
@@ -122,7 +122,7 @@ public class Utils {
     /** Authorizes the installed application to access user's protected data.
      * @return 
      * @throws java.lang.Exception */
-    private static Pair<Pair<Credential, Userinfoplus>, Boolean> authorize(GoogleClientSecrets clientSecrets, Set<String> scopes, FileDataStoreFactory dataStoreFactory) throws Exception {
+    private static Pair<Pair<Credential, String>, Boolean> authorize(GoogleClientSecrets clientSecrets, Set<String> scopes, FileDataStoreFactory dataStoreFactory) throws Exception {
         // Set up authorization code flow.
 
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(

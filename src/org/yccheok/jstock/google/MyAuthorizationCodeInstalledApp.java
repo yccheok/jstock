@@ -50,18 +50,18 @@ public class MyAuthorizationCodeInstalledApp {
      * @param userId user ID or {@code null} if not using a persisted credential store
      * @return credential
      */
-    public Pair<Pair<Credential, Userinfoplus>, Boolean> authorize(String userId) throws IOException {
+    public Pair<Pair<Credential, String>, Boolean> authorize(String userId) throws IOException {
         try {
             Credential credential = flow.loadCredential(userId);
             if (credential != null && credential.getRefreshToken() != null) {
                 if (credential.getExpiresInSeconds() <= 60) {
                     if (credential.refreshToken()) {
                         Userinfoplus userinfoplus = org.yccheok.jstock.google.Utils.getUserInfo(credential);
-                        return new Pair<Pair<Credential, Userinfoplus>, Boolean>(new Pair<Credential, Userinfoplus>(credential, userinfoplus), true);
+                        return new Pair<Pair<Credential, String>, Boolean>(new Pair<Credential, String>(credential, userinfoplus.getEmail()), true);
                     }
                 } else {
                     Userinfoplus userinfoplus = org.yccheok.jstock.google.Utils.getUserInfo(credential);
-                    return new Pair<Pair<Credential, Userinfoplus>, Boolean>(new Pair<Credential, Userinfoplus>(credential, userinfoplus), true);
+                    return new Pair<Pair<Credential, String>, Boolean>(new Pair<Credential, String>(credential, userinfoplus.getEmail()), true);
                 }
             }
             
@@ -79,7 +79,7 @@ public class MyAuthorizationCodeInstalledApp {
             // store credential and return it
             credential = flow.createAndStoreCredential(response, userId);
             Userinfoplus userinfoplus = org.yccheok.jstock.google.Utils.getUserInfo(credential);
-            return new Pair<Pair<Credential, Userinfoplus>, Boolean>(new Pair<Credential, Userinfoplus>(credential, userinfoplus), false);
+            return new Pair<Pair<Credential, String>, Boolean>(new Pair<Credential, String>(credential, userinfoplus.getEmail()), false);
         } finally {        
             receiver.stop();
             SimpleSwingBrowser _browser = this.browser;
