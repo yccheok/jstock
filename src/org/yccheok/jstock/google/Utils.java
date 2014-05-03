@@ -112,6 +112,13 @@ public class Utils {
         }
     }
     
+    public static void logoutCalendar() {
+        File credential = new File(getCalendarDataDirectory(), "StoredCredential");
+        File email = new File(getCalendarDataDirectory(), "email");
+        credential.delete();
+        email.delete();
+    }
+    
     public static void logoutDrive() {
         File credential = new File(getDriveDataDirectory(), "StoredCredential");
         File email = new File(getDriveDataDirectory(), "email");

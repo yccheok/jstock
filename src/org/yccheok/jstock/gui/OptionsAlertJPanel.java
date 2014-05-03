@@ -45,6 +45,53 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         initCredentialEx();
     }
     
+    private void signOut() {
+        this.credentialEx = null;
+        jCheckBox3.setSelected(false);
+        org.yccheok.jstock.google.Utils.logoutCalendar();
+        updateGUIState();
+    }
+    
+    private void signIn() {
+        jCheckBox3.setEnabled(false);
+        jButton2.setEnabled(false);
+        jButton4.setEnabled(false);
+        
+        SwingWorker swingWorker = new SwingWorker<Pair<Pair<Credential, String>, Boolean>, Void>() {
+
+            @Override
+            protected Pair<Pair<Credential, String>, Boolean> doInBackground() throws Exception {
+                final Pair<Pair<Credential, String>, Boolean> pair = org.yccheok.jstock.google.Utils.authorizeCalendar();
+                return pair;
+            }
+            
+            @Override
+            public void done() {
+                Pair<Pair<Credential, String>, Boolean> pair = null;
+                
+                try {
+                    pair = this.get();
+                } catch (InterruptedException ex) {
+                    JOptionPane.showMessageDialog(OptionsAlertJPanel.this, ex.getMessage(), GUIBundle.getString("OptionsAlertJPanel_Alert"), JOptionPane.ERROR_MESSAGE);
+                    log.error(null, ex);
+                } catch (ExecutionException ex) {
+                    JOptionPane.showMessageDialog(OptionsAlertJPanel.this, ex.getMessage(), GUIBundle.getString("OptionsAlertJPanel_Alert"), JOptionPane.ERROR_MESSAGE);
+                    log.error(null, ex);
+                }                
+                
+                if (pair != null) {
+                    credentialEx = pair.first;
+                } else {
+                    jCheckBox3.setSelected(false);
+                }
+                
+                updateGUIState();                
+            }
+        };
+        
+        swingWorker.execute();
+    }
+    
     private void initCredentialEx() {
         SwingWorker swingWorker = new SwingWorker<Pair<Credential, String>, Void>() {
 
@@ -66,14 +113,11 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
                     log.error(null, ex);
                 }
                 
-                if (pair == null) {
-                    jLabel13.setVisible(false);
-                    jButton4.setText(GUIBundle.getString("OptionsAlertJPanel_SignIn"));
-                } else {
-                    jLabel13.setText(pair.second);
-                    jLabel13.setVisible(true);
+                if (pair != null) {
                     credentialEx = pair;
                 }
+                
+                updateGUIState();
             }
         };
         
@@ -316,6 +360,11 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         jPanel7.add(jLabel13);
 
         jButton4.setText(bundle.getString("OptionsAlertJPanel_SignOut")); // NOI18N
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
         jPanel7.add(jButton4);
 
         jPanel4.add(jPanel7, java.awt.BorderLayout.CENTER);
@@ -429,6 +478,12 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
     private void jCheckBox3ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jCheckBox3ItemStateChanged
         // TODO add your handling code here:
         updateGUIState();
+        
+        if (jCheckBox3.isSelected()) {
+            if (this.credentialEx == null) {
+                signIn();
+            }
+        }
     }//GEN-LAST:event_jCheckBox3ItemStateChanged
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -457,6 +512,10 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
         jButton1.doClick();
     }//GEN-LAST:event_jTextField1ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        signOut();
+    }//GEN-LAST:event_jButton4ActionPerformed
 
     public void cancel() {
         if (this.testSMSSwingWorker != null) {
@@ -560,13 +619,22 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         jCheckBox2.setEnabled(isTestEmailDone);
         jLabel7.setVisible(!isTestEmailDone);
 
-        jButton2.setEnabled(smsState && isTestSMSDone);
+        jButton2.setEnabled(smsState && isTestSMSDone && this.credentialEx != null);
         jCheckBox3.setEnabled(isTestSMSDone);
-        jEditorPane3.setEnabled(smsState);
+        
         jLabel8.setVisible(!isTestSMSDone);
-        jLabel9.setEnabled(smsState);
-        jLabel10.setEnabled(smsState);
-        jComboBox1.setEnabled(smsState);
+        jLabel9.setEnabled(smsState && this.credentialEx != null);
+        jLabel10.setEnabled(smsState && this.credentialEx != null);
+        jComboBox1.setEnabled(smsState && this.credentialEx != null);
+        jButton4.setEnabled(smsState && isTestSMSDone && this.credentialEx != null);
+        jPanel7.setEnabled(smsState && this.credentialEx != null);
+        jEditorPane3.setEnabled(smsState && this.credentialEx != null);
+        
+        if (this.credentialEx == null) {
+            jLabel13.setText("?");
+        } else {
+            jLabel13.setText(credentialEx.second);
+        }        
     }
 
     private Font getRobotoLightFont() {
