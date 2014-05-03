@@ -22,9 +22,14 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.oauth2.Oauth2;
 import com.google.api.services.oauth2.model.Userinfoplus;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.util.HashSet;
 import java.util.Set;
@@ -79,10 +84,39 @@ public class Utils {
         Userinfoplus userInfo  = userInfoService.userinfo().get().execute();
         return userInfo;
     }
-  
+
+    public static String loadEmail(File dataStoreDirectory)  {
+        File file = new File(dataStoreDirectory, "email");
+        try {
+            return new String(Files.readAllBytes(Paths.get(file.toURI())), "UTF-8");
+        } catch (IOException ex) {
+            log.error(null, ex);
+            return null;
+        }
+    }
+
+    public static boolean saveEmail(File dataStoreDirectory, String email) {
+        File file = new File(dataStoreDirectory, "email");
+        try {
+            //If the constructor throws an exception, the finally block will NOT execute
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
+            try {
+                writer.write(email);
+            } finally {
+                writer.close();
+            }
+            return true;
+        } catch (IOException ex){
+            log.error(null, ex);
+            return false;
+        }
+    }
+    
     public static void logoutDrive() {
-        File file = new File(getDriveDataDirectory(), "StoredCredential");
-        file.delete();
+        File credential = new File(getDriveDataDirectory(), "StoredCredential");
+        File email = new File(getDriveDataDirectory(), "email");
+        credential.delete();
+        email.delete();
     }
 
     public static Pair<Pair<Credential, String>, Boolean> authorizeCalendar() throws Exception {

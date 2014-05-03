@@ -12,6 +12,7 @@ import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.auth.oauth2.TokenResponse;
 import com.google.api.client.extensions.java6.auth.oauth2.VerificationCodeReceiver;
 import com.google.api.client.repackaged.com.google.common.base.Preconditions;
+import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.oauth2.model.Userinfoplus;
 import java.io.IOException;
 import javax.swing.SwingUtilities;
@@ -54,14 +55,23 @@ public class MyAuthorizationCodeInstalledApp {
         try {
             Credential credential = flow.loadCredential(userId);
             if (credential != null && credential.getRefreshToken() != null) {
+                boolean success = false;
                 if (credential.getExpiresInSeconds() <= 60) {
                     if (credential.refreshToken()) {
-                        Userinfoplus userinfoplus = org.yccheok.jstock.google.Utils.getUserInfo(credential);
-                        return new Pair<Pair<Credential, String>, Boolean>(new Pair<Credential, String>(credential, userinfoplus.getEmail()), true);
+                        success = true;
                     }
                 } else {
-                    Userinfoplus userinfoplus = org.yccheok.jstock.google.Utils.getUserInfo(credential);
-                    return new Pair<Pair<Credential, String>, Boolean>(new Pair<Credential, String>(credential, userinfoplus.getEmail()), true);
+                    success = true;
+                }
+                
+                if (success) {
+                    FileDataStoreFactory fileDataStoreFactory = (FileDataStoreFactory)flow.getCredentialDataStore().getDataStoreFactory();
+                    String email = Utils.loadEmail(fileDataStoreFactory.getDataDirectory());
+                    if (email == null) {
+                        Userinfoplus userinfoplus = org.yccheok.jstock.google.Utils.getUserInfo(credential);
+                        email = userinfoplus.getEmail();
+                    }                    
+                    return new Pair<Pair<Credential, String>, Boolean>(new Pair<Credential, String>(credential, email), true);
                 }
             }
             
@@ -79,7 +89,10 @@ public class MyAuthorizationCodeInstalledApp {
             // store credential and return it
             credential = flow.createAndStoreCredential(response, userId);
             Userinfoplus userinfoplus = org.yccheok.jstock.google.Utils.getUserInfo(credential);
-            return new Pair<Pair<Credential, String>, Boolean>(new Pair<Credential, String>(credential, userinfoplus.getEmail()), false);
+            String email = userinfoplus.getEmail();
+            FileDataStoreFactory fileDataStoreFactory = (FileDataStoreFactory)flow.getCredentialDataStore().getDataStoreFactory();
+            Utils.saveEmail(fileDataStoreFactory.getDataDirectory(), email);
+            return new Pair<Pair<Credential, String>, Boolean>(new Pair<Credential, String>(credential, email), false);
         } finally {        
             receiver.stop();
             SimpleSwingBrowser _browser = this.browser;
