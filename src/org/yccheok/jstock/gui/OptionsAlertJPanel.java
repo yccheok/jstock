@@ -22,7 +22,6 @@ package org.yccheok.jstock.gui;
 import com.google.api.client.auth.oauth2.Credential;
 import java.awt.Font;
 import java.util.concurrent.CancellationException;
-import org.yccheok.jstock.alert.GoogleMail;
 import java.util.concurrent.ExecutionException;
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
@@ -30,6 +29,8 @@ import javax.swing.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.yccheok.jstock.alert.GoogleCalendar;
+import org.yccheok.jstock.alert.GoogleMail;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.internationalization.MessagesBundle;
 
@@ -115,6 +116,7 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
                 
                 if (pair != null) {
                     credentialEx = pair;
+                    jCheckBox3.setSelected(MainFrame.getInstance().getJStockOptions().isSMSEnabled());
                 }
                 
                 updateGUIState();
@@ -297,9 +299,9 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         jCheckBox3.setText(bundle.getString("OptionsAlertJPanel_SMSThroughGoogleCalendar")); // NOI18N
         jCheckBox3.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 0, 0));
         jCheckBox3.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        jCheckBox3.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                jCheckBox3ItemStateChanged(evt);
+        jCheckBox3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCheckBox3ActionPerformed(evt);
             }
         });
         jPanel4.add(jCheckBox3, java.awt.BorderLayout.NORTH);
@@ -475,17 +477,6 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         Utils.launchWebBrowser(evt);
 }//GEN-LAST:event_jEditorPane3jEditorPane1HyperlinkUpdate
 
-    private void jCheckBox3ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jCheckBox3ItemStateChanged
-        // TODO add your handling code here:
-        updateGUIState();
-        
-        if (jCheckBox3.isSelected()) {
-            if (this.credentialEx == null) {
-                signIn();
-            }
-        }
-    }//GEN-LAST:event_jCheckBox3ItemStateChanged
-
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         this.testSMSSwingWorker = getTestSMSSwingWorker();
         this.updateGUIState();
@@ -517,6 +508,16 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         signOut();
     }//GEN-LAST:event_jButton4ActionPerformed
 
+    private void jCheckBox3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox3ActionPerformed
+        updateGUIState();
+        
+        if (jCheckBox3.isSelected()) {
+            if (this.credentialEx == null) {
+                signIn();
+            }
+        }
+    }//GEN-LAST:event_jCheckBox3ActionPerformed
+
     public void cancel() {
         if (this.testSMSSwingWorker != null) {
             this.testSMSSwingWorker.cancel(true);
@@ -535,7 +536,7 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
     public void set(JStockOptions jStockOptions) {
         jCheckBox1.setSelected(jStockOptions.isPopupMessage());
         jCheckBox2.setSelected(jStockOptions.isSendEmail());
-        jCheckBox3.setSelected(jStockOptions.isSMSEnabled());
+        //jCheckBox3.setSelected(jStockOptions.isSMSEnabled());
         jCheckBox4.setSelected(jStockOptions.isSoundEnabled());
         jTextField2.setText(Utils.decrypt(jStockOptions.getEmail()));
         jTextField1.setText(Utils.decrypt(jStockOptions.getCCEmail()));
@@ -725,7 +726,8 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         SwingWorker worker = new SwingWorker<Boolean, Void>() {
             @Override
             public Boolean doInBackground() {
-                return false;
+                final boolean status = GoogleCalendar.SMS(MessagesBundle.getString("info_message_congratulation_sms_alert_system_is_working"));
+                return status;
             }
 
             @Override

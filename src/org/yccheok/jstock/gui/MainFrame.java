@@ -20,7 +20,6 @@
 package org.yccheok.jstock.gui;
 
 import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.services.oauth2.model.Userinfoplus;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
@@ -2896,7 +2895,7 @@ public class MainFrame extends javax.swing.JFrame {
                     }
 
                     if (SMSLimiter.INSTANCE.isSMSAllowed()) {
-                        final boolean status = GoogleCalendar.SMS("", "", message);
+                        final boolean status = GoogleCalendar.SMS(message);
                         if (status) {
                             SMSLimiter.INSTANCE.inc();
                         }
