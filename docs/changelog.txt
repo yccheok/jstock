@@ -1,8 +1,10 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
-JStock 1.0.7m - xxxx-xx-xx
+JStock 1.0.7m - 2014-05-08
   Feature: Use oAuth 2.0 for Google Drive.
+  Feature: Use oAuth 2.0 for Google Calendar.
+  Bugfix:  Proper shutdown in Mac.
   
 JStock 1.0.7L - 2014-04-18
   Bugfix:  Fix ASX.

@@ -34,6 +34,7 @@ Code Contributors:
 * Mark DeSpain <mdespain@users.sourceforge.net>
 * Vetsper Felix
 * Peter Kane
+* Dennis Lee, https://github.com/dennislwy
 
 Mac Packager:
 * Karl Heinz Putz <puzzz@users.sourceforge.net>
