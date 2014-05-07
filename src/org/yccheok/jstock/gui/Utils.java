@@ -1411,7 +1411,7 @@ public class Utils {
             FileContent mediaContent = new FileContent("", fileContent);
             
             // Send the request to the API.
-            com.google.api.services.drive.model.File updatedFile = service.files().update(fileId, file, mediaContent).execute();
+            com.google.api.services.drive.model.File updatedFile = service.files().update(fileId, file, mediaContent).setNewRevision(false).execute();
 
             return updatedFile;
         } catch (IOException e) {
