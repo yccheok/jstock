@@ -1410,8 +1410,10 @@ public class Utils {
 
             FileContent mediaContent = new FileContent("", fileContent);
             
+            // http://stackoverflow.com/questions/23707388/unable-update-file-store-in-appdata-scope-500-internal-server-error
+
             // Send the request to the API.
-            com.google.api.services.drive.model.File updatedFile = service.files().update(fileId, file, mediaContent).setNewRevision(false).execute();
+            com.google.api.services.drive.model.File updatedFile = service.files().update(fileId, file, mediaContent).execute();
 
             return updatedFile;
         } catch (IOException e) {
@@ -2740,15 +2742,15 @@ public class Utils {
     // We will use this as directory name. Do not have space or special characters.
     private static final String APPLICATION_VERSION_STRING = "1.0.7";
 
-    private static final String ABOUT_BOX_VERSION_STRING = "1.0.7m";
+    private static final String ABOUT_BOX_VERSION_STRING = "1.0.7n";
     
     // 1.0.7e
     // Remember to update isCloudFileCompatible method.
     private static final int CLOUD_FILE_VERSION_ID = 1107;
 
-    // 1.0.7m
+    // 1.0.7n
     // For About box comparision on latest version purpose.
-    private static final int APPLICATION_VERSION_ID = 1116;
+    private static final int APPLICATION_VERSION_ID = 1117;
         
     private static final Executor zombiePool = Executors.newFixedThreadPool(Utils.NUM_OF_THREADS_ZOMBIE_POOL);
 
