@@ -45,7 +45,6 @@ import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
-
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
@@ -55,9 +54,9 @@ import org.apache.commons.logging.*;
 import org.jdesktop.swingx.JXTableHeader;
 import org.jdesktop.swingx.JXTreeTable;
 import org.jdesktop.swingx.table.TableColumnExt;
-import org.yccheok.jstock.portfolio.*;
-import org.yccheok.jstock.engine.*;
 import org.jdesktop.swingx.treetable.*;
+import org.joda.time.DateTime;
+import org.yccheok.jstock.engine.*;
 import org.yccheok.jstock.file.GUIBundleWrapper;
 import org.yccheok.jstock.file.Statement;
 import org.yccheok.jstock.file.Statements;
@@ -77,6 +76,7 @@ import org.yccheok.jstock.gui.treetable.SellPortfolioTreeTableModelEx;
 import org.yccheok.jstock.gui.treetable.SortableTreeTable;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.internationalization.MessagesBundle;
+import org.yccheok.jstock.portfolio.*;
 
 /**
  *
@@ -362,6 +362,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             }
         });
 
+        //Bug Fix Two
+        
         treeTable.setDefaultRenderer(SimpleDate.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -370,7 +372,22 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     if (c instanceof JLabel) {
                         DateFormat dateFormat = DateFormat.getDateInstance();
                         SimpleDate simpleDate = (SimpleDate)value;
-                        ((JLabel)c).setText(dateFormat.format(simpleDate.getTime()));
+                        //((JLabel)c).setText(dateFormat.format(simpleDate.getTime()));
+                        String tempDate = dateFormat.format(simpleDate.getTime());
+                        tempDate = tempDate.replace(",", "");
+                        String[] dateComponents = tempDate.split(" ");
+                        String displayDate = dateComponents[1] + " " + dateComponents[0] + " " + dateComponents[2];
+                        
+                        JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+                        Country country = jStockOptions.getCountry();
+                        if (!country.toHumanReadableString().equals("United States"))
+                        {
+                            ((JLabel)c).setText(displayDate);
+                        }
+                        else
+                        {
+                            ((JLabel)c).setText(dateFormat.format(simpleDate.getTime()));
+                        }
                     }
                 }
                 return c;
