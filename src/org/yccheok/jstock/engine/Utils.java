@@ -48,7 +48,29 @@ public class Utils {
     private Utils() {
     }   
 
-
+    public static Country toCountry(Code code) {
+        assert(countries.keySet().size() == 41);
+        
+        String string = code.toString();
+        int index = string.lastIndexOf(".");
+        if (index == -1) {
+            if (isYahooIndex(code)) {
+                Country country = indices.get(string.toUpperCase());
+                if (country == null) {
+                    return Country.UnitedState;
+                }
+                return country;
+            }
+            return Country.UnitedState;
+        }
+        String key = string.substring(index + 1, string.length());
+        Country country = countries.get(key.toUpperCase());
+        if (country == null) {
+            return Country.UnitedState;
+        }
+        return country;
+    }
+    
     /**
      * Generate the best online database result if possible so that it is
      * acceptable by JStock application.
@@ -350,10 +372,12 @@ public class Utils {
     static
     {
         austriaIndices.add(Index.ATX);
+        australiaIndices.add(Index.ASX);
         australiaIndices.add(Index.AORD);
         belgiumIndices.add(Index.BFX);
         brazilIndices.add(Index.BVSP);
         canadaIndices.add(Index.GSPTSE);
+        chinaIndices.add(Index.CSI300);
         chinaIndices.add(Index.SSEC);
         denmarkIndices.add(Index.OMXC20CO);
         franceIndices.add(Index.FCHI);  
@@ -362,6 +386,7 @@ public class Utils {
         indiaIndices.add(Index.BSESN);
         indiaIndices.add(Index.NSEI);
         indonesiaIndices.add(Index.JKSE);
+        israelIndices.add(Index.TA25);
         israelIndices.add(Index.TA100);
         italyIndices.add(Index.FTSEMIB);
         koreaIndices.add(Index.KS11);
@@ -768,6 +793,67 @@ public class Utils {
         }
         // This is an invalid value.
         return 0L;
+    }
+    
+    private static final Map<String, Country> countries = new HashMap<String, Country>();
+    private static final Map<String, Country> indices = new HashMap<String, Country>();
+    
+    static {
+        countries.put("AX", Country.Australia);
+        countries.put("VI", Country.Austria);
+        countries.put("BR", Country.Brazil);
+        countries.put("TO", Country.Canada);
+        
+        countries.put("SS", Country.China);
+        countries.put("SZ", Country.China);
+        
+        countries.put("CO", Country.Denmark);
+        countries.put("PA", Country.France);
+
+        countries.put("BE", Country.Germany);
+        countries.put("DE", Country.Germany);
+        countries.put("DU", Country.Germany);
+        countries.put("EX", Country.Germany);
+        countries.put("F", Country.Germany);
+        countries.put("HA", Country.Germany);
+        countries.put("HM", Country.Germany);
+        countries.put("MU", Country.Germany);
+        countries.put("SG", Country.Germany);
+        
+        countries.put("HK", Country.HongKong);
+        
+        countries.put("NS", Country.India);
+        countries.put("N", Country.India);
+        countries.put("B", Country.India);
+        
+        countries.put("JK", Country.Indonesia);
+        countries.put("TA", Country.Israel);
+        countries.put("MI", Country.Italy);
+        countries.put("KQ", Country.Korea);
+        countries.put("KL", Country.Malaysia);
+        countries.put("AS", Country.Netherlands);
+        countries.put("NZ", Country.NewZealand);
+        countries.put("OL", Country.Norway);
+        countries.put("LS", Country.Portugal);
+        countries.put("SI", Country.Singapore);
+        
+        countries.put("BI", Country.Spain);
+        countries.put("BC", Country.Spain);
+        countries.put("MA", Country.Spain);
+        countries.put("MC", Country.Spain);
+        countries.put("VA", Country.Spain);
+        
+        countries.put("SW", Country.Sweden);
+        countries.put("VX", Country.Sweden);
+        
+        countries.put("TW", Country.Taiwan);
+        countries.put("TWO", Country.Taiwan);
+        
+        countries.put("L", Country.UnitedKingdom);
+        
+        for (Index index : Index.values()) {
+            indices.put(index.code.toString(), index.country);
+        }
     }
     
     private static final Gson gson = new Gson();
