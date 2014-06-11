@@ -147,7 +147,7 @@ public class Contract {
         Sell
     }
     
-    private Contract(ContractBuilder builder)
+    public Contract(ContractBuilder builder)
     {
         this.stock = builder.stock;
         this.date = builder.date;

@@ -24,7 +24,7 @@ package org.yccheok.jstock.engine;
  * @author yccheok
  */
 public class Symbol {
-    private Symbol(String symbol) {
+    public Symbol(String symbol) {
         this.symbol = symbol;
     }
     

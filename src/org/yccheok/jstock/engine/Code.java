@@ -24,7 +24,7 @@ package org.yccheok.jstock.engine;
  * @author yccheok
  */
 public class Code {
-    private Code(String code) {
+    public Code(String code) {
         this.code = code;
     }
     
