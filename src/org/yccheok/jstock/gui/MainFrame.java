@@ -145,7 +145,6 @@ public class MainFrame extends javax.swing.JFrame {
         this.initAjaxProvider();
         this.initMarketThread();
         this.initLatestNewsTask();
-        this.initKLSEInfoStockServerFactoryThread();
         this.initCurrencyExchangeMonitor();
         this.initRealTimeStockMonitor();
         this.initWatchlist();
@@ -3653,24 +3652,11 @@ public class MainFrame extends javax.swing.JFrame {
             System.getProperties().remove("http.proxyHost");
             System.getProperties().remove("http.proxyPort");
         }
-
-        for (Country country : Country.values()) {
-            final Class c = this.jStockOptions.getPrimaryStockServerFactoryClass(country);
-            if (c == null) {
-                continue;
-            }
-            Factories.INSTANCE.updatePrimaryStockServerFactory(country, c);
-        }
     }   
 
     public void updatePrimaryStockServerFactory(Country country, Class<? extends StockServerFactory> c) {
-        // Same. Nothing to be updated.
-        if (c == jStockOptions.getPrimaryStockServerFactoryClass(country)) {
-            return;
-        }
-
-        jStockOptions.addPrimaryStockServerFactoryClass(country, c);
-        Factories.INSTANCE.updatePrimaryStockServerFactory(country, c);
+        // TODO : Need revision. We no longer have primaryStockServerFactoryClasses
+        // concept. Going to replace with PriceSource.
 
         realTimeStockMonitor.setStockServerFactories(this.getStockServerFactories());
         stockHistoryMonitor.setStockServerFactories(this.getStockServerFactories());
@@ -3905,24 +3891,6 @@ public class MainFrame extends javax.swing.JFrame {
         stockHistoryMonitor.setDuration(Duration.getTodayDurationByYears(jStockOptions.getHistoryDuration()));
     }
 
-    // Determine whether we should make use of KLSEInfoStockServerFactory.
-    private void initKLSEInfoStockServerFactoryThread()
-    {
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                final String remove = org.yccheok.jstock.gui.Utils.getUUIDValue(org.yccheok.jstock.network.Utils.getURL(org.yccheok.jstock.network.Utils.Type.OPTIONS), "remove_klse_info_stock_server_factory");
-                if (remove != null && remove.equals("1"))
-                {
-                    Factories.INSTANCE.removeKLSEInfoStockServerFactory();
-                }
-            }            
-        };
-        
-        this.klseInfoStockServerFactoryThread = new Thread(runnable);
-        this.klseInfoStockServerFactoryThread.start();
-    }
-    
     public void initLatestNewsTask()
     {
         if (jStockOptions.isAutoUpdateNewsEnabled() == true)
@@ -4777,8 +4745,7 @@ public class MainFrame extends javax.swing.JFrame {
     private final Object databaseTaskMonitor = new Object();
 
     private LatestNewsTask latestNewsTask = null;
-    private volatile Thread marketThread = null;
-    private Thread klseInfoStockServerFactoryThread = null;   
+    private volatile Thread marketThread = null;   
     private JStockOptions jStockOptions;
     private ChartJDialogOptions chartJDialogOptions;
     
