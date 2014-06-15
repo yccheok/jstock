@@ -29,8 +29,9 @@ import java.util.Locale;
 import java.util.Map;
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.NTCredentials;
-import org.yccheok.jstock.portfolio.BrokingFirm;
 import org.yccheok.jstock.engine.Country;
+import org.yccheok.jstock.engine.PriceSource;
+import org.yccheok.jstock.portfolio.BrokingFirm;
 
 /**
  *
@@ -285,6 +286,8 @@ public class JStockOptions {
     // Possile be null in entire application life cycle.
     private BoundsEx boundsEx;
 
+    private Map<Country, PriceSource> priceSources = new EnumMap<Country, PriceSource>(Country.class);
+    
     private Map<Country, String> currencies = new EnumMap<Country, String>(Country.class);
 
     private Map<Country, Boolean> currencyExchangeEnable = new EnumMap<Country, Boolean>(Country.class);
@@ -1287,6 +1290,18 @@ public class JStockOptions {
         this.fourDecimalPlacesEnabled.put(this.country, fourDecimalPlacesEnabled);
     }
 
+    public PriceSource getPriceSource(Country country) {
+        final PriceSource priceSource = this.priceSources.get(country);
+        if (priceSource == null) {
+            return org.yccheok.jstock.engine.Utils.getDefaultPriceSource(country);
+        }
+        return priceSource;
+    }
+    
+    public void setPriceSource(Country country, PriceSource priceSource) {
+        this.priceSources.put(country, priceSource);
+    }
+    
     /**
      * @return the soundEnabled
      */
