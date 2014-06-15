@@ -19,9 +19,6 @@
 
 package org.yccheok.jstock.gui;
 
-import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.text.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,7 +34,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.Country;
 import org.yccheok.jstock.engine.PriceSource;
-import org.yccheok.jstock.engine.StockServerFactory;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.internationalization.MessagesBundle;
 import org.yccheok.jstock.network.ProxyDetector;
@@ -161,9 +157,13 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
     }
 
     private void initJComboBox(JStockOptions jStockOptions) {
-        for (String entry : getPriceSourceEntries(jStockOptions.getCountry())) {
+        final Country country = jStockOptions.getCountry();
+        
+        for (String entry : getPriceSourceEntries(country)) {
             jComboBox1.addItem(entry);
         }
+        PriceSource priceSource = jStockOptions.getPriceSource(country);
+        this.jComboBox1.setSelectedItem(priceSourceEntries.get(priceSource.name()));
     }
     
     private JFormattedTextField getPortNumberJFormattedTextField() {
@@ -479,8 +479,10 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
         jStockOptions.setProxyAuthUserName(jTextField2.getText());
         jStockOptions.setProxyAuthPassword(Utils.encrypt(new String(jPasswordField1.getPassword())));
         
-        // TODO : Need revision. We no longer have primaryStockServerFactoryClasses
-        // concept. Going to replace with PriceSource.
+        Country country = jStockOptions.getCountry();
+        String priceSourceName = getPriceSourceEntryValues(country)[this.jComboBox1.getSelectedIndex()];
+        PriceSource priceSource = PriceSource.valueOf(priceSourceName);
+        jStockOptions.setPriceSource(country, priceSource);
         
         return true;
     }

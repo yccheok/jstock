@@ -423,6 +423,7 @@ public class JStockOptions {
         // local.
         //this.boundsEx = jStockOptions.boundsEx;
 
+        this.priceSources = new EnumMap<Country, PriceSource>(jStockOptions.priceSources);
         this.currencies = new EnumMap<Country, String>(jStockOptions.currencies);
         this.currencyExchangeEnable = new EnumMap<Country, Boolean>(jStockOptions.currencyExchangeEnable);
         this.localCurrencyCountries = new EnumMap<Country, Country>(jStockOptions.localCurrencyCountries);
@@ -548,6 +549,7 @@ public class JStockOptions {
         //jStockOptions.boundsEx = this.boundsEx;
         
         // Perform deep copy.
+        jStockOptions.priceSources = new EnumMap<Country, PriceSource>(this.priceSources);
         jStockOptions.currencies = new EnumMap<Country, String>(this.currencies);
         jStockOptions.currencyExchangeEnable = new EnumMap<Country, Boolean>(this.currencyExchangeEnable);
         jStockOptions.localCurrencyCountries = new EnumMap<Country, Country>(this.localCurrencyCountries);
@@ -675,6 +677,10 @@ public class JStockOptions {
 
         if (this.getLocale() == null) {
             this.setLocale(Locale.getDefault());
+        }
+        
+        if (this.priceSources == null) {
+            this.priceSources = new EnumMap<Country, PriceSource>(Country.class);
         }
         
         if (this.currencies == null) {
