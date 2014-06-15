@@ -795,8 +795,30 @@ public class Utils {
         return 0L;
     }
     
+    public static PriceSource getDefaultPriceSource(Country country) {
+        assert(defaultPriceSources.containsKey(country));
+        return defaultPriceSources.get(country);
+    }
+    
+    public static Set<PriceSource> getSupportedPriceSources(Country country) {
+        List<StockServerFactory> stockServerFactories = Factories.INSTANCE.getStockServerFactories(country);
+        Set<PriceSource> set = EnumSet.noneOf(PriceSource.class);
+        for (StockServerFactory stockServerFactory : stockServerFactories) {
+            final String name = stockServerFactory.getClass().getName().toLowerCase();
+            for (PriceSource priceSource : PriceSource.values()) {
+                final String tmp = priceSource.name().toLowerCase();
+                if (name.contains(tmp)) {
+                    set.add(priceSource);
+                    break;
+                }
+            }
+        }
+        return set;
+    }
+    
     private static final Map<String, Country> countries = new HashMap<String, Country>();
     private static final Map<String, Country> indices = new HashMap<String, Country>();
+    private static final Map<Country, PriceSource> defaultPriceSources = new HashMap<Country, PriceSource>();
     
     static {
         countries.put("AX", Country.Australia);
@@ -854,6 +876,37 @@ public class Utils {
         for (Index index : Index.values()) {
             indices.put(index.code.toString(), index.country);
         }
+        
+        // TODO : Need revision. We no longer have primaryStockServerFactoryClasses
+        // concept. Going to replace with PriceSource.
+        defaultPriceSources.put(Country.Australia, PriceSource.Yahoo);
+        defaultPriceSources.put(Country.Austria, PriceSource.Yahoo);
+        defaultPriceSources.put(Country.Belgium, PriceSource.Yahoo);
+        defaultPriceSources.put(Country.Brazil, PriceSource.Yahoo);
+        defaultPriceSources.put(Country.Canada, PriceSource.Yahoo);
+        defaultPriceSources.put(Country.China, PriceSource.Yahoo);
+        defaultPriceSources.put(Country.Czech, PriceSource.Yahoo);
+        defaultPriceSources.put(Country.Denmark, PriceSource.Yahoo);
+        defaultPriceSources.put(Country.France, PriceSource.Yahoo);
+        defaultPriceSources.put(Country.Germany, PriceSource.Yahoo);
+        defaultPriceSources.put(Country.HongKong, PriceSource.Yahoo);
+        defaultPriceSources.put(Country.India, PriceSource.Google);
+        defaultPriceSources.put(Country.Indonesia, PriceSource.Yahoo);
+        defaultPriceSources.put(Country.Israel, PriceSource.Yahoo);
+        defaultPriceSources.put(Country.Italy, PriceSource.Yahoo);
+        defaultPriceSources.put(Country.Korea, PriceSource.Yahoo);
+        defaultPriceSources.put(Country.Malaysia, PriceSource.Yahoo);
+        defaultPriceSources.put(Country.Netherlands, PriceSource.Yahoo);
+        defaultPriceSources.put(Country.NewZealand, PriceSource.Yahoo);
+        defaultPriceSources.put(Country.Norway, PriceSource.Yahoo);
+        defaultPriceSources.put(Country.Portugal, PriceSource.Yahoo);
+        defaultPriceSources.put(Country.Singapore, PriceSource.Yahoo);
+        defaultPriceSources.put(Country.Spain, PriceSource.Yahoo);
+        defaultPriceSources.put(Country.Sweden, PriceSource.Yahoo);
+        defaultPriceSources.put(Country.Switzerland, PriceSource.Yahoo);
+        defaultPriceSources.put(Country.Taiwan, PriceSource.Yahoo);
+        defaultPriceSources.put(Country.UnitedKingdom, PriceSource.Yahoo);
+        defaultPriceSources.put(Country.UnitedState, PriceSource.Yahoo);        
     }
     
     private static final Gson gson = new Gson();

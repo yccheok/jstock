@@ -22,14 +22,21 @@ package org.yccheok.jstock.gui;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import javax.swing.*;
 import java.text.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
+import javax.swing.*;
 import javax.swing.text.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.Country;
+import org.yccheok.jstock.engine.PriceSource;
 import org.yccheok.jstock.engine.StockServerFactory;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.internationalization.MessagesBundle;
@@ -154,7 +161,9 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
     }
 
     private void initJComboBox(JStockOptions jStockOptions) {
-        
+        for (String entry : getPriceSourceEntries(jStockOptions.getCountry())) {
+            jComboBox1.addItem(entry);
+        }
     }
     
     private JFormattedTextField getPortNumberJFormattedTextField() {
@@ -225,7 +234,6 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsNetworkJPanel_PriceSource"))); // NOI18N
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jPanel4.add(jComboBox1);
 
         jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsNetworkJPanel_ProxyServer"))); // NOI18N
@@ -501,10 +509,34 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
         jLabel7.setVisible(!isTestConnectionDone);
     }
 
+    private static String[] getPriceSourceEntries(Country country) {
+        String[] values = getPriceSourceEntryValues(country);
+        List<String> entries = new ArrayList<String>();
+        for (String value : values) {
+            entries.add(priceSourceEntries.get(value));
+        }
+        return entries.toArray(new String[entries.size()]);
+    }
+
+    private static String[] getPriceSourceEntryValues(Country country) {
+        Set<PriceSource> priceSources = org.yccheok.jstock.engine.Utils.getSupportedPriceSources(country);
+        TreeSet<String> treeSet = new TreeSet<String>();
+        for (PriceSource priceSource : priceSources) {
+            treeSet.add(priceSource.name());
+        }
+        return treeSet.toArray(new String[treeSet.size()]);
+    }
+    
     private static final Log log = LogFactory.getLog(OptionsNetworkJPanel.class);
 
     private volatile SwingWorker testConnectionSwingWorker = null;
 
+    private static final Map<String, String> priceSourceEntries = new HashMap<String, String>();
+    static {
+        priceSourceEntries.put(PriceSource.Yahoo.name(), GUIBundle.getString("OptionsNetworkJPanel_YahooFinance"));
+        priceSourceEntries.put(PriceSource.Google.name(), GUIBundle.getString("OptionsNetworkJPanel_GoogleFinance"));
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
