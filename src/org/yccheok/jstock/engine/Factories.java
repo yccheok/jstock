@@ -39,32 +39,8 @@ public enum Factories {
         
         return java.util.Collections.emptyList();
     }
-
-    public void updatePrimaryStockServerFactory(Country country, Class<?> c) {
-        synchronized(klseInfoStockServerFactoryMonitor) {
-            final List<StockServerFactory> stockServerFactories = map.get(country);
-            int index = 0;
-            for (StockServerFactory stockServerFactory : stockServerFactories) {
-                if (stockServerFactory.getClass().equals(c)) {
-                    StockServerFactory tmp = stockServerFactories.get(0);
-                    stockServerFactories.set(0, stockServerFactory);
-                    stockServerFactories.set(index, tmp);
-                    break;
-                }
-                index++;
-            }
-        }
-    }
-
-    public void removeKLSEInfoStockServerFactory() {
-        synchronized(klseInfoStockServerFactoryMonitor) {
-            map.get(Country.Malaysia).remove(klseInfoStockServerFactory);
-        }
-    }
     
     private static final Map<Country, List<StockServerFactory>> map = new EnumMap<Country, List<StockServerFactory>>(Country.class);
-    private static final StockServerFactory klseInfoStockServerFactory = KLSEInfoStockServerFactory.newInstance();
-    private static final Object klseInfoStockServerFactoryMonitor = new Object();
     
     static {
         final List<StockServerFactory> australiaList = new CopyOnWriteArrayList<StockServerFactory>();
@@ -113,7 +89,7 @@ public enum Factories {
         israelList.add(YahooStockServerFactory.newInstance());
         italyList.add(YahooStockServerFactory.newInstance());
         koreaList.add(YahooStockServerFactory.newInstance());
-        malaysiaList.add(klseInfoStockServerFactory);
+        malaysiaList.add(KLSEInfoStockServerFactory.newInstance());
         malaysiaList.add(YahooStockServerFactory.newInstance());
         netherlandsList.add(YahooStockServerFactory.newInstance());
         newZealandList.add(YahooStockServerFactory.newInstance());
