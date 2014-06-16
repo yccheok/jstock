@@ -19,6 +19,8 @@
 
 package org.yccheok.jstock.engine;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +40,31 @@ public enum Factories {
         }
         
         return java.util.Collections.emptyList();
+    }
+    
+    public void updatePriceSource(Country country, final PriceSource priceSource) {
+        final String name = priceSource.name().toLowerCase();
+        
+        final List<StockServerFactory> stockServerFactories = map.get(country);
+        Collections.sort(stockServerFactories, new Comparator<StockServerFactory>() {
+
+            @Override
+            public int compare(StockServerFactory o1, StockServerFactory o2) {
+                final String name1 = o1.getClass().getName().toLowerCase();
+                final String name2 = o1.getClass().getName().toLowerCase();
+                final boolean result1 = name1.contains(name);
+                final boolean result2 = name2.contains(name);
+                if (result1 && !result2) {
+                    return -1;
+                }
+                
+                if (!result1 && result2) {
+                    return 1;
+                }
+                
+                return 0;
+            }
+        });
     }
     
     private static final Map<Country, List<StockServerFactory>> map = new EnumMap<Country, List<StockServerFactory>>(Country.class);

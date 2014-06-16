@@ -482,8 +482,11 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
         Country country = jStockOptions.getCountry();
         String priceSourceName = getPriceSourceEntryValues(country)[this.jComboBox1.getSelectedIndex()];
         PriceSource priceSource = PriceSource.valueOf(priceSourceName);
-        jStockOptions.setPriceSource(country, priceSource);
         
+        // Note that, MainFrame's updatepriceSource will call JStockOptions'
+        // setPriceSource as well.
+        MainFrame.getInstance().updatePriceSource(country, priceSource);
+                
         return true;
     }
 

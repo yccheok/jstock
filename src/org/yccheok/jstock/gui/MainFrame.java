@@ -3652,11 +3652,16 @@ public class MainFrame extends javax.swing.JFrame {
             System.getProperties().remove("http.proxyHost");
             System.getProperties().remove("http.proxyPort");
         }
+        
+        for (Country country : Country.values()) {
+            final PriceSource priceSource = this.jStockOptions.getPriceSource(country);
+            Factories.INSTANCE.updatePriceSource(country, priceSource);
+        }        
     }   
 
-    public void updatePrimaryStockServerFactory(Country country, Class<? extends StockServerFactory> c) {
-        // TODO : Need revision. We no longer have primaryStockServerFactoryClasses
-        // concept. Going to replace with PriceSource.
+    public void updatePriceSource(Country country, PriceSource priceSource) {
+        jStockOptions.setPriceSource(country, priceSource);
+        Factories.INSTANCE.updatePriceSource(country, priceSource);
 
         realTimeStockMonitor.setStockServerFactories(this.getStockServerFactories());
         stockHistoryMonitor.setStockServerFactories(this.getStockServerFactories());
