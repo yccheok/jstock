@@ -28,6 +28,11 @@ import org.apache.commons.logging.LogFactory;
  */
 public class KLSEInfoStockServerFactory implements StockServerFactory {
 
+    @Override
+    public char getId() {
+        return 'c';
+    }
+    
     private KLSEInfoStockServerFactory() {        
     }
     

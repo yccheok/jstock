@@ -27,7 +27,12 @@ import org.apache.commons.logging.LogFactory;
  * @author yccheok
  */
 public class YahooStockServerFactory implements StockServerFactory {
-
+    
+    @Override
+    public char getId() {
+        return 'd';
+    }
+    
     private YahooStockServerFactory() {
         dividendServer = new YahooDividendServer();
     }

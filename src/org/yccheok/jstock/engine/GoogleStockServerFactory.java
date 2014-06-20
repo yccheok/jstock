@@ -30,7 +30,12 @@ import org.apache.commons.logging.LogFactory;
  * @author yccheok
  */
 public class GoogleStockServerFactory implements StockServerFactory {
-
+    
+    @Override
+    public char getId() {
+        return 'b';
+    }
+    
     private GoogleStockServerFactory(boolean useStockServer) {
         if (useStockServer) {
             stockServer = new GoogleStockServer();
