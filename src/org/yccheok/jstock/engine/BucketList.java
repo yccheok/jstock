@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -48,6 +50,9 @@ public class BucketList<E> {
     public List<E> get(int index) {        
         ListIterator<E> listIterator = null;
         final int size = size();
+        
+        // ....
+        
         if (index < size) {
             listIterator = buckets.listIterator(index * maxBucketSize);
         }
@@ -63,7 +68,7 @@ public class BucketList<E> {
         return java.util.Collections.emptyList();
     }
     
-    public boolean add(E e) {
+    public synchronized boolean add(E e) {
         if (bucketsIndexMapping.containsKey(e)) {
             return false;
         }
@@ -75,7 +80,25 @@ public class BucketList<E> {
 
     }
     
+    public synchronized boolean remove(E e) {
+        Integer row = bucketsIndexMapping.get(e);
+        boolean status = false;
+        
+        if (row == null) {
+            return status;
+        }
+            
+        status = (null != buckets.remove((int)row));            
+        bucketsIndexMapping.remove(e);
+            
+        for (int i = row, ei = buckets.size(); i < ei; i++) {
+            bucketsIndexMapping.put(buckets.get(i), i);
+        }
+
+        return status;
+    }    
+    
     private final int maxBucketSize;
-    private List<E> buckets = new ArrayList<E>();
+    private List<E> buckets = new java.util.concurrent.CopyOnWriteArrayList<E>();
     private Map<E, Integer> bucketsIndexMapping = new HashMap<E, Integer>();
 }
