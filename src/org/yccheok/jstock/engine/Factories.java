@@ -19,6 +19,7 @@
 
 package org.yccheok.jstock.engine;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumMap;
@@ -32,7 +33,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public enum Factories {
     INSTANCE;
-            
+          
+    public List<StockServerFactory> getStockServerFactories(Code code) {
+        Country country = Utils.toCountry(code);
+        return getStockServerFactories(country);
+    }
+    
     public List<StockServerFactory> getStockServerFactories(Country country) {
         List<StockServerFactory> list = map.get(country);
         if (list != null) {
@@ -46,12 +52,21 @@ public enum Factories {
         final String name = priceSource.name().toLowerCase();
         
         final List<StockServerFactory> stockServerFactories = map.get(country);
-        Collections.sort(stockServerFactories, new Comparator<StockServerFactory>() {
+        
+        if (null == stockServerFactories) {
+            return;
+        }
+        
+        // It isn't possible to perform sorting directly on CopyOnWriteArrayList.
+        // at java.util.concurrent.CopyOnWriteArrayList$COWIterator.set(CopyOnWriteArrayList.java:1049)
+        final List<StockServerFactory> tmp = new ArrayList<StockServerFactory>(stockServerFactories);
+        
+        Collections.sort(tmp, new Comparator<StockServerFactory>() {
 
             @Override
             public int compare(StockServerFactory o1, StockServerFactory o2) {
                 final String name1 = o1.getClass().getName().toLowerCase();
-                final String name2 = o1.getClass().getName().toLowerCase();
+                final String name2 = o2.getClass().getName().toLowerCase();
                 final boolean result1 = name1.contains(name);
                 final boolean result2 = name2.contains(name);
                 if (result1 && !result2) {
@@ -65,6 +80,14 @@ public enum Factories {
                 return 0;
             }
         });
+        
+        // Copy back to CopyOnWriteArrayList.
+        for (int i = 0, ei = tmp.size(); i < ei; i++) {
+            StockServerFactory f = tmp.get(i);
+            if (f != stockServerFactories.get(i)) {
+                stockServerFactories.set(i, f);
+            }
+        }
     }
     
     private static final Map<Country, List<StockServerFactory>> map = new EnumMap<Country, List<StockServerFactory>>(Country.class);
