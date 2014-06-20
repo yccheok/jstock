@@ -31,7 +31,7 @@ import java.util.Map;
  */
 public class BucketList<E> {
     public BucketList(int maxBucketSize) {
-        if (this.maxBucketSize <= 0) {
+        if (maxBucketSize <= 0) {
             throw new java.lang.IllegalArgumentException();
         }
         
