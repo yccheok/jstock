@@ -42,10 +42,12 @@ public class BucketList<E> {
     }    
     
     public int size() {
-        final int buckets_size = buckets.size();
+        final int bucketsSize = buckets.size();
+        
         final int size = 
-            (buckets_size / maxBucketSize) + 
-            (((buckets_size % maxBucketSize) == 0) ? 0 : 1);        
+            (bucketsSize / maxBucketSize) + 
+            (((bucketsSize % maxBucketSize) == 0) ? 0 : 1);
+        
         return size;
     }
     

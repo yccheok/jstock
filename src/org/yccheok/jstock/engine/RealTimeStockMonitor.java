@@ -253,9 +253,11 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
     }
     
     private int getNumOfRequiredThread() {
+        final int stockCodesSize = stockCodes.size();
+        
         final int numOfThreadRequired = 
-            (stockCodes.size() / maxStockSizePerScan) + 
-            (((stockCodes.size() % maxStockSizePerScan) == 0) ? 0 : 1);
+            (stockCodesSize / maxStockSizePerScan) + 
+            (((stockCodesSize % maxStockSizePerScan) == 0) ? 0 : 1);
         
         return Math.min(numOfThreadRequired, maxThread);
     }
