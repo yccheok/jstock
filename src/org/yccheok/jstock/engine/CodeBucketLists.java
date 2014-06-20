@@ -40,11 +40,11 @@ public class CodeBucketLists {
     public boolean add(Code code) {
         final String id = getStockServerFactoriesId(code);
         
-        BucketList<Code> bucketList = bucketLists.get(id);
+        BucketList<Code> bucketList = getBucketLists().get(id);
         
         if (bucketList == null) {
             bucketList = new BucketList(this.maxBucketSize);
-            bucketLists.put(id, bucketList);
+            getBucketLists().put(id, bucketList);
         }
         
         final int beforeSize = bucketList.size();
@@ -64,39 +64,39 @@ public class CodeBucketLists {
             return true;
         }
         
-        final Integer basedIndexInfosIndex = basedIndexInfosIndexMapping.get(id);
+        final Integer basedIndexInfosIndex = getBasedIndexInfosIndexMapping().get(id);
         final int basedIndex;
         
         if (basedIndexInfosIndex == null) {
             // id not found.
             
-            final int basedIndexInfosSize = basedIndexInfos.size();
+            final int basedIndexInfosSize = getBasedIndexInfos().size();
             
-            basedIndexInfosIndexMapping.put(id, basedIndexInfosSize);            
+            getBasedIndexInfosIndexMapping().put(id, basedIndexInfosSize);            
             
             if (basedIndexInfosSize == 0) {
                 // ever first id in this CodeBucketLists.
                 
                 basedIndex = 0;
             } else {
-                final Pair<String, Integer> previousBasedIndexInfo = basedIndexInfos.get(basedIndexInfosSize - 1);
-                final BucketList<Code> previousBucketList = bucketLists.get(previousBasedIndexInfo.first);
+                final Pair<String, Integer> previousBasedIndexInfo = getBasedIndexInfos().get(basedIndexInfosSize - 1);
+                final BucketList<Code> previousBucketList = getBucketLists().get(previousBasedIndexInfo.first);
                 final int previousBucketListSize = previousBucketList.size();
                 basedIndex = previousBasedIndexInfo.second + previousBucketListSize;
             }  
             
-            basedIndexInfos.add(Pair.create(id, basedIndex));
+            getBasedIndexInfos().add(Pair.create(id, basedIndex));
             
         } else {
-            basedIndex = basedIndexInfos.get(basedIndexInfosIndex).second;
+            basedIndex = getBasedIndexInfos().get(basedIndexInfosIndex).second;
             
-            for (int i = (basedIndexInfosIndex + 1), ei = basedIndexInfos.size(); i < ei; i++) {
-                final Pair<String, Integer> basedIndexInfo = basedIndexInfos.get(i);
-                basedIndexInfos.set(i, Pair.create(basedIndexInfo.first, basedIndexInfo.second + 1));
+            for (int i = (basedIndexInfosIndex + 1), ei = getBasedIndexInfos().size(); i < ei; i++) {
+                final Pair<String, Integer> basedIndexInfo = getBasedIndexInfos().get(i);
+                getBasedIndexInfos().set(i, Pair.create(basedIndexInfo.first, basedIndexInfo.second + 1));
             }
         }
         
-        bucketListsIndexMapping.add(basedIndex, id);
+        getBucketListsIndexMapping().add(basedIndex, id);
         
         return true;
     }
@@ -144,4 +144,36 @@ public class CodeBucketLists {
      * ----------------------------------
      */
     private final List<Pair<String, Integer>> basedIndexInfos = new java.util.concurrent.CopyOnWriteArrayList<Pair<String, Integer>>();
+
+    /***************************************************************************
+     * FOR UNIT TESTING PURPOSE
+     **************************************************************************/
+    
+    /**
+     * @return the bucketLists
+     */
+    public Map<String, BucketList<Code>> getBucketLists() {
+        return java.util.Collections.unmodifiableMap(bucketLists);
+    }
+
+    /**
+     * @return the bucketListsIndexMapping
+     */
+    public List<String> getBucketListsIndexMapping() {
+        return java.util.Collections.unmodifiableList(bucketListsIndexMapping);
+    }
+
+    /**
+     * @return the basedIndexInfosIndexMapping
+     */
+    public Map<String, Integer> getBasedIndexInfosIndexMapping() {
+        return java.util.Collections.unmodifiableMap(basedIndexInfosIndexMapping);
+    }
+
+    /**
+     * @return the basedIndexInfos
+     */
+    public List<Pair<String, Integer>> getBasedIndexInfos() {
+        return java.util.Collections.unmodifiableList(basedIndexInfos);
+    }    
 }
