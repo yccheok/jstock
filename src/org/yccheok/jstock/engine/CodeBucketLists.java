@@ -51,6 +51,7 @@ public class CodeBucketLists {
         
         final boolean status = bucketList.add(code);
         if (status == false) {
+            // Duplicated.
             return status;
         }
         
@@ -63,25 +64,25 @@ public class CodeBucketLists {
             return true;
         }
         
-        Integer idsIndex = basedIndexInfosIndexMapping.get(id);
-        if (idsIndex == null) {
-            int basedIndexInfosSize = basedIndexInfos.size();
+        final Integer basedIndexInfosIndex = basedIndexInfosIndexMapping.get(id);
+        if (basedIndexInfosIndex == null) {
+            final int basedIndexInfosSize = basedIndexInfos.size();
             basedIndexInfosIndexMapping.put(id, basedIndexInfosSize);            
             
             if (basedIndexInfosSize == 0) {
                 basedIndexInfos.add(Pair.create(id, 0));
             } else {
-                Pair<String, Integer> previousBasedIndexInfo = basedIndexInfos.get(basedIndexInfosSize - 1);
-                BucketList<Code> previousBucketList = bucketLists.get(previousBasedIndexInfo.first);
-                int previousBucketListSize = previousBucketList.size();
-                int myBasedIndex = previousBasedIndexInfo.second + previousBucketListSize;
+                final Pair<String, Integer> previousBasedIndexInfo = basedIndexInfos.get(basedIndexInfosSize - 1);
+                final BucketList<Code> previousBucketList = bucketLists.get(previousBasedIndexInfo.first);
+                final int previousBucketListSize = previousBucketList.size();
+                int basedIndex = previousBasedIndexInfo.second + previousBucketListSize;
                 
-                basedIndexInfos.add(Pair.create(id, myBasedIndex));
+                basedIndexInfos.add(Pair.create(id, basedIndex));
             }            
         } else {
-            for (int i = (idsIndex + 1), ei = basedIndexInfos.size(); i < ei; i++) {
-                Pair<String, Integer> basedIndex = basedIndexInfos.get(i);
-                basedIndexInfos.set(i, Pair.create(basedIndex.first, basedIndex.second + 1));
+            for (int i = (basedIndexInfosIndex + 1), ei = basedIndexInfos.size(); i < ei; i++) {
+                final Pair<String, Integer> basedIndexInfo = basedIndexInfos.get(i);
+                basedIndexInfos.set(i, Pair.create(basedIndexInfo.first, basedIndexInfo.second + 1));
             }
         }
         
@@ -121,16 +122,16 @@ public class CodeBucketLists {
     private final List<String> bucketListsIndexMapping = new java.util.concurrent.CopyOnWriteArrayList<String>();
     
     /*        
-     * "A" => 1
-     * "B" => 2
-     * "C" => 3
+     * "A" => 0
+     * "B" => 1
+     * "C" => 2
      */    
     private final Map<String, Integer> basedIndexInfosIndexMapping = new ConcurrentHashMap<String, Integer>();
     
     /*
-     * ---------------------------------
-     * | ("A", 0) | ("B", 4), ("C", 5) |
-     * ---------------------------------
+     * ----------------------------------
+     * | ("A", 0) | ("B", 4) | ("C", 5) |
+     * ----------------------------------
      */
     private final List<Pair<String, Integer>> basedIndexInfos = new java.util.concurrent.CopyOnWriteArrayList<Pair<String, Integer>>();
 }
