@@ -153,8 +153,7 @@ public class CodeBucketLists {
         
         StringBuilder stringBuilder = new StringBuilder();
         for (StockServerFactory stockServerFactory : stockServerFactories) {
-            // Get simple name will be good enough at this moment
-            stringBuilder.append(stockServerFactory.getClass().getSimpleName());
+            stringBuilder.append(stockServerFactory.getId());
         }
         return stringBuilder.toString();
     }
