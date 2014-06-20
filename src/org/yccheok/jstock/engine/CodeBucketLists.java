@@ -65,28 +65,38 @@ public class CodeBucketLists {
         }
         
         final Integer basedIndexInfosIndex = basedIndexInfosIndexMapping.get(id);
+        final int basedIndex;
+        
         if (basedIndexInfosIndex == null) {
+            // id not found.
+            
             final int basedIndexInfosSize = basedIndexInfos.size();
+            
             basedIndexInfosIndexMapping.put(id, basedIndexInfosSize);            
             
             if (basedIndexInfosSize == 0) {
-                basedIndexInfos.add(Pair.create(id, 0));
+                // ever first id in this CodeBucketLists.
+                
+                basedIndex = 0;
             } else {
                 final Pair<String, Integer> previousBasedIndexInfo = basedIndexInfos.get(basedIndexInfosSize - 1);
                 final BucketList<Code> previousBucketList = bucketLists.get(previousBasedIndexInfo.first);
                 final int previousBucketListSize = previousBucketList.size();
-                int basedIndex = previousBasedIndexInfo.second + previousBucketListSize;
-                
-                basedIndexInfos.add(Pair.create(id, basedIndex));
-            }            
+                basedIndex = previousBasedIndexInfo.second + previousBucketListSize;
+            }  
+            
+            basedIndexInfos.add(Pair.create(id, basedIndex));
+            
         } else {
+            basedIndex = basedIndexInfos.get(basedIndexInfosIndex).second;
+            
             for (int i = (basedIndexInfosIndex + 1), ei = basedIndexInfos.size(); i < ei; i++) {
                 final Pair<String, Integer> basedIndexInfo = basedIndexInfos.get(i);
                 basedIndexInfos.set(i, Pair.create(basedIndexInfo.first, basedIndexInfo.second + 1));
             }
         }
         
-        bucketListsIndexMapping.add(afterSize - 1, id);
+        bucketListsIndexMapping.add(basedIndex, id);
         
         return true;
     }
