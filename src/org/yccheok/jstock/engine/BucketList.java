@@ -58,7 +58,7 @@ public class BucketList<E> {
         try {
             final int size = size();
 
-            if (index < size) {
+            if (index >= 0 && index < size) {
                 listIterator = buckets.listIterator(index * maxBucketSize);
             }
         } finally {

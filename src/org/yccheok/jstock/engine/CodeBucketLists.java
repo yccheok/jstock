@@ -35,6 +35,53 @@ public class CodeBucketLists {
         }
         
         this.maxBucketSize = maxBucketSize;
+        bucketListsIndexMappingReadWriteLock = new java.util.concurrent.locks.ReentrantReadWriteLock();
+        bucketListsIndexMappingReaderLock = bucketListsIndexMappingReadWriteLock.readLock();
+        bucketListsIndexMappingWriterLock = bucketListsIndexMappingReadWriteLock.writeLock();                
+        
+    }
+    
+    public List<Code> get(int index) {
+        bucketListsIndexMappingReaderLock.lock();
+        try {
+            final int size = bucketListsIndexMapping.size();    
+            if (index >= size) {
+                return java.util.Collections.emptyList(); 
+            }
+
+            final String id = bucketListsIndexMapping.get(index); 
+            final Integer index2 = basedIndexInfosIndexMapping.get(id);
+
+            if (index2 == null) {
+                return java.util.Collections.emptyList();
+            }
+            
+            final int size2 = basedIndexInfos.size();
+            if (index2 >= size2) {
+                return java.util.Collections.emptyList();
+            }
+
+            final Pair<String, Integer> info = basedIndexInfos.get(index2);
+            if (info == null) {
+                return java.util.Collections.emptyList();
+            } 
+            
+            final BucketList<Code> bucketList = bucketLists.get(id);
+            if (bucketList == null) {
+                return java.util.Collections.emptyList();
+            }
+
+            final int basedIndex = info.second;
+            final int i = index - basedIndex;
+            
+            return bucketList.get(i);
+        } finally {
+            bucketListsIndexMappingReaderLock.unlock();
+        }
+    }
+    
+    public int size() {
+        return bucketListsIndexMapping.size();
     }
     
     public boolean add(Code code) {
@@ -145,35 +192,7 @@ public class CodeBucketLists {
      */
     private final List<Pair<String, Integer>> basedIndexInfos = new java.util.concurrent.CopyOnWriteArrayList<Pair<String, Integer>>();
     
-    /***************************************************************************
-     * FOR UNIT TESTING PURPOSE
-     **************************************************************************/
-    
-    /**
-     * @return the bucketLists
-     */
-    public Map<String, BucketList<Code>> getBucketLists() {
-        return java.util.Collections.unmodifiableMap(bucketLists);
-    }
-
-    /**
-     * @return the bucketListsIndexMapping
-     */
-    public List<String> getBucketListsIndexMapping() {
-        return java.util.Collections.unmodifiableList(bucketListsIndexMapping);
-    }
-
-    /**
-     * @return the basedIndexInfosIndexMapping
-     */
-    public Map<String, Integer> getBasedIndexInfosIndexMapping() {
-        return java.util.Collections.unmodifiableMap(basedIndexInfosIndexMapping);
-    }
-
-    /**
-     * @return the basedIndexInfos
-     */
-    public List<Pair<String, Integer>> getBasedIndexInfos() {
-        return java.util.Collections.unmodifiableList(basedIndexInfos);
-    }      
+    private final java.util.concurrent.locks.ReadWriteLock bucketListsIndexMappingReadWriteLock;
+    private final java.util.concurrent.locks.Lock bucketListsIndexMappingReaderLock;
+    private final java.util.concurrent.locks.Lock bucketListsIndexMappingWriterLock;    
 }
