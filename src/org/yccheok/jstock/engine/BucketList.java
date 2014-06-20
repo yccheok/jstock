@@ -38,23 +38,31 @@ public class BucketList<E> {
         }
         
         this.maxBucketSize = maxBucketSize;
+        bucketsReadWriteLock = new java.util.concurrent.locks.ReentrantReadWriteLock();
+        bucketsReaderLock = bucketsReadWriteLock.readLock();
+        bucketsWriterLock = bucketsReadWriteLock.writeLock();                
     }    
     
     public int size() {
+        final int buckets_size = buckets.size();
         final int size = 
-            (buckets.size() / maxBucketSize) + 
-            (((buckets.size() % maxBucketSize) == 0) ? 0 : 1);        
+            (buckets_size / maxBucketSize) + 
+            (((buckets_size % maxBucketSize) == 0) ? 0 : 1);        
         return size;
     }
     
     public List<E> get(int index) {        
         ListIterator<E> listIterator = null;
-        final int size = size();
         
-        // ....
-        
-        if (index < size) {
-            listIterator = buckets.listIterator(index * maxBucketSize);
+        bucketsReaderLock.lock();
+        try {
+            final int size = size();
+
+            if (index < size) {
+                listIterator = buckets.listIterator(index * maxBucketSize);
+            }
+        } finally {
+            bucketsReaderLock.unlock();
         }
         
         if (listIterator != null) {
@@ -68,7 +76,10 @@ public class BucketList<E> {
         return java.util.Collections.emptyList();
     }
     
+    // synchronized, to avoid add and remove at the same time.
     public synchronized boolean add(E e) {
+        // Lock isn't required here. This is because increase the size of the 
+        // list is not going to get IndexOutOfBoundException.        
         if (bucketsIndexMapping.containsKey(e)) {
             return false;
         }
@@ -80,25 +91,38 @@ public class BucketList<E> {
 
     }
     
+    // synchronized, to avoid add and remove at the same time
     public synchronized boolean remove(E e) {
-        Integer row = bucketsIndexMapping.get(e);
+        // This is to ensure we are able to get the correct StockCodes size,
+        // and able to retrieve Iterator in a safe way without getting 
+        // IndexOutOfBoundException.
+        bucketsWriterLock.lock();        
         boolean status = false;
         
-        if (row == null) {
-            return status;
-        }
-            
-        status = (null != buckets.remove((int)row));            
-        bucketsIndexMapping.remove(e);
-            
-        for (int i = row, ei = buckets.size(); i < ei; i++) {
-            bucketsIndexMapping.put(buckets.get(i), i);
-        }
+        try {
+            Integer row = bucketsIndexMapping.get(e);
 
+            if (row == null) {
+                return status;
+            }
+
+            status = (null != buckets.remove((int)row));            
+            bucketsIndexMapping.remove(e);
+
+            for (int i = row, ei = buckets.size(); i < ei; i++) {
+                bucketsIndexMapping.put(buckets.get(i), i);
+            }
+        } finally {
+            bucketsWriterLock.unlock();
+        }
+        
         return status;
     }    
     
     private final int maxBucketSize;
-    private List<E> buckets = new java.util.concurrent.CopyOnWriteArrayList<E>();
-    private Map<E, Integer> bucketsIndexMapping = new HashMap<E, Integer>();
+    private final List<E> buckets = new java.util.concurrent.CopyOnWriteArrayList<E>();
+    private final Map<E, Integer> bucketsIndexMapping = new HashMap<E, Integer>();
+    private final java.util.concurrent.locks.ReadWriteLock bucketsReadWriteLock;
+    private final java.util.concurrent.locks.Lock bucketsReaderLock;
+    private final java.util.concurrent.locks.Lock bucketsWriterLock;    
 }
