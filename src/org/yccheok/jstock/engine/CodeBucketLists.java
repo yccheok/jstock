@@ -40,11 +40,11 @@ public class CodeBucketLists {
     public boolean add(Code code) {
         final String id = getStockServerFactoriesId(code);
         
-        BucketList<Code> bucketList = getBucketLists().get(id);
+        BucketList<Code> bucketList = bucketLists.get(id);
         
         if (bucketList == null) {
             bucketList = new BucketList(this.maxBucketSize);
-            getBucketLists().put(id, bucketList);
+            bucketLists.put(id, bucketList);
         }
         
         final int beforeSize = bucketList.size();
@@ -64,39 +64,39 @@ public class CodeBucketLists {
             return true;
         }
         
-        final Integer basedIndexInfosIndex = getBasedIndexInfosIndexMapping().get(id);
+        final Integer basedIndexInfosIndex = basedIndexInfosIndexMapping.get(id);
         final int basedIndex;
         
         if (basedIndexInfosIndex == null) {
             // id not found.
             
-            final int basedIndexInfosSize = getBasedIndexInfos().size();
+            final int basedIndexInfosSize = basedIndexInfos.size();
             
-            getBasedIndexInfosIndexMapping().put(id, basedIndexInfosSize);            
+            basedIndexInfosIndexMapping.put(id, basedIndexInfosSize);            
             
             if (basedIndexInfosSize == 0) {
                 // ever first id in this CodeBucketLists.
                 
                 basedIndex = 0;
             } else {
-                final Pair<String, Integer> previousBasedIndexInfo = getBasedIndexInfos().get(basedIndexInfosSize - 1);
-                final BucketList<Code> previousBucketList = getBucketLists().get(previousBasedIndexInfo.first);
+                final Pair<String, Integer> previousBasedIndexInfo = basedIndexInfos.get(basedIndexInfosSize - 1);
+                final BucketList<Code> previousBucketList = bucketLists.get(previousBasedIndexInfo.first);
                 final int previousBucketListSize = previousBucketList.size();
                 basedIndex = previousBasedIndexInfo.second + previousBucketListSize;
             }  
             
-            getBasedIndexInfos().add(Pair.create(id, basedIndex));
+            basedIndexInfos.add(Pair.create(id, basedIndex));
             
         } else {
-            basedIndex = getBasedIndexInfos().get(basedIndexInfosIndex).second;
+            basedIndex = basedIndexInfos.get(basedIndexInfosIndex).second;
             
-            for (int i = (basedIndexInfosIndex + 1), ei = getBasedIndexInfos().size(); i < ei; i++) {
-                final Pair<String, Integer> basedIndexInfo = getBasedIndexInfos().get(i);
-                getBasedIndexInfos().set(i, Pair.create(basedIndexInfo.first, basedIndexInfo.second + 1));
+            for (int i = (basedIndexInfosIndex + 1), ei = basedIndexInfos.size(); i < ei; i++) {
+                final Pair<String, Integer> basedIndexInfo = basedIndexInfos.get(i);
+                basedIndexInfos.set(i, Pair.create(basedIndexInfo.first, basedIndexInfo.second + 1));
             }
         }
         
-        getBucketListsIndexMapping().add(basedIndex, id);
+        bucketListsIndexMapping.add(basedIndex, id);
         
         return true;
     }
@@ -144,7 +144,7 @@ public class CodeBucketLists {
      * ----------------------------------
      */
     private final List<Pair<String, Integer>> basedIndexInfos = new java.util.concurrent.CopyOnWriteArrayList<Pair<String, Integer>>();
-
+    
     /***************************************************************************
      * FOR UNIT TESTING PURPOSE
      **************************************************************************/
@@ -175,5 +175,5 @@ public class CodeBucketLists {
      */
     public List<Pair<String, Integer>> getBasedIndexInfos() {
         return java.util.Collections.unmodifiableList(basedIndexInfos);
-    }    
+    }      
 }
