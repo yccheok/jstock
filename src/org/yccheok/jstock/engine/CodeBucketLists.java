@@ -35,14 +35,14 @@ public class CodeBucketLists {
         }
         
         this.maxBucketSize = maxBucketSize;
-        bucketListsIndexMappingReadWriteLock = new java.util.concurrent.locks.ReentrantReadWriteLock();
-        bucketListsIndexMappingReaderLock = bucketListsIndexMappingReadWriteLock.readLock();
-        bucketListsIndexMappingWriterLock = bucketListsIndexMappingReadWriteLock.writeLock();                
+        readWriteLock = new java.util.concurrent.locks.ReentrantReadWriteLock();
+        readerLock = readWriteLock.readLock();
+        writerLock = readWriteLock.writeLock();                
         
     }
     
     public List<Code> get(int index) {
-        bucketListsIndexMappingReaderLock.lock();
+        readerLock.lock();
         try {
             final int size = bucketListsIndexMapping.size();    
             if (index >= size) {
@@ -76,7 +76,7 @@ public class CodeBucketLists {
             
             return bucketList.get(i);
         } finally {
-            bucketListsIndexMappingReaderLock.unlock();
+            readerLock.unlock();
         }
     }
     
@@ -192,7 +192,7 @@ public class CodeBucketLists {
      */
     private final List<Pair<String, Integer>> basedIndexInfos = new java.util.concurrent.CopyOnWriteArrayList<Pair<String, Integer>>();
     
-    private final java.util.concurrent.locks.ReadWriteLock bucketListsIndexMappingReadWriteLock;
-    private final java.util.concurrent.locks.Lock bucketListsIndexMappingReaderLock;
-    private final java.util.concurrent.locks.Lock bucketListsIndexMappingWriterLock;    
+    private final java.util.concurrent.locks.ReadWriteLock readWriteLock;
+    private final java.util.concurrent.locks.Lock readerLock;
+    private final java.util.concurrent.locks.Lock writerLock;    
 }
