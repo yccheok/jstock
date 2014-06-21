@@ -84,7 +84,7 @@ public class CodeBucketLists {
         return bucketListsIndexMapping.size();
     }
     
-    public boolean add(Code code) {
+    public synchronized boolean add(Code code) {
         final String id = getStockServerFactoriesId(code);
         
         BucketList<Code> bucketList = bucketLists.get(id);
@@ -144,6 +144,60 @@ public class CodeBucketLists {
         }
         
         bucketListsIndexMapping.add(basedIndex, id);
+        
+        return true;
+    }
+    
+    public synchronized boolean remove(Code code) {
+        final String id = getStockServerFactoriesId(code);
+        
+        BucketList<Code> bucketList = bucketLists.get(id);
+        
+        if (bucketList == null) {
+            // Nothing to be removed.
+            return false;
+        }
+        
+        final int beforeSize = bucketList.size();
+        
+        final boolean status = bucketList.remove(code);
+        if (status == false) {
+            // Nothing to be removed.
+            return status;
+        } 
+        
+        final int afterSize = bucketList.size();
+        
+        assert(afterSize >= 0);
+        assert(afterSize <= beforeSize); 
+        
+        if (afterSize == beforeSize) {
+            return true;
+        }        
+        
+        final Integer basedIndexInfosIndex = basedIndexInfosIndexMapping.get(id);
+        final int basedIndex = basedIndexInfos.get(basedIndexInfosIndex).second;
+                
+        for (int i = (basedIndexInfosIndex + 1), ei = basedIndexInfos.size(); i < ei; i++) {
+            final Pair<String, Integer> basedIndexInfo = basedIndexInfos.get(i);
+            basedIndexInfos.set(i, Pair.create(basedIndexInfo.first, basedIndexInfo.second - 1));
+        }
+                    
+        bucketListsIndexMapping.remove((int)basedIndex);
+        
+        if (afterSize == 0) {
+            for (int i = (basedIndexInfosIndex + 1), ei = basedIndexInfos.size(); i < ei; i++) {
+                final Pair<String, Integer> basedIndexInfo = basedIndexInfos.get(i);
+                final String _id = basedIndexInfo.first;
+                int index = basedIndexInfosIndexMapping.get(_id);
+                index--;
+                basedIndexInfosIndexMapping.put(_id, index);
+            }
+            
+            bucketLists.remove(id);
+            int index = basedIndexInfosIndexMapping.remove(id);
+            basedIndexInfos.remove(index);
+        }
         
         return true;
     }
