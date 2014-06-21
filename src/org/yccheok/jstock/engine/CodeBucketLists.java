@@ -52,24 +52,9 @@ public class CodeBucketLists {
             final String id = bucketListsIndexMapping.get(index); 
             final Integer index2 = basedIndexInfosIndexMapping.get(id);
 
-            if (index2 == null) {
-                return java.util.Collections.emptyList();
-            }
-            
-            final int size2 = basedIndexInfos.size();
-            if (index2 >= size2) {
-                return java.util.Collections.emptyList();
-            }
-
             final Pair<String, Integer> info = basedIndexInfos.get(index2);
-            if (info == null) {
-                return java.util.Collections.emptyList();
-            } 
             
             final BucketList<Code> bucketList = bucketLists.get(id);
-            if (bucketList == null) {
-                return java.util.Collections.emptyList();
-            }
 
             final int basedIndex = info.second;
             final int i = index - basedIndex;
