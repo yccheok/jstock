@@ -19,6 +19,7 @@
 
 package org.yccheok.jstock.engine;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -205,6 +206,22 @@ public class CodeBucketLists {
             return true;
         } finally {
             writerLock.unlock();
+        }
+    }
+    
+    // Someone had modified Factories singleton content. Rebuild code bucket
+    // lists.
+    public synchronized void rebuild() {
+        final List<Code> codes = new ArrayList<Code>();
+        
+        for (int i = 0, ei = size(); i < ei; i++) {
+            codes.addAll(get(i));
+        }
+        
+        this.clear();
+        
+        for (Code code : codes) {
+            this.add(code);
         }
     }
     

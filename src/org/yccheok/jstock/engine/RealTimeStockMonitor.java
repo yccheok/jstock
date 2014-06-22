@@ -127,6 +127,21 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
         }
     }
     
+    public synchronized void rebuild() {
+        this.codeBucketLists.rebuild();
+                
+        this.startNewThreadsIfNecessary();
+        
+        final int numOfMonitorRequired = this.getNumOfRequiredThread();
+        
+        assert(numOfMonitorRequired <= this.maxThread);
+        
+        while (this.stockMonitors.size() > numOfMonitorRequired) {
+            StockMonitor stockMonitor = stockMonitors.remove(stockMonitors.size() - 1);
+            stockMonitor._stop();
+        }        
+    }
+    
     // Stop all the monitoring thread. Once this had been stopped, all the
     // previous monitoring thread will be removed.
     public synchronized void stop() {
