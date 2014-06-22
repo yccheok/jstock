@@ -54,13 +54,14 @@ public class Utils {
         String string = code.toString();
         int index = string.lastIndexOf(".");
         if (index == -1) {
-            if (isYahooIndex(code)) {
+            if (isYahooIndexSubset(code)) {
                 Country country = indices.get(string.toUpperCase());
                 if (country == null) {
                     return Country.UnitedState;
                 }
                 return country;
             }
+            
             return Country.UnitedState;
         }
         String key = string.substring(index + 1, string.length());
@@ -341,68 +342,18 @@ public class Utils {
         return result;
     }
     
-    private static final List<Index> australiaIndices = new ArrayList<Index>();
-    private static final List<Index> austriaIndices = new ArrayList<Index>();
-    private static final List<Index> belgiumIndices = new ArrayList<Index>();
-    private static final List<Index> brazilIndices = new ArrayList<Index>();
-    private static final List<Index> canadaIndices = new ArrayList<Index>();
-    private static final List<Index> chinaIndices = new ArrayList<Index>();
-    private static final List<Index> denmarkIndices = new ArrayList<Index>();
-    private static final List<Index> franceIndices = new ArrayList<Index>();
-    private static final List<Index> germanyIndices = new ArrayList<Index>();
-    private static final List<Index> hongkongIndices = new ArrayList<Index>();
-    private static final List<Index> indiaIndices = new ArrayList<Index>();
-    private static final List<Index> indonesiaIndices = new ArrayList<Index>();
-    private static final List<Index> israelIndices = new ArrayList<Index>();
-    private static final List<Index> italyIndices = new ArrayList<Index>();
-    private static final List<Index> koreaIndices = new ArrayList<Index>();
-    private static final List<Index> malaysiaIndices = new ArrayList<Index>();
-    private static final List<Index> netherlandsIndices = new ArrayList<Index>();
-    private static final List<Index> newZealandIndices = new ArrayList<Index>();
-    private static final List<Index> norwayIndices = new ArrayList<Index>();
-    private static final List<Index> portugalIndices = new ArrayList<Index>();
-    private static final List<Index> singaporeIndices = new ArrayList<Index>();
-    private static final List<Index> spainIndices = new ArrayList<Index>();
-    private static final List<Index> swedenIndices = new ArrayList<Index>();
-    private static final List<Index> switzerlandIndices = new ArrayList<Index>();
-    private static final List<Index> taiwanIndices = new ArrayList<Index>();
-    private static final List<Index> unitedKingdomIndices = new ArrayList<Index>();
-    private static final List<Index> unitedStateIndices = new ArrayList<Index>();
-    
+    private static final Map<Country, List<Index>> country2Indices = new EnumMap<Country, List<Index>>(Country.class);
+
     static
     {
-        austriaIndices.add(Index.ATX);
-        australiaIndices.add(Index.ASX);
-        australiaIndices.add(Index.AORD);
-        belgiumIndices.add(Index.BFX);
-        brazilIndices.add(Index.BVSP);
-        canadaIndices.add(Index.GSPTSE);
-        chinaIndices.add(Index.CSI300);
-        chinaIndices.add(Index.SSEC);
-        denmarkIndices.add(Index.OMXC20CO);
-        franceIndices.add(Index.FCHI);  
-        germanyIndices.add(Index.DAX);
-        hongkongIndices.add(Index.HSI);
-        indiaIndices.add(Index.BSESN);
-        indiaIndices.add(Index.NSEI);
-        indonesiaIndices.add(Index.JKSE);
-        israelIndices.add(Index.TA25);
-        israelIndices.add(Index.TA100);
-        italyIndices.add(Index.FTSEMIB);
-        koreaIndices.add(Index.KS11);
-        malaysiaIndices.add(Index.KLSE);
-        netherlandsIndices.add(Index.AEX);
-        newZealandIndices.add(Index.NZSX50);
-        norwayIndices.add(Index.OSEAX);
-        portugalIndices.add(Index.PSI20);
-        singaporeIndices.add(Index.STI);
-        spainIndices.add(Index.SMSI);
-        swedenIndices.add(Index.OMX30);
-        switzerlandIndices.add(Index.SSMI);
-        taiwanIndices.add(Index.TWII);
-        unitedKingdomIndices.add(Index.FTSE);
-        unitedStateIndices.add(Index.DJI);        
-        unitedStateIndices.add(Index.IXIC);        
+        for (Index index : Index.values()) {
+            List<Index> indices = country2Indices.get(index.country);
+            if (indices == null) {
+                indices = new ArrayList<Index>();
+                country2Indices.put(index.country, indices);
+            }
+            indices.add(index);
+        }
     }
 
     /**
@@ -412,8 +363,10 @@ public class Utils {
      * @return code in Google's format
      */
     public static Code toGoogleFormat(Code code) {
-        if (isYahooIndex(code)) {
+        if (isYahooIndexSubset(code)) {
             return toGoogleIndex(code);
+        } else if (isYahooCurrency(code)) {
+            return toGoogleCurrency(code);
         }
         
         String string = code.toString().trim().toUpperCase();
@@ -477,16 +430,31 @@ public class Utils {
             return Code.newInstance(string);
         }
         
+        if (string.startsWith("CURRENCY:")) {
+            return toYahooCurrency(code);
+        }
+        
         Code newCode = toYahooIndex(code);
         return newCode;
     }
     
-    public static boolean isYahooIndex(Code code) {
+    private static boolean isYahooIndexSubset(Code code) {
         return code.toString().startsWith("^");
     }
     
     public static boolean isYahooCurrency(Code code) {
         return code.toString().toUpperCase().endsWith("=X");
+    }
+    
+    private static Code toYahooCurrency(Code code) {
+        String string = code.toString().trim().toUpperCase();
+        if (string.startsWith("CURRENCY:")) {
+            String str = string.substring("CURRENCY:".length());
+            if (str.isEmpty() == false) {
+                return Code.newInstance(str + "=X");
+            }
+        }
+        return code;
     }
     
     private static Code toYahooIndex(Code code) {
@@ -498,11 +466,20 @@ public class Utils {
         return code;
     }
     
-    public static Code toGoogleIndex(Code code) {
+    private static Code toGoogleIndex(Code code) {
         String string = code.toString().trim().toUpperCase();
         String googleIndex = toGoogleIndex.get(string);
         if (googleIndex != null) {
             return Code.newInstance(googleIndex);
+        }
+        return code;
+    }
+    
+    private static Code toGoogleCurrency(Code code) {
+        String string = code.toString().trim().toUpperCase();
+        int index = string.indexOf("=X");
+        if (index > 0) {
+            return Code.newInstance(string.substring(0, index));
         }
         return code;
     }
@@ -618,64 +595,10 @@ public class Utils {
     }
 
     public static List<Index> getStockIndices(Country country) {
-        switch (country)
-        {
-            case Australia:
-                return java.util.Collections.unmodifiableList(Utils.australiaIndices);
-            case Austria:
-                return java.util.Collections.unmodifiableList(Utils.austriaIndices);
-            case Belgium:
-                return java.util.Collections.unmodifiableList(Utils.belgiumIndices);
-            case Brazil:
-                return java.util.Collections.unmodifiableList(Utils.brazilIndices);
-            case Canada:
-                return java.util.Collections.unmodifiableList(Utils.canadaIndices);
-            case China:
-                return java.util.Collections.unmodifiableList(Utils.chinaIndices);
-            case Denmark:
-                return java.util.Collections.unmodifiableList(Utils.denmarkIndices);
-            case France:
-                return java.util.Collections.unmodifiableList(Utils.franceIndices);
-            case Germany:
-                return java.util.Collections.unmodifiableList(Utils.germanyIndices);
-            case HongKong:
-                return java.util.Collections.unmodifiableList(Utils.hongkongIndices);
-            case India:
-                return java.util.Collections.unmodifiableList(Utils.indiaIndices);
-            case Indonesia:
-                return java.util.Collections.unmodifiableList(Utils.indonesiaIndices);
-            case Israel:
-                return java.util.Collections.unmodifiableList(Utils.israelIndices);
-            case Italy:
-                return java.util.Collections.unmodifiableList(Utils.italyIndices);
-            case Korea:
-                return java.util.Collections.unmodifiableList(Utils.koreaIndices);
-            case Malaysia:
-                return java.util.Collections.unmodifiableList(Utils.malaysiaIndices);
-            case Netherlands:
-                return java.util.Collections.unmodifiableList(Utils.netherlandsIndices);
-            case NewZealand:
-                return java.util.Collections.unmodifiableList(Utils.newZealandIndices);
-            case Norway:
-                return java.util.Collections.unmodifiableList(Utils.norwayIndices);
-            case Portugal:
-                return java.util.Collections.unmodifiableList(Utils.portugalIndices);
-            case Singapore:
-                return java.util.Collections.unmodifiableList(Utils.singaporeIndices);
-            case Spain:
-                return java.util.Collections.unmodifiableList(Utils.spainIndices);
-            case Sweden:
-                return java.util.Collections.unmodifiableList(Utils.swedenIndices);
-            case Switzerland:
-                return java.util.Collections.unmodifiableList(Utils.switzerlandIndices);
-            case Taiwan:
-                return java.util.Collections.unmodifiableList(Utils.taiwanIndices);
-            case UnitedKingdom:
-                return java.util.Collections.unmodifiableList(Utils.unitedKingdomIndices);                
-            case UnitedState:
-                return java.util.Collections.unmodifiableList(Utils.unitedStateIndices);
+        List<Index> indices = country2Indices.get(country);
+        if (indices != null) {
+            return java.util.Collections.unmodifiableList(indices);
         }
-        
         return java.util.Collections.emptyList();
     }
 
