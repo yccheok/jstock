@@ -2660,10 +2660,6 @@ public class MainFrame extends javax.swing.JFrame {
         return stockNameDatabase;
     }
     
-    public java.util.List<StockServerFactory> getStockServerFactories() {
-        return Factories.INSTANCE.getStockServerFactories(this.jStockOptions.getCountry());
-    }
-    
     public java.util.List<Stock> getStocks() {
         final StockTableModel tableModel = (StockTableModel)jTable1.getModel();
         return tableModel.getStocks();
@@ -3136,7 +3132,6 @@ public class MainFrame extends javax.swing.JFrame {
         public void run() {
             final Thread currentThread = Thread.currentThread();
 
-            final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactories();
             final java.util.List<Index> is = org.yccheok.jstock.engine.Utils.getStockIndices(jStockOptions.getCountry());
             final int is_size = is.size();
             
@@ -3146,7 +3141,7 @@ public class MainFrame extends javax.swing.JFrame {
                 
                 int fail = is_size;
                 
-                for (StockServerFactory factory : stockServerFactories) {
+                for (StockServerFactory factory : Factories.INSTANCE.getStockServerFactories(is.get(0))) {
                     MarketServer marketServer = factory.getMarketServer();
                     
                     if (marketServer == null) {
@@ -3514,8 +3509,7 @@ public class MainFrame extends javax.swing.JFrame {
      * Initializes currency exchange monitor.
      */
     public void initCurrencyExchangeMonitor() {
-        final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactories();
-        this.portfolioManagementJPanel.initCurrencyExchangeMonitor(stockServerFactories);
+        this.portfolioManagementJPanel.initCurrencyExchangeMonitor();
     }
 
     private void initRealTimeStockMonitor() {
@@ -3534,14 +3528,11 @@ public class MainFrame extends javax.swing.JFrame {
         }
 
         realTimeStockMonitor = new RealTimeStockMonitor(4, 20, jStockOptions.getScanningSpeed());
-        
-        final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactories();
-        realTimeStockMonitor.setStockServerFactories(stockServerFactories);
 
         realTimeStockMonitor.attach(this.realTimeStockMonitorObserver);
 
-        this.indicatorScannerJPanel.initRealTimeStockMonitor(stockServerFactories);
-        this.portfolioManagementJPanel.initRealTimeStockMonitor(stockServerFactories);
+        this.indicatorScannerJPanel.initRealTimeStockMonitor();
+        this.portfolioManagementJPanel.initRealTimeStockMonitor();
     }
 
     // Only call after initJStockOptions.
@@ -3662,13 +3653,9 @@ public class MainFrame extends javax.swing.JFrame {
     public void updatePriceSource(Country country, PriceSource priceSource) {
         jStockOptions.setPriceSource(country, priceSource);
         Factories.INSTANCE.updatePriceSource(country, priceSource);
-
-        realTimeStockMonitor.setStockServerFactories(this.getStockServerFactories());
-        stockHistoryMonitor.setStockServerFactories(this.getStockServerFactories());
-
-        this.indicatorScannerJPanel.updatePrimaryStockServerFactory(Collections.unmodifiableList(this.getStockServerFactories()));
-        this.portfolioManagementJPanel.updatePrimaryStockServerFactory(Collections.unmodifiableList(this.getStockServerFactories()));
-        this.indicatorPanel.updatePrimaryStockServerFactory(Collections.unmodifiableList(this.getStockServerFactories()));
+        
+        // TODO : Need revision. We no longer have primaryStockServerFactoryClasses
+        // concept. Going to replace with PriceSource.        
     }
 
     private void initWatchlist() {
@@ -3854,10 +3841,8 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void initOthersStockHistoryMonitor()
     {
-        final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactories();
-
-        this.indicatorPanel.initStockHistoryMonitor(Collections.unmodifiableList(stockServerFactories));
-        this.indicatorScannerJPanel.initStockHistoryMonitor(Collections.unmodifiableList(stockServerFactories));
+        this.indicatorPanel.initStockHistoryMonitor();
+        this.indicatorScannerJPanel.initStockHistoryMonitor();
     }
 
     // Do not combine initOthersStockHistoryMonitor with initStockHistoryMonitor. We need to be able to update
@@ -3879,9 +3864,6 @@ public class MainFrame extends javax.swing.JFrame {
         }
         
         this.stockHistoryMonitor = new StockHistoryMonitor(HISTORY_MONITOR_MAX_THREAD);
-        
-        final java.util.List<StockServerFactory> stockServerFactories = getStockServerFactories();
-        stockHistoryMonitor.setStockServerFactories(stockServerFactories);
         
         stockHistoryMonitor.attach(this.stockHistoryMonitorObserver);
 
