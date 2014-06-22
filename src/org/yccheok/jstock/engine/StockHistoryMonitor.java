@@ -48,14 +48,6 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
         this.stockHistorySerializer = null;
     }
     
-    public void setStockServerFactories(java.util.List<StockServerFactory> factories) {
-        // Do not use deep copy. If not, Factories's removeKLSEInfoStockServerFactory 
-        // effect won't propagate to here.
-        //this.factories.clear();
-        //return this.factories.addAll(factories);
-        this.factories = factories;
-    }
-    
     public boolean addStockCode(final Code code) {
         writerLock.lock();
 
@@ -132,7 +124,7 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
         public void run() {
             final Thread currentThread = Thread.currentThread();
             
-            for (StockServerFactory factory : factories) {
+            for (StockServerFactory factory : Factories.INSTANCE.getStockServerFactories(this.code)) {
                 // Do not apply ExecutorService.isShutDown technique, to quit
                 // from this loop. This is because pool variable isn't final.
                 // We might be referring to the wrong pool. But checking for
@@ -380,7 +372,6 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
         }
     }
     
-    private java.util.List<StockServerFactory> factories = new java.util.concurrent.CopyOnWriteArrayList<StockServerFactory>();
     // The purpose of stockCodes, is to ensure there are no 2 StockHistoryRunnable
     // with same codes in the queue.
     private final java.util.List<Code> stockCodes = new java.util.ArrayList<Code>();
