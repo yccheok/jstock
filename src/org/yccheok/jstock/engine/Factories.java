@@ -34,6 +34,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public enum Factories {
     INSTANCE;
           
+    public List<StockServerFactory> getStockServerFactories(Index index) {
+        Country country = index.country;
+        return getStockServerFactories(country);
+    }
+    
     public List<StockServerFactory> getStockServerFactories(Code code) {
         Country country = Utils.toCountry(code);
         return getStockServerFactories(country);
