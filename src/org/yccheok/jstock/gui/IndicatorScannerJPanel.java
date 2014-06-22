@@ -60,8 +60,8 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         writer = readWriteLock.writeLock();
 
         // Get ready with all the data structures when pressing "start".
-        initRealTimeStockMonitor(MainFrame.getInstance().getStockServerFactories());
-        initStockHistoryMonitor(MainFrame.getInstance().getStockServerFactories());
+        initRealTimeStockMonitor();
+        initStockHistoryMonitor();
         initAlertDataStructures();
         initCompleteProgressDataStructures();
     }
@@ -544,9 +544,8 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     
     public void clear()
     {
-        final MainFrame m = MainFrame.getInstance();
-        this.initRealTimeStockMonitor(m.getStockServerFactories());
-        this.initStockHistoryMonitor(m.getStockServerFactories());
+        this.initRealTimeStockMonitor();
+        this.initStockHistoryMonitor();
 
         this.operatorIndicators.clear();
         // Ask help from dirty flag, so that background thread won't have
@@ -554,7 +553,8 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         allowIndicatorShown = false;
         
         removeAllIndicatorsFromTable();
-
+        
+        final MainFrame m = MainFrame.getInstance();
         m.setStatusBar(false, GUIBundle.getString("IndicatorScannerJPanel_Connected"));
     }
     
@@ -579,8 +579,8 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                 }
             }
             final MainFrame m = MainFrame.getInstance();
-            this.initRealTimeStockMonitor(m.getStockServerFactories());
-            this.initStockHistoryMonitor(m.getStockServerFactories());
+            this.initRealTimeStockMonitor();
+            this.initStockHistoryMonitor();
             this.initAlertDataStructures();
             this.initCompleteProgressDataStructures();
         } finally {
@@ -626,7 +626,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         this.realTimeStockMonitor.setDelay(speed);
     }
 
-    public final void initStockHistoryMonitor(java.util.List<StockServerFactory> stockServerFactories) {
+    public final void initStockHistoryMonitor() {
         final StockHistoryMonitor oldStockHistoryMonitor = stockHistoryMonitor;
         if (oldStockHistoryMonitor != null) {            
             Utils.getZoombiePool().execute(new Runnable() {
@@ -642,7 +642,6 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         }
 
         this.stockHistoryMonitor = new StockHistoryMonitor(HISTORY_MONITOR_MAX_THREAD);
-        stockHistoryMonitor.setStockServerFactories(stockServerFactories);
 
         stockHistoryMonitor.attach(stockHistoryMonitorObserver);
         stockHistoryMonitor.setStockHistorySerializer(new StockHistorySerializer(Utils.getHistoryDirectory()));
@@ -729,16 +728,6 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         };
     }
 
-    public void updatePrimaryStockServerFactory(java.util.List<StockServerFactory> stockServerFactories) {
-        if (realTimeStockMonitor != null) {
-            realTimeStockMonitor.setStockServerFactories(stockServerFactories);
-        }
-
-        if (stockHistoryMonitor != null) {
-            stockHistoryMonitor.setStockServerFactories(stockServerFactories);
-        }
-    }
-
     // Initializes data structure used for complete progress calculation.
     private void initCompleteProgressDataStructures() {
         Set<Code> oldSuccessCodes = successCodes;
@@ -812,7 +801,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         systemTrayAlertPool = Executors.newFixedThreadPool(1);
     }
 
-    public final void initRealTimeStockMonitor(java.util.List<StockServerFactory> stockServerFactories) {
+    public final void initRealTimeStockMonitor() {
         final RealTimeStockMonitor oldRealTimeStockMonitor = this.realTimeStockMonitor;
         if (oldRealTimeStockMonitor != null) {            
             Utils.getZoombiePool().execute(new Runnable() {
@@ -828,7 +817,6 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         }
         
         this.realTimeStockMonitor = new RealTimeStockMonitor(4, 20, MainFrame.getInstance().getJStockOptions().getScanningSpeed());
-        this.realTimeStockMonitor.setStockServerFactories(stockServerFactories);
         
         this.realTimeStockMonitor.attach(this.realTimeStockMonitorObserver);
     }
