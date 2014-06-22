@@ -108,20 +108,6 @@ public class CurrencyExchangeMonitor extends Subject<CurrencyExchangeMonitor, Do
     }
 
     /**
-     * Assign list of stock server factories to this currency monitor.
-     *
-     * @param factories list of stock server factories
-     */
-    public synchronized void setStockServerFactories(java.util.List<StockServerFactory> factories) {
-        // Do not use deep copy. If not, Factories's removeKLSEInfoStockServerFactory 
-        // effect won't propagate to here.
-        //stockServerFactories.clear();
-        //return stockServerFactories.addAll(factories);
-
-        stockServerFactories = factories;
-    }
-
-    /**
      * @return the fromCountry's currency
      */
     public String getFromCurrency() {
@@ -208,7 +194,9 @@ public class CurrencyExchangeMonitor extends Subject<CurrencyExchangeMonitor, Do
                         }   // if (successUpdatedCountryToCurrencyCode == false)
 
                         // Let's do the job.
-                        for (StockServerFactory factory : stockServerFactories) {
+
+                        // Use fromCountry?
+                        for (StockServerFactory factory : Factories.INSTANCE.getStockServerFactories(fromCountry)) {
                             final StockServer stockServer = factory.getStockServer();
                             
                             if (stockServer == null) {
@@ -331,11 +319,6 @@ public class CurrencyExchangeMonitor extends Subject<CurrencyExchangeMonitor, Do
      * Convert to this country's currency.
      */
     private final Country toCountry;
-
-    /**
-     * List of stock server factories.
-     */
-    private java.util.List<StockServerFactory> stockServerFactories = new java.util.concurrent.CopyOnWriteArrayList<StockServerFactory>();
 
     // Use volatile, to make assignment operation on double atomic.
     private volatile double exchangeRate = 1.0;
