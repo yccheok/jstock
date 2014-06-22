@@ -41,6 +41,10 @@ public class CodeBucketLists {
         
     }
     
+    public boolean isEmpty() {
+        return bucketListsIndexMapping.isEmpty();
+    }
+    
     public List<Code> get(int index) {
         readerLock.lock();
         try {
@@ -131,6 +135,18 @@ public class CodeBucketLists {
         bucketListsIndexMapping.add(basedIndex, id);
         
         return true;
+    }
+    
+    public synchronized void clear() {
+        writerLock.lock();
+        try {
+            bucketLists.clear();
+            bucketListsIndexMapping.clear();
+            basedIndexInfosIndexMapping.clear();
+            basedIndexInfos.clear();
+        } finally {
+            writerLock.unlock();
+        }
     }
     
     public synchronized boolean remove(Code code) {

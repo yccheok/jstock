@@ -20,7 +20,6 @@
 package org.yccheok.jstock.engine;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -34,46 +33,22 @@ import org.apache.commons.logging.LogFactory;
 public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.util.List<Stock>> {
     
     /** Creates a new instance of RealTimeStockMonitor */
-    public RealTimeStockMonitor(int maxThread, int maxStockSizePerScan, long delay) {
-        if (maxThread <= 0 || maxStockSizePerScan <= 0 || delay <= 0) {
-            throw new IllegalArgumentException("maxThread : " + maxThread + ", maxStockSizePerScan : " + maxStockSizePerScan + ", delay : " + delay);
+    public RealTimeStockMonitor(int maxThread, int maxBucketSize, long delay) {
+        if (maxThread <= 0 || maxBucketSize <= 0 || delay <= 0) {
+            throw new IllegalArgumentException("maxThread : " + maxThread + ", maxBucketSize : " + maxBucketSize + ", delay : " + delay);
         }
         
         this.maxThread = maxThread;
-        this.maxStockSizePerScan = maxStockSizePerScan;
         this.delay = delay;
         
-        this.stockServerFactories = new java.util.concurrent.CopyOnWriteArrayList<StockServerFactory>();
-        this.stockCodes = new java.util.concurrent.CopyOnWriteArrayList<Code>();
-        this.rowStockCodeMapping = new HashMap<Code, Integer>();
-        this.stockMonitors = new java.util.ArrayList<StockMonitor>();
+        this.codeBucketLists = new CodeBucketLists(maxBucketSize);
         
-        stockCodesReadWriteLock = new java.util.concurrent.locks.ReentrantReadWriteLock();
-        stockCodesReaderLock = stockCodesReadWriteLock.readLock();
-        stockCodesWriterLock = stockCodesReadWriteLock.writeLock();        
-    }
-    
-    public synchronized void setStockServerFactories(java.util.List<StockServerFactory> factories) {
-        // Do not use deep copy. If not, Factories's removeKLSEInfoStockServerFactory 
-        // effect won't propagate to here.
-        //stockServerFactories.clear();
-        //return stockServerFactories.addAll(factories);
-        stockServerFactories = factories;
+        this.stockMonitors = new java.util.ArrayList<StockMonitor>();
     }
     
     // synchronized, to avoid addStockCode and removeStockCode at the same time.
-    // This method will start all the monitoring threads automatically.
     public synchronized boolean addStockCode(Code code) {
-        // Lock isn't required here. This is because increase the size of the 
-        // list is not going to get IndexOutOfBoundException.
-        if (rowStockCodeMapping.containsKey(code)) {
-            return false;
-        }
-
-        boolean status = stockCodes.add(code);
-        rowStockCodeMapping.put(code, stockCodes.size() - 1);
-        
-        return status;
+        return codeBucketLists.add(code);
     }
 
     /**
@@ -82,43 +57,19 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
      * @return true if there is no stock code in this monitor
      */
     public synchronized boolean isEmpty() {
-        return stockCodes.isEmpty();
+        return codeBucketLists.isEmpty();
     }
-
+    
     public synchronized int getNumOfStockCode() {
         return stockCodes.size();
     }
 
-    public synchronized Code getStockCode(int index) {
-        return stockCodes.get(index);
-    }
-    
     public synchronized boolean clearStockCodes() {
-        // This is to ensure we are able to get the correct StockCodes size,
-        // and able to retrieve Iterator in a safe way without getting 
-        // IndexOutOfBoundException.
-        stockCodesWriterLock.lock();
-        try {
-            stockCodes.clear();
-            rowStockCodeMapping.clear();
-        } finally {
-            stockCodesWriterLock.unlock();
-        }
+        codeBucketLists.clear();
         
         while (stockMonitors.size() > 0) {
             StockMonitor stockMonitor = stockMonitors.remove(stockMonitors.size() - 1);
-            stockMonitor._stop();
-            /*
-             * Unlike stop(), no need to explicitly wait for the thread to dead. Let it dead
-             * naturally. However, is it safe to do so?
-             *            
-            try {
-                stockMonitor.join();
-            }
-            catch(java.lang.InterruptedException exp) {
-                log.error(null, exp);
-            } 
-             */           
+            stockMonitor._stop();          
         }
         
         return true;
@@ -126,49 +77,14 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
     
     // synchronized, to avoid addStockCode and removeStockCode at the same time
     public synchronized boolean removeStockCode(Code code) {
-        // This is to ensure we are able to get the correct StockCodes size,
-        // and able to retrieve Iterator in a safe way without getting 
-        // IndexOutOfBoundException.
-        stockCodesWriterLock.lock();
-        boolean status = false;
-        try {
-            Integer row = rowStockCodeMapping.get(code);
-            if (row == null) {
-                return status;
-            }
-            
-            status = (null != stockCodes.remove((int)row));            
-            rowStockCodeMapping.remove(code);
-            
-            for (int i = row, ei = stockCodes.size(); i < ei; i++) {
-                rowStockCodeMapping.put(stockCodes.get(i), i);
-            }
-        } finally {
-            stockCodesWriterLock.unlock();
-        }
+        boolean status = codeBucketLists.remove(code);
 
         // Do we need to remove any old thread?
         final int numOfMonitorRequired = this.getNumOfRequiredThread();
 
-        if (this.stockMonitors.size() > numOfMonitorRequired) {
-            log.info("After removing : current thread size=" + this.stockMonitors.size() + ",numOfMonitorRequired=" + numOfMonitorRequired);
-
+        if (this.stockMonitors.size() > numOfMonitorRequired) {            
             StockMonitor stockMonitor = stockMonitors.remove(stockMonitors.size() - 1);
             stockMonitor._stop();
-            
-            /*
-             * Unlike stop(), no need to explicitly wait for the thread to dead. Let it dead
-             * naturally. However, is it safe to do so?
-             * 
-            try {
-                stockMonitor.join();
-            }
-            catch(java.lang.InterruptedException exp) {
-                log.error(null, exp);
-            }
-             */
-            
-            log.info("After removing : current thread size=" + this.stockMonitors.size() + ",numOfMonitorRequired=" + numOfMonitorRequired);
         }
 
         return status;
@@ -209,7 +125,7 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
         for (int i = this.stockMonitors.size(); i < numOfMonitorRequired; i++) {
             log.info("Before adding : current thread size=" + this.stockMonitors.size() + ",numOfMonitorRequired=" + numOfMonitorRequired);
             
-            StockMonitor stockMonitor = new StockMonitor(i * maxStockSizePerScan);
+            StockMonitor stockMonitor = new StockMonitor(i);
             stockMonitors.add(stockMonitor);
             stockMonitor.start();
             
@@ -253,11 +169,7 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
     }
     
     private int getNumOfRequiredThread() {
-        final int stockCodesSize = stockCodes.size();
-        
-        final int numOfThreadRequired = 
-            (stockCodesSize / maxStockSizePerScan) + 
-            (((stockCodesSize % maxStockSizePerScan) == 0) ? 0 : 1);
+        final int numOfThreadRequired = codeBucketLists.size();
         
         return Math.min(numOfThreadRequired, maxThread);
     }
@@ -294,8 +206,8 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
         public void run() {
             final Thread thisThread = Thread.currentThread();
             
-            /* Will advance by maxStockSizePerScan * maxThread */            
-            final int step = maxStockSizePerScan * maxThread;
+            /* Will advance by maxThread */            
+            final int step = maxThread;
 
 
             while (thisThread == thread) {                
@@ -330,67 +242,51 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
                         int fail = 0;
                         
                         for (int currIndex = index; thisThread == thread; currIndex += step) {
-                            ListIterator<Code> listIterator = null;
+                            final List<Code> codes = codeBucketLists.get(index);
 
-                            // Acquire iterator in a safe way.
-                            stockCodesReaderLock.lock();
-                            try {
-                                final int stockCodesSize = stockCodes.size();
-                                if (currIndex < stockCodesSize) {
-                                    listIterator = stockCodes.listIterator(currIndex);
-                                }
-                            } finally {
-                                stockCodesReaderLock.unlock();
-                            }
-
-                            if (listIterator != null) {
-                                List<Code> codes = new ArrayList<Code>();
-
-                                for (int i = 0; listIterator.hasNext() && i < maxStockSizePerScan && thisThread == thread; i++) {
-                                    codes.add(listIterator.next());
-                                }
-
-                                final int size = codes.size();
-                                fail += size;
-                                for (StockServerFactory factory : stockServerFactories)
-                                {
-                                    final StockServer stockServer = factory.getStockServer();
-
-                                    if (stockServer == null) {
-                                        continue;
-                                    }
-                                    
-                                    List<Stock> stocks = null;
-                                    try {
-                                        stocks = stockServer.getStocks(codes);
-                                    } catch (StockNotFoundException exp) {
-                                        if (thisThread != thread) {
-                                            break;    
-                                        }
-                                        
-                                        log.error(codes, exp);
-                                        // Try with another server.
-                                        continue;
-                                    }
-
-                                    if (thisThread != thread) {
-                                        break;
-                                    }
-
-                                    pass += size;
-                                    fail -= size;
-                                    totalScanned = pass + fail;
-
-                                    // Notify all the interested parties.
-                                    RealTimeStockMonitor.this.notify(RealTimeStockMonitor.this, stocks);
-
-                                    break;
-                                }   // for
-
-                            }   // if (listIterator != null)
-                            else {
+                            if (codes.isEmpty()) {
                                 break;
                             }
+
+
+                            final int size = codes.size();
+                            fail += size;
+                            for (StockServerFactory factory : stockServerFactories)
+                            {
+                                final StockServer stockServer = factory.getStockServer();
+
+                                if (stockServer == null) {
+                                    continue;
+                                }
+
+                                List<Stock> stocks = null;
+                                try {
+                                    stocks = stockServer.getStocks(codes);
+                                } catch (StockNotFoundException exp) {
+                                    if (thisThread != thread) {
+                                        break;    
+                                    }
+
+                                    log.error(codes, exp);
+                                    // Try with another server.
+                                    continue;
+                                }
+
+                                if (thisThread != thread) {
+                                    break;
+                                }
+
+                                pass += size;
+                                fail -= size;
+                                totalScanned = pass + fail;
+
+                                // Notify all the interested parties.
+                                RealTimeStockMonitor.this.notify(RealTimeStockMonitor.this, stocks);
+
+                                break;
+                            }   // for
+
+
                         }   // for (int currIndex = index; thisThread == thread; curIndex += step)
 
                         totalScanned = pass + fail;
@@ -490,17 +386,10 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
     private static final long MIN_DELAY_COUNTER = 3;
     
     private final int maxThread;
-    // Number of stock to be monitored per iteration.
-    private final int maxStockSizePerScan;
-    private java.util.List<StockServerFactory> stockServerFactories;
-    private final java.util.List<Code> stockCodes;
-    // Used for duplication check. We avoid using stockCodes.constains, as the
-    // complexity is O(n).
-    private final java.util.HashMap<Code, Integer> rowStockCodeMapping;
+
+    private final CodeBucketLists codeBucketLists;
+    
     private final java.util.List<StockMonitor> stockMonitors;
-    private final java.util.concurrent.locks.ReadWriteLock stockCodesReadWriteLock;
-    private final java.util.concurrent.locks.Lock stockCodesReaderLock;
-    private final java.util.concurrent.locks.Lock stockCodesWriterLock;
     
     private static final Log log = LogFactory.getLog(RealTimeStockMonitor.class);    
 }
