@@ -2256,19 +2256,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         return saveCSVPortfolio();
     }
 
-    public void updatePrimaryStockServerFactory(java.util.List<StockServerFactory> stockServerFactories) {
-        if (realTimeStockMonitor != null) {
-            realTimeStockMonitor.setStockServerFactories(stockServerFactories);
-        }
-        if (currencyExchangeMonitor != null) {
-            currencyExchangeMonitor.setStockServerFactories(stockServerFactories);
-        }
-    }
-
     /**
      * Initializes currency exchange monitor.
      */
-    public void initCurrencyExchangeMonitor(java.util.List<StockServerFactory> stockServerFactories) {
+    public void initCurrencyExchangeMonitor() {
         final MainFrame mainFrame = MainFrame.getInstance();
         final JStockOptions jStockOptions = mainFrame.getJStockOptions();
 
@@ -2310,7 +2301,6 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
 
         currencyExchangeMonitor = new CurrencyExchangeMonitor(fromCountry, toCountry);
-        currencyExchangeMonitor.setStockServerFactories(stockServerFactories);
         currencyExchangeMonitor.attach(currencyExchangeMonitorObserver);
 
         // Update the tool tip text.
@@ -2329,7 +2319,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         this.updateWealthHeader();
     }
 
-    public void initRealTimeStockMonitor(java.util.List<StockServerFactory> stockServerFactories) {
+    public void initRealTimeStockMonitor() {
         final RealTimeStockMonitor oldRealTimeStockMonitor = realTimeStockMonitor;
         if (oldRealTimeStockMonitor != null) {            
             Utils.getZoombiePool().execute(new Runnable() {
@@ -2345,7 +2335,6 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
         
         realTimeStockMonitor = new RealTimeStockMonitor(4, 20, MainFrame.getInstance().getJStockOptions().getScanningSpeed());
-        realTimeStockMonitor.setStockServerFactories(stockServerFactories);
         
         realTimeStockMonitor.attach(this.realTimeStockMonitorObserver);
         
