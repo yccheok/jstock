@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2013 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2014 Yan Cheng Cheok <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -485,46 +485,24 @@ public class Utils {
         return code.toString().startsWith("^");
     }
     
+    public static boolean isYahooCurrency(Code code) {
+        return code.toString().toUpperCase().endsWith("=X");
+    }
+    
     private static Code toYahooIndex(Code code) {
         String string = code.toString().trim().toUpperCase();
-        if (string.equals("INDEXDJX:.DJI")) {
-            return Code.newInstance("^DJI");
-        } else if (string.equals("INDEXNASDAQ:.IXIC")) {
-            return Code.newInstance("^IXIC");
-        } else if (string.equals("INDEXBOM:SENSEX")) {
-            return Code.newInstance("^BSESN");
-        } else if (string.equals("NSE:NIFTY")) {
-            return Code.newInstance("^NSEI");
-        } else if (string.equals("NSE:BANKNIFTY")) {
-            return Code.newInstance("^NSEBANK");
-        } else if (string.equals("INDEXBVMF:IBOV")) {
-            return Code.newInstance("^BVSP");
-        } else if (string.equals("INDEXVIE:ATX")) {
-            return Code.newInstance("^ATX");
-        } else if (string.equals("INDEXFTSE:UKX")) {
-            return Code.newInstance("^FTSE");
+        String yahooIndex = toYahooIndex.get(string);
+        if (yahooIndex != null) {
+            return Code.newInstance(yahooIndex);
         }
-        return code;        
+        return code;
     }
     
     public static Code toGoogleIndex(Code code) {
         String string = code.toString().trim().toUpperCase();
-        if (string.equals("^DJI")) {
-            return Code.newInstance("INDEXDJX:.DJI");
-        } else if (string.equals("^IXIC")) {
-            return Code.newInstance("INDEXNASDAQ:.IXIC");
-        } else if (string.equals("^BSESN")) {
-            return Code.newInstance("INDEXBOM:SENSEX");
-        } else if (string.equals("^NSEI")) {
-            return Code.newInstance("NSE:NIFTY");
-        } else if (string.equals("^NSEBANK")) {
-            return Code.newInstance("NSE:BANKNIFTY");
-        } else if (string.equals("^BVSP")) {
-            return Code.newInstance("INDEXBVMF:IBOV");
-        } else if (string.equals("^ATX")) {
-            return Code.newInstance("INDEXVIE:ATX");
-        } else if (string.equals("^FTSE")) {
-            return Code.newInstance("INDEXFTSE:UKX");
+        String googleIndex = toGoogleIndex.get(string);
+        if (googleIndex != null) {
+            return Code.newInstance(googleIndex);
         }
         return code;
     }
@@ -818,6 +796,8 @@ public class Utils {
     
     private static final Map<String, Country> countries = new HashMap<String, Country>();
     private static final Map<String, Country> indices = new HashMap<String, Country>();
+    private static final Map<String, String> toYahooIndex = new HashMap<String, String>();
+    private static final Map<String, String> toGoogleIndex = new HashMap<String, String>();
     private static final Map<Country, PriceSource> defaultPriceSources = new HashMap<Country, PriceSource>();
     
     static {
@@ -876,6 +856,26 @@ public class Utils {
         for (Index index : Index.values()) {
             indices.put(index.code.toString(), index.country);
         }
+
+        toYahooIndex.put("INDEXDJX:.DJI", "^DJI");
+        toYahooIndex.put("INDEXNASDAQ:.IXIC", "^IXIC");
+        toYahooIndex.put("INDEXBOM:SENSEX", "^BSESN");
+        toYahooIndex.put("NSE:NIFTY", "^NSEI");
+        toYahooIndex.put("NSE:BANKNIFTY", "^NSEBANK");
+        toYahooIndex.put("INDEXBVMF:IBOV", "^BVSP");
+        toYahooIndex.put("INDEXVIE:ATX", "^ATX");
+        toYahooIndex.put("INDEXFTSE:UKX", "^FTSE");
+        
+        toGoogleIndex.put("^DJI", "INDEXDJX:.DJI");
+        toGoogleIndex.put("^IXIC", "INDEXNASDAQ:.IXIC");
+        toGoogleIndex.put("^BSESN", "INDEXBOM:SENSEX");
+        toGoogleIndex.put("^NSEI", "NSE:NIFTY");
+        toGoogleIndex.put("^NSEBANK", "NSE:BANKNIFTY");
+        toGoogleIndex.put("^BVSP", "INDEXBVMF:IBOV");
+        toGoogleIndex.put("^ATX", "INDEXVIE:ATX");
+        toGoogleIndex.put("^FTSE", "INDEXFTSE:UKX");
+        
+        assert(toGoogleIndex.size() == toYahooIndex.size());
         
         // TODO : Need revision. We no longer have primaryStockServerFactoryClasses
         // concept. Going to replace with PriceSource.
