@@ -19,9 +19,7 @@
 
 package org.yccheok.jstock.engine;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -58,10 +56,6 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
      */
     public synchronized boolean isEmpty() {
         return codeBucketLists.isEmpty();
-    }
-    
-    public synchronized int getNumOfStockCode() {
-        return stockCodes.size();
     }
 
     public synchronized boolean clearStockCodes() {
@@ -242,16 +236,15 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
                         int fail = 0;
                         
                         for (int currIndex = index; thisThread == thread; currIndex += step) {
-                            final List<Code> codes = codeBucketLists.get(index);
+                            final List<Code> codes = codeBucketLists.get(currIndex);
 
                             if (codes.isEmpty()) {
                                 break;
                             }
 
-
                             final int size = codes.size();
                             fail += size;
-                            for (StockServerFactory factory : stockServerFactories)
+                            for (StockServerFactory factory : Factories.INSTANCE.getStockServerFactories(codes.get(0)))
                             {
                                 final StockServer stockServer = factory.getStockServer();
 
