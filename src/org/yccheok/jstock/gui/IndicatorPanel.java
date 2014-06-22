@@ -1416,10 +1416,8 @@ public class IndicatorPanel extends JPanel {
             
             m.setStatusBar(true, GUIBundle.getString("IndicatorPanel_StockSampleDataRetrievingInProgress..."));
             
-            java.util.List<StockServerFactory> stockServerFactories = m.getStockServerFactories();
-            
             while (!isCancelled() && !success) {
-                for (StockServerFactory factory : stockServerFactories) {
+                for (StockServerFactory factory : Factories.INSTANCE.getStockServerFactories(code)) {
                     
                     StockServer server = factory.getStockServer();
                     
@@ -1567,7 +1565,7 @@ public class IndicatorPanel extends JPanel {
             final Duration oldDuration = stockHistoryMonitor.getDuration();
             if (oldDuration.equals(historyDuration) == false)
             {
-                this.initStockHistoryMonitor(m.getStockServerFactories());
+                this.initStockHistoryMonitor();
                 this.stockHistoryMonitor.setDuration(historyDuration);
             }
 
@@ -1738,13 +1736,7 @@ public class IndicatorPanel extends JPanel {
         return this.moduleIndicatorProjectManager;
     }
 
-    public void updatePrimaryStockServerFactory(java.util.List<StockServerFactory> stockServerFactories) {
-        if (stockHistoryMonitor != null) {
-            stockHistoryMonitor.setStockServerFactories(stockServerFactories);
-        }
-    }
-
-    public void initStockHistoryMonitor(java.util.List<StockServerFactory> stockServerFactories) {
+    public void initStockHistoryMonitor() {
         final StockHistoryMonitor oldStockHistoryMonitor = stockHistoryMonitor;
         if (oldStockHistoryMonitor != null) {            
             Utils.getZoombiePool().execute(new Runnable() {
@@ -1760,7 +1752,7 @@ public class IndicatorPanel extends JPanel {
         }
 
         this.stockHistoryMonitor = new StockHistoryMonitor(HISTORY_MONITOR_MAX_THREAD);
-        stockHistoryMonitor.setStockServerFactories(stockServerFactories);
+
         stockHistoryMonitor.setStockHistorySerializer(new StockHistorySerializer(Utils.getHistoryDirectory()));
     }
 
