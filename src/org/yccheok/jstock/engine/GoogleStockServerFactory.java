@@ -36,16 +36,12 @@ public class GoogleStockServerFactory implements StockServerFactory {
         return 'b';
     }
     
-    private GoogleStockServerFactory(boolean useStockServer) {
-        if (useStockServer) {
-            stockServer = new GoogleStockServer();
-        } else {
-            stockServer = null;
-        }        
+    private GoogleStockServerFactory() {
+        stockServer = new GoogleStockServer();
     }
     
-    public static StockServerFactory newInstance(boolean useStockServer) {
-        return new GoogleStockServerFactory(useStockServer);
+    public static StockServerFactory newInstance() {
+        return new GoogleStockServerFactory();
     }
 
     /**
