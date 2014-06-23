@@ -65,68 +65,6 @@ public class GoogleStockServer implements StockServer {
 
         result = originalCodes.get(googleCodeStr1);
 
-        if (result != null) {
-            return result;
-        }
-
-        // 3rd try...
-        if (googleExchange.equals("NSE")) {
-            result = originalCodes.get(googleTicker + ".N");
-
-            if (result != null) {
-                return result;
-            }
-        } else if (googleExchange.equals("BOM")) {
-            result = originalCodes.get(googleTicker + ".B");
-
-            if (result != null) {
-                return result;
-            }
-        }
-
-        final Code googleCode = Code.newInstance(googleCodeStr0);
-        
-        result = originalCodes.get(Utils.toYahooFormat(googleCode).toString());
-        
-        if (result != null) {
-            return result;
-        }
-        
-        // Legacy code handling. In old India stock market, we are using Yahoo
-        // stock code format like TATAMOTORS.NS
-        final int googleTickerLength = googleTicker.length();
-        final int ns_length = ".NS".length();
-        for (Map.Entry<String, Code> entry : originalCodes.entrySet()) {
-            String key = entry.getKey();
-            final Code value = entry.getValue();
-            
-            final int key_length = key.length();
-            if (key.endsWith(".NS") && key_length > ns_length) {
-                key = key.substring(0, key_length - ns_length);
-            } else {
-                continue;
-            }
-            
-            if (googleTickerLength >= key.length()) {
-                if (googleTicker.equals(key)) {
-                    result = value;
-                    // Early break.
-                    break;
-                }
-                if (googleTicker.contains(key)) {
-                    result = value;
-                    // Don't break. Keep searching. We might
-                    // have a better.
-                }
-            } else {
-                if (key.contains(googleTicker)) {
-                    result = value;
-                    // Don't break. Keep searching. We might
-                    // have a better.
-                }
-            } 
-        }
-      
         return result;
     }
     
@@ -135,9 +73,6 @@ public class GoogleStockServer implements StockServer {
         assert(codes.isEmpty() == false);
         
         Map<String, Code> originalCodes = new HashMap<String, Code>();
-        for (Code code : codes) {
-            originalCodes.put(code.toString().trim().toUpperCase(), code);
-        }
                 
         // Use StringBuilder instead of StringBuffer. We do not concern on 
         // thread safety.
@@ -145,11 +80,17 @@ public class GoogleStockServer implements StockServer {
         try {
             // Exception will be thrown from apache httpclient, if we do not
             // perform URL encoding.
-            builder.append(java.net.URLEncoder.encode(Utils.toGoogleFormat(codes.get(0)).toString(), "UTF-8"));
+            Code _code = codes.get(0);
+            String googleFormat = Utils.toGoogleFormat(_code).toString();
+            builder.append(java.net.URLEncoder.encode(Utils.toGoogleFormat(_code).toString(), "UTF-8"));
+            originalCodes.put(googleFormat, _code);
 
             for (int i = 1, size = codes.size(); i < size; i++) {
                 builder.append(",");
-                builder.append(java.net.URLEncoder.encode(Utils.toGoogleFormat(codes.get(i)).toString(), "UTF-8"));
+                _code = codes.get(i);
+                googleFormat = Utils.toGoogleFormat(_code).toString();
+                builder.append(java.net.URLEncoder.encode(Utils.toGoogleFormat(_code).toString(), "UTF-8"));
+                originalCodes.put(googleFormat, _code);
             }
             
             final String location = builder.toString();
