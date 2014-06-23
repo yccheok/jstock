@@ -406,6 +406,9 @@ public class Utils {
         } else if (string.endsWith(".L") && string_length > ".L".length()) {
             string = "LON:" + string.substring(0, string_length - ".L".length());
             return Code.newInstance(string);
+        } else if (string.endsWith(".SI") && string_length > ".SI".length()) {
+            string = "SGX:" + string.substring(0, string_length - ".SI".length());
+            return Code.newInstance(string);
         }
         return code;
     }
@@ -763,13 +766,13 @@ public class Utils {
         defaultPriceSources.put(Country.NewZealand, PriceSource.Yahoo);
         defaultPriceSources.put(Country.Norway, PriceSource.Yahoo);
         defaultPriceSources.put(Country.Portugal, PriceSource.Yahoo);
-        defaultPriceSources.put(Country.Singapore, PriceSource.Yahoo);
+        defaultPriceSources.put(Country.Singapore, PriceSource.Google);
         defaultPriceSources.put(Country.Spain, PriceSource.Yahoo);
         defaultPriceSources.put(Country.Sweden, PriceSource.Yahoo);
         defaultPriceSources.put(Country.Switzerland, PriceSource.Yahoo);
         defaultPriceSources.put(Country.Taiwan, PriceSource.Yahoo);
-        defaultPriceSources.put(Country.UnitedKingdom, PriceSource.Yahoo);
-        defaultPriceSources.put(Country.UnitedState, PriceSource.Yahoo);        
+        defaultPriceSources.put(Country.UnitedKingdom, PriceSource.Google);
+        defaultPriceSources.put(Country.UnitedState, PriceSource.Google);
     }
     
     private static final Gson gson = new Gson();
