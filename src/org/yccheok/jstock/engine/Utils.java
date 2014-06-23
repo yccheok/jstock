@@ -409,7 +409,11 @@ public class Utils {
         } else if (string.endsWith(".SI") && string_length > ".SI".length()) {
             string = "SGX:" + string.substring(0, string_length - ".SI".length());
             return Code.newInstance(string);
+        } else if (string.endsWith(".TW") && string_length > ".TW".length()) {
+            string = "TPE:" + string.substring(0, string_length - ".TW".length());
+            return Code.newInstance(string);
         }
+        
         return code;
     }
     
@@ -742,6 +746,7 @@ public class Utils {
         toGoogleIndex.put("^BVSP", "INDEXBVMF:IBOV");
         toGoogleIndex.put("^ATX", "INDEXVIE:ATX");
         toGoogleIndex.put("^FTSE", "INDEXFTSE:UKX");
+        toGoogleIndex.put("^TWII", "TPE:TAIEX");
         
         // TODO : Need revision. We no longer have primaryStockServerFactoryClasses
         // concept. Going to replace with PriceSource.
@@ -750,7 +755,7 @@ public class Utils {
         defaultPriceSources.put(Country.Belgium, PriceSource.Yahoo);
         defaultPriceSources.put(Country.Brazil, PriceSource.Yahoo);
         defaultPriceSources.put(Country.Canada, PriceSource.Yahoo);
-        defaultPriceSources.put(Country.China, PriceSource.Yahoo);
+        defaultPriceSources.put(Country.China, PriceSource.Google);
         defaultPriceSources.put(Country.Czech, PriceSource.Yahoo);
         defaultPriceSources.put(Country.Denmark, PriceSource.Yahoo);
         defaultPriceSources.put(Country.France, PriceSource.Yahoo);
@@ -770,7 +775,7 @@ public class Utils {
         defaultPriceSources.put(Country.Spain, PriceSource.Yahoo);
         defaultPriceSources.put(Country.Sweden, PriceSource.Yahoo);
         defaultPriceSources.put(Country.Switzerland, PriceSource.Yahoo);
-        defaultPriceSources.put(Country.Taiwan, PriceSource.Yahoo);
+        defaultPriceSources.put(Country.Taiwan, PriceSource.Google);
         defaultPriceSources.put(Country.UnitedKingdom, PriceSource.Google);
         defaultPriceSources.put(Country.UnitedState, PriceSource.Google);
     }
