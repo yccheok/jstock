@@ -368,8 +368,14 @@ public class Utils {
         } else if (isYahooCurrency(code)) {
             return toGoogleCurrency(code);
         }
-        
+
         String string = code.toString().trim().toUpperCase();
+
+        // WTF?! Handle case for RDS-B (Yahoo Finance) & RDS.B (Google Finance)
+        if (toCountry(code) == Country.UnitedState) {
+            return Code.newInstance(string.replaceAll("-", "."));
+        }
+        
         final int string_length = string.length();
         if (string.endsWith(".N") && string_length > ".N".length()) {
             return Code.newInstance("NSE:" + string.substring(0, string_length - ".N".length()));
@@ -404,66 +410,12 @@ public class Utils {
         return code;
     }
     
-    public static Code toYahooFormat(Code code) {
-        String string = code.toString().trim().toUpperCase();
-        final int string_length = string.length();
-        if (string.startsWith("SHA:") && string_length > "SHA:".length()) {
-            string = string.substring("SHA:".length()) + ".SS";
-            return Code.newInstance(string);
-        } else if (string.startsWith("SHE:") && string_length > "SHE:".length()) {
-            string = string.substring("SHE:".length()) + ".SZ";
-            return Code.newInstance(string);
-        } else if (string.startsWith("NASDAQ:") && string_length > "NASDAQ:".length()) {
-            string = string.substring("NASDAQ:".length());
-            return Code.newInstance(string);
-        } else if (string.startsWith("NYSE:") && string_length > "NYSE:".length()) {
-            string = string.substring("NYSE:".length());
-            return Code.newInstance(string);
-        } else if (string.startsWith("BVMF:") && string_length > "BVMF:".length()) {
-            string = string.substring("BVMF:".length()) + ".SA";
-            return Code.newInstance(string);
-        } else if (string.startsWith("VIE:") && string_length > "VIE:".length()) {
-            string = string.substring("VIE:".length()) + ".VI";
-            return Code.newInstance(string);
-        } else if (string.startsWith("LON:") && string_length > "LON:".length()) {
-            string = string.substring("LON:".length()) + ".L";
-            return Code.newInstance(string);
-        }
-        
-        if (string.startsWith("CURRENCY:")) {
-            return toYahooCurrency(code);
-        }
-        
-        Code newCode = toYahooIndex(code);
-        return newCode;
-    }
-    
     private static boolean isYahooIndexSubset(Code code) {
         return code.toString().startsWith("^");
     }
     
     public static boolean isYahooCurrency(Code code) {
         return code.toString().toUpperCase().endsWith("=X");
-    }
-    
-    private static Code toYahooCurrency(Code code) {
-        String string = code.toString().trim().toUpperCase();
-        if (string.startsWith("CURRENCY:")) {
-            String str = string.substring("CURRENCY:".length());
-            if (str.isEmpty() == false) {
-                return Code.newInstance(str + "=X");
-            }
-        }
-        return code;
-    }
-    
-    private static Code toYahooIndex(Code code) {
-        String string = code.toString().trim().toUpperCase();
-        String yahooIndex = toYahooIndex.get(string);
-        if (yahooIndex != null) {
-            return Code.newInstance(yahooIndex);
-        }
-        return code;
     }
     
     private static Code toGoogleIndex(Code code) {
@@ -719,7 +671,6 @@ public class Utils {
     
     private static final Map<String, Country> countries = new HashMap<String, Country>();
     private static final Map<String, Country> indices = new HashMap<String, Country>();
-    private static final Map<String, String> toYahooIndex = new HashMap<String, String>();
     private static final Map<String, String> toGoogleIndex = new HashMap<String, String>();
     private static final Map<Country, PriceSource> defaultPriceSources = new HashMap<Country, PriceSource>();
     
@@ -779,15 +730,6 @@ public class Utils {
         for (Index index : Index.values()) {
             indices.put(index.code.toString(), index.country);
         }
-
-        toYahooIndex.put("INDEXDJX:.DJI", "^DJI");
-        toYahooIndex.put("INDEXNASDAQ:.IXIC", "^IXIC");
-        toYahooIndex.put("INDEXBOM:SENSEX", "^BSESN");
-        toYahooIndex.put("NSE:NIFTY", "^NSEI");
-        toYahooIndex.put("NSE:BANKNIFTY", "^NSEBANK");
-        toYahooIndex.put("INDEXBVMF:IBOV", "^BVSP");
-        toYahooIndex.put("INDEXVIE:ATX", "^ATX");
-        toYahooIndex.put("INDEXFTSE:UKX", "^FTSE");
         
         toGoogleIndex.put("^DJI", "INDEXDJX:.DJI");
         toGoogleIndex.put("^IXIC", "INDEXNASDAQ:.IXIC");
@@ -797,8 +739,6 @@ public class Utils {
         toGoogleIndex.put("^BVSP", "INDEXBVMF:IBOV");
         toGoogleIndex.put("^ATX", "INDEXVIE:ATX");
         toGoogleIndex.put("^FTSE", "INDEXFTSE:UKX");
-        
-        assert(toGoogleIndex.size() == toYahooIndex.size());
         
         // TODO : Need revision. We no longer have primaryStockServerFactoryClasses
         // concept. Going to replace with PriceSource.
