@@ -19,6 +19,8 @@
 
 package org.yccheok.jstock.gui;
 
+import org.yccheok.jstock.engine.PriceSource;
+
 /**
  *
  * @author  yccheok
@@ -91,11 +93,15 @@ public class OptionsJDialog extends javax.swing.JDialog implements JStockOptions
         final boolean oldIsDynamicChartVisible = jStockOptions.isDynamicChartVisible();
         final boolean oldIsPenceToPoundConversionEnabled = jStockOptions.isPenceToPoundConversionEnabled();
         final boolean oldIsFourDecimalPlacesEnabled = jStockOptions.isFourDecimalPlacesEnabled();
+        final PriceSource oldPriceSource = jStockOptions.getPriceSource(jStockOptions.getCountry());
         
         if (apply(jStockOptions) == false) {
             return;
         }
 
+        if (oldPriceSource != jStockOptions.getPriceSource(jStockOptions.getCountry())) {
+            MainFrame.getInstance().updatePriceSource(jStockOptions.getCountry(), jStockOptions.getPriceSource(jStockOptions.getCountry()));
+        }
         if (oldScanningSpeed != jStockOptions.getScanningSpeed()) {
             MainFrame.getInstance().refreshAllRealTimeStockMonitors();
         }

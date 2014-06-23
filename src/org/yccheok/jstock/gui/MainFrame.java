@@ -3651,17 +3651,17 @@ public class MainFrame extends javax.swing.JFrame {
     }   
 
     public void updatePriceSource(Country country, PriceSource priceSource) {
-        if (priceSource == jStockOptions.getPriceSource(country)) {
-            return;
-        }
-        
-        jStockOptions.setPriceSource(country, priceSource);
         Factories.INSTANCE.updatePriceSource(country, priceSource);
         
         rebuildRealTimeStockMonitor();
 
         this.indicatorScannerJPanel.rebuildRealTimeStockMonitor();
         this.portfolioManagementJPanel.rebuildRealTimeStockMonitor();
+        
+        this.refreshAllRealTimeStockMonitors();
+        this.refreshCurrencyExchangeMonitor();
+        
+        // TODO : How to refresh market thread?
     }
 
     private void rebuildRealTimeStockMonitor() {
