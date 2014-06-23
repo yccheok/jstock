@@ -1165,6 +1165,13 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             _realTimeStockMonitor.refresh();
         }
     }
+
+    public void rebuildRealTimeStockMonitor() {
+        RealTimeStockMonitor _realTimeStockMonitor = this.realTimeStockMonitor;
+        if (_realTimeStockMonitor != null) {
+            _realTimeStockMonitor.rebuild();
+        }
+    }
     
     private Wizard wizard;
     private RealTimeStockMonitor realTimeStockMonitor;

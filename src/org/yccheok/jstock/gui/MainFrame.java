@@ -3651,13 +3651,26 @@ public class MainFrame extends javax.swing.JFrame {
     }   
 
     public void updatePriceSource(Country country, PriceSource priceSource) {
+        if (priceSource == jStockOptions.getPriceSource(country)) {
+            return;
+        }
+        
         jStockOptions.setPriceSource(country, priceSource);
         Factories.INSTANCE.updatePriceSource(country, priceSource);
         
-        // TODO : Need revision. We no longer have primaryStockServerFactoryClasses
-        // concept. Going to replace with PriceSource.        
+        rebuildRealTimeStockMonitor();
+
+        this.indicatorScannerJPanel.rebuildRealTimeStockMonitor();
+        this.portfolioManagementJPanel.rebuildRealTimeStockMonitor();
     }
 
+    private void rebuildRealTimeStockMonitor() {
+        RealTimeStockMonitor _realTimeStockMonitor = this.realTimeStockMonitor;
+        if (_realTimeStockMonitor != null) {
+            _realTimeStockMonitor.rebuild();
+        }
+    }
+    
     private void initWatchlist() {
         // This is new watchlist. Reset last update date.
         this.timestamp = 0;

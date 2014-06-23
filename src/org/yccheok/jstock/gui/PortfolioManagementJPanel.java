@@ -2666,6 +2666,13 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
     }
     
+    public void rebuildRealTimeStockMonitor() {
+        RealTimeStockMonitor _realTimeStockMonitor = this.realTimeStockMonitor;
+        if (_realTimeStockMonitor != null) {
+            _realTimeStockMonitor.rebuild();
+        }
+    }
+    
     private static final Log log = LogFactory.getLog(PortfolioManagementJPanel.class);
 
     private int dividerLocation = -1;
