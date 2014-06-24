@@ -3527,7 +3527,10 @@ public class MainFrame extends javax.swing.JFrame {
             });
         }
 
-        realTimeStockMonitor = new RealTimeStockMonitor(Constants.REAL_TIME_STOCK_MONITOR_MAX_THREAD, 20, jStockOptions.getScanningSpeed());
+        realTimeStockMonitor = new RealTimeStockMonitor(
+                Constants.REAL_TIME_STOCK_MONITOR_MAX_THREAD, 
+                Constants.REAL_TIME_STOCK_MONITOR_MAX_STOCK_SIZE_PER_SCAN,
+                jStockOptions.getScanningSpeed());
 
         realTimeStockMonitor.attach(this.realTimeStockMonitorObserver);
 

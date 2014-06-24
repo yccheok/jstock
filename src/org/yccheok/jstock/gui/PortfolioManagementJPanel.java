@@ -2334,7 +2334,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             });
         }
         
-        realTimeStockMonitor = new RealTimeStockMonitor(Constants.REAL_TIME_STOCK_MONITOR_MAX_THREAD, 20, MainFrame.getInstance().getJStockOptions().getScanningSpeed());
+        realTimeStockMonitor = new RealTimeStockMonitor(
+                Constants.REAL_TIME_STOCK_MONITOR_MAX_THREAD, 
+                Constants.REAL_TIME_STOCK_MONITOR_MAX_STOCK_SIZE_PER_SCAN, 
+                MainFrame.getInstance().getJStockOptions().getScanningSpeed());
         
         realTimeStockMonitor.attach(this.realTimeStockMonitorObserver);
         

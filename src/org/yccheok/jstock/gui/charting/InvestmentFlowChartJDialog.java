@@ -555,7 +555,10 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
             });
         }
 
-        this.realTimeStockMonitor = new RealTimeStockMonitor(Constants.REAL_TIME_STOCK_MONITOR_MAX_THREAD, 20, MainFrame.getInstance().getJStockOptions().getScanningSpeed());
+        this.realTimeStockMonitor = new RealTimeStockMonitor(
+                Constants.REAL_TIME_STOCK_MONITOR_MAX_THREAD, 
+                Constants.REAL_TIME_STOCK_MONITOR_MAX_STOCK_SIZE_PER_SCAN, 
+                MainFrame.getInstance().getJStockOptions().getScanningSpeed());
 
         this.realTimeStockMonitor.attach(this);
     }
