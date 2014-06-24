@@ -26,6 +26,8 @@ package org.yccheok.jstock.engine;
 public class RealTimeIndexMonitor extends Subject<RealTimeIndexMonitor, java.util.List<Market>> {
     /** Creates a new instance of RealTimeIndexMonitor */
     public RealTimeIndexMonitor(int maxThread, int maxBucketSize, long delay) {
-
+        realTimeStockMonitor = new RealTimeStockMonitor(maxThread, maxBucketSize, delay);
     }
+    
+    private final RealTimeStockMonitor realTimeStockMonitor;
 }
