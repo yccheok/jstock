@@ -41,9 +41,30 @@ public enum Factories {
     
     public List<StockServerFactory> getStockServerFactories(Code code) {
         Country country = Utils.toCountry(code);
+        
+        if (country == Country.Taiwan && isTaiwanOTC(code)) {
+            return taiwanOTCList;
+        }
+        
         return getStockServerFactories(country);
     }
     
+    private boolean isTaiwanOTC(Code code) {
+        String string = code.toString();
+        int index = string.lastIndexOf(".");
+        if (index == -1) {
+            return false;
+        }
+        String key = string.substring(index + 1, string.length());
+        return key.equalsIgnoreCase("two");
+    }
+    
+    // Avoid using this method unless you're pretty sure what you're looking for.
+    // The reason is that, for certain countries, we might require 2 completely
+    // different List<StockServerFactory>. As an example, country Taiwan contains
+    // .TW and .TWO stocks. .TW requires taiwanList, and .TWO requires taiwanOTCList.
+    // So, this method can't really handle such situation. In such case, we required
+    // to use getStockServerFactories(Code code).
     public List<StockServerFactory> getStockServerFactories(Country country) {
         List<StockServerFactory> list = map.get(country);
         if (list != null) {
@@ -96,6 +117,9 @@ public enum Factories {
     }
     
     private static final Map<Country, List<StockServerFactory>> map = new EnumMap<Country, List<StockServerFactory>>(Country.class);
+    
+    // Taiwan over-the-counter.
+    private static final List<StockServerFactory> taiwanOTCList = new CopyOnWriteArrayList<StockServerFactory>();
     
     static {
         final List<StockServerFactory> australiaList = new CopyOnWriteArrayList<StockServerFactory>();
@@ -161,7 +185,9 @@ public enum Factories {
         unitedKingdomList.add(YahooStockServerFactory.newInstance());
         unitedStateList.add(GoogleStockServerFactory.newInstance());
         unitedStateList.add(YahooStockServerFactory.newInstance());
-
+        
+        taiwanOTCList.add(YahooStockServerFactory.newInstance());
+        
         map.put(Country.Australia, australiaList);
         map.put(Country.Austria, austriaList);
         map.put(Country.Belgium, belgiumList);
