@@ -816,7 +816,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             });
         }
         
-        this.realTimeStockMonitor = new RealTimeStockMonitor(4, 20, MainFrame.getInstance().getJStockOptions().getScanningSpeed());
+        this.realTimeStockMonitor = new RealTimeStockMonitor(Constants.REAL_TIME_STOCK_MONITOR_MAX_THREAD, 20, MainFrame.getInstance().getJStockOptions().getScanningSpeed());
         
         this.realTimeStockMonitor.attach(this.realTimeStockMonitorObserver);
     }
