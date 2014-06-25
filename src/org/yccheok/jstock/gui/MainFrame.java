@@ -2480,10 +2480,12 @@ public class MainFrame extends javax.swing.JFrame {
             return;
         }
 
+        final Country oldCountry = jStockOptions.getCountry();
+        
         if (needToSaveUserDefinedDatabase) {
             // We are having updated user database in memory.
             // Save it to disk.
-            this.saveUserDefinedDatabaseAsCSV(country, stockInfoDatabase);
+            this.saveUserDefinedDatabaseAsCSV(oldCountry, stockInfoDatabase);
         }
 
         /* Save the GUI look. */
