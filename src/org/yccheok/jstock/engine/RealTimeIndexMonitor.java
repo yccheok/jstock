@@ -19,6 +19,9 @@
 
 package org.yccheok.jstock.engine;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  *
  * @author yccheok
@@ -29,5 +32,18 @@ public class RealTimeIndexMonitor extends Subject<RealTimeIndexMonitor, java.uti
         realTimeStockMonitor = new RealTimeStockMonitor(maxThread, maxBucketSize, delay);
     }
     
+    public synchronized boolean addIndex(Index index) {
+        if (realTimeStockMonitor.addStockCode(index.code)) {
+            indexMapping.put(index.code, index);
+            return true;
+        }
+        return false;
+    }
+    
+    public synchronized boolean isEmpty() {
+        return realTimeStockMonitor.isEmpty();
+    }
+    
+    private final Map<Code, Index> indexMapping = new HashMap<Code, Index>();
     private final RealTimeStockMonitor realTimeStockMonitor;
 }
