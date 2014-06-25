@@ -44,6 +44,16 @@ public class RealTimeIndexMonitor extends Subject<RealTimeIndexMonitor, java.uti
         return realTimeStockMonitor.isEmpty();
     }
     
+    public synchronized boolean clearIndices() {
+        indexMapping.clear();        
+        return realTimeStockMonitor.clearStockCodes();
+    }
+    
+    public synchronized boolean removeIndex(Index index) {
+        indexMapping.remove(index.code);
+        return realTimeStockMonitor.removeStockCode(index.code);
+    } 
+    
     private final Map<Code, Index> indexMapping = new HashMap<Code, Index>();
     private final RealTimeStockMonitor realTimeStockMonitor;
 }
