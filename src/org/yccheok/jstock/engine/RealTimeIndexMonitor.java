@@ -19,8 +19,10 @@
 
 package org.yccheok.jstock.engine;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
@@ -30,6 +32,30 @@ public class RealTimeIndexMonitor extends Subject<RealTimeIndexMonitor, java.uti
     /** Creates a new instance of RealTimeIndexMonitor */
     public RealTimeIndexMonitor(int maxThread, int maxBucketSize, long delay) {
         realTimeStockMonitor = new RealTimeStockMonitor(maxThread, maxBucketSize, delay);
+        
+        realTimeStockMonitor.attach(getRealTimeStockMonitorObserver());
+    }
+    
+    private Observer<RealTimeStockMonitor, List<Stock>> getRealTimeStockMonitorObserver() {
+        return new Observer<RealTimeStockMonitor, List<Stock>>() {
+
+            @Override
+            public void update(RealTimeStockMonitor subject, List<Stock> stocks) {
+                
+                List<Market> markets = new ArrayList<Market>();
+                for (Stock stock : stocks) {
+                    Index index = indexMapping.get(stock.code);
+                    if (index != null) {
+                        markets.add(Market.newInstance(stock, index));
+                    }
+                }
+                
+                if (false == markets.isEmpty()) {
+                    RealTimeIndexMonitor.this.notify(RealTimeIndexMonitor.this, markets);
+                }
+            }
+            
+        };
     }
     
     public synchronized boolean addIndex(Index index) {
@@ -54,6 +80,42 @@ public class RealTimeIndexMonitor extends Subject<RealTimeIndexMonitor, java.uti
         return realTimeStockMonitor.removeStockCode(index.code);
     } 
     
-    private final Map<Code, Index> indexMapping = new HashMap<Code, Index>();
+    public synchronized void resume() {
+        realTimeStockMonitor.resume();
+    }
+
+    public synchronized void suspend() {
+        realTimeStockMonitor.suspend();
+    } 
+    
+    public synchronized void startNewThreadsIfNecessary() {
+        realTimeStockMonitor.startNewThreadsIfNecessary();
+    }
+    
+    public synchronized void rebuild() {
+        realTimeStockMonitor.rebuild();
+    }
+    
+    public synchronized void stop() {
+        realTimeStockMonitor.stop();
+    }
+    
+    public synchronized void refresh() {
+        realTimeStockMonitor.refresh();
+    }
+    
+    public synchronized long getDelay() {
+        return realTimeStockMonitor.getDelay();
+    }
+    
+    public synchronized void setDelay(int delay) {
+        realTimeStockMonitor.setDelay(delay);
+    }
+    
+    public int getTotalScanned() {
+        return realTimeStockMonitor.getTotalScanned();
+    }
+    
+    private final Map<Code, Index> indexMapping = new ConcurrentHashMap<Code, Index>();
     private final RealTimeStockMonitor realTimeStockMonitor;
 }
