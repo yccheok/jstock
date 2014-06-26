@@ -42,8 +42,7 @@ public class KLSEInfoStockServerFactory implements StockServerFactory {
     
     @Override
     public StockServer getStockServer() {
-        // Steal stock server from Yahoo! server.
-        return stockServerFactory.getStockServer();
+        return null;
     }
 
     @Override
@@ -67,18 +66,11 @@ public class KLSEInfoStockServerFactory implements StockServerFactory {
             return null;
         }
     }
-
-    @Override
-    public MarketServer getMarketServer() {
-        // Steal market server from Yahoo! server.
-        return stockServerFactory.getMarketServer();
-    }
     
     @Override
     public DividendServer getDividendServer() {
         return null;
     }
     
-    private final StockServerFactory stockServerFactory = YahooStockServerFactory.newInstance();    
     private static final Log log = LogFactory.getLog(KLSEInfoStockServerFactory.class);    
 }
