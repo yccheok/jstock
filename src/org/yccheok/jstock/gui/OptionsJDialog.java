@@ -104,6 +104,7 @@ public class OptionsJDialog extends javax.swing.JDialog implements JStockOptions
         }
         if (oldScanningSpeed != jStockOptions.getScanningSpeed()) {
             MainFrame.getInstance().refreshAllRealTimeStockMonitors();
+            MainFrame.getInstance().refreshRealTimeIndexMonitor();
         }
         if (oldIsFeeCalculationEnabled != jStockOptions.isFeeCalculationEnabled()) {
             MainFrame.getInstance().getPortfolioManagementJPanel().refreshGUIAfterFeeCalculationEnabledOptionsChanged();

@@ -143,7 +143,7 @@ public class MainFrame extends javax.swing.JFrame {
         this.initStockInfoDatabaseMeta();
         this.initDatabase(true);
         this.initAjaxProvider();
-        this.initMarketThread();
+        this.initRealTimeIndexMonitor();
         this.initLatestNewsTask();
         this.initCurrencyExchangeMonitor();
         this.initRealTimeStockMonitor();
@@ -1599,9 +1599,8 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void jMenuItem15ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem15ActionPerformed
         refreshAllRealTimeStockMonitors();
+        refreshRealTimeIndexMonitor();
         refreshCurrencyExchangeMonitor();
-        // Refresh stock index as well.
-        this.initMarketThread();
         
         // Only update UI when there is at least one stock.
         if (this.getStocks().isEmpty() == false) {
@@ -2434,7 +2433,7 @@ public class MainFrame extends javax.swing.JFrame {
         // freshly.
         this.initDatabase(true);
         this.initAjaxProvider();
-        this.initMarketThread();
+        this.initRealTimeIndexMonitor();
         this.initMarketJPanel();
         this.initStockHistoryMonitor();
         this.initOthersStockHistoryMonitor();
@@ -2520,7 +2519,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         this.initDatabase(true);
         this.initAjaxProvider();
-        this.initMarketThread();
+        this.initRealTimeIndexMonitor();
         this.initMarketJPanel();
         this.initStockHistoryMonitor();
         this.initOthersStockHistoryMonitor();
@@ -3025,6 +3024,16 @@ public class MainFrame extends javax.swing.JFrame {
         };
     }
 
+    private org.yccheok.jstock.engine.Observer<RealTimeIndexMonitor, java.util.List<Market>> getRealTimeIndexMonitorObserver() {
+        return new org.yccheok.jstock.engine.Observer<RealTimeIndexMonitor, java.util.List<Market>>() {
+            @Override
+            public void update(RealTimeIndexMonitor monitor, java.util.List<Market> markets)
+            {
+                MainFrame.this.update(markets);
+            }
+        };        
+    }
+    
     private org.yccheok.jstock.engine.Observer<StockHistoryMonitor, StockHistoryMonitor.StockHistoryRunnable> getStockHistoryMonitorObserver() {
         return new org.yccheok.jstock.engine.Observer<StockHistoryMonitor, StockHistoryMonitor.StockHistoryRunnable>() {
             @Override
@@ -3119,79 +3128,6 @@ public class MainFrame extends javax.swing.JFrame {
         popup.add(menuItem);
         
         return popup;
-    }
-    
-    private class MarketRunnable implements Runnable {
-        // 2 seconds.
-        private static final long MIN_DELAY = 2000;
-        private static final long MIN_DELAY_COUNTER = 3;
-        private int minDelayCounter = 0;
-        
-        public MarketRunnable() {
-        }
-        
-        @Override
-        public void run() {
-            final Thread currentThread = Thread.currentThread();
-
-            final java.util.List<Index> is = org.yccheok.jstock.engine.Utils.getStockIndices(jStockOptions.getCountry());
-            final int is_size = is.size();
-            
-            // Do not rely on isInterrupted flag only. The flag can be cleared by 3rd party easily.
-            // Check for current thread as well.
-            while (!currentThread.isInterrupted()  && (marketThread == currentThread)) {
-                
-                int fail = is_size;
-                
-                for (StockServerFactory factory : Factories.INSTANCE.getStockServerFactories(is.get(0))) {
-                    MarketServer marketServer = factory.getMarketServer();
-                    
-                    if (marketServer == null) {
-                        continue;
-                    }
-                    
-                    java.util.List<Market> markets = marketServer.getMarkets(is);
-                    
-                                        
-                    if (marketThread != currentThread) {
-                        break;
-                    }
-
-                    final int market_size = markets.size();
-
-                    // Very strict rule.
-                    if (market_size != is_size) {
-                        continue;
-                    }
-
-                    fail -= market_size;
-
-                    // Notify all the interested parties.
-                    update(markets);
-
-                    break;
-                }
-                
-                try {
-                    if (fail == 0) {
-                        Thread.sleep(jStockOptions.getScanningSpeed());
-                    } else {
-                        if (minDelayCounter < MIN_DELAY_COUNTER) {
-                            // Sleep as little as possible, to get the 1st reading
-                            // as soon as possible. MIN_DELAY_COUNTER is used to avoid
-                            // from getting our CPU and network too busy.
-                            minDelayCounter++;
-                            Thread.sleep(MIN_DELAY);
-                        } else {
-                            Thread.sleep(jStockOptions.getScanningSpeed());
-                        }
-                    }
-                } catch (java.lang.InterruptedException exp) {
-                    log.error(null, exp);
-                    break;
-                }
-            }   // while
-        }            
     }
 
     private static boolean saveStockNameDatabaseAsCSV(Country country, StockNameDatabase stockNameDatabase) {
@@ -3514,6 +3450,35 @@ public class MainFrame extends javax.swing.JFrame {
         this.portfolioManagementJPanel.initCurrencyExchangeMonitor();
     }
 
+    private void initRealTimeIndexMonitor() {
+        final RealTimeIndexMonitor oldRealTimeIndexMonitor = realTimeIndexMonitor;
+        if (oldRealTimeIndexMonitor != null) {            
+            zombiePool.execute(new Runnable() {
+                @Override
+                public void run() {
+                    log.info("Prepare to shut down " + oldRealTimeIndexMonitor + "...");
+                    oldRealTimeIndexMonitor.clearIndices();
+                    oldRealTimeIndexMonitor.dettachAll();
+                    oldRealTimeIndexMonitor.stop();
+                    log.info("Shut down " + oldRealTimeIndexMonitor + " peacefully.");
+                }
+            });
+        }
+
+        realTimeIndexMonitor = new RealTimeIndexMonitor(
+                Constants.REAL_TIME_INDEX_MONITOR_MAX_THREAD, 
+                Constants.REAL_TIME_INDEX_MONITOR_MAX_STOCK_SIZE_PER_SCAN,
+                jStockOptions.getScanningSpeed());
+
+        realTimeIndexMonitor.attach(this.realTimeIndexMonitorObserver);
+        
+        for (Index index : org.yccheok.jstock.engine.Utils.getStockIndices(jStockOptions.getCountry())) {
+            realTimeIndexMonitor.addIndex(index);
+        }
+        
+        realTimeIndexMonitor.startNewThreadsIfNecessary();
+    }
+    
     private void initRealTimeStockMonitor() {
         final RealTimeStockMonitor oldRealTimeStockMonitor = realTimeStockMonitor;
         if (oldRealTimeStockMonitor != null) {            
@@ -3659,20 +3624,27 @@ public class MainFrame extends javax.swing.JFrame {
         Factories.INSTANCE.updatePriceSource(country, priceSource);
         
         rebuildRealTimeStockMonitor();
+        rebuildRealTimeIndexMonitor();
 
         this.indicatorScannerJPanel.rebuildRealTimeStockMonitor();
         this.portfolioManagementJPanel.rebuildRealTimeStockMonitor();
         
         this.refreshAllRealTimeStockMonitors();
+        this.refreshRealTimeIndexMonitor();
         this.refreshCurrencyExchangeMonitor();
-        
-        // TODO : How to refresh market thread?
     }
 
     private void rebuildRealTimeStockMonitor() {
         RealTimeStockMonitor _realTimeStockMonitor = this.realTimeStockMonitor;
         if (_realTimeStockMonitor != null) {
             _realTimeStockMonitor.rebuild();
+        }
+    }
+    
+    private void rebuildRealTimeIndexMonitor() {
+        RealTimeIndexMonitor _realTimeIndexMonitor = this.realTimeIndexMonitor;
+        if (_realTimeIndexMonitor != null) {
+            _realTimeIndexMonitor.rebuild();
         }
     }
     
@@ -3922,28 +3894,6 @@ public class MainFrame extends javax.swing.JFrame {
                 latestNewsTask = null;
             }
         }
-    }
-    
-    private void initMarketThread() {
-        final Thread oldMarketThread = marketThread;
-        if (oldMarketThread != null) {
-            zombiePool.execute(new Runnable() {
-                @Override
-                public void run() {
-                    log.info("Prepare to shut down market thread " + oldMarketThread + "...");
-                    oldMarketThread.interrupt();
-                    try {
-                        oldMarketThread.join();
-                    } catch (InterruptedException ex) {
-                        log.error(null, ex);
-                    }
-                    log.info("Shut down market thread " + oldMarketThread + " peacefully.");
-                }
-            });            
-        }
-        
-        this.marketThread = new Thread(new MarketRunnable());
-        this.marketThread.start();
     }
     
     private void initAjaxProvider() {
@@ -4473,7 +4423,8 @@ public class MainFrame extends javax.swing.JFrame {
     
     public void updateScanningSpeed(int speed) {
         this.realTimeStockMonitor.setDelay(speed);
-        indicatorScannerJPanel.updateScanningSpeed(speed);
+        this.realTimeIndexMonitor.setDelay(speed);
+        this.indicatorScannerJPanel.updateScanningSpeed(speed);
     }
 
     public void updateHistoryDuration(Duration historyDuration) {
@@ -4728,6 +4679,13 @@ public class MainFrame extends javax.swing.JFrame {
         this.indicatorScannerJPanel.refreshRealTimeStockMonitor();
         this.portfolioManagementJPanel.refreshRealTimeStockMonitor();
     }
+
+    public void refreshRealTimeIndexMonitor() {        
+        RealTimeIndexMonitor _realTimeIndexMonitor = this.realTimeIndexMonitor;
+        if (_realTimeIndexMonitor != null) {
+            _realTimeIndexMonitor.refresh();
+        }
+    }
     
     private TrayIcon trayIcon;
     
@@ -4744,13 +4702,13 @@ public class MainFrame extends javax.swing.JFrame {
     private volatile StockNameDatabase stockNameDatabase = null;
     
     private RealTimeStockMonitor realTimeStockMonitor = null;
+    private RealTimeIndexMonitor realTimeIndexMonitor = null;
     private StockHistoryMonitor stockHistoryMonitor = null;
 
     private DatabaseTask databaseTask = null;
     private final Object databaseTaskMonitor = new Object();
 
     private LatestNewsTask latestNewsTask = null;
-    private volatile Thread marketThread = null;   
     private JStockOptions jStockOptions;
     private ChartJDialogOptions chartJDialogOptions;
     
@@ -4765,19 +4723,20 @@ public class MainFrame extends javax.swing.JFrame {
     private volatile ExecutorService stockInfoDatabaseMetaPool = Executors.newFixedThreadPool(1);
             
     private final org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
+    private final org.yccheok.jstock.engine.Observer<RealTimeIndexMonitor, java.util.List<Market>> realTimeIndexMonitorObserver = this.getRealTimeIndexMonitorObserver();
     private final org.yccheok.jstock.engine.Observer<StockHistoryMonitor, StockHistoryMonitor.StockHistoryRunnable> stockHistoryMonitorObserver = this.getStockHistoryMonitorObserver();
     private final org.yccheok.jstock.engine.Observer<Indicator, Boolean> alertStateManagerObserver = this.getAlertStateManagerObserver();
 
     private final javax.swing.ImageIcon smileIcon = this.getImageIcon("/images/16x16/smile.png");
     private final javax.swing.ImageIcon smileGrayIcon = this.getImageIcon("/images/16x16/smile-gray.png");
 
-    private Executor zombiePool = Utils.getZoombiePool();
+    private final Executor zombiePool = Utils.getZoombiePool();
     
     private MarketJPanel marketJPanel;
 
     // Use ConcurrentHashMap, enable us able to read and write using different
     // threads.
-    private java.util.Map<Code, DynamicChart> dynamicCharts = new java.util.concurrent.ConcurrentHashMap<Code, DynamicChart>();
+    private final java.util.Map<Code, DynamicChart> dynamicCharts = new java.util.concurrent.ConcurrentHashMap<Code, DynamicChart>();
     // We have 720 (6 * 60 * 2) points per chart, based on 10 seconds per points, with maximum 2 hours.
     // By having maximum 10 charts, we shall not face any memory problem.
     private static final int MAX_DYNAMIC_CHART_SIZE = 10;
