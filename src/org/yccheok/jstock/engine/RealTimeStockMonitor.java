@@ -266,7 +266,7 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
                             fail += size;
                             
                             List<Stock> stocks = null;
-                            int numberOfInvalidLastPrice = codes.size();
+                            int numberOfInvalidLastPrice = Integer.MAX_VALUE;
                             
                             for (StockServerFactory factory : Factories.INSTANCE.getStockServerFactories(codes.get(0)))
                             {
