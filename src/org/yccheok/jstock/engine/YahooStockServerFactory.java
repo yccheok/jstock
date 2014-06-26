@@ -69,17 +69,11 @@ public class YahooStockServerFactory implements StockServerFactory {
     }
     
     @Override
-    public MarketServer getMarketServer() {
-        return marketServer;
-    }
-    
-    @Override
     public DividendServer getDividendServer() {
         return dividendServer;
     }
     
     private final StockServer stockServer = new YahooStockServer();
-    private final MarketServer marketServer = new YahooMarketServer();
     private final DividendServer dividendServer;
     
     private static final Log log = LogFactory.getLog(YahooStockServerFactory.class);
