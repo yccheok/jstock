@@ -30,6 +30,11 @@ import org.apache.commons.logging.LogFactory;
  */
 public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.util.List<Stock>> {
     
+    public enum Strategy {
+        Speed,
+        Quality
+    }
+    
     /** Creates a new instance of RealTimeStockMonitor */
     public RealTimeStockMonitor(int maxThread, int maxBucketSize, long delay) {
         if (maxThread <= 0 || maxBucketSize <= 0 || delay <= 0) {
@@ -256,9 +261,13 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
                             if (codes.isEmpty()) {
                                 break;
                             }
-
+                            
                             final int size = codes.size();
                             fail += size;
+                            
+                            List<Stock> stocks = null;
+                            int numberOfInvalidLastPrice = codes.size();
+                            
                             for (StockServerFactory factory : Factories.INSTANCE.getStockServerFactories(codes.get(0)))
                             {
                                 final StockServer stockServer = factory.getStockServer();
@@ -267,9 +276,9 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
                                     continue;
                                 }
 
-                                List<Stock> stocks = null;
+                                List<Stock> tmpStocks = null;
                                 try {
-                                    stocks = stockServer.getStocks(codes);
+                                    tmpStocks = stockServer.getStocks(codes);
                                 } catch (StockNotFoundException exp) {
                                     if (thisThread != thread) {
                                         break;    
@@ -282,18 +291,35 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
 
                                 if (thisThread != thread) {
                                     break;
+                                }                              
+
+                                if (strategy == Strategy.Speed) {
+                                    stocks = tmpStocks;
+                                    break;
+                                } else {
+                                    assert(strategy == Strategy.Quality);
+                                    int _numberOfInvalidLastPrice = 0;
+                                    for (Stock tmp : tmpStocks) {
+                                        if (tmp.getLastPrice() == 0.0) {
+                                            _numberOfInvalidLastPrice++;
+                                        }
+                                    }
+                                    
+                                    if (_numberOfInvalidLastPrice < numberOfInvalidLastPrice) {
+                                        stocks = tmpStocks;    
+                                        numberOfInvalidLastPrice = _numberOfInvalidLastPrice;
+                                    }
                                 }
-
-                                pass += size;
-                                fail -= size;
-                                totalScanned = pass + fail;
-
-                                // Notify all the interested parties.
-                                RealTimeStockMonitor.this.notify(RealTimeStockMonitor.this, stocks);
-
-                                break;
                             }   // for
 
+                            // Notify all the interested parties.
+                            if (stocks != null) {
+                                pass += size;
+                                fail -= size;
+                                totalScanned = pass + fail;  
+                                
+                                RealTimeStockMonitor.this.notify(RealTimeStockMonitor.this, stocks);
+                            }
 
                         }   // for (int currIndex = index; thisThread == thread; curIndex += step)
 
@@ -385,6 +411,12 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
         }
         return totalScanned;
     }
+    
+    public void setStrategy(Strategy strategy) {
+        this.strategy = strategy;
+    }
+    
+    private volatile Strategy strategy = Strategy.Speed;
     
     // Delay in ms
     private volatile long delay;

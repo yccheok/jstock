@@ -116,6 +116,10 @@ public class RealTimeIndexMonitor extends Subject<RealTimeIndexMonitor, java.uti
         return realTimeStockMonitor.getTotalScanned();
     }
     
+    public void setStrategy(RealTimeStockMonitor.Strategy strategy) {
+        realTimeStockMonitor.setStrategy(strategy);
+    }
+    
     private final Map<Code, Index> indexMapping = new ConcurrentHashMap<Code, Index>();
     private final RealTimeStockMonitor realTimeStockMonitor;
 }

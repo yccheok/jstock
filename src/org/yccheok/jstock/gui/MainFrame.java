@@ -3470,6 +3470,8 @@ public class MainFrame extends javax.swing.JFrame {
                 Constants.REAL_TIME_INDEX_MONITOR_MAX_STOCK_SIZE_PER_SCAN,
                 jStockOptions.getScanningSpeed());
 
+        realTimeIndexMonitor.setStrategy(RealTimeStockMonitor.Strategy.Quality);
+        
         realTimeIndexMonitor.attach(this.realTimeIndexMonitorObserver);
         
         for (Index index : org.yccheok.jstock.engine.Utils.getStockIndices(jStockOptions.getCountry())) {
