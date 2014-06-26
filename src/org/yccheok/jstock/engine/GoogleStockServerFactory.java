@@ -93,23 +93,12 @@ public class GoogleStockServerFactory implements StockServerFactory {
         }
     }
 
-    /**
-     * Returns market server for this factory.
-     *
-     * @return market server for this factory
-     */
-    @Override
-    public MarketServer getMarketServer() {
-        return marketServer;
-    }
-
     @Override
     public DividendServer getDividendServer() {
         return null;
     }
     
     private final StockServer stockServer;
-    private final MarketServer marketServer = new GoogleMarketServer();
     
     private static final Log log = LogFactory.getLog(GoogleStockServerFactory.class);
 }
