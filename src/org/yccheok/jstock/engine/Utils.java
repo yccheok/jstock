@@ -48,7 +48,6 @@ public class Utils {
     private Utils() {
     }   
 
-
     /**
      * Returns empty stock based on given stock info.
      *
