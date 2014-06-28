@@ -80,7 +80,7 @@ public class CodeBucketLists {
         BucketList<Code> bucketList = bucketLists.get(id);
         
         if (bucketList == null) {
-            bucketList = new BucketList(this.maxBucketSize);
+            bucketList = new BucketList<Code>(this.maxBucketSize);
             bucketLists.put(id, bucketList);
         }
         

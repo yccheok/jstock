@@ -19,26 +19,27 @@
 
 package org.yccheok.jstock.gui;
 
-import org.yccheok.jstock.alert.GoogleMail;
-import org.yccheok.jstock.alert.GoogleCalendar;
-import javax.mail.MessagingException;
-import javax.mail.internet.AddressException;
-import javax.swing.event.*;
 import com.nexes.wizard.*;
-import javax.swing.*;
 import java.awt.event.*;
 import java.io.File;
 import java.text.MessageFormat;
-import javax.swing.table.*;
 import java.util.*;
-import org.yccheok.jstock.engine.*;
-import org.yccheok.jstock.analysis.*;
 import java.util.concurrent.*;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.AddressException;
+import javax.swing.*;
+import javax.swing.event.*;
+import javax.swing.table.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.yccheok.jstock.alert.GoogleCalendar;
+import org.yccheok.jstock.alert.GoogleMail;
 import org.yccheok.jstock.alert.SMSLimiter;
+import org.yccheok.jstock.analysis.*;
 import org.yccheok.jstock.analysis.Indicator;
+import org.yccheok.jstock.engine.*;
+import org.yccheok.jstock.engine.RealTimeStockMonitor.Strategy;
 import org.yccheok.jstock.internationalization.GUIBundle;
 
 /**
@@ -819,6 +820,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         this.realTimeStockMonitor = new RealTimeStockMonitor(
                 Constants.REAL_TIME_STOCK_MONITOR_MAX_THREAD, 
                 Constants.REAL_TIME_STOCK_MONITOR_MAX_STOCK_SIZE_PER_SCAN, 
+                Strategy.Speed,
                 MainFrame.getInstance().getJStockOptions().getScanningSpeed());
         
         this.realTimeStockMonitor.attach(this.realTimeStockMonitorObserver);

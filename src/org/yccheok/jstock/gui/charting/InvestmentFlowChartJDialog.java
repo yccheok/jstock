@@ -53,6 +53,7 @@ import org.jfree.data.xy.XYDataset;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.Observer;
 import org.yccheok.jstock.engine.RealTimeStockMonitor;
+import org.yccheok.jstock.engine.RealTimeStockMonitor.Strategy;
 import org.yccheok.jstock.engine.SimpleDate;
 import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.StockInfo;
@@ -558,6 +559,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         this.realTimeStockMonitor = new RealTimeStockMonitor(
                 Constants.REAL_TIME_STOCK_MONITOR_MAX_THREAD, 
                 Constants.REAL_TIME_STOCK_MONITOR_MAX_STOCK_SIZE_PER_SCAN, 
+                Strategy.Speed,
                 MainFrame.getInstance().getJStockOptions().getScanningSpeed());
 
         this.realTimeStockMonitor.attach(this);

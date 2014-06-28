@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.yccheok.jstock.engine.RealTimeStockMonitor.Strategy;
 
 /**
  *
@@ -30,8 +31,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class RealTimeIndexMonitor extends Subject<RealTimeIndexMonitor, java.util.List<Market>> {
     /** Creates a new instance of RealTimeIndexMonitor */
-    public RealTimeIndexMonitor(int maxThread, int maxBucketSize, long delay) {
-        realTimeStockMonitor = new RealTimeStockMonitor(maxThread, maxBucketSize, delay);
+    public RealTimeIndexMonitor(int maxThread, int maxBucketSize, Strategy strategy, long delay) {
+        realTimeStockMonitor = new RealTimeStockMonitor(maxThread, maxBucketSize, strategy, delay);
         
         realTimeStockMonitor.attach(getRealTimeStockMonitorObserver());
     }
@@ -114,10 +115,6 @@ public class RealTimeIndexMonitor extends Subject<RealTimeIndexMonitor, java.uti
     
     public int getTotalScanned() {
         return realTimeStockMonitor.getTotalScanned();
-    }
-    
-    public void setStrategy(RealTimeStockMonitor.Strategy strategy) {
-        realTimeStockMonitor.setStrategy(strategy);
     }
     
     private final Map<Code, Index> indexMapping = new ConcurrentHashMap<Code, Index>();

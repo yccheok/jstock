@@ -45,7 +45,6 @@ import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
-
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
@@ -55,9 +54,9 @@ import org.apache.commons.logging.*;
 import org.jdesktop.swingx.JXTableHeader;
 import org.jdesktop.swingx.JXTreeTable;
 import org.jdesktop.swingx.table.TableColumnExt;
-import org.yccheok.jstock.portfolio.*;
-import org.yccheok.jstock.engine.*;
 import org.jdesktop.swingx.treetable.*;
+import org.yccheok.jstock.engine.*;
+import org.yccheok.jstock.engine.RealTimeStockMonitor.Strategy;
 import org.yccheok.jstock.file.GUIBundleWrapper;
 import org.yccheok.jstock.file.Statement;
 import org.yccheok.jstock.file.Statements;
@@ -77,6 +76,7 @@ import org.yccheok.jstock.gui.treetable.SellPortfolioTreeTableModelEx;
 import org.yccheok.jstock.gui.treetable.SortableTreeTable;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.internationalization.MessagesBundle;
+import org.yccheok.jstock.portfolio.*;
 
 /**
  *
@@ -2337,6 +2337,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         realTimeStockMonitor = new RealTimeStockMonitor(
                 Constants.REAL_TIME_STOCK_MONITOR_MAX_THREAD, 
                 Constants.REAL_TIME_STOCK_MONITOR_MAX_STOCK_SIZE_PER_SCAN, 
+                Strategy.Speed,
                 MainFrame.getInstance().getJStockOptions().getScanningSpeed());
         
         realTimeStockMonitor.attach(this.realTimeStockMonitorObserver);

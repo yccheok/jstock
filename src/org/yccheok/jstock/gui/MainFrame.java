@@ -48,6 +48,7 @@ import org.yccheok.jstock.alert.SMSLimiter;
 import org.yccheok.jstock.analysis.Indicator;
 import org.yccheok.jstock.analysis.OperatorIndicator;
 import org.yccheok.jstock.engine.*;
+import org.yccheok.jstock.engine.RealTimeStockMonitor.Strategy;
 import org.yccheok.jstock.engine.ResultType;
 import org.yccheok.jstock.engine.Stock.Board;
 import org.yccheok.jstock.engine.Stock.Industry;
@@ -3468,9 +3469,8 @@ public class MainFrame extends javax.swing.JFrame {
         realTimeIndexMonitor = new RealTimeIndexMonitor(
                 Constants.REAL_TIME_INDEX_MONITOR_MAX_THREAD, 
                 Constants.REAL_TIME_INDEX_MONITOR_MAX_STOCK_SIZE_PER_SCAN,
+                Strategy.Quality,
                 jStockOptions.getScanningSpeed());
-
-        realTimeIndexMonitor.setStrategy(RealTimeStockMonitor.Strategy.Quality);
         
         realTimeIndexMonitor.attach(this.realTimeIndexMonitorObserver);
         
@@ -3499,6 +3499,7 @@ public class MainFrame extends javax.swing.JFrame {
         realTimeStockMonitor = new RealTimeStockMonitor(
                 Constants.REAL_TIME_STOCK_MONITOR_MAX_THREAD, 
                 Constants.REAL_TIME_STOCK_MONITOR_MAX_STOCK_SIZE_PER_SCAN,
+                Strategy.Speed,
                 jStockOptions.getScanningSpeed());
 
         realTimeStockMonitor.attach(this.realTimeStockMonitorObserver);

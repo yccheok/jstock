@@ -36,12 +36,13 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
     }
     
     /** Creates a new instance of RealTimeStockMonitor */
-    public RealTimeStockMonitor(int maxThread, int maxBucketSize, long delay) {
-        if (maxThread <= 0 || maxBucketSize <= 0 || delay <= 0) {
-            throw new IllegalArgumentException("maxThread : " + maxThread + ", maxBucketSize : " + maxBucketSize + ", delay : " + delay);
+    public RealTimeStockMonitor(int maxThread, int maxBucketSize, Strategy strategy, long delay) {
+        if (maxThread <= 0 || maxBucketSize <= 0 || strategy == null || delay <= 0) {
+            throw new IllegalArgumentException("maxThread : " + maxThread + ", maxBucketSize : " + maxBucketSize + ", strategy = " + strategy + ", delay : " + delay);
         }
         
         this.maxThread = maxThread;
+        this.strategy = strategy;
         this.delay = delay;
         
         this.codeBucketLists = new CodeBucketLists(maxBucketSize);
@@ -266,7 +267,7 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
                             fail += size;
                             
                             List<Stock> stocks = null;
-                            int numberOfInvalidLastPrice = Integer.MAX_VALUE;
+                            Set<Code> nonZeroCodes = null;
                             
                             for (StockServerFactory factory : Factories.INSTANCE.getStockServerFactories(codes.get(0)))
                             {
@@ -298,22 +299,41 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
                                     break;
                                 } else {
                                     assert(strategy == Strategy.Quality);
-                                    int _numberOfInvalidLastPrice = 0;
-                                    for (Stock tmp : tmpStocks) {
-                                        if (tmp.getLastPrice() == 0.0) {
-                                            _numberOfInvalidLastPrice++;
-                                        }
+                                    
+                                    if (stocks == null) {
+                                        stocks = new ArrayList<Stock>();
                                     }
                                     
-                                    if (_numberOfInvalidLastPrice < numberOfInvalidLastPrice) {
-                                        stocks = tmpStocks;    
-                                        numberOfInvalidLastPrice = _numberOfInvalidLastPrice;
+                                    if (nonZeroCodes == null) {
+                                        nonZeroCodes = new HashSet<Code>();
+                                    }
+                                    
+                                    for (Stock tmp : tmpStocks) {
+                                        if (nonZeroCodes.contains(tmp.code)) {
+                                            continue;
+                                        }
+                                        
+                                        if (tmp.getLastPrice() > 0.0) {
+                                            nonZeroCodes.add(tmp.code);
+                                            stocks.add(tmp);
+                                        }
                                     }
                                 }
                             }   // for
 
                             // Notify all the interested parties.
                             if (stocks != null) {
+                                
+                                if (stocks.size() < codes.size()) {
+                                    if (nonZeroCodes != null) {
+                                        for (Code code : codes) {
+                                            if (false == nonZeroCodes.contains(code)) {
+                                                stocks.add(org.yccheok.jstock.gui.Utils.getEmptyStock(code, Symbol.newInstance(code.toString())));
+                                            }
+                                        }
+                                    }
+                                }
+                                
                                 pass += size;
                                 fail -= size;
                                 totalScanned = pass + fail;  
@@ -412,11 +432,7 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
         return totalScanned;
     }
     
-    public void setStrategy(Strategy strategy) {
-        this.strategy = strategy;
-    }
-    
-    private volatile Strategy strategy = Strategy.Speed;
+    private final Strategy strategy;
     
     // Delay in ms
     private volatile long delay;
