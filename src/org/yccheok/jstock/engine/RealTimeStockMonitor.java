@@ -19,8 +19,10 @@
 
 package org.yccheok.jstock.engine;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-
+import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -328,7 +330,7 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
                                     if (nonZeroCodes != null) {
                                         for (Code code : codes) {
                                             if (false == nonZeroCodes.contains(code)) {
-                                                stocks.add(org.yccheok.jstock.gui.Utils.getEmptyStock(code, Symbol.newInstance(code.toString())));
+                                                stocks.add(org.yccheok.jstock.engine.Utils.getEmptyStock(code, Symbol.newInstance(code.toString())));
                                             }
                                         }
                                     }

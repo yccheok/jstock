@@ -644,7 +644,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
                     assert(symbol != null);
                     assert(code != null);
                     
-                    NewBuyTransactionJDialog.this.stock = Utils.getEmptyStock(code, symbol);
+                    NewBuyTransactionJDialog.this.stock = org.yccheok.jstock.engine.Utils.getEmptyStock(code, symbol);
                     this.jTextField2.setText(code.toString());
                     this.jTextField1.setText(symbol.toString());
                     // text fields now contain necessary info. Don't proceed first.
@@ -753,7 +753,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
             final DateField dateField = (DateField)jPanel3;
             final Date date = (Date)dateField.getValue();
             // Stock and date information is not important at this moment.
-            Contract.ContractBuilder builder = new Contract.ContractBuilder(Utils.getEmptyStock(Code.newInstance(name), Symbol.newInstance(name)), new SimpleDate(date));        
+            Contract.ContractBuilder builder = new Contract.ContractBuilder(org.yccheok.jstock.engine.Utils.getEmptyStock(Code.newInstance(name), Symbol.newInstance(name)), new SimpleDate(date));        
             Contract contract = builder.type(Contract.Type.Buy).quantity(unit).price(price).build();
 
             final double brokerFee = brokingFirm.brokerCalculate(contract);
@@ -952,7 +952,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
     }
 
     private void addStockInfoFromAutoCompleteJComboBox(StockInfo stockInfo) {
-        NewBuyTransactionJDialog.this.stock = Utils.getEmptyStock(stockInfo);
+        NewBuyTransactionJDialog.this.stock = org.yccheok.jstock.engine.Utils.getEmptyStock(stockInfo);
         NewBuyTransactionJDialog.this.jTextField1.setText(NewBuyTransactionJDialog.this.stock.symbol.toString());
         NewBuyTransactionJDialog.this.jTextField2.setText(NewBuyTransactionJDialog.this.stock.code.toString());
         // So that the 1st character is being displayed.

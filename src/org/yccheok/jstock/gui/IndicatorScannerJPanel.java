@@ -249,7 +249,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                 final OperatorIndicator operatorIndicator = alertIndicatorProjectManager.getOperatorIndicator(project);
 
                 if (operatorIndicator != null) {
-                    final Stock stock = Utils.getEmptyStock(stockInfo);
+                    final Stock stock = org.yccheok.jstock.engine.Utils.getEmptyStock(stockInfo);
 
                     operatorIndicator.setStock(stock);
 

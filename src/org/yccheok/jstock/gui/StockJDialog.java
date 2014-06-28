@@ -427,7 +427,7 @@ public class StockJDialog extends javax.swing.JDialog {
             @Override
             public void run() {
                 for (StockInfo stockInfo : stockInfos) {
-                    final Stock stock = org.yccheok.jstock.gui.Utils.getEmptyStock(stockInfo);
+                    final Stock stock = org.yccheok.jstock.engine.Utils.getEmptyStock(stockInfo);
                     m.addStockToTable(stock);
                     m.getRealTimeStockMonitor().addStockCode(stock.code);
                 }

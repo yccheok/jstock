@@ -822,7 +822,7 @@ public class MainFrame extends javax.swing.JFrame {
                 final Double fallBelowDouble = statement.getValueAsDouble(guiBundleWrapper.getString("MainFrame_FallBelow"));
                 final Double riseAboveDouble = statement.getValueAsDouble(guiBundleWrapper.getString("MainFrame_RiseAbove"));
                 if (codeStr.length() > 0 && symbolStr.length() > 0) {
-                    final Stock stock = Utils.getEmptyStock(Code.newInstance(codeStr), Symbol.newInstance(symbolStr));
+                    final Stock stock = org.yccheok.jstock.engine.Utils.getEmptyStock(Code.newInstance(codeStr), Symbol.newInstance(symbolStr));
                     final StockAlert stockAlert = new StockAlert().setFallBelow(fallBelowDouble).setRiseAbove(riseAboveDouble);
                     this.addStockToTable(stock, stockAlert);
                     realTimeStockMonitor.addStockCode(Code.newInstance(codeStr));
@@ -839,7 +839,7 @@ public class MainFrame extends javax.swing.JFrame {
                 final String codeStr = statement.getValueAsString(guiBundleWrapper.getString("MainFrame_Code"));
                 final String symbolStr = statement.getValueAsString(guiBundleWrapper.getString("MainFrame_Symbol"));
                 if (codeStr.length() > 0 && symbolStr.length() > 0) {
-                    final Stock stock = Utils.getEmptyStock(Code.newInstance(codeStr), Symbol.newInstance(symbolStr));
+                    final Stock stock = org.yccheok.jstock.engine.Utils.getEmptyStock(Code.newInstance(codeStr), Symbol.newInstance(symbolStr));
                     this.addStockToTable(stock);
                     realTimeStockMonitor.addStockCode(Code.newInstance(codeStr));
                 }
@@ -2991,7 +2991,7 @@ public class MainFrame extends javax.swing.JFrame {
         // selected and the table shall be scrolled to be visible.
         final StockTableModel tableModel = (StockTableModel)MainFrame.this.jTable1.getModel();
 
-        final Stock emptyStock = Utils.getEmptyStock(stockInfo);
+        final Stock emptyStock = org.yccheok.jstock.engine.Utils.getEmptyStock(stockInfo);
         
         // First add the empty stock, so that the user will not have wrong perspective that
         // our system is slow.

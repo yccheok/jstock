@@ -192,7 +192,7 @@ public class GoogleStockServer implements StockServer {
 
             for (Code code : codes) {
                 if (currCodes.contains(code) == false) {
-                    emptyStocks.add(org.yccheok.jstock.gui.Utils.getEmptyStock(code, Symbol.newInstance(code.toString())));
+                    emptyStocks.add(org.yccheok.jstock.engine.Utils.getEmptyStock(code, Symbol.newInstance(code.toString())));
                 }
             }
 

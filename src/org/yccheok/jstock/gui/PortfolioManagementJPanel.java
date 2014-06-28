@@ -476,7 +476,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
                         Stock stock = null;
                         if (_code.length() > 0 && _symbol.length() > 0) {
-                            stock = Utils.getEmptyStock(Code.newInstance(_code), Symbol.newInstance(_symbol));
+                            stock = org.yccheok.jstock.engine.Utils.getEmptyStock(Code.newInstance(_code), Symbol.newInstance(_symbol));
                         }
                         else {
                             log.error("Unexpected empty stock. Ignore");
@@ -614,7 +614,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
                         Stock stock = null;
                         if (_code.length() > 0 && _symbol.length() > 0) {
-                            stock = Utils.getEmptyStock(Code.newInstance(_code), Symbol.newInstance(_symbol));
+                            stock = org.yccheok.jstock.engine.Utils.getEmptyStock(Code.newInstance(_code), Symbol.newInstance(_symbol));
                         }
                         else {
                             log.error("Unexpected empty stock. Ignore");
@@ -1513,7 +1513,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     PortfolioManagementJPanel.this.showNewBuyTransactionJDialog(stocks.get(0), PortfolioManagementJPanel.this.getStockPrice(stocks.get(0)), true);
                 }
                 else {
-                    PortfolioManagementJPanel.this.showNewBuyTransactionJDialog(Utils.getEmptyStock(Code.newInstance(""), Symbol.newInstance("")), 0.0, true);
+                    PortfolioManagementJPanel.this.showNewBuyTransactionJDialog(org.yccheok.jstock.engine.Utils.getEmptyStock(Code.newInstance(""), Symbol.newInstance("")), 0.0, true);
                 }
             }
         });

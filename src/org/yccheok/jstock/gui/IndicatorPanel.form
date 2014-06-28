@@ -363,7 +363,7 @@
                 </Container>
                 <Container class="javax.swing.JPanel" name="objectInspectorJPanel">
                   <AuxValues>
-                    <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new ObjectInspectorJPanel(new MutableStock(Utils.getEmptyStock(Code.newInstance(&quot;&quot;), Symbol.newInstance(&quot;&quot;))));"/>
+                    <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new ObjectInspectorJPanel(new MutableStock(org.yccheok.jstock.engine.Utils.getEmptyStock(Code.newInstance(&quot;&quot;), Symbol.newInstance(&quot;&quot;))));"/>
                   </AuxValues>
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">

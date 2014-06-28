@@ -872,54 +872,6 @@ public class Utils {
         return dir.delete();
     }
 
-    /**
-     * Returns empty stock based on given stock info.
-     *
-     * @param stockInfo the stock info
-     * @return empty stock based on given stock info
-     */
-    public static Stock getEmptyStock(StockInfo stockInfo) {
-        return getEmptyStock(stockInfo.code, stockInfo.symbol);
-    }
-
-    /**
-     * Returns empty stock based on given code and symbol.
-     *
-     * @param code the code
-     * @param symbol the symbol
-     * @return empty stock based on given code and symbol
-     */
-    public static Stock getEmptyStock(Code code, Symbol symbol) {
-        return new Stock(   code,
-                            symbol,
-                            "",
-                            Stock.Board.Unknown,
-                            Stock.Industry.Unknown,
-                            0.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                            0,
-                            0.0,
-                            0.0,
-                            0,
-                            0.0,
-                            0,
-                            0.0,
-                            0,
-                            0.0,
-                            0,
-                            0.0,
-                            0,
-                            0.0,
-                            0,
-                            0.0,
-                            0,
-                            System.currentTimeMillis()                              
-                            );                
-    } 
-
     public static void deleteAllOldFiles(File dir, int days) {
         if (dir.isDirectory()) {
             String[] children = dir.list();

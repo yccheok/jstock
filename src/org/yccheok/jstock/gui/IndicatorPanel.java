@@ -185,7 +185,7 @@ public class IndicatorPanel extends JPanel {
         jButton4 = new javax.swing.JButton();
         jButton6 = new javax.swing.JButton();
         jPanel7 = new javax.swing.JPanel();
-        objectInspectorJPanel = new ObjectInspectorJPanel(new MutableStock(Utils.getEmptyStock(Code.newInstance(""), Symbol.newInstance(""))));
+        objectInspectorJPanel = new ObjectInspectorJPanel(new MutableStock(org.yccheok.jstock.engine.Utils.getEmptyStock(Code.newInstance(""), Symbol.newInstance(""))));
 
         jPanel10.setLayout(new java.awt.BorderLayout());
 

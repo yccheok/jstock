@@ -955,7 +955,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
             final DateField dateField = (DateField)jPanel3;
             final Date date = (Date)dateField.getValue();
             // Stock and date information is not important at this moment.
-            Contract.ContractBuilder builder = new Contract.ContractBuilder(Utils.getEmptyStock(Code.newInstance(name), Symbol.newInstance(name)), new SimpleDate(date));
+            Contract.ContractBuilder builder = new Contract.ContractBuilder(org.yccheok.jstock.engine.Utils.getEmptyStock(Code.newInstance(name), Symbol.newInstance(name)), new SimpleDate(date));
             Contract contract = builder.type(Contract.Type.Sell).quantity(unit).price(price).build();
 
             final double brokerFee = brokingFirm.brokerCalculate(contract);

@@ -112,7 +112,7 @@ public class MarketJPanel extends javax.swing.JPanel {
                 public void mouseClicked(java.awt.event.MouseEvent evt) {
                     final Code code = index.code;
                     final MainFrame m = MainFrame.getInstance();
-                    final Stock stock = Utils.getEmptyStock(code, Symbol.newInstance(code.toString()));
+                    final Stock stock = org.yccheok.jstock.engine.Utils.getEmptyStock(code, Symbol.newInstance(code.toString()));
                     m.displayHistoryChart(stock);
                 }
             });
