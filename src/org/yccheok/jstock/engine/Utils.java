@@ -712,13 +712,9 @@ public class Utils {
         List<StockServerFactory> stockServerFactories = Factories.INSTANCE.getStockServerFactories(country);
         Set<PriceSource> set = EnumSet.noneOf(PriceSource.class);
         for (StockServerFactory stockServerFactory : stockServerFactories) {
-            final String name = stockServerFactory.getClass().getName().toLowerCase();
-            for (PriceSource priceSource : PriceSource.values()) {
-                final String tmp = priceSource.name().toLowerCase();
-                if (name.contains(tmp)) {
-                    set.add(priceSource);
-                    break;
-                }
+            PriceSource priceSource = classToPriceSourceMap.get(stockServerFactory.getClass());
+            if (priceSource != null) {
+                set.add(priceSource);
             }
         }
         return set;
@@ -728,6 +724,7 @@ public class Utils {
     private static final Map<String, Country> indices = new HashMap<String, Country>();
     private static final Map<String, String> toGoogleIndex = new HashMap<String, String>();
     private static final Map<Country, PriceSource> defaultPriceSources = new HashMap<Country, PriceSource>();
+    private static final Map<Class<? extends StockServerFactory>, PriceSource> classToPriceSourceMap = new HashMap<Class<? extends StockServerFactory>, PriceSource>();
     
     static {
         countries.put("AX", Country.Australia);
@@ -826,6 +823,10 @@ public class Utils {
         defaultPriceSources.put(Country.Taiwan, PriceSource.Google);
         defaultPriceSources.put(Country.UnitedKingdom, PriceSource.Google);
         defaultPriceSources.put(Country.UnitedState, PriceSource.Google);
+        
+        classToPriceSourceMap.put(GoogleStockServerFactory.class, PriceSource.Google);
+        classToPriceSourceMap.put(YahooStockServerFactory.class, PriceSource.Yahoo);
+        classToPriceSourceMap.put(BrazilYahooStockServerFactory.class, PriceSource.Yahoo);
     }
     
     private static final Gson gson = new Gson();

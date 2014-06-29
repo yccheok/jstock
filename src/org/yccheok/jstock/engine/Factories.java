@@ -23,8 +23,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -75,7 +77,11 @@ public enum Factories {
     }
     
     public void updatePriceSource(Country country, final PriceSource priceSource) {
-        final String name = priceSource.name().toLowerCase();
+        final Set<Class<? extends StockServerFactory>> classes = priceSourceMap.get(priceSource);
+        
+        if (classes == null) {
+            return;
+        }
         
         final List<StockServerFactory> stockServerFactories = map.get(country);
         
@@ -91,10 +97,8 @@ public enum Factories {
 
             @Override
             public int compare(StockServerFactory o1, StockServerFactory o2) {
-                final String name1 = o1.getClass().getName().toLowerCase();
-                final String name2 = o2.getClass().getName().toLowerCase();
-                final boolean result1 = name1.contains(name);
-                final boolean result2 = name2.contains(name);
+                final boolean result1 = classes.contains(o1.getClass());
+                final boolean result2 = classes.contains(o2.getClass());
                 if (result1 && !result2) {
                     return -1;
                 }
@@ -116,12 +120,17 @@ public enum Factories {
         }
     }
     
+    private static final Map<PriceSource, Set<Class<? extends StockServerFactory>>> priceSourceMap = new EnumMap<PriceSource, Set<Class<? extends StockServerFactory>>>(PriceSource.class);
+    
     private static final Map<Country, List<StockServerFactory>> map = new EnumMap<Country, List<StockServerFactory>>(Country.class);
     
     // Taiwan over-the-counter.
     private static final List<StockServerFactory> taiwanOTCList = new CopyOnWriteArrayList<StockServerFactory>();
     
     static {
+        final Set<Class<? extends StockServerFactory>> googleSet = new HashSet<Class<? extends StockServerFactory>>();
+        final Set<Class<? extends StockServerFactory>> yahooSet = new HashSet<Class<? extends StockServerFactory>>();
+        
         final List<StockServerFactory> australiaList = new CopyOnWriteArrayList<StockServerFactory>();
         final List<StockServerFactory> austriaList = new CopyOnWriteArrayList<StockServerFactory>();
         final List<StockServerFactory> belgiumList = new CopyOnWriteArrayList<StockServerFactory>();
@@ -150,6 +159,10 @@ public enum Factories {
         final List<StockServerFactory> unitedKingdomList = new CopyOnWriteArrayList<StockServerFactory>();
         final List<StockServerFactory> unitedStateList = new CopyOnWriteArrayList<StockServerFactory>();
 
+        googleSet.add(GoogleStockServerFactory.class);
+        yahooSet.add(YahooStockServerFactory.class);
+        yahooSet.add(BrazilYahooStockServerFactory.class);
+        
         australiaList.add(YahooStockServerFactory.newInstance());
         austriaList.add(YahooStockServerFactory.newInstance());
         austriaList.add(GoogleStockServerFactory.newInstance());
@@ -187,6 +200,9 @@ public enum Factories {
         unitedStateList.add(YahooStockServerFactory.newInstance());
         
         taiwanOTCList.add(YahooStockServerFactory.newInstance());
+        
+        priceSourceMap.put(PriceSource.Google, googleSet);
+        priceSourceMap.put(PriceSource.Yahoo, yahooSet);
         
         map.put(Country.Australia, australiaList);
         map.put(Country.Austria, austriaList);
