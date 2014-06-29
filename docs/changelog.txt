@@ -1,6 +1,9 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.7p - xxxx-xx-xx
+  Bugfix:  Update price source after open from cloud.
+  
 JStock 1.0.7o - 2014-06-29
   Feature: US, UK, Singapore, Taiwan, China, India countries are now using 
            Google Finance as realtime price source.

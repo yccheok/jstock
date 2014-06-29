@@ -146,6 +146,13 @@ public class Utils {
     private Utils() {
     }
 
+    public static void updateFactoriesPriceSource() {
+        for (Country country : Country.values()) {
+            final PriceSource priceSource = MainFrame.getInstance().getJStockOptions().getPriceSource(country);
+            Factories.INSTANCE.updatePriceSource(country, priceSource);
+        }  
+    }
+    
     /**
      * Returns true if there are specified language files designed for this
      * locale. As in Java, when there are no specified language files for a 

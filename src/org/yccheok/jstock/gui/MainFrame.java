@@ -2415,6 +2415,14 @@ public class MainFrame extends javax.swing.JFrame {
      * requirement.
      */
     public void reloadAfterDownloadFromCloud() {
+        
+        ////////////////////////////////////////////////////////////////////////
+        // JStockOptions is already restored at this point.
+        // Please refer to LoadFromCloudJDialog.
+        ////////////////////////////////////////////////////////////////////////
+        
+        Utils.updateFactoriesPriceSource();
+        
         /* These codes are very similar to clean up code during changing country.
          */
         MainFrame.this.statusBar.setCountryIcon(jStockOptions.getCountry().getIcon(), jStockOptions.getCountry().toString());
@@ -3617,10 +3625,7 @@ public class MainFrame extends javax.swing.JFrame {
             System.getProperties().remove("http.proxyPort");
         }
         
-        for (Country country : Country.values()) {
-            final PriceSource priceSource = this.jStockOptions.getPriceSource(country);
-            Factories.INSTANCE.updatePriceSource(country, priceSource);
-        }        
+        Utils.updateFactoriesPriceSource();        
     }   
 
     public void updatePriceSource(Country country, PriceSource priceSource) {
