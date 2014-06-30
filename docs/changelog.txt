@@ -3,6 +3,7 @@ Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
 JStock 1.0.7p - xxxx-xx-xx
   Bugfix:  Update price source after open from cloud.
+  Bugfix:  Better quality stock scanner.
   
 JStock 1.0.7o - 2014-06-29
   Feature: US, UK, Singapore, Taiwan, China, India countries are now using 

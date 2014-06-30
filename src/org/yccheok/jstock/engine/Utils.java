@@ -729,7 +729,7 @@ public class Utils {
     static {
         countries.put("AX", Country.Australia);
         countries.put("VI", Country.Austria);
-        countries.put("BR", Country.Brazil);
+        countries.put("SA", Country.Brazil);
         countries.put("TO", Country.Canada);
         
         countries.put("SS", Country.China);
