@@ -268,8 +268,9 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
                             final int size = codes.size();
                             fail += size;
                             
+                            List<Code> zeroPriceCodes = codes;
+                            Set<Code> nonZeroPriceCodes = null;
                             List<Stock> stocks = null;
-                            Set<Code> nonZeroCodes = null;
                             
                             for (StockServerFactory factory : Factories.INSTANCE.getStockServerFactories(codes.get(0)))
                             {
@@ -281,7 +282,7 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
 
                                 List<Stock> tmpStocks = null;
                                 try {
-                                    tmpStocks = stockServer.getStocks(codes);
+                                    tmpStocks = stockServer.getStocks(zeroPriceCodes);
                                 } catch (StockNotFoundException exp) {
                                     if (thisThread != thread) {
                                         break;    
@@ -294,7 +295,7 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
 
                                 if (thisThread != thread) {
                                     break;
-                                }                              
+                                }
 
                                 if (strategy == Strategy.Speed) {
                                     stocks = tmpStocks;
@@ -306,30 +307,24 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
                                         stocks = new ArrayList<Stock>();
                                     }
                                     
-                                    if (nonZeroCodes == null) {
-                                        nonZeroCodes = new HashSet<Code>();
+                                    if (nonZeroPriceCodes == null) {
+                                        nonZeroPriceCodes = new HashSet<Code>();
                                     }
                                     
-                                    for (Stock tmp : tmpStocks) {
-                                        if (nonZeroCodes.contains(tmp.code)) {
-                                            continue;
-                                        }
-                                        
-                                        if (tmp.getLastPrice() > 0.0) {
-                                            nonZeroCodes.add(tmp.code);
-                                            stocks.add(tmp);
-                                        }
+                                    zeroPriceCodes = getZeroPriceCodes(tmpStocks, stocks, nonZeroPriceCodes);
+                                    if (zeroPriceCodes.isEmpty()) {
+                                        break;
                                     }
                                 }
-                            }   // for
+                            }   /* for (StockServerFactory factory : Factories.INSTANCE.getStockServerFactories(codes.get(0))) */
 
                             // Notify all the interested parties.
-                            if (stocks != null) {
+                            if (thisThread == thread && stocks != null) {
                                 
                                 if (stocks.size() < codes.size()) {
-                                    if (nonZeroCodes != null) {
+                                    if (nonZeroPriceCodes != null) {
                                         for (Code code : codes) {
-                                            if (false == nonZeroCodes.contains(code)) {
+                                            if (false == nonZeroPriceCodes.contains(code)) {
                                                 stocks.add(org.yccheok.jstock.engine.Utils.getEmptyStock(code, Symbol.newInstance(code.toString())));
                                             }
                                         }
@@ -425,7 +420,38 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
         private final int index;
         private volatile Thread thread;
     }
+    
+    private List<Code> getZeroPriceCodes(List<Stock> stocks, List<Stock> nonZeroPriceStocks, Set<Code> nonZeroPriceCodes) {
+        assert(stocks != null);
+        assert(nonZeroPriceStocks != null);
+        assert(nonZeroPriceCodes != null);
         
+        List<Code> zeroPriceCodes = null;
+        
+        for (Stock stock : stocks) {
+            if (nonZeroPriceCodes.contains(stock.code)) {
+                continue;
+            }
+                
+            if (stock.getLastPrice() == 0.0 && stock.getOpenPrice() == 0.0) {
+                if (zeroPriceCodes == null) {
+                    zeroPriceCodes = new ArrayList<Code>();
+                }
+                
+                zeroPriceCodes.add(stock.code);
+            } else {
+                nonZeroPriceCodes.add(stock.code);
+                nonZeroPriceStocks.add(stock);
+            }
+        }
+        
+        if (zeroPriceCodes == null) {
+            return java.util.Collections.emptyList();
+        }
+        
+        return zeroPriceCodes;
+    }
+    
     public int getTotalScanned() {
         int totalScanned = 0;
         for (StockMonitor stockMonitor : stockMonitors) {
