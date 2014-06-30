@@ -263,8 +263,8 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
                             fail += size;
                             
                             List<Code> zeroPriceCodes = codes;
-                            Set<Code> nonZeroPriceCodes = null;
-                            List<Stock> stocks = null;
+                            final Set<Code> nonZeroPriceCodes = new HashSet<Code>();
+                            final List<Stock> stocks = new ArrayList<Stock>();
                             
                             for (StockServerFactory factory : Factories.INSTANCE.getStockServerFactories(codes.get(0)))
                             {
@@ -290,14 +290,6 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
                                 if (thisThread != thread) {
                                     break;
                                 }
-                                    
-                                if (stocks == null) {
-                                    stocks = new ArrayList<Stock>();
-                                }
-
-                                if (nonZeroPriceCodes == null) {
-                                    nonZeroPriceCodes = new HashSet<Code>();
-                                }
 
                                 zeroPriceCodes = getZeroPriceCodes(tmpStocks, stocks, nonZeroPriceCodes);
                                 if (zeroPriceCodes.isEmpty()) {
@@ -306,14 +298,11 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
                             }   /* for (StockServerFactory factory : Factories.INSTANCE.getStockServerFactories(codes.get(0))) */
 
                             // Notify all the interested parties.
-                            if (thisThread == thread && stocks != null) {
-                                
+                            if (thisThread == thread) {
                                 if (stocks.size() < codes.size()) {
-                                    if (nonZeroPriceCodes != null) {
-                                        for (Code code : codes) {
-                                            if (false == nonZeroPriceCodes.contains(code)) {
-                                                stocks.add(org.yccheok.jstock.engine.Utils.getEmptyStock(code, Symbol.newInstance(code.toString())));
-                                            }
+                                    for (Code code : codes) {
+                                        if (false == nonZeroPriceCodes.contains(code)) {
+                                            stocks.add(org.yccheok.jstock.engine.Utils.getEmptyStock(code, Symbol.newInstance(code.toString())));
                                         }
                                     }
                                 }
