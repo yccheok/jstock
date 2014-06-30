@@ -39,7 +39,6 @@ import org.yccheok.jstock.alert.SMSLimiter;
 import org.yccheok.jstock.analysis.*;
 import org.yccheok.jstock.analysis.Indicator;
 import org.yccheok.jstock.engine.*;
-import org.yccheok.jstock.engine.RealTimeStockMonitor.Strategy;
 import org.yccheok.jstock.internationalization.GUIBundle;
 
 /**
@@ -820,7 +819,6 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         this.realTimeStockMonitor = new RealTimeStockMonitor(
                 Constants.REAL_TIME_STOCK_MONITOR_MAX_THREAD, 
                 Constants.REAL_TIME_STOCK_MONITOR_MAX_STOCK_SIZE_PER_SCAN, 
-                Strategy.Speed,
                 MainFrame.getInstance().getJStockOptions().getScanningSpeed());
         
         this.realTimeStockMonitor.attach(this.realTimeStockMonitorObserver);

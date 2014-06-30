@@ -31,20 +31,14 @@ import org.apache.commons.logging.LogFactory;
  * @author yccheok
  */
 public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.util.List<Stock>> {
-    
-    public enum Strategy {
-        Speed,
-        Quality
-    }
-    
+ 
     /** Creates a new instance of RealTimeStockMonitor */
-    public RealTimeStockMonitor(int maxThread, int maxBucketSize, Strategy strategy, long delay) {
-        if (maxThread <= 0 || maxBucketSize <= 0 || strategy == null || delay <= 0) {
-            throw new IllegalArgumentException("maxThread : " + maxThread + ", maxBucketSize : " + maxBucketSize + ", strategy = " + strategy + ", delay : " + delay);
+    public RealTimeStockMonitor(int maxThread, int maxBucketSize, long delay) {
+        if (maxThread <= 0 || maxBucketSize <= 0 || delay <= 0) {
+            throw new IllegalArgumentException("maxThread : " + maxThread + ", maxBucketSize : " + maxBucketSize + ", delay : " + delay);
         }
         
         this.maxThread = maxThread;
-        this.strategy = strategy;
         this.delay = delay;
         
         this.codeBucketLists = new CodeBucketLists(maxBucketSize);
@@ -296,25 +290,18 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
                                 if (thisThread != thread) {
                                     break;
                                 }
+                                    
+                                if (stocks == null) {
+                                    stocks = new ArrayList<Stock>();
+                                }
 
-                                if (strategy == Strategy.Speed) {
-                                    stocks = tmpStocks;
+                                if (nonZeroPriceCodes == null) {
+                                    nonZeroPriceCodes = new HashSet<Code>();
+                                }
+
+                                zeroPriceCodes = getZeroPriceCodes(tmpStocks, stocks, nonZeroPriceCodes);
+                                if (zeroPriceCodes.isEmpty()) {
                                     break;
-                                } else {
-                                    assert(strategy == Strategy.Quality);
-                                    
-                                    if (stocks == null) {
-                                        stocks = new ArrayList<Stock>();
-                                    }
-                                    
-                                    if (nonZeroPriceCodes == null) {
-                                        nonZeroPriceCodes = new HashSet<Code>();
-                                    }
-                                    
-                                    zeroPriceCodes = getZeroPriceCodes(tmpStocks, stocks, nonZeroPriceCodes);
-                                    if (zeroPriceCodes.isEmpty()) {
-                                        break;
-                                    }
                                 }
                             }   /* for (StockServerFactory factory : Factories.INSTANCE.getStockServerFactories(codes.get(0))) */
 
@@ -459,8 +446,6 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
         }
         return totalScanned;
     }
-    
-    private final Strategy strategy;
     
     // Delay in ms
     private volatile long delay;
