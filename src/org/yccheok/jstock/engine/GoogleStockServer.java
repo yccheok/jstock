@@ -324,7 +324,7 @@ public class GoogleStockServer implements StockServer {
         } catch (NumberFormatException ex) { log.error(null, ex); }
         // Change Percentage
         try { cp = Double.parseDouble(jsonObject.get("cp").replaceAll("[^0-9\\.\\-]", "")); } catch (NumberFormatException ex) { log.error(null, ex); }
-        // No last volumne information for Google Finance.
+        // No last volume information for Google Finance.
         // No buy price information for Google Finance.
         // No buy volume information for Google Finance.
         // No sell price information for Google Finance.
