@@ -199,11 +199,17 @@ public class GoogleStockServer implements StockServer {
                 originalCodes.put(googleFormat6, _code);
                 
                 builder.append(java.net.URLEncoder.encode(googleFormat0, "UTF-8"));
+                builder.append(",");
                 builder.append(java.net.URLEncoder.encode(googleFormat1, "UTF-8"));
+                builder.append(",");
                 builder.append(java.net.URLEncoder.encode(googleFormat2, "UTF-8"));
+                builder.append(",");
                 builder.append(java.net.URLEncoder.encode(googleFormat3, "UTF-8"));
+                builder.append(",");
                 builder.append(java.net.URLEncoder.encode(googleFormat4, "UTF-8"));
+                builder.append(",");
                 builder.append(java.net.URLEncoder.encode(googleFormat5, "UTF-8"));
+                builder.append(",");
                 builder.append(java.net.URLEncoder.encode(googleFormat6, "UTF-8"));
             }
             
@@ -250,6 +256,7 @@ public class GoogleStockServer implements StockServer {
         }        
     }
     
+    // https://www.google.com/intl/en/googlefinance/disclaimer/
     private boolean isUnitedStatesStockExchange(String e) {
         return e.equals("NASDAQ") || e.equals("NYSE") ||
                e.equals("NYSEARCA") || e.equals("NYSEMKT") || e.equals("OPRA") ||
@@ -276,7 +283,7 @@ public class GoogleStockServer implements StockServer {
             return null;
         }
 
-        if (Utils.toCountry(code) == Country.UnitedState) {
+        if (Utils.isUSStock(code)) {
             if (false == isUnitedStatesStockExchange(exchange)) {
                 return Pair.create(Utils.getEmptyStock(code, Symbol.newInstance(code.toString())), false);
             }

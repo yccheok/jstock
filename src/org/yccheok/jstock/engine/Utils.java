@@ -97,7 +97,7 @@ public class Utils {
     } 
     
     public static Country toCountry(Code code) {
-        assert(countries.keySet().size() == 41);
+        assert(countries.keySet().size() == 42);
         
         String string = code.toString();
         int index = string.lastIndexOf(".");
@@ -469,6 +469,10 @@ public class Utils {
         return code.toString().startsWith("^");
     }
     
+    public static boolean isUSStock(Code code) {
+        return Utils.toCountry(code) == Country.UnitedState && !Utils.isYahooCurrency(code) && !Utils.isYahooIndexSubset(code);
+    }
+    
     public static boolean isYahooCurrency(Code code) {
         return code.toString().toUpperCase().endsWith("=X");
     }
@@ -731,6 +735,7 @@ public class Utils {
         countries.put("VI", Country.Austria);
         countries.put("SA", Country.Brazil);
         countries.put("TO", Country.Canada);
+        countries.put("V", Country.Canada); // TSXV
         
         countries.put("SS", Country.China);
         countries.put("SZ", Country.China);
