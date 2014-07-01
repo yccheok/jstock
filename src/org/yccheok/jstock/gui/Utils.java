@@ -368,9 +368,7 @@ public class Utils {
         return extractZipFile(zipFilePath, Utils.getUserDataDirectory(), overwrite);
     }
     
-    public static boolean extractZipFile(File zipFilePath, String destDirectory, boolean overwrite) {
-        assert(destDirectory.endsWith(File.separator));
-        
+    public static boolean extractZipFile(File zipFilePath, String destDirectory, boolean overwrite) {        
         InputStream inputStream = null;
         ZipInputStream zipInputStream = null;
         boolean status = true;
@@ -392,7 +390,12 @@ public class Utils {
                         break;
                     }
 
-                    final String destination =  destDirectory + zipEntry.getName();
+                    final String destination;
+                    if (destDirectory.endsWith(File.separator)) {
+                        destination =  destDirectory + zipEntry.getName();
+                    } else {
+                        destination =  destDirectory + File.separator + zipEntry.getName();
+                    }
 
                     if (overwrite == false) {
                         if (Utils.isFileOrDirectoryExist(destination)) {

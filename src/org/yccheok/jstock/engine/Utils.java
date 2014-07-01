@@ -234,10 +234,10 @@ public class Utils {
      * @param country The country of the stock market
      * @return Location of the stocks CSV file.
      */
-    public static String getStocksCSVFileLocation(Country country) {
+    public static String getStocksCSVZipFileLocation(Country country) {
         // Must use lower case, as Google App Engine only support URL in lower
         // case.
-        return org.yccheok.jstock.network.Utils.getJStockStaticServer() + "stocks_information/" + country.toString().toLowerCase() + "/" + "stocks.csv";
+        return org.yccheok.jstock.network.Utils.getJStockStaticServer() + "stocks_information/" + country.toString().toLowerCase() + "/" + "stocks.zip";
     }
 
     /**
