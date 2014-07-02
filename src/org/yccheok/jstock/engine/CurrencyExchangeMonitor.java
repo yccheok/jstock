@@ -171,28 +171,6 @@ public class CurrencyExchangeMonitor extends Subject<CurrencyExchangeMonitor, Do
                             }
                         }
 
-                        if (successUpdatedCountryToCurrencyCode == false) {
-                            // Keep trying to fill in countryToCurrencyCode with latest
-                            // country -> currency information, until it successes at
-                            // least once.
-                            final String server = org.yccheok.jstock.network.Utils.getURL(Type.CURRENCY_CODE_TXT);
-                            Map<String, String> map = org.yccheok.jstock.gui.Utils.getUUIDValue(server);
-                            for (Entry<String, String> entry : map.entrySet()) {
-                                if (entry.getValue() != null) {
-                                    try {
-                                        countryToCurrencyCode.put(Country.valueOf(entry.getKey()), entry.getValue());
-                                    } catch (java.lang.IllegalArgumentException ex) {
-                                        // I am not sure whether I should set
-                                        // successUpdatedCountryToCurrencyCode to false.
-                                        log.error(null, ex);
-                                    }
-                                    // OK. We need not to contact CURRENCY_CODE_TXT's
-                                    // server anymore.
-                                    successUpdatedCountryToCurrencyCode = true;
-                                }   // if
-                            }   // for
-                        }   // if (successUpdatedCountryToCurrencyCode == false)
-
                         // Let's do the job.
 
                         // Use fromCountry?
@@ -274,10 +252,6 @@ public class CurrencyExchangeMonitor extends Subject<CurrencyExchangeMonitor, Do
     // from CURRENCY_CODE_TXT's server, this map itself still able to provide
     // default information.
     private static final Map<Country, String> countryToCurrencyCode =  new EnumMap<Country, String>(Country.class);
-    // Whether we had updated countryToCurrencyCode at least once?
-    // Do I have to use volatile here? As this flag may write by a thread, but
-    // read by another thread later.
-    private static boolean successUpdatedCountryToCurrencyCode = false;
 
     static {
         countryToCurrencyCode.put(Country.Australia, "AUD");

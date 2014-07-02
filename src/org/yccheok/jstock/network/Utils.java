@@ -33,7 +33,6 @@ public class Utils {
         CHAT_SERVER_TXT,
         NTP_SERVER_TXT,
         VERSION_INFORMATION_TXT,
-        CURRENCY_CODE_TXT,
         MODULE_INDICATOR_DOWNLOAD_MANAGER_XML,
         ALERT_INDICATOR_DOWNLOAD_MANAGER_XML,
         HELP_STOCK_DATABASE_HTML,
@@ -82,7 +81,6 @@ public class Utils {
         map.put(Type.NTP_SERVER_TXT, JSTOCK_STATIC_SERVER + "servers_information/ntp_server.txt");
         map.put(Type.NEWS_INFORMATION_TXT, JSTOCK_STATIC_SERVER + "news_information/index.txt");
         map.put(Type.VERSION_INFORMATION_TXT, JSTOCK_STATIC_SERVER + "version_information/index.txt");
-        map.put(Type.CURRENCY_CODE_TXT, JSTOCK_STATIC_SERVER + "currency_information/currency_code.txt");
         map.put(Type.MODULE_INDICATOR_DOWNLOAD_MANAGER_XML, JSTOCK_STATIC_SERVER + "module_indicators/indicator_download_manager.xml");
         map.put(Type.ALERT_INDICATOR_DOWNLOAD_MANAGER_XML, JSTOCK_STATIC_SERVER + "alert_indicators/indicator_download_manager.xml");
         map.put(Type.HELP_STOCK_DATABASE_HTML, "http://www.jstock.org/help_real_time_info.html?utm_source=jstock&utm_medium=database_dialog#new-database");
@@ -102,7 +100,6 @@ public class Utils {
         zh_map.put(Type.NTP_SERVER_TXT, JSTOCK_STATIC_SERVER + "servers_information/ntp_server.txt");
         zh_map.put(Type.NEWS_INFORMATION_TXT, JSTOCK_STATIC_SERVER + "news_information/zh/index.txt");
         zh_map.put(Type.VERSION_INFORMATION_TXT, JSTOCK_STATIC_SERVER + "version_information/zh/index.txt");
-        zh_map.put(Type.CURRENCY_CODE_TXT, JSTOCK_STATIC_SERVER + "currency_information/currency_code.txt");
         zh_map.put(Type.MODULE_INDICATOR_DOWNLOAD_MANAGER_XML, JSTOCK_STATIC_SERVER + "module_indicators/zh/indicator_download_manager.xml");
         zh_map.put(Type.ALERT_INDICATOR_DOWNLOAD_MANAGER_XML, JSTOCK_STATIC_SERVER + "alert_indicators/zh/indicator_download_manager.xml");
         zh_map.put(Type.HELP_STOCK_DATABASE_HTML, "http://jstock.org/zh/help_stock_database.html?utm_source=jstock&utm_medium=database_dialog");
