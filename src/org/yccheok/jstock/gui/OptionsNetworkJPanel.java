@@ -538,6 +538,7 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
     static {
         priceSourceEntries.put(PriceSource.Yahoo.name(), GUIBundle.getString("OptionsNetworkJPanel_YahooFinance"));
         priceSourceEntries.put(PriceSource.Google.name(), GUIBundle.getString("OptionsNetworkJPanel_GoogleFinance"));
+        priceSourceEntries.put(PriceSource.KLSEInfo.name(), GUIBundle.getString("OptionsNetworkJPanel_KLSEInfo"));
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables

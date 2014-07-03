@@ -816,7 +816,7 @@ public class Utils {
         defaultPriceSources.put(Country.Israel, PriceSource.Yahoo);
         defaultPriceSources.put(Country.Italy, PriceSource.Yahoo);
         defaultPriceSources.put(Country.Korea, PriceSource.Yahoo);
-        defaultPriceSources.put(Country.Malaysia, PriceSource.Yahoo);
+        defaultPriceSources.put(Country.Malaysia, PriceSource.KLSEInfo);
         defaultPriceSources.put(Country.Netherlands, PriceSource.Yahoo);
         defaultPriceSources.put(Country.NewZealand, PriceSource.Yahoo);
         defaultPriceSources.put(Country.Norway, PriceSource.Yahoo);
@@ -832,6 +832,7 @@ public class Utils {
         classToPriceSourceMap.put(GoogleStockServerFactory.class, PriceSource.Google);
         classToPriceSourceMap.put(YahooStockServerFactory.class, PriceSource.Yahoo);
         classToPriceSourceMap.put(BrazilYahooStockServerFactory.class, PriceSource.Yahoo);
+        classToPriceSourceMap.put(KLSEInfoStockServerFactory.class, PriceSource.KLSEInfo);
     }
     
     private static final Gson gson = new Gson();
