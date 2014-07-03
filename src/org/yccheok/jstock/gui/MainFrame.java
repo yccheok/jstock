@@ -3620,7 +3620,7 @@ public class MainFrame extends javax.swing.JFrame {
     /**
      * Initialize JStock options.
      */
-    private void initJStockOptions(JStockOptions jStockOptions) {
+    public void initJStockOptions(JStockOptions jStockOptions) {
         this.jStockOptions = jStockOptions;
 
         /* Hard core fix. */
