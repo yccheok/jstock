@@ -1,6 +1,9 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.7q - xxxx-xx-xx
+  Feature:  Added KLSE Info price source.
+
 JStock 1.0.7p - 2014-07-03
   Bugfix:  Update price source after open from cloud.
   Bugfix:  Better quality stock scanner.

@@ -707,6 +707,92 @@ public class Utils {
         return 0L;
     }
     
+    public static int getGoogleUnitedStatesStockExchangePriority(String e) {
+        Integer priority = googleUnitedStatesStockExchanges.get(e);
+        if (priority == null) {
+            return Integer.MAX_VALUE;
+        }
+        return priority;
+    }
+    
+    public static String toCompleteUnitedStatesGoogleFormat(Code code) {
+        if (false == Utils.isUSStock(code)) {
+            return null;
+        }
+        
+        final String googleFormat = UnitedStatesGoogleFormatCodeLookup.INSTANCE.get(code);
+        if (googleFormat != null) {
+            return googleFormat;
+        }
+        
+        String[] exchanges = {"NYSE:", "NASDAQ:", "NYSEARCA:", "NYSEMKT:", "OPRA:", "OTCBB:", "OTCMKTS:"};
+        final StringBuilder builder = new StringBuilder("https://www.google.com/finance/info?infotype=infoquoteall&q=");
+        
+        try {
+            
+            builder.append(java.net.URLEncoder.encode(exchanges[0] + code, "UTF-8"));
+            for (int i = 1, ei = exchanges.length; i < ei; i++) {
+                builder.append(",");
+                builder.append(java.net.URLEncoder.encode(exchanges[i] + code, "UTF-8"));
+            }
+        } catch (UnsupportedEncodingException ex) {
+            log.error(null, ex);
+            return null;
+        } 
+        
+        final String location = builder.toString();
+        final String _respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(location);
+        if (_respond == null) {
+            return null;
+        }
+
+        final String respond = Utils.GoogleRespondToJSON(_respond);
+        // Google returns "// [ { "id": ... } ]".
+        // We need to turn them into "[ { "id": ... } ]".
+        final List<Map> jsonArray = gson.fromJson(respond, List.class);
+
+        if (jsonArray == null) {
+            return null;
+        }
+        
+        List<Pair<String, String>> pairs = new ArrayList<Pair<String, String>>();
+        
+        for (Map<String, String> jsonObject : jsonArray) {
+            try {
+                String ticker = jsonObject.get("t").toUpperCase();
+                String exchange = jsonObject.get("e").toUpperCase();
+                pairs.add(Pair.create(ticker, exchange));
+            } catch (Exception ex) {
+                log.error(null, ex);
+            }
+        }
+        
+        if (pairs.isEmpty()) {
+            return null;
+        }
+        
+        Collections.sort(pairs, new Comparator<Pair<String, String>>() {
+
+            @Override
+            public int compare(Pair<String, String> o0, Pair<String, String> o1) {
+                String e0 = o0.second;
+                String e1 = o1.second;                
+                return Integer.compare(getGoogleUnitedStatesStockExchangePriority(e0), getGoogleUnitedStatesStockExchangePriority(e1));
+            }            
+        });
+        
+        Pair<String, String> pair = pairs.get(0);
+        final String result = pair.second + ":" + pair.first;
+        UnitedStatesGoogleFormatCodeLookup.INSTANCE.put(code, result);
+        
+        return result; 
+    }
+    
+    // https://www.google.com/intl/en/googlefinance/disclaimer/
+    public static boolean isGoogleUnitedStatesStockExchange(String e) {
+        return googleUnitedStatesStockExchanges.containsKey(e);
+    }
+    
     public static PriceSource getDefaultPriceSource(Country country) {
         assert(defaultPriceSources.containsKey(country));
         return defaultPriceSources.get(country);
@@ -729,6 +815,7 @@ public class Utils {
     private static final Map<String, String> toGoogleIndex = new HashMap<String, String>();
     private static final Map<Country, PriceSource> defaultPriceSources = new HashMap<Country, PriceSource>();
     private static final Map<Class<? extends StockServerFactory>, PriceSource> classToPriceSourceMap = new HashMap<Class<? extends StockServerFactory>, PriceSource>();
+    private static final Map<String, Integer> googleUnitedStatesStockExchanges = new HashMap<String, Integer>();
     
     static {
         countries.put("AX", Country.Australia);
@@ -833,6 +920,14 @@ public class Utils {
         classToPriceSourceMap.put(YahooStockServerFactory.class, PriceSource.Yahoo);
         classToPriceSourceMap.put(BrazilYahooStockServerFactory.class, PriceSource.Yahoo);
         classToPriceSourceMap.put(KLSEInfoStockServerFactory.class, PriceSource.KLSEInfo);
+        
+        googleUnitedStatesStockExchanges.put("NYSE", 0);
+        googleUnitedStatesStockExchanges.put("NASDAQ", 1);
+        googleUnitedStatesStockExchanges.put("NYSEARCA", 2);
+        googleUnitedStatesStockExchanges.put("NYSEMKT", 3);
+        googleUnitedStatesStockExchanges.put("OPRA", 4);
+        googleUnitedStatesStockExchanges.put("OTCBB", 5);
+        googleUnitedStatesStockExchanges.put("OTCMKTS", 6);
     }
     
     private static final Gson gson = new Gson();
