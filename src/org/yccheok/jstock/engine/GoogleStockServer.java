@@ -22,6 +22,8 @@ package org.yccheok.jstock.engine;
 import com.google.gson.Gson;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -86,7 +88,10 @@ public class GoogleStockServer implements StockServer {
                     builder.append(",");
                 }
                 Code _code = codes.get(i);
-                String googleFormat = Utils.toGoogleFormat(_code).toString();
+                String googleFormat = UnitedStatesGoogleFormatCodeLookup.INSTANCE.get(_code);
+                if (googleFormat == null) {
+                    googleFormat = Utils.toGoogleFormat(_code).toString();
+                }
                 builder.append(java.net.URLEncoder.encode(googleFormat, "UTF-8"));
                 originalCodes.put(googleFormat, _code);
             }
@@ -183,8 +188,8 @@ public class GoogleStockServer implements StockServer {
                 }
                 Code _code = codes.get(i);
                 
-                String googleFormat0 = "NASDAQ:" + _code;
-                String googleFormat1 = "NYSE:" + _code;
+                String googleFormat0 = "NYSE:" + _code;
+                String googleFormat1 = "NASDAQ:" + _code;
                 String googleFormat2 = "NYSEARCA:" + _code;
                 String googleFormat3 = "NYSEMKT:" + _code;
                 String googleFormat4 = "OPRA:" + _code;
@@ -227,6 +232,17 @@ public class GoogleStockServer implements StockServer {
                 return java.util.Collections.emptyList();
             }
             
+            Collections.sort(jsonArray, new Comparator<Map>() {
+                @Override
+                public int compare(Map o0, Map o1) {
+                    Object s0 = o0.get("e");
+                    Object s1 = o1.get("e");
+                    String e0 = s0 instanceof String ? (String)s0 : null;
+                    String e1 = s1 instanceof String ? (String)s1 : null;
+                    return Integer.compare(Utils.getGoogleUnitedStatesStockExchangePriority(e0), Utils.getGoogleUnitedStatesStockExchangePriority(e1));
+                }            
+            });
+
             final List<Stock> stocks = new ArrayList<Stock>();
             Set<Code> currCodes = new HashSet<Code>();
             
@@ -255,13 +271,7 @@ public class GoogleStockServer implements StockServer {
             return java.util.Collections.emptyList();
         }        
     }
-    
-    // https://www.google.com/intl/en/googlefinance/disclaimer/
-    private boolean isUnitedStatesStockExchange(String e) {
-        return e.equals("NASDAQ") || e.equals("NYSE") ||
-               e.equals("NYSEARCA") || e.equals("NYSEMKT") || e.equals("OPRA") ||
-               e.equals("OTCBB") || e.equals("OTCMKTS");
-    }
+
     
     private Pair<Stock, Boolean> toStockEx(Map<String, String> jsonObject, Map<String, Code> originalCodes) {
         String name;
@@ -284,8 +294,14 @@ public class GoogleStockServer implements StockServer {
         }
 
         if (Utils.isUSStock(code)) {
-            if (false == isUnitedStatesStockExchange(exchange)) {
+            if (false == Utils.isGoogleUnitedStatesStockExchange(exchange)) {
                 return Pair.create(Utils.getEmptyStock(code, Symbol.newInstance(code.toString())), false);
+            } else {
+                // code and ticker might be different. For example, 
+                //
+                // code   = RDS-B (Yahoo! Format)
+                // ticker = RDS.B (Google Format)
+                UnitedStatesGoogleFormatCodeLookup.INSTANCE.put(code, exchange + ":" + ticker);
             }
         }
         
