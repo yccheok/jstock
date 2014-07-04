@@ -410,7 +410,7 @@ public class Utils {
      * @param code the code
      * @return code in Google's format
      */
-    public static Code toGoogleFormat(Code code) {
+    public static String toGoogleFormat(Code code) {
         if (isYahooIndexSubset(code)) {
             return toGoogleIndex(code);
         } else if (isYahooCurrency(code)) {
@@ -421,14 +421,18 @@ public class Utils {
 
         // WTF?! Handle case for RDS-B (Yahoo Finance) & RDS.B (Google Finance)
         if (toCountry(code) == Country.UnitedState) {
-            return Code.newInstance(string.replaceAll("-", "."));
+            String googleFormat = UnitedStatesGoogleFormatCodeLookup.INSTANCE.get(code);
+            if (googleFormat != null) {
+                return googleFormat;
+            }
+            return string.replaceAll("-", ".");
         }
         
         final int string_length = string.length();
         if (string.endsWith(".N") && string_length > ".N".length()) {
-            return Code.newInstance("NSE:" + string.substring(0, string_length - ".N".length()));
+            return "NSE:" + string.substring(0, string_length - ".N".length());
         } else if (string.endsWith(".B") && string_length > ".B".length()) {
-            return Code.newInstance("BOM:" + string.substring(0, string_length - ".B".length()));
+            return "BOM:" + string.substring(0, string_length - ".B".length());
         } else if (string.endsWith(".NS") && string_length > ".NS".length()) {
             // Resolving Yahoo server down for India NSE stock market. Note, we
             // do not support Bombay stock market at this moment, due to the
@@ -437,32 +441,25 @@ public class Utils {
             string = string.substring(0, string_length - ".NS".length());
             String googleFormat = toGoogleFormatThroughAutoComplete(string, "NSE");
             if (googleFormat != null) {
-                return Code.newInstance("NSE:" + googleFormat);
+                return "NSE:" + googleFormat;
             }
         } else if (string.endsWith(".SS") && string_length > ".SS".length()) {
-            string = "SHA:" + string.substring(0, string_length - ".SS".length());
-            return Code.newInstance(string);
+            return "SHA:" + string.substring(0, string_length - ".SS".length());
         } else if (string.endsWith(".SZ") && string_length > ".SZ".length()) {
-            string = "SHE:" + string.substring(0, string_length - ".SZ".length());
-            return Code.newInstance(string);
+            return "SHE:" + string.substring(0, string_length - ".SZ".length());
         } else if (string.endsWith(".SA") && string_length > ".SA".length()) {
-            string = "BVMF:" + string.substring(0, string_length - ".SA".length());
-            return Code.newInstance(string);
+            return "BVMF:" + string.substring(0, string_length - ".SA".length());
         } else if (string.endsWith(".VI") && string_length > ".VI".length()) {
-            string = "VIE:" + string.substring(0, string_length - ".VI".length());
-            return Code.newInstance(string);
+            return "VIE:" + string.substring(0, string_length - ".VI".length());
         } else if (string.endsWith(".L") && string_length > ".L".length()) {
-            string = "LON:" + string.substring(0, string_length - ".L".length());
-            return Code.newInstance(string);
+            return "LON:" + string.substring(0, string_length - ".L".length());
         } else if (string.endsWith(".SI") && string_length > ".SI".length()) {
-            string = "SGX:" + string.substring(0, string_length - ".SI".length());
-            return Code.newInstance(string);
+            return "SGX:" + string.substring(0, string_length - ".SI".length());
         } else if (string.endsWith(".TW") && string_length > ".TW".length()) {
-            string = "TPE:" + string.substring(0, string_length - ".TW".length());
-            return Code.newInstance(string);
+            return "TPE:" + string.substring(0, string_length - ".TW".length());
         }
         
-        return code;
+        return string;
     }
     
     private static boolean isYahooIndexSubset(Code code) {
@@ -477,22 +474,22 @@ public class Utils {
         return code.toString().toUpperCase().endsWith("=X");
     }
     
-    private static Code toGoogleIndex(Code code) {
+    private static String toGoogleIndex(Code code) {
         String string = code.toString().trim().toUpperCase();
         String googleIndex = toGoogleIndex.get(string);
         if (googleIndex != null) {
-            return Code.newInstance(googleIndex);
+            return googleIndex;
         }
-        return code;
+        return string;
     }
     
-    private static Code toGoogleCurrency(Code code) {
+    private static String toGoogleCurrency(Code code) {
         String string = code.toString().trim().toUpperCase();
         int index = string.indexOf("=X");
         if (index > 0) {
-            return Code.newInstance(string.substring(0, index));
+            return string.substring(0, index);
         }
-        return code;
+        return string;
     }
     
     // FIXME : Make it private.
@@ -720,8 +717,10 @@ public class Utils {
             return null;
         }
         
-        final String googleFormat = UnitedStatesGoogleFormatCodeLookup.INSTANCE.get(code);
-        if (googleFormat != null) {
+        // Use toGoogleFormat, as it will handle case for RDS-B (Yahoo Finance) 
+        // & RDS.B (Google Finance)
+        final String googleFormat = toGoogleFormat(code);
+        if (googleFormat.contains(":")) {
             return googleFormat;
         }
         
