@@ -39,7 +39,13 @@ public class GoogleStockHistoryServer implements StockHistoryServer {
     public GoogleStockHistoryServer(Code code, Duration duration) throws StockHistoryNotFoundException {
         this.code = code;
         this.duration = duration;
-        this.googleCode = Utils.toGoogleFormat(code);
+        
+        String _googleCode = Utils.toCompleteUnitedStatesGoogleFormat(code);
+        if (_googleCode == null) {
+            _googleCode = Utils.toGoogleFormat(code);
+        }
+        
+        this.googleCode = _googleCode;
         
         final StringBuilder stringBuilder = new StringBuilder("http://www.google.com/finance/getprices?f=d,c,v,o,h,l&i=86400&p=");
                 
@@ -55,7 +61,7 @@ public class GoogleStockHistoryServer implements StockHistoryServer {
         //stringBuilder.append(days).append("d&ts=");
         //stringBuilder.append(duration.getEndDate().getTime().getTime()).append("d");
         
-        String googleCodeStr = googleCode.toString();
+        String googleCodeStr = googleCode;
         // Turn "INDEXDJX:.DJI" into "INDEXDJX" and ".DJI".
         String[] result = googleCodeStr.split(":");
         
@@ -175,7 +181,7 @@ public class GoogleStockHistoryServer implements StockHistoryServer {
             
             if (initialized == false) {
                 try {
-                    Stock stock = stockServer.getStock(googleCode);
+                    Stock stock = stockServer.getStock(code);
                     symbol = stock.symbol;
                     name = stock.getName();
                     board = stock.getBoard();
@@ -321,7 +327,7 @@ public class GoogleStockHistoryServer implements StockHistoryServer {
     private final java.util.Map<Long, Stock> historyDatabase = new HashMap<Long, Stock>();
     private final java.util.List<Long> timestamps = new ArrayList<Long>();       
     private final Code code;
-    private final Code googleCode;
+    private final String googleCode;
     private final StockServer stockServer = new GoogleStockServer();
     private final Duration duration;
     
