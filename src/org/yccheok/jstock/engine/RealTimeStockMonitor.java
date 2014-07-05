@@ -298,7 +298,7 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
                             }   /* for (StockServerFactory factory : Factories.INSTANCE.getStockServerFactories(codes.get(0))) */
 
                             // Notify all the interested parties.
-                            if (thisThread == thread) {
+                            if (thisThread == thread && nonZeroPriceCodes.isEmpty() == false) {
                                 if (stocks.size() < codes.size()) {
                                     for (Code code : codes) {
                                         if (false == nonZeroPriceCodes.contains(code)) {
