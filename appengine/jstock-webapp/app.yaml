@@ -6,3 +6,5 @@ api_version: 1
 handlers:
 - url: /get-time\.py
   script: get-time.py
+- url: /gdc
+  script: gdc
