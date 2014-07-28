@@ -30,7 +30,6 @@ import org.yccheok.jstock.engine.Stock;
  */
 public class Activity {
     public enum Param {
-        Stock,
         StockInfo,
         Quantity        
     }
@@ -89,17 +88,6 @@ public class Activity {
 
     public double getAmount() {
         return this.amount;
-    }
-
-    @Override
-    public String toString() {
-        Stock stock = (Stock)this.get(Param.Stock);
-
-        if (stock != null) {
-            return stock.symbol.toString() + " " + type.toString().toLowerCase() + " " + Utils.toCurrencyWithSymbol(DecimalPlaces.Three, amount);
-        }
-
-        return type.toString().toLowerCase() + " " + Utils.toCurrencyWithSymbol(DecimalPlaces.Three, amount);
     }
 
     private final Type type;
