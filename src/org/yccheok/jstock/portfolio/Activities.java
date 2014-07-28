@@ -71,48 +71,6 @@ public class Activities {
         return types;
     }
 
-    public String toSummary() {
-        Map<String, Double> datas = new HashMap<String, Double>();
-
-        for (Activity activity : activities) {
-            final Stock stock = (Stock)activity.get(Activity.Param.Stock);
-            String key = (stock != null ? stock.symbol.toString() : "") + activity.getType();
-            Double d = datas.get(key);
-            if (d != null) {
-                double total = d.doubleValue() + activity.getAmount();
-                datas.put(key, total);
-            }
-            else {
-                datas.put(key, activity.getAmount());
-            }
-        }
-
-        String message = "";
-        int count = 0;
-        final int size = activities.size();
-        for (Activity activity : activities) {
-            count++;
-            final Stock stock = (Stock)activity.get(Activity.Param.Stock);
-            final String who = stock != null ? stock.symbol.toString() : "";
-            final Activity.Type type = activity.getType();
-            String key = who + type;
-            Double d = datas.get(key);
-            /* Must not be null due to first loop. */
-            if (who.length() > 1) {
-                message = message + who + " " + type.toString().toLowerCase() + " " + Utils.toCurrencyWithSymbol(DecimalPlaces.Three, d);
-            }
-            else {
-                message = message + type.toString().toLowerCase() + " " + Utils.toCurrencyWithSymbol(DecimalPlaces.Three, d);
-            }
-
-            if (count < size) {
-                message = message + "<br>";
-            }
-        }
-        message = message + "";
-        return message;
-    }
-
     private final List<Activity> activities = new ArrayList<Activity>();
     private final SimpleDate simpleDate;
 }
