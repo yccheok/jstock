@@ -35,20 +35,10 @@ public class Activity {
     }
 
     public enum Type {
-        Deposit("/images/16x16/money.png"),
-        Buy("/images/16x16/inbox.png"),
-        Sell("/images/16x16/outbox.png"),
-        Dividend("/images/16x16/money2.png");
-
-        Type(String fileName) {
-            this.icon = new javax.swing.ImageIcon(this.getClass().getResource(fileName));
-        }
-
-        public ImageIcon getIcon() {
-            return icon;
-        }
-
-        private ImageIcon icon;
+        Deposit,
+        Buy,
+        Sell,
+        Dividend;
     }
 
     public static class Builder {

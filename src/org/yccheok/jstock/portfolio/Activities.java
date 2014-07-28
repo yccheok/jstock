@@ -21,11 +21,8 @@ package org.yccheok.jstock.portfolio;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.yccheok.jstock.engine.SimpleDate;
-import org.yccheok.jstock.engine.Stock;
 
 /**
  *
