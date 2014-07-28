@@ -37,17 +37,24 @@ public class ActivitySummary {
         if (activities == null) {
             activities = new Activities(date);
             activitiesList.add(activities);
-            java.util.Collections.sort(this.activitiesList, new Comparator<Activities>() {
-                @Override
-                public int compare(Activities o1, Activities o2) {
-                    return o1.getDate().compareTo(o2.getDate());
-                }
-            });
             activitiesMap.put(date, activities);
         }
         return activities.add(activity);
     }
 
+    public void ensureSorted() {
+        java.util.Collections.sort(this.activitiesList, new Comparator<Activities>() {
+            @Override
+            public int compare(Activities o1, Activities o2) {
+                return o1.getDate().compareTo(o2.getDate());
+            }
+        });
+        
+        for (Activities activities : activitiesList) {
+            activities.ensureSorted();
+        }
+    }
+    
     public int size() {
         return activitiesList.size();
     }

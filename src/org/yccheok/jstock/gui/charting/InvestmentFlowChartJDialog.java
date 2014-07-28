@@ -540,6 +540,9 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
                     put(Activity.Param.StockInfo, dividend.stockInfo).build();
             this.ROISummary.add(dividend.date, activity);
         }
+        
+        this.investSummary.ensureSorted();
+        this.ROISummary.ensureSorted();
     }
 
     private void initRealTimeStockMonitor() {

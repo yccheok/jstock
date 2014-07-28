@@ -34,18 +34,22 @@ public class Activities {
         this.simpleDate = simpleDate;
     }
 
-    public SimpleDate getDate() {
-        return this.simpleDate;
-    }
-
-    public boolean add(Activity activity) {
-        final boolean status = this.activities.add(activity);
+    public void ensureSorted() {
         java.util.Collections.sort(this.activities, new Comparator<Activity>() {
             @Override
             public int compare(Activity o1, Activity o2) {
                 return o1.getType().compareTo(o2.getType());
             }
         });
+    }
+    
+    public SimpleDate getDate() {
+        return this.simpleDate;
+    }
+
+    public boolean add(Activity activity) {
+        final boolean status = this.activities.add(activity);
+
         return status;
     }
 
