@@ -306,22 +306,22 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
 
                 if (type == Activity.Type.Buy) {
                     final double quantity = (Double)activity.get(Activity.Param.Quantity);
-                    final Stock stock = (Stock)activity.get(Activity.Param.Stock);
+                    final StockInfo stockInfo = (StockInfo)activity.get(Activity.Param.StockInfo);
                     if (noCodeAddedToMonitor) {
                         // We might already have last price information in
                         // PortfolioManagementJPanel, we will still request
                         // stock monitor to provide continuous update.
-                        codesNeedToAddToRealTimeStockMonitor.add(stock.code);
+                        codesNeedToAddToRealTimeStockMonitor.add(stockInfo.code);
                         // If PortfolioManagementJPanel already has last price
                         // information, just get it from there.
-                        final double lastPrice = this.portfolioManagementJPanel.getStockPrice(stock);
+                        final double lastPrice = this.portfolioManagementJPanel.getStockPrice(stockInfo.code);
                         if (lastPrice != 0.0) {
-                            this.codeToPrice.put(stock.code, lastPrice);
+                            this.codeToPrice.put(stockInfo.code, lastPrice);
                         } else {
-                            this.lookUpCodes.add(stock.code);
+                            this.lookUpCodes.add(stockInfo.code);
                         }
                     }
-                    final Double price = this.codeToPrice.get(stock.code);
+                    final Double price = this.codeToPrice.get(stockInfo.code);
                     if (price != null) {
                         amount += convertToPoundIfNecessary((price * quantity));
                     }
@@ -496,10 +496,12 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
                     }
                 }
                 Contract.Type type = transaction.getType();
+                final StockInfo stockInfo = StockInfo.newInstance(transaction.getStock());
+
                 if (type == Contract.Type.Buy) {
                     final Activity activity = new Activity.Builder(Activity.Type.Buy, 
                             isFeeCalculationEnabled ? transaction.getNetTotal() : transaction.getTotal()).
-                            put(Activity.Param.Stock, transaction.getStock()).
+                            put(Activity.Param.StockInfo, stockInfo).
                             put(Activity.Param.Quantity, transaction.getQuantity()).
                             build();
                     this.ROISummary.add(transaction.getDate(), activity);
@@ -507,13 +509,13 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
                 } else if (type == Contract.Type.Sell) {
                     final Activity activity0 = new Activity.Builder(Activity.Type.Buy, 
                             isFeeCalculationEnabled ? transaction.getNetReferenceTotal() : transaction.getReferenceTotal()).
-                            put(Activity.Param.Stock, transaction.getStock()).
+                            put(Activity.Param.StockInfo, stockInfo).
                             put(Activity.Param.Quantity, transaction.getQuantity()).
                             build();
                     this.investSummary.add(transaction.getReferenceDate(), activity0);
                     final Activity activity1 = new Activity.Builder(Activity.Type.Sell, 
                             isFeeCalculationEnabled ? transaction.getNetTotal() : transaction.getTotal()).
-                            put(Activity.Param.Stock, transaction.getStock()).
+                            put(Activity.Param.StockInfo, stockInfo).
                             put(Activity.Param.Quantity, transaction.getQuantity()).
                             build();
                     this.ROISummary.add(transaction.getDate(), activity1);

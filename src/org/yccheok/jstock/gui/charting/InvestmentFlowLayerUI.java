@@ -304,18 +304,18 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
             // Buy, Sell or Dividend only.
             if (activity.getType() == Activity.Type.Buy) {
                 final double quantity = (Double)activity.get(Activity.Param.Quantity);
-                final Stock stock = (Stock)activity.get(Activity.Param.Stock);
+                final StockInfo stockInfo = (StockInfo)activity.get(Activity.Param.StockInfo);
                 this.ROIParams.add(GUIBundle.getString("InvestmentFlowLayerUI_Own") + " " + 
-                        org.yccheok.jstock.portfolio.Utils.toQuantity(quantity) + " " + stock.symbol);
-                final double amount = convertToPoundIfNecessary(quantity * this.investmentFlowChartJDialog.getStockPrice(stock.code));
+                        org.yccheok.jstock.portfolio.Utils.toQuantity(quantity) + " " + stockInfo.symbol);
+                final double amount = convertToPoundIfNecessary(quantity * this.investmentFlowChartJDialog.getStockPrice(stockInfo.code));
                 this.totalROIValue += amount;
                 this.ROIValues.add(org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(DecimalPlaces.Three, amount));
             }
             else if (activity.getType() == Activity.Type.Sell) {
                 final double quantity = (Double)activity.get(Activity.Param.Quantity);
-                final Stock stock = (Stock)activity.get(Activity.Param.Stock);
+                final StockInfo stockInfo = (StockInfo)activity.get(Activity.Param.StockInfo);
                 this.ROIParams.add(activity.getType() + " " +
-                        org.yccheok.jstock.portfolio.Utils.toQuantity(quantity) + " " + stock.symbol);
+                        org.yccheok.jstock.portfolio.Utils.toQuantity(quantity) + " " + stockInfo.symbol);
                 final double amount = convertToPoundIfNecessary(activity.getAmount());
                 this.totalROIValue += amount;
                 this.ROIValues.add(org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(DecimalPlaces.Three, amount));
@@ -418,7 +418,7 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
             final Activity activity = activities.get(i);
             // Buy only.
             this.investParams.add(activity.getType() + " " + 
-                    org.yccheok.jstock.portfolio.Utils.toQuantity(activity.get(Activity.Param.Quantity)) + " " + ((Stock)activity.get(Activity.Param.Stock)).symbol);
+                org.yccheok.jstock.portfolio.Utils.toQuantity(activity.get(Activity.Param.Quantity)) + " " + ((StockInfo)activity.get(Activity.Param.StockInfo)).symbol);
 
             if (activity.getType() == Activity.Type.Buy) {
                 final double amount = convertToPoundIfNecessary(activity.getAmount());
