@@ -30,6 +30,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.Country;
+import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.file.Statements;
 import org.yccheok.jstock.gui.JStockOptions;
 import org.yccheok.jstock.gui.MainFrame;
@@ -441,6 +442,56 @@ public class Utils {
         return portfolioInfos;
     }
     
+    // This utility method is for XIRR calculation purpose.
+    // The code is very similar to InvestmentFlowChartJDialog's initSummaries.
+    // However, it doesn't have roiSummary and investSummary concept.
+    public static ActivitySummary toActivitySummary(List<TransactionSummary> transactionSummaries, DividendSummary dividendSummary) {
+        final ActivitySummary activitySummary = new ActivitySummary();
+        
+        final boolean isFeeCalculationEnabled = MainFrame.getInstance().getJStockOptions().isFeeCalculationEnabled();
+        
+        for (TransactionSummary transactionSummary : transactionSummaries) {
+            final int count = transactionSummary.getChildCount();
+            for (int i = 0; i < count; i++) {
+                final Transaction transaction = (Transaction)transactionSummary.getChildAt(i);
+
+                Contract.Type type = transaction.getType();
+                final StockInfo stockInfo = StockInfo.newInstance(transaction.getStock());
+
+                if (type == Contract.Type.Buy) {
+                    final Activity activity = new Activity.Builder(Activity.Type.Buy, 
+                            isFeeCalculationEnabled ? transaction.getNetTotal() : transaction.getTotal()).
+                            put(Activity.Param.StockInfo, stockInfo).
+                            put(Activity.Param.Quantity, transaction.getQuantity()).
+                            build();
+                    
+                    activitySummary.add(transaction.getDate(), activity);
+                } else if (type == Contract.Type.Sell) {
+                    final Activity activity0 = new Activity.Builder(Activity.Type.Buy, 
+                            isFeeCalculationEnabled ? transaction.getNetReferenceTotal() : transaction.getReferenceTotal()).
+                            put(Activity.Param.StockInfo, stockInfo).
+                            put(Activity.Param.Quantity, transaction.getQuantity()).
+                            build();
+                    final Activity activity1 = new Activity.Builder(Activity.Type.Sell, 
+                            isFeeCalculationEnabled ? transaction.getNetTotal() : transaction.getTotal()).
+                            put(Activity.Param.StockInfo, stockInfo).
+                            put(Activity.Param.Quantity, transaction.getQuantity()).
+                            build();
+                    
+                    activitySummary.add(transaction.getDate(), activity0);
+                    activitySummary.add(transaction.getDate(), activity1);
+                } else {
+                    throw new java.lang.UnsupportedOperationException("Unsupported contract type " + type);
+                }
+            }
+        }
+        
+        // TODO :
+        
+        activitySummary.ensureSorted();        
+        return activitySummary;
+    }
+            
     public static List<String> getPortfolioNames() {
         final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
         return getPortfolioNames(jStockOptions.getCountry());
