@@ -486,9 +486,16 @@ public class Utils {
             }
         }
         
-        // TODO :
+        for (int i = 0, count = dividendSummary.size(); i < count; i++) {
+            final Dividend dividend = dividendSummary.get(i);
+
+            final Activity activity = new Activity.Builder(Activity.Type.Dividend, dividend.amount).
+                    put(Activity.Param.StockInfo, dividend.stockInfo).build();
+            
+            activitySummary.add(dividend.date, activity);
+        }
         
-        activitySummary.ensureSorted();        
+        activitySummary.ensureSorted();
         return activitySummary;
     }
             
