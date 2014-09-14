@@ -1,0 +1,49 @@
+// Brooke Smith 13/9/2014 - https://github.com/oehm-smith/jstock 
+// - Convert jstock to Gradle utilising gradle-javafx plugin to easily create deployments
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply from: 'libs/javafx.plugin'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.apache.lucene:lucene-core:3.2.0'
+    compile 'org.apache.lucene:lucene-grouping:3.2.0'
+}
+
+javafx {
+    mainClass = 'ensemble.Ensemble2'
+
+    icons {
+        shortcut = [
+                'icon-16.png', 'icon-16@2x.png',
+                'icon-32.png', 'icon-32@2x.png',
+                'icon-64.png',
+                'icon-128.png', 'icon-128@2x.png',
+                'icon-256.png',
+        ]
+        volume = shortcut
+        setup = 'icon-32.png'
+    }
+
+    profiles {
+        windows {
+            id = 'b533f663-1efd-489f-b910-4c7ec20c7fd0'
+        }
+
+        macosx {
+            id = 'net.java.openjdk.openjfx.Ensemble2'
+            category = 'public.app-category.developer-tools'
+        }
+    }
+}
+
+cssToBin {
+    enabled = false //7u21 has some font bugs in the BSS code
+}
+
