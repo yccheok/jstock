@@ -4,19 +4,84 @@
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
-apply from: 'libs/javafx.plugin'
+//apply from: 'libs/javafx.plugin'
 
 repositories {
-    mavenLocal()
-    mavenCentral()
+    //mavenLocal()
+    //mavenCentral()
+}
+
+repositories {
+   flatDir {
+       dirs 'libs'
+   }
 }
 
 dependencies {
-    compile 'org.apache.lucene:lucene-core:3.2.0'
-    compile 'org.apache.lucene:lucene-grouping:3.2.0'
+	compile name: 'blobsallad/blobsallad'
+	compile name: 'xstream/cglib-nodep-2.2'
+	compile name: 'commons-codec-1.3'
+	compile name: 'commons-httpclient-3.1-rc1'
+	compile name: 'commons-lang-2.4/commons-lang-2.4'
+	compile name: 'commons-logging-1.1'
+	compile name: 'commons-net-1.4.1'
+	compile name: 'commons-validator/commons-validator-1.3.1'
+	compile name: 'xstream/dom4j-1.6.1'
+	compile name: 'forms-1.1.0'
+	compile name: 'drive/libs/google-api-client-1.18.0-rc'
+	compile name: 'drive/libs/google-api-client-java6-1.18.0-rc'
+	compile name: 'calendar/google-api-services-calendar-v3-rev82-1.18.0-rc'
+	compile name: 'drive/google-api-services-drive-v2-rev120-1.18.0-rc'
+	compile name: 'oauth2/google-api-services-oauth2-v2-rev68-1.18.0-rc'
+	compile name: 'drive/libs/google-http-client-1.18.0-rc'
+	compile name: 'drive/libs/google-http-client-gson-1.18.0-rc'
+	compile name: 'drive/libs/google-oauth-client-1.18.0-rc'
+	compile name: 'drive/libs/google-oauth-client-java6-1.18.0-rc'
+	compile name: 'drive/libs/google-oauth-client-jetty-1.18.0-rc'
+	compile name: 'google-gson-2.2.4/gson-2.2.4'
+	compile name: 'drive/libs/httpclient-4.0.1'
+	compile name: 'drive/libs/httpcore-4.0.1'
+	compile name: 'commons-validator/jakarta-oro-2.0.8'
+	compile name: 'jasypt-1.5/dist/jasypt-1.5'
+	compile name: 'jfreechart/jcommon-1.0.16'
+	compile name: 'xstream/jdom-1.1'
+	compile name: 'drive/libs/jetty-6.1.26'
+	compile name: 'drive/libs/jetty-util-6.1.26'
+	compile name: 'jfreechart/jfreechart-1.0.13'
+	compile name: 'jh'
+	compile name: 'jhotdraw7/JHotDraw7'
+	compile name: 'xstream/joda-time-1.6'
+	compile name: 'drive/libs/jsr305-1.3.9'
+	compile name: 'jxlayer/jxlayer'
+	compile name: 'xstream/kxml2-2.3.0'
+	compile name: 'l2fprod-common-all'
+	compile name: 'mail'
+	compile name: 'nachocalendar-0.23/lib/nachocalendar-0.23'
+	compile name: 'opencsv/opencsv-2.3'
+	compile name: 'pinyin4j-2.5.0/lib/pinyin4j-2.5.0'
+	compile name: 'poi-3.2-FINAL/poi-3.2-FINAL-20081019'
+	compile name: 'drive/libs/servlet-api-2.5-20081211'
+	compile name: 'xstream/stax-1.2.0'
+	compile name: 'xstream/stax-api-1.0.1'
+	compile name: 'swing-layout-1.0'
+	compile name: 'swingx/swingx-0.9.6'
+	compile name: 'TA-Lib/ta-lib-0.4.0'
+	compile name: 'xstream/xml-writer-0.2'
+	compile name: 'xstream/xom-1.1'
+	compile name: 'xstream/xpp3_min-1.1.4c'
+	compile name: 'xstream/xstream-1.4.2'
 }
 
-javafx {
+sourceSets {
+	main {
+		java {
+			srcDir 'src'
+		}
+	}
+}
+
+// There's actually no functioning JavaFx in jstock that I can see
+/* javafx {
     mainClass = 'ensemble.Ensemble2'
 
     icons {
@@ -45,5 +110,6 @@ javafx {
 
 cssToBin {
     enabled = false //7u21 has some font bugs in the BSS code
-}
+}*/
+
 
