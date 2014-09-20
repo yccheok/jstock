@@ -97,7 +97,7 @@ public class Utils {
     } 
     
     public static Country toCountry(Code code) {
-        assert(countries.keySet().size() == 42);
+        assert(countries.keySet().size() == 43);
         
         String string = code.toString();
         int index = string.lastIndexOf(".");
@@ -849,6 +849,7 @@ public class Utils {
         countries.put("TA", Country.Israel);
         countries.put("MI", Country.Italy);
         countries.put("KQ", Country.Korea);
+        countries.put("KS", Country.Korea);
         countries.put("KL", Country.Malaysia);
         countries.put("AS", Country.Netherlands);
         countries.put("NZ", Country.NewZealand);
