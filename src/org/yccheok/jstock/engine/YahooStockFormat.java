@@ -39,11 +39,11 @@ public class YahooStockFormat implements StockFormat {
     // This function is used to resolve, random corrupted data returned from
     // Yahoo! server. Once a while, we will receive complain from users as in
     // http://sourceforge.net/projects/jstock/forums/forum/723855/topic/4611584
-    // 1048576 is just a random picked number. I assume in this world, there
-    // should be no stock's last price larger than 1048576.
+    // 5000000 is just a random picked number. I assume in this world, there
+    // should be no stock's last price larger than 5000000.
     // Note that, this is a very hacking way, and not reliable at all!
     private boolean isCorruptedData(double price) {
-        return price > 1048576 || price < 0;
+        return price > 5000000 || price < 0;
     }
 
     // This function is used to resolve, random corrupted data returned from
