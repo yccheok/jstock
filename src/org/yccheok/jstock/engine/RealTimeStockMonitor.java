@@ -282,7 +282,7 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
                                         break;    
                                     }
 
-                                    log.error(codes, exp);
+                                    log.error(zeroPriceCodes, exp);
                                     // Try with another server.
                                     continue;
                                 }
