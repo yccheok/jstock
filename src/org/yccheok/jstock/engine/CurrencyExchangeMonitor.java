@@ -265,6 +265,7 @@ public class CurrencyExchangeMonitor extends Subject<CurrencyExchangeMonitor, Do
         countryToCurrencyCode.put(Country.France, "EUR");
         countryToCurrencyCode.put(Country.Germany, "EUR");
         countryToCurrencyCode.put(Country.HongKong, "HKD");
+        countryToCurrencyCode.put(Country.Hungary, "HUF");
         countryToCurrencyCode.put(Country.India, "INR");
         countryToCurrencyCode.put(Country.Indonesia, "IDR");
         countryToCurrencyCode.put(Country.Israel, "ILS");

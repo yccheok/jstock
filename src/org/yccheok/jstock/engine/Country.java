@@ -37,6 +37,7 @@ public enum Country {
     France("/images/16x16/fr.png", "France"),
     Germany("/images/16x16/de.png", "Germany"),
     HongKong("/images/16x16/hk.png", "Hong Kong"),
+    Hungary("/images/16x16/hu.png", "Hungary"),
     India("/images/16x16/in.png", "India"),
     Indonesia("/images/16x16/id.png", "Indonesia"),
     Israel("/images/16x16/il.png", "Israel"),

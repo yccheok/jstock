@@ -279,6 +279,7 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
                 "FR",   // France
                 "DE",   // Germany
                 "HK",   // HongKong
+                "HU",   // Hungary
                 "IN",   // India
                 "ID",   // Indonesia
                 "IT",   // Italy

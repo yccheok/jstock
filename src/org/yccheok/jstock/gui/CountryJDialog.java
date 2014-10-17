@@ -140,8 +140,9 @@ public class CountryJDialog extends javax.swing.JDialog {
         return new AbstractListModel() {
             java.util.List<Country> countries = new ArrayList<Country>(Arrays.asList(Country.values()));
             {        
-                // Czech is only for currency exchange purpose.
-                countries.remove(Country.Czech);                
+                // Czech and Hungary are only for currency exchange purpose.
+                countries.remove(Country.Czech);
+                countries.remove(Country.Hungary);                
             }
             
             @Override

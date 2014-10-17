@@ -2069,8 +2069,9 @@ public class MainFrame extends javax.swing.JFrame {
       
     public void createCountryMenuItem() {
         java.util.List<Country> countries = new ArrayList<Country>(Arrays.asList(Country.values()));
-        // Czech is only for currency exchange purpose.
+        // Czech and Hungary are only for currency exchange purpose.
         countries.remove(Country.Czech);
+        countries.remove(Country.Hungary);
 
         for (final Country country : countries) {
             // Ugly fix on spelling mistake.
