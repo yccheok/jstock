@@ -38,7 +38,6 @@ import org.yccheok.jstock.portfolio.BrokingFirm;
  * @author yccheok
  */
 public class JStockOptions {
-
     /**
      * Data structure to carry location, size and state of a JFrame.
      */
@@ -128,6 +127,7 @@ public class JStockOptions {
         this.scanningSpeed = 10000;
         this.alertSpeed = 5;
         this.looknFeel = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
+        this.alwaysOnTop = false;
         this.country = Country.Malaysia;
         this.soundEnabled = false;
 
@@ -192,7 +192,8 @@ public class JStockOptions {
     private int scanningSpeed;  /* In ms. */
     private int alertSpeed;
     private String looknFeel;
-    
+    private boolean alwaysOnTop;
+
     private Color normalTextForegroundColor;
     private Color lowerNumericalValueForegroundColor;
     private Color higherNumericalValueForegroundColor;
@@ -335,6 +336,7 @@ public class JStockOptions {
         this.scanningSpeed = jStockOptions.scanningSpeed;
         this.alertSpeed = jStockOptions.alertSpeed;
         this.looknFeel = jStockOptions.looknFeel;
+        this.alwaysOnTop = jStockOptions.alwaysOnTop;
 
         this.normalTextForegroundColor = jStockOptions.normalTextForegroundColor;
         this.lowerNumericalValueForegroundColor = jStockOptions.lowerNumericalValueForegroundColor;
@@ -459,6 +461,7 @@ public class JStockOptions {
         jStockOptions.scanningSpeed = this.scanningSpeed;
         jStockOptions.alertSpeed = this.alertSpeed;
         jStockOptions.looknFeel = this.looknFeel;
+        jStockOptions.alwaysOnTop = this.alwaysOnTop;
 
         jStockOptions.normalTextForegroundColor = this.normalTextForegroundColor;
         jStockOptions.lowerNumericalValueForegroundColor = this.lowerNumericalValueForegroundColor;
@@ -765,6 +768,14 @@ public class JStockOptions {
         this.looknFeel = looknFeel;
     }
     
+    public boolean getAlwaysOnTop() {
+        return alwaysOnTop;
+    }
+
+    public void setAlwaysOnTop(boolean alwaysOnTop) {
+        this.alwaysOnTop = alwaysOnTop;
+    }
+
     public boolean isSingleIndicatorAlert() {
         return singleIndicatorAlert;
     }

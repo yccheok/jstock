@@ -2109,6 +2109,27 @@ public class MainFrame extends javax.swing.JFrame {
                 }
             }
         }
+
+        // Alway on Top
+        jMenu4.addSeparator();
+        final JMenuItem mi;
+        mi = (JCheckBoxMenuItem) jMenu4.add(new JCheckBoxMenuItem(GUIBundle.getString("MainFrame_AlwaysOnTop")));
+
+        mi.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                AbstractButton aButton = (AbstractButton) e.getSource();
+                boolean selected = aButton.getModel().isSelected();
+
+                MainFrame.this.setAlwaysOnTop(selected);
+                MainFrame.this.jStockOptions.setAlwaysOnTop(selected);
+            }
+        });
+
+        boolean selected = jStockOptions.getAlwaysOnTop();
+        mi.setSelected(selected);
+        this.setAlwaysOnTop(selected);
+
     }
   
     private javax.swing.event.TableModelListener getTableModelListener() {
