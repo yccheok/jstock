@@ -2110,10 +2110,9 @@ public class MainFrame extends javax.swing.JFrame {
             }
         }
 
-        // Alway on Top
+        // Always on Top
         jMenu4.addSeparator();
-        final JMenuItem mi;
-        mi = (JCheckBoxMenuItem) jMenu4.add(new JCheckBoxMenuItem(GUIBundle.getString("MainFrame_AlwaysOnTop")));
+        final JMenuItem mi = jMenu4.add(new JCheckBoxMenuItem(GUIBundle.getString("MainFrame_AlwaysOnTop")));
 
         mi.addActionListener(new ActionListener() {
             @Override
@@ -2126,7 +2125,7 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
-        boolean selected = jStockOptions.getAlwaysOnTop();
+        boolean selected = jStockOptions.isAlwaysOnTop();
         mi.setSelected(selected);
         this.setAlwaysOnTop(selected);
 

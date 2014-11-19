@@ -767,8 +767,8 @@ public class JStockOptions {
     public void setLookNFeel(String looknFeel) {
         this.looknFeel = looknFeel;
     }
-    
-    public boolean getAlwaysOnTop() {
+
+    public boolean isAlwaysOnTop() {
         return alwaysOnTop;
     }
 
