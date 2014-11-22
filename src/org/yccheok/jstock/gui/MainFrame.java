@@ -102,6 +102,11 @@ public class MainFrame extends javax.swing.JFrame {
      * Initialize this MainFrame based on the JStockOptions.
      */
     private void init() {
+        // OSX menu bar at top
+        if (Utils.isMacOSX()) {
+            System.setProperty("apple.laf.useScreenMenuBar", "true");
+            System.setProperty("apple.awt.brushMetalLook", "true");
+        }
 
         try {
             UIManager.setLookAndFeel(getJStockOptions().getLooknFeel());
@@ -118,7 +123,7 @@ public class MainFrame extends javax.swing.JFrame {
         catch (javax.swing.UnsupportedLookAndFeelException exp) {
             log.error(null, exp);
         }
-
+        
         initComponents();
 
         createLookAndFeelMenuItem();
@@ -1781,7 +1786,7 @@ public class MainFrame extends javax.swing.JFrame {
                 return;
             }
         }        
-
+        
         // Avoid "JavaFX IllegalStateException when disposing JFXPanel in Swing"
         // http://stackoverflow.com/questions/16867120/javafx-illegalstateexception-when-disposing-jfxpanel-in-swing
         Platform.setImplicitExit(false);
@@ -1791,9 +1796,14 @@ public class MainFrame extends javax.swing.JFrame {
         // before we manually change the system properties according to
         // JStockOptions.
         ProxyDetector.getInstance();      
-
+        
+        // OSX menu bar at top
+        if (Utils.isMacOSX()) {
+            System.setProperty("apple.laf.useScreenMenuBar", "true");
+            System.setProperty("apple.awt.brushMetalLook", "true");
+        }    
         Utils.setDefaultLookAndFeel();
-
+        
         final String[] _args = args;
 
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -1998,6 +2008,13 @@ public class MainFrame extends javax.swing.JFrame {
         if (lafClassName == null) {
             return;
         }
+        
+        // OSX menu bar at top
+        if (Utils.isMacOSX()) {
+            System.setProperty("apple.laf.useScreenMenuBar", "true");
+            System.setProperty("apple.awt.brushMetalLook", "true");
+        }
+
         try {
             UIManager.setLookAndFeel(lafClassName);
             SwingUtilities.updateComponentTreeUI(this);
