@@ -25,6 +25,7 @@ package org.yccheok.jstock.engine;
  */
 public enum Index {
     // By referring to Bloomberg Android app.
+    MERV(Country.Argentina, "MERVAL", "Buenos Aires Stock Exchange Merval Index", Code.newInstance("^MERV")),
     ASX(Country.Australia, "ASX 200", "S&P/ASX 200", Code.newInstance("^AXJO")),
     AORD(Country.Australia, "All Ordinaries", "All Ordinaries", Code.newInstance("^AORD")),
     ATX(Country.Austria, "ATX", "Austrian Traded Index", Code.newInstance("^ATX")),
