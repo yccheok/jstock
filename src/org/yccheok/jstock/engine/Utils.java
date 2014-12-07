@@ -36,7 +36,6 @@ import org.yccheok.jstock.engine.Stock.Board;
 import org.yccheok.jstock.engine.Stock.Industry;
 import org.yccheok.jstock.file.Statements;
 import org.yccheok.jstock.gui.MainFrame;
-import org.yccheok.jstock.gui.Pair;
 
 /**
  *

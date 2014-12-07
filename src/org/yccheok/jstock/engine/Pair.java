@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.yccheok.jstock.gui;
+package org.yccheok.jstock.engine;
 
 /**
  * Container to ease passing around a tuple of two objects. This object provides a sensible

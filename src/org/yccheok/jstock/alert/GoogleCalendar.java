@@ -34,7 +34,7 @@ import java.util.logging.Logger;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.google.Utils;
-import org.yccheok.jstock.gui.Pair;
+import org.yccheok.jstock.engine.Pair;
 
 /**
  *

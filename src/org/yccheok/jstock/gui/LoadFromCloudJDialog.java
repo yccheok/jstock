@@ -19,6 +19,7 @@
 
 package org.yccheok.jstock.gui;
 
+import org.yccheok.jstock.engine.Pair;
 import com.google.api.client.auth.oauth2.Credential;
 import java.awt.Color;
 import java.awt.Cursor;

@@ -63,7 +63,7 @@ import org.yccheok.jstock.gui.BackwardCompatible;
 import org.yccheok.jstock.gui.JStockOptions;
 import org.yccheok.jstock.gui.MainFrame;
 import org.yccheok.jstock.gui.POIUtils;
-import org.yccheok.jstock.gui.Pair;
+import org.yccheok.jstock.engine.Pair;
 import org.yccheok.jstock.gui.StockTableModel;
 import org.yccheok.jstock.gui.portfolio.CommentableContainer;
 import org.yccheok.jstock.gui.treetable.BuyPortfolioTreeTableModelEx;
