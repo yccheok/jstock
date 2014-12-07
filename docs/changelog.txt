@@ -4,7 +4,9 @@ Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 JStock 1.0.7s - 2014-xx-xx
   Feature: Support Hungary currency.
   Bugfix:  Fix Korea stock market.
-  
+  Bugfix:  Use Google Finance as alternative data feed for New Zealand stock 
+           market.
+           
 JStock 1.0.7r - 2014-07-06
   Bugfix:  Avoid 0 pricing when there is no internet connection.
 

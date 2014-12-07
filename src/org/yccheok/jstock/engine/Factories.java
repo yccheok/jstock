@@ -185,6 +185,7 @@ public enum Factories {
         malaysiaList.add(YahooStockServerFactory.newInstance());
         netherlandsList.add(YahooStockServerFactory.newInstance());
         newZealandList.add(YahooStockServerFactory.newInstance());
+        newZealandList.add(GoogleStockServerFactory.newInstance());
         norwayList.add(YahooStockServerFactory.newInstance());
         portugalList.add(YahooStockServerFactory.newInstance());
         singaporeList.add(GoogleStockServerFactory.newInstance());

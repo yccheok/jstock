@@ -456,6 +456,8 @@ public class Utils {
             return "SGX:" + string.substring(0, string_length - ".SI".length());
         } else if (string.endsWith(".TW") && string_length > ".TW".length()) {
             return "TPE:" + string.substring(0, string_length - ".TW".length());
+        } else if (string.endsWith(".NZ") && string_length > ".NZ".length()) {
+            return "NZE:" + string.substring(0, string_length - ".NZ".length());
         }
         
         return string;
@@ -883,6 +885,7 @@ public class Utils {
         toGoogleIndex.put("^ATX", "INDEXVIE:ATX");
         toGoogleIndex.put("^FTSE", "INDEXFTSE:UKX");
         toGoogleIndex.put("^TWII", "TPE:TAIEX");
+        toGoogleIndex.put("^NZ50", "NZE:NZ50G");
         
         // TODO : Need revision. We no longer have primaryStockServerFactoryClasses
         // concept. Going to replace with PriceSource.
