@@ -488,7 +488,7 @@ public class Utils {
         String string = code.toString().trim().toUpperCase();
         int index = string.indexOf("=X");
         if (index > 0) {
-            return string.substring(0, index);
+            return "CURRENCY:" + string.substring(0, index);
         }
         return string;
     }
