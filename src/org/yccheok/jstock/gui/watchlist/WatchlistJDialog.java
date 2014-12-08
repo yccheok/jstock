@@ -169,7 +169,7 @@ public class WatchlistJDialog extends javax.swing.JDialog {
         String newWatchlistName = null;
 
         boolean needToReload = false;
-        final MainFrame mainFrame = MainFrame.getInstance();
+        final JStock mainFrame = JStock.getInstance();
         if (mainFrame.getJStockOptions().getWatchlistName().equals(oldWatchlistName)) {
             needToReload = true;
         }
@@ -209,7 +209,7 @@ public class WatchlistJDialog extends javax.swing.JDialog {
             // In Linux, creating "My Watchlist" and "my watchlist" are allowed. We
             // want to prevent this from happening, as user might upload such 2 folders
             // in Linux, and download into Windows.
-            final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+            final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
             final File file = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() +  jStockOptions.getCountry() + File.separator + "watchlist" + File.separator);
             File[] children = file.listFiles();            
             if (children != null) {
@@ -252,13 +252,13 @@ public class WatchlistJDialog extends javax.swing.JDialog {
             JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_you_must_select_watchlist"), MessagesBundle.getString("warning_title_you_must_select_watchlist"), JOptionPane.WARNING_MESSAGE);
             return;
         }
-        final MainFrame mainFrame = MainFrame.getInstance();
+        final JStock mainFrame = JStock.getInstance();
         if (mainFrame.getJStockOptions().getWatchlistName().equals(selectedValue)) {
             JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_cannot_delete_current_active_watchlist"), MessagesBundle.getString("warning_title_cannot_delete_current_active_watchlist"), JOptionPane.WARNING_MESSAGE);
             return;
         }
         final String output = MessageFormat.format(MessagesBundle.getString("question_message_delete_template"), selectedValue);
-        final int result = javax.swing.JOptionPane.showConfirmDialog(MainFrame.getInstance(), output, MessagesBundle.getString("question_title_delete"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
+        final int result = javax.swing.JOptionPane.showConfirmDialog(JStock.getInstance(), output, MessagesBundle.getString("question_title_delete"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
         if (result != javax.swing.JOptionPane.YES_OPTION) {
             return;
         }
@@ -308,7 +308,7 @@ public class WatchlistJDialog extends javax.swing.JDialog {
             // In Linux, creating "My Watchlist" and "my watchlist" are allowed. We
             // want to prevent this from happening, as user might upload such 2 folders
             // in Linux, and download into Windows.
-            final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+            final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
             final File file = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() +  jStockOptions.getCountry() + File.separator + "watchlist" + File.separator);
             File[] children = file.listFiles();  
             if (children != null) {
@@ -345,8 +345,8 @@ public class WatchlistJDialog extends javax.swing.JDialog {
             // Get item index
             final int index = list.locationToIndex(evt.getPoint());
             final String watchlist = list.getModel().getElementAt(index).toString();
-            if (MainFrame.getInstance().getJStockOptions().getWatchlistName().equals(watchlist) == false) {
-                MainFrame.getInstance().selectActiveWatchlist(watchlist);
+            if (JStock.getInstance().getJStockOptions().getWatchlistName().equals(watchlist) == false) {
+                JStock.getInstance().selectActiveWatchlist(watchlist);
                 // Ensure Bold effect on active watchlist.
                 this.jList1.repaint();
             }
@@ -368,7 +368,7 @@ public class WatchlistJDialog extends javax.swing.JDialog {
             public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 Component component = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (component != null && value != null) {
-                    final MainFrame mainFrame = MainFrame.getInstance();
+                    final JStock mainFrame = JStock.getInstance();
                     final String watchlistName = mainFrame.getJStockOptions().getWatchlistName();
 
                     if (value.toString().equals(watchlistName)) {

@@ -167,7 +167,7 @@ public class OptionsUpdateJPanel extends javax.swing.JPanel implements JStockOpt
                 }
                 else
                 {
-                    AutoUpdateNewsJDialog dialog = new AutoUpdateNewsJDialog(MainFrame.getInstance(), true);
+                    AutoUpdateNewsJDialog dialog = new AutoUpdateNewsJDialog(JStock.getInstance(), true);
                     dialog.setNews(status);
                     dialog.setVisible(true);
                 }
@@ -233,7 +233,7 @@ public class OptionsUpdateJPanel extends javax.swing.JPanel implements JStockOpt
     public boolean apply(JStockOptions jStockOptions) {
         jStockOptions.setAutoUpdateNewsEnabled(jCheckBox1.isSelected());
         // Apply the effect immediately.
-        MainFrame.getInstance().initLatestNewsTask();
+        JStock.getInstance().initLatestNewsTask();
         return true;
     }
 

@@ -25,7 +25,7 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableModel;
 import org.yccheok.jstock.gui.JStockOptions;
-import org.yccheok.jstock.gui.MainFrame;
+import org.yccheok.jstock.gui.JStock;
 import org.yccheok.jstock.gui.portfolio.CommentableContainer;
 
 /**
@@ -35,7 +35,7 @@ import org.yccheok.jstock.gui.portfolio.CommentableContainer;
 public class GenericRenderer extends DefaultTableCellRenderer {
 
     protected Color getBackgroundColor(int row) {
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
 
         if(row % 2 == 0) {
             return jStockOptions.getFirstRowBackgroundColor();
@@ -70,7 +70,7 @@ public class GenericRenderer extends DefaultTableCellRenderer {
             return c;
         }
 
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
 
         c.setForeground(jStockOptions.getNormalTextForegroundColor());
 

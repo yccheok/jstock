@@ -33,7 +33,7 @@ import org.yccheok.jstock.engine.Country;
 import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.file.Statements;
 import org.yccheok.jstock.gui.JStockOptions;
-import org.yccheok.jstock.gui.MainFrame;
+import org.yccheok.jstock.gui.JStock;
 
 /**
  *
@@ -218,7 +218,7 @@ public class Utils {
      * @return currency representation (with symbol)
      */
     public static String toCurrencyWithSymbol(DecimalPlaces decimalPlace, Object value) {
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         final Country country = jStockOptions.getCountry();
         return jStockOptions.getCurrencySymbol(country) + toCurrency(decimalPlace, value);
     }
@@ -230,7 +230,7 @@ public class Utils {
      * @return currency representation (with symbol)
      */
     public static String toCurrencyWithSymbol(DecimalPlaces decimalPlace, double value) {
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         final Country country = jStockOptions.getCountry();
         return jStockOptions.getCurrencySymbol(country) + toCurrency(decimalPlace, value);
     }
@@ -251,7 +251,7 @@ public class Utils {
      * @return portfolio directory, based on given portfolio name
      */
     public static String getPortfolioDirectory(String name) {
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         return getPortfolioDirectory(jStockOptions.getCountry(), name);
     }
 
@@ -312,7 +312,7 @@ public class Utils {
      * @return current active portfolio directory
      */
     public static String getPortfolioDirectory() {
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         return getPortfolioDirectory(jStockOptions.getPortfolioName());
     }
 
@@ -448,7 +448,7 @@ public class Utils {
     public static ActivitySummary toActivitySummary(List<TransactionSummary> transactionSummaries, DividendSummary dividendSummary) {
         final ActivitySummary activitySummary = new ActivitySummary();
         
-        final boolean isFeeCalculationEnabled = MainFrame.getInstance().getJStockOptions().isFeeCalculationEnabled();
+        final boolean isFeeCalculationEnabled = JStock.getInstance().getJStockOptions().isFeeCalculationEnabled();
         
         for (TransactionSummary transactionSummary : transactionSummaries) {
             final int count = transactionSummary.getChildCount();
@@ -500,7 +500,7 @@ public class Utils {
     }
             
     public static List<String> getPortfolioNames() {
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         return getPortfolioNames(jStockOptions.getCountry());
     }
     

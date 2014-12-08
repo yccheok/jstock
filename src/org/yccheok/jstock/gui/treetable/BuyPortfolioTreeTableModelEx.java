@@ -31,7 +31,7 @@ import javax.swing.tree.TreePath;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.gui.JStockOptions;
-import org.yccheok.jstock.gui.MainFrame;
+import org.yccheok.jstock.gui.JStock;
 import org.yccheok.jstock.internationalization.GUIBundle;
 
 /**
@@ -389,7 +389,7 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
     
     @Override
     public Object getValueAt(Object node, int column) {
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         final boolean isFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
         final boolean isPenceToPoundConversionEnabled = jStockOptions.isPenceToPoundConversionEnabled();
         
@@ -471,7 +471,7 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
                     return transactionSummary.getQuantity();
                     
                 case 3:
-                    if (MainFrame.getInstance().getJStockOptions().isFourDecimalPlacesEnabled()) {
+                    if (JStock.getInstance().getJStockOptions().isFourDecimalPlacesEnabled()) {
                         return new DoubleWrapper(DecimalPlaces.Four, this.getPurchasePrice(transactionSummary));
                     } else {
                         return new DoubleWrapper(DecimalPlaces.Three, this.getPurchasePrice(transactionSummary));   

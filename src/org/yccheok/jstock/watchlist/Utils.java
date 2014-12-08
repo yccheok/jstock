@@ -27,7 +27,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.yccheok.jstock.engine.Country;
 import org.yccheok.jstock.gui.JStockOptions;
-import org.yccheok.jstock.gui.MainFrame;
+import org.yccheok.jstock.gui.JStock;
 import org.yccheok.jstock.gui.StockTableModel;
 
 /**
@@ -61,7 +61,7 @@ public class Utils {
      * @return watchlist directory, based on given watchlist name
      */
     public static String getWatchlistDirectory(String name) {
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         return getWatchlistDirectory(jStockOptions.getCountry(), name);
     }
 
@@ -70,7 +70,7 @@ public class Utils {
     }
     
     public static String getWatchlistDirectory() {
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         return getWatchlistDirectory(jStockOptions.getWatchlistName());
     }
     
@@ -120,7 +120,7 @@ public class Utils {
     }
     
     public static List<String> getWatchlistNames() {
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         return getWatchlistNames(jStockOptions.getCountry());
     }
     
@@ -177,9 +177,9 @@ public class Utils {
 
         final StockTableModel stockTableModel = new StockTableModel();
         
-        MainFrame.CSVWatchlist csvWatchlist = MainFrame.CSVWatchlist.newInstance(stockTableModel);
+        JStock.CSVWatchlist csvWatchlist = JStock.CSVWatchlist.newInstance(stockTableModel);
 
-        return MainFrame.saveCSVWatchlist(directory, csvWatchlist);
+        return JStock.saveCSVWatchlist(directory, csvWatchlist);
     }
     
     public static List<WatchlistInfo> getWatchlistInfos() {

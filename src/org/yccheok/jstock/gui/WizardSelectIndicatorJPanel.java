@@ -134,7 +134,7 @@ public class WizardSelectIndicatorJPanel extends javax.swing.JPanel {
         if (this.alertIndicatorProjectManager != null)
             return;
         
-        final MainFrame m = MainFrame.getInstance();
+        final JStock m = JStock.getInstance();
         
         this.alertIndicatorProjectManager = m.getAlertIndicatorProjectManager();
         

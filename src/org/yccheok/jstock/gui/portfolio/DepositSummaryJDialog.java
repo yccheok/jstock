@@ -32,7 +32,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.table.TableCellEditor;
 import org.yccheok.jstock.gui.JTableUtilities;
-import org.yccheok.jstock.gui.MainFrame;
+import org.yccheok.jstock.gui.JStock;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.portfolio.Commentable;
 import org.yccheok.jstock.portfolio.DecimalPlaces;
@@ -355,7 +355,7 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
             return;
         }
 
-        final MainFrame mainFrame = MainFrame.getInstance();
+        final JStock mainFrame = JStock.getInstance();
         CommentJDialog commentJDialog = new CommentJDialog(mainFrame, true, commentable);
         commentJDialog.setTitle(title);
         commentJDialog.setLocationRelativeTo(this);

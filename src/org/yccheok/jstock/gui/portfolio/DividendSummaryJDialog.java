@@ -59,7 +59,7 @@ import org.yccheok.jstock.engine.SimpleDate;
 import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.engine.StockServerFactory;
 import org.yccheok.jstock.gui.JTableUtilities;
-import org.yccheok.jstock.gui.MainFrame;
+import org.yccheok.jstock.gui.JStock;
 import org.yccheok.jstock.gui.PortfolioManagementJPanel;
 import org.yccheok.jstock.gui.table.StockInfoRenderer;
 import org.yccheok.jstock.internationalization.GUIBundle;
@@ -328,7 +328,7 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
         if (this.dividendSummary == null || this.dividendSummary.getTotal() <= 0.0) {
             return;
         }
-        final MainFrame m = MainFrame.getInstance();
+        final JStock m = JStock.getInstance();
         final DividendSummaryBarChartJDialog dividendSummaryBarChartJDialog = new DividendSummaryBarChartJDialog(this, false, this.getDividendSummary());
         dividendSummaryBarChartJDialog.setVisible(true);
     }//GEN-LAST:event_jLabel2MouseClicked
@@ -523,7 +523,7 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
             return;
         }
 
-        final MainFrame mainFrame = MainFrame.getInstance();
+        final JStock mainFrame = JStock.getInstance();
         CommentJDialog commentJDialog = new CommentJDialog(mainFrame, true, commentable);
         commentJDialog.setTitle(title);
         commentJDialog.setLocationRelativeTo(this);
@@ -613,10 +613,10 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
                             if (total == 0) {
                                 continue;
                             }
-                            if (MainFrame.getInstance().getJStockOptions().isPenceToPoundConversionEnabled()) {
+                            if (JStock.getInstance().getJStockOptions().isPenceToPoundConversionEnabled()) {
                                 total = total / 100.0;
                             }
-                            StockInfo betterStockInfo = MainFrame.getInstance().getStockInfoDatabase().codeToStockInfo(dividend.stockInfo.code);
+                            StockInfo betterStockInfo = JStock.getInstance().getStockInfoDatabase().codeToStockInfo(dividend.stockInfo.code);
                             Dividend suggestedDividend = new Dividend(betterStockInfo == null ? dividend.stockInfo : betterStockInfo, total, dividend.date);
                             suggestedDividends.add(suggestedDividend);
                         }
@@ -643,7 +643,7 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
                     if (dividends.isEmpty()) {
                         JOptionPane.showMessageDialog(DividendSummaryJDialog.this, MessagesBundle.getString("info_message_no_dividend_found"), MessagesBundle.getString("info_title_no_dividend_found"), JOptionPane.INFORMATION_MESSAGE);
                     } else {
-                        AutoDividendJDialog autoDividendJDialog = new AutoDividendJDialog(MainFrame.getInstance(), true, dividends);
+                        AutoDividendJDialog autoDividendJDialog = new AutoDividendJDialog(JStock.getInstance(), true, dividends);
                         autoDividendJDialog.setLocationRelativeTo(DividendSummaryJDialog.this);
                         autoDividendJDialog.setVisible(true);
                         List<Dividend> dividendsAfterPressingOK = autoDividendJDialog.getDividendsAfterPressingOK();

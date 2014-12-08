@@ -58,7 +58,7 @@ import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.gui.Constants;
 import org.yccheok.jstock.gui.JStockOptions;
-import org.yccheok.jstock.gui.MainFrame;
+import org.yccheok.jstock.gui.JStock;
 import org.yccheok.jstock.gui.PortfolioManagementJPanel;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.portfolio.Activities;
@@ -360,7 +360,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
     }
 
     private double convertToPoundIfNecessary(double value) {
-        if (MainFrame.getInstance().getJStockOptions().isPenceToPoundConversionEnabled() == false) {
+        if (JStock.getInstance().getJStockOptions().isPenceToPoundConversionEnabled() == false) {
             return value;
         }
         return value / 100.0;
@@ -420,7 +420,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         XYPlot plot = chart.getXYPlot();
 
         NumberAxis rangeAxis1 = (NumberAxis) plot.getRangeAxis();
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         final String currencySymbol = jStockOptions.getCurrencySymbol(jStockOptions.getCountry());
         // Use apostrophes to escape currencySymbol. If currencySymbol contains
         // apostrophes, we may need to escape those by doubling them.
@@ -482,7 +482,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         investSummary = new ActivitySummary();
         ROISummary = new ActivitySummary();
         
-        final boolean isFeeCalculationEnabled = MainFrame.getInstance().getJStockOptions().isFeeCalculationEnabled();
+        final boolean isFeeCalculationEnabled = JStock.getInstance().getJStockOptions().isFeeCalculationEnabled();
         
         for (TransactionSummary transactionSummary : transactionSummaries) {
             final int count = transactionSummary.getChildCount();
@@ -563,7 +563,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         this.realTimeStockMonitor = new RealTimeStockMonitor(
                 Constants.REAL_TIME_STOCK_MONITOR_MAX_THREAD, 
                 Constants.REAL_TIME_STOCK_MONITOR_MAX_STOCK_SIZE_PER_SCAN, 
-                MainFrame.getInstance().getJStockOptions().getScanningSpeed());
+                JStock.getInstance().getJStockOptions().getScanningSpeed());
 
         this.realTimeStockMonitor.attach(this);
     }

@@ -22,7 +22,7 @@ package org.yccheok.jstock.gui.treetable;
 import java.util.Arrays;
 import org.jdesktop.swingx.treetable.TreeTableModel;
 import org.yccheok.jstock.gui.JStockOptions;
-import org.yccheok.jstock.gui.MainFrame;
+import org.yccheok.jstock.gui.JStock;
 import org.yccheok.jstock.portfolio.Contract;
 import org.yccheok.jstock.portfolio.Portfolio;
 import org.yccheok.jstock.portfolio.Transaction;
@@ -200,7 +200,7 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
     
     @Override
     public Object getValueAt(Object node, int column) {
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         final boolean isFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
         final boolean isPenceToPoundConversionEnabled = jStockOptions.isPenceToPoundConversionEnabled();
 
@@ -291,14 +291,14 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
                     return transactionSummary.getQuantity();
                     
                 case 3:
-                    if (MainFrame.getInstance().getJStockOptions().isFourDecimalPlacesEnabled()) {
+                    if (JStock.getInstance().getJStockOptions().isFourDecimalPlacesEnabled()) {
                         return new DoubleWrapper(DecimalPlaces.Four, getSellingPrice(transactionSummary));
                     } else {
                         return new DoubleWrapper(DecimalPlaces.Three, getSellingPrice(transactionSummary));   
                     }
                     
                 case 4:
-                    if (MainFrame.getInstance().getJStockOptions().isFourDecimalPlacesEnabled()) {
+                    if (JStock.getInstance().getJStockOptions().isFourDecimalPlacesEnabled()) {
                         return new DoubleWrapper(DecimalPlaces.Four, getPurchasePrice(transactionSummary));
                     } else {
                         return new DoubleWrapper(DecimalPlaces.Three, getPurchasePrice(transactionSummary));   

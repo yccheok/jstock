@@ -49,7 +49,7 @@ import org.jfree.data.time.TimeSeriesDataItem;
 import org.jfree.ui.RectangleEdge;
 import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.gui.JStockOptions;
-import org.yccheok.jstock.gui.MainFrame;
+import org.yccheok.jstock.gui.JStock;
 import org.yccheok.jstock.gui.Utils;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.internationalization.MessagesBundle;
@@ -121,7 +121,7 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         numberFormat.setMaximumFractionDigits(2);
         numberFormat.setMinimumFractionDigits(2);
         
-        final double exchangeRate = MainFrame.getInstance().getPortfolioManagementJPanel().getCurrencyExchangeRate();
+        final double exchangeRate = JStock.getInstance().getPortfolioManagementJPanel().getCurrencyExchangeRate();
         final double totalInvestValue = this.investmentFlowChartJDialog.getTotalInvestValue() * exchangeRate;
         final double totalROIValue = this.investmentFlowChartJDialog.getTotalROIValue() * exchangeRate;
                 
@@ -161,9 +161,9 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         if (gain >= 0) {
             if (gain > 0) {
                 if (org.yccheok.jstock.engine.Utils.isFallBelowAndRiseAboveColorReverse()) {
-                    g2.setColor(MainFrame.getInstance().getJStockOptions().getLowerNumericalValueForegroundColor());
+                    g2.setColor(JStock.getInstance().getJStockOptions().getLowerNumericalValueForegroundColor());
                 } else {
-                    g2.setColor(MainFrame.getInstance().getJStockOptions().getHigherNumericalValueForegroundColor());
+                    g2.setColor(JStock.getInstance().getJStockOptions().getHigherNumericalValueForegroundColor());
                 }
             }
             g2.drawString(GAIN + ": ", x, y);
@@ -171,9 +171,9 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         }
         else {
             if (org.yccheok.jstock.engine.Utils.isFallBelowAndRiseAboveColorReverse()) {
-                g2.setColor(MainFrame.getInstance().getJStockOptions().getHigherNumericalValueForegroundColor());
+                g2.setColor(JStock.getInstance().getJStockOptions().getHigherNumericalValueForegroundColor());
             } else {
-                g2.setColor(MainFrame.getInstance().getJStockOptions().getLowerNumericalValueForegroundColor());
+                g2.setColor(JStock.getInstance().getJStockOptions().getLowerNumericalValueForegroundColor());
             }
             g2.drawString(LOSS + ": ", x, y);
             x += oldFontMetrics.stringWidth(LOSS + ": ");
@@ -277,7 +277,7 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
     }
 
     private double convertToPoundIfNecessary(double value) {
-        if (MainFrame.getInstance().getJStockOptions().isPenceToPoundConversionEnabled() == false) {
+        if (JStock.getInstance().getJStockOptions().isPenceToPoundConversionEnabled() == false) {
             return value;
         }
         return value / 100.0;
