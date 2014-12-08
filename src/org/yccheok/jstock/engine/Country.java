@@ -26,6 +26,7 @@ import javax.swing.ImageIcon;
  * @author yccheok
  */
 public enum Country {
+    Argentina("/images/16x16/ar.png", "Argentina"),
     Australia("/images/16x16/au.png", "Australia"),
     Austria("/images/16x16/at.png", "Austria"),
     Belgium("/images/16x16/be.png", "Belgium"),
@@ -55,7 +56,7 @@ public enum Country {
     Taiwan("/images/16x16/tw.png", "Taiwan"),
     UnitedKingdom("/images/16x16/gb.png", "United Kingdom"),
     UnitedState("/images/16x16/us.png", "United States");
-            
+    
     Country(String fileName, String humanReadableString) {
         this.icon = new javax.swing.ImageIcon(this.getClass().getResource(fileName));
         this.humanReadableString = humanReadableString;

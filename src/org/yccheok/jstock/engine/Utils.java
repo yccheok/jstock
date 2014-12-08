@@ -97,7 +97,7 @@ public class Utils {
     } 
     
     public static Country toCountry(Code code) {
-        assert(countries.keySet().size() == 43);
+        assert(countries.keySet().size() == 44);
         
         String string = code.toString();
         int index = string.lastIndexOf(".");
@@ -817,6 +817,7 @@ public class Utils {
     private static final Map<String, Integer> googleUnitedStatesStockExchanges = new HashMap<String, Integer>();
     
     static {
+        countries.put("BA", Country.Argentina);
         countries.put("AX", Country.Australia);
         countries.put("VI", Country.Austria);
         countries.put("SA", Country.Brazil);
@@ -887,6 +888,7 @@ public class Utils {
         
         // TODO : Need revision. We no longer have primaryStockServerFactoryClasses
         // concept. Going to replace with PriceSource.
+        defaultPriceSources.put(Country.Argentina, PriceSource.Yahoo);
         defaultPriceSources.put(Country.Australia, PriceSource.Yahoo);
         defaultPriceSources.put(Country.Austria, PriceSource.Yahoo);
         defaultPriceSources.put(Country.Belgium, PriceSource.Yahoo);
