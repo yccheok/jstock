@@ -137,7 +137,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
 
         stop_button_pressed = false;
 
-        final MainFrame m = MainFrame.getInstance();
+        final JStock m = JStock.getInstance();
         
         if (m.getStockInfoDatabase() == null) {
             javax.swing.JOptionPane.showMessageDialog(this, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/messages").getString("info_message_we_havent_connected_to_stock_server"), java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/messages").getString("info_title_we_havent_connected_to_stock_server"), javax.swing.JOptionPane.INFORMATION_MESSAGE);
@@ -230,7 +230,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         WizardPanelDescriptor wizardPanelDescriptor1 = wizardModel.getPanelDescriptor(WizardSelectIndicatorDescriptor.IDENTIFIER);
         WizardSelectIndicatorJPanel wizardSelectIndicatorJPanel = (WizardSelectIndicatorJPanel)wizardPanelDescriptor1.getPanelComponent();
 
-        final MainFrame m = MainFrame.getInstance();
+        final JStock m = JStock.getInstance();
         final IndicatorProjectManager alertIndicatorProjectManager = m.getAlertIndicatorProjectManager();
         java.util.List<String> projects = wizardSelectIndicatorJPanel.getSelectedProjects();
         java.util.List<StockInfo> stockInfos = wizardSelectStockJPanel.getSelectedStockInfos();
@@ -365,7 +365,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
 
         addIndicatorToTable(indicator);
 
-        final MainFrame m = MainFrame.getInstance();
+        final JStock m = JStock.getInstance();
         final JStockOptions jStockOptions = m.getJStockOptions();
 
         if (jStockOptions.isPopupMessage()) {
@@ -554,7 +554,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         
         removeAllIndicatorsFromTable();
         
-        final MainFrame m = MainFrame.getInstance();
+        final JStock m = JStock.getInstance();
         m.setStatusBar(false, GUIBundle.getString("IndicatorScannerJPanel_Connected"));
     }
     
@@ -578,7 +578,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                     log.error(null, ex);
                 }
             }
-            final MainFrame m = MainFrame.getInstance();
+            final JStock m = JStock.getInstance();
             this.initRealTimeStockMonitor();
             this.initStockHistoryMonitor();
             this.initAlertDataStructures();
@@ -597,11 +597,11 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             
         });
 
-        MainFrame.getInstance().setStatusBar(false, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("IndicatorScannerJPanel_Connected"));
+        JStock.getInstance().setStatusBar(false, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("IndicatorScannerJPanel_Connected"));
     }
     
     private void initWizardDialog() {
-        final MainFrame m = MainFrame.getInstance();
+        final JStock m = JStock.getInstance();
         
         wizard = new Wizard(m);
 
@@ -669,7 +669,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             reader.unlock();
         }
 
-        final MainFrame m = MainFrame.getInstance();
+        final JStock m = JStock.getInstance();
 
         List<OperatorIndicator> indicators = this.operatorIndicators.get(code);
         if (indicators == null)
@@ -819,7 +819,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         this.realTimeStockMonitor = new RealTimeStockMonitor(
                 Constants.REAL_TIME_STOCK_MONITOR_MAX_THREAD, 
                 Constants.REAL_TIME_STOCK_MONITOR_MAX_STOCK_SIZE_PER_SCAN, 
-                MainFrame.getInstance().getJStockOptions().getScanningSpeed());
+                JStock.getInstance().getJStockOptions().getScanningSpeed());
         
         this.realTimeStockMonitor.attach(this.realTimeStockMonitorObserver);
     }
@@ -841,7 +841,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         if (this.stop_button_pressed) {
             return;
         }
-        MainFrame.getInstance().setStatusBar(true, message);
+        JStock.getInstance().setStatusBar(true, message);
     }
 
     private void update(RealTimeStockMonitor monitor, final java.util.List<Stock> stocks) {
@@ -887,7 +887,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             // We will fix it through offline database.
             if (isSymbolImmutable || new_stock.symbol.toString().isEmpty()) {                
                 // Use local variable to ensure thread safety.
-                final StockInfoDatabase stock_info_database = MainFrame.getInstance().getStockInfoDatabase();
+                final StockInfoDatabase stock_info_database = JStock.getInstance().getStockInfoDatabase();
 
                 if (stock_info_database != null) {
                     final Symbol symbol = stock_info_database.codeToSymbol(stock.code);
@@ -920,7 +920,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                 continue;
             }
             
-            final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+            final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
 
             if (jStockOptions.isSingleIndicatorAlert()) {
                 for (OperatorIndicator indicator : indicators) {
@@ -1041,7 +1041,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     private JPopupMenu getMyJTablePopupMenu() {
         JPopupMenu popup = new JPopupMenu();
         
-        final MainFrame m = MainFrame.getInstance();
+        final JStock m = JStock.getInstance();
         
         javax.swing.JMenuItem menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("IndicatorScannerJPanel_History..."), this.getImageIcon("/images/16x16/strokedocker.png"));
         
@@ -1096,7 +1096,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                     final IndicatorTableModel tableModel = (IndicatorTableModel)jTable1.getModel();
                     final Indicator indicator = tableModel.getIndicator(modelIndex);
                     final Stock stock = indicator.getStock();
-                    MainFrame.getInstance().getPortfolioManagementJPanel().showNewBuyTransactionJDialog(stock, stock.getLastPrice(), false);
+                    JStock.getInstance().getPortfolioManagementJPanel().showNewBuyTransactionJDialog(stock, stock.getLastPrice(), false);
                 }
             });
 

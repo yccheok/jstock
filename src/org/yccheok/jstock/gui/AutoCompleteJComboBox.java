@@ -528,10 +528,10 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
         if (mode == Mode.Offline) {
             // Check through JStockOptions, to determine which renderer to be
             // applied.
-            if (MainFrame.getInstance().getJStockOptions().getStockInputSuggestionListOption() == JStockOptions.StockInputSuggestionListOption.OneColumn) {
+            if (JStock.getInstance().getJStockOptions().getStockInputSuggestionListOption() == JStockOptions.StockInputSuggestionListOption.OneColumn) {
                 me = oldListCellRenderer;
             } else {
-                assert(MainFrame.getInstance().getJStockOptions().getStockInputSuggestionListOption() == JStockOptions.StockInputSuggestionListOption.TwoColumns);
+                assert(JStock.getInstance().getJStockOptions().getStockInputSuggestionListOption() == JStockOptions.StockInputSuggestionListOption.TwoColumns);
                 me = offlineModeCellRenderer;
             }
         } else if (mode == Mode.YahooOnline) {

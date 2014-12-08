@@ -55,7 +55,7 @@ import org.jfree.data.xy.XYDataset;
 import org.jfree.ui.RectangleEdge;
 import org.yccheok.jstock.charting.ChartData;
 import org.yccheok.jstock.gui.JStockOptions;
-import org.yccheok.jstock.gui.MainFrame;
+import org.yccheok.jstock.gui.JStock;
 import org.yccheok.jstock.gui.Utils;
 import org.yccheok.jstock.internationalization.GUIBundle;
 
@@ -149,7 +149,7 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
     }
 
     private void drawInformationBox(Graphics2D g2, JXLayer<? extends V> layer) {
-        if (MainFrame.getInstance().getJStockOptions().getYellowInformationBoxOption() == JStockOptions.YellowInformationBoxOption.Hide) {
+        if (JStock.getInstance().getJStockOptions().getYellowInformationBoxOption() == JStockOptions.YellowInformationBoxOption.Hide) {
             return;
         }
 
@@ -268,7 +268,7 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
         final double suggestedBorderY = this.mainTraceInfo.getPoint().getY() - (borderHeight >> 1);
         double bestBorderX = 0;
         double bestBorderY = 0;
-        if (MainFrame.getInstance().getJStockOptions().getYellowInformationBoxOption() == JStockOptions.YellowInformationBoxOption.Stay) {
+        if (JStock.getInstance().getJStockOptions().getYellowInformationBoxOption() == JStockOptions.YellowInformationBoxOption.Stay) {
             if (this.mainTraceInfo.getPoint().getX() > ((int)(this.mainDrawArea.getX() + this.mainDrawArea.getWidth() + 0.5) >> 1)) {
                 bestBorderX = this.mainDrawArea.getX();
                 bestBorderY = this.mainDrawArea.getY();
@@ -279,7 +279,7 @@ public class ChartLayerUI<V extends javax.swing.JComponent> extends AbstractLaye
             }
         }
         else {
-            assert(MainFrame.getInstance().getJStockOptions().getYellowInformationBoxOption() == JStockOptions.YellowInformationBoxOption.Follow);
+            assert(JStock.getInstance().getJStockOptions().getYellowInformationBoxOption() == JStockOptions.YellowInformationBoxOption.Follow);
             bestBorderX = suggestedBorderX > this.mainDrawArea.getX() ?
                             (suggestedBorderX + borderWidth) < (this.mainDrawArea.getX() + this.mainDrawArea.getWidth()) ? suggestedBorderX : this.mainDrawArea.getX() + this.mainDrawArea.getWidth() - borderWidth - boxPointMargin :
                             this.mainTraceInfo.getPoint().getX() + boxPointMargin;

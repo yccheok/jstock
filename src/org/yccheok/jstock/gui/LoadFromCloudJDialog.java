@@ -195,7 +195,7 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jLabel5MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel5MouseClicked
-        MemoryLogJDialog memoryLogJDialog = new MemoryLogJDialog(MainFrame.getInstance(), true);
+        MemoryLogJDialog memoryLogJDialog = new MemoryLogJDialog(JStock.getInstance(), true);
         memoryLogJDialog.setLocationRelativeTo(this);
         memoryLogJDialog.setLog(memoryLog);
         memoryLogJDialog.setVisible(true);
@@ -229,7 +229,7 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
         this.setVisible(false);
         this.dispose();
         
-        MainFrame.getInstance().loadFromCloud();
+        JStock.getInstance().loadFromCloud();
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private static class Status {
@@ -370,10 +370,10 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
                 final File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "options.xml");
                 final JStockOptions jStockOptions = Utils.fromXML(JStockOptions.class, f);
                 if (jStockOptions != null) {
-                    MainFrame.getInstance().getJStockOptions().insensitiveCopy(jStockOptions);
+                    JStock.getInstance().getJStockOptions().insensitiveCopy(jStockOptions);
                 }
 
-                MainFrame.getInstance().reloadAfterDownloadFromCloud();
+                JStock.getInstance().reloadAfterDownloadFromCloud();
 
                 publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_Success"), Icons.OK));
 

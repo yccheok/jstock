@@ -68,7 +68,7 @@ import org.yccheok.jstock.charting.MACD;
 import org.yccheok.jstock.charting.TechnicalAnalysis;
 import org.yccheok.jstock.file.Statements;
 import org.yccheok.jstock.gui.JStockOptions;
-import org.yccheok.jstock.gui.MainFrame;
+import org.yccheok.jstock.gui.JStock;
 import org.yccheok.jstock.gui.charting.ChartJDialog.TAEx;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.internationalization.MessagesBundle;
@@ -130,7 +130,7 @@ public class ChartJDialog extends javax.swing.JDialog {
         this.chartPanel = new ChartPanel(null, true, true, true, true, true);
         this.stockHistoryServer = stockHistoryServer;
 
-        final ChartJDialogOptions chartJDialogOptions = MainFrame.getInstance().getChartJDialogOptions();
+        final ChartJDialogOptions chartJDialogOptions = JStock.getInstance().getChartJDialogOptions();
         this.changeInterval(chartJDialogOptions.getInterval());
         
         // Yellow box and chart resizing (#2969416)
@@ -174,7 +174,7 @@ public class ChartJDialog extends javax.swing.JDialog {
         });
         
         // Update GUI.
-        if (MainFrame.getInstance().getJStockOptions().getChartTheme() == JStockOptions.ChartTheme.Light) {
+        if (JStock.getInstance().getJStockOptions().getChartTheme() == JStockOptions.ChartTheme.Light) {
             this.jRadioButtonMenuItem3.setSelected(true);
         } else {
             this.jRadioButtonMenuItem4.setSelected(true);
@@ -231,9 +231,9 @@ public class ChartJDialog extends javax.swing.JDialog {
             "info_message_please_enter_number_of_days_for_CCI"
         };
         final Map<TA, Set<Object>> m = new EnumMap<TA, Set<Object>>(TA.class);
-        final int taExSize = MainFrame.getInstance().getChartJDialogOptions().getTAExSize();
+        final int taExSize = JStock.getInstance().getChartJDialogOptions().getTAExSize();
         for (int i = 0; i < taExSize; i++) {
-            final TAEx taEx = MainFrame.getInstance().getChartJDialogOptions().getTAEx(i);
+            final TAEx taEx = JStock.getInstance().getChartJDialogOptions().getTAEx(i);
             if (m.containsKey(taEx.getTA()) == false) {
                 m.put(taEx.getTA(), new HashSet<Object>());
             }
@@ -377,7 +377,7 @@ public class ChartJDialog extends javax.swing.JDialog {
      * Restores previous chart dialog options.
      */
     private void loadChartJDialogOptions() {
-        final ChartJDialogOptions chartJDialogOptions = MainFrame.getInstance().getChartJDialogOptions();
+        final ChartJDialogOptions chartJDialogOptions = JStock.getInstance().getChartJDialogOptions();
         /* Zoom in to which days? */
         ChartJDialog.this.zoom(chartJDialogOptions.getZoom());
         /* Restore TA information. */
@@ -695,7 +695,7 @@ public class ChartJDialog extends javax.swing.JDialog {
         // Throw away all the old data.
         this.priceVolumeChart = null;
         this.candlestickChart = null;
-        changeType(MainFrame.getInstance().getChartJDialogOptions().getType());
+        changeType(JStock.getInstance().getChartJDialogOptions().getType());
         // and throw away all the old TAs.
         time_series_moving_average_map.clear();
         time_series_exponential_moving_average_map.clear();
@@ -707,7 +707,7 @@ public class ChartJDialog extends javax.swing.JDialog {
         this.jMenu2.removeAll();
 
         /* Remember the setting. */
-        MainFrame.getInstance().getChartJDialogOptions().setInterval(interval);
+        JStock.getInstance().getChartJDialogOptions().setInterval(interval);
         /* Remember current interval. */
         this.currentInverval = interval;
 
@@ -779,7 +779,7 @@ public class ChartJDialog extends javax.swing.JDialog {
         }
 
         /* Remember the setting. */
-        MainFrame.getInstance().getChartJDialogOptions().setType(type);
+        JStock.getInstance().getChartJDialogOptions().setType(type);
         /* Remember current interval. */
         this.currentType = type;
 
@@ -1065,7 +1065,7 @@ public class ChartJDialog extends javax.swing.JDialog {
             this.jLabel14.setFont(org.yccheok.jstock.gui.Utils.getBoldFont(this.jLabel14.getFont()));
             break;
         }
-        MainFrame.getInstance().getChartJDialogOptions().setZoom(z);
+        JStock.getInstance().getChartJDialogOptions().setZoom(z);
     }
 
     /**
@@ -1182,12 +1182,12 @@ public class ChartJDialog extends javax.swing.JDialog {
 
     private void jRadioButtonMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonMenuItem1ActionPerformed
         this.changeType(Type.PriceVolume);
-        this.zoom(MainFrame.getInstance().getChartJDialogOptions().getZoom());
+        this.zoom(JStock.getInstance().getChartJDialogOptions().getZoom());
     }//GEN-LAST:event_jRadioButtonMenuItem1ActionPerformed
 
     private void jRadioButtonMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonMenuItem2ActionPerformed
         this.changeType(Type.Candlestick);
-        this.zoom(MainFrame.getInstance().getChartJDialogOptions().getZoom());
+        this.zoom(JStock.getInstance().getChartJDialogOptions().getZoom());
     }//GEN-LAST:event_jRadioButtonMenuItem2ActionPerformed
 
     private void jLabel5MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel5MouseClicked
@@ -1199,7 +1199,7 @@ public class ChartJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jLabel6MouseClicked
 
     private void jRadioButtonMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonMenuItem3ActionPerformed
-        MainFrame.getInstance().getJStockOptions().setChartTheme(JStockOptions.ChartTheme.Light);
+        JStock.getInstance().getJStockOptions().setChartTheme(JStockOptions.ChartTheme.Light);
         if (priceVolumeChart != null) {
             org.yccheok.jstock.charting.Utils.applyChartThemeEx(priceVolumeChart);
         }
@@ -1209,7 +1209,7 @@ public class ChartJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jRadioButtonMenuItem3ActionPerformed
 
     private void jRadioButtonMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonMenuItem4ActionPerformed
-        MainFrame.getInstance().getJStockOptions().setChartTheme(JStockOptions.ChartTheme.Dark);
+        JStock.getInstance().getJStockOptions().setChartTheme(JStockOptions.ChartTheme.Dark);
         if (priceVolumeChart != null) {
             org.yccheok.jstock.charting.Utils.applyChartThemeEx(priceVolumeChart);
         }
@@ -1311,7 +1311,7 @@ public class ChartJDialog extends javax.swing.JDialog {
         final Stock stock = stockHistoryServer.getStock(stockHistoryServer.getTimestamp(num - 1));
 
         if (org.yccheok.jstock.engine.Utils.isNameImmutable()) {
-            final StockNameDatabase stockNameDatabase = MainFrame.getInstance().getStockNameDatabase();
+            final StockNameDatabase stockNameDatabase = JStock.getInstance().getStockNameDatabase();
             if (stockNameDatabase != null) {
                 final String name = stockNameDatabase.codeToName(stock.code);
                 if (name != null) {
@@ -1331,7 +1331,7 @@ public class ChartJDialog extends javax.swing.JDialog {
             }
             // Symbol from server is empty. We need to ask help from offline
             // database.
-            final StockInfoDatabase stockInfoDatabase = MainFrame.getInstance().getStockInfoDatabase();
+            final StockInfoDatabase stockInfoDatabase = JStock.getInstance().getStockInfoDatabase();
             if (stockInfoDatabase != null) {
                 final Symbol s = stockInfoDatabase.codeToSymbol(stock.code);
                 if (s != null) {
@@ -1570,11 +1570,11 @@ public class ChartJDialog extends javax.swing.JDialog {
 
         if (show && this.activeTAExs.contains(taEx) == false) {
             this.activeTAExs.add(taEx);
-            MainFrame.getInstance().getChartJDialogOptions().add(taEx);
+            JStock.getInstance().getChartJDialogOptions().add(taEx);
         }
         else if (!show) {
             this.activeTAExs.remove(taEx);
-            MainFrame.getInstance().getChartJDialogOptions().remove(taEx);
+            JStock.getInstance().getChartJDialogOptions().remove(taEx);
         }
     }
 
@@ -1651,11 +1651,11 @@ public class ChartJDialog extends javax.swing.JDialog {
 
         if (show && this.activeTAExs.contains(taEx) == false) {
             this.activeTAExs.add(taEx);
-            MainFrame.getInstance().getChartJDialogOptions().add(taEx);
+            JStock.getInstance().getChartJDialogOptions().add(taEx);
         }
         else if (!show) {
             this.activeTAExs.remove(taEx);
-            MainFrame.getInstance().getChartJDialogOptions().remove(taEx);
+            JStock.getInstance().getChartJDialogOptions().remove(taEx);
         }
     }
 
@@ -1732,11 +1732,11 @@ public class ChartJDialog extends javax.swing.JDialog {
 
         if (show && this.activeTAExs.contains(taEx) == false) {
             this.activeTAExs.add(taEx);
-            MainFrame.getInstance().getChartJDialogOptions().add(taEx);
+            JStock.getInstance().getChartJDialogOptions().add(taEx);
         }
         else if (!show) {
             this.activeTAExs.remove(taEx);
-            MainFrame.getInstance().getChartJDialogOptions().remove(taEx);
+            JStock.getInstance().getChartJDialogOptions().remove(taEx);
         }
     }
 
@@ -1849,10 +1849,10 @@ public class ChartJDialog extends javax.swing.JDialog {
         
         if (show && this.activeTAExs.contains(taEx) == false) {
             this.activeTAExs.add(taEx);
-            MainFrame.getInstance().getChartJDialogOptions().add(taEx);
+            JStock.getInstance().getChartJDialogOptions().add(taEx);
         } else if (!show) {
             this.activeTAExs.remove(taEx);
-            MainFrame.getInstance().getChartJDialogOptions().remove(taEx);
+            JStock.getInstance().getChartJDialogOptions().remove(taEx);
         }        
     }
     
@@ -1922,10 +1922,10 @@ public class ChartJDialog extends javax.swing.JDialog {
 
         if (show && this.activeTAExs.contains(taEx) == false) {
             this.activeTAExs.add(taEx);
-            MainFrame.getInstance().getChartJDialogOptions().add(taEx);
+            JStock.getInstance().getChartJDialogOptions().add(taEx);
         } else if (!show) {
             this.activeTAExs.remove(taEx);
-            MainFrame.getInstance().getChartJDialogOptions().remove(taEx);
+            JStock.getInstance().getChartJDialogOptions().remove(taEx);
         }
     }
 
@@ -2057,11 +2057,11 @@ public class ChartJDialog extends javax.swing.JDialog {
 
         if (show && this.activeTAExs.contains(taEx) == false) {
             this.activeTAExs.add(taEx);
-            MainFrame.getInstance().getChartJDialogOptions().add(taEx);
+            JStock.getInstance().getChartJDialogOptions().add(taEx);
         }
         else if (!show) {
             this.activeTAExs.remove(taEx);
-            MainFrame.getInstance().getChartJDialogOptions().remove(taEx);
+            JStock.getInstance().getChartJDialogOptions().remove(taEx);
         }
     }
 

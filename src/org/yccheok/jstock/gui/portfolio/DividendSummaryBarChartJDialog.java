@@ -41,7 +41,7 @@ import org.jfree.data.category.DefaultCategoryDataset;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.gui.JStockOptions;
-import org.yccheok.jstock.gui.MainFrame;
+import org.yccheok.jstock.gui.JStock;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.portfolio.Dividend;
 import org.yccheok.jstock.portfolio.DividendSummary;
@@ -174,7 +174,7 @@ public class DividendSummaryBarChartJDialog extends javax.swing.JDialog {
             total += ((DefaultCategoryDataset)dataset).getValue(0, i).doubleValue();
         }
 
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         final String currencySymbol = jStockOptions.getCurrencySymbol(jStockOptions.getCountry());
         // Use apostrophes to escape currencySymbol. If currencySymbol contains
         // apostrophes, we may need to escape those by doubling them.
