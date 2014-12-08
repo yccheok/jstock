@@ -254,7 +254,6 @@ public class CurrencyExchangeMonitor extends Subject<CurrencyExchangeMonitor, Do
     private static final Map<Country, String> countryToCurrencyCode =  new EnumMap<Country, String>(Country.class);
 
     static {
-        countryToCurrencyCode.put(Country.Argentina, "ARS");
         countryToCurrencyCode.put(Country.Australia, "AUD");
         countryToCurrencyCode.put(Country.Austria, "EUR");
         countryToCurrencyCode.put(Country.Belgium, "EUR");
@@ -284,7 +283,7 @@ public class CurrencyExchangeMonitor extends Subject<CurrencyExchangeMonitor, Do
         countryToCurrencyCode.put(Country.Taiwan, "TWD");
         countryToCurrencyCode.put(Country.UnitedKingdom, "GBP");
         countryToCurrencyCode.put(Country.UnitedState, "USD");
-}
+    }
 
     /**
      * Convert from this country's currency.

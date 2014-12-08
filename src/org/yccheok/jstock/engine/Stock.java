@@ -627,7 +627,6 @@ public class Stock {
         Nasdaq("Nasdaq"),
         AMEX("AMEX"),
         PinkSheet("Pink Sheet"),
-        Buenos("Buenos Aires"),                 // Argentina
         Sydney("Sydney"),                       // Australia
         ASX("ASX"),
         Vienna("Vienna"),                       // Austria

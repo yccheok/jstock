@@ -131,7 +131,6 @@ public enum Factories {
         final Set<Class<? extends StockServerFactory>> googleSet = new HashSet<Class<? extends StockServerFactory>>();
         final Set<Class<? extends StockServerFactory>> yahooSet = new HashSet<Class<? extends StockServerFactory>>();
         
-        final List<StockServerFactory> argentinaList = new CopyOnWriteArrayList<StockServerFactory>();
         final List<StockServerFactory> australiaList = new CopyOnWriteArrayList<StockServerFactory>();
         final List<StockServerFactory> austriaList = new CopyOnWriteArrayList<StockServerFactory>();
         final List<StockServerFactory> belgiumList = new CopyOnWriteArrayList<StockServerFactory>();
@@ -164,7 +163,6 @@ public enum Factories {
         yahooSet.add(YahooStockServerFactory.class);
         yahooSet.add(BrazilYahooStockServerFactory.class);
         
-        argentinaList.add(YahooStockServerFactory.newInstance());
         australiaList.add(YahooStockServerFactory.newInstance());
         austriaList.add(YahooStockServerFactory.newInstance());
         austriaList.add(GoogleStockServerFactory.newInstance());
@@ -206,7 +204,6 @@ public enum Factories {
         priceSourceMap.put(PriceSource.Google, googleSet);
         priceSourceMap.put(PriceSource.Yahoo, yahooSet);
         
-        map.put(Country.Argentina, argentinaList);
         map.put(Country.Australia, australiaList);
         map.put(Country.Austria, austriaList);
         map.put(Country.Belgium, belgiumList);
