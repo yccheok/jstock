@@ -229,7 +229,7 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
 
     // Print out label text for currency exchange enable check box.
     private String getConvertCurrencyString() {
-        return MessageFormat.format(GUIBundle.getString("OptionsSellAdvisorJPanel_ConvertCurrencyFromTo"), MainFrame.getInstance().getJStockOptions().getCountry());
+        return MessageFormat.format(GUIBundle.getString("OptionsSellAdvisorJPanel_ConvertCurrencyFromTo"), JStock.getInstance().getJStockOptions().getCountry());
     }
 
     private JFormattedTextField getPercentageJFormattedTextField() {
@@ -251,7 +251,7 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
                 return defaultCountryComboBoxModel;
             }
             for (Country country : Country.values()) {
-                if (country.equals(MainFrame.getInstance().getJStockOptions().getCountry())) {
+                if (country.equals(JStock.getInstance().getJStockOptions().getCountry())) {
                     // Skip "local" country.
                     continue;
                 }
@@ -351,9 +351,9 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
         jStockOptions.setFourDecimalPlacesEnabled(this.jCheckBox3.isSelected());
         
         // Remember to refresh the GUIs as well.
-        MainFrame.getInstance().getPortfolioManagementJPanel().refreshCurrencySymbol();
+        JStock.getInstance().getPortfolioManagementJPanel().refreshCurrencySymbol();
         // Update the new state of currency exchange monitor.
-        MainFrame.getInstance().initCurrencyExchangeMonitor();
+        JStock.getInstance().initCurrencyExchangeMonitor();
 
         return true;
     }

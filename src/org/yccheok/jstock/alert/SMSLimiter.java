@@ -20,7 +20,7 @@
 package org.yccheok.jstock.alert;
 
 import org.yccheok.jstock.gui.JStockOptions;
-import org.yccheok.jstock.gui.MainFrame;
+import org.yccheok.jstock.gui.JStock;
 
 /**
  *
@@ -32,7 +32,7 @@ public enum SMSLimiter {
     private java.util.concurrent.atomic.AtomicInteger atomic = new java.util.concurrent.atomic.AtomicInteger();
 
     public boolean isSMSAllowed() {
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         final int max = jStockOptions.getMaxSMSPerDay();
 
         if (max <= 0) {
@@ -53,7 +53,7 @@ public enum SMSLimiter {
     }
 
     public void inc() {
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         final int max = jStockOptions.getMaxSMSPerDay();
 
         if (max <= 0) {

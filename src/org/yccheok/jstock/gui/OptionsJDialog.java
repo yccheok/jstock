@@ -100,20 +100,20 @@ public class OptionsJDialog extends javax.swing.JDialog implements JStockOptions
         }
 
         if (oldPriceSource != jStockOptions.getPriceSource(jStockOptions.getCountry())) {
-            MainFrame.getInstance().updatePriceSource(jStockOptions.getCountry(), jStockOptions.getPriceSource(jStockOptions.getCountry()));
+            JStock.getInstance().updatePriceSource(jStockOptions.getCountry(), jStockOptions.getPriceSource(jStockOptions.getCountry()));
         }
         if (oldScanningSpeed != jStockOptions.getScanningSpeed()) {
-            MainFrame.getInstance().refreshAllRealTimeStockMonitors();
-            MainFrame.getInstance().refreshRealTimeIndexMonitor();
+            JStock.getInstance().refreshAllRealTimeStockMonitors();
+            JStock.getInstance().refreshRealTimeIndexMonitor();
         }
         if (oldIsFeeCalculationEnabled != jStockOptions.isFeeCalculationEnabled()) {
-            MainFrame.getInstance().getPortfolioManagementJPanel().refreshGUIAfterFeeCalculationEnabledOptionsChanged();
+            JStock.getInstance().getPortfolioManagementJPanel().refreshGUIAfterFeeCalculationEnabledOptionsChanged();
         }
         if (oldIsDynamicChartVisible != jStockOptions.isDynamicChartVisible()) {
-            MainFrame.getInstance().initDynamicChartVisibility();
+            JStock.getInstance().initDynamicChartVisibility();
         }        
         if (oldIsPenceToPoundConversionEnabled != jStockOptions.isPenceToPoundConversionEnabled() || oldIsFourDecimalPlacesEnabled != jStockOptions.isFourDecimalPlacesEnabled()) {
-            MainFrame.getInstance().getPortfolioManagementJPanel().refreshGUIAfterOptionsJDialog();
+            JStock.getInstance().getPortfolioManagementJPanel().refreshGUIAfterOptionsJDialog();
         }
         
         this.setVisible(false);

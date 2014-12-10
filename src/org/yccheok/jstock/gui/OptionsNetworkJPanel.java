@@ -56,16 +56,16 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
                 // Store old proxy server and old proxy auth information.
                 final String httpproxyHost = System.getProperties().getProperty("http.proxyHost");
                 final String httpproxyPort = System.getProperties().getProperty("http.proxyPort");
-                final String oldProxyAuthUsername = MainFrame.getInstance().getJStockOptions().getProxyAuthUserName();
-                final String oldProxyAuthPassword = MainFrame.getInstance().getJStockOptions().getProxyAuthPassword();
-                final boolean oldIsProxyAuthEnabled = MainFrame.getInstance().getJStockOptions().isProxyAuthEnabled();
+                final String oldProxyAuthUsername = JStock.getInstance().getJStockOptions().getProxyAuthUserName();
+                final String oldProxyAuthPassword = JStock.getInstance().getJStockOptions().getProxyAuthPassword();
+                final boolean oldIsProxyAuthEnabled = JStock.getInstance().getJStockOptions().isProxyAuthEnabled();
 
                 // Set new proxy auth information.
                 final String newProxyAuthUsername = jTextField2.getText() != null ? jTextField2.getText() : "";
                 final String newProxyAuthPassword = Utils.encrypt(new String(jPasswordField1.getPassword()));                
-                MainFrame.getInstance().getJStockOptions().setProxyAuthUserName(newProxyAuthUsername);
-                MainFrame.getInstance().getJStockOptions().setProxyAuthPassword(newProxyAuthPassword);
-                MainFrame.getInstance().getJStockOptions().setIsProxyAuthEnabled(jCheckBox1.isSelected());
+                JStock.getInstance().getJStockOptions().setProxyAuthUserName(newProxyAuthUsername);
+                JStock.getInstance().getJStockOptions().setProxyAuthPassword(newProxyAuthPassword);
+                JStock.getInstance().getJStockOptions().setIsProxyAuthEnabled(jCheckBox1.isSelected());
 
                 // Set new proxy server information.
                 if ((jTextField1.getText().length() > 0) && org.yccheok.jstock.engine.Utils.isValidPortNumber(jFormattedTextField1.getText())) {
@@ -91,9 +91,9 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
                 }
                 finally {
                     // Restore.
-                    MainFrame.getInstance().getJStockOptions().setProxyAuthUserName(oldProxyAuthUsername);
-                    MainFrame.getInstance().getJStockOptions().setProxyAuthPassword(oldProxyAuthPassword);
-                    MainFrame.getInstance().getJStockOptions().setIsProxyAuthEnabled(oldIsProxyAuthEnabled);
+                    JStock.getInstance().getJStockOptions().setProxyAuthUserName(oldProxyAuthUsername);
+                    JStock.getInstance().getJStockOptions().setProxyAuthPassword(oldProxyAuthPassword);
+                    JStock.getInstance().getJStockOptions().setIsProxyAuthEnabled(oldIsProxyAuthEnabled);
 
                     if (httpproxyHost != null) {
                         System.getProperties().put("http.proxyHost", httpproxyHost);

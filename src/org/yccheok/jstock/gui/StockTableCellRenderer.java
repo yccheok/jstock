@@ -45,7 +45,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
     }
     
     private void performCellBlinking(final Component cell, final double value, final double oldValue, final Color finalForegroundColor, final Color finalBackgroundColor, final AbstractTableModelWithMemory tableModel, final int modelRow, final int modelCol) {
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
 
         if (value == oldValue) {
             cell.setForeground(finalForegroundColor);
@@ -57,7 +57,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
         }                
         
         // in ms.
-        final int scanningSpeed = MainFrame.getInstance().getJStockOptions().getScanningSpeed();
+        final int scanningSpeed = JStock.getInstance().getJStockOptions().getScanningSpeed();
         // Cannot more than 5 seconds.
         int numberOfMillisecondsInTheFuture = Math.min(5000, scanningSpeed);
         Date timeToRun = new Date(System.currentTimeMillis()+numberOfMillisecondsInTheFuture);
@@ -72,7 +72,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
     }
     
     private Color getBackgroundColor(int row, Alert alert) {
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
 
         if (alert == Alert.FallBelow) {
             return jStockOptions.getFallBelowAlertBackgroundColor();
@@ -88,7 +88,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
     }
 
     private Color getNormalTextForegroundColor(Alert alert) {
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
 
         if (alert == Alert.FallBelow) {
             return jStockOptions.getFallBelowAlertForegroundColor();
@@ -100,7 +100,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
     }
 
     private Color getForegroundColor(double value, double ref, Alert alert) {
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         final boolean reverse = org.yccheok.jstock.engine.Utils.isFallBelowAndRiseAboveColorReverse();
 
         if (alert == Alert.FallBelow) {
@@ -133,7 +133,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
                             int row, int column) {        
         assert(isSelected == false);
         
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         
         AbstractTableModelWithMemory tableModel = (AbstractTableModelWithMemory)table.getModel();
 
@@ -378,7 +378,7 @@ public class StockTableCellRenderer extends javax.swing.table.DefaultTableCellRe
                             int row, int column) {
         Component c = super.getTableCellRendererComponent(table, color, isSelected, hasFocus, row, column);
 
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         
         if (!isSelected && jStockOptions.isEnableColorChange()) {
             return getTableCellRendererComponentWithCellBlinking(c, table, color, isSelected, hasFocus, row, column);
