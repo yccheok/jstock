@@ -60,7 +60,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
     public NewBuyTransactionJDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         final boolean isFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
         
         if (isFeeCalculationEnabled) {
@@ -298,7 +298,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
     }
     
     private boolean shouldAutoCalculateBrokerFee() {
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         
         return 
                 (jStockOptions.isAutoBrokerFeeCalculationEnabled()) && 
@@ -617,7 +617,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
                 if (object != null) {
                     // There is item(s) in this combo box. Let's transfer the 1st
                     // item into text field.
-                    MainFrame m = (MainFrame)NewBuyTransactionJDialog.this.getParent();
+                    JStock m = (JStock)NewBuyTransactionJDialog.this.getParent();
 
                     if (m == null) {
                         // Break and fall back to warning message box pop up 
@@ -740,12 +740,12 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         // follow the formatter text field's.
         commitEdit();
         
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         final boolean isFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
 
         if (isFeeCalculationEnabled && shouldAutoCalculateBrokerFee())
         {
-            final BrokingFirm brokingFirm = MainFrame.getInstance().getJStockOptions().getSelectedBrokingFirm();
+            final BrokingFirm brokingFirm = JStock.getInstance().getJStockOptions().getSelectedBrokingFirm();
             
             final String name = jTextField1.getText();
             final double unit = (Double)jSpinner1.getValue();
@@ -881,7 +881,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
     }
     
     private void initAjaxProvider() {
-        JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         
         Country country = jStockOptions.getCountry();
         
@@ -916,7 +916,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
                 addStockInfoFromAutoCompleteJComboBox(stockInfo);
 
                 // Remember to update our offline database as well.
-                MainFrame.getInstance().addUserDefinedStockInfo(stockInfo);
+                JStock.getInstance().addUserDefinedStockInfo(stockInfo);
             }
         };
     }
@@ -936,7 +936,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
                 addStockInfoFromAutoCompleteJComboBox(stockInfo);
 
                 // Remember to update our offline database as well.
-                MainFrame.getInstance().addUserDefinedStockInfo(stockInfo);
+                JStock.getInstance().addUserDefinedStockInfo(stockInfo);
             }
         };
     }

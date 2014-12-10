@@ -28,7 +28,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import net.sf.nachocalendar.table.DateRendererDecorator;
 import org.yccheok.jstock.gui.JStockOptions;
-import org.yccheok.jstock.gui.MainFrame;
+import org.yccheok.jstock.gui.JStock;
 import org.yccheok.jstock.gui.portfolio.DepositSummaryTableModel;
 
 /**
@@ -43,7 +43,7 @@ public class DateRendererDecoratorEx extends DateRendererDecorator {
     }
 
     private Color getBackgroundColor(int row) {
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
 
         if (row % 2 == 0) {
             return jStockOptions.getFirstRowBackgroundColor();
@@ -75,7 +75,7 @@ public class DateRendererDecoratorEx extends DateRendererDecorator {
 
         if(isSelected || hasFocus) return c;
 
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
 
         c.setForeground(jStockOptions.getNormalTextForegroundColor());
 

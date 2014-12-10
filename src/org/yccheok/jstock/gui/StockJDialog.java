@@ -421,7 +421,7 @@ public class StockJDialog extends javax.swing.JDialog {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         final java.util.List<StockInfo> stockInfos = this.buildSelectedStockInfos();
-        final MainFrame m = MainFrame.getInstance();
+        final JStock m = JStock.getInstance();
 
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -466,7 +466,7 @@ public class StockJDialog extends javax.swing.JDialog {
     public java.util.List<StockInfo> buildSelectedStockInfos() {
         java.util.List<StockInfo> selectedStockInfos = new java.util.ArrayList<StockInfo>();
         
-        MainFrame m = MainFrame.getInstance();
+        JStock m = JStock.getInstance();
         
 		StockInfoDatabase stock_info_database = m.getStockInfoDatabase();
         if (stock_info_database == null) {
@@ -517,7 +517,7 @@ public class StockJDialog extends javax.swing.JDialog {
     }
     
     private void initBoardCheckBoxes() {
-        final MainFrame m = MainFrame.getInstance();
+        final JStock m = JStock.getInstance();
         final StockInfoDatabase stockInfoDatabase = m.getStockInfoDatabase();
         
         boardCheckBoxes.add(jCheckBox1);
@@ -552,7 +552,7 @@ public class StockJDialog extends javax.swing.JDialog {
     }
 
     private void initIndustryCheckBoxes() {
-        final MainFrame m = MainFrame.getInstance();
+        final JStock m = JStock.getInstance();
         final StockInfoDatabase stockInfoDatabase = m.getStockInfoDatabase();
         
         industryCheckBoxes.add(jCheckBox5);

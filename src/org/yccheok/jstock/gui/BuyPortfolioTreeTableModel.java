@@ -354,7 +354,7 @@ public class BuyPortfolioTreeTableModel extends DeprecatedAbstractPortfolioTreeT
 
     @Override
     public Object getValueAt(Object node, int column) {
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
 
         if (node instanceof Portfolio) {
             final Portfolio portfolio = (Portfolio)node;
@@ -439,7 +439,7 @@ public class BuyPortfolioTreeTableModel extends DeprecatedAbstractPortfolioTreeT
                     return transactionSummary.getQuantity();
                     
                 case 3:
-                    if (MainFrame.getInstance().getJStockOptions().isFourDecimalPlacesEnabled()) {
+                    if (JStock.getInstance().getJStockOptions().isFourDecimalPlacesEnabled()) {
                         return new DoubleWrapper(DecimalPlaces.Four, this.getPurchasePrice(transactionSummary));
                     } else {
                         return new DoubleWrapper(DecimalPlaces.Three, this.getPurchasePrice(transactionSummary));   

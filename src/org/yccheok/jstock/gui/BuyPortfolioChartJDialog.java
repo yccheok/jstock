@@ -73,7 +73,7 @@ public class BuyPortfolioChartJDialog extends javax.swing.JDialog {
         this.portfolioTreeTableModel = portfolioTreeTableModel;
         
         final JFreeChart freeChart;
-        final int lastSelectedBuyPortfolioChartIndex = MainFrame.getInstance().getJStockOptions().getLastSelectedBuyPortfolioChartIndex();
+        final int lastSelectedBuyPortfolioChartIndex = JStock.getInstance().getJStockOptions().getLastSelectedBuyPortfolioChartIndex();
         if (lastSelectedBuyPortfolioChartIndex < this.jComboBox1.getItemCount() && lastSelectedBuyPortfolioChartIndex < cNames.length && lastSelectedBuyPortfolioChartIndex >= 0) {            
             freeChart = createChart(cNames[lastSelectedBuyPortfolioChartIndex]);
             // Put it in next queue, so that it won't trigger jComBox1's event
@@ -128,7 +128,7 @@ public class BuyPortfolioChartJDialog extends javax.swing.JDialog {
 
         jPanel1.setLayout(new java.awt.BorderLayout());
 
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         final boolean isFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
         Set<String> excludedStrings = new HashSet<String>();
         excludedStrings.add(GUIBundle.getString("BuyPortfolioTreeTableModel_Broker"));
@@ -178,7 +178,7 @@ public class BuyPortfolioChartJDialog extends javax.swing.JDialog {
     }
     
     private JFreeChart createChart(String name) {
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         final boolean isFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
         final boolean isPenceToPoundConversionEnabled = jStockOptions.isPenceToPoundConversionEnabled();
         
@@ -289,7 +289,7 @@ public class BuyPortfolioChartJDialog extends javax.swing.JDialog {
         String selected = ((javax.swing.JComboBox)evt.getSource()).getSelectedItem().toString();
         
         final int selectedIndex = ((javax.swing.JComboBox)evt.getSource()).getSelectedIndex();
-        MainFrame.getInstance().getJStockOptions().setLastSelectedBuyPortfolioChartIndex(selectedIndex);
+        JStock.getInstance().getJStockOptions().setLastSelectedBuyPortfolioChartIndex(selectedIndex);
         
         final JFreeChart freeChart = this.createChart(selected);
         org.yccheok.jstock.charting.Utils.applyChartTheme(freeChart);

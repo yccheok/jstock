@@ -333,7 +333,7 @@ public class IndicatorPanel extends JPanel {
         
         stop();
         
-        MainFrame m = MainFrame.getInstance();
+        JStock m = JStock.getInstance();
         m.setStatusBar(false, GUIBundle.getString("IndicatorPanel_SimulationStopped"));
     }//GEN-LAST:event_jButton6ActionPerformed
 
@@ -403,7 +403,7 @@ public class IndicatorPanel extends JPanel {
     }//GEN-LAST:event_jList1ValueChanged
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        final MainFrame m = MainFrame.getInstance();
+        final JStock m = JStock.getInstance();
         final IndicatorDefaultDrawing indicatorDefaultDrawing = (IndicatorDefaultDrawing)this.view.getDrawing();
         final OperatorIndicator operatorIndicator = indicatorDefaultDrawing.getOperatorIndicator();
         
@@ -488,7 +488,7 @@ public class IndicatorPanel extends JPanel {
             output = MessageFormat.format(MessagesBundle.getString("question_message_current_drawing_is_modified_save_it_template"), _listSelectionEx.projectName);
         }
         // We have a unsaved drawing. Prompt user to save it.
-        final int result = javax.swing.JOptionPane.showConfirmDialog(MainFrame.getInstance(), output, MessagesBundle.getString("question_title_current_drawing_is_modified_save_it"), javax.swing.JOptionPane.YES_NO_CANCEL_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
+        final int result = javax.swing.JOptionPane.showConfirmDialog(JStock.getInstance(), output, MessagesBundle.getString("question_title_current_drawing_is_modified_save_it"), javax.swing.JOptionPane.YES_NO_CANCEL_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
 
         if (result == JOptionPane.YES_OPTION) {
             // Do not use this.Save(false). this.Save(false) will only save the
@@ -576,7 +576,7 @@ public class IndicatorPanel extends JPanel {
             output = MessageFormat.format(MessagesBundle.getString("question_message_current_drawing_is_modified_save_it_template"), this.jList2.getSelectedValue());
         }
         // We have a unsaved drawing. Prompt user to save it.
-        final int result = javax.swing.JOptionPane.showConfirmDialog(MainFrame.getInstance(), output, MessagesBundle.getString("question_title_current_drawing_is_modified_save_it"), javax.swing.JOptionPane.YES_NO_CANCEL_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
+        final int result = javax.swing.JOptionPane.showConfirmDialog(JStock.getInstance(), output, MessagesBundle.getString("question_title_current_drawing_is_modified_save_it"), javax.swing.JOptionPane.YES_NO_CANCEL_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
         if (result == JOptionPane.YES_OPTION) {
             // Do not use this.Save(false). this.Save(false) will only save the
             // project in current active tab and current selected project.
@@ -861,7 +861,7 @@ public class IndicatorPanel extends JPanel {
         }
         if (confirmationDialog) {
             final String output = MessageFormat.format(MessagesBundle.getString("question_message_delete_template"), projectName);
-            final int result = javax.swing.JOptionPane.showConfirmDialog(MainFrame.getInstance(), output, MessagesBundle.getString("question_title_delete"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
+            final int result = javax.swing.JOptionPane.showConfirmDialog(JStock.getInstance(), output, MessagesBundle.getString("question_title_delete"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
             if (result != javax.swing.JOptionPane.YES_OPTION) {
                 return;
             }
@@ -881,7 +881,7 @@ public class IndicatorPanel extends JPanel {
         }
         if (confirmationDialog) {
             final String output = MessageFormat.format(MessagesBundle.getString("question_message_delete_template"), projectName);
-            final int result = javax.swing.JOptionPane.showConfirmDialog(MainFrame.getInstance(), output, MessagesBundle.getString("question_title_delete"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
+            final int result = javax.swing.JOptionPane.showConfirmDialog(JStock.getInstance(), output, MessagesBundle.getString("question_title_delete"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
             if (result != javax.swing.JOptionPane.YES_OPTION) {
                 return;
             }
@@ -1314,7 +1314,7 @@ public class IndicatorPanel extends JPanel {
     }
     
     public void initAjaxProvider() {        
-        JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         
         Country country = jStockOptions.getCountry();
         
@@ -1357,7 +1357,7 @@ public class IndicatorPanel extends JPanel {
                 addStockInfoFromAutoCompleteJComboBox(stockInfo);
 
                 // Remember to update our offline database as well.
-                MainFrame.getInstance().addUserDefinedStockInfo(stockInfo);                
+                JStock.getInstance().addUserDefinedStockInfo(stockInfo);                
             }                
         };
     }
@@ -1377,7 +1377,7 @@ public class IndicatorPanel extends JPanel {
                 addStockInfoFromAutoCompleteJComboBox(stockInfo);
 
                 // Remember to update our offline database as well.
-                MainFrame.getInstance().addUserDefinedStockInfo(stockInfo);
+                JStock.getInstance().addUserDefinedStockInfo(stockInfo);
             }
         };
     }
@@ -1407,7 +1407,7 @@ public class IndicatorPanel extends JPanel {
             Stock s = null;
             int tries = 0;
             
-            MainFrame m = MainFrame.getInstance();
+            JStock m = JStock.getInstance();
 
             if (m == null) {
                 publish(s);
@@ -1459,7 +1459,7 @@ public class IndicatorPanel extends JPanel {
                     return;
                 }
 
-                final MainFrame m = MainFrame.getInstance();
+                final JStock m = JStock.getInstance();
                  
                 if (stock != null) {
                     Stock new_stock = stock;
@@ -1548,7 +1548,7 @@ public class IndicatorPanel extends JPanel {
 
     // Run by worker thread only.
     private void simulate(final Stock stock) {
-        MainFrame m = MainFrame.getInstance();
+        JStock m = JStock.getInstance();
 
         // First, check whether there is a need to get history.
         final IndicatorDefaultDrawing indicatorDefaultDrawing = (IndicatorDefaultDrawing)this.view.getDrawing();
@@ -1777,7 +1777,7 @@ public class IndicatorPanel extends JPanel {
     }
 
     private Wizard getWizardDialog() {
-        final MainFrame m = MainFrame.getInstance();
+        final JStock m = JStock.getInstance();
         final Wizard wizard = new Wizard(m);
         wizard.getDialog().setTitle(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("IndicatorPanel_IndicatorInstallWizard"));
         wizard.getDialog().setResizable(false);

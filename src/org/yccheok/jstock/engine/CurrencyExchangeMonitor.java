@@ -199,7 +199,7 @@ public class CurrencyExchangeMonitor extends Subject<CurrencyExchangeMonitor, Do
                         }   // for
 
                         try {
-                            Thread.sleep(org.yccheok.jstock.gui.MainFrame.getInstance().getJStockOptions().getScanningSpeed());
+                            Thread.sleep(org.yccheok.jstock.gui.JStock.getInstance().getJStockOptions().getScanningSpeed());
                         } catch (InterruptedException ex) {
                             log.error(null, ex);
                             if (isRefresh == false) {
