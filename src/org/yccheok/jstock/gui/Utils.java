@@ -1719,9 +1719,9 @@ public class Utils {
         }
         catch (NumberFormatException exp) {
             log.error(null, exp);
-			return null;
+            return null;
         }
-		return new ApplicationInfo(version, windowsDownloadLink, linuxDownloadLink, macDownloadLink, solarisDownloadLink);
+        return new ApplicationInfo(version, windowsDownloadLink, linuxDownloadLink, macDownloadLink, solarisDownloadLink);
     }
 
     public static int getApplicationVersionID() {
@@ -2701,11 +2701,11 @@ public class Utils {
     // Remember to update isCloudFileCompatible method.
     private static final int CLOUD_FILE_VERSION_ID = 1107;
 
-    private static final String ABOUT_BOX_VERSION_STRING = "1.0.7r";
+    private static final String ABOUT_BOX_VERSION_STRING = "1.0.7s";
 
-    // 1.0.7r
+    // 1.0.7s
     // For About box comparision on latest version purpose.
-    private static final int APPLICATION_VERSION_ID = 1121;
+    private static final int APPLICATION_VERSION_ID = 1122;
         
     private static final Executor zombiePool = Executors.newFixedThreadPool(Utils.NUM_OF_THREADS_ZOMBIE_POOL);
 
