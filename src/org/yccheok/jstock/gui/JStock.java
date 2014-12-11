@@ -102,29 +102,7 @@ public class JStock extends javax.swing.JFrame {
     /**
      * Initialize this MainFrame based on the JStockOptions.
      */
-    private void init() {
-        // OSX menu bar at top
-        if (Utils.isMacOSX()) {
-            System.setProperty("apple.laf.useScreenMenuBar", "true");
-            System.setProperty("apple.awt.brushMetalLook", "true");
-        }
-
-        try {
-            UIManager.setLookAndFeel(getJStockOptions().getLooknFeel());
-        }
-        catch (java.lang.ClassNotFoundException exp) {
-            log.error(null, exp);
-        }
-        catch (java.lang.InstantiationException exp) {
-            log.error(null, exp);
-        }
-        catch (java.lang.IllegalAccessException exp) {
-            log.error(null, exp);
-        }
-        catch (javax.swing.UnsupportedLookAndFeelException exp) {
-            log.error(null, exp);
-        }
-        
+    private void init() {        
         initComponents();
 
         createLookAndFeelMenuItem();
@@ -1728,10 +1706,7 @@ public class JStock extends javax.swing.JFrame {
         return statements.saveAsExcelFile(file, GUIBundle.getString("MainFrame_Title"));
     }
 
-    /**
-     * Returns the best JStockOptions, based on command line argument.
-     */
-    private static JStockOptions getJStockOptions(String args[]) {
+    private static JStockOptions getJStockOptionsViaXML() {
         final File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "options.xml");
         JStockOptions jStockOptions = Utils.fromXML(JStockOptions.class, f);
         if (jStockOptions == null) {
@@ -1739,40 +1714,59 @@ public class JStock extends javax.swing.JFrame {
             // run JStock.
             jStockOptions = new JStockOptions();
         }
-            
-        for (String arg : args) {
-            final String[] tokens = arg.split("=");
-            if (tokens.length != 2) {
-                continue;
-            }
-            final String compare = tokens[0].trim();
-            if (compare.equalsIgnoreCase("-country")) {
-                final String countryStr = tokens[1].trim();
-                try {
-                    final Country country = Country.valueOf(countryStr);
-                    if (country == Country.China) {
-                        // Has user switch to this country before?
-                        if (false == Utils.isFileOrDirectoryExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country)) {
-                            // First time switching to this country. Use the settings from
-                            // command line argument.
-                            jStockOptions.setCountry(country);
-                            final Locale locale = new Locale(Locale.SIMPLIFIED_CHINESE.getLanguage(), Locale.getDefault().getCountry(), Locale.getDefault().getVariant());
-                            jStockOptions.setLocale(locale);
-                        }
-                    }
-                } catch(IllegalArgumentException ex) {
-                    log.error(null, ex);
-                }
-            }
-        }
-
         return jStockOptions;
     }
 
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {        
+    public static void main(String args[]) {
+        /***********************************************************************
+         * UI Manager initialization via JStockOptions.
+         **********************************************************************/
+        final JStockOptions jStockOptions = getJStockOptionsViaXML();
+
+        // OSX menu bar at top.
+        if (Utils.isMacOSX()) {
+            System.setProperty("apple.laf.useScreenMenuBar", "true");
+            System.setProperty("apple.awt.brushMetalLook", "true");
+        }    
+        
+        boolean uiManagerLookAndFeelSuccess = false;
+        try {
+            String lookNFeel = jStockOptions.getLooknFeel();
+            if (null != lookNFeel) {
+                UIManager.setLookAndFeel(lookNFeel);
+                uiManagerLookAndFeelSuccess = true;
+            }
+        } catch (java.lang.ClassNotFoundException | java.lang.InstantiationException | java.lang.IllegalAccessException | javax.swing.UnsupportedLookAndFeelException exp) {
+            log.error(null, exp);
+        }
+
+        if (!uiManagerLookAndFeelSuccess) {
+            String className = Utils.setDefaultLookAndFeel();
+            if (null != className) {
+                final String lookNFeel = jStockOptions.getLooknFeel();
+                // When jStockOptions.getLookNFeel returns null, it means we wish
+                // to use system default value. Hence, don't overwrite the null value,
+                // so that we can use the same jStockOptions, across different
+                // platforms.
+                if (lookNFeel != null) {
+                    jStockOptions.setLooknFeel(className);    
+                }
+            }
+        }
+        
+        /***********************************************************************
+         * Ensure correct localization.
+         **********************************************************************/
+        // This global effect, should just come before anything else, 
+        // after we get an instance of JStockOptions.
+        Locale.setDefault(jStockOptions.getLocale());
+        
+        /***********************************************************************
+         * Single application instance enforcement.
+         **********************************************************************/
         if (false == AppLock.lock()) {
             final int choice = JOptionPane.showOptionDialog(null, 
                     MessagesBundle.getString("warning_message_running_2_jstock"),
@@ -1797,24 +1791,11 @@ public class JStock extends javax.swing.JFrame {
         // before we manually change the system properties according to
         // JStockOptions.
         ProxyDetector.getInstance();      
-        
-        // OSX menu bar at top
-        if (Utils.isMacOSX()) {
-            System.setProperty("apple.laf.useScreenMenuBar", "true");
-            System.setProperty("apple.awt.brushMetalLook", "true");
-        }    
-        Utils.setDefaultLookAndFeel();
-        
-        final String[] _args = args;
-
+                
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
                 final JStock mainFrame = JStock.getInstance();
-                final JStockOptions jStockOptions = getJStockOptions(_args);
-                // This global effect, should just come before anything else, 
-                // after we get an instance of JStockOptions.
-                Locale.setDefault(jStockOptions.getLocale());
                 
                 // We need to first assign jStockOptions to mainFrame, as during
                 // Utils.migrateXMLToCSVPortfolios, we will be accessing mainFrame's
@@ -2009,12 +1990,6 @@ public class JStock extends javax.swing.JFrame {
         if (lafClassName == null) {
             return;
         }
-        
-        // OSX menu bar at top
-        if (Utils.isMacOSX()) {
-            System.setProperty("apple.laf.useScreenMenuBar", "true");
-            System.setProperty("apple.awt.brushMetalLook", "true");
-        }
 
         try {
             UIManager.setLookAndFeel(lafClassName);
@@ -2033,7 +2008,7 @@ public class JStock extends javax.swing.JFrame {
             log.error(null, exp);
         }
         
-        this.jStockOptions.setLookNFeel(lafClassName);
+        this.jStockOptions.setLooknFeel(lafClassName);
         
         for (Enumeration<AbstractButton> e = this.buttonGroup1.getElements() ; e.hasMoreElements() ;) {
             AbstractButton button = e.nextElement();
@@ -3673,8 +3648,7 @@ public class JStock extends javax.swing.JFrame {
         if ((proxyHost.length() > 0) && (org.yccheok.jstock.engine.Utils.isValidPortNumber(proxyPort))) {
             System.getProperties().put("http.proxyHost", proxyHost);
             System.getProperties().put("http.proxyPort", "" + proxyPort);
-        }
-        else {
+        } else {
             System.getProperties().remove("http.proxyHost");
             System.getProperties().remove("http.proxyPort");
         }

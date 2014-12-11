@@ -1093,22 +1093,15 @@ public class Utils {
         return operatorIndicator;
     }
 
-    public static void setDefaultLookAndFeel() {
+    public static String setDefaultLookAndFeel() {
         try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        }
-        catch (java.lang.ClassNotFoundException exp) {
+            String className = UIManager.getSystemLookAndFeelClassName();
+            UIManager.setLookAndFeel(className);
+            return className;
+        } catch (java.lang.ClassNotFoundException | java.lang.InstantiationException | java.lang.IllegalAccessException | javax.swing.UnsupportedLookAndFeelException exp) {
             log.error(null, exp);
         }
-        catch (java.lang.InstantiationException exp) {
-            log.error(null, exp);
-        }
-        catch (java.lang.IllegalAccessException exp) {
-            log.error(null, exp);
-        }
-        catch (javax.swing.UnsupportedLookAndFeelException exp) {
-            log.error(null, exp);
-        }
+        return null;
     }
 
     public static class CloudFile {
