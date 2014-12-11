@@ -135,6 +135,7 @@ public class JStock extends javax.swing.JFrame {
         this.initAlertStateManager();
         this.initDynamicCharts();
         this.initDynamicChartVisibility();
+        this.initAlwaysOnTop();
         this.initStockHistoryMonitor();
         this.initOthersStockHistoryMonitor();
         this.initBrokingFirmLogos();
@@ -1985,46 +1986,54 @@ public class JStock extends javax.swing.JFrame {
         }
     }
   
-    public void setLookAndFeel(String lafClassName) {
-        /* Backward compataible purpose. Old JStockOptions may contain null in this field. */
-        if (lafClassName == null) {
-            return;
-        }
-
+    private void _setAlwaysOnTop(boolean alwaysOnTop) {
+        this.setAlwaysOnTop(alwaysOnTop);
+        this.jStockOptions.setAlwaysOnTop(alwaysOnTop);
+        this.alwaysOnTopMenuItem.setSelected(alwaysOnTop);
+    }
+    
+    private void setLookAndFeel(String lafClassName) {
+        boolean uiManagerLookAndFeelSuccess = false;
+        String realLafClassName = null;
+        
         try {
-            UIManager.setLookAndFeel(lafClassName);
-            SwingUtilities.updateComponentTreeUI(this);
-        }
-        catch (java.lang.ClassNotFoundException exp) {
-            log.error(null, exp);
-        }
-        catch (java.lang.InstantiationException exp) {
-            log.error(null, exp);
-        }
-        catch (java.lang.IllegalAccessException exp) {
-            log.error(null, exp);
-        }
-        catch (javax.swing.UnsupportedLookAndFeelException exp) {
-            log.error(null, exp);
-        }
-        
-        this.jStockOptions.setLooknFeel(lafClassName);
-        
-        for (Enumeration<AbstractButton> e = this.buttonGroup1.getElements() ; e.hasMoreElements() ;) {
-            AbstractButton button = e.nextElement();
-            javax.swing.JRadioButtonMenuItem m = (javax.swing.JRadioButtonMenuItem)button;
-            ChangeLookAndFeelAction a = (ChangeLookAndFeelAction)m.getActionListeners()[0];
-                        
-            if (a.getLafClassName().equals(lafClassName)) {
-                m.setSelected(true);
-                break;                   
+            if (lafClassName == null) {
+                String className = Utils.setDefaultLookAndFeel();
+                if (className != null) {
+                    SwingUtilities.updateComponentTreeUI(this);
+                    realLafClassName = className;
+                    uiManagerLookAndFeelSuccess = true;
+                }
+            } else {
+                UIManager.setLookAndFeel(lafClassName);
+                SwingUtilities.updateComponentTreeUI(this);
+                realLafClassName = lafClassName;
+                uiManagerLookAndFeelSuccess = true;
             }
+        } catch (java.lang.ClassNotFoundException | java.lang.InstantiationException | java.lang.IllegalAccessException | javax.swing.UnsupportedLookAndFeelException exp) {
+            log.error(null, exp);
         }
         
-        // Sequence are important. The AutoCompleteJComboBox itself should have the highest
-        // priority.
-        ((AutoCompleteJComboBox)jComboBox1).setStockInfoDatabase(this.stockInfoDatabase);
-        this.indicatorPanel.setStockInfoDatabase(this.stockInfoDatabase);
+        if (uiManagerLookAndFeelSuccess) {
+            // Don't use realLafClassName.
+            this.jStockOptions.setLooknFeel(lafClassName);
+
+            for (Enumeration<AbstractButton> e = this.buttonGroup1.getElements() ; e.hasMoreElements() ;) {
+                AbstractButton button = e.nextElement();
+                javax.swing.JRadioButtonMenuItem m = (javax.swing.JRadioButtonMenuItem)button;
+                ChangeLookAndFeelAction a = (ChangeLookAndFeelAction)m.getActionListeners()[0];
+
+                if (a.getLafClassName().equals(realLafClassName)) {
+                    m.setSelected(true);
+                    break;                   
+                }
+            }
+            
+            // Sequence are important. The AutoCompleteJComboBox itself should have the highest
+            // priority.
+            ((AutoCompleteJComboBox)jComboBox1).setStockInfoDatabase(this.stockInfoDatabase);
+            this.indicatorPanel.setStockInfoDatabase(this.stockInfoDatabase);
+        }        
     }
 
     public PortfolioManagementJPanel getPortfolioManagementJPanel() {
@@ -2087,7 +2096,7 @@ public class JStock extends javax.swing.JFrame {
             
     public void createLookAndFeelMenuItem() {
         LookAndFeel currentlaf = UIManager.getLookAndFeel();
-        
+
         UIManager.LookAndFeelInfo[] lafInfo = UIManager.getInstalledLookAndFeels();
 
         for(int i=0; i<lafInfo.length; i++) {
@@ -2105,23 +2114,17 @@ public class JStock extends javax.swing.JFrame {
 
         // Always on Top
         jMenu4.addSeparator();
-        final JMenuItem mi = jMenu4.add(new JCheckBoxMenuItem(GUIBundle.getString("MainFrame_AlwaysOnTop")));
+        this.alwaysOnTopMenuItem = jMenu4.add(new JCheckBoxMenuItem(GUIBundle.getString("MainFrame_AlwaysOnTop")));
 
-        mi.addActionListener(new ActionListener() {
+        this.alwaysOnTopMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 AbstractButton aButton = (AbstractButton) e.getSource();
                 boolean selected = aButton.getModel().isSelected();
 
-                JStock.this.setAlwaysOnTop(selected);
-                JStock.this.jStockOptions.setAlwaysOnTop(selected);
+                JStock.this._setAlwaysOnTop(selected);
             }
         });
-
-        boolean selected = jStockOptions.isAlwaysOnTop();
-        mi.setSelected(selected);
-        this.setAlwaysOnTop(selected);
-
     }
   
     private javax.swing.event.TableModelListener getTableModelListener() {
@@ -2427,12 +2430,24 @@ public class JStock extends javax.swing.JFrame {
      * JStockOptions before and outside this method, due to insensitive data
      * requirement.
      */
-    public void reloadAfterDownloadFromCloud() {
+    public void reloadAfterDownloadFromCloud(JStockOptions newJStockOptions) {
+        final String oldLookNFeel = this.jStockOptions.getLooknFeel();
         
-        ////////////////////////////////////////////////////////////////////////
-        // JStockOptions is already restored at this point.
-        // Please refer to LoadFromCloudJDialog.
-        ////////////////////////////////////////////////////////////////////////
+        assert (newJStockOptions != null);
+        
+        this.jStockOptions.insensitiveCopy(newJStockOptions);
+         
+        final String newLookNFeel = this.jStockOptions.getLooknFeel();
+        
+        if (oldLookNFeel != null) {
+            if (false == oldLookNFeel.equals(newLookNFeel)) {
+                this.setLookAndFeel(newLookNFeel);
+            }
+        } else {
+            if (null != newLookNFeel) {
+                this.setLookAndFeel(newLookNFeel);
+            }
+        }
         
         Utils.updateFactoriesPriceSource();
         
@@ -2469,7 +2484,8 @@ public class JStock extends javax.swing.JFrame {
         this.initAlertStateManager();
         this.initDynamicCharts();
         this.initDynamicChartVisibility();
-
+        this.initAlwaysOnTop();
+        
         for (Enumeration<AbstractButton> e = this.buttonGroup2.getElements() ; e.hasMoreElements() ;) {
             AbstractButton button = e.nextElement();
             javax.swing.JRadioButtonMenuItem m = (javax.swing.JRadioButtonMenuItem)button;
@@ -4619,6 +4635,11 @@ public class JStock extends javax.swing.JFrame {
         return this.jTabbedPane1.getSelectedComponent();
     }
 
+    private void initAlwaysOnTop() {
+        boolean selected = jStockOptions.isAlwaysOnTop();
+        this._setAlwaysOnTop(selected);
+    }
+    
     // Unlike a JButton, setIcon() does not add an icon to the text label. 
     // Rather, in a radio button, the method is used to customize the icons used
     // to depict its state. However, by using the HTML capabilities in a label, 
@@ -4827,6 +4848,9 @@ public class JStock extends javax.swing.JFrame {
     // The last time when we receive stock price update.
     private long timestamp = 0;
     private boolean refreshPriceInProgress = false;
+    
+    // To handle look n feel & always on top.
+    private JMenuItem alwaysOnTopMenuItem = null;
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
