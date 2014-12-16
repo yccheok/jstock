@@ -28,6 +28,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.PopupMenuEvent;
@@ -761,7 +762,7 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
                 Integer order1 = m.get(extension1);
                 Integer order2 = m.get(extension2);
                 
-                if (order1 == order2) {
+                if (Objects.equals(order1, order2)) {
                     return str1.compareTo(str2);
                 }
                 
