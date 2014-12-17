@@ -96,7 +96,7 @@ public class Utils {
     } 
     
     public static Country toCountry(Code code) {
-        assert(countries.keySet().size() == 43);
+        assert(countries.keySet().size() == 44);
         
         String string = code.toString();
         int index = string.lastIndexOf(".");
@@ -428,11 +428,26 @@ public class Utils {
         }
         
         final int string_length = string.length();
-        if (string.endsWith(".N") && string_length > ".N".length()) {
-            return "NSE:" + string.substring(0, string_length - ".N".length());
-        } else if (string.endsWith(".B") && string_length > ".B".length()) {
-            return "BOM:" + string.substring(0, string_length - ".B".length());
-        } else if (string.endsWith(".NS") && string_length > ".NS".length()) {
+        if (string_length > 3) {
+            String suffix = string.substring(string_length-3, string_length);
+            String prefix = twoLetterSuffixes.get(suffix);
+            if (prefix != null) {
+                return prefix + string.substring(0, string_length - 3);
+            }
+        } 
+        
+        if (string_length > 2) {
+            String suffix = string.substring(string_length-2, string_length);
+            System.out.println("suffix = " + suffix);
+            String prefix = oneLetterSuffixes.get(suffix);
+            if (prefix != null) {
+                return prefix + string.substring(0, string_length - 2);
+            }
+        }
+
+        if (string_length > ".NS".length() && string.endsWith(".NS")) {
+            // Special case.
+
             // Resolving Yahoo server down for India NSE stock market. Note, we
             // do not support Bombay stock market at this moment, due to the
             // difficulty in converting "TATACHEM.BO" (Yahoo Finance) to 
@@ -442,27 +457,11 @@ public class Utils {
             if (googleFormat != null) {
                 return "NSE:" + googleFormat;
             }
-        } else if (string.endsWith(".SS") && string_length > ".SS".length()) {
-            return "SHA:" + string.substring(0, string_length - ".SS".length());
-        } else if (string.endsWith(".SZ") && string_length > ".SZ".length()) {
-            return "SHE:" + string.substring(0, string_length - ".SZ".length());
-        } else if (string.endsWith(".SA") && string_length > ".SA".length()) {
-            return "BVMF:" + string.substring(0, string_length - ".SA".length());
-        } else if (string.endsWith(".VI") && string_length > ".VI".length()) {
-            return "VIE:" + string.substring(0, string_length - ".VI".length());
-        } else if (string.endsWith(".L") && string_length > ".L".length()) {
-            return "LON:" + string.substring(0, string_length - ".L".length());
-        } else if (string.endsWith(".SI") && string_length > ".SI".length()) {
-            return "SGX:" + string.substring(0, string_length - ".SI".length());
-        } else if (string.endsWith(".TW") && string_length > ".TW".length()) {
-            return "TPE:" + string.substring(0, string_length - ".TW".length());
-        } else if (string.endsWith(".NZ") && string_length > ".NZ".length()) {
-            return "NZE:" + string.substring(0, string_length - ".NZ".length());
         }
-        
+
         return string;
     }
-    
+
     private static boolean isYahooIndexSubset(Code code) {
         return code.toString().startsWith("^");
     }
@@ -817,7 +816,23 @@ public class Utils {
     private static final Map<Class<? extends StockServerFactory>, PriceSource> classToPriceSourceMap = new HashMap<Class<? extends StockServerFactory>, PriceSource>();
     private static final Map<String, Integer> googleUnitedStatesStockExchanges = new HashMap<String, Integer>();
     
+    private static final Map<String, String> oneLetterSuffixes = new HashMap<String, String>();
+    private static final Map<String, String> twoLetterSuffixes = new HashMap<String, String>();
+    
     static {
+        oneLetterSuffixes.put(".N", "NSE:");
+        oneLetterSuffixes.put(".B", "BOM:");
+        oneLetterSuffixes.put(".L", "LON:");
+
+        twoLetterSuffixes.put(".SS", "SHA:");
+        twoLetterSuffixes.put(".SZ", "SHE:");
+        twoLetterSuffixes.put(".SA", "BVMF:");
+        twoLetterSuffixes.put(".VI", "VIE:");
+        twoLetterSuffixes.put(".SI", "SGX:");
+        twoLetterSuffixes.put(".TW", "TPE:");
+        twoLetterSuffixes.put(".NZ", "NZE:");
+        twoLetterSuffixes.put(".ST", "STO:");
+        
         countries.put("AX", Country.Australia);
         countries.put("VI", Country.Austria);
         countries.put("SA", Country.Brazil);
@@ -864,8 +879,10 @@ public class Utils {
         countries.put("MC", Country.Spain);
         countries.put("VA", Country.Spain);
         
-        countries.put("SW", Country.Sweden);
-        countries.put("VX", Country.Sweden);
+        countries.put("ST", Country.Sweden);
+
+        countries.put("SW", Country.Switzerland);
+        countries.put("VX", Country.Switzerland);
         
         countries.put("TW", Country.Taiwan);
         countries.put("TWO", Country.Taiwan);
@@ -886,6 +903,7 @@ public class Utils {
         toGoogleIndex.put("^FTSE", "INDEXFTSE:UKX");
         toGoogleIndex.put("^TWII", "TPE:TAIEX");
         toGoogleIndex.put("^NZ50", "NZE:NZ50G");
+        toGoogleIndex.put("^OMX", "INDEXNASDAQ:OMXS30");
         
         // TODO : Need revision. We no longer have primaryStockServerFactoryClasses
         // concept. Going to replace with PriceSource.
