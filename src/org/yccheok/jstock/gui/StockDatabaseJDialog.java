@@ -88,7 +88,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
     }
 
     private void initAjaxProvider() {
-        JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         
         Country country = jStockOptions.getCountry();
         
@@ -413,7 +413,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
 
     
         private Color getBackgroundColor(int row) {
-            final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+            final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         
             if (row % 2 == 0) {
                 return jStockOptions.getFirstRowBackgroundColor();
@@ -433,7 +433,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
                 return c;
             }
 
-            final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+            final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         
             c.setForeground(jStockOptions.getNormalTextForegroundColor());
     

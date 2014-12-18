@@ -31,7 +31,6 @@ import java.util.Map;
 import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.yccheok.jstock.gui.Pair;
 
 /**
  *
@@ -90,7 +89,7 @@ public class GoogleStockServer implements StockServer {
                 Code _code = codes.get(i);
                 String googleFormat = UnitedStatesGoogleFormatCodeLookup.INSTANCE.get(_code);
                 if (googleFormat == null) {
-                    googleFormat = Utils.toGoogleFormat(_code).toString();
+                    googleFormat = Utils.toGoogleFormat(_code);
                 }
                 builder.append(java.net.URLEncoder.encode(googleFormat, "UTF-8"));
                 originalCodes.put(googleFormat, _code);

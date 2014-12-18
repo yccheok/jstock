@@ -35,7 +35,7 @@ import java.util.HashSet;
 import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.yccheok.jstock.gui.Pair;
+import org.yccheok.jstock.engine.Pair;
 
 /**
  *

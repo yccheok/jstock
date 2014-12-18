@@ -1,3 +1,3 @@
 id=ltsgi4R41y6x9GucPlNn5ls5HPDzKBIgRezXRcuYF/AjqV9XZCmyDJ9wl+KWaTed
-news_id=6/7/14
+news_id=17/12/14
 news_url=http://jstock-static.appspot.com/news_information/index.html

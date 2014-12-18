@@ -34,7 +34,7 @@ import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.StockHistoryServer;
 import org.yccheok.jstock.gui.JStockOptions;
-import org.yccheok.jstock.gui.MainFrame;
+import org.yccheok.jstock.gui.JStock;
 
 /**
  *
@@ -341,7 +341,7 @@ public class Utils {
      */
     public static void applyChartThemeEx(JFreeChart chart) {
         final StandardChartTheme chartTheme;
-        final JStockOptions.ChartTheme theme = MainFrame.getInstance().getJStockOptions().getChartTheme();
+        final JStockOptions.ChartTheme theme = JStock.getInstance().getJStockOptions().getChartTheme();
         
         if (theme == JStockOptions.ChartTheme.Light) {
             applyChartTheme(chart);

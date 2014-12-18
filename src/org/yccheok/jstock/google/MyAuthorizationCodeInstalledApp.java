@@ -16,7 +16,7 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.oauth2.model.Userinfoplus;
 import java.io.IOException;
 import javax.swing.SwingUtilities;
-import org.yccheok.jstock.gui.Pair;
+import org.yccheok.jstock.engine.Pair;
 
 /**
  *

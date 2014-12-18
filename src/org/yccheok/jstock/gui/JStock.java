@@ -19,6 +19,7 @@
 
 package org.yccheok.jstock.gui;
 
+import org.yccheok.jstock.engine.Pair;
 import com.google.api.client.auth.oauth2.Credential;
 import java.awt.*;
 import java.awt.event.*;
@@ -71,7 +72,7 @@ import org.yccheok.jstock.watchlist.WatchlistInfo;
  *
  * @author  doraemon
  */
-public class MainFrame extends javax.swing.JFrame {
+public class JStock extends javax.swing.JFrame {
 
     public static final class CSVWatchlist {
         public final TableModel tableModel;
@@ -94,36 +95,14 @@ public class MainFrame extends javax.swing.JFrame {
     /** Creates new form MainFrame */
 
     // Private constructor is sufficient to suppress unauthorized calls to the constructor
-    private MainFrame()
+    private JStock()
     {
     }
 
     /**
      * Initialize this MainFrame based on the JStockOptions.
      */
-    private void init() {
-        // OSX menu bar at top
-        if (Utils.isMacOSX()) {
-            System.setProperty("apple.laf.useScreenMenuBar", "true");
-            System.setProperty("apple.awt.brushMetalLook", "true");
-        }
-
-        try {
-            UIManager.setLookAndFeel(getJStockOptions().getLooknFeel());
-        }
-        catch (java.lang.ClassNotFoundException exp) {
-            log.error(null, exp);
-        }
-        catch (java.lang.InstantiationException exp) {
-            log.error(null, exp);
-        }
-        catch (java.lang.IllegalAccessException exp) {
-            log.error(null, exp);
-        }
-        catch (javax.swing.UnsupportedLookAndFeelException exp) {
-            log.error(null, exp);
-        }
-        
+    private void init() {        
         initComponents();
 
         createLookAndFeelMenuItem();
@@ -156,6 +135,7 @@ public class MainFrame extends javax.swing.JFrame {
         this.initAlertStateManager();
         this.initDynamicCharts();
         this.initDynamicChartVisibility();
+        this.initAlwaysOnTop();
         this.initStockHistoryMonitor();
         this.initOthersStockHistoryMonitor();
         this.initBrokingFirmLogos();
@@ -231,7 +211,7 @@ public class MainFrame extends javax.swing.JFrame {
     private void watchlistNavigation() {
         if (this.getSelectedComponent() != this.jPanel8) {
             // The page is not active. Make it active.
-            MainFrame.this.jTabbedPane1.setSelectedIndex(0);
+            JStock.this.jTabbedPane1.setSelectedIndex(0);
             return;
         }
         
@@ -258,7 +238,7 @@ public class MainFrame extends javax.swing.JFrame {
     private void portfolioNavigation() {
         if (this.getSelectedComponent() != this.portfolioManagementJPanel) {
             // The page is not active. Make it active.
-            MainFrame.this.jTabbedPane1.setSelectedIndex(3);
+            JStock.this.jTabbedPane1.setSelectedIndex(3);
             return;
         }
         
@@ -298,12 +278,12 @@ public class MainFrame extends javax.swing.JFrame {
                     // 1) Do not call formWindowClosed directly, as accessing UI
                     // will cause "hang".
                     // 2) Calling system.exit will cause "hang" too.
-                    MainFrame.this.save();
+                    JStock.this.save();
 
-                    if (MainFrame.this.needToSaveUserDefinedDatabase) {
+                    if (JStock.this.needToSaveUserDefinedDatabase) {
                         // We are having updated user database in memory.
                         // Save it to disk.
-                        MainFrame.this.saveUserDefinedDatabaseAsCSV(jStockOptions.getCountry(), stockInfoDatabase);
+                        JStock.this.saveUserDefinedDatabaseAsCSV(jStockOptions.getCountry(), stockInfoDatabase);
                     }
                     
                     AppLock.unlock();
@@ -348,7 +328,7 @@ public class MainFrame extends javax.swing.JFrame {
      * or the first access to MainFrameHolder.INSTANCE, not before.
      */
     private static class MainFrameHolder {
-        private final static MainFrame INSTANCE = new MainFrame();
+        private final static JStock INSTANCE = new JStock();
     }
 
     /**
@@ -356,7 +336,7 @@ public class MainFrame extends javax.swing.JFrame {
      * 
      * @return MainFrame as singleton
      */
-    public static MainFrame getInstance() {
+    public static JStock getInstance() {
         return MainFrameHolder.INSTANCE;
     }
 
@@ -680,24 +660,24 @@ public class MainFrame extends javax.swing.JFrame {
 
         jMenu9.setText(bundle.getString("MainFrame_Watchlist")); // NOI18N
         jMenu9.addMenuListener(new javax.swing.event.MenuListener() {
-            public void menuCanceled(javax.swing.event.MenuEvent evt) {
+            public void menuSelected(javax.swing.event.MenuEvent evt) {
+                jMenu9MenuSelected(evt);
             }
             public void menuDeselected(javax.swing.event.MenuEvent evt) {
             }
-            public void menuSelected(javax.swing.event.MenuEvent evt) {
-                jMenu9MenuSelected(evt);
+            public void menuCanceled(javax.swing.event.MenuEvent evt) {
             }
         });
         jMenuBar2.add(jMenu9);
 
         jMenu8.setText(bundle.getString("MainFrame_Portfolio")); // NOI18N
         jMenu8.addMenuListener(new javax.swing.event.MenuListener() {
-            public void menuCanceled(javax.swing.event.MenuEvent evt) {
+            public void menuSelected(javax.swing.event.MenuEvent evt) {
+                jMenu8MenuSelected(evt);
             }
             public void menuDeselected(javax.swing.event.MenuEvent evt) {
             }
-            public void menuSelected(javax.swing.event.MenuEvent evt) {
-                jMenu8MenuSelected(evt);
+            public void menuCanceled(javax.swing.event.MenuEvent evt) {
             }
         });
         jMenuBar2.add(jMenu8);
@@ -1124,9 +1104,9 @@ public class MainFrame extends javax.swing.JFrame {
     private void updateDynamicChart(Stock stock) {
         assert(java.awt.EventQueue.isDispatchThread());
 
-        DynamicChart dynamicChart = stock != null ? this.dynamicCharts.get(stock.code) : MainFrame.EMPTY_DYNAMIC_CHART;
+        DynamicChart dynamicChart = stock != null ? this.dynamicCharts.get(stock.code) : JStock.EMPTY_DYNAMIC_CHART;
         if (dynamicChart == null) {
-            dynamicChart = MainFrame.EMPTY_DYNAMIC_CHART;
+            dynamicChart = JStock.EMPTY_DYNAMIC_CHART;
         }
 
         if (java.util.Arrays.asList(jPanel3.getComponents()).contains(dynamicChart.getChartPanel()))
@@ -1152,7 +1132,7 @@ public class MainFrame extends javax.swing.JFrame {
         }
         
         if (evt.isActionKey()) {
-            int[] rows = MainFrame.this.jTable1.getSelectedRows();
+            int[] rows = JStock.this.jTable1.getSelectedRows();
             
             if (rows.length == 1) {
                 int row = rows[0];
@@ -1286,7 +1266,7 @@ public class MainFrame extends javax.swing.JFrame {
                 public void actionPerformed(ActionEvent e) {
                     final String s = ((JRadioButtonMenuItem)e.getSource()).getText();
                     if (false == s.equals(currentPortfolioName)) {
-                        MainFrame.this.selectActivePortfolio(s);
+                        JStock.this.selectActivePortfolio(s);
                     }
                 }
 
@@ -1330,10 +1310,10 @@ public class MainFrame extends javax.swing.JFrame {
                 try {
                     pair = this.get();
                 } catch (InterruptedException ex) {
-                    JOptionPane.showMessageDialog(MainFrame.this, ex.getMessage(), GUIBundle.getString("SaveToCloudJDialog_Title"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(JStock.this, ex.getMessage(), GUIBundle.getString("SaveToCloudJDialog_Title"), JOptionPane.ERROR_MESSAGE);
                     log.error(null, ex);
                 } catch (ExecutionException ex) {
-                    JOptionPane.showMessageDialog(MainFrame.this, ex.getMessage(), GUIBundle.getString("SaveToCloudJDialog_Title"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(JStock.this, ex.getMessage(), GUIBundle.getString("SaveToCloudJDialog_Title"), JOptionPane.ERROR_MESSAGE);
                     log.error(null, ex);
                 }
                 
@@ -1341,7 +1321,7 @@ public class MainFrame extends javax.swing.JFrame {
                     return;
                 }
                 
-                SaveToCloudJDialog saveToCloudJDialog = new SaveToCloudJDialog(MainFrame.this, true, pair.first, pair.second);
+                SaveToCloudJDialog saveToCloudJDialog = new SaveToCloudJDialog(JStock.this, true, pair.first, pair.second);
                 saveToCloudJDialog.setVisible(true);
             }
         };
@@ -1372,10 +1352,10 @@ public class MainFrame extends javax.swing.JFrame {
                 try {
                     pair = this.get();
                 } catch (InterruptedException ex) {
-                    JOptionPane.showMessageDialog(MainFrame.this, ex.getMessage(), GUIBundle.getString("LoadFromCloudJDialog_Title"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(JStock.this, ex.getMessage(), GUIBundle.getString("LoadFromCloudJDialog_Title"), JOptionPane.ERROR_MESSAGE);
                     log.error(null, ex);
                 } catch (ExecutionException ex) {
-                    JOptionPane.showMessageDialog(MainFrame.this, ex.getMessage(), GUIBundle.getString("LoadFromCloudJDialog_Title"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(JStock.this, ex.getMessage(), GUIBundle.getString("LoadFromCloudJDialog_Title"), JOptionPane.ERROR_MESSAGE);
                     log.error(null, ex);
                 }
                 
@@ -1383,7 +1363,7 @@ public class MainFrame extends javax.swing.JFrame {
                     return;
                 }
                 
-                LoadFromCloudJDialog loadFromCloudJDialog = new LoadFromCloudJDialog(MainFrame.this, true, pair.first, pair.second);
+                LoadFromCloudJDialog loadFromCloudJDialog = new LoadFromCloudJDialog(JStock.this, true, pair.first, pair.second);
                 loadFromCloudJDialog.setVisible(true);
             }
         };
@@ -1412,7 +1392,7 @@ public class MainFrame extends javax.swing.JFrame {
                 public void actionPerformed(ActionEvent e) {
                     final String s = ((JRadioButtonMenuItem)e.getSource()).getText();
                     if (false == s.equals(currentWatchlistName)) {
-                        MainFrame.this.selectActiveWatchlist(s);
+                        JStock.this.selectActiveWatchlist(s);
                     }
                 }
 
@@ -1656,17 +1636,17 @@ public class MainFrame extends javax.swing.JFrame {
     public void selectActiveWatchlist(String watchlist) {
         assert(SwingUtilities.isEventDispatchThread());
         // Save current watchlist.
-        MainFrame.this.saveWatchlist();
+        JStock.this.saveWatchlist();
         // Save current GUI options.
         // Do not call MainFrame.this.saveGUIOptions() (Pay note on the underscore)
         // , as that will save portfolio's and indicator scanner's as well.
-        MainFrame.this._saveGUIOptions();
+        JStock.this._saveGUIOptions();
         // And switch to new portfolio.
-        MainFrame.this.getJStockOptions().setWatchlistName(watchlist);
-        MainFrame.this.initWatchlist();
+        JStock.this.getJStockOptions().setWatchlistName(watchlist);
+        JStock.this.initWatchlist();
         // I guess user wants to watch the current active watchlist right now.
         // We will help him to turn to the stock watchlist page.
-        MainFrame.this.jTabbedPane1.setSelectedIndex(0);
+        JStock.this.jTabbedPane1.setSelectedIndex(0);
 
         // No matter how, just stop progress bar, and display best message.
         this.setStatusBar(false, this.getBestStatusBarMessage());
@@ -1680,17 +1660,17 @@ public class MainFrame extends javax.swing.JFrame {
     public void selectActivePortfolio(String portfolio) {
         assert(SwingUtilities.isEventDispatchThread());
         // Save current portfolio.
-        MainFrame.this.portfolioManagementJPanel.savePortfolio();
+        JStock.this.portfolioManagementJPanel.savePortfolio();
         // Save current GUI options.
-        MainFrame.this.portfolioManagementJPanel.saveGUIOptions();
+        JStock.this.portfolioManagementJPanel.saveGUIOptions();
         // And switch to new portfolio.
-        MainFrame.this.getJStockOptions().setPortfolioName(portfolio);
-        MainFrame.this.portfolioManagementJPanel.initPortfolio();
+        JStock.this.getJStockOptions().setPortfolioName(portfolio);
+        JStock.this.portfolioManagementJPanel.initPortfolio();
         // I guess user wants to watch the current active portfolio right now.
         // We will help him to turn to the portfolio page.
-        MainFrame.this.jTabbedPane1.setSelectedIndex(3);
+        JStock.this.jTabbedPane1.setSelectedIndex(3);
         
-        MainFrame.this.portfolioManagementJPanel.updateTitledBorder();
+        JStock.this.portfolioManagementJPanel.updateTitledBorder();
 
         // No matter how, just stop progress bar, and display best message.
         this.setStatusBar(false, this.getBestStatusBarMessage());
@@ -1727,10 +1707,7 @@ public class MainFrame extends javax.swing.JFrame {
         return statements.saveAsExcelFile(file, GUIBundle.getString("MainFrame_Title"));
     }
 
-    /**
-     * Returns the best JStockOptions, based on command line argument.
-     */
-    private static JStockOptions getJStockOptions(String args[]) {
+    private static JStockOptions getJStockOptionsViaXML() {
         final File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "options.xml");
         JStockOptions jStockOptions = Utils.fromXML(JStockOptions.class, f);
         if (jStockOptions == null) {
@@ -1738,40 +1715,59 @@ public class MainFrame extends javax.swing.JFrame {
             // run JStock.
             jStockOptions = new JStockOptions();
         }
-            
-        for (String arg : args) {
-            final String[] tokens = arg.split("=");
-            if (tokens.length != 2) {
-                continue;
-            }
-            final String compare = tokens[0].trim();
-            if (compare.equalsIgnoreCase("-country")) {
-                final String countryStr = tokens[1].trim();
-                try {
-                    final Country country = Country.valueOf(countryStr);
-                    if (country == Country.China) {
-                        // Has user switch to this country before?
-                        if (false == Utils.isFileOrDirectoryExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country)) {
-                            // First time switching to this country. Use the settings from
-                            // command line argument.
-                            jStockOptions.setCountry(country);
-                            final Locale locale = new Locale(Locale.SIMPLIFIED_CHINESE.getLanguage(), Locale.getDefault().getCountry(), Locale.getDefault().getVariant());
-                            jStockOptions.setLocale(locale);
-                        }
-                    }
-                } catch(IllegalArgumentException ex) {
-                    log.error(null, ex);
-                }
-            }
-        }
-
         return jStockOptions;
     }
 
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {        
+    public static void main(String args[]) {
+        /***********************************************************************
+         * UI Manager initialization via JStockOptions.
+         **********************************************************************/
+        final JStockOptions jStockOptions = getJStockOptionsViaXML();
+
+        // OSX menu bar at top.
+        if (Utils.isMacOSX()) {
+            System.setProperty("apple.laf.useScreenMenuBar", "true");
+            System.setProperty("apple.awt.brushMetalLook", "true");
+        }    
+        
+        boolean uiManagerLookAndFeelSuccess = false;
+        try {
+            String lookNFeel = jStockOptions.getLooknFeel();
+            if (null != lookNFeel) {
+                UIManager.setLookAndFeel(lookNFeel);
+                uiManagerLookAndFeelSuccess = true;
+            }
+        } catch (java.lang.ClassNotFoundException | java.lang.InstantiationException | java.lang.IllegalAccessException | javax.swing.UnsupportedLookAndFeelException exp) {
+            log.error(null, exp);
+        }
+
+        if (!uiManagerLookAndFeelSuccess) {
+            String className = Utils.setDefaultLookAndFeel();
+            if (null != className) {
+                final String lookNFeel = jStockOptions.getLooknFeel();
+                // When jStockOptions.getLookNFeel returns null, it means we wish
+                // to use system default value. Hence, don't overwrite the null value,
+                // so that we can use the same jStockOptions, across different
+                // platforms.
+                if (lookNFeel != null) {
+                    jStockOptions.setLooknFeel(className);    
+                }
+            }
+        }
+        
+        /***********************************************************************
+         * Ensure correct localization.
+         **********************************************************************/
+        // This global effect, should just come before anything else, 
+        // after we get an instance of JStockOptions.
+        Locale.setDefault(jStockOptions.getLocale());
+        
+        /***********************************************************************
+         * Single application instance enforcement.
+         **********************************************************************/
         if (false == AppLock.lock()) {
             final int choice = JOptionPane.showOptionDialog(null, 
                     MessagesBundle.getString("warning_message_running_2_jstock"),
@@ -1796,24 +1792,11 @@ public class MainFrame extends javax.swing.JFrame {
         // before we manually change the system properties according to
         // JStockOptions.
         ProxyDetector.getInstance();      
-        
-        // OSX menu bar at top
-        if (Utils.isMacOSX()) {
-            System.setProperty("apple.laf.useScreenMenuBar", "true");
-            System.setProperty("apple.awt.brushMetalLook", "true");
-        }    
-        Utils.setDefaultLookAndFeel();
-        
-        final String[] _args = args;
-
+                
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                final MainFrame mainFrame = MainFrame.getInstance();
-                final JStockOptions jStockOptions = getJStockOptions(_args);
-                // This global effect, should just come before anything else, 
-                // after we get an instance of JStockOptions.
-                Locale.setDefault(jStockOptions.getLocale());
+                final JStock mainFrame = JStock.getInstance();
                 
                 // We need to first assign jStockOptions to mainFrame, as during
                 // Utils.migrateXMLToCSVPortfolios, we will be accessing mainFrame's
@@ -1984,10 +1967,10 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     class ChangeLookAndFeelAction extends AbstractAction {
-        MainFrame mainFrame;
+        JStock mainFrame;
         String lafClassName;
   
-        protected ChangeLookAndFeelAction(MainFrame mainFrame, String lafClassName) {
+        protected ChangeLookAndFeelAction(JStock mainFrame, String lafClassName) {
             super("ChangeTheme");
             this.mainFrame = mainFrame;
             this.lafClassName = lafClassName;
@@ -2003,52 +1986,54 @@ public class MainFrame extends javax.swing.JFrame {
         }
     }
   
-    public void setLookAndFeel(String lafClassName) {
-        /* Backward compataible purpose. Old JStockOptions may contain null in this field. */
-        if (lafClassName == null) {
-            return;
-        }
+    private void _setAlwaysOnTop(boolean alwaysOnTop) {
+        this.setAlwaysOnTop(alwaysOnTop);
+        this.jStockOptions.setAlwaysOnTop(alwaysOnTop);
+        this.alwaysOnTopMenuItem.setSelected(alwaysOnTop);
+    }
+    
+    private void setLookAndFeel(String lafClassName) {
+        boolean uiManagerLookAndFeelSuccess = false;
+        String realLafClassName = null;
         
-        // OSX menu bar at top
-        if (Utils.isMacOSX()) {
-            System.setProperty("apple.laf.useScreenMenuBar", "true");
-            System.setProperty("apple.awt.brushMetalLook", "true");
-        }
-
         try {
-            UIManager.setLookAndFeel(lafClassName);
-            SwingUtilities.updateComponentTreeUI(this);
-        }
-        catch (java.lang.ClassNotFoundException exp) {
-            log.error(null, exp);
-        }
-        catch (java.lang.InstantiationException exp) {
-            log.error(null, exp);
-        }
-        catch (java.lang.IllegalAccessException exp) {
-            log.error(null, exp);
-        }
-        catch (javax.swing.UnsupportedLookAndFeelException exp) {
-            log.error(null, exp);
-        }
-        
-        this.jStockOptions.setLookNFeel(lafClassName);
-        
-        for (Enumeration<AbstractButton> e = this.buttonGroup1.getElements() ; e.hasMoreElements() ;) {
-            AbstractButton button = e.nextElement();
-            javax.swing.JRadioButtonMenuItem m = (javax.swing.JRadioButtonMenuItem)button;
-            ChangeLookAndFeelAction a = (ChangeLookAndFeelAction)m.getActionListeners()[0];
-                        
-            if (a.getLafClassName().equals(lafClassName)) {
-                m.setSelected(true);
-                break;                   
+            if (lafClassName == null) {
+                String className = Utils.setDefaultLookAndFeel();
+                if (className != null) {
+                    SwingUtilities.updateComponentTreeUI(this);
+                    realLafClassName = className;
+                    uiManagerLookAndFeelSuccess = true;
+                }
+            } else {
+                UIManager.setLookAndFeel(lafClassName);
+                SwingUtilities.updateComponentTreeUI(this);
+                realLafClassName = lafClassName;
+                uiManagerLookAndFeelSuccess = true;
             }
+        } catch (java.lang.ClassNotFoundException | java.lang.InstantiationException | java.lang.IllegalAccessException | javax.swing.UnsupportedLookAndFeelException exp) {
+            log.error(null, exp);
         }
         
-        // Sequence are important. The AutoCompleteJComboBox itself should have the highest
-        // priority.
-        ((AutoCompleteJComboBox)jComboBox1).setStockInfoDatabase(this.stockInfoDatabase);
-        this.indicatorPanel.setStockInfoDatabase(this.stockInfoDatabase);
+        if (uiManagerLookAndFeelSuccess) {
+            // Don't use realLafClassName.
+            this.jStockOptions.setLooknFeel(lafClassName);
+
+            for (Enumeration<AbstractButton> e = this.buttonGroup1.getElements() ; e.hasMoreElements() ;) {
+                AbstractButton button = e.nextElement();
+                javax.swing.JRadioButtonMenuItem m = (javax.swing.JRadioButtonMenuItem)button;
+                ChangeLookAndFeelAction a = (ChangeLookAndFeelAction)m.getActionListeners()[0];
+
+                if (a.getLafClassName().equals(realLafClassName)) {
+                    m.setSelected(true);
+                    break;                   
+                }
+            }
+            
+            // Sequence are important. The AutoCompleteJComboBox itself should have the highest
+            // priority.
+            ((AutoCompleteJComboBox)jComboBox1).setStockInfoDatabase(this.stockInfoDatabase);
+            this.indicatorPanel.setStockInfoDatabase(this.stockInfoDatabase);
+        }        
     }
 
     public PortfolioManagementJPanel getPortfolioManagementJPanel() {
@@ -2099,7 +2084,7 @@ public class MainFrame extends javax.swing.JFrame {
             mi.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    MainFrame.this.changeCountry(country);
+                    JStock.this.changeCountry(country);
                 }                
             });
             
@@ -2111,7 +2096,7 @@ public class MainFrame extends javax.swing.JFrame {
             
     public void createLookAndFeelMenuItem() {
         LookAndFeel currentlaf = UIManager.getLookAndFeel();
-        
+
         UIManager.LookAndFeelInfo[] lafInfo = UIManager.getInstalledLookAndFeels();
 
         for(int i=0; i<lafInfo.length; i++) {
@@ -2129,23 +2114,17 @@ public class MainFrame extends javax.swing.JFrame {
 
         // Always on Top
         jMenu4.addSeparator();
-        final JMenuItem mi = jMenu4.add(new JCheckBoxMenuItem(GUIBundle.getString("MainFrame_AlwaysOnTop")));
+        this.alwaysOnTopMenuItem = jMenu4.add(new JCheckBoxMenuItem(GUIBundle.getString("MainFrame_AlwaysOnTop")));
 
-        mi.addActionListener(new ActionListener() {
+        this.alwaysOnTopMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 AbstractButton aButton = (AbstractButton) e.getSource();
                 boolean selected = aButton.getModel().isSelected();
 
-                MainFrame.this.setAlwaysOnTop(selected);
-                MainFrame.this.jStockOptions.setAlwaysOnTop(selected);
+                JStock.this._setAlwaysOnTop(selected);
             }
         });
-
-        boolean selected = jStockOptions.isAlwaysOnTop();
-        mi.setSelected(selected);
-        this.setAlwaysOnTop(selected);
-
     }
   
     private javax.swing.event.TableModelListener getTableModelListener() {
@@ -2185,8 +2164,8 @@ public class MainFrame extends javax.swing.JFrame {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     if(e.getButton() == MouseEvent.BUTTON1) {
-                        MainFrame.this.setVisible(true);
-                        MainFrame.this.setState(Frame.NORMAL);
+                        JStock.this.setVisible(true);
+                        JStock.this.setState(Frame.NORMAL);
                     }
                 }
 
@@ -2210,8 +2189,8 @@ public class MainFrame extends javax.swing.JFrame {
             ActionListener exitListener = new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    MainFrame.this.setVisible(false);
-                    MainFrame.this.dispose();
+                    JStock.this.setVisible(false);
+                    JStock.this.dispose();
                 }
             };
 
@@ -2236,13 +2215,13 @@ public class MainFrame extends javax.swing.JFrame {
                 tray.add(trayIcon);
             } catch (AWTException e) {
                 trayIcon = null;
-                JOptionPane.showMessageDialog(MainFrame.this, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/messages").getString("warning_message_trayicon_could_not_be_added"), java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/messages").getString("warning_title_trayicon_could_not_be_added"), JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(JStock.this, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/messages").getString("warning_message_trayicon_could_not_be_added"), java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/messages").getString("warning_title_trayicon_could_not_be_added"), JOptionPane.WARNING_MESSAGE);
             }
 
         } else {
             //  System Tray is not supported
             trayIcon = null;
-            JOptionPane.showMessageDialog(MainFrame.this, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/messages").getString("warning_message_system_tray_is_not_supported"), java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/messages").getString("warning_title_system_tray_is_not_supported"), JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(JStock.this, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/messages").getString("warning_message_system_tray_is_not_supported"), java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/messages").getString("warning_title_system_tray_is_not_supported"), JOptionPane.WARNING_MESSAGE);
         }        
     }
     
@@ -2451,18 +2430,30 @@ public class MainFrame extends javax.swing.JFrame {
      * JStockOptions before and outside this method, due to insensitive data
      * requirement.
      */
-    public void reloadAfterDownloadFromCloud() {
+    public void reloadAfterDownloadFromCloud(JStockOptions newJStockOptions) {
+        final String oldLookNFeel = this.jStockOptions.getLooknFeel();
         
-        ////////////////////////////////////////////////////////////////////////
-        // JStockOptions is already restored at this point.
-        // Please refer to LoadFromCloudJDialog.
-        ////////////////////////////////////////////////////////////////////////
+        assert (newJStockOptions != null);
+        
+        this.jStockOptions.insensitiveCopy(newJStockOptions);
+         
+        final String newLookNFeel = this.jStockOptions.getLooknFeel();
+        
+        if (oldLookNFeel != null) {
+            if (false == oldLookNFeel.equals(newLookNFeel)) {
+                this.setLookAndFeel(newLookNFeel);
+            }
+        } else {
+            if (null != newLookNFeel) {
+                this.setLookAndFeel(newLookNFeel);
+            }
+        }
         
         Utils.updateFactoriesPriceSource();
         
         /* These codes are very similar to clean up code during changing country.
          */
-        MainFrame.this.statusBar.setCountryIcon(jStockOptions.getCountry().getIcon(), jStockOptions.getCountry().toString());
+        JStock.this.statusBar.setCountryIcon(jStockOptions.getCountry().getIcon(), jStockOptions.getCountry().toString());
 
         // Here is the dirty trick here. We let our the 'child' panels perform
         // cleanup/ initialization first before initStockCodeAndSymbolDatabase.
@@ -2493,7 +2484,8 @@ public class MainFrame extends javax.swing.JFrame {
         this.initAlertStateManager();
         this.initDynamicCharts();
         this.initDynamicChartVisibility();
-
+        this.initAlwaysOnTop();
+        
         for (Enumeration<AbstractButton> e = this.buttonGroup2.getElements() ; e.hasMoreElements() ;) {
             AbstractButton button = e.nextElement();
             javax.swing.JRadioButtonMenuItem m = (javax.swing.JRadioButtonMenuItem)button;
@@ -2551,7 +2543,7 @@ public class MainFrame extends javax.swing.JFrame {
             );
         }        
         jStockOptions.setCountry(country);
-        MainFrame.this.statusBar.setCountryIcon(country.getIcon(), country.toString());
+        JStock.this.statusBar.setCountryIcon(country.getIcon(), country.toString());
 
         // Here is the dirty trick here. We let our the 'child' panels perform
         // cleanup/ initialization first before initStockCodeAndSymbolDatabase.
@@ -2603,8 +2595,8 @@ public class MainFrame extends javax.swing.JFrame {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
                     // Popup dialog to select currency exchange option.
-                    OptionsJDialog optionsJDialog = new OptionsJDialog(MainFrame.this, true);
-                    optionsJDialog.setLocationRelativeTo(MainFrame.this);
+                    OptionsJDialog optionsJDialog = new OptionsJDialog(JStock.this, true);
+                    optionsJDialog.setLocationRelativeTo(JStock.this);
                     optionsJDialog.set(jStockOptions);
                     optionsJDialog.select(GUIBundle.getString("OptionsJPanel_Wealth"));
                     optionsJDialog.setVisible(true);
@@ -2618,8 +2610,8 @@ public class MainFrame extends javax.swing.JFrame {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if(e.getClickCount() == 2) {
-                    CountryJDialog countryJDialog = new CountryJDialog(MainFrame.this, true);
-                    countryJDialog.setLocationRelativeTo(MainFrame.this);
+                    CountryJDialog countryJDialog = new CountryJDialog(JStock.this, true);
+                    countryJDialog.setLocationRelativeTo(JStock.this);
                     countryJDialog.setCountry(jStockOptions.getCountry());
                     countryJDialog.setVisible(true);
                     
@@ -2638,7 +2630,7 @@ public class MainFrame extends javax.swing.JFrame {
                     
                     // Make sure no other task is running.
                     // Use local variable to be thread safe.
-                    final DatabaseTask task = MainFrame.this.databaseTask;
+                    final DatabaseTask task = JStock.this.databaseTask;
                     if (task != null) {
                         if (task.isDone() == true) {
                             // Task is done. But, does it success?
@@ -2660,26 +2652,26 @@ public class MainFrame extends javax.swing.JFrame {
                             if (success == false) {
                                 // Fail. Automatically reload database for user. Need not to prompt them message.
                                 // As, they do not have any database right now.
-                                MainFrame.this.initDatabase(true);
+                                JStock.this.initDatabase(true);
                                 
                             } else {
-                                final int result = JOptionPane.showConfirmDialog(MainFrame.this, MessagesBundle.getString("question_message_perform_server_reconnecting"), MessagesBundle.getString("question_title_perform_server_reconnecting"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                                final int result = JOptionPane.showConfirmDialog(JStock.this, MessagesBundle.getString("question_message_perform_server_reconnecting"), MessagesBundle.getString("question_title_perform_server_reconnecting"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
                                 if (result == JOptionPane.YES_OPTION) {
-                                    MainFrame.this.initDatabase(false);
+                                    JStock.this.initDatabase(false);
                                 }
                             }
                         }
                         else {
                             // There is task still running. Ask user whether he wants
                             // to stop it.
-                            final int result = JOptionPane.showConfirmDialog(MainFrame.this, MessagesBundle.getString("question_message_cancel_server_reconnecting"), MessagesBundle.getString("question_title_cancel_server_reconnecting"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                            final int result = JOptionPane.showConfirmDialog(JStock.this, MessagesBundle.getString("question_message_cancel_server_reconnecting"), MessagesBundle.getString("question_title_cancel_server_reconnecting"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
                             
                             if (result == JOptionPane.YES_OPTION)
                             {                            
-                                synchronized (MainFrame.this.databaseTaskMonitor)
+                                synchronized (JStock.this.databaseTaskMonitor)
                                 {
-                                    MainFrame.this.databaseTask.cancel(true);
-                                    MainFrame.this.databaseTask = null;
+                                    JStock.this.databaseTask.cancel(true);
+                                    JStock.this.databaseTask = null;
                                 }
                                 
                                 setStatusBar(false, GUIBundle.getString("MainFrame_NetworkError"));
@@ -2748,7 +2740,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     // Only will return true if the selected stock is the one and only one.
     private boolean isStockBeingSelected(final Stock stock) {
-        int[] rows = MainFrame.this.jTable1.getSelectedRows();
+        int[] rows = JStock.this.jTable1.getSelectedRows();
             
         if (rows.length == 1) {
             final int row = rows[0];
@@ -2764,7 +2756,7 @@ public class MainFrame extends javax.swing.JFrame {
     
     // Return one and only one selected stock. Otherwise null.
     private Stock getSelectedStock() {
-        int[] rows = MainFrame.this.jTable1.getSelectedRows();
+        int[] rows = JStock.this.jTable1.getSelectedRows();
 
         if(rows.length == 1) {
             int row = rows[0];
@@ -2790,7 +2782,7 @@ public class MainFrame extends javax.swing.JFrame {
             return;
         }
 
-        final StockTableModel stockTableModel = (StockTableModel)MainFrame.this.jTable1.getModel();
+        final StockTableModel stockTableModel = (StockTableModel)JStock.this.jTable1.getModel();
         final Stock stock = indicator.getStock();        
         final Double price = ((OperatorIndicator)indicator).getName().equalsIgnoreCase("fallbelow") ? stockTableModel.getFallBelow(stock) : stockTableModel.getRiseAbove(stock);
 	final double lastPrice = stock.getLastPrice();
@@ -3034,7 +3026,7 @@ public class MainFrame extends javax.swing.JFrame {
         // When user try to enter a stock, and the stock is already in
         // the table, the stock shall be highlighted. Stock will be
         // selected and the table shall be scrolled to be visible.
-        final StockTableModel tableModel = (StockTableModel)MainFrame.this.jTable1.getModel();
+        final StockTableModel tableModel = (StockTableModel)JStock.this.jTable1.getModel();
 
         final Stock emptyStock = org.yccheok.jstock.engine.Utils.getEmptyStock(stockInfo);
         
@@ -3046,14 +3038,14 @@ public class MainFrame extends javax.swing.JFrame {
         realTimeStockMonitor.startNewThreadsIfNecessary();
         realTimeStockMonitor.refresh();
         
-        MainFrame.this.highlightStock(row);
+        JStock.this.highlightStock(row);
     }
 
     private org.yccheok.jstock.engine.Observer<Indicator, Boolean> getAlertStateManagerObserver() {
         return new org.yccheok.jstock.engine.Observer<Indicator, Boolean>() {
             @Override
             public void update(Indicator subject, Boolean arg) {
-                MainFrame.this.update(subject, arg);
+                JStock.this.update(subject, arg);
             }
         };
     }
@@ -3065,7 +3057,7 @@ public class MainFrame extends javax.swing.JFrame {
             @Override
             public void update(RealTimeStockMonitor monitor, java.util.List<Stock> stocks)
             {
-                MainFrame.this.update(monitor, stocks);
+                JStock.this.update(monitor, stocks);
             }
         };
     }
@@ -3075,7 +3067,7 @@ public class MainFrame extends javax.swing.JFrame {
             @Override
             public void update(RealTimeIndexMonitor monitor, java.util.List<Market> markets)
             {
-                MainFrame.this.update(markets);
+                JStock.this.update(markets);
             }
         };        
     }
@@ -3085,7 +3077,7 @@ public class MainFrame extends javax.swing.JFrame {
             @Override
             public void update(StockHistoryMonitor monitor, StockHistoryMonitor.StockHistoryRunnable runnable)
             {
-                MainFrame.this.update(monitor, runnable);
+                JStock.this.update(monitor, runnable);
             }
         };
     }
@@ -3102,7 +3094,7 @@ public class MainFrame extends javax.swing.JFrame {
             }
         }
         else {
-            ChartJDialog chartJDialog = new ChartJDialog(MainFrame.this, stock.symbol + " (" + stock.code + ")", false, stockHistoryServer);
+            ChartJDialog chartJDialog = new ChartJDialog(JStock.this, stock.symbol + " (" + stock.code + ")", false, stockHistoryServer);
             chartJDialog.setVisible(true);                            
         }        
     }
@@ -3167,7 +3159,7 @@ public class MainFrame extends javax.swing.JFrame {
         menuItem.addActionListener(new ActionListener() {
             @Override
         	public void actionPerformed(ActionEvent evt) {
-                    MainFrame.this.deteleSelectedTableRow();
+                    JStock.this.deteleSelectedTableRow();
             }
         });
             
@@ -3358,7 +3350,7 @@ public class MainFrame extends javax.swing.JFrame {
                 // StockNameDatabase is an optional item.
                 final StockNameDatabase tmp_name_database;
                 if (org.yccheok.jstock.engine.Utils.isNameImmutable()) {
-                    tmp_name_database = MainFrame.this.loadStockNameDatabaseFromCSV(country);
+                    tmp_name_database = JStock.this.loadStockNameDatabaseFromCSV(country);
                 } else {
                     tmp_name_database = null;
                 }
@@ -3394,17 +3386,17 @@ public class MainFrame extends javax.swing.JFrame {
                     }
 
                     // Prepare proper synchronization for us to change country.
-                    synchronized (MainFrame.this.databaseTaskMonitor)
+                    synchronized (JStock.this.databaseTaskMonitor)
                     {
                         if (this.isCancelled()) {
                             return false;
                         }
                         
-                        MainFrame.this.stockInfoDatabase = tmp_stock_info_database;
-                        MainFrame.this.stockNameDatabase = tmp_name_database;
+                        JStock.this.stockInfoDatabase = tmp_stock_info_database;
+                        JStock.this.stockNameDatabase = tmp_name_database;
                         // Register the auto complete JComboBox with latest database.
-                        ((AutoCompleteJComboBox)MainFrame.this.jComboBox1).setStockInfoDatabase(MainFrame.this.stockInfoDatabase);
-                        MainFrame.this.indicatorPanel.setStockInfoDatabase(MainFrame.this.stockInfoDatabase);
+                        ((AutoCompleteJComboBox)JStock.this.jComboBox1).setStockInfoDatabase(JStock.this.stockInfoDatabase);
+                        JStock.this.indicatorPanel.setStockInfoDatabase(JStock.this.stockInfoDatabase);
 
                         return true;
                     }                
@@ -3449,9 +3441,9 @@ public class MainFrame extends javax.swing.JFrame {
                     }
 
                     // Save to disk.
-                    MainFrame.saveStockInfoDatabaseAsCSV(country, stockDatabase.first);
+                    JStock.saveStockInfoDatabaseAsCSV(country, stockDatabase.first);
                     if (stockDatabase.second != null) {
-                        MainFrame.saveStockNameDatabaseAsCSV(country, stockDatabase.second);
+                        JStock.saveStockNameDatabaseAsCSV(country, stockDatabase.second);
                     }
 
                     // Yes. We need to integrate "user-defined-database.csv" into tmp_stock_info_database
@@ -3465,18 +3457,18 @@ public class MainFrame extends javax.swing.JFrame {
                     }
 
                     // Prepare proper synchronization for us to change country.
-                    synchronized (MainFrame.this.databaseTaskMonitor)
+                    synchronized (JStock.this.databaseTaskMonitor)
                     {
                         if (this.isCancelled()) {
                             return false;
                         }
 
-                        MainFrame.this.stockInfoDatabase = stockDatabase.first;
-                        MainFrame.this.stockNameDatabase = stockDatabase.second;
+                        JStock.this.stockInfoDatabase = stockDatabase.first;
+                        JStock.this.stockNameDatabase = stockDatabase.second;
 
                         // Register the auto complete JComboBox with latest database.
-                        ((AutoCompleteJComboBox)MainFrame.this.jComboBox1).setStockInfoDatabase(MainFrame.this.stockInfoDatabase);
-                        MainFrame.this.indicatorPanel.setStockInfoDatabase(MainFrame.this.stockInfoDatabase);
+                        ((AutoCompleteJComboBox)JStock.this.jComboBox1).setStockInfoDatabase(JStock.this.stockInfoDatabase);
+                        JStock.this.indicatorPanel.setStockInfoDatabase(JStock.this.stockInfoDatabase);
 
                         return true;
                     }
@@ -3672,8 +3664,7 @@ public class MainFrame extends javax.swing.JFrame {
         if ((proxyHost.length() > 0) && (org.yccheok.jstock.engine.Utils.isValidPortNumber(proxyPort))) {
             System.getProperties().put("http.proxyHost", proxyHost);
             System.getProperties().put("http.proxyPort", "" + proxyPort);
-        }
-        else {
+        } else {
             System.getProperties().remove("http.proxyHost");
             System.getProperties().remove("http.proxyPort");
         }
@@ -3747,14 +3738,14 @@ public class MainFrame extends javax.swing.JFrame {
         {
             return false;
         } 
-        return MainFrame.saveAsCSVFile(csvWatchlist, org.yccheok.jstock.watchlist.Utils.getWatchlistFile(directory), true);
+        return JStock.saveAsCSVFile(csvWatchlist, org.yccheok.jstock.watchlist.Utils.getWatchlistFile(directory), true);
     }
     
     private boolean saveCSVWathclist() {
         final String directory = org.yccheok.jstock.watchlist.Utils.getWatchlistDirectory();
         final TableModel tableModel = jTable1.getModel();
         CSVWatchlist csvWatchlist = CSVWatchlist.newInstance(tableModel);
-        return MainFrame.saveCSVWatchlist(directory, csvWatchlist);
+        return JStock.saveCSVWatchlist(directory, csvWatchlist);
     }
 
     private boolean saveWatchlist() {
@@ -4026,9 +4017,9 @@ public class MainFrame extends javax.swing.JFrame {
 
                             if (false == stocks.isEmpty()) {
                                 final Pair<StockInfoDatabase, StockNameDatabase> stockDatabase = org.yccheok.jstock.engine.Utils.toStockDatabase(stocks, country);
-                                MainFrame.saveStockInfoDatabaseAsCSV(country, stockDatabase.first);
+                                JStock.saveStockInfoDatabaseAsCSV(country, stockDatabase.first);
                                 if (stockDatabase.second != null) {
-                                    MainFrame.saveStockNameDatabaseAsCSV(country, stockDatabase.second);
+                                    JStock.saveStockNameDatabaseAsCSV(country, stockDatabase.second);
                                 }
                                 successStockInfoDatabaseMeta.put(country, latest);
 
@@ -4163,7 +4154,7 @@ public class MainFrame extends javax.swing.JFrame {
         this.timestamp = System.currentTimeMillis();
         ((StockTableModel)jTable1.getModel()).setTimestamp(this.timestamp);
         
-        MainFrame.getInstance().updateStatusBarWithLastUpdateDateMessageIfPossible();
+        JStock.getInstance().updateStatusBarWithLastUpdateDateMessageIfPossible();
 
         // Do it in GUI event dispatch thread. Otherwise, we may face deadlock.
         // For example, we lock the jTable, and try to remove the stock from the
@@ -4176,7 +4167,7 @@ public class MainFrame extends javax.swing.JFrame {
                 for (Stock stock : stocks) {                    
                     updateStockToTable(stock);
                     if (isStockBeingSelected(stock)) {
-                        MainFrame.this.updateDynamicChart(stock);
+                        JStock.this.updateDynamicChart(stock);
                     }
                 }               
             }
@@ -4188,7 +4179,7 @@ public class MainFrame extends javax.swing.JFrame {
             DynamicChart dynamicChart = this.dynamicCharts.get(code);
             if (dynamicChart == null) {
                 // Not found. Try to create a new dynamic chart.
-                if (this.dynamicCharts.size() <= MainFrame.MAX_DYNAMIC_CHART_SIZE) {
+                if (this.dynamicCharts.size() <= JStock.MAX_DYNAMIC_CHART_SIZE) {
                     dynamicChart = new DynamicChart();
                     this.dynamicCharts.put(code, dynamicChart);
                 }
@@ -4199,7 +4190,7 @@ public class MainFrame extends javax.swing.JFrame {
                         for (Code c : codes) {
                             // Random remove. We do not care who is being removed.
                             this.dynamicCharts.remove(c);
-                            if (this.dynamicCharts.size() <= MainFrame.MAX_DYNAMIC_CHART_SIZE) {
+                            if (this.dynamicCharts.size() <= JStock.MAX_DYNAMIC_CHART_SIZE) {
                                 // Remove success.
                                 break;
                             }
@@ -4223,7 +4214,7 @@ public class MainFrame extends javax.swing.JFrame {
                 javax.swing.SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        MainFrame.this.updateDynamicChart(s);
+                        JStock.this.updateDynamicChart(s);
                     }
                 });
             }
@@ -4358,13 +4349,13 @@ public class MainFrame extends javax.swing.JFrame {
                 Symbol symbol = null;
 
                 // Use local variable to ensure thread safety.
-                final StockInfoDatabase stock_info_database = MainFrame.this.stockInfoDatabase;
+                final StockInfoDatabase stock_info_database = JStock.this.stockInfoDatabase;
                 // Is the database ready?
                 if (stock_info_database != null) {
                     // Possible null if we are trying to get index history.
                     symbol = stock_info_database.codeToSymbol(code);
                 }
-                final boolean shouldShowGUI = MainFrame.this.stockCodeHistoryGUI.remove(code);
+                final boolean shouldShowGUI = JStock.this.stockCodeHistoryGUI.remove(code);
                
                 if (stockCodeHistoryGUI.isEmpty()) {
                     if (runnable.getStockHistoryServer() != null) {
@@ -4392,7 +4383,7 @@ public class MainFrame extends javax.swing.JFrame {
                 }
                
                 if ((runnable.getStockHistoryServer() != null) && shouldShowGUI) {
-                    ChartJDialog chartJDialog = new ChartJDialog(MainFrame.this, (symbol != null ? symbol : code) + " (" + code + ")", false, runnable.getStockHistoryServer());
+                    ChartJDialog chartJDialog = new ChartJDialog(JStock.this, (symbol != null ? symbol : code) + " (" + code + ")", false, runnable.getStockHistoryServer());
                     chartJDialog.setVisible(true);
                 }
            } 
@@ -4407,7 +4398,7 @@ public class MainFrame extends javax.swing.JFrame {
         
         @Override
         public void mouseClicked(MouseEvent evt) {
-            int[] rows = MainFrame.this.jTable1.getSelectedRows();
+            int[] rows = JStock.this.jTable1.getSelectedRows();
             
             if (rows.length == 1) {
                 int row = rows[0];
@@ -4582,7 +4573,7 @@ public class MainFrame extends javax.swing.JFrame {
 
             for (String message : messages)
             {
-                AutoUpdateNewsJDialog dialog = new AutoUpdateNewsJDialog(MainFrame.this, true);
+                AutoUpdateNewsJDialog dialog = new AutoUpdateNewsJDialog(JStock.this, true);
                 dialog.setNews(message);
                 dialog.setVisible(true);
                 show = true;
@@ -4605,7 +4596,7 @@ public class MainFrame extends javax.swing.JFrame {
                     break;
                 }
                 final java.util.Map<String, String> map = Utils.getUUIDValue(org.yccheok.jstock.network.Utils.getURL(org.yccheok.jstock.network.Utils.Type.NEWS_INFORMATION_TXT));
-                final String newsID = MainFrame.this.getJStockOptions().getNewsID();
+                final String newsID = JStock.this.getJStockOptions().getNewsID();
                 if (newsID.equals(map.get("news_id"))) {
                     // Seen before. Quit.
                     break;
@@ -4644,6 +4635,11 @@ public class MainFrame extends javax.swing.JFrame {
         return this.jTabbedPane1.getSelectedComponent();
     }
 
+    private void initAlwaysOnTop() {
+        boolean selected = jStockOptions.isAlwaysOnTop();
+        this._setAlwaysOnTop(selected);
+    }
+    
     // Unlike a JButton, setIcon() does not add an icon to the text label. 
     // Rather, in a radio button, the method is used to customize the icons used
     // to depict its state. However, by using the HTML capabilities in a label, 
@@ -4659,13 +4655,13 @@ public class MainFrame extends javax.swing.JFrame {
         return new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (MainFrame.this.jTabbedPane1.getIconAt(4) == MainFrame.this.smileIcon)
+                if (JStock.this.jTabbedPane1.getIconAt(4) == JStock.this.smileIcon)
                 {
-                   MainFrame.this.jTabbedPane1.setIconAt(4, smileGrayIcon);
+                   JStock.this.jTabbedPane1.setIconAt(4, smileGrayIcon);
                 }
                 else
                 {
-                    MainFrame.this.jTabbedPane1.setIconAt(4, smileIcon);
+                    JStock.this.jTabbedPane1.setIconAt(4, smileIcon);
                 }
             }
         };
@@ -4701,13 +4697,13 @@ public class MainFrame extends javax.swing.JFrame {
                         return;
                     }
 
-                    final DynamicChart dynamicChart = MainFrame.this.dynamicCharts.get(stock.code);
+                    final DynamicChart dynamicChart = JStock.this.dynamicCharts.get(stock.code);
                     if (dynamicChart == null) {
                         return;
                     }
                     Symbol symbol = null;
                     // Use local variable to ensure thread safety.
-                    final StockInfoDatabase stock_info_database = MainFrame.this.stockInfoDatabase;
+                    final StockInfoDatabase stock_info_database = JStock.this.stockInfoDatabase;
                     // Is the database ready?
                     if (stock_info_database != null) {
                         // Possible null if we are trying to get index history.
@@ -4715,7 +4711,7 @@ public class MainFrame extends javax.swing.JFrame {
                     }
                     final String template = GUIBundle.getString("MainFrame_IntradayMovementTemplate");
                     final String message = MessageFormat.format(template, symbol == null ? stock.symbol : symbol);
-                    dynamicChart.showNewJDialog(MainFrame.this, message);
+                    dynamicChart.showNewJDialog(JStock.this, message);
                 }
             }
             // Shall we provide visualize mouse move over effect, so that user
@@ -4746,7 +4742,7 @@ public class MainFrame extends javax.swing.JFrame {
     private class TableKeyEventListener extends java.awt.event.KeyAdapter {
         @Override
         public void keyTyped(java.awt.event.KeyEvent e) {
-            MainFrame.this.jTable1.getSelectionModel().clearSelection();
+            JStock.this.jTable1.getSelectionModel().clearSelection();
         }
     }
     
@@ -4772,7 +4768,7 @@ public class MainFrame extends javax.swing.JFrame {
     
     private TrayIcon trayIcon;
     
-    private static final Log log = LogFactory.getLog(MainFrame.class);
+    private static final Log log = LogFactory.getLog(JStock.class);
         
     private final MyJXStatusBar statusBar = new MyJXStatusBar();
     private boolean isStatusBarBusy = false;
@@ -4852,6 +4848,9 @@ public class MainFrame extends javax.swing.JFrame {
     // The last time when we receive stock price update.
     private long timestamp = 0;
     private boolean refreshPriceInProgress = false;
+    
+    // To handle look n feel & always on top.
+    private JMenuItem alwaysOnTopMenuItem = null;
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;

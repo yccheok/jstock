@@ -24,7 +24,7 @@ import javafx.scene.Scene;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javax.swing.*;
-import org.yccheok.jstock.gui.MainFrame;
+import org.yccheok.jstock.gui.JStock;
 import org.yccheok.jstock.internationalization.MessagesBundle;
   
 public class SimpleSwingBrowser extends JDialog {
@@ -35,7 +35,7 @@ public class SimpleSwingBrowser extends JDialog {
     private final JPanel panel = new JPanel(new BorderLayout());
  
     public SimpleSwingBrowser() {
-        super(MainFrame.getInstance(), JDialog.ModalityType.APPLICATION_MODAL);
+        super(JStock.getInstance(), JDialog.ModalityType.APPLICATION_MODAL);
         initComponents();
     }
 

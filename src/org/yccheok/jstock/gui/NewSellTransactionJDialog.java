@@ -59,7 +59,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
     public NewSellTransactionJDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         final boolean isFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
         
         if (isFeeCalculationEnabled) {
@@ -82,7 +82,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
     }
 
     private boolean shouldAutoCalculateBrokerFee() {
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         
         return 
                 (jStockOptions.isAutoBrokerFeeCalculationEnabled()) && 
@@ -611,7 +611,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         final Symbol symbol = _stock.symbol;
         final Date date = java.util.Calendar.getInstance().getTime();
 
-        MainFrame mainFrame = MainFrame.getInstance();
+        JStock mainFrame = JStock.getInstance();
         double price = mainFrame.getPortfolioManagementJPanel().getStockPrice(_stock.code);
 
         this.jTextField1.setText(symbol.toString());
@@ -638,7 +638,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
     }
 
     private void updateBuyValueAfterSpinner(double spinnerQuantity) {
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         final boolean isFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
         
         double sellQuantity = spinnerQuantity;
@@ -744,7 +744,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         this.stock = transaction.getStock();
         this.type = Contract.Type.Sell;
         
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         final boolean isFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
         if (isFeeCalculationEnabled) {
             this.buyValue = transaction.getNetReferenceTotal();
@@ -942,12 +942,12 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         // follow the formatter text field's.
         commitEdit();
 
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         final boolean isFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
         
         if (isFeeCalculationEnabled && shouldAutoCalculateBrokerFee())
         {
-            final BrokingFirm brokingFirm = MainFrame.getInstance().getJStockOptions().getSelectedBrokingFirm();
+            final BrokingFirm brokingFirm = JStock.getInstance().getJStockOptions().getSelectedBrokingFirm();
 
             final String name = jTextField1.getText();
             final double unit = (Double)jSpinner1.getValue();
@@ -1107,7 +1107,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
     }
 
     public double suggestBestSellingPrice() {
-        final double expectedProfitPercentage = MainFrame.getInstance().getJStockOptions().getExpectedProfitPercentage();
+        final double expectedProfitPercentage = JStock.getInstance().getJStockOptions().getExpectedProfitPercentage();
         
         final double unit = (Double)jSpinner1.getValue();
         
@@ -1125,7 +1125,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         final double bestSellingValue = (1.0 + expectedProfitPercentage / 100.0) * totalCost;
         final double bestPrice = bestSellingValue / (double)unit;
 
-        MainFrame mainFrame = MainFrame.getInstance();
+        JStock mainFrame = JStock.getInstance();
         double currentPrice = mainFrame.getPortfolioManagementJPanel().getStockPrice(stock.code);
 
         return bestPrice > currentPrice ? bestPrice : currentPrice;

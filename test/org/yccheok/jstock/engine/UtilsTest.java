@@ -8,7 +8,7 @@ package org.yccheok.jstock.engine;
 
 import junit.framework.TestCase;
 import org.yccheok.jstock.gui.JStockOptions;
-import org.yccheok.jstock.gui.MainFrame;
+import org.yccheok.jstock.gui.JStock;
 
 /**
  *
@@ -23,7 +23,7 @@ public class UtilsTest extends TestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        MainFrame.getInstance().initJStockOptions(new JStockOptions());
+        JStock.getInstance().initJStockOptions(new JStockOptions());
     }
     
     @Override

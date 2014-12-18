@@ -18,6 +18,8 @@
 
 package org.yccheok.jstock.gui;
 
+import java.util.Objects;
+
 /**
  *
  * @author yccheok
@@ -68,8 +70,8 @@ public class StockAlert {
 
         final StockAlert stockAlert = (StockAlert)o;
 
-        boolean result0 =   (fallBelow != null ? fallBelow.equals(stockAlert.fallBelow) : fallBelow == stockAlert.fallBelow) &&
-                            (riseAbove != null ? riseAbove.equals(stockAlert.riseAbove) : riseAbove == stockAlert.riseAbove);
+        boolean result0 = Objects.equals(fallBelow, stockAlert.fallBelow) &&
+                          Objects.equals(riseAbove, stockAlert.riseAbove);
 
         return result0;
     }

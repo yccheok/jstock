@@ -1,9 +1,17 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
-JStock 1.0.7s - 2014-xx-xx
+JStock 1.0.7t - 2014-12-17
+  Feature: Support Google Finance for Sweden.
+  
+JStock 1.0.7s - 2014-12-12
   Feature: Support Hungary currency.
+  Feature: Always on top function.
   Bugfix:  Fix Korea stock market.
+  Bugfix:  Use Google Finance as alternative data feed for New Zealand stock 
+           market.
+  Bugfix:  Fix on fetching currency exchange information from Google Finance.
+  Bugfix:  Improve OSX UI, by placing menu bar at top.
   
 JStock 1.0.7r - 2014-07-06
   Bugfix:  Avoid 0 pricing when there is no internet connection.

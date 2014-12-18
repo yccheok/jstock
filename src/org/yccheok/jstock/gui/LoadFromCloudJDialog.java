@@ -19,6 +19,7 @@
 
 package org.yccheok.jstock.gui;
 
+import org.yccheok.jstock.engine.Pair;
 import com.google.api.client.auth.oauth2.Credential;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -195,7 +196,7 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jLabel5MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel5MouseClicked
-        MemoryLogJDialog memoryLogJDialog = new MemoryLogJDialog(MainFrame.getInstance(), true);
+        MemoryLogJDialog memoryLogJDialog = new MemoryLogJDialog(JStock.getInstance(), true);
         memoryLogJDialog.setLocationRelativeTo(this);
         memoryLogJDialog.setLog(memoryLog);
         memoryLogJDialog.setVisible(true);
@@ -229,7 +230,7 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
         this.setVisible(false);
         this.dispose();
         
-        MainFrame.getInstance().loadFromCloud();
+        JStock.getInstance().loadFromCloud();
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private static class Status {
@@ -247,11 +248,11 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
         }
     }
     
-    private SwingWorker<Boolean, Status> getLoadFromCloudTask() {
-        SwingWorker<Boolean, Status> worker = new SwingWorker<Boolean, Status>() {
+    private SwingWorker<JStockOptions, Status> getLoadFromCloudTask() {
+        SwingWorker<JStockOptions, Status> worker = new SwingWorker<JStockOptions, Status>() {
             @Override
             protected void done() {
-                boolean result = false;
+                JStockOptions result = null;
 
                 // Some developers suggest to catch this exception, instead of
                 // checking on isCancelled. As I am not confident by merely
@@ -273,7 +274,8 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
                 jButton1.setEnabled(true);
                 jButton3.setEnabled(true);
 
-                if (result == true) {
+                if (result != null) {
+                    JStock.getInstance().reloadAfterDownloadFromCloud(result);
                     JOptionPane.showMessageDialog(LoadFromCloudJDialog.this, GUIBundle.getString("LoadFromCloudJDialog_Success"));
                     setVisible(false);
                     dispose();
@@ -300,10 +302,13 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
                 }
             }
 
+            // Unlike Android, we don't mutate old JStockOptions first. Instead, 
+            // we return JStockOptions to UI thread. This allow JStock.java make 
+            // look n feel decision, based on old JStockOptions.
             @Override
-            protected Boolean doInBackground() {
+            protected JStockOptions doInBackground() {
                 if (isCancelled()) {
-                    return false;
+                    return null;
                 }
 
                 memoryLog.clear();
@@ -317,7 +322,7 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
                     cloudFile = Utils.loadFromLegacyGoogleDrive(credentialEx.first);
                     if (cloudFile == null) {                        
                         publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_LoadingFromCloudFail"), Icons.ERROR));
-                        return false;
+                        return null;
                     } else {
                         Utils.saveToGoogleDrive(credentialEx.first, cloudFile.file);
                     }
@@ -325,7 +330,7 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
                 /* Check for checksum. */
                 if (cloudFile.checksum != org.yccheok.jstock.analysis.Utils.getChecksum(cloudFile.file)) {
                     publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_CheckingCheckSumFail"), Icons.ERROR));
-                    return false;
+                    return null;
                 }
                 /* Check for date. */
                 final long today = new Date().getTime();
@@ -336,21 +341,21 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
                     final int result = JOptionPane.showConfirmDialog(LoadFromCloudJDialog.this, message, MessagesBundle.getString("question_title_overwrite_your_data_by_cloud_data_at"), JOptionPane.YES_NO_OPTION);
                     if (result != JOptionPane.YES_OPTION) {
                         publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_UserRefuseToOverwriteWithOldData"), Icons.ERROR));
-                        return false;
+                        return null;
                     }
                 }
                 /* Check for version. */
                 if (Utils.isCloudFileCompatible(cloudFile.version) == false) {
                     final String message = MessageFormat.format(GUIBundle.getString("LoadFromCloudJDialog_VersionNotCompatible_template"), cloudFile.version);
                     publish(Status.newInstance(message, Icons.ERROR));
-                    return false;
+                    return null;
                 }
 
                 // Place isCancelled check after time consuming operation.
                 // Not the best way, but perhaps the easiest way to cancel
                 // the operation.
                 if (isCancelled()) {
-                    return false;
+                    return null;
                 }
 
                 publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_ExtractingData..."), Icons.BUSY));
@@ -360,24 +365,25 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
                 // Not the best way, but perhaps the easiest way to cancel
                 // the operation.
                 if (isCancelled()) {
-                    return false;
+                    return null;
                 }
                 
                 if (false == status) {
                     publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_ExtractingDataFail"), Icons.ERROR));
+                    return null;
                 }
 
                 final File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "options.xml");
                 final JStockOptions jStockOptions = Utils.fromXML(JStockOptions.class, f);
-                if (jStockOptions != null) {
-                    MainFrame.getInstance().getJStockOptions().insensitiveCopy(jStockOptions);
-                }
 
-                MainFrame.getInstance().reloadAfterDownloadFromCloud();
+                if (jStockOptions == null) {
+                    publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_ExtractingDataFail"), Icons.ERROR));
+                    return null;
+                }
 
                 publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_Success"), Icons.OK));
 
-                return status;
+                return jStockOptions;
             }
         };
         return worker;
@@ -400,7 +406,7 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
        
     private final Pair<Credential, String> credentialEx;
     
-    private volatile SwingWorker<Boolean, Status> loadFromCloudTask = null;
+    private volatile SwingWorker<JStockOptions, Status> loadFromCloudTask = null;
     private final List<String> memoryLog = new ArrayList<String>();
     
     private static final Log log = LogFactory.getLog(LoadFromCloudJDialog.class);

@@ -19,6 +19,7 @@
 
 package org.yccheok.jstock.gui;
 
+import org.yccheok.jstock.engine.Pair;
 import com.google.api.client.auth.oauth2.Credential;
 import java.awt.Font;
 import java.util.concurrent.CancellationException;
@@ -116,7 +117,7 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
                 
                 if (pair != null) {
                     credentialEx = pair;
-                    jCheckBox3.setSelected(MainFrame.getInstance().getJStockOptions().isSMSEnabled());
+                    jCheckBox3.setSelected(JStock.getInstance().getJStockOptions().isSMSEnabled());
                 }
                 
                 updateGUIState();

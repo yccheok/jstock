@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <launch4jConfig>
   <dontWrapJar>false</dontWrapJar>
   <headerType>gui</headerType>
@@ -10,6 +11,7 @@
   <downloadUrl>http://java.com/download</downloadUrl>
   <supportUrl></supportUrl>
   <stayAlive>false</stayAlive>
+  <restartOnCrash>false</restartOnCrash>
   <manifest></manifest>
   <icon>c:\yocto\jstock\installer\windows\chart.ico</icon>
   <jre>
@@ -23,12 +25,12 @@
     <maxHeapSize>512</maxHeapSize>
   </jre>
   <versionInfo>
-    <fileVersion>1.1.2.1</fileVersion>
-    <txtFileVersion>1.1.2.1</txtFileVersion>
+    <fileVersion>1.1.2.3</fileVersion>
+    <txtFileVersion>1.1.2.3</txtFileVersion>
     <fileDescription>JStock - Stock Market Software</fileDescription>
     <copyright>Yan Cheng Cheok &lt;yancheng.cheok@gmail.com&gt;</copyright>
-    <productVersion>1.1.2.1</productVersion>
-    <txtProductVersion>1.1.2.1</txtProductVersion>
+    <productVersion>1.1.2.3</productVersion>
+    <txtProductVersion>1.1.2.3</txtProductVersion>
     <productName>JStock - Stock Market Software</productName>
     <companyName>Yan Cheng Cheok &lt;yancheng.cheok@gmail.com&gt;</companyName>
     <internalName>jstock</internalName>

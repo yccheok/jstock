@@ -148,7 +148,7 @@ public class Utils {
 
     public static void updateFactoriesPriceSource() {
         for (Country country : Country.values()) {
-            final PriceSource priceSource = MainFrame.getInstance().getJStockOptions().getPriceSource(country);
+            final PriceSource priceSource = JStock.getInstance().getJStockOptions().getPriceSource(country);
             Factories.INSTANCE.updatePriceSource(country, priceSource);
         }  
     }
@@ -285,7 +285,7 @@ public class Utils {
      * @param mainFrame One and only one mainFrame
      * @return true if restart success
      */
-    public static boolean restartApplication(MainFrame mainFrame)
+    public static boolean restartApplication(JStock mainFrame)
     {
         String javaBin = System.getProperty("java.home") + "/bin/javaw";
         File jarFile;
@@ -831,7 +831,7 @@ public class Utils {
      * @return cached history files directory
      */
     public static String getHistoryDirectory() {
-        return getHistoryDirectory(MainFrame.getInstance().getJStockOptions().getCountry());
+        return getHistoryDirectory(JStock.getInstance().getJStockOptions().getCountry());
     }
 
     public static String getHistoryDirectory(Country country) {
@@ -1093,22 +1093,15 @@ public class Utils {
         return operatorIndicator;
     }
 
-    public static void setDefaultLookAndFeel() {
+    public static String setDefaultLookAndFeel() {
         try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        }
-        catch (java.lang.ClassNotFoundException exp) {
+            String className = UIManager.getSystemLookAndFeelClassName();
+            UIManager.setLookAndFeel(className);
+            return className;
+        } catch (java.lang.ClassNotFoundException | java.lang.InstantiationException | java.lang.IllegalAccessException | javax.swing.UnsupportedLookAndFeelException exp) {
             log.error(null, exp);
         }
-        catch (java.lang.InstantiationException exp) {
-            log.error(null, exp);
-        }
-        catch (java.lang.IllegalAccessException exp) {
-            log.error(null, exp);
-        }
-        catch (javax.swing.UnsupportedLookAndFeelException exp) {
-            log.error(null, exp);
-        }
+        return null;
     }
 
     public static class CloudFile {
@@ -1418,7 +1411,7 @@ public class Utils {
         method.setRequestEntity(entity);
         method.setContentChunked(false);
 
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         String respond = null;
         try {
             if (jStockOptions.isProxyAuthEnabled()) {
@@ -1509,7 +1502,7 @@ public class Utils {
         org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(client);
 
         final HttpMethod method = new GetMethod(request);
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         String respond = null;
         try {
             if (jStockOptions.isProxyAuthEnabled()) {
@@ -1592,7 +1585,7 @@ public class Utils {
         org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
 
         final GetMethod method = new GetMethod(request);
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         InputStreamAndMethod inputStreamAndMethod = null;
         InputStream respond = null;
         HttpMethod methodToClosed = method;
@@ -1653,7 +1646,7 @@ public class Utils {
     // We prefer to have this method in gui package instead of engine. This is because it requires
     // access to JStockOptions.
     private static void setHttpClientProxyCredentialsFromJStockOptions(HttpClient httpClient) {
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         if (jStockOptions.isProxyAuthEnabled() == false) {
             httpClient.getState().clearCredentials();
         }
@@ -1726,9 +1719,9 @@ public class Utils {
         }
         catch (NumberFormatException exp) {
             log.error(null, exp);
-			return null;
+            return null;
         }
-		return new ApplicationInfo(version, windowsDownloadLink, linuxDownloadLink, macDownloadLink, solarisDownloadLink);
+        return new ApplicationInfo(version, windowsDownloadLink, linuxDownloadLink, macDownloadLink, solarisDownloadLink);
     }
 
     public static int getApplicationVersionID() {
@@ -1853,7 +1846,7 @@ public class Utils {
     // Calling to this method will affect state of JStockOptions.
     // Returns null if no file being selected.
     public static FileEx promptSavePortfolioCSVAndExcelJFileChooser(final String suggestedFileName) {
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         final JFileChooser chooser = new JFileChooser(jStockOptions.getLastFileIODirectory());
         final FileNameExtensionFilter csvFilter = new FileNameExtensionFilter("CSV Documents (*.csv)", "csv");
         final FileNameExtensionFilter xlsFilter = new FileNameExtensionFilter("Microsoft Excel (*.xls)", "xls");
@@ -1895,7 +1888,7 @@ public class Utils {
         chooser.setSelectedFile(chooser.getFileFilter().getDescription().equals(csvFilter.getDescription()) ? new File(portfolioSelectionJPanel.getSuggestedFileName()) : new File(suggestedFileName));
 
         while (true) {
-            final int returnVal = chooser.showSaveDialog(MainFrame.getInstance());
+            final int returnVal = chooser.showSaveDialog(JStock.getInstance());
             if (returnVal != JFileChooser.APPROVE_OPTION) {
                 return null;
             }
@@ -1924,7 +1917,7 @@ public class Utils {
             if (file.exists()) {
                 final String output = MessageFormat.format(MessagesBundle.getString("question_message_replace_old_template"), file.getName());
 
-                final int result = javax.swing.JOptionPane.showConfirmDialog(MainFrame.getInstance(), output, MessagesBundle.getString("question_title_replace_old"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
+                final int result = javax.swing.JOptionPane.showConfirmDialog(JStock.getInstance(), output, MessagesBundle.getString("question_title_replace_old"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
                 if (result != javax.swing.JOptionPane.YES_OPTION) {
                     continue;
                 }
@@ -1962,7 +1955,7 @@ public class Utils {
     }
 
     private static File promptOpenJFileChooser(FileNameExtensionFilter... fileNameExtensionFilters) {
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         final JFileChooser chooser = new JFileChooser(jStockOptions.getLastFileIODirectory());
         chooser.setAcceptAllFileFilterUsed(false);
         for (FileNameExtensionFilter fileNameExtensionFilter : fileNameExtensionFilters) {
@@ -1976,7 +1969,7 @@ public class Utils {
         if (filter != null) {
             chooser.setFileFilter(filter);
         }
-        int returnVal = chooser.showOpenDialog(MainFrame.getInstance());
+        int returnVal = chooser.showOpenDialog(JStock.getInstance());
 
         if (returnVal != JFileChooser.APPROVE_OPTION) {
             return null;
@@ -2062,7 +2055,7 @@ public class Utils {
     }
 
     private static File promptSaveJFileChooser(String suggestedFileName, FileNameExtensionFilter... fileNameExtensionFilters) {
-        final JStockOptions jStockOptions = MainFrame.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         final JFileChooser chooser = new JFileChooser(jStockOptions.getLastFileIODirectory());
         chooser.setAcceptAllFileFilterUsed(false);
         for (FileNameExtensionFilter fileNameExtensionFilter : fileNameExtensionFilters) {
@@ -2078,7 +2071,7 @@ public class Utils {
             chooser.setFileFilter(filter);
         }
         while (true) {
-            final int returnVal = chooser.showSaveDialog(MainFrame.getInstance());
+            final int returnVal = chooser.showSaveDialog(JStock.getInstance());
             if (returnVal != JFileChooser.APPROVE_OPTION) {
                 return null;
             }
@@ -2122,7 +2115,7 @@ public class Utils {
             if (file.exists()) {
                 final String output = MessageFormat.format(MessagesBundle.getString("question_message_replace_old_template"), file.getName());
 
-                final int result = javax.swing.JOptionPane.showConfirmDialog(MainFrame.getInstance(), output, MessagesBundle.getString("question_title_replace_old"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
+                final int result = javax.swing.JOptionPane.showConfirmDialog(JStock.getInstance(), output, MessagesBundle.getString("question_title_replace_old"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
                 if (result != javax.swing.JOptionPane.YES_OPTION) {
                     continue;
                 }
@@ -2708,11 +2701,11 @@ public class Utils {
     // Remember to update isCloudFileCompatible method.
     private static final int CLOUD_FILE_VERSION_ID = 1107;
 
-    private static final String ABOUT_BOX_VERSION_STRING = "1.0.7r";
+    private static final String ABOUT_BOX_VERSION_STRING = "1.0.7t";
 
-    // 1.0.7r
+    // 1.0.7t
     // For About box comparision on latest version purpose.
-    private static final int APPLICATION_VERSION_ID = 1121;
+    private static final int APPLICATION_VERSION_ID = 1123;
         
     private static final Executor zombiePool = Executors.newFixedThreadPool(Utils.NUM_OF_THREADS_ZOMBIE_POOL);
 
