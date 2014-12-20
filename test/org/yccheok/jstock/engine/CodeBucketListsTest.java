@@ -42,12 +42,14 @@ public class CodeBucketListsTest extends TestCase {
         instance.add(Code.newInstance("1.l"));
         instance.add(Code.newInstance("2.kl"));
         instance.add(Code.newInstance("3.kl"));
-        instance.add(Code.newInstance("0.nz"));
+        instance.add(Code.newInstance("0.co"));
         instance.add(Code.newInstance("1.to"));
         instance.add(Code.newInstance("2"));
-        instance.add(Code.newInstance("2.nz"));
-        instance.add(Code.newInstance("3.nz"));
+        instance.add(Code.newInstance("2.co"));
+        instance.add(Code.newInstance("3.co"));
         instance.add(Code.newInstance("4.to"));
+        
+        assertEquals(5, instance.size());
         
         List<Code> codes = instance.get(0);
         assertEquals(3, codes.size());
@@ -67,13 +69,13 @@ public class CodeBucketListsTest extends TestCase {
         
         codes = instance.get(3);
         assertEquals(3, codes.size());
-        assertEquals(Code.newInstance("0.nz"), codes.get(0));
+        assertEquals(Code.newInstance("0.co"), codes.get(0));
         assertEquals(Code.newInstance("1.to"), codes.get(1));
-        assertEquals(Code.newInstance("2.nz"), codes.get(2));
+        assertEquals(Code.newInstance("2.co"), codes.get(2));
         
         codes = instance.get(4);
         assertEquals(2, codes.size());
-        assertEquals(Code.newInstance("3.nz"), codes.get(0));
+        assertEquals(Code.newInstance("3.co"), codes.get(0));
         assertEquals(Code.newInstance("4.to"), codes.get(1));         
         
     }
@@ -128,11 +130,11 @@ public class CodeBucketListsTest extends TestCase {
         instance.add(Code.newInstance("1.l"));
         instance.add(Code.newInstance("2.kl"));
         instance.add(Code.newInstance("3.kl"));
-        instance.add(Code.newInstance("0.nz"));
+        instance.add(Code.newInstance("0.co"));
         instance.add(Code.newInstance("1.to"));
         instance.add(Code.newInstance("2"));
-        instance.add(Code.newInstance("2.nz"));
-        instance.add(Code.newInstance("3.nz"));
+        instance.add(Code.newInstance("2.co"));
+        instance.add(Code.newInstance("3.co"));
         instance.add(Code.newInstance("4.to"));
         
         boolean status = instance.remove(Code.newInstance("no_such_code"));
@@ -162,13 +164,13 @@ public class CodeBucketListsTest extends TestCase {
         
         codes = instance.get(2);
         assertEquals(3, codes.size());
-        assertEquals(Code.newInstance("0.nz"), codes.get(0));
+        assertEquals(Code.newInstance("0.co"), codes.get(0));
         assertEquals(Code.newInstance("1.to"), codes.get(1));
-        assertEquals(Code.newInstance("2.nz"), codes.get(2));
+        assertEquals(Code.newInstance("2.co"), codes.get(2));
         
         codes = instance.get(3);
         assertEquals(2, codes.size());
-        assertEquals(Code.newInstance("3.nz"), codes.get(0));
+        assertEquals(Code.newInstance("3.co"), codes.get(0));
         assertEquals(Code.newInstance("4.to"), codes.get(1)); 
         
         status = instance.remove(Code.newInstance("0"));
@@ -188,13 +190,13 @@ public class CodeBucketListsTest extends TestCase {
         
         codes = instance.get(2);
         assertEquals(3, codes.size());
-        assertEquals(Code.newInstance("0.nz"), codes.get(0));
+        assertEquals(Code.newInstance("0.co"), codes.get(0));
         assertEquals(Code.newInstance("1.to"), codes.get(1));
-        assertEquals(Code.newInstance("2.nz"), codes.get(2));
+        assertEquals(Code.newInstance("2.co"), codes.get(2));
         
         codes = instance.get(3);
         assertEquals(2, codes.size());
-        assertEquals(Code.newInstance("3.nz"), codes.get(0));
+        assertEquals(Code.newInstance("3.co"), codes.get(0));
         assertEquals(Code.newInstance("4.to"), codes.get(1));   
         
         status = instance.remove(Code.newInstance("2"));
@@ -213,13 +215,13 @@ public class CodeBucketListsTest extends TestCase {
         
         codes = instance.get(2);
         assertEquals(3, codes.size());
-        assertEquals(Code.newInstance("0.nz"), codes.get(0));
+        assertEquals(Code.newInstance("0.co"), codes.get(0));
         assertEquals(Code.newInstance("1.to"), codes.get(1));
-        assertEquals(Code.newInstance("2.nz"), codes.get(2));
+        assertEquals(Code.newInstance("2.co"), codes.get(2));
         
         codes = instance.get(3);
         assertEquals(2, codes.size());
-        assertEquals(Code.newInstance("3.nz"), codes.get(0));
+        assertEquals(Code.newInstance("3.co"), codes.get(0));
         assertEquals(Code.newInstance("4.to"), codes.get(1));          
     }
     
