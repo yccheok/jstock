@@ -438,7 +438,6 @@ public class Utils {
         
         if (string_length > 2) {
             String suffix = string.substring(string_length-2, string_length);
-            System.out.println("suffix = " + suffix);
             String prefix = oneLetterSuffixes.get(suffix);
             if (prefix != null) {
                 return prefix + string.substring(0, string_length - 2);
