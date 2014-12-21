@@ -164,6 +164,7 @@ public enum Factories {
         yahooSet.add(BrazilYahooStockServerFactory.class);
         
         australiaList.add(YahooStockServerFactory.newInstance());
+        australiaList.add(GoogleStockServerFactory.newInstance());
         austriaList.add(YahooStockServerFactory.newInstance());
         austriaList.add(GoogleStockServerFactory.newInstance());
         belgiumList.add(YahooStockServerFactory.newInstance());

@@ -831,6 +831,7 @@ public class Utils {
         twoLetterSuffixes.put(".TW", "TPE:");
         twoLetterSuffixes.put(".NZ", "NZE:");
         twoLetterSuffixes.put(".ST", "STO:");
+        twoLetterSuffixes.put(".AX", "ASX:");
         
         countries.put("AX", Country.Australia);
         countries.put("VI", Country.Austria);
@@ -903,6 +904,8 @@ public class Utils {
         toGoogleIndex.put("^TWII", "TPE:TAIEX");
         toGoogleIndex.put("^NZ50", "NZE:NZ50G");
         toGoogleIndex.put("^OMX", "INDEXNASDAQ:OMXS30");
+        toGoogleIndex.put("^AXJO", "INDEXASX:XJO");
+        toGoogleIndex.put("^AORD", "INDEXASX:XAO");
         
         // TODO : Need revision. We no longer have primaryStockServerFactoryClasses
         // concept. Going to replace with PriceSource.

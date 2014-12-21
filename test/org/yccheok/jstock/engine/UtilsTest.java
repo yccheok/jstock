@@ -114,6 +114,16 @@ public class UtilsTest extends TestCase {
         result = Utils.toGoogleFormat(code);
         assertEquals(expResult, result);
 
+        code = Code.newInstance("^AXJO");
+        expResult = "INDEXASX:XJO";
+        result = Utils.toGoogleFormat(code);
+        assertEquals(expResult, result);
+
+        code = Code.newInstance("^AORD");
+        expResult = "INDEXASX:XAO";
+        result = Utils.toGoogleFormat(code);
+        assertEquals(expResult, result);
+
         code = Code.newInstance("USDMYR=X");
         expResult = "CURRENCY:USDMYR";
         result = Utils.toGoogleFormat(code);
@@ -181,6 +191,11 @@ public class UtilsTest extends TestCase {
 
         code = Code.newInstance("tatamotor.ns");
         expResult = "NSE:TATAMOTORS";
+        result = Utils.toGoogleFormat(code);
+        assertEquals(expResult, result);
+        
+        code = Code.newInstance("8ih.ax");
+        expResult = "ASX:8IH";
         result = Utils.toGoogleFormat(code);
         assertEquals(expResult, result);
     }

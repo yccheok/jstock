@@ -1,6 +1,9 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.7u - 2014-12-21
+  Feature: Support Google Finance for Australia.
+  
 JStock 1.0.7t - 2014-12-17
   Feature: Support Google Finance for Sweden.
   
