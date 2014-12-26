@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2012 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2015 Yan Cheng Cheok <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -56,6 +56,8 @@ import org.jdesktop.swingx.JXTreeTable;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.treetable.*;
 import org.yccheok.jstock.engine.*;
+import org.yccheok.jstock.engine.currency.ExchangeRate;
+import org.yccheok.jstock.engine.currency.ExchangeRateMonitor;
 import org.yccheok.jstock.file.GUIBundleWrapper;
 import org.yccheok.jstock.file.Statement;
 import org.yccheok.jstock.file.Statements;
@@ -1699,6 +1701,22 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         portfolioTreeTableModel.editTransaction(newTransaction, oldTransaction);        
     }
 
+    private Set<Country> getBuyTransactionCountries() {
+        Set<Country> countries = new HashSet<>();
+        final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
+        final Portfolio buyPortfolio = (Portfolio) buyPortfolioTreeTableModel.getRoot();
+
+        for (int i = 0, count = buyPortfolio.getChildCount(); i < count; i++) {
+            TransactionSummary transactionSummary = (TransactionSummary)buyPortfolio.getChildAt(i);
+            Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
+            Stock stock = transaction.getStock();
+            Country country = org.yccheok.jstock.engine.Utils.toCountry(stock.code);
+            countries.add(country);
+        }
+        
+        return countries;
+    }
+    
     private int getBuyTransactionSize() {
         final BuyPortfolioTreeTableModelEx portfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
         return portfolioTreeTableModel.getTransactionSize();
@@ -2268,25 +2286,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         // Should we show the exchange rate label on status bar?
         mainFrame.setStatusBarExchangeRateVisible(jStockOptions.isCurrencyExchangeEnable(fromCountry));
 
-        if (currencyExchangeMonitor != null) {
-            // Can we re-use this currencyExchangeMonitor?
-            if (currencyExchangeMonitor.getFromCountry() == fromCountry && currencyExchangeMonitor.getToCountry() == toCountry) {
-                // Yes. We can re-use it. Should we resume or suspend it?
-                if (jStockOptions.isCurrencyExchangeEnable(fromCountry)) {
-                    // Start it first if we haven't do so.
-                    currencyExchangeMonitor.start();
-                    currencyExchangeMonitor.resume();
-                } else {
-                    currencyExchangeMonitor.suspend();
-                }
-                // Before returning, update wealth header immediately.
-                this.updateWealthHeader();
-                // Return early.
-                return;
-            }
-        }
-
-        final CurrencyExchangeMonitor oldCurrencyExchangeMonitor = currencyExchangeMonitor;
+        final CurrencyExchangeMonitor oldCurrencyExchangeMonitor = this.exchangeRateMonitor;
         if (oldCurrencyExchangeMonitor != null) {            
             Utils.getZoombiePool().execute(new Runnable() {
                 @Override
@@ -2343,10 +2343,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         updateRealTimeStockMonitorAccordingToBuyPortfolioTreeTableModel();
     }
 
-    private org.yccheok.jstock.engine.Observer<CurrencyExchangeMonitor, Double> getCurrencyExchangeMonitorObserver() {
-        return new org.yccheok.jstock.engine.Observer<CurrencyExchangeMonitor, Double>() {
+    private org.yccheok.jstock.engine.Observer<ExchangeRateMonitor, List<ExchangeRate>> getExchangeRateMonitorObserver() {
+        return new org.yccheok.jstock.engine.Observer<ExchangeRateMonitor, List<ExchangeRate>>() {
             @Override
-            public void update(CurrencyExchangeMonitor subject, Double arg) {
+            public void update(ExchangeRateMonitor subject, java.util.List<ExchangeRate> arg) {
                 JStock.getInstance().setStatusBarExchangeRate(arg);
                 updateWealthHeader();
             }
@@ -2684,10 +2684,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private DividendSummary dividendSummary = new DividendSummary();
 
     private RealTimeStockMonitor realTimeStockMonitor = null;
-    private CurrencyExchangeMonitor currencyExchangeMonitor = null;
+    private ExchangeRateMonitor exchangeRateMonitor = null;
 
-    private final org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
-    private final org.yccheok.jstock.engine.Observer<CurrencyExchangeMonitor, Double> currencyExchangeMonitorObserver = this.getCurrencyExchangeMonitorObserver();
+    private final org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, List<Stock>> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
+    private final org.yccheok.jstock.engine.Observer<ExchangeRateMonitor, List<ExchangeRate>> exchangeRateMonitorObserver = this.getExchangeRateMonitorObserver();
 
     private long timestamp = 0;
     
