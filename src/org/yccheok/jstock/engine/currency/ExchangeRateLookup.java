@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2014 Yan Cheng Cheok <yccheok@yahoo.com>
+ * Copyright (C) 2015 Yan Cheng Cheok <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,22 +17,30 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package org.yccheok.jstock.gui;
+package org.yccheok.jstock.engine.currency;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
  * @author yccheok
  */
-public class Constants {
-    public static final int REAL_TIME_STOCK_MONITOR_MAX_THREAD = 4;
-    public static final int REAL_TIME_STOCK_MONITOR_MAX_STOCK_SIZE_PER_SCAN = 20;
+public enum ExchangeRateLookup {
+    INSTANCE;
     
-    // I know that entire stock indices shall never more than 2 x 20 = 40. But,
-    // it really make no harm that we use 4 instead of 2 in such case.
-    // RealTimeIndexMonitor is smart enough to handle such case.
-    public static final int REAL_TIME_INDEX_MONITOR_MAX_THREAD = 4;
-    public static final int REAL_TIME_INDEX_MONITOR_MAX_STOCK_SIZE_PER_SCAN = 20;
+    public ExchangeRate put(ExchangeRate exchageRate) {
+        // Avoid out of memory.
+        if (map.size() >= MAX_SIZE) {
+            map.clear();
+        }
+        return map.put(exchageRate.currencyPair(), exchageRate);
+    }
     
-    public static final int EXCHANGE_RATE_MONITOR_MAX_THREAD = 4;
-    public static final int EXCHANGE_RATE_MONITOR_MAX_STOCK_SIZE_PER_SCAN = 20;
+    public ExchangeRate get(CurrencyPair currencyPair) {
+        return map.get(currencyPair);
+    }
+    
+    private final int MAX_SIZE = 512;
+    private final Map<CurrencyPair, ExchangeRate> map = new ConcurrentHashMap<>();
 }

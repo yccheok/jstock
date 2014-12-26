@@ -32,6 +32,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Currency;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -56,6 +57,7 @@ import org.jdesktop.swingx.JXTreeTable;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.treetable.*;
 import org.yccheok.jstock.engine.*;
+import org.yccheok.jstock.engine.currency.CurrencyPair;
 import org.yccheok.jstock.engine.currency.ExchangeRate;
 import org.yccheok.jstock.engine.currency.ExchangeRateMonitor;
 import org.yccheok.jstock.file.GUIBundleWrapper;
@@ -2286,32 +2288,48 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         // Should we show the exchange rate label on status bar?
         mainFrame.setStatusBarExchangeRateVisible(jStockOptions.isCurrencyExchangeEnable(fromCountry));
 
-        final CurrencyExchangeMonitor oldCurrencyExchangeMonitor = this.exchangeRateMonitor;
-        if (oldCurrencyExchangeMonitor != null) {            
+        final ExchangeRateMonitor oldExchangeRateMonitor = this.exchangeRateMonitor;
+        if (oldExchangeRateMonitor != null) {            
             Utils.getZoombiePool().execute(new Runnable() {
                 @Override
                 public void run() {
-                    log.info("Prepare to shut down " + oldCurrencyExchangeMonitor + "...");
-                    oldCurrencyExchangeMonitor.dettachAll();
-                    oldCurrencyExchangeMonitor.stop();
-                    log.info("Shut down " + oldCurrencyExchangeMonitor + " peacefully.");
+                    log.info("Prepare to shut down " + oldExchangeRateMonitor + "...");
+                    oldExchangeRateMonitor.dettachAll();
+                    oldExchangeRateMonitor.stop();
+                    log.info("Shut down " + oldExchangeRateMonitor + " peacefully.");
                 }
             });
         }
 
-        currencyExchangeMonitor = new CurrencyExchangeMonitor(fromCountry, toCountry);
-        currencyExchangeMonitor.attach(currencyExchangeMonitorObserver);
+        this.exchangeRateMonitor = new ExchangeRateMonitor(
+            Constants.EXCHANGE_RATE_MONITOR_MAX_THREAD, 
+            Constants.EXCHANGE_RATE_MONITOR_MAX_STOCK_SIZE_PER_SCAN,
+            jStockOptions.getScanningSpeed());
+        
+        this.exchangeRateMonitor.attach(exchangeRateMonitorObserver);
 
-        // Update the tool tip text.
-        final String text = MessageFormat.format(GUIBundle.getString("MyJXStatusBar_CurrencyExchangeRateFor"), currencyExchangeMonitor.getFromCurrency(), currencyExchangeMonitor.getToCurrency());
-        mainFrame.setStatusBarExchangeRateToolTipText(text);
+        Set<Country> countries = this.getBuyTransactionCountries();
+        for (Country country : countries) {
+            CurrencyPair currencyPair = new CurrencyPair(country.getCurrency(), toCountry.getCurrency());
+            this.exchangeRateMonitor.addCurrencyPair(currencyPair);
+        }
+        
+        // We will display the currency exchange rate, only if there is 1 
+        // currency pair.
+        if (countries.size() == 1) {
+            // Update the tool tip text.
+            Currency fromCurrency = countries.iterator().next().getCurrency();
+            Currency toCurrency = toCountry.getCurrency();
+            final String text = MessageFormat.format(GUIBundle.getString("MyJXStatusBar_CurrencyExchangeRateFor"), fromCurrency.toString(), toCurrency.toString());
+            mainFrame.setStatusBarExchangeRateToolTipText(text);
+        }
 
         // Everything is new. So, reset the displayed text first.
         mainFrame.setStatusBarExchangeRate(null);
 
         if (jStockOptions.isCurrencyExchangeEnable(fromCountry)) {
             // Start immediately.
-            currencyExchangeMonitor.start();
+            this.exchangeRateMonitor.startNewThreadsIfNecessary();
         }
 
         // Before returning, update wealth header immediately.
