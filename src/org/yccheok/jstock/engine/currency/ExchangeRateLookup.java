@@ -19,6 +19,7 @@
 
 package org.yccheok.jstock.engine.currency;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -29,12 +30,22 @@ import java.util.concurrent.ConcurrentHashMap;
 public enum ExchangeRateLookup {
     INSTANCE;
     
-    public ExchangeRate put(ExchangeRate exchageRate) {
-        // Avoid out of memory.
-        if (map.size() >= MAX_SIZE) {
+    public ExchangeRate put(ExchangeRate exchangeRate) {
+        // A simple & not so sophisticated way to avoid out of memory.
+        if ((map.size() + 1) > MAX_SIZE) {
             map.clear();
         }
-        return map.put(exchageRate.currencyPair(), exchageRate);
+        return map.put(exchangeRate.currencyPair(), exchangeRate);
+    }
+    
+    public void put(List<ExchangeRate> exchangeRates) {
+        // A simple & not so sophisticated way to avoid out of memory.
+        if ((map.size() + exchangeRates.size()) > MAX_SIZE) {
+            map.clear();
+        }
+        for (ExchangeRate exchangeRate : exchangeRates) {
+            map.put(exchangeRate.currencyPair(), exchangeRate);
+        }
     }
     
     public ExchangeRate get(CurrencyPair currencyPair) {

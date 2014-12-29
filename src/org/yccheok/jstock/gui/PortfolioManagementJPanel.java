@@ -59,6 +59,7 @@ import org.jdesktop.swingx.treetable.*;
 import org.yccheok.jstock.engine.*;
 import org.yccheok.jstock.engine.currency.CurrencyPair;
 import org.yccheok.jstock.engine.currency.ExchangeRate;
+import org.yccheok.jstock.engine.currency.ExchangeRateLookup;
 import org.yccheok.jstock.engine.currency.ExchangeRateMonitor;
 import org.yccheok.jstock.file.GUIBundleWrapper;
 import org.yccheok.jstock.file.Statement;
@@ -1703,6 +1704,25 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         portfolioTreeTableModel.editTransaction(newTransaction, oldTransaction);        
     }
 
+    private boolean isBuyTransactionCountriesSingle() {
+        Set<Country> countries = new HashSet<>();
+        final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
+        final Portfolio buyPortfolio = (Portfolio) buyPortfolioTreeTableModel.getRoot();
+
+        for (int i = 0, count = buyPortfolio.getChildCount(); i < count; i++) {
+            TransactionSummary transactionSummary = (TransactionSummary)buyPortfolio.getChildAt(i);
+            Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
+            Stock stock = transaction.getStock();
+            Country country = org.yccheok.jstock.engine.Utils.toCountry(stock.code);
+            countries.add(country);
+            if (countries.size() > 1) {
+                return false;
+            }
+        }
+        
+        return countries.size() == 1;
+    }
+    
     private Set<Country> getBuyTransactionCountries() {
         Set<Country> countries = new HashSet<>();
         final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
@@ -2365,7 +2385,13 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         return new org.yccheok.jstock.engine.Observer<ExchangeRateMonitor, List<ExchangeRate>>() {
             @Override
             public void update(ExchangeRateMonitor subject, java.util.List<ExchangeRate> arg) {
-                JStock.getInstance().setStatusBarExchangeRate(arg);
+                ExchangeRateLookup.INSTANCE.put(arg);
+                
+                if (isBuyTransactionCountriesSingle() && arg.size() == 1) {
+                    ExchangeRate exchangeRate = arg.get(0);
+                    JStock.getInstance().setStatusBarExchangeRate(exchangeRate.rate());
+                }
+                
                 updateWealthHeader();
             }
         };
@@ -2527,20 +2553,6 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     this.dividendSummary, 
                     this.depositSummary);
         return saveAsCSVFile(csvPortfolio, fileEx, languageIndependent);
-    }
-
-    public double getCurrencyExchangeRate() {
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
-        
-        // Get the currency exchange rate.
-        double exchangeRate = 1.0;
-        if (jStockOptions.isCurrencyExchangeEnable(jStockOptions.getCountry())) {
-            final CurrencyExchangeMonitor _currencyExchangeMonitor = this.currencyExchangeMonitor;
-            if (_currencyExchangeMonitor != null) {
-                exchangeRate = _currencyExchangeMonitor.getExchangeRate();
-            }
-        }
-        return exchangeRate;
     }
     
     private void updateWealthHeader() {
