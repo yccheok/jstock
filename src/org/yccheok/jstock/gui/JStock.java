@@ -129,7 +129,7 @@ public class JStock extends javax.swing.JFrame {
         this.initAjaxProvider();
         this.initRealTimeIndexMonitor();
         this.initLatestNewsTask();
-        this.initCurrencyExchangeMonitor();
+        this.initExchangeRateMonitor();
         this.initRealTimeStockMonitor();
         this.initWatchlist();
         this.initAlertStateManager();
@@ -1585,7 +1585,7 @@ public class JStock extends javax.swing.JFrame {
     private void jMenuItem15ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem15ActionPerformed
         refreshAllRealTimeStockMonitors();
         refreshRealTimeIndexMonitor();
-        refreshCurrencyExchangeMonitor();
+        refreshExchangeRateMonitor();
         
         // Only update UI when there is at least one stock.
         if (this.getStocks().isEmpty() == false) {
@@ -2474,7 +2474,7 @@ public class JStock extends javax.swing.JFrame {
         this.initMarketJPanel();
         this.initStockHistoryMonitor();
         this.initOthersStockHistoryMonitor();
-        this.initCurrencyExchangeMonitor();
+        this.initExchangeRateMonitor();
         // Initialize real time monitor must come before initialize real time
         // stocks. We need to submit real time stocks to real time stock monitor.
         // Hence, after we load real time stocks from file, real time stock monitor
@@ -2561,7 +2561,7 @@ public class JStock extends javax.swing.JFrame {
         this.initMarketJPanel();
         this.initStockHistoryMonitor();
         this.initOthersStockHistoryMonitor();
-        this.initCurrencyExchangeMonitor();
+        this.initExchangeRateMonitor();
         // Initialize real time monitor must come before initialize real time
         // stocks. We need to submit real time stocks to real time stock monitor.
         // Hence, after we load real time stocks from file, real time stock monitor
@@ -3502,8 +3502,8 @@ public class JStock extends javax.swing.JFrame {
     /**
      * Initializes currency exchange monitor.
      */
-    public void initCurrencyExchangeMonitor() {
-        this.portfolioManagementJPanel.initCurrencyExchangeMonitor();
+    public void initExchangeRateMonitor() {
+        this.portfolioManagementJPanel.initExchangeRateMonitor();
     }
 
     private void initRealTimeIndexMonitor() {
@@ -3683,7 +3683,7 @@ public class JStock extends javax.swing.JFrame {
         
         this.refreshAllRealTimeStockMonitors();
         this.refreshRealTimeIndexMonitor();
-        this.refreshCurrencyExchangeMonitor();
+        this.refreshExchangeRateMonitor();
     }
 
     private void rebuildRealTimeStockMonitor() {
@@ -4746,8 +4746,8 @@ public class JStock extends javax.swing.JFrame {
         }
     }
     
-    private void refreshCurrencyExchangeMonitor() {
-        this.portfolioManagementJPanel.refreshCurrencyExchangeMonitor();
+    private void refreshExchangeRateMonitor() {
+        this.portfolioManagementJPanel.refreshExchangeRateMonitor();
     }
     
     public void refreshAllRealTimeStockMonitors() {

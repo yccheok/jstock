@@ -353,7 +353,7 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
         // Remember to refresh the GUIs as well.
         JStock.getInstance().getPortfolioManagementJPanel().refreshCurrencySymbol();
         // Update the new state of currency exchange monitor.
-        JStock.getInstance().initCurrencyExchangeMonitor();
+        JStock.getInstance().initExchangeRateMonitor();
 
         return true;
     }

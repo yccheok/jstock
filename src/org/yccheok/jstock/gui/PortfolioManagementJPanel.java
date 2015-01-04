@@ -2296,9 +2296,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
 
     /**
-     * Initializes currency exchange monitor.
+     * Initializes exchange rate monitor.
      */
-    public void initCurrencyExchangeMonitor() {
+    public void initExchangeRateMonitor() {
         final JStock mainFrame = JStock.getInstance();
         final JStockOptions jStockOptions = mainFrame.getJStockOptions();
 
@@ -2697,7 +2697,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         );
     }
 
-    public void refreshCurrencyExchangeMonitor() {
+    public void refreshExchangeRateMonitor() {
         ExchangeRateMonitor _exchangeRateMonitor = this.exchangeRateMonitor;
         if (_exchangeRateMonitor != null) {
             _exchangeRateMonitor.refresh();
