@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2012 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2015 Yan Cheng Cheok <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,9 @@ import org.jdesktop.swingx.treetable.*;
 import org.yccheok.jstock.portfolio.*;
 import javax.swing.tree.TreePath;
 import org.yccheok.jstock.engine.Code;
+import org.yccheok.jstock.engine.Country;
 import org.yccheok.jstock.engine.StockInfo;
+import org.yccheok.jstock.engine.currency.ExchangeRateLookup;
 import org.yccheok.jstock.gui.JStockOptions;
 import org.yccheok.jstock.gui.JStock;
 import org.yccheok.jstock.internationalization.GUIBundle;
@@ -42,7 +44,7 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
     // Can be either stock last price or open price. If stock last price is 0
     // at current moment (Usually, this means no transaction has been done on
     // that day), open price will be applied.
-    private java.util.Map<Code, Double> stockPrice = new ConcurrentHashMap<Code, Double>();
+    private final java.util.Map<Code, Double> stockPrice = new ConcurrentHashMap<Code, Double>();
     
     public BuyPortfolioTreeTableModelEx() {
         super(Arrays.asList(columnNames));
@@ -309,6 +311,37 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
         if(portfolio.getNetTotal() == 0) return 0.0;
         
         return (getCurrentValue(portfolio) - portfolio.getNetTotal()) / portfolio.getNetTotal() * 100.0;        
+    }
+
+    public double getCurrentValue(ExchangeRateLookup exchangeRateLookup, Country toCountry) {
+        Portfolio portfolio = (Portfolio)getRoot();
+        
+        final int count = portfolio.getChildCount();
+        
+        double result = 0.0;
+        
+        for (int i = 0; i < count; i++) {
+            Object o = portfolio.getChildAt(i);
+            
+            assert(o instanceof TransactionSummary);
+            
+            final TransactionSummary transactionSummary = (TransactionSummary)o;
+                    
+            assert(transactionSummary.getChildCount() > 0);            
+                        
+            double currentValue = this.getCurrentValue(transactionSummary);
+            
+            final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
+        
+            final Code code = transaction.getStock().code;
+            
+            double exchangeRate = org.yccheok.jstock.portfolio.Utils.getExchangeRate(exchangeRateLookup, toCountry, code);
+            
+            result += (currentValue * exchangeRate);
+        }
+        
+        return result;
+
     }
     
     public double getCurrentValue() {
