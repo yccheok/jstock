@@ -27,9 +27,8 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author yccheok
  */
-public enum ExchangeRateLookup {
-    INSTANCE;
-    
+public class ExchangeRateLookup {
+
     public ExchangeRate put(ExchangeRate exchangeRate) {
         // A simple & not so sophisticated way to avoid out of memory.
         if ((map.size() + 1) > MAX_SIZE) {
