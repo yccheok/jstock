@@ -1704,7 +1704,12 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         portfolioTreeTableModel.editTransaction(newTransaction, oldTransaction);        
     }
 
-    private boolean isBuyTransactionCountriesSingle() {
+    private boolean isBuyTransactionEffectiveCountriesSingle() {
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+
+        final Country fromCountry = jStockOptions.getCountry();
+        final Country toCountry = jStockOptions.getLocalCurrencyCountry(fromCountry);
+
         Set<Country> countries = new HashSet<>();
         final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
         final Portfolio buyPortfolio = (Portfolio) buyPortfolioTreeTableModel.getRoot();
@@ -1714,6 +1719,18 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
             Stock stock = transaction.getStock();
             Country country = org.yccheok.jstock.engine.Utils.toCountry(stock.code);
+            
+            if (country == toCountry) {
+                continue;
+            }
+            
+            final Currency currency = country.getCurrency();
+            final Currency toCurrency = toCountry.getCurrency();
+
+            if (currency.equals(toCurrency)) {
+                continue;
+            }
+
             countries.add(country);
             if (countries.size() > 1) {
                 return false;
@@ -1723,7 +1740,12 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         return countries.size() == 1;
     }
     
-    private Set<Country> getBuyTransactionCountries() {
+    private Set<Country> getBuyTransactionEffectiveCountries() {
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+
+        final Country fromCountry = jStockOptions.getCountry();
+        final Country toCountry = jStockOptions.getLocalCurrencyCountry(fromCountry);
+
         Set<Country> countries = new HashSet<>();
         final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
         final Portfolio buyPortfolio = (Portfolio) buyPortfolioTreeTableModel.getRoot();
@@ -1733,6 +1755,18 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
             Stock stock = transaction.getStock();
             Country country = org.yccheok.jstock.engine.Utils.toCountry(stock.code);
+            
+            if (country == toCountry) {
+                continue;
+            }
+            
+            final Currency currency = country.getCurrency();
+            final Currency toCurrency = toCountry.getCurrency();
+
+            if (currency.equals(toCurrency)) {
+                continue;
+            }
+
             countries.add(country);
         }
         
@@ -2328,8 +2362,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         
         this.exchangeRateMonitor.attach(exchangeRateMonitorObserver);
 
-        Set<Country> countries = this.getBuyTransactionCountries();
-        for (Country country : countries) {
+        Set<Country> countries = this.getBuyTransactionEffectiveCountries();
+        for (Country country : countries) {            
             CurrencyPair currencyPair = new CurrencyPair(country.getCurrency(), toCountry.getCurrency());
             this.exchangeRateMonitor.addCurrencyPair(currencyPair);
         }
@@ -2387,7 +2421,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             public void update(ExchangeRateMonitor subject, java.util.List<ExchangeRate> arg) {
                 exchangeRateLookup.put(arg);
                 
-                if (isBuyTransactionCountriesSingle() && arg.size() == 1) {
+                if (isBuyTransactionEffectiveCountriesSingle() && arg.size() == 1) {
                     ExchangeRate exchangeRate = arg.get(0);
                     JStock.getInstance().setStatusBarExchangeRate(exchangeRate.rate());
                 }

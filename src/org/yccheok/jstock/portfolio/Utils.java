@@ -25,6 +25,7 @@ import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Currency;
 import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -677,9 +678,21 @@ public class Utils {
     }
 
     public static double getExchangeRate(ExchangeRateLookup exchangeRateLookup, Country toCountry, Code code) {
-        Country fromCountry = org.yccheok.jstock.engine.Utils.toCountry(code);
-        CurrencyPair currencyPair = new CurrencyPair(fromCountry.getCurrency(), toCountry.getCurrency());
-        ExchangeRate exchangeRate = exchangeRateLookup.get(currencyPair);
+        final Country fromCountry = org.yccheok.jstock.engine.Utils.toCountry(code);
+        
+        if (fromCountry == toCountry) {
+            return 1.0;
+        }
+        
+        final Currency fromCurrency = fromCountry.getCurrency();
+        final Currency toCurrency = toCountry.getCurrency();
+        
+        if (fromCurrency.equals(toCurrency)) {
+            return 1.0;
+        }
+        
+        final CurrencyPair currencyPair = new CurrencyPair(fromCurrency, toCurrency);
+        final ExchangeRate exchangeRate = exchangeRateLookup.get(currencyPair);
         if (exchangeRate != null) {
             return exchangeRate.rate();
         }        
