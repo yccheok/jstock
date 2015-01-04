@@ -2385,7 +2385,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         return new org.yccheok.jstock.engine.Observer<ExchangeRateMonitor, List<ExchangeRate>>() {
             @Override
             public void update(ExchangeRateMonitor subject, java.util.List<ExchangeRate> arg) {
-                ExchangeRateLookup.INSTANCE.put(arg);
+                exchangeRateLookup.put(arg);
                 
                 if (isBuyTransactionCountriesSingle() && arg.size() == 1) {
                     ExchangeRate exchangeRate = arg.get(0);
@@ -2563,32 +2563,45 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)this.buyTreeTable.getTreeTableModel();
         final SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel = (SellPortfolioTreeTableModelEx)this.sellTreeTable.getTreeTableModel();
       
-        final double exchangeRate = getCurrencyExchangeRate();
+        final Country fromCountry = jStockOptions.getCountry();
+        final Country toCountry = jStockOptions.getLocalCurrencyCountry(fromCountry);
+        final boolean currencyExchangeEnable = jStockOptions.isCurrencyExchangeEnable(fromCountry);
 
+        // TODO: SUPER UGLY HACK?!?!?!?!
+        double exchangeRate = 1.0;
+        
         final double share;
         final double cash;
         final double paperProfit;
         final double realizedProfit;
         if (false == isPenceToPoundConversionEnabled) {
+            if (currencyExchangeEnable) {
+                share = buyPortfolioTreeTableModel.getCurrentValue(exchangeRateLookup, toCountry);
+            } else {
+                share = buyPortfolioTreeTableModel.getCurrentValue();
+            }
+            
             if (isFeeCalculationEnabled) {
-                share = exchangeRate * buyPortfolioTreeTableModel.getCurrentValue();
                 cash = exchangeRate * (sellPortfolioTreeTableModel.getNetSellingValue() - ((Portfolio)sellPortfolioTreeTableModel.getRoot()).getNetReferenceTotal() - buyPortfolioTreeTableModel.getNetPurchaseValue() + this.getDepositSummary().getTotal() + this.getDividendSummary().getTotal());
                 paperProfit = exchangeRate * buyPortfolioTreeTableModel.getNetGainLossValue();
                 realizedProfit = exchangeRate * sellPortfolioTreeTableModel.getNetGainLossValue();
             } else {
-                share = exchangeRate * buyPortfolioTreeTableModel.getCurrentValue();
                 cash = exchangeRate * (sellPortfolioTreeTableModel.getSellingValue() - ((Portfolio)sellPortfolioTreeTableModel.getRoot()).getReferenceTotal() - buyPortfolioTreeTableModel.getPurchaseValue() + this.getDepositSummary().getTotal() + this.getDividendSummary().getTotal());
                 paperProfit = exchangeRate * buyPortfolioTreeTableModel.getGainLossValue();
                 realizedProfit = exchangeRate * sellPortfolioTreeTableModel.getGainLossValue();                
             }
         } else {
+            if (currencyExchangeEnable) {
+                share = buyPortfolioTreeTableModel.getCurrentValue(exchangeRateLookup, toCountry) / 100.0;
+            } else {
+                share = buyPortfolioTreeTableModel.getCurrentValue() / 100.0;
+            }
+
             if (isFeeCalculationEnabled) {
-                share = (exchangeRate * buyPortfolioTreeTableModel.getCurrentValue()) / 100.0;
                 cash = exchangeRate * (sellPortfolioTreeTableModel.getNetSellingValue() / 100.0 - ((Portfolio)sellPortfolioTreeTableModel.getRoot()).getNetReferenceTotal() / 100.0 - buyPortfolioTreeTableModel.getNetPurchaseValue() / 100.0 + this.getDepositSummary().getTotal() + this.getDividendSummary().getTotal());
                 paperProfit = (exchangeRate * buyPortfolioTreeTableModel.getNetGainLossValue()) / 100.0;
                 realizedProfit = (exchangeRate * sellPortfolioTreeTableModel.getNetGainLossValue()) / 100.0;
             } else {
-                share = (exchangeRate * buyPortfolioTreeTableModel.getCurrentValue()) / 100.0;
                 cash = exchangeRate * (sellPortfolioTreeTableModel.getSellingValue() / 100.0 - ((Portfolio)sellPortfolioTreeTableModel.getRoot()).getReferenceTotal() / 100.0 - buyPortfolioTreeTableModel.getPurchaseValue() / 100.0 + this.getDepositSummary().getTotal() + this.getDividendSummary().getTotal());
                 paperProfit = (exchangeRate * buyPortfolioTreeTableModel.getGainLossValue()) / 100.0;
                 realizedProfit = (exchangeRate * sellPortfolioTreeTableModel.getGainLossValue()) / 100.0;                
@@ -2685,9 +2698,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
 
     public void refreshCurrencyExchangeMonitor() {
-        CurrencyExchangeMonitor _currencyExchangeMonitor = this.currencyExchangeMonitor;
-        if (_currencyExchangeMonitor != null) {
-            _currencyExchangeMonitor.refresh();
+        ExchangeRateMonitor _exchangeRateMonitor = this.exchangeRateMonitor;
+        if (_exchangeRateMonitor != null) {
+            _exchangeRateMonitor.refresh();
         }
     }
     
@@ -2714,8 +2727,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private DividendSummary dividendSummary = new DividendSummary();
 
     private RealTimeStockMonitor realTimeStockMonitor = null;
+    
     private ExchangeRateMonitor exchangeRateMonitor = null;
-
+    private final ExchangeRateLookup exchangeRateLookup = new ExchangeRateLookup();
+    
     private final org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, List<Stock>> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
     private final org.yccheok.jstock.engine.Observer<ExchangeRateMonitor, List<ExchangeRate>> exchangeRateMonitorObserver = this.getExchangeRateMonitorObserver();
 

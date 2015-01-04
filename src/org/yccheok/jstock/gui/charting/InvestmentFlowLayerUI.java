@@ -121,7 +121,9 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         numberFormat.setMaximumFractionDigits(2);
         numberFormat.setMinimumFractionDigits(2);
         
-        final double exchangeRate = JStock.getInstance().getPortfolioManagementJPanel().getCurrencyExchangeRate();
+        // TODO: SUPER UGLY HACK?!?!?!?!
+        final double exchangeRate = 1.0;
+        
         final double totalInvestValue = this.investmentFlowChartJDialog.getTotalInvestValue() * exchangeRate;
         final double totalROIValue = this.investmentFlowChartJDialog.getTotalROIValue() * exchangeRate;
                 
