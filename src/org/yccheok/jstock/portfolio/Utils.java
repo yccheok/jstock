@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2012 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2015 Yan Cheng Cheok <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,6 +31,9 @@ import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.Country;
 import org.yccheok.jstock.engine.StockInfo;
+import org.yccheok.jstock.engine.currency.CurrencyPair;
+import org.yccheok.jstock.engine.currency.ExchangeRate;
+import org.yccheok.jstock.engine.currency.ExchangeRateLookup;
 import org.yccheok.jstock.file.Statements;
 import org.yccheok.jstock.gui.JStockOptions;
 import org.yccheok.jstock.gui.JStock;
@@ -673,6 +676,16 @@ public class Utils {
         return (b - a) > ( (Math.abs(a) < Math.abs(b) ? Math.abs(b) : Math.abs(a)) * EPSILON);
     }
 
+    public static double getExchangeRate(ExchangeRateLookup exchangeRateLookup, Country toCountry, Code code) {
+        Country fromCountry = org.yccheok.jstock.engine.Utils.toCountry(code);
+        CurrencyPair currencyPair = new CurrencyPair(fromCountry.getCurrency(), toCountry.getCurrency());
+        ExchangeRate exchangeRate = exchangeRateLookup.get(currencyPair);
+        if (exchangeRate != null) {
+            return exchangeRate.rate();
+        }        
+        return 1.0;
+    }
+    
     // 0.00000001 is a magic number. I have 0 idea what I should have for this
     // value.
     private static final double EPSILON = 0.00000001;
