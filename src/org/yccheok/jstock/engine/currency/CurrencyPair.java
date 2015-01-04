@@ -35,6 +35,6 @@ public class CurrencyPair extends org.yccheok.jstock.engine.Pair<Currency, Curre
     }
     
     public Currency to() {
-        return this.first;
+        return this.second;
     }
 }
