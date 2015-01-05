@@ -574,7 +574,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
                     expandTreeTable(this.buyTreeTable);
                     
-                    updateRealTimeStockMonitorAccordingToBuyPortfolioTreeTableModel();                                        
+                    updateRealTimeStockMonitorAccordingToBuyPortfolioTreeTableModel();  
+                    
+                    refreshStatusBarExchangeRateVisibility();
                 }
                 break;
 
@@ -1060,7 +1062,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         final Transaction transaction = newTransactionJDialog.getTransaction();
         if (transaction != null) {
             this.addBuyTransaction(transaction);
-            updateWealthHeader();
+            this.refreshStatusBarExchangeRateVisibility();
+            this.updateWealthHeader();
         }
     }
     
@@ -1069,13 +1072,15 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         sellTreeTable.getSelectionModel().clearSelection();
     }
     
-    private void deleteSelectedTreeTableRow(org.jdesktop.swingx.JXTreeTable treeTable) {
+    private boolean deleteSelectedTreeTableRow(org.jdesktop.swingx.JXTreeTable treeTable) {
         final AbstractPortfolioTreeTableModelEx portfolioTreeTableModel = (AbstractPortfolioTreeTableModelEx)treeTable.getTreeTableModel();
         final TreePath[] treePaths = treeTable.getTreeSelectionModel().getSelectionPaths();
         
         if (treePaths == null) {
-            return;
+            return false;
         }
+        
+        boolean atLeastOnce = false;
         
         for (TreePath treePath : treePaths) {
             final Object o = treePath.getLastPathComponent();
@@ -1090,16 +1095,23 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             }
                         
             if (o instanceof Transaction) {
-                portfolioTreeTableModel.removeTransaction((Transaction)o);                
+                portfolioTreeTableModel.removeTransaction((Transaction)o);     
+                atLeastOnce = true;
             }
             else if (o instanceof TransactionSummary) {
                 portfolioTreeTableModel.removeTransactionSummary((TransactionSummary)o);
+                atLeastOnce = true;
             }
-        }        
+        } 
+        
+        return atLeastOnce;
     }
     
     private void deteleSelectedTreeTableRow() {
-        deleteSelectedTreeTableRow(this.buyTreeTable);
+        if (deleteSelectedTreeTableRow(this.buyTreeTable)) {
+            this.refreshStatusBarExchangeRateVisibility();
+        }
+        
         deleteSelectedTreeTableRow(this.sellTreeTable);
         
         updateWealthHeader();
@@ -1704,13 +1716,13 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         portfolioTreeTableModel.editTransaction(newTransaction, oldTransaction);        
     }
 
-    private boolean isBuyTransactionEffectiveCountriesSingle() {
+    private Set<Currency> getBuyTransactionForeignCurrencies() {
         final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
 
         final Country fromCountry = jStockOptions.getCountry();
         final Country toCountry = jStockOptions.getLocalCurrencyCountry(fromCountry);
 
-        Set<Country> countries = new HashSet<>();
+        Set<Currency> currencies = new HashSet<>();
         final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
         final Portfolio buyPortfolio = (Portfolio) buyPortfolioTreeTableModel.getRoot();
 
@@ -1731,46 +1743,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 continue;
             }
 
-            countries.add(country);
-            if (countries.size() > 1) {
-                return false;
-            }
+            currencies.add(country.getCurrency());
         }
         
-        return countries.size() == 1;
-    }
-    
-    private Set<Country> getBuyTransactionEffectiveCountries() {
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
-
-        final Country fromCountry = jStockOptions.getCountry();
-        final Country toCountry = jStockOptions.getLocalCurrencyCountry(fromCountry);
-
-        Set<Country> countries = new HashSet<>();
-        final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
-        final Portfolio buyPortfolio = (Portfolio) buyPortfolioTreeTableModel.getRoot();
-
-        for (int i = 0, count = buyPortfolio.getChildCount(); i < count; i++) {
-            TransactionSummary transactionSummary = (TransactionSummary)buyPortfolio.getChildAt(i);
-            Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
-            Stock stock = transaction.getStock();
-            Country country = org.yccheok.jstock.engine.Utils.toCountry(stock.code);
-            
-            if (country == toCountry) {
-                continue;
-            }
-            
-            final Currency currency = country.getCurrency();
-            final Currency toCurrency = toCountry.getCurrency();
-
-            if (currency.equals(toCurrency)) {
-                continue;
-            }
-
-            countries.add(country);
-        }
-        
-        return countries;
+        return currencies;
     }
     
     private int getBuyTransactionSize() {
@@ -1797,6 +1773,34 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             this.realTimeStockMonitor.startNewThreadsIfNecessary();
             this.realTimeStockMonitor.refresh();
         }
+        
+        do {
+            final ExchangeRateMonitor _exchangeRateMonitor = exchangeRateMonitor;
+            if (_exchangeRateMonitor != null) {
+                final JStock jstock = JStock.getInstance();
+                final JStockOptions jStockOptions = jstock.getJStockOptions();
+                final Country country = jStockOptions.getCountry();
+                final boolean currencyExchangeEnable = jStockOptions.isCurrencyExchangeEnable(country);
+                if (currencyExchangeEnable) {
+                    final Country fromCountry = org.yccheok.jstock.engine.Utils.toCountry(transaction.getStock().code);
+                    final Country toCountry = jStockOptions.getLocalCurrencyCountry(country);
+                    
+                    if (fromCountry == toCountry) {
+                        break;
+                    }
+
+                    final Currency fromCurrency = fromCountry.getCurrency();
+                    final Currency toCurrency = toCountry.getCurrency();
+
+                    if (fromCurrency.equals(toCurrency)) {
+                        break;
+                    }
+
+                    _exchangeRateMonitor.addCurrencyPair(new CurrencyPair(fromCurrency, toCurrency));
+                }
+            }
+            break;
+        } while (true);
         
         return transactionSummary;
     }
@@ -2329,19 +2333,58 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         return saveCSVPortfolio();
     }
 
+    private void refreshStatusBarExchangeRateVisibility() {
+        final JStock mainFrame = JStock.getInstance();
+        final JStockOptions jStockOptions = mainFrame.getJStockOptions();
+
+        final Country country = jStockOptions.getCountry();
+
+        final boolean currencyExchangeEnable = jStockOptions.isCurrencyExchangeEnable(country);
+        
+        if (!currencyExchangeEnable) {
+            mainFrame.setStatusBarExchangeRateVisible(false);
+            mainFrame.setStatusBarExchangeRateToolTipText(null);
+            return;
+        }
+        
+        Set<Currency> currencies = this.getBuyTransactionForeignCurrencies();
+        
+        // We will display the currency exchange rate, only if there is 1 
+        // currency pair.
+        if (currencies.size() == 1) {
+            // Update the tool tip text.
+            final Country toCountry = jStockOptions.getLocalCurrencyCountry(country);
+            Currency fromCurrency = currencies.iterator().next();
+            Currency toCurrency = toCountry.getCurrency();
+            final String text = MessageFormat.format(GUIBundle.getString("MyJXStatusBar_CurrencyExchangeRateFor"), fromCurrency.toString(), toCurrency.toString());
+            mainFrame.setStatusBarExchangeRateVisible(true);
+            mainFrame.setStatusBarExchangeRateToolTipText(text);
+            ExchangeRate exchangeRate = this.exchangeRateLookup.get(new CurrencyPair(fromCurrency, toCurrency));
+            if (exchangeRate != null) {
+                mainFrame.setStatusBarExchangeRate(exchangeRate.rate());
+            } else {
+                mainFrame.setStatusBarExchangeRate(null);
+            }
+            return;
+        }
+        
+        mainFrame.setStatusBarExchangeRateVisible(false);
+        mainFrame.setStatusBarExchangeRateToolTipText(null);
+    }
+    
     /**
      * Initializes exchange rate monitor.
      */
     public void initExchangeRateMonitor() {
-        final JStock mainFrame = JStock.getInstance();
-        final JStockOptions jStockOptions = mainFrame.getJStockOptions();
+        final JStock jstock = JStock.getInstance();
+        final JStockOptions jStockOptions = jstock.getJStockOptions();
 
-        final Country fromCountry = jStockOptions.getCountry();
-        final Country toCountry = jStockOptions.getLocalCurrencyCountry(fromCountry);
+        final Country country = jStockOptions.getCountry();
 
-        // Should we show the exchange rate label on status bar?
-        mainFrame.setStatusBarExchangeRateVisible(jStockOptions.isCurrencyExchangeEnable(fromCountry));
+        final boolean currencyExchangeEnable = jStockOptions.isCurrencyExchangeEnable(country);
 
+        refreshStatusBarExchangeRateVisibility();
+        
         final ExchangeRateMonitor oldExchangeRateMonitor = this.exchangeRateMonitor;
         if (oldExchangeRateMonitor != null) {            
             Utils.getZoombiePool().execute(new Runnable() {
@@ -2355,36 +2398,29 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             });
         }
 
+        if (!currencyExchangeEnable) {
+            this.exchangeRateMonitor = null;
+            return;
+        }
+        
+        assert(currencyExchangeEnable);
+        
         this.exchangeRateMonitor = new ExchangeRateMonitor(
             Constants.EXCHANGE_RATE_MONITOR_MAX_THREAD, 
             Constants.EXCHANGE_RATE_MONITOR_MAX_STOCK_SIZE_PER_SCAN,
             jStockOptions.getScanningSpeed());
-        
+
         this.exchangeRateMonitor.attach(exchangeRateMonitorObserver);
 
-        Set<Country> countries = this.getBuyTransactionEffectiveCountries();
-        for (Country country : countries) {            
-            CurrencyPair currencyPair = new CurrencyPair(country.getCurrency(), toCountry.getCurrency());
+        Set<Currency> currencies = this.getBuyTransactionForeignCurrencies();
+        final Country toCountry = jStockOptions.getLocalCurrencyCountry(country);
+        for (Currency currency : currencies) {            
+            CurrencyPair currencyPair = new CurrencyPair(currency, toCountry.getCurrency());
             this.exchangeRateMonitor.addCurrencyPair(currencyPair);
         }
-        
-        // We will display the currency exchange rate, only if there is 1 
-        // currency pair.
-        if (countries.size() == 1) {
-            // Update the tool tip text.
-            Currency fromCurrency = countries.iterator().next().getCurrency();
-            Currency toCurrency = toCountry.getCurrency();
-            final String text = MessageFormat.format(GUIBundle.getString("MyJXStatusBar_CurrencyExchangeRateFor"), fromCurrency.toString(), toCurrency.toString());
-            mainFrame.setStatusBarExchangeRateToolTipText(text);
-        }
 
-        // Everything is new. So, reset the displayed text first.
-        mainFrame.setStatusBarExchangeRate(null);
-
-        if (jStockOptions.isCurrencyExchangeEnable(fromCountry)) {
-            // Start immediately.
-            this.exchangeRateMonitor.startNewThreadsIfNecessary();
-        }
+        // Start immediately.
+        this.exchangeRateMonitor.startNewThreadsIfNecessary();
 
         // Before returning, update wealth header immediately.
         this.updateWealthHeader();
@@ -2418,13 +2454,21 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private org.yccheok.jstock.engine.Observer<ExchangeRateMonitor, List<ExchangeRate>> getExchangeRateMonitorObserver() {
         return new org.yccheok.jstock.engine.Observer<ExchangeRateMonitor, List<ExchangeRate>>() {
             @Override
-            public void update(ExchangeRateMonitor subject, java.util.List<ExchangeRate> arg) {
-                exchangeRateLookup.put(arg);
+            public void update(ExchangeRateMonitor subject, java.util.List<ExchangeRate> exchangeRates) {
+                final ExchangeRateMonitor _exchangeRateMonitor = exchangeRateMonitor;
                 
-                if (isBuyTransactionEffectiveCountriesSingle() && arg.size() == 1) {
-                    ExchangeRate exchangeRate = arg.get(0);
-                    JStock.getInstance().setStatusBarExchangeRate(exchangeRate.rate());
+                if (_exchangeRateMonitor != null) {
+                    Set<Currency> currencies = getBuyTransactionForeignCurrencies();
+                    for (ExchangeRate exchangeRate : exchangeRates) {
+                        if (false == currencies.contains(exchangeRate.currencyPair().from())) {
+                            _exchangeRateMonitor.removeCurrencyPair(exchangeRate.currencyPair());
+                        }
+                    }
                 }
+                
+                exchangeRateLookup.put(exchangeRates);
+                
+                refreshStatusBarExchangeRateVisibility();
                 
                 updateWealthHeader();
             }
