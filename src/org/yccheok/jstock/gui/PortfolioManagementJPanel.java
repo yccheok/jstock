@@ -2466,6 +2466,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     }
                 }
                 
+                // I guess, it is no harm we insert unnecessary currency pair in 
+                // lookup table. We might need them in the future.
                 exchangeRateLookup.put(exchangeRates);
                 
                 refreshStatusBarExchangeRateVisibility();
