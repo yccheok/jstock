@@ -24,6 +24,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Currency;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -68,6 +69,42 @@ public class GoogleStockServer implements StockServer {
         result = originalCodes.get(googleCodeStr1);
 
         return result;
+    }
+    
+    private Currency getBestCurrency(String l_cur) {
+        if (l_cur == null) {
+            return null;
+        }
+        
+        l_cur = l_cur.trim();
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0, length = l_cur.length(); i < length; i++) {
+            char c = l_cur.charAt(i);
+            if (Character.isWhitespace(c) || Character.isDigit(c) || c == '.' || c == ',') {
+                break;
+            }
+            sb.append(c);
+        }
+        
+        if (sb.length() == 0) {
+            return null;
+        }
+        
+        String currencySymbol = sb.toString();
+        
+        String currencyCode = currencySymbolToCurrencyCodeMap.get(currencySymbol);
+        
+        try {
+            if (currencyCode == null) {
+                return Currency.getInstance(currencySymbol);
+            }
+        
+            return Currency.getInstance(currencyCode);
+        } catch (java.lang.IllegalArgumentException ex) {
+            log.error(null, ex);
+        }
+
+        return null;
     }
     
     @Override
@@ -312,7 +349,8 @@ public class GoogleStockServer implements StockServer {
         double lo = 0;
         long vo = 0;
         double cp = 0;
-
+        Currency currency = null;
+        
         // Change
         try { c = Double.parseDouble(jsonObject.get("c").replaceAll("[^0-9\\.\\-]", "")); } catch (NumberFormatException ex) { log.error(null, ex); }
         // Last
@@ -339,6 +377,9 @@ public class GoogleStockServer implements StockServer {
         } catch (NumberFormatException ex) { log.error(null, ex); }
         // Change Percentage
         try { cp = Double.parseDouble(jsonObject.get("cp").replaceAll("[^0-9\\.\\-]", "")); } catch (NumberFormatException ex) { log.error(null, ex); }
+
+        currency = getBestCurrency(jsonObject.get("l_cur"));
+        
         // No last volume information for Google Finance.
         // No buy price information for Google Finance.
         // No buy volume information for Google Finance.
@@ -357,7 +398,12 @@ public class GoogleStockServer implements StockServer {
                 .build();
         return Pair.create(stock, true);
     }
-    
+
+    private static final Map<String, String> currencySymbolToCurrencyCodeMap = new HashMap<>();
+    static {
+        currencySymbolToCurrencyCodeMap.put("Rs", "INR");
+    }
+
     private static final int SYMBOL_MAX_LENGTH = 17;
     
     // Will it be better if we make this as static?
