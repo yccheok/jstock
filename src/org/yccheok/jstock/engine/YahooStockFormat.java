@@ -23,6 +23,7 @@ import au.com.bytecode.opencsv.CSVParser;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Currency;
 import java.util.List;
 import java.util.regex.Pattern;
 import org.apache.commons.logging.Log;
@@ -109,6 +110,7 @@ public class YahooStockFormat implements StockFormat {
     // (29) Symbol
     // (30) Last Trade Date
     // (31) Last Trade Time.
+    // (32) Currency
     //
     // s = Symbol
     // n = Name
@@ -126,17 +128,18 @@ public class YahooStockFormat implements StockFormat {
     // c1 = Change
     // p2 = Change Percent
     // k3 = Last Trade Size <-- We need to take special care on this, it may give us 1,234...
-    // b = Bid
+    // b3 = Bid (Real-time) <-- We use b = Bid previously. However, most stocks return 0.
     // b6 = Bid Size        <-- We need to take special care on this, it may give us 1,234...
-    // a = Ask
+    // b2 = Ask (Real-time) <-- We use a = Ask previously. However, most stocks return 0.
     // a5 = Ask Size        <-- We need to take special care on this, it may give us 1,234...
     // d1 = Last Trade Date
     // t1 = Last Trade Time
+    // c4 = Currency
     //
     // c6k2c1p2c -> Change (Real-time), Change Percent (Real-time), Change, Change in Percent, Change & Percent Change
     // "+1400.00","N/A - +4.31%",+1400.00,"+4.31%","+1400.00 - +4.31%"
     //
-    // "MAERSKB.CO","AP MOELLER-MAERS-","Copenhagen",32500.00,33700.00,34200.00,33400.00,660,"+1200.00","N/A - +3.69%",33,33500.00,54,33700.00,96,"11/10/2008","10:53am"    
+    // "MAERSKB.CO","AP MOELLER-MAERS-","Copenhagen",32500.00,33700.00,34200.00,33400.00,660,"+1200.00","N/A - +3.69%",33,33500.00,54,33700.00,96,"11/10/2008","10:53am","EUR"
     @Override
     public List<Stock> parse(String source) {
         List<Stock> stocks = new ArrayList<Stock>();
@@ -202,6 +205,7 @@ public class YahooStockFormat implements StockFormat {
             double thirdSellPrice = 0.0;
             int thirdSellQuantity = 0;
             long timestamp = 0;
+            Currency currency = null;
             
             do {
                 if (length < 1) break; code = Code.newInstance(quotePattern.matcher(fields[0]).replaceAll("").trim());
@@ -275,6 +279,11 @@ public class YahooStockFormat implements StockFormat {
                     // Most of the time, we just obtain "N/A"
                     // log.error(fields[23] + ", " + fields[24] + ", " + data_and_time, exp);
                 }
+                
+                // I can't really recall why I need to apply quotePattern on 
+                // "code", "name", ... I decide not to do so for "currency".
+                if (length < 33) break; 
+                try { currency = Currency.getInstance(fields[32].trim()); } catch (java.lang.IllegalArgumentException ex) { log.error(null, ex); }
                 
                 break;
             } while(true);
