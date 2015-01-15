@@ -77,6 +77,11 @@ public class GoogleStockServer implements StockServer {
         }
         
         l_cur = l_cur.trim();
+
+        if (l_cur.isEmpty()) {
+            return null;
+        }
+
         StringBuilder sb = new StringBuilder();
         for (int i = 0, length = l_cur.length(); i < length; i++) {
             char c = l_cur.charAt(i);
@@ -87,7 +92,7 @@ public class GoogleStockServer implements StockServer {
         }
         
         if (sb.length() == 0) {
-            return null;
+            return Currency.getInstance("USD");
         }
         
         String currencySymbol = sb.toString();
@@ -401,7 +406,13 @@ public class GoogleStockServer implements StockServer {
 
     private static final Map<String, String> currencySymbolToCurrencyCodeMap = new HashMap<>();
     static {
+        currencySymbolToCurrencyCodeMap.put("A$", "AUD");
         currencySymbolToCurrencyCodeMap.put("Rs", "INR");
+        currencySymbolToCurrencyCodeMap.put("\u20AC", "EUR");
+        currencySymbolToCurrencyCodeMap.put("R$", "BRL");
+        currencySymbolToCurrencyCodeMap.put("CN\u00A5", "CNY");
+        currencySymbolToCurrencyCodeMap.put("NZ$", "NZD");
+        currencySymbolToCurrencyCodeMap.put("NT$", "TWD");
     }
 
     private static final int SYMBOL_MAX_LENGTH = 17;
