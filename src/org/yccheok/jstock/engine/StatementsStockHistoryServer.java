@@ -52,6 +52,7 @@ public class StatementsStockHistoryServer implements StockHistoryServer {
                     code,
                     symbol,
                     name,
+                    null,
                     board,
                     industry,
                     prevPrice,

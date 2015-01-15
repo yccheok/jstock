@@ -254,6 +254,7 @@ public class GoogleStockHistoryServer implements StockHistoryServer {
                     code,
                     symbol,
                     name,
+                    null,
                     board,
                     industry,
                     prevPrice,

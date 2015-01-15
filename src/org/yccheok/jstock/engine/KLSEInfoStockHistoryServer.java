@@ -266,6 +266,9 @@ public class KLSEInfoStockHistoryServer implements StockHistoryServer {
                     code,
                     symbol,
                     name,
+                    null,       // Although it makes sense to hard code the value
+                                // to MYR, we will let it be null, as we don't
+                                // concern the currency info in stock history.
                     board,
                     industry,
                     prevPrice,

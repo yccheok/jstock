@@ -327,6 +327,7 @@ public class YahooStockFormat implements StockFormat {
                     code,
                     symbol,
                     name,
+                    currency,
                     board,
                     industry,
                     prevPrice,

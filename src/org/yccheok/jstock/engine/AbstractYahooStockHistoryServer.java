@@ -146,6 +146,7 @@ public abstract class AbstractYahooStockHistoryServer implements StockHistorySer
                     code,
                     symbol,
                     name,
+                    null,
                     board,
                     industry,
                     prevPrice,

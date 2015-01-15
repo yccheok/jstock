@@ -68,6 +68,7 @@ public class Utils {
         return new Stock(   code,
                             symbol,
                             "",
+                            null,
                             Stock.Board.Unknown,
                             Stock.Industry.Unknown,
                             0.0,
