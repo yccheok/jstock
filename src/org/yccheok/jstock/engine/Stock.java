@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2015 Yan Cheng Cheok <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,8 @@
 
 package org.yccheok.jstock.engine;
 
+import java.util.Currency;
+
 /**
  *
  * @author yccheok
@@ -35,6 +37,7 @@ public class Stock {
 
         // Optional parameters - initialized to default values.
         private String name = "";
+        private Currency currency = null;
         private Board board = Board.Unknown;
         private Industry industry = Industry.Unknown;
         private double prevPrice = 0.0;
@@ -76,6 +79,14 @@ public class Stock {
             return this;
         }
 
+        /**
+         * @param currency the currency to set
+         */
+        public Builder currency(Currency currency) {
+            this.currency = currency;
+            return this;
+        }
+        
         /**
          * @param board the board to set
          */
@@ -284,6 +295,7 @@ public class Stock {
             builder.code,
             builder.symbol,
             builder.name,
+            builder.currency,
             builder.board,
             builder.industry,
             builder.prevPrice,
@@ -315,6 +327,7 @@ public class Stock {
         Code code,
         Symbol symbol,
         String name,
+        Currency currency,
         Board board,
         Industry industry,
         double prevPrice,
@@ -345,6 +358,7 @@ public class Stock {
         this.code = code;
         this.symbol = symbol;
         this.name = name;
+        this.currency = currency;
         this.board = board;
         this.industry = industry;
         this.prevPrice = prevPrice;
@@ -377,6 +391,7 @@ public class Stock {
         this.code = stock.code;
         this.symbol = stock.symbol;
         this.name = stock.name;
+        this.currency = stock.currency;
         this.board = stock.board;
         this.industry = stock.industry;
         this.prevPrice = stock.prevPrice;
@@ -407,6 +422,10 @@ public class Stock {
         return name;
     }
 
+    public Currency getCurrency() {
+        return currency;
+    }
+    
     public Board getBoard() {
         return board;
     }
@@ -518,6 +537,7 @@ public class Stock {
             this.code,
             this.symbol,
             name,
+            this.currency,
             this.board,
             this.industry,
             this.prevPrice,
@@ -560,6 +580,7 @@ public class Stock {
             this.code,
             symbol,
             this.name,
+            this.currency,
             this.board,
             this.industry,
             this.prevPrice,
@@ -703,6 +724,7 @@ public class Stock {
     public final Code code;
     public final Symbol symbol;
     private final String name;
+    private final Currency currency;
     private final Board board;
     private final Industry industry;
     private final double prevPrice;
