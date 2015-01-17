@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2012 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2015 Yan Cheng Cheok <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ import java.util.Date;
  * @author yccheok
  */
 public class Duration {
-    public Duration (SimpleDate startDate, SimpleDate endDate)
+    public Duration(SimpleDate startDate, SimpleDate endDate)
     {
         if (startDate.compareTo(endDate) > 0)
         {
@@ -76,7 +76,22 @@ public class Duration {
     {
         return (this.startDate.compareTo(date) <= 0) && (this.endDate.compareTo(date) >= 0);
     }
-    
+
+    public Duration backStepStartDate(int day) {
+        Calendar calendar = this.startDate.getCalendar();
+        calendar.add(Calendar.DATE, -Math.abs(day));
+        SimpleDate startDate = new SimpleDate(calendar);
+        return new Duration(startDate, this.endDate);
+    }
+
+    public static Duration getTodayDurationByPeriod(Period period) {
+        final SimpleDate end = new SimpleDate();
+        final long endTimestamp = end.getTime().getTime();
+        final long startTimestamp = period.getStartTimestamp(endTimestamp);
+        final SimpleDate start = new SimpleDate(startTimestamp);
+        return new Duration(start, end);
+    }
+
     public static Duration getTodayDurationByYears(int durationInYears)
     {
         if (durationInYears < 0)
