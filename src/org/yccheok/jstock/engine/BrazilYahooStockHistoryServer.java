@@ -30,6 +30,11 @@ public class BrazilYahooStockHistoryServer extends AbstractYahooStockHistoryServ
         super(code);
     }
 
+    public BrazilYahooStockHistoryServer(Code code, Period period) throws StockHistoryNotFoundException
+    {
+        super(code, period);
+    }
+
     public BrazilYahooStockHistoryServer(Code code, Duration duration) throws StockHistoryNotFoundException
     {
         super(code, duration);
@@ -39,7 +44,7 @@ public class BrazilYahooStockHistoryServer extends AbstractYahooStockHistoryServ
     protected StockServer getStockServer() {
         // Don't return member variable, as NPE might occur. We do have case 
         // where constructor calls abstract method.
-        // http://stackoverflow.com/questions/15327417/is-it-ok-to-call-abstract-method-from-constructor-in-java        
+        // http://stackoverflow.com/questions/15327417/is-it-ok-to-call-abstract-method-from-constructor-in-java
         return new BrazilYahooStockServer();
     }
 }
