@@ -51,14 +51,35 @@ public class StockHistorySerializer {
         final File file = new File(getFileName(code, duration));
         return statements.saveAsCSVFile(file);
     }
-    
+
+    public boolean save(StockHistoryServer stockHistoryServer, Period period)
+    {
+        // If the history server doesn't contain any information, return early.
+        if (stockHistoryServer.size() == 0) {
+            return false;
+        }
+
+        final long timestamp = stockHistoryServer.getTimestamp(0);
+        final Code code = stockHistoryServer.getStock(timestamp).code;
+        final Statements statements = Statements.newInstanceFromStockHistoryServer(stockHistoryServer);
+        final File file = new File(getFileName(code, period));
+        return statements.saveAsCSVFile(file);
+    }
+
     public StockHistoryServer load(Code code, Duration duration)
     {
         final File file = new File(getFileName(code, duration));
         final Statements statements = Statements.newInstanceFromCSVFile(file);
         return StatementsStockHistoryServer.newInstance(statements);
     }
-    
+
+    public StockHistoryServer load(Code code, Period period)
+    {
+        final File file = new File(getFileName(code, period));
+        final Statements statements = Statements.newInstanceFromCSVFile(file);
+        return StatementsStockHistoryServer.newInstance(statements);
+    }
+
     private String getFileName(Code code, Duration duration) {
         final int startYear = duration.getStartDate().getYear();
         // +1, as we prefer based 1 month, for readability.
@@ -77,6 +98,14 @@ public class StockHistorySerializer {
 
         return fileName;
     }
-    
+
+    private String getFileName(Code code, Period period) {
+        final String fileName = directory + File.separator + code +
+                "-" + period.name() +
+                ".csv";
+
+        return fileName;
+    }
+
     private final String directory;     
 }
