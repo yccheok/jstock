@@ -86,8 +86,17 @@ public class GoogleStockServerFactory implements StockServerFactory {
     public StockHistoryServer getStockHistoryServer(Code code, Duration duration) {
         try {
             return new GoogleStockHistoryServer(code, duration);
+        } catch (StockHistoryNotFoundException exp) {
+            log.error(null, exp);
+            return null;
         }
-        catch (StockHistoryNotFoundException exp) {
+    }
+
+    @Override
+    public StockHistoryServer getStockHistoryServer(Code code, Period period) {
+        try {
+            return new GoogleStockHistoryServer(code, period);
+        } catch (StockHistoryNotFoundException exp) {
             log.error(null, exp);
             return null;
         }

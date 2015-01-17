@@ -66,7 +66,17 @@ public class KLSEInfoStockServerFactory implements StockServerFactory {
             return null;
         }
     }
-    
+
+    @Override
+    public StockHistoryServer getStockHistoryServer(Code code, Period period) {
+        try {
+            return new KLSEInfoStockHistoryServer(code, period);
+        } catch (StockHistoryNotFoundException exp) {
+            log.error(null, exp);
+            return null;
+        }
+    }
+
     @Override
     public DividendServer getDividendServer() {
         return null;

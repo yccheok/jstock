@@ -54,7 +54,32 @@ public class KLSEInfoStockHistoryServer implements StockHistoryServer {
     
     public KLSEInfoStockHistoryServer(Code code) throws StockHistoryNotFoundException
     {
-        this(code, DEFAULT_HISTORY_DURATION);
+        this(code, DEFAULT_HISTORY_PERIOD);
+    }
+
+    public KLSEInfoStockHistoryServer(Code code, Period period) throws StockHistoryNotFoundException {
+        this(code, toBestDuration(period));
+        long t0 = this.getTimestamp(0);
+        long t1 = this.getTimestamp(this.size() - 1);
+        long endTimestamp = Math.max(t0, t1);
+        long startTimestamp = period.getStartTimestamp(endTimestamp);
+        for (int i = 0, size = timestamps.size(); i < size; i++) {
+            long timestamp = timestamps.get(i);
+            if (startTimestamp > timestamp) {
+                historyDatabase.remove(timestamp);
+                timestamps.remove(i);
+                size--;
+                i--;
+                continue;
+            }
+            break;
+        }
+    }
+
+    private static Duration toBestDuration(Period period) {
+        // 7 is for tolerance. Tolerance is in a way such that : Today is N days. However, we only
+        // have latest data, which date is (N-tolerance) days.
+        return Duration.getTodayDurationByPeriod(period).backStepStartDate(7);
     }
 
     public KLSEInfoStockHistoryServer(Code code, Duration duration) throws StockHistoryNotFoundException
@@ -172,7 +197,7 @@ public class KLSEInfoStockHistoryServer implements StockHistoryServer {
         boolean success = false;
 
         for (int retry = 0; retry < NUM_OF_RETRY; retry++) {
-            final String respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOptionWithAgentInfo(location);
+            final String respond = org.yccheok.jstock.gui.Utils.getResponseBodyAsString(location);
 
             if (respond == null) {
                 continue;
@@ -304,7 +329,7 @@ public class KLSEInfoStockHistoryServer implements StockHistoryServer {
     }
     
     private static final int NUM_OF_RETRY = 2;
-    private static final Duration DEFAULT_HISTORY_DURATION =  Duration.getTodayDurationByYears(10);
+    private static final Period DEFAULT_HISTORY_PERIOD =  Period.Years10;
     private static final String KLSE_INFO_BASED_URL = "http://www.klse.info/jstock/historical-prices?s=";
     
     private final java.util.Map<Long, Stock> historyDatabase = new HashMap<Long, Stock>();
