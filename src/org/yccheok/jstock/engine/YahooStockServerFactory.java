@@ -67,7 +67,17 @@ public class YahooStockServerFactory implements StockServerFactory {
             return null;
         }
     }
-    
+
+    @Override
+    public StockHistoryServer getStockHistoryServer(Code code, Period period) {
+        try {
+            return new YahooStockHistoryServer(code, period);
+        } catch (StockHistoryNotFoundException exp) {
+            log.error(null, exp);
+            return null;
+        }
+    }
+
     @Override
     public DividendServer getDividendServer() {
         return dividendServer;
