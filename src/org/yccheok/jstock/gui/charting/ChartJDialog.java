@@ -940,30 +940,38 @@ public class ChartJDialog extends javax.swing.JDialog {
             return;
         }
 
-        double high_last_price = Double.NEGATIVE_INFINITY;
-        double low_last_price = Double.MAX_VALUE;
+        double high_price = Double.NEGATIVE_INFINITY;
+        double low_price = Double.MAX_VALUE;
+        final DefaultHighLowDataset defaultHighLowDataset = (DefaultHighLowDataset)this.priceOHLCDataset;
         for (int i = best_mid; i >= 0; i--) {
             final TimeSeriesDataItem item = this.priceTimeSeries.getDataItem(i);
             final long time = ((Day)item.getPeriod()).getFirstMillisecond();
             if (time < lowerBound) {
                 break;
             }
-            double value = (Double)item.getValue();
-            if (value == 0.0) {
-                /* Market closed during that time. Ignore. */
-                continue;
-            }
-            if (high_last_price < value) {
-                high_last_price = value;
-            }
-            if (low_last_price > value) {
-                low_last_price = value;
+            
+            final double _high_price = defaultHighLowDataset.getHighValue(0, i);
+            final double _low_price = defaultHighLowDataset.getLowValue(0, i);
+            final double _last_price = defaultHighLowDataset.getCloseValue(0, i);
+
+            high_price = Math.max(high_price, _high_price);
+
+            // Prevent bad data.
+            if (_low_price > 0) {
+                low_price = Math.min(low_price, _low_price);
+            } else {
+                if (_high_price > 0) {
+                    low_price = Math.min(low_price, _high_price);
+                }
+                if (_last_price > 0) {
+                    low_price = Math.min(low_price, _last_price);
+                }
             }
         }
 
-        final double h = high_last_price;
-        final double l = low_last_price;
-        if (high_last_price >= low_last_price) {
+        final double h = high_price;
+        final double l = low_price;
+        if (high_price >= low_price) {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
@@ -1106,13 +1114,15 @@ public class ChartJDialog extends javax.swing.JDialog {
         double min = Double.MAX_VALUE;
         double max = Double.MIN_VALUE;
         double max_volume = Double.MIN_VALUE;
+        final DefaultHighLowDataset defaultHighLowDataset = (DefaultHighLowDataset)this.priceOHLCDataset;
+        
         for (int i = itemCount - 1; i >= 0; i--) {
             final TimeSeriesDataItem item = this.priceTimeSeries.getDataItem(i);
             final Day d = (Day)item.getPeriod();
             if (d.getFirstMillisecond() < start) {
                 break;
             }
-            final DefaultHighLowDataset defaultHighLowDataset = (DefaultHighLowDataset)this.priceOHLCDataset;
+            
             final double high = defaultHighLowDataset.getHighValue(0, i);
             final double low = defaultHighLowDataset.getLowValue(0, i);
             final double volume = defaultHighLowDataset.getVolumeValue(0, i);
