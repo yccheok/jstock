@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2013 Yan Cheng Cheok <yccheok@yahoo.com>
+ * Copyright (C) 2015 Yan Cheng Cheok <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,9 +33,34 @@ import org.apache.commons.logging.LogFactory;
 public class GoogleStockHistoryServer implements StockHistoryServer {
 
     public GoogleStockHistoryServer(Code code) throws StockHistoryNotFoundException {
-        this(code, DEFAULT_HISTORY_DURATION);
+        this(code, DEFAULT_HISTORY_PERIOD);
     }
-    
+
+    public GoogleStockHistoryServer(Code code, Period period) throws StockHistoryNotFoundException {
+        this(code, toBestDuration(period));
+        long t0 = this.getTimestamp(0);
+        long t1 = this.getTimestamp(this.size() - 1);
+        long endTimestamp = Math.max(t0, t1);
+        long startTimestamp = period.getStartTimestamp(endTimestamp);
+        for (int i = 0, size = timestamps.size(); i < size; i++) {
+            long timestamp = timestamps.get(i);
+            if (startTimestamp > timestamp) {
+                historyDatabase.remove(timestamp);
+                timestamps.remove(i);
+                size--;
+                i--;
+                continue;
+            }
+            break;
+        }
+    }
+
+    private static Duration toBestDuration(Period period) {
+        // 7 is for tolerance. Tolerance is in a way such that : Today is N days. However, we only
+        // have latest data, which date is (N-tolerance) days.
+        return Duration.getTodayDurationByPeriod(period).backStepStartDate(7);
+    }
+
     public GoogleStockHistoryServer(Code code, Duration duration) throws StockHistoryNotFoundException {
         this.code = code;
         this.duration = duration;
@@ -324,7 +349,7 @@ public class GoogleStockHistoryServer implements StockHistoryServer {
     
     // I believe Google server is much more reliable than Yahoo! server. 
     private static final int NUM_OF_RETRY = 1;
-    private static final Duration DEFAULT_HISTORY_DURATION =  Duration.getTodayDurationByYears(10);
+    private static final Period DEFAULT_HISTORY_PERIOD =  Period.Years10;
     private final java.util.Map<Long, Stock> historyDatabase = new HashMap<Long, Stock>();
     private final java.util.List<Long> timestamps = new ArrayList<Long>();       
     private final Code code;
