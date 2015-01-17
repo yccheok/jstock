@@ -35,6 +35,11 @@ public class YahooStockHistoryServer extends AbstractYahooStockHistoryServer {
         super(code, duration);
     }
 
+    public YahooStockHistoryServer(Code code, Period period) throws StockHistoryNotFoundException
+    {
+        super(code, period);
+    }
+
     @Override
     protected StockServer getStockServer() {
         // Don't return member variable, as NPE might occur. We do have case 
