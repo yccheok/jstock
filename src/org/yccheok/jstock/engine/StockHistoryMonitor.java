@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2015 Yan Cheng Cheok <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,10 @@
 
 package org.yccheok.jstock.engine;
 
-import java.util.concurrent.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -42,7 +45,11 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
         readWriteLock = new java.util.concurrent.locks.ReentrantReadWriteLock();
         readerLock = readWriteLock.readLock();
         writerLock = readWriteLock.writeLock();
-        
+
+        readWriteLockForPeriodDuration = new java.util.concurrent.locks.ReentrantReadWriteLock();
+        readerLockForPeriodDuration = readWriteLockForPeriodDuration.readLock();
+        writerLockForPeriodDuration = readWriteLockForPeriodDuration.writeLock();
+
         this.DATABASE_SIZE = databaseSize;
         
         this.stockHistorySerializer = null;
@@ -111,9 +118,34 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
             throw new IllegalArgumentException("duration cannot be null");
         }
 
-        this.duration = duration;
+        writerLockForPeriodDuration.lock();
+        try {
+            this.duration = duration;
+            this.period = null;
+        } finally {
+            writerLockForPeriodDuration.unlock();
+        }
     }
-    
+
+    public Period getPeriod() {
+        return period;
+    }
+
+    public void setPeriod(Period period) {
+        if (period == null)
+        {
+            throw new IllegalArgumentException("period cannot be null");
+        }
+
+        writerLockForPeriodDuration.lock();
+        try {
+            this.period = period;
+            this.duration = null;
+        } finally {
+            writerLockForPeriodDuration.unlock();
+        }
+    }
+
     public class StockHistoryRunnable implements Runnable {
         public StockHistoryRunnable(Code code) {
             this.code = code;
@@ -123,8 +155,19 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
         @Override
         public void run() {
             final Thread currentThread = Thread.currentThread();
-            
-            for (StockServerFactory factory : Factories.INSTANCE.getStockServerFactories(this.code)) {
+
+            // Thread safety purpose.
+            readerLockForPeriodDuration.lock();
+            Duration duration;
+            Period period;
+            try {
+                duration = StockHistoryMonitor.this.duration;
+                period = StockHistoryMonitor.this.period;
+            } finally {
+                readerLockForPeriodDuration.unlock();
+            }
+
+            for (StockServerFactory factory : Factories.INSTANCE.getStockServerFactories(code)) {
                 // Do not apply ExecutorService.isShutDown technique, to quit
                 // from this loop. This is because pool variable isn't final.
                 // We might be referring to the wrong pool. But checking for
@@ -136,7 +179,14 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
                     break;
                 }
 
-                StockHistoryServer history = factory.getStockHistoryServer(this.code, duration);
+                StockHistoryServer history = null;
+
+                if (period != null) {
+                    history = factory.getStockHistoryServer(this.code, period);
+                } else {
+                    assert(duration != null);
+                    history = factory.getStockHistoryServer(this.code, duration);
+                }
 
                 if (history != null) {
                     readerLock.lock();
@@ -177,10 +227,14 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
                             }
 
                             if (shouldUseSerializer) {
-                                if(StockHistoryMonitor.this.stockHistorySerializer != null) {
-                                    StockHistoryMonitor.this.stockHistorySerializer.save(history, duration);
-                                }
-                                else {
+                                if (StockHistoryMonitor.this.stockHistorySerializer != null) {
+                                    if (period != null) {
+                                        StockHistoryMonitor.this.stockHistorySerializer.save(history, period);
+                                    } else {
+                                        assert(duration != null);
+                                        StockHistoryMonitor.this.stockHistorySerializer.save(history, duration);
+                                    }
+                                } else {
                                     log.error("Fail to perform serialization on stock history due to uninitialized serialization component.");
                                 }
                             }
@@ -295,7 +349,23 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
             else {
                 final StockHistorySerializer shs = StockHistoryMonitor.this.stockHistorySerializer;
                 if (shs != null) {
-                    StockHistoryServer stockHistoryServer = shs.load(code, duration);
+                    StockHistoryServer stockHistoryServer;
+
+                    readerLockForPeriodDuration.lock();
+                    Duration duration;
+                    Period period;
+                    try {
+                        duration = StockHistoryMonitor.this.duration;
+                        period = StockHistoryMonitor.this.period;
+                    } finally {
+                        readerLockForPeriodDuration.unlock();
+                    }
+
+                    if (period != null) {
+                        stockHistoryServer = shs.load(code, period);
+                    } else {
+                        stockHistoryServer = shs.load(code, duration);
+                    }
 
                     /* So that next time we won't read from the disk. */
                     if (stockHistoryServer != null && (this.DATABASE_SIZE > histories.size())) {
@@ -314,7 +384,7 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
                         // But that doesn't really matter.
                         //
                         synchronized (histories) {
-                            if(stockHistoryServer != null && (this.DATABASE_SIZE > histories.size())) {
+                            if (stockHistoryServer != null && (this.DATABASE_SIZE > histories.size())) {
                                 histories.put(code, stockHistoryServer);
                             }
                         }
@@ -376,10 +446,15 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
     // with same codes in the queue.
     private final java.util.List<Code> stockCodes = new java.util.ArrayList<Code>();
     private final java.util.Map<Code, StockHistoryServer> histories = new java.util.HashMap<Code, StockHistoryServer>();
+
     private final java.util.concurrent.locks.ReadWriteLock readWriteLock;
     private final java.util.concurrent.locks.Lock readerLock;
     private final java.util.concurrent.locks.Lock writerLock;
-    
+
+    private final java.util.concurrent.locks.ReadWriteLock readWriteLockForPeriodDuration;
+    private final java.util.concurrent.locks.Lock readerLockForPeriodDuration;
+    private final java.util.concurrent.locks.Lock writerLockForPeriodDuration;
+
     private Executor pool;
     
     // Prevent out of memory problem.
@@ -387,10 +462,12 @@ public class StockHistoryMonitor extends Subject<StockHistoryMonitor, StockHisto
     
     private StockHistorySerializer stockHistorySerializer;
 
+    // Either duration or period will always be null.
+    private volatile Period period = Period.Years10;
     // This one is a mutable member. We just want to make our life easier. We
     // want to avoid stopping and creating a new StockHistoryMonitor, just
     // to make change on duration.
-    private volatile Duration duration = Duration.getTodayDurationByYears(10);
+    private volatile Duration duration = null;
 
     private static final Log log = LogFactory.getLog(StockHistoryMonitor.class);     
 }
