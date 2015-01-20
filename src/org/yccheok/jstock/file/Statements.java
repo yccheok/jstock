@@ -68,7 +68,7 @@ import org.yccheok.jstock.gui.StockTableModel;
 import org.yccheok.jstock.gui.portfolio.CommentableContainer;
 import org.yccheok.jstock.gui.treetable.BuyPortfolioTreeTableModelEx;
 import org.yccheok.jstock.gui.treetable.SellPortfolioTreeTableModelEx;
-import org.yccheok.jstock.portfolio.Portfolio;
+import org.yccheok.jstock.portfolio.PortfolioRoot;
 import org.yccheok.jstock.portfolio.PortfolioInfo;
 import org.yccheok.jstock.portfolio.Transaction;
 import org.yccheok.jstock.portfolio.TransactionSummary;
@@ -131,11 +131,11 @@ public class Statements {
         Statement.What what = Statement.what(Arrays.asList(tmp));
         final Statements statements = new Statements(what.type, what.guiBundleWrapper);
 
-        final Portfolio portfolio = (Portfolio)buyPortfolioTreeTableModel.getRoot();
-        final int summaryCount = portfolio.getChildCount();
+        final PortfolioRoot portfolioRoot = (PortfolioRoot)buyPortfolioTreeTableModel.getRoot();
+        final int summaryCount = portfolioRoot.getChildCount();
 
         for (int i = 0; i < summaryCount; i++) {
-            Object o = portfolio.getChildAt(i);
+            Object o = portfolioRoot.getChildAt(i);
             final TransactionSummary transactionSummary = (TransactionSummary)o;
             
             // Metadatas will be used to store TransactionSummary's comment.
@@ -868,11 +868,11 @@ public class Statements {
         Statement.What what = Statement.what(Arrays.asList(tmp));
         final Statements statements = new Statements(what.type, what.guiBundleWrapper);
 
-        final Portfolio portfolio = (Portfolio)sellPortfolioTreeTableModel.getRoot();
-        final int summaryCount = portfolio.getChildCount();
+        final PortfolioRoot portfolioRoot = (PortfolioRoot)sellPortfolioTreeTableModel.getRoot();
+        final int summaryCount = portfolioRoot.getChildCount();
 
         for (int i = 0; i < summaryCount; i++) {
-            Object o = portfolio.getChildAt(i);
+            Object o = portfolioRoot.getChildAt(i);
             final TransactionSummary transactionSummary = (TransactionSummary)o;
             
             // Metadatas will be used to store TransactionSummary's comment.
