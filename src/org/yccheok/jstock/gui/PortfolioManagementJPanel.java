@@ -1724,10 +1724,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         Set<Currency> currencies = new HashSet<>();
         final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
-        final Portfolio buyPortfolio = (Portfolio) buyPortfolioTreeTableModel.getRoot();
+        final PortfolioRoot buyPortfolioRoot = (PortfolioRoot) buyPortfolioTreeTableModel.getRoot();
 
-        for (int i = 0, count = buyPortfolio.getChildCount(); i < count; i++) {
-            TransactionSummary transactionSummary = (TransactionSummary)buyPortfolio.getChildAt(i);
+        for (int i = 0, count = buyPortfolioRoot.getChildCount(); i < count; i++) {
+            TransactionSummary transactionSummary = (TransactionSummary)buyPortfolioRoot.getChildAt(i);
             Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
             Stock stock = transaction.getStock();
             Country country = org.yccheok.jstock.engine.Utils.toCountry(stock.code);
@@ -1808,16 +1808,16 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     public List<TransactionSummary> getTransactionSummariesFromPortfolios() {
         final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
         final SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel = (SellPortfolioTreeTableModelEx)sellTreeTable.getTreeTableModel();
-        final Portfolio buyPortfolio = (Portfolio) buyPortfolioTreeTableModel.getRoot();
-        final Portfolio sellPortfolio = (Portfolio) sellPortfolioTreeTableModel.getRoot();
+        final PortfolioRoot buyPortfolioRoot = (PortfolioRoot) buyPortfolioTreeTableModel.getRoot();
+        final PortfolioRoot sellPortfolioRoot = (PortfolioRoot) sellPortfolioTreeTableModel.getRoot();
         List<TransactionSummary> summaries = new ArrayList<TransactionSummary>();
 
-        for (int i = 0, count = buyPortfolio.getChildCount(); i < count; i++) {
-            summaries.add((TransactionSummary)buyPortfolio.getChildAt(i));
+        for (int i = 0, count = buyPortfolioRoot.getChildCount(); i < count; i++) {
+            summaries.add((TransactionSummary)buyPortfolioRoot.getChildAt(i));
         }
         
-        for (int i = 0, count = sellPortfolio.getChildCount(); i < count; i++) {
-            summaries.add((TransactionSummary)sellPortfolio.getChildAt(i));
+        for (int i = 0, count = sellPortfolioRoot.getChildCount(); i < count; i++) {
+            summaries.add((TransactionSummary)sellPortfolioRoot.getChildAt(i));
         }
 
         return summaries;
@@ -1826,16 +1826,16 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     public List<StockInfo> getStockInfosFromPortfolios() {
         final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
         final SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel = (SellPortfolioTreeTableModelEx)sellTreeTable.getTreeTableModel();
-        final Portfolio buyPortfolio = (Portfolio) buyPortfolioTreeTableModel.getRoot();
-        final Portfolio sellPortfolio = (Portfolio) sellPortfolioTreeTableModel.getRoot();
+        final PortfolioRoot buyPortfolioRoot = (PortfolioRoot) buyPortfolioTreeTableModel.getRoot();
+        final PortfolioRoot sellPortfolioRoot = (PortfolioRoot) sellPortfolioTreeTableModel.getRoot();
 
         Set<Code> codes = new HashSet<Code>();
         List<StockInfo> stockInfos = new ArrayList<StockInfo>();
 
-        final int count = buyPortfolio.getChildCount();
+        final int count = buyPortfolioRoot.getChildCount();
         TransactionSummary transactionSummary = null;
         for (int i = 0; i < count; i++) {
-            transactionSummary = (TransactionSummary)buyPortfolio.getChildAt(i);
+            transactionSummary = (TransactionSummary)buyPortfolioRoot.getChildAt(i);
 
             assert(transactionSummary.getChildCount() > 0);
 
@@ -1849,10 +1849,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             }
         }
 
-        final int count2 = sellPortfolio.getChildCount();
+        final int count2 = sellPortfolioRoot.getChildCount();
         transactionSummary = null;
         for (int i = 0; i < count2; i++) {
-            transactionSummary = (TransactionSummary)sellPortfolio.getChildAt(i);
+            transactionSummary = (TransactionSummary)sellPortfolioRoot.getChildAt(i);
 
             assert(transactionSummary.getChildCount() > 0);
 
@@ -1886,11 +1886,11 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         if (portfolioTreeTableModel != null) {
             this.buyTreeTable.setTreeTableModel(portfolioTreeTableModel);
             
-            Portfolio portfolio = (Portfolio)portfolioTreeTableModel.getRoot();
-            final int count = portfolio.getChildCount();
+            PortfolioRoot portfolioRoot = (PortfolioRoot)portfolioTreeTableModel.getRoot();
+            final int count = portfolioRoot.getChildCount();
             
             for (int i = 0; i < count; i++) {
-                TransactionSummary transactionSummary = (TransactionSummary)portfolio.getChildAt(i);
+                TransactionSummary transactionSummary = (TransactionSummary)portfolioRoot.getChildAt(i);
                 
                 if (transactionSummary.getChildCount() <= 0) continue;
                 
@@ -2307,10 +2307,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         // transaction summary deletion.
         Map<Code, Double> stockPrices = buyPortfolioTreeTableModelEx.getStockPrices();
         Map<Code, Double> goodStockPrices = new HashMap<Code, Double>();
-        final Portfolio portfolio = (Portfolio)buyPortfolioTreeTableModelEx.getRoot();
-        final int count = portfolio.getChildCount();
+        final PortfolioRoot portfolioRoot = (PortfolioRoot)buyPortfolioTreeTableModelEx.getRoot();
+        final int count = portfolioRoot.getChildCount();
         for (int i = 0; i < count; i++) {
-            TransactionSummary transactionSummary = (TransactionSummary)portfolio.getChildAt(i);
+            TransactionSummary transactionSummary = (TransactionSummary)portfolioRoot.getChildAt(i);
             assert(transactionSummary.getChildCount() > 0);            
             final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
             final Code code = transaction.getStock().code;
@@ -2662,11 +2662,11 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             }
             
             if (isFeeCalculationEnabled) {
-                cash = exchangeRate * (sellPortfolioTreeTableModel.getNetSellingValue() - ((Portfolio)sellPortfolioTreeTableModel.getRoot()).getNetReferenceTotal() - buyPortfolioTreeTableModel.getNetPurchaseValue() + this.getDepositSummary().getTotal() + this.getDividendSummary().getTotal());
+                cash = exchangeRate * (sellPortfolioTreeTableModel.getNetSellingValue() - ((PortfolioRoot)sellPortfolioTreeTableModel.getRoot()).getNetReferenceTotal() - buyPortfolioTreeTableModel.getNetPurchaseValue() + this.getDepositSummary().getTotal() + this.getDividendSummary().getTotal());
                 paperProfit = exchangeRate * buyPortfolioTreeTableModel.getNetGainLossValue();
                 realizedProfit = exchangeRate * sellPortfolioTreeTableModel.getNetGainLossValue();
             } else {
-                cash = exchangeRate * (sellPortfolioTreeTableModel.getSellingValue() - ((Portfolio)sellPortfolioTreeTableModel.getRoot()).getReferenceTotal() - buyPortfolioTreeTableModel.getPurchaseValue() + this.getDepositSummary().getTotal() + this.getDividendSummary().getTotal());
+                cash = exchangeRate * (sellPortfolioTreeTableModel.getSellingValue() - ((PortfolioRoot)sellPortfolioTreeTableModel.getRoot()).getReferenceTotal() - buyPortfolioTreeTableModel.getPurchaseValue() + this.getDepositSummary().getTotal() + this.getDividendSummary().getTotal());
                 paperProfit = exchangeRate * buyPortfolioTreeTableModel.getGainLossValue();
                 realizedProfit = exchangeRate * sellPortfolioTreeTableModel.getGainLossValue();                
             }
@@ -2678,11 +2678,11 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             }
 
             if (isFeeCalculationEnabled) {
-                cash = exchangeRate * (sellPortfolioTreeTableModel.getNetSellingValue() / 100.0 - ((Portfolio)sellPortfolioTreeTableModel.getRoot()).getNetReferenceTotal() / 100.0 - buyPortfolioTreeTableModel.getNetPurchaseValue() / 100.0 + this.getDepositSummary().getTotal() + this.getDividendSummary().getTotal());
+                cash = exchangeRate * (sellPortfolioTreeTableModel.getNetSellingValue() / 100.0 - ((PortfolioRoot)sellPortfolioTreeTableModel.getRoot()).getNetReferenceTotal() / 100.0 - buyPortfolioTreeTableModel.getNetPurchaseValue() / 100.0 + this.getDepositSummary().getTotal() + this.getDividendSummary().getTotal());
                 paperProfit = (exchangeRate * buyPortfolioTreeTableModel.getNetGainLossValue()) / 100.0;
                 realizedProfit = (exchangeRate * sellPortfolioTreeTableModel.getNetGainLossValue()) / 100.0;
             } else {
-                cash = exchangeRate * (sellPortfolioTreeTableModel.getSellingValue() / 100.0 - ((Portfolio)sellPortfolioTreeTableModel.getRoot()).getReferenceTotal() / 100.0 - buyPortfolioTreeTableModel.getPurchaseValue() / 100.0 + this.getDepositSummary().getTotal() + this.getDividendSummary().getTotal());
+                cash = exchangeRate * (sellPortfolioTreeTableModel.getSellingValue() / 100.0 - ((PortfolioRoot)sellPortfolioTreeTableModel.getRoot()).getReferenceTotal() / 100.0 - buyPortfolioTreeTableModel.getPurchaseValue() / 100.0 + this.getDepositSummary().getTotal() + this.getDividendSummary().getTotal());
                 paperProfit = (exchangeRate * buyPortfolioTreeTableModel.getGainLossValue()) / 100.0;
                 realizedProfit = (exchangeRate * sellPortfolioTreeTableModel.getGainLossValue()) / 100.0;                
             }
