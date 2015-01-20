@@ -320,25 +320,6 @@ public class Utils {
         return getPortfolioDirectory(jStockOptions.getPortfolioName());
     }
 
-    // TODO : Remove this code after some time.
-    /**
-     * Due to historical reason, we are storing portfolio information in XML
-     * files. Now, they are considered as obsolete. CSV files will become the
-     * replacement. Returns true if the given file is a XML portfolio directory.
-     *
-     * @param file The <code>File</code> to be checked against
-     * @return true if the given file is a XML portfolio directory
-     */
-    private static boolean isXMLPortfolioDirectory(File file) {
-        if (false == file.isDirectory()) {
-            // Returns false immediately if this is not a directory.
-            return false;
-        }
-        String[] files = file.list();
-        List<String> list = Arrays.asList(files);
-        return list.contains("buyportfolio.xml") && list.contains("sellportfolio.xml") && list.contains("depositsummary.xml") && list.contains("dividendsummary.xml");
-    }
-
     /**
      * Returns true if the given file is a CSV portfolio directory.
      *
@@ -524,28 +505,6 @@ public class Utils {
             // Only seek for 1st level directory.
             for (File child : children) {
                 if (isPortfolioDirectory(child)) {
-                    portfolioNames.add(child.getName());
-                }
-            }
-        }
-        return portfolioNames;
-    }
-    
-    // TODO : Remove this code after some time.
-    private static List<String> getXMLPortfolioNames(String baseDirectory, Country country, boolean oldData) {
-        List<String> portfolioNames = new ArrayList<String>();
-        final File file = oldData ?
-            new File(baseDirectory + country + File.separator + "config" + File.separator) :
-            new File(baseDirectory + country + File.separator + "portfolios" + File.separator);
-        
-        File[] children = file.listFiles();
-        if (children == null) {
-            // Either dir does not exist or is not a directory
-            return portfolioNames;
-        } else {
-            // Only seek for 1st level directory.
-            for (File child : children) {
-                if (isXMLPortfolioDirectory(child)) {
                     portfolioNames.add(child.getName());
                 }
             }
