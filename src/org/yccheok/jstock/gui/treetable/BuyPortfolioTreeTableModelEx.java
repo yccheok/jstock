@@ -107,13 +107,13 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
     public boolean split(StockInfo stockInfo, double ratio) {
         boolean status = false;
 
-        final Portfolio portfolio = (Portfolio)getRoot();
-        final int count = portfolio.getChildCount();
+        final PortfolioRoot portfolioRoot = (PortfolioRoot)getRoot();
+        final int count = portfolioRoot.getChildCount();
 
         TransactionSummary transactionSummary = null;
 
         for (int i = 0; i < count; i++) {
-            transactionSummary = (TransactionSummary)portfolio.getChildAt(i);
+            transactionSummary = (TransactionSummary)portfolioRoot.getChildAt(i);
 
             assert(transactionSummary.getChildCount() > 0);
 
@@ -141,8 +141,8 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
     }
 
     public boolean updateStockLastPrice(Code code, double price) {
-        final Portfolio portfolio = (Portfolio)getRoot();
-        final int count = portfolio.getChildCount();
+        final PortfolioRoot portfolioRoot = (PortfolioRoot)getRoot();
+        final int count = portfolioRoot.getChildCount();
         
         TransactionSummary transactionSummary = null;
         
@@ -151,7 +151,7 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
         // moment, as this method will only be consumed by RealTimeStockMonitor,
         // and it is fail safe.
         for (int i = 0; i < count; i++) {
-            TransactionSummary ts = (TransactionSummary)portfolio.getChildAt(i);
+            TransactionSummary ts = (TransactionSummary)portfolioRoot.getChildAt(i);
             
             assert(ts.getChildCount() > 0);
             
@@ -246,25 +246,25 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
     }
     
     public double getGainLossValue() {
-        return getGainLossValue((Portfolio)getRoot());
+        return getGainLossValue((PortfolioRoot)getRoot());
     }
     
-    private double getGainLossValue(Portfolio portfolio) {
-        return getCurrentValue(portfolio) - portfolio.getTotal();
+    private double getGainLossValue(PortfolioRoot portfolioRoot) {
+        return getCurrentValue(portfolioRoot) - portfolioRoot.getTotal();
     }
     
     public double getGainLossPercentage() {
-        return getGainLossPercentage((Portfolio)getRoot());
+        return getGainLossPercentage((PortfolioRoot)getRoot());
     }
     
-    private double getGainLossPercentage(Portfolio portfolio) {
-        if(portfolio.getTotal() == 0) return 0.0;
+    private double getGainLossPercentage(PortfolioRoot portfolioRoot) {
+        if (portfolioRoot.getTotal() == 0) return 0.0;
         
-        return (getCurrentValue(portfolio) - portfolio.getTotal()) / portfolio.getTotal() * 100.0;        
+        return (getCurrentValue(portfolioRoot) - portfolioRoot.getTotal()) / portfolioRoot.getTotal() * 100.0;        
     }
 
     public double getGainLossPercentage(TransactionSummary transactionSummary) {
-        if(transactionSummary.getTotal() == 0) return 0.0;
+        if (transactionSummary.getTotal() == 0) return 0.0;
         
         return (getCurrentValue(transactionSummary) - transactionSummary.getTotal()) / transactionSummary.getTotal() * 100.0;        
     }
@@ -274,13 +274,13 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
     }
     
     public double getNetGainLossPercentage(TransactionSummary transactionSummary) {
-        if(transactionSummary.getTotal() == 0) return 0.0;
+        if (transactionSummary.getTotal() == 0) return 0.0;
         
         return (getCurrentValue(transactionSummary) - transactionSummary.getNetTotal()) / transactionSummary.getNetTotal() * 100.0;        
     }
     
     public double getGainLossPercentage(Transaction transaction) {
-        if(transaction.getTotal() == 0) return 0.0;
+        if (transaction.getTotal() == 0) return 0.0;
         
         return (getCurrentValue(transaction) - transaction.getTotal()) / transaction.getTotal() * 100.0;        
     }
@@ -290,31 +290,31 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
     }
     
     public double getNetGainLossPercentage(Transaction transaction) {
-        if(transaction.getNetTotal() == 0) return 0.0;
+        if (transaction.getNetTotal() == 0) return 0.0;
         
         return (getCurrentValue(transaction) - transaction.getNetTotal()) / transaction.getNetTotal() * 100.0;        
     }
     
     public double getNetGainLossValue() {
-        return getNetGainLossValue((Portfolio)getRoot());
+        return getNetGainLossValue((PortfolioRoot)getRoot());
     }
     
-    private double getNetGainLossValue(Portfolio portfolio) {
-        return getCurrentValue(portfolio) - portfolio.getNetTotal();
+    private double getNetGainLossValue(PortfolioRoot portfolioRoot) {
+        return getCurrentValue(portfolioRoot) - portfolioRoot.getNetTotal();
     }
 
     public double getNetGainLossPercentage() {
-        return getNetGainLossPercentage((Portfolio)getRoot());
+        return getNetGainLossPercentage((PortfolioRoot)getRoot());
     }
     
-    private double getNetGainLossPercentage(Portfolio portfolio) {
-        if(portfolio.getNetTotal() == 0) return 0.0;
+    private double getNetGainLossPercentage(PortfolioRoot portfolioRoot) {
+        if (portfolioRoot.getNetTotal() == 0) return 0.0;
         
-        return (getCurrentValue(portfolio) - portfolio.getNetTotal()) / portfolio.getNetTotal() * 100.0;        
+        return (getCurrentValue(portfolioRoot) - portfolioRoot.getNetTotal()) / portfolioRoot.getNetTotal() * 100.0;        
     }
 
     public double getCurrentValue(ExchangeRateLookup exchangeRateLookup, Country toCountry) {
-        Portfolio portfolio = (Portfolio)getRoot();
+        PortfolioRoot portfolio = (PortfolioRoot)getRoot();
         
         final int count = portfolio.getChildCount();
         
@@ -345,24 +345,24 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
     }
     
     public double getCurrentValue() {
-        return this.getCurrentValue((Portfolio)getRoot());        
+        return this.getCurrentValue((PortfolioRoot)getRoot());        
     }
 
     public double getNetPurchaseValue() {
-        return ((Portfolio)getRoot()).getNetTotal();
+        return ((PortfolioRoot)getRoot()).getNetTotal();
     }
 
     public double getPurchaseValue() {
-        return ((Portfolio)getRoot()).getTotal();
+        return ((PortfolioRoot)getRoot()).getTotal();
     }
     
-    private double getCurrentValue(Portfolio portfolio) {
-        final int count = portfolio.getChildCount();
+    private double getCurrentValue(PortfolioRoot portfolioRoot) {
+        final int count = portfolioRoot.getChildCount();
         
         double result = 0.0;
         
         for (int i = 0; i < count; i++) {
-            Object o = portfolio.getChildAt(i);
+            Object o = portfolioRoot.getChildAt(i);
             
             assert(o instanceof TransactionSummary);
             
@@ -426,8 +426,8 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
         final boolean isFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
         final boolean isPenceToPoundConversionEnabled = jStockOptions.isPenceToPoundConversionEnabled();
         
-        if (node instanceof Portfolio) {
-            final Portfolio portfolio = (Portfolio)node;
+        if (node instanceof PortfolioRoot) {
+            final PortfolioRoot portfolioRoot = (PortfolioRoot)node;
             
             switch(column) {
                 case 0:
@@ -436,58 +436,58 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
                 case 5:
                     if (isPenceToPoundConversionEnabled == false) {
                         if (isFeeCalculationEnabled) {
-                            return portfolio.getNetTotal();
+                            return portfolioRoot.getNetTotal();
                         } else {
-                            return portfolio.getTotal();
+                            return portfolioRoot.getTotal();
                         }
                     } else {
                         if (isFeeCalculationEnabled) {
-                            return portfolio.getNetTotal() / 100.0;
+                            return portfolioRoot.getNetTotal() / 100.0;
                         } else {
-                            return portfolio.getTotal() / 100.0;
+                            return portfolioRoot.getTotal() / 100.0;
                         }
                     }
                     
                 case 6:
                     if (isPenceToPoundConversionEnabled == false) {
-                        return getCurrentValue(portfolio);
+                        return getCurrentValue(portfolioRoot);
                     } else {
-                        return getCurrentValue(portfolio) / 100.0;
+                        return getCurrentValue(portfolioRoot) / 100.0;
                     }
                     
                 case 7:
                     if (isPenceToPoundConversionEnabled == false) {
                         if (isFeeCalculationEnabled) {
-                            return this.getNetGainLossValue(portfolio);
+                            return this.getNetGainLossValue(portfolioRoot);
                         } else {
-                            return this.getGainLossValue(portfolio);
+                            return this.getGainLossValue(portfolioRoot);
                         }                        
                     } else {
                         if (isFeeCalculationEnabled) {
-                            return this.getNetGainLossValue(portfolio) / 100.00;
+                            return this.getNetGainLossValue(portfolioRoot) / 100.00;
                         } else {
-                            return this.getGainLossValue(portfolio) / 100.00;
+                            return this.getGainLossValue(portfolioRoot) / 100.00;
                         }
                     }
                     
                 case 8:
                     if (isFeeCalculationEnabled) {
-                        return new DoubleWrapper(DecimalPlaces.Two, this.getNetGainLossPercentage(portfolio));
+                        return new DoubleWrapper(DecimalPlaces.Two, this.getNetGainLossPercentage(portfolioRoot));
                     } else {
-                        return new DoubleWrapper(DecimalPlaces.Two, this.getGainLossPercentage(portfolio));
+                        return new DoubleWrapper(DecimalPlaces.Two, this.getGainLossPercentage(portfolioRoot));
                     }
     
                 case 9:
-                    return portfolio.getBroker();
+                    return portfolioRoot.getBroker();
                     
                 case 10:
-                    return portfolio.getClearingFee();
+                    return portfolioRoot.getClearingFee();
                     
                 case 11:
-                    return portfolio.getStampDuty();
+                    return portfolioRoot.getStampDuty();
                     
                 case 12:
-                    return portfolio.getComment();
+                    return portfolioRoot.getComment();
             }
         }
    
@@ -669,12 +669,12 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
         // Remove all invalid records found in stockPrice. This is caused by
         // old bug introduced in updateStockLastPrice.
 
-        final Portfolio portfolio = (Portfolio)getRoot();
-        final int count = portfolio.getChildCount();
+        final PortfolioRoot portfolioRoot = (PortfolioRoot)getRoot();
+        final int count = portfolioRoot.getChildCount();
         final Set<Code> set = new HashSet<Code>();
 
         for (int i = 0; i < count; i++) {
-            TransactionSummary transactionSummary = (TransactionSummary)portfolio.getChildAt(i);
+            TransactionSummary transactionSummary = (TransactionSummary)portfolioRoot.getChildAt(i);
 
             assert(transactionSummary.getChildCount() > 0);
 
