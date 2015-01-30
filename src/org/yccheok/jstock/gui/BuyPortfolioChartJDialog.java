@@ -37,7 +37,7 @@ import org.yccheok.jstock.gui.treetable.BuyPortfolioTreeTableModelEx;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.portfolio.Dividend;
 import org.yccheok.jstock.portfolio.DividendSummary;
-import org.yccheok.jstock.portfolio.PortfolioRoot;
+import org.yccheok.jstock.portfolio.Portfolio;
 import org.yccheok.jstock.portfolio.Transaction;
 import org.yccheok.jstock.portfolio.TransactionSummary;
 
@@ -182,13 +182,13 @@ public class BuyPortfolioChartJDialog extends javax.swing.JDialog {
         final boolean isFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
         final boolean isPenceToPoundConversionEnabled = jStockOptions.isPenceToPoundConversionEnabled();
         
-        final PortfolioRoot portfolioRoot = (PortfolioRoot)portfolioTreeTableModel.getRoot();
-        final int count = portfolioRoot.getChildCount();
+        final Portfolio portfolio = (Portfolio)portfolioTreeTableModel.getRoot();
+        final int count = portfolio.getChildCount();
         DefaultPieDataset data = new DefaultPieDataset();
         final List<DataEx> dataExs = new ArrayList<DataEx>();
 
         for (int i = 0; i < count; i++) {
-            TransactionSummary transactionSummary = (TransactionSummary)portfolioRoot.getChildAt(i);
+            TransactionSummary transactionSummary = (TransactionSummary)portfolio.getChildAt(i);
             
             if(transactionSummary.getChildCount() <= 0) continue;
             
