@@ -23,7 +23,7 @@ import java.util.List;
 import javax.swing.tree.TreePath;
 import org.jdesktop.swingx.treetable.TreeTableNode;
 import org.yccheok.jstock.engine.Code;
-import org.yccheok.jstock.portfolio.PortfolioRoot;
+import org.yccheok.jstock.portfolio.Portfolio;
 import org.yccheok.jstock.portfolio.Transaction;
 import org.yccheok.jstock.portfolio.TransactionSummary;
 
@@ -38,9 +38,9 @@ public abstract class AbstractPortfolioTreeTableModelEx extends SortableTreeTabl
         // SortableTreeTableModel to work correct, we must call its constructor
         // SortableTreeTableModel(TreeTableNode root, List<?> columnNames) so 
         // that columnIdentifiers will be initialized with correct value.        
-        super(new PortfolioRoot(), columnNames);
+        super(new Portfolio(), columnNames);
         // Hacking. Pass myself to portfolio, so that sorting would work.
-        ((PortfolioRoot)this.getRoot()).setTreeTableModel(this);
+        ((Portfolio)this.getRoot()).setTreeTableModel(this);
     }
 
     public void fireTreeTableNodeChanged(TreeTableNode node) {
@@ -64,7 +64,7 @@ public abstract class AbstractPortfolioTreeTableModelEx extends SortableTreeTabl
     public abstract boolean isValidTransaction(Transaction transaction);
 
     public int getTransactionSize() {
-        return ((PortfolioRoot)getRoot()).getChildCount();
+        return ((Portfolio)getRoot()).getChildCount();
     }
     
     // Please take note that, after we edit with newTransaction, the resultant
@@ -94,16 +94,16 @@ public abstract class AbstractPortfolioTreeTableModelEx extends SortableTreeTabl
     public void removeTransaction(Transaction transaction) {
         if (isValidTransaction(transaction) == false) return;
         
-        final PortfolioRoot portfolioRoot = (PortfolioRoot)this.getRoot();
+        final Portfolio portfolio = (Portfolio)this.getRoot();
         
-        final int size = portfolioRoot.getChildCount();
+        final int size = portfolio.getChildCount();
         
         final Code code = transaction.getStock().code;
         
         TransactionSummary transactionSummary = null;
         
         for (int i = 0; i < size; i++) {
-            TransactionSummary t = (TransactionSummary)portfolioRoot.getChildAt(i);
+            TransactionSummary t = (TransactionSummary)portfolio.getChildAt(i);
             
             if (((Transaction)t.getChildAt(0)).getStock().code.equals(code)) {
                 transactionSummary = t;
@@ -130,16 +130,16 @@ public abstract class AbstractPortfolioTreeTableModelEx extends SortableTreeTabl
             return null;
         }
         
-        final PortfolioRoot portfolioRoot = (PortfolioRoot)this.getRoot();
+        final Portfolio portfolio = (Portfolio)this.getRoot();
         
-        final int size = portfolioRoot.getChildCount();
+        final int size = portfolio.getChildCount();
         
         final Code code = transaction.getStock().code;
         
         TransactionSummary transactionSummary = null;
         
         for (int i = 0; i < size; i++) {
-            TransactionSummary t = (TransactionSummary)portfolioRoot.getChildAt(i);
+            TransactionSummary t = (TransactionSummary)portfolio.getChildAt(i);
             
             if (((Transaction)t.getChildAt(0)).getStock().code.equals(code)) {
                 transactionSummary = t;
@@ -151,7 +151,7 @@ public abstract class AbstractPortfolioTreeTableModelEx extends SortableTreeTabl
             transactionSummary = new TransactionSummary();
             // Hacking. Pass myself to portfolio, so that sorting would work.
             transactionSummary.setTreeTableModel(this);
-            this.insertNodeInto(transactionSummary, portfolioRoot, portfolioRoot.getChildCount());
+            this.insertNodeInto(transactionSummary, portfolio, portfolio.getChildCount());
         }
         
         // Hacking. Pass myself to portfolio, so that sorting would work.
