@@ -24,7 +24,7 @@ import org.jdesktop.swingx.treetable.TreeTableModel;
 import org.yccheok.jstock.gui.JStockOptions;
 import org.yccheok.jstock.gui.JStock;
 import org.yccheok.jstock.portfolio.Contract;
-import org.yccheok.jstock.portfolio.PortfolioRoot;
+import org.yccheok.jstock.portfolio.Portfolio;
 import org.yccheok.jstock.portfolio.Transaction;
 import org.yccheok.jstock.portfolio.TransactionSummary;
 import org.yccheok.jstock.internationalization.GUIBundle;
@@ -96,48 +96,48 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
         return columnNames[column];
     }
     
-    private double getGainLossPercentage(PortfolioRoot portfolioRoot) {
-        if(portfolioRoot.getReferenceTotal() == 0.0) return 0.0;
+    private double getGainLossPercentage(Portfolio portfolio) {
+        if(portfolio.getReferenceTotal() == 0.0) return 0.0;
         
-        return (portfolioRoot.getTotal() - portfolioRoot.getReferenceTotal()) / portfolioRoot.getReferenceTotal() * 100.0;
+        return (portfolio.getTotal() - portfolio.getReferenceTotal()) / portfolio.getReferenceTotal() * 100.0;
     }
     
     public double getGainLossValue() {
-        return getGainLossValue((PortfolioRoot)getRoot());
+        return getGainLossValue((Portfolio)getRoot());
     }
     
-    private double getGainLossValue(PortfolioRoot portfolioRoot) {
-        return portfolioRoot.getTotal() - portfolioRoot.getReferenceTotal();
+    private double getGainLossValue(Portfolio portfolio) {
+        return portfolio.getTotal() - portfolio.getReferenceTotal();
     }
     
     public double getSellingValue() {
-        return ((PortfolioRoot)getRoot()).getTotal();
+        return ((Portfolio)getRoot()).getTotal();
     }
     
     public double getNetSellingValue() {
-        return ((PortfolioRoot)getRoot()).getNetTotal();
+        return ((Portfolio)getRoot()).getNetTotal();
     }
 
     public double getGainLossPercentage() {
-        return getGainLossPercentage((PortfolioRoot)getRoot());
+        return getGainLossPercentage((Portfolio)getRoot());
     }
     
     public double getNetGainLossPercentage() {
-        return getNetGainLossPercentage((PortfolioRoot)getRoot());
+        return getNetGainLossPercentage((Portfolio)getRoot());
     }
 
     public double getNetGainLossValue() {
-        return getNetGainLossValue((PortfolioRoot)getRoot());
+        return getNetGainLossValue((Portfolio)getRoot());
     }
     
-    private double getNetGainLossPercentage(PortfolioRoot portfolioRoot) {
-        if (portfolioRoot.getNetReferenceTotal() == 0.0) return 0.0;
+    private double getNetGainLossPercentage(Portfolio portfolio) {
+        if (portfolio.getNetReferenceTotal() == 0.0) return 0.0;
         
-        return (portfolioRoot.getNetTotal() - portfolioRoot.getNetReferenceTotal()) / portfolioRoot.getNetReferenceTotal() * 100.0;
+        return (portfolio.getNetTotal() - portfolio.getNetReferenceTotal()) / portfolio.getNetReferenceTotal() * 100.0;
     }
     
-    private double getNetGainLossValue(PortfolioRoot portfolioRoot) {
-        return portfolioRoot.getNetTotal() - portfolioRoot.getNetReferenceTotal();
+    private double getNetGainLossValue(Portfolio portfolio) {
+        return portfolio.getNetTotal() - portfolio.getNetReferenceTotal();
     }
     
     public double getSellingPrice(TransactionSummary transactionSummary) {
@@ -204,8 +204,8 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
         final boolean isFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
         final boolean isPenceToPoundConversionEnabled = jStockOptions.isPenceToPoundConversionEnabled();
 
-        if (node instanceof PortfolioRoot) {
-            final PortfolioRoot portfolioRoot = (PortfolioRoot)node;
+        if (node instanceof Portfolio) {
+            final Portfolio portfolio = (Portfolio)node;
             
             switch(column) {
                 case 0:
@@ -214,15 +214,15 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
                 case 5:
                     if (isPenceToPoundConversionEnabled == false) {
                         if (isFeeCalculationEnabled) {
-                            return portfolioRoot.getNetTotal();
+                            return portfolio.getNetTotal();
                         } else {
-                            return portfolioRoot.getTotal();
+                            return portfolio.getTotal();
                         }
                     } else {
                         if (isFeeCalculationEnabled) {
-                            return portfolioRoot.getNetTotal() / 100.0;
+                            return portfolio.getNetTotal() / 100.0;
                         } else {
-                            return portfolioRoot.getTotal() / 100.0;
+                            return portfolio.getTotal() / 100.0;
                         }
                     }
 
@@ -230,51 +230,51 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
                     // Total purchase value.
                     if (isPenceToPoundConversionEnabled == false) {
                         if (isFeeCalculationEnabled) {
-                            return portfolioRoot.getNetReferenceTotal();
+                            return portfolio.getNetReferenceTotal();
                         } else {
-                            return portfolioRoot.getReferenceTotal();
+                            return portfolio.getReferenceTotal();
                         }
                     } else {
                         if (isFeeCalculationEnabled) {
-                            return portfolioRoot.getNetReferenceTotal() / 100.0;
+                            return portfolio.getNetReferenceTotal() / 100.0;
                         } else {
-                            return portfolioRoot.getReferenceTotal() / 100.0;
+                            return portfolio.getReferenceTotal() / 100.0;
                         }
                     }
 
                 case 7:
                     if (isPenceToPoundConversionEnabled == false) {
                         if (isFeeCalculationEnabled) {
-                            return getNetGainLossValue(portfolioRoot);
+                            return getNetGainLossValue(portfolio);
                         } else {
-                            return getGainLossValue(portfolioRoot);
+                            return getGainLossValue(portfolio);
                         }
                     } else {
                         if (isFeeCalculationEnabled) {
-                            return getNetGainLossValue(portfolioRoot) / 100.0;
+                            return getNetGainLossValue(portfolio) / 100.0;
                         } else {
-                            return getGainLossValue(portfolioRoot) / 100.0;
+                            return getGainLossValue(portfolio) / 100.0;
                         }
                     }
 
                 case 8:
                     if (isFeeCalculationEnabled) {
-                        return new DoubleWrapper(DecimalPlaces.Two, getNetGainLossPercentage(portfolioRoot));
+                        return new DoubleWrapper(DecimalPlaces.Two, getNetGainLossPercentage(portfolio));
                     } else {
-                        return new DoubleWrapper(DecimalPlaces.Two, getGainLossPercentage(portfolioRoot));
+                        return new DoubleWrapper(DecimalPlaces.Two, getGainLossPercentage(portfolio));
                     }
     
                 case 9:
-                    return portfolioRoot.getBroker();
+                    return portfolio.getBroker();
                     
                 case 10:
-                    return portfolioRoot.getClearingFee();
+                    return portfolio.getClearingFee();
                     
                 case 11:
-                    return portfolioRoot.getStampDuty();
+                    return portfolio.getStampDuty();
                     
                 case 12:
-                    return portfolioRoot.getComment();
+                    return portfolio.getComment();
             }
         }
    
