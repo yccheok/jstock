@@ -26,6 +26,10 @@ import java.util.Currency;
  * @author yccheok
  */
 public class CurrencyPair extends org.yccheok.jstock.engine.Pair<Currency, Currency> {
+    public static CurrencyPair create(Currency from, Currency to) {
+        return new CurrencyPair(from, to);
+    }
+    
     public CurrencyPair(Currency from, Currency to) {
         super(from, to);
     }
