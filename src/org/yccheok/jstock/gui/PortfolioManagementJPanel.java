@@ -1877,31 +1877,34 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
     
     private void updateRealTimeStockMonitorAccordingToBuyPortfolioTreeTableModel() {
-        if (this.realTimeStockMonitor == null) {
+        RealTimeStockMonitor _realTimeStockMonitor = this.realTimeStockMonitor;
+        
+        if (_realTimeStockMonitor == null) {
             return;
         }
         
         final BuyPortfolioTreeTableModelEx portfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
-                
-        if (portfolioTreeTableModel != null) {
-            this.buyTreeTable.setTreeTableModel(portfolioTreeTableModel);
-            
-            Portfolio portfolio = (Portfolio)portfolioTreeTableModel.getRoot();
-            final int count = portfolio.getChildCount();
-            
-            for (int i = 0; i < count; i++) {
-                TransactionSummary transactionSummary = (TransactionSummary)portfolio.getChildAt(i);
-                
-                if (transactionSummary.getChildCount() <= 0) continue;
-                
-                final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
-
-                this.realTimeStockMonitor.addStockCode(transaction.getStock().code);
-            }
-            this.realTimeStockMonitor.startNewThreadsIfNecessary();
-            this.realTimeStockMonitor.refresh();
-        }
         
+        if (portfolioTreeTableModel == null) {
+            return;
+        }
+         
+        _realTimeStockMonitor.clearStockCodes();
+        
+        Portfolio portfolio = (Portfolio)portfolioTreeTableModel.getRoot();
+        final int count = portfolio.getChildCount();
+
+        for (int i = 0; i < count; i++) {
+            TransactionSummary transactionSummary = (TransactionSummary)portfolio.getChildAt(i);
+
+            if (transactionSummary.getChildCount() <= 0) continue;
+
+            final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
+
+            _realTimeStockMonitor.addStockCode(transaction.getStock().code);
+        }
+        _realTimeStockMonitor.startNewThreadsIfNecessary();
+        _realTimeStockMonitor.refresh();
     }
     
     private List<Stock> getSelectedStocks(JXTreeTable treeTable) {
