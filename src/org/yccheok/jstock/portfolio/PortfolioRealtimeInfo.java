@@ -27,7 +27,7 @@ import org.yccheok.jstock.engine.currency.CurrencyPair;
  *
  * @author yccheok
  */
-public class PortfolioRealtimeInfo {
+public class PortfolioRealTimeInfo {
     // Avoid using interface class, so that our gson serialization & 
     // deserialization can work correctly.
     public final HashMap<Code, Double> stockPrices = new HashMap<>();
