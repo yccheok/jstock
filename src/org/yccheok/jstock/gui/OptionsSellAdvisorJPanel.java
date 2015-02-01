@@ -382,11 +382,14 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
                 boolean isSelected,      // is the cell selected
                 boolean cellHasFocus)    // does the cell have focus
         {
-            String s = value.toString();
-            setText(s);
 
-            if(value instanceof Country) {
-                setIcon(((Country)value).getIcon());
+            if (value instanceof Country) {
+                Country country = (Country)value;
+                setText(country.toHumanReadableString());
+                setIcon(country.getIcon());
+            } else {
+                String s = value.toString();
+                setText(s);        
             }
 
             if (isSelected) {
