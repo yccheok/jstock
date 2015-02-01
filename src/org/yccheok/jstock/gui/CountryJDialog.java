@@ -174,7 +174,7 @@ public class CountryJDialog extends javax.swing.JDialog {
             setText(s);
             
             if(value instanceof Country) {
-                setIcon(((Country)value).getIcon());
+                setIcon(((Country)value).icon);
             }
             
             if (isSelected) {

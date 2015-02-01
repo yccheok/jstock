@@ -382,8 +382,8 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
 
             if (value instanceof Country) {
                 Country country = (Country)value;
-                setText(country.toHumanReadableString());
-                setIcon(country.getIcon());
+                setText(country.humanString);
+                setIcon(country.icon);
             } else {
                 String s = value.toString();
                 setText(s);        

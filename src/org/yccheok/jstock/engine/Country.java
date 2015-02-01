@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2013 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2015 Yan Cheng Cheok <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,18 +57,10 @@ public enum Country {
     UnitedKingdom("/images/16x16/gb.png", "United Kingdom", Currency.getInstance("GBP")),
     UnitedState("/images/16x16/us.png", "United States", Currency.getInstance("USD"));
             
-    Country(String fileName, String humanReadableString, Currency currency) {
+    Country(String fileName, String humanString, Currency currency) {
         this.icon = new javax.swing.ImageIcon(this.getClass().getResource(fileName));
-        this.humanReadableString = humanReadableString;
+        this.humanString = humanString;
         this.currency = currency;
-    }
-    
-    public ImageIcon getIcon() {
-        return icon;
-    }
-    
-    public String toHumanReadableString() {
-        return humanReadableString;
     }
     
     public Currency getCurrency() {
@@ -90,7 +82,7 @@ public enum Country {
     //    return string;
     //}
     
-    private final ImageIcon icon;
-    private final String humanReadableString; 
+    public final ImageIcon icon;
+    public final String humanString; 
     private final Currency currency;
 }

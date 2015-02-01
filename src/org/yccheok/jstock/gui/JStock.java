@@ -2078,7 +2078,7 @@ public class JStock extends javax.swing.JFrame {
         for (final Country country : countries) {
             // Ugly fix on spelling mistake.
             final JMenuItem mi;
-            mi = (JRadioButtonMenuItem) jMenu6.add(new JRadioButtonMenuItem(country.toHumanReadableString(), country.getIcon()));
+            mi = (JRadioButtonMenuItem) jMenu6.add(new JRadioButtonMenuItem(country.humanString, country.icon));
 
             buttonGroup2.add(mi);
             mi.addActionListener(new ActionListener() {
@@ -2453,7 +2453,7 @@ public class JStock extends javax.swing.JFrame {
         
         /* These codes are very similar to clean up code during changing country.
          */
-        JStock.this.statusBar.setCountryIcon(jStockOptions.getCountry().getIcon(), jStockOptions.getCountry().toString());
+        JStock.this.statusBar.setCountryIcon(jStockOptions.getCountry().icon, jStockOptions.getCountry().humanString);
 
         // Here is the dirty trick here. We let our the 'child' panels perform
         // cleanup/ initialization first before initStockCodeAndSymbolDatabase.
@@ -2490,7 +2490,7 @@ public class JStock extends javax.swing.JFrame {
             AbstractButton button = e.nextElement();
             javax.swing.JRadioButtonMenuItem m = (javax.swing.JRadioButtonMenuItem)button;
             
-            if(m.getText().equals(jStockOptions.getCountry().toHumanReadableString())) {
+            if(m.getText().equals(jStockOptions.getCountry().humanString)) {
                 m.setSelected(true);
                 break;
             }
@@ -2543,7 +2543,7 @@ public class JStock extends javax.swing.JFrame {
             );
         }        
         jStockOptions.setCountry(country);
-        JStock.this.statusBar.setCountryIcon(country.getIcon(), country.toString());
+        JStock.this.statusBar.setCountryIcon(country.icon, country.humanString);
 
         // Here is the dirty trick here. We let our the 'child' panels perform
         // cleanup/ initialization first before initStockCodeAndSymbolDatabase.
@@ -4684,7 +4684,7 @@ public class JStock extends javax.swing.JFrame {
         
         statusBar.setMainMessage(message)
                 .setImageIcon(icon, iconMessage)
-                .setCountryIcon(jStockOptions.getCountry().getIcon(), jStockOptions.getCountry().toString());
+                .setCountryIcon(jStockOptions.getCountry().icon, jStockOptions.getCountry().humanString);
     }
 
     private MouseAdapter getDynamicChartMouseAdapter() {
