@@ -120,7 +120,7 @@ public class WizardSelectIndicatorJPanel extends javax.swing.JPanel {
         
         Object[] selected = this.jList1.getSelectedValues();
         
-        java.util.List<String> list = new java.util.ArrayList<String>();
+        java.util.List<String> list = new java.util.ArrayList<>();
         
         for(Object o : selected) {
             list.add(o.toString());
