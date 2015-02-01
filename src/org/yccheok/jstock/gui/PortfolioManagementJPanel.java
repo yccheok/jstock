@@ -575,6 +575,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     expandTreeTable(this.buyTreeTable);
                     
                     updateRealTimeStockMonitorAccordingToBuyPortfolioTreeTableModel();  
+                    updateExchangeRateMonitorAccordingToPortfolioTreeTableModel();
+                    
+                    // updateWealthHeader will be called at end of switch.
                     
                     refreshStatusBarExchangeRateVisibility();
                 }
@@ -912,7 +915,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
                 default:
                     assert(false);
-            }
+            }   // End of switch
+            
             this.updateWealthHeader();
         }
         else if (statements.getType() == Statement.Type.RealtimeInfo) {
@@ -1716,7 +1720,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         portfolioTreeTableModel.editTransaction(newTransaction, oldTransaction);        
     }
 
-    private Set<Currency> getBuyTransactionForeignCurrencies() {
+    private Set<Currency> getTransactionForeignCurrencies() {
         final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
 
         final Country fromCountry = jStockOptions.getCountry();
@@ -1724,26 +1728,33 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         Set<Currency> currencies = new HashSet<>();
         final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
-        final Portfolio buyPortfolio = (Portfolio) buyPortfolioTreeTableModel.getRoot();
+        final SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel = (SellPortfolioTreeTableModelEx)sellTreeTable.getTreeTableModel();
+        
+        final Portfolio[] portfolios = new Portfolio[] {
+            (Portfolio) buyPortfolioTreeTableModel.getRoot(),
+            (Portfolio) sellPortfolioTreeTableModel.getRoot()
+        };
 
-        for (int i = 0, count = buyPortfolio.getChildCount(); i < count; i++) {
-            TransactionSummary transactionSummary = (TransactionSummary)buyPortfolio.getChildAt(i);
-            Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
-            Stock stock = transaction.getStock();
-            Country country = org.yccheok.jstock.engine.Utils.toCountry(stock.code);
-            
-            if (country == toCountry) {
-                continue;
+        for (Portfolio portfolio : portfolios) {
+            for (int i = 0, count = portfolio.getChildCount(); i < count; i++) {
+                TransactionSummary transactionSummary = (TransactionSummary)portfolio.getChildAt(i);
+                Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
+                Stock stock = transaction.getStock();
+                Country country = org.yccheok.jstock.engine.Utils.toCountry(stock.code);
+
+                if (country == toCountry) {
+                    continue;
+                }
+
+                final Currency currency = country.getCurrency();
+                final Currency toCurrency = toCountry.getCurrency();
+
+                if (currency.equals(toCurrency)) {
+                    continue;
+                }
+
+                currencies.add(country.getCurrency());
             }
-            
-            final Currency currency = country.getCurrency();
-            final Currency toCurrency = toCountry.getCurrency();
-
-            if (currency.equals(toCurrency)) {
-                continue;
-            }
-
-            currencies.add(country.getCurrency());
         }
         
         return currencies;
@@ -1768,14 +1779,15 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         // This is to prevent NPE, during initPortfolio through constructor.
         // Information will be pumped in later to realTimeStockMonitor, through 
         // initRealTimeStockMonitor.
-        if (this.realTimeStockMonitor != null) {
-            this.realTimeStockMonitor.addStockCode(transaction.getStock().code);
-            this.realTimeStockMonitor.startNewThreadsIfNecessary();
-            this.realTimeStockMonitor.refresh();
+        final RealTimeStockMonitor _realTimeStockMonitor = this.realTimeStockMonitor;
+        if (_realTimeStockMonitor != null) {
+            _realTimeStockMonitor.addStockCode(transaction.getStock().code);
+            _realTimeStockMonitor.startNewThreadsIfNecessary();
+            _realTimeStockMonitor.refresh();
         }
         
         do {
-            final ExchangeRateMonitor _exchangeRateMonitor = exchangeRateMonitor;
+            final ExchangeRateMonitor _exchangeRateMonitor = this.exchangeRateMonitor;
             if (_exchangeRateMonitor != null) {
                 final JStock jstock = JStock.getInstance();
                 final JStockOptions jStockOptions = jstock.getJStockOptions();
@@ -1797,6 +1809,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     }
 
                     _exchangeRateMonitor.addCurrencyPair(new CurrencyPair(fromCurrency, toCurrency));
+                    _exchangeRateMonitor.startNewThreadsIfNecessary();
+                    _exchangeRateMonitor.refresh();
                 }
             }
             break;
@@ -1810,7 +1824,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         final SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel = (SellPortfolioTreeTableModelEx)sellTreeTable.getTreeTableModel();
         final Portfolio buyPortfolio = (Portfolio) buyPortfolioTreeTableModel.getRoot();
         final Portfolio sellPortfolio = (Portfolio) sellPortfolioTreeTableModel.getRoot();
-        List<TransactionSummary> summaries = new ArrayList<TransactionSummary>();
+        List<TransactionSummary> summaries = new ArrayList<>();
 
         for (int i = 0, count = buyPortfolio.getChildCount(); i < count; i++) {
             summaries.add((TransactionSummary)buyPortfolio.getChildAt(i));
@@ -1874,6 +1888,30 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         
         final SellPortfolioTreeTableModelEx portfolioTreeTableModel = (SellPortfolioTreeTableModelEx)sellTreeTable.getTreeTableModel();
         return portfolioTreeTableModel.addTransaction(transaction);
+    }
+    
+    private void updateExchangeRateMonitorAccordingToPortfolioTreeTableModel() {
+        ExchangeRateMonitor _exchangeRateMonitor = this.exchangeRateMonitor;
+        
+        if (_exchangeRateMonitor == null) {
+            return;
+        }
+                
+        _exchangeRateMonitor.clearCurrencyPairs();
+        
+        final JStock jstock = JStock.getInstance();
+        final JStockOptions jStockOptions = jstock.getJStockOptions();
+        final Country country = jStockOptions.getCountry();
+        final Country toCountry = jStockOptions.getLocalCurrencyCountry(country);
+        Set<Currency> currencies = this.getTransactionForeignCurrencies();
+
+        for (Currency currency : currencies) {            
+            CurrencyPair currencyPair = new CurrencyPair(currency, toCountry.getCurrency());
+            _exchangeRateMonitor.addCurrencyPair(currencyPair);
+        }
+
+        _exchangeRateMonitor.startNewThreadsIfNecessary();
+        _exchangeRateMonitor.refresh();
     }
     
     private void updateRealTimeStockMonitorAccordingToBuyPortfolioTreeTableModel() {
@@ -2104,6 +2142,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         PortfolioManagementJPanel.this.dividendSummary = _dividendSummary;
 
         PortfolioManagementJPanel.this.updateRealTimeStockMonitorAccordingToBuyPortfolioTreeTableModel();
+        PortfolioManagementJPanel.this.updateExchangeRateMonitorAccordingToPortfolioTreeTableModel();
 
         PortfolioManagementJPanel.this.updateWealthHeader();
 
@@ -2350,7 +2389,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             return;
         }
         
-        Set<Currency> currencies = this.getBuyTransactionForeignCurrencies();
+        Set<Currency> currencies = this.getTransactionForeignCurrencies();
         
         // We will display the currency exchange rate, only if there is 1 
         // currency pair.
@@ -2414,19 +2453,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             jStockOptions.getScanningSpeed());
 
         this.exchangeRateMonitor.attach(exchangeRateMonitorObserver);
-
-        Set<Currency> currencies = this.getBuyTransactionForeignCurrencies();
-        final Country toCountry = jStockOptions.getLocalCurrencyCountry(country);
-        for (Currency currency : currencies) {            
-            CurrencyPair currencyPair = new CurrencyPair(currency, toCountry.getCurrency());
-            this.exchangeRateMonitor.addCurrencyPair(currencyPair);
-        }
-
-        // Start immediately.
-        this.exchangeRateMonitor.startNewThreadsIfNecessary();
-
-        // Before returning, update wealth header immediately.
-        this.updateWealthHeader();
+        
+        updateExchangeRateMonitorAccordingToPortfolioTreeTableModel();
     }
 
     public void initRealTimeStockMonitor() {
@@ -2461,7 +2489,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 final ExchangeRateMonitor _exchangeRateMonitor = exchangeRateMonitor;
                 
                 if (_exchangeRateMonitor != null) {
-                    Set<Currency> currencies = getBuyTransactionForeignCurrencies();
+                    Set<Currency> currencies = getTransactionForeignCurrencies();
                     for (ExchangeRate exchangeRate : exchangeRates) {
                         if (false == currencies.contains(exchangeRate.currencyPair().from())) {
                             _exchangeRateMonitor.removeCurrencyPair(exchangeRate.currencyPair());
