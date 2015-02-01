@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2015 Yan Cheng Cheok <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -250,11 +250,8 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
             if (defaultCountryComboBoxModel.getSize() > 0) {
                 return defaultCountryComboBoxModel;
             }
+            
             for (Country country : Country.values()) {
-                if (country.equals(JStock.getInstance().getJStockOptions().getCountry())) {
-                    // Skip "local" country.
-                    continue;
-                }
                 defaultCountryComboBoxModel.addElement(country);
             }
         }
@@ -326,7 +323,7 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
     
     @Override
     public void set(JStockOptions jStockOptions) {
-        this.jFormattedTextField1.setValue(new Double(jStockOptions.getExpectedProfitPercentage()));
+        this.jFormattedTextField1.setValue(jStockOptions.getExpectedProfitPercentage());
         this.jCheckBox1.setSelected(jStockOptions.isPenceToPoundConversionEnabled());
         this.jComboBox1.setSelectedItem(jStockOptions.getCurrencySymbol(jStockOptions.getCountry()));
         this.jCheckBox2.setSelected(jStockOptions.isCurrencyExchangeEnable(jStockOptions.getCountry()));
