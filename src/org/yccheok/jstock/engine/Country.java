@@ -63,10 +63,6 @@ public enum Country {
         this.currency = currency;
     }
     
-    public Currency getCurrency() {
-        return currency;
-    }
-    
     // For legacy reason, when generating path or operation, the following code
     // should be used :
     // String path = country.name() + File.separator
@@ -84,5 +80,5 @@ public enum Country {
     
     public final ImageIcon icon;
     public final String humanString; 
-    private final Currency currency;
+    public final Currency currency;
 }

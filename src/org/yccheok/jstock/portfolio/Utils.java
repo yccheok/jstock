@@ -643,8 +643,8 @@ public class Utils {
             return 1.0;
         }
         
-        final Currency fromCurrency = fromCountry.getCurrency();
-        final Currency toCurrency = toCountry.getCurrency();
+        final Currency fromCurrency = fromCountry.currency;
+        final Currency toCurrency = toCountry.currency;
         
         if (fromCurrency.equals(toCurrency)) {
             return 1.0;

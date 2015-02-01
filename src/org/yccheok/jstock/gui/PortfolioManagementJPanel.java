@@ -1746,14 +1746,14 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     continue;
                 }
 
-                final Currency currency = country.getCurrency();
-                final Currency toCurrency = toCountry.getCurrency();
+                final Currency currency = country.currency;
+                final Currency toCurrency = toCountry.currency;
 
                 if (currency.equals(toCurrency)) {
                     continue;
                 }
 
-                currencies.add(country.getCurrency());
+                currencies.add(country.currency);
             }
         }
         
@@ -1801,8 +1801,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                         break;
                     }
 
-                    final Currency fromCurrency = fromCountry.getCurrency();
-                    final Currency toCurrency = toCountry.getCurrency();
+                    final Currency fromCurrency = fromCountry.currency;
+                    final Currency toCurrency = toCountry.currency;
 
                     if (fromCurrency.equals(toCurrency)) {
                         break;
@@ -1906,7 +1906,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         Set<Currency> currencies = this.getTransactionForeignCurrencies();
 
         for (Currency currency : currencies) {            
-            CurrencyPair currencyPair = new CurrencyPair(currency, toCountry.getCurrency());
+            CurrencyPair currencyPair = new CurrencyPair(currency, toCountry.currency);
             _exchangeRateMonitor.addCurrencyPair(currencyPair);
         }
 
@@ -2397,7 +2397,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             // Update the tool tip text.
             final Country toCountry = jStockOptions.getLocalCurrencyCountry(country);
             Currency fromCurrency = currencies.iterator().next();
-            Currency toCurrency = toCountry.getCurrency();
+            Currency toCurrency = toCountry.currency;
             final String text = MessageFormat.format(GUIBundle.getString("MyJXStatusBar_CurrencyExchangeRateFor"), fromCurrency.toString(), toCurrency.toString());
             mainFrame.setStatusBarExchangeRateVisible(true);
             mainFrame.setStatusBarExchangeRateToolTipText(text);
