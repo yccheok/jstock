@@ -70,11 +70,11 @@ public class ExchangeRateMonitor extends Subject<ExchangeRateMonitor, List<Excha
                                 final String from = gbxCurrencyPair.from().toString();
                                 final String to = gbxCurrencyPair.to().toString();
                                 double revisedLastPrice = lastPrice;
-                                if (from.equals("GBX") && !to.equals("GBX")) {
+                                if (from.equals(GBX) && !to.equals(GBX)) {
                                     revisedLastPrice = lastPrice / 100.0;
-                                } else if (!from.equals("GBX") && to.equals("GBX")) {
+                                } else if (!from.equals(GBX) && to.equals(GBX)) {
                                     revisedLastPrice = lastPrice * 100.0;
-                                } else if (from.equals("GBX") && to.equals("GBX")) {
+                                } else if (from.equals(GBX) && to.equals(GBX)) {
                                     revisedLastPrice = 1.0;
                                 }
                                 
@@ -94,14 +94,14 @@ public class ExchangeRateMonitor extends Subject<ExchangeRateMonitor, List<Excha
     }
     
     private Set<CurrencyPair> getGBXCurrencyPairs() {
-        Set<CurrencyPair> currencyPairs = new HashSet<CurrencyPair>();
+        Set<CurrencyPair> currencyPairs = new HashSet<>();
         
         for (Map.Entry<Code, CurrencyPair> entry : currencyPairMapping.entrySet())
         {
             CurrencyPair currencyPair = entry.getValue();
             String from = currencyPair.from().toString();
             String to = currencyPair.to().toString();
-            if (from.equals("GBX") || to.equals("GBX")) {
+            if (from.equals(GBX) || to.equals(GBX)) {
                 currencyPairs.add(currencyPair);
             }
         }
@@ -113,12 +113,12 @@ public class ExchangeRateMonitor extends Subject<ExchangeRateMonitor, List<Excha
         String from = currencyPair.from().toString();
         String to = currencyPair.to().toString();
         
-        if (from.equals("GBX")) {
-            from = "GBP";
+        if (from.equals(GBX)) {
+            from = GBX;
         }
         
-        if (to.equals("GBX")) {
-            to = "GBP";
+        if (to.equals(GBX)) {
+            to = GBX;
         }
         
         if (from.equals(currencyPair.from().toString()) && to.equals(currencyPair.to().toString())) {
@@ -214,6 +214,8 @@ public class ExchangeRateMonitor extends Subject<ExchangeRateMonitor, List<Excha
     public int getTotalScanned() {
         return realTimeStockMonitor.getTotalScanned();
     }
+    
+    private static final String GBX = "GBX";
     
     private final Map<Code, CurrencyPair> currencyPairMapping = new ConcurrentHashMap<>();
     private final RealTimeStockMonitor realTimeStockMonitor;
