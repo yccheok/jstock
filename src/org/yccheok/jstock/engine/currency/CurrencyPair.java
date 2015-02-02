@@ -19,8 +19,6 @@
 
 package org.yccheok.jstock.engine.currency;
 
-import java.util.Currency;
-
 /**
  *
  * @author yccheok
