@@ -27,40 +27,41 @@ import javax.swing.ImageIcon;
  * @author yccheok
  */
 public enum Country {
-    Australia("/images/16x16/au.png", "Australia", Currency.getInstance("AUD")),
-    Austria("/images/16x16/at.png", "Austria", Currency.getInstance("EUR")),
-    Belgium("/images/16x16/be.png", "Belgium", Currency.getInstance("EUR")),
-    Brazil("/images/16x16/br.png", "Brazil", Currency.getInstance("BRL")),
-    Canada("/images/16x16/ca.png", "Canada", Currency.getInstance("CAD")),
-    China("/images/16x16/cn.png", "China", Currency.getInstance("CNY")),
-    Czech("/images/16x16/cz.png", "Czech Republic", Currency.getInstance("CZK")),
-    Denmark("/images/16x16/dk.png", "Denmark", Currency.getInstance("DKK")),
-    France("/images/16x16/fr.png", "France", Currency.getInstance("EUR")),
-    Germany("/images/16x16/de.png", "Germany", Currency.getInstance("EUR")),
-    HongKong("/images/16x16/hk.png", "Hong Kong", Currency.getInstance("HKD")),
-    Hungary("/images/16x16/hu.png", "Hungary", Currency.getInstance("HUF")),
-    India("/images/16x16/in.png", "India", Currency.getInstance("INR")),
-    Indonesia("/images/16x16/id.png", "Indonesia", Currency.getInstance("IDR")),
-    Israel("/images/16x16/il.png", "Israel", Currency.getInstance("ILS")),
-    Italy("/images/16x16/it.png", "Italy", Currency.getInstance("EUR")),
-    Korea("/images/16x16/kr.png", "Korea", Currency.getInstance("KPW")),
-    Malaysia("/images/16x16/my.png", "Malaysia", Currency.getInstance("MYR")),
-    Netherlands("/images/16x16/nl.png", "Netherlands", Currency.getInstance("EUR")),
-    NewZealand("/images/16x16/nz.png", "New Zealand", Currency.getInstance("NZD")),
-    Norway("/images/16x16/no.png", "Norway", Currency.getInstance("NOK")),
-    Portugal("/images/16x16/pt.png", "Portugal", Currency.getInstance("EUR")),
-    Singapore("/images/16x16/sg.png", "Singapore", Currency.getInstance("SGD")),
-    Spain("/images/16x16/es.png", "Spain", Currency.getInstance("EUR")),            
-    Sweden("/images/16x16/se.png", "Sweden", Currency.getInstance("SEK")),
-    Switzerland("/images/16x16/ch.png", "Switzerland", Currency.getInstance("CHF")),
-    Taiwan("/images/16x16/tw.png", "Taiwan", Currency.getInstance("TWD")),
-    UnitedKingdom("/images/16x16/gb.png", "United Kingdom", Currency.getInstance("GBP")),
-    UnitedState("/images/16x16/us.png", "United States", Currency.getInstance("USD"));
+    Australia("/images/16x16/au.png", "Australia", Currency.getInstance("AUD"), Currency.getInstance("AUD")),
+    Austria("/images/16x16/at.png", "Austria", Currency.getInstance("EUR"), Currency.getInstance("EUR")),
+    Belgium("/images/16x16/be.png", "Belgium", Currency.getInstance("EUR"), Currency.getInstance("EUR")),
+    Brazil("/images/16x16/br.png", "Brazil", Currency.getInstance("BRL"), Currency.getInstance("BRL")),
+    Canada("/images/16x16/ca.png", "Canada", Currency.getInstance("CAD"), Currency.getInstance("CAD")),
+    China("/images/16x16/cn.png", "China", Currency.getInstance("CNY"), Currency.getInstance("CNY")),
+    Czech("/images/16x16/cz.png", "Czech Republic", Currency.getInstance("CZK"), Currency.getInstance("CZK")),
+    Denmark("/images/16x16/dk.png", "Denmark", Currency.getInstance("DKK"), Currency.getInstance("DKK")),
+    France("/images/16x16/fr.png", "France", Currency.getInstance("EUR"), Currency.getInstance("EUR")),
+    Germany("/images/16x16/de.png", "Germany", Currency.getInstance("EUR"), Currency.getInstance("EUR")),
+    HongKong("/images/16x16/hk.png", "Hong Kong", Currency.getInstance("HKD"), Currency.getInstance("HKD")),
+    Hungary("/images/16x16/hu.png", "Hungary", Currency.getInstance("HUF"), Currency.getInstance("HUF")),
+    India("/images/16x16/in.png", "India", Currency.getInstance("INR"), Currency.getInstance("INR")),
+    Indonesia("/images/16x16/id.png", "Indonesia", Currency.getInstance("IDR"), Currency.getInstance("IDR")),
+    Israel("/images/16x16/il.png", "Israel", Currency.getInstance("ILS"), Currency.getInstance("ILS")),
+    Italy("/images/16x16/it.png", "Italy", Currency.getInstance("EUR"), Currency.getInstance("EUR")),
+    Korea("/images/16x16/kr.png", "Korea", Currency.getInstance("KPW"), Currency.getInstance("KPW")),
+    Malaysia("/images/16x16/my.png", "Malaysia", Currency.getInstance("MYR"), Currency.getInstance("MYR")),
+    Netherlands("/images/16x16/nl.png", "Netherlands", Currency.getInstance("EUR"), Currency.getInstance("EUR")),
+    NewZealand("/images/16x16/nz.png", "New Zealand", Currency.getInstance("NZD"), Currency.getInstance("NZD")),
+    Norway("/images/16x16/no.png", "Norway", Currency.getInstance("NOK"), Currency.getInstance("NOK")),
+    Portugal("/images/16x16/pt.png", "Portugal", Currency.getInstance("EUR"), Currency.getInstance("EUR")),
+    Singapore("/images/16x16/sg.png", "Singapore", Currency.getInstance("SGD"), Currency.getInstance("SGD")),
+    Spain("/images/16x16/es.png", "Spain", Currency.getInstance("EUR"), Currency.getInstance("EUR")),
+    Sweden("/images/16x16/se.png", "Sweden", Currency.getInstance("SEK"), Currency.getInstance("SEK")),
+    Switzerland("/images/16x16/ch.png", "Switzerland", Currency.getInstance("CHF"), Currency.getInstance("CHF")),
+    Taiwan("/images/16x16/tw.png", "Taiwan", Currency.getInstance("TWD"), Currency.getInstance("TWD")),
+    UnitedKingdom("/images/16x16/gb.png", "United Kingdom", Currency.getInstance("GBX"), Currency.getInstance("GBP")),
+    UnitedState("/images/16x16/us.png", "United States", Currency.getInstance("USD"), Currency.getInstance("USD"));
             
-    Country(String fileName, String humanString, Currency currency) {
+    Country(String fileName, String humanString, Currency stockCurrency, Currency localCurrency) {
         this.icon = new javax.swing.ImageIcon(this.getClass().getResource(fileName));
         this.humanString = humanString;
-        this.currency = currency;
+        this.stockCurrency = stockCurrency;
+        this.localCurrency = localCurrency;
     }
     
     // For legacy reason, when generating path or operation, the following code
@@ -80,5 +81,6 @@ public enum Country {
     
     public final ImageIcon icon;
     public final String humanString; 
-    public final Currency currency;
+    public final Currency stockCurrency;
+    public final Currency localCurrency;
 }
