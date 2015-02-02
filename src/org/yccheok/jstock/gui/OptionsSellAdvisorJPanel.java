@@ -229,7 +229,7 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
 
     // Print out label text for currency exchange enable check box.
     private String getConvertCurrencyString() {
-        return MessageFormat.format(GUIBundle.getString("OptionsSellAdvisorJPanel_ConvertCurrencyFromTo"), JStock.getInstance().getJStockOptions().getCountry());
+        return MessageFormat.format(GUIBundle.getString("OptionsSellAdvisorJPanel_ConvertCurrencyFromTo"), JStock.getInstance().getJStockOptions().getCountry().humanString);
     }
 
     private JFormattedTextField getPercentageJFormattedTextField() {

@@ -20,7 +20,6 @@
 package org.yccheok.jstock.engine.currency;
 
 import java.util.ArrayList;
-import java.util.Currency;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -71,8 +70,8 @@ public class ExchangeRateMonitor extends Subject<ExchangeRateMonitor, List<Excha
     private Code toCode(CurrencyPair currencyPair) {
         final Currency from = currencyPair.from();
         final Currency to = currencyPair.to();
-        final String fromCurrencyCode = from.getCurrencyCode();
-        final String toCurrencyCode = to.getCurrencyCode();
+        final String fromCurrencyCode = from.toString();
+        final String toCurrencyCode = to.toString();
         // Format used by Yahoo! Finance.
         return Code.newInstance(fromCurrencyCode + toCurrencyCode + "=X");
     }
