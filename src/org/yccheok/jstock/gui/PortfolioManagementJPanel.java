@@ -1720,13 +1720,13 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         portfolioTreeTableModel.editTransaction(newTransaction, oldTransaction);        
     }
 
-    private Set<Currency> getTransactionForeignCurrencies() {
+    private Set<CurrencyPair> getTransactionCurrencyPairs() {
         final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
 
-        final Country fromCountry = jStockOptions.getCountry();
-        final Country toCountry = jStockOptions.getLocalCurrencyCountry(fromCountry);
+        final Country country = jStockOptions.getCountry();
+        final Country localCountry = jStockOptions.getLocalCurrencyCountry(country);
 
-        Set<Currency> currencies = new HashSet<>();
+        Set<CurrencyPair> currencyPairs = new HashSet<>();
         final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
         final SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel = (SellPortfolioTreeTableModelEx)sellTreeTable.getTreeTableModel();
         
@@ -1740,24 +1740,21 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 TransactionSummary transactionSummary = (TransactionSummary)portfolio.getChildAt(i);
                 Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
                 Stock stock = transaction.getStock();
-                Country country = org.yccheok.jstock.engine.Utils.toCountry(stock.code);
+                Country stockCountry = org.yccheok.jstock.engine.Utils.toCountry(stock.code);
 
-                if (country == toCountry) {
+                final Currency stockCurrency = stockCountry.stockCurrency;
+                final Currency localCurrency = localCountry.localCurrency;
+
+                if (stockCurrency.equals(localCurrency)) {
                     continue;
                 }
 
-                final Currency currency = country.currency;
-                final Currency toCurrency = toCountry.currency;
-
-                if (currency.equals(toCurrency)) {
-                    continue;
-                }
-
-                currencies.add(country.currency);
+                CurrencyPair currencyPair = CurrencyPair.create(stockCurrency, localCurrency);
+                currencyPairs.add(currencyPair);
             }
         }
         
-        return currencies;
+        return currencyPairs;
     }
     
     private int getBuyTransactionSize() {
@@ -1794,21 +1791,17 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 final Country country = jStockOptions.getCountry();
                 final boolean currencyExchangeEnable = jStockOptions.isCurrencyExchangeEnable(country);
                 if (currencyExchangeEnable) {
-                    final Country fromCountry = org.yccheok.jstock.engine.Utils.toCountry(transaction.getStock().code);
-                    final Country toCountry = jStockOptions.getLocalCurrencyCountry(country);
+                    final Country stockCountry = org.yccheok.jstock.engine.Utils.toCountry(transaction.getStock().code);
+                    final Country localCountry = jStockOptions.getLocalCurrencyCountry(country);
                     
-                    if (fromCountry == toCountry) {
+                    final Currency stockCurrency = stockCountry.stockCurrency;
+                    final Currency localCurrency = localCountry.localCurrency;
+
+                    if (stockCurrency.equals(localCurrency)) {
                         break;
                     }
 
-                    final Currency fromCurrency = fromCountry.currency;
-                    final Currency toCurrency = toCountry.currency;
-
-                    if (fromCurrency.equals(toCurrency)) {
-                        break;
-                    }
-
-                    _exchangeRateMonitor.addCurrencyPair(new CurrencyPair(fromCurrency, toCurrency));
+                    _exchangeRateMonitor.addCurrencyPair(CurrencyPair.create(stockCurrency, localCurrency));
                     _exchangeRateMonitor.startNewThreadsIfNecessary();
                     _exchangeRateMonitor.refresh();
                 }
@@ -1899,14 +1892,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 
         _exchangeRateMonitor.clearCurrencyPairs();
         
-        final JStock jstock = JStock.getInstance();
-        final JStockOptions jStockOptions = jstock.getJStockOptions();
-        final Country country = jStockOptions.getCountry();
-        final Country toCountry = jStockOptions.getLocalCurrencyCountry(country);
-        Set<Currency> currencies = this.getTransactionForeignCurrencies();
+        Set<CurrencyPair> currencyPairs = this.getTransactionCurrencyPairs();
 
-        for (Currency currency : currencies) {            
-            CurrencyPair currencyPair = new CurrencyPair(currency, toCountry.currency);
+        for (CurrencyPair currencyPair : currencyPairs) {            
             _exchangeRateMonitor.addCurrencyPair(currencyPair);
         }
 
@@ -2389,19 +2377,19 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             return;
         }
         
-        Set<Currency> currencies = this.getTransactionForeignCurrencies();
+        Set<CurrencyPair> currencyPairs = this.getTransactionCurrencyPairs();
         
         // We will display the currency exchange rate, only if there is 1 
         // currency pair.
-        if (currencies.size() == 1) {
+        if (currencyPairs.size() == 1) {
             // Update the tool tip text.
-            final Country toCountry = jStockOptions.getLocalCurrencyCountry(country);
-            Currency fromCurrency = currencies.iterator().next();
-            Currency toCurrency = toCountry.currency;
+            CurrencyPair currencyPair = currencyPairs.iterator().next();
+            Currency fromCurrency = currencyPair.from();
+            Currency toCurrency = currencyPair.to();
             final String text = MessageFormat.format(GUIBundle.getString("MyJXStatusBar_CurrencyExchangeRateFor"), fromCurrency.toString(), toCurrency.toString());
             mainFrame.setStatusBarExchangeRateVisible(true);
             mainFrame.setStatusBarExchangeRateToolTipText(text);
-            ExchangeRate exchangeRate = this.exchangeRateLookup.get(new CurrencyPair(fromCurrency, toCurrency));
+            ExchangeRate exchangeRate = this.exchangeRateLookup.get(currencyPair);
             if (exchangeRate != null) {
                 mainFrame.setStatusBarExchangeRate(exchangeRate.rate());
             } else {
@@ -2489,9 +2477,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 final ExchangeRateMonitor _exchangeRateMonitor = exchangeRateMonitor;
                 
                 if (_exchangeRateMonitor != null) {
-                    Set<Currency> currencies = getTransactionForeignCurrencies();
+                    Set<CurrencyPair> currencyPairs = getTransactionCurrencyPairs();
                     for (ExchangeRate exchangeRate : exchangeRates) {
-                        if (false == currencies.contains(exchangeRate.currencyPair().from())) {
+                        if (false == currencyPairs.contains(exchangeRate.currencyPair())) {
                             _exchangeRateMonitor.removeCurrencyPair(exchangeRate.currencyPair());
                         }
                     }

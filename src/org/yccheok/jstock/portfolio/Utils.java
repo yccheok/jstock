@@ -636,21 +636,17 @@ public class Utils {
         return (b - a) > ( (Math.abs(a) < Math.abs(b) ? Math.abs(b) : Math.abs(a)) * EPSILON);
     }
 
-    public static double getExchangeRate(ExchangeRateLookup exchangeRateLookup, Country toCountry, Code code) {
-        final Country fromCountry = org.yccheok.jstock.engine.Utils.toCountry(code);
+    public static double getExchangeRate(ExchangeRateLookup exchangeRateLookup, Country localCountry, Code code) {
+        final Country stockCountry = org.yccheok.jstock.engine.Utils.toCountry(code);
+
+        final Currency stockCurrency = stockCountry.stockCurrency;
+        final Currency localCurrency = localCountry.localCurrency;
         
-        if (fromCountry == toCountry) {
+        if (stockCurrency.equals(localCurrency)) {
             return 1.0;
         }
         
-        final Currency fromCurrency = fromCountry.currency;
-        final Currency toCurrency = toCountry.currency;
-        
-        if (fromCurrency.equals(toCurrency)) {
-            return 1.0;
-        }
-        
-        final CurrencyPair currencyPair = new CurrencyPair(fromCurrency, toCurrency);
+        final CurrencyPair currencyPair = new CurrencyPair(stockCurrency, localCurrency);
         final ExchangeRate exchangeRate = exchangeRateLookup.get(currencyPair);
         if (exchangeRate != null) {
             return exchangeRate.rate();

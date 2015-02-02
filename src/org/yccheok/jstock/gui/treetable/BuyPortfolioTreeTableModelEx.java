@@ -313,7 +313,7 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
         return (getCurrentValue(portfolio) - portfolio.getNetTotal()) / portfolio.getNetTotal() * 100.0;        
     }
 
-    public double getCurrentValue(ExchangeRateLookup exchangeRateLookup, Country toCountry) {
+    public double getCurrentValue(ExchangeRateLookup exchangeRateLookup, Country localCountry) {
         Portfolio portfolio = (Portfolio)getRoot();
         
         final int count = portfolio.getChildCount();
@@ -335,7 +335,7 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
         
             final Code code = transaction.getStock().code;
             
-            double exchangeRate = org.yccheok.jstock.portfolio.Utils.getExchangeRate(exchangeRateLookup, toCountry, code);
+            double exchangeRate = org.yccheok.jstock.portfolio.Utils.getExchangeRate(exchangeRateLookup, localCountry, code);
             
             result += (currentValue * exchangeRate);
         }
