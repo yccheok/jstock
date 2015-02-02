@@ -24,7 +24,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Currency;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -32,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.yccheok.jstock.engine.currency.Currency;
 
 /**
  *
@@ -92,7 +92,7 @@ public class GoogleStockServer implements StockServer {
         }
         
         if (sb.length() == 0) {
-            return Currency.getInstance("USD");
+            return Currency.newInstance("USD");
         }
         
         String currencySymbol = sb.toString();
@@ -101,10 +101,10 @@ public class GoogleStockServer implements StockServer {
         
         try {
             if (currencyCode == null) {
-                return Currency.getInstance(currencySymbol);
+                return Currency.newInstance(currencySymbol);
             }
         
-            return Currency.getInstance(currencyCode);
+            return Currency.newInstance(currencyCode);
         } catch (java.lang.IllegalArgumentException ex) {
             log.error(null, ex);
         }

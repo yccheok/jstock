@@ -19,7 +19,7 @@
 
 package org.yccheok.jstock.engine;
 
-import java.util.Currency;
+import org.yccheok.jstock.engine.currency.Currency;
 
 /**
  *

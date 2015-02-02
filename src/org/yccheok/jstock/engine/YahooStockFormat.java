@@ -23,11 +23,11 @@ import au.com.bytecode.opencsv.CSVParser;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Currency;
 import java.util.List;
 import java.util.regex.Pattern;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.yccheok.jstock.engine.currency.Currency;
 
 /**
  *
@@ -283,7 +283,7 @@ public class YahooStockFormat implements StockFormat {
                 // I can't really recall why I need to apply quotePattern on 
                 // "code", "name", ... I decide not to do so for "currency".
                 if (length < 33) break; 
-                try { currency = Currency.getInstance(fields[32].trim()); } catch (java.lang.IllegalArgumentException ex) { log.error(null, ex); }
+                try { currency = Currency.newInstance(fields[32].trim()); } catch (java.lang.IllegalArgumentException ex) { log.error(null, ex); }
                 
                 break;
             } while(true);
