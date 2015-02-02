@@ -29,7 +29,7 @@ public class Currency {
     }
     
     public static Currency newInstance(String currency) {
-        if (currency.equals("GBX")) {
+        if (currency.equals(GBX)) {
             // Pence sterling is a subdivision of Pound sterling, the currency 
             // for the United Kingdom. Stocks are often traded in pence rather 
             // than pounds and stock exchages often use GBX to indicate that 
@@ -69,6 +69,8 @@ public class Currency {
     public String toString() {
         return currency;
     }
+    
+    private static final String GBX = "GBX";
     
     private final String currency;
 }
