@@ -125,7 +125,7 @@ public class ExchangeRateMonitor extends Subject<ExchangeRateMonitor, List<Excha
             return currencyPair;
         }
         
-        return CurrencyPair.create(Currency.newInstance(from), Currency.newInstance(to));
+        return CurrencyPair.create(from, to);
     }
     
     private Code toCode(CurrencyPair currencyPair) {
