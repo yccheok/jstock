@@ -20,8 +20,10 @@
 package org.yccheok.jstock.engine.currency;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.Observer;
@@ -47,14 +49,38 @@ public class ExchangeRateMonitor extends Subject<ExchangeRateMonitor, List<Excha
             
             @Override
             public void update(RealTimeStockMonitor subject, List<Stock> stocks) {
-                List<ExchangeRate> exchangeRates = new ArrayList<ExchangeRate>();
+                List<ExchangeRate> exchangeRates = new ArrayList<>();
+                Set<CurrencyPair> gbxCurrencyPairs = getGBXCurrencyPairs();
+                
                 for (Stock stock : stocks) {
-                    CurrencyPair currencyPair = currencyPairMapping.get(stock.code);
-                    if (currencyPair != null) {
-                        double lastPrice = stock.getLastPrice();
-                        if (lastPrice > 0.0) {
+                    final double lastPrice = stock.getLastPrice();
+                    if (lastPrice > 0.0) {
+                        CurrencyPair currencyPair = currencyPairMapping.get(stock.code);
+                        if (currencyPair != null) {
                             ExchangeRate exchangeRate = new ExchangeRate(currencyPair, lastPrice);    
                             exchangeRates.add(exchangeRate);
+                        }
+                    }
+                    
+                    if (lastPrice > 0.0) {
+                        for (CurrencyPair gbxCurrencyPair : gbxCurrencyPairs) {
+                            final CurrencyPair realTimeMonitorCurrencyPair = toCurrencyPairForRealTimeStockMonitor(gbxCurrencyPair);
+                            final Code realTimeMonitorCode = toCode(realTimeMonitorCurrencyPair);
+                            if (stock.code.equals(realTimeMonitorCode)) {
+                                final String from = gbxCurrencyPair.from().toString();
+                                final String to = gbxCurrencyPair.to().toString();
+                                double revisedLastPrice = lastPrice;
+                                if (from.equals("GBX") && !to.equals("GBX")) {
+                                    revisedLastPrice = lastPrice / 100.0;
+                                } else if (!from.equals("GBX") && to.equals("GBX")) {
+                                    revisedLastPrice = lastPrice * 100.0;
+                                } else if (from.equals("GBX") && to.equals("GBX")) {
+                                    revisedLastPrice = 1.0;
+                                }
+                                
+                                ExchangeRate exchangeRate = new ExchangeRate(gbxCurrencyPair, revisedLastPrice);
+                                exchangeRates.add(exchangeRate);
+                            }
                         }
                     }
                 }
@@ -65,6 +91,41 @@ public class ExchangeRateMonitor extends Subject<ExchangeRateMonitor, List<Excha
             }
             
         };
+    }
+    
+    private Set<CurrencyPair> getGBXCurrencyPairs() {
+        Set<CurrencyPair> currencyPairs = new HashSet<CurrencyPair>();
+        
+        for (Map.Entry<Code, CurrencyPair> entry : currencyPairMapping.entrySet())
+        {
+            CurrencyPair currencyPair = entry.getValue();
+            String from = currencyPair.from().toString();
+            String to = currencyPair.to().toString();
+            if (from.equals("GBX") || to.equals("GBX")) {
+                currencyPairs.add(currencyPair);
+            }
+        }
+        
+        return currencyPairs;
+    }
+    
+    private CurrencyPair toCurrencyPairForRealTimeStockMonitor(CurrencyPair currencyPair) {
+        String from = currencyPair.from().toString();
+        String to = currencyPair.to().toString();
+        
+        if (from.equals("GBX")) {
+            from = "GBP";
+        }
+        
+        if (to.equals("GBX")) {
+            to = "GBP";
+        }
+        
+        if (from.equals(currencyPair.from().toString()) && to.equals(currencyPair.to().toString())) {
+            return currencyPair;
+        }
+        
+        return CurrencyPair.create(Currency.newInstance(from), Currency.newInstance(to));
     }
     
     private Code toCode(CurrencyPair currencyPair) {
@@ -78,12 +139,18 @@ public class ExchangeRateMonitor extends Subject<ExchangeRateMonitor, List<Excha
     
     public synchronized boolean addCurrencyPair(CurrencyPair currencyPair) {
         final Code code = toCode(currencyPair);
-        
-        if (realTimeStockMonitor.addStockCode(code)) {
-            currencyPairMapping.put(code, currencyPair);
-            return true;
+                
+        if (currencyPairMapping.containsKey(code)) {
+            return false;
         }
-        return false;
+        
+        currencyPairMapping.put(code, currencyPair);
+        
+        final CurrencyPair realTimeMonitorCurrencyPair = toCurrencyPairForRealTimeStockMonitor(currencyPair);
+        final Code realTimeMonitorCode = toCode(realTimeMonitorCurrencyPair);
+        realTimeStockMonitor.addStockCode(realTimeMonitorCode);
+        
+        return true;
     }
     
     public synchronized boolean isEmpty() {
@@ -97,8 +164,19 @@ public class ExchangeRateMonitor extends Subject<ExchangeRateMonitor, List<Excha
     
     public synchronized boolean removeCurrencyPair(CurrencyPair currencyPair) {
         final Code code = toCode(currencyPair);
-        currencyPairMapping.remove(code);
-        return realTimeStockMonitor.removeStockCode(code);
+        if (null == currencyPairMapping.remove(code)) {
+            return false;
+        }
+
+        final CurrencyPair realTimeMonitorCurrencyPair = toCurrencyPairForRealTimeStockMonitor(currencyPair);
+        final Code realTimeMonitorCode = toCode(realTimeMonitorCurrencyPair);
+        // Can we remove?
+        if (currencyPairMapping.containsKey(realTimeMonitorCode)) {
+            // Cannot remove first. Someone is requesting real GBP.
+            return true;
+        }
+        
+        return realTimeStockMonitor.removeStockCode(realTimeMonitorCode);
     } 
     
     public synchronized void resume() {
@@ -137,6 +215,6 @@ public class ExchangeRateMonitor extends Subject<ExchangeRateMonitor, List<Excha
         return realTimeStockMonitor.getTotalScanned();
     }
     
-    private final Map<Code, CurrencyPair> currencyPairMapping = new ConcurrentHashMap<Code, CurrencyPair>();
+    private final Map<Code, CurrencyPair> currencyPairMapping = new ConcurrentHashMap<>();
     private final RealTimeStockMonitor realTimeStockMonitor;
 }
