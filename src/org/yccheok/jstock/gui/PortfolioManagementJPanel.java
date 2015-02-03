@@ -2041,16 +2041,16 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
         
         File portfolioOptionsFile = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioOptionsFilepath());
-        PortfolioOptions portfolioOptions = new PortfolioOptions();
-        boolean status = portfolioOptions.load(portfolioOptionsFile);
+        PortfolioOptions _portfolioOptions = new PortfolioOptions();
+        boolean status = _portfolioOptions.load(portfolioOptionsFile);
         if (false == status) {
             Pair<HashMap<Code, Double>, Long> csvStockPrices = this.initCSVStockPrices();
-            portfolioOptions.stockPrices.putAll(csvStockPrices.first);
-            portfolioOptions.stockPricesTimeStamp = csvStockPrices.second;
-            portfolioOptions.stockPricesDirty = !portfolioOptions.stockPrices.isEmpty();
+            _portfolioOptions.stockPrices.putAll(csvStockPrices.first);
+            _portfolioOptions.stockPricesTimeStamp = csvStockPrices.second;
+            _portfolioOptions.stockPricesDirty = !_portfolioOptions.stockPrices.isEmpty();
         }
         
-        this.portfolioOptions = portfolioOptions;
+        this.portfolioOptions = _portfolioOptions;
         
         refershGUIAfterInitPortfolio(
                 (BuyPortfolioTreeTableModelEx)PortfolioManagementJPanel.this.buyTreeTable.getTreeTableModel(), 
@@ -2186,8 +2186,6 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
     
     public final void initPortfolio() {
-        // This is new portfolio. Reset last update date.
-        this.timestamp = 0;
         this.initCSVPortfolio();
     }
 
@@ -2292,7 +2290,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         return saveCSVPortfolio(
             org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory(), 
             CSVPortfolio.newInstance((BuyPortfolioTreeTableModelEx)this.buyTreeTable.getTreeTableModel(), (SellPortfolioTreeTableModelEx)this.sellTreeTable.getTreeTableModel(), this.dividendSummary, this.depositSummary),
-            timestamp
+            this.portfolioOptions
         );
     }
     
@@ -2531,7 +2529,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         updateWealthHeader();
         
         // Update status bar with current time string.
-        this.timestamp = System.currentTimeMillis();
+        this.portfolioOptions.stockPricesTimeStamp = System.currentTimeMillis();
         
         JStock.getInstance().updateStatusBarWithLastUpdateDateMessageIfPossible();     
     }  
