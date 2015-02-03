@@ -59,13 +59,26 @@ public class PortfolioOptions {
     
     private static final Log log = LogFactory.getLog(PortfolioOptions.class);
     
+    public PortfolioOptions() {
+    }
+    
+    public PortfolioOptions(PortfolioOptions portfolioOptions) {
+        copy(portfolioOptions);
+    }
+    
     private void copy(PortfolioOptions portfolioOptions) {
+        stockPrices.clear();
+        exchangeRates.clear();
+        currencies.clear();
+        
         stockPrices.putAll(portfolioOptions.stockPrices);
         exchangeRates.putAll(portfolioOptions.exchangeRates);
         currencies.putAll(portfolioOptions.currencies);
         
         stockPricesTimeStamp = portfolioOptions.stockPricesTimeStamp;
         exchangeRatesTimeStamp = portfolioOptions.exchangeRatesTimeStamp;
+
+        // I don't know what to do with dirty flags at this moment.
     }
     
     public boolean load(File file) {

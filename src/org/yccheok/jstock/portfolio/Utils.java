@@ -342,7 +342,7 @@ public class Utils {
         String[] files = file.list();
         List<String> list = Arrays.asList(files);
         //return list.contains("stockprices.csv") && list.contains("buyportfolio.csv") && list.contains("sellportfolio.csv") && list.contains("depositsummary.csv") && list.contains("dividendsummary.csv");
-        return list.contains("stockprices.csv");
+        return list.contains("stockprices.csv") || list.contains("portfolio-options.json");
     }
 
     /**
@@ -388,20 +388,31 @@ public class Utils {
             } else {
                 // Only seek for 1st level directory.
                 for (File child : children) {
-                    
-                    File stockPricesFile = new File(child, "stockprices.csv");
-                    int lines = org.yccheok.jstock.gui.Utils.numOfLines(stockPricesFile, true);
-                    // Skip CSV header.
-                    lines = lines - 1;
-                    if (lines > 0) {
-                        PortfolioInfo portfolioInfo = PortfolioInfo.newInstance(country, child.getName(), lines);
-                        portfolioInfos.add(portfolioInfo);
-                        continue;
-                    } 
+                    File portfolioOptionsFile = new File(child, "portfolio-options.json");
+                    PortfolioOptions portfolioOptions = new PortfolioOptions();
+                    if (portfolioOptions.load(portfolioOptionsFile)) {
+                        final int lines = portfolioOptions.stockPrices.size();
+                        if (lines > 0) {
+                            PortfolioInfo portfolioInfo = PortfolioInfo.newInstance(country, child.getName(), lines);
+                            portfolioInfos.add(portfolioInfo);
+                            continue;
+                        }                        
+                    } else {
+                        // Legacy
+                        File stockPricesFile = new File(child, "stockprices.csv");
+                        int lines = org.yccheok.jstock.gui.Utils.numOfLines(stockPricesFile, true);
+                        // Skip CSV header.
+                        lines = lines - 1;
+                        if (lines > 0) {
+                            PortfolioInfo portfolioInfo = PortfolioInfo.newInstance(country, child.getName(), lines);
+                            portfolioInfos.add(portfolioInfo);
+                            continue;
+                        }    
+                    }                            
 
                     // We do not have buy record. Do we have sell record, dividend record or deposit record?
                     File sellPortfolioFile = new File(child, "sellportfolio.csv");
-                    lines = org.yccheok.jstock.gui.Utils.numOfLines(sellPortfolioFile, true);
+                    int lines = org.yccheok.jstock.gui.Utils.numOfLines(sellPortfolioFile, true);
                     // Skip CSV header.
                     lines = lines - 1;
                     if (lines > 0) {

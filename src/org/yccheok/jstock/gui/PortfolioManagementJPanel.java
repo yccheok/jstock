@@ -2048,6 +2048,15 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             _portfolioOptions.stockPrices.putAll(csvStockPrices.first);
             _portfolioOptions.stockPricesTimeStamp = csvStockPrices.second;
             _portfolioOptions.stockPricesDirty = !_portfolioOptions.stockPrices.isEmpty();
+        } else {
+            final BuyPortfolioTreeTableModelEx portfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
+
+            // Initialization.
+            for (Map.Entry<Code, Double> entry : _portfolioOptions.stockPrices.entrySet()) {
+                Code code = entry.getKey();
+                Double price = entry.getValue();
+                portfolioTreeTableModel.updateStockLastPrice(code, price);
+            }
         }
         
         this.portfolioOptions = _portfolioOptions;
@@ -2210,7 +2219,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
     }
 
-    public static boolean saveCSVPortfolio(String directory, CSVPortfolio csvPortfolio, long timestamp) {
+    public static boolean saveCSVPortfolio(String directory, CSVPortfolio csvPortfolio, PortfolioOptions portfolioOptions) {
         if (Utils.createCompleteDirectoryHierarchyIfDoesNotExist(directory) == false)
         {
             return false;
@@ -2283,7 +2292,15 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             }
         }
         
-        return saveCSVStockPrices(directory, csvPortfolio.buyPortfolioTreeTableModel, timestamp);
+        boolean status = savePortfolioOptions(directory, csvPortfolio.buyPortfolioTreeTableModel, portfolioOptions);
+        
+        if (status) {
+            // Legacy file.
+            final File stockPricesFile = new File(directory + "stockprices.csv");
+            stockPricesFile.delete();
+        }
+        
+        return status;
     }
     
     private boolean saveCSVPortfolio() {
@@ -2337,14 +2354,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         return Pair.create(stockPrices, _timestamp);
     }
     
-    private static boolean saveCSVStockPrices(String directory, BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModelEx, long timestamp) {
-        assert(directory.endsWith(File.separator));
+    private static boolean savePortfolioOptions(String directory, BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModelEx, PortfolioOptions portfolioOptions) {
+        PortfolioOptions _portfolioOptions = new PortfolioOptions(portfolioOptions);
         
-        // Ensure our stock prices data structure doesn't contain too less or
-        // too much information. stockPrices might still contain redundant
-        // information, as we do not update stockPrices immediately during
-        // transaction summary deletion.
-        Map<Code, Double> stockPrices = buyPortfolioTreeTableModelEx.getStockPrices();
         Map<Code, Double> goodStockPrices = new HashMap<>();
         final Portfolio portfolio = (Portfolio)buyPortfolioTreeTableModelEx.getRoot();
         final int count = portfolio.getChildCount();
@@ -2353,7 +2365,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             assert(transactionSummary.getChildCount() > 0);            
             final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
             final Code code = transaction.getStock().code;
-            final Double price = stockPrices.get(code);
+            final Double price = _portfolioOptions.stockPrices.get(code);
             if (price == null) {
                 goodStockPrices.put(code, 0.0);
             } else {
@@ -2361,11 +2373,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             }
         }
         
-        Statements statements = Statements.newInstanceFromStockPrices(goodStockPrices, timestamp);
-        
-        final File stockPricesFile = new File(directory + "stockprices.csv");
-        
-        return statements.saveAsCSVFile(stockPricesFile);
+        _portfolioOptions.stockPrices.clear();
+        _portfolioOptions.stockPrices.putAll(goodStockPrices);
+        final File stockPricesFile = new File(directory + "portfolio-options.json");
+        return _portfolioOptions.save(stockPricesFile);
     }
 
     public boolean savePortfolio() {
@@ -2523,6 +2534,13 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         for (Stock stock : stocks) {
             if (false == portfolioTreeTableModel.updateStockLastPrice(stock)) {
                 this.realTimeStockMonitor.removeStockCode(stock.code);
+            } else {
+                if (stock.getLastPrice() > 0.0) {
+                    this.portfolioOptions.stockPrices.put(stock.code, stock.getLastPrice());
+                } else {
+                    this.portfolioOptions.stockPrices.put(stock.code, stock.getPrevPrice());
+                }
+                this.portfolioOptions.stockPricesDirty = true;
             }
         }
         
@@ -2535,7 +2553,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }  
 
     public long getTimestamp() {
-        return this.timestamp;
+        return this.portfolioOptions.stockPricesTimeStamp;
     }
     
     private void initGUIOptions() {
