@@ -40,7 +40,7 @@ import org.yccheok.jstock.engine.currency.CurrencyPair;
  *
  * @author yccheok
  */
-public class PortfolioOptions {    
+public class PortfolioRealTimeInfo {    
     // Avoid using interface class, so that our gson serialization & 
     // deserialization can work correctly.
     
@@ -57,26 +57,26 @@ public class PortfolioOptions {
     public transient volatile boolean exchangeRatesDirty = false;
     public transient volatile boolean currenciesDirty = false;
     
-    private static final Log log = LogFactory.getLog(PortfolioOptions.class);
+    private static final Log log = LogFactory.getLog(PortfolioRealTimeInfo.class);
     
-    public PortfolioOptions() {
+    public PortfolioRealTimeInfo() {
     }
     
-    public PortfolioOptions(PortfolioOptions portfolioOptions) {
-        copy(portfolioOptions);
+    public PortfolioRealTimeInfo(PortfolioRealTimeInfo portfolioRealTimeInfo) {
+        copy(portfolioRealTimeInfo);
     }
     
-    private void copy(PortfolioOptions portfolioOptions) {
+    private void copy(PortfolioRealTimeInfo portfolioRealTimeInfo) {
         stockPrices.clear();
         exchangeRates.clear();
         currencies.clear();
         
-        stockPrices.putAll(portfolioOptions.stockPrices);
-        exchangeRates.putAll(portfolioOptions.exchangeRates);
-        currencies.putAll(portfolioOptions.currencies);
+        stockPrices.putAll(portfolioRealTimeInfo.stockPrices);
+        exchangeRates.putAll(portfolioRealTimeInfo.exchangeRates);
+        currencies.putAll(portfolioRealTimeInfo.currencies);
         
-        stockPricesTimeStamp = portfolioOptions.stockPricesTimeStamp;
-        exchangeRatesTimeStamp = portfolioOptions.exchangeRatesTimeStamp;
+        stockPricesTimeStamp = portfolioRealTimeInfo.stockPricesTimeStamp;
+        exchangeRatesTimeStamp = portfolioRealTimeInfo.exchangeRatesTimeStamp;
 
         // I don't know what to do with dirty flags at this moment.
     }
@@ -91,12 +91,12 @@ public class PortfolioOptions {
         GsonBuilder builder = new GsonBuilder();
         Gson gson = builder.create();        
         
-        PortfolioOptions portfolioOptions = null;
+        PortfolioRealTimeInfo portfolioRealTimeInfo = null;
         
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));            
             try {
-                portfolioOptions = gson.fromJson(reader, PortfolioOptions.class);
+                portfolioRealTimeInfo = gson.fromJson(reader, PortfolioRealTimeInfo.class);
             } finally {
                 reader.close();
             }
@@ -106,11 +106,11 @@ public class PortfolioOptions {
             log.error(null, ex);
         } 
         
-        if (portfolioOptions == null) {
+        if (portfolioRealTimeInfo == null) {
             return false;
         }
         
-        copy(portfolioOptions);
+        copy(portfolioRealTimeInfo);
         
         return true;
     }
