@@ -263,6 +263,26 @@ public class Utils {
         return org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "portfolios" + File.separator + name + File.separator;
     }
     
+    public static String getPortfolioOptionsFilepath(Country country, String name) {
+        final String portfolioDirectory = org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory(country, name);
+        return portfolioDirectory + "portfolio-options.json";        
+    }
+
+    public static String getPortfolioOptionsFilepath(String name) {
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        return getPortfolioOptionsFilepath(jStockOptions.getCountry(), name);       
+    }
+
+    public static String getStockPricesFilepath(Country country, String name) {
+        final String portfolioDirectory = org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory(country, name);
+        return portfolioDirectory + "stockprices.csv";        
+    }
+
+    public static String getStockPricesFilepath(String name) {
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        return getStockPricesFilepath(jStockOptions.getCountry(), name);       
+    }
+    
     /**
      * Creates empty portfolio for current selected country.
      *
@@ -271,41 +291,19 @@ public class Utils {
     public static boolean createEmptyPortfolio(String name) {
         final String directory = getPortfolioDirectory(name);
 
-        // Note : Instead of creating multiple files, we will only create single 
-        // file for space optimization purpose. This is important as we are 
-        // going migrate to Android soon.
-
-        //final File buyPortfolioFile = new File(directory + "buyportfolio.csv");
-        //final File sellPortfolioFile = new File(directory + "sellportfolio.csv");
-        //final File dividendSummaryFile = new File(directory + "dividendsummary.csv");
-        //final File depositSummaryFile = new File(directory + "depositsummary.csv");        
-        final File stockPricesFile = new File(directory + "stockprices.csv");
+        final File portfolioOptionsFile = new File(getPortfolioOptionsFilepath(name));
+        final File stockPricesFile = new File(getStockPricesFilepath(name));
         
-        // Do not allow to create empty portfolio, if the desired location already
-        // contain portfolio files.
-        //if (buyPortfolioFile.exists() || sellPortfolioFile.exists() || dividendSummaryFile.exists() || depositSummaryFile.exists() || stockPricesFile.exists()) {
-        if (stockPricesFile.exists()) {
+        if (portfolioOptionsFile.exists() || stockPricesFile.exists()) {
             return false;
         }
         
         if (false == org.yccheok.jstock.gui.Utils.createCompleteDirectoryHierarchyIfDoesNotExist(directory)) {
             return false;
         }
-        
-        //final Statements statements0 = Statements.newInstanceFromBuyPortfolioTreeTableModel(new BuyPortfolioTreeTableModelEx(), true);
-        //final Statements statements1 = Statements.newInstanceFromSellPortfolioTreeTableModel(new SellPortfolioTreeTableModelEx(), true);
-        //final Statements statements2 = Statements.newInstanceFromTableModel(new DividendSummaryTableModel(new DividendSummary()), true);
-        //final Statements statements3 = Statements.newInstanceFromTableModel(new DepositSummaryTableModel(new DepositSummary()), true);
-        final Statements statements4 = Statements.newInstanceFromStockPrices(java.util.Collections.<Code, Double> emptyMap(), 0);
-        
-        boolean status = true;
-        //status = status & statements0.saveAsCSVFile(buyPortfolioFile);
-        //status = status & statements1.saveAsCSVFile(sellPortfolioFile);
-        //status = status & statements2.saveAsCSVFile(dividendSummaryFile);
-        //status = status & statements3.saveAsCSVFile(depositSummaryFile);
-        status = status & statements4.saveAsCSVFile(stockPricesFile);
-        
-        return status;
+                
+        PortfolioOptions portfolioOptions = new PortfolioOptions();
+        return portfolioOptions.save(portfolioOptionsFile);
     }
 
     /**

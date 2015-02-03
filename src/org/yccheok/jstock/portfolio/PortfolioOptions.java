@@ -21,12 +21,15 @@ package org.yccheok.jstock.portfolio;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.Code;
@@ -37,27 +40,71 @@ import org.yccheok.jstock.engine.currency.CurrencyPair;
  *
  * @author yccheok
  */
-public class PortfolioOptions {
-    
+public class PortfolioOptions {    
     // Avoid using interface class, so that our gson serialization & 
     // deserialization can work correctly.
-    public final HashMap<Code, Double> stockPrices = new HashMap<>();
     
-    // Avoid using ExchangeRateLookup. As once we perform serialization on
-    // ExchangeRateLookup, it is very difficult to evolve its design. We better
-    // stick with simple data structure.
-    public final HashMap<CurrencyPair, Double> exchangeRates = new HashMap<>();
+    public final ConcurrentHashMap<Code, Double> stockPrices = new ConcurrentHashMap<>();
     
-    public final HashMap<Code, Currency> currencies = new HashMap<>();
+    public final ConcurrentHashMap<CurrencyPair, Double> exchangeRates = new ConcurrentHashMap<>();
+    
+    public final ConcurrentHashMap<Code, Currency> currencies = new ConcurrentHashMap<>();
     
     public long stockPricesTimeStamp = 0;
     public long exchangeRatesTimeStamp = 0;
     
-    public volatile boolean stockPricesDirty = false;
-    public volatile boolean exchangeRatesDirty = false;
-    public volatile boolean currenciesDirty = false;
+    public transient volatile boolean stockPricesDirty = false;
+    public transient volatile boolean exchangeRatesDirty = false;
+    public transient volatile boolean currenciesDirty = false;
     
     private static final Log log = LogFactory.getLog(PortfolioOptions.class);
+    
+    private void copy(PortfolioOptions portfolioOptions) {
+        stockPrices.clear();
+        exchangeRates.clear();
+        currencies.clear();
+        
+        stockPrices.putAll(portfolioOptions.stockPrices);
+        exchangeRates.putAll(portfolioOptions.exchangeRates);
+        currencies.putAll(portfolioOptions.currencies);
+        
+        stockPricesTimeStamp = portfolioOptions.stockPricesTimeStamp;
+        exchangeRatesTimeStamp = portfolioOptions.exchangeRatesTimeStamp;
+    }
+    
+    public boolean load(File file) {
+        assert(file != null);
+
+        if (false == file.isFile()) {
+            return false;
+        }
+        
+        GsonBuilder builder = new GsonBuilder();
+        Gson gson = builder.create();        
+        
+        PortfolioOptions portfolioOptions = null;
+        
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));            
+            try {
+                portfolioOptions = gson.fromJson(reader, PortfolioOptions.class);
+            } finally {
+                reader.close();
+            }
+        } catch (IOException ex){
+            log.error(null, ex);
+        } catch (com.google.gson.JsonSyntaxException ex) {
+            log.error(null, ex);
+        } 
+        
+        if (portfolioOptions == null) {
+            return false;
+        }
+        
+        copy(portfolioOptions);
+        
+        return true;
+    }
     
     public boolean save(File file) {
         GsonBuilder builder = new GsonBuilder();
