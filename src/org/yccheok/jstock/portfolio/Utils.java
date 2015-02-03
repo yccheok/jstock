@@ -263,24 +263,34 @@ public class Utils {
         return org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "portfolios" + File.separator + name + File.separator;
     }
     
-    public static String getPortfolioOptionsFilepath(Country country, String name) {
+    private static String getPortfolioOptionsFilepath(Country country, String name) {
         final String portfolioDirectory = org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory(country, name);
         return portfolioDirectory + "portfolio-options.json";        
     }
 
-    public static String getPortfolioOptionsFilepath(String name) {
+    private static String getPortfolioOptionsFilepath(String name) {
         final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         return getPortfolioOptionsFilepath(jStockOptions.getCountry(), name);       
     }
 
-    public static String getStockPricesFilepath(Country country, String name) {
+    public static String getPortfolioOptionsFilepath() {
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        return getPortfolioOptionsFilepath(jStockOptions.getPortfolioName());       
+    }
+    
+    private static String getStockPricesFilepath(Country country, String name) {
         final String portfolioDirectory = org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory(country, name);
         return portfolioDirectory + "stockprices.csv";        
     }
 
-    public static String getStockPricesFilepath(String name) {
+    private static String getStockPricesFilepath(String name) {
         final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         return getStockPricesFilepath(jStockOptions.getCountry(), name);       
+    }
+
+    public static String getStockPricesFilepath() {
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        return getStockPricesFilepath(jStockOptions.getPortfolioName());       
     }
     
     /**

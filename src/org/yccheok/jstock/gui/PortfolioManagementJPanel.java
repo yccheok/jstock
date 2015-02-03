@@ -2005,7 +2005,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         if (openAsCSVFile(buyPortfolioFile) == false) {
             // If CSV file is not there, consider this as empty record. This is
-            // because in createEmptyPortfolio, we only create stockprices.csv,
+            // because in createEmptyPortfolio, we only create portfolio-options.json,
             // for space and speed optimization purpose.            
             if (buyPortfolioFile.exists()) {
                 // Either CSV format is corrupted.
@@ -2014,7 +2014,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
         if (openAsCSVFile(sellPortfolioFile) == false) {
             // If CSV file is not there, consider this as empty record. This is
-            // because in createEmptyPortfolio, we only create stockprices.csv,
+            // because in createEmptyPortfolio, we only create portfolio-options.json,
             // for space and speed optimization purpose.            
             if (sellPortfolioFile.exists()) {
                 // Either CSV format is corrupted.
@@ -2023,7 +2023,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
         if (openAsCSVFile(dividendSummaryFile) == false) {
             // If CSV file is not there, consider this as empty record. This is
-            // because in createEmptyPortfolio, we only create stockprices.csv,
+            // because in createEmptyPortfolio, we only create portfolio-options.json,
             // for space and speed optimization purpose.            
             if (dividendSummaryFile.exists()) {
                 // Either CSV format is corrupted.
@@ -2032,7 +2032,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }        
         if (openAsCSVFile(depositSummaryFile) == false) {
             // If CSV file is not there, consider this as empty record. This is
-            // because in createEmptyPortfolio, we only create stockprices.csv,
+            // because in createEmptyPortfolio, we only create portfolio-options.json,
             // for space and speed optimization purpose.            
             if (depositSummaryFile.exists()) {
                 // Either CSV format is corrupted.
@@ -2040,7 +2040,17 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             }
         }
         
-        this.timestamp = initCSVStockPrices();
+        File portfolioOptionsFile = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioOptionsFilepath());
+        PortfolioOptions portfolioOptions = new PortfolioOptions();
+        boolean status = portfolioOptions.load(portfolioOptionsFile);
+        if (false == status) {
+            Pair<HashMap<Code, Double>, Long> csvStockPrices = this.initCSVStockPrices();
+            portfolioOptions.stockPrices.putAll(csvStockPrices.first);
+            portfolioOptions.stockPricesTimeStamp = csvStockPrices.second;
+            portfolioOptions.stockPricesDirty = !portfolioOptions.stockPrices.isEmpty();
+        }
+        
+        this.portfolioOptions = portfolioOptions;
         
         refershGUIAfterInitPortfolio(
                 (BuyPortfolioTreeTableModelEx)PortfolioManagementJPanel.this.buyTreeTable.getTreeTableModel(), 
@@ -2285,11 +2295,12 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             timestamp
         );
     }
-
-    private long initCSVStockPrices() {
-        final File stockPricesFile = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "stockprices.csv");
+    
+    @Deprecated
+    private Pair<HashMap<Code, Double>, Long> initCSVStockPrices() {
+        File stockPricesFile = new File(org.yccheok.jstock.portfolio.Utils.getStockPricesFilepath());
         
-        final Map<Code, Double> stockPrices = new LinkedHashMap<Code, Double>();
+        final HashMap<Code, Double> stockPrices = new HashMap<>();
         
         Statements statements = Statements.newInstanceFromCSVFile(stockPricesFile);
         
@@ -2325,7 +2336,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             log.error(null, ex);
         }
         
-        return _timestamp;
+        return Pair.create(stockPrices, _timestamp);
     }
     
     private static boolean saveCSVStockPrices(String directory, BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModelEx, long timestamp) {
@@ -2336,7 +2347,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         // information, as we do not update stockPrices immediately during
         // transaction summary deletion.
         Map<Code, Double> stockPrices = buyPortfolioTreeTableModelEx.getStockPrices();
-        Map<Code, Double> goodStockPrices = new HashMap<Code, Double>();
+        Map<Code, Double> goodStockPrices = new HashMap<>();
         final Portfolio portfolio = (Portfolio)buyPortfolioTreeTableModelEx.getRoot();
         final int count = portfolio.getChildCount();
         for (int i = 0; i < count; i++) {
@@ -2833,7 +2844,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private final org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, List<Stock>> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
     private final org.yccheok.jstock.engine.Observer<ExchangeRateMonitor, List<ExchangeRate>> exchangeRateMonitorObserver = this.getExchangeRateMonitorObserver();
 
-    private long timestamp = 0;
+    private PortfolioOptions portfolioOptions = new PortfolioOptions();
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private org.yccheok.jstock.gui.treetable.SortableTreeTable buyTreeTable;

@@ -60,10 +60,6 @@ public class PortfolioOptions {
     private static final Log log = LogFactory.getLog(PortfolioOptions.class);
     
     private void copy(PortfolioOptions portfolioOptions) {
-        stockPrices.clear();
-        exchangeRates.clear();
-        currencies.clear();
-        
         stockPrices.putAll(portfolioOptions.stockPrices);
         exchangeRates.putAll(portfolioOptions.exchangeRates);
         currencies.putAll(portfolioOptions.currencies);
