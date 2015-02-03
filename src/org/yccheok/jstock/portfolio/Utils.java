@@ -263,19 +263,19 @@ public class Utils {
         return org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "portfolios" + File.separator + name + File.separator;
     }
     
-    private static String getPortfolioOptionsFilepath(Country country, String name) {
+    private static String getPortfolioRealTimeInfoFilepath(Country country, String name) {
         final String portfolioDirectory = org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory(country, name);
-        return portfolioDirectory + "portfolio-options.json";        
+        return portfolioDirectory + "portfolio-real-time-info.json";        
     }
 
-    private static String getPortfolioOptionsFilepath(String name) {
+    private static String getPortfolioRealTimeInfoFilepath(String name) {
         final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
-        return getPortfolioOptionsFilepath(jStockOptions.getCountry(), name);       
+        return getPortfolioRealTimeInfoFilepath(jStockOptions.getCountry(), name);       
     }
 
-    public static String getPortfolioOptionsFilepath() {
+    public static String getPortfolioRealTimeInfoFilepath() {
         final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
-        return getPortfolioOptionsFilepath(jStockOptions.getPortfolioName());       
+        return getPortfolioRealTimeInfoFilepath(jStockOptions.getPortfolioName());       
     }
     
     private static String getStockPricesFilepath(Country country, String name) {
@@ -301,10 +301,10 @@ public class Utils {
     public static boolean createEmptyPortfolio(String name) {
         final String directory = getPortfolioDirectory(name);
 
-        final File portfolioOptionsFile = new File(getPortfolioOptionsFilepath(name));
+        final File portfolioRealTimeInfoFile = new File(getPortfolioRealTimeInfoFilepath(name));
         final File stockPricesFile = new File(getStockPricesFilepath(name));
         
-        if (portfolioOptionsFile.exists() || stockPricesFile.exists()) {
+        if (portfolioRealTimeInfoFile.exists() || stockPricesFile.exists()) {
             return false;
         }
         
@@ -312,8 +312,8 @@ public class Utils {
             return false;
         }
                 
-        PortfolioOptions portfolioOptions = new PortfolioOptions();
-        return portfolioOptions.save(portfolioOptionsFile);
+        PortfolioRealTimeInfo portfolioRealTimeInfo = new PortfolioRealTimeInfo();
+        return portfolioRealTimeInfo.save(portfolioRealTimeInfoFile);
     }
 
     /**
@@ -342,7 +342,7 @@ public class Utils {
         String[] files = file.list();
         List<String> list = Arrays.asList(files);
         //return list.contains("stockprices.csv") && list.contains("buyportfolio.csv") && list.contains("sellportfolio.csv") && list.contains("depositsummary.csv") && list.contains("dividendsummary.csv");
-        return list.contains("stockprices.csv") || list.contains("portfolio-options.json");
+        return list.contains("stockprices.csv") || list.contains("portfolio-real-time-info.json");
     }
 
     /**
@@ -388,10 +388,10 @@ public class Utils {
             } else {
                 // Only seek for 1st level directory.
                 for (File child : children) {
-                    File portfolioOptionsFile = new File(child, "portfolio-options.json");
-                    PortfolioOptions portfolioOptions = new PortfolioOptions();
-                    if (portfolioOptions.load(portfolioOptionsFile)) {
-                        final int lines = portfolioOptions.stockPrices.size();
+                    File portfolioRealTimeInfoFile = new File(child, "portfolio-real-time-info.json");
+                    PortfolioRealTimeInfo portfolioRealTimeInfo = new PortfolioRealTimeInfo();
+                    if (portfolioRealTimeInfo.load(portfolioRealTimeInfoFile)) {
+                        final int lines = portfolioRealTimeInfo.stockPrices.size();
                         if (lines > 0) {
                             PortfolioInfo portfolioInfo = PortfolioInfo.newInstance(country, child.getName(), lines);
                             portfolioInfos.add(portfolioInfo);

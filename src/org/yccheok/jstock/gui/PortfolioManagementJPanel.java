@@ -2005,7 +2005,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         if (openAsCSVFile(buyPortfolioFile) == false) {
             // If CSV file is not there, consider this as empty record. This is
-            // because in createEmptyPortfolio, we only create portfolio-options.json,
+            // because in createEmptyPortfolio, we only create portfolio-real-time-info.json,
             // for space and speed optimization purpose.            
             if (buyPortfolioFile.exists()) {
                 // Either CSV format is corrupted.
@@ -2014,7 +2014,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
         if (openAsCSVFile(sellPortfolioFile) == false) {
             // If CSV file is not there, consider this as empty record. This is
-            // because in createEmptyPortfolio, we only create portfolio-options.json,
+            // because in createEmptyPortfolio, we only create portfolio-real-time-info.json,
             // for space and speed optimization purpose.            
             if (sellPortfolioFile.exists()) {
                 // Either CSV format is corrupted.
@@ -2023,7 +2023,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
         if (openAsCSVFile(dividendSummaryFile) == false) {
             // If CSV file is not there, consider this as empty record. This is
-            // because in createEmptyPortfolio, we only create portfolio-options.json,
+            // because in createEmptyPortfolio, we only create portfolio-real-time-info.json,
             // for space and speed optimization purpose.            
             if (dividendSummaryFile.exists()) {
                 // Either CSV format is corrupted.
@@ -2032,7 +2032,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }        
         if (openAsCSVFile(depositSummaryFile) == false) {
             // If CSV file is not there, consider this as empty record. This is
-            // because in createEmptyPortfolio, we only create portfolio-options.json,
+            // because in createEmptyPortfolio, we only create portfolio-real-time-info.json,
             // for space and speed optimization purpose.            
             if (depositSummaryFile.exists()) {
                 // Either CSV format is corrupted.
@@ -2040,26 +2040,26 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             }
         }
         
-        File portfolioOptionsFile = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioOptionsFilepath());
-        PortfolioOptions _portfolioOptions = new PortfolioOptions();
-        boolean status = _portfolioOptions.load(portfolioOptionsFile);
+        File portfolioRealTimeInfoFile = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioRealTimeInfoFilepath());
+        PortfolioRealTimeInfo _portfolioRealTimeInfo = new PortfolioRealTimeInfo();
+        boolean status = _portfolioRealTimeInfo.load(portfolioRealTimeInfoFile);
         if (false == status) {
             Pair<HashMap<Code, Double>, Long> csvStockPrices = this.initCSVStockPrices();
-            _portfolioOptions.stockPrices.putAll(csvStockPrices.first);
-            _portfolioOptions.stockPricesTimeStamp = csvStockPrices.second;
-            _portfolioOptions.stockPricesDirty = !_portfolioOptions.stockPrices.isEmpty();
+            _portfolioRealTimeInfo.stockPrices.putAll(csvStockPrices.first);
+            _portfolioRealTimeInfo.stockPricesTimeStamp = csvStockPrices.second;
+            _portfolioRealTimeInfo.stockPricesDirty = !_portfolioRealTimeInfo.stockPrices.isEmpty();
         } else {
             final BuyPortfolioTreeTableModelEx portfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
 
             // Initialization.
-            for (Map.Entry<Code, Double> entry : _portfolioOptions.stockPrices.entrySet()) {
+            for (Map.Entry<Code, Double> entry : _portfolioRealTimeInfo.stockPrices.entrySet()) {
                 Code code = entry.getKey();
                 Double price = entry.getValue();
                 portfolioTreeTableModel.updateStockLastPrice(code, price);
             }
         }
         
-        this.portfolioOptions = _portfolioOptions;
+        this.portfolioRealTimeInfo = _portfolioRealTimeInfo;
         
         refershGUIAfterInitPortfolio(
                 (BuyPortfolioTreeTableModelEx)PortfolioManagementJPanel.this.buyTreeTable.getTreeTableModel(), 
@@ -2219,7 +2219,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
     }
 
-    public static boolean saveCSVPortfolio(String directory, CSVPortfolio csvPortfolio, PortfolioOptions portfolioOptions) {
+    public static boolean saveCSVPortfolio(String directory, CSVPortfolio csvPortfolio, PortfolioRealTimeInfo portfolioRealTimeInfo) {
         if (Utils.createCompleteDirectoryHierarchyIfDoesNotExist(directory) == false)
         {
             return false;
@@ -2292,7 +2292,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             }
         }
         
-        boolean status = savePortfolioOptions(directory, csvPortfolio.buyPortfolioTreeTableModel, portfolioOptions);
+        boolean status = savePortfolioRealTimeInfo(directory, csvPortfolio.buyPortfolioTreeTableModel, portfolioRealTimeInfo);
         
         if (status) {
             // Legacy file.
@@ -2304,10 +2304,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
     
     private boolean saveCSVPortfolio() {
-        return saveCSVPortfolio(
-            org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory(), 
+        return saveCSVPortfolio(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory(), 
             CSVPortfolio.newInstance((BuyPortfolioTreeTableModelEx)this.buyTreeTable.getTreeTableModel(), (SellPortfolioTreeTableModelEx)this.sellTreeTable.getTreeTableModel(), this.dividendSummary, this.depositSummary),
-            this.portfolioOptions
+            this.portfolioRealTimeInfo
         );
     }
     
@@ -2354,8 +2353,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         return Pair.create(stockPrices, _timestamp);
     }
     
-    private static boolean savePortfolioOptions(String directory, BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModelEx, PortfolioOptions portfolioOptions) {
-        PortfolioOptions _portfolioOptions = new PortfolioOptions(portfolioOptions);
+    private static boolean savePortfolioRealTimeInfo(String directory, BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModelEx, PortfolioRealTimeInfo portfolioRealTimeInfo) {
+        PortfolioRealTimeInfo _portfolioRealTimeInfo = new PortfolioRealTimeInfo(portfolioRealTimeInfo);
         
         Map<Code, Double> goodStockPrices = new HashMap<>();
         final Portfolio portfolio = (Portfolio)buyPortfolioTreeTableModelEx.getRoot();
@@ -2365,7 +2364,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             assert(transactionSummary.getChildCount() > 0);            
             final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
             final Code code = transaction.getStock().code;
-            final Double price = _portfolioOptions.stockPrices.get(code);
+            final Double price = _portfolioRealTimeInfo.stockPrices.get(code);
             if (price == null) {
                 goodStockPrices.put(code, 0.0);
             } else {
@@ -2373,10 +2372,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             }
         }
         
-        _portfolioOptions.stockPrices.clear();
-        _portfolioOptions.stockPrices.putAll(goodStockPrices);
-        final File stockPricesFile = new File(directory + "portfolio-options.json");
-        return _portfolioOptions.save(stockPricesFile);
+        _portfolioRealTimeInfo.stockPrices.clear();
+        _portfolioRealTimeInfo.stockPrices.putAll(goodStockPrices);
+        final File stockPricesFile = new File(directory + "portfolio-real-time-info.json");
+        return _portfolioRealTimeInfo.save(stockPricesFile);
     }
 
     public boolean savePortfolio() {
@@ -2536,24 +2535,24 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 this.realTimeStockMonitor.removeStockCode(stock.code);
             } else {
                 if (stock.getLastPrice() > 0.0) {
-                    this.portfolioOptions.stockPrices.put(stock.code, stock.getLastPrice());
+                    this.portfolioRealTimeInfo.stockPrices.put(stock.code, stock.getLastPrice());
                 } else {
-                    this.portfolioOptions.stockPrices.put(stock.code, stock.getPrevPrice());
+                    this.portfolioRealTimeInfo.stockPrices.put(stock.code, stock.getPrevPrice());
                 }
-                this.portfolioOptions.stockPricesDirty = true;
+                this.portfolioRealTimeInfo.stockPricesDirty = true;
             }
         }
         
         updateWealthHeader();
         
         // Update status bar with current time string.
-        this.portfolioOptions.stockPricesTimeStamp = System.currentTimeMillis();
+        this.portfolioRealTimeInfo.stockPricesTimeStamp = System.currentTimeMillis();
         
         JStock.getInstance().updateStatusBarWithLastUpdateDateMessageIfPossible();     
     }  
 
     public long getTimestamp() {
-        return this.portfolioOptions.stockPricesTimeStamp;
+        return this.portfolioRealTimeInfo.stockPricesTimeStamp;
     }
     
     private void initGUIOptions() {
@@ -2860,7 +2859,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private final org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, List<Stock>> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
     private final org.yccheok.jstock.engine.Observer<ExchangeRateMonitor, List<ExchangeRate>> exchangeRateMonitorObserver = this.getExchangeRateMonitorObserver();
 
-    private PortfolioOptions portfolioOptions = new PortfolioOptions();
+    private PortfolioRealTimeInfo portfolioRealTimeInfo = new PortfolioRealTimeInfo();
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private org.yccheok.jstock.gui.treetable.SortableTreeTable buyTreeTable;
