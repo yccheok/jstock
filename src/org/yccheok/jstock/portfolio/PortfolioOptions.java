@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2015 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2015 Yan Cheng Cheok <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,8 +19,18 @@
 
 package org.yccheok.jstock.portfolio;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.HashMap;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.Code;
+import org.yccheok.jstock.engine.currency.Currency;
 import org.yccheok.jstock.engine.currency.CurrencyPair;
 
 /**
@@ -28,6 +38,7 @@ import org.yccheok.jstock.engine.currency.CurrencyPair;
  * @author yccheok
  */
 public class PortfolioOptions {
+    
     // Avoid using interface class, so that our gson serialization & 
     // deserialization can work correctly.
     public final HashMap<Code, Double> stockPrices = new HashMap<>();
@@ -37,6 +48,35 @@ public class PortfolioOptions {
     // stick with simple data structure.
     public final HashMap<CurrencyPair, Double> exchangeRates = new HashMap<>();
     
+    public final HashMap<Code, Currency> currencies = new HashMap<>();
+    
     public long stockPricesTimeStamp = 0;
     public long exchangeRatesTimeStamp = 0;
+    
+    public volatile boolean stockPricesDirty = false;
+    public volatile boolean exchangeRatesDirty = false;
+    public volatile boolean currenciesDirty = false;
+    
+    private static final Log log = LogFactory.getLog(PortfolioOptions.class);
+    
+    public boolean save(File file) {
+        GsonBuilder builder = new GsonBuilder();
+        builder.enableComplexMapKeySerialization();
+        Gson gson = builder.create(); 
+        String string = gson.toJson(this);
+        
+        try {
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
+            try {
+                writer.write(string);
+            } finally {
+                writer.close();
+            }
+        } catch (IOException ex){
+            log.error(null, ex);
+            return false;
+        }
+        
+        return true;
+    }
 }
