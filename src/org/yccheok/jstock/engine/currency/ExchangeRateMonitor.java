@@ -114,11 +114,11 @@ public class ExchangeRateMonitor extends Subject<ExchangeRateMonitor, List<Excha
         String to = currencyPair.to().toString();
         
         if (from.equals(GBX)) {
-            from = GBX;
+            from = "GBP";
         }
         
         if (to.equals(GBX)) {
-            to = GBX;
+            to = "GBP";
         }
         
         if (from.equals(currencyPair.from().toString()) && to.equals(currencyPair.to().toString())) {
