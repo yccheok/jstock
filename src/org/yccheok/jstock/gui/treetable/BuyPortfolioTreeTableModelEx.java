@@ -20,11 +20,6 @@
 package org.yccheok.jstock.gui.treetable;
 
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import org.jdesktop.swingx.treetable.*;
 import org.yccheok.jstock.portfolio.*;
 import javax.swing.tree.TreePath;
@@ -41,20 +36,15 @@ import org.yccheok.jstock.internationalization.GUIBundle;
  * @author yccheok
  */
 public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableModelEx {
-    // Can be either stock last price or open price. If stock last price is 0
-    // at current moment (Usually, this means no transaction has been done on
-    // that day), open price will be applied.
-    private final java.util.Map<Code, Double> stockPrice = new ConcurrentHashMap<>();
+    
+    private PortfolioRealTimeInfo portfolioRealTimeInfo = new PortfolioRealTimeInfo();
+            
+    public void bind(PortfolioRealTimeInfo portfolioRealTimeInfo) {
+        this.portfolioRealTimeInfo = portfolioRealTimeInfo;
+    }
     
     public BuyPortfolioTreeTableModelEx() {
         super(Arrays.asList(columnNames));
-    }
-    
-    public double getStockPrice(Code code) {
-        Object price = stockPrice.get(code);
-        if (price == null) return 0.0;
-                
-        return (Double)price;
     }
     
     // Names of the columns.
@@ -140,7 +130,7 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
         return status;
     }
 
-    public boolean updateStockLastPrice(Code code, double price) {
+    public boolean refresh(Code code) {
         final Portfolio portfolio = (Portfolio)getRoot();
         final int count = portfolio.getChildCount();
         
@@ -164,23 +154,14 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
         }
         
         if (null == transactionSummary) {
-            // This stock is not found in transaction records. Reduce memory 
-            // usage, and returns false early.
-            stockPrice.remove(code);
             return false;
         }
         
         final int num = transactionSummary.getChildCount();
 
         if (num == 0) {
-            // Reduce memory usage, and returns false early.            
-            stockPrice.remove(code);
             return false;
         }
-
-        // Only update stockPrice map if this stock is found in transaction
-        // records.
-        stockPrice.put(code, price);
 
         for (int i = 0; i < num; i++) {
             final Transaction transaction = (Transaction)transactionSummary.getChildAt(i);
@@ -194,17 +175,9 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
         return true;        
     }
     
-    public boolean updateStockLastPrice(org.yccheok.jstock.engine.Stock stock) {
-        if (stock.getLastPrice() > 0.0) {
-            return updateStockLastPrice(stock.code, stock.getLastPrice());
-        } else {
-            return updateStockLastPrice(stock.code, stock.getPrevPrice());
-        }
-    }
-    
     public double getCurrentValue(Transaction transaction) {
         final Code code = transaction.getStock().code;
-        final Double price = this.stockPrice.get(code);
+        final Double price = this.portfolioRealTimeInfo.stockPrices.get(code);
 
         if (price == null) return 0.0;
         
@@ -216,7 +189,7 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
         
         final Code code = transaction.getStock().code;
         
-        final Double price = this.stockPrice.get(code);
+        final Double price = this.portfolioRealTimeInfo.stockPrices.get(code);
 
         if (price == null) return 0.0;
         
@@ -226,7 +199,7 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
     public double getCurrentPrice(Transaction transaction) {
         final Code code = transaction.getStock().code;
         
-        final Double price = this.stockPrice.get(code);
+        final Double price = this.portfolioRealTimeInfo.stockPrices.get(code);
 
         if (price == null) return 0.0;
         
@@ -238,7 +211,7 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
         
         final Code code = transaction.getStock().code;
 
-        final Double price = this.stockPrice.get(code);
+        final Double price = this.portfolioRealTimeInfo.stockPrices.get(code);
 
         if (price == null) return 0.0;
         

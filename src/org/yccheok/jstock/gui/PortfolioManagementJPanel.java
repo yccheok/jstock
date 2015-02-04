@@ -35,7 +35,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -953,8 +952,11 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
     
     public double getStockPrice(Code code) {
-        final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
-        return buyPortfolioTreeTableModel.getStockPrice(code);
+        Double price = portfolioRealTimeInfo.stockPrices.get(code);
+        if (price == null) {
+            return 0.0;
+        }
+        return price;
     }
 
     private void showNewSellTransactionJDialog(List<Transaction> buyTransactions) {
@@ -2044,28 +2046,22 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         PortfolioRealTimeInfo _portfolioRealTimeInfo = new PortfolioRealTimeInfo();
         boolean status = _portfolioRealTimeInfo.load(portfolioRealTimeInfoFile);
         if (false == status) {
-            Pair<HashMap<Code, Double>, Long> csvStockPrices = this.initCSVStockPrices();
+            Pair<HashMap<Code, Double>, Long> csvStockPrices = this.getCSVStockPrices();
             _portfolioRealTimeInfo.stockPrices.putAll(csvStockPrices.first);
             _portfolioRealTimeInfo.stockPricesTimeStamp = csvStockPrices.second;
             _portfolioRealTimeInfo.stockPricesDirty = !_portfolioRealTimeInfo.stockPrices.isEmpty();
-        } else {
-            final BuyPortfolioTreeTableModelEx portfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
-
-            // Initialization.
-            for (Map.Entry<Code, Double> entry : _portfolioRealTimeInfo.stockPrices.entrySet()) {
-                Code code = entry.getKey();
-                Double price = entry.getValue();
-                portfolioTreeTableModel.updateStockLastPrice(code, price);
-            }
         }
-        
+
+        final BuyPortfolioTreeTableModelEx portfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
+        portfolioTreeTableModel.bind(_portfolioRealTimeInfo);
+
         this.portfolioRealTimeInfo = _portfolioRealTimeInfo;
         
         refershGUIAfterInitPortfolio(
-                (BuyPortfolioTreeTableModelEx)PortfolioManagementJPanel.this.buyTreeTable.getTreeTableModel(), 
-                (SellPortfolioTreeTableModelEx)PortfolioManagementJPanel.this.sellTreeTable.getTreeTableModel(), 
-                this.dividendSummary,
-                this.depositSummary);
+            (BuyPortfolioTreeTableModelEx)PortfolioManagementJPanel.this.buyTreeTable.getTreeTableModel(), 
+            (SellPortfolioTreeTableModelEx)PortfolioManagementJPanel.this.sellTreeTable.getTreeTableModel(), 
+            this.dividendSummary,
+            this.depositSummary);
 
         return true;
     }
@@ -2311,7 +2307,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
     
     @Deprecated
-    private Pair<HashMap<Code, Double>, Long> initCSVStockPrices() {
+    private Pair<HashMap<Code, Double>, Long> getCSVStockPrices() {
         File stockPricesFile = new File(org.yccheok.jstock.portfolio.Utils.getStockPricesFilepath());
         
         final HashMap<Code, Double> stockPrices = new HashMap<>();
@@ -2332,15 +2328,6 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 Code code = Code.newInstance(codeStr);
                 stockPrices.put(code, price);
             }
-        }
-        
-        final BuyPortfolioTreeTableModelEx portfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
- 
-        // Initialization.
-        for (Map.Entry<Code, Double> entry : stockPrices.entrySet()) {
-            Code code = entry.getKey();
-            Double price = entry.getValue();
-            portfolioTreeTableModel.updateStockLastPrice(code, price);
         }
 
         long _timestamp = 0;
@@ -2531,14 +2518,25 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         final BuyPortfolioTreeTableModelEx portfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
  
         for (Stock stock : stocks) {
-            if (false == portfolioTreeTableModel.updateStockLastPrice(stock)) {
-                this.realTimeStockMonitor.removeStockCode(stock.code);
+            final Code code = stock.code;
+            final Map<Code, Double> stockPrices = this.portfolioRealTimeInfo.stockPrices;
+            final int sizeBeforePut = stockPrices.size();
+            
+            if (stock.getLastPrice() > 0.0) {
+                stockPrices.put(code, stock.getLastPrice());
             } else {
-                if (stock.getLastPrice() > 0.0) {
-                    this.portfolioRealTimeInfo.stockPrices.put(stock.code, stock.getLastPrice());
-                } else {
-                    this.portfolioRealTimeInfo.stockPrices.put(stock.code, stock.getPrevPrice());
+                stockPrices.put(code, stock.getPrevPrice());
+            }
+
+            if (false == portfolioTreeTableModel.refresh(code)) {
+                this.realTimeStockMonitor.removeStockCode(code);
+                stockPrices.remove(code);
+                final int sizeAfterRemove = stockPrices.size();
+                
+                if (sizeBeforePut != sizeAfterRemove) {
+                    this.portfolioRealTimeInfo.stockPricesDirty = true;
                 }
+            } else {
                 this.portfolioRealTimeInfo.stockPricesDirty = true;
             }
         }
