@@ -2520,7 +2520,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         for (Stock stock : stocks) {
             final Code code = stock.code;
             final Map<Code, Double> stockPrices = this.portfolioRealTimeInfo.stockPrices;
-            final int sizeBeforePut = stockPrices.size();
+            final Map<Code, Currency> currencies = this.portfolioRealTimeInfo.currencies;
+            
+            final int stockPricesSizeBeforePut = stockPrices.size();
+            final int currenciesSizeBeforePut = currencies.size();
             
             if (stock.getLastPrice() > 0.0) {
                 stockPrices.put(code, stock.getLastPrice());
@@ -2528,16 +2531,30 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 stockPrices.put(code, stock.getPrevPrice());
             }
 
+            Currency currency = stock.getCurrency();
+            // ConcurrentHashMap doesn't support null value.
+            // http://stackoverflow.com/questions/698638/why-does-concurrenthashmap-prevent-null-keys-and-values
+            if (currency != null) {
+                currencies.put(code, currency);
+            }
+            
             if (false == portfolioTreeTableModel.refresh(code)) {
                 this.realTimeStockMonitor.removeStockCode(code);
                 stockPrices.remove(code);
-                final int sizeAfterRemove = stockPrices.size();
+                currencies.remove(code);
+                final int stockPricesSizeAfterRemove = stockPrices.size();
+                final int currenciesSizeAfterRemove = stockPrices.size();
                 
-                if (sizeBeforePut != sizeAfterRemove) {
+                if (stockPricesSizeBeforePut != stockPricesSizeAfterRemove) {
                     this.portfolioRealTimeInfo.stockPricesDirty = true;
+                }
+                
+                if (currenciesSizeBeforePut != currenciesSizeAfterRemove) {
+                    this.portfolioRealTimeInfo.currenciesDirty = true;
                 }
             } else {
                 this.portfolioRealTimeInfo.stockPricesDirty = true;
+                this.portfolioRealTimeInfo.currenciesDirty = true;
             }
         }
         

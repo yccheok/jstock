@@ -35,7 +35,6 @@ import org.yccheok.jstock.engine.currency.Currency;
 import org.yccheok.jstock.engine.currency.CurrencyPair;
 import org.yccheok.jstock.engine.currency.ExchangeRate;
 import org.yccheok.jstock.engine.currency.ExchangeRateLookup;
-import org.yccheok.jstock.file.Statements;
 import org.yccheok.jstock.gui.JStockOptions;
 import org.yccheok.jstock.gui.JStock;
 

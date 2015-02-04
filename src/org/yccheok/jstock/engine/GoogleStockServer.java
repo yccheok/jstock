@@ -400,6 +400,7 @@ public class GoogleStockServer implements StockServer {
                 .lowPrice(lo)
                 .volume(vo)
                 .changePricePercentage(cp)
+                .currency(currency)
                 .build();
         return Pair.create(stock, true);
     }
@@ -413,6 +414,7 @@ public class GoogleStockServer implements StockServer {
         currencySymbolToCurrencyCodeMap.put("CN\u00A5", "CNY");
         currencySymbolToCurrencyCodeMap.put("NZ$", "NZD");
         currencySymbolToCurrencyCodeMap.put("NT$", "TWD");
+        currencySymbolToCurrencyCodeMap.put("\u00A3", "GBP");
     }
 
     private static final int SYMBOL_MAX_LENGTH = 17;
