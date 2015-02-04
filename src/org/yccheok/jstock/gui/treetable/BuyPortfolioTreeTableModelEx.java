@@ -655,13 +655,4 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
     public boolean isValidTransaction(Transaction transaction) {
         return (transaction.getType() == Contract.Type.Buy);
     }
-
-    /**
-     * Returns read only snap shot view of stock price map.
-     * 
-     * @return read only snap shot view of stock price map
-     */
-    public Map<Code, Double> getStockPrices() {
-        return java.util.Collections.unmodifiableMap(stockPrice);
-    }
 }
