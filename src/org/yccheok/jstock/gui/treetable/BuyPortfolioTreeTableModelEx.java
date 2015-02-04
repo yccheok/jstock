@@ -44,7 +44,7 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
     // Can be either stock last price or open price. If stock last price is 0
     // at current moment (Usually, this means no transaction has been done on
     // that day), open price will be applied.
-    private final java.util.Map<Code, Double> stockPrice = new ConcurrentHashMap<Code, Double>();
+    private final java.util.Map<Code, Double> stockPrice = new ConcurrentHashMap<>();
     
     public BuyPortfolioTreeTableModelEx() {
         super(Arrays.asList(columnNames));
@@ -663,35 +663,5 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
      */
     public Map<Code, Double> getStockPrices() {
         return java.util.Collections.unmodifiableMap(stockPrice);
-    }
-    
-    private Object readResolve() {
-        // Remove all invalid records found in stockPrice. This is caused by
-        // old bug introduced in updateStockLastPrice.
-
-        final Portfolio portfolio = (Portfolio)getRoot();
-        final int count = portfolio.getChildCount();
-        final Set<Code> set = new HashSet<Code>();
-
-        for (int i = 0; i < count; i++) {
-            TransactionSummary transactionSummary = (TransactionSummary)portfolio.getChildAt(i);
-
-            assert(transactionSummary.getChildCount() > 0);
-
-            final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
-
-            set.add(transaction.getStock().code);
-        }
-
-        // http://stackoverflow.com/questions/1884889/iterating-over-and-removing-from-a-map
-        Iterator<Code> it = stockPrice.keySet().iterator();
-        while (it.hasNext()) {
-            if (!set.contains(it.next())) {
-                // This stock is not found in transaction records. Remove it.
-                it.remove();
-            }
-        }
-
-        return this;
     }
 }
