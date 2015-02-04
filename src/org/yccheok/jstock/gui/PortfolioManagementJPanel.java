@@ -1742,9 +1742,16 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 TransactionSummary transactionSummary = (TransactionSummary)portfolio.getChildAt(i);
                 Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
                 Stock stock = transaction.getStock();
-                Country stockCountry = org.yccheok.jstock.engine.Utils.toCountry(stock.code);
-
-                final Currency stockCurrency = stockCountry.stockCurrency;
+                final Currency stockCurrency;
+                
+                Currency c = portfolioRealTimeInfo.currencies.get(stock.code);
+                if (c == null) {
+                    Country stockCountry = org.yccheok.jstock.engine.Utils.toCountry(stock.code);
+                    stockCurrency = stockCountry.stockCurrency;
+                } else {
+                    stockCurrency = c;
+                }
+                
                 final Currency localCurrency = localCountry.localCurrency;
 
                 if (stockCurrency.equals(localCurrency)) {
@@ -2483,12 +2490,22 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 final ExchangeRateMonitor _exchangeRateMonitor = exchangeRateMonitor;
                 
                 if (_exchangeRateMonitor != null) {
+                    final Map<CurrencyPair, Double> exchangeRatesMap = portfolioRealTimeInfo.exchangeRates;
+                    
                     Set<CurrencyPair> currencyPairs = getTransactionCurrencyPairs();
                     for (ExchangeRate exchangeRate : exchangeRates) {
-                        if (false == currencyPairs.contains(exchangeRate.currencyPair())) {
-                            _exchangeRateMonitor.removeCurrencyPair(exchangeRate.currencyPair());
+                        final CurrencyPair currencyPair = exchangeRate.currencyPair();
+                        if (false == currencyPairs.contains(currencyPair)) {
+                            _exchangeRateMonitor.removeCurrencyPair(currencyPair);
+                            exchangeRatesMap.remove(currencyPair);
+                        } else {
+                            double rate = exchangeRate.rate();
+                            exchangeRatesMap.put(currencyPair, rate);
                         }
+                        portfolioRealTimeInfo.exchangeRatesDirty = true;
                     }
+                    
+                    portfolioRealTimeInfo.exchangeRatesTimeStamp = System.currentTimeMillis();
                 }
                 
                 // I guess, it is no harm we insert unnecessary currency pair in 
@@ -2516,11 +2533,11 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     
     private void update(RealTimeStockMonitor monitor, final java.util.List<Stock> stocks) {
         final BuyPortfolioTreeTableModelEx portfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
+        final Map<Code, Double> stockPrices = this.portfolioRealTimeInfo.stockPrices;
+        final Map<Code, Currency> currencies = this.portfolioRealTimeInfo.currencies;
  
         for (Stock stock : stocks) {
             final Code code = stock.code;
-            final Map<Code, Double> stockPrices = this.portfolioRealTimeInfo.stockPrices;
-            final Map<Code, Currency> currencies = this.portfolioRealTimeInfo.currencies;
             
             final int stockPricesSizeBeforePut = stockPrices.size();
             final int currenciesSizeBeforePut = currencies.size();
@@ -2555,6 +2572,21 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             } else {
                 this.portfolioRealTimeInfo.stockPricesDirty = true;
                 this.portfolioRealTimeInfo.currenciesDirty = true;
+                
+                ExchangeRateMonitor _exchangeRateMonitor = this.exchangeRateMonitor;
+                if (currency != null && _exchangeRateMonitor != null) {
+                    JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+                    final Country country = jStockOptions.getCountry();
+                    final Country localCountry = jStockOptions.getLocalCurrencyCountry(country);
+                    final Currency localCurrency = localCountry.localCurrency;
+                    if (false == currency.equals(localCurrency)) {
+                        CurrencyPair currencyPair = CurrencyPair.create(currency, localCurrency);
+                        if (_exchangeRateMonitor.addCurrencyPair(currencyPair)) {
+                            _exchangeRateMonitor.startNewThreadsIfNecessary();
+                            _exchangeRateMonitor.refresh();
+                        }
+                    }
+                }
             }
         }
         
