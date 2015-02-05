@@ -31,10 +31,6 @@ import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.Country;
 import org.yccheok.jstock.engine.StockInfo;
-import org.yccheok.jstock.engine.currency.Currency;
-import org.yccheok.jstock.engine.currency.CurrencyPair;
-import org.yccheok.jstock.engine.currency.ExchangeRate;
-import org.yccheok.jstock.engine.currency.ExchangeRateLookup;
 import org.yccheok.jstock.gui.JStockOptions;
 import org.yccheok.jstock.gui.JStock;
 
@@ -652,24 +648,6 @@ public class Utils {
     public static boolean definitelyLessThan(double a, double b)
     {
         return (b - a) > ( (Math.abs(a) < Math.abs(b) ? Math.abs(b) : Math.abs(a)) * EPSILON);
-    }
-
-    public static double getExchangeRate(ExchangeRateLookup exchangeRateLookup, Country localCountry, Code code) {
-        final Country stockCountry = org.yccheok.jstock.engine.Utils.toCountry(code);
-
-        final Currency stockCurrency = stockCountry.stockCurrency;
-        final Currency localCurrency = localCountry.localCurrency;
-        
-        if (stockCurrency.equals(localCurrency)) {
-            return 1.0;
-        }
-        
-        final CurrencyPair currencyPair = new CurrencyPair(stockCurrency, localCurrency);
-        final ExchangeRate exchangeRate = exchangeRateLookup.get(currencyPair);
-        if (exchangeRate != null) {
-            return exchangeRate.rate();
-        }        
-        return 1.0;
     }
     
     // 0.00000001 is a magic number. I have 0 idea what I should have for this

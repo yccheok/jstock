@@ -26,7 +26,8 @@ import javax.swing.tree.TreePath;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.Country;
 import org.yccheok.jstock.engine.StockInfo;
-import org.yccheok.jstock.engine.currency.ExchangeRateLookup;
+import org.yccheok.jstock.engine.currency.Currency;
+import org.yccheok.jstock.engine.currency.CurrencyPair;
 import org.yccheok.jstock.gui.JStockOptions;
 import org.yccheok.jstock.gui.JStock;
 import org.yccheok.jstock.internationalization.GUIBundle;
@@ -286,7 +287,7 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
         return (getCurrentValue(portfolio) - portfolio.getNetTotal()) / portfolio.getNetTotal() * 100.0;        
     }
 
-    public double getCurrentValue(ExchangeRateLookup exchangeRateLookup, Country localCountry) {
+    public double getCurrentValue(Country localCountry) {
         Portfolio portfolio = (Portfolio)getRoot();
         
         final int count = portfolio.getChildCount();
@@ -308,8 +309,28 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
         
             final Code code = transaction.getStock().code;
             
-            double exchangeRate = org.yccheok.jstock.portfolio.Utils.getExchangeRate(exchangeRateLookup, localCountry, code);
+            final Currency localCurrency = localCountry.localCurrency;
+            final Currency stockCurrency;
+            Currency c = portfolioRealTimeInfo.currencies.get(code);
+            if (c == null) {
+                Country stockCountry = org.yccheok.jstock.engine.Utils.toCountry(code);
+                stockCurrency = stockCountry.stockCurrency;
+            } else {
+                stockCurrency = c;
+            }
             
+            final double exchangeRate;
+            if (stockCurrency.equals(localCurrency)) {
+                exchangeRate = 1.0;
+            } else {
+                Double rate = portfolioRealTimeInfo.exchangeRates.get(CurrencyPair.create(stockCurrency, localCurrency));
+                if (rate != null) {
+                    exchangeRate = rate;
+                } else {
+                    exchangeRate = 1.0;
+                }
+            }
+                        
             result += (currentValue * exchangeRate);
         }
         

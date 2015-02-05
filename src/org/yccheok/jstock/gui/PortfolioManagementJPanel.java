@@ -58,7 +58,6 @@ import org.yccheok.jstock.engine.*;
 import org.yccheok.jstock.engine.currency.Currency;
 import org.yccheok.jstock.engine.currency.CurrencyPair;
 import org.yccheok.jstock.engine.currency.ExchangeRate;
-import org.yccheok.jstock.engine.currency.ExchangeRateLookup;
 import org.yccheok.jstock.engine.currency.ExchangeRateMonitor;
 import org.yccheok.jstock.file.GUIBundleWrapper;
 import org.yccheok.jstock.file.Statement;
@@ -2426,9 +2425,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             final String text = MessageFormat.format(GUIBundle.getString("MyJXStatusBar_CurrencyExchangeRateFor"), fromCurrency.toString(), toCurrency.toString());
             mainFrame.setStatusBarExchangeRateVisible(true);
             mainFrame.setStatusBarExchangeRateToolTipText(text);
-            ExchangeRate exchangeRate = this.exchangeRateLookup.get(currencyPair);
-            if (exchangeRate != null) {
-                mainFrame.setStatusBarExchangeRate(exchangeRate.rate());
+            Double rate = this.portfolioRealTimeInfo.exchangeRates.get(currencyPair);
+            if (rate != null) {
+                mainFrame.setStatusBarExchangeRate(rate);
             } else {
                 mainFrame.setStatusBarExchangeRate(null);
             }
@@ -2531,10 +2530,6 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     
                     portfolioRealTimeInfo.exchangeRatesTimeStamp = System.currentTimeMillis();
                 }
-                
-                // I guess, it is no harm we insert unnecessary currency pair in 
-                // lookup table. We might need them in the future.
-                exchangeRateLookup.put(exchangeRates);
                 
                 refreshStatusBarExchangeRateVisibility();
                 
@@ -2750,9 +2745,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)this.buyTreeTable.getTreeTableModel();
         final SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel = (SellPortfolioTreeTableModelEx)this.sellTreeTable.getTreeTableModel();
       
-        final Country fromCountry = jStockOptions.getCountry();
-        final Country toCountry = jStockOptions.getLocalCurrencyCountry(fromCountry);
-        final boolean currencyExchangeEnable = jStockOptions.isCurrencyExchangeEnable(fromCountry);
+        final Country country = jStockOptions.getCountry();
+        final Country localCountry = jStockOptions.getLocalCurrencyCountry(country);
+        final boolean currencyExchangeEnable = jStockOptions.isCurrencyExchangeEnable(country);
 
         // TODO: SUPER UGLY HACK?!?!?!?!
         double exchangeRate = 1.0;
@@ -2763,7 +2758,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         final double realizedProfit;
         if (false == isPenceToPoundConversionEnabled) {
             if (currencyExchangeEnable) {
-                share = buyPortfolioTreeTableModel.getCurrentValue(exchangeRateLookup, toCountry);
+                share = buyPortfolioTreeTableModel.getCurrentValue(localCountry);
             } else {
                 share = buyPortfolioTreeTableModel.getCurrentValue();
             }
@@ -2779,7 +2774,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             }
         } else {
             if (currencyExchangeEnable) {
-                share = buyPortfolioTreeTableModel.getCurrentValue(exchangeRateLookup, toCountry) / 100.0;
+                share = buyPortfolioTreeTableModel.getCurrentValue(localCountry) / 100.0;
             } else {
                 share = buyPortfolioTreeTableModel.getCurrentValue() / 100.0;
             }
@@ -2916,7 +2911,6 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private RealTimeStockMonitor realTimeStockMonitor = null;
     
     private ExchangeRateMonitor exchangeRateMonitor = null;
-    private final ExchangeRateLookup exchangeRateLookup = new ExchangeRateLookup();
     
     private final org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, List<Stock>> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
     private final org.yccheok.jstock.engine.Observer<ExchangeRateMonitor, List<ExchangeRate>> exchangeRateMonitorObserver = this.getExchangeRateMonitorObserver();
@@ -2947,5 +2941,4 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private javax.swing.JSplitPane jSplitPane1;
     private org.yccheok.jstock.gui.treetable.SortableTreeTable sellTreeTable;
     // End of variables declaration//GEN-END:variables
-
 }
