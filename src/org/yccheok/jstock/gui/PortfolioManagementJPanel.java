@@ -1722,45 +1722,57 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         portfolioTreeTableModel.editTransaction(newTransaction, oldTransaction);        
     }
 
+    private Set<Code> getCodes(org.yccheok.jstock.gui.treetable.SortableTreeTable treeTable) {
+        Set<Code> codes = new HashSet<>();
+        
+        final AbstractPortfolioTreeTableModelEx portfolioTreeTableModelEx = (AbstractPortfolioTreeTableModelEx)treeTable.getTreeTableModel();
+        Portfolio portfolio = (Portfolio) portfolioTreeTableModelEx.getRoot();
+        for (int i = 0, count = portfolio.getChildCount(); i < count; i++) {
+            TransactionSummary transactionSummary = (TransactionSummary)portfolio.getChildAt(i);
+            Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
+            Stock stock = transaction.getStock();
+            codes.add(stock.code);
+        }
+        
+        return codes;
+    }
+    
+    private Set<Code> getBuyCodes() {
+        return getCodes(buyTreeTable);
+    }
+    
+    private Set<Code> getSellCodes() {
+        return getCodes(sellTreeTable);
+    }
+    
     private Set<CurrencyPair> getTransactionCurrencyPairs() {
+        Set<Code> codes = getBuyCodes();
+        codes.addAll(getSellCodes());
+        
         final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
 
         final Country country = jStockOptions.getCountry();
         final Country localCountry = jStockOptions.getLocalCurrencyCountry(country);
-
-        Set<CurrencyPair> currencyPairs = new HashSet<>();
-        final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
-        final SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel = (SellPortfolioTreeTableModelEx)sellTreeTable.getTreeTableModel();
+        final Currency localCurrency = localCountry.localCurrency;
         
-        final Portfolio[] portfolios = new Portfolio[] {
-            (Portfolio) buyPortfolioTreeTableModel.getRoot(),
-            (Portfolio) sellPortfolioTreeTableModel.getRoot()
-        };
-
-        for (Portfolio portfolio : portfolios) {
-            for (int i = 0, count = portfolio.getChildCount(); i < count; i++) {
-                TransactionSummary transactionSummary = (TransactionSummary)portfolio.getChildAt(i);
-                Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
-                Stock stock = transaction.getStock();
-                final Currency stockCurrency;
-                
-                Currency c = portfolioRealTimeInfo.currencies.get(stock.code);
-                if (c == null) {
-                    Country stockCountry = org.yccheok.jstock.engine.Utils.toCountry(stock.code);
-                    stockCurrency = stockCountry.stockCurrency;
-                } else {
-                    stockCurrency = c;
-                }
-                
-                final Currency localCurrency = localCountry.localCurrency;
-
-                if (stockCurrency.equals(localCurrency)) {
-                    continue;
-                }
-
-                CurrencyPair currencyPair = CurrencyPair.create(stockCurrency, localCurrency);
-                currencyPairs.add(currencyPair);
+        Set<CurrencyPair> currencyPairs = new HashSet<>();
+        
+        for (Code code : codes) {
+            final Currency stockCurrency;
+            Currency c = portfolioRealTimeInfo.currencies.get(code);
+            if (c == null) {
+                Country stockCountry = org.yccheok.jstock.engine.Utils.toCountry(code);
+                stockCurrency = stockCountry.stockCurrency;
+            } else {
+                stockCurrency = c;
             }
+                
+            if (stockCurrency.equals(localCurrency)) {
+                continue;
+            }
+
+            CurrencyPair currencyPair = CurrencyPair.create(stockCurrency, localCurrency);
+            currencyPairs.add(currencyPair);
         }
         
         return currencyPairs;
@@ -2360,6 +2372,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             final Code code = transaction.getStock().code;
             final Double price = _portfolioRealTimeInfo.stockPrices.get(code);
             if (price == null) {
+                // Having 0 is important too, so that we can generate correct
+                // portfolioinfos.csv
                 goodStockPrices.put(code, 0.0);
             } else {
                 goodStockPrices.put(code, price);
