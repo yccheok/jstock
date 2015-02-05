@@ -50,8 +50,8 @@ public class PortfolioRealTimeInfo {
     
     public final ConcurrentHashMap<Code, Currency> currencies = new ConcurrentHashMap<>();
     
-    public long stockPricesTimeStamp = 0;
-    public long exchangeRatesTimeStamp = 0;
+    public long stockPricesTimestamp = 0;
+    public long exchangeRatesTimestamp = 0;
     
     public transient volatile boolean stockPricesDirty = false;
     public transient volatile boolean exchangeRatesDirty = false;
@@ -75,8 +75,8 @@ public class PortfolioRealTimeInfo {
         exchangeRates.putAll(portfolioRealTimeInfo.exchangeRates);
         currencies.putAll(portfolioRealTimeInfo.currencies);
         
-        stockPricesTimeStamp = portfolioRealTimeInfo.stockPricesTimeStamp;
-        exchangeRatesTimeStamp = portfolioRealTimeInfo.exchangeRatesTimeStamp;
+        stockPricesTimestamp = portfolioRealTimeInfo.stockPricesTimestamp;
+        exchangeRatesTimestamp = portfolioRealTimeInfo.exchangeRatesTimestamp;
 
         // I don't know what to do with dirty flags at this moment.
     }

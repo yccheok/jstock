@@ -2052,7 +2052,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         if (false == status) {
             Pair<HashMap<Code, Double>, Long> csvStockPrices = this.getCSVStockPrices();
             _portfolioRealTimeInfo.stockPrices.putAll(csvStockPrices.first);
-            _portfolioRealTimeInfo.stockPricesTimeStamp = csvStockPrices.second;
+            _portfolioRealTimeInfo.stockPricesTimestamp = csvStockPrices.second;
             _portfolioRealTimeInfo.stockPricesDirty = !_portfolioRealTimeInfo.stockPrices.isEmpty();
         }
 
@@ -2528,7 +2528,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                         portfolioRealTimeInfo.exchangeRatesDirty = true;
                     }
                     
-                    portfolioRealTimeInfo.exchangeRatesTimeStamp = System.currentTimeMillis();
+                    portfolioRealTimeInfo.exchangeRatesTimestamp = System.currentTimeMillis();
                 }
                 
                 refreshStatusBarExchangeRateVisibility();
@@ -2612,13 +2612,13 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         updateWealthHeader();
         
         // Update status bar with current time string.
-        this.portfolioRealTimeInfo.stockPricesTimeStamp = System.currentTimeMillis();
+        this.portfolioRealTimeInfo.stockPricesTimestamp = System.currentTimeMillis();
         
         JStock.getInstance().updateStatusBarWithLastUpdateDateMessageIfPossible();     
     }  
 
     public long getTimestamp() {
-        return this.portfolioRealTimeInfo.stockPricesTimeStamp;
+        return this.portfolioRealTimeInfo.stockPricesTimestamp;
     }
     
     private void initGUIOptions() {
