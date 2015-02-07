@@ -2480,6 +2480,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         if (!currencyExchangeEnable) {
             this.exchangeRateMonitor = null;
+            if (oldExchangeRateMonitor != null) { 
+                this.updateWealthHeader();
+            }
             return;
         }
         
