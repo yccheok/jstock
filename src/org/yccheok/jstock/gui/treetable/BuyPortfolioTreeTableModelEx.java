@@ -344,7 +344,15 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
                     
             assert(transactionSummary.getChildCount() > 0);            
                         
-            result += this.getCurrentValue(transactionSummary);
+            final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
+        
+            final Code code = transaction.getStock().code;        
+        
+            if (org.yccheok.jstock.portfolio.Utils.shouldConvertPenceToPound(portfolioRealTimeInfo, code)) {
+                result += (this.getCurrentValue(transactionSummary) / 100.0);
+            } else {
+                result += this.getCurrentValue(transactionSummary);    
+            }
         }
         
         return result;
