@@ -1743,14 +1743,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         Set<CurrencyPair> currencyPairs = new HashSet<>();
         
         for (Code code : codes) {
-            final Currency stockCurrency;
-            Currency c = portfolioRealTimeInfo.currencies.get(code);
-            if (c == null) {
-                Country stockCountry = org.yccheok.jstock.engine.Utils.toCountry(code);
-                stockCurrency = stockCountry.stockCurrency;
-            } else {
-                stockCurrency = c;
-            }
+            final Currency stockCurrency = Utils.getStockCurrency(portfolioRealTimeInfo, code);
                 
             if (stockCurrency.equals(localCurrency)) {
                 continue;
@@ -1796,11 +1789,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 final JStockOptions jStockOptions = jstock.getJStockOptions();
                 final Country country = jStockOptions.getCountry();
                 final boolean currencyExchangeEnable = jStockOptions.isCurrencyExchangeEnable(country);
-                if (currencyExchangeEnable) {
-                    final Country stockCountry = org.yccheok.jstock.engine.Utils.toCountry(transaction.getStock().code);
+                if (currencyExchangeEnable) {                    
+                    final Currency stockCurrency = org.yccheok.jstock.gui.Utils.getStockCurrency(portfolioRealTimeInfo, transaction.getStock().code);
                     final Country localCountry = jStockOptions.getLocalCurrencyCountry(country);
-                    
-                    final Currency stockCurrency = stockCountry.stockCurrency;
                     final Currency localCurrency = localCountry.localCurrency;
 
                     if (stockCurrency.equals(localCurrency)) {

@@ -78,7 +78,17 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.EnumMap;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
@@ -134,8 +144,10 @@ import org.yccheok.jstock.analysis.OperatorIndicator;
 import org.yccheok.jstock.analysis.SinkOperator;
 import org.yccheok.jstock.analysis.StockOperator;
 import org.yccheok.jstock.engine.*;
+import org.yccheok.jstock.engine.currency.Currency;
 import org.yccheok.jstock.internationalization.MessagesBundle;
 import org.yccheok.jstock.network.Utils.Type;
+import org.yccheok.jstock.portfolio.PortfolioRealTimeInfo;
 
 /**
  *
@@ -146,6 +158,31 @@ public class Utils {
     private Utils() {
     }
 
+    public static Currency getStockCurrency(PortfolioRealTimeInfo portfolioRealTimeInfo, Code code) {
+        //////////////////////////////////////////
+        // Get traded currency in this stock code.
+        //////////////////////////////////////////
+        final Currency stockCurrency;
+        org.yccheok.jstock.engine.currency.Currency c = portfolioRealTimeInfo.currencies.get(code);
+        if (c == null) {
+            Country stockCountry = org.yccheok.jstock.engine.Utils.toCountry(code);
+            stockCurrency = stockCountry.stockCurrency;
+        } else {
+            stockCurrency = c;
+        }
+        return stockCurrency;
+    }
+    
+    public static double getExchangeRate(PortfolioRealTimeInfo portfolioRealTimeInfo, Country localCountry, Code code) {
+
+        /////////////////////
+        // Get local currency
+        /////////////////////
+        final Currency localCurrency = localCountry.localCurrency;
+        
+        return 1;
+    }
+    
     public static void updateFactoriesPriceSource() {
         for (Country country : Country.values()) {
             final PriceSource priceSource = JStock.getInstance().getJStockOptions().getPriceSource(country);
