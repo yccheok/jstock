@@ -46,6 +46,11 @@ public class Utils {
     private Utils() {
     }
 
+    public static boolean shouldConvertPenceToPound(PortfolioRealTimeInfo portfolioRealTimeInfo, Code code) {
+        final Currency stockCurrency = getStockCurrency(portfolioRealTimeInfo, code);
+        return stockCurrency.toString().equals("GBX");
+    }
+    
     public static Currency getStockCurrency(PortfolioRealTimeInfo portfolioRealTimeInfo, Code code) {
         //////////////////////////////////////////
         // Get traded currency in this stock code.
