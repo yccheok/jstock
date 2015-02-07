@@ -309,21 +309,8 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
         
             final Code code = transaction.getStock().code;
             
-            final Currency localCurrency = localCountry.localCurrency;
-            final Currency stockCurrency = org.yccheok.jstock.gui.Utils.getStockCurrency(portfolioRealTimeInfo, code);
-            
-            final double exchangeRate;
-            if (stockCurrency.equals(localCurrency)) {
-                exchangeRate = 1.0;
-            } else {
-                Double rate = portfolioRealTimeInfo.exchangeRates.get(CurrencyPair.create(stockCurrency, localCurrency));
-                if (rate != null) {
-                    exchangeRate = rate;
-                } else {
-                    exchangeRate = 1.0;
-                }
-            }
-                        
+            final double exchangeRate = org.yccheok.jstock.portfolio.Utils.getExchangeRate(portfolioRealTimeInfo, localCountry, code);
+                                    
             result += (currentValue * exchangeRate);
         }
         

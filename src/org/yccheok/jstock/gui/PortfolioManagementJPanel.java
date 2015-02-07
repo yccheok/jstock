@@ -78,7 +78,18 @@ import org.yccheok.jstock.gui.treetable.SellPortfolioTreeTableModelEx;
 import org.yccheok.jstock.gui.treetable.SortableTreeTable;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.internationalization.MessagesBundle;
-import org.yccheok.jstock.portfolio.*;
+import org.yccheok.jstock.portfolio.Commentable;
+import org.yccheok.jstock.portfolio.Contract;
+import org.yccheok.jstock.portfolio.DecimalPlaces;
+import org.yccheok.jstock.portfolio.Deposit;
+import org.yccheok.jstock.portfolio.DepositSummary;
+import org.yccheok.jstock.portfolio.Dividend;
+import org.yccheok.jstock.portfolio.DividendSummary;
+import org.yccheok.jstock.portfolio.DoubleWrapper;
+import org.yccheok.jstock.portfolio.Portfolio;
+import org.yccheok.jstock.portfolio.PortfolioRealTimeInfo;
+import org.yccheok.jstock.portfolio.Transaction;
+import org.yccheok.jstock.portfolio.TransactionSummary;
 
 /**
  *
@@ -1743,7 +1754,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         Set<CurrencyPair> currencyPairs = new HashSet<>();
         
         for (Code code : codes) {
-            final Currency stockCurrency = Utils.getStockCurrency(portfolioRealTimeInfo, code);
+            final Currency stockCurrency = org.yccheok.jstock.portfolio.Utils.getStockCurrency(portfolioRealTimeInfo, code);
                 
             if (stockCurrency.equals(localCurrency)) {
                 continue;
@@ -1790,7 +1801,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 final Country country = jStockOptions.getCountry();
                 final boolean currencyExchangeEnable = jStockOptions.isCurrencyExchangeEnable(country);
                 if (currencyExchangeEnable) {                    
-                    final Currency stockCurrency = org.yccheok.jstock.gui.Utils.getStockCurrency(portfolioRealTimeInfo, transaction.getStock().code);
+                    final Currency stockCurrency = org.yccheok.jstock.portfolio.Utils.getStockCurrency(portfolioRealTimeInfo, transaction.getStock().code);
                     final Country localCountry = jStockOptions.getLocalCurrencyCountry(country);
                     final Currency localCurrency = localCountry.localCurrency;
 

@@ -31,6 +31,8 @@ import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.Country;
 import org.yccheok.jstock.engine.StockInfo;
+import org.yccheok.jstock.engine.currency.Currency;
+import org.yccheok.jstock.engine.currency.CurrencyPair;
 import org.yccheok.jstock.gui.JStockOptions;
 import org.yccheok.jstock.gui.JStock;
 
@@ -44,6 +46,41 @@ public class Utils {
     private Utils() {
     }
 
+
+    public static Currency getStockCurrency(PortfolioRealTimeInfo portfolioRealTimeInfo, Code code) {
+        //////////////////////////////////////////
+        // Get traded currency in this stock code.
+        //////////////////////////////////////////
+        final Currency stockCurrency;
+        org.yccheok.jstock.engine.currency.Currency c = portfolioRealTimeInfo.currencies.get(code);
+        if (c == null) {
+            Country stockCountry = org.yccheok.jstock.engine.Utils.toCountry(code);
+            stockCurrency = stockCountry.stockCurrency;
+        } else {
+            stockCurrency = c;
+        }
+        return stockCurrency;
+    }
+    
+    public static double getExchangeRate(PortfolioRealTimeInfo portfolioRealTimeInfo, Country localCountry, Code code) {
+        final Currency stockCurrency = getStockCurrency(portfolioRealTimeInfo, code);
+        final Currency localCurrency = localCountry.localCurrency;
+        
+        final double exchangeRate;
+        if (stockCurrency.equals(localCurrency)) {
+            exchangeRate = 1.0;
+        } else {
+            Double rate = portfolioRealTimeInfo.exchangeRates.get(CurrencyPair.create(stockCurrency, localCurrency));
+            if (rate != null) {
+                exchangeRate = rate;
+            } else {
+                exchangeRate = 1.0;
+            }
+        }
+
+        return exchangeRate;
+    }
+    
     private static final ThreadLocal <NumberFormat> unitsNumberFormat = new ThreadLocal <NumberFormat>() {
         @Override protected NumberFormat initialValue() {
             // Instead of limiting currency decimal places to 2 only.
