@@ -147,6 +147,7 @@ public class ExchangeRateMonitor extends Subject<ExchangeRateMonitor, List<Excha
         currencyPairMapping.put(code, currencyPair);
         
         final CurrencyPair realTimeMonitorCurrencyPair = toCurrencyPairForRealTimeStockMonitor(currencyPair);
+        
         final Code realTimeMonitorCode = toCode(realTimeMonitorCurrencyPair);
         realTimeStockMonitor.addStockCode(realTimeMonitorCode);
         

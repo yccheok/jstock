@@ -46,7 +46,6 @@ public class Utils {
     private Utils() {
     }
 
-
     public static Currency getStockCurrency(PortfolioRealTimeInfo portfolioRealTimeInfo, Code code) {
         //////////////////////////////////////////
         // Get traded currency in this stock code.

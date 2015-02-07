@@ -2428,8 +2428,20 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             mainFrame.setStatusBarExchangeRateVisible(true);
             mainFrame.setStatusBarExchangeRateToolTipText(text);
             Double rate = this.portfolioRealTimeInfo.exchangeRates.get(currencyPair);
+            
             if (rate != null) {
-                mainFrame.setStatusBarExchangeRate(rate);
+                // Special handling for GBX. User would prefer to see the currency
+                // exchange in GBP.
+                if (currencyPair.from().toString().equals("GBX")) {
+                    rate = rate * 100.0;
+                }
+            
+                if (rate == 1.0) {
+                    // User are not interested in such exchange rate.
+                    mainFrame.setStatusBarExchangeRate(null);    
+                } else {
+                    mainFrame.setStatusBarExchangeRate(rate);
+                }
             } else {
                 mainFrame.setStatusBarExchangeRate(null);
             }
