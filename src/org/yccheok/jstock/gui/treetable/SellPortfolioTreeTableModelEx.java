@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2012 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2015 Yan Cheng Cheok <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,11 +32,21 @@ import org.yccheok.jstock.portfolio.TransactionSummary;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.portfolio.DecimalPlaces;
 import org.yccheok.jstock.portfolio.DoubleWrapper;
+import org.yccheok.jstock.portfolio.PortfolioRealTimeInfo;
 /**
  *
  * @author yccheok
  */
 public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableModelEx {
+    
+    // Avoid NPE.
+    private PortfolioRealTimeInfo portfolioRealTimeInfo = new PortfolioRealTimeInfo();
+            
+    public void bind(PortfolioRealTimeInfo portfolioRealTimeInfo) {
+        this.portfolioRealTimeInfo = portfolioRealTimeInfo;
+        final Portfolio portfolio = (Portfolio)getRoot();
+        portfolio.bind(portfolioRealTimeInfo);
+    }
     
     public SellPortfolioTreeTableModelEx() {
         super(Arrays.asList(columnNames));
@@ -202,7 +212,6 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
     public Object getValueAt(Object node, int column) {
         final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         final boolean isFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
-        final boolean isPenceToPoundConversionEnabled = jStockOptions.isPenceToPoundConversionEnabled();
 
         if (node instanceof Portfolio) {
             final Country country = jStockOptions.getCountry();
@@ -264,6 +273,8 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
             
             if (transactionSummary.getChildCount() <= 0) return null;
             
+            final boolean shouldConvertPenceToPound = org.yccheok.jstock.portfolio.Utils.shouldConvertPenceToPound(portfolioRealTimeInfo, ((Transaction)transactionSummary.getChildAt(0)).getStock().code);
+            
             switch(column) {
                 case 0:
                     return ((Transaction)transactionSummary.getChildAt(0)).getStock().symbol;
@@ -286,7 +297,7 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
                     }                    
                     
                 case 5:
-                    if (isPenceToPoundConversionEnabled == false) {
+                    if (shouldConvertPenceToPound == false) {
                         if (isFeeCalculationEnabled) {
                             return transactionSummary.getNetTotal();
                         } else {
@@ -301,7 +312,7 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
                     }
     
                 case 6:
-                    if (isPenceToPoundConversionEnabled == false) {
+                    if (shouldConvertPenceToPound == false) {
                         if (isFeeCalculationEnabled) {
                             return transactionSummary.getNetReferenceTotal();
                         } else {
@@ -316,7 +327,7 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
                     }
                        
                 case 7:
-                    if (isPenceToPoundConversionEnabled == false) {
+                    if (shouldConvertPenceToPound == false) {
                         if (isFeeCalculationEnabled) {
                             return getNetGainLossValue(transactionSummary);
                         } else {
@@ -354,6 +365,8 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
         if (node instanceof Transaction) {
             final Transaction transaction = (Transaction)node;
             
+            final boolean shouldConvertPenceToPound = org.yccheok.jstock.portfolio.Utils.shouldConvertPenceToPound(portfolioRealTimeInfo, transaction.getStock().code);
+            
             switch(column) {
                 case 0:
                     return (transaction).getStock().symbol;
@@ -371,7 +384,7 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
                     return transaction.getReferencePrice();
                     
                 case 5:
-                    if (isPenceToPoundConversionEnabled == false) {
+                    if (shouldConvertPenceToPound == false) {
                         if (isFeeCalculationEnabled) {
                             return transaction.getNetTotal();
                         } else {
@@ -386,7 +399,7 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
                     }                    
 
                 case 6:
-                    if (isPenceToPoundConversionEnabled == false) {
+                    if (shouldConvertPenceToPound == false) {
                         if (isFeeCalculationEnabled) {
                             return transaction.getNetReferenceTotal();
                         } else {
@@ -401,7 +414,7 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
                     }
                     
                 case 7:
-                    if (isPenceToPoundConversionEnabled == false) {
+                    if (shouldConvertPenceToPound == false) {
                         if (isFeeCalculationEnabled) {
                             return getNetGainLossValue(transaction);
                         } else {
