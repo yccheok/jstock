@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2012 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2015 Yan Cheng Cheok <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,8 @@
 package org.yccheok.jstock.portfolio;
 
 import org.jdesktop.swingx.treetable.TreeTableModel;
+import org.yccheok.jstock.engine.Code;
+import org.yccheok.jstock.engine.currency.Currency;
 import org.yccheok.jstock.gui.treetable.DefaultSortableMutableTreeTableNode;
 
 /**
@@ -28,24 +30,37 @@ import org.yccheok.jstock.gui.treetable.DefaultSortableMutableTreeTableNode;
  */
 public class Portfolio extends DefaultSortableMutableTreeTableNode implements Commentable {
 
-    public double getNetTotal() {
+    private PortfolioRealTimeInfo portfolioRealTimeInfo;
+    
+    public void bind(PortfolioRealTimeInfo portfolioRealTimeInfo) {
+        this.portfolioRealTimeInfo = portfolioRealTimeInfo;
+    }
+    
+    public double getNetTotal(Currency localCurrency) {
         double result = 0.0;
 
         final int count = this.getChildCount();
         
-        for(int i=0; i<count; i++) {
+        for (int i = 0; i < count; i++) {
             Object o = this.getChildAt(i);
             
             assert(o instanceof TransactionSummary);
             
             final TransactionSummary transactionSummary = (TransactionSummary)o;
-            result += transactionSummary.getNetTotal();
+            
+            final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
+        
+            final Code code = transaction.getStock().code;
+            
+            final double exchangeRate = org.yccheok.jstock.portfolio.Utils.getExchangeRate(portfolioRealTimeInfo, localCurrency, code);
+
+            result += (transactionSummary.getNetTotal() * exchangeRate);
         }
         
         return result;                
     }
     
-    public double getTotal() {
+    public double getTotal(Currency localCurrency) {
         double result = 0.0;
      
         final int count = this.getChildCount();
@@ -56,13 +71,20 @@ public class Portfolio extends DefaultSortableMutableTreeTableNode implements Co
             assert(o instanceof TransactionSummary);
             
             final TransactionSummary transactionSummary = (TransactionSummary)o;
-            result += transactionSummary.getTotal();
+            
+            final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
+        
+            final Code code = transaction.getStock().code;
+            
+            final double exchangeRate = org.yccheok.jstock.portfolio.Utils.getExchangeRate(portfolioRealTimeInfo, localCurrency, code);
+
+            result += (transactionSummary.getTotal() * exchangeRate);
         }
         
         return result;        
     }
 
-    public double getNetReferenceTotal() {
+    public double getNetReferenceTotal(Currency localCurrency) {
         double result = 0.0;
      
         final int count = this.getChildCount();
@@ -73,13 +95,20 @@ public class Portfolio extends DefaultSortableMutableTreeTableNode implements Co
             assert(o instanceof TransactionSummary);
             
             final TransactionSummary transactionSummary = (TransactionSummary)o;
-            result += transactionSummary.getNetReferenceTotal();
+            
+            final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
+        
+            final Code code = transaction.getStock().code;
+            
+            final double exchangeRate = org.yccheok.jstock.portfolio.Utils.getExchangeRate(portfolioRealTimeInfo, localCurrency, code);
+
+            result += (transactionSummary.getNetReferenceTotal() * exchangeRate);
         }
         
         return result;        
     }
     
-    public double getReferenceTotal() {
+    public double getReferenceTotal(Currency localCurrency) {
         double result = 0.0;
      
         final int count = this.getChildCount();
@@ -90,7 +119,14 @@ public class Portfolio extends DefaultSortableMutableTreeTableNode implements Co
             assert(o instanceof TransactionSummary);
             
             final TransactionSummary transactionSummary = (TransactionSummary)o;
-            result += transactionSummary.getReferenceTotal();
+            
+            final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
+        
+            final Code code = transaction.getStock().code;
+            
+            final double exchangeRate = org.yccheok.jstock.portfolio.Utils.getExchangeRate(portfolioRealTimeInfo, localCurrency, code);
+
+            result += (transactionSummary.getReferenceTotal() * exchangeRate);
         }
         
         return result;        
