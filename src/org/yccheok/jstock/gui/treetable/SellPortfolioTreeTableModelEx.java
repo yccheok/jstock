@@ -21,6 +21,8 @@ package org.yccheok.jstock.gui.treetable;
 
 import java.util.Arrays;
 import org.jdesktop.swingx.treetable.TreeTableModel;
+import org.yccheok.jstock.engine.Country;
+import org.yccheok.jstock.engine.currency.Currency;
 import org.yccheok.jstock.gui.JStockOptions;
 import org.yccheok.jstock.gui.JStock;
 import org.yccheok.jstock.portfolio.Contract;
@@ -96,48 +98,46 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
         return columnNames[column];
     }
     
-    private double getGainLossPercentage(Portfolio portfolio) {
-        if(portfolio.getReferenceTotal() == 0.0) return 0.0;
+    public double getGainLossPercentage(Currency localCurrency) {
+        Portfolio portfolio = (Portfolio)getRoot();
+
+        double referenceTotal = portfolio.getReferenceTotal(localCurrency);
+        if (referenceTotal == 0.0) {
+            return 0.0;
+        }
         
-        return (portfolio.getTotal() - portfolio.getReferenceTotal()) / portfolio.getReferenceTotal() * 100.0;
+        return (portfolio.getTotal(localCurrency) - referenceTotal) / referenceTotal * 100.0;
     }
     
-    public double getGainLossValue() {
-        return getGainLossValue((Portfolio)getRoot());
+    public double getGainLossValue(Currency localCurrency) {
+        Portfolio portfolio = (Portfolio)getRoot();
+        return portfolio.getTotal(localCurrency) - portfolio.getReferenceTotal(localCurrency);
     }
     
-    private double getGainLossValue(Portfolio portfolio) {
-        return portfolio.getTotal() - portfolio.getReferenceTotal();
+    public double getSellingValue(Currency localCurrency) {
+        Portfolio portfolio = (Portfolio)getRoot();
+        return portfolio.getTotal(localCurrency);
     }
     
-    public double getSellingValue() {
-        return ((Portfolio)getRoot()).getTotal();
-    }
-    
-    public double getNetSellingValue() {
-        return ((Portfolio)getRoot()).getNetTotal();
+    public double getNetSellingValue(Currency localCurrency) {
+        Portfolio portfolio = (Portfolio)getRoot();
+        return portfolio.getNetTotal(localCurrency);
     }
 
-    public double getGainLossPercentage() {
-        return getGainLossPercentage((Portfolio)getRoot());
-    }
-    
-    public double getNetGainLossPercentage() {
-        return getNetGainLossPercentage((Portfolio)getRoot());
-    }
+    public double getNetGainLossPercentage(Currency localCurrency) {
+        Portfolio portfolio = (Portfolio)getRoot();
 
-    public double getNetGainLossValue() {
-        return getNetGainLossValue((Portfolio)getRoot());
-    }
-    
-    private double getNetGainLossPercentage(Portfolio portfolio) {
-        if (portfolio.getNetReferenceTotal() == 0.0) return 0.0;
+        double netReferenceTotal = portfolio.getNetReferenceTotal(localCurrency);
+        if (netReferenceTotal == 0.0) {
+            return 0.0;
+        }
         
-        return (portfolio.getNetTotal() - portfolio.getNetReferenceTotal()) / portfolio.getNetReferenceTotal() * 100.0;
+        return (portfolio.getNetTotal(localCurrency) - netReferenceTotal) / netReferenceTotal * 100.0;
     }
     
-    private double getNetGainLossValue(Portfolio portfolio) {
-        return portfolio.getNetTotal() - portfolio.getNetReferenceTotal();
+    public double getNetGainLossValue(Currency localCurrency) {
+        Portfolio portfolio = (Portfolio)getRoot();
+        return portfolio.getNetTotal(localCurrency) - portfolio.getNetReferenceTotal(localCurrency);
     }
     
     public double getSellingPrice(TransactionSummary transactionSummary) {
@@ -205,6 +205,10 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
         final boolean isPenceToPoundConversionEnabled = jStockOptions.isPenceToPoundConversionEnabled();
 
         if (node instanceof Portfolio) {
+            final Country country = jStockOptions.getCountry();
+            final Country localCountry = jStockOptions.getLocalCurrencyCountry(country);
+            final Currency localCurrency = localCountry.localCurrency;
+
             final Portfolio portfolio = (Portfolio)node;
             
             switch(column) {
@@ -212,56 +216,33 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
                     return GUIBundle.getString("PortfolioManagementJPanel_Sell");
         
                 case 5:
-                    if (isPenceToPoundConversionEnabled == false) {
-                        if (isFeeCalculationEnabled) {
-                            return portfolio.getNetTotal();
-                        } else {
-                            return portfolio.getTotal();
-                        }
+                    if (isFeeCalculationEnabled) {
+                        return portfolio.getNetTotal(localCurrency);
                     } else {
-                        if (isFeeCalculationEnabled) {
-                            return portfolio.getNetTotal() / 100.0;
-                        } else {
-                            return portfolio.getTotal() / 100.0;
-                        }
+                        return portfolio.getTotal(localCurrency);
                     }
 
                 case 6:
                     // Total purchase value.
-                    if (isPenceToPoundConversionEnabled == false) {
-                        if (isFeeCalculationEnabled) {
-                            return portfolio.getNetReferenceTotal();
-                        } else {
-                            return portfolio.getReferenceTotal();
-                        }
+                    if (isFeeCalculationEnabled) {
+                        return portfolio.getNetReferenceTotal(localCurrency);
                     } else {
-                        if (isFeeCalculationEnabled) {
-                            return portfolio.getNetReferenceTotal() / 100.0;
-                        } else {
-                            return portfolio.getReferenceTotal() / 100.0;
-                        }
+                        return portfolio.getReferenceTotal(localCurrency);
                     }
 
                 case 7:
-                    if (isPenceToPoundConversionEnabled == false) {
-                        if (isFeeCalculationEnabled) {
-                            return getNetGainLossValue(portfolio);
-                        } else {
-                            return getGainLossValue(portfolio);
-                        }
+                    if (isFeeCalculationEnabled) {
+                        return getNetGainLossValue(localCurrency);
                     } else {
-                        if (isFeeCalculationEnabled) {
-                            return getNetGainLossValue(portfolio) / 100.0;
-                        } else {
-                            return getGainLossValue(portfolio) / 100.0;
-                        }
+                        return getGainLossValue(localCurrency);
                     }
+
 
                 case 8:
                     if (isFeeCalculationEnabled) {
-                        return new DoubleWrapper(DecimalPlaces.Two, getNetGainLossPercentage(portfolio));
+                        return new DoubleWrapper(DecimalPlaces.Two, getNetGainLossPercentage(localCurrency));
                     } else {
-                        return new DoubleWrapper(DecimalPlaces.Two, getGainLossPercentage(portfolio));
+                        return new DoubleWrapper(DecimalPlaces.Two, getGainLossPercentage(localCurrency));
                     }
     
                 case 9:
