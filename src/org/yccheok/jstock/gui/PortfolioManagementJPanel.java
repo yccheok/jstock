@@ -1807,20 +1807,17 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 final JStock jstock = JStock.getInstance();
                 final JStockOptions jStockOptions = jstock.getJStockOptions();
                 final Country country = jStockOptions.getCountry();
-                final boolean currencyExchangeEnable = jStockOptions.isCurrencyExchangeEnable(country);
-                if (currencyExchangeEnable) {                    
-                    final Currency stockCurrency = org.yccheok.jstock.portfolio.Utils.getStockCurrency(portfolioRealTimeInfo, transaction.getStock().code);
-                    final Country localCountry = jStockOptions.getLocalCurrencyCountry(country);
-                    final Currency localCurrency = localCountry.localCurrency;
+                final Currency stockCurrency = org.yccheok.jstock.portfolio.Utils.getStockCurrency(portfolioRealTimeInfo, transaction.getStock().code);
+                final Country localCountry = jStockOptions.getLocalCurrencyCountry(country);
+                final Currency localCurrency = localCountry.localCurrency;
 
-                    if (stockCurrency.equals(localCurrency)) {
-                        break;
-                    }
-
-                    _exchangeRateMonitor.addCurrencyPair(CurrencyPair.create(stockCurrency, localCurrency));
-                    _exchangeRateMonitor.startNewThreadsIfNecessary();
-                    _exchangeRateMonitor.refresh();
+                if (stockCurrency.equals(localCurrency)) {
+                    break;
                 }
+
+                _exchangeRateMonitor.addCurrencyPair(CurrencyPair.create(stockCurrency, localCurrency));
+                _exchangeRateMonitor.startNewThreadsIfNecessary();
+                _exchangeRateMonitor.refresh();
             }
             break;
         } while (true);
@@ -2427,19 +2424,14 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
     private void refreshStatusBarExchangeRateVisibility() {
         final JStock mainFrame = JStock.getInstance();
-        final JStockOptions jStockOptions = mainFrame.getJStockOptions();
 
-        final Country country = jStockOptions.getCountry();
-
-        final boolean currencyExchangeEnable = jStockOptions.isCurrencyExchangeEnable(country);
+        Set<CurrencyPair> currencyPairs = this.getCurrencyPairs();
         
-        if (!currencyExchangeEnable) {
+        if (currencyPairs.isEmpty()) {
             mainFrame.setStatusBarExchangeRateVisible(false);
             mainFrame.setStatusBarExchangeRateToolTipText(null);
             return;
         }
-        
-        Set<CurrencyPair> currencyPairs = this.getCurrencyPairs();
         
         // We will display the currency exchange rate, only if there is 1 
         // currency pair.
@@ -2483,10 +2475,6 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         final JStock jstock = JStock.getInstance();
         final JStockOptions jStockOptions = jstock.getJStockOptions();
 
-        final Country country = jStockOptions.getCountry();
-
-        final boolean currencyExchangeEnable = jStockOptions.isCurrencyExchangeEnable(country);
-
         refreshStatusBarExchangeRateVisibility();
         
         final ExchangeRateMonitor oldExchangeRateMonitor = this.exchangeRateMonitor;
@@ -2501,16 +2489,6 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 }
             });
         }
-
-        if (!currencyExchangeEnable) {
-            this.exchangeRateMonitor = null;
-            if (oldExchangeRateMonitor != null) { 
-                this.updateWealthHeader();
-            }
-            return;
-        }
-        
-        assert(currencyExchangeEnable);
         
         this.exchangeRateMonitor = new ExchangeRateMonitor(
             Constants.EXCHANGE_RATE_MONITOR_MAX_THREAD, 
@@ -2789,7 +2767,6 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         final Country country = jStockOptions.getCountry();
         final Country localCountry = jStockOptions.getLocalCurrencyCountry(country);
         final Currency localCurrency = localCountry.localCurrency;
-        final boolean currencyExchangeEnable = jStockOptions.isCurrencyExchangeEnable(country);
 
         // TODO: SUPER UGLY HACK?!?!?!?!
         double exchangeRate = 1.0;

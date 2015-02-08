@@ -85,7 +85,7 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
         javax.swing.JLabel jLabel2 = new javax.swing.JLabel();
         jComboBox1 = new javax.swing.JComboBox();
         jComboBox2 = new javax.swing.JComboBox();
-        jCheckBox2 = new javax.swing.JCheckBox();
+        javax.swing.JLabel jLabel3 = new javax.swing.JLabel();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -157,12 +157,7 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
         jComboBox2.setModel(getCountryComboBoxModel());
         jComboBox2.setRenderer(new MyCellRenderer());
 
-        jCheckBox2.setText(getConvertCurrencyString());
-        jCheckBox2.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                jCheckBox2ItemStateChanged(evt);
-            }
-        });
+        jLabel3.setText(bundle.getString("OptionsSellAdvisorJPanel_Currency")); // NOI18N
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -171,14 +166,12 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addComponent(jLabel2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addComponent(jCheckBox2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(jLabel2)
+                    .addComponent(jLabel3))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
@@ -190,8 +183,8 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
                     .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jCheckBox2)
-                    .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel3))
                 .addContainerGap())
         );
 
@@ -213,7 +206,7 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
                 .addContainerGap()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -221,16 +214,6 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
 
         add(jPanel1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
-
-    private void jCheckBox2ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jCheckBox2ItemStateChanged
-        // Update the GUI state of combo box.
-        updateGUIState();
-    }//GEN-LAST:event_jCheckBox2ItemStateChanged
-
-    // Print out label text for currency exchange enable check box.
-    private String getConvertCurrencyString() {
-        return MessageFormat.format(GUIBundle.getString("OptionsSellAdvisorJPanel_ConvertCurrencyFromTo"), JStock.getInstance().getJStockOptions().getCountry().humanString);
-    }
 
     private JFormattedTextField getPercentageJFormattedTextField() {
         NumberFormat format= NumberFormat.getNumberInstance();
@@ -326,11 +309,9 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
         this.jFormattedTextField1.setValue(jStockOptions.getExpectedProfitPercentage());
         this.jCheckBox1.setSelected(jStockOptions.isPenceToPoundConversionEnabled());
         this.jComboBox1.setSelectedItem(jStockOptions.getCurrencySymbol(jStockOptions.getCountry()));
-        this.jCheckBox2.setSelected(jStockOptions.isCurrencyExchangeEnable(jStockOptions.getCountry()));
         this.jComboBox2.setSelectedItem(jStockOptions.getLocalCurrencyCountry(jStockOptions.getCountry()));
         this.jCheckBox3.setSelected(jStockOptions.isFourDecimalPlacesEnabled());
         commitEdit();
-        updateGUIState();
     }
 
     @Override
@@ -343,7 +324,6 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
             jStockOptions.setCurrencySymbol(jStockOptions.getCountry(), currencySymbol);
         }
 
-        jStockOptions.setCurrencyExchangeEnable(jStockOptions.getCountry(), jCheckBox2.isSelected());
         jStockOptions.setLocalCurrencyCountry(jStockOptions.getCountry(), (Country)jComboBox2.getSelectedItem());
         jStockOptions.setFourDecimalPlacesEnabled(this.jCheckBox3.isSelected());
         
@@ -353,12 +333,6 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
         JStock.getInstance().initExchangeRateMonitor();
 
         return true;
-    }
-
-    // Update the GUI state of combo box, according to currency exchange enable
-    // feature.
-    private void updateGUIState() {
-        jComboBox2.setEnabled(jCheckBox2.isSelected());
     }
 
     // Display an icon and a string for each object in the list.
@@ -414,7 +388,6 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox jCheckBox1;
-    private javax.swing.JCheckBox jCheckBox2;
     javax.swing.JCheckBox jCheckBox3;
     private javax.swing.JComboBox jComboBox1;
     private javax.swing.JComboBox jComboBox2;
