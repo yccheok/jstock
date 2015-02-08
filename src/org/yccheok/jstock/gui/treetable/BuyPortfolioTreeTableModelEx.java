@@ -27,7 +27,6 @@ import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.Country;
 import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.engine.currency.Currency;
-import org.yccheok.jstock.engine.currency.CurrencyPair;
 import org.yccheok.jstock.gui.JStockOptions;
 import org.yccheok.jstock.gui.JStock;
 import org.yccheok.jstock.internationalization.GUIBundle;
@@ -42,6 +41,8 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
             
     public void bind(PortfolioRealTimeInfo portfolioRealTimeInfo) {
         this.portfolioRealTimeInfo = portfolioRealTimeInfo;
+        final Portfolio portfolio = (Portfolio)getRoot();
+        portfolio.bind(portfolioRealTimeInfo);
     }
     
     public BuyPortfolioTreeTableModelEx() {
@@ -219,22 +220,20 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
         return price;
     }
     
-    public double getGainLossValue() {
-        return getGainLossValue((Portfolio)getRoot());
+    public double getGainLossValue(Currency localCurrency) {
+        Portfolio portfolio = (Portfolio)getRoot();
+        return getCurrentValue(localCurrency) - portfolio.getTotal(localCurrency);
     }
     
-    private double getGainLossValue(Portfolio portfolio) {
-        return getCurrentValue(portfolio) - portfolio.getTotal();
-    }
-    
-    public double getGainLossPercentage() {
-        return getGainLossPercentage((Portfolio)getRoot());
-    }
-    
-    private double getGainLossPercentage(Portfolio portfolio) {
-        if(portfolio.getTotal() == 0) return 0.0;
+    public double getGainLossPercentage(Currency localCurrency) {
+        Portfolio portfolio = (Portfolio)getRoot();
         
-        return (getCurrentValue(portfolio) - portfolio.getTotal()) / portfolio.getTotal() * 100.0;        
+        double total = portfolio.getTotal(localCurrency);
+        if (total == 0.0) {
+            return 0.0;
+        }
+        
+        return (getCurrentValue(localCurrency) - total) / total * 100.0;        
     }
 
     public double getGainLossPercentage(TransactionSummary transactionSummary) {
@@ -248,13 +247,13 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
     }
     
     public double getNetGainLossPercentage(TransactionSummary transactionSummary) {
-        if(transactionSummary.getTotal() == 0) return 0.0;
+        if (transactionSummary.getTotal() == 0) return 0.0;
         
         return (getCurrentValue(transactionSummary) - transactionSummary.getNetTotal()) / transactionSummary.getNetTotal() * 100.0;        
     }
     
     public double getGainLossPercentage(Transaction transaction) {
-        if(transaction.getTotal() == 0) return 0.0;
+        if (transaction.getTotal() == 0) return 0.0;
         
         return (getCurrentValue(transaction) - transaction.getTotal()) / transaction.getTotal() * 100.0;        
     }
@@ -264,30 +263,28 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
     }
     
     public double getNetGainLossPercentage(Transaction transaction) {
-        if(transaction.getNetTotal() == 0) return 0.0;
+        if (transaction.getNetTotal() == 0) return 0.0;
         
         return (getCurrentValue(transaction) - transaction.getNetTotal()) / transaction.getNetTotal() * 100.0;        
     }
     
-    public double getNetGainLossValue() {
-        return getNetGainLossValue((Portfolio)getRoot());
+    public double getNetGainLossValue(Currency localCurrency) {
+        Portfolio portfolio = (Portfolio)getRoot();
+        return getCurrentValue(localCurrency) - portfolio.getNetTotal(localCurrency);
     }
     
-    private double getNetGainLossValue(Portfolio portfolio) {
-        return getCurrentValue(portfolio) - portfolio.getNetTotal();
-    }
-
-    public double getNetGainLossPercentage() {
-        return getNetGainLossPercentage((Portfolio)getRoot());
-    }
-    
-    private double getNetGainLossPercentage(Portfolio portfolio) {
-        if(portfolio.getNetTotal() == 0) return 0.0;
+    public double getNetGainLossPercentage(Currency localCurrency) {
+        Portfolio portfolio = (Portfolio)getRoot();
         
-        return (getCurrentValue(portfolio) - portfolio.getNetTotal()) / portfolio.getNetTotal() * 100.0;        
+        double netTotal = portfolio.getNetTotal(localCurrency);
+        if (netTotal == 0.0) {
+            return 0.0;
+        }
+        
+        return (getCurrentValue(localCurrency) - netTotal) / netTotal * 100.0;        
     }
 
-    public double getCurrentValue(Country localCountry) {
+    public double getCurrentValue(Currency localCurrency) {
         Portfolio portfolio = (Portfolio)getRoot();
         
         final int count = portfolio.getChildCount();
@@ -309,7 +306,7 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
         
             final Code code = transaction.getStock().code;
             
-            final double exchangeRate = org.yccheok.jstock.portfolio.Utils.getExchangeRate(portfolioRealTimeInfo, localCountry, code);
+            final double exchangeRate = org.yccheok.jstock.portfolio.Utils.getExchangeRate(portfolioRealTimeInfo, localCurrency, code);
                                     
             result += (currentValue * exchangeRate);
         }
@@ -317,45 +314,13 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
         return result;
 
     }
-    
-    public double getCurrentValue() {
-        return this.getCurrentValue((Portfolio)getRoot());        
+
+    public double getNetPurchaseValue(Currency localCurrency) {
+        return ((Portfolio)getRoot()).getNetTotal(localCurrency);
     }
 
-    public double getNetPurchaseValue() {
-        return ((Portfolio)getRoot()).getNetTotal();
-    }
-
-    public double getPurchaseValue() {
-        return ((Portfolio)getRoot()).getTotal();
-    }
-    
-    private double getCurrentValue(Portfolio portfolio) {
-        final int count = portfolio.getChildCount();
-        
-        double result = 0.0;
-        
-        for (int i = 0; i < count; i++) {
-            Object o = portfolio.getChildAt(i);
-            
-            assert(o instanceof TransactionSummary);
-            
-            final TransactionSummary transactionSummary = (TransactionSummary)o;
-                    
-            assert(transactionSummary.getChildCount() > 0);            
-                        
-            final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
-        
-            final Code code = transaction.getStock().code;        
-        
-            if (org.yccheok.jstock.portfolio.Utils.shouldConvertPenceToPound(portfolioRealTimeInfo, code)) {
-                result += (this.getCurrentValue(transactionSummary) / 100.0);
-            } else {
-                result += this.getCurrentValue(transactionSummary);    
-            }
-        }
-        
-        return result;
+    public double getPurchaseValue(Currency localCurrency) {
+        return ((Portfolio)getRoot()).getTotal(localCurrency);
     }
     
     public double getPurchasePrice(TransactionSummary transactionSummary) {
@@ -409,6 +374,10 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
         final boolean isPenceToPoundConversionEnabled = jStockOptions.isPenceToPoundConversionEnabled();
         
         if (node instanceof Portfolio) {
+            final Country country = jStockOptions.getCountry();
+            final Country localCountry = jStockOptions.getLocalCurrencyCountry(country);
+            final Currency localCurrency = localCountry.localCurrency;
+
             final Portfolio portfolio = (Portfolio)node;
             
             switch(column) {
@@ -416,47 +385,27 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
                     return GUIBundle.getString("PortfolioManagementJPanel_Buy");
         
                 case 5:
-                    if (isPenceToPoundConversionEnabled == false) {
-                        if (isFeeCalculationEnabled) {
-                            return portfolio.getNetTotal();
-                        } else {
-                            return portfolio.getTotal();
-                        }
+                    if (isFeeCalculationEnabled) {
+                        return portfolio.getNetTotal(localCurrency);
                     } else {
-                        if (isFeeCalculationEnabled) {
-                            return portfolio.getNetTotal() / 100.0;
-                        } else {
-                            return portfolio.getTotal() / 100.0;
-                        }
+                        return portfolio.getTotal(localCurrency);
                     }
                     
                 case 6:
-                    if (isPenceToPoundConversionEnabled == false) {
-                        return getCurrentValue(portfolio);
-                    } else {
-                        return getCurrentValue(portfolio) / 100.0;
-                    }
+                    return getCurrentValue(localCurrency);
                     
                 case 7:
-                    if (isPenceToPoundConversionEnabled == false) {
-                        if (isFeeCalculationEnabled) {
-                            return this.getNetGainLossValue(portfolio);
-                        } else {
-                            return this.getGainLossValue(portfolio);
-                        }                        
+                    if (isFeeCalculationEnabled) {
+                        return this.getNetGainLossValue(localCurrency);
                     } else {
-                        if (isFeeCalculationEnabled) {
-                            return this.getNetGainLossValue(portfolio) / 100.00;
-                        } else {
-                            return this.getGainLossValue(portfolio) / 100.00;
-                        }
-                    }
+                        return this.getGainLossValue(localCurrency);
+                    }                        
                     
                 case 8:
                     if (isFeeCalculationEnabled) {
-                        return new DoubleWrapper(DecimalPlaces.Two, this.getNetGainLossPercentage(portfolio));
+                        return new DoubleWrapper(DecimalPlaces.Two, this.getNetGainLossPercentage(localCurrency));
                     } else {
-                        return new DoubleWrapper(DecimalPlaces.Two, this.getGainLossPercentage(portfolio));
+                        return new DoubleWrapper(DecimalPlaces.Two, this.getGainLossPercentage(localCurrency));
                     }
     
                 case 9:
