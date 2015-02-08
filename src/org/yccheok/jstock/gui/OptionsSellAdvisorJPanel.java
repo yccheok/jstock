@@ -300,7 +300,6 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
     @Override
     public void set(JStockOptions jStockOptions) {
         this.jFormattedTextField1.setValue(jStockOptions.getExpectedProfitPercentage());
-        this.jCheckBox1.setSelected(jStockOptions.isPenceToPoundConversionEnabled());
         this.jComboBox1.setSelectedItem(jStockOptions.getCurrencySymbol(jStockOptions.getCountry()));
         this.jComboBox2.setSelectedItem(jStockOptions.getLocalCurrencyCountry(jStockOptions.getCountry()));
         this.jCheckBox3.setSelected(jStockOptions.isFourDecimalPlacesEnabled());
@@ -311,7 +310,6 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
     public boolean apply(JStockOptions jStockOptions) {
         commitEdit();
         jStockOptions.setExpectedProfitPercentage((Double)jFormattedTextField1.getValue());
-        jStockOptions.setPenceToPoundConversionEnabled(this.jCheckBox1.isSelected());
         final String currencySymbol = jComboBox1.getSelectedItem().toString().trim();
         if (currencySymbol.isEmpty() == false) {
             jStockOptions.setCurrencySymbol(jStockOptions.getCountry(), currencySymbol);

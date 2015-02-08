@@ -94,7 +94,6 @@ public class OptionsJDialog extends javax.swing.JDialog implements JStockOptions
         final int oldScanningSpeed = jStockOptions.getScanningSpeed();
         final boolean oldIsFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
         final boolean oldIsDynamicChartVisible = jStockOptions.isDynamicChartVisible();
-        final boolean oldIsPenceToPoundConversionEnabled = jStockOptions.isPenceToPoundConversionEnabled();
         final boolean oldIsFourDecimalPlacesEnabled = jStockOptions.isFourDecimalPlacesEnabled();
         final PriceSource oldPriceSource = jStockOptions.getPriceSource(country);
         final Country oldLocalCurrencyCountry = jStockOptions.getLocalCurrencyCountry(country);
@@ -116,7 +115,7 @@ public class OptionsJDialog extends javax.swing.JDialog implements JStockOptions
         if (oldIsDynamicChartVisible != jStockOptions.isDynamicChartVisible()) {
             JStock.getInstance().initDynamicChartVisibility();
         }        
-        if (oldLocalCurrencyCountry != jStockOptions.getLocalCurrencyCountry(country) || oldIsPenceToPoundConversionEnabled != jStockOptions.isPenceToPoundConversionEnabled() || oldIsFourDecimalPlacesEnabled != jStockOptions.isFourDecimalPlacesEnabled()) {
+        if (oldLocalCurrencyCountry != jStockOptions.getLocalCurrencyCountry(country) || oldIsFourDecimalPlacesEnabled != jStockOptions.isFourDecimalPlacesEnabled()) {
             JStock.getInstance().getPortfolioManagementJPanel().refreshGUIAfterOptionsJDialog();
         }
         
