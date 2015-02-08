@@ -47,6 +47,7 @@ import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.time.TimeSeriesDataItem;
 import org.jfree.ui.RectangleEdge;
+import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.gui.JStockOptions;
 import org.yccheok.jstock.gui.JStock;
@@ -278,8 +279,10 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         g2.setFont(oldFont);
     }
 
-    private double convertToPoundIfNecessary(double value) {
-        if (JStock.getInstance().getJStockOptions().isPenceToPoundConversionEnabled() == false) {
+    private double convertToPoundIfNecessary(Code code, double value) {
+        final boolean shouldConvertPenceToPound = org.yccheok.jstock.portfolio.Utils.shouldConvertPenceToPound(this.investmentFlowChartJDialog.getPortfolioRealTimeInfo(), code);
+        
+        if (shouldConvertPenceToPound == false) {
             return value;
         }
         return value / 100.0;
@@ -308,7 +311,7 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
                 final StockInfo stockInfo = (StockInfo)activity.get(Activity.Param.StockInfo);
                 this.ROIParams.add(GUIBundle.getString("InvestmentFlowLayerUI_Own") + " " + 
                         org.yccheok.jstock.portfolio.Utils.toQuantity(quantity) + " " + stockInfo.symbol);
-                final double amount = convertToPoundIfNecessary(quantity * this.investmentFlowChartJDialog.getStockPrice(stockInfo.code));
+                final double amount = convertToPoundIfNecessary(stockInfo.code, quantity * this.investmentFlowChartJDialog.getStockPrice(stockInfo.code));
                 this.totalROIValue += amount;
                 this.ROIValues.add(org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(DecimalPlaces.Three, amount));
             }
@@ -317,7 +320,7 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
                 final StockInfo stockInfo = (StockInfo)activity.get(Activity.Param.StockInfo);
                 this.ROIParams.add(activity.getType() + " " +
                         org.yccheok.jstock.portfolio.Utils.toQuantity(quantity) + " " + stockInfo.symbol);
-                final double amount = convertToPoundIfNecessary(activity.getAmount());
+                final double amount = convertToPoundIfNecessary(stockInfo.code, activity.getAmount());
                 this.totalROIValue += amount;
                 this.ROIValues.add(org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(DecimalPlaces.Three, amount));
             }
@@ -422,7 +425,9 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
                 org.yccheok.jstock.portfolio.Utils.toQuantity(activity.get(Activity.Param.Quantity)) + " " + ((StockInfo)activity.get(Activity.Param.StockInfo)).symbol);
 
             if (activity.getType() == Activity.Type.Buy) {
-                final double amount = convertToPoundIfNecessary(activity.getAmount());
+                final StockInfo stockInfo = (StockInfo)activity.get(Activity.Param.StockInfo);
+                
+                final double amount = convertToPoundIfNecessary(stockInfo.code, activity.getAmount());
                 this.totalInvestValue += amount;
                 this.investValues.add(org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(DecimalPlaces.Three, amount));
             }
