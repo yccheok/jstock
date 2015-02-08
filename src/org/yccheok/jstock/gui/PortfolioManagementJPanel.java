@@ -2788,6 +2788,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
       
         final Country country = jStockOptions.getCountry();
         final Country localCountry = jStockOptions.getLocalCurrencyCountry(country);
+        final Currency localCurrency = localCountry.localCurrency;
         final boolean currencyExchangeEnable = jStockOptions.isCurrencyExchangeEnable(country);
 
         // TODO: SUPER UGLY HACK?!?!?!?!
@@ -2798,31 +2799,29 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         final double paperProfit;
         final double realizedProfit;
 
-        if (currencyExchangeEnable) {
-            share = buyPortfolioTreeTableModel.getCurrentValue(localCountry);
-        } else {
-            share = buyPortfolioTreeTableModel.getCurrentValue();
-        }
+        share = buyPortfolioTreeTableModel.getCurrentValue(localCurrency);
 
         if (isFeeCalculationEnabled) {
-            cash = exchangeRate * (sellPortfolioTreeTableModel.getNetSellingValue() - ((Portfolio)sellPortfolioTreeTableModel.getRoot()).getNetReferenceTotal() - buyPortfolioTreeTableModel.getNetPurchaseValue() + this.getDepositSummary().getTotal() + this.getDividendSummary().getTotal());
-            paperProfit = exchangeRate * buyPortfolioTreeTableModel.getNetGainLossValue();
-            realizedProfit = exchangeRate * sellPortfolioTreeTableModel.getNetGainLossValue();
+            //cash = exchangeRate * (sellPortfolioTreeTableModel.getNetSellingValue() - ((Portfolio)sellPortfolioTreeTableModel.getRoot()).getNetReferenceTotal() - buyPortfolioTreeTableModel.getNetPurchaseValue() + this.getDepositSummary().getTotal() + this.getDividendSummary().getTotal());
+            cash = 0.0;
+            paperProfit = exchangeRate * buyPortfolioTreeTableModel.getNetGainLossValue(localCurrency);
+            realizedProfit = sellPortfolioTreeTableModel.getNetGainLossValue(localCurrency);
         } else {
-            cash = exchangeRate * (sellPortfolioTreeTableModel.getSellingValue() - ((Portfolio)sellPortfolioTreeTableModel.getRoot()).getReferenceTotal() - buyPortfolioTreeTableModel.getPurchaseValue() + this.getDepositSummary().getTotal() + this.getDividendSummary().getTotal());
-            paperProfit = exchangeRate * buyPortfolioTreeTableModel.getGainLossValue();
-            realizedProfit = exchangeRate * sellPortfolioTreeTableModel.getGainLossValue();                
+            //cash = exchangeRate * (sellPortfolioTreeTableModel.getSellingValue() - ((Portfolio)sellPortfolioTreeTableModel.getRoot()).getReferenceTotal() - buyPortfolioTreeTableModel.getPurchaseValue() + this.getDepositSummary().getTotal() + this.getDividendSummary().getTotal());
+            cash = 0.0;
+            paperProfit = exchangeRate * buyPortfolioTreeTableModel.getGainLossValue(localCurrency);
+            realizedProfit = sellPortfolioTreeTableModel.getGainLossValue(localCurrency);
         }
 
         final double paperProfitPercentage;
         final double realizedProfitPercentage;
 
         if (isFeeCalculationEnabled) {
-            paperProfitPercentage = buyPortfolioTreeTableModel.getNetGainLossPercentage();
-            realizedProfitPercentage = sellPortfolioTreeTableModel.getNetGainLossPercentage();
+            paperProfitPercentage = buyPortfolioTreeTableModel.getNetGainLossPercentage(localCurrency);
+            realizedProfitPercentage = sellPortfolioTreeTableModel.getNetGainLossPercentage(localCurrency);
         } else {
-            paperProfitPercentage = buyPortfolioTreeTableModel.getGainLossPercentage();
-            realizedProfitPercentage = sellPortfolioTreeTableModel.getGainLossPercentage();            
+            paperProfitPercentage = buyPortfolioTreeTableModel.getGainLossPercentage(localCurrency);
+            realizedProfitPercentage = sellPortfolioTreeTableModel.getGainLossPercentage(localCurrency);
         }
         
         final String _share = org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlaces.Two, share);
