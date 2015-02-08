@@ -613,7 +613,10 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
                             if (total == 0) {
                                 continue;
                             }
-                            if (JStock.getInstance().getJStockOptions().isPenceToPoundConversionEnabled()) {
+                            
+                            final boolean shouldConvertPenceToPound = org.yccheok.jstock.portfolio.Utils.shouldConvertPenceToPound(portfolioManagementJPanel.getPortfolioRealTimeInfo(), dividend.stockInfo.code);
+                            
+                            if (shouldConvertPenceToPound) {
                                 total = total / 100.0;
                             }
                             StockInfo betterStockInfo = JStock.getInstance().getStockInfoDatabase().codeToStockInfo(dividend.stockInfo.code);
