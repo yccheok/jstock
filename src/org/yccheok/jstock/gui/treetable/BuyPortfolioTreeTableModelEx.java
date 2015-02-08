@@ -133,6 +133,10 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
         return status;
     }
 
+    public void refreshRoot() {
+        fireTreeTableNodeChanged(getRoot());
+    }
+    
     public boolean refresh(Code code) {
         final Portfolio portfolio = (Portfolio)getRoot();
         final int count = portfolio.getChildCount();

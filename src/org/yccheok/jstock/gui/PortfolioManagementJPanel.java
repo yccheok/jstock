@@ -2553,6 +2553,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 refreshStatusBarExchangeRateVisibility();
                 
                 updateWealthHeader();
+                
+                final BuyPortfolioTreeTableModelEx portfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
+                portfolioTreeTableModel.refreshRoot();
             }
         };
     }

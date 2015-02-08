@@ -19,6 +19,7 @@
 
 package org.yccheok.jstock.gui;
 
+import org.yccheok.jstock.engine.Country;
 import org.yccheok.jstock.engine.PriceSource;
 
 /**
@@ -88,12 +89,15 @@ public class OptionsJDialog extends javax.swing.JDialog implements JStockOptions
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        final Country country = jStockOptions.getCountry();
+        
         final int oldScanningSpeed = jStockOptions.getScanningSpeed();
         final boolean oldIsFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
         final boolean oldIsDynamicChartVisible = jStockOptions.isDynamicChartVisible();
         final boolean oldIsPenceToPoundConversionEnabled = jStockOptions.isPenceToPoundConversionEnabled();
         final boolean oldIsFourDecimalPlacesEnabled = jStockOptions.isFourDecimalPlacesEnabled();
-        final PriceSource oldPriceSource = jStockOptions.getPriceSource(jStockOptions.getCountry());
+        final PriceSource oldPriceSource = jStockOptions.getPriceSource(country);
+        final Country oldLocalCurrencyCountry = jStockOptions.getLocalCurrencyCountry(country);
         
         if (apply(jStockOptions) == false) {
             return;
@@ -112,7 +116,7 @@ public class OptionsJDialog extends javax.swing.JDialog implements JStockOptions
         if (oldIsDynamicChartVisible != jStockOptions.isDynamicChartVisible()) {
             JStock.getInstance().initDynamicChartVisibility();
         }        
-        if (oldIsPenceToPoundConversionEnabled != jStockOptions.isPenceToPoundConversionEnabled() || oldIsFourDecimalPlacesEnabled != jStockOptions.isFourDecimalPlacesEnabled()) {
+        if (oldLocalCurrencyCountry != jStockOptions.getLocalCurrencyCountry(country) || oldIsPenceToPoundConversionEnabled != jStockOptions.isPenceToPoundConversionEnabled() || oldIsFourDecimalPlacesEnabled != jStockOptions.isFourDecimalPlacesEnabled()) {
             JStock.getInstance().getPortfolioManagementJPanel().refreshGUIAfterOptionsJDialog();
         }
         
