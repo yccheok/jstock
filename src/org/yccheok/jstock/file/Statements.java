@@ -70,6 +70,7 @@ import org.yccheok.jstock.gui.treetable.BuyPortfolioTreeTableModelEx;
 import org.yccheok.jstock.gui.treetable.SellPortfolioTreeTableModelEx;
 import org.yccheok.jstock.portfolio.Portfolio;
 import org.yccheok.jstock.portfolio.PortfolioInfo;
+import org.yccheok.jstock.portfolio.PortfolioRealTimeInfo;
 import org.yccheok.jstock.portfolio.Transaction;
 import org.yccheok.jstock.portfolio.TransactionSummary;
 import org.yccheok.jstock.watchlist.WatchlistInfo;
@@ -101,10 +102,7 @@ public class Statements {
         this.guiBundleWrapper = guiBundleWrapper;
     }
 
-    public static Statements newInstanceFromBuyPortfolioTreeTableModel(BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel, boolean languageIndependent) {
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
-        final boolean isPenceToPoundConversionEnabled = jStockOptions.isPenceToPoundConversionEnabled();
-
+    public static Statements newInstanceFromBuyPortfolioTreeTableModel(BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel, PortfolioRealTimeInfo portfolioRealTimeInfo, boolean languageIndependent) {
         final GUIBundleWrapper guiBundleWrapper = GUIBundleWrapper.newInstance(languageIndependent ? GUIBundleWrapper.Language.INDEPENDENT : GUIBundleWrapper.Language.DEFAULT);
         
         final String[] tmp = {
@@ -150,7 +148,9 @@ public class Statements {
             {
                 final Transaction transaction = (Transaction)transactionSummary.getChildAt(j);
                 final Stock stock = transaction.getStock();
-                final List<Atom> atoms = new ArrayList<Atom>();
+                final boolean shouldConvertPenceToPound = org.yccheok.jstock.portfolio.Utils.shouldConvertPenceToPound(portfolioRealTimeInfo, stock.code);
+                
+                final List<Atom> atoms = new ArrayList<>();
                 atoms.add(new Atom(stock.code.toString(), tmp[0]));
                 atoms.add(new Atom(stock.symbol.toString(), tmp[1]));
                 
@@ -160,14 +160,14 @@ public class Statements {
                 atoms.add(new Atom(transaction.getQuantity(), tmp[3]));
                 atoms.add(new Atom(transaction.getPrice(), tmp[4]));
                 atoms.add(new Atom(buyPortfolioTreeTableModel.getCurrentPrice(transaction), tmp[5]));
-                if (isPenceToPoundConversionEnabled == false) {
+                if (shouldConvertPenceToPound == false) {
                     atoms.add(new Atom(transaction.getTotal(), tmp[6]));
                 } else {
                     atoms.add(new Atom(transaction.getTotal() / 100.0, tmp[6]));
                 }
                 atoms.add(new Atom(buyPortfolioTreeTableModel.getCurrentValue(transaction), tmp[7]));
                 atoms.add(new Atom(buyPortfolioTreeTableModel.getGainLossPrice(transaction), tmp[8]));
-                if (isPenceToPoundConversionEnabled == false) {
+                if (shouldConvertPenceToPound == false) {
                     atoms.add(new Atom(buyPortfolioTreeTableModel.getGainLossValue(transaction), tmp[9]));
                 } else {
                     atoms.add(new Atom(buyPortfolioTreeTableModel.getGainLossValue(transaction) / 100.0, tmp[9]));
@@ -176,7 +176,7 @@ public class Statements {
                 atoms.add(new Atom(transaction.getBroker(), tmp[11]));
                 atoms.add(new Atom(transaction.getClearingFee(), tmp[12]));
                 atoms.add(new Atom(transaction.getStampDuty(), tmp[13]));
-                if (isPenceToPoundConversionEnabled == false) {
+                if (shouldConvertPenceToPound == false) {
                     atoms.add(new Atom(transaction.getNetTotal(), tmp[14]));
                     atoms.add(new Atom(buyPortfolioTreeTableModel.getNetGainLossValue(transaction), tmp[15]));
                 } else {
@@ -834,10 +834,7 @@ public class Statements {
         return s;
     }
 
-    public static Statements newInstanceFromSellPortfolioTreeTableModel(SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel, boolean languageIndependent) {
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
-        final boolean isPenceToPoundConversionEnabled = jStockOptions.isPenceToPoundConversionEnabled();
-
+    public static Statements newInstanceFromSellPortfolioTreeTableModel(SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel, PortfolioRealTimeInfo portfolioRealTimeInfo, boolean languageIndependent) {
         final GUIBundleWrapper guiBundleWrapper = GUIBundleWrapper.newInstance(languageIndependent ? GUIBundleWrapper.Language.INDEPENDENT : GUIBundleWrapper.Language.DEFAULT);
         
         final String[] tmp = {            
@@ -887,7 +884,8 @@ public class Statements {
             {
                 final Transaction transaction = (Transaction)transactionSummary.getChildAt(j);
                 final Stock stock = transaction.getStock();
-                final List<Atom> atoms = new ArrayList<Atom>();
+                final boolean shouldConvertPenceToPound = org.yccheok.jstock.portfolio.Utils.shouldConvertPenceToPound(portfolioRealTimeInfo, stock.code);
+                final List<Atom> atoms = new ArrayList<>();
                 atoms.add(new Atom(stock.code.toString(), tmp[0]));
                 atoms.add(new Atom(stock.symbol.toString(), tmp[1]));
                 
@@ -900,7 +898,7 @@ public class Statements {
                 atoms.add(new Atom(transaction.getPrice(), tmp[5]));
                 atoms.add(new Atom(transaction.getReferencePrice(), tmp[6]));
                 
-                if (isPenceToPoundConversionEnabled == false) {
+                if (shouldConvertPenceToPound == false) {
                     atoms.add(new Atom(transaction.getTotal(), tmp[7]));                
                     atoms.add(new Atom(transaction.getReferenceTotal(), tmp[8]));
                 } else {
@@ -914,7 +912,7 @@ public class Statements {
                 
                 atoms.add(new Atom(sellPortfolioTreeTableModel.getGainLossPrice(transaction), tmp[12]));
                 
-                if (isPenceToPoundConversionEnabled == false) {
+                if (shouldConvertPenceToPound == false) {
                     atoms.add(new Atom(sellPortfolioTreeTableModel.getGainLossValue(transaction), tmp[13]));
                 } else {
                     atoms.add(new Atom(sellPortfolioTreeTableModel.getGainLossValue(transaction) / 100.0, tmp[13]));
@@ -925,7 +923,7 @@ public class Statements {
                 atoms.add(new Atom(transaction.getClearingFee(), tmp[16]));
                 atoms.add(new Atom(transaction.getStampDuty(), tmp[17]));
                 
-                if (isPenceToPoundConversionEnabled == false) {
+                if (shouldConvertPenceToPound == false) {
                     atoms.add(new Atom(transaction.getNetTotal(), tmp[18]));                
                     atoms.add(new Atom(sellPortfolioTreeTableModel.getNetGainLossValue(transaction), tmp[19]));
                 } else {
