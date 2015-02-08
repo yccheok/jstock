@@ -376,7 +376,6 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
     public Object getValueAt(Object node, int column) {
         final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         final boolean isFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
-        final boolean isPenceToPoundConversionEnabled = jStockOptions.isPenceToPoundConversionEnabled();
         
         if (node instanceof Portfolio) {
             final Country country = jStockOptions.getCountry();
@@ -432,6 +431,8 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
             
             if (transactionSummary.getChildCount() <= 0) return null;
             
+            final boolean shouldConvertPenceToPound = org.yccheok.jstock.portfolio.Utils.shouldConvertPenceToPound(portfolioRealTimeInfo, ((Transaction)transactionSummary.getChildAt(0)).getStock().code);
+            
             switch(column) {
                 case 0:
                     return ((Transaction)transactionSummary.getChildAt(0)).getStock().symbol;
@@ -450,7 +451,7 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
                     return this.getCurrentPrice(transactionSummary);
                     
                 case 5:
-                    if (isPenceToPoundConversionEnabled == false) {
+                    if (shouldConvertPenceToPound == false) {
                         if (isFeeCalculationEnabled) {
                             return transactionSummary.getNetTotal();
                         } else {
@@ -465,14 +466,14 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
                     }
                     
                 case 6:
-                    if (isPenceToPoundConversionEnabled == false) {
+                    if (shouldConvertPenceToPound == false) {
                         return this.getCurrentValue(transactionSummary);
                     } else {
                         return this.getCurrentValue(transactionSummary) / 100.0;
                     }                    
                     
                 case 7:
-                    if (isPenceToPoundConversionEnabled == false) {
+                    if (shouldConvertPenceToPound == false) {
                         if (isFeeCalculationEnabled) {
                             return this.getNetGainLossValue(transactionSummary);
                         } else {
@@ -510,6 +511,8 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
         if (node instanceof Transaction) {
             final Transaction transaction = (Transaction)node;
             
+            final boolean shouldConvertPenceToPound = org.yccheok.jstock.portfolio.Utils.shouldConvertPenceToPound(portfolioRealTimeInfo, transaction.getStock().code);
+            
             switch(column) {
                 case 0:
                     return (transaction).getStock().symbol;
@@ -527,7 +530,7 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
                     return this.getCurrentPrice(transaction);
                     
                 case 5:
-                    if (isPenceToPoundConversionEnabled == false) {
+                    if (shouldConvertPenceToPound == false) {
                         if (isFeeCalculationEnabled) {
                             return transaction.getNetTotal();
                         } else {
@@ -542,14 +545,14 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
                     }
                     
                 case 6:
-                    if (isPenceToPoundConversionEnabled == false) {
+                    if (shouldConvertPenceToPound == false) {
                         return this.getCurrentValue(transaction);
                     } else {
                         return this.getCurrentValue(transaction) / 100.0;
                     }
                     
                 case 7:
-                    if (isPenceToPoundConversionEnabled == false) {
+                    if (shouldConvertPenceToPound == false) {
                         if (isFeeCalculationEnabled) {
                             return this.getNetGainLossValue(transaction);
                         } else {

@@ -67,6 +67,7 @@ import org.yccheok.jstock.portfolio.ActivitySummary;
 import org.yccheok.jstock.portfolio.Contract;
 import org.yccheok.jstock.portfolio.Dividend;
 import org.yccheok.jstock.portfolio.DividendSummary;
+import org.yccheok.jstock.portfolio.PortfolioRealTimeInfo;
 import org.yccheok.jstock.portfolio.Transaction;
 import org.yccheok.jstock.portfolio.TransactionSummary;
 
@@ -323,10 +324,11 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
                     }
                     final Double price = this.codeToPrice.get(stockInfo.code);
                     if (price != null) {
-                        amount += convertToPoundIfNecessary((price * quantity));
+                        amount += convertToPoundIfNecessary(stockInfo.code, (price * quantity));
                     }
                 } else if (type == Activity.Type.Sell) {
-                    amount += convertToPoundIfNecessary(activity.getAmount());
+                    final StockInfo stockInfo = (StockInfo)activity.get(Activity.Param.StockInfo);
+                    amount += convertToPoundIfNecessary(stockInfo.code, activity.getAmount());
                 } else if (type == Activity.Type.Dividend) {
                     amount += activity.getAmount();
                 } else {
@@ -359,8 +361,14 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         }
     }
 
-    private double convertToPoundIfNecessary(double value) {
-        if (JStock.getInstance().getJStockOptions().isPenceToPoundConversionEnabled() == false) {
+    public PortfolioRealTimeInfo getPortfolioRealTimeInfo() {
+        return this.portfolioManagementJPanel.getPortfolioRealTimeInfo();
+    }
+    
+    private double convertToPoundIfNecessary(Code code, double value) {
+        final boolean shouldConvertPenceToPound = org.yccheok.jstock.portfolio.Utils.shouldConvertPenceToPound(this.portfolioManagementJPanel.getPortfolioRealTimeInfo(), code);
+        
+        if (shouldConvertPenceToPound == false) {
             return value;
         }
         return value / 100.0;
@@ -376,19 +384,18 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
             for (int j = 0, count2 = activities.size(); j < count2; j++) {
                 final Activity activity = activities.get(j);
                 final Activity.Type type = activity.getType();
+                final StockInfo stockInfo = (StockInfo)activity.get(Activity.Param.StockInfo);
 
                 if (type == Activity.Type.Buy) {
-                    amount += activity.getAmount();
+                    amount += convertToPoundIfNecessary(stockInfo.code, activity.getAmount());
                 }
                 else if (type == Activity.Type.Sell) {
-                    amount -= activity.getAmount();
+                    amount -= convertToPoundIfNecessary(stockInfo.code, activity.getAmount());
                 }
                 else {
                     assert(false);
                 }
             }   // for (int j = 0, count2 = activities.size(); j < count2; j++)
-
-            amount = convertToPoundIfNecessary(amount);
 
             this.totalInvestValue += amount;
 
@@ -668,12 +675,12 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
 
     /* For real time stock information. */
     private RealTimeStockMonitor realTimeStockMonitor;    
-    private final Map<Code, Double> codeToPrice = new ConcurrentHashMap<Code, Double>();
+    private final Map<Code, Double> codeToPrice = new ConcurrentHashMap<>();
     /* Whether we had finished scan through all the BUY stocks. */
     private volatile boolean finishLookUpPrice = false;
     // Use in conjuction with realTimeStockMonitor, to obtain current BUY stocks
     // price.
-    private final Set<Code> lookUpCodes = new HashSet<Code>();
+    private final Set<Code> lookUpCodes = new HashSet<>();
     
     /* Overlay layer. */
     private InvestmentFlowLayerUI<ChartPanel> investmentFlowLayerUI;
