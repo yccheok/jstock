@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2012 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2015 Yan Cheng Cheok <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@ import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.portfolio.Dividend;
 import org.yccheok.jstock.portfolio.DividendSummary;
 import org.yccheok.jstock.portfolio.Portfolio;
+import org.yccheok.jstock.portfolio.PortfolioRealTimeInfo;
 import org.yccheok.jstock.portfolio.Transaction;
 import org.yccheok.jstock.portfolio.TransactionSummary;
 
@@ -62,7 +63,7 @@ public class SellPortfolioChartJDialog extends javax.swing.JDialog {
     };
     
     /** Creates new form SellPortfolioChartJDialog */
-    public SellPortfolioChartJDialog(java.awt.Frame parent, boolean modal, SellPortfolioTreeTableModelEx portfolioTreeTableModel, DividendSummary dividendSummary) {
+    public SellPortfolioChartJDialog(java.awt.Frame parent, boolean modal, SellPortfolioTreeTableModelEx portfolioTreeTableModel, PortfolioRealTimeInfo portfolioRealTimeInfo, DividendSummary dividendSummary) {
         super(parent, GUIBundle.getString("SellPortfolioChartJDialog_SellSummary"), modal);
 
         this.initCodeToTotalDividend(dividendSummary);
@@ -70,6 +71,7 @@ public class SellPortfolioChartJDialog extends javax.swing.JDialog {
         initComponents();
         
         this.portfolioTreeTableModel = portfolioTreeTableModel;
+        this.portfolioRealTimeInfo = portfolioRealTimeInfo;
         
         final JFreeChart freeChart;
         final int lastSelectedSellPortfolioChartIndex = JStock.getInstance().getJStockOptions().getLastSelectedSellPortfolioChartIndex();
@@ -180,12 +182,11 @@ public class SellPortfolioChartJDialog extends javax.swing.JDialog {
     private JFreeChart createChart(String name) {
         final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         final boolean isFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
-        final boolean isPenceToPoundConversionEnabled = jStockOptions.isPenceToPoundConversionEnabled();
         
         final Portfolio portfolio = (Portfolio)portfolioTreeTableModel.getRoot();
         final int count = portfolio.getChildCount();
         DefaultPieDataset data = new DefaultPieDataset();
-        final List<DataEx> dataExs = new ArrayList<DataEx>();
+        final List<DataEx> dataExs = new ArrayList<>();
         
         for (int i = 0; i < count; i++) {
             TransactionSummary transactionSummary = (TransactionSummary)portfolio.getChildAt(i);
@@ -198,9 +199,11 @@ public class SellPortfolioChartJDialog extends javax.swing.JDialog {
             final Symbol symbol = transaction.getStock().symbol;
             final Code code = transaction.getStock().code;
 
+            final boolean shouldConvertPenceToPound = org.yccheok.jstock.portfolio.Utils.shouldConvertPenceToPound(portfolioRealTimeInfo, code);
+            
             /* Should use reflection technology. */
             if(name.equals(cNames[0])) {
-                if (isPenceToPoundConversionEnabled == false) {
+                if (shouldConvertPenceToPound == false) {
                     if (isFeeCalculationEnabled) {
                         dataExs.add(DataEx.newInstance(symbol.toString(), portfolioTreeTableModel.getNetGainLossValue(transactionSummary)));
                     } else {
@@ -214,7 +217,7 @@ public class SellPortfolioChartJDialog extends javax.swing.JDialog {
                     }                    
                 }
             } else if(name.equals(cNames[1])) {
-                if (isPenceToPoundConversionEnabled == false) {
+                if (shouldConvertPenceToPound == false) {
                     if (isFeeCalculationEnabled) {
                         dataExs.add(DataEx.newInstance(symbol.toString(), -portfolioTreeTableModel.getNetGainLossValue(transactionSummary)));
                     } else {
@@ -247,7 +250,7 @@ public class SellPortfolioChartJDialog extends javax.swing.JDialog {
                     }
                 }
             } else if(name.equals(cNames[5])) {
-                if (isPenceToPoundConversionEnabled == false) {
+                if (shouldConvertPenceToPound == false) {
                     if (isFeeCalculationEnabled) {
                         dataExs.add(DataEx.newInstance(symbol.toString(), transactionSummary.getNetTotal()));
                     } else {
@@ -261,7 +264,7 @@ public class SellPortfolioChartJDialog extends javax.swing.JDialog {
                     }                    
                 }
             } else if(name.equals(cNames[6])) {
-                if (isPenceToPoundConversionEnabled == false) {
+                if (shouldConvertPenceToPound == false) {
                     if (isFeeCalculationEnabled) {
                         dataExs.add(DataEx.newInstance(symbol.toString(), transactionSummary.getNetReferenceTotal()));
                     } else {
@@ -309,9 +312,10 @@ public class SellPortfolioChartJDialog extends javax.swing.JDialog {
         chartPanel.setChart(freeChart);
     }//GEN-LAST:event_jComboBox1ActionPerformed
     
-    private SellPortfolioTreeTableModelEx portfolioTreeTableModel;
-    private ChartPanel chartPanel;
-    private Map<Code, Double> codeToTotalDividend = new HashMap<Code, Double>();
+    private final SellPortfolioTreeTableModelEx portfolioTreeTableModel;
+    private final PortfolioRealTimeInfo portfolioRealTimeInfo;
+    private final ChartPanel chartPanel;
+    private final Map<Code, Double> codeToTotalDividend = new HashMap<>();
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox jComboBox1;
