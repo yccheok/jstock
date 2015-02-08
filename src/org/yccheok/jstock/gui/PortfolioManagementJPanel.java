@@ -2771,9 +2771,6 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         final Country country = jStockOptions.getCountry();
         final Country localCountry = jStockOptions.getLocalCurrencyCountry(country);
         final Currency localCurrency = localCountry.localCurrency;
-
-        // TODO: SUPER UGLY HACK?!?!?!?!
-        double exchangeRate = 1.0;
         
         final double share;
         final double cash;
@@ -2785,12 +2782,12 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         if (isFeeCalculationEnabled) {
             //cash = exchangeRate * (sellPortfolioTreeTableModel.getNetSellingValue() - ((Portfolio)sellPortfolioTreeTableModel.getRoot()).getNetReferenceTotal() - buyPortfolioTreeTableModel.getNetPurchaseValue() + this.getDepositSummary().getTotal() + this.getDividendSummary().getTotal());
             cash = 0.0;
-            paperProfit = exchangeRate * buyPortfolioTreeTableModel.getNetGainLossValue(localCurrency);
+            paperProfit = buyPortfolioTreeTableModel.getNetGainLossValue(localCurrency);
             realizedProfit = sellPortfolioTreeTableModel.getNetGainLossValue(localCurrency);
         } else {
             //cash = exchangeRate * (sellPortfolioTreeTableModel.getSellingValue() - ((Portfolio)sellPortfolioTreeTableModel.getRoot()).getReferenceTotal() - buyPortfolioTreeTableModel.getPurchaseValue() + this.getDepositSummary().getTotal() + this.getDividendSummary().getTotal());
             cash = 0.0;
-            paperProfit = exchangeRate * buyPortfolioTreeTableModel.getGainLossValue(localCurrency);
+            paperProfit = buyPortfolioTreeTableModel.getGainLossValue(localCurrency);
             realizedProfit = sellPortfolioTreeTableModel.getGainLossValue(localCurrency);
         }
 
