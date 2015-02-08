@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2012 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2015 Yan Cheng Cheok <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@ import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.portfolio.Dividend;
 import org.yccheok.jstock.portfolio.DividendSummary;
 import org.yccheok.jstock.portfolio.Portfolio;
+import org.yccheok.jstock.portfolio.PortfolioRealTimeInfo;
 import org.yccheok.jstock.portfolio.Transaction;
 import org.yccheok.jstock.portfolio.TransactionSummary;
 
@@ -62,15 +63,15 @@ public class BuyPortfolioChartJDialog extends javax.swing.JDialog {
     };
     
     /** Creates new form BuyPortfolioChartJDialog */
-    public BuyPortfolioChartJDialog(java.awt.Frame parent, boolean modal, BuyPortfolioTreeTableModelEx portfolioTreeTableModel, DividendSummary dividendSummary) {
+    public BuyPortfolioChartJDialog(java.awt.Frame parent, boolean modal, BuyPortfolioTreeTableModelEx portfolioTreeTableModel, PortfolioRealTimeInfo portfolioRealTimeInfo, DividendSummary dividendSummary) {
         super(parent, GUIBundle.getString("BuyPortfolioChartJDialog_BuySummary"), modal);
 
-        this.dividendSummary = dividendSummary;
         this.initCodeToTotalDividend(dividendSummary);
 
         initComponents();
         
         this.portfolioTreeTableModel = portfolioTreeTableModel;
+        this.portfolioRealTimeInfo = portfolioRealTimeInfo;
         
         final JFreeChart freeChart;
         final int lastSelectedBuyPortfolioChartIndex = JStock.getInstance().getJStockOptions().getLastSelectedBuyPortfolioChartIndex();
@@ -180,12 +181,11 @@ public class BuyPortfolioChartJDialog extends javax.swing.JDialog {
     private JFreeChart createChart(String name) {
         final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         final boolean isFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
-        final boolean isPenceToPoundConversionEnabled = jStockOptions.isPenceToPoundConversionEnabled();
         
         final Portfolio portfolio = (Portfolio)portfolioTreeTableModel.getRoot();
         final int count = portfolio.getChildCount();
         DefaultPieDataset data = new DefaultPieDataset();
-        final List<DataEx> dataExs = new ArrayList<DataEx>();
+        final List<DataEx> dataExs = new ArrayList<>();
 
         for (int i = 0; i < count; i++) {
             TransactionSummary transactionSummary = (TransactionSummary)portfolio.getChildAt(i);
@@ -196,9 +196,11 @@ public class BuyPortfolioChartJDialog extends javax.swing.JDialog {
             final Symbol symbol = transaction.getStock().symbol;
             final Code code =  transaction.getStock().code;
 
+            final boolean shouldConvertPenceToPound = org.yccheok.jstock.portfolio.Utils.shouldConvertPenceToPound(portfolioRealTimeInfo, code);
+            
             /* Should use reflection technology. */
             if(name.equals(cNames[0])) {
-                if (isPenceToPoundConversionEnabled == false) {
+                if (shouldConvertPenceToPound == false) {
                     if (isFeeCalculationEnabled) {
                         dataExs.add(DataEx.newInstance(symbol.toString(), portfolioTreeTableModel.getNetGainLossValue(transactionSummary)));
                     } else {
@@ -212,7 +214,7 @@ public class BuyPortfolioChartJDialog extends javax.swing.JDialog {
                     }                    
                 }
             } else if(name.equals(cNames[1])) {
-                if (isPenceToPoundConversionEnabled == false) {
+                if (shouldConvertPenceToPound == false) {
                     if (isFeeCalculationEnabled) {
                         dataExs.add(DataEx.newInstance(symbol.toString(), -portfolioTreeTableModel.getNetGainLossValue(transactionSummary)));
                     } else {
@@ -240,12 +242,12 @@ public class BuyPortfolioChartJDialog extends javax.swing.JDialog {
             } else if(name.equals(cNames[4])) {
                 Double value = this.codeToTotalDividend.get(code);
                 if (value != null) {
-                    if (value.doubleValue() > 0.0) {
+                    if (value > 0.0) {
                         dataExs.add(DataEx.newInstance(symbol.toString(), this.codeToTotalDividend.get(code)));
                     }
                 }
             } else if(name.equals(cNames[5])) {
-                if (isPenceToPoundConversionEnabled == false) {
+                if (shouldConvertPenceToPound == false) {
                     if (isFeeCalculationEnabled) {
                         dataExs.add(DataEx.newInstance(symbol.toString(), transactionSummary.getNetTotal()));
                     } else {
@@ -259,7 +261,7 @@ public class BuyPortfolioChartJDialog extends javax.swing.JDialog {
                     }                    
                 }
             } else if(name.equals(cNames[6])) {
-                if (isPenceToPoundConversionEnabled == false) {
+                if (shouldConvertPenceToPound == false) {
                     dataExs.add(DataEx.newInstance(symbol.toString(), portfolioTreeTableModel.getCurrentValue(transactionSummary)));                
                 } else {
                     dataExs.add(DataEx.newInstance(symbol.toString(), portfolioTreeTableModel.getCurrentValue(transactionSummary) / 100.0));
@@ -297,9 +299,9 @@ public class BuyPortfolioChartJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jComboBox1ActionPerformed
     
     private final BuyPortfolioTreeTableModelEx portfolioTreeTableModel;
+    private final PortfolioRealTimeInfo portfolioRealTimeInfo;
     private final ChartPanel chartPanel;
-    private final DividendSummary dividendSummary;
-    private final Map<Code, Double> codeToTotalDividend = new HashMap<Code, Double>();
+    private final Map<Code, Double> codeToTotalDividend = new HashMap<>();
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox jComboBox1;
