@@ -2780,13 +2780,25 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         share = buyPortfolioTreeTableModel.getCurrentValue(localCurrency);
 
         if (isFeeCalculationEnabled) {
-            //cash = exchangeRate * (sellPortfolioTreeTableModel.getNetSellingValue() - ((Portfolio)sellPortfolioTreeTableModel.getRoot()).getNetReferenceTotal() - buyPortfolioTreeTableModel.getNetPurchaseValue() + this.getDepositSummary().getTotal() + this.getDividendSummary().getTotal());
-            cash = 0.0;
+            final double exchangeRate = org.yccheok.jstock.portfolio.Utils.getExchangeRate(portfolioRealTimeInfo, localCurrency, country.stockCurrency);
+            
+            cash =  sellPortfolioTreeTableModel.getNetSellingValue(localCurrency) - 
+                    ((Portfolio)sellPortfolioTreeTableModel.getRoot()).getNetReferenceTotal(localCurrency) - 
+                    buyPortfolioTreeTableModel.getNetPurchaseValue(localCurrency) + 
+                    this.getDepositSummary().getTotal() * exchangeRate +
+                    this.getDividendSummary().getTotal() * exchangeRate;
+            
             paperProfit = buyPortfolioTreeTableModel.getNetGainLossValue(localCurrency);
             realizedProfit = sellPortfolioTreeTableModel.getNetGainLossValue(localCurrency);
         } else {
-            //cash = exchangeRate * (sellPortfolioTreeTableModel.getSellingValue() - ((Portfolio)sellPortfolioTreeTableModel.getRoot()).getReferenceTotal() - buyPortfolioTreeTableModel.getPurchaseValue() + this.getDepositSummary().getTotal() + this.getDividendSummary().getTotal());
-            cash = 0.0;
+            final double exchangeRate = org.yccheok.jstock.portfolio.Utils.getExchangeRate(portfolioRealTimeInfo, localCurrency, country.stockCurrency);
+            
+            cash =  sellPortfolioTreeTableModel.getSellingValue(localCurrency) - 
+                    ((Portfolio)sellPortfolioTreeTableModel.getRoot()).getReferenceTotal(localCurrency) - 
+                    buyPortfolioTreeTableModel.getPurchaseValue(localCurrency) + 
+                    this.getDepositSummary().getTotal() * exchangeRate + 
+                    this.getDividendSummary().getTotal() * exchangeRate;
+
             paperProfit = buyPortfolioTreeTableModel.getGainLossValue(localCurrency);
             realizedProfit = sellPortfolioTreeTableModel.getGainLossValue(localCurrency);
         }

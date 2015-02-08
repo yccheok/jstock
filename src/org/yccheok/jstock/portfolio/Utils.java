@@ -66,9 +66,7 @@ public class Utils {
         return stockCurrency;
     }
     
-    public static double getExchangeRate(PortfolioRealTimeInfo portfolioRealTimeInfo, Currency localCurrency, Code code) {
-        final Currency stockCurrency = getStockCurrency(portfolioRealTimeInfo, code);
-        
+    public static double getExchangeRate(PortfolioRealTimeInfo portfolioRealTimeInfo, Currency localCurrency, Currency stockCurrency) {
         final double exchangeRate;
         if (stockCurrency.equals(localCurrency)) {
             exchangeRate = 1.0;
@@ -82,6 +80,12 @@ public class Utils {
         }
 
         return exchangeRate;
+    }
+    
+    public static double getExchangeRate(PortfolioRealTimeInfo portfolioRealTimeInfo, Currency localCurrency, Code code) {
+        final Currency stockCurrency = getStockCurrency(portfolioRealTimeInfo, code);
+        
+        return getExchangeRate(portfolioRealTimeInfo, localCurrency, stockCurrency);
     }
     
     private static final ThreadLocal <NumberFormat> unitsNumberFormat = new ThreadLocal <NumberFormat>() {
