@@ -79,7 +79,6 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
         javax.swing.JLabel jLabel1 = new javax.swing.JLabel();
         jFormattedTextField1 = getPercentageJFormattedTextField();
         javax.swing.JPanel jPanel3 = new javax.swing.JPanel();
-        jCheckBox1 = new javax.swing.JCheckBox();
         jCheckBox3 = new javax.swing.JCheckBox();
         javax.swing.JPanel jPanel4 = new javax.swing.JPanel();
         javax.swing.JLabel jLabel2 = new javax.swing.JLabel();
@@ -122,8 +121,6 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsSellAdvisorJPanel_Wealth"))); // NOI18N
 
-        jCheckBox1.setText(bundle.getString("OptionsSellAdvisorJPanel_ShowStockValueInDollar")); // NOI18N
-
         jCheckBox3.setText(bundle.getString("OptionsSellAdvisorJPanel_ShowStockPriceAndValueIn4DecimalPlaces")); // NOI18N
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
@@ -132,17 +129,13 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jCheckBox1)
-                    .addComponent(jCheckBox3))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jCheckBox3)
+                .addContainerGap(102, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jCheckBox1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jCheckBox3)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -387,7 +380,6 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
     private final DefaultComboBoxModel defaultCountryComboBoxModel = new DefaultComboBoxModel();
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JCheckBox jCheckBox1;
     javax.swing.JCheckBox jCheckBox3;
     private javax.swing.JComboBox jComboBox1;
     private javax.swing.JComboBox jComboBox2;

@@ -297,7 +297,8 @@ public class JStockOptions {
 
     private Map<Country, Country> localCurrencyCountries = new EnumMap<Country, Country>(Country.class);
 
-    private Map<Country, Boolean> penceToPoundConversionEnabled = new EnumMap<Country, Boolean>(Country.class);
+    @Deprecated
+    private transient Map<Country, Boolean> penceToPoundConversionEnabled = new EnumMap<Country, Boolean>(Country.class);
     
     private Map<Country, Boolean> fourDecimalPlacesEnabled = new EnumMap<Country, Boolean>(Country.class);
     
@@ -388,7 +389,7 @@ public class JStockOptions {
         //this.isProxyAuthEnabled = jStockOptions.isProxyAuthEnabled;
 
         /* For UK client. */
-        this.penceToPoundConversionEnabled = jStockOptions.penceToPoundConversionEnabled;
+        //this.penceToPoundConversionEnabled = jStockOptions.penceToPoundConversionEnabled;
         
         this.fourDecimalPlacesEnabled = jStockOptions.fourDecimalPlacesEnabled;
         
@@ -431,7 +432,7 @@ public class JStockOptions {
         this.currencies = new EnumMap<Country, String>(jStockOptions.currencies);
         //this.currencyExchangeEnable = new EnumMap<Country, Boolean>(jStockOptions.currencyExchangeEnable);
         this.localCurrencyCountries = new EnumMap<Country, Country>(jStockOptions.localCurrencyCountries);
-        this.penceToPoundConversionEnabled = new EnumMap<Country, Boolean>(jStockOptions.penceToPoundConversionEnabled);
+        //this.penceToPoundConversionEnabled = new EnumMap<Country, Boolean>(jStockOptions.penceToPoundConversionEnabled);
         this.fourDecimalPlacesEnabled = new EnumMap<Country, Boolean>(jStockOptions.fourDecimalPlacesEnabled);
         
         this.chartTheme = jStockOptions.getChartTheme();
@@ -513,7 +514,7 @@ public class JStockOptions {
         //jStockOptions.isProxyAuthEnabled = this.isProxyAuthEnabled;
 
         /* For UK client. */
-        jStockOptions.penceToPoundConversionEnabled = this.penceToPoundConversionEnabled;
+        //jStockOptions.penceToPoundConversionEnabled = this.penceToPoundConversionEnabled;
 
         jStockOptions.fourDecimalPlacesEnabled = this.fourDecimalPlacesEnabled;
         
@@ -558,7 +559,7 @@ public class JStockOptions {
         jStockOptions.currencies = new EnumMap<Country, String>(this.currencies);
         //jStockOptions.currencyExchangeEnable = new EnumMap<Country, Boolean>(this.currencyExchangeEnable);
         jStockOptions.localCurrencyCountries = new EnumMap<Country, Country>(this.localCurrencyCountries);
-        jStockOptions.penceToPoundConversionEnabled = new EnumMap<Country, Boolean>(jStockOptions.penceToPoundConversionEnabled);
+        //jStockOptions.penceToPoundConversionEnabled = new EnumMap<Country, Boolean>(jStockOptions.penceToPoundConversionEnabled);
         jStockOptions.fourDecimalPlacesEnabled = new EnumMap<Country, Boolean>(jStockOptions.fourDecimalPlacesEnabled);
         
         jStockOptions.chartTheme = this.chartTheme;
@@ -700,13 +701,13 @@ public class JStockOptions {
             this.localCurrencyCountries = new EnumMap<Country, Country>(Country.class);
         }
 
-        if (this.penceToPoundConversionEnabled == null) {
-            this.penceToPoundConversionEnabled = new EnumMap<Country, Boolean>(Country.class);
-        }
+        //if (this.penceToPoundConversionEnabled == null) {
+        //    this.penceToPoundConversionEnabled = new EnumMap<Country, Boolean>(Country.class);
+        //}
         
-        if (false == this.penceToPoundConversionEnabled.containsKey(Country.UnitedKingdom)) {
-            this.penceToPoundConversionEnabled.put(Country.UnitedKingdom, true);
-        }
+        //if (false == this.penceToPoundConversionEnabled.containsKey(Country.UnitedKingdom)) {
+        //    this.penceToPoundConversionEnabled.put(Country.UnitedKingdom, true);
+        //}
         
         if (this.fourDecimalPlacesEnabled == null) {
             this.fourDecimalPlacesEnabled = new EnumMap<Country, Boolean>(Country.class);
@@ -1276,32 +1277,12 @@ public class JStockOptions {
         this.newsID = newsID;
     }
 
-    /**
-     * @return the penceToPoundConversionEnabled
-     */
-    // Do we need country as parameter?
-    public boolean isPenceToPoundConversionEnabled(/*Country country*/) {
-        Boolean b = this.penceToPoundConversionEnabled.get(this.country);
-        if (b == null) {
-            return false;
-        }
-        return b;
-    }
-
     public boolean isFourDecimalPlacesEnabled(/*Country country*/) {
         Boolean b = this.fourDecimalPlacesEnabled.get(this.country);
         if (b == null) {
             return false;
         }
         return b;
-    }
-    
-    /**
-     * @param penceToPoundConversionEnabled the penceToPoundConversionEnabled to set
-     */
-    // Do we need country as parameter?
-    public void setPenceToPoundConversionEnabled(/*Country country, */boolean penceToPoundConversionEnabled) {
-        this.penceToPoundConversionEnabled.put(this.country, penceToPoundConversionEnabled);
     }
 
     // Do we need country as parameter?
