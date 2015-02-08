@@ -75,7 +75,11 @@ public class Utils {
             if (rate != null) {
                 exchangeRate = rate;
             } else {
-                exchangeRate = 1.0;
+                if (stockCurrency.toString().equals("GBX")) {
+                    exchangeRate = 0.01;    
+                } else {
+                    exchangeRate = 1.0;
+                }
             }
         }
 
