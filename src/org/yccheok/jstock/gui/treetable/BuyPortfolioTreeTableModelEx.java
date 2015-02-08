@@ -37,6 +37,7 @@ import org.yccheok.jstock.internationalization.GUIBundle;
  */
 public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableModelEx {
     
+    // Avoid NPE.
     private PortfolioRealTimeInfo portfolioRealTimeInfo = new PortfolioRealTimeInfo();
             
     public void bind(PortfolioRealTimeInfo portfolioRealTimeInfo) {

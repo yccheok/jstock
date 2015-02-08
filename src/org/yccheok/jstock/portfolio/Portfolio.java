@@ -29,8 +29,8 @@ import org.yccheok.jstock.gui.treetable.DefaultSortableMutableTreeTableNode;
  * @author Owner
  */
 public class Portfolio extends DefaultSortableMutableTreeTableNode implements Commentable {
-
-    private PortfolioRealTimeInfo portfolioRealTimeInfo;
+    // Avoid NPE.
+    private PortfolioRealTimeInfo portfolioRealTimeInfo = new PortfolioRealTimeInfo();
     
     public void bind(PortfolioRealTimeInfo portfolioRealTimeInfo) {
         this.portfolioRealTimeInfo = portfolioRealTimeInfo;
