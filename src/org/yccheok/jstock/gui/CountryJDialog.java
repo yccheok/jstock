@@ -170,11 +170,13 @@ public class CountryJDialog extends javax.swing.JDialog {
                 boolean isSelected,      // is the cell selected
                 boolean cellHasFocus)    // does the cell have focus
         {
-            String s = value.toString();
-            setText(s);
-            
-            if(value instanceof Country) {
-                setIcon(((Country)value).icon);
+            if (value instanceof Country) {
+                Country country = (Country)value;
+                setText(country.humanString);
+                setIcon(country.icon);
+            } else {
+                String s = value.toString();
+                setText(s);        
             }
             
             if (isSelected) {
