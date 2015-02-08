@@ -566,6 +566,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     
                     updateRealTimeStockMonitorAccordingToBuyPortfolioTreeTableModel();  
                     updateExchangeRateMonitorAccordingToPortfolioTreeTableModel();
+                    injectPredefinedExchangeRates();
                     
                     // updateWealthHeader will be called at end of switch.
                     
@@ -716,6 +717,13 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     initGUIOptions();
                     
                     expandTreeTable(this.sellTreeTable);
+
+                    updateExchangeRateMonitorAccordingToPortfolioTreeTableModel();
+                    injectPredefinedExchangeRates();
+                    
+                    // updateWealthHeader will be called at end of switch.
+                    
+                    refreshStatusBarExchangeRateVisibility();
                 }
                 break;
 
@@ -2132,6 +2140,21 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }        
     }
     
+    private void injectPredefinedExchangeRates() {
+        Set<CurrencyPair> currencyPairs = this.getCurrencyPairs();
+        
+        // Initialization.
+        Map<CurrencyPair, Double> predefinedExchangeRates = new HashMap<>();
+        predefinedExchangeRates.put(CurrencyPair.create("GBX", "GBP"), 0.01);
+        
+        for (CurrencyPair currencyPair : currencyPairs) {
+            Double rate = predefinedExchangeRates.get(currencyPair);
+            if (rate != null) {
+                this.portfolioRealTimeInfo.exchangeRates.put(currencyPair, rate);
+            }
+        }
+    }
+    
     private void _refershGUIAfterInitPortfolio(
             final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel,
             final SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel,
@@ -2152,7 +2175,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         PortfolioManagementJPanel.this.updateRealTimeStockMonitorAccordingToBuyPortfolioTreeTableModel();
         PortfolioManagementJPanel.this.updateExchangeRateMonitorAccordingToPortfolioTreeTableModel();
-
+        PortfolioManagementJPanel.this.injectPredefinedExchangeRates();
+        
         PortfolioManagementJPanel.this.updateWealthHeader();
 
         // Give user preferred GUI look. We do it here, because the entire table model is being changed.
