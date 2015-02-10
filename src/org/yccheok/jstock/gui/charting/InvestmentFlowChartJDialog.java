@@ -51,11 +51,13 @@ import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.XYDataset;
 import org.yccheok.jstock.engine.Code;
+import org.yccheok.jstock.engine.Country;
 import org.yccheok.jstock.engine.Observer;
 import org.yccheok.jstock.engine.RealTimeStockMonitor;
 import org.yccheok.jstock.engine.SimpleDate;
 import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.StockInfo;
+import org.yccheok.jstock.engine.currency.Currency;
 import org.yccheok.jstock.gui.Constants;
 import org.yccheok.jstock.gui.JStockOptions;
 import org.yccheok.jstock.gui.JStock;
@@ -287,6 +289,11 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
     }
 
     private void updateROITimeSeries() {
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        final Country country = jStockOptions.getCountry();
+        final Country localCountry = jStockOptions.getLocalCurrencyCountry(country);
+        final Currency localCurrency = localCountry.localCurrency;
+
         final boolean noCodeAddedToMonitor = this.realTimeStockMonitor.isEmpty();
         final List<Code> codesNeedToAddToRealTimeStockMonitor = new ArrayList<Code>();
         
@@ -305,9 +312,11 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
                 final Activity activity = activities.get(j);
                 final Activity.Type type = activity.getType();
 
+                final StockInfo stockInfo = (StockInfo)activity.get(Activity.Param.StockInfo);
+                double exchangeRate = org.yccheok.jstock.portfolio.Utils.getExchangeRate(this.portfolioManagementJPanel.getPortfolioRealTimeInfo(), localCurrency, stockInfo.code);
+                
                 if (type == Activity.Type.Buy) {
-                    final double quantity = (Double)activity.get(Activity.Param.Quantity);
-                    final StockInfo stockInfo = (StockInfo)activity.get(Activity.Param.StockInfo);
+                    final double quantity = (Double)activity.get(Activity.Param.Quantity);                    
                     if (noCodeAddedToMonitor) {
                         // We might already have last price information in
                         // PortfolioManagementJPanel, we will still request
@@ -324,13 +333,12 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
                     }
                     final Double price = this.codeToPrice.get(stockInfo.code);
                     if (price != null) {
-                        amount += convertToPoundIfNecessary(stockInfo.code, (price * quantity));
+                        amount += (price * quantity * exchangeRate);
                     }
                 } else if (type == Activity.Type.Sell) {
-                    final StockInfo stockInfo = (StockInfo)activity.get(Activity.Param.StockInfo);
-                    amount += convertToPoundIfNecessary(stockInfo.code, activity.getAmount());
+                    amount += (activity.getAmount() * exchangeRate);
                 } else if (type == Activity.Type.Dividend) {
-                    amount += activity.getAmount();
+                    amount += (activity.getAmount() * exchangeRate);
                 } else {
                     assert(false);
                 }
@@ -365,16 +373,12 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         return this.portfolioManagementJPanel.getPortfolioRealTimeInfo();
     }
     
-    private double convertToPoundIfNecessary(Code code, double value) {
-        final boolean shouldConvertPenceToPound = org.yccheok.jstock.portfolio.Utils.shouldConvertPenceToPound(this.portfolioManagementJPanel.getPortfolioRealTimeInfo(), code);
-        
-        if (shouldConvertPenceToPound == false) {
-            return value;
-        }
-        return value / 100.0;
-    }
-    
     private XYDataset createInvestDataset() {
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        final Country country = jStockOptions.getCountry();
+        final Country localCountry = jStockOptions.getLocalCurrencyCountry(country);
+        final Currency localCurrency = localCountry.localCurrency;
+        
         final TimeSeries series = new TimeSeries(GUIBundle.getString("InvestmentFlowChartJDialog_Invest"));
         
         this.totalInvestValue = 0.0;
@@ -385,14 +389,14 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
                 final Activity activity = activities.get(j);
                 final Activity.Type type = activity.getType();
                 final StockInfo stockInfo = (StockInfo)activity.get(Activity.Param.StockInfo);
-
+                double exchangeRate = org.yccheok.jstock.portfolio.Utils.getExchangeRate(this.portfolioManagementJPanel.getPortfolioRealTimeInfo(), localCurrency, stockInfo.code);
+         
                 if (type == Activity.Type.Buy) {
-                    amount += convertToPoundIfNecessary(stockInfo.code, activity.getAmount());
+                    amount += (activity.getAmount() * exchangeRate);
                 }
                 else if (type == Activity.Type.Sell) {
-                    amount -= convertToPoundIfNecessary(stockInfo.code, activity.getAmount());
-                }
-                else {
+                    amount -= (activity.getAmount() * exchangeRate);
+                } else {
                     assert(false);
                 }
             }   // for (int j = 0, count2 = activities.size(); j < count2; j++)
@@ -654,7 +658,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         return new javax.swing.DefaultComboBoxModel(new String[] { GUIBundle.getString("InvestmentFlowChartJDialog_AllStock(s)") });
     }
 
-    private final List<StockInfo> stockInfos = new ArrayList<StockInfo>();
+    private final List<StockInfo> stockInfos = new ArrayList<>();
 
     /* How much I had invested. */
     /* Contains Buy, Sell. When Sell, it will pull down your investment value. */

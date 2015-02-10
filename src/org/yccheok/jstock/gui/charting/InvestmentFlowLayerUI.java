@@ -122,11 +122,8 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         numberFormat.setMaximumFractionDigits(2);
         numberFormat.setMinimumFractionDigits(2);
         
-        // TODO: SUPER UGLY HACK?!?!?!?!
-        final double exchangeRate = 1.0;
-        
-        final double totalInvestValue = this.investmentFlowChartJDialog.getTotalInvestValue() * exchangeRate;
-        final double totalROIValue = this.investmentFlowChartJDialog.getTotalROIValue() * exchangeRate;
+        final double totalInvestValue = this.investmentFlowChartJDialog.getTotalInvestValue();
+        final double totalROIValue = this.investmentFlowChartJDialog.getTotalROIValue();
                 
         final String invest = org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(DecimalPlaces.Three, totalInvestValue);
         final String roi = org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(DecimalPlaces.Three, totalROIValue);
