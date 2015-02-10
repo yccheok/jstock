@@ -21,6 +21,7 @@ package org.yccheok.jstock.portfolio;
 import java.util.ArrayList;
 import java.util.List;
 import org.yccheok.jstock.engine.Stock;
+import org.yccheok.jstock.engine.currency.Currency;
 
 /**
  *
@@ -46,6 +47,17 @@ public class DividendSummary extends AbstractSummary<Dividend> {
         return tmp;
     }
 
+    public double getTotal(PortfolioRealTimeInfo portfolioRealTimeInfo, Currency localCurrency) {
+        double tmp = 0.0;
+        final int size = size();
+        for (int i = 0; i < size; i++) {
+            final Dividend dividend = this.get(i);
+            double exchangeRate = org.yccheok.jstock.portfolio.Utils.getExchangeRate(portfolioRealTimeInfo, localCurrency, dividend.stockInfo.code);
+            tmp += (dividend.amount * exchangeRate);
+        }
+        return tmp;
+    }
+    
     public double getTotal(Stock stock) {
         double tmp = 0.0;
         final int size = size();

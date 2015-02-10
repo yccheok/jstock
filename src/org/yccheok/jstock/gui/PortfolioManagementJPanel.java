@@ -2768,7 +2768,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     ((Portfolio)sellPortfolioTreeTableModel.getRoot()).getNetReferenceTotal(localCurrency) - 
                     buyPortfolioTreeTableModel.getNetPurchaseValue(localCurrency) + 
                     this.getDepositSummary().getTotal() * exchangeRate +
-                    this.getDividendSummary().getTotal() * exchangeRate;
+                    this.getDividendSummary().getTotal(this.portfolioRealTimeInfo, localCurrency);
             
             paperProfit = buyPortfolioTreeTableModel.getNetGainLossValue(localCurrency);
             realizedProfit = sellPortfolioTreeTableModel.getNetGainLossValue(localCurrency);
@@ -2779,7 +2779,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     ((Portfolio)sellPortfolioTreeTableModel.getRoot()).getReferenceTotal(localCurrency) - 
                     buyPortfolioTreeTableModel.getPurchaseValue(localCurrency) + 
                     this.getDepositSummary().getTotal() * exchangeRate + 
-                    this.getDividendSummary().getTotal() * exchangeRate;
+                    this.getDividendSummary().getTotal(this.portfolioRealTimeInfo, localCurrency);
 
             paperProfit = buyPortfolioTreeTableModel.getGainLossValue(localCurrency);
             realizedProfit = sellPortfolioTreeTableModel.getGainLossValue(localCurrency);
