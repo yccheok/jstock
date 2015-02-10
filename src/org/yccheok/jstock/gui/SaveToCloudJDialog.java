@@ -564,6 +564,7 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
             extensions.add(".bmp");
         } else if (name.equals("portfolios")) {
             extensions.add(".csv");
+            extensions.add(".json");
         } else if (name.equals("watchlist")) {
             extensions.add(".csv");
         } else if (name.equals("android")) {
@@ -577,110 +578,10 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
         return java.util.Collections.unmodifiableList(extensions);
     }
     
-    // Merely copy n paste code from getJStockZipFile
-    public static File getJStockZipFileForConversionErrorMessageJDialog(File destFile) {
-        // Look for "user-defined-database.xml" for all countries.
-        final List<File> files = getUserDefinedDatabaseFiles();
-        final List<FileEx> fileExs = new ArrayList<FileEx>();
-        for (File file : files) {
-            final String filename = file.getAbsolutePath();
-            final int index = filename.indexOf(Utils.getApplicationVersionString());
-            if (index < 0) {
-                continue;
-            }
-            final String output = filename.substring(index + Utils.getApplicationVersionString().length() + File.separator.length());
-            fileExs.add(FileEx.newInstance(file, output));
-        }
-
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
-        // User will sue us, if we store their Google account information in our server.
-        // Let's get a copy of JStockOptions, without any sensitive data.
-        final JStockOptions insensitiveJStockOptions = jStockOptions.insensitiveClone();
-        try {
-            final File tempJStockOptions = File.createTempFile(Utils.getJStockUUID(), ".xml");
-            // Delete temp file when program exits.
-            tempJStockOptions.deleteOnExit();
-            org.yccheok.jstock.gui.Utils.toXML(insensitiveJStockOptions, tempJStockOptions);
-            fileExs.add(FileEx.newInstance(tempJStockOptions, "config" + File.separator + "options.xml"));
-        } catch (IOException ex) {
-            // Should we return null? As the saved information is not complete.
-            log.error(null, ex);
-        }
-
-        final List<Country> countryWithWatchlistFilesBeingIgnored = new ArrayList<Country>();
-        getFileEx(fileExs, "config", null);
-        getFileEx(fileExs, "indicator", null);
-        getFileEx(fileExs, "logos", null);
-        for (Country country : Country.values()) {
-            getFileEx(fileExs, country + File.separator + "portfolios", null);
-            // For legacy usage. Shall be removed after a few more release
-            // later than 1.0.5k
-            getFileEx(fileExs, country + File.separator + "config", null);
-
-            LastErrorCode lastErrorCode = new LastErrorCode();
-            getFileEx(fileExs, country + File.separator + "watchlist", null, lastErrorCode);
-            if (lastErrorCode.flag) {
-                // Watchlist file(s) is being ignored due to too much stocks in
-                // the watchlist.
-                countryWithWatchlistFilesBeingIgnored.add(country);
-            }
-        }
-
-        //if (false == promptUserToContinue(countryWithWatchlistFilesBeingIgnored)) {
-        //    return null;
-        //}
-
-        // Create a buffer for reading the files
-        final byte[] buf = new byte[1024];
-
-        ZipOutputStream out = null;
-        File temp = destFile;
-        
-        try {
-
-            out = new ZipOutputStream(new FileOutputStream(temp));
-
-            // Compress the files
-            for (FileEx fileEx : fileExs) {
-                FileInputStream in = null;
-                try {
-                    in = new FileInputStream(fileEx.input);
-                    final String zipEntryName = fileEx.output;
-                    // Add ZIP entry to output stream.
-                    out.putNextEntry(Utils.getZipEntry(zipEntryName));
-
-                    // Transfer bytes from the file to the ZIP file
-                    int len;
-                    while ((len = in.read(buf)) > 0) {
-                        out.write(buf, 0, len);
-                    }
-                }
-                catch (IOException exp) {
-                    log.error(null, exp);
-                    // Should we return null? As the saved information is not complete.
-                    continue;
-                }
-                finally {
-                    // Complete the entry
-                    Utils.closeEntry(out);
-                    Utils.close(in);
-                }
-            }
-        } 
-        catch (IOException exp) {
-            // Should we return null? As the saved information is not complete.
-            log.error(null, exp);
-        }
-        finally {
-            Utils.close(out);
-        }
-        return temp;        
-    }
-    
     private File getJStockZipFile() {
         // Look for "user-defined-database.xml" for all countries.
         final List<File> files = getUserDefinedDatabaseFiles();
-        final List<FileEx> fileExs = new ArrayList<FileEx>();
+        final List<FileEx> fileExs = new ArrayList<>();
         for (File file : files) {
             final String filename = file.getAbsolutePath();
             final int index = filename.indexOf(Utils.getApplicationVersionString());
@@ -706,7 +607,7 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
             log.error(null, ex);
         }
 
-        final List<Country> countryWithWatchlistFilesBeingIgnored = new ArrayList<Country>();
+        final List<Country> countryWithWatchlistFilesBeingIgnored = new ArrayList<>();
         getFileEx(fileExs, "config", getExtensions("config"));
         getFileEx(fileExs, "indicator", getExtensions("indicator"));
         getFileEx(fileExs, "logos", getExtensions("logos"));
