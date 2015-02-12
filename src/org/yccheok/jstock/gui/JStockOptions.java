@@ -292,8 +292,7 @@ public class JStockOptions {
     
     private Map<Country, String> currencies = new EnumMap<Country, String>(Country.class);
 
-    @Deprecated
-    private transient Map<Country, Boolean> currencyExchangeEnable = new EnumMap<Country, Boolean>(Country.class);
+    private Map<Country, Boolean> currencyExchangeEnable = new EnumMap<Country, Boolean>(Country.class);
 
     private Map<Country, Country> localCurrencyCountries = new EnumMap<Country, Country>(Country.class);
 
@@ -430,7 +429,7 @@ public class JStockOptions {
 
         this.priceSources = new EnumMap<Country, PriceSource>(jStockOptions.priceSources);
         this.currencies = new EnumMap<Country, String>(jStockOptions.currencies);
-        //this.currencyExchangeEnable = new EnumMap<Country, Boolean>(jStockOptions.currencyExchangeEnable);
+        this.currencyExchangeEnable = new EnumMap<Country, Boolean>(jStockOptions.currencyExchangeEnable);
         this.localCurrencyCountries = new EnumMap<Country, Country>(jStockOptions.localCurrencyCountries);
         //this.penceToPoundConversionEnabled = new EnumMap<Country, Boolean>(jStockOptions.penceToPoundConversionEnabled);
         this.fourDecimalPlacesEnabled = new EnumMap<Country, Boolean>(jStockOptions.fourDecimalPlacesEnabled);
@@ -557,7 +556,7 @@ public class JStockOptions {
         // Perform deep copy.
         jStockOptions.priceSources = new EnumMap<Country, PriceSource>(this.priceSources);
         jStockOptions.currencies = new EnumMap<Country, String>(this.currencies);
-        //jStockOptions.currencyExchangeEnable = new EnumMap<Country, Boolean>(this.currencyExchangeEnable);
+        jStockOptions.currencyExchangeEnable = new EnumMap<Country, Boolean>(this.currencyExchangeEnable);
         jStockOptions.localCurrencyCountries = new EnumMap<Country, Country>(this.localCurrencyCountries);
         //jStockOptions.penceToPoundConversionEnabled = new EnumMap<Country, Boolean>(jStockOptions.penceToPoundConversionEnabled);
         jStockOptions.fourDecimalPlacesEnabled = new EnumMap<Country, Boolean>(jStockOptions.fourDecimalPlacesEnabled);
@@ -693,9 +692,9 @@ public class JStockOptions {
             this.currencies = new EnumMap<Country, String>(Country.class);
         }
 
-        //if (this.currencyExchangeEnable == null) {
-        //    this.currencyExchangeEnable = new EnumMap<Country, Boolean>(Country.class);
-        //}
+        if (this.currencyExchangeEnable == null) {
+            this.currencyExchangeEnable = new EnumMap<Country, Boolean>(Country.class);
+        }
 
         if (this.localCurrencyCountries == null) {
             this.localCurrencyCountries = new EnumMap<Country, Country>(Country.class);
@@ -1338,6 +1337,30 @@ public class JStockOptions {
         this.currencies.put(c, s);
     }
 
+    /**
+     * Returns true if currency exchange feature is enabled for country.
+     *
+     * @param c the country to get
+     * @return true if currency exchange feature is enabled for the country
+     */
+    public boolean isCurrencyExchangeEnable(Country c) {
+        Boolean flag = this.currencyExchangeEnable.get(c);
+        if (flag != null) {
+            return flag;
+        }
+        return false;
+    }
+
+    /**
+     * Enables currency exchange feature for the country.
+     *
+     * @param country the country to set
+     * @param enable true to enable
+     */
+    public void setCurrencyExchangeEnable(Country country, boolean enable) {
+        this.currencyExchangeEnable.put(country, enable);
+    }
+    
     /**
      * Returns country of local currency used to purchase foreign stocks. If no
      * country of local currency found for the country of foreign stocks,
