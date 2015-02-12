@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2015 Yan Cheng Cheok <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +16,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+
 
 package org.yccheok.jstock.gui;
 
@@ -95,8 +96,9 @@ public class OptionsJDialog extends javax.swing.JDialog implements JStockOptions
         final boolean oldIsFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
         final boolean oldIsDynamicChartVisible = jStockOptions.isDynamicChartVisible();
         final boolean oldIsFourDecimalPlacesEnabled = jStockOptions.isFourDecimalPlacesEnabled();
+        final boolean oldIsCurrencyExchangeEnable = jStockOptions.isCurrencyExchangeEnable(country);
         final PriceSource oldPriceSource = jStockOptions.getPriceSource(country);
-        final Country oldLocalCurrencyCountry = jStockOptions.getLocalCurrencyCountry(country);
+        final Country oldLocalCurrencyCountry = jStockOptions.getLocalCurrencyCountry(country);        
         
         if (apply(jStockOptions) == false) {
             return;
@@ -115,7 +117,7 @@ public class OptionsJDialog extends javax.swing.JDialog implements JStockOptions
         if (oldIsDynamicChartVisible != jStockOptions.isDynamicChartVisible()) {
             JStock.getInstance().initDynamicChartVisibility();
         }        
-        if (oldLocalCurrencyCountry != jStockOptions.getLocalCurrencyCountry(country) || oldIsFourDecimalPlacesEnabled != jStockOptions.isFourDecimalPlacesEnabled()) {
+        if (oldIsCurrencyExchangeEnable != jStockOptions.isCurrencyExchangeEnable(country) || oldLocalCurrencyCountry != jStockOptions.getLocalCurrencyCountry(country) || oldIsFourDecimalPlacesEnabled != jStockOptions.isFourDecimalPlacesEnabled()) {
             JStock.getInstance().getPortfolioManagementJPanel().refreshGUIAfterOptionsJDialog();
         }
         

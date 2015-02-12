@@ -215,8 +215,14 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
 
         if (node instanceof Portfolio) {
             final Country country = jStockOptions.getCountry();
-            final Country localCountry = jStockOptions.getLocalCurrencyCountry(country);
-            final Currency localCurrency = localCountry.localCurrency;
+            final boolean currencyExchangeEnable = jStockOptions.isCurrencyExchangeEnable(country);
+            final Currency localCurrency;
+            if (currencyExchangeEnable) {
+                final Country localCountry = jStockOptions.getLocalCurrencyCountry(country);
+                localCurrency = localCountry.localCurrency;
+            } else {
+                localCurrency = null;
+            }
 
             final Portfolio portfolio = (Portfolio)node;
             
