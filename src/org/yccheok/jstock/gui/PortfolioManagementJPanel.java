@@ -1934,7 +1934,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         
         Set<CurrencyPair> currencyPairs = this.getCurrencyPairs();
 
-        for (CurrencyPair currencyPair : currencyPairs) {            
+        for (CurrencyPair currencyPair : currencyPairs) {
             _exchangeRateMonitor.addCurrencyPair(currencyPair);
         }
 
@@ -1951,8 +1951,14 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
          
         _realTimeStockMonitor.clearStockCodes();
 
-        for (Code code : getCodes()) {
+        for (Code code : getBuyCodes()) {
             _realTimeStockMonitor.addStockCode(code);
+        }
+        
+        for (Code code : getSellCodes()) {
+            if (false == this.portfolioRealTimeInfo.currencies.containsKey(code)) {
+                _realTimeStockMonitor.addStockCode(code);
+            }
         }
         
         _realTimeStockMonitor.startNewThreadsIfNecessary();
@@ -2029,6 +2035,19 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         final File depositSummaryFile = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "depositsummary.csv");
         final File dividendSummaryFile = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory() + "dividendsummary.csv");
 
+        // PortfolioRealTimeInfo should be the very first thing to be loaded,
+        // as updateRealTimeStockMonitorAccordingToPortfolioTreeTableModels depends on this.portfolioRealTimeInfo.
+        File portfolioRealTimeInfoFile = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioRealTimeInfoFilepath());
+        PortfolioRealTimeInfo _portfolioRealTimeInfo = new PortfolioRealTimeInfo();
+        boolean status = _portfolioRealTimeInfo.load(portfolioRealTimeInfoFile);
+        if (false == status) {
+            Pair<HashMap<Code, Double>, Long> csvStockPrices = this.getCSVStockPrices();
+            _portfolioRealTimeInfo.stockPrices.putAll(csvStockPrices.first);
+            _portfolioRealTimeInfo.stockPricesTimestamp = csvStockPrices.second;
+            _portfolioRealTimeInfo.stockPricesDirty = !_portfolioRealTimeInfo.stockPrices.isEmpty();
+        }
+        this.portfolioRealTimeInfo = _portfolioRealTimeInfo;
+        
         if (openAsCSVFile(buyPortfolioFile) == false) {
             // If CSV file is not there, consider this as empty record. This is
             // because in createEmptyPortfolio, we only create portfolio-real-time-info.json,
@@ -2065,23 +2084,11 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 return false;
             }
         }
-        
-        File portfolioRealTimeInfoFile = new File(org.yccheok.jstock.portfolio.Utils.getPortfolioRealTimeInfoFilepath());
-        PortfolioRealTimeInfo _portfolioRealTimeInfo = new PortfolioRealTimeInfo();
-        boolean status = _portfolioRealTimeInfo.load(portfolioRealTimeInfoFile);
-        if (false == status) {
-            Pair<HashMap<Code, Double>, Long> csvStockPrices = this.getCSVStockPrices();
-            _portfolioRealTimeInfo.stockPrices.putAll(csvStockPrices.first);
-            _portfolioRealTimeInfo.stockPricesTimestamp = csvStockPrices.second;
-            _portfolioRealTimeInfo.stockPricesDirty = !_portfolioRealTimeInfo.stockPrices.isEmpty();
-        }
 
         final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
         final SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel = (SellPortfolioTreeTableModelEx)sellTreeTable.getTreeTableModel();
         buyPortfolioTreeTableModel.bind(_portfolioRealTimeInfo);
         sellPortfolioTreeTableModel.bind(_portfolioRealTimeInfo);
-
-        this.portfolioRealTimeInfo = _portfolioRealTimeInfo;
         
         refershGUIAfterInitPortfolio(
             (BuyPortfolioTreeTableModelEx)PortfolioManagementJPanel.this.buyTreeTable.getTreeTableModel(), 
