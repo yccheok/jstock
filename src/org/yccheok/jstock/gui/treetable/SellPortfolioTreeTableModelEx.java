@@ -458,6 +458,10 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
         return null;
     }
     
+    public void refreshRoot() {
+        fireTreeTableNodeChanged(getRoot());
+    }
+    
     @Override
     public boolean isValidTransaction(Transaction transaction) {
         return (transaction.getType() == Contract.Type.Sell);

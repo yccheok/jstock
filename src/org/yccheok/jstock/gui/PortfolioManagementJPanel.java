@@ -564,8 +564,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
                     expandTreeTable(this.buyTreeTable);
                     
-                    updateRealTimeStockMonitorAccordingToBuyPortfolioTreeTableModel();  
-                    updateExchangeRateMonitorAccordingToPortfolioTreeTableModel();
+                    updateRealTimeStockMonitorAccordingToPortfolioTreeTableModels();  
+                    updateExchangeRateMonitorAccordingToPortfolioTreeTableModels();
                     
                     // updateWealthHeader will be called at end of switch.
                     
@@ -717,7 +717,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     
                     expandTreeTable(this.sellTreeTable);
 
-                    updateExchangeRateMonitorAccordingToPortfolioTreeTableModel();
+                    updateExchangeRateMonitorAccordingToPortfolioTreeTableModels();
                     
                     // updateWealthHeader will be called at end of switch.
                     
@@ -1111,11 +1111,19 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
     
     private void deteleSelectedTreeTableRow() {
+        boolean refreshStatusBarExchangeRateVisibility = false;
+        
         if (deleteSelectedTreeTableRow(this.buyTreeTable)) {
-            this.refreshStatusBarExchangeRateVisibility();
+            refreshStatusBarExchangeRateVisibility = true;
         }
         
-        deleteSelectedTreeTableRow(this.sellTreeTable);
+        if (deleteSelectedTreeTableRow(this.sellTreeTable)) {
+            refreshStatusBarExchangeRateVisibility = true;
+        };
+        
+        if (refreshStatusBarExchangeRateVisibility) {
+            this.refreshStatusBarExchangeRateVisibility();
+        }
         
         updateWealthHeader();
     }
@@ -1898,7 +1906,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         return portfolioTreeTableModel.addTransaction(transaction);
     }
     
-    private void updateExchangeRateMonitorAccordingToPortfolioTreeTableModel() {
+    private void updateExchangeRateMonitorAccordingToPortfolioTreeTableModels() {
         ExchangeRateMonitor _exchangeRateMonitor = this.exchangeRateMonitor;
         
         if (_exchangeRateMonitor == null) {
@@ -1917,33 +1925,19 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         _exchangeRateMonitor.refresh();
     }
     
-    private void updateRealTimeStockMonitorAccordingToBuyPortfolioTreeTableModel() {
+    private void updateRealTimeStockMonitorAccordingToPortfolioTreeTableModels() {
         RealTimeStockMonitor _realTimeStockMonitor = this.realTimeStockMonitor;
         
         if (_realTimeStockMonitor == null) {
             return;
         }
-        
-        final BuyPortfolioTreeTableModelEx portfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
-        
-        if (portfolioTreeTableModel == null) {
-            return;
-        }
          
         _realTimeStockMonitor.clearStockCodes();
-        
-        Portfolio portfolio = (Portfolio)portfolioTreeTableModel.getRoot();
-        final int count = portfolio.getChildCount();
 
-        for (int i = 0; i < count; i++) {
-            TransactionSummary transactionSummary = (TransactionSummary)portfolio.getChildAt(i);
-
-            if (transactionSummary.getChildCount() <= 0) continue;
-
-            final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
-
-            _realTimeStockMonitor.addStockCode(transaction.getStock().code);
+        for (Code code : getCodes()) {
+            _realTimeStockMonitor.addStockCode(code);
         }
+        
         _realTimeStockMonitor.startNewThreadsIfNecessary();
         _realTimeStockMonitor.refresh();
     }
@@ -2159,8 +2153,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         PortfolioManagementJPanel.this.depositSummary = _depositSummary;
         PortfolioManagementJPanel.this.dividendSummary = _dividendSummary;
 
-        PortfolioManagementJPanel.this.updateRealTimeStockMonitorAccordingToBuyPortfolioTreeTableModel();
-        PortfolioManagementJPanel.this.updateExchangeRateMonitorAccordingToPortfolioTreeTableModel();
+        PortfolioManagementJPanel.this.updateRealTimeStockMonitorAccordingToPortfolioTreeTableModels();
+        PortfolioManagementJPanel.this.updateExchangeRateMonitorAccordingToPortfolioTreeTableModels();
         
         PortfolioManagementJPanel.this.updateWealthHeader();
 
@@ -2375,9 +2369,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
         
         ////////////////////////////////////////////////////////////////////////
-        // goodCurrencies
+        // goodCurrencies. Don't use getBuyCodes, as we need to perform currency
+        // conversion on sell stocks too.
         ////////////////////////////////////////////////////////////////////////
-        for (Code code : getBuyCodes()) {
+        for (Code code : getCodes()) {
             final Currency currency = _portfolioRealTimeInfo.currencies.get(code);
             if (currency != null) {
                 goodCurrencies.put(code, currency);
@@ -2515,7 +2510,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         this.exchangeRateMonitor.attach(exchangeRateMonitorObserver);
         
-        updateExchangeRateMonitorAccordingToPortfolioTreeTableModel();
+        updateExchangeRateMonitorAccordingToPortfolioTreeTableModels();
     }
 
     public void initRealTimeStockMonitor() {
@@ -2540,7 +2535,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         
         realTimeStockMonitor.attach(this.realTimeStockMonitorObserver);
         
-        updateRealTimeStockMonitorAccordingToBuyPortfolioTreeTableModel();
+        updateRealTimeStockMonitorAccordingToPortfolioTreeTableModels();
     }
 
     private org.yccheok.jstock.engine.Observer<ExchangeRateMonitor, List<ExchangeRate>> getExchangeRateMonitorObserver() {
@@ -2572,8 +2567,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 
                 updateWealthHeader();
                 
-                final BuyPortfolioTreeTableModelEx portfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
-                portfolioTreeTableModel.refreshRoot();
+                final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
+                final SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel = (SellPortfolioTreeTableModelEx)sellTreeTable.getTreeTableModel();
+                buyPortfolioTreeTableModel.refreshRoot();
+                sellPortfolioTreeTableModel.refreshRoot();
             }
         };
     }
@@ -2591,63 +2588,64 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
     
     private void update(RealTimeStockMonitor monitor, final java.util.List<Stock> stocks) {
-        final BuyPortfolioTreeTableModelEx portfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
+        final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
+        final SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel = (SellPortfolioTreeTableModelEx)sellTreeTable.getTreeTableModel();
+        
         final Map<Code, Double> stockPrices = this.portfolioRealTimeInfo.stockPrices;
         final Map<Code, Currency> currencies = this.portfolioRealTimeInfo.currencies;
  
-        for (Stock stock : stocks) {
+        final Set<Code> buyCodes = this.getBuyCodes();
+        final Set<Code> sellCodes = this.getSellCodes();
+        
+        for (Stock stock : stocks) {            
             final Code code = stock.code;
-            
-            final int stockPricesSizeBeforePut = stockPrices.size();
-            final int currenciesSizeBeforePut = currencies.size();
-            
-            if (stock.getLastPrice() > 0.0) {
-                stockPrices.put(code, stock.getLastPrice());
-            } else {
-                stockPrices.put(code, stock.getPrevPrice());
-            }
+            final Currency currency = stock.getCurrency();
 
-            Currency currency = stock.getCurrency();
-            // ConcurrentHashMap doesn't support null value.
-            // http://stackoverflow.com/questions/698638/why-does-concurrenthashmap-prevent-null-keys-and-values
-            if (currency != null) {
-                currencies.put(code, currency);
+            if (buyCodes.contains(code)) {
+                if (stock.getLastPrice() > 0.0) {
+                    if (null == stockPrices.put(code, stock.getLastPrice())) {
+                        this.portfolioRealTimeInfo.stockPricesDirty = true;        
+                    }
+                } else {
+                    if (null == stockPrices.put(code, stock.getPrevPrice())) {
+                        this.portfolioRealTimeInfo.stockPricesDirty = true;
+                    }
+                }
+                
+                // ConcurrentHashMap doesn't support null value.
+                // http://stackoverflow.com/questions/698638/why-does-concurrenthashmap-prevent-null-keys-and-values
+                if (currency != null) {
+                    if (null == currencies.put(code, currency)) {
+                        this.portfolioRealTimeInfo.currenciesDirty = true;
+                    }
+                }
+            } else if (sellCodes.contains(code)) {
+                // ???
+            } else {
+                continue;
             }
             
-            if (false == portfolioTreeTableModel.refresh(code)) {
-                this.realTimeStockMonitor.removeStockCode(code);
-                stockPrices.remove(code);
-                currencies.remove(code);
-                final int stockPricesSizeAfterRemove = stockPrices.size();
-                final int currenciesSizeAfterRemove = stockPrices.size();
-                
-                if (stockPricesSizeBeforePut != stockPricesSizeAfterRemove) {
-                    this.portfolioRealTimeInfo.stockPricesDirty = true;
-                }
-                
-                if (currenciesSizeBeforePut != currenciesSizeAfterRemove) {
-                    this.portfolioRealTimeInfo.currenciesDirty = true;
-                }
-            } else {
-                this.portfolioRealTimeInfo.stockPricesDirty = true;
-                this.portfolioRealTimeInfo.currenciesDirty = true;
-                
-                ExchangeRateMonitor _exchangeRateMonitor = this.exchangeRateMonitor;
-                if (currency != null && _exchangeRateMonitor != null) {
-                    JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
-                    final Country country = jStockOptions.getCountry();
-                    final Country localCountry = jStockOptions.getLocalCurrencyCountry(country);
-                    final Currency localCurrency = localCountry.localCurrency;
-                    if (false == currency.equals(localCurrency)) {
-                        CurrencyPair currencyPair = CurrencyPair.create(currency, localCurrency);
-                        if (_exchangeRateMonitor.addCurrencyPair(currencyPair)) {
-                            _exchangeRateMonitor.startNewThreadsIfNecessary();
-                            _exchangeRateMonitor.refresh();
-                        }
+            // Because we have new price & new currency.
+            buyPortfolioTreeTableModel.refresh(code);
+            // Because we have new currency.
+            sellPortfolioTreeTableModel.refresh(code);
+            
+            // Update currency monitor as well.
+            ExchangeRateMonitor _exchangeRateMonitor = this.exchangeRateMonitor;
+            if (currency != null && _exchangeRateMonitor != null) {
+                JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+                final Country country = jStockOptions.getCountry();
+                final Country localCountry = jStockOptions.getLocalCurrencyCountry(country);
+                final Currency localCurrency = localCountry.localCurrency;
+                if (false == currency.equals(localCurrency)) {
+                    CurrencyPair currencyPair = CurrencyPair.create(currency, localCurrency);
+                    if (_exchangeRateMonitor.addCurrencyPair(currencyPair)) {
+                        _exchangeRateMonitor.startNewThreadsIfNecessary();
+                        _exchangeRateMonitor.refresh();
                     }
                 }
             }
-        }
+        }   // for
         
         updateWealthHeader();
         
