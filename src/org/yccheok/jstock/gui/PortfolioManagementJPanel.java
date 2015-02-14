@@ -1807,30 +1807,25 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             _realTimeStockMonitor.refresh();
         }
         
-        do {
-            final ExchangeRateMonitor _exchangeRateMonitor = this.exchangeRateMonitor;
-            if (_exchangeRateMonitor != null) {
-                final JStock jstock = JStock.getInstance();
-                final JStockOptions jStockOptions = jstock.getJStockOptions();
-                final Country country = jStockOptions.getCountry();
-                
-                final boolean currencyExchangeEnable = jStockOptions.isCurrencyExchangeEnable(country);
-                if (currencyExchangeEnable) {
-                    final Currency stockCurrency = org.yccheok.jstock.portfolio.Utils.getStockCurrency(portfolioRealTimeInfo, transaction.getStock().code);
-                    final Country localCountry = jStockOptions.getLocalCurrencyCountry(country);
-                    final Currency localCurrency = localCountry.localCurrency;
+        final ExchangeRateMonitor _exchangeRateMonitor = this.exchangeRateMonitor;
+        if (_exchangeRateMonitor != null) {
+            final JStock jstock = JStock.getInstance();
+            final JStockOptions jStockOptions = jstock.getJStockOptions();
+            final Country country = jStockOptions.getCountry();
 
-                    if (stockCurrency.equals(localCurrency)) {
-                        break;
-                    }
+            final boolean currencyExchangeEnable = jStockOptions.isCurrencyExchangeEnable(country);
+            if (currencyExchangeEnable) {
+                final Currency stockCurrency = org.yccheok.jstock.portfolio.Utils.getStockCurrency(portfolioRealTimeInfo, transaction.getStock().code);
+                final Country localCountry = jStockOptions.getLocalCurrencyCountry(country);
+                final Currency localCurrency = localCountry.localCurrency;
 
+                if (false == stockCurrency.equals(localCurrency)) {
                     _exchangeRateMonitor.addCurrencyPair(CurrencyPair.create(stockCurrency, localCurrency));
                     _exchangeRateMonitor.startNewThreadsIfNecessary();
                     _exchangeRateMonitor.refresh();
                 }
             }
-            break;
-        } while (true);
+        }
         
         return transactionSummary;
     }
@@ -1903,7 +1898,29 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         assert(transaction.getType() == Contract.Type.Sell);
         
         final SellPortfolioTreeTableModelEx portfolioTreeTableModel = (SellPortfolioTreeTableModelEx)sellTreeTable.getTreeTableModel();
-        return portfolioTreeTableModel.addTransaction(transaction);
+        final TransactionSummary transactionSummary = portfolioTreeTableModel.addTransaction(transaction);
+        
+        final ExchangeRateMonitor _exchangeRateMonitor = this.exchangeRateMonitor;
+        if (_exchangeRateMonitor != null) {
+            final JStock jstock = JStock.getInstance();
+            final JStockOptions jStockOptions = jstock.getJStockOptions();
+            final Country country = jStockOptions.getCountry();
+
+            final boolean currencyExchangeEnable = jStockOptions.isCurrencyExchangeEnable(country);
+            if (currencyExchangeEnable) {
+                final Currency stockCurrency = org.yccheok.jstock.portfolio.Utils.getStockCurrency(portfolioRealTimeInfo, transaction.getStock().code);
+                final Country localCountry = jStockOptions.getLocalCurrencyCountry(country);
+                final Currency localCurrency = localCountry.localCurrency;
+
+                if (false == stockCurrency.equals(localCurrency)) {
+                    _exchangeRateMonitor.addCurrencyPair(CurrencyPair.create(stockCurrency, localCurrency));
+                    _exchangeRateMonitor.startNewThreadsIfNecessary();
+                    _exchangeRateMonitor.refresh();
+                }
+            }
+        }
+        
+        return transactionSummary;
     }
     
     private void updateExchangeRateMonitorAccordingToPortfolioTreeTableModels() {
@@ -2620,8 +2637,40 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     }
                 }
             } else if (sellCodes.contains(code)) {
-                // ???
+                if (currency != null) {
+                    if (null == currencies.put(code, currency)) {
+                        this.portfolioRealTimeInfo.currenciesDirty = true;
+                    }
+
+                    // Thread safety purpose.
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            Set<Code> buyCodes = PortfolioManagementJPanel.this.getBuyCodes();
+                            if (false == buyCodes.contains(code)) {
+                                // We can remove this code safely.
+                                PortfolioManagementJPanel.this.realTimeStockMonitor.removeStockCode(code);
+                            }
+                        }
+                    });
+                } else {
+                    // Should I do something here? Or, should I keep retrying
+                    // without removing code from 
+                }
+
             } else {
+                // Thread safety purpose.
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        Set<Code> codes = PortfolioManagementJPanel.this.getCodes();
+                        if (false == codes.contains(code)) {
+                            // We can remove this code safely.
+                            PortfolioManagementJPanel.this.realTimeStockMonitor.removeStockCode(code);
+                        }
+                    }
+                });
+
                 continue;
             }
             
