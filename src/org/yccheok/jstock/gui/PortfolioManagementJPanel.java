@@ -2575,8 +2575,16 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     for (ExchangeRate exchangeRate : exchangeRates) {
                         final CurrencyPair currencyPair = exchangeRate.currencyPair();
                         if (false == currencyPairs.contains(currencyPair)) {
-                            _exchangeRateMonitor.removeCurrencyPair(currencyPair);
-                            exchangeRatesMap.remove(currencyPair);
+                            // Thread safety purpose.
+                            SwingUtilities.invokeLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (false == getCurrencyPairs().contains(currencyPair)) {
+                                        _exchangeRateMonitor.removeCurrencyPair(currencyPair);
+                                        exchangeRatesMap.remove(currencyPair);                                        
+                                    }
+                                }
+                            });
                         } else {
                             double rate = exchangeRate.rate();
                             exchangeRatesMap.put(currencyPair, rate);
