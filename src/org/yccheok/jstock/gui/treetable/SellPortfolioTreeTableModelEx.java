@@ -20,7 +20,9 @@
 package org.yccheok.jstock.gui.treetable;
 
 import java.util.Arrays;
+import javax.swing.tree.TreePath;
 import org.jdesktop.swingx.treetable.TreeTableModel;
+import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.Country;
 import org.yccheok.jstock.engine.currency.Currency;
 import org.yccheok.jstock.gui.JStockOptions;
@@ -460,6 +462,51 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
     
     public void refreshRoot() {
         fireTreeTableNodeChanged(getRoot());
+    }
+    
+    public boolean refresh(Code code) {
+        final Portfolio portfolio = (Portfolio)getRoot();
+        final int count = portfolio.getChildCount();
+        
+        TransactionSummary transactionSummary = null;
+        
+        // Possible to have index out of bound exception, as mutable operation
+        // may occur in between by another thread. But it should be fine at this
+        // moment, as this method will only be consumed by RealTimeStockMonitor,
+        // and it is fail safe.
+        for (int i = 0; i < count; i++) {
+            TransactionSummary ts = (TransactionSummary)portfolio.getChildAt(i);
+            
+            assert(ts.getChildCount() > 0);
+            
+            final Transaction transaction = (Transaction)ts.getChildAt(0);
+            
+            if (true == transaction.getStock().code.equals(code)) {
+                transactionSummary = ts;
+                break;
+            }
+        }
+        
+        if (null == transactionSummary) {
+            return false;
+        }
+        
+        final int num = transactionSummary.getChildCount();
+
+        if (num == 0) {
+            return false;
+        }
+
+        for (int i = 0; i < num; i++) {
+            final Transaction transaction = (Transaction)transactionSummary.getChildAt(i);
+                        
+            this.modelSupport.fireChildChanged(new TreePath(getPathToRoot(transaction)), i, transaction);
+        }
+                
+        fireTreeTableNodeChanged(transactionSummary);
+        fireTreeTableNodeChanged(getRoot());
+                
+        return true;        
     }
     
     @Override
