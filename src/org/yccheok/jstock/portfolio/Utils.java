@@ -69,6 +69,9 @@ public class Utils {
     public static double getExchangeRate(PortfolioRealTimeInfo portfolioRealTimeInfo, Currency localCurrency, Currency stockCurrency) {
         // Possible null.
         if (localCurrency == null) {
+            if (stockCurrency.toString().equals("GBX")) {
+                return 0.01;
+            }
             return 1.0;
         }
         
