@@ -74,6 +74,7 @@ import org.yccheok.jstock.gui.portfolio.SplitJDialog;
 import org.yccheok.jstock.gui.portfolio.ToolTipHighlighter;
 import org.yccheok.jstock.gui.treetable.AbstractPortfolioTreeTableModelEx;
 import org.yccheok.jstock.gui.treetable.BuyPortfolioTreeTableModelEx;
+import org.yccheok.jstock.gui.treetable.DoubleWithCurrency;
 import org.yccheok.jstock.gui.treetable.SellPortfolioTreeTableModelEx;
 import org.yccheok.jstock.gui.treetable.SortableTreeTable;
 import org.yccheok.jstock.internationalization.GUIBundle;
@@ -340,7 +341,23 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                             if (value instanceof DoubleWrapper) {
                                 DoubleWrapper v = (DoubleWrapper)value;
                                 ((JLabel)c).setText(org.yccheok.jstock.portfolio.Utils.toCurrency(v.decimalPlace, v.value));
-                            } else {
+                            } else if (value instanceof DoubleWithCurrency) {
+                                DoubleWithCurrency v = (DoubleWithCurrency)value;
+                                Currency currency = v.currency();
+                                String content = org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlaces.Four, v.Double());
+                                if (currency == null) {
+                                    ((JLabel)c).setText(content);
+                                } else {
+                                    String prefix = currency.toString();
+                                    if (prefix.equals("GBX")) {
+                                        // Special handling.
+                                        prefix = "GBP";
+                                    }
+                                    
+                                    ((JLabel)c).setText(prefix + " " + content);
+                                }  
+                            }
+                            else {
                                 ((JLabel)c).setText(org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlaces.Four, value));
                             }
                         }
@@ -562,7 +579,12 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     // Only shows necessary columns.
                     initGUIOptions();
 
-                    expandTreeTable(this.buyTreeTable);
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            expandTreeTable(buyTreeTable);
+                        }                        
+                    });                    
                     
                     updateRealTimeStockMonitorAccordingToPortfolioTreeTableModels();  
                     updateExchangeRateMonitorAccordingToPortfolioTreeTableModels();
@@ -2089,6 +2111,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         final SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel = (SellPortfolioTreeTableModelEx)sellTreeTable.getTreeTableModel();
         buyPortfolioTreeTableModel.bind(_portfolioRealTimeInfo);
         sellPortfolioTreeTableModel.bind(_portfolioRealTimeInfo);
+        buyPortfolioTreeTableModel.bind(this);
+        sellPortfolioTreeTableModel.bind(this);
         
         refershGUIAfterInitPortfolio(
             (BuyPortfolioTreeTableModelEx)PortfolioManagementJPanel.this.buyTreeTable.getTreeTableModel(), 
@@ -2999,6 +3023,16 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     
     public PortfolioRealTimeInfo getPortfolioRealTimeInfo() {
         return this.portfolioRealTimeInfo;
+    }
+    
+    public boolean shouldDisplayCurrencyInfoForValue() {
+        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        final Country country = jStockOptions.getCountry();
+        final boolean isCurrencyExchangeEnable = jStockOptions.isCurrencyExchangeEnable(country);
+        if (false == isCurrencyExchangeEnable) {
+            return false;
+        }
+        return this.getCurrencyPairs().size() > 1;
     }
     
     private static final Log log = LogFactory.getLog(PortfolioManagementJPanel.class);

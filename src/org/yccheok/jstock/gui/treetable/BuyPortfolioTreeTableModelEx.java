@@ -29,6 +29,7 @@ import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.engine.currency.Currency;
 import org.yccheok.jstock.gui.JStockOptions;
 import org.yccheok.jstock.gui.JStock;
+import org.yccheok.jstock.gui.PortfolioManagementJPanel;
 import org.yccheok.jstock.internationalization.GUIBundle;
 
 /**
@@ -39,11 +40,16 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
     
     // Avoid NPE.
     private PortfolioRealTimeInfo portfolioRealTimeInfo = new PortfolioRealTimeInfo();
-            
+    private PortfolioManagementJPanel portfolioManagementJPanel = null;
+
     public void bind(PortfolioRealTimeInfo portfolioRealTimeInfo) {
         this.portfolioRealTimeInfo = portfolioRealTimeInfo;
         final Portfolio portfolio = (Portfolio)getRoot();
         portfolio.bind(portfolioRealTimeInfo);
+    }
+
+    public void bind(PortfolioManagementJPanel portfolioManagementJPanel) {
+        this.portfolioManagementJPanel = portfolioManagementJPanel;
     }
     
     public BuyPortfolioTreeTableModelEx() {
@@ -437,7 +443,13 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
             
             if (transactionSummary.getChildCount() <= 0) return null;
             
-            final boolean shouldConvertPenceToPound = org.yccheok.jstock.portfolio.Utils.shouldConvertPenceToPound(portfolioRealTimeInfo, ((Transaction)transactionSummary.getChildAt(0)).getStock().code);
+            final Code code = ((Transaction)transactionSummary.getChildAt(0)).getStock().code;
+            
+            final boolean shouldConvertPenceToPound = org.yccheok.jstock.portfolio.Utils.shouldConvertPenceToPound(portfolioRealTimeInfo, code);
+            
+            final boolean shouldDisplayCurrencyInfoForValue = this.portfolioManagementJPanel.shouldDisplayCurrencyInfoForValue();
+            
+            final Currency stockCurrency = shouldDisplayCurrencyInfoForValue ? org.yccheok.jstock.portfolio.Utils.getStockCurrency(portfolioRealTimeInfo, code) : null;
             
             switch(column) {
                 case 0:
@@ -459,37 +471,37 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
                 case 5:
                     if (shouldConvertPenceToPound == false) {
                         if (isFeeCalculationEnabled) {
-                            return transactionSummary.getNetTotal();
+                            return DoubleWithCurrency.create(transactionSummary.getNetTotal(), stockCurrency);
                         } else {
-                            return transactionSummary.getTotal();
+                            return DoubleWithCurrency.create(transactionSummary.getTotal(), stockCurrency);
                         }
                     } else {
                         if (isFeeCalculationEnabled) {
-                            return transactionSummary.getNetTotal() / 100.0;
+                            return DoubleWithCurrency.create(transactionSummary.getNetTotal() / 100.0, stockCurrency);
                         } else {                        
-                            return transactionSummary.getTotal() / 100.0;
+                            return DoubleWithCurrency.create(transactionSummary.getTotal() / 100.0, stockCurrency);
                         }
                     }
                     
                 case 6:
                     if (shouldConvertPenceToPound == false) {
-                        return this.getCurrentValue(transactionSummary);
+                        return DoubleWithCurrency.create(this.getCurrentValue(transactionSummary), stockCurrency);
                     } else {
-                        return this.getCurrentValue(transactionSummary) / 100.0;
+                        return DoubleWithCurrency.create(this.getCurrentValue(transactionSummary) / 100.0, stockCurrency);
                     }                    
                     
                 case 7:
                     if (shouldConvertPenceToPound == false) {
                         if (isFeeCalculationEnabled) {
-                            return this.getNetGainLossValue(transactionSummary);
+                            return DoubleWithCurrency.create(this.getNetGainLossValue(transactionSummary), stockCurrency);
                         } else {
-                            return this.getGainLossValue(transactionSummary);
+                            return DoubleWithCurrency.create(this.getGainLossValue(transactionSummary), stockCurrency);
                         }
                     } else {
                         if (isFeeCalculationEnabled) {
-                            return this.getNetGainLossValue(transactionSummary) / 100.0;
+                            return DoubleWithCurrency.create(this.getNetGainLossValue(transactionSummary) / 100.0, stockCurrency);
                         } else {
-                            return this.getGainLossValue(transactionSummary) / 100.0;
+                            return DoubleWithCurrency.create(this.getGainLossValue(transactionSummary) / 100.0, stockCurrency);
                         }
                     }
                     
@@ -517,8 +529,14 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
         if (node instanceof Transaction) {
             final Transaction transaction = (Transaction)node;
             
-            final boolean shouldConvertPenceToPound = org.yccheok.jstock.portfolio.Utils.shouldConvertPenceToPound(portfolioRealTimeInfo, transaction.getStock().code);
+            final Code code = transaction.getStock().code;
             
+            final boolean shouldConvertPenceToPound = org.yccheok.jstock.portfolio.Utils.shouldConvertPenceToPound(portfolioRealTimeInfo, code);
+            
+            final boolean shouldDisplayCurrencyInfoForValue = this.portfolioManagementJPanel.shouldDisplayCurrencyInfoForValue();
+            
+            final Currency stockCurrency = shouldDisplayCurrencyInfoForValue ? org.yccheok.jstock.portfolio.Utils.getStockCurrency(portfolioRealTimeInfo, code) : null;
+
             switch(column) {
                 case 0:
                     return (transaction).getStock().symbol;
@@ -538,37 +556,37 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
                 case 5:
                     if (shouldConvertPenceToPound == false) {
                         if (isFeeCalculationEnabled) {
-                            return transaction.getNetTotal();
+                            return DoubleWithCurrency.create(transaction.getNetTotal(), stockCurrency);
                         } else {
-                            return transaction.getTotal();
+                            return DoubleWithCurrency.create(transaction.getTotal(), stockCurrency);
                         }
                     } else {
                         if (isFeeCalculationEnabled) {
-                            return transaction.getNetTotal() / 100.0;
+                            return DoubleWithCurrency.create(transaction.getNetTotal() / 100.0, stockCurrency);
                         } else {
-                            return transaction.getTotal() / 100.0;
+                            return DoubleWithCurrency.create(transaction.getTotal() / 100.0, stockCurrency);
                         }
                     }
                     
                 case 6:
                     if (shouldConvertPenceToPound == false) {
-                        return this.getCurrentValue(transaction);
+                        return DoubleWithCurrency.create(this.getCurrentValue(transaction), stockCurrency);
                     } else {
-                        return this.getCurrentValue(transaction) / 100.0;
+                        return DoubleWithCurrency.create(this.getCurrentValue(transaction) / 100.0, stockCurrency);
                     }
                     
                 case 7:
                     if (shouldConvertPenceToPound == false) {
                         if (isFeeCalculationEnabled) {
-                            return this.getNetGainLossValue(transaction);
+                            return DoubleWithCurrency.create(this.getNetGainLossValue(transaction), stockCurrency);
                         } else {
-                            return this.getGainLossValue(transaction);
+                            return DoubleWithCurrency.create(this.getGainLossValue(transaction), stockCurrency);
                         }
                     } else {
                         if (isFeeCalculationEnabled) {
-                            return this.getNetGainLossValue(transaction) / 100.0;
+                            return DoubleWithCurrency.create(this.getNetGainLossValue(transaction) / 100.0, stockCurrency);
                         } else {
-                            return this.getGainLossValue(transaction) / 100.0;
+                            return DoubleWithCurrency.create(this.getGainLossValue(transaction) / 100.0, stockCurrency);
                         }
                     }
                     

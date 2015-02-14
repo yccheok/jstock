@@ -27,6 +27,7 @@ import org.yccheok.jstock.engine.Country;
 import org.yccheok.jstock.engine.currency.Currency;
 import org.yccheok.jstock.gui.JStockOptions;
 import org.yccheok.jstock.gui.JStock;
+import org.yccheok.jstock.gui.PortfolioManagementJPanel;
 import org.yccheok.jstock.portfolio.Contract;
 import org.yccheok.jstock.portfolio.Portfolio;
 import org.yccheok.jstock.portfolio.Transaction;
@@ -43,11 +44,16 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
     
     // Avoid NPE.
     private PortfolioRealTimeInfo portfolioRealTimeInfo = new PortfolioRealTimeInfo();
+    private PortfolioManagementJPanel portfolioManagementJPanel = null;
             
     public void bind(PortfolioRealTimeInfo portfolioRealTimeInfo) {
         this.portfolioRealTimeInfo = portfolioRealTimeInfo;
         final Portfolio portfolio = (Portfolio)getRoot();
         portfolio.bind(portfolioRealTimeInfo);
+    }
+    
+    public void bind(PortfolioManagementJPanel portfolioManagementJPanel) {
+        this.portfolioManagementJPanel = portfolioManagementJPanel;
     }
     
     public SellPortfolioTreeTableModelEx() {
