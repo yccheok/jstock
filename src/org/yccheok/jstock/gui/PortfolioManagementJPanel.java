@@ -562,8 +562,12 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                             return true;
                         }
                     }
-                    this.buyTreeTable.setTreeTableModel(new BuyPortfolioTreeTableModelEx());
                     
+                    this.buyTreeTable.setTreeTableModel(new BuyPortfolioTreeTableModelEx());
+                    final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
+                    buyPortfolioTreeTableModel.bind(this.portfolioRealTimeInfo);
+                    buyPortfolioTreeTableModel.bind(this);
+
                     Map<String, String> metadatas = statements.getMetadatas();
                     for (Transaction transaction : transactions) {
                         final Code code = transaction.getStock().code;
@@ -579,12 +583,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     // Only shows necessary columns.
                     initGUIOptions();
 
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            expandTreeTable(buyTreeTable);
-                        }                        
-                    });                    
+                    expandTreeTable(buyTreeTable);
                     
                     updateRealTimeStockMonitorAccordingToPortfolioTreeTableModels();  
                     updateExchangeRateMonitorAccordingToPortfolioTreeTableModels();
@@ -719,8 +718,12 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                             return true;
                         }
                     }
+
                     this.sellTreeTable.setTreeTableModel(new SellPortfolioTreeTableModelEx());                    
-                    
+                    final SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel = (SellPortfolioTreeTableModelEx)sellTreeTable.getTreeTableModel();
+                    sellPortfolioTreeTableModel.bind(this.portfolioRealTimeInfo);
+                    sellPortfolioTreeTableModel.bind(this);
+
                     Map<String, String> metadatas = statements.getMetadatas();
 
                     for (Transaction transaction : transactions) {
@@ -2079,6 +2082,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 return false;
             }
         }
+        
         if (openAsCSVFile(sellPortfolioFile) == false) {
             // If CSV file is not there, consider this as empty record. This is
             // because in createEmptyPortfolio, we only create portfolio-real-time-info.json,
@@ -2088,6 +2092,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 return false;
             }
         }
+                
         if (openAsCSVFile(dividendSummaryFile) == false) {
             // If CSV file is not there, consider this as empty record. This is
             // because in createEmptyPortfolio, we only create portfolio-real-time-info.json,
@@ -2106,13 +2111,6 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 return false;
             }
         }
-
-        final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
-        final SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel = (SellPortfolioTreeTableModelEx)sellTreeTable.getTreeTableModel();
-        buyPortfolioTreeTableModel.bind(_portfolioRealTimeInfo);
-        sellPortfolioTreeTableModel.bind(_portfolioRealTimeInfo);
-        buyPortfolioTreeTableModel.bind(this);
-        sellPortfolioTreeTableModel.bind(this);
         
         refershGUIAfterInitPortfolio(
             (BuyPortfolioTreeTableModelEx)PortfolioManagementJPanel.this.buyTreeTable.getTreeTableModel(), 
@@ -3032,7 +3030,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         if (false == isCurrencyExchangeEnable) {
             return false;
         }
-        return this.getCurrencyPairs().size() > 1;
+        return !this.getCurrencyPairs().isEmpty();
     }
     
     private static final Log log = LogFactory.getLog(PortfolioManagementJPanel.class);

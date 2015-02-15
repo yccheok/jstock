@@ -287,8 +287,14 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
             
             if (transactionSummary.getChildCount() <= 0) return null;
             
-            final boolean shouldConvertPenceToPound = org.yccheok.jstock.portfolio.Utils.shouldConvertPenceToPound(portfolioRealTimeInfo, ((Transaction)transactionSummary.getChildAt(0)).getStock().code);
+            final Code code = ((Transaction)transactionSummary.getChildAt(0)).getStock().code;
             
+            final boolean shouldConvertPenceToPound = org.yccheok.jstock.portfolio.Utils.shouldConvertPenceToPound(portfolioRealTimeInfo, code);
+            
+            final boolean shouldDisplayCurrencyInfoForValue = this.portfolioManagementJPanel.shouldDisplayCurrencyInfoForValue();
+            
+            final Currency stockCurrency = shouldDisplayCurrencyInfoForValue ? org.yccheok.jstock.portfolio.Utils.getStockCurrency(portfolioRealTimeInfo, code) : null;
+
             switch(column) {
                 case 0:
                     return ((Transaction)transactionSummary.getChildAt(0)).getStock().symbol;
@@ -313,45 +319,45 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
                 case 5:
                     if (shouldConvertPenceToPound == false) {
                         if (isFeeCalculationEnabled) {
-                            return transactionSummary.getNetTotal();
+                            return DoubleWithCurrency.create(transactionSummary.getNetTotal(), stockCurrency);
                         } else {
-                            return transactionSummary.getTotal();
+                            return DoubleWithCurrency.create(transactionSummary.getTotal(), stockCurrency);
                         }
                     } else {
                         if (isFeeCalculationEnabled) {
-                            return transactionSummary.getNetTotal() / 100.0;
+                            return DoubleWithCurrency.create(transactionSummary.getNetTotal() / 100.0, stockCurrency);
                         } else {
-                            return transactionSummary.getTotal() / 100.0;
+                            return DoubleWithCurrency.create(transactionSummary.getTotal() / 100.0, stockCurrency);
                         }
                     }
     
                 case 6:
                     if (shouldConvertPenceToPound == false) {
                         if (isFeeCalculationEnabled) {
-                            return transactionSummary.getNetReferenceTotal();
+                            return DoubleWithCurrency.create(transactionSummary.getNetReferenceTotal(), stockCurrency);
                         } else {
-                            return transactionSummary.getReferenceTotal();
+                            return DoubleWithCurrency.create(transactionSummary.getReferenceTotal(), stockCurrency);
                         }
                     } else {
                         if (isFeeCalculationEnabled) {
-                            return transactionSummary.getNetReferenceTotal() / 100.0;
+                            return DoubleWithCurrency.create(transactionSummary.getNetReferenceTotal() / 100.0, stockCurrency);
                         } else {
-                            return transactionSummary.getReferenceTotal() / 100.0;
+                            return DoubleWithCurrency.create(transactionSummary.getReferenceTotal() / 100.0, stockCurrency);
                         }
                     }
                        
                 case 7:
                     if (shouldConvertPenceToPound == false) {
                         if (isFeeCalculationEnabled) {
-                            return getNetGainLossValue(transactionSummary);
+                            return DoubleWithCurrency.create(getNetGainLossValue(transactionSummary), stockCurrency);
                         } else {
-                            return getGainLossValue(transactionSummary);
+                            return DoubleWithCurrency.create(getGainLossValue(transactionSummary), stockCurrency);
                         }
                     } else {
                         if (isFeeCalculationEnabled) {
-                            return getNetGainLossValue(transactionSummary) / 100.0;
+                            return DoubleWithCurrency.create(getNetGainLossValue(transactionSummary) / 100.0, stockCurrency);
                         } else {
-                            return getGainLossValue(transactionSummary) / 100.0;
+                            return DoubleWithCurrency.create(getGainLossValue(transactionSummary) / 100.0, stockCurrency);
                         }
                     }
 
@@ -379,8 +385,14 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
         if (node instanceof Transaction) {
             final Transaction transaction = (Transaction)node;
             
-            final boolean shouldConvertPenceToPound = org.yccheok.jstock.portfolio.Utils.shouldConvertPenceToPound(portfolioRealTimeInfo, transaction.getStock().code);
+            final Code code = transaction.getStock().code;
             
+            final boolean shouldConvertPenceToPound = org.yccheok.jstock.portfolio.Utils.shouldConvertPenceToPound(portfolioRealTimeInfo, code);
+            
+            final boolean shouldDisplayCurrencyInfoForValue = this.portfolioManagementJPanel.shouldDisplayCurrencyInfoForValue();
+            
+            final Currency stockCurrency = shouldDisplayCurrencyInfoForValue ? org.yccheok.jstock.portfolio.Utils.getStockCurrency(portfolioRealTimeInfo, code) : null;
+
             switch(column) {
                 case 0:
                     return (transaction).getStock().symbol;
@@ -400,45 +412,45 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
                 case 5:
                     if (shouldConvertPenceToPound == false) {
                         if (isFeeCalculationEnabled) {
-                            return transaction.getNetTotal();
+                            return DoubleWithCurrency.create(transaction.getNetTotal(), stockCurrency);
                         } else {
-                            return transaction.getTotal();
+                            return DoubleWithCurrency.create(transaction.getTotal(), stockCurrency);
                         }
                     } else {
                         if (isFeeCalculationEnabled) {
-                            return transaction.getNetTotal() / 100.0;
+                            return DoubleWithCurrency.create(transaction.getNetTotal() / 100.0, stockCurrency);
                         } else {
-                            return transaction.getTotal() / 100.0;
+                            return DoubleWithCurrency.create(transaction.getTotal() / 100.0, stockCurrency);
                         }
                     }                    
 
                 case 6:
                     if (shouldConvertPenceToPound == false) {
                         if (isFeeCalculationEnabled) {
-                            return transaction.getNetReferenceTotal();
+                            return DoubleWithCurrency.create(transaction.getNetReferenceTotal(), stockCurrency);
                         } else {
-                            return transaction.getReferenceTotal();
+                            return DoubleWithCurrency.create(transaction.getReferenceTotal(), stockCurrency);
                         }
                     } else {
                         if (isFeeCalculationEnabled) {
-                            return transaction.getNetReferenceTotal() / 100.0;
+                            return DoubleWithCurrency.create(transaction.getNetReferenceTotal() / 100.0, stockCurrency);
                         } else {
-                            return transaction.getReferenceTotal() / 100.0;
+                            return DoubleWithCurrency.create(transaction.getReferenceTotal() / 100.0, stockCurrency);
                         }
                     }
                     
                 case 7:
                     if (shouldConvertPenceToPound == false) {
                         if (isFeeCalculationEnabled) {
-                            return getNetGainLossValue(transaction);
+                            return DoubleWithCurrency.create(getNetGainLossValue(transaction), stockCurrency);
                         } else {
-                            return getGainLossValue(transaction);
+                            return DoubleWithCurrency.create(getGainLossValue(transaction), stockCurrency);
                         }
                     } else {
                         if (isFeeCalculationEnabled) {
-                            return getNetGainLossValue(transaction) / 100.0;
+                            return DoubleWithCurrency.create(getNetGainLossValue(transaction) / 100.0, stockCurrency);
                         } else {
-                            return getGainLossValue(transaction) / 100.0;
+                            return DoubleWithCurrency.create(getGainLossValue(transaction) / 100.0, stockCurrency);
                         }
                     }
                                         
