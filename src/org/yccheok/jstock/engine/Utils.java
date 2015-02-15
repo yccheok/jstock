@@ -97,7 +97,7 @@ public class Utils {
     } 
     
     public static Country toCountry(Code code) {
-        assert(countries.keySet().size() == 44);
+        assert(countries.keySet().size() == 45);
         
         String string = code.toString();
         int index = string.lastIndexOf(".");
@@ -833,9 +833,11 @@ public class Utils {
         twoLetterSuffixes.put(".NZ", "NZE:");
         twoLetterSuffixes.put(".ST", "STO:");
         twoLetterSuffixes.put(".AX", "ASX:");
+        twoLetterSuffixes.put(".BR", "EBR:");
         
         countries.put("AX", Country.Australia);
         countries.put("VI", Country.Austria);
+        countries.put("BR", Country.Belgium);
         countries.put("SA", Country.Brazil);
         countries.put("TO", Country.Canada);
         countries.put("V", Country.Canada); // TSXV
@@ -907,6 +909,7 @@ public class Utils {
         toGoogleIndex.put("^OMX", "INDEXNASDAQ:OMXS30");
         toGoogleIndex.put("^AXJO", "INDEXASX:XJO");
         toGoogleIndex.put("^AORD", "INDEXASX:XAO");
+        toGoogleIndex.put("^BFX", "INDEXEURO:BEL20");
         
         // TODO : Need revision. We no longer have primaryStockServerFactoryClasses
         // concept. Going to replace with PriceSource.

@@ -170,6 +170,7 @@ public enum Factories {
         austriaList.add(YahooStockServerFactory.newInstance());
         austriaList.add(GoogleStockServerFactory.newInstance());
         belgiumList.add(YahooStockServerFactory.newInstance());
+        belgiumList.add(GoogleStockServerFactory.newInstance());
         brazilList.add(BrazilYahooStockServerFactory.newInstance());
         brazilList.add(GoogleStockServerFactory.newInstance());
         canadaList.add(YahooStockServerFactory.newInstance());

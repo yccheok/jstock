@@ -1,6 +1,10 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.7x - 2015-02-15
+  Feature: Show foreign currency in portfolio page, to avoid user confusion.
+  Feature: Google Finance supported in Belgium.
+
 JStock 1.0.7w - 2015-02-13
   Bugfix:  Allow user to enable/disable new currency exchange feature.
   
