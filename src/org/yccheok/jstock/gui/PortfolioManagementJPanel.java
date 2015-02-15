@@ -2465,6 +2465,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
 
         Set<CurrencyPair> currencyPairs = this.getCurrencyPairs();
+        // Special handling for GBX.
+        currencyPairs.remove(CurrencyPair.create("GBX", "GBP"));
         
         if (currencyPairs.isEmpty()) {
             mainFrame.setStatusBarExchangeRateVisible(false);
@@ -3023,14 +3025,30 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         return this.portfolioRealTimeInfo;
     }
     
-    public boolean shouldDisplayCurrencyInfoForValue() {
+    public boolean shouldDisplayCurrencyInfoForValue(Code code) {
         final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
         final Country country = jStockOptions.getCountry();
         final boolean isCurrencyExchangeEnable = jStockOptions.isCurrencyExchangeEnable(country);
         if (false == isCurrencyExchangeEnable) {
             return false;
         }
-        return !this.getCurrencyPairs().isEmpty();
+        
+        if (false == this.getCurrencyPairs().isEmpty()) {
+            final Currency stockCurrency = org.yccheok.jstock.portfolio.Utils.getStockCurrency(portfolioRealTimeInfo, code);
+            final Currency localCurrency = country.localCurrency;
+            if (stockCurrency.equals(localCurrency)) {
+                return false;
+            }
+            
+            // Special handling for GBX.
+            if (stockCurrency.toString().equals("GBX") && localCurrency.toString().equals("GBP")) {
+                return false;
+            }
+            
+            return true;
+        }
+        
+        return false;
     }
     
     private static final Log log = LogFactory.getLog(PortfolioManagementJPanel.class);

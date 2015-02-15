@@ -291,7 +291,7 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
             
             final boolean shouldConvertPenceToPound = org.yccheok.jstock.portfolio.Utils.shouldConvertPenceToPound(portfolioRealTimeInfo, code);
             
-            final boolean shouldDisplayCurrencyInfoForValue = this.portfolioManagementJPanel.shouldDisplayCurrencyInfoForValue();
+            final boolean shouldDisplayCurrencyInfoForValue = this.portfolioManagementJPanel.shouldDisplayCurrencyInfoForValue(code);
             
             final Currency stockCurrency = shouldDisplayCurrencyInfoForValue ? org.yccheok.jstock.portfolio.Utils.getStockCurrency(portfolioRealTimeInfo, code) : null;
 
@@ -389,7 +389,7 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
             
             final boolean shouldConvertPenceToPound = org.yccheok.jstock.portfolio.Utils.shouldConvertPenceToPound(portfolioRealTimeInfo, code);
             
-            final boolean shouldDisplayCurrencyInfoForValue = this.portfolioManagementJPanel.shouldDisplayCurrencyInfoForValue();
+            final boolean shouldDisplayCurrencyInfoForValue = this.portfolioManagementJPanel.shouldDisplayCurrencyInfoForValue(code);
             
             final Currency stockCurrency = shouldDisplayCurrencyInfoForValue ? org.yccheok.jstock.portfolio.Utils.getStockCurrency(portfolioRealTimeInfo, code) : null;
 
