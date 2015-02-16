@@ -196,7 +196,7 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jLabel5MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel5MouseClicked
-        MemoryLogJDialog memoryLogJDialog = new MemoryLogJDialog(JStock.getInstance(), true);
+        MemoryLogJDialog memoryLogJDialog = new MemoryLogJDialog(JStock.instance(), true);
         memoryLogJDialog.setLocationRelativeTo(this);
         memoryLogJDialog.setLog(memoryLog);
         memoryLogJDialog.setVisible(true);
@@ -230,7 +230,7 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
         this.setVisible(false);
         this.dispose();
         
-        JStock.getInstance().loadFromCloud();
+        JStock.instance().loadFromCloud();
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private static class Status {
@@ -275,7 +275,7 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
                 jButton3.setEnabled(true);
 
                 if (result != null) {
-                    JStock.getInstance().reloadAfterDownloadFromCloud(result);
+                    JStock.instance().reloadAfterDownloadFromCloud(result);
                     JOptionPane.showMessageDialog(LoadFromCloudJDialog.this, GUIBundle.getString("LoadFromCloudJDialog_Success"));
                     setVisible(false);
                     dispose();

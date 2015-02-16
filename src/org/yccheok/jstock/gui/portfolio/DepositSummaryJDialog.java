@@ -355,7 +355,7 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
             return;
         }
 
-        final JStock mainFrame = JStock.getInstance();
+        final JStock mainFrame = JStock.instance();
         CommentJDialog commentJDialog = new CommentJDialog(mainFrame, true, commentable);
         commentJDialog.setTitle(title);
         commentJDialog.setLocationRelativeTo(this);

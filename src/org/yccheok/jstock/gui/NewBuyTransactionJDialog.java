@@ -60,7 +60,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
     public NewBuyTransactionJDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         final boolean isFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
         
         if (isFeeCalculationEnabled) {
@@ -298,7 +298,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
     }
     
     private boolean shouldAutoCalculateBrokerFee() {
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         
         return 
                 (jStockOptions.isAutoBrokerFeeCalculationEnabled()) && 
@@ -740,12 +740,12 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         // follow the formatter text field's.
         commitEdit();
         
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         final boolean isFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
 
         if (isFeeCalculationEnabled && shouldAutoCalculateBrokerFee())
         {
-            final BrokingFirm brokingFirm = JStock.getInstance().getJStockOptions().getSelectedBrokingFirm();
+            final BrokingFirm brokingFirm = JStock.instance().getJStockOptions().getSelectedBrokingFirm();
             
             final String name = jTextField1.getText();
             final double unit = (Double)jSpinner1.getValue();
@@ -881,7 +881,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
     }
     
     private void initAjaxProvider() {
-        JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         
         Country country = jStockOptions.getCountry();
         
@@ -916,7 +916,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
                 addStockInfoFromAutoCompleteJComboBox(stockInfo);
 
                 // Remember to update our offline database as well.
-                JStock.getInstance().addUserDefinedStockInfo(stockInfo);
+                JStock.instance().addUserDefinedStockInfo(stockInfo);
             }
         };
     }
@@ -936,7 +936,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
                 addStockInfoFromAutoCompleteJComboBox(stockInfo);
 
                 // Remember to update our offline database as well.
-                JStock.getInstance().addUserDefinedStockInfo(stockInfo);
+                JStock.instance().addUserDefinedStockInfo(stockInfo);
             }
         };
     }

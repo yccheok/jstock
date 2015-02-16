@@ -339,9 +339,9 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
         jStockOptions.setFourDecimalPlacesEnabled(this.jCheckBox3.isSelected());
         
         // Remember to refresh the GUIs as well.
-        JStock.getInstance().getPortfolioManagementJPanel().refreshCurrencySymbol();
+        JStock.instance().getPortfolioManagementJPanel().refreshCurrencySymbol();
         // Update the new state of currency exchange monitor.
-        JStock.getInstance().initExchangeRateMonitor();
+        JStock.instance().initExchangeRateMonitor();
 
         return true;
     }

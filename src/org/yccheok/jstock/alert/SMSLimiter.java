@@ -32,7 +32,7 @@ public enum SMSLimiter {
     private java.util.concurrent.atomic.AtomicInteger atomic = new java.util.concurrent.atomic.AtomicInteger();
 
     public boolean isSMSAllowed() {
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         final int max = jStockOptions.getMaxSMSPerDay();
 
         if (max <= 0) {
@@ -53,7 +53,7 @@ public enum SMSLimiter {
     }
 
     public void inc() {
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         final int max = jStockOptions.getMaxSMSPerDay();
 
         if (max <= 0) {

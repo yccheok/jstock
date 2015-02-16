@@ -435,7 +435,7 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
     }
     
     public void updateRadioBoxState() {
-        JStock m = JStock.getInstance();
+        JStock m = JStock.instance();
         java.util.List<Stock> stocks = m.getStocks();
         jRadioButton4.setEnabled(stocks.size() > 0);        
     }
@@ -500,7 +500,7 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
     public boolean buildSelectedStockCodes() {
         selectedStockInfos.clear();
         
-        JStock m = JStock.getInstance();
+        JStock m = JStock.instance();
         StockInfoDatabase stock_info_database = m.getStockInfoDatabase();
         if (stock_info_database == null) {
             log.error("Unable to locate MainFrame");

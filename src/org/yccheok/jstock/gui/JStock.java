@@ -336,7 +336,7 @@ public class JStock extends javax.swing.JFrame {
      * 
      * @return MainFrame as singleton
      */
-    public static JStock getInstance() {
+    public static JStock instance() {
         return MainFrameHolder.INSTANCE;
     }
 
@@ -1796,7 +1796,7 @@ public class JStock extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                final JStock mainFrame = JStock.getInstance();
+                final JStock mainFrame = JStock.instance();
                 
                 // We need to first assign jStockOptions to mainFrame, as during
                 // Utils.migrateXMLToCSVPortfolios, we will be accessing mainFrame's
@@ -4154,7 +4154,7 @@ public class JStock extends javax.swing.JFrame {
         this.timestamp = System.currentTimeMillis();
         ((StockTableModel)jTable1.getModel()).setTimestamp(this.timestamp);
         
-        JStock.getInstance().updateStatusBarWithLastUpdateDateMessageIfPossible();
+        JStock.instance().updateStatusBarWithLastUpdateDateMessageIfPossible();
 
         // Do it in GUI event dispatch thread. Otherwise, we may face deadlock.
         // For example, we lock the jTable, and try to remove the stock from the

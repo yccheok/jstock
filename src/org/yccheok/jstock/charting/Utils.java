@@ -341,7 +341,7 @@ public class Utils {
      */
     public static void applyChartThemeEx(JFreeChart chart) {
         final StandardChartTheme chartTheme;
-        final JStockOptions.ChartTheme theme = JStock.getInstance().getJStockOptions().getChartTheme();
+        final JStockOptions.ChartTheme theme = JStock.instance().getJStockOptions().getChartTheme();
         
         if (theme == JStockOptions.ChartTheme.Light) {
             applyChartTheme(chart);

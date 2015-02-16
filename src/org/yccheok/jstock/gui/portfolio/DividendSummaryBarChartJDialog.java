@@ -174,7 +174,7 @@ public class DividendSummaryBarChartJDialog extends javax.swing.JDialog {
             total += ((DefaultCategoryDataset)dataset).getValue(0, i).doubleValue();
         }
 
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         final String currencySymbol = jStockOptions.getCurrencySymbol(jStockOptions.getCountry());
         // Use apostrophes to escape currencySymbol. If currencySymbol contains
         // apostrophes, we may need to escape those by doubling them.

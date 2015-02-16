@@ -106,7 +106,7 @@ public class WizardDownloadIndicatorJPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jLabel3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel3MouseClicked
-        MemoryLogJDialog memoryLogJDialog = new MemoryLogJDialog(JStock.getInstance(), true);
+        MemoryLogJDialog memoryLogJDialog = new MemoryLogJDialog(JStock.instance(), true);
         memoryLogJDialog.setLocationRelativeTo(this);
         memoryLogJDialog.setLog(memoryLog);
         memoryLogJDialog.setVisible(true);

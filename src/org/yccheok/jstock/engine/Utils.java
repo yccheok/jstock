@@ -556,7 +556,7 @@ public class Utils {
      * @return Best search engine based on current selected country.
      */
     public static boolean isPinyinTSTSearchEngineRequiredForSymbol() {
-        final Country country = JStock.getInstance().getJStockOptions().getCountry();
+        final Country country = JStock.instance().getJStockOptions().getCountry();
         return (country == Country.China || country == Country.Taiwan);
     }
 
@@ -569,7 +569,7 @@ public class Utils {
      * @return <code>true</code> if we should maintain the symbol as database's.
      */
     public static boolean isSymbolImmutable() {
-        final Country country = JStock.getInstance().getJStockOptions().getCountry();
+        final Country country = JStock.instance().getJStockOptions().getCountry();
         return (country == Country.China || country == Country.Taiwan);
     }
 
@@ -582,7 +582,7 @@ public class Utils {
      * @return <code>true</code> if we should maintain the name as database's.
      */
     public static boolean isNameImmutable() {
-        final Country country = JStock.getInstance().getJStockOptions().getCountry();
+        final Country country = JStock.instance().getJStockOptions().getCountry();
         return isNameImmutable(country);
     }
 
@@ -598,7 +598,7 @@ public class Utils {
      * above". Green color to indicate "fall below".
      */
     public static boolean isFallBelowAndRiseAboveColorReverse() {
-        final Country country = JStock.getInstance().getJStockOptions().getCountry();
+        final Country country = JStock.instance().getJStockOptions().getCountry();
         return (country == Country.China || country == Country.Taiwan);
     }
 

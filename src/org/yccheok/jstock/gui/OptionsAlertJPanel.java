@@ -117,7 +117,7 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
                 
                 if (pair != null) {
                     credentialEx = pair;
-                    jCheckBox3.setSelected(JStock.getInstance().getJStockOptions().isSMSEnabled());
+                    jCheckBox3.setSelected(JStock.instance().getJStockOptions().isSMSEnabled());
                 }
                 
                 updateGUIState();

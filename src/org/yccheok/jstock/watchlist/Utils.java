@@ -61,7 +61,7 @@ public class Utils {
      * @return watchlist directory, based on given watchlist name
      */
     public static String getWatchlistDirectory(String name) {
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         return getWatchlistDirectory(jStockOptions.getCountry(), name);
     }
 
@@ -70,7 +70,7 @@ public class Utils {
     }
     
     public static String getWatchlistDirectory() {
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         return getWatchlistDirectory(jStockOptions.getWatchlistName());
     }
     
@@ -120,7 +120,7 @@ public class Utils {
     }
     
     public static List<String> getWatchlistNames() {
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         return getWatchlistNames(jStockOptions.getCountry());
     }
     

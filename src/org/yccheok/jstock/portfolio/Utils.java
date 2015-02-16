@@ -273,7 +273,7 @@ public class Utils {
      * @return currency representation (with symbol)
      */
     public static String toCurrencyWithSymbol(DecimalPlaces decimalPlace, Object value) {
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         final Country country = jStockOptions.getCountry();
         return jStockOptions.getCurrencySymbol(country) + toCurrency(decimalPlace, value);
     }
@@ -285,7 +285,7 @@ public class Utils {
      * @return currency representation (with symbol)
      */
     public static String toCurrencyWithSymbol(DecimalPlaces decimalPlace, double value) {
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         final Country country = jStockOptions.getCountry();
         return jStockOptions.getCurrencySymbol(country) + toCurrency(decimalPlace, value);
     }
@@ -306,7 +306,7 @@ public class Utils {
      * @return portfolio directory, based on given portfolio name
      */
     public static String getPortfolioDirectory(String name) {
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         return getPortfolioDirectory(jStockOptions.getCountry(), name);
     }
 
@@ -320,12 +320,12 @@ public class Utils {
     }
 
     private static String getPortfolioRealTimeInfoFilepath(String name) {
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         return getPortfolioRealTimeInfoFilepath(jStockOptions.getCountry(), name);       
     }
 
     public static String getPortfolioRealTimeInfoFilepath() {
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         return getPortfolioRealTimeInfoFilepath(jStockOptions.getPortfolioName());       
     }
     
@@ -335,12 +335,12 @@ public class Utils {
     }
 
     private static String getStockPricesFilepath(String name) {
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         return getStockPricesFilepath(jStockOptions.getCountry(), name);       
     }
 
     public static String getStockPricesFilepath() {
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         return getStockPricesFilepath(jStockOptions.getPortfolioName());       
     }
     
@@ -375,7 +375,7 @@ public class Utils {
      * @return current active portfolio directory
      */
     public static String getPortfolioDirectory() {
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         return getPortfolioDirectory(jStockOptions.getPortfolioName());
     }
 
@@ -503,7 +503,7 @@ public class Utils {
     public static ActivitySummary toActivitySummary(List<TransactionSummary> transactionSummaries, DividendSummary dividendSummary) {
         final ActivitySummary activitySummary = new ActivitySummary();
         
-        final boolean isFeeCalculationEnabled = JStock.getInstance().getJStockOptions().isFeeCalculationEnabled();
+        final boolean isFeeCalculationEnabled = JStock.instance().getJStockOptions().isFeeCalculationEnabled();
         
         for (TransactionSummary transactionSummary : transactionSummaries) {
             final int count = transactionSummary.getChildCount();
@@ -555,7 +555,7 @@ public class Utils {
     }
             
     public static List<String> getPortfolioNames() {
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         return getPortfolioNames(jStockOptions.getCountry());
     }
     

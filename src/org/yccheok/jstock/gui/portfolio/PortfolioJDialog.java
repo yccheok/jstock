@@ -170,7 +170,7 @@ public class PortfolioJDialog extends javax.swing.JDialog {
         String newPortfolioName = null;
 
         boolean needToReload = false;
-        final JStock mainFrame = JStock.getInstance();
+        final JStock mainFrame = JStock.instance();
         if ( mainFrame.getJStockOptions().getPortfolioName().equals(oldPortfolioName)) {
             needToReload = true;
         }
@@ -209,7 +209,7 @@ public class PortfolioJDialog extends javax.swing.JDialog {
             // In Linux, creating "My Portfolio" and "my portfolio" are allowed. We
             // want to prevent this from happening, as user might upload such 2 folders
             // in Linux, and download into Windows.
-            final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+            final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
             final File file = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() +  jStockOptions.getCountry() + File.separator + "portfolios" + File.separator);
             File[] children = file.listFiles();   
             if (children != null) {
@@ -252,14 +252,14 @@ public class PortfolioJDialog extends javax.swing.JDialog {
             JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_you_must_select_portfolio"), MessagesBundle.getString("warning_title_you_must_select_portfolio"), JOptionPane.WARNING_MESSAGE);
             return;
         }
-        final JStock mainFrame = JStock.getInstance();
+        final JStock mainFrame = JStock.instance();
         final JStockOptions jStockOptions = mainFrame.getJStockOptions();
         if (jStockOptions.getPortfolioName().equals(selectedValue)) {
             JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_cannot_delete_current_active_portflio"), MessagesBundle.getString("warning_title_cannot_delete_current_active_portflio"), JOptionPane.WARNING_MESSAGE);
             return;
         }
         final String output = MessageFormat.format(MessagesBundle.getString("question_message_delete_template"), selectedValue);
-        final int result = javax.swing.JOptionPane.showConfirmDialog(JStock.getInstance(), output, MessagesBundle.getString("question_title_delete"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
+        final int result = javax.swing.JOptionPane.showConfirmDialog(JStock.instance(), output, MessagesBundle.getString("question_title_delete"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
         if (result != javax.swing.JOptionPane.YES_OPTION) {
             return;
         }
@@ -309,7 +309,7 @@ public class PortfolioJDialog extends javax.swing.JDialog {
             // In Linux, creating "My Portfolio" and "my portfolio" are allowed. We
             // want to prevent this from happening, as user might upload such 2 folders
             // in Linux, and download into Windows.
-            final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+            final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
             final File file = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() +  jStockOptions.getCountry() + File.separator + "portfolios" + File.separator);
             File[] children = file.listFiles(); 
             if (children != null) {
@@ -346,9 +346,9 @@ public class PortfolioJDialog extends javax.swing.JDialog {
             // Get item index
             final int index = list.locationToIndex(evt.getPoint());
             final String portfolio = list.getModel().getElementAt(index).toString();
-            final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+            final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
             if (jStockOptions.getPortfolioName().equals(portfolio) == false) {
-                JStock.getInstance().selectActivePortfolio(portfolio);
+                JStock.instance().selectActivePortfolio(portfolio);
                 // Ensure Bold effect on active portfolio.    
                 this.jList1.repaint();
             }
@@ -370,7 +370,7 @@ public class PortfolioJDialog extends javax.swing.JDialog {
             public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 Component component = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (component != null && value != null) {
-                    final JStock mainFrame = JStock.getInstance();
+                    final JStock mainFrame = JStock.instance();
                     final JStockOptions jStockOptions = mainFrame.getJStockOptions();
                     final String portfolioName = jStockOptions.getPortfolioName();
 

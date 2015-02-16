@@ -74,7 +74,7 @@ public class SellPortfolioChartJDialog extends javax.swing.JDialog {
         this.portfolioRealTimeInfo = portfolioRealTimeInfo;
         
         final JFreeChart freeChart;
-        final int lastSelectedSellPortfolioChartIndex = JStock.getInstance().getJStockOptions().getLastSelectedSellPortfolioChartIndex();
+        final int lastSelectedSellPortfolioChartIndex = JStock.instance().getJStockOptions().getLastSelectedSellPortfolioChartIndex();
         if (lastSelectedSellPortfolioChartIndex < this.jComboBox1.getItemCount() && lastSelectedSellPortfolioChartIndex < cNames.length && lastSelectedSellPortfolioChartIndex >= 0) {            
             freeChart = createChart(cNames[lastSelectedSellPortfolioChartIndex]);
             // Put it in next queue, so that it won't trigger jComBox1's event
@@ -130,7 +130,7 @@ public class SellPortfolioChartJDialog extends javax.swing.JDialog {
 
         jPanel1.setLayout(new java.awt.BorderLayout());
 
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = org.yccheok.jstock.gui.JStock.instance().getJStockOptions();
         final boolean isFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
         Set<String> excludedStrings = new HashSet<String>();
         excludedStrings.add(GUIBundle.getString("SellPortfolioTreeTableModel_Broker"));
@@ -138,9 +138,8 @@ public class SellPortfolioChartJDialog extends javax.swing.JDialog {
         excludedStrings.add(GUIBundle.getString("SellPortfolioTreeTableModel_ClearingFee"));
         for(String cName : this.cNames) {
             if (isFeeCalculationEnabled == false) {
-                if (excludedStrings.contains(cName)) {
-                    continue;
-                }
+                excludedStrings.contains(cName);
+                continue;
             }
             this.jComboBox1.addItem(cName);
         }
@@ -155,8 +154,8 @@ public class SellPortfolioChartJDialog extends javax.swing.JDialog {
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-750)/2, (screenSize.height-600)/2, 750, 600);
+        setSize(new java.awt.Dimension(750, 600));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private static class DataEx implements Comparable<DataEx> {
@@ -180,7 +179,7 @@ public class SellPortfolioChartJDialog extends javax.swing.JDialog {
     
     
     private JFreeChart createChart(String name) {
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         final boolean isFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
         
         final Portfolio portfolio = (Portfolio)portfolioTreeTableModel.getRoot();
@@ -306,7 +305,7 @@ public class SellPortfolioChartJDialog extends javax.swing.JDialog {
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
         String selected = ((javax.swing.JComboBox)evt.getSource()).getSelectedItem().toString();
         final int selectedIndex = ((javax.swing.JComboBox)evt.getSource()).getSelectedIndex();
-        JStock.getInstance().getJStockOptions().setLastSelectedSellPortfolioChartIndex(selectedIndex);
+        JStock.instance().getJStockOptions().setLastSelectedSellPortfolioChartIndex(selectedIndex);
         final JFreeChart freeChart = this.createChart(selected);
         org.yccheok.jstock.charting.Utils.applyChartTheme(freeChart);
         chartPanel.setChart(freeChart);

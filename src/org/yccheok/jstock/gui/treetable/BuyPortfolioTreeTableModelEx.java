@@ -380,7 +380,7 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
     
     @Override
     public Object getValueAt(Object node, int column) {
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         final boolean isFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
         
         if (node instanceof Portfolio) {
@@ -459,7 +459,7 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
                     return transactionSummary.getQuantity();
                     
                 case 3:
-                    if (JStock.getInstance().getJStockOptions().isFourDecimalPlacesEnabled()) {
+                    if (JStock.instance().getJStockOptions().isFourDecimalPlacesEnabled()) {
                         return new DoubleWrapper(DecimalPlaces.Four, this.getPurchasePrice(transactionSummary));
                     } else {
                         return new DoubleWrapper(DecimalPlaces.Three, this.getPurchasePrice(transactionSummary));   

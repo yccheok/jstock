@@ -23,7 +23,7 @@ public class UtilsTest extends TestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        JStock.getInstance().initJStockOptions(new JStockOptions());
+        JStock.instance().initJStockOptions(new JStockOptions());
     }
     
     @Override

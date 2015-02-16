@@ -161,9 +161,9 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         if (gain >= 0) {
             if (gain > 0) {
                 if (org.yccheok.jstock.engine.Utils.isFallBelowAndRiseAboveColorReverse()) {
-                    g2.setColor(JStock.getInstance().getJStockOptions().getLowerNumericalValueForegroundColor());
+                    g2.setColor(JStock.instance().getJStockOptions().getLowerNumericalValueForegroundColor());
                 } else {
-                    g2.setColor(JStock.getInstance().getJStockOptions().getHigherNumericalValueForegroundColor());
+                    g2.setColor(JStock.instance().getJStockOptions().getHigherNumericalValueForegroundColor());
                 }
             }
             g2.drawString(GAIN + ": ", x, y);
@@ -171,9 +171,9 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         }
         else {
             if (org.yccheok.jstock.engine.Utils.isFallBelowAndRiseAboveColorReverse()) {
-                g2.setColor(JStock.getInstance().getJStockOptions().getHigherNumericalValueForegroundColor());
+                g2.setColor(JStock.instance().getJStockOptions().getHigherNumericalValueForegroundColor());
             } else {
-                g2.setColor(JStock.getInstance().getJStockOptions().getLowerNumericalValueForegroundColor());
+                g2.setColor(JStock.instance().getJStockOptions().getLowerNumericalValueForegroundColor());
             }
             g2.drawString(LOSS + ": ", x, y);
             x += oldFontMetrics.stringWidth(LOSS + ": ");

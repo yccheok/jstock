@@ -35,7 +35,7 @@ public class SimpleSwingBrowser extends JDialog {
     private final JPanel panel = new JPanel(new BorderLayout());
  
     public SimpleSwingBrowser() {
-        super(JStock.getInstance(), JDialog.ModalityType.APPLICATION_MODAL);
+        super(JStock.instance(), JDialog.ModalityType.APPLICATION_MODAL);
         initComponents();
     }
 

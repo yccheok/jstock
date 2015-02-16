@@ -556,7 +556,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     // Is there any exsiting displayed data?
                     if (this.getBuyTransactionSize() > 0) {
                         final String output = MessageFormat.format(MessagesBundle.getString("question_message_load_file_for_buy_portfolio_template"), file.getName());
-                        final int result = javax.swing.JOptionPane.showConfirmDialog(JStock.getInstance(), output, MessagesBundle.getString("question_title_load_file_for_buy_portfolio"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
+                        final int result = javax.swing.JOptionPane.showConfirmDialog(JStock.instance(), output, MessagesBundle.getString("question_title_load_file_for_buy_portfolio"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
                         if (result != javax.swing.JOptionPane.YES_OPTION) {
                             // Assume success.
                             return true;
@@ -712,7 +712,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     // Is there any exsiting displayed data?
                     if (this.getSellTransactionSize() > 0) {
                         final String output = MessageFormat.format(MessagesBundle.getString("question_message_load_file_for_sell_portfolio_template"), file.getName());
-                        final int result = javax.swing.JOptionPane.showConfirmDialog(JStock.getInstance(), output, MessagesBundle.getString("question_title_load_file_for_sell_portfolio"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
+                        final int result = javax.swing.JOptionPane.showConfirmDialog(JStock.instance(), output, MessagesBundle.getString("question_title_load_file_for_sell_portfolio"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
                         if (result != javax.swing.JOptionPane.YES_OPTION) {
                             // Assume success.
                             return true;
@@ -820,7 +820,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     // Is there any exsiting displayed data?
                     if (this.depositSummary.size() > 0) {
                         final String output = MessageFormat.format(MessagesBundle.getString("question_message_load_file_for_cash_deposit_template"), file.getName());
-                        final int result = javax.swing.JOptionPane.showConfirmDialog(JStock.getInstance(), output, MessagesBundle.getString("question_title_load_file_for_cash_deposit"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
+                        final int result = javax.swing.JOptionPane.showConfirmDialog(JStock.instance(), output, MessagesBundle.getString("question_title_load_file_for_cash_deposit"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
                         if (result != javax.swing.JOptionPane.YES_OPTION) {
                             // Assume success.
                             return true;
@@ -919,7 +919,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
                     if (this.dividendSummary.size() > 0) {
                         final String output = MessageFormat.format(MessagesBundle.getString("question_message_load_file_for_dividend_template"), file.getName());
-                        final int result = javax.swing.JOptionPane.showConfirmDialog(JStock.getInstance(), output, MessagesBundle.getString("question_title_load_file_for_dividend"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
+                        final int result = javax.swing.JOptionPane.showConfirmDialog(JStock.instance(), output, MessagesBundle.getString("question_title_load_file_for_dividend"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
                         if (result != javax.swing.JOptionPane.YES_OPTION) {
                             // Assume success.
                             return true;
@@ -942,7 +942,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
         else if (statements.getType() == Statement.Type.RealtimeInfo) {
             /* Open using other tabs. */
-            return JStock.getInstance().openAsStatements(statements, file);
+            return JStock.instance().openAsStatements(statements, file);
         }
         else {
             return false;
@@ -982,7 +982,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
 
     private void showNewSellTransactionJDialog(List<Transaction> buyTransactions) {
-        final JStock mainFrame = JStock.getInstance();        
+        final JStock mainFrame = JStock.instance();        
         NewSellTransactionJDialog newSellTransactionJDialog = new NewSellTransactionJDialog(mainFrame, true);
         if (buyTransactions.size() > 1) {
             final String template = GUIBundle.getString("PortfolioManagementJPanel_BatchSell_template");
@@ -1023,7 +1023,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
     
     private void showEditTransactionJDialog(Transaction transaction) {
-        final JStock mainFrame = JStock.getInstance();
+        final JStock mainFrame = JStock.instance();
 
         if (transaction.getType() == Contract.Type.Buy) {
             NewBuyTransactionJDialog newTransactionJDialog = new NewBuyTransactionJDialog(mainFrame, true);
@@ -1060,7 +1060,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     
     public void showNewBuyTransactionJDialog(Stock stock, double lastPrice, boolean JComboBoxEnabled) {
 
-        final JStock mainFrame = JStock.getInstance();
+        final JStock mainFrame = JStock.instance();
 
         final StockInfoDatabase stockInfoDatabase = mainFrame.getStockInfoDatabase();
         
@@ -1246,7 +1246,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
 
     private void showDividendSummaryJDialog() {
-        final JStock mainFrame = JStock.getInstance();
+        final JStock mainFrame = JStock.instance();
         DividendSummaryJDialog dividendSummaryJDialog = new DividendSummaryJDialog(mainFrame, true, this.getDividendSummary(), this);
         dividendSummaryJDialog.setLocationRelativeTo(this);
 
@@ -1264,7 +1264,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
 
     private void showSplitOrMergeJDialog(StockInfo stockInfo) {
-        final JStock mainFrame = JStock.getInstance();
+        final JStock mainFrame = JStock.instance();
         SplitJDialog splitOrMergeJDialog = new SplitJDialog(mainFrame, true, stockInfo);
         splitOrMergeJDialog.pack();
         splitOrMergeJDialog.setLocationRelativeTo(this);
@@ -1283,7 +1283,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
 
     private void showDepositSummaryJDialog() {
-        final JStock mainFrame = JStock.getInstance();
+        final JStock mainFrame = JStock.instance();
         DepositSummaryJDialog depositSummaryJDialog = new DepositSummaryJDialog(mainFrame, true, this.getDepositSummary());
         depositSummaryJDialog.setLocationRelativeTo(this);
         depositSummaryJDialog.setVisible(true);
@@ -1301,7 +1301,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             return;
         }
 
-        final JStock mainFrame = JStock.getInstance();
+        final JStock mainFrame = JStock.instance();
         CommentJDialog commentJDialog = new CommentJDialog(mainFrame, true, commentable);
         commentJDialog.setTitle(title);
         commentJDialog.setLocationRelativeTo(this);
@@ -1394,20 +1394,20 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
     
     private void showBuyPortfolioChartJDialog() {
-        final JStock m = JStock.getInstance();
+        final JStock m = JStock.instance();
         final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
         BuyPortfolioChartJDialog buyPortfolioChartJDialog = new BuyPortfolioChartJDialog(m, false, buyPortfolioTreeTableModel, this.portfolioRealTimeInfo, this.getDividendSummary());
         buyPortfolioChartJDialog.setVisible(true);                                    
     }
 
     private void showChashFlowChartJDialog() {
-        final JStock m = JStock.getInstance();
+        final JStock m = JStock.instance();
         InvestmentFlowChartJDialog cashFlowChartJDialog = new InvestmentFlowChartJDialog(m, false, this);
         cashFlowChartJDialog.setVisible(true);
     }
 
     private void showSellPortfolioChartJDialog() {
-        final JStock m = JStock.getInstance();
+        final JStock m = JStock.instance();
         final SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel = (SellPortfolioTreeTableModelEx)sellTreeTable.getTreeTableModel();
         SellPortfolioChartJDialog sellPortfolioChartJDialog = new SellPortfolioChartJDialog(m, false, sellPortfolioTreeTableModel, this.portfolioRealTimeInfo, this.getDividendSummary());
         sellPortfolioChartJDialog.setVisible(true);                                    
@@ -1513,7 +1513,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         popup.add(menuItem);        
         
         if(isOnlyTreeTableRootBeingSelected(sellTreeTable) == false && (sellTreeTable.getSelectedRow() > 0)) {
-            final JStock m = JStock.getInstance();
+            final JStock m = JStock.instance();
                                 
             menuItem = new JMenuItem(GUIBundle.getString("PortfolioManagement_History..."), this.getImageIcon("/images/16x16/strokedocker.png"));
 
@@ -1547,7 +1547,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
 
     private void showDividendSummaryBarChartJDialog() {
-        final JStock m = JStock.getInstance();
+        final JStock m = JStock.instance();
         final DividendSummaryBarChartJDialog dividendSummaryBarChartJDialog = new DividendSummaryBarChartJDialog(m, false, this.getDividendSummary());
         dividendSummaryBarChartJDialog.setVisible(true);
     }
@@ -1703,7 +1703,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         popup.add(menuItem);                
         
         if (isOnlyTreeTableRootBeingSelected(buyTreeTable) == false && (buyTreeTable.getSelectedRow() > 0)) {
-            final JStock m = JStock.getInstance();
+            final JStock m = JStock.instance();
                                 
             menuItem = new JMenuItem(GUIBundle.getString("PortfolioManagement_History..."), this.getImageIcon("/images/16x16/strokedocker.png"));
 
@@ -1784,7 +1784,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     private Set<CurrencyPair> getCurrencyPairs() {
         Set<Code> codes = getCodes();
         
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
 
         final Country country = jStockOptions.getCountry();
         final Country localCountry = jStockOptions.getLocalCurrencyCountry(country);
@@ -1834,7 +1834,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         
         final ExchangeRateMonitor _exchangeRateMonitor = this.exchangeRateMonitor;
         if (_exchangeRateMonitor != null) {
-            final JStock jstock = JStock.getInstance();
+            final JStock jstock = JStock.instance();
             final JStockOptions jStockOptions = jstock.getJStockOptions();
             final Country country = jStockOptions.getCountry();
 
@@ -1927,7 +1927,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         
         final ExchangeRateMonitor _exchangeRateMonitor = this.exchangeRateMonitor;
         if (_exchangeRateMonitor != null) {
-            final JStock jstock = JStock.getInstance();
+            final JStock jstock = JStock.instance();
             final JStockOptions jStockOptions = jstock.getJStockOptions();
             final Country country = jStockOptions.getCountry();
 
@@ -2032,7 +2032,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     // Initialize portfolios through CSV files. This is the preferable method,
     // as it works well under Desktop platform and Android platform.
     private boolean initCSVPortfolio() {
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         
         List<String> availablePortfolioNames = org.yccheok.jstock.portfolio.Utils.getPortfolioNames();
         // Do we have any portfolio for this country?
@@ -2161,7 +2161,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         this.updateWealthHeader();
         
         // Add/ remove columns based on user option.
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         JTable[] tables = {this.sellTreeTable, this.buyTreeTable};
         String[] names = { 
             GUIBundle.getString("PortfolioManagementJPanel_Broker"),
@@ -2250,7 +2250,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
 
     public void updateTitledBorder() {
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         if (SwingUtilities.isEventDispatchThread()) {
             final TitledBorder titledBorder = (TitledBorder)PortfolioManagementJPanel.this.jPanel1.getBorder();
             titledBorder.setTitle(jStockOptions.getPortfolioName());
@@ -2452,7 +2452,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
 
     private void refreshStatusBarExchangeRateVisibility() {
-        final JStock mainFrame = JStock.getInstance();
+        final JStock mainFrame = JStock.instance();
         final JStockOptions jStockOptions = mainFrame.getJStockOptions();
         final Country country = jStockOptions.getCountry();
         
@@ -2518,7 +2518,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
      * Initializes exchange rate monitor.
      */
     public void initExchangeRateMonitor() {
-        final JStock jstock = JStock.getInstance();
+        final JStock jstock = JStock.instance();
         final JStockOptions jStockOptions = jstock.getJStockOptions();
 
         final Country country = jStockOptions.getCountry();
@@ -2579,7 +2579,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         realTimeStockMonitor = new RealTimeStockMonitor(
                 Constants.REAL_TIME_STOCK_MONITOR_MAX_THREAD, 
                 Constants.REAL_TIME_STOCK_MONITOR_MAX_STOCK_SIZE_PER_SCAN, 
-                JStock.getInstance().getJStockOptions().getScanningSpeed());
+                JStock.instance().getJStockOptions().getScanningSpeed());
         
         realTimeStockMonitor.attach(this.realTimeStockMonitorObserver);
         
@@ -2721,7 +2721,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             // Update currency monitor as well.
             ExchangeRateMonitor _exchangeRateMonitor = this.exchangeRateMonitor;
             if (currency != null && _exchangeRateMonitor != null) {
-                JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+                JStockOptions jStockOptions = JStock.instance().getJStockOptions();
                 final Country country = jStockOptions.getCountry();
                 final Country localCountry = jStockOptions.getLocalCurrencyCountry(country);
                 final Currency localCurrency = localCountry.localCurrency;
@@ -2740,7 +2740,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         // Update status bar with current time string.
         this.portfolioRealTimeInfo.stockPricesTimestamp = System.currentTimeMillis();
         
-        JStock.getInstance().updateStatusBarWithLastUpdateDateMessageIfPossible();     
+        JStock.instance().updateStatusBarWithLastUpdateDateMessageIfPossible();     
     }  
 
     public long getTimestamp() {
@@ -2864,7 +2864,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
     
     private void updateWealthHeader() {
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         final boolean isFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
         
         final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)this.buyTreeTable.getTreeTableModel();
@@ -2969,7 +2969,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
 
     private String getShareLabel() {
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         return MessageFormat.format(
             GUIBundle.getString("PortfolioManagementJPanel_ShareLabel"),
             jStockOptions.getCurrencySymbol(jStockOptions.getCountry())
@@ -2977,7 +2977,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
     
     private String getCashLabel() {
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         return MessageFormat.format(
             GUIBundle.getString("PortfolioManagementJPanel_CashLabel_template"),
             jStockOptions.getCurrencySymbol(jStockOptions.getCountry())
@@ -2985,7 +2985,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
     
     private String getPaperProfitLabel() {
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         return MessageFormat.format(
             GUIBundle.getString("PortfolioManagementJPanel_PaperProfitLabel_template"),
             jStockOptions.getCurrencySymbol(jStockOptions.getCountry())
@@ -2993,7 +2993,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
     
     private String getRealizedProfitLabel() {
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         return MessageFormat.format(
             GUIBundle.getString("PortfolioManagementJPanel_RealizedProfitLabel_template"),
             jStockOptions.getCurrencySymbol(jStockOptions.getCountry())
@@ -3026,7 +3026,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
     
     public boolean shouldDisplayCurrencyInfoForValue(Code code) {
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         final Country country = jStockOptions.getCountry();
         final boolean isCurrencyExchangeEnable = jStockOptions.isCurrencyExchangeEnable(country);
         if (false == isCurrencyExchangeEnable) {

@@ -245,7 +245,7 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jLabel5MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel5MouseClicked
-        MemoryLogJDialog memoryLogJDialog = new MemoryLogJDialog(JStock.getInstance(), true);
+        MemoryLogJDialog memoryLogJDialog = new MemoryLogJDialog(JStock.instance(), true);
         memoryLogJDialog.setLocationRelativeTo(this);
         memoryLogJDialog.setLog(memoryLog);
         memoryLogJDialog.setVisible(true);
@@ -302,7 +302,7 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
         this.setVisible(false);
         this.dispose();
         
-        JStock.getInstance().saveToCloud();
+        JStock.instance().saveToCloud();
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private static class Status {
@@ -384,7 +384,7 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
 
                 publish(Status.newInstance(GUIBundle.getString("SaveToCloudJDialog_PreparingData..."), Icons.BUSY));
 
-                JStock.getInstance().commitBeforeSaveToCloud();
+                JStock.instance().commitBeforeSaveToCloud();
                 
                 final File zipFile = getJStockZipFile();
                 
@@ -592,7 +592,7 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
             fileExs.add(FileEx.newInstance(file, output));
         }
 
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         // User will sue us, if we store their Google account information in our server.
         // Let's get a copy of JStockOptions, without any sensitive data.
         final JStockOptions insensitiveJStockOptions = jStockOptions.insensitiveClone();

@@ -158,7 +158,7 @@ public class Utils {
     
     public static void updateFactoriesPriceSource() {
         for (Country country : Country.values()) {
-            final PriceSource priceSource = JStock.getInstance().getJStockOptions().getPriceSource(country);
+            final PriceSource priceSource = JStock.instance().getJStockOptions().getPriceSource(country);
             Factories.INSTANCE.updatePriceSource(country, priceSource);
         }  
     }
@@ -841,7 +841,7 @@ public class Utils {
      * @return cached history files directory
      */
     public static String getHistoryDirectory() {
-        return getHistoryDirectory(JStock.getInstance().getJStockOptions().getCountry());
+        return getHistoryDirectory(JStock.instance().getJStockOptions().getCountry());
     }
 
     public static String getHistoryDirectory(Country country) {
@@ -1421,7 +1421,7 @@ public class Utils {
         method.setRequestEntity(entity);
         method.setContentChunked(false);
 
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         String respond = null;
         try {
             if (jStockOptions.isProxyAuthEnabled()) {
@@ -1512,7 +1512,7 @@ public class Utils {
         org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(client);
 
         final HttpMethod method = new GetMethod(request);
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         String respond = null;
         try {
             if (jStockOptions.isProxyAuthEnabled()) {
@@ -1595,7 +1595,7 @@ public class Utils {
         org.yccheok.jstock.gui.Utils.setHttpClientProxyCredentialsFromJStockOptions(httpClient);
 
         final GetMethod method = new GetMethod(request);
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         InputStreamAndMethod inputStreamAndMethod = null;
         InputStream respond = null;
         HttpMethod methodToClosed = method;
@@ -1656,7 +1656,7 @@ public class Utils {
     // We prefer to have this method in gui package instead of engine. This is because it requires
     // access to JStockOptions.
     private static void setHttpClientProxyCredentialsFromJStockOptions(HttpClient httpClient) {
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         if (jStockOptions.isProxyAuthEnabled() == false) {
             httpClient.getState().clearCredentials();
         }
@@ -1856,7 +1856,7 @@ public class Utils {
     // Calling to this method will affect state of JStockOptions.
     // Returns null if no file being selected.
     public static FileEx promptSavePortfolioCSVAndExcelJFileChooser(final String suggestedFileName) {
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         final JFileChooser chooser = new JFileChooser(jStockOptions.getLastFileIODirectory());
         final FileNameExtensionFilter csvFilter = new FileNameExtensionFilter("CSV Documents (*.csv)", "csv");
         final FileNameExtensionFilter xlsFilter = new FileNameExtensionFilter("Microsoft Excel (*.xls)", "xls");
@@ -1898,7 +1898,7 @@ public class Utils {
         chooser.setSelectedFile(chooser.getFileFilter().getDescription().equals(csvFilter.getDescription()) ? new File(portfolioSelectionJPanel.getSuggestedFileName()) : new File(suggestedFileName));
 
         while (true) {
-            final int returnVal = chooser.showSaveDialog(JStock.getInstance());
+            final int returnVal = chooser.showSaveDialog(JStock.instance());
             if (returnVal != JFileChooser.APPROVE_OPTION) {
                 return null;
             }
@@ -1927,7 +1927,7 @@ public class Utils {
             if (file.exists()) {
                 final String output = MessageFormat.format(MessagesBundle.getString("question_message_replace_old_template"), file.getName());
 
-                final int result = javax.swing.JOptionPane.showConfirmDialog(JStock.getInstance(), output, MessagesBundle.getString("question_title_replace_old"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
+                final int result = javax.swing.JOptionPane.showConfirmDialog(JStock.instance(), output, MessagesBundle.getString("question_title_replace_old"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
                 if (result != javax.swing.JOptionPane.YES_OPTION) {
                     continue;
                 }
@@ -1965,7 +1965,7 @@ public class Utils {
     }
 
     private static File promptOpenJFileChooser(FileNameExtensionFilter... fileNameExtensionFilters) {
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         final JFileChooser chooser = new JFileChooser(jStockOptions.getLastFileIODirectory());
         chooser.setAcceptAllFileFilterUsed(false);
         for (FileNameExtensionFilter fileNameExtensionFilter : fileNameExtensionFilters) {
@@ -1979,7 +1979,7 @@ public class Utils {
         if (filter != null) {
             chooser.setFileFilter(filter);
         }
-        int returnVal = chooser.showOpenDialog(JStock.getInstance());
+        int returnVal = chooser.showOpenDialog(JStock.instance());
 
         if (returnVal != JFileChooser.APPROVE_OPTION) {
             return null;
@@ -2065,7 +2065,7 @@ public class Utils {
     }
 
     private static File promptSaveJFileChooser(String suggestedFileName, FileNameExtensionFilter... fileNameExtensionFilters) {
-        final JStockOptions jStockOptions = JStock.getInstance().getJStockOptions();
+        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         final JFileChooser chooser = new JFileChooser(jStockOptions.getLastFileIODirectory());
         chooser.setAcceptAllFileFilterUsed(false);
         for (FileNameExtensionFilter fileNameExtensionFilter : fileNameExtensionFilters) {
@@ -2081,7 +2081,7 @@ public class Utils {
             chooser.setFileFilter(filter);
         }
         while (true) {
-            final int returnVal = chooser.showSaveDialog(JStock.getInstance());
+            final int returnVal = chooser.showSaveDialog(JStock.instance());
             if (returnVal != JFileChooser.APPROVE_OPTION) {
                 return null;
             }
@@ -2125,7 +2125,7 @@ public class Utils {
             if (file.exists()) {
                 final String output = MessageFormat.format(MessagesBundle.getString("question_message_replace_old_template"), file.getName());
 
-                final int result = javax.swing.JOptionPane.showConfirmDialog(JStock.getInstance(), output, MessagesBundle.getString("question_title_replace_old"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
+                final int result = javax.swing.JOptionPane.showConfirmDialog(JStock.instance(), output, MessagesBundle.getString("question_title_replace_old"), javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
                 if (result != javax.swing.JOptionPane.YES_OPTION) {
                     continue;
                 }
