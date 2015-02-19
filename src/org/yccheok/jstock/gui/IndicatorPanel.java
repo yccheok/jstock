@@ -1563,7 +1563,7 @@ public class IndicatorPanel extends JPanel {
 
             // Avoid from using old history monitor. Their duration are not the same.
             final Duration oldDuration = stockHistoryMonitor.getDuration();
-            if (oldDuration.equals(historyDuration) == false)
+            if (oldDuration == null || oldDuration.equals(historyDuration) == false)
             {
                 this.initStockHistoryMonitor();
                 this.stockHistoryMonitor.setDuration(historyDuration);
