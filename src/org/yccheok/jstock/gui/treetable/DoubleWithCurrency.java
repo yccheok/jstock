@@ -25,7 +25,7 @@ import org.yccheok.jstock.engine.currency.Currency;
  *
  * @author yccheok
  */
-public class DoubleWithCurrency extends org.yccheok.jstock.engine.Pair<Double, Currency> {
+public class DoubleWithCurrency extends org.yccheok.jstock.engine.Pair<Double, Currency> implements Comparable<DoubleWithCurrency> {
     public static DoubleWithCurrency create(Double _double, Currency currency) {
         return new DoubleWithCurrency(_double, currency);
     }
@@ -40,5 +40,10 @@ public class DoubleWithCurrency extends org.yccheok.jstock.engine.Pair<Double, C
     
     public Currency currency() {
         return this.second;
+    }
+
+    @Override
+    public int compareTo(DoubleWithCurrency o) {
+        return first.compareTo(o.first);
     }
 }
