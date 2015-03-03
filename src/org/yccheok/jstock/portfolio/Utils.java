@@ -329,16 +329,19 @@ public class Utils {
         return getPortfolioRealTimeInfoFilepath(jStockOptions.getPortfolioName());       
     }
     
+    @Deprecated
     private static String getStockPricesFilepath(Country country, String name) {
         final String portfolioDirectory = org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory(country, name);
         return portfolioDirectory + "stockprices.csv";        
     }
 
+    @Deprecated
     private static String getStockPricesFilepath(String name) {
         final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         return getStockPricesFilepath(jStockOptions.getCountry(), name);       
     }
 
+    @Deprecated
     public static String getStockPricesFilepath() {
         final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         return getStockPricesFilepath(jStockOptions.getPortfolioName());       
