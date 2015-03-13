@@ -1,6 +1,9 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+xxxxxxxxxxxxxxxxxxxxxxxxxx
+  Bugfix:  Fix for cash management file save, when localization is non-english.
+  
 JStock 1.0.7z - 2015-02-24
   Bugfix:  Fix on portfolio sorting.
   
