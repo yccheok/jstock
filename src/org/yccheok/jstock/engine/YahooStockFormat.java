@@ -128,7 +128,8 @@ public class YahooStockFormat implements StockFormat {
     // c1 = Change
     // p2 = Change Percent
     // k3 = Last Trade Size <-- We need to take special care on this, it may give us 1,234...
-    // b3 = Bid (Real-time) <-- We use b = Bid previously. However, most stocks return 0.
+    // b3 = Bid (Real-time) <-- Either "b3" or "b" may return 0 sometimes.
+    // b  = Bid             <-- Either "b3" or "b" may return 0 sometimes.
     // b6 = Bid Size        <-- We need to take special care on this, it may give us 1,234...
     // b2 = Ask (Real-time) <-- We use a = Ask previously. However, most stocks return 0.
     // a5 = Ask Size        <-- We need to take special care on this, it may give us 1,234...
@@ -259,18 +260,23 @@ public class YahooStockFormat implements StockFormat {
                 if (length < 23) break;
                 try { buyPrice = Double.parseDouble(fields[22]); } catch (NumberFormatException exp) {}
                 
-                if (length < 25) break;
-                try { buyQuantity = Integer.parseInt(fields[24]); } catch (NumberFormatException exp) {}
+                if (buyPrice == 0.0) {
+                    if (length < 25) break;
+                    try { buyPrice = Double.parseDouble(fields[24]); } catch (NumberFormatException exp) {}                    
+                }
                 
                 if (length < 27) break;
-                try { sellPrice = Double.parseDouble(fields[26]); } catch (NumberFormatException exp) {}
+                try { buyQuantity = Integer.parseInt(fields[26]); } catch (NumberFormatException exp) {}
                 
                 if (length < 29) break;
-                try { sellQuantity = Integer.parseInt(fields[28]); } catch (NumberFormatException exp) {}
+                try { sellPrice = Double.parseDouble(fields[28]); } catch (NumberFormatException exp) {}
                 
-                if (length < 32) break;
+                if (length < 31) break;
+                try { sellQuantity = Integer.parseInt(fields[30]); } catch (NumberFormatException exp) {}
+                
+                if (length < 34) break;
                 java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("MM/dd/yyyy hh:mmaa");
-                String date_and_time = quotePattern.matcher(fields[30]).replaceAll("").trim() + " " + quotePattern.matcher(fields[31]).replaceAll("").trim();
+                String date_and_time = quotePattern.matcher(fields[32]).replaceAll("").trim() + " " + quotePattern.matcher(fields[33]).replaceAll("").trim();
                 java.util.Date serverDate;
                 try {
                     serverDate = dateFormat.parse(date_and_time);
@@ -282,9 +288,9 @@ public class YahooStockFormat implements StockFormat {
                 
                 // I can't really recall why I need to apply quotePattern on 
                 // "code", "name", ... I decide not to do so for "currency".
-                if (length < 33) break; 
-                try { currency = Currency.newInstance(fields[32].trim()); } catch (java.lang.IllegalArgumentException ex) { log.error(null, ex); }
-                
+                if (length < 35) break; 
+                try { currency = Currency.newInstance(fields[34].trim().toUpperCase()); } catch (java.lang.IllegalArgumentException ex) { log.error(null, ex); }
+
                 break;
             } while(true);
             

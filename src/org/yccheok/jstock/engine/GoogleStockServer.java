@@ -95,7 +95,7 @@ public class GoogleStockServer implements StockServer {
             return Currency.newInstance("USD");
         }
         
-        String currencySymbol = sb.toString();
+        String currencySymbol = sb.toString().toUpperCase();
         
         String currencyCode = currencySymbolToCurrencyCodeMap.get(currencySymbol);
         
