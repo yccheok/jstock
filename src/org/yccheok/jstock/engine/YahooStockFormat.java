@@ -131,7 +131,8 @@ public class YahooStockFormat implements StockFormat {
     // b3 = Bid (Real-time) <-- Either "b3" or "b" may return 0 sometimes.
     // b  = Bid             <-- Either "b3" or "b" may return 0 sometimes.
     // b6 = Bid Size        <-- We need to take special care on this, it may give us 1,234...
-    // b2 = Ask (Real-time) <-- We use a = Ask previously. However, most stocks return 0.
+    // b2 = Ask (Real-time) <-- Either "b2" or "a" may return 0 sometimes.
+    // a  = Ask             <-- Either "b2" or "a" may return 0 sometimes.
     // a5 = Ask Size        <-- We need to take special care on this, it may give us 1,234...
     // d1 = Last Trade Date
     // t1 = Last Trade Time
@@ -271,12 +272,17 @@ public class YahooStockFormat implements StockFormat {
                 if (length < 29) break;
                 try { sellPrice = Double.parseDouble(fields[28]); } catch (NumberFormatException exp) {}
                 
-                if (length < 31) break;
-                try { sellQuantity = Integer.parseInt(fields[30]); } catch (NumberFormatException exp) {}
+                if (sellPrice == 0.0) {
+                    if (length < 31) break;
+                    try { sellPrice = Double.parseDouble(fields[30]); } catch (NumberFormatException exp) {}                    
+                }
                 
-                if (length < 34) break;
+                if (length < 33) break;
+                try { sellQuantity = Integer.parseInt(fields[32]); } catch (NumberFormatException exp) {}
+                
+                if (length < 36) break;
                 java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("MM/dd/yyyy hh:mmaa");
-                String date_and_time = quotePattern.matcher(fields[32]).replaceAll("").trim() + " " + quotePattern.matcher(fields[33]).replaceAll("").trim();
+                String date_and_time = quotePattern.matcher(fields[34]).replaceAll("").trim() + " " + quotePattern.matcher(fields[35]).replaceAll("").trim();
                 java.util.Date serverDate;
                 try {
                     serverDate = dateFormat.parse(date_and_time);
@@ -288,8 +294,8 @@ public class YahooStockFormat implements StockFormat {
                 
                 // I can't really recall why I need to apply quotePattern on 
                 // "code", "name", ... I decide not to do so for "currency".
-                if (length < 35) break; 
-                try { currency = Currency.newInstance(fields[34].trim().toUpperCase()); } catch (java.lang.IllegalArgumentException ex) { log.error(null, ex); }
+                if (length < 37) break; 
+                try { currency = Currency.newInstance(fields[36].trim().toUpperCase()); } catch (java.lang.IllegalArgumentException ex) { log.error(null, ex); }
 
                 break;
             } while(true);

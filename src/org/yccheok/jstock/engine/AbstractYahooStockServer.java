@@ -343,7 +343,8 @@ public abstract class AbstractYahooStockServer implements StockServer {
     // b3 = Bid (Real-time) <-- Either "b3" or "b" may return 0 sometimes.
     // b  = Bid             <-- Either "b3" or "b" may return 0 sometimes.
     // b6 = Bid Size        <-- We need to take special care on this, it may give us 1,234...
-    // b2 = Ask (Real-time) <-- We use a = Ask previously. However, most stocks return 0.
+    // b2 = Ask (Real-time) <-- Either "b2" or "a" may return 0 sometimes.
+    // a  = Ask             <-- Either "b2" or "a" may return 0 sometimes.
     // a5 = Ask Size        <-- We need to take special care on this, it may give us 1,234...
     // d1 = Last Trade Date
     // t1 = Last Trade Time
@@ -353,5 +354,5 @@ public abstract class AbstractYahooStockServer implements StockServer {
     // "+1400.00","N/A - +4.31%",+1400.00,"+4.31%","+1400.00 - +4.31%"
     //
     // "MAERSKB.CO","AP MOELLER-MAERS-","Copenhagen",32500.00,33700.00,34200.00,33400.00,660,"+1200.00","N/A - +3.69%",33,33500.00,54,33700.00,96,"11/10/2008","10:53am","EUR"
-    private static final String YAHOO_STOCK_FORMAT = "&f=snxspsosl1shsgsvsc1sp2sk3sb3sbsb6sb2sa5sd1t1c4";
+    private static final String YAHOO_STOCK_FORMAT = "&f=snxspsosl1shsgsvsc1sp2sk3sb3sbsb6sb2sasa5sd1t1c4";
 }
