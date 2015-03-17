@@ -2658,8 +2658,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             final Currency currency = stock.getCurrency();
 
             if (buyCodes.contains(code)) {
-                if (stock.getLastPrice() > 0.0) {
-                    if (null == stockPrices.put(code, stock.getLastPrice())) {
+                final double lastPrice = stock.getLastPrice();
+                if (lastPrice > 0.0) {
+                    if (null == stockPrices.put(code, lastPrice)) {
                         this.portfolioRealTimeInfo.stockPricesDirty = true;        
                     }
                 } else {
