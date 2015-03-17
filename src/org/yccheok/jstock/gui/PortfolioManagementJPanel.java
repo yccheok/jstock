@@ -2643,6 +2643,24 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         };
     }
     
+    private double getNonZeroPriceIfPossible(Stock stock) {
+        // First.
+        final double lastPrice = stock.getLastPrice();
+        if (lastPrice > 0.0) {
+            return lastPrice;
+        }
+        
+        // Second.
+        final double openPrice = stock.getOpenPrice();
+        if (openPrice > 0.0) {
+            return openPrice;
+        }
+        
+        // Third.
+        final double prevPrice = stock.getPrevPrice();
+        return Math.max(0.0, prevPrice);
+    }
+    
     private void update(RealTimeStockMonitor monitor, final java.util.List<Stock> stocks) {
         final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
         final SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel = (SellPortfolioTreeTableModelEx)sellTreeTable.getTreeTableModel();
@@ -2658,15 +2676,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             final Currency currency = stock.getCurrency();
 
             if (buyCodes.contains(code)) {
-                final double lastPrice = stock.getLastPrice();
-                if (lastPrice > 0.0) {
-                    if (null == stockPrices.put(code, lastPrice)) {
-                        this.portfolioRealTimeInfo.stockPricesDirty = true;        
-                    }
-                } else {
-                    if (null == stockPrices.put(code, stock.getPrevPrice())) {
-                        this.portfolioRealTimeInfo.stockPricesDirty = true;
-                    }
+                final double price = getNonZeroPriceIfPossible(stock);
+                if (null == stockPrices.put(code, price)) {
+                    this.portfolioRealTimeInfo.stockPricesDirty = true;        
                 }
                 
                 // ConcurrentHashMap doesn't support null value.
