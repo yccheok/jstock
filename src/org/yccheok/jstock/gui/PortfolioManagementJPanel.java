@@ -2694,7 +2694,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 }
             } else if (sellCodes.contains(code)) {
                 if (currency != null) {
-                    if (null == currencies.put(code, currency)) {
+                    final Currency oldCurrency = currencies.put(code, currency);
+                    if (false == currency.equals(oldCurrency)) {
                         this.portfolioRealTimeInfo.currenciesDirty = true;
                     }
 
