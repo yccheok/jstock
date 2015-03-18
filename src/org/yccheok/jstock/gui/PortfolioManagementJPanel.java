@@ -2677,14 +2677,18 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
             if (buyCodes.contains(code)) {
                 final double price = getNonZeroPriceIfPossible(stock);
-                if (null == stockPrices.put(code, price)) {
-                    this.portfolioRealTimeInfo.stockPricesDirty = true;        
+                final Double oldPrice = stockPrices.put(code, price);
+                if (oldPrice == null) {
+                    this.portfolioRealTimeInfo.stockPricesDirty = true;
+                } else if (false == org.yccheok.jstock.portfolio.Utils.essentiallyEqual(price, oldPrice)) {
+                    this.portfolioRealTimeInfo.stockPricesDirty = true;
                 }
                 
                 // ConcurrentHashMap doesn't support null value.
                 // http://stackoverflow.com/questions/698638/why-does-concurrenthashmap-prevent-null-keys-and-values
                 if (currency != null) {
-                    if (null == currencies.put(code, currency)) {
+                    final Currency oldCurrency = currencies.put(code, currency);
+                    if (false == currency.equals(oldCurrency)) {
                         this.portfolioRealTimeInfo.currenciesDirty = true;
                     }
                 }
