@@ -2676,11 +2676,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             final Currency currency = stock.getCurrency();
 
             if (buyCodes.contains(code)) {
-                final double price = getNonZeroPriceIfPossible(stock);
+                final Double price = getNonZeroPriceIfPossible(stock);
                 final Double oldPrice = stockPrices.put(code, price);
-                if (oldPrice == null) {
-                    this.portfolioRealTimeInfo.stockPricesDirty = true;
-                } else if (false == org.yccheok.jstock.portfolio.Utils.essentiallyEqual(price, oldPrice)) {
+                if (false == price.equals(oldPrice)) {
                     this.portfolioRealTimeInfo.stockPricesDirty = true;
                 }
                 
