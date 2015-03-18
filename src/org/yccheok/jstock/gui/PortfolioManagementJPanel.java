@@ -2674,12 +2674,15 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         for (Stock stock : stocks) {            
             final Code code = stock.code;
             final Currency currency = stock.getCurrency();
-
+            
+            boolean needRefresh = false;
+            
             if (buyCodes.contains(code)) {
                 final Double price = getNonZeroPriceIfPossible(stock);
                 final Double oldPrice = stockPrices.put(code, price);
                 if (false == price.equals(oldPrice)) {
                     this.portfolioRealTimeInfo.stockPricesDirty = true;
+                    needRefresh = true;
                 }
                 
                 // ConcurrentHashMap doesn't support null value.
@@ -2688,6 +2691,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     final Currency oldCurrency = currencies.put(code, currency);
                     if (false == currency.equals(oldCurrency)) {
                         this.portfolioRealTimeInfo.currenciesDirty = true;
+                        needRefresh = true;
                     }
                 }
             } else if (sellCodes.contains(code)) {
@@ -2695,6 +2699,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     final Currency oldCurrency = currencies.put(code, currency);
                     if (false == currency.equals(oldCurrency)) {
                         this.portfolioRealTimeInfo.currenciesDirty = true;
+                        needRefresh = true;
                     }
 
                     // Thread safety purpose.
@@ -2729,10 +2734,12 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 continue;
             }
             
-            // Because we have new price & new currency.
-            buyPortfolioTreeTableModel.refresh(code);
-            // Because we have new currency.
-            sellPortfolioTreeTableModel.refresh(code);
+            if (needRefresh) {
+                // Because we have new price & new currency.
+                buyPortfolioTreeTableModel.refresh(code);
+                // Because we have new currency.
+                sellPortfolioTreeTableModel.refresh(code);
+            }
             
             // Update currency monitor as well.
             ExchangeRateMonitor _exchangeRateMonitor = this.exchangeRateMonitor;
