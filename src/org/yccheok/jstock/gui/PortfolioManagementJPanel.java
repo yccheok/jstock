@@ -2675,14 +2675,15 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             final Code code = stock.code;
             final Currency currency = stock.getCurrency();
             
-            boolean needRefresh = false;
+            boolean needBuyRefresh = false;
+            boolean needSellRefresh = false;
             
             if (buyCodes.contains(code)) {
                 final Double price = getNonZeroPriceIfPossible(stock);
                 final Double oldPrice = stockPrices.put(code, price);
                 if (false == price.equals(oldPrice)) {
                     this.portfolioRealTimeInfo.stockPricesDirty = true;
-                    needRefresh = true;
+                    needBuyRefresh = true;
                 }
                 
                 // ConcurrentHashMap doesn't support null value.
@@ -2691,7 +2692,11 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     final Currency oldCurrency = currencies.put(code, currency);
                     if (false == currency.equals(oldCurrency)) {
                         this.portfolioRealTimeInfo.currenciesDirty = true;
-                        needRefresh = true;
+                        needBuyRefresh = true;
+                        // Should sell portfolio refresh too, since we have new currency info?
+                        if (sellCodes.contains(code)) {
+                            needSellRefresh = true;    
+                        }
                     }
                 }
             } else if (sellCodes.contains(code)) {
@@ -2699,7 +2704,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     final Currency oldCurrency = currencies.put(code, currency);
                     if (false == currency.equals(oldCurrency)) {
                         this.portfolioRealTimeInfo.currenciesDirty = true;
-                        needRefresh = true;
+                        needSellRefresh = true;
                     }
 
                     // Thread safety purpose.
@@ -2734,9 +2739,12 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 continue;
             }
             
-            if (needRefresh) {
+            if (needBuyRefresh) {
                 // Because we have new price & new currency.
                 buyPortfolioTreeTableModel.refresh(code);
+            }
+            
+            if (needSellRefresh) {
                 // Because we have new currency.
                 sellPortfolioTreeTableModel.refresh(code);
             }
