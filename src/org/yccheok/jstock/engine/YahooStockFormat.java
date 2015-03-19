@@ -295,7 +295,14 @@ public class YahooStockFormat implements StockFormat {
                 // I can't really recall why I need to apply quotePattern on 
                 // "code", "name", ... I decide not to do so for "currency".
                 if (length < 37) break; 
-                try { currency = Currency.newInstance(fields[36].trim().toUpperCase()); } catch (java.lang.IllegalArgumentException ex) { log.error(null, ex); }
+                // In Yahoo Finance, "GBP" means "GBP" in our context.
+                // In Yahoo Finance, "GBp" means "GBX" in our context.
+                
+                String currencyText = fields[36].trim();
+                if (currencyText.equals("GBp")) {
+                    currencyText = "GBX";
+                }
+                try { currency = Currency.newInstance(currencyText); } catch (java.lang.IllegalArgumentException ex) { log.error(null, ex); }
 
                 break;
             } while(true);

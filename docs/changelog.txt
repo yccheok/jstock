@@ -3,6 +3,7 @@ Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
 JStock 1.0.7.2 - xxxxxxxxxx
   Bugfix:  Fix on stockPricesDirty and currenciesDirty flag.
+  Bugfix:  Fix stock currency fetching. (again?!)
   
 JStock 1.0.7.1 - 2015-03-16
   Bugfix:  Fix for cash management file save, when localization is non-english.
