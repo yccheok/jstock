@@ -78,7 +78,11 @@ public class PortfolioRealTimeInfo {
         stockPricesTimestamp = portfolioRealTimeInfo.stockPricesTimestamp;
         exchangeRatesTimestamp = portfolioRealTimeInfo.exchangeRatesTimestamp;
 
-        // I don't know what to do with dirty flags at this moment.
+        // I don't know what to do with dirty flags at this moment. At this moment, I just copy 
+        // them.
+        this.stockPricesDirty = portfolioRealTimeInfo.stockPricesDirty;
+        this.exchangeRatesDirty = portfolioRealTimeInfo.exchangeRatesDirty;
+        this.currenciesDirty = portfolioRealTimeInfo.currenciesDirty;
     }
     
     public boolean load(File file) {
