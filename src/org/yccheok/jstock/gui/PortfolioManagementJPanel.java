@@ -2346,7 +2346,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         
         if (status) {
             // Legacy file.
-            final File stockPricesFile = new File(directory + "stockprices.csv");
+            final File stockPricesFile = new File(org.yccheok.jstock.portfolio.Utils.getStockPricesFilepathViaDirectory(directory));
             stockPricesFile.delete();
         }
         

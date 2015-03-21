@@ -332,9 +332,14 @@ public class Utils {
     @Deprecated
     private static String getStockPricesFilepath(Country country, String name) {
         final String portfolioDirectory = org.yccheok.jstock.portfolio.Utils.getPortfolioDirectory(country, name);
-        return portfolioDirectory + "stockprices.csv";        
+        return getStockPricesFilepathViaDirectory(portfolioDirectory);
     }
 
+    @Deprecated
+    public static String getStockPricesFilepathViaDirectory(String portfolioDirectory) {
+        return portfolioDirectory + "stockprices.csv";
+    }
+    
     @Deprecated
     private static String getStockPricesFilepath(String name) {
         final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
