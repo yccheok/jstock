@@ -4774,7 +4774,7 @@ public class JStock extends javax.swing.JFrame {
     private boolean isStatusBarBusy = false;
     
     // A set of stock history which we need to display GUI on them, when user request explicitly.
-    private final java.util.Set<Code> stockCodeHistoryGUI = new java.util.HashSet<Code>();
+    private final java.util.Set<Code> stockCodeHistoryGUI = new java.util.HashSet<>();
     
     private volatile StockInfoDatabase stockInfoDatabase = null;
     // StockNameDatabase is an optional item.
