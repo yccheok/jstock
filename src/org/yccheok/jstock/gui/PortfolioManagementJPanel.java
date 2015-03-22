@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -1757,11 +1758,18 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         
         final AbstractPortfolioTreeTableModelEx portfolioTreeTableModelEx = (AbstractPortfolioTreeTableModelEx)treeTable.getTreeTableModel();
         Portfolio portfolio = (Portfolio) portfolioTreeTableModelEx.getRoot();
-        for (int i = 0, count = portfolio.getChildCount(); i < count; i++) {
-            TransactionSummary transactionSummary = (TransactionSummary)portfolio.getChildAt(i);
-            Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
-            Stock stock = transaction.getStock();
-            codes.add(stock.code);
+        
+        Enumeration<? extends MutableTreeTableNode> transactionSummaries = portfolio.children();
+        
+        while (transactionSummaries.hasMoreElements()) {
+            TransactionSummary transactionSummary = (TransactionSummary)transactionSummaries.nextElement();
+            
+            Enumeration<? extends MutableTreeTableNode> transactions = transactionSummary.children();
+            if (transactions.hasMoreElements()) {
+                Transaction transaction = (Transaction)transactionSummary.children().nextElement();
+                Stock stock = transaction.getStock();
+                codes.add(stock.code);
+            }
         }
         
         return codes;
