@@ -1790,15 +1790,14 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
     
     private Set<CurrencyPair> getCurrencyPairs() {
-        Set<Code> codes = getCodes();
-        
-        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
-
-        final Country country = jStockOptions.getCountry();
-        final Country localCountry = jStockOptions.getLocalCurrencyCountry(country);
-        final Currency localCurrency = localCountry.localCurrency;
+        final Currency localCurrency = org.yccheok.jstock.portfolio.Utils.getLocalCurrency();
+        if (localCurrency == null) {
+            return Collections.<CurrencyPair>emptySet();
+        }
         
         Set<CurrencyPair> currencyPairs = new HashSet<>();
+        
+        Set<Code> codes = getCodes();
         
         for (Code code : codes) {
             final Currency stockCurrency = org.yccheok.jstock.portfolio.Utils.getStockCurrency(portfolioRealTimeInfo, code);
@@ -1842,16 +1841,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         
         final ExchangeRateMonitor _exchangeRateMonitor = this.exchangeRateMonitor;
         if (_exchangeRateMonitor != null) {
-            final JStock jstock = JStock.instance();
-            final JStockOptions jStockOptions = jstock.getJStockOptions();
-            final Country country = jStockOptions.getCountry();
-
-            final boolean currencyExchangeEnable = jStockOptions.isCurrencyExchangeEnable(country);
-            if (currencyExchangeEnable) {
+            final Currency localCurrency = org.yccheok.jstock.portfolio.Utils.getLocalCurrency();
+            if (localCurrency != null) {
                 final Currency stockCurrency = org.yccheok.jstock.portfolio.Utils.getStockCurrency(portfolioRealTimeInfo, transaction.getStock().code);
-                final Country localCountry = jStockOptions.getLocalCurrencyCountry(country);
-                final Currency localCurrency = localCountry.localCurrency;
-
                 if (false == stockCurrency.equals(localCurrency)) {
                     _exchangeRateMonitor.addCurrencyPair(CurrencyPair.create(stockCurrency, localCurrency));
                     _exchangeRateMonitor.startNewThreadsIfNecessary();
@@ -1935,16 +1927,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         
         final ExchangeRateMonitor _exchangeRateMonitor = this.exchangeRateMonitor;
         if (_exchangeRateMonitor != null) {
-            final JStock jstock = JStock.instance();
-            final JStockOptions jStockOptions = jstock.getJStockOptions();
-            final Country country = jStockOptions.getCountry();
-
-            final boolean currencyExchangeEnable = jStockOptions.isCurrencyExchangeEnable(country);
-            if (currencyExchangeEnable) {
+            final Currency localCurrency = org.yccheok.jstock.portfolio.Utils.getLocalCurrency();
+            if (localCurrency != null) {
                 final Currency stockCurrency = org.yccheok.jstock.portfolio.Utils.getStockCurrency(portfolioRealTimeInfo, transaction.getStock().code);
-                final Country localCountry = jStockOptions.getLocalCurrencyCountry(country);
-                final Currency localCurrency = localCountry.localCurrency;
-
+                
                 if (false == stockCurrency.equals(localCurrency)) {
                     _exchangeRateMonitor.addCurrencyPair(CurrencyPair.create(stockCurrency, localCurrency));
                     _exchangeRateMonitor.startNewThreadsIfNecessary();
@@ -2760,16 +2746,15 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             // Update currency monitor as well.
             ExchangeRateMonitor _exchangeRateMonitor = this.exchangeRateMonitor;
             if (currency != null && _exchangeRateMonitor != null) {
-                JStockOptions jStockOptions = JStock.instance().getJStockOptions();
-                final Country country = jStockOptions.getCountry();
-                final Country localCountry = jStockOptions.getLocalCurrencyCountry(country);
-                final Currency localCurrency = localCountry.localCurrency;
-                if (false == currency.equals(localCurrency)) {
-                    CurrencyPair currencyPair = CurrencyPair.create(currency, localCurrency);
-                    if (_exchangeRateMonitor.addCurrencyPair(currencyPair)) {
-                        _exchangeRateMonitor.startNewThreadsIfNecessary();
-                        _exchangeRateMonitor.refresh();
-                    }
+                final Currency localCurrency = org.yccheok.jstock.portfolio.Utils.getLocalCurrency();
+                if (localCurrency != null) {
+                    if (false == currency.equals(localCurrency)) {
+                        CurrencyPair currencyPair = CurrencyPair.create(currency, localCurrency);
+                        if (_exchangeRateMonitor.addCurrencyPair(currencyPair)) {
+                            _exchangeRateMonitor.startNewThreadsIfNecessary();
+                            _exchangeRateMonitor.refresh();
+                        }
+                    }                    
                 }
             }
         }   // for
@@ -2909,15 +2894,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)this.buyTreeTable.getTreeTableModel();
         final SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel = (SellPortfolioTreeTableModelEx)this.sellTreeTable.getTreeTableModel();
       
-        final Country country = jStockOptions.getCountry();
-        final boolean currencyExchangeEnable = jStockOptions.isCurrencyExchangeEnable(country);
-        final Currency localCurrency;
-        if (currencyExchangeEnable) {
-            final Country localCountry = jStockOptions.getLocalCurrencyCountry(country);
-            localCurrency = localCountry.localCurrency;
-        } else {
-            localCurrency = null;
-        }
+        final Currency localCurrency = org.yccheok.jstock.portfolio.Utils.getLocalCurrency();
         
         final double share;
         final double cash;
@@ -2925,6 +2902,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         final double realizedProfit;
 
         share = buyPortfolioTreeTableModel.getCurrentValue(localCurrency);
+
+        final Country country = jStockOptions.getCountry();
 
         if (isFeeCalculationEnabled) {
             final double exchangeRate = org.yccheok.jstock.portfolio.Utils.getExchangeRate(portfolioRealTimeInfo, localCurrency, country.stockCurrency);

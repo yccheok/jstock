@@ -32,8 +32,12 @@ public class CurrencyPair extends org.yccheok.jstock.engine.Pair<Currency, Curre
         return new CurrencyPair(from, to);
     }
     
-    public CurrencyPair(Currency from, Currency to) {
+    public CurrencyPair(Currency from, Currency to) {        
         super(from, to);
+        
+        if (from == null || to == null) {
+            throw new java.lang.IllegalArgumentException();
+        }
     }
     
     public Currency from() {

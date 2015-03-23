@@ -51,6 +51,22 @@ public class Utils {
         return stockCurrency.toString().equals("GBX");
     }
     
+    public static Currency getLocalCurrency() {
+        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
+        
+        final Country country = jStockOptions.getCountry();
+        final boolean currencyExchangeEnable = jStockOptions.isCurrencyExchangeEnable(country);
+        final Currency localCurrency;
+        if (currencyExchangeEnable) {
+            final Country localCountry = jStockOptions.getLocalCurrencyCountry(country);
+            localCurrency = localCountry.localCurrency;
+        } else {
+            localCurrency = null;
+        }
+        
+        return localCurrency;
+    }
+        
     public static Currency getStockCurrency(PortfolioRealTimeInfo portfolioRealTimeInfo, Code code) {
         //////////////////////////////////////////
         // Get traded currency in this stock code.
