@@ -289,19 +289,9 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
     }
 
     private void updateROITimeSeries() {
-        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
-        final Country country = jStockOptions.getCountry();
-            final boolean currencyExchangeEnable = jStockOptions.isCurrencyExchangeEnable(country);
-            final Currency localCurrency;
-            if (currencyExchangeEnable) {
-                final Country localCountry = jStockOptions.getLocalCurrencyCountry(country);
-                localCurrency = localCountry.localCurrency;
-            } else {
-                localCurrency = null;
-            }
-
+        final Currency localCurrency = org.yccheok.jstock.portfolio.Utils.getLocalCurrency();
         final boolean noCodeAddedToMonitor = this.realTimeStockMonitor.isEmpty();
-        final List<Code> codesNeedToAddToRealTimeStockMonitor = new ArrayList<Code>();
+        final List<Code> codesNeedToAddToRealTimeStockMonitor = new ArrayList<>();
         
         // Use local variables for thread safe.
         // I don't think we need local variables for thread safe purpose,
@@ -380,16 +370,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
     }
     
     private XYDataset createInvestDataset() {
-        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
-        final Country country = jStockOptions.getCountry();
-        final boolean currencyExchangeEnable = jStockOptions.isCurrencyExchangeEnable(country);
-        final Currency localCurrency;
-        if (currencyExchangeEnable) {
-            final Country localCountry = jStockOptions.getLocalCurrencyCountry(country);
-            localCurrency = localCountry.localCurrency;
-        } else {
-            localCurrency = null;
-        }
+        final Currency localCurrency = org.yccheok.jstock.portfolio.Utils.getLocalCurrency();
         
         final TimeSeries series = new TimeSeries(GUIBundle.getString("InvestmentFlowChartJDialog_Invest"));
         

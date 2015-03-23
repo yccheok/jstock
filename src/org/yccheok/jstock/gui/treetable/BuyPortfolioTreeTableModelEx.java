@@ -384,15 +384,7 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
         final boolean isFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
         
         if (node instanceof Portfolio) {
-            final Country country = jStockOptions.getCountry();
-            final boolean currencyExchangeEnable = jStockOptions.isCurrencyExchangeEnable(country);
-            final Currency localCurrency;
-            if (currencyExchangeEnable) {
-                final Country localCountry = jStockOptions.getLocalCurrencyCountry(country);
-                localCurrency = localCountry.localCurrency;
-            } else {
-                localCurrency = null;
-            }
+            final Currency localCurrency = org.yccheok.jstock.portfolio.Utils.getLocalCurrency();
 
             final Portfolio portfolio = (Portfolio)node;
             
