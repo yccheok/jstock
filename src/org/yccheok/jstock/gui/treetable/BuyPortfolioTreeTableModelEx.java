@@ -443,6 +443,8 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
             
             final Currency stockCurrency = shouldDisplayCurrencyInfoForValue ? org.yccheok.jstock.portfolio.Utils.getStockCurrency(portfolioRealTimeInfo, code) : null;
             
+            final DecimalPlace decimalPlace = JStock.instance().getJStockOptions().getDecimalPlace();
+            
             switch(column) {
                 case 0:
                     return ((Transaction)transactionSummary.getChildAt(0)).getStock().symbol;
@@ -451,11 +453,7 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
                     return transactionSummary.getQuantity();
                     
                 case 3:
-                    if (JStock.instance().getJStockOptions().isFourDecimalPlacesEnabled()) {
-                        return new DoubleWrapper(DecimalPlace.Four, this.getPurchasePrice(transactionSummary));
-                    } else {
-                        return new DoubleWrapper(DecimalPlace.Three, this.getPurchasePrice(transactionSummary));   
-                    }
+                    return new DoubleWrapper(decimalPlace, this.getPurchasePrice(transactionSummary));
                     
                 case 4:
                     return this.getCurrentPrice(transactionSummary);

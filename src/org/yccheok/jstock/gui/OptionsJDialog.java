@@ -22,6 +22,7 @@ package org.yccheok.jstock.gui;
 
 import org.yccheok.jstock.engine.Country;
 import org.yccheok.jstock.engine.PriceSource;
+import org.yccheok.jstock.portfolio.DecimalPlace;
 
 /**
  *
@@ -95,7 +96,7 @@ public class OptionsJDialog extends javax.swing.JDialog implements JStockOptions
         final int oldScanningSpeed = jStockOptions.getScanningSpeed();
         final boolean oldIsFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();
         final boolean oldIsDynamicChartVisible = jStockOptions.isDynamicChartVisible();
-        final boolean oldIsFourDecimalPlacesEnabled = jStockOptions.isFourDecimalPlacesEnabled();
+        final DecimalPlace oldDecimalPlace = jStockOptions.getDecimalPlace();
         final boolean oldIsCurrencyExchangeEnable = jStockOptions.isCurrencyExchangeEnable(country);
         final PriceSource oldPriceSource = jStockOptions.getPriceSource(country);
         final Country oldLocalCurrencyCountry = jStockOptions.getLocalCurrencyCountry(country);        
@@ -117,7 +118,7 @@ public class OptionsJDialog extends javax.swing.JDialog implements JStockOptions
         if (oldIsDynamicChartVisible != jStockOptions.isDynamicChartVisible()) {
             JStock.instance().initDynamicChartVisibility();
         }        
-        if (oldIsCurrencyExchangeEnable != jStockOptions.isCurrencyExchangeEnable(country) || oldLocalCurrencyCountry != jStockOptions.getLocalCurrencyCountry(country) || oldIsFourDecimalPlacesEnabled != jStockOptions.isFourDecimalPlacesEnabled()) {
+        if (oldIsCurrencyExchangeEnable != jStockOptions.isCurrencyExchangeEnable(country) || oldLocalCurrencyCountry != jStockOptions.getLocalCurrencyCountry(country) || oldDecimalPlace != jStockOptions.getDecimalPlace()) {
             JStock.instance().getPortfolioManagementJPanel().refreshGUIAfterOptionsJDialog();
         }
         

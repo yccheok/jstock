@@ -44,6 +44,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.Country;
 import org.yccheok.jstock.internationalization.GUIBundle;
+import org.yccheok.jstock.portfolio.DecimalPlace;
 
 /**
  *
@@ -80,7 +81,7 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
         jFormattedTextField1 = getPercentageJFormattedTextField();
         javax.swing.JPanel jPanel3 = new javax.swing.JPanel();
         javax.swing.JLabel jLabel3 = new javax.swing.JLabel();
-        javax.swing.JComboBox jComboBox3 = new javax.swing.JComboBox();
+        jComboBox3 = new javax.swing.JComboBox();
         javax.swing.JPanel jPanel4 = new javax.swing.JPanel();
         javax.swing.JLabel jLabel2 = new javax.swing.JLabel();
         jComboBox1 = new javax.swing.JComboBox();
@@ -327,7 +328,7 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
         this.jComboBox1.setSelectedItem(jStockOptions.getCurrencySymbol(jStockOptions.getCountry()));
         this.jComboBox2.setSelectedItem(jStockOptions.getLocalCurrencyCountry(jStockOptions.getCountry()));
         this.jCheckBox1.setSelected(jStockOptions.isCurrencyExchangeEnable(jStockOptions.getCountry()));
-        this.jCheckBox3.setSelected(jStockOptions.isFourDecimalPlacesEnabled());
+        this.jComboBox3.setSelectedIndex(jStockOptions.getDecimalPlace().ordinal());
         commitEdit();
         updateGUIState();
     }
@@ -343,7 +344,7 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
 
         jStockOptions.setCurrencyExchangeEnable(jStockOptions.getCountry(), jCheckBox1.isSelected());
         jStockOptions.setLocalCurrencyCountry(jStockOptions.getCountry(), (Country)jComboBox2.getSelectedItem());
-        jStockOptions.setFourDecimalPlacesEnabled(this.jCheckBox3.isSelected());
+        jStockOptions.setDecimalPlace(DecimalPlace.values()[this.jComboBox3.getSelectedIndex()]);
         
         // Remember to refresh the GUIs as well.
         JStock.instance().getPortfolioManagementJPanel().refreshCurrencySymbol();
@@ -408,6 +409,7 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JComboBox jComboBox1;
     private javax.swing.JComboBox jComboBox2;
+    private javax.swing.JComboBox jComboBox3;
     private javax.swing.JFormattedTextField jFormattedTextField1;
     // End of variables declaration//GEN-END:variables
 }

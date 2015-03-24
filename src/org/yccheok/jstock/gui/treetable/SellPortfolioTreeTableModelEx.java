@@ -287,6 +287,8 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
             
             final Currency stockCurrency = shouldDisplayCurrencyInfoForValue ? org.yccheok.jstock.portfolio.Utils.getStockCurrency(portfolioRealTimeInfo, code) : null;
 
+            final DecimalPlace decimalPlace = JStock.instance().getJStockOptions().getDecimalPlace();
+            
             switch(column) {
                 case 0:
                     return ((Transaction)transactionSummary.getChildAt(0)).getStock().symbol;
@@ -295,18 +297,10 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
                     return transactionSummary.getQuantity();
                     
                 case 3:
-                    if (JStock.instance().getJStockOptions().isFourDecimalPlacesEnabled()) {
-                        return new DoubleWrapper(DecimalPlace.Four, getSellingPrice(transactionSummary));
-                    } else {
-                        return new DoubleWrapper(DecimalPlace.Three, getSellingPrice(transactionSummary));   
-                    }
+                    return new DoubleWrapper(decimalPlace, getSellingPrice(transactionSummary));
                     
                 case 4:
-                    if (JStock.instance().getJStockOptions().isFourDecimalPlacesEnabled()) {
-                        return new DoubleWrapper(DecimalPlace.Four, getPurchasePrice(transactionSummary));
-                    } else {
-                        return new DoubleWrapper(DecimalPlace.Three, getPurchasePrice(transactionSummary));   
-                    }                    
+                    return new DoubleWrapper(decimalPlace, getPurchasePrice(transactionSummary));
                     
                 case 5:
                     if (shouldConvertPenceToPound == false) {

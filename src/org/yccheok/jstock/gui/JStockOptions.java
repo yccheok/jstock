@@ -1160,17 +1160,17 @@ public class JStockOptions {
         this.newsID = newsID;
     }
 
-    public DecimalPlace getDecimalPlaces(/*Country country*/) {
-        DecimalPlace decimalPlaces = this.decimalPlaces.get(this.country);
-        if (decimalPlaces == null) {
+    public DecimalPlace getDecimalPlace(/*Country country*/) {
+        DecimalPlace decimalPlace = this.decimalPlaces.get(this.country);
+        if (decimalPlace == null) {
             return DecimalPlace.Two;
         }
-        return decimalPlaces;
+        return decimalPlace;
     }
 
     // Do we need country as parameter?
-    public void setDecimalPlaces(/*Country country, */DecimalPlace decimalPlaces) {
-        this.decimalPlaces.put(this.country, decimalPlaces);
+    public void setDecimalPlace(/*Country country, */DecimalPlace decimalPlace) {
+        this.decimalPlaces.put(this.country, decimalPlace);
     }
 
     public PriceSource getPriceSource(Country country) {
