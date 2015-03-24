@@ -31,6 +31,7 @@ import org.apache.commons.httpclient.NTCredentials;
 import org.yccheok.jstock.engine.Country;
 import org.yccheok.jstock.engine.PriceSource;
 import org.yccheok.jstock.portfolio.BrokingFirm;
+import org.yccheok.jstock.portfolio.DecimalPlaces;
 
 /**
  *
@@ -299,7 +300,10 @@ public class JStockOptions {
     @Deprecated
     private transient Map<Country, Boolean> penceToPoundConversionEnabled = new EnumMap<Country, Boolean>(Country.class);
     
-    private Map<Country, Boolean> fourDecimalPlacesEnabled = new EnumMap<Country, Boolean>(Country.class);
+    @Deprecated
+    private transient Map<Country, Boolean> fourDecimalPlacesEnabled = new EnumMap<Country, Boolean>(Country.class);
+    
+    private Map<Country, DecimalPlaces> decimalPlacesMap = new EnumMap<>(Country.class);
     
     // So that in later time we know that, which version of JStock, is used to
     // save this options.xml.
@@ -390,7 +394,7 @@ public class JStockOptions {
         /* For UK client. */
         //this.penceToPoundConversionEnabled = jStockOptions.penceToPoundConversionEnabled;
         
-        this.fourDecimalPlacesEnabled = jStockOptions.fourDecimalPlacesEnabled;
+        this.decimalPlacesMap = jStockOptions.decimalPlacesMap;
         
         //this.rememberGoogleAccountEnabled = jStockOptions.rememberGoogleAccountEnabled;
         //this.googleUsername = jStockOptions.googleUsername;
@@ -432,7 +436,7 @@ public class JStockOptions {
         this.currencyExchangeEnable = new EnumMap<Country, Boolean>(jStockOptions.currencyExchangeEnable);
         this.localCurrencyCountries = new EnumMap<Country, Country>(jStockOptions.localCurrencyCountries);
         //this.penceToPoundConversionEnabled = new EnumMap<Country, Boolean>(jStockOptions.penceToPoundConversionEnabled);
-        this.fourDecimalPlacesEnabled = new EnumMap<Country, Boolean>(jStockOptions.fourDecimalPlacesEnabled);
+        this.decimalPlacesMap = new EnumMap<Country, DecimalPlaces>(jStockOptions.decimalPlacesMap);
         
         this.chartTheme = jStockOptions.getChartTheme();
         
@@ -515,7 +519,7 @@ public class JStockOptions {
         /* For UK client. */
         //jStockOptions.penceToPoundConversionEnabled = this.penceToPoundConversionEnabled;
 
-        jStockOptions.fourDecimalPlacesEnabled = this.fourDecimalPlacesEnabled;
+        jStockOptions.decimalPlacesMap = this.decimalPlacesMap;
         
         //jStockOptions.rememberGoogleAccountEnabled = this.rememberGoogleAccountEnabled;
         //jStockOptions.googleUsername = this.googleUsername;
@@ -559,7 +563,7 @@ public class JStockOptions {
         jStockOptions.currencyExchangeEnable = new EnumMap<Country, Boolean>(this.currencyExchangeEnable);
         jStockOptions.localCurrencyCountries = new EnumMap<Country, Country>(this.localCurrencyCountries);
         //jStockOptions.penceToPoundConversionEnabled = new EnumMap<Country, Boolean>(jStockOptions.penceToPoundConversionEnabled);
-        jStockOptions.fourDecimalPlacesEnabled = new EnumMap<Country, Boolean>(jStockOptions.fourDecimalPlacesEnabled);
+        jStockOptions.decimalPlacesMap = new EnumMap<Country, DecimalPlaces>(jStockOptions.decimalPlacesMap);
         
         jStockOptions.chartTheme = this.chartTheme;
         
@@ -708,8 +712,8 @@ public class JStockOptions {
         //    this.penceToPoundConversionEnabled.put(Country.UnitedKingdom, true);
         //}
         
-        if (this.fourDecimalPlacesEnabled == null) {
-            this.fourDecimalPlacesEnabled = new EnumMap<Country, Boolean>(Country.class);
+        if (this.decimalPlacesMap == null) {
+            this.decimalPlacesMap = new EnumMap<Country, DecimalPlaces>(Country.class);
         }
         
         // Bug caused by change language menu method. We rectify it, after we 
@@ -1276,17 +1280,17 @@ public class JStockOptions {
         this.newsID = newsID;
     }
 
-    public boolean isFourDecimalPlacesEnabled(/*Country country*/) {
-        Boolean b = this.fourDecimalPlacesEnabled.get(this.country);
-        if (b == null) {
-            return false;
+    public DecimalPlaces getDecimalPlaces(/*Country country*/) {
+        DecimalPlaces decimalPlaces = this.decimalPlacesMap.get(this.country);
+        if (decimalPlaces == null) {
+            return DecimalPlaces.Two;
         }
-        return b;
+        return decimalPlaces;
     }
 
     // Do we need country as parameter?
-    public void setFourDecimalPlacesEnabled(/*Country country, */boolean fourDecimalPlacesEnabled) {
-        this.fourDecimalPlacesEnabled.put(this.country, fourDecimalPlacesEnabled);
+    public void setDecimalPlaces(/*Country country, */DecimalPlaces decimalPlaces) {
+        this.decimalPlacesMap.put(this.country, decimalPlaces);
     }
 
     public PriceSource getPriceSource(Country country) {
