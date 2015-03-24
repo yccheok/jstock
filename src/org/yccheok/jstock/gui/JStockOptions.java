@@ -303,7 +303,7 @@ public class JStockOptions {
     @Deprecated
     private transient Map<Country, Boolean> fourDecimalPlacesEnabled = new EnumMap<Country, Boolean>(Country.class);
     
-    private Map<Country, DecimalPlace> decimalPlacesMap = new EnumMap<>(Country.class);
+    private Map<Country, DecimalPlace> decimalPlaces = new EnumMap<>(Country.class);
     
     // So that in later time we know that, which version of JStock, is used to
     // save this options.xml.
@@ -394,7 +394,7 @@ public class JStockOptions {
         /* For UK client. */
         //this.penceToPoundConversionEnabled = jStockOptions.penceToPoundConversionEnabled;
         
-        this.decimalPlacesMap = jStockOptions.decimalPlacesMap;
+        this.decimalPlaces = jStockOptions.decimalPlaces;
         
         //this.rememberGoogleAccountEnabled = jStockOptions.rememberGoogleAccountEnabled;
         //this.googleUsername = jStockOptions.googleUsername;
@@ -436,7 +436,7 @@ public class JStockOptions {
         this.currencyExchangeEnable = new EnumMap<Country, Boolean>(jStockOptions.currencyExchangeEnable);
         this.localCurrencyCountries = new EnumMap<Country, Country>(jStockOptions.localCurrencyCountries);
         //this.penceToPoundConversionEnabled = new EnumMap<Country, Boolean>(jStockOptions.penceToPoundConversionEnabled);
-        this.decimalPlacesMap = new EnumMap<Country, DecimalPlace>(jStockOptions.decimalPlacesMap);
+        this.decimalPlaces = new EnumMap<Country, DecimalPlace>(jStockOptions.decimalPlaces);
         
         this.chartTheme = jStockOptions.getChartTheme();
         
@@ -592,8 +592,8 @@ public class JStockOptions {
         //    this.penceToPoundConversionEnabled.put(Country.UnitedKingdom, true);
         //}
         
-        if (this.decimalPlacesMap == null) {
-            this.decimalPlacesMap = new EnumMap<Country, DecimalPlace>(Country.class);
+        if (this.decimalPlaces == null) {
+            this.decimalPlaces = new EnumMap<Country, DecimalPlace>(Country.class);
         }
         
         // Bug caused by change language menu method. We rectify it, after we 
@@ -1161,7 +1161,7 @@ public class JStockOptions {
     }
 
     public DecimalPlace getDecimalPlaces(/*Country country*/) {
-        DecimalPlace decimalPlaces = this.decimalPlacesMap.get(this.country);
+        DecimalPlace decimalPlaces = this.decimalPlaces.get(this.country);
         if (decimalPlaces == null) {
             return DecimalPlace.Two;
         }
@@ -1170,7 +1170,7 @@ public class JStockOptions {
 
     // Do we need country as parameter?
     public void setDecimalPlaces(/*Country country, */DecimalPlace decimalPlaces) {
-        this.decimalPlacesMap.put(this.country, decimalPlaces);
+        this.decimalPlaces.put(this.country, decimalPlaces);
     }
 
     public PriceSource getPriceSource(Country country) {
