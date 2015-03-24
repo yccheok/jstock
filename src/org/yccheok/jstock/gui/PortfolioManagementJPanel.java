@@ -2940,11 +2940,13 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             realizedProfitPercentage = sellPortfolioTreeTableModel.getGainLossPercentage(localCurrency);
         }
         
-        final String _share = org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlace.Two, share);
-        final String _cash = org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlace.Two, cash);
-        final String _paperProfit = org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlace.Two, paperProfit);
+        final DecimalPlace decimalPlace = jStockOptions.getDecimalPlace();
+        
+        final String _share = org.yccheok.jstock.portfolio.Utils.toCurrency(decimalPlace, share);
+        final String _cash = org.yccheok.jstock.portfolio.Utils.toCurrency(decimalPlace, cash);
+        final String _paperProfit = org.yccheok.jstock.portfolio.Utils.toCurrency(decimalPlace, paperProfit);
         final String _paperProfitPercentage = org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlace.Two, paperProfitPercentage);
-        final String _realizedProfit = org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlace.Two, realizedProfit);
+        final String _realizedProfit = org.yccheok.jstock.portfolio.Utils.toCurrency(decimalPlace, realizedProfit);
         final String _realizedProfitPercentage = org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlace.Two, realizedProfitPercentage);
         
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
