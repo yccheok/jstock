@@ -19,7 +19,7 @@
 
 package org.yccheok.jstock.gui.table;
 
-import org.yccheok.jstock.portfolio.DecimalPlaces;
+import org.yccheok.jstock.portfolio.DecimalPlace;
 
 /**
  *
@@ -32,6 +32,6 @@ public class CurrencyRenderer extends GenericRenderer {
 
     @Override
     public void setValue(Object value) {
-        setText((value == null) ? "" : org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(DecimalPlaces.Three, value));
+        setText((value == null) ? "" : org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(DecimalPlace.Three, value));
     }
 }

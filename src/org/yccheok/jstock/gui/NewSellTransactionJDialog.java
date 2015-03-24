@@ -47,7 +47,7 @@ import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.Symbol;
 import org.yccheok.jstock.portfolio.BrokingFirm;
 import org.yccheok.jstock.portfolio.Contract;
-import org.yccheok.jstock.portfolio.DecimalPlaces;
+import org.yccheok.jstock.portfolio.DecimalPlace;
 import org.yccheok.jstock.portfolio.Transaction;
 
 /**
@@ -700,7 +700,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         //
         // Use Three instead of Four. The idea is, shorter is better.
         // Is it good to use isFourDecimalPlacesEnabled right here???
-        final String text = org.yccheok.jstock.portfolio.Utils.toEditCurrency(DecimalPlaces.Three, sellQuantity /  buyQuantity * value);
+        final String text = org.yccheok.jstock.portfolio.Utils.toEditCurrency(DecimalPlace.Three, sellQuantity /  buyQuantity * value);
         return Double.parseDouble(text);
     }
     

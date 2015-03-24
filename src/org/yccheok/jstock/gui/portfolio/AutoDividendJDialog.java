@@ -44,7 +44,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.internationalization.GUIBundle;
-import org.yccheok.jstock.portfolio.DecimalPlaces;
+import org.yccheok.jstock.portfolio.DecimalPlace;
 import org.yccheok.jstock.portfolio.Dividend;
 
 /**
@@ -87,11 +87,11 @@ public class AutoDividendJDialog extends javax.swing.JDialog {
         String template = GUIBundle.getString("AutoDividendJDialog_Intruction_template");
         double tax = (Double)jFormattedTextField1.getValue();
         double taxRate = (Double)jFormattedTextField2.getValue();        
-        final String text0 = org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlaces.Three, tax);
-        final String text1 = org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlaces.Three, taxRate);
+        final String text0 = org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlace.Three, tax);
+        final String text1 = org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlace.Three, taxRate);
         double value = 100.0 - tax - (100.0 * taxRate / 100.0);
         value = Math.max(value, 0.0);
-        final String text2 = org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(DecimalPlaces.Three, value);
+        final String text2 = org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(DecimalPlace.Three, value);
         String message = MessageFormat.format(template, text0, text1, text2);
         
         if (jLabel3 == null) {
@@ -126,7 +126,7 @@ public class AutoDividendJDialog extends javax.swing.JDialog {
         
         String stock_text = selectedStock + " " + GUIBundle.getString(selectedStock <= 1 ? "AutoDividendJDialog_StockSingular" : "AutoDividendJDialog_StockPlural");
         String dividend_text = selectedDividend + " " + GUIBundle.getString(selectedDividend <= 1 ? "AutoDividendJDialog_DividendSingular" : "AutoDividendJDialog_DividendPlural");
-        String total_text = org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(DecimalPlaces.Three, selectedAmount);
+        String total_text = org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(DecimalPlace.Three, selectedAmount);
         String message = MessageFormat.format(GUIBundle.getString("AutoDividendJDialog_Total_template"), stock_text, dividend_text, total_text);
         this.jLabel4.setText(message);
     }

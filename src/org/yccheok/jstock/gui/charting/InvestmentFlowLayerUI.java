@@ -56,7 +56,7 @@ import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.internationalization.MessagesBundle;
 import org.yccheok.jstock.portfolio.Activities;
 import org.yccheok.jstock.portfolio.Activity;
-import org.yccheok.jstock.portfolio.DecimalPlaces;
+import org.yccheok.jstock.portfolio.DecimalPlace;
 
 /**
  *
@@ -125,11 +125,11 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
         final double totalInvestValue = this.investmentFlowChartJDialog.getTotalInvestValue();
         final double totalROIValue = this.investmentFlowChartJDialog.getTotalROIValue();
                 
-        final String invest = org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(DecimalPlaces.Three, totalInvestValue);
-        final String roi = org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(DecimalPlaces.Three, totalROIValue);
+        final String invest = org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(DecimalPlace.Three, totalInvestValue);
+        final String roi = org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(DecimalPlace.Three, totalROIValue);
         final double gain = totalROIValue - totalInvestValue;
         final double percentage = totalInvestValue > 0.0 ? gain / totalInvestValue * 100.0 : 0.0;
-        final String gain_str = org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(DecimalPlaces.Three, gain);
+        final String gain_str = org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(DecimalPlace.Three, gain);
         final String percentage_str = numberFormat.format(percentage);
 
         final String SELECTED = this.investmentFlowChartJDialog.getCurrentSelectedString();
@@ -265,7 +265,7 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
                 padding + x,
                 yy);
             g2.setFont(valueFont);
-            final String totalValueStr = org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(DecimalPlaces.Three, totalValue);
+            final String totalValueStr = org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(DecimalPlace.Three, totalValue);
             g2.drawString(totalValueStr,
                 width - padding - valueFontMetrics.stringWidth(totalValueStr) + x,
                 yy);
@@ -310,7 +310,7 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
                         org.yccheok.jstock.portfolio.Utils.toQuantity(quantity) + " " + stockInfo.symbol);
                 final double amount = convertToPoundIfNecessary(stockInfo.code, quantity * this.investmentFlowChartJDialog.getStockPrice(stockInfo.code));
                 this.totalROIValue += amount;
-                this.ROIValues.add(org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(DecimalPlaces.Three, amount));
+                this.ROIValues.add(org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(DecimalPlace.Three, amount));
             }
             else if (activity.getType() == Activity.Type.Sell) {
                 final double quantity = (Double)activity.get(Activity.Param.Quantity);
@@ -319,14 +319,14 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
                         org.yccheok.jstock.portfolio.Utils.toQuantity(quantity) + " " + stockInfo.symbol);
                 final double amount = convertToPoundIfNecessary(stockInfo.code, activity.getAmount());
                 this.totalROIValue += amount;
-                this.ROIValues.add(org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(DecimalPlaces.Three, amount));
+                this.ROIValues.add(org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(DecimalPlace.Three, amount));
             }
             else if (activity.getType() == Activity.Type.Dividend) {
                 final StockInfo stockInfo = (StockInfo)activity.get(Activity.Param.StockInfo);
                 this.ROIParams.add(activity.getType() + " " + stockInfo.symbol);
                 final double amount = activity.getAmount();
                 this.totalROIValue += amount;
-                this.ROIValues.add(org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(DecimalPlaces.Three, amount));
+                this.ROIValues.add(org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(DecimalPlace.Three, amount));
             }
             else {
                 assert(false);
@@ -335,7 +335,7 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
 
         final boolean isTotalNeeded = this.ROIParams.size() > 1;
         final String totalParam = GUIBundle.getString("InvestmentFlowLayerUI_Total_Return");
-        final String totalValue = org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(DecimalPlaces.Three, this.totalROIValue);
+        final String totalValue = org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(DecimalPlace.Three, this.totalROIValue);
         /* This is the height for "total" information. */
         int totalHeight = 0;
 
@@ -426,7 +426,7 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
                 
                 final double amount = convertToPoundIfNecessary(stockInfo.code, activity.getAmount());
                 this.totalInvestValue += amount;
-                this.investValues.add(org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(DecimalPlaces.Three, amount));
+                this.investValues.add(org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(DecimalPlace.Three, amount));
             }
             else {
                 assert(false);
@@ -435,7 +435,7 @@ public class InvestmentFlowLayerUI<V extends javax.swing.JComponent> extends Abs
 
         final boolean isTotalNeeded = this.investParams.size() > 1;
         final String totalParam = GUIBundle.getString("InvestmentFlowLayerUI_Total_Invest");
-        final String totalValue = org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(DecimalPlaces.Three, this.totalInvestValue);
+        final String totalValue = org.yccheok.jstock.portfolio.Utils.toCurrencyWithSymbol(DecimalPlace.Three, this.totalInvestValue);
         /* This is the height for "total" information. */
         int totalHeight = 0;
 

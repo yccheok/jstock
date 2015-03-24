@@ -34,7 +34,7 @@ import net.sf.nachocalendar.CalendarFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.SimpleDate;
-import org.yccheok.jstock.portfolio.DecimalPlaces;
+import org.yccheok.jstock.portfolio.DecimalPlace;
 import org.yccheok.jstock.portfolio.Dividend;
 
 /**
@@ -170,7 +170,7 @@ public class AutoDividendRowJPanel extends javax.swing.JPanel {
     public void updateTaxInfo(double tax, double taxRate) {
         double value = this.dividend.amount - tax - (this.dividend.amount * taxRate / 100.0);
         value = Math.max(value, 0.0);
-        final String text = org.yccheok.jstock.portfolio.Utils.toEditCurrency(DecimalPlaces.Three, value);
+        final String text = org.yccheok.jstock.portfolio.Utils.toEditCurrency(DecimalPlace.Three, value);
         value = Double.parseDouble(text);        
         jFormattedTextField2.setValue(value);
     }

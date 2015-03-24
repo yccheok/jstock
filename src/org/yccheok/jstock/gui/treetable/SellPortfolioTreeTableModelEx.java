@@ -33,7 +33,7 @@ import org.yccheok.jstock.portfolio.Portfolio;
 import org.yccheok.jstock.portfolio.Transaction;
 import org.yccheok.jstock.portfolio.TransactionSummary;
 import org.yccheok.jstock.internationalization.GUIBundle;
-import org.yccheok.jstock.portfolio.DecimalPlaces;
+import org.yccheok.jstock.portfolio.DecimalPlace;
 import org.yccheok.jstock.portfolio.DoubleWrapper;
 import org.yccheok.jstock.portfolio.PortfolioRealTimeInfo;
 /**
@@ -255,9 +255,9 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
 
                 case 8:
                     if (isFeeCalculationEnabled) {
-                        return new DoubleWrapper(DecimalPlaces.Two, getNetGainLossPercentage(localCurrency));
+                        return new DoubleWrapper(DecimalPlace.Two, getNetGainLossPercentage(localCurrency));
                     } else {
-                        return new DoubleWrapper(DecimalPlaces.Two, getGainLossPercentage(localCurrency));
+                        return new DoubleWrapper(DecimalPlace.Two, getGainLossPercentage(localCurrency));
                     }
     
                 case 9:
@@ -296,16 +296,16 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
                     
                 case 3:
                     if (JStock.instance().getJStockOptions().isFourDecimalPlacesEnabled()) {
-                        return new DoubleWrapper(DecimalPlaces.Four, getSellingPrice(transactionSummary));
+                        return new DoubleWrapper(DecimalPlace.Four, getSellingPrice(transactionSummary));
                     } else {
-                        return new DoubleWrapper(DecimalPlaces.Three, getSellingPrice(transactionSummary));   
+                        return new DoubleWrapper(DecimalPlace.Three, getSellingPrice(transactionSummary));   
                     }
                     
                 case 4:
                     if (JStock.instance().getJStockOptions().isFourDecimalPlacesEnabled()) {
-                        return new DoubleWrapper(DecimalPlaces.Four, getPurchasePrice(transactionSummary));
+                        return new DoubleWrapper(DecimalPlace.Four, getPurchasePrice(transactionSummary));
                     } else {
-                        return new DoubleWrapper(DecimalPlaces.Three, getPurchasePrice(transactionSummary));   
+                        return new DoubleWrapper(DecimalPlace.Three, getPurchasePrice(transactionSummary));   
                     }                    
                     
                 case 5:
@@ -355,9 +355,9 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
 
                 case 8:
                     if (isFeeCalculationEnabled) {
-                        return new DoubleWrapper(DecimalPlaces.Two, getNetGainLossPercentage(transactionSummary));
+                        return new DoubleWrapper(DecimalPlace.Two, getNetGainLossPercentage(transactionSummary));
                     } else {
-                        return new DoubleWrapper(DecimalPlaces.Two, getGainLossPercentage(transactionSummary));
+                        return new DoubleWrapper(DecimalPlace.Two, getGainLossPercentage(transactionSummary));
                     }
                     
                 case 9:
@@ -448,9 +448,9 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
                                         
                 case 8:
                     if (isFeeCalculationEnabled) {
-                        return new DoubleWrapper(DecimalPlaces.Two, getNetGainLossPercentage(transaction));
+                        return new DoubleWrapper(DecimalPlace.Two, getNetGainLossPercentage(transaction));
                     } else {
-                        return new DoubleWrapper(DecimalPlaces.Two, getGainLossPercentage(transaction));
+                        return new DoubleWrapper(DecimalPlace.Two, getGainLossPercentage(transaction));
                     }
                     
                 case 9:

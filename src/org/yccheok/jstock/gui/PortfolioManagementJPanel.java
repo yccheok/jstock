@@ -82,7 +82,7 @@ import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.internationalization.MessagesBundle;
 import org.yccheok.jstock.portfolio.Commentable;
 import org.yccheok.jstock.portfolio.Contract;
-import org.yccheok.jstock.portfolio.DecimalPlaces;
+import org.yccheok.jstock.portfolio.DecimalPlace;
 import org.yccheok.jstock.portfolio.Deposit;
 import org.yccheok.jstock.portfolio.DepositSummary;
 import org.yccheok.jstock.portfolio.Dividend;
@@ -345,7 +345,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                             } else if (value instanceof DoubleWithCurrency) {
                                 DoubleWithCurrency v = (DoubleWithCurrency)value;
                                 Currency currency = v.currency();
-                                String content = org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlaces.Four, v.Double());
+                                String content = org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlace.Four, v.Double());
                                 if (currency == null) {
                                     ((JLabel)c).setText(content);
                                 } else {
@@ -359,7 +359,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                                 }  
                             }
                             else {
-                                ((JLabel)c).setText(org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlaces.Four, value));
+                                ((JLabel)c).setText(org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlace.Four, value));
                             }
                         }
                     }
@@ -2940,12 +2940,12 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             realizedProfitPercentage = sellPortfolioTreeTableModel.getGainLossPercentage(localCurrency);
         }
         
-        final String _share = org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlaces.Two, share);
-        final String _cash = org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlaces.Two, cash);
-        final String _paperProfit = org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlaces.Two, paperProfit);
-        final String _paperProfitPercentage = org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlaces.Two, paperProfitPercentage);
-        final String _realizedProfit = org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlaces.Two, realizedProfit);
-        final String _realizedProfitPercentage = org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlaces.Two, realizedProfitPercentage);
+        final String _share = org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlace.Two, share);
+        final String _cash = org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlace.Two, cash);
+        final String _paperProfit = org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlace.Two, paperProfit);
+        final String _paperProfitPercentage = org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlace.Two, paperProfitPercentage);
+        final String _realizedProfit = org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlace.Two, realizedProfit);
+        final String _realizedProfitPercentage = org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlace.Two, realizedProfitPercentage);
         
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             @Override

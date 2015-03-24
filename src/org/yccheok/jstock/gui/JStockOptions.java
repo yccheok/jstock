@@ -31,7 +31,7 @@ import org.apache.commons.httpclient.NTCredentials;
 import org.yccheok.jstock.engine.Country;
 import org.yccheok.jstock.engine.PriceSource;
 import org.yccheok.jstock.portfolio.BrokingFirm;
-import org.yccheok.jstock.portfolio.DecimalPlaces;
+import org.yccheok.jstock.portfolio.DecimalPlace;
 
 /**
  *
@@ -303,7 +303,7 @@ public class JStockOptions {
     @Deprecated
     private transient Map<Country, Boolean> fourDecimalPlacesEnabled = new EnumMap<Country, Boolean>(Country.class);
     
-    private Map<Country, DecimalPlaces> decimalPlacesMap = new EnumMap<>(Country.class);
+    private Map<Country, DecimalPlace> decimalPlacesMap = new EnumMap<>(Country.class);
     
     // So that in later time we know that, which version of JStock, is used to
     // save this options.xml.
@@ -436,7 +436,7 @@ public class JStockOptions {
         this.currencyExchangeEnable = new EnumMap<Country, Boolean>(jStockOptions.currencyExchangeEnable);
         this.localCurrencyCountries = new EnumMap<Country, Country>(jStockOptions.localCurrencyCountries);
         //this.penceToPoundConversionEnabled = new EnumMap<Country, Boolean>(jStockOptions.penceToPoundConversionEnabled);
-        this.decimalPlacesMap = new EnumMap<Country, DecimalPlaces>(jStockOptions.decimalPlacesMap);
+        this.decimalPlacesMap = new EnumMap<Country, DecimalPlace>(jStockOptions.decimalPlacesMap);
         
         this.chartTheme = jStockOptions.getChartTheme();
         
@@ -593,7 +593,7 @@ public class JStockOptions {
         //}
         
         if (this.decimalPlacesMap == null) {
-            this.decimalPlacesMap = new EnumMap<Country, DecimalPlaces>(Country.class);
+            this.decimalPlacesMap = new EnumMap<Country, DecimalPlace>(Country.class);
         }
         
         // Bug caused by change language menu method. We rectify it, after we 
@@ -1160,16 +1160,16 @@ public class JStockOptions {
         this.newsID = newsID;
     }
 
-    public DecimalPlaces getDecimalPlaces(/*Country country*/) {
-        DecimalPlaces decimalPlaces = this.decimalPlacesMap.get(this.country);
+    public DecimalPlace getDecimalPlaces(/*Country country*/) {
+        DecimalPlace decimalPlaces = this.decimalPlacesMap.get(this.country);
         if (decimalPlaces == null) {
-            return DecimalPlaces.Two;
+            return DecimalPlace.Two;
         }
         return decimalPlaces;
     }
 
     // Do we need country as parameter?
-    public void setDecimalPlaces(/*Country country, */DecimalPlaces decimalPlaces) {
+    public void setDecimalPlaces(/*Country country, */DecimalPlace decimalPlaces) {
         this.decimalPlacesMap.put(this.country, decimalPlaces);
     }
 
