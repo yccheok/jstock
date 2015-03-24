@@ -587,13 +587,13 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
                     }
                     
                 case 9:
-                    return transaction.getBroker();
+                    return new DoubleWrapper(decimalPlace, transaction.getBroker());
                     
                 case 10:
-                    return transaction.getClearingFee();
+                    return new DoubleWrapper(decimalPlace, transaction.getClearingFee());
                     
                 case 11:
-                    return transaction.getStampDuty();
+                    return new DoubleWrapper(decimalPlace, transaction.getStampDuty());
                     
                 case 12:
                     return transaction.getComment();

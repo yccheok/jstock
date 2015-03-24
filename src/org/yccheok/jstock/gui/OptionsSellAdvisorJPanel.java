@@ -123,9 +123,9 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsSellAdvisorJPanel_Wealth"))); // NOI18N
 
-        jLabel3.setText(bundle.getString("OptionsSellAdvisorJPanel_ShowStockPriceAndValueIn4DecimalPlaces")); // NOI18N
+        jLabel3.setText(bundle.getString("OptionsSellAdvisorJPanel_StockValueDisplay")); // NOI18N
 
-        jComboBox3.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "2", "3", "4" }));
+        jComboBox3.setModel(getDecimalPlaceComboBoxModel());
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -257,6 +257,14 @@ public class OptionsSellAdvisorJPanel extends javax.swing.JPanel implements JSto
             }
         }
         return defaultCountryComboBoxModel;
+    }
+    
+    private ComboBoxModel getDecimalPlaceComboBoxModel() {
+        return new javax.swing.DefaultComboBoxModel(new String[] {
+            MessageFormat.format(GUIBundle.getString("OptionsSellAdvisorJPanel_DecimalPlaces_template"), 2),
+            MessageFormat.format(GUIBundle.getString("OptionsSellAdvisorJPanel_DecimalPlaces_template"), 3),
+            MessageFormat.format(GUIBundle.getString("OptionsSellAdvisorJPanel_DecimalPlaces_template"), 4)
+        });
     }
     
     private static ComboBoxModel getComboBoxModel() {
