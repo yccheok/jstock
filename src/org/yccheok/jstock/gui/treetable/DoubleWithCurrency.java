@@ -20,30 +20,40 @@
 package org.yccheok.jstock.gui.treetable;
 
 import org.yccheok.jstock.engine.currency.Currency;
+import org.yccheok.jstock.portfolio.DecimalPlace;
+import org.yccheok.jstock.portfolio.DoubleWrapper;
 
 /**
  *
  * @author yccheok
  */
-public class DoubleWithCurrency extends org.yccheok.jstock.engine.Pair<Double, Currency> implements Comparable<DoubleWithCurrency> {
-    public static DoubleWithCurrency create(Double _double, Currency currency) {
-        return new DoubleWithCurrency(_double, currency);
+public class DoubleWithCurrency extends org.yccheok.jstock.engine.Pair<Currency, DoubleWrapper> implements Comparable<DoubleWithCurrency> {
+    public static DoubleWithCurrency create(Currency currency, DecimalPlace decimalPlace, double _double) {
+        return new DoubleWithCurrency(currency, new DoubleWrapper(decimalPlace, _double));
     }
     
-    public DoubleWithCurrency(Double _double, Currency currency) {
-        super(_double, currency);
+    public static DoubleWithCurrency create(Currency currency, DoubleWrapper doubleWrapper) {
+        return new DoubleWithCurrency(currency, doubleWrapper);
+    }
+    
+    public DoubleWithCurrency(Currency currency, DoubleWrapper doubleWrapper) {
+        super(currency, doubleWrapper);
     }
     
     public Double Double() {
-        return this.first;
+        return this.second.value;
+    }
+    
+    public DecimalPlace decimalPlace() {
+        return this.second.decimalPlace;
     }
     
     public Currency currency() {
-        return this.second;
+        return this.first;
     }
 
     @Override
     public int compareTo(DoubleWithCurrency o) {
-        return first.compareTo(o.first);
+        return second.value.compareTo(o.second.value);
     }
 }

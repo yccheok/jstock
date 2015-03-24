@@ -345,7 +345,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                             } else if (value instanceof DoubleWithCurrency) {
                                 DoubleWithCurrency v = (DoubleWithCurrency)value;
                                 Currency currency = v.currency();
-                                String content = org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlace.Four, v.Double());
+                                String content = org.yccheok.jstock.portfolio.Utils.toCurrency(v.decimalPlace(), v.Double());
                                 if (currency == null) {
                                     ((JLabel)c).setText(content);
                                 } else {
