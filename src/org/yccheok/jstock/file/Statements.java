@@ -38,8 +38,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import javax.swing.table.TableModel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -60,8 +58,6 @@ import org.yccheok.jstock.engine.StockNameDatabase;
 import org.yccheok.jstock.engine.Symbol;
 import org.yccheok.jstock.file.GUIBundleWrapper.Language;
 import org.yccheok.jstock.gui.BackwardCompatible;
-import org.yccheok.jstock.gui.JStockOptions;
-import org.yccheok.jstock.gui.JStock;
 import org.yccheok.jstock.gui.POIUtils;
 import org.yccheok.jstock.engine.Pair;
 import org.yccheok.jstock.gui.StockTableModel;
@@ -929,25 +925,9 @@ public class Statements {
             return false;
         }
         
-        String canonicalPath;
-        try {
-            canonicalPath = file.getCanonicalPath();
-        } catch (IOException ex) {
-            log.error(null, ex);
+        final ThreadSafeFileLock.Lock lock = ThreadSafeFileLock.getLock(file);
+        if (lock == null) {
             return false;
-        }
-        
-        Pair<ReentrantReadWriteLock, AtomicInteger> pair;
-        synchronized(reentrantReadWriteLockMapMonitor) {
-            pair = reentrantReadWriteLockMap.get(canonicalPath);
-            if (pair == null) {
-                ReentrantReadWriteLock reentrantReadWriteLock = new ReentrantReadWriteLock();
-                AtomicInteger atomicInteger = new AtomicInteger(1);
-                pair = Pair.create(reentrantReadWriteLock, atomicInteger);
-                reentrantReadWriteLockMap.put(canonicalPath, pair);
-            } else {
-                pair.second.incrementAndGet();
-            }
         }
         
         boolean status = false;
@@ -955,10 +935,11 @@ public class Statements {
         FileOutputStream fileOutputStream = null;
         OutputStreamWriter outputStreamWriter = null;
         CSVWriter csvwriter = null;
-
+        
+        // http://stackoverflow.com/questions/10868423/lock-lock-before-try
+        ThreadSafeFileLock.lockWrite(lock);
+        
         try {
-            pair.first.writeLock().lock();
-            
             fileOutputStream = new FileOutputStream(file);
 
             outputStreamWriter = new OutputStreamWriter(fileOutputStream,  Charset.forName("UTF-8"));
@@ -1009,14 +990,8 @@ public class Statements {
             org.yccheok.jstock.gui.Utils.close(outputStreamWriter);
             org.yccheok.jstock.gui.Utils.close(fileOutputStream);
             
-            pair.first.writeLock().unlock();
-            
-            synchronized(reentrantReadWriteLockMapMonitor) {
-                int counter = pair.second.decrementAndGet();
-                if (counter == 0) {
-                    reentrantReadWriteLockMap.remove(canonicalPath);
-                }
-            }
+            ThreadSafeFileLock.unlockWrite(lock);
+            ThreadSafeFileLock.releaseLock(lock);
         }
 
         return status;
