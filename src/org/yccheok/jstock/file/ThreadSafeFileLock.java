@@ -43,11 +43,13 @@ import org.yccheok.jstock.engine.Pair;
  */
 
 public class ThreadSafeFileLock {
+    private ThreadSafeFileLock() {
+    }
     
     /***************************************************************************
      * CRITICAL SECTION OF THE CODE.
      **************************************************************************/
-    public Lock getLock(File file) {
+    public static Lock getLock(File file) {
         String canonicalPath;
         try {
             canonicalPath = file.getCanonicalPath();
@@ -73,7 +75,7 @@ public class ThreadSafeFileLock {
         return lock;
     }
     
-    public void releaseLock(Lock lock) {    
+    public static void releaseLock(Lock lock) {    
         synchronized(reentrantReadWriteLockMapMonitor) {
             int counter = lock.reentrantReadWriteLock.second.decrementAndGet();
             if (counter == 0) {
@@ -88,11 +90,11 @@ public class ThreadSafeFileLock {
     /***************************************************************************
      * CRITICAL SECTION OF THE CODE.
      **************************************************************************/
-    public void lockRead(Lock lock) {
+    public static void lockRead(Lock lock) {
         lock.reentrantReadWriteLock.first.readLock().lock();
     }
     
-    public void unlockRead(Lock lock) {
+    public static void unlockRead(Lock lock) {
         lock.reentrantReadWriteLock.first.readLock().unlock();
     }
     /***************************************************************************
@@ -102,11 +104,11 @@ public class ThreadSafeFileLock {
     /***************************************************************************
      * CRITICAL SECTION OF THE CODE.
      **************************************************************************/
-    public void lockWrite(Lock lock) {
+    public static void lockWrite(Lock lock) {
         lock.reentrantReadWriteLock.first.writeLock().lock();
     }
     
-    public void unlockWrite(Lock lock) {
+    public static void unlockWrite(Lock lock) {
         lock.reentrantReadWriteLock.first.writeLock().unlock();
     }
     /***************************************************************************
