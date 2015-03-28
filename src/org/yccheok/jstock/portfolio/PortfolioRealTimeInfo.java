@@ -35,6 +35,7 @@ import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.currency.Currency;
 import org.yccheok.jstock.engine.currency.CurrencyPair;
+import org.yccheok.jstock.file.ThreadSafeFileLock;
 
 /**
  *
@@ -97,6 +98,13 @@ public class PortfolioRealTimeInfo {
         
         PortfolioRealTimeInfo portfolioRealTimeInfo = null;
         
+        final ThreadSafeFileLock.Lock lock = ThreadSafeFileLock.getLock(file);
+        if (lock == null) {
+            return false;
+        }
+        // http://stackoverflow.com/questions/10868423/lock-lock-before-try
+        ThreadSafeFileLock.lockRead(lock);
+        
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));            
             try {
@@ -108,7 +116,10 @@ public class PortfolioRealTimeInfo {
             log.error(null, ex);
         } catch (com.google.gson.JsonSyntaxException ex) {
             log.error(null, ex);
-        } 
+        } finally {
+            ThreadSafeFileLock.unlockRead(lock);
+            ThreadSafeFileLock.releaseLock(lock);
+        }
         
         if (portfolioRealTimeInfo == null) {
             return false;
@@ -125,6 +136,13 @@ public class PortfolioRealTimeInfo {
         Gson gson = builder.create(); 
         String string = gson.toJson(this);
         
+        final ThreadSafeFileLock.Lock lock = ThreadSafeFileLock.getLock(file);
+        if (lock == null) {
+            return false;
+        }
+        // http://stackoverflow.com/questions/10868423/lock-lock-before-try
+        ThreadSafeFileLock.lockWrite(lock);
+        
         try {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
             try {
@@ -135,6 +153,9 @@ public class PortfolioRealTimeInfo {
         } catch (IOException ex){
             log.error(null, ex);
             return false;
+        } finally {
+            ThreadSafeFileLock.unlockWrite(lock);
+            ThreadSafeFileLock.releaseLock(lock);
         }
         
         return true;
