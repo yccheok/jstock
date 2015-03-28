@@ -392,30 +392,14 @@ public class Statements {
      * @return the constructed Statements. UNKNOWN_STATEMENTS if fail
      */
     public static Statements newInstanceFromCSVFile(File file) {
-        String canonicalPath;
-        try {
-            canonicalPath = file.getCanonicalPath();
-        } catch (IOException ex) {
-            log.error(null, ex);
+        final ThreadSafeFileLock.Lock lock = ThreadSafeFileLock.getLock(file);
+        if (lock == null) {
             return UNKNOWN_STATEMENTS;
         }
         
         // FIXME :
         final boolean needToPerformBackwardCompatible = BackwardCompatible.needToPerformBackwardCompatible(file);
         final boolean needToHandleMetadata = BackwardCompatible.needToHandleMetadata(file);
-        
-        Pair<ReentrantReadWriteLock, AtomicInteger> pair;
-        synchronized(reentrantReadWriteLockMapMonitor) {
-            pair = reentrantReadWriteLockMap.get(canonicalPath);
-            if (pair == null) {
-                ReentrantReadWriteLock reentrantReadWriteLock = new ReentrantReadWriteLock();
-                AtomicInteger atomicInteger = new AtomicInteger(1);
-                pair = Pair.create(reentrantReadWriteLock, atomicInteger);
-                reentrantReadWriteLockMap.put(canonicalPath, pair);
-            } else {
-                pair.second.incrementAndGet();
-            }
-        }
                 
         boolean status = false;
 
@@ -424,9 +408,10 @@ public class Statements {
         CSVReader csvreader = null;
         Statements s = null;
         
-        try {
-            pair.first.readLock().lock();
-            
+        // http://stackoverflow.com/questions/10868423/lock-lock-before-try
+        ThreadSafeFileLock.lockRead(lock);
+        
+        try {            
             fileInputStream = new FileInputStream(file);   
                         
             inputStreamReader = new InputStreamReader(fileInputStream,  Charset.forName("UTF-8"));
@@ -522,14 +507,8 @@ public class Statements {
             org.yccheok.jstock.gui.Utils.close(inputStreamReader);
             org.yccheok.jstock.gui.Utils.close(fileInputStream);
             
-            pair.first.readLock().unlock();
-            
-            synchronized(reentrantReadWriteLockMapMonitor) {
-                int counter = pair.second.decrementAndGet();
-                if (counter == 0) {
-                    reentrantReadWriteLockMap.remove(canonicalPath);
-                }
-            }            
+            ThreadSafeFileLock.unlockRead(lock);
+            ThreadSafeFileLock.releaseLock(lock);
         }
 
         if (status) {
@@ -1169,10 +1148,6 @@ public class Statements {
     public Statement get(int index) {
         return statements.get(index);
     }
-    
-    private static final Map<String, Pair<ReentrantReadWriteLock, AtomicInteger>> reentrantReadWriteLockMap
-            = new HashMap<String, Pair<ReentrantReadWriteLock, AtomicInteger>>();
-    private static final Object reentrantReadWriteLockMapMonitor = new Object();
     
     private final Statement.Type type;
     private final GUIBundleWrapper guiBundleWrapper;
