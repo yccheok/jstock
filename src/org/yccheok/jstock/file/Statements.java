@@ -387,12 +387,7 @@ public class Statements {
      * @param file Given CSV File
      * @return the constructed Statements. UNKNOWN_STATEMENTS if fail
      */
-    public static Statements newInstanceFromCSVFile(File file) {
-        final ThreadSafeFileLock.Lock lock = ThreadSafeFileLock.getLock(file);
-        if (lock == null) {
-            return UNKNOWN_STATEMENTS;
-        }
-        
+    public static Statements newInstanceFromCSVFile(File file) {        
         // FIXME :
         final boolean needToPerformBackwardCompatible = BackwardCompatible.needToPerformBackwardCompatible(file);
         final boolean needToHandleMetadata = BackwardCompatible.needToHandleMetadata(file);
@@ -404,6 +399,10 @@ public class Statements {
         CSVReader csvreader = null;
         Statements s = null;
         
+        final ThreadSafeFileLock.Lock lock = ThreadSafeFileLock.getLock(file);
+        if (lock == null) {
+            return UNKNOWN_STATEMENTS;
+        }
         // http://stackoverflow.com/questions/10868423/lock-lock-before-try
         ThreadSafeFileLock.lockRead(lock);
         
@@ -925,17 +924,16 @@ public class Statements {
             return false;
         }
         
-        final ThreadSafeFileLock.Lock lock = ThreadSafeFileLock.getLock(file);
-        if (lock == null) {
-            return false;
-        }
-        
         boolean status = false;
 
         FileOutputStream fileOutputStream = null;
         OutputStreamWriter outputStreamWriter = null;
         CSVWriter csvwriter = null;
         
+        final ThreadSafeFileLock.Lock lock = ThreadSafeFileLock.getLock(file);
+        if (lock == null) {
+            return false;
+        }
         // http://stackoverflow.com/questions/10868423/lock-lock-before-try
         ThreadSafeFileLock.lockWrite(lock);
         
@@ -1034,6 +1032,7 @@ public class Statements {
         if (lock == null) {
             return false;
         }
+        // http://stackoverflow.com/questions/10868423/lock-lock-before-try
         ThreadSafeFileLock.lockWrite(lock);
         
         try {
@@ -1100,6 +1099,7 @@ public class Statements {
         if (lock == null) {
             return false;
         }
+        // http://stackoverflow.com/questions/10868423/lock-lock-before-try
         ThreadSafeFileLock.lockWrite(lock);
         
         try {
