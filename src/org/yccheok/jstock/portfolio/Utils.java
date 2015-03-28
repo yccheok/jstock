@@ -25,14 +25,19 @@ import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.Country;
+import org.yccheok.jstock.engine.Pair;
 import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.engine.currency.Currency;
 import org.yccheok.jstock.engine.currency.CurrencyPair;
+import org.yccheok.jstock.file.GUIBundleWrapper;
+import org.yccheok.jstock.file.Statement;
+import org.yccheok.jstock.file.Statements;
 import org.yccheok.jstock.gui.JStockOptions;
 import org.yccheok.jstock.gui.JStock;
 
@@ -44,6 +49,40 @@ public class Utils {
 
     // Prevent from being instantiated.
     private Utils() {
+    }
+
+    @Deprecated
+    public static Pair<HashMap<Code, Double>, Long> getCSVStockPrices() {
+        File stockPricesFile = new File(org.yccheok.jstock.portfolio.Utils.getStockPricesFilepath());
+        
+        final HashMap<Code, Double> stockPrices = new HashMap<>();
+        
+        Statements statements = Statements.newInstanceFromCSVFile(stockPricesFile);
+        
+        if (statements.getType() == Statement.Type.StockPrice) {
+            final GUIBundleWrapper guiBundleWrapper = statements.getGUIBundleWrapper();
+            
+            for (int i = 0, ei = statements.size(); i < ei; i++) {
+                Statement statement = statements.get(i);
+                String codeStr = statement.getValueAsString(guiBundleWrapper.getString("MainFrame_Code"));
+                Double price = statement.getValueAsDouble(guiBundleWrapper.getString("MainFrame_Last"));
+                if (codeStr == null || price == null) {
+                    continue;
+                }
+                
+                Code code = Code.newInstance(codeStr);
+                stockPrices.put(code, price);
+            }
+        }
+
+        long _timestamp = 0;
+        try {
+            _timestamp = Long.parseLong(statements.getMetadatas().get("timestamp"));
+        } catch (NumberFormatException ex) {
+            log.error(null, ex);
+        }
+        
+        return Pair.create(stockPrices, _timestamp);
     }
 
     public static boolean shouldConvertPenceToPound(PortfolioRealTimeInfo portfolioRealTimeInfo, Code code) {
