@@ -1029,6 +1029,13 @@ public class Statements {
         }
         boolean status = false;
         FileOutputStream fileOut = null;
+        
+        final ThreadSafeFileLock.Lock lock = ThreadSafeFileLock.getLock(file);
+        if (lock == null) {
+            return false;
+        }
+        ThreadSafeFileLock.lockWrite(lock);
+        
         try {
             fileOut = new FileOutputStream(file);
             wb.write(fileOut);
@@ -1041,6 +1048,9 @@ public class Statements {
         }
         finally {
             org.yccheok.jstock.gui.Utils.close(fileOut);
+            
+            ThreadSafeFileLock.unlockWrite(lock);
+            ThreadSafeFileLock.releaseLock(lock);
         }
         return status;
     }
@@ -1085,6 +1095,13 @@ public class Statements {
         }
         boolean status = false;
         FileOutputStream fileOut = null;
+        
+        final ThreadSafeFileLock.Lock lock = ThreadSafeFileLock.getLock(file);
+        if (lock == null) {
+            return false;
+        }
+        ThreadSafeFileLock.lockWrite(lock);
+        
         try {
             fileOut = new FileOutputStream(file);
             wb.write(fileOut);
@@ -1097,6 +1114,9 @@ public class Statements {
         }
         finally {
             org.yccheok.jstock.gui.Utils.close(fileOut);
+            
+            ThreadSafeFileLock.unlockWrite(lock);
+            ThreadSafeFileLock.releaseLock(lock);
         }
         return status;
     }
