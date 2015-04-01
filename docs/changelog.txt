@@ -1,6 +1,10 @@
 This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.7.3 - 2015-03-25
+  Feature: Better decimal places handling for portfolio. User can now choose
+           2, 3, or 4 decimal places, for their portfolio stock value display.
+           
 JStock 1.0.7.2 - 2015-03-22
   Bugfix:  Fix on stockPricesDirty and currenciesDirty flag.
   Bugfix:  Fix stock currency fetching. (again?!)

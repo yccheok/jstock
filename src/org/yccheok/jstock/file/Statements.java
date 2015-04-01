@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2012 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2015 Yan Cheng Cheok <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,8 +38,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import javax.swing.table.TableModel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -60,8 +58,6 @@ import org.yccheok.jstock.engine.StockNameDatabase;
 import org.yccheok.jstock.engine.Symbol;
 import org.yccheok.jstock.file.GUIBundleWrapper.Language;
 import org.yccheok.jstock.gui.BackwardCompatible;
-import org.yccheok.jstock.gui.JStockOptions;
-import org.yccheok.jstock.gui.JStock;
 import org.yccheok.jstock.gui.POIUtils;
 import org.yccheok.jstock.engine.Pair;
 import org.yccheok.jstock.gui.StockTableModel;
@@ -391,31 +387,10 @@ public class Statements {
      * @param file Given CSV File
      * @return the constructed Statements. UNKNOWN_STATEMENTS if fail
      */
-    public static Statements newInstanceFromCSVFile(File file) {
-        String canonicalPath;
-        try {
-            canonicalPath = file.getCanonicalPath();
-        } catch (IOException ex) {
-            log.error(null, ex);
-            return UNKNOWN_STATEMENTS;
-        }
-        
+    public static Statements newInstanceFromCSVFile(File file) {        
         // FIXME :
         final boolean needToPerformBackwardCompatible = BackwardCompatible.needToPerformBackwardCompatible(file);
         final boolean needToHandleMetadata = BackwardCompatible.needToHandleMetadata(file);
-        
-        Pair<ReentrantReadWriteLock, AtomicInteger> pair;
-        synchronized(reentrantReadWriteLockMapMonitor) {
-            pair = reentrantReadWriteLockMap.get(canonicalPath);
-            if (pair == null) {
-                ReentrantReadWriteLock reentrantReadWriteLock = new ReentrantReadWriteLock();
-                AtomicInteger atomicInteger = new AtomicInteger(1);
-                pair = Pair.create(reentrantReadWriteLock, atomicInteger);
-                reentrantReadWriteLockMap.put(canonicalPath, pair);
-            } else {
-                pair.second.incrementAndGet();
-            }
-        }
                 
         boolean status = false;
 
@@ -424,9 +399,14 @@ public class Statements {
         CSVReader csvreader = null;
         Statements s = null;
         
-        try {
-            pair.first.readLock().lock();
-            
+        final ThreadSafeFileLock.Lock lock = ThreadSafeFileLock.getLock(file);
+        if (lock == null) {
+            return UNKNOWN_STATEMENTS;
+        }
+        // http://stackoverflow.com/questions/10868423/lock-lock-before-try
+        ThreadSafeFileLock.lockRead(lock);
+        
+        try {            
             fileInputStream = new FileInputStream(file);   
                         
             inputStreamReader = new InputStreamReader(fileInputStream,  Charset.forName("UTF-8"));
@@ -522,14 +502,8 @@ public class Statements {
             org.yccheok.jstock.gui.Utils.close(inputStreamReader);
             org.yccheok.jstock.gui.Utils.close(fileInputStream);
             
-            pair.first.readLock().unlock();
-            
-            synchronized(reentrantReadWriteLockMapMonitor) {
-                int counter = pair.second.decrementAndGet();
-                if (counter == 0) {
-                    reentrantReadWriteLockMap.remove(canonicalPath);
-                }
-            }            
+            ThreadSafeFileLock.unlockRead(lock);
+            ThreadSafeFileLock.releaseLock(lock);
         }
 
         if (status) {
@@ -950,36 +924,20 @@ public class Statements {
             return false;
         }
         
-        String canonicalPath;
-        try {
-            canonicalPath = file.getCanonicalPath();
-        } catch (IOException ex) {
-            log.error(null, ex);
-            return false;
-        }
-        
-        Pair<ReentrantReadWriteLock, AtomicInteger> pair;
-        synchronized(reentrantReadWriteLockMapMonitor) {
-            pair = reentrantReadWriteLockMap.get(canonicalPath);
-            if (pair == null) {
-                ReentrantReadWriteLock reentrantReadWriteLock = new ReentrantReadWriteLock();
-                AtomicInteger atomicInteger = new AtomicInteger(1);
-                pair = Pair.create(reentrantReadWriteLock, atomicInteger);
-                reentrantReadWriteLockMap.put(canonicalPath, pair);
-            } else {
-                pair.second.incrementAndGet();
-            }
-        }
-        
         boolean status = false;
 
         FileOutputStream fileOutputStream = null;
         OutputStreamWriter outputStreamWriter = null;
         CSVWriter csvwriter = null;
-
+        
+        final ThreadSafeFileLock.Lock lock = ThreadSafeFileLock.getLock(file);
+        if (lock == null) {
+            return false;
+        }
+        // http://stackoverflow.com/questions/10868423/lock-lock-before-try
+        ThreadSafeFileLock.lockWrite(lock);
+        
         try {
-            pair.first.writeLock().lock();
-            
             fileOutputStream = new FileOutputStream(file);
 
             outputStreamWriter = new OutputStreamWriter(fileOutputStream,  Charset.forName("UTF-8"));
@@ -1030,14 +988,8 @@ public class Statements {
             org.yccheok.jstock.gui.Utils.close(outputStreamWriter);
             org.yccheok.jstock.gui.Utils.close(fileOutputStream);
             
-            pair.first.writeLock().unlock();
-            
-            synchronized(reentrantReadWriteLockMapMonitor) {
-                int counter = pair.second.decrementAndGet();
-                if (counter == 0) {
-                    reentrantReadWriteLockMap.remove(canonicalPath);
-                }
-            }
+            ThreadSafeFileLock.unlockWrite(lock);
+            ThreadSafeFileLock.releaseLock(lock);
         }
 
         return status;
@@ -1075,6 +1027,14 @@ public class Statements {
         }
         boolean status = false;
         FileOutputStream fileOut = null;
+        
+        final ThreadSafeFileLock.Lock lock = ThreadSafeFileLock.getLock(file);
+        if (lock == null) {
+            return false;
+        }
+        // http://stackoverflow.com/questions/10868423/lock-lock-before-try
+        ThreadSafeFileLock.lockWrite(lock);
+        
         try {
             fileOut = new FileOutputStream(file);
             wb.write(fileOut);
@@ -1087,6 +1047,9 @@ public class Statements {
         }
         finally {
             org.yccheok.jstock.gui.Utils.close(fileOut);
+            
+            ThreadSafeFileLock.unlockWrite(lock);
+            ThreadSafeFileLock.releaseLock(lock);
         }
         return status;
     }
@@ -1131,6 +1094,14 @@ public class Statements {
         }
         boolean status = false;
         FileOutputStream fileOut = null;
+        
+        final ThreadSafeFileLock.Lock lock = ThreadSafeFileLock.getLock(file);
+        if (lock == null) {
+            return false;
+        }
+        // http://stackoverflow.com/questions/10868423/lock-lock-before-try
+        ThreadSafeFileLock.lockWrite(lock);
+        
         try {
             fileOut = new FileOutputStream(file);
             wb.write(fileOut);
@@ -1143,6 +1114,9 @@ public class Statements {
         }
         finally {
             org.yccheok.jstock.gui.Utils.close(fileOut);
+            
+            ThreadSafeFileLock.unlockWrite(lock);
+            ThreadSafeFileLock.releaseLock(lock);
         }
         return status;
     }
@@ -1169,10 +1143,6 @@ public class Statements {
     public Statement get(int index) {
         return statements.get(index);
     }
-    
-    private static final Map<String, Pair<ReentrantReadWriteLock, AtomicInteger>> reentrantReadWriteLockMap
-            = new HashMap<String, Pair<ReentrantReadWriteLock, AtomicInteger>>();
-    private static final Object reentrantReadWriteLockMapMonitor = new Object();
     
     private final Statement.Type type;
     private final GUIBundleWrapper guiBundleWrapper;

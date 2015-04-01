@@ -697,8 +697,10 @@ public class ChartJDialog extends javax.swing.JFrame implements WindowListener {
 
         setJMenuBar(jMenuBar1);
 
-        setSize(new java.awt.Dimension(750, 600));
-        setLocationRelativeTo(null);
+        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        setBounds((screenSize.width-750)/2, (screenSize.height-600)/2, 750, 600);
+        //setSize(new java.awt.Dimension(750, 600));
+        //setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void initKeyBindings() {

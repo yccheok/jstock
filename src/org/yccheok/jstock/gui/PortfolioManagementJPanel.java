@@ -2060,7 +2060,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         PortfolioRealTimeInfo _portfolioRealTimeInfo = new PortfolioRealTimeInfo();
         boolean status = _portfolioRealTimeInfo.load(portfolioRealTimeInfoFile);
         if (false == status) {
-            Pair<HashMap<Code, Double>, Long> csvStockPrices = this.getCSVStockPrices();
+            Pair<HashMap<Code, Double>, Long> csvStockPrices = org.yccheok.jstock.portfolio.Utils.getCSVStockPrices();
             _portfolioRealTimeInfo.stockPrices.putAll(csvStockPrices.first);
             _portfolioRealTimeInfo.stockPricesTimestamp = csvStockPrices.second;
             _portfolioRealTimeInfo.stockPricesDirty = !_portfolioRealTimeInfo.stockPrices.isEmpty();
@@ -2352,41 +2352,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             this.portfolioRealTimeInfo
         );
     }
-    
-    @Deprecated
-    private Pair<HashMap<Code, Double>, Long> getCSVStockPrices() {
-        File stockPricesFile = new File(org.yccheok.jstock.portfolio.Utils.getStockPricesFilepath());
         
-        final HashMap<Code, Double> stockPrices = new HashMap<>();
-        
-        Statements statements = Statements.newInstanceFromCSVFile(stockPricesFile);
-        
-        if (statements.getType() == Statement.Type.StockPrice) {
-            final GUIBundleWrapper guiBundleWrapper = statements.getGUIBundleWrapper();
-            
-            for (int i = 0, ei = statements.size(); i < ei; i++) {
-                Statement statement = statements.get(i);
-                String codeStr = statement.getValueAsString(guiBundleWrapper.getString("MainFrame_Code"));
-                Double price = statement.getValueAsDouble(guiBundleWrapper.getString("MainFrame_Last"));
-                if (codeStr == null || price == null) {
-                    continue;
-                }
-                
-                Code code = Code.newInstance(codeStr);
-                stockPrices.put(code, price);
-            }
-        }
-
-        long _timestamp = 0;
-        try {
-            _timestamp = Long.parseLong(statements.getMetadatas().get("timestamp"));
-        } catch (NumberFormatException ex) {
-            log.error(null, ex);
-        }
-        
-        return Pair.create(stockPrices, _timestamp);
-    }
-    
     private boolean savePortfolioRealTimeInfo(String directory, PortfolioRealTimeInfo portfolioRealTimeInfo) {
         PortfolioRealTimeInfo _portfolioRealTimeInfo = new PortfolioRealTimeInfo(portfolioRealTimeInfo);
         
@@ -2940,11 +2906,13 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             realizedProfitPercentage = sellPortfolioTreeTableModel.getGainLossPercentage(localCurrency);
         }
         
-        final String _share = org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlace.Two, share);
-        final String _cash = org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlace.Two, cash);
-        final String _paperProfit = org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlace.Two, paperProfit);
+        final DecimalPlace decimalPlace = jStockOptions.getDecimalPlace();
+        
+        final String _share = org.yccheok.jstock.portfolio.Utils.toCurrency(decimalPlace, share);
+        final String _cash = org.yccheok.jstock.portfolio.Utils.toCurrency(decimalPlace, cash);
+        final String _paperProfit = org.yccheok.jstock.portfolio.Utils.toCurrency(decimalPlace, paperProfit);
         final String _paperProfitPercentage = org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlace.Two, paperProfitPercentage);
-        final String _realizedProfit = org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlace.Two, realizedProfit);
+        final String _realizedProfit = org.yccheok.jstock.portfolio.Utils.toCurrency(decimalPlace, realizedProfit);
         final String _realizedProfitPercentage = org.yccheok.jstock.portfolio.Utils.toCurrency(DecimalPlace.Two, realizedProfitPercentage);
         
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
