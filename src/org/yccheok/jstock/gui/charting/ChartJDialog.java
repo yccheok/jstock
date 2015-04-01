@@ -22,6 +22,7 @@ package org.yccheok.jstock.gui.charting;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -34,11 +35,15 @@ import java.text.SimpleDateFormat;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.ComboBoxModel;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -127,6 +132,7 @@ public class ChartJDialog extends javax.swing.JFrame implements WindowListener {
         this.setIconImage(parent.getIconImage());
                 
         initComponents();
+        initKeyBindings(); 
 
         // Must initialized first before any other operations. Our objective
         // is to show this chart as fast as possible. Hence, we will pass in
@@ -691,12 +697,23 @@ public class ChartJDialog extends javax.swing.JFrame implements WindowListener {
 
         setJMenuBar(jMenuBar1);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-750)/2, (screenSize.height-600)/2, 750, 600);
-        //setSize(new java.awt.Dimension(750, 600));
-        //setLocationRelativeTo(null);
+        setSize(new java.awt.Dimension(750, 600));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    private void initKeyBindings() {
+        KeyStroke escapeKeyStroke = KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_ESCAPE, 0, false);
+        Action escapeAction = new AbstractAction() {
+            // close the frame when the user presses escape
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+            }
+        }; 
+
+        getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(escapeKeyStroke, "ESCAPE");
+        getRootPane().getActionMap().put("ESCAPE", escapeAction);
+    }
+    
     private ComboBoxModel getComboBoxModel() {
         return new javax.swing.DefaultComboBoxModel(new String[] { 
             GUIBundle.getString("ChartJDialog_Daily"),

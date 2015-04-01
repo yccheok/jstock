@@ -56,7 +56,8 @@ public enum Index {
     TWII(Country.Taiwan, "TSEC", "Taiwan Stock Exchange Weighted Index", Code.newInstance("^TWII")),
     FTSE(Country.UnitedKingdom, "FTSE 100", "FTSE 100 Index", Code.newInstance("^FTSE")),
     DJI(Country.UnitedState, "DOW JONES", "Dow Jones Industrial Average", Code.newInstance("^DJI")),
-    IXIC(Country.UnitedState, "NASDAQ", "NASDAQ Composite Index", Code.newInstance("^IXIC"));
+    IXIC(Country.UnitedState, "NASDAQ", "NASDAQ Composite Index", Code.newInstance("^IXIC")),
+    SP500(Country.UnitedState, "S&P500", "Standard and Poors 500 Index", Code.newInstance("^GSPC"));
     
     Index(Country country, String name, String longName, Code code) {
         this.country = country;
