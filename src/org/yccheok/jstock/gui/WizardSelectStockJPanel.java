@@ -635,12 +635,12 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
         }
     }
     
-    private java.util.List<javax.swing.JCheckBox> boardCheckBoxes = new java.util.ArrayList<javax.swing.JCheckBox>();
-    private java.util.List<javax.swing.JCheckBox> industryCheckBoxes = new java.util.ArrayList<javax.swing.JCheckBox>();
-    private java.util.Map<javax.swing.JCheckBox, Stock.Industry> checkBoxToIndustry = new java.util.HashMap<javax.swing.JCheckBox, Stock.Industry>();
-    private java.util.Map<javax.swing.JCheckBox, Stock.Board> checkBoxToBoard = new java.util.HashMap<javax.swing.JCheckBox, Stock.Board>();
+    private final java.util.List<javax.swing.JCheckBox> boardCheckBoxes = new java.util.ArrayList<>();
+    private final java.util.List<javax.swing.JCheckBox> industryCheckBoxes = new java.util.ArrayList<>();
+    private final java.util.Map<javax.swing.JCheckBox, Stock.Industry> checkBoxToIndustry = new java.util.HashMap<>();
+    private final java.util.Map<javax.swing.JCheckBox, Board> checkBoxToBoard = new java.util.HashMap<>();
     
-    private java.util.List<StockInfo> selectedStockInfos = new java.util.ArrayList<StockInfo>();
+    private final java.util.List<StockInfo> selectedStockInfos = new java.util.ArrayList<>();
     
     private static final Log log = LogFactory.getLog(WizardSelectStockJPanel.class);
     

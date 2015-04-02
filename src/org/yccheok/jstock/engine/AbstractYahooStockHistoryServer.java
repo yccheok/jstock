@@ -108,7 +108,7 @@ public abstract class AbstractYahooStockHistoryServer implements StockHistorySer
 
         Symbol symbol = Symbol.newInstance(code.toString());
         String name = symbol.toString();
-        Stock.Board board = Stock.Board.Unknown;
+        Board board = Board.Unknown;
         Stock.Industry industry = Stock.Industry.Unknown;
 
         try {
