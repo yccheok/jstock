@@ -30,9 +30,15 @@ public class Board implements Comparable<Board> {
         this.board = board;
     }
     
-    public static Board newInstance(String board) {
+    public static Board valueOf(String board) {
         if (board == null) {
             throw new java.lang.IllegalArgumentException("board cannot be null");
+        }
+        
+        board = board.trim();
+        
+        if (board.isEmpty()) {
+            throw new java.lang.IllegalArgumentException("board cannot be empty");
         }
         
         Board result = map.get(board);
@@ -92,6 +98,6 @@ public class Board implements Comparable<Board> {
     private static final ConcurrentHashMap<String, Board> map = new ConcurrentHashMap<>();
     
     // Common used board.
-    public static final Board Unknown = Board.newInstance("Unknown");
-    public static final Board UserDefined = Board.newInstance("UserDefined");
+    public static final Board Unknown = Board.valueOf("Unknown");
+    public static final Board UserDefined = Board.valueOf("UserDefined");
 }

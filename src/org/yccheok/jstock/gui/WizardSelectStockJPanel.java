@@ -516,7 +516,7 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
              for (JCheckBox checkBox : boardCheckBoxes) {
                 if (checkBox.isSelected() == false) continue;
 
-                final Stock.Board board = this.checkBoxToBoard.get(checkBox);
+                final Board board = this.checkBoxToBoard.get(checkBox);
 
                 if (board == null) {
                     log.error("Wrong text in JCheckBox GUI : " + checkBox.getText());
@@ -577,11 +577,11 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
             checkBox.setVisible(false);
         }
         
-        java.util.List<Stock.Board> sortedBoards = stockInfoDatabase.getBoards();
+        java.util.List<Board> sortedBoards = stockInfoDatabase.getBoards();
         Collections.sort(sortedBoards);
         
         int count = 0;
-        for (Stock.Board board : sortedBoards) {
+        for (Board board : sortedBoards) {
             if (count >= boardCheckBoxes.size()) {
                 log.error("You do not have enough check box components (" + boardCheckBoxes.size() + ") to hold board (" + sortedBoards.size() + ")");
                 break;

@@ -68,7 +68,7 @@ public class Utils {
                             symbol,
                             "",
                             null,
-                            Stock.Board.Unknown,
+                            Board.Unknown,
                             Stock.Industry.Unknown,
                             0.0,
                             0.0,

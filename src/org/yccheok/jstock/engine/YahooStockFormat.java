@@ -182,7 +182,7 @@ public class YahooStockFormat implements StockFormat {
             Code code = null;
             Symbol symbol = null;
             String name = null;
-            Stock.Board board = null;
+            Board board = null;
             Stock.Industry industry = null;
             double prevPrice = 0.0;
             double openPrice = 0.0;
@@ -220,10 +220,10 @@ public class YahooStockFormat implements StockFormat {
                 if (length < 3) break;
                 
                 try {
-                    board = Stock.Board.valueOf(quotePattern.matcher(fields[2]).replaceAll("").trim());
+                    board = Board.valueOf(quotePattern.matcher(fields[2]).replaceAll("").trim());
                 }
                 catch (java.lang.IllegalArgumentException exp) {
-                    board = Stock.Board.Unknown;
+                    board = Board.Unknown;
                 }
                 
                 industry = Stock.Industry.Unknown;
