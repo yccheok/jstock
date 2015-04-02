@@ -48,7 +48,7 @@ public class MutableStock {
         return stock.getName();
     }
 
-    public Stock.Board getBoard() {
+    public Board getBoard() {
         return stock.getBoard();
     }
     

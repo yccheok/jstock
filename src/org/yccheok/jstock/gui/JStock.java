@@ -50,7 +50,6 @@ import org.yccheok.jstock.analysis.Indicator;
 import org.yccheok.jstock.analysis.OperatorIndicator;
 import org.yccheok.jstock.engine.*;
 import org.yccheok.jstock.engine.ResultType;
-import org.yccheok.jstock.engine.Stock.Board;
 import org.yccheok.jstock.engine.Stock.Industry;
 import org.yccheok.jstock.file.Atom;
 import org.yccheok.jstock.file.GUIBundleWrapper;

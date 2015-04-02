@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author yccheok
  */
-public class Board {
+public class Board implements Comparable<Board> {
     private Board(String board) {
         this.board = board;
     }
@@ -57,6 +57,11 @@ public class Board {
     }
     
     @Override
+    public int compareTo(Board o) {
+        return this.board.compareTo(o.board);
+    }
+    
+    @Override
     public boolean equals(Object o) {
         if (o == this) {
             return true;
@@ -74,7 +79,19 @@ public class Board {
         return board;
     }
     
+    /***************************************************************************
+     * Emulate enum's member methods.
+     **************************************************************************/
+    public String name() {
+        return board;
+    }
+    
+    private final String board;
+    
     // Avoid using interface. We want it to be fast!
     private static final ConcurrentHashMap<String, Board> map = new ConcurrentHashMap<>();
-    private final String board;
+    
+    // Common used board.
+    public static final Board Unknown = Board.newInstance("Unknown");
+    public static final Board UserDefined = Board.newInstance("UserDefined");
 }
