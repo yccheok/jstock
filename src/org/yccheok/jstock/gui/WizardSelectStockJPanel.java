@@ -533,7 +533,7 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
              for (JCheckBox checkBox : industryCheckBoxes) {
                 if (checkBox.isSelected() == false) continue;
 
-                final Stock.Industry industry = this.checkBoxToIndustry.get(checkBox);
+                final Industry industry = this.checkBoxToIndustry.get(checkBox);
 
                 if (industry == null) {
                     log.error("Wrong text in JCheckBox GUI : " + checkBox.getText());
@@ -618,11 +618,11 @@ public class WizardSelectStockJPanel extends javax.swing.JPanel {
             checkBox.setVisible(false);
         }
         
-        java.util.List<Stock.Industry> sortedIndustries = stockInfoDatabase.getIndustries();
+        java.util.List<Industry> sortedIndustries = stockInfoDatabase.getIndustries();
         Collections.sort(sortedIndustries);
         
         int count = 0;
-        for (Stock.Industry industry : sortedIndustries) {
+        for (Industry industry : sortedIndustries) {
             if (count >= industryCheckBoxes.size()) {
                 log.error("You do not have enough check box components (" + industryCheckBoxes.size() + ") to hold industry (" + sortedIndustries.size() + ")");
                 break;
