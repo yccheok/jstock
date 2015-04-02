@@ -32,7 +32,7 @@ import java.util.*;
 import org.apache.commons.httpclient.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.yccheok.jstock.engine.Stock.Industry;
+import org.yccheok.jstock.engine.Industry;
 import org.yccheok.jstock.file.Statements;
 import org.yccheok.jstock.gui.JStock;
 

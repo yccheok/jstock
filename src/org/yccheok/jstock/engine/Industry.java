@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author yccheok
  */
-public class Industry {
+public class Industry implements Comparable<Industry> {
     private Industry(String industry) {
         this.industry = industry;
     }
@@ -60,6 +60,11 @@ public class Industry {
         result = 31 * result + industry.hashCode();
         
         return result;
+    }
+    
+    @Override
+    public int compareTo(Industry o) {
+        return this.industry.compareTo(o.industry);
     }
     
     @Override
