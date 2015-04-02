@@ -71,7 +71,7 @@ public class StockInfoDatabase {
         for (Stock stock : stocks) {
             final Code code = stock.code;
             final Symbol symbol = stock.symbol;
-            final Stock.Industry industry = stock.getIndustry();
+            final Industry industry = stock.getIndustry();
             final Board board = stock.getBoard();
 
             StockInfo stockInfo = StockInfo.newInstance(code, symbol);
@@ -262,7 +262,7 @@ public class StockInfoDatabase {
     public boolean removeAllUserDefinedStockInfos() {
         writer.lock();
         try {
-            List<StockInfo> _stockInfos = this.industryToStockInfos.get(Stock.Industry.UserDefined);
+            List<StockInfo> _stockInfos = this.industryToStockInfos.get(Industry.UserDefined);
             if (_stockInfos == null) {
                 return false;
             }
@@ -288,7 +288,7 @@ public class StockInfoDatabase {
             throw new java.lang.IllegalArgumentException("Stock info length cannot be 0");
         }
 
-        final Stock.Industry industry = Stock.Industry.UserDefined;
+        final Industry industry = Industry.UserDefined;
         final Board board = Board.UserDefined;
 
         // Do call getStockInfos(Stock.Industry) and
@@ -362,7 +362,7 @@ public class StockInfoDatabase {
         reader.lock();
         try {
             List<StockInfo> _stockInfos = new ArrayList<StockInfo>(stockInfos);
-            List<StockInfo> userDefinedStockInfos = this.industryToStockInfos.get(Stock.Industry.UserDefined);
+            List<StockInfo> userDefinedStockInfos = this.industryToStockInfos.get(Industry.UserDefined);
             if (userDefinedStockInfos != null) {
                 _stockInfos.removeAll(userDefinedStockInfos);
             }
@@ -381,14 +381,14 @@ public class StockInfoDatabase {
     public List<StockInfo> getUserDefinedStockInfos() {
         reader.lock();
         try {
-            List<StockInfo> _stockInfos = this.industryToStockInfos.get(Stock.Industry.UserDefined);
+            List<StockInfo> _stockInfos = this.industryToStockInfos.get(Industry.UserDefined);
             if (_stockInfos == null) {
                 // Do not return Collections.emptyList(), as the returned list
                 // need to be a mutable list.
-                return new ArrayList<StockInfo>();
+                return new ArrayList<>();
             }
             // Construct a new list as StockInfoDatabase is a mutable class.
-            return new ArrayList<StockInfo>(_stockInfos);
+            return new ArrayList<>(_stockInfos);
         } finally {
             reader.unlock();
         }
@@ -445,7 +445,7 @@ public class StockInfoDatabase {
         ((TSTSearchEngine<StockInfo>)this.codeSearchEngine).put(stockInfo);
 
         // Update board and industry mapping.
-        final Stock.Industry industry = Stock.Industry.UserDefined;
+        final Industry industry = Industry.UserDefined;
         final Board board = Board.UserDefined;
 
         List<StockInfo> _stockInfos = this.industryToStockInfos.get(industry);

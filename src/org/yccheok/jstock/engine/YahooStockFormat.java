@@ -183,7 +183,7 @@ public class YahooStockFormat implements StockFormat {
             Symbol symbol = null;
             String name = null;
             Board board = null;
-            Stock.Industry industry = null;
+            Industry industry = null;
             double prevPrice = 0.0;
             double openPrice = 0.0;
             double lastPrice = 0.0;    
@@ -226,7 +226,7 @@ public class YahooStockFormat implements StockFormat {
                     board = Board.Unknown;
                 }
                 
-                industry = Stock.Industry.Unknown;
+                industry = Industry.Unknown;
                 
                 if (length < 5) break;
                 try { prevPrice = Double.parseDouble(fields[4]); } catch (NumberFormatException exp) {}

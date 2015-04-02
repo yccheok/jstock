@@ -232,7 +232,7 @@ public class KLSEInfoStockHistoryServer implements StockHistoryServer {
         Symbol symbol = Symbol.newInstance(code.toString());
         String name = symbol.toString();
         Board board = Board.Unknown;
-        Stock.Industry industry = Stock.Industry.Unknown;
+        Industry industry = Industry.Unknown;
 
         try {
             Stock stock = stockServer.getStock(code);

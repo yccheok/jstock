@@ -46,7 +46,7 @@ public class StatementsStockHistoryServer implements StockHistoryServer {
             Symbol symbol = Symbol.newInstance(metadatas.get("symbol"));
             String name = metadatas.get("name");
             Board board = Board.valueOf(metadatas.get("board"));
-            Stock.Industry industry = Stock.Industry.valueOf(metadatas.get("industry"));
+            Industry industry = Industry.valueOf(metadatas.get("industry"));
             
             Stock stock = new Stock(
                     code,
