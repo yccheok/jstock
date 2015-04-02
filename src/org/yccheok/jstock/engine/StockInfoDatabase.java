@@ -72,7 +72,7 @@ public class StockInfoDatabase {
             final Code code = stock.code;
             final Symbol symbol = stock.symbol;
             final Stock.Industry industry = stock.getIndustry();
-            final Stock.Board board = stock.getBoard();
+            final Board board = stock.getBoard();
 
             StockInfo stockInfo = StockInfo.newInstance(code, symbol);
             StockInfoWithSymbolAsString stockInfoWithSymbolAsString = new StockInfoWithSymbolAsString(code, symbol);
@@ -224,7 +224,7 @@ public class StockInfoDatabase {
      * @param board the board
      * @return a list of stock info based on given board
      */
-    public List<StockInfo> getStockInfos(Stock.Board board) {
+    public List<StockInfo> getStockInfos(Board board) {
         reader.lock();
         try {
             final List<StockInfo> list = this.boardToStockInfos.get(board);
@@ -289,7 +289,7 @@ public class StockInfoDatabase {
         }
 
         final Stock.Industry industry = Stock.Industry.UserDefined;
-        final Stock.Board board = Stock.Board.UserDefined;
+        final Board board = Board.UserDefined;
 
         // Do call getStockInfos(Stock.Industry) and
         // getStockInfos(Stock.Board), which will give you heavy performance 
@@ -446,7 +446,7 @@ public class StockInfoDatabase {
 
         // Update board and industry mapping.
         final Stock.Industry industry = Stock.Industry.UserDefined;
-        final Stock.Board board = Stock.Board.UserDefined;
+        final Board board = Board.UserDefined;
 
         List<StockInfo> _stockInfos = this.industryToStockInfos.get(industry);
         if (_stockInfos == null) {
@@ -561,11 +561,11 @@ public class StockInfoDatabase {
      *
      * @return list of all the stock board of this database
      */
-    public List<Stock.Board> getBoards() {
+    public List<Board> getBoards() {
         reader.lock();
         try {
             // Construct a new list as StockInfoDatabase is a mutable class.
-            return new ArrayList<Stock.Board>(this.boardToStockInfos.keySet());
+            return new ArrayList<Board>(this.boardToStockInfos.keySet());
         } finally {
             reader.unlock();
         }
@@ -592,7 +592,7 @@ public class StockInfoDatabase {
     // Stock industry to list of stock info mapping.
     private final Map<Stock.Industry, List<StockInfo>> industryToStockInfos = new EnumMap<Stock.Industry, List<StockInfo>>(Stock.Industry.class);
     // Stock board to list of stock info mapping.
-    private final Map<Stock.Board, List<StockInfo>> boardToStockInfos = new EnumMap<Stock.Board, List<StockInfo>>(Stock.Board.class);
+    private final Map<Board, List<StockInfo>> boardToStockInfos = new HashMap<>();
 
     // Symbol to list of stock info mapping.
     private transient Map<Symbol, List<StockInfo>> symbolToStockInfos = new HashMap<Symbol, List<StockInfo>>();
