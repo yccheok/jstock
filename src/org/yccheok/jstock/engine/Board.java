@@ -85,9 +85,6 @@ public class Board implements Comparable<Board> {
         return board;
     }
     
-    /***************************************************************************
-     * Emulate enum's member methods.
-     **************************************************************************/
     public String name() {
         return board;
     }

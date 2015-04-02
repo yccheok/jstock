@@ -203,7 +203,7 @@ public class StockInfoDatabase {
      * @param industry the industry
      * @return a list of stock info based on given industry
      */
-    public List<StockInfo> getStockInfos(Stock.Industry industry) {
+    public List<StockInfo> getStockInfos(Industry industry) {
         reader.lock();
         try {
             final List<StockInfo> list = this.industryToStockInfos.get(industry);
@@ -577,11 +577,11 @@ public class StockInfoDatabase {
      * 
      * @return list of all the stock industry of this database
      */
-    public List<Stock.Industry> getIndustries() {
+    public List<Industry> getIndustries() {
         reader.lock();
         try {
             // Construct a new list as StockInfoDatabase is a mutable class.
-            return new ArrayList<Stock.Industry>(this.industryToStockInfos.keySet());
+            return new ArrayList<Industry>(this.industryToStockInfos.keySet());
         } finally {
             reader.unlock();
         }
@@ -590,7 +590,7 @@ public class StockInfoDatabase {
     // Entire stock info of this database.
     private final List<StockInfo> stockInfos = new ArrayList<StockInfo>();
     // Stock industry to list of stock info mapping.
-    private final Map<Stock.Industry, List<StockInfo>> industryToStockInfos = new EnumMap<Stock.Industry, List<StockInfo>>(Stock.Industry.class);
+    private final Map<Industry, List<StockInfo>> industryToStockInfos = new HashMap<>();
     // Stock board to list of stock info mapping.
     private final Map<Board, List<StockInfo>> boardToStockInfos = new HashMap<>();
 

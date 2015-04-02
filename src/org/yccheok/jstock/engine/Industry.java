@@ -30,9 +30,15 @@ public class Industry {
         this.industry = industry;
     }
     
-    public static Industry newInstance(String industry) {
+    public static Industry valueOf(String industry) {
         if (industry == null) {
             throw new java.lang.IllegalArgumentException("industry cannot be null");
+        }
+        
+        industry = industry.trim();
+        
+        if (industry.isEmpty()) {
+            throw new java.lang.IllegalArgumentException("industry cannot be empty");
         }
         
         Industry result = map.get(industry);
@@ -74,7 +80,16 @@ public class Industry {
         return industry;
     }
     
+    public String name() {
+        return industry;
+    }
+    
+    private final String industry;
+    
     // Avoid using interface. We want it to be fast!
     private static final ConcurrentHashMap<String, Industry> map = new ConcurrentHashMap<>();
-    private final String industry;
+    
+    // Common used industry.
+    public static final Industry Unknown = Industry.valueOf("Unknown");
+    public static final Industry UserDefined = Industry.valueOf("UserDefined");
 }

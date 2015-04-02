@@ -50,7 +50,7 @@ import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.yccheok.jstock.engine.Board;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.Stock;
-import org.yccheok.jstock.engine.Stock.Industry;
+import org.yccheok.jstock.engine.Industry;
 import org.yccheok.jstock.engine.StockHistoryServer;
 import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.engine.StockInfoDatabase;

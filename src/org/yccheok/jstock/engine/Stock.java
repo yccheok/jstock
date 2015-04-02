@@ -613,39 +613,6 @@ public class Stock {
     public String toString() {
         return symbol.toString();
     }
-        
-    public enum Industry {
-                                                    // The following are naming conventions from CIMB :
-        ConsumerProducts("Consumer Products"),      // CONSUMER
-        IndustrialProducts("Industrial Products"),  // IND-PROD
-        Construction("Construction"),               // CONSTRUCTN
-        TradingServices("Trading / Services"),      // TRAD/SERV
-        Technology("Technology"),                   // TECHNOLOGY
-        Infrastructure("Infrastructure"),           // IPC
-        Finance("Finance"),                         // FINANCE
-        Hotels("Hotels"),                           // HOTELS
-        Properties("Properties"),                   // PROPERTIES 
-        Plantation("Plantation"),                   // PLANTATION
-        Mining("Mining"),                           // MINING
-        Trusts("Trusts"),                           // REITS
-        CloseEndFund("Close-End Fund"),             // CLOSED/FUND 
-        ETF("ETF"),                                 // ETF
-        Loans("Loans"),                             // LOANS
-        CallWarrant("Call Warrant"),                // CALL-WARR
-        UserDefined("User Defined"),
-        Unknown("Unknown");
-        
-        private final String name;
-
-        Industry(String name) {
-            this.name = name;
-        }
-        
-        @Override
-        public String toString() {
-            return name;
-        }
-    }
             
     public final Code code;
     public final Symbol symbol;
