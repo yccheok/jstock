@@ -933,7 +933,6 @@ public class Utils {
         defaultPriceSources.put(Country.Korea, PriceSource.Yahoo);
         defaultPriceSources.put(Country.Malaysia, PriceSource.KLSEInfo);
         defaultPriceSources.put(Country.Netherlands, PriceSource.Yahoo);
-        defaultPriceSources.put(Country.Netherlands, PriceSource.Google);
         defaultPriceSources.put(Country.NewZealand, PriceSource.Yahoo);
         defaultPriceSources.put(Country.Norway, PriceSource.Yahoo);
         defaultPriceSources.put(Country.Portugal, PriceSource.Yahoo);
