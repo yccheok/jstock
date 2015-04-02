@@ -808,15 +808,15 @@ public class Utils {
         return set;
     }
     
-    private static final Map<String, Country> countries = new HashMap<String, Country>();
-    private static final Map<String, Country> indices = new HashMap<String, Country>();
-    private static final Map<String, String> toGoogleIndex = new HashMap<String, String>();
-    private static final Map<Country, PriceSource> defaultPriceSources = new HashMap<Country, PriceSource>();
-    private static final Map<Class<? extends StockServerFactory>, PriceSource> classToPriceSourceMap = new HashMap<Class<? extends StockServerFactory>, PriceSource>();
-    private static final Map<String, Integer> googleUnitedStatesStockExchanges = new HashMap<String, Integer>();
+    private static final Map<String, Country> countries = new HashMap<>();
+    private static final Map<String, Country> indices = new HashMap<>();
+    private static final Map<String, String> toGoogleIndex = new HashMap<>();
+    private static final Map<Country, PriceSource> defaultPriceSources = new EnumMap<>(Country.class);
+    private static final Map<Class<? extends StockServerFactory>, PriceSource> classToPriceSourceMap = new HashMap<>();
+    private static final Map<String, Integer> googleUnitedStatesStockExchanges = new HashMap<>();
     
-    private static final Map<String, String> oneLetterSuffixes = new HashMap<String, String>();
-    private static final Map<String, String> twoLetterSuffixes = new HashMap<String, String>();
+    private static final Map<String, String> oneLetterSuffixes = new HashMap<>();
+    private static final Map<String, String> twoLetterSuffixes = new HashMap<>();
     
     static {
         oneLetterSuffixes.put(".N", "NSE:");
@@ -833,6 +833,7 @@ public class Utils {
         twoLetterSuffixes.put(".ST", "STO:");
         twoLetterSuffixes.put(".AX", "ASX:");
         twoLetterSuffixes.put(".BR", "EBR:");
+        twoLetterSuffixes.put(".AS", "AMS:");
         
         countries.put("AX", Country.Australia);
         countries.put("VI", Country.Austria);
@@ -909,6 +910,7 @@ public class Utils {
         toGoogleIndex.put("^AXJO", "INDEXASX:XJO");
         toGoogleIndex.put("^AORD", "INDEXASX:XAO");
         toGoogleIndex.put("^BFX", "INDEXEURO:BEL20");
+        toGoogleIndex.put("^AEX", "INDEXEURO:AEX");
         
         // TODO : Need revision. We no longer have primaryStockServerFactoryClasses
         // concept. Going to replace with PriceSource.
@@ -931,6 +933,7 @@ public class Utils {
         defaultPriceSources.put(Country.Korea, PriceSource.Yahoo);
         defaultPriceSources.put(Country.Malaysia, PriceSource.KLSEInfo);
         defaultPriceSources.put(Country.Netherlands, PriceSource.Yahoo);
+        defaultPriceSources.put(Country.Netherlands, PriceSource.Google);
         defaultPriceSources.put(Country.NewZealand, PriceSource.Yahoo);
         defaultPriceSources.put(Country.Norway, PriceSource.Yahoo);
         defaultPriceSources.put(Country.Portugal, PriceSource.Yahoo);

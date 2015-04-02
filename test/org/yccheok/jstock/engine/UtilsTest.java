@@ -124,6 +124,11 @@ public class UtilsTest extends TestCase {
         result = Utils.toGoogleFormat(code);
         assertEquals(expResult, result);
 
+        code = Code.newInstance("^AEX");
+        expResult = "INDEXEURO:AEX";
+        result = Utils.toGoogleFormat(code);
+        assertEquals(expResult, result);
+        
         code = Code.newInstance("USDMYR=X");
         expResult = "CURRENCY:USDMYR";
         result = Utils.toGoogleFormat(code);
