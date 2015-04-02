@@ -142,7 +142,7 @@ public class GoogleStockHistoryServer implements StockHistoryServer {
         Symbol symbol = Symbol.newInstance(code.toString());
         String name = symbol.toString();
         Board board = Board.Unknown;
-        Stock.Industry industry = Stock.Industry.Unknown;
+        Industry industry = Industry.Unknown;
         Calendar calendar = null;
         boolean initialized = false;
         
