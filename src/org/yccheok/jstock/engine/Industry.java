@@ -46,7 +46,7 @@ public class Industry implements Comparable<Industry> {
             final Industry instance = new Industry(industry);
             result = map.putIfAbsent(industry, instance);
             if (result == null) {
-                return instance;
+                result = instance;
             }
         }
         

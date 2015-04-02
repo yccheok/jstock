@@ -46,7 +46,7 @@ public class Board implements Comparable<Board> {
             final Board instance = new Board(board);
             result = map.putIfAbsent(board, instance);
             if (result == null) {
-                return instance;
+                result = instance;
             }
         }
         
