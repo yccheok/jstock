@@ -467,13 +467,8 @@ public class JStock extends javax.swing.JFrame {
         this.jTable1.getModel().addTableModelListener(this.getTableModelListener());
 
         this.jTable1.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(1));
-        this.jTable1.addMouseListener(new TableRowPopupListener());
+        this.jTable1.addMouseListener(new TableMouseAdapter());
         this.jTable1.addKeyListener(new TableKeyEventListener());
-        jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jTable1MouseClicked(evt);
-            }
-        });
         jTable1.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 jTable1KeyPressed(evt);
@@ -664,24 +659,24 @@ public class JStock extends javax.swing.JFrame {
 
         jMenu9.setText(bundle.getString("MainFrame_Watchlist")); // NOI18N
         jMenu9.addMenuListener(new javax.swing.event.MenuListener() {
-            public void menuSelected(javax.swing.event.MenuEvent evt) {
-                jMenu9MenuSelected(evt);
+            public void menuCanceled(javax.swing.event.MenuEvent evt) {
             }
             public void menuDeselected(javax.swing.event.MenuEvent evt) {
             }
-            public void menuCanceled(javax.swing.event.MenuEvent evt) {
+            public void menuSelected(javax.swing.event.MenuEvent evt) {
+                jMenu9MenuSelected(evt);
             }
         });
         jMenuBar2.add(jMenu9);
 
         jMenu8.setText(bundle.getString("MainFrame_Portfolio")); // NOI18N
         jMenu8.addMenuListener(new javax.swing.event.MenuListener() {
-            public void menuSelected(javax.swing.event.MenuEvent evt) {
-                jMenu8MenuSelected(evt);
+            public void menuCanceled(javax.swing.event.MenuEvent evt) {
             }
             public void menuDeselected(javax.swing.event.MenuEvent evt) {
             }
-            public void menuCanceled(javax.swing.event.MenuEvent evt) {
+            public void menuSelected(javax.swing.event.MenuEvent evt) {
+                jMenu8MenuSelected(evt);
             }
         });
         jMenuBar2.add(jMenu8);
@@ -1634,14 +1629,6 @@ public class JStock extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_jRadioButtonMenuItem6ActionPerformed
-
-    private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
-        if (evt.getClickCount() == 2) {
-           // by definition of a dbl-click this will always only show one chart
-           // because the dbl-click action cannot have multiple items selected 
-           displayHistoryCharts(); 
-        }
-    }//GEN-LAST:event_jTable1MouseClicked
     
     /**
      * Activate specified watchlist.
@@ -4413,8 +4400,7 @@ public class JStock extends javax.swing.JFrame {
         return new javax.swing.ImageIcon(getClass().getResource(imageIcon));
     }
     
-    private class TableRowPopupListener extends MouseAdapter {
-        
+    private class TableMouseAdapter extends MouseAdapter {        
         @Override
         public void mouseClicked(MouseEvent evt) {
             int[] rows = JStock.this.jTable1.getSelectedRows();
@@ -4429,6 +4415,12 @@ public class JStock extends javax.swing.JFrame {
             } else {
                 updateDynamicChart(null);
                 
+            }
+            
+            if (evt.getClickCount() == 2) {
+               // by definition of a dbl-click this will always only show one chart
+               // because the dbl-click action cannot have multiple items selected 
+               displayHistoryCharts(); 
             }
         }
         
