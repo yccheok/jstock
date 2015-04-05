@@ -4437,7 +4437,7 @@ public class JStock extends javax.swing.JFrame {
         private void maybeShowPopup(MouseEvent e) {
             if (e.isPopupTrigger()) {
                 if (jTable1.getSelectedRowCount() <= 1) {
-                   SetFocusToRightClickLocation(e, jTable1); 
+                   setFocusToRightClickLocation(e, jTable1); 
                 }
                 if (jTable1.getSelectedRowCount() > 0) {
                     getMyJTablePopupMenu().show(e.getComponent(), e.getX(), e.getY());
@@ -4445,7 +4445,7 @@ public class JStock extends javax.swing.JFrame {
             }
         }
 
-        private void SetFocusToRightClickLocation(MouseEvent e, JTable table) {
+        private void setFocusToRightClickLocation(MouseEvent e, JTable table) {
     	    // get the coordinates of the mouse click
 	    Point p = e.getPoint();
  
