@@ -991,7 +991,7 @@ public class ChartJDialog extends javax.swing.JFrame implements WindowListener {
             return;
         }
 
-        double high_price = Double.NEGATIVE_INFINITY;
+        double high_price = -Double.MAX_VALUE;
         double low_price = Double.MAX_VALUE;
         final DefaultHighLowDataset defaultHighLowDataset = (DefaultHighLowDataset)this.priceOHLCDataset;
         for (int i = best_mid; i >= 0; i--) {
