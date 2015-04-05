@@ -64,6 +64,11 @@ public class UtilsTest extends TestCase {
         String result = Utils.toGoogleFormat(code);
         assertEquals(expResult, result);
         
+        code = Code.newInstance("^GSPC");
+        expResult = "INDEXSP:.INX";
+        result = Utils.toGoogleFormat(code);
+        assertEquals(expResult, result);
+
         code = Code.newInstance("^IXIC");
         expResult = "INDEXNASDAQ:.IXIC";
         result = Utils.toGoogleFormat(code);

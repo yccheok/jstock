@@ -898,6 +898,7 @@ public class Utils {
         
         toGoogleIndex.put("^DJI", "INDEXDJX:.DJI");
         toGoogleIndex.put("^IXIC", "INDEXNASDAQ:.IXIC");
+        toGoogleIndex.put("^GSPC", "INDEXSP:.INX");
         toGoogleIndex.put("^BSESN", "INDEXBOM:SENSEX");
         toGoogleIndex.put("^NSEI", "NSE:NIFTY");
         toGoogleIndex.put("^NSEBANK", "NSE:BANKNIFTY");
