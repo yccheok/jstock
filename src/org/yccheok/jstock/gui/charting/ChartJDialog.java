@@ -22,7 +22,10 @@ package org.yccheok.jstock.gui.charting;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
 import java.awt.event.ComponentEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.File;
 import org.yccheok.jstock.engine.*;
 
@@ -32,11 +35,15 @@ import java.text.SimpleDateFormat;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.ComboBoxModel;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -78,7 +85,7 @@ import org.yccheok.jstock.network.Utils;
  *
  * @author  yccheok
  */
-public class ChartJDialog extends javax.swing.JDialog {
+public class ChartJDialog extends javax.swing.JFrame implements WindowListener {
     public enum TA {
         SMA,
         EMA,
@@ -119,10 +126,13 @@ public class ChartJDialog extends javax.swing.JDialog {
     }
     
     /** Creates new form ChartJDialog */
-    public ChartJDialog(java.awt.Frame parent, String title, boolean modal, StockHistoryServer stockHistoryServer) {
-        super(parent, title, modal);
+    public ChartJDialog(java.awt.Frame parent, String title, boolean modalNotUsed, StockHistoryServer stockHistoryServer) {
+        super(title);
+        parent.addWindowListener(this);
+        this.setIconImage(parent.getIconImage());
                 
         initComponents();
+        initKeyBindings(); 
 
         // Must initialized first before any other operations. Our objective
         // is to show this chart as fast as possible. Hence, we will pass in
@@ -181,6 +191,30 @@ public class ChartJDialog extends javax.swing.JDialog {
         }
     }
 
+    public void windowActivated(WindowEvent e) {
+       // this only works becuase AutoRequestFocus is false, so this stays on
+       // top, but looses focus 
+       this.toFront();
+    }
+    public void windowDeactivated(WindowEvent e) {
+       // JFrame is set to AlwaysOnTop = true at design time. So this is only
+       // useful on first deactivation. After that it is meaningless. But without
+       // initial AlwaysOnTop, it would not receive focus because autoRequestFocus
+       // is false.
+       this.setAlwaysOnTop(false);
+    }
+    public void windowIconified(WindowEvent e) {
+       // when main app goes away, this child window should also go away 
+       this.setVisible(false);
+    }
+    public void windowDeiconified(WindowEvent e) {
+       // when main app comes back, this child window should also come back
+       this.setVisible(true);
+    }
+    public void windowClosed(WindowEvent e) {}
+    public void windowClosing(WindowEvent e) {}
+    public void windowOpened(WindowEvent e) {}
+    
     /**
      * Build menu items for TA.
      */
@@ -446,6 +480,8 @@ public class ChartJDialog extends javax.swing.JDialog {
         jMenuItem7 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setAlwaysOnTop(true);
+        setAutoRequestFocus(false);
         getContentPane().setLayout(new java.awt.BorderLayout(5, 5));
 
         jPanel4.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 2, 5));
@@ -663,8 +699,23 @@ public class ChartJDialog extends javax.swing.JDialog {
 
         java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
         setBounds((screenSize.width-750)/2, (screenSize.height-600)/2, 750, 600);
+        //setSize(new java.awt.Dimension(750, 600));
+        //setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    private void initKeyBindings() {
+        KeyStroke escapeKeyStroke = KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_ESCAPE, 0, false);
+        Action escapeAction = new AbstractAction() {
+            // close the frame when the user presses escape
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+            }
+        }; 
+
+        getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(escapeKeyStroke, "ESCAPE");
+        getRootPane().getActionMap().put("ESCAPE", escapeAction);
+    }
+    
     private ComboBoxModel getComboBoxModel() {
         return new javax.swing.DefaultComboBoxModel(new String[] { 
             GUIBundle.getString("ChartJDialog_Daily"),

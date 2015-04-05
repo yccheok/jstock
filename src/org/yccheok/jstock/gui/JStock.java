@@ -469,6 +469,11 @@ public class JStock extends javax.swing.JFrame {
         this.jTable1.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(1));
         this.jTable1.addMouseListener(new TableRowPopupListener());
         this.jTable1.addKeyListener(new TableKeyEventListener());
+        jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTable1MouseClicked(evt);
+            }
+        });
         jTable1.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 jTable1KeyPressed(evt);
@@ -1129,8 +1134,11 @@ public class JStock extends javax.swing.JFrame {
             this.deteleSelectedTableRow();
             return;
         }
-        
-        if (evt.isActionKey()) {
+        else if (KeyEvent.VK_ENTER == evt.getKeyCode()) {
+            displayHistoryCharts();
+            return;
+        }
+        else if (evt.isActionKey()) {
             int[] rows = JStock.this.jTable1.getSelectedRows();
             
             if (rows.length == 1) {
@@ -1626,6 +1634,14 @@ public class JStock extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_jRadioButtonMenuItem6ActionPerformed
+
+    private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
+        if (evt.getClickCount() == 2) {
+           // by definition of a dbl-click this will always only show one chart
+           // because the dbl-click action cannot have multiple items selected 
+           displayHistoryCharts(); 
+        }
+    }//GEN-LAST:event_jTable1MouseClicked
     
     /**
      * Activate specified watchlist.
@@ -3098,6 +3114,17 @@ public class JStock extends javax.swing.JFrame {
         }        
     }
     
+    public void displayHistoryCharts() {
+        int rows[] = jTable1.getSelectedRows();
+        final StockTableModel tableModel = (StockTableModel)jTable1.getModel();
+
+        for (int row : rows) {
+            final int modelIndex = jTable1.getRowSorter().convertRowIndexToModel(row);
+            Stock stock = tableModel.getStock(modelIndex);
+            displayHistoryChart(stock);
+        }
+    }
+
     private JPopupMenu getMyJTablePopupMenu() {
         final JPopupMenu popup = new JPopupMenu();
         final TableModel tableModel = jTable1.getModel();            
@@ -3107,14 +3134,7 @@ public class JStock extends javax.swing.JFrame {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
-                int rows[] = jTable1.getSelectedRows();
-                final StockTableModel tableModel = (StockTableModel)jTable1.getModel();
-
-                for (int row : rows) {
-                    final int modelIndex = jTable1.getRowSorter().convertRowIndexToModel(row);
-                    Stock stock = tableModel.getStock(modelIndex);
-                    displayHistoryChart(stock);
-                }
+                displayHistoryCharts();
             }
         });
                 
@@ -4424,10 +4444,31 @@ public class JStock extends javax.swing.JFrame {
 
         private void maybeShowPopup(MouseEvent e) {
             if (e.isPopupTrigger()) {
+                if (jTable1.getSelectedRowCount() <= 1) {
+                   SetFocusToRightClickLocation(e, jTable1); 
+                }
                 if (jTable1.getSelectedRowCount() > 0) {
                     getMyJTablePopupMenu().show(e.getComponent(), e.getX(), e.getY());
                 }
             }
+        }
+
+        private void SetFocusToRightClickLocation(MouseEvent e, JTable table) {
+    	    // get the coordinates of the mouse click
+	    Point p = e.getPoint();
+ 
+            // get the row index that contains that coordinate
+	    int rowNumber = table.rowAtPoint( p );
+
+            // either select the row or unselect row (if right-clicked outside rows
+            if (rowNumber >= 0 && rowNumber < table.getRowCount()) {
+	       // set the selected interval of rows. Using the "rowNumber"
+	       // variable for the beginning and end selects only that one row.
+               table.setRowSelectionInterval(rowNumber, rowNumber);
+            } else {
+               table.clearSelection();
+            }
+ 
         }
     }
 
