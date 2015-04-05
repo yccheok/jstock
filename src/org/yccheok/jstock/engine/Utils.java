@@ -551,7 +551,6 @@ public class Utils {
     /**
      * Returns best search engine based on current selected country.
      * 
-     * @param list List of elements, to be inserted into search engine
      * @return Best search engine based on current selected country.
      */
     public static boolean isPinyinTSTSearchEngineRequiredForSymbol() {
