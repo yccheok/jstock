@@ -1975,6 +1975,12 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
         
         for (Code code : getSellCodes()) {
+            // This is for optimization purpose. If we already have currency information for a stock
+            // code, we will not further query for it. However, this does have its own shortcoming.
+            // If the stock currency has been changed, we will not have chance to make any amendment.
+            // So far, we treat this as an extremely rare case, and should not happen in real life.
+            // However, if it does so, please remove the following optimization - contains(code)
+            // check.
             if (false == this.portfolioRealTimeInfo.currencies.containsKey(code)) {
                 _realTimeStockMonitor.addStockCode(code);
             }
