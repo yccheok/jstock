@@ -2463,7 +2463,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             if (rate != null) {
                 // Special handling for GBX. User would prefer to see the currency
                 // exchange in GBP.
-                if (currencyPair.from().toString().equals("GBX")) {
+                if (currencyPair.from().isGBX()) {
                     rate = rate * 100.0;
                 }
             
@@ -2880,23 +2880,48 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         if (isFeeCalculationEnabled) {
             final double exchangeRate = org.yccheok.jstock.portfolio.Utils.getExchangeRate(portfolioRealTimeInfo, localCurrency, country.stockCurrency);
             
-            cash =  sellPortfolioTreeTableModel.getNetSellingValue(localCurrency) - 
-                    ((Portfolio)sellPortfolioTreeTableModel.getRoot()).getNetReferenceTotal(localCurrency) - 
-                    buyPortfolioTreeTableModel.getNetPurchaseValue(localCurrency) + 
-                    this.getDepositSummary().getTotal() * exchangeRate +
-                    this.getDividendSummary().getTotal(this.portfolioRealTimeInfo, localCurrency);
+            double _cash =  
+                sellPortfolioTreeTableModel.getNetSellingValue(localCurrency) - 
+                ((Portfolio)sellPortfolioTreeTableModel.getRoot()).getNetReferenceTotal(localCurrency) - 
+                buyPortfolioTreeTableModel.getNetPurchaseValue(localCurrency);
+            
+            double deposit = this.getDepositSummary().getTotal() * exchangeRate;
+            if (country.stockCurrency.isGBX()) {
+                // Use will input cash in GBP instead of GBX.
+                deposit = deposit * 100.0;
+            }
+            
+            double dividend = this.getDividendSummary().getTotal(this.portfolioRealTimeInfo, localCurrency);
+            
+            _cash += deposit;
+            _cash += dividend;
+            cash = _cash;
             
             paperProfit = buyPortfolioTreeTableModel.getNetGainLossValue(localCurrency);
             realizedProfit = sellPortfolioTreeTableModel.getNetGainLossValue(localCurrency);
         } else {
             final double exchangeRate = org.yccheok.jstock.portfolio.Utils.getExchangeRate(portfolioRealTimeInfo, localCurrency, country.stockCurrency);
             
-            cash =  sellPortfolioTreeTableModel.getSellingValue(localCurrency) - 
-                    ((Portfolio)sellPortfolioTreeTableModel.getRoot()).getReferenceTotal(localCurrency) - 
-                    buyPortfolioTreeTableModel.getPurchaseValue(localCurrency) + 
-                    this.getDepositSummary().getTotal() * exchangeRate + 
-                    this.getDividendSummary().getTotal(this.portfolioRealTimeInfo, localCurrency);
-
+            double _cash = 
+                sellPortfolioTreeTableModel.getSellingValue(localCurrency) - 
+                ((Portfolio)sellPortfolioTreeTableModel.getRoot()).getReferenceTotal(localCurrency) - 
+                buyPortfolioTreeTableModel.getPurchaseValue(localCurrency);
+            
+            double deposit = this.getDepositSummary().getTotal() * exchangeRate;
+            if (country.stockCurrency.isGBX()) {
+                // Use will input cash in GBP instead of GBX.
+                deposit = deposit * 100.0;
+            }
+            
+            double dividend = this.getDividendSummary().getTotal(this.portfolioRealTimeInfo, localCurrency);
+            
+            _cash += deposit;
+            _cash += dividend;
+            cash = _cash;
+            
+            System.out.println("deposit = " + deposit);
+            System.out.println("dividend = " + dividend);
+            
             paperProfit = buyPortfolioTreeTableModel.getGainLossValue(localCurrency);
             realizedProfit = sellPortfolioTreeTableModel.getGainLossValue(localCurrency);
         }
@@ -3033,7 +3058,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             }
             
             // Special handling for GBX.
-            if (stockCurrency.toString().equals("GBX") && localCurrency.toString().equals("GBP")) {
+            if (stockCurrency.isGBX() && localCurrency.isGBP()) {
                 return false;
             }
             
