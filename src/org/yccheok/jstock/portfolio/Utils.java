@@ -87,7 +87,7 @@ public class Utils {
 
     public static boolean shouldConvertPenceToPound(PortfolioRealTimeInfo portfolioRealTimeInfo, Code code) {
         final Currency stockCurrency = getStockCurrency(portfolioRealTimeInfo, code);
-        return stockCurrency.toString().equals("GBX");
+        return stockCurrency.isGBX();
     }
     
     public static Currency getLocalCurrency() {
@@ -124,7 +124,7 @@ public class Utils {
     public static double getExchangeRate(PortfolioRealTimeInfo portfolioRealTimeInfo, Currency localCurrency, Currency stockCurrency) {
         // Possible null.
         if (localCurrency == null) {
-            if (stockCurrency.toString().equals("GBX")) {
+            if (stockCurrency.isGBX()) {
                 return 0.01;
             }
             return 1.0;
@@ -138,7 +138,7 @@ public class Utils {
             if (rate != null) {
                 exchangeRate = rate;
             } else {
-                if (stockCurrency.toString().equals("GBX")) {
+                if (stockCurrency.isGBX()) {
                     exchangeRate = 0.01;    
                 } else {
                     exchangeRate = 1.0;
