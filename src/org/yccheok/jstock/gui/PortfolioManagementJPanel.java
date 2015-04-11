@@ -2919,9 +2919,6 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             _cash += dividend;
             cash = _cash;
             
-            System.out.println("deposit = " + deposit);
-            System.out.println("dividend = " + dividend);
-            
             paperProfit = buyPortfolioTreeTableModel.getGainLossValue(localCurrency);
             realizedProfit = sellPortfolioTreeTableModel.getGainLossValue(localCurrency);
         }
