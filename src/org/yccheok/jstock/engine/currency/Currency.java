@@ -70,7 +70,16 @@ public class Currency {
         return currency;
     }
     
+    public boolean isGBX() {
+        return currency.equals(GBX);
+    }
+
+    public boolean isGBP() {
+        return currency.equals(GBP);
+    }
+    
     private static final String GBX = "GBX";
+    private static final String GBP = "GBP";
     
     private final String currency;
 }
