@@ -73,7 +73,7 @@ public class Industry implements Comparable<Industry> {
             return true;
         }
 
-        if (!(o instanceof Board)) {
+        if (!(o instanceof Industry)) {
             return false;
         }
         
