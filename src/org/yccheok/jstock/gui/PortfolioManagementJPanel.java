@@ -3039,6 +3039,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         return this.portfolioRealTimeInfo;
     }
     
+    // We will display currency info if currency exchange feature is enabled,
+    // and the stock currency is different from country stock currency.
     public boolean shouldDisplayCurrencyInfoForValue(Code code) {
         final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         final Country country = jStockOptions.getCountry();
@@ -3047,22 +3049,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             return false;
         }
         
-        if (false == this.getCurrencyPairs().isEmpty()) {
-            final Currency stockCurrency = org.yccheok.jstock.portfolio.Utils.getStockCurrency(portfolioRealTimeInfo, code);
-            final Currency localCurrency = country.localCurrency;
-            if (stockCurrency.equals(localCurrency)) {
-                return false;
-            }
-            
-            // Special handling for GBX.
-            if (stockCurrency.isGBX() && localCurrency.isGBP()) {
-                return false;
-            }
-            
-            return true;
-        }
+        final Currency stockCurrency = org.yccheok.jstock.portfolio.Utils.getStockCurrency(portfolioRealTimeInfo, code);
+        final Currency countryStockCurrency = country.stockCurrency;
         
-        return false;
+        return (false == stockCurrency.equals(countryStockCurrency));
     }
     
     private static final Log log = LogFactory.getLog(PortfolioManagementJPanel.class);
