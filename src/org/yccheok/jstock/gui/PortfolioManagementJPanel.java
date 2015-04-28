@@ -3041,7 +3041,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     
     // We will display currency info if currency exchange feature is enabled,
     // and the stock currency is different from country stock currency.
-    public boolean shouldDisplayCurrencyInfoForValue(Code code) {
+    public boolean shouldDisplayCurrencyForValue(Code code) {
         final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         final Country country = jStockOptions.getCountry();
         final boolean isCurrencyExchangeEnable = jStockOptions.isCurrencyExchangeEnable(country);
