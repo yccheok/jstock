@@ -25,7 +25,7 @@ package org.yccheok.jstock.engine.currency;
  */
 public class CurrencyPair extends org.yccheok.jstock.engine.Pair<Currency, Currency> {
     public static CurrencyPair create(String from, String to) {
-        return create(Currency.newInstance(from), Currency.newInstance(to));
+        return create(Currency.valueOf(from), Currency.valueOf(to));
     }
     
     public static CurrencyPair create(Currency from, Currency to) {
