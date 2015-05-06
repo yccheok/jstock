@@ -92,7 +92,7 @@ public class GoogleStockServer implements StockServer {
         }
         
         if (sb.length() == 0) {
-            return Currency.newInstance("USD");
+            return Currency.valueOf("USD");
         }
         
         String currencySymbol = sb.toString();
@@ -101,10 +101,10 @@ public class GoogleStockServer implements StockServer {
         
         try {
             if (currencyCode == null) {
-                return Currency.newInstance(currencySymbol);
+                return Currency.valueOfWithVerification(currencySymbol);
             }
         
-            return Currency.newInstance(currencyCode);
+            return Currency.valueOfWithVerification(currencyCode);
         } catch (java.lang.IllegalArgumentException ex) {
             log.error(null, ex);
         }
