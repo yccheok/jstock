@@ -302,7 +302,7 @@ public class YahooStockFormat implements StockFormat {
                 if (currencyText.equals("GBp")) {
                     currencyText = "GBX";
                 }
-                try { currency = Currency.newInstance(currencyText); } catch (java.lang.IllegalArgumentException ex) { log.error(null, ex); }
+                try { currency = Currency.valueOfWithVerification(currencyText); } catch (java.lang.IllegalArgumentException ex) { log.error(null, ex); }
 
                 break;
             } while(true);
