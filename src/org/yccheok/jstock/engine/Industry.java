@@ -27,6 +27,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class Industry implements Comparable<Industry> {
     private Industry(String industry) {
+        assert(industry != null);
+
         this.industry = industry;
     }
     

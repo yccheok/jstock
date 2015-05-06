@@ -27,6 +27,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class Board implements Comparable<Board> {
     private Board(String board) {
+        assert(board != null);
+        
         this.board = board;
     }
     
