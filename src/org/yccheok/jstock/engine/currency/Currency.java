@@ -33,6 +33,15 @@ public class Currency implements Comparable<Currency> {
     }
 
     public static Currency valueOfWithVerification(String currency) {
+        if (currency.equals(GBX)) {
+            // Pence sterling is a subdivision of Pound sterling, the currency
+            // for the United Kingdom. Stocks are often traded in pence rather
+            // than pounds and stock exchages often use GBX to indicate that
+            // this is the case for the give stock rather than use the ISO 4217
+            // currency symbol GBP for pounds sterling.
+            return valueOf(currency);
+        }
+        
         // Possible throw java.lang.IllegalArgumentException
         java.util.Currency c = java.util.Currency.getInstance(currency);
         assert(c != null);
