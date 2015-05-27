@@ -2229,7 +2229,7 @@ public class ChartJDialog extends javax.swing.JFrame implements WindowListener {
     /* Overlay layer. */
     private final ChartLayerUI<ChartPanel> chartLayerUI;
 
-    /* To avoid memory leak */
+    /* To avoid memory leak. */
     private java.awt.Frame parent;
     
     private static final Log log = LogFactory.getLog(ChartJDialog.class);
