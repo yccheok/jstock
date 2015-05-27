@@ -125,7 +125,13 @@ public class ResultSetCellRenderer extends javax.swing.JPanel implements ListCel
         jLabel2.setText(result.name);
         final String type = result.typeDisp != null ? result.typeDisp : result.type;
         final String exch = result.exchDisp != null ? result.exchDisp : result.exch;
-        jLabel3.setText(type  + " - " + exch);
+        if (type == null || exch == null) {
+            jLabel3.setVisible(false);
+        } else {
+            jLabel3.setVisible(true);
+            jLabel3.setText(type  + " - " + exch);    
+        }
+        
         return this;
     }
 

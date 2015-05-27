@@ -92,10 +92,11 @@ public class AjaxYahooSearchEngineMonitor extends Subject<AjaxYahooSearchEngineM
             }
         }
     }
+        
     private final SearchEngine<ResultType> searchEngine = new AjaxYahooSearchEngine();
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     // 128 is just a magic number.
-    private final BlockingQueue<String> blockingQueue = new ArrayBlockingQueue<String>(128);
+    private final BlockingQueue<String> blockingQueue = new ArrayBlockingQueue<>(128);
 
     private static final Log log = LogFactory.getLog(AjaxYahooSearchEngineMonitor.class);
 

@@ -21,8 +21,11 @@ package org.yccheok.jstock.engine;
 
 import com.google.gson.Gson;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -49,13 +52,26 @@ public class AjaxYahooSearchEngine implements SearchEngine<ResultType> {
         try {
             final Holder value = gson.fromJson(json, Holder.class);
             
-            if (value != null) {
+            if (value != null && false == value.ResultSet.Result.isEmpty()) {
                 // Shall I check value.ResultSet.Query against prefix?
                 return Collections.unmodifiableList(value.ResultSet.Result);
             }
         } catch (Exception ex) {
             log.error(null, ex);
         }
+        
+        Code code = Code.newInstance(prefix);
+        Country country = Utils.toCountry(code);
+        if (requiredDeepSearchCountries.contains(country)) {
+            Stock stock = Utils.getStock(code);
+            if (stock != null) {
+                ResultType resultType = new ResultType(stock.code.toString(), stock.symbol.toString());
+                List<ResultType> resultTypes = new ArrayList<>();
+                resultTypes.add(resultType);
+                return resultTypes;
+            }
+        }
+
         return java.util.Collections.emptyList();
     }
 
@@ -71,8 +87,8 @@ public class AjaxYahooSearchEngine implements SearchEngine<ResultType> {
     public ResultType search(String prefix) {
         final List<ResultType> list = searchAll(prefix);
         if (list.isEmpty()) {
-            return null;
-        }
+                return null;
+            }
         return list.get(0);
     }
 
@@ -89,6 +105,16 @@ public class AjaxYahooSearchEngine implements SearchEngine<ResultType> {
 
     private static class Holder {
         public final ResultSetType ResultSet = null;
+    }
+
+    // In certain country like Malaysia, even if you type in complete stock code
+    // "7252WA.KL", the API will give you 0 result. Hence, we will perform stock
+    // pricing enquiry (deep search) to determine whether it is a valid stock 
+    // code input. At this moment, we only accept "7252WA.KL", but not "7252WA", 
+    // for speed optimization purpose.
+    private static final Set<Country> requiredDeepSearchCountries = new HashSet<>();
+    static {
+        requiredDeepSearchCountries.add(Country.Malaysia);
     }
 
     // Will it be better if we make this as static?

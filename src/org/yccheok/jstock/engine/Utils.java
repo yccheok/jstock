@@ -32,8 +32,8 @@ import java.util.*;
 import org.apache.commons.httpclient.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.yccheok.jstock.engine.Industry;
 import org.yccheok.jstock.file.Statements;
+import org.yccheok.jstock.gui.Constants;
 import org.yccheok.jstock.gui.JStock;
 
 /**
@@ -41,6 +41,10 @@ import org.yccheok.jstock.gui.JStock;
  * @author yccheok
  */
 public class Utils {
+    
+    public static interface GetStocksCallback {
+        public void update(List<Stock> stocks);
+    }
     
     /** Creates a new instance of Utils */
     private Utils() {
@@ -95,6 +99,106 @@ public class Utils {
                             );                
     } 
     
+    public static Stock getStock(Code code) {
+        List<Code> codes = new ArrayList<>();
+        codes.add(code);
+        List<Stock> stocks = getStocks(codes, new GetStocksCallback() {
+            @Override
+            public void update(List<Stock> stocks) {
+            }            
+        });
+        if (stocks.size() == 1) {
+            return stocks.get(0);
+        }
+        return null;
+    }
+    
+    private static List<Code> getZeroPriceCodes(List<Stock> stocks, List<Stock> nonZeroPriceStocks, Set<Code> nonZeroPriceCodes) {
+        assert(stocks != null);
+        assert(nonZeroPriceStocks != null);
+        assert(nonZeroPriceCodes != null);
+        
+        List<Code> zeroPriceCodes = null;
+        
+        for (Stock stock : stocks) {
+            if (nonZeroPriceCodes.contains(stock.code)) {
+                continue;
+            }
+                
+            if (stock.getLastPrice() == 0.0 && stock.getOpenPrice() == 0.0) {
+                if (zeroPriceCodes == null) {
+                    zeroPriceCodes = new ArrayList<>();
+                }
+                
+                zeroPriceCodes.add(stock.code);
+            } else {
+                nonZeroPriceCodes.add(stock.code);
+                nonZeroPriceStocks.add(stock);
+            }
+        }
+        
+        if (zeroPriceCodes == null) {
+            return java.util.Collections.emptyList();
+        }
+        
+        return zeroPriceCodes;
+    }
+
+    public static List<Stock> getStocks(List<Code> codes, GetStocksCallback getStockCallback) {
+        final List<Stock> s = new ArrayList<>();
+        final Set<Code> nonZeroPriceCodes = new HashSet<>();        
+        final CodeBucketLists codeBucketLists = new CodeBucketLists(Constants.REAL_TIME_STOCK_MONITOR_MAX_STOCK_SIZE_PER_SCAN);
+        
+        for (Code code : codes) {
+            codeBucketLists.add(code);
+        }
+        
+        final int size = codeBucketLists.size();
+        for (int i = 0; i < size; i++) {
+            List<Code> _codes = codeBucketLists.get(i);
+            
+            List<Code> zeroPriceCodes = _codes;
+            final List<Stock> stocks = new ArrayList<>();
+            
+            for (StockServerFactory factory : Factories.INSTANCE.getStockServerFactories(_codes.get(0)))
+            {
+                final StockServer stockServer = factory.getStockServer();
+
+                if (stockServer == null) {
+                    continue;
+                }
+                
+                List<Stock> tmpStocks = null;
+                try {
+                    tmpStocks = stockServer.getStocks(zeroPriceCodes);
+                } catch (StockNotFoundException exp) {
+                    log.error("" + zeroPriceCodes, exp);
+                    // Try with another server.
+                    continue;
+                }
+
+                zeroPriceCodes = getZeroPriceCodes(tmpStocks, stocks, nonZeroPriceCodes);
+                if (zeroPriceCodes.isEmpty()) {
+                    break;
+                }
+            }   /* for (StockServerFactory factory : Factories.INSTANCE.getStockServerFactories(codes.get(0))) */
+            
+            // Avoid multiple empty stocks callback.
+            if (!stocks.isEmpty()) {
+                getStockCallback.update(stocks);
+                s.addAll(stocks);
+            }
+        }
+        
+        // Even the final result is empty, ensure we trigger callback at least
+        // once.
+        if (s.isEmpty()) {
+            getStockCallback.update(s);
+        }
+        
+        return s;
+    }
+
     public static Country toCountry(Code code) {
         assert(countries.keySet().size() == 45);
         
