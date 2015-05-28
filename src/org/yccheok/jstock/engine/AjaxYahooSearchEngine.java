@@ -147,8 +147,7 @@ public class AjaxYahooSearchEngine implements SearchEngine<ResultType> {
     // In certain country like Malaysia, even if you type in complete stock code
     // "7252WA.KL", the API will give you 0 result. Hence, we will perform stock
     // pricing enquiry (deep search) to determine whether it is a valid stock 
-    // code input. At this moment, we only accept "7252WA.KL", but not "7252WA", 
-    // for speed optimization purpose.
+    // code input.
     private static final Set<Country> requiredDeepSearchCountries = new HashSet<>();
     static {
         requiredDeepSearchCountries.add(Country.Malaysia);
