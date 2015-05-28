@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.yccheok.jstock.gui.JStock;
 
 /**
  * This class is used to suggest a list of items, which will be similar to a
@@ -62,7 +63,23 @@ public class AjaxYahooSearchEngine implements SearchEngine<ResultType> {
         
         Code code = Code.newInstance(prefix);
         Country country = Utils.toCountry(code);
+        boolean requiredDeepSearch = false;
+        
         if (requiredDeepSearchCountries.contains(country)) {
+            requiredDeepSearch = true;
+        } else {
+            /*******************************************************************
+             * Hack & ugly code! We shouldn't access JStock in this class!
+             ******************************************************************/
+            country = JStock.instance().getJStockOptions().getCountry();
+            if (requiredDeepSearchCountries.contains(country)) {
+                code = toDeepSearchCode(code, country);
+                requiredDeepSearch = (code != null);    
+            }
+        }
+
+        if (requiredDeepSearch) {
+            assert(code != null);
             Stock stock = Utils.getStock(code);
             if (stock != null) {
                 ResultType resultType = new ResultType(stock.code.toString(), stock.symbol.toString());
@@ -71,10 +88,30 @@ public class AjaxYahooSearchEngine implements SearchEngine<ResultType> {
                 return resultTypes;
             }
         }
-
+        
         return java.util.Collections.emptyList();
     }
 
+    private Code toDeepSearchCode(Code code, Country country) {
+        String s = code.toString().toUpperCase();
+        
+        switch (country) {
+        case Malaysia:
+            if (s.endsWith(".KL")) { 
+                return code;
+            } else if (s.endsWith(".K")) {
+                s = s + "L";                    
+            } else if (s.endsWith(".")) {
+                s = s + "KL";
+            } else if (s.matches("^[0-9]{4}[0-9A-Z]{2}$")) {
+                s = s + ".KL";
+            } else {
+                return null;
+            }
+            return Code.newInstance(s);                
+        }
+        return null;
+    }
     /**
      * Returns a ResultType, which will be similar to a given prefix.
      * The searching mechanism based on the logic behind Yahoo server.
