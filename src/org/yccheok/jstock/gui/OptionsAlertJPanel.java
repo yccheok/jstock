@@ -323,7 +323,6 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
     public void set(JStockOptions jStockOptions) {
         jCheckBox1.setSelected(jStockOptions.isPopupMessage());
         jCheckBox2.setSelected(jStockOptions.isSendEmail());
-        //jCheckBox3.setSelected(jStockOptions.isSMSEnabled());
         jCheckBox4.setSelected(jStockOptions.isSoundEnabled());
         jTextField2.setText(Utils.decrypt(jStockOptions.getEmail()));
         jTextField1.setText(Utils.decrypt(jStockOptions.getCCEmail()));

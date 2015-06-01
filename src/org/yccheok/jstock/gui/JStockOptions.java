@@ -333,7 +333,6 @@ public class JStockOptions {
         //this.emailPassword = jStockOptions.emailPassword;
         //this.googleCalendarUsername = jStockOptions.googleCalendarUsername;
         //this.googleCalendarPassword = jStockOptions.googleCalendarPassword;
-        //this.SMSEnabled = jStockOptions.SMSEnabled;
 
         // Don't store proxy. Home and office proxy environment are most probably different.
         //this.proxyServer = jStockOptions.proxyServer;
