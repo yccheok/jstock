@@ -118,9 +118,6 @@ public class JStockOptions {
         this.email = "";
         this.CCEmail = "";
         this.emailPassword = "";
-        this.SMSEnabled = false;
-        this.googleCalendarUsername = "";
-        this.googleCalendarPassword = "";
         this.singleIndicatorAlert = true;
         this.proxyServer = "";
         this.proxyPort = -1;
@@ -182,7 +179,8 @@ public class JStockOptions {
     private transient String googleCalendarUsername;
     @Deprecated
     private transient String googleCalendarPassword;
-    private boolean SMSEnabled;
+    @Deprecated
+    private transient boolean SMSEnabled;
     @Deprecated
     private transient boolean passwordProtectedIndicator;
     @Deprecated
@@ -270,7 +268,8 @@ public class JStockOptions {
     private int lastSelectedBuyPortfolioChartIndex = 0;
     
     // Use -1 to indicate unlimited SMS per day.
-    private int maxSMSPerDay = -1;
+    @Deprecated
+    private transient int maxSMSPerDay = -1;
 
     @Deprecated
     private transient String portfolioName = org.yccheok.jstock.portfolio.Utils.getDefaultPortfolioName();
@@ -410,9 +409,6 @@ public class JStockOptions {
         this.lastSelectedPageIndex = jStockOptions.lastSelectedPageIndex;
         this.lastSelectedSellPortfolioChartIndex = jStockOptions.lastSelectedSellPortfolioChartIndex;
         this.lastSelectedBuyPortfolioChartIndex = jStockOptions.lastSelectedBuyPortfolioChartIndex;
-    
-        // Use -1 to indicate unlimited SMS per day.
-        this.maxSMSPerDay = jStockOptions.maxSMSPerDay;
 
         this.portfolioNames = new EnumMap<Country, String>(jStockOptions.portfolioNames);
 
@@ -542,10 +538,6 @@ public class JStockOptions {
 
         if (this.watchlistNames == null) {
             this.watchlistNames = new EnumMap<Country, String>(Country.class);
-        }
-
-        if (this.maxSMSPerDay <= 0) {
-            maxSMSPerDay = -1;
         }
 
         if (this.getNewsID() == null) {
@@ -1075,20 +1067,6 @@ public class JStockOptions {
     public void setLastSelectedSellPortfolioChartIndex(int lastSelectedSellPortfolioChartIndex) {
         this.lastSelectedSellPortfolioChartIndex = lastSelectedSellPortfolioChartIndex;
     }
-    
-    /**
-     * @return the SMSEnabled
-     */
-    public boolean isSMSEnabled() {
-        return SMSEnabled;
-    }
-
-    /**
-     * @param SMSEnabled the SMSEnabled to set
-     */
-    public void setSMSEnabled(boolean SMSEnabled) {
-        this.SMSEnabled = SMSEnabled;
-    }
 
     /**
      * Returns the watchlist name for current country. If there is no watchlist 
@@ -1130,20 +1108,6 @@ public class JStockOptions {
      */
     public void setWatchlistName(String watchlistName) {
         this.watchlistNames.put(this.country, watchlistName);
-    }
-
-    /**
-     * @return the maxSMSPerDay
-     */
-    public int getMaxSMSPerDay() {
-        return maxSMSPerDay;
-    }
-
-    /**
-     * @param maxSMSPerDay the maxSMSPerDay to set
-     */
-    public void setMaxSMSPerDay(int maxSMSPerDay) {
-        this.maxSMSPerDay = maxSMSPerDay;
     }
 
     /**

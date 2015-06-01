@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2015 Yan Cheng Cheok <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,9 +19,6 @@
 
 package org.yccheok.jstock.gui;
 
-import org.yccheok.jstock.engine.Pair;
-import com.google.api.client.auth.oauth2.Credential;
-import java.awt.Font;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import javax.mail.MessagingException;
@@ -30,9 +27,7 @@ import javax.swing.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.yccheok.jstock.alert.GoogleCalendar;
 import org.yccheok.jstock.alert.GoogleMail;
-import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.internationalization.MessagesBundle;
 
 /**
@@ -44,87 +39,6 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
     /** Creates new form OptionsAlertJPanel */
     public OptionsAlertJPanel() {
         initComponents();
-        initCredentialEx();
-    }
-    
-    private void signOut() {
-        this.credentialEx = null;
-        jCheckBox3.setSelected(false);
-        org.yccheok.jstock.google.Utils.logoutCalendar();
-        updateGUIState();
-    }
-    
-    private void signIn() {
-        jCheckBox3.setEnabled(false);
-        jButton2.setEnabled(false);
-        jButton4.setEnabled(false);
-        
-        SwingWorker swingWorker = new SwingWorker<Pair<Pair<Credential, String>, Boolean>, Void>() {
-
-            @Override
-            protected Pair<Pair<Credential, String>, Boolean> doInBackground() throws Exception {
-                final Pair<Pair<Credential, String>, Boolean> pair = org.yccheok.jstock.google.Utils.authorizeCalendar();
-                return pair;
-            }
-            
-            @Override
-            public void done() {
-                Pair<Pair<Credential, String>, Boolean> pair = null;
-                
-                try {
-                    pair = this.get();
-                } catch (InterruptedException ex) {
-                    JOptionPane.showMessageDialog(OptionsAlertJPanel.this, ex.getMessage(), GUIBundle.getString("OptionsAlertJPanel_Alert"), JOptionPane.ERROR_MESSAGE);
-                    log.error(null, ex);
-                } catch (ExecutionException ex) {
-                    JOptionPane.showMessageDialog(OptionsAlertJPanel.this, ex.getMessage(), GUIBundle.getString("OptionsAlertJPanel_Alert"), JOptionPane.ERROR_MESSAGE);
-                    log.error(null, ex);
-                }                
-                
-                if (pair != null) {
-                    credentialEx = pair.first;
-                } else {
-                    jCheckBox3.setSelected(false);
-                }
-                
-                updateGUIState();                
-            }
-        };
-        
-        swingWorker.execute();
-    }
-    
-    private void initCredentialEx() {
-        SwingWorker swingWorker = new SwingWorker<Pair<Credential, String>, Void>() {
-
-            @Override
-            protected Pair<Credential, String> doInBackground() throws Exception {
-                final Pair<Credential, String> pair = org.yccheok.jstock.google.Utils.authorizeCalendarOffline();
-                return pair;
-            }
-            
-            @Override
-            public void done() { 
-                Pair<Credential, String> pair = null;
-                
-                try {
-                    pair = this.get();
-                } catch (InterruptedException ex) {
-                    log.error(null, ex);
-                } catch (ExecutionException ex) {
-                    log.error(null, ex);
-                }
-                
-                if (pair != null) {
-                    credentialEx = pair;
-                    jCheckBox3.setSelected(JStock.instance().getJStockOptions().isSMSEnabled());
-                }
-                
-                updateGUIState();
-            }
-        };
-        
-        swingWorker.execute();
     }
     
     /** This method is called from within the constructor to
@@ -135,7 +49,6 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        buttonGroup1 = new javax.swing.ButtonGroup();
         jXHeader1 = new org.jdesktop.swingx.JXHeader();
         jPanel1 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
@@ -150,19 +63,6 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         jLabel11 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
         jLabel12 = new javax.swing.JLabel();
-        jPanel4 = new javax.swing.JPanel();
-        jCheckBox3 = new javax.swing.JCheckBox();
-        jPanel6 = new javax.swing.JPanel();
-        jEditorPane3 = new javax.swing.JEditorPane();
-        jPanel2 = new javax.swing.JPanel();
-        jLabel9 = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox();
-        jLabel10 = new javax.swing.JLabel();
-        jButton2 = new javax.swing.JButton();
-        jLabel8 = new javax.swing.JLabel();
-        jPanel7 = new javax.swing.JPanel();
-        jLabel13 = new javax.swing.JLabel();
-        jButton4 = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
         jCheckBox1 = new javax.swing.JCheckBox();
         jCheckBox4 = new javax.swing.JCheckBox();
@@ -294,84 +194,6 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
                 .addContainerGap())
         );
 
-        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsAlertJPanel_SMS"))); // NOI18N
-        jPanel4.setLayout(new java.awt.BorderLayout(5, 5));
-
-        jCheckBox3.setText(bundle.getString("OptionsAlertJPanel_SMSThroughGoogleCalendar")); // NOI18N
-        jCheckBox3.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 0, 0));
-        jCheckBox3.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        jCheckBox3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jCheckBox3ActionPerformed(evt);
-            }
-        });
-        jPanel4.add(jCheckBox3, java.awt.BorderLayout.NORTH);
-
-        jPanel6.setLayout(new java.awt.BorderLayout());
-
-        jEditorPane3.setEditable(false);
-        jEditorPane3.setBackground(new java.awt.Color(240, 240, 240));
-        jEditorPane3.setContentType("text/html"); // NOI18N
-        jEditorPane3.setText(bundle.getString("OptionsAlertJPanel_FindOutHowToSetupYourMobilePhone")); // NOI18N
-        jEditorPane3.setEnabled(false);
-        jEditorPane3.addHyperlinkListener(new javax.swing.event.HyperlinkListener() {
-            public void hyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {
-                jEditorPane3jEditorPane1HyperlinkUpdate(evt);
-            }
-        });
-        jPanel6.add(jEditorPane3, java.awt.BorderLayout.SOUTH);
-
-        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
-
-        jLabel9.setText(bundle.getString("OptionsAlertJPanel_Limit")); // NOI18N
-        jLabel9.setEnabled(false);
-        jPanel2.add(jLabel9);
-
-        jComboBox1.setModel(getComboBoxModel());
-        jComboBox1.setEnabled(false);
-        jPanel2.add(jComboBox1);
-
-        jLabel10.setText(bundle.getString("OptionsAlertJPanel_SMSPerDay")); // NOI18N
-        jLabel10.setEnabled(false);
-        jPanel2.add(jLabel10);
-
-        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/sms_protocol.png"))); // NOI18N
-        jButton2.setText(bundle.getString("OptionsAlertJPanel_TestSMS")); // NOI18N
-        jButton2.setEnabled(false);
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
-            }
-        });
-        jPanel2.add(jButton2);
-
-        jLabel8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/spinner.gif"))); // NOI18N
-        jPanel2.add(jLabel8);
-
-        jPanel6.add(jPanel2, java.awt.BorderLayout.NORTH);
-
-        jPanel4.add(jPanel6, java.awt.BorderLayout.SOUTH);
-
-        jPanel7.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsAlertJPanel_GoogleAccount"))); // NOI18N
-
-        jLabel13.setBackground(new java.awt.Color(140, 196, 116));
-        jLabel13.setFont(getRobotoLightFont());
-        jLabel13.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel13.setText("username@email.com");
-        jLabel13.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        jLabel13.setOpaque(true);
-        jPanel7.add(jLabel13);
-
-        jButton4.setText(bundle.getString("OptionsAlertJPanel_SignOut")); // NOI18N
-        jButton4.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton4ActionPerformed(evt);
-            }
-        });
-        jPanel7.add(jButton4);
-
-        jPanel4.add(jPanel7, java.awt.BorderLayout.CENTER);
-
         jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsAlertJPanel_System"))); // NOI18N
 
         jCheckBox1.setText(bundle.getString("OptionsAlertJPanel_ShowAMessage")); // NOI18N
@@ -429,7 +251,6 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
@@ -441,9 +262,7 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(257, Short.MAX_VALUE))
         );
 
         add(jPanel1, java.awt.BorderLayout.CENTER);
@@ -474,17 +293,6 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         updateGUIState();
     }//GEN-LAST:event_jCheckBox2ItemStateChanged
 
-    private void jEditorPane3jEditorPane1HyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {//GEN-FIRST:event_jEditorPane3jEditorPane1HyperlinkUpdate
-        Utils.launchWebBrowser(evt);
-}//GEN-LAST:event_jEditorPane3jEditorPane1HyperlinkUpdate
-
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        this.testSMSSwingWorker = getTestSMSSwingWorker();
-        this.updateGUIState();
-        this.jButton2.requestFocus();
-        this.testSMSSwingWorker.execute();
-    }//GEN-LAST:event_jButton2ActionPerformed
-
     private void jCheckBox4ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jCheckBox4ItemStateChanged
         updateGUIState();
     }//GEN-LAST:event_jCheckBox4ItemStateChanged
@@ -505,32 +313,10 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         jButton1.doClick();
     }//GEN-LAST:event_jTextField1ActionPerformed
 
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        signOut();
-    }//GEN-LAST:event_jButton4ActionPerformed
-
-    private void jCheckBox3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox3ActionPerformed
-        updateGUIState();
-        
-        if (jCheckBox3.isSelected()) {
-            if (this.credentialEx == null) {
-                signIn();
-            }
-        }
-    }//GEN-LAST:event_jCheckBox3ActionPerformed
-
     public void cancel() {
-        if (this.testSMSSwingWorker != null) {
-            this.testSMSSwingWorker.cancel(true);
-        }
-
         if (this.testEmailSwingWorker != null) {
             this.testEmailSwingWorker.cancel(true);
         }
-    }
-
-    private ComboBoxModel getComboBoxModel() {
-        return new javax.swing.DefaultComboBoxModel(new String[] { "1", "5", "10", "20", "50", GUIBundle.getString("OptionsAlertJPanel_Unlimited") });
     }
 
     @Override
@@ -542,13 +328,6 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         jTextField2.setText(Utils.decrypt(jStockOptions.getEmail()));
         jTextField1.setText(Utils.decrypt(jStockOptions.getCCEmail()));
         jPasswordField1.setText(Utils.decrypt(jStockOptions.getEmailPassword()));
-
-        if (jStockOptions.getMaxSMSPerDay() <= 0) {
-            jComboBox1.setSelectedItem(GUIBundle.getString("OptionsAlertJPanel_Unlimited"));
-        }
-        else {
-            jComboBox1.setSelectedItem("" + jStockOptions.getMaxSMSPerDay());
-        }
         
         updateGUIState();
     }
@@ -571,27 +350,12 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
             }            
         }
 
-        if (jCheckBox3.isSelected()) {
-        }
-
         jStockOptions.setSoundEnabled(jCheckBox4.isSelected());
         jStockOptions.setPopupMessage(jCheckBox1.isSelected());
         jStockOptions.setSendEmail(jCheckBox2.isSelected());
         jStockOptions.setEmail(Utils.encrypt(jTextField2.getText().trim()));
         jStockOptions.setCCEmail(Utils.encrypt(jTextField1.getText().trim()));
         jStockOptions.setEmailPassword(Utils.encrypt(new String(jPasswordField1.getPassword())));
-        jStockOptions.setSMSEnabled(jCheckBox3.isSelected());
-
-        int maxSMSPerDay = -1;
-        try {
-            maxSMSPerDay = Integer.parseInt(jComboBox1.getSelectedItem().toString());
-            jStockOptions.setMaxSMSPerDay(maxSMSPerDay);
-        }
-        catch (NumberFormatException exp) {
-            log.error(null, exp);
-            jStockOptions.setMaxSMSPerDay(-1);
-        }
-        
 
         return true;
     }
@@ -602,11 +366,9 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
      */
     private void updateGUIState() {
         final boolean isTestEmailDone = (testEmailSwingWorker == null || testEmailSwingWorker.isDone());
-        final boolean isTestSMSDone = (testSMSSwingWorker == null || testSMSSwingWorker.isDone());
 
         final boolean soundState = jCheckBox4.isSelected();
         final boolean emailState = jCheckBox2.isSelected();
-        final boolean smsState = jCheckBox3.isSelected();
 
         jButton3.setEnabled(soundState);
         jLabel1.setEnabled(emailState);
@@ -619,28 +381,7 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         jTextField1.setEnabled(emailState && isTestEmailDone);
         jPasswordField1.setEnabled(emailState && isTestEmailDone);
         jCheckBox2.setEnabled(isTestEmailDone);
-        jLabel7.setVisible(!isTestEmailDone);
-
-        jButton2.setEnabled(smsState && isTestSMSDone && this.credentialEx != null);
-        jCheckBox3.setEnabled(isTestSMSDone);
-        
-        jLabel8.setVisible(!isTestSMSDone);
-        jLabel9.setEnabled(smsState && this.credentialEx != null);
-        jLabel10.setEnabled(smsState && this.credentialEx != null);
-        jComboBox1.setEnabled(smsState && this.credentialEx != null);
-        jButton4.setEnabled(smsState && isTestSMSDone && this.credentialEx != null);
-        jPanel7.setEnabled(smsState && this.credentialEx != null);
-        jEditorPane3.setEnabled(smsState && this.credentialEx != null);
-        
-        if (this.credentialEx == null) {
-            jLabel13.setText("?");
-        } else {
-            jLabel13.setText(credentialEx.second);
-        }        
-    }
-
-    private Font getRobotoLightFont() {
-        return Utils.getRobotoLightFont().deriveFont((float)16);
+        jLabel7.setVisible(!isTestEmailDone);       
     }
     
     /**
@@ -722,99 +463,26 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
 
         return worker;
     }
-
-    private SwingWorker getTestSMSSwingWorker() {
-        SwingWorker worker = new SwingWorker<Boolean, Void>() {
-            @Override
-            public Boolean doInBackground() {
-                final boolean status = GoogleCalendar.SMS(MessagesBundle.getString("info_message_congratulation_sms_alert_system_is_working"));
-                return status;
-            }
-
-            @Override
-            public void done() {
-                // The done Method: When you are informed that the SwingWorker
-                // is done via a property change or via the SwingWorker object's
-                // done method, you need to be aware that the get methods can
-                // throw a CancellationException. A CancellationException is a
-                // RuntimeException, which means you do not need to declare it
-                // thrown and you do not need to catch it. Instead, you should
-                // test the SwingWorker using the isCancelled method before you
-                // use the get method.
-                if (this.isCancelled()) {
-                    // Cancelled by user explicitly. Do not perform any GUI update.
-                    // No pop-up message.
-                    return;
-                }
-
-                Boolean status = null;
-                try {
-                    status = get();
-                } catch (InterruptedException ex) {
-                    log.error(null, ex);
-                } catch (ExecutionException ex) {
-                    log.error(null, ex);
-                } catch (CancellationException ex) {
-                    // Some developers suggest to catch this exception, instead of
-                    // checking on isCancelled. As I am not confident by merely
-                    // isCancelled check can prevent CancellationException (What
-                    // if cancellation is happen just after isCancelled check?),
-                    // I will apply both techniques. 
-                    log.error(null, ex);
-                }
-
-                OptionsAlertJPanel.this.updateGUIState();
-
-                if (status == null || status == false)
-                {
-                    JOptionPane.showMessageDialog(OptionsAlertJPanel.this, MessagesBundle.getString("error_message_error_in_sending_sms"), MessagesBundle.getString("error_title_error_in_sending_sms"), JOptionPane.ERROR_MESSAGE);
-                }
-                else
-                {
-                    JOptionPane.showMessageDialog(OptionsAlertJPanel.this, MessagesBundle.getString("info_message_sms_alert_system_is_working"), MessagesBundle.getString("info_title_sms_alert_system_is_working"), JOptionPane.INFORMATION_MESSAGE);
-                }
-            }
-        };
-
-        return worker;
-    }
-
-    private Pair<Credential, String> credentialEx;
     
-    private volatile SwingWorker testSMSSwingWorker = null;
     private volatile SwingWorker testEmailSwingWorker = null;
 
     private static final Log log = LogFactory.getLog(OptionsAlertJPanel.class);
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JCheckBox jCheckBox2;
-    private javax.swing.JCheckBox jCheckBox3;
     private javax.swing.JCheckBox jCheckBox4;
-    private javax.swing.JComboBox jComboBox1;
-    private javax.swing.JEditorPane jEditorPane3;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
-    private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel7;
     private javax.swing.JPasswordField jPasswordField1;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;

@@ -43,9 +43,7 @@ import javax.swing.*;
 import javax.swing.table.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.yccheok.jstock.alert.GoogleCalendar;
 import org.yccheok.jstock.alert.GoogleMail;
-import org.yccheok.jstock.alert.SMSLimiter;
 import org.yccheok.jstock.analysis.Indicator;
 import org.yccheok.jstock.analysis.OperatorIndicator;
 import org.yccheok.jstock.engine.*;
@@ -2905,39 +2903,6 @@ public class JStock extends javax.swing.JFrame {
                 log.error(null, exp);
             }
         }   /* if(jStockOptions.isSendEmail()) */
-
-        if (this.jStockOptions.isSMSEnabled()) {
-            final Runnable r = new Runnable() {
-                @Override
-                public void run() {
-                    String message = "";
-                    if (((OperatorIndicator)indicator).getName().equalsIgnoreCase("fallbelow"))
-                    {
-                        final String template = GUIBundle.getString("MainFrame_FallBelow_template");
-                        message = MessageFormat.format(template, stock.symbol, lastPrice, price);
-                    }
-                    else
-                    {
-                        final String template = GUIBundle.getString("MainFrame_RiseAbove_template");
-                        message = MessageFormat.format(template, stock.symbol, lastPrice, price);
-                    }
-
-                    if (SMSLimiter.INSTANCE.isSMSAllowed()) {
-                        final boolean status = GoogleCalendar.SMS(message);
-                        if (status) {
-                            SMSLimiter.INSTANCE.inc();
-                        }
-                    }
-                }
-            };
-
-            try {
-                smsAlertPool.submit(r);
-            }
-            catch(java.util.concurrent.RejectedExecutionException exp) {
-                log.error(null, exp);
-            }
-        }   /* if(jStockOptions.isSMSEnabled()) */
     }
 
     /**
@@ -4232,7 +4197,7 @@ public class JStock extends javax.swing.JFrame {
         }   /* for (Stock stock : stocks) */
 
         // No alert is needed. Early return.
-        if ((jStockOptions.isSMSEnabled() == false) && (jStockOptions.isPopupMessage() == false) && (jStockOptions.isSoundEnabled() == false) && (jStockOptions.isSendEmail() == false)) {
+        if ((jStockOptions.isPopupMessage() == false) && (jStockOptions.isSoundEnabled() == false) && (jStockOptions.isSendEmail() == false)) {
             return;
         }
 
@@ -4829,7 +4794,6 @@ public class JStock extends javax.swing.JFrame {
 
     private final AlertStateManager alertStateManager = new AlertStateManager();
     private final ExecutorService emailAlertPool = Executors.newFixedThreadPool(1);
-    private final ExecutorService smsAlertPool = Executors.newFixedThreadPool(1);
     private final ExecutorService systemTrayAlertPool = Executors.newFixedThreadPool(1);
     private volatile ExecutorService stockInfoDatabaseMetaPool = Executors.newFixedThreadPool(1);
             
