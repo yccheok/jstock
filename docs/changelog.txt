@@ -1,15 +1,16 @@
 ﻿This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
-JStock 1.0.7.7 - xxxx-xx-xx
+JStock 1.0.7.7 - 2015-06-02
   Feature: In certain country like Malaysia, even if you type in complete stock 
            code "7252WA.KL", the API will give you 0 result. Hence, we will 
            perform stock pricing enquiry (deep search) to determine whether it 
            is a valid stock code input.
   Bugfix:  Memory leak on history chart window. After viewing and closing 
-           (using ‘X’ not ‘_”), and minimizing JStock, when JStock is then 
+           (using 'X' not '_'), and minimizing JStock, when JStock is then 
            maximized again, there are all of a sudden all charts previously 
            viewed and closed.
+  Bugfix:  Remove SMS alert feature.
   
 JStock 1.0.7.6 - 2015-04-12
   Bugfix:  Cash balance calculation.
