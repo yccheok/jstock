@@ -163,8 +163,12 @@ public enum Factories {
         yahooSet.add(YahooStockServerFactory.class);
         yahooSet.add(BrazilYahooStockServerFactory.class);
         
+        // *********************************************************************
         // Kindly revise GoogleStockServer's getBestCurrency, for countries
         // which are using GoogleStockServerFactory.
+        //
+        // Please revise AjaxStockInfoSearchEngine's isSupported as well.
+        // *********************************************************************
         australiaList.add(YahooStockServerFactory.newInstance());
         australiaList.add(GoogleStockServerFactory.newInstance());
         austriaList.add(YahooStockServerFactory.newInstance());
