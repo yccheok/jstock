@@ -914,9 +914,6 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
                 final StockInfo stockInfo = StockInfo.newInstance(code, symbol);
 
                 addStockInfoFromAutoCompleteJComboBox(stockInfo);
-
-                // Remember to update our offline database as well.
-                JStock.instance().addUserDefinedStockInfo(stockInfo);
             }
         };
     }
@@ -934,9 +931,6 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
                 final StockInfo stockInfo = StockInfo.newInstance(code, symbol);
 
                 addStockInfoFromAutoCompleteJComboBox(stockInfo);
-
-                // Remember to update our offline database as well.
-                JStock.instance().addUserDefinedStockInfo(stockInfo);
             }
         };
     }

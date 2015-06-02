@@ -255,10 +255,10 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
                 // them to do so.
                 //
                 // Without setReadOnly(true), when we type the first character "w", IME
-                // will suggest "æˆ?. However, when we call removeAllItems and addItem,
+                // will suggest ... However, when we call removeAllItems and addItem,
                 // JComboBox will "commit" this suggestion to JComboBox's text field.
                 // Hence, if we continue to type second character "m", the string displayed
-                // at JComboBox's text field will be "æˆ‘æˆ‘æˆ?.
+                // at JComboBox's text field will be ...
                 //
                 AutoCompleteJComboBox.this.jComboBoxEditor.setReadOnly(true);
 
@@ -582,10 +582,10 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
                 // them to do so.
                 //
                 // Without setReadOnly(true), when we type the first character "w", IME
-                // will suggest "æˆ?. However, when we call removeAllItems and addItem,
+                // will suggest ... However, when we call removeAllItems and addItem,
                 // JComboBox will "commit" this suggestion to JComboBox's text field.
                 // Hence, if we continue to type second character "m", the string displayed
-                // at JComboBox's text field will be "æˆ‘æˆ‘æˆ?.
+                // at JComboBox's text field will be ...
                 //
                 AutoCompleteJComboBox.this.jComboBoxEditor.setReadOnly(true);
 
@@ -658,10 +658,10 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
                 // them to do so.
                 //
                 // Without setReadOnly(true), when we type the first character "w", IME
-                // will suggest "æˆ?. However, when we call removeAllItems and addItem,
+                // will suggest ... However, when we call removeAllItems and addItem,
                 // JComboBox will "commit" this suggestion to JComboBox's text field.
                 // Hence, if we continue to type second character "m", the string displayed
-                // at JComboBox's text field will be "æˆ‘æˆ‘æˆ?.
+                // at JComboBox's text field will be ...
                 //
                 AutoCompleteJComboBox.this.jComboBoxEditor.setReadOnly(true);
 

@@ -1354,10 +1354,7 @@ public class IndicatorPanel extends JPanel {
                 final Symbol symbol = Symbol.newInstance(matchType.n);
                 final StockInfo stockInfo = StockInfo.newInstance(code, symbol);
                 
-                addStockInfoFromAutoCompleteJComboBox(stockInfo);
-
-                // Remember to update our offline database as well.
-                JStock.instance().addUserDefinedStockInfo(stockInfo);                
+                addStockInfoFromAutoCompleteJComboBox(stockInfo);              
             }                
         };
     }
@@ -1375,9 +1372,6 @@ public class IndicatorPanel extends JPanel {
                 final StockInfo stockInfo = StockInfo.newInstance(code, symbol);
 
                 addStockInfoFromAutoCompleteJComboBox(stockInfo);
-
-                // Remember to update our offline database as well.
-                JStock.instance().addUserDefinedStockInfo(stockInfo);
             }
         };
     }

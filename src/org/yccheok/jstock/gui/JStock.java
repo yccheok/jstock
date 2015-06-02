@@ -2922,24 +2922,6 @@ public class JStock extends javax.swing.JFrame {
         JTableUtilities.scrollToVisible(this.jTable1, row, 0);
     }
 
-    /**
-     * Add user defined stock info.
-     *
-     * @param stockInfo the stock info
-     * @return true if success
-     */
-    public boolean addUserDefinedStockInfo(StockInfo stockInfo) {
-        StockInfoDatabase stock_info_database = this.stockInfoDatabase;
-        if (stock_info_database == null) {
-            return false;
-        }
-        boolean result = stock_info_database.addUserDefinedStockInfo(stockInfo);
-        if (result) {
-            needToSaveUserDefinedDatabase = true;
-        }
-        return result;
-    }
-
     private org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, MatchType> getMatchObserver() {
         return new org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, MatchType>() {
 
@@ -2951,9 +2933,6 @@ public class JStock extends javax.swing.JFrame {
                 final StockInfo stockInfo = StockInfo.newInstance(code, symbol);
 
                 addStockInfoFromAutoCompleteJComboBox(stockInfo);
-
-                // Remember to update our offline database as well.
-                addUserDefinedStockInfo(stockInfo);
             }
         };
     }
@@ -2971,9 +2950,6 @@ public class JStock extends javax.swing.JFrame {
                 final StockInfo stockInfo = StockInfo.newInstance(code, symbol);
 
                 addStockInfoFromAutoCompleteJComboBox(stockInfo);
-
-                // Remember to update our offline database as well.
-                addUserDefinedStockInfo(stockInfo);
             }
         };
     }

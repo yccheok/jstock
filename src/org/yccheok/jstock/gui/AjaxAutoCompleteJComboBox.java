@@ -380,10 +380,10 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
                 // them to do so.
                 //
                 // Without setReadOnly(true), when we type the first character "w", IME
-                // will suggest "æˆ?. However, when we call removeAllItems and addItem,
+                // will suggest ... However, when we call removeAllItems and addItem,
                 // JComboBox will "commit" this suggestion to JComboBox's text field.
                 // Hence, if we continue to type second character "m", the string displayed
-                // at JComboBox's text field will be "æˆ‘æˆ‘æˆ?.
+                // at JComboBox's text field will be ...
                 //
                 AjaxAutoCompleteJComboBox.this.jComboBoxEditor.setReadOnly(true);
 
@@ -451,10 +451,10 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
                 // them to do so.
                 //
                 // Without setReadOnly(true), when we type the first character "w", IME
-                // will suggest "ï¿?. However, when we call removeAllItems and addItem,
+                // will suggest ... However, when we call removeAllItems and addItem,
                 // JComboBox will "commit" this suggestion to JComboBox's text field.
                 // Hence, if we continue to type second character "m", the string displayed
-                // at JComboBox's text field will be "æˆ‘æˆ‘ï¿?.
+                // at JComboBox's text field will be ...
                 //
                 AjaxAutoCompleteJComboBox.this.jComboBoxEditor.setReadOnly(true);
 
