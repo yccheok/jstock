@@ -1,6 +1,9 @@
 ﻿This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.7.8 - 2015-06-04
+  Feature: Better stock search for all countries except United States.
+  
 JStock 1.0.7.7 - 2015-06-02
   Feature: In certain country like Malaysia, even if you type in complete stock 
            code "7252WA.KL", the API will give you 0 result. Hence, we will 
