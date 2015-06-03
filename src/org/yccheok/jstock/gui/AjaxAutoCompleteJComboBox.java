@@ -362,6 +362,7 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
                         List<MatchType> matchTypes = new ArrayList<>();
                         matchTypes.add(matchType);
                         MatchSetType matchSetType = MatchSetType.newInstance(arg.Query, matchTypes);
+                        // Overwrite!
                         arg = matchSetType;
                     }
                 }

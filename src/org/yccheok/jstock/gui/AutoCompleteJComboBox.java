@@ -564,6 +564,7 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
                         List<MatchType> matchTypes = new ArrayList<>();
                         matchTypes.add(matchType);
                         MatchSetType matchSetType = MatchSetType.newInstance(arg.Query, matchTypes);
+                        // Overwrite!
                         arg = matchSetType;
                     }
                 }
