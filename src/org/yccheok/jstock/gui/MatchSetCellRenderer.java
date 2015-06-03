@@ -123,7 +123,14 @@ public class MatchSetCellRenderer extends javax.swing.JPanel implements ListCell
         final MatchType result = (MatchType)value;
         jLabel1.setText(result.t);
         jLabel2.setText(result.n);
-        jLabel3.setText(result.e);
+        
+        if (result.e == null) {
+            jLabel3.setVisible(false);
+        } else {
+            jLabel3.setVisible(true);
+            jLabel3.setText(result.e);
+        }
+        
         return this;
     }
 }

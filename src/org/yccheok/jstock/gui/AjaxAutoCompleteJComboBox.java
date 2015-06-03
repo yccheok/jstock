@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2015 Yan Cheng Cheok <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -353,14 +353,28 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
         return new Observer<AjaxGoogleSearchEngineMonitor, MatchSetType>() {
 
             @Override
-            public void update(final AjaxGoogleSearchEngineMonitor subject, final MatchSetType arg) {
+            public void update(final AjaxGoogleSearchEngineMonitor subject, MatchSetType arg) {
+                // Can we further enhance our search result?
+                if (arg.Match.isEmpty()) {
+                    StockInfo stockInfo = ajaxStockInfoSearchEngine.search(arg.Query);
+                    if (stockInfo != null) {
+                        MatchType matchType = new MatchType(stockInfo.code.toString(), stockInfo.symbol.toString(), null, null);
+                        List<MatchType> matchTypes = new ArrayList<>();
+                        matchTypes.add(matchType);
+                        MatchSetType matchSetType = MatchSetType.newInstance(arg.Query, matchTypes);
+                        arg = matchSetType;
+                    }
+                }
+
+                final MatchSetType _arg = arg;
+
                 if (SwingUtilities.isEventDispatchThread()) {
-                    _update(subject, arg);
+                    _update(subject, _arg);
                 } else {
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            _update(subject, arg);
+                            _update(subject, _arg);
                         }
                     });
                 }

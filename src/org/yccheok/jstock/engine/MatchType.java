@@ -43,10 +43,12 @@ public class MatchType {
     }
     
     public Code getCode() {
-        if (this.e.equals("NSE")) {
+        if ("NSE".equals(e)) {
             return Code.newInstance(this.t + ".N");
-        } else if (this.e.equals("BOM")) {
+        } else if ("BOM".equals(e)) {
             return Code.newInstance(this.t + ".B");
+        } else if (this.e == null || this.e.isEmpty()) {
+            return Code.newInstance(this.t);    
         }
         return Code.newInstance(this.e + ":" + this.t);
     }
