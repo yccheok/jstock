@@ -40,6 +40,7 @@ public class Utils {
         HELP_HTML,
         MA_INDICATOR_HTML,
         GET_TIME,
+        GET_IP,
         OPTIONS,
         DONATE_HTML,
         CONTRIBUTE_HTML,
@@ -88,6 +89,7 @@ public class Utils {
         map.put(Type.HELP_HTML, "http://jstock.org/help.html?utm_source=jstock&utm_medium=help_menu");
         map.put(Type.MA_INDICATOR_HTML, "http://jstock.org/ma_indicator.html?utm_source=jstock&utm_medium=chart_dialog");
         map.put(Type.GET_TIME, JSTOCK_WEBAPP_SERVER + "get-time.py");
+        map.put(Type.GET_IP, JSTOCK_WEBAPP_SERVER + "get-ip.py");
         map.put(Type.OPTIONS, JSTOCK_STATIC_SERVER + "options_information/options.txt");
         map.put(Type.DONATE_HTML,"http://jstock.org/donation.html?utm_source=jstock&utm_medium=help_menu");
         // http://webmasters.stackexchange.com/questions/35413/unable-to-use-anchor-hash-tag-if-using-google-analytics-utm
@@ -107,6 +109,7 @@ public class Utils {
         zh_map.put(Type.HELP_HTML, "http://jstock.org/zh/help.html?utm_source=jstock&utm_medium=help_menu");
         zh_map.put(Type.MA_INDICATOR_HTML, "http://jstock.org/zh/ma_indicator.html?utm_source=jstock&utm_medium=chart_dialog");
         zh_map.put(Type.GET_TIME, JSTOCK_WEBAPP_SERVER + "get-time.py");
+        zh_map.put(Type.GET_IP, JSTOCK_WEBAPP_SERVER + "get-ip.py");
         zh_map.put(Type.OPTIONS, JSTOCK_STATIC_SERVER + "options_information/options.txt");
         zh_map.put(Type.DONATE_HTML,"http://jstock.org/zh/donation.html?utm_source=jstock&utm_medium=help_menu");
         // http://webmasters.stackexchange.com/questions/35413/unable-to-use-anchor-hash-tag-if-using-google-analytics-utm
