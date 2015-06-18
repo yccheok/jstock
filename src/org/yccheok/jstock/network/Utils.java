@@ -46,7 +46,8 @@ public class Utils {
         CONTRIBUTE_HTML,
         HELP_KEYBOARD_SHORTCUTS_HTML,
         ANDROID_HTML,
-        STOCK_INFO_DATABASE_META
+        STOCK_INFO_DATABASE_META,
+        ANDROID_FAQ,
     }
 
     private Utils() {
@@ -61,6 +62,8 @@ public class Utils {
         final Locale defaultLocale = Locale.getDefault();
         if (org.yccheok.jstock.gui.Utils.isSimplifiedChinese(defaultLocale)) {
             return zh_map.get(type);
+        } else if (org.yccheok.jstock.gui.Utils.isTraditionalChinese(defaultLocale)) {
+            return zh_Hant_map.get(type);
         }
         return map.get(type);
     }
@@ -72,8 +75,10 @@ public class Utils {
         return JSTOCK_STATIC_SERVER;
     }
     
-    private static final Map<Type, String> map = new EnumMap<Type, String>(Type.class);
-    private static final Map<Type, String> zh_map = new EnumMap<Type, String>(Type.class);
+    private static final Map<Type, String> map = new EnumMap<>(Type.class);
+    private static final Map<Type, String> zh_map = new EnumMap<>(Type.class);
+    private static final Map<Type, String> zh_Hant_map = new EnumMap<>(Type.class);
+
     private static final String JSTOCK_STATIC_SERVER = "http://jstock-static.appspot.com/";
     private static final String JSTOCK_WEBAPP_SERVER = "http://jstock-webapp.appspot.com/";
 
@@ -97,7 +102,8 @@ public class Utils {
         map.put(Type.HELP_KEYBOARD_SHORTCUTS_HTML, "http://jstock.org/help_faq.html?utm_source=jstock&utm_medium=help_menu#keyboard-shortcuts");
         map.put(Type.ANDROID_HTML, "http://goo.gl/VAm6Mx");
         map.put(Type.STOCK_INFO_DATABASE_META, JSTOCK_STATIC_SERVER + "stocks_information/stock-info-database-meta.json");
-        
+        map.put(Type.ANDROID_FAQ, "http://faq.jstock.co/?utm_source=jstock-android&utm_medium=settings");
+
         zh_map.put(Type.CHAT_SERVER_TXT, JSTOCK_STATIC_SERVER + "servers_information/chat_server.txt");
         zh_map.put(Type.NTP_SERVER_TXT, JSTOCK_STATIC_SERVER + "servers_information/ntp_server.txt");
         zh_map.put(Type.NEWS_INFORMATION_TXT, JSTOCK_STATIC_SERVER + "news_information/zh/index.txt");
@@ -117,6 +123,28 @@ public class Utils {
         zh_map.put(Type.HELP_KEYBOARD_SHORTCUTS_HTML, "http://jstock.org/zh/help_faq.html?utm_source=jstock&utm_medium=help_menu#keyboard-shortcuts");
         zh_map.put(Type.ANDROID_HTML, "http://goo.gl/VAm6Mx");
         zh_map.put(Type.STOCK_INFO_DATABASE_META, JSTOCK_STATIC_SERVER + "stocks_information/stock-info-database-meta.json");
+        zh_map.put(Type.ANDROID_FAQ, "http://faq.jstock.co/zh/?utm_source=jstock-android&utm_medium=settings");
+
+        zh_Hant_map.put(Type.CHAT_SERVER_TXT, JSTOCK_STATIC_SERVER + "servers_information/chat_server.txt");
+        zh_Hant_map.put(Type.NTP_SERVER_TXT, JSTOCK_STATIC_SERVER + "servers_information/ntp_server.txt");
+        zh_Hant_map.put(Type.NEWS_INFORMATION_TXT, JSTOCK_STATIC_SERVER + "news_information/zh/index.txt");
+        zh_Hant_map.put(Type.VERSION_INFORMATION_TXT, JSTOCK_STATIC_SERVER + "version_information/zh/index.txt");
+        zh_Hant_map.put(Type.MODULE_INDICATOR_DOWNLOAD_MANAGER_XML, JSTOCK_STATIC_SERVER + "module_indicators/zh/indicator_download_manager.xml");
+        zh_Hant_map.put(Type.ALERT_INDICATOR_DOWNLOAD_MANAGER_XML, JSTOCK_STATIC_SERVER + "alert_indicators/zh/indicator_download_manager.xml");
+        zh_Hant_map.put(Type.HELP_STOCK_DATABASE_HTML, "http://jstock.org/zh/help_stock_database.html?utm_source=jstock&utm_medium=database_dialog");
+        zh_Hant_map.put(Type.PRIVACY_HTML, "http://jstock.org/zh/privacy.html");
+        zh_Hant_map.put(Type.HELP_HTML, "http://jstock.org/zh/help.html?utm_source=jstock&utm_medium=help_menu");
+        zh_Hant_map.put(Type.MA_INDICATOR_HTML, "http://jstock.org/zh/ma_indicator.html?utm_source=jstock&utm_medium=chart_dialog");
+        zh_Hant_map.put(Type.GET_TIME, JSTOCK_WEBAPP_SERVER + "get-time.py");
+        zh_Hant_map.put(Type.GET_IP, JSTOCK_WEBAPP_SERVER + "get-ip.py");
+        zh_Hant_map.put(Type.OPTIONS, JSTOCK_STATIC_SERVER + "options_information/options.txt");
+        zh_Hant_map.put(Type.DONATE_HTML,"http://jstock.org/zh/donation.html?utm_source=jstock&utm_medium=help_menu");
+        // http://webmasters.stackexchange.com/questions/35413/unable-to-use-anchor-hash-tag-if-using-google-analytics-utm
+        zh_Hant_map.put(Type.CONTRIBUTE_HTML, "http://jstock.org/zh/help_faq.html?utm_source=jstock&utm_medium=help_menu#contribution");
+        zh_Hant_map.put(Type.HELP_KEYBOARD_SHORTCUTS_HTML, "http://jstock.org/zh/help_faq.html?utm_source=jstock&utm_medium=help_menu#keyboard-shortcuts");
+        zh_Hant_map.put(Type.ANDROID_HTML, "http://goo.gl/VAm6Mx");
+        zh_Hant_map.put(Type.STOCK_INFO_DATABASE_META, JSTOCK_STATIC_SERVER + "stocks_information/stock-info-database-meta.json");
+        zh_Hant_map.put(Type.ANDROID_FAQ, "http://faq.jstock.co/zh-Hant/?utm_source=jstock-android&utm_medium=settings");
 
         assert(map.size() == Type.values().length);
         assert(zh_map.size() == Type.values().length);
