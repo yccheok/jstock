@@ -215,7 +215,7 @@ public class GoogleStockServer implements StockServer {
             return java.util.Collections.emptyList();
         }
         
-        Map<String, Code> originalCodes = new HashMap<String, Code>();
+        Map<String, Code> originalCodes = new HashMap<>();
                 
         // Use StringBuilder instead of StringBuffer. We do not concern on 
         // thread safety.

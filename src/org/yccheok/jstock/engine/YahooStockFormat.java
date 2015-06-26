@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Pattern;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -281,7 +282,7 @@ public class YahooStockFormat implements StockFormat {
                 try { sellQuantity = Integer.parseInt(fields[32]); } catch (NumberFormatException exp) {}
                 
                 if (length < 36) break;
-                java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("MM/dd/yyyy hh:mmaa");
+                java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("MM/dd/yyyy hh:mmaa", Locale.ENGLISH);
                 String date_and_time = quotePattern.matcher(fields[34]).replaceAll("").trim() + " " + quotePattern.matcher(fields[35]).replaceAll("").trim();
                 java.util.Date serverDate;
                 try {
