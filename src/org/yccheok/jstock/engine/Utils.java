@@ -353,7 +353,7 @@ public class Utils {
      * @return List of stocks carried by the CSV file.
      */
     public static List<Stock> getStocksFromCSVFile(File file) {
-        List<Stock> stocks = new ArrayList<Stock>();
+        List<Stock> stocks = new ArrayList<>();
         FileInputStream fileInputStream = null;
         InputStreamReader inputStreamReader = null;
         CSVReader csvreader = null;
@@ -937,6 +937,7 @@ public class Utils {
         twoLetterSuffixes.put(".AX", "ASX:");
         twoLetterSuffixes.put(".BR", "EBR:");
         twoLetterSuffixes.put(".AS", "AMS:");
+        twoLetterSuffixes.put(".CO", "CPH:");
         
         countries.put("AX", Country.Australia);
         countries.put("VI", Country.Austria);
@@ -1015,6 +1016,7 @@ public class Utils {
         toGoogleIndex.put("^AORD", "INDEXASX:XAO");
         toGoogleIndex.put("^BFX", "INDEXEURO:BEL20");
         toGoogleIndex.put("^AEX", "INDEXEURO:AEX");
+        toGoogleIndex.put("^OMXC20", "INDEXNASDAQ:OMXC20");
         
         // TODO : Need revision. We no longer have primaryStockServerFactoryClasses
         // concept. Going to replace with PriceSource.

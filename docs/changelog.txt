@@ -1,6 +1,10 @@
 ﻿This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.7.9 - xxxxxxxxxx
+  Feature: Use Google Finance for Denmark.
+  Bugfix:  Fix Denmark stock index.
+  
 JStock 1.0.7.8 - 2015-06-04
   Feature: Better stock search for all countries except United States.
   
