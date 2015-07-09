@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2010 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2015 Yan Cheng Cheok <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -92,10 +92,11 @@ public class AjaxYahooSearchEngineMonitor extends Subject<AjaxYahooSearchEngineM
             }
         }
     }
+        
     private final SearchEngine<ResultType> searchEngine = new AjaxYahooSearchEngine();
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     // 128 is just a magic number.
-    private final BlockingQueue<String> blockingQueue = new ArrayBlockingQueue<String>(128);
+    private final BlockingQueue<String> blockingQueue = new ArrayBlockingQueue<>(128);
 
     private static final Log log = LogFactory.getLog(AjaxYahooSearchEngineMonitor.class);
 

@@ -32,9 +32,8 @@ import java.util.*;
 import org.apache.commons.httpclient.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.yccheok.jstock.engine.Stock.Board;
-import org.yccheok.jstock.engine.Stock.Industry;
 import org.yccheok.jstock.file.Statements;
+import org.yccheok.jstock.gui.Constants;
 import org.yccheok.jstock.gui.JStock;
 
 /**
@@ -42,6 +41,10 @@ import org.yccheok.jstock.gui.JStock;
  * @author yccheok
  */
 public class Utils {
+    
+    public static interface GetStocksCallback {
+        public void update(List<Stock> stocks);
+    }
     
     /** Creates a new instance of Utils */
     private Utils() {
@@ -69,8 +72,8 @@ public class Utils {
                             symbol,
                             "",
                             null,
-                            Stock.Board.Unknown,
-                            Stock.Industry.Unknown,
+                            Board.Unknown,
+                            Industry.Unknown,
                             0.0,
                             0.0,
                             0.0,
@@ -96,6 +99,106 @@ public class Utils {
                             );                
     } 
     
+    public static Stock getStock(Code code) {
+        List<Code> codes = new ArrayList<>();
+        codes.add(code);
+        List<Stock> stocks = getStocks(codes, new GetStocksCallback() {
+            @Override
+            public void update(List<Stock> stocks) {
+            }            
+        });
+        if (stocks.size() == 1) {
+            return stocks.get(0);
+        }
+        return null;
+    }
+    
+    private static List<Code> getZeroPriceCodes(List<Stock> stocks, List<Stock> nonZeroPriceStocks, Set<Code> nonZeroPriceCodes) {
+        assert(stocks != null);
+        assert(nonZeroPriceStocks != null);
+        assert(nonZeroPriceCodes != null);
+        
+        List<Code> zeroPriceCodes = null;
+        
+        for (Stock stock : stocks) {
+            if (nonZeroPriceCodes.contains(stock.code)) {
+                continue;
+            }
+                
+            if (stock.getLastPrice() == 0.0 && stock.getOpenPrice() == 0.0) {
+                if (zeroPriceCodes == null) {
+                    zeroPriceCodes = new ArrayList<>();
+                }
+                
+                zeroPriceCodes.add(stock.code);
+            } else {
+                nonZeroPriceCodes.add(stock.code);
+                nonZeroPriceStocks.add(stock);
+            }
+        }
+        
+        if (zeroPriceCodes == null) {
+            return java.util.Collections.emptyList();
+        }
+        
+        return zeroPriceCodes;
+    }
+
+    public static List<Stock> getStocks(List<Code> codes, GetStocksCallback getStockCallback) {
+        final List<Stock> s = new ArrayList<>();
+        final Set<Code> nonZeroPriceCodes = new HashSet<>();        
+        final CodeBucketLists codeBucketLists = new CodeBucketLists(Constants.REAL_TIME_STOCK_MONITOR_MAX_STOCK_SIZE_PER_SCAN);
+        
+        for (Code code : codes) {
+            codeBucketLists.add(code);
+        }
+        
+        final int size = codeBucketLists.size();
+        for (int i = 0; i < size; i++) {
+            List<Code> _codes = codeBucketLists.get(i);
+            
+            List<Code> zeroPriceCodes = _codes;
+            final List<Stock> stocks = new ArrayList<>();
+            
+            for (StockServerFactory factory : Factories.INSTANCE.getStockServerFactories(_codes.get(0)))
+            {
+                final StockServer stockServer = factory.getStockServer();
+
+                if (stockServer == null) {
+                    continue;
+                }
+                
+                List<Stock> tmpStocks = null;
+                try {
+                    tmpStocks = stockServer.getStocks(zeroPriceCodes);
+                } catch (StockNotFoundException exp) {
+                    log.error("" + zeroPriceCodes, exp);
+                    // Try with another server.
+                    continue;
+                }
+
+                zeroPriceCodes = getZeroPriceCodes(tmpStocks, stocks, nonZeroPriceCodes);
+                if (zeroPriceCodes.isEmpty()) {
+                    break;
+                }
+            }   /* for (StockServerFactory factory : Factories.INSTANCE.getStockServerFactories(codes.get(0))) */
+            
+            // Avoid multiple empty stocks callback.
+            if (!stocks.isEmpty()) {
+                getStockCallback.update(stocks);
+                s.addAll(stocks);
+            }
+        }
+        
+        // Even the final result is empty, ensure we trigger callback at least
+        // once.
+        if (s.isEmpty()) {
+            getStockCallback.update(s);
+        }
+        
+        return s;
+    }
+
     public static Country toCountry(Code code) {
         assert(countries.keySet().size() == 45);
         
@@ -250,7 +353,7 @@ public class Utils {
      * @return List of stocks carried by the CSV file.
      */
     public static List<Stock> getStocksFromCSVFile(File file) {
-        List<Stock> stocks = new ArrayList<Stock>();
+        List<Stock> stocks = new ArrayList<>();
         FileInputStream fileInputStream = null;
         InputStreamReader inputStreamReader = null;
         CSVReader csvreader = null;
@@ -552,7 +655,6 @@ public class Utils {
     /**
      * Returns best search engine based on current selected country.
      * 
-     * @param list List of elements, to be inserted into search engine
      * @return Best search engine based on current selected country.
      */
     public static boolean isPinyinTSTSearchEngineRequiredForSymbol() {
@@ -809,15 +911,15 @@ public class Utils {
         return set;
     }
     
-    private static final Map<String, Country> countries = new HashMap<String, Country>();
-    private static final Map<String, Country> indices = new HashMap<String, Country>();
-    private static final Map<String, String> toGoogleIndex = new HashMap<String, String>();
-    private static final Map<Country, PriceSource> defaultPriceSources = new HashMap<Country, PriceSource>();
-    private static final Map<Class<? extends StockServerFactory>, PriceSource> classToPriceSourceMap = new HashMap<Class<? extends StockServerFactory>, PriceSource>();
-    private static final Map<String, Integer> googleUnitedStatesStockExchanges = new HashMap<String, Integer>();
+    private static final Map<String, Country> countries = new HashMap<>();
+    private static final Map<String, Country> indices = new HashMap<>();
+    private static final Map<String, String> toGoogleIndex = new HashMap<>();
+    private static final Map<Country, PriceSource> defaultPriceSources = new EnumMap<>(Country.class);
+    private static final Map<Class<? extends StockServerFactory>, PriceSource> classToPriceSourceMap = new HashMap<>();
+    private static final Map<String, Integer> googleUnitedStatesStockExchanges = new HashMap<>();
     
-    private static final Map<String, String> oneLetterSuffixes = new HashMap<String, String>();
-    private static final Map<String, String> twoLetterSuffixes = new HashMap<String, String>();
+    private static final Map<String, String> oneLetterSuffixes = new HashMap<>();
+    private static final Map<String, String> twoLetterSuffixes = new HashMap<>();
     
     static {
         oneLetterSuffixes.put(".N", "NSE:");
@@ -834,6 +936,8 @@ public class Utils {
         twoLetterSuffixes.put(".ST", "STO:");
         twoLetterSuffixes.put(".AX", "ASX:");
         twoLetterSuffixes.put(".BR", "EBR:");
+        twoLetterSuffixes.put(".AS", "AMS:");
+        twoLetterSuffixes.put(".CO", "CPH:");
         
         countries.put("AX", Country.Australia);
         countries.put("VI", Country.Austria);
@@ -898,6 +1002,7 @@ public class Utils {
         
         toGoogleIndex.put("^DJI", "INDEXDJX:.DJI");
         toGoogleIndex.put("^IXIC", "INDEXNASDAQ:.IXIC");
+        toGoogleIndex.put("^GSPC", "INDEXSP:.INX");
         toGoogleIndex.put("^BSESN", "INDEXBOM:SENSEX");
         toGoogleIndex.put("^NSEI", "NSE:NIFTY");
         toGoogleIndex.put("^NSEBANK", "NSE:BANKNIFTY");
@@ -910,6 +1015,8 @@ public class Utils {
         toGoogleIndex.put("^AXJO", "INDEXASX:XJO");
         toGoogleIndex.put("^AORD", "INDEXASX:XAO");
         toGoogleIndex.put("^BFX", "INDEXEURO:BEL20");
+        toGoogleIndex.put("^AEX", "INDEXEURO:AEX");
+        toGoogleIndex.put("^OMXC20", "INDEXNASDAQ:OMXC20");
         
         // TODO : Need revision. We no longer have primaryStockServerFactoryClasses
         // concept. Going to replace with PriceSource.

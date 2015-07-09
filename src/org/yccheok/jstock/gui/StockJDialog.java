@@ -483,7 +483,7 @@ public class StockJDialog extends javax.swing.JDialog {
             for (JCheckBox checkBox : boardCheckBoxes) {
                 if (checkBox.isSelected() == false) continue;
                     
-                final Stock.Board board = this.checkBoxToBoard.get(checkBox);
+                final Board board = this.checkBoxToBoard.get(checkBox);
                                         
                 if (board == null) {
                     log.error("Wrong text in JCheckBox GUI : " + checkBox.getText());
@@ -500,7 +500,7 @@ public class StockJDialog extends javax.swing.JDialog {
             for (JCheckBox checkBox : industryCheckBoxes) {
                 if (checkBox.isSelected() == false) continue;
                     
-                final Stock.Industry industry = this.checkBoxToIndustry.get(checkBox);
+                final Industry industry = this.checkBoxToIndustry.get(checkBox);
                     
                 if (industry == null) {
                     log.error("Wrong text in JCheckBox GUI : " + checkBox.getText());
@@ -534,11 +534,11 @@ public class StockJDialog extends javax.swing.JDialog {
             checkBox.setVisible(false);
         }
         
-        java.util.List<Stock.Board> sortedBoards = stockInfoDatabase.getBoards();
+        java.util.List<Board> sortedBoards = stockInfoDatabase.getBoards();
         Collections.sort(sortedBoards);
         
         int count = 0;
-        for (Stock.Board board : sortedBoards) {
+        for (Board board : sortedBoards) {
             if (count >= boardCheckBoxes.size()) {
                 log.error("You do not have enough check box components (" + boardCheckBoxes.size() + ") to hold board (" + sortedBoards.size() + ")");
                 break;
@@ -578,11 +578,11 @@ public class StockJDialog extends javax.swing.JDialog {
             checkBox.setVisible(false);
         }
         
-        java.util.List<Stock.Industry> sortedIndustries = stockInfoDatabase.getIndustries();
+        java.util.List<Industry> sortedIndustries = stockInfoDatabase.getIndustries();
         Collections.sort(sortedIndustries);
         
         int count = 0;
-        for (Stock.Industry industry : sortedIndustries) {
+        for (Industry industry : sortedIndustries) {
             if (count >= industryCheckBoxes.size()) {
                 log.error("You do not have enough check box components (" + industryCheckBoxes.size() + ") to hold industry (" + sortedIndustries.size() + ")");
                 break;
@@ -595,10 +595,10 @@ public class StockJDialog extends javax.swing.JDialog {
         }
     }
     
-    private java.util.List<javax.swing.JCheckBox> boardCheckBoxes = new java.util.ArrayList<javax.swing.JCheckBox>();
-    private java.util.List<javax.swing.JCheckBox> industryCheckBoxes = new java.util.ArrayList<javax.swing.JCheckBox>();
-    private java.util.Map<javax.swing.JCheckBox, Stock.Industry> checkBoxToIndustry = new java.util.HashMap<javax.swing.JCheckBox, Stock.Industry>();
-    private java.util.Map<javax.swing.JCheckBox, Stock.Board> checkBoxToBoard = new java.util.HashMap<javax.swing.JCheckBox, Stock.Board>();
+    private final java.util.List<javax.swing.JCheckBox> boardCheckBoxes = new java.util.ArrayList<>();
+    private final java.util.List<javax.swing.JCheckBox> industryCheckBoxes = new java.util.ArrayList<>();
+    private final java.util.Map<javax.swing.JCheckBox, Industry> checkBoxToIndustry = new java.util.HashMap<>();
+    private final java.util.Map<javax.swing.JCheckBox, Board> checkBoxToBoard = new java.util.HashMap<>();
     
     private static final Log log = LogFactory.getLog(StockJDialog.class);
     

@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Pattern;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -182,8 +183,8 @@ public class YahooStockFormat implements StockFormat {
             Code code = null;
             Symbol symbol = null;
             String name = null;
-            Stock.Board board = null;
-            Stock.Industry industry = null;
+            Board board = null;
+            Industry industry = null;
             double prevPrice = 0.0;
             double openPrice = 0.0;
             double lastPrice = 0.0;    
@@ -220,13 +221,13 @@ public class YahooStockFormat implements StockFormat {
                 if (length < 3) break;
                 
                 try {
-                    board = Stock.Board.valueOf(quotePattern.matcher(fields[2]).replaceAll("").trim());
+                    board = Board.valueOf(quotePattern.matcher(fields[2]).replaceAll("").trim());
                 }
                 catch (java.lang.IllegalArgumentException exp) {
-                    board = Stock.Board.Unknown;
+                    board = Board.Unknown;
                 }
                 
-                industry = Stock.Industry.Unknown;
+                industry = Industry.Unknown;
                 
                 if (length < 5) break;
                 try { prevPrice = Double.parseDouble(fields[4]); } catch (NumberFormatException exp) {}
@@ -281,7 +282,7 @@ public class YahooStockFormat implements StockFormat {
                 try { sellQuantity = Integer.parseInt(fields[32]); } catch (NumberFormatException exp) {}
                 
                 if (length < 36) break;
-                java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("MM/dd/yyyy hh:mmaa");
+                java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("MM/dd/yyyy hh:mmaa", Locale.ENGLISH);
                 String date_and_time = quotePattern.matcher(fields[34]).replaceAll("").trim() + " " + quotePattern.matcher(fields[35]).replaceAll("").trim();
                 java.util.Date serverDate;
                 try {
@@ -302,7 +303,7 @@ public class YahooStockFormat implements StockFormat {
                 if (currencyText.equals("GBp")) {
                     currencyText = "GBX";
                 }
-                try { currency = Currency.newInstance(currencyText); } catch (java.lang.IllegalArgumentException ex) { log.error(null, ex); }
+                try { currency = Currency.valueOfWithVerification(currencyText); } catch (java.lang.IllegalArgumentException ex) { log.error(null, ex); }
 
                 break;
             } while(true);

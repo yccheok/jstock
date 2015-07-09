@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2012 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2015 Yan Cheng Cheok <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,9 +33,7 @@ import javax.swing.event.*;
 import javax.swing.table.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.yccheok.jstock.alert.GoogleCalendar;
 import org.yccheok.jstock.alert.GoogleMail;
-import org.yccheok.jstock.alert.SMSLimiter;
 import org.yccheok.jstock.analysis.*;
 import org.yccheok.jstock.analysis.Indicator;
 import org.yccheok.jstock.engine.*;
@@ -335,7 +333,6 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         // initialized variables after stop(). The code should be placed before
         // "if (this.stop_button_pressed)" check.
         ExecutorService _emailAlertPool = null;
-        ExecutorService _smsAlertPool = null;
         ExecutorService _systemTrayAlertPool = null;
 
         // There are 2 reasons why we are applying lock right here.
@@ -345,7 +342,6 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         reader.lock();
         try {
             _emailAlertPool = this.emailAlertPool;
-            _smsAlertPool = this.smsAlertPool;
             _systemTrayAlertPool = this.systemTrayAlertPool;
 
             if (this.stop_button_pressed) {
@@ -455,38 +451,6 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                 _emailAlertPool.submit(r);
             }
             catch (java.util.concurrent.RejectedExecutionException exp) {
-                log.error(null, exp);
-            }
-        }
-
-        if (jStockOptions.isSMSEnabled()) {
-            final Runnable r = new Runnable() {
-                @Override
-                public void run() {
-                    final Stock stock = indicator.getStock();
-                    final double price = stock.getLastPrice();
-                    // Google Calendar only support "short" Chinese message.
-                    // Usually our indicator name are quite long.
-                    // We do not have any workaround except fall back to English message.
-                    //
-                    //final String template = GUIBundle.getString("IndicatorScannerJPanel_Hit_template");
-                    final ResourceBundle bundle = ResourceBundle.getBundle("org.yccheok.jstock.data.gui", Locale.ENGLISH);
-                    final String template = bundle.getString("IndicatorScannerJPanel_Hit_template");
-                    final String message = MessageFormat.format(template, stock.symbol, price, indicator.toString());
-
-                    if (SMSLimiter.INSTANCE.isSMSAllowed()) {
-                        final boolean status = GoogleCalendar.SMS(message);
-                        if (status) {
-                            SMSLimiter.INSTANCE.inc();
-                        }
-                    }
-                }
-            };
-
-            try {
-                _smsAlertPool.submit(r);
-            }
-            catch(java.util.concurrent.RejectedExecutionException exp) {
                 log.error(null, exp);
             }
         }
@@ -752,7 +716,6 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
 
         final ExecutorService oldSystemTrayAlertPool = systemTrayAlertPool;
         final ExecutorService oldEmailAlertPool = emailAlertPool;
-        final ExecutorService oldSMSAlertPool = smsAlertPool;
 
         Utils.getZoombiePool().execute(new Runnable() {
             @Override
@@ -779,17 +742,6 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                     }
                     log.info("Shut down " + oldEmailAlertPool + " peacefully.");
                 }
-
-                if (oldSMSAlertPool != null) {
-                    log.info("Prepare to shut down " + oldSMSAlertPool + "...");
-                    oldSMSAlertPool.shutdownNow();
-                    try {
-                        oldSMSAlertPool.awaitTermination(100, TimeUnit.DAYS);
-                    } catch (InterruptedException exp) {
-                        log.error(null, exp);
-                    }
-                    log.info("Shut down " + oldSMSAlertPool + " peacefully.");
-                }
             }
         });
 
@@ -797,7 +749,6 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         alertStateManager.attach(this);
 
         emailAlertPool = Executors.newFixedThreadPool(1);
-        smsAlertPool = Executors.newFixedThreadPool(1);
         systemTrayAlertPool = Executors.newFixedThreadPool(1);
     }
 
@@ -1186,7 +1137,6 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
 
     private AlertStateManager alertStateManager;
     private ExecutorService emailAlertPool;
-    private ExecutorService smsAlertPool;
     private ExecutorService systemTrayAlertPool;
     
     private final org.yccheok.jstock.engine.Observer<StockHistoryMonitor, StockHistoryMonitor.StockHistoryRunnable> stockHistoryMonitorObserver = this.getStockHistoryMonitorObserver();

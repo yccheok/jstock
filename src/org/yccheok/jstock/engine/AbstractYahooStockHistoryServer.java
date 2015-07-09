@@ -24,6 +24,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -35,7 +36,7 @@ public abstract class AbstractYahooStockHistoryServer implements StockHistorySer
     // Use ThreadLocal to ensure thread safety.
     private static final ThreadLocal <SimpleDateFormat> simpleDateFormatThreadLocal = new ThreadLocal <SimpleDateFormat>() {
         @Override protected SimpleDateFormat initialValue() {
-            return new java.text.SimpleDateFormat("yyyy-MM-dd");
+            return new java.text.SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
         }
     };
     
@@ -108,8 +109,8 @@ public abstract class AbstractYahooStockHistoryServer implements StockHistorySer
 
         Symbol symbol = Symbol.newInstance(code.toString());
         String name = symbol.toString();
-        Stock.Board board = Stock.Board.Unknown;
-        Stock.Industry industry = Stock.Industry.Unknown;
+        Board board = Board.Unknown;
+        Industry industry = Industry.Unknown;
 
         try {
             Stock stock = getStockServer().getStock(code);

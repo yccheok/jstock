@@ -44,7 +44,7 @@ public class GoogleStockServer implements StockServer {
     
     @Override
     public Stock getStock(Code code) throws StockNotFoundException {
-        List<Code> codes = new ArrayList<Code>();
+        List<Code> codes = new ArrayList<>();
         codes.add(code);
         List<Stock> stocks = getStocks(codes);
         if (stocks.size() == 1) {
@@ -92,7 +92,7 @@ public class GoogleStockServer implements StockServer {
         }
         
         if (sb.length() == 0) {
-            return Currency.newInstance("USD");
+            return Currency.valueOf("USD");
         }
         
         String currencySymbol = sb.toString();
@@ -101,10 +101,10 @@ public class GoogleStockServer implements StockServer {
         
         try {
             if (currencyCode == null) {
-                return Currency.newInstance(currencySymbol);
+                return Currency.valueOfWithVerification(currencySymbol);
             }
         
-            return Currency.newInstance(currencyCode);
+            return Currency.valueOfWithVerification(currencyCode);
         } catch (java.lang.IllegalArgumentException ex) {
             log.error(null, ex);
         }
@@ -116,7 +116,7 @@ public class GoogleStockServer implements StockServer {
     public List<Stock> getStocks(List<Code> codes) throws StockNotFoundException {
         assert(codes.isEmpty() == false);
         
-        Map<String, Code> originalCodes = new HashMap<String, Code>();
+        Map<String, Code> originalCodes = new HashMap<>();
                 
         // Use StringBuilder instead of StringBuffer. We do not concern on 
         // thread safety.
@@ -151,14 +151,14 @@ public class GoogleStockServer implements StockServer {
                 throw new StockNotFoundException();
             }
             
-            final List<Stock> stocks = new ArrayList<Stock>();
-            Set<Code> currCodes = new HashSet<Code>();
+            final List<Stock> stocks = new ArrayList<>();
+            Set<Code> currCodes = new HashSet<>();
             
             // Let's say London stock exchange & OTCMKTS stock exchange both
             // contains LON:ENVS and OTCMKTS:ENVS respectively. Making query 
             // using "ENVS" will return LON:ENVS. In such case, we need to
             // perform some special treaty.
-            List<Stock> specialUSStocks = new ArrayList<Stock>();
+            List<Stock> specialUSStocks = new ArrayList<>();
             
             for (int i = 0, size = jsonArray.size(); i < size; i++) {
                 final Map<String, String> jsonObject = jsonArray.get(i);
@@ -177,7 +177,7 @@ public class GoogleStockServer implements StockServer {
             } 
 
             // Special US stock handling.
-            List<Code> specialUSCodes = new ArrayList<Code>();
+            List<Code> specialUSCodes = new ArrayList<>();
             for (Stock stock : specialUSStocks) {
                 specialUSCodes.add(stock.code);
             }
@@ -215,7 +215,7 @@ public class GoogleStockServer implements StockServer {
             return java.util.Collections.emptyList();
         }
         
-        Map<String, Code> originalCodes = new HashMap<String, Code>();
+        Map<String, Code> originalCodes = new HashMap<>();
                 
         // Use StringBuilder instead of StringBuffer. We do not concern on 
         // thread safety.

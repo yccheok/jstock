@@ -71,8 +71,8 @@ public class StockInfoDatabase {
         for (Stock stock : stocks) {
             final Code code = stock.code;
             final Symbol symbol = stock.symbol;
-            final Stock.Industry industry = stock.getIndustry();
-            final Stock.Board board = stock.getBoard();
+            final Industry industry = stock.getIndustry();
+            final Board board = stock.getBoard();
 
             StockInfo stockInfo = StockInfo.newInstance(code, symbol);
             StockInfoWithSymbolAsString stockInfoWithSymbolAsString = new StockInfoWithSymbolAsString(code, symbol);
@@ -203,7 +203,7 @@ public class StockInfoDatabase {
      * @param industry the industry
      * @return a list of stock info based on given industry
      */
-    public List<StockInfo> getStockInfos(Stock.Industry industry) {
+    public List<StockInfo> getStockInfos(Industry industry) {
         reader.lock();
         try {
             final List<StockInfo> list = this.industryToStockInfos.get(industry);
@@ -224,7 +224,7 @@ public class StockInfoDatabase {
      * @param board the board
      * @return a list of stock info based on given board
      */
-    public List<StockInfo> getStockInfos(Stock.Board board) {
+    public List<StockInfo> getStockInfos(Board board) {
         reader.lock();
         try {
             final List<StockInfo> list = this.boardToStockInfos.get(board);
@@ -262,7 +262,7 @@ public class StockInfoDatabase {
     public boolean removeAllUserDefinedStockInfos() {
         writer.lock();
         try {
-            List<StockInfo> _stockInfos = this.industryToStockInfos.get(Stock.Industry.UserDefined);
+            List<StockInfo> _stockInfos = this.industryToStockInfos.get(Industry.UserDefined);
             if (_stockInfos == null) {
                 return false;
             }
@@ -288,8 +288,8 @@ public class StockInfoDatabase {
             throw new java.lang.IllegalArgumentException("Stock info length cannot be 0");
         }
 
-        final Stock.Industry industry = Stock.Industry.UserDefined;
-        final Stock.Board board = Stock.Board.UserDefined;
+        final Industry industry = Industry.UserDefined;
+        final Board board = Board.UserDefined;
 
         // Do call getStockInfos(Stock.Industry) and
         // getStockInfos(Stock.Board), which will give you heavy performance 
@@ -362,7 +362,7 @@ public class StockInfoDatabase {
         reader.lock();
         try {
             List<StockInfo> _stockInfos = new ArrayList<StockInfo>(stockInfos);
-            List<StockInfo> userDefinedStockInfos = this.industryToStockInfos.get(Stock.Industry.UserDefined);
+            List<StockInfo> userDefinedStockInfos = this.industryToStockInfos.get(Industry.UserDefined);
             if (userDefinedStockInfos != null) {
                 _stockInfos.removeAll(userDefinedStockInfos);
             }
@@ -381,14 +381,14 @@ public class StockInfoDatabase {
     public List<StockInfo> getUserDefinedStockInfos() {
         reader.lock();
         try {
-            List<StockInfo> _stockInfos = this.industryToStockInfos.get(Stock.Industry.UserDefined);
+            List<StockInfo> _stockInfos = this.industryToStockInfos.get(Industry.UserDefined);
             if (_stockInfos == null) {
                 // Do not return Collections.emptyList(), as the returned list
                 // need to be a mutable list.
-                return new ArrayList<StockInfo>();
+                return new ArrayList<>();
             }
             // Construct a new list as StockInfoDatabase is a mutable class.
-            return new ArrayList<StockInfo>(_stockInfos);
+            return new ArrayList<>(_stockInfos);
         } finally {
             reader.unlock();
         }
@@ -445,8 +445,8 @@ public class StockInfoDatabase {
         ((TSTSearchEngine<StockInfo>)this.codeSearchEngine).put(stockInfo);
 
         // Update board and industry mapping.
-        final Stock.Industry industry = Stock.Industry.UserDefined;
-        final Stock.Board board = Stock.Board.UserDefined;
+        final Industry industry = Industry.UserDefined;
+        final Board board = Board.UserDefined;
 
         List<StockInfo> _stockInfos = this.industryToStockInfos.get(industry);
         if (_stockInfos == null) {
@@ -561,11 +561,11 @@ public class StockInfoDatabase {
      *
      * @return list of all the stock board of this database
      */
-    public List<Stock.Board> getBoards() {
+    public List<Board> getBoards() {
         reader.lock();
         try {
             // Construct a new list as StockInfoDatabase is a mutable class.
-            return new ArrayList<Stock.Board>(this.boardToStockInfos.keySet());
+            return new ArrayList<Board>(this.boardToStockInfos.keySet());
         } finally {
             reader.unlock();
         }
@@ -577,11 +577,11 @@ public class StockInfoDatabase {
      * 
      * @return list of all the stock industry of this database
      */
-    public List<Stock.Industry> getIndustries() {
+    public List<Industry> getIndustries() {
         reader.lock();
         try {
             // Construct a new list as StockInfoDatabase is a mutable class.
-            return new ArrayList<Stock.Industry>(this.industryToStockInfos.keySet());
+            return new ArrayList<Industry>(this.industryToStockInfos.keySet());
         } finally {
             reader.unlock();
         }
@@ -590,9 +590,9 @@ public class StockInfoDatabase {
     // Entire stock info of this database.
     private final List<StockInfo> stockInfos = new ArrayList<StockInfo>();
     // Stock industry to list of stock info mapping.
-    private final Map<Stock.Industry, List<StockInfo>> industryToStockInfos = new EnumMap<Stock.Industry, List<StockInfo>>(Stock.Industry.class);
+    private final Map<Industry, List<StockInfo>> industryToStockInfos = new HashMap<>();
     // Stock board to list of stock info mapping.
-    private final Map<Stock.Board, List<StockInfo>> boardToStockInfos = new EnumMap<Stock.Board, List<StockInfo>>(Stock.Board.class);
+    private final Map<Board, List<StockInfo>> boardToStockInfos = new HashMap<>();
 
     // Symbol to list of stock info mapping.
     private transient Map<Symbol, List<StockInfo>> symbolToStockInfos = new HashMap<Symbol, List<StockInfo>>();

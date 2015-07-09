@@ -91,7 +91,7 @@ public enum Factories {
         
         // It isn't possible to perform sorting directly on CopyOnWriteArrayList.
         // at java.util.concurrent.CopyOnWriteArrayList$COWIterator.set(CopyOnWriteArrayList.java:1049)
-        final List<StockServerFactory> tmp = new ArrayList<StockServerFactory>(stockServerFactories);
+        final List<StockServerFactory> tmp = new ArrayList<>(stockServerFactories);
         
         Collections.sort(tmp, new Comparator<StockServerFactory>() {
 
@@ -120,51 +120,55 @@ public enum Factories {
         }
     }
     
-    private static final Map<PriceSource, Set<Class<? extends StockServerFactory>>> priceSourceMap = new EnumMap<PriceSource, Set<Class<? extends StockServerFactory>>>(PriceSource.class);
+    private static final Map<PriceSource, Set<Class<? extends StockServerFactory>>> priceSourceMap = new EnumMap<>(PriceSource.class);
     
-    private static final Map<Country, List<StockServerFactory>> map = new EnumMap<Country, List<StockServerFactory>>(Country.class);
+    private static final Map<Country, List<StockServerFactory>> map = new EnumMap<>(Country.class);
     
     // Taiwan over-the-counter.
-    private static final List<StockServerFactory> taiwanOTCList = new CopyOnWriteArrayList<StockServerFactory>();
+    private static final List<StockServerFactory> taiwanOTCList = new CopyOnWriteArrayList<>();
     
     static {
-        final Set<Class<? extends StockServerFactory>> googleSet = new HashSet<Class<? extends StockServerFactory>>();
-        final Set<Class<? extends StockServerFactory>> yahooSet = new HashSet<Class<? extends StockServerFactory>>();
+        final Set<Class<? extends StockServerFactory>> googleSet = new HashSet<>();
+        final Set<Class<? extends StockServerFactory>> yahooSet = new HashSet<>();
         
-        final List<StockServerFactory> australiaList = new CopyOnWriteArrayList<StockServerFactory>();
-        final List<StockServerFactory> austriaList = new CopyOnWriteArrayList<StockServerFactory>();
-        final List<StockServerFactory> belgiumList = new CopyOnWriteArrayList<StockServerFactory>();
-        final List<StockServerFactory> brazilList = new CopyOnWriteArrayList<StockServerFactory>();
-        final List<StockServerFactory> canadaList = new CopyOnWriteArrayList<StockServerFactory>();
-        final List<StockServerFactory> chinaList = new CopyOnWriteArrayList<StockServerFactory>();
-        final List<StockServerFactory> denmarkList = new CopyOnWriteArrayList<StockServerFactory>();
-        final List<StockServerFactory> franceList = new CopyOnWriteArrayList<StockServerFactory>();
-        final List<StockServerFactory> germanyList = new CopyOnWriteArrayList<StockServerFactory>();
-        final List<StockServerFactory> hongkongList = new CopyOnWriteArrayList<StockServerFactory>();
-        final List<StockServerFactory> indiaList = new CopyOnWriteArrayList<StockServerFactory>();
-        final List<StockServerFactory> indonesiaList = new CopyOnWriteArrayList<StockServerFactory>();
-        final List<StockServerFactory> israelList = new CopyOnWriteArrayList<StockServerFactory>();
-        final List<StockServerFactory> italyList = new CopyOnWriteArrayList<StockServerFactory>();
-        final List<StockServerFactory> koreaList = new CopyOnWriteArrayList<StockServerFactory>();
-        final List<StockServerFactory> malaysiaList = new CopyOnWriteArrayList<StockServerFactory>();
-        final List<StockServerFactory> netherlandsList = new CopyOnWriteArrayList<StockServerFactory>();
-        final List<StockServerFactory> newZealandList = new CopyOnWriteArrayList<StockServerFactory>();
-        final List<StockServerFactory> norwayList = new CopyOnWriteArrayList<StockServerFactory>();
-        final List<StockServerFactory> portugalList = new CopyOnWriteArrayList<StockServerFactory>();
-        final List<StockServerFactory> singaporeList = new CopyOnWriteArrayList<StockServerFactory>();
-        final List<StockServerFactory> spainList = new CopyOnWriteArrayList<StockServerFactory>();
-        final List<StockServerFactory> swedenList = new CopyOnWriteArrayList<StockServerFactory>();
-        final List<StockServerFactory> switzerlandList = new CopyOnWriteArrayList<StockServerFactory>();
-        final List<StockServerFactory> taiwanList = new CopyOnWriteArrayList<StockServerFactory>();
-        final List<StockServerFactory> unitedKingdomList = new CopyOnWriteArrayList<StockServerFactory>();
-        final List<StockServerFactory> unitedStateList = new CopyOnWriteArrayList<StockServerFactory>();
+        final List<StockServerFactory> australiaList = new CopyOnWriteArrayList<>();
+        final List<StockServerFactory> austriaList = new CopyOnWriteArrayList<>();
+        final List<StockServerFactory> belgiumList = new CopyOnWriteArrayList<>();
+        final List<StockServerFactory> brazilList = new CopyOnWriteArrayList<>();
+        final List<StockServerFactory> canadaList = new CopyOnWriteArrayList<>();
+        final List<StockServerFactory> chinaList = new CopyOnWriteArrayList<>();
+        final List<StockServerFactory> denmarkList = new CopyOnWriteArrayList<>();
+        final List<StockServerFactory> franceList = new CopyOnWriteArrayList<>();
+        final List<StockServerFactory> germanyList = new CopyOnWriteArrayList<>();
+        final List<StockServerFactory> hongkongList = new CopyOnWriteArrayList<>();
+        final List<StockServerFactory> indiaList = new CopyOnWriteArrayList<>();
+        final List<StockServerFactory> indonesiaList = new CopyOnWriteArrayList<>();
+        final List<StockServerFactory> israelList = new CopyOnWriteArrayList<>();
+        final List<StockServerFactory> italyList = new CopyOnWriteArrayList<>();
+        final List<StockServerFactory> koreaList = new CopyOnWriteArrayList<>();
+        final List<StockServerFactory> malaysiaList = new CopyOnWriteArrayList<>();
+        final List<StockServerFactory> netherlandsList = new CopyOnWriteArrayList<>();
+        final List<StockServerFactory> newZealandList = new CopyOnWriteArrayList<>();
+        final List<StockServerFactory> norwayList = new CopyOnWriteArrayList<>();
+        final List<StockServerFactory> portugalList = new CopyOnWriteArrayList<>();
+        final List<StockServerFactory> singaporeList = new CopyOnWriteArrayList<>();
+        final List<StockServerFactory> spainList = new CopyOnWriteArrayList<>();
+        final List<StockServerFactory> swedenList = new CopyOnWriteArrayList<>();
+        final List<StockServerFactory> switzerlandList = new CopyOnWriteArrayList<>();
+        final List<StockServerFactory> taiwanList = new CopyOnWriteArrayList<>();
+        final List<StockServerFactory> unitedKingdomList = new CopyOnWriteArrayList<>();
+        final List<StockServerFactory> unitedStateList = new CopyOnWriteArrayList<>();
 
         googleSet.add(GoogleStockServerFactory.class);
         yahooSet.add(YahooStockServerFactory.class);
         yahooSet.add(BrazilYahooStockServerFactory.class);
         
+        // *********************************************************************
         // Kindly revise GoogleStockServer's getBestCurrency, for countries
         // which are using GoogleStockServerFactory.
+        //
+        // Please revise AjaxStockInfoSearchEngine's isSupported as well.
+        // *********************************************************************
         australiaList.add(YahooStockServerFactory.newInstance());
         australiaList.add(GoogleStockServerFactory.newInstance());
         austriaList.add(YahooStockServerFactory.newInstance());
@@ -177,6 +181,7 @@ public enum Factories {
         chinaList.add(GoogleStockServerFactory.newInstance());
         chinaList.add(YahooStockServerFactory.newInstance());
         denmarkList.add(YahooStockServerFactory.newInstance());
+        denmarkList.add(GoogleStockServerFactory.newInstance());
         franceList.add(YahooStockServerFactory.newInstance());
         germanyList.add(YahooStockServerFactory.newInstance());
         hongkongList.add(YahooStockServerFactory.newInstance());
@@ -188,6 +193,7 @@ public enum Factories {
         malaysiaList.add(KLSEInfoStockServerFactory.newInstance());
         malaysiaList.add(YahooStockServerFactory.newInstance());
         netherlandsList.add(YahooStockServerFactory.newInstance());
+        netherlandsList.add(GoogleStockServerFactory.newInstance());
         newZealandList.add(YahooStockServerFactory.newInstance());
         newZealandList.add(GoogleStockServerFactory.newInstance());
         norwayList.add(YahooStockServerFactory.newInstance());

@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2014 Yan Cheng Cheok <yccheok@yahoo.com>
+ * Copyright (C) 2015 Yan Cheng Cheok <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,15 +43,12 @@ import javax.swing.*;
 import javax.swing.table.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.yccheok.jstock.alert.GoogleCalendar;
 import org.yccheok.jstock.alert.GoogleMail;
-import org.yccheok.jstock.alert.SMSLimiter;
 import org.yccheok.jstock.analysis.Indicator;
 import org.yccheok.jstock.analysis.OperatorIndicator;
 import org.yccheok.jstock.engine.*;
 import org.yccheok.jstock.engine.ResultType;
-import org.yccheok.jstock.engine.Stock.Board;
-import org.yccheok.jstock.engine.Stock.Industry;
+import org.yccheok.jstock.engine.Industry;
 import org.yccheok.jstock.file.Atom;
 import org.yccheok.jstock.file.GUIBundleWrapper;
 import org.yccheok.jstock.file.Statement;
@@ -468,13 +465,8 @@ public class JStock extends javax.swing.JFrame {
         this.jTable1.getModel().addTableModelListener(this.getTableModelListener());
 
         this.jTable1.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(1));
-        this.jTable1.addMouseListener(new TableRowPopupListener());
+        this.jTable1.addMouseListener(new TableMouseAdapter());
         this.jTable1.addKeyListener(new TableKeyEventListener());
-        jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jTable1MouseClicked(evt);
-            }
-        });
         jTable1.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 jTable1KeyPressed(evt);
@@ -665,24 +657,24 @@ public class JStock extends javax.swing.JFrame {
 
         jMenu9.setText(bundle.getString("MainFrame_Watchlist")); // NOI18N
         jMenu9.addMenuListener(new javax.swing.event.MenuListener() {
-            public void menuSelected(javax.swing.event.MenuEvent evt) {
-                jMenu9MenuSelected(evt);
+            public void menuCanceled(javax.swing.event.MenuEvent evt) {
             }
             public void menuDeselected(javax.swing.event.MenuEvent evt) {
             }
-            public void menuCanceled(javax.swing.event.MenuEvent evt) {
+            public void menuSelected(javax.swing.event.MenuEvent evt) {
+                jMenu9MenuSelected(evt);
             }
         });
         jMenuBar2.add(jMenu9);
 
         jMenu8.setText(bundle.getString("MainFrame_Portfolio")); // NOI18N
         jMenu8.addMenuListener(new javax.swing.event.MenuListener() {
-            public void menuSelected(javax.swing.event.MenuEvent evt) {
-                jMenu8MenuSelected(evt);
+            public void menuCanceled(javax.swing.event.MenuEvent evt) {
             }
             public void menuDeselected(javax.swing.event.MenuEvent evt) {
             }
-            public void menuCanceled(javax.swing.event.MenuEvent evt) {
+            public void menuSelected(javax.swing.event.MenuEvent evt) {
+                jMenu8MenuSelected(evt);
             }
         });
         jMenuBar2.add(jMenu8);
@@ -1635,14 +1627,6 @@ public class JStock extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_jRadioButtonMenuItem6ActionPerformed
-
-    private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
-        if (evt.getClickCount() == 2) {
-           // by definition of a dbl-click this will always only show one chart
-           // because the dbl-click action cannot have multiple items selected 
-           displayHistoryCharts(); 
-        }
-    }//GEN-LAST:event_jTable1MouseClicked
     
     /**
      * Activate specified watchlist.
@@ -2919,39 +2903,6 @@ public class JStock extends javax.swing.JFrame {
                 log.error(null, exp);
             }
         }   /* if(jStockOptions.isSendEmail()) */
-
-        if (this.jStockOptions.isSMSEnabled()) {
-            final Runnable r = new Runnable() {
-                @Override
-                public void run() {
-                    String message = "";
-                    if (((OperatorIndicator)indicator).getName().equalsIgnoreCase("fallbelow"))
-                    {
-                        final String template = GUIBundle.getString("MainFrame_FallBelow_template");
-                        message = MessageFormat.format(template, stock.symbol, lastPrice, price);
-                    }
-                    else
-                    {
-                        final String template = GUIBundle.getString("MainFrame_RiseAbove_template");
-                        message = MessageFormat.format(template, stock.symbol, lastPrice, price);
-                    }
-
-                    if (SMSLimiter.INSTANCE.isSMSAllowed()) {
-                        final boolean status = GoogleCalendar.SMS(message);
-                        if (status) {
-                            SMSLimiter.INSTANCE.inc();
-                        }
-                    }
-                }
-            };
-
-            try {
-                smsAlertPool.submit(r);
-            }
-            catch(java.util.concurrent.RejectedExecutionException exp) {
-                log.error(null, exp);
-            }
-        }   /* if(jStockOptions.isSMSEnabled()) */
     }
 
     /**
@@ -2971,24 +2922,6 @@ public class JStock extends javax.swing.JFrame {
         JTableUtilities.scrollToVisible(this.jTable1, row, 0);
     }
 
-    /**
-     * Add user defined stock info.
-     *
-     * @param stockInfo the stock info
-     * @return true if success
-     */
-    public boolean addUserDefinedStockInfo(StockInfo stockInfo) {
-        StockInfoDatabase stock_info_database = this.stockInfoDatabase;
-        if (stock_info_database == null) {
-            return false;
-        }
-        boolean result = stock_info_database.addUserDefinedStockInfo(stockInfo);
-        if (result) {
-            needToSaveUserDefinedDatabase = true;
-        }
-        return result;
-    }
-
     private org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, MatchType> getMatchObserver() {
         return new org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, MatchType>() {
 
@@ -3000,9 +2933,6 @@ public class JStock extends javax.swing.JFrame {
                 final StockInfo stockInfo = StockInfo.newInstance(code, symbol);
 
                 addStockInfoFromAutoCompleteJComboBox(stockInfo);
-
-                // Remember to update our offline database as well.
-                addUserDefinedStockInfo(stockInfo);
             }
         };
     }
@@ -3020,9 +2950,6 @@ public class JStock extends javax.swing.JFrame {
                 final StockInfo stockInfo = StockInfo.newInstance(code, symbol);
 
                 addStockInfoFromAutoCompleteJComboBox(stockInfo);
-
-                // Remember to update our offline database as well.
-                addUserDefinedStockInfo(stockInfo);
             }
         };
     }
@@ -4246,7 +4173,7 @@ public class JStock extends javax.swing.JFrame {
         }   /* for (Stock stock : stocks) */
 
         // No alert is needed. Early return.
-        if ((jStockOptions.isSMSEnabled() == false) && (jStockOptions.isPopupMessage() == false) && (jStockOptions.isSoundEnabled() == false) && (jStockOptions.isSendEmail() == false)) {
+        if ((jStockOptions.isPopupMessage() == false) && (jStockOptions.isSoundEnabled() == false) && (jStockOptions.isSendEmail() == false)) {
             return;
         }
 
@@ -4414,8 +4341,7 @@ public class JStock extends javax.swing.JFrame {
         return new javax.swing.ImageIcon(getClass().getResource(imageIcon));
     }
     
-    private class TableRowPopupListener extends MouseAdapter {
-        
+    private class TableMouseAdapter extends MouseAdapter {        
         @Override
         public void mouseClicked(MouseEvent evt) {
             int[] rows = JStock.this.jTable1.getSelectedRows();
@@ -4430,6 +4356,12 @@ public class JStock extends javax.swing.JFrame {
             } else {
                 updateDynamicChart(null);
                 
+            }
+            
+            if (evt.getClickCount() == 2) {
+               // by definition of a dbl-click this will always only show one chart
+               // because the dbl-click action cannot have multiple items selected 
+               displayHistoryCharts(); 
             }
         }
         
@@ -4446,7 +4378,7 @@ public class JStock extends javax.swing.JFrame {
         private void maybeShowPopup(MouseEvent e) {
             if (e.isPopupTrigger()) {
                 if (jTable1.getSelectedRowCount() <= 1) {
-                   SetFocusToRightClickLocation(e, jTable1); 
+                   setFocusToRightClickLocation(e, jTable1); 
                 }
                 if (jTable1.getSelectedRowCount() > 0) {
                     getMyJTablePopupMenu().show(e.getComponent(), e.getX(), e.getY());
@@ -4454,7 +4386,7 @@ public class JStock extends javax.swing.JFrame {
             }
         }
 
-        private void SetFocusToRightClickLocation(MouseEvent e, JTable table) {
+        private void setFocusToRightClickLocation(MouseEvent e, JTable table) {
     	    // get the coordinates of the mouse click
 	    Point p = e.getPoint();
  
@@ -4838,7 +4770,6 @@ public class JStock extends javax.swing.JFrame {
 
     private final AlertStateManager alertStateManager = new AlertStateManager();
     private final ExecutorService emailAlertPool = Executors.newFixedThreadPool(1);
-    private final ExecutorService smsAlertPool = Executors.newFixedThreadPool(1);
     private final ExecutorService systemTrayAlertPool = Executors.newFixedThreadPool(1);
     private volatile ExecutorService stockInfoDatabaseMetaPool = Executors.newFixedThreadPool(1);
             

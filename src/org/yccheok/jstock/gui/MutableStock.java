@@ -48,11 +48,11 @@ public class MutableStock {
         return stock.getName();
     }
 
-    public Stock.Board getBoard() {
+    public Board getBoard() {
         return stock.getBoard();
     }
     
-    public Stock.Industry getIndustry() {
+    public Industry getIndustry() {
         return stock.getIndustry();
     }
 

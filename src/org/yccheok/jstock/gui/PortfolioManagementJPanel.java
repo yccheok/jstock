@@ -1975,6 +1975,12 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
         
         for (Code code : getSellCodes()) {
+            // This is for optimization purpose. If we already have currency information for a stock
+            // code, we will not further query for it. However, this does have its own shortcoming.
+            // If the stock currency has been changed, we will not have chance to make any amendment.
+            // So far, we treat this as an extremely rare case, and should not happen in real life.
+            // However, if it does so, please remove the following optimization - contains(code)
+            // check.
             if (false == this.portfolioRealTimeInfo.currencies.containsKey(code)) {
                 _realTimeStockMonitor.addStockCode(code);
             }
@@ -2457,7 +2463,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             if (rate != null) {
                 // Special handling for GBX. User would prefer to see the currency
                 // exchange in GBP.
-                if (currencyPair.from().toString().equals("GBX")) {
+                if (currencyPair.from().isGBX()) {
                     rate = rate * 100.0;
                 }
             
@@ -2874,23 +2880,45 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         if (isFeeCalculationEnabled) {
             final double exchangeRate = org.yccheok.jstock.portfolio.Utils.getExchangeRate(portfolioRealTimeInfo, localCurrency, country.stockCurrency);
             
-            cash =  sellPortfolioTreeTableModel.getNetSellingValue(localCurrency) - 
-                    ((Portfolio)sellPortfolioTreeTableModel.getRoot()).getNetReferenceTotal(localCurrency) - 
-                    buyPortfolioTreeTableModel.getNetPurchaseValue(localCurrency) + 
-                    this.getDepositSummary().getTotal() * exchangeRate +
-                    this.getDividendSummary().getTotal(this.portfolioRealTimeInfo, localCurrency);
+            double _cash =  
+                sellPortfolioTreeTableModel.getNetSellingValue(localCurrency) - 
+                ((Portfolio)sellPortfolioTreeTableModel.getRoot()).getNetReferenceTotal(localCurrency) - 
+                buyPortfolioTreeTableModel.getNetPurchaseValue(localCurrency);
+            
+            double deposit = this.getDepositSummary().getTotal() * exchangeRate;
+            if (country.stockCurrency.isGBX()) {
+                // Use will input cash in GBP instead of GBX.
+                deposit = deposit * 100.0;
+            }
+            
+            double dividend = this.getDividendSummary().getTotal(this.portfolioRealTimeInfo, localCurrency);
+            
+            _cash += deposit;
+            _cash += dividend;
+            cash = _cash;
             
             paperProfit = buyPortfolioTreeTableModel.getNetGainLossValue(localCurrency);
             realizedProfit = sellPortfolioTreeTableModel.getNetGainLossValue(localCurrency);
         } else {
             final double exchangeRate = org.yccheok.jstock.portfolio.Utils.getExchangeRate(portfolioRealTimeInfo, localCurrency, country.stockCurrency);
             
-            cash =  sellPortfolioTreeTableModel.getSellingValue(localCurrency) - 
-                    ((Portfolio)sellPortfolioTreeTableModel.getRoot()).getReferenceTotal(localCurrency) - 
-                    buyPortfolioTreeTableModel.getPurchaseValue(localCurrency) + 
-                    this.getDepositSummary().getTotal() * exchangeRate + 
-                    this.getDividendSummary().getTotal(this.portfolioRealTimeInfo, localCurrency);
-
+            double _cash = 
+                sellPortfolioTreeTableModel.getSellingValue(localCurrency) - 
+                ((Portfolio)sellPortfolioTreeTableModel.getRoot()).getReferenceTotal(localCurrency) - 
+                buyPortfolioTreeTableModel.getPurchaseValue(localCurrency);
+            
+            double deposit = this.getDepositSummary().getTotal() * exchangeRate;
+            if (country.stockCurrency.isGBX()) {
+                // Use will input cash in GBP instead of GBX.
+                deposit = deposit * 100.0;
+            }
+            
+            double dividend = this.getDividendSummary().getTotal(this.portfolioRealTimeInfo, localCurrency);
+            
+            _cash += deposit;
+            _cash += dividend;
+            cash = _cash;
+            
             paperProfit = buyPortfolioTreeTableModel.getGainLossValue(localCurrency);
             realizedProfit = sellPortfolioTreeTableModel.getGainLossValue(localCurrency);
         }
@@ -3011,7 +3039,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         return this.portfolioRealTimeInfo;
     }
     
-    public boolean shouldDisplayCurrencyInfoForValue(Code code) {
+    // We will display currency info if currency exchange feature is enabled,
+    // and the stock currency is different from country stock currency.
+    public boolean shouldDisplayCurrencyForValue(Code code) {
         final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         final Country country = jStockOptions.getCountry();
         final boolean isCurrencyExchangeEnable = jStockOptions.isCurrencyExchangeEnable(country);
@@ -3019,22 +3049,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             return false;
         }
         
-        if (false == this.getCurrencyPairs().isEmpty()) {
-            final Currency stockCurrency = org.yccheok.jstock.portfolio.Utils.getStockCurrency(portfolioRealTimeInfo, code);
-            final Currency localCurrency = country.localCurrency;
-            if (stockCurrency.equals(localCurrency)) {
-                return false;
-            }
-            
-            // Special handling for GBX.
-            if (stockCurrency.toString().equals("GBX") && localCurrency.toString().equals("GBP")) {
-                return false;
-            }
-            
-            return true;
-        }
+        final Currency stockCurrency = org.yccheok.jstock.portfolio.Utils.getStockCurrency(portfolioRealTimeInfo, code);
+        final Currency countryStockCurrency = country.stockCurrency;
         
-        return false;
+        return (false == stockCurrency.equals(countryStockCurrency));
     }
     
     private static final Log log = LogFactory.getLog(PortfolioManagementJPanel.class);

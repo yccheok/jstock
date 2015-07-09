@@ -21,6 +21,7 @@ package org.yccheok.jstock.gui.charting;
 
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentEvent;
@@ -126,9 +127,12 @@ public class ChartJDialog extends javax.swing.JFrame implements WindowListener {
     }
     
     /** Creates new form ChartJDialog */
-    public ChartJDialog(java.awt.Frame parent, String title, boolean modalNotUsed, StockHistoryServer stockHistoryServer) {
+    public ChartJDialog(java.awt.Frame parent, String title, boolean modalNotUsed, StockHistoryServer stockHistoryServer) {                
         super(title);
-        parent.addWindowListener(this);
+        
+        this.parent = parent;
+        this.parent.addWindowListener(this);
+        
         this.setIconImage(parent.getIconImage());
                 
         initComponents();
@@ -479,9 +483,14 @@ public class ChartJDialog extends javax.swing.JFrame implements WindowListener {
         jMenu8 = new javax.swing.JMenu();
         jMenuItem7 = new javax.swing.JMenuItem();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setAlwaysOnTop(true);
         setAutoRequestFocus(false);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
         getContentPane().setLayout(new java.awt.BorderLayout(5, 5));
 
         jPanel4.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 2, 5));
@@ -989,7 +998,7 @@ public class ChartJDialog extends javax.swing.JFrame implements WindowListener {
             return;
         }
 
-        double high_price = Double.NEGATIVE_INFINITY;
+        double high_price = -Double.MAX_VALUE;
         double low_price = Double.MAX_VALUE;
         final DefaultHighLowDataset defaultHighLowDataset = (DefaultHighLowDataset)this.priceOHLCDataset;
         for (int i = best_mid; i >= 0; i--) {
@@ -1276,6 +1285,12 @@ public class ChartJDialog extends javax.swing.JFrame implements WindowListener {
             org.yccheok.jstock.charting.Utils.applyChartThemeEx(candlestickChart);
         }
     }//GEN-LAST:event_jRadioButtonMenuItem4ActionPerformed
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        // To avoid memory leak.
+        parent.removeWindowListener(this);
+        this.dispose();
+    }//GEN-LAST:event_formWindowClosing
    
     /**
      * Creates a chart.
@@ -2214,6 +2229,9 @@ public class ChartJDialog extends javax.swing.JFrame implements WindowListener {
     /* Overlay layer. */
     private final ChartLayerUI<ChartPanel> chartLayerUI;
 
+    /* To avoid memory leak. */
+    private final java.awt.Frame parent;
+    
     private static final Log log = LogFactory.getLog(ChartJDialog.class);
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

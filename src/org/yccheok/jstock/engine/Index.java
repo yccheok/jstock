@@ -33,7 +33,7 @@ public enum Index {
     GSPTSE(Country.Canada, "TSX", "S&P/TSX Composite Index", Code.newInstance("^GSPTSE")),
     CSI300(Country.China, "CSI 300", "Shanghai Shenzhen CSI 300 Index", Code.newInstance("000300.SS")),
     SSEC(Country.China, "China Shanghai Composite", "China Shanghai Composite", Code.newInstance("000001.SS")),
-    OMXC20CO(Country.Denmark, "KFX", "OMX Copenhagen 20 Index", Code.newInstance("OMXC20.CO")),
+    OMXC20CO(Country.Denmark, "KFX", "OMX Copenhagen 20 Index", Code.newInstance("^OMXC20")),
     FCHI(Country.France, "CAC 40", "CAC 40 Index", Code.newInstance("^FCHI")),
     DAX(Country.Germany, "DAX", "Deutsche Borse AG German Stock Index", Code.newInstance("^GDAXI")),
     HSI(Country.HongKong, "Hang Seng", "Hong Kong Hang Seng Index", Code.newInstance("^HSI")),

@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -48,7 +49,7 @@ public class KLSEInfoStockHistoryServer implements StockHistoryServer {
     // Use ThreadLocal to ensure thread safety.
     private static final ThreadLocal <SimpleDateFormat> simpleDateFormatThreadLocal = new ThreadLocal <SimpleDateFormat>() {
         @Override protected SimpleDateFormat initialValue() {
-            return new java.text.SimpleDateFormat("yyyy-MM-dd");            
+            return new java.text.SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);            
         }
     };
     
@@ -231,8 +232,8 @@ public class KLSEInfoStockHistoryServer implements StockHistoryServer {
 
         Symbol symbol = Symbol.newInstance(code.toString());
         String name = symbol.toString();
-        Stock.Board board = Stock.Board.Unknown;
-        Stock.Industry industry = Stock.Industry.Unknown;
+        Board board = Board.Unknown;
+        Industry industry = Industry.Unknown;
 
         try {
             Stock stock = stockServer.getStock(code);

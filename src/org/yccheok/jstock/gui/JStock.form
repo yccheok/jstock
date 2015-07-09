@@ -533,11 +533,10 @@
                     <Property name="autoResizeMode" type="int" value="0"/>
                   </Properties>
                   <Events>
-                    <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jTable1MouseClicked"/>
                     <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="jTable1KeyPressed"/>
                   </Events>
                   <AuxValues>
-                    <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="this.jTable1.setDefaultRenderer(Number.class, new StockTableCellRenderer(SwingConstants.RIGHT));&#xa;this.jTable1.setDefaultRenderer(Double.class, new StockTableCellRenderer(SwingConstants.RIGHT));&#xa;this.jTable1.setDefaultRenderer(Object.class, new StockTableCellRenderer(SwingConstants.LEFT));&#xa;&#xa;this.jTable1.setDefaultEditor(Double.class, new NonNegativeDoubleEditor());&#xa;&#xa;this.jTable1.getModel().addTableModelListener(this.getTableModelListener());&#xa;        &#xa;this.jTable1.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(1));&#xa;this.jTable1.addMouseListener(new TableRowPopupListener());&#xa;this.jTable1.addKeyListener(new TableKeyEventListener());"/>
+                    <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="this.jTable1.setDefaultRenderer(Number.class, new StockTableCellRenderer(SwingConstants.RIGHT));&#xa;this.jTable1.setDefaultRenderer(Double.class, new StockTableCellRenderer(SwingConstants.RIGHT));&#xa;this.jTable1.setDefaultRenderer(Object.class, new StockTableCellRenderer(SwingConstants.LEFT));&#xa;&#xa;this.jTable1.setDefaultEditor(Double.class, new NonNegativeDoubleEditor());&#xa;&#xa;this.jTable1.getModel().addTableModelListener(this.getTableModelListener());&#xa;        &#xa;this.jTable1.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(1));&#xa;this.jTable1.addMouseListener(new TableMouseAdapter());&#xa;this.jTable1.addKeyListener(new TableKeyEventListener());"/>
                   </AuxValues>
                 </Component>
               </SubComponents>

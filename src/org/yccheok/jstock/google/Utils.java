@@ -16,8 +16,6 @@ import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
-import com.google.api.services.calendar.Calendar;
-import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.oauth2.Oauth2;
@@ -112,13 +110,6 @@ public class Utils {
         }
     }
     
-    public static void logoutCalendar() {
-        File credential = new File(getCalendarDataDirectory(), "StoredCredential");
-        File email = new File(getCalendarDataDirectory(), "email");
-        credential.delete();
-        email.delete();
-    }
-    
     public static void logoutDrive() {
         File credential = new File(getDriveDataDirectory(), "StoredCredential");
         File email = new File(getDriveDataDirectory(), "email");
@@ -126,19 +117,6 @@ public class Utils {
         email.delete();
     }
 
-    public static Pair<Pair<Credential, String>, Boolean> authorizeCalendar() throws Exception {
-        Set<String> scopes = new HashSet<String>();
-        scopes.add("email");
-        scopes.add("profile");
-        scopes.add(CalendarScopes.CALENDAR);  
-
-        // load client secrets
-        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(Utils.JSON_FACTORY,
-            new InputStreamReader(Utils.class.getResourceAsStream("/assets/authentication/calendar/client_secrets.json")));
-        
-        return authorize(clientSecrets, scopes, getCalendarDataDirectory());
-    }
-    
     public static Pair<Pair<Credential, String>, Boolean> authorizeDrive() throws Exception {
         // Ask for only the permissions you need. Asking for more permissions will
         // reduce the number of users who finish the process for giving you access
@@ -160,46 +138,6 @@ public class Utils {
         return authorize(clientSecrets, scopes, getDriveDataDirectory());
     }
     
-    public static Pair<Credential, String> authorizeCalendarOffline() throws Exception {
-        Set<String> scopes = new HashSet<String>();
-        scopes.add("email");
-        scopes.add("profile");
-        scopes.add(CalendarScopes.CALENDAR);  
-        
-        // load client secrets
-        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(Utils.JSON_FACTORY,
-            new InputStreamReader(Utils.class.getResourceAsStream("/assets/authentication/calendar/client_secrets.json")));
-
-        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
-            httpTransport, JSON_FACTORY, clientSecrets, scopes)
-            .setDataStoreFactory(new FileDataStoreFactory(getCalendarDataDirectory()))
-            .build();
-        
-        Credential credential = flow.loadCredential("user");
-        if (credential != null && credential.getRefreshToken() != null) {
-            boolean success = false;
-            if (credential.getExpiresInSeconds() <= 60) {
-                if (credential.refreshToken()) {
-                    success = true;
-                }
-            } else {
-                success = true;
-            }
-
-            if (success) {
-                FileDataStoreFactory fileDataStoreFactory = (FileDataStoreFactory)flow.getCredentialDataStore().getDataStoreFactory();
-                String email = Utils.loadEmail(fileDataStoreFactory.getDataDirectory());
-                if (email == null) {
-                    Userinfoplus userinfoplus = org.yccheok.jstock.google.Utils.getUserInfo(credential);
-                    email = userinfoplus.getEmail();
-                }                    
-                return new Pair<Credential, String>(credential, email);
-            }
-        }
-        
-        return null;
-    }
-    
     /** Authorizes the installed application to access user's protected data.
      * @return 
      * @throws java.lang.Exception */
@@ -217,10 +155,5 @@ public class Utils {
     public static Drive getDrive(Credential credential) {
         Drive service = new Drive.Builder(httpTransport, JSON_FACTORY, credential).setApplicationName("JStock").build();
         return service;
-    }
-    
-    public static Calendar getCalendar(Credential credential) {
-        Calendar service = new Calendar.Builder(httpTransport, JSON_FACTORY, credential).setApplicationName("JStock").build();
-        return service;
-    }    
+    }  
 }

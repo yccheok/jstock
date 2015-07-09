@@ -47,10 +47,10 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.yccheok.jstock.engine.Board;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.Stock;
-import org.yccheok.jstock.engine.Stock.Board;
-import org.yccheok.jstock.engine.Stock.Industry;
+import org.yccheok.jstock.engine.Industry;
 import org.yccheok.jstock.engine.StockHistoryServer;
 import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.engine.StockInfoDatabase;
@@ -259,7 +259,7 @@ public class Statements {
      */
     public static List<Statements> newInstanceFromExcelFile(File file) {
         FileInputStream fileInputStream = null;
-        final List<Statements> statementsList = new ArrayList<Statements>();
+        final List<Statements> statementsList = new ArrayList<>();
         try
         {
             fileInputStream = new FileInputStream(file);

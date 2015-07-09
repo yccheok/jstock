@@ -21,81 +21,126 @@ package org.yccheok.jstock.portfolio;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.util.concurrent.ConcurrentHashMap;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.google.gson.InstanceCreator;
+import com.google.gson.reflect.TypeToken;
+
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.currency.Currency;
 import org.yccheok.jstock.engine.currency.CurrencyPair;
 import org.yccheok.jstock.file.ThreadSafeFileLock;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.lang.reflect.Type;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.concurrent.ConcurrentHashMap;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  *
  * @author yccheok
  */
-public class PortfolioRealTimeInfo {    
-    // Avoid using interface class, so that our gson serialization & 
+public class PortfolioRealTimeInfo {
+    // Avoid using interface class, so that our gson serialization &
     // deserialization can work correctly.
-    
+
     public final ConcurrentHashMap<Code, Double> stockPrices = new ConcurrentHashMap<>();
-    
+
     public final ConcurrentHashMap<CurrencyPair, Double> exchangeRates = new ConcurrentHashMap<>();
-    
+
     public final ConcurrentHashMap<Code, Currency> currencies = new ConcurrentHashMap<>();
-    
+
     public long stockPricesTimestamp = 0;
     public long exchangeRatesTimestamp = 0;
-    
+
     public transient volatile boolean stockPricesDirty = false;
     public transient volatile boolean exchangeRatesDirty = false;
     public transient volatile boolean currenciesDirty = false;
-    
+
     private static final Log log = LogFactory.getLog(PortfolioRealTimeInfo.class);
-    
+
     public PortfolioRealTimeInfo() {
     }
-    
+
     public PortfolioRealTimeInfo(PortfolioRealTimeInfo portfolioRealTimeInfo) {
         copy(portfolioRealTimeInfo);
     }
-    
+
     private void copy(PortfolioRealTimeInfo portfolioRealTimeInfo) {
         stockPrices.clear();
         exchangeRates.clear();
         currencies.clear();
-        
+
         stockPrices.putAll(portfolioRealTimeInfo.stockPrices);
         exchangeRates.putAll(portfolioRealTimeInfo.exchangeRates);
         currencies.putAll(portfolioRealTimeInfo.currencies);
-        
+
         stockPricesTimestamp = portfolioRealTimeInfo.stockPricesTimestamp;
         exchangeRatesTimestamp = portfolioRealTimeInfo.exchangeRatesTimestamp;
 
-        // I don't know what to do with dirty flags at this moment. At this moment, I just copy 
+        // I don't know what to do with dirty flags at this moment. At this moment, I just copy
         // them.
         this.stockPricesDirty = portfolioRealTimeInfo.stockPricesDirty;
         this.exchangeRatesDirty = portfolioRealTimeInfo.exchangeRatesDirty;
         this.currenciesDirty = portfolioRealTimeInfo.currenciesDirty;
     }
-    
+
+    // http://stackoverflow.com/questions/16921012/gson-handles-case-when-synchronized-hashmap-as-class-member
+    private static class ConcurrentHashMapInstanceCreator<K, V> implements
+            InstanceCreator<Map<K, V>> {
+
+        @Override
+        public Map<K, V> createInstance(final Type type) {
+            return new ConcurrentHashMap<>();
+        }
+    }
+
+    // For debugging purpose
+    private String getString(File file) throws FileNotFoundException {
+        StringBuilder fileContents = new StringBuilder((int)file.length());
+        Scanner scanner = new Scanner(file);
+        String lineSeparator = ";";
+
+        try {
+            while (scanner.hasNextLine()) {
+                fileContents.append(scanner.nextLine()).append(lineSeparator);
+            }
+            return fileContents.toString();
+        } finally {
+            scanner.close();
+        }
+    }
+
+
     public boolean load(File file) {
         assert(file != null);
 
         if (false == file.isFile()) {
             return false;
         }
-        
-        GsonBuilder builder = new GsonBuilder();
-        Gson gson = builder.create();        
-        
+
+        final Gson gson = new GsonBuilder().
+            registerTypeAdapter(
+                new TypeToken<ConcurrentHashMap<Code, Double>>() {}.getType(),
+                new ConcurrentHashMapInstanceCreator<Code, Double>())
+            .registerTypeAdapter(
+                new TypeToken<ConcurrentHashMap<CurrencyPair, Double>>() {}.getType(),
+                new ConcurrentHashMapInstanceCreator<CurrencyPair, Double>())
+            .registerTypeAdapter(
+                new TypeToken<ConcurrentHashMap<Code, Currency>>() {}.getType(),
+                new ConcurrentHashMapInstanceCreator<Code, Currency>())
+            .create();
+
+
         PortfolioRealTimeInfo portfolioRealTimeInfo = null;
         
         final ThreadSafeFileLock.Lock lock = ThreadSafeFileLock.getLock(file);
@@ -106,9 +151,57 @@ public class PortfolioRealTimeInfo {
         ThreadSafeFileLock.lockRead(lock);
         
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));            
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
             try {
                 portfolioRealTimeInfo = gson.fromJson(reader, PortfolioRealTimeInfo.class);
+
+                if (portfolioRealTimeInfo == null) {
+                    return false;
+                }
+
+                // Check for data corruption if we load from legacy file.
+                for (Map.Entry<Code, Double> entry : portfolioRealTimeInfo.stockPrices.entrySet())
+                {
+                    Code code = entry.getKey();
+                    Double value = entry.getValue();
+                    if (code == null || value == null) {
+                        return false;
+                    }
+
+                    if (code.toString() == null) {
+                        return false;
+                    }
+                }
+
+                for (Map.Entry<CurrencyPair, Double> entry : portfolioRealTimeInfo.exchangeRates.entrySet())
+                {
+                    CurrencyPair currencyPair = entry.getKey();
+                    Double value = entry.getValue();
+                    if (currencyPair == null || value == null) {
+                        return false;
+                    }
+
+                    if (currencyPair.to() == null || currencyPair.from() == null) {
+                        return false;
+                    }
+
+                    if (currencyPair.to().toString() == null || currencyPair.from().toString() == null) {
+                        return false;
+                    }
+                }
+
+                for (Map.Entry<Code, Currency> entry : portfolioRealTimeInfo.currencies.entrySet())
+                {
+                    Code code = entry.getKey();
+                    Currency currency = entry.getValue();
+                    if (code == null || currency == null) {
+                        return false;
+                    }
+
+                    if (code.toString() == null || currency.toString() == null) {
+                        return false;
+                    }
+                }
             } finally {
                 reader.close();
             }
@@ -116,26 +209,28 @@ public class PortfolioRealTimeInfo {
             log.error(null, ex);
         } catch (com.google.gson.JsonSyntaxException ex) {
             log.error(null, ex);
+        } catch (Exception ex) {
+            log.error(null, ex);
         } finally {
             ThreadSafeFileLock.unlockRead(lock);
             ThreadSafeFileLock.releaseLock(lock);
         }
-        
+
         if (portfolioRealTimeInfo == null) {
             return false;
         }
-        
+
         copy(portfolioRealTimeInfo);
-        
+
         return true;
     }
-    
+
     public boolean save(File file) {
         GsonBuilder builder = new GsonBuilder();
         builder.enableComplexMapKeySerialization();
-        Gson gson = builder.create(); 
+        Gson gson = builder.create();
         String string = gson.toJson(this);
-        
+
         final ThreadSafeFileLock.Lock lock = ThreadSafeFileLock.getLock(file);
         if (lock == null) {
             return false;
@@ -157,7 +252,7 @@ public class PortfolioRealTimeInfo {
             ThreadSafeFileLock.unlockWrite(lock);
             ThreadSafeFileLock.releaseLock(lock);
         }
-        
+
         return true;
     }
 }

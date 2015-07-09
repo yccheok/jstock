@@ -84,12 +84,12 @@ public class AjaxGoogleSearchEngineMonitor extends Subject<AjaxGoogleSearchEngin
                 try {
                     string = blockingQueue.take();
                     
-                    List<String> queries = new ArrayList<String>();
+                    List<String> queries = new ArrayList<>();
                     queries.add(string);
                     
-                    Set<String> exchSet = new HashSet<String>();
-                    Set<String> codeSet = new HashSet<String>();
-                    List<MatchType> matchTypes = new ArrayList<MatchType>();
+                    Set<String> exchSet = new HashSet<>();
+                    Set<String> codeSet = new HashSet<>();
+                    List<MatchType> matchTypes = new ArrayList<>();
                     
                     for (String exch : exchs) {
                         queries.add(exch + ":" + string);

@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2011 Yan Cheng CHEOK <yccheok@yahoo.com>
+ * Copyright (C) 2015 Yan Cheng Cheok <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -45,12 +46,14 @@ import javax.swing.text.JTextComponent;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.AjaxGoogleSearchEngineMonitor;
+import org.yccheok.jstock.engine.AjaxStockInfoSearchEngine;
 import org.yccheok.jstock.engine.ResultSetType;
 import org.yccheok.jstock.engine.ResultType;
 import org.yccheok.jstock.engine.AjaxYahooSearchEngineMonitor;
 import org.yccheok.jstock.engine.MatchSetType;
 import org.yccheok.jstock.engine.MatchType;
 import org.yccheok.jstock.engine.Observer;
+import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.engine.Subject;
 
 /**
@@ -350,14 +353,29 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
         return new Observer<AjaxGoogleSearchEngineMonitor, MatchSetType>() {
 
             @Override
-            public void update(final AjaxGoogleSearchEngineMonitor subject, final MatchSetType arg) {
+            public void update(final AjaxGoogleSearchEngineMonitor subject, MatchSetType arg) {
+                // Can we further enhance our search result?
+                if (arg.Match.isEmpty()) {
+                    StockInfo stockInfo = ajaxStockInfoSearchEngine.search(arg.Query);
+                    if (stockInfo != null) {
+                        MatchType matchType = new MatchType(stockInfo.code.toString(), stockInfo.symbol.toString(), null, null);
+                        List<MatchType> matchTypes = new ArrayList<>();
+                        matchTypes.add(matchType);
+                        MatchSetType matchSetType = MatchSetType.newInstance(arg.Query, matchTypes);
+                        // Overwrite!
+                        arg = matchSetType;
+                    }
+                }
+
+                final MatchSetType _arg = arg;
+
                 if (SwingUtilities.isEventDispatchThread()) {
-                    _update(subject, arg);
+                    _update(subject, _arg);
                 } else {
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            _update(subject, arg);
+                            _update(subject, _arg);
                         }
                     });
                 }
@@ -377,10 +395,10 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
                 // them to do so.
                 //
                 // Without setReadOnly(true), when we type the first character "w", IME
-                // will suggest "我". However, when we call removeAllItems and addItem,
+                // will suggest ... However, when we call removeAllItems and addItem,
                 // JComboBox will "commit" this suggestion to JComboBox's text field.
                 // Hence, if we continue to type second character "m", the string displayed
-                // at JComboBox's text field will be "我我我".
+                // at JComboBox's text field will be ...
                 //
                 AjaxAutoCompleteJComboBox.this.jComboBoxEditor.setReadOnly(true);
 
@@ -407,14 +425,28 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
     private Observer<AjaxYahooSearchEngineMonitor, ResultSetType> getYahooMonitorObserver() {
         return new Observer<AjaxYahooSearchEngineMonitor, ResultSetType>() {
             @Override
-            public void update(final AjaxYahooSearchEngineMonitor subject, final ResultSetType arg) {
+            public void update(final AjaxYahooSearchEngineMonitor subject, ResultSetType arg) {
+                // Can we further enhance our search result?
+                if (arg.Result.isEmpty()) {
+                    StockInfo stockInfo = ajaxStockInfoSearchEngine.search(arg.Query);
+                    if (stockInfo != null) {
+                        ResultType resultType = new ResultType(stockInfo.code.toString(), stockInfo.symbol.toString());
+                        List<ResultType> resultTypes = new ArrayList<>();
+                        resultTypes.add(resultType);
+                        // Overwrite!
+                        arg = ResultSetType.newInstance(arg.Query, resultTypes);
+                    }
+                }
+
+                final ResultSetType _arg = arg;
+                
                 if (SwingUtilities.isEventDispatchThread()) {
-                    _update(subject, arg);    
+                    _update(subject, _arg);    
                 } else {
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            _update(subject, arg);
+                            _update(subject, _arg);
                         }
                     });
                 }
@@ -434,10 +466,10 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
                 // them to do so.
                 //
                 // Without setReadOnly(true), when we type the first character "w", IME
-                // will suggest "�?. However, when we call removeAllItems and addItem,
+                // will suggest ... However, when we call removeAllItems and addItem,
                 // JComboBox will "commit" this suggestion to JComboBox's text field.
                 // Hence, if we continue to type second character "m", the string displayed
-                // at JComboBox's text field will be "我我�?.
+                // at JComboBox's text field will be ...
                 //
                 AjaxAutoCompleteJComboBox.this.jComboBoxEditor.setReadOnly(true);
 
@@ -559,6 +591,7 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
     private AjaxServiceProvider ajaxServiceProvider;    
     private final AjaxYahooSearchEngineMonitor ajaxYahooSearchEngineMonitor = new AjaxYahooSearchEngineMonitor();
     private final AjaxGoogleSearchEngineMonitor ajaxGoogleSearchEngineMonitor = new AjaxGoogleSearchEngineMonitor();
+    private final AjaxStockInfoSearchEngine ajaxStockInfoSearchEngine = new AjaxStockInfoSearchEngine();
     
     private final MyJComboBoxEditor jComboBoxEditor;
     private final KeyAdapter keyAdapter;

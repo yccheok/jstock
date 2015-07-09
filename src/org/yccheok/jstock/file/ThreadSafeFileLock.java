@@ -58,20 +58,20 @@ public class ThreadSafeFileLock {
             return null;
         }
         
-        Pair<ReentrantReadWriteLock, AtomicInteger> pair;
+        Lock lock;
         synchronized(reentrantReadWriteLockMapMonitor) {
-            pair = reentrantReadWriteLockMap.get(canonicalPath);
-            if (pair == null) {
+            lock = reentrantReadWriteLockMap.get(canonicalPath);
+            if (lock == null) {
                 ReentrantReadWriteLock reentrantReadWriteLock = new ReentrantReadWriteLock();
                 AtomicInteger atomicInteger = new AtomicInteger(1);
-                pair = Pair.create(reentrantReadWriteLock, atomicInteger);
-                reentrantReadWriteLockMap.put(canonicalPath, pair);
+                Pair<ReentrantReadWriteLock, AtomicInteger> pair = Pair.create(reentrantReadWriteLock, atomicInteger);
+                lock = new Lock(pair, canonicalPath);
+                reentrantReadWriteLockMap.put(canonicalPath, lock);
             } else {
-                pair.second.incrementAndGet();
+                lock.reentrantReadWriteLock.second.incrementAndGet();
             }
         }
-        
-        Lock lock = new Lock(pair, canonicalPath);
+                
         return lock;
     }
     
@@ -125,7 +125,7 @@ public class ThreadSafeFileLock {
         }
     }
     
-    private static final Map<String, Pair<ReentrantReadWriteLock, AtomicInteger>> reentrantReadWriteLockMap = new HashMap<>();
+    private static final Map<String, Lock> reentrantReadWriteLockMap = new HashMap<>();
     private static final Object reentrantReadWriteLockMapMonitor = new Object();
     
     private static final Log log = LogFactory.getLog(Statements.class);
