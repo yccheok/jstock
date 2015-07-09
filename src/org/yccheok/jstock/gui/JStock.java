@@ -1058,7 +1058,7 @@ public class JStock extends javax.swing.JFrame {
             //
             // MultiThreadedHttpConnectionManager.shutdownAll();
 
-            log.info("Widnow is closed.");
+            log.info("Window is closed.");
         }
         catch (Exception exp) {
             log.error("Unexpected error while trying to quit application", exp);

@@ -1401,7 +1401,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         buyPortfolioChartJDialog.setVisible(true);                                    
     }
 
-    private void showChashFlowChartJDialog() {
+    private void showCashFlowChartJDialog() {
         final JStock m = JStock.instance();
         InvestmentFlowChartJDialog cashFlowChartJDialog = new InvestmentFlowChartJDialog(m, false, this);
         cashFlowChartJDialog.setVisible(true);
@@ -1485,7 +1485,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
-                showChashFlowChartJDialog();
+                showCashFlowChartJDialog();
             }
         });
 
@@ -1675,7 +1675,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
-                showChashFlowChartJDialog();
+                showCashFlowChartJDialog();
             }
         });
 
