@@ -3967,14 +3967,18 @@ public class JStock extends javax.swing.JFrame {
 
                             if (false == stocks.isEmpty()) {
                                 final Pair<StockInfoDatabase, StockNameDatabase> stockDatabase = org.yccheok.jstock.engine.Utils.toStockDatabase(stocks, country);
-                                JStock.saveStockInfoDatabaseAsCSV(country, stockDatabase.first);
+
+                                final boolean success = JStock.saveStockInfoDatabaseAsCSV(country, stockDatabase.first);
+                                
                                 if (stockDatabase.second != null) {
                                     JStock.saveStockNameDatabaseAsCSV(country, stockDatabase.second);
                                 }
-                                successStockInfoDatabaseMeta.put(country, latest);
-
-                                if (country == jStockOptions.getCountry()) {
-                                    needToInitDatabase = true;
+                                
+                                if (success) {
+                                    successStockInfoDatabaseMeta.put(country, latest);
+                                    if (country == jStockOptions.getCountry()) {
+                                        needToInitDatabase = true;
+                                    }
                                 }
                             }
                         } catch (IOException ex) {
