@@ -43,6 +43,7 @@ public enum Index {
     TA25(Country.Israel, "TA 25", "Tel Aviv 25 Index", Code.newInstance("T25.TA")),
     TA100(Country.Israel, "TA 100", "Tel Aviv 100 Index", Code.newInstance("^TA100")),
     FTSEMIB(Country.Italy, "MIB", "FTSE MIB Index", Code.newInstance("FTSEMIB.MI")),
+    NIKKEI(Country.Japan, "Nikkei 225", "Nikkei 225", Code.newInstance("^N225")),
     KS11(Country.Korea, "KOSPI", "Korea Stock Exchange KOSPI Index", Code.newInstance("^KS11")),
     KLSE(Country.Malaysia, "KLCI", "Kuala Lumpur Composite Index", Code.newInstance("^KLSE")),    
     AEX(Country.Netherlands, "AEX", "AEX-Index", Code.newInstance("^AEX")),

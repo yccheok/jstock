@@ -43,6 +43,7 @@ public enum Country {
     Indonesia("/images/16x16/id.png", "Indonesia", Currency.valueOf("IDR"), Currency.valueOf("IDR")),
     Israel("/images/16x16/il.png", "Israel", Currency.valueOf("ILS"), Currency.valueOf("ILS")),
     Italy("/images/16x16/it.png", "Italy", Currency.valueOf("EUR"), Currency.valueOf("EUR")),
+    Japan("/images/16x16/jp.png", "Japan", Currency.valueOf("JPY"), Currency.valueOf("JPY")),
     Korea("/images/16x16/kr.png", "Korea", Currency.valueOf("KPW"), Currency.valueOf("KPW")),
     Malaysia("/images/16x16/my.png", "Malaysia", Currency.valueOf("MYR"), Currency.valueOf("MYR")),
     Netherlands("/images/16x16/nl.png", "Netherlands", Currency.valueOf("EUR"), Currency.valueOf("EUR")),

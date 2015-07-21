@@ -415,6 +415,7 @@ public class GoogleStockServer implements StockServer {
         currencySymbolToCurrencyCodeMap.put("NZ$", "NZD");
         currencySymbolToCurrencyCodeMap.put("NT$", "TWD");
         currencySymbolToCurrencyCodeMap.put("\u00A3", "GBP");
+        currencySymbolToCurrencyCodeMap.put("\u00A5", "JPY");
     }
 
     private static final int SYMBOL_MAX_LENGTH = 17;

@@ -91,9 +91,11 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         
         Country country = jStockOptions.getCountry();
-        
+        AjaxAutoCompleteJComboBox autoCompleteJComboBox = ((AjaxAutoCompleteJComboBox)this.jComboBox1);
         if (country == Country.India) {
-            ((AjaxAutoCompleteJComboBox)this.jComboBox1).setAjaxProvider(AjaxServiceProvider.Google, Arrays.asList("NSE", "BOM"));
+            autoCompleteJComboBox.setAjaxProvider(AjaxServiceProvider.Google, Arrays.asList("NSE", "BOM"));
+        } else if (country == Country.Japan) {
+            ((AjaxAutoCompleteJComboBox)this.jComboBox1).setAjaxProvider(AjaxServiceProvider.Google, Arrays.asList("TYO"));
         } else {
             ((AjaxAutoCompleteJComboBox)this.jComboBox1).setAjaxProvider(AjaxServiceProvider.Yahoo, java.util.Collections.<String>emptyList());
         }

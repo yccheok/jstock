@@ -47,6 +47,8 @@ public class MatchType {
             return Code.newInstance(this.t + ".N");
         } else if ("BOM".equals(e)) {
             return Code.newInstance(this.t + ".B");
+        } else if ("TYO".equals(e)) {
+            return Code.newInstance(this.t + ".T");
         } else if (this.e == null || this.e.isEmpty()) {
             return Code.newInstance(this.t);    
         }

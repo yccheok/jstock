@@ -252,6 +252,8 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
                         int pass = 0;
                         int fail = 0;
                         
+                        boolean codeBucketListsChanged = false;
+                        
                         for (int currIndex = index; thisThread == thread; currIndex += step) {
                             final List<Code> codes = codeBucketLists.get(currIndex);
 
@@ -314,10 +316,20 @@ public class RealTimeStockMonitor extends Subject<RealTimeStockMonitor, java.uti
                                 RealTimeStockMonitor.this.notify(RealTimeStockMonitor.this, stocks);
                             }
 
+                            if (size != codeBucketLists.get(currIndex).size()) {
+                                // Someone injects new code while we are scanning.
+                                codeBucketListsChanged = true;
+                            }
                         }   // for (int currIndex = index; thisThread == thread; curIndex += step)
 
                         totalScanned = pass + fail;
 
+                        if (codeBucketListsChanged) {
+                            // Someone injects new code while we are scanning. Don't sleep first.
+                            // Re-scan immediately.
+                            continue;
+                        }
+                        
                         try {
                             if (fail == 0) {
                                 Thread.sleep(delay);

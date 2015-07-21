@@ -200,7 +200,7 @@ public class Utils {
     }
 
     public static Country toCountry(Code code) {
-        assert(countries.keySet().size() == 45);
+        assert(countries.keySet().size() == 46);
         
         String string = code.toString();
         int index = string.lastIndexOf(".");
@@ -925,6 +925,7 @@ public class Utils {
         oneLetterSuffixes.put(".N", "NSE:");
         oneLetterSuffixes.put(".B", "BOM:");
         oneLetterSuffixes.put(".L", "LON:");
+        oneLetterSuffixes.put(".T", "TYO:");
 
         twoLetterSuffixes.put(".SS", "SHA:");
         twoLetterSuffixes.put(".SZ", "SHE:");
@@ -971,6 +972,7 @@ public class Utils {
         countries.put("JK", Country.Indonesia);
         countries.put("TA", Country.Israel);
         countries.put("MI", Country.Italy);
+        countries.put("T", Country.Japan);
         countries.put("KQ", Country.Korea);
         countries.put("KS", Country.Korea);
         countries.put("KL", Country.Malaysia);
@@ -1017,6 +1019,7 @@ public class Utils {
         toGoogleIndex.put("^BFX", "INDEXEURO:BEL20");
         toGoogleIndex.put("^AEX", "INDEXEURO:AEX");
         toGoogleIndex.put("^OMXC20", "INDEXNASDAQ:OMXC20");
+        toGoogleIndex.put("^N225", "INDEXNIKKEI:NI225");
         
         // TODO : Need revision. We no longer have primaryStockServerFactoryClasses
         // concept. Going to replace with PriceSource.
@@ -1036,6 +1039,7 @@ public class Utils {
         defaultPriceSources.put(Country.Indonesia, PriceSource.Yahoo);
         defaultPriceSources.put(Country.Israel, PriceSource.Yahoo);
         defaultPriceSources.put(Country.Italy, PriceSource.Yahoo);
+        defaultPriceSources.put(Country.Japan, PriceSource.Google);
         defaultPriceSources.put(Country.Korea, PriceSource.Yahoo);
         defaultPriceSources.put(Country.Malaysia, PriceSource.KLSEInfo);
         defaultPriceSources.put(Country.Netherlands, PriceSource.Yahoo);
