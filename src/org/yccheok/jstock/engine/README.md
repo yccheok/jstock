@@ -1,1 +1,1 @@
-org.yccheok.jstock.engine will be closed source component.
+org.yccheok.jstock.engine is closed source component.
