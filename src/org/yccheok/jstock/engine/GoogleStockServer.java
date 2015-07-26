@@ -119,7 +119,7 @@ public class GoogleStockServer implements StockServer {
                 List<Stock> stocks = _getStocks(codes);
                 return stocks;
             } catch (StockNotFoundException ex) {
-                if (org.yccheok.jstock.network.Utils.isInternetAvailable()) {
+                if (true) {
                     // Can we retry again?
                     if (i >= (NUM_OF_RETRY + 1)) {
                         // Nope. Don't retry.
