@@ -2507,9 +2507,9 @@ public class Utils {
         
         try {
             stockInfoDatabaseMeta = gson.fromJson(json, new TypeToken<EnumMap<Country, Long>>(){}.getType());
-        } catch (com.google.gson.JsonSyntaxException ex) {
+        } catch (Exception ex) {
             log.error(null, ex);
-        }  
+        }
         
         if (stockInfoDatabaseMeta == null) {
             return java.util.Collections.emptyMap();
