@@ -114,6 +114,29 @@ public class GoogleStockServer implements StockServer {
     
     @Override
     public List<Stock> getStocks(List<Code> codes) throws StockNotFoundException {
+        for (int i = 0; i < NUM_OF_RETRY; i++) {
+            try {
+                List<Stock> stocks = _getStocks(codes);
+                return stocks;
+            } catch (StockNotFoundException ex) {
+                if (org.yccheok.jstock.network.Utils.isInternetAvailable()) {
+                    // Can we retry again?
+                    if (i >= (NUM_OF_RETRY + 1)) {
+                        // Nope. Don't retry.
+                        throw ex;
+                    }
+                } else {
+                    // No internet. Don't retry.
+                    throw ex;
+                }
+            }
+        }
+
+        assert(false);
+        return null;
+    }
+
+    private List<Stock> _getStocks(List<Code> codes) throws StockNotFoundException {
         assert(codes.isEmpty() == false);
         
         Map<String, Code> originalCodes = new HashMap<>();
@@ -417,6 +440,24 @@ public class GoogleStockServer implements StockServer {
         currencySymbolToCurrencyCodeMap.put("\u00A3", "GBP");
         currencySymbolToCurrencyCodeMap.put("\u00A5", "JPY");
     }
+
+    // Even when internet is in good condition, we will get the following exception sometimes.
+    // NUM_OF_RETRY is used to reduce such exception.
+    /*
+        java.io.InterruptedIOException
+        at com.android.okio.Deadline.throwIfReached(Deadline.java:56)
+        at com.android.okio.Okio$2.read(Okio.java:110)
+        at com.android.okio.RealBufferedSource.read(RealBufferedSource.java:48)
+        at com.android.okhttp.internal.http.HttpConnection$ChunkedSource.read(HttpConnection.java:499)
+        at com.android.okio.RealBufferedSource$1.read(RealBufferedSource.java:168)
+        at java.io.InputStreamReader.read(InputStreamReader.java:231)
+        at java.io.BufferedReader.read(BufferedReader.java:325)
+        at java.io.Reader.read(Reader.java:141)
+        at org.yccheok.jstock.gui.Utils.getResponseBodyAsString(Utils.java:1240)
+        at org.yccheok.jstock.engine.GoogleStockServer.getStocks(GoogleStockServer.java:142)
+        at org.yccheok.jstock.engine.RealTimeStockMonitor$StockMonitor.run(RealTimeStockMonitor.java:282)
+    */
+    private static final int NUM_OF_RETRY = 2;
 
     private static final int SYMBOL_MAX_LENGTH = 17;
     
