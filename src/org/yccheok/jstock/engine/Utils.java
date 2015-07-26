@@ -326,8 +326,12 @@ public class Utils {
         return isValidPortNumber(port);
     }
     
+    public static String getStockInfoDatabaseFileDirectory(Country country) {
+        return org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database" + File.separator;
+    }
+    
     public static File getStockInfoDatabaseFile(Country country) {
-        return new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + country + File.separator + "database" + File.separator + "stock-info-database.csv");
+        return new File(getStockInfoDatabaseFileDirectory(country) + "stock-info-database.csv");
     }
     
     /**
