@@ -3123,6 +3123,7 @@ public class JStock extends javax.swing.JFrame {
     }
     
     private static boolean saveStockInfoDatabaseAsCSV(Country country, StockInfoDatabase stockInfoDatabase) {
+        org.yccheok.jstock.gui.Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.engine.Utils.getStockInfoDatabaseFileDirectory(country));
         final File stockInfoDatabaseCSVFile = org.yccheok.jstock.engine.Utils.getStockInfoDatabaseFile(country);
         final Statements statements = Statements.newInstanceFromStockInfoDatabase(stockInfoDatabase);
         boolean result = statements.saveAsCSVFile(stockInfoDatabaseCSVFile);
