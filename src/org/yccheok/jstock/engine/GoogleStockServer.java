@@ -121,7 +121,7 @@ public class GoogleStockServer implements StockServer {
             } catch (StockNotFoundException ex) {
                 if (true) {
                     // Can we retry again?
-                    if (i >= (NUM_OF_RETRY + 1)) {
+                    if ((i+1) >= NUM_OF_RETRY) {
                         // Nope. Don't retry.
                         throw ex;
                     }
@@ -439,6 +439,7 @@ public class GoogleStockServer implements StockServer {
         currencySymbolToCurrencyCodeMap.put("NT$", "TWD");
         currencySymbolToCurrencyCodeMap.put("\u00A3", "GBP");
         currencySymbolToCurrencyCodeMap.put("\u00A5", "JPY");
+        currencySymbolToCurrencyCodeMap.put("HK$", "HKD");
     }
 
     // Even when internet is in good condition, we will get the following exception sometimes.
