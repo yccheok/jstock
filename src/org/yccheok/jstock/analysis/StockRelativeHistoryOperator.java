@@ -40,7 +40,8 @@ public class StockRelativeHistoryOperator extends AbstractOperator {
         MFI,
         MACD,
         MACDSignal,
-        MACDHist
+        MACDHist,
+        StandardDeviation
     }
     
     public enum Type
@@ -188,15 +189,15 @@ public class StockRelativeHistoryOperator extends AbstractOperator {
             return;
         }
 
-        java.util.List<Stock> stocks = new java.util.ArrayList<Stock>();
-        java.util.List<Double> values = new java.util.ArrayList<Double>();
+        java.util.List<Stock> stocks = new java.util.ArrayList<>();
+        java.util.List<Double> values = new java.util.ArrayList<>();
 
         // For MFI usage.
-        java.util.List<Double> highs = new java.util.ArrayList<Double>();
-        java.util.List<Double> lows = new java.util.ArrayList<Double>();
-        java.util.List<Double> closes = new java.util.ArrayList<Double>();
+        java.util.List<Double> highs = new java.util.ArrayList<>();
+        java.util.List<Double> lows = new java.util.ArrayList<>();
+        java.util.List<Double> closes = new java.util.ArrayList<>();
         // TODO: CRITICAL LONG BUG REVISED NEEDED.
-        java.util.List<Long> volumes = new java.util.ArrayList<Long>();
+        java.util.List<Long> volumes = new java.util.ArrayList<>();
 
         final int size = stockHistoryServer.size();
         /* Fill up stocks. */
@@ -348,6 +349,24 @@ public class StockRelativeHistoryOperator extends AbstractOperator {
                 
             case MACDHist:
                 v = TechnicalAnalysis.createMACDFix(values, day).outMACDHist;
+                break;
+                
+            case StandardDeviation:
+                if ((dataSize - 1) <= 0) {
+                    Object oldValue = this.value;
+                    this.value = null;
+                    if (Utils.equals(oldValue, value) == false) {
+                        this.firePropertyChange("value", oldValue, this.value);
+                    }
+                    return;
+                }
+                
+                double mean = average(values);
+                double squareSum = 0.0;
+                for (Double _value : values) {
+                    squareSum += Math.pow(_value - mean, 2);
+                }
+                v = Math.sqrt((squareSum) / (dataSize - 1));                
                 break;
                 
             default:
