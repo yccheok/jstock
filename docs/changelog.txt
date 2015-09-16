@@ -1,6 +1,9 @@
 ﻿This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.7.10 - 2015-09-18
+  Feature: Added standard deviation for indicator editor.
+  
 JStock 1.0.7.9 - 2015-07-22
   Feature: Support Japan stock market.
   Feature: Use Google Finance for Denmark.
