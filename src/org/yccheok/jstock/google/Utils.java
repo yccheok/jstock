@@ -18,6 +18,7 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
+import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.GmailScopes;
 import com.google.api.services.oauth2.Oauth2;
 import com.google.api.services.oauth2.model.Userinfoplus;
@@ -229,4 +230,9 @@ public class Utils {
         Drive service = new Drive.Builder(httpTransport, JSON_FACTORY, credential).setApplicationName("JStock").build();
         return service;
     }  
+    
+    public static Gmail getGmail(Credential credential) {
+        Gmail service = new Gmail.Builder(httpTransport, JSON_FACTORY, credential).setApplicationName("JStock").build();
+        return service;        
+    }
 }

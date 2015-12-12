@@ -23,7 +23,6 @@ import org.yccheok.jstock.engine.Pair;
 import com.google.api.client.auth.oauth2.Credential;
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Font;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.MessageFormat;
@@ -155,7 +154,7 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("LoadFromCloudJDialog_GoogleAccount"))); // NOI18N
 
         jLabel1.setBackground(new java.awt.Color(140, 196, 116));
-        jLabel1.setFont(getRobotoLightFont());
+        jLabel1.setFont(jLabel1.getFont().deriveFont(jLabel1.getFont().getStyle() | java.awt.Font.BOLD, jLabel1.getFont().getSize()+1));
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("username@email.com");
@@ -398,10 +397,6 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
         final DateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy hh:mm:ss a");
         final String s = dateFormat.format(new Date()) + "\n" + message;
         this.memoryLog.add(s);
-    }
-
-    private Font getRobotoLightFont() {
-        return Utils.getRobotoLightFont().deriveFont((float)18);
     }
        
     private final Pair<Credential, String> credentialEx;

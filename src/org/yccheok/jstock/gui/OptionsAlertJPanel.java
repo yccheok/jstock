@@ -21,12 +21,16 @@ package org.yccheok.jstock.gui;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.json.GoogleJsonError;
+import com.google.api.services.gmail.Gmail;
+import java.io.IOException;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
+import javax.mail.MessagingException;
 import javax.swing.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.yccheok.jstock.alert.GoogleMail;
 import org.yccheok.jstock.engine.Pair;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.internationalization.MessagesBundle;
@@ -80,8 +84,7 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
                                 org.yccheok.jstock.google.Utils.logoutGmail();
                                 break;
                             }
-                        }
-                        
+                        }                        
                     }
                     
                     JOptionPane.showMessageDialog(OptionsAlertJPanel.this, ex.getMessage(), GUIBundle.getString("OptionsAlertJPanel_Alert"), JOptionPane.ERROR_MESSAGE);
@@ -220,6 +223,7 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsAlertJPanel_GmalAccount"))); // NOI18N
 
         jLabel1.setBackground(new java.awt.Color(140, 196, 116));
+        jLabel1.setFont(jLabel1.getFont().deriveFont(jLabel1.getFont().getStyle() | java.awt.Font.BOLD, jLabel1.getFont().getSize()+1));
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setText("username@email.com");
         jLabel1.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -252,7 +256,7 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
                             .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addComponent(jLabel11)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(jLabel12)))
                         .addGap(0, 0, Short.MAX_VALUE)))
@@ -452,6 +456,32 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
             public Boolean doInBackground() {
                 boolean status = true;
 
+                Pair<Credential, String> credentialEx = OptionsAlertJPanel.this.credentialEx;
+                if (credentialEx == null) {
+                    status = false;
+                } else {
+                    final Credential credential = credentialEx.first;
+                    final Gmail service = org.yccheok.jstock.google.Utils.getGmail(credential);                    
+                    final String recipientEmail = credentialEx.second;
+                    final String fromEmail = credentialEx.second;
+                    final String ccEmail = jTextField1.getText().trim();
+                    final String title = MessagesBundle.getString("info_message_congratulation_email_alert_system_is_working");
+                    final String message = MessagesBundle.getString("info_message_congratulation_email_alert_system_is_working");
+                    
+                    System.out.println("recipientEmail = " + recipientEmail);
+                    System.out.println("fromEmail = " + fromEmail);
+                    System.out.println("ccEmail = " + ccEmail);
+                    
+                    try {
+                        GoogleMail.Send(service, recipientEmail, ccEmail, fromEmail, title, message);
+                    } catch (IOException ex) {
+                        log.error(null, ex);
+                        status = false;
+                    } catch (MessagingException ex) {
+                        log.error(null, ex);
+                        status = false;
+                    }
+                }
                 return status;
             }
 
