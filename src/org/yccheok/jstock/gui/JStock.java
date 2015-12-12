@@ -2907,16 +2907,6 @@ public class JStock extends javax.swing.JFrame {
                     }
 
                     final String message = title + "\n(JStock)";
-
-                    try {
-                        String email = Utils.decrypt(jStockOptions.getEmail());
-                        final String CCEmail = Utils.decrypt(jStockOptions.getCCEmail());
-                        GoogleMail.Send(email, Utils.decrypt(jStockOptions.getEmailPassword()), email + "@gmail.com", CCEmail, title, message);
-                    } catch (AddressException exp) {
-                        log.error(null, exp);
-                    } catch (MessagingException exp) {
-                        log.error(null, exp);
-                    }
                 }
             };
 
