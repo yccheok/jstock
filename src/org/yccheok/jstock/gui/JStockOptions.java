@@ -115,9 +115,7 @@ public class JStockOptions {
     public JStockOptions() {
         this.popupMessage = true;
         this.sendEmail = false;
-        this.email = "";
         this.CCEmail = "";
-        this.emailPassword = "";
         this.singleIndicatorAlert = true;
         this.proxyServer = "";
         this.proxyPort = -1;
@@ -172,8 +170,12 @@ public class JStockOptions {
     private boolean singleIndicatorAlert;
     private boolean popupMessage;
     private boolean sendEmail;
-    private String email;
-    private String emailPassword;
+    
+    @Deprecated
+    private transient String email;
+    @Deprecated
+    private transient String emailPassword;
+    
     private String CCEmail;
     @Deprecated
     private transient String googleCalendarUsername;
@@ -675,22 +677,6 @@ public class JStockOptions {
 
     public void setSendEmail(boolean sendEmail) {
         this.sendEmail = sendEmail;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getEmailPassword() {
-        return emailPassword;
-    }
-
-    public void setEmailPassword(String emailPassword) {
-        this.emailPassword = emailPassword;
     }
 
     public String getProxyServer() {
