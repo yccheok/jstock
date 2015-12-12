@@ -20,16 +20,15 @@
 package org.yccheok.jstock.gui;
 
 import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.googleapis.json.GoogleJsonError;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
-import javax.mail.MessagingException;
-import javax.mail.internet.AddressException;
 import javax.swing.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.yccheok.jstock.alert.GoogleMail;
 import org.yccheok.jstock.engine.Pair;
+import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.internationalization.MessagesBundle;
 
 /**
@@ -43,6 +42,56 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         initComponents();
     }
     
+    private void signIn() {
+        jCheckBox2.setEnabled(false);
+        
+        SwingWorker swingWorker = new SwingWorker<Pair<Pair<Credential, String>, Boolean>, Void>() {
+
+            @Override
+            protected Pair<Pair<Credential, String>, Boolean> doInBackground() throws Exception {
+                final Pair<Pair<Credential, String>, Boolean> pair = org.yccheok.jstock.google.Utils.authorizeGmail();
+                return pair;
+            }
+            
+            @Override
+            public void done() {
+                Pair<Pair<Credential, String>, Boolean> pair = null;
+                
+                try {
+                    pair = this.get();
+                } catch (InterruptedException ex) {
+                    JOptionPane.showMessageDialog(OptionsAlertJPanel.this, ex.getMessage(), GUIBundle.getString("OptionsAlertJPanel_Alert"), JOptionPane.ERROR_MESSAGE);
+                    log.error(null, ex);
+                } catch (ExecutionException ex) {
+                    Throwable throwable = ex.getCause();
+                    if (throwable instanceof com.google.api.client.googleapis.json.GoogleJsonResponseException) {
+                        com.google.api.client.googleapis.json.GoogleJsonResponseException ge = (com.google.api.client.googleapis.json.GoogleJsonResponseException)throwable;
+                        for (GoogleJsonError.ErrorInfo errorInfo : ge.getDetails().getErrors()) {
+                            if ("insufficientPermissions".equals(errorInfo.getReason())) {
+                                org.yccheok.jstock.google.Utils.logoutGmail();
+                                break;
+                            }
+                        }
+                        
+                    }
+                    
+                    JOptionPane.showMessageDialog(OptionsAlertJPanel.this, ex.getMessage(), GUIBundle.getString("OptionsAlertJPanel_Alert"), JOptionPane.ERROR_MESSAGE);
+                    log.error(null, ex);
+                }                
+                
+                if (pair != null) {
+                    credentialEx = pair.first;
+                } else {
+                    jCheckBox2.setSelected(false);
+                }
+                
+                updateGUIState();                
+            }
+        };
+        
+        swingWorker.execute();
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -251,6 +300,12 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
 
     private void jCheckBox2ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jCheckBox2ItemStateChanged
         updateGUIState();
+        
+        if (jCheckBox2.isSelected()) {
+            if (this.credentialEx == null) {
+                signIn();
+            }
+        }
     }//GEN-LAST:event_jCheckBox2ItemStateChanged
 
     private void jCheckBox4ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jCheckBox4ItemStateChanged
