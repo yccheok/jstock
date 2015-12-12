@@ -19,15 +19,20 @@
 
 package org.yccheok.jstock.gui;
 
+import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.googleapis.json.GoogleJsonError;
+import com.google.api.services.gmail.Gmail;
+import java.io.IOException;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import javax.mail.MessagingException;
-import javax.mail.internet.AddressException;
 import javax.swing.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.alert.GoogleMail;
+import org.yccheok.jstock.engine.Pair;
+import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.internationalization.MessagesBundle;
 
 /**
@@ -39,6 +44,111 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
     /** Creates new form OptionsAlertJPanel */
     public OptionsAlertJPanel() {
         initComponents();
+        initCredentialEx();
+    }
+    
+    private void signOut() {
+        this.credentialEx = null;
+        jCheckBox2.setSelected(false);
+        jTextField1.setText("");
+        org.yccheok.jstock.google.Utils.logoutGmail();
+        updateGUIState();
+    }
+    
+    private void signIn() {
+        jCheckBox2.setEnabled(false);
+        
+        SwingWorker swingWorker = new SwingWorker<Pair<Pair<Credential, String>, Boolean>, Void>() {
+
+            @Override
+            protected Pair<Pair<Credential, String>, Boolean> doInBackground() throws Exception {
+                final Pair<Pair<Credential, String>, Boolean> pair = org.yccheok.jstock.google.Utils.authorizeGmail();
+                return pair;
+            }
+            
+            @Override
+            public void done() {
+                Pair<Pair<Credential, String>, Boolean> pair = null;
+                
+                try {
+                    pair = this.get();
+                } catch (InterruptedException ex) {
+                    JOptionPane.showMessageDialog(OptionsAlertJPanel.this, ex.getMessage(), GUIBundle.getString("OptionsAlertJPanel_Alert"), JOptionPane.ERROR_MESSAGE);
+                    log.error(null, ex);
+                } catch (ExecutionException ex) {
+                    Throwable throwable = ex.getCause();
+                    if (throwable instanceof com.google.api.client.googleapis.json.GoogleJsonResponseException) {
+                        com.google.api.client.googleapis.json.GoogleJsonResponseException ge = (com.google.api.client.googleapis.json.GoogleJsonResponseException)throwable;
+                        for (GoogleJsonError.ErrorInfo errorInfo : ge.getDetails().getErrors()) {
+                            if ("insufficientPermissions".equals(errorInfo.getReason())) {
+                                org.yccheok.jstock.google.Utils.logoutGmail();
+                                break;
+                            }
+                        }                        
+                    }
+                    
+                    JOptionPane.showMessageDialog(OptionsAlertJPanel.this, ex.getMessage(), GUIBundle.getString("OptionsAlertJPanel_Alert"), JOptionPane.ERROR_MESSAGE);
+                    log.error(null, ex);
+                }                
+                
+                if (pair != null) {
+                    credentialEx = pair.first;
+                } else {
+                    jCheckBox2.setSelected(false);
+                    JStock.instance().getJStockOptions().setSendEmail(jCheckBox2.isSelected());
+                }
+                
+                updateGUIState();                
+            }
+        };
+        
+        swingWorker.execute();
+    }
+
+    private void initCredentialEx() {
+        SwingWorker swingWorker = new SwingWorker<Pair<Credential, String>, Void>() {
+
+            @Override
+            protected Pair<Credential, String> doInBackground() throws Exception {
+                System.out.println("gmail offline");
+                final Pair<Credential, String> pair = org.yccheok.jstock.google.Utils.authorizeGmailOffline();
+                return pair;
+            }
+            
+            @Override
+            public void done() { 
+                Pair<Credential, String> pair = null;
+                
+                try {
+                    pair = this.get();
+                } catch (InterruptedException ex) {
+                    log.error(null, ex);
+                } catch (ExecutionException ex) {
+                    Throwable throwable = ex.getCause();
+                    if (throwable instanceof com.google.api.client.googleapis.json.GoogleJsonResponseException) {
+                        com.google.api.client.googleapis.json.GoogleJsonResponseException ge = (com.google.api.client.googleapis.json.GoogleJsonResponseException)throwable;
+                        for (GoogleJsonError.ErrorInfo errorInfo : ge.getDetails().getErrors()) {
+                            if ("insufficientPermissions".equals(errorInfo.getReason())) {
+                                org.yccheok.jstock.google.Utils.logoutGmail();
+                                break;
+                            }
+                        }
+                        
+                    }
+                    
+                    log.error(null, ex);
+                }
+                
+                if (pair != null) {
+                    credentialEx = pair;
+                    jCheckBox2.setSelected(JStock.instance().getJStockOptions().isSendEmail());
+                }
+                
+                updateGUIState();
+            }
+        };
+        
+        swingWorker.execute();
     }
     
     /** This method is called from within the constructor to
@@ -53,16 +163,14 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         jPanel1 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jCheckBox2 = new javax.swing.JCheckBox();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jTextField2 = new javax.swing.JTextField();
-        jPasswordField1 = new javax.swing.JPasswordField();
-        jLabel2 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
         jLabel7 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
         jLabel12 = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jButton2 = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
         jCheckBox1 = new javax.swing.JCheckBox();
         jCheckBox4 = new javax.swing.JCheckBox();
@@ -86,30 +194,6 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
                 jCheckBox2ItemStateChanged(evt);
             }
         });
-
-        jLabel1.setText(bundle.getString("OptionsAlertJPanel_Email")); // NOI18N
-        jLabel1.setEnabled(false);
-
-        jLabel3.setText(bundle.getString("OptionsAlertJPanel_Password")); // NOI18N
-        jLabel3.setEnabled(false);
-
-        jTextField2.setEnabled(false);
-        jTextField2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField2ActionPerformed(evt);
-            }
-        });
-
-        jPasswordField1.setEnabled(false);
-        jPasswordField1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jPasswordField1ActionPerformed(evt);
-            }
-        });
-
-        jLabel2.setForeground(new java.awt.Color(0, 0, 255));
-        jLabel2.setText("@gmail.com");
-        jLabel2.setEnabled(false);
 
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/mail_send.png"))); // NOI18N
         jButton1.setText(bundle.getString("OptionsAlertJPanel_TestEmail")); // NOI18N
@@ -136,6 +220,24 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         jLabel12.setText(bundle.getString("OptionsAlertJPanel_EmailExample")); // NOI18N
         jLabel12.setEnabled(false);
 
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsAlertJPanel_GmalAccount"))); // NOI18N
+
+        jLabel1.setBackground(new java.awt.Color(140, 196, 116));
+        jLabel1.setFont(jLabel1.getFont().deriveFont(jLabel1.getFont().getStyle() | java.awt.Font.BOLD, jLabel1.getFont().getSize()+1));
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel1.setText("username@email.com");
+        jLabel1.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        jLabel1.setOpaque(true);
+        jPanel2.add(jLabel1);
+
+        jButton2.setText(bundle.getString("OptionsAlertJPanel_SignOut")); // NOI18N
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+        jPanel2.add(jButton2);
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -143,55 +245,40 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jCheckBox2)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel1)
-                                    .addComponent(jLabel3))
-                                .addGap(21, 21, 21))
-                            .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addComponent(jLabel11)
-                                .addGap(25, 25, 25)))
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(jPasswordField1, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jTextField2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 139, Short.MAX_VALUE)
-                            .addComponent(jTextField1, javax.swing.GroupLayout.Alignment.LEADING))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2)
+                            .addComponent(jCheckBox2)
                             .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addComponent(jButton1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(jLabel7))
-                            .addComponent(jLabel12))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addComponent(jLabel11)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabel12)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                        .addComponent(jCheckBox2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel1)
-                            .addComponent(jLabel2))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jPasswordField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel3)
-                            .addComponent(jButton1)))
-                    .addComponent(jLabel7, javax.swing.GroupLayout.Alignment.TRAILING))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jCheckBox2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel11)
                     .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel12)
-                    .addComponent(jLabel11))
-                .addContainerGap())
+                    .addComponent(jLabel12))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jButton1)
+                    .addComponent(jLabel7))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OptionsAlertJPanel_System"))); // NOI18N
@@ -251,8 +338,8 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -262,26 +349,13 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(257, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         add(jPanel1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        if (jTextField2.getText().trim().length() == 0)
-        {
-            JOptionPane.showMessageDialog(this, "Email address cannot be empty", "Empty email", JOptionPane.WARNING_MESSAGE);
-            jTextField2.requestFocus();
-            return;
-        }
-
-        if (jPasswordField1.getPassword().length == 0)
-        {
-            JOptionPane.showMessageDialog(this, "Email password cannot be empty", "Empty password", JOptionPane.WARNING_MESSAGE);
-            jPasswordField1.requestFocus();
-            return;
-        }   
 
         this.testEmailSwingWorker = getTestEmailSwingWorker();
         this.updateGUIState();
@@ -291,6 +365,12 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
 
     private void jCheckBox2ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jCheckBox2ItemStateChanged
         updateGUIState();
+        
+        if (jCheckBox2.isSelected()) {
+            if (this.credentialEx == null) {
+                signIn();
+            }
+        }
     }//GEN-LAST:event_jCheckBox2ItemStateChanged
 
     private void jCheckBox4ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jCheckBox4ItemStateChanged
@@ -301,17 +381,13 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         Utils.playAlertSound();
     }//GEN-LAST:event_jButton3ActionPerformed
 
-    private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
-        jButton1.doClick();
-    }//GEN-LAST:event_jTextField2ActionPerformed
-
-    private void jPasswordField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jPasswordField1ActionPerformed
-        jButton1.doClick();
-    }//GEN-LAST:event_jPasswordField1ActionPerformed
-
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
         jButton1.doClick();
     }//GEN-LAST:event_jTextField1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        signOut();
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     public void cancel() {
         if (this.testEmailSwingWorker != null) {
@@ -324,37 +400,20 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         jCheckBox1.setSelected(jStockOptions.isPopupMessage());
         jCheckBox2.setSelected(jStockOptions.isSendEmail());
         jCheckBox4.setSelected(jStockOptions.isSoundEnabled());
-        jTextField2.setText(Utils.decrypt(jStockOptions.getEmail()));
         jTextField1.setText(Utils.decrypt(jStockOptions.getCCEmail()));
-        jPasswordField1.setText(Utils.decrypt(jStockOptions.getEmailPassword()));
         
         updateGUIState();
     }
 
     @Override
     public boolean apply(JStockOptions jStockOptions) {
-        if (jCheckBox2.isSelected()) {
-            if (jTextField2.getText().trim().length() == 0)
-            {
-                JOptionPane.showMessageDialog(this, "Email address cannot be empty", "Empty email", JOptionPane.WARNING_MESSAGE);
-                jTextField2.requestFocus();
-                return false;
-            }
-            
-            if (jPasswordField1.getPassword().length == 0)
-            {
-                JOptionPane.showMessageDialog(this, "Email password cannot be empty", "Empty password", JOptionPane.WARNING_MESSAGE);
-                jPasswordField1.requestFocus();
-                return false;
-            }            
+        if (jCheckBox2.isSelected()) {           
         }
 
         jStockOptions.setSoundEnabled(jCheckBox4.isSelected());
         jStockOptions.setPopupMessage(jCheckBox1.isSelected());
         jStockOptions.setSendEmail(jCheckBox2.isSelected());
-        jStockOptions.setEmail(Utils.encrypt(jTextField2.getText().trim()));
         jStockOptions.setCCEmail(Utils.encrypt(jTextField1.getText().trim()));
-        jStockOptions.setEmailPassword(Utils.encrypt(new String(jPasswordField1.getPassword())));
 
         return true;
     }
@@ -370,17 +429,21 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         final boolean emailState = jCheckBox2.isSelected();
 
         jButton3.setEnabled(soundState);
-        jLabel1.setEnabled(emailState);
-        jLabel11.setEnabled(emailState);
-        jLabel2.setEnabled(emailState);
-        jLabel3.setEnabled(emailState);
-        jLabel12.setEnabled(emailState);
-        jButton1.setEnabled(emailState && isTestEmailDone);
-        jTextField2.setEnabled(emailState && isTestEmailDone);
-        jTextField1.setEnabled(emailState && isTestEmailDone);
-        jPasswordField1.setEnabled(emailState && isTestEmailDone);
+
+        jButton1.setEnabled(emailState && isTestEmailDone && this.credentialEx != null);
+        jButton2.setEnabled(emailState && isTestEmailDone && this.credentialEx != null);
         jCheckBox2.setEnabled(isTestEmailDone);
-        jLabel7.setVisible(!isTestEmailDone);       
+        jLabel7.setVisible(!isTestEmailDone);
+        
+        jLabel11.setEnabled(emailState && this.credentialEx != null);
+        jLabel12.setEnabled(emailState && this.credentialEx != null);
+        jTextField1.setEnabled(emailState && isTestEmailDone && this.credentialEx != null);                      
+        
+        if (this.credentialEx == null) {
+            jLabel1.setText("?");
+        } else {
+            jLabel1.setText(credentialEx.second);
+        }  
     }
     
     /**
@@ -393,25 +456,28 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
             public Boolean doInBackground() {
                 boolean status = true;
 
-                try {
-                    final String username = jTextField2.getText().trim();
-                    final String cc_email = jTextField1.getText().trim();
-                    GoogleMail.Send(
-                        username,
-                        new String(jPasswordField1.getPassword()),
-                        username + "@gmail.com",
-                        cc_email,
-                        MessagesBundle.getString("info_message_congratulation_email_alert_system_is_working"),
-                        MessagesBundle.getString("info_message_congratulation_email_alert_system_is_working")
-                    );
-                } catch (AddressException ex) {
-                    log.error(null, ex);
+                Pair<Credential, String> credentialEx = OptionsAlertJPanel.this.credentialEx;
+                if (credentialEx == null) {
                     status = false;
-                } catch (MessagingException ex) {
-                    log.error(null, ex);
-                    status = false;
+                } else {
+                    final Credential credential = credentialEx.first;
+                    final Gmail service = org.yccheok.jstock.google.Utils.getGmail(credential);                    
+                    final String recipientEmail = credentialEx.second;
+                    final String fromEmail = credentialEx.second;
+                    final String ccEmail = jTextField1.getText().trim();
+                    final String title = MessagesBundle.getString("info_message_congratulation_email_alert_system_is_working");
+                    final String message = MessagesBundle.getString("info_message_congratulation_email_alert_system_is_working");
+                    
+                    try {
+                        GoogleMail.Send(service, recipientEmail, ccEmail, fromEmail, title, message);
+                    } catch (IOException ex) {
+                        log.error(null, ex);
+                        status = false;
+                    } catch (MessagingException ex) {
+                        log.error(null, ex);
+                        status = false;
+                    }
                 }
-
                 return status;
             }
 
@@ -463,12 +529,15 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         return worker;
     }
     
+    private Pair<Credential, String> credentialEx;
+    
     private volatile SwingWorker testEmailSwingWorker = null;
 
     private static final Log log = LogFactory.getLog(OptionsAlertJPanel.class);
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JCheckBox jCheckBox2;
@@ -476,15 +545,12 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel5;
-    private javax.swing.JPasswordField jPasswordField1;
     private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
     private org.jdesktop.swingx.JXHeader jXHeader1;
     // End of variables declaration//GEN-END:variables
     

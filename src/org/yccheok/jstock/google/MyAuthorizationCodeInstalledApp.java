@@ -16,6 +16,8 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.oauth2.model.Userinfoplus;
 import java.io.IOException;
 import javax.swing.SwingUtilities;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.Pair;
 
 /**
@@ -24,6 +26,8 @@ import org.yccheok.jstock.engine.Pair;
  */
 public class MyAuthorizationCodeInstalledApp {
 
+    private static final Log log = LogFactory.getLog(MyAuthorizationCodeInstalledApp.class);
+    
     private static final String CODE = "org.yccheok.jstock.google.MyAuthorizationCodeInstalledApp";
     
     private SimpleSwingBrowser browser;  
@@ -99,7 +103,17 @@ public class MyAuthorizationCodeInstalledApp {
             
             if (_browser != null) {
                 _browser.setVisible(false);
-                _browser.dispose();
+                try {
+                    // Possible cause random exception
+                    // java.lang.NullPointerException
+                    //     at javafx.embed.swing.JFXPanel.getInputMethodRequests(JFXPanel.java:810)
+                    //
+                    // If such exception happens, there's no chance to execute windowClosed.
+                    _browser.dispose();
+                } catch (Exception ex) {
+                    performRedirectUri();
+                    log.error(null, ex);
+                }
                 this.browser = null;
             }      
         }
@@ -138,33 +152,25 @@ public class MyAuthorizationCodeInstalledApp {
                 _browser.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosed(java.awt.event.WindowEvent evt) {
-
-                        String uri = redirectUri;
-                        
-                        if (uri == null) {
-                            return;
-                        }
-                        
-                        // Avoid redirectUri being called twice.
-                        // http://stackoverflow.com/questions/23319579/why-formwindowclosed-is-being-triggered-twice-in-jdialog-after-dispose
-                        redirectUri = null;
-                        
-                        final String url = uri + "?code=" + CODE;
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(url);
-                            }
-                            
-                        }).start();
+                        performRedirectUri();
                     }
                     
                     @Override
-                    public void windowClosing(java.awt.event.WindowEvent evt) {
+                    public void windowClosing(java.awt.event.WindowEvent evt) {                        
                         SimpleSwingBrowser _browser = browser;
                         if (_browser != null) {
                             _browser.setVisible(false);
-                            _browser.dispose();
+                            try {
+                                // Possible cause random exception
+                                // java.lang.NullPointerException
+                                //     at javafx.embed.swing.JFXPanel.getInputMethodRequests(JFXPanel.java:810)
+                                //
+                                // If such exception happens, there's no chance to execute windowClosed.
+                                _browser.dispose();
+                            } catch (Exception ex) {
+                                performRedirectUri();
+                                log.error(null, ex);
+                            }
                             browser = null;
                         }
                     }
@@ -184,6 +190,27 @@ public class MyAuthorizationCodeInstalledApp {
        
     }
 
+    private void performRedirectUri() {
+        String uri = redirectUri;
+
+        if (uri == null) {
+            return;
+        }
+
+        // Avoid redirectUri being called twice.
+        // http://stackoverflow.com/questions/23319579/why-formwindowclosed-is-being-triggered-twice-in-jdialog-after-dispose
+        redirectUri = null;
+
+        final String url = uri + "?code=" + CODE;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                org.yccheok.jstock.gui.Utils.getResponseBodyAsStringBasedOnProxyAuthOption(url);
+            }
+
+        }).start();
+    }
+    
     /** Returns the authorization code flow. */
     public final AuthorizationCodeFlow getFlow() {
         return flow;

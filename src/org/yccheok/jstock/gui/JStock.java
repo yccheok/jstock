@@ -21,6 +21,7 @@ package org.yccheok.jstock.gui;
 
 import org.yccheok.jstock.engine.Pair;
 import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.googleapis.json.GoogleJsonError.ErrorInfo;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
@@ -37,13 +38,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import javafx.application.Platform;
 import javax.imageio.ImageIO;
-import javax.mail.MessagingException;
-import javax.mail.internet.AddressException;
 import javax.swing.*;
 import javax.swing.table.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.yccheok.jstock.alert.GoogleMail;
 import org.yccheok.jstock.analysis.Indicator;
 import org.yccheok.jstock.analysis.OperatorIndicator;
 import org.yccheok.jstock.engine.*;
@@ -1313,6 +1311,18 @@ public class JStock extends javax.swing.JFrame {
                     JOptionPane.showMessageDialog(JStock.this, ex.getMessage(), GUIBundle.getString("SaveToCloudJDialog_Title"), JOptionPane.ERROR_MESSAGE);
                     log.error(null, ex);
                 } catch (ExecutionException ex) {
+                    Throwable throwable = ex.getCause();
+                    if (throwable instanceof com.google.api.client.googleapis.json.GoogleJsonResponseException) {
+                        com.google.api.client.googleapis.json.GoogleJsonResponseException ge = (com.google.api.client.googleapis.json.GoogleJsonResponseException)throwable;
+                        for (ErrorInfo errorInfo : ge.getDetails().getErrors()) {
+                            if ("insufficientPermissions".equals(errorInfo.getReason())) {
+                                org.yccheok.jstock.google.Utils.logoutDrive();
+                                break;
+                            }
+                        }
+                        
+                    }
+                    
                     JOptionPane.showMessageDialog(JStock.this, ex.getMessage(), GUIBundle.getString("SaveToCloudJDialog_Title"), JOptionPane.ERROR_MESSAGE);
                     log.error(null, ex);
                 }
@@ -1355,6 +1365,17 @@ public class JStock extends javax.swing.JFrame {
                     JOptionPane.showMessageDialog(JStock.this, ex.getMessage(), GUIBundle.getString("LoadFromCloudJDialog_Title"), JOptionPane.ERROR_MESSAGE);
                     log.error(null, ex);
                 } catch (ExecutionException ex) {
+                    Throwable throwable = ex.getCause();
+                    if (throwable instanceof com.google.api.client.googleapis.json.GoogleJsonResponseException) {
+                        com.google.api.client.googleapis.json.GoogleJsonResponseException ge = (com.google.api.client.googleapis.json.GoogleJsonResponseException)throwable;
+                        for (ErrorInfo errorInfo : ge.getDetails().getErrors()) {
+                            if ("insufficientPermissions".equals(errorInfo.getReason())) {
+                                org.yccheok.jstock.google.Utils.logoutDrive();
+                                break;
+                            }
+                        }
+                        
+                    }
                     JOptionPane.showMessageDialog(JStock.this, ex.getMessage(), GUIBundle.getString("LoadFromCloudJDialog_Title"), JOptionPane.ERROR_MESSAGE);
                     log.error(null, ex);
                 }
@@ -2883,16 +2904,6 @@ public class JStock extends javax.swing.JFrame {
                     }
 
                     final String message = title + "\n(JStock)";
-
-                    try {
-                        String email = Utils.decrypt(jStockOptions.getEmail());
-                        final String CCEmail = Utils.decrypt(jStockOptions.getCCEmail());
-                        GoogleMail.Send(email, Utils.decrypt(jStockOptions.getEmailPassword()), email + "@gmail.com", CCEmail, title, message);
-                    } catch (AddressException exp) {
-                        log.error(null, exp);
-                    } catch (MessagingException exp) {
-                        log.error(null, exp);
-                    }
                 }
             };
 

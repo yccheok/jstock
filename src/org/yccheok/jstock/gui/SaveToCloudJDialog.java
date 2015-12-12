@@ -23,7 +23,6 @@ import org.yccheok.jstock.engine.Pair;
 import com.google.api.client.auth.oauth2.Credential;
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Font;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -203,7 +202,7 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
         jPanel2.add(jPanel7, java.awt.BorderLayout.SOUTH);
 
         jLabel10.setBackground(new java.awt.Color(140, 196, 116));
-        jLabel10.setFont(getRobotoLightFont());
+        jLabel10.setFont(jLabel10.getFont().deriveFont(jLabel10.getFont().getStyle() | java.awt.Font.BOLD, jLabel10.getFont().getSize()+1));
         jLabel10.setForeground(new java.awt.Color(255, 255, 255));
         jLabel10.setText("username@email.com");
         jLabel10.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -703,10 +702,6 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
         final DateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy hh:mm:ss a");
         final String s = dateFormat.format(new Date()) + "\n" + message;
         this.memoryLog.add(s);
-    }
-
-    private Font getRobotoLightFont() {
-        return Utils.getRobotoLightFont().deriveFont((float)18);
     }
     
     private final Pair<Credential, String> credentialEx;

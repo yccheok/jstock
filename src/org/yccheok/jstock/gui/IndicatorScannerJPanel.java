@@ -434,16 +434,6 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                     final String template = GUIBundle.getString("IndicatorScannerJPanel_Hit_template");
                     final String title = MessageFormat.format(template, stock.symbol, price, indicator.toString());
                     final String message = title + "\n(JStock)";
-
-                    try {
-                        final String email = Utils.decrypt(jStockOptions.getEmail());
-                        final String CCEmail = Utils.decrypt(jStockOptions.getCCEmail());
-                        GoogleMail.Send(email, Utils.decrypt(jStockOptions.getEmailPassword()), email + "@gmail.com", CCEmail, title, message);
-                    } catch (AddressException exp) {
-                        log.error(null, exp);
-                    } catch (MessagingException exp) {
-                        log.error(null, exp);
-                    }
                 }
             };
 
