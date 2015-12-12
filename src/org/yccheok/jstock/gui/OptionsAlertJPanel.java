@@ -468,10 +468,6 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
                     final String title = MessagesBundle.getString("info_message_congratulation_email_alert_system_is_working");
                     final String message = MessagesBundle.getString("info_message_congratulation_email_alert_system_is_working");
                     
-                    System.out.println("recipientEmail = " + recipientEmail);
-                    System.out.println("fromEmail = " + fromEmail);
-                    System.out.println("ccEmail = " + ccEmail);
-                    
                     try {
                         GoogleMail.Send(service, recipientEmail, ccEmail, fromEmail, title, message);
                     } catch (IOException ex) {
