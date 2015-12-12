@@ -21,6 +21,7 @@ package org.yccheok.jstock.gui;
 
 import org.yccheok.jstock.engine.Pair;
 import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.googleapis.json.GoogleJsonError.ErrorInfo;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
@@ -1313,6 +1314,18 @@ public class JStock extends javax.swing.JFrame {
                     JOptionPane.showMessageDialog(JStock.this, ex.getMessage(), GUIBundle.getString("SaveToCloudJDialog_Title"), JOptionPane.ERROR_MESSAGE);
                     log.error(null, ex);
                 } catch (ExecutionException ex) {
+                    Throwable throwable = ex.getCause();
+                    if (throwable instanceof com.google.api.client.googleapis.json.GoogleJsonResponseException) {
+                        com.google.api.client.googleapis.json.GoogleJsonResponseException ge = (com.google.api.client.googleapis.json.GoogleJsonResponseException)throwable;
+                        for (ErrorInfo errorInfo : ge.getDetails().getErrors()) {
+                            if ("insufficientPermissions".equals(errorInfo.getReason())) {
+                                org.yccheok.jstock.google.Utils.logoutDrive();
+                                break;
+                            }
+                        }
+                        
+                    }
+                    
                     JOptionPane.showMessageDialog(JStock.this, ex.getMessage(), GUIBundle.getString("SaveToCloudJDialog_Title"), JOptionPane.ERROR_MESSAGE);
                     log.error(null, ex);
                 }
@@ -1355,6 +1368,17 @@ public class JStock extends javax.swing.JFrame {
                     JOptionPane.showMessageDialog(JStock.this, ex.getMessage(), GUIBundle.getString("LoadFromCloudJDialog_Title"), JOptionPane.ERROR_MESSAGE);
                     log.error(null, ex);
                 } catch (ExecutionException ex) {
+                    Throwable throwable = ex.getCause();
+                    if (throwable instanceof com.google.api.client.googleapis.json.GoogleJsonResponseException) {
+                        com.google.api.client.googleapis.json.GoogleJsonResponseException ge = (com.google.api.client.googleapis.json.GoogleJsonResponseException)throwable;
+                        for (ErrorInfo errorInfo : ge.getDetails().getErrors()) {
+                            if ("insufficientPermissions".equals(errorInfo.getReason())) {
+                                org.yccheok.jstock.google.Utils.logoutDrive();
+                                break;
+                            }
+                        }
+                        
+                    }
                     JOptionPane.showMessageDialog(JStock.this, ex.getMessage(), GUIBundle.getString("LoadFromCloudJDialog_Title"), JOptionPane.ERROR_MESSAGE);
                     log.error(null, ex);
                 }
