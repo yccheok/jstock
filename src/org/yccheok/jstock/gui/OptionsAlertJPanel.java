@@ -40,6 +40,15 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
     /** Creates new form OptionsAlertJPanel */
     public OptionsAlertJPanel() {
         initComponents();
+        initCredentialEx();
+    }
+    
+    private void signOut() {
+        this.credentialEx = null;
+        jCheckBox2.setSelected(false);
+        jTextField1.setText("");
+        org.yccheok.jstock.google.Utils.logoutGmail();
+        updateGUIState();
     }
     
     private void signIn() {
@@ -83,6 +92,7 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
                     credentialEx = pair.first;
                 } else {
                     jCheckBox2.setSelected(false);
+                    JStock.instance().getJStockOptions().setSendEmail(jCheckBox2.isSelected());
                 }
                 
                 updateGUIState();                
@@ -92,6 +102,52 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         swingWorker.execute();
     }
 
+    private void initCredentialEx() {
+        SwingWorker swingWorker = new SwingWorker<Pair<Credential, String>, Void>() {
+
+            @Override
+            protected Pair<Credential, String> doInBackground() throws Exception {
+                System.out.println("gmail offline");
+                final Pair<Credential, String> pair = org.yccheok.jstock.google.Utils.authorizeGmailOffline();
+                return pair;
+            }
+            
+            @Override
+            public void done() { 
+                Pair<Credential, String> pair = null;
+                
+                try {
+                    pair = this.get();
+                } catch (InterruptedException ex) {
+                    log.error(null, ex);
+                } catch (ExecutionException ex) {
+                    Throwable throwable = ex.getCause();
+                    if (throwable instanceof com.google.api.client.googleapis.json.GoogleJsonResponseException) {
+                        com.google.api.client.googleapis.json.GoogleJsonResponseException ge = (com.google.api.client.googleapis.json.GoogleJsonResponseException)throwable;
+                        for (GoogleJsonError.ErrorInfo errorInfo : ge.getDetails().getErrors()) {
+                            if ("insufficientPermissions".equals(errorInfo.getReason())) {
+                                org.yccheok.jstock.google.Utils.logoutGmail();
+                                break;
+                            }
+                        }
+                        
+                    }
+                    
+                    log.error(null, ex);
+                }
+                
+                if (pair != null) {
+                    credentialEx = pair;
+                    jCheckBox2.setSelected(JStock.instance().getJStockOptions().isSendEmail());
+                }
+                
+                updateGUIState();
+            }
+        };
+        
+        swingWorker.execute();
+    }
+    
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -171,6 +227,11 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
         jPanel2.add(jLabel1);
 
         jButton2.setText(bundle.getString("OptionsAlertJPanel_SignOut")); // NOI18N
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
         jPanel2.add(jButton2);
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
@@ -319,6 +380,10 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
         jButton1.doClick();
     }//GEN-LAST:event_jTextField1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        signOut();
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     public void cancel() {
         if (this.testEmailSwingWorker != null) {
