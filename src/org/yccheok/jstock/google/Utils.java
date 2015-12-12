@@ -18,6 +18,7 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
+import com.google.api.services.gmail.GmailScopes;
 import com.google.api.services.oauth2.Oauth2;
 import com.google.api.services.oauth2.model.Userinfoplus;
 import java.io.BufferedWriter;
@@ -64,8 +65,8 @@ public class Utils {
         return new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "authentication" + File.separator + "drive");
     }
 
-    private static File getCalendarDataDirectory() {
-        return new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "authentication" + File.separator + "calendar");
+    private static File getGmailDataDirectory() {
+        return new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "authentication" + File.separator + "gmail");
     }
     
     /**
@@ -117,6 +118,31 @@ public class Utils {
         email.delete();
     }
 
+    public static void logoutGmail() {
+        File credential = new File(getGmailDataDirectory(), "StoredCredential");
+        File email = new File(getGmailDataDirectory(), "email");
+        credential.delete();
+        email.delete();
+    }
+    
+    public static Pair<Pair<Credential, String>, Boolean> authorizeGmail() throws Exception {
+        // Ask for only the permissions you need. Asking for more permissions will
+        // reduce the number of users who finish the process for giving you access
+        // to their accounts. It will also increase the amount of effort you will
+        // have to spend explaining to users what you are doing with their data.
+        // Here we are listing all of the available scopes. You should remove scopes
+        // that you are not actually using.
+        Set<String> scopes = new HashSet<>();
+
+        scopes.add(GmailScopes.GMAIL_SEND);
+        
+        // load client secrets
+        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(Utils.JSON_FACTORY,
+            new InputStreamReader(Utils.class.getResourceAsStream("/assets/authentication/gmail/client_secrets.json")));
+        
+        return authorize(clientSecrets, scopes, getGmailDataDirectory());
+    }
+    
     public static Pair<Pair<Credential, String>, Boolean> authorizeDrive() throws Exception {
         // Ask for only the permissions you need. Asking for more permissions will
         // reduce the number of users who finish the process for giving you access
@@ -124,9 +150,12 @@ public class Utils {
         // have to spend explaining to users what you are doing with their data.
         // Here we are listing all of the available scopes. You should remove scopes
         // that you are not actually using.
-        Set<String> scopes = new HashSet<String>();
+        Set<String> scopes = new HashSet<>();
+        
+        // We would like to display what email this credential associated to.
         scopes.add("email");
         scopes.add("profile");
+        
         scopes.add(DriveScopes.DRIVE_APPDATA);  
         // Legacy. Shall be removed after a while...
         scopes.add(DriveScopes.DRIVE);
