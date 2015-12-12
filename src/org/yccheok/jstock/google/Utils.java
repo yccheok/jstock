@@ -125,6 +125,48 @@ public class Utils {
         email.delete();
     }
     
+    public static Pair<Credential, String> authorizeGmailOffline() throws Exception {
+        Set<String> scopes = new HashSet<>();
+
+        // We would like to display what email this credential associated to.
+        scopes.add("email");
+        
+        scopes.add(GmailScopes.GMAIL_SEND);  
+        
+        // load client secrets
+        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(Utils.JSON_FACTORY,
+            new InputStreamReader(Utils.class.getResourceAsStream("/assets/authentication/gmail/client_secrets.json")));
+
+        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
+            httpTransport, JSON_FACTORY, clientSecrets, scopes)
+            .setDataStoreFactory(new FileDataStoreFactory(getGmailDataDirectory()))
+            .build();
+        
+        Credential credential = flow.loadCredential("user");
+        if (credential != null && credential.getRefreshToken() != null) {
+            boolean success = false;
+            if (credential.getExpiresInSeconds() <= 60) {
+                if (credential.refreshToken()) {
+                    success = true;
+                }
+            } else {
+                success = true;
+            }
+
+            if (success) {
+                FileDataStoreFactory fileDataStoreFactory = (FileDataStoreFactory)flow.getCredentialDataStore().getDataStoreFactory();
+                String email = Utils.loadEmail(fileDataStoreFactory.getDataDirectory());
+                if (email == null) {
+                    Userinfoplus userinfoplus = org.yccheok.jstock.google.Utils.getUserInfo(credential);
+                    email = userinfoplus.getEmail();
+                }                    
+                return new Pair<>(credential, email);
+            }
+        }
+        
+        return null;
+    }
+    
     public static Pair<Pair<Credential, String>, Boolean> authorizeGmail() throws Exception {
         // Ask for only the permissions you need. Asking for more permissions will
         // reduce the number of users who finish the process for giving you access
@@ -134,6 +176,9 @@ public class Utils {
         // that you are not actually using.
         Set<String> scopes = new HashSet<>();
 
+        // We would like to display what email this credential associated to.
+        scopes.add("email");
+        
         scopes.add(GmailScopes.GMAIL_SEND);
         
         // load client secrets
@@ -154,7 +199,6 @@ public class Utils {
         
         // We would like to display what email this credential associated to.
         scopes.add("email");
-        scopes.add("profile");
         
         scopes.add(DriveScopes.DRIVE_APPDATA);  
         // Legacy. Shall be removed after a while...
