@@ -50,6 +50,7 @@ import org.yccheok.jstock.engine.ResultType;
 import org.yccheok.jstock.engine.Industry;
 import org.yccheok.jstock.file.Atom;
 import org.yccheok.jstock.file.GUIBundleWrapper;
+import org.yccheok.jstock.file.GUIBundleWrapper.Language;
 import org.yccheok.jstock.file.Statement;
 import org.yccheok.jstock.file.Statements;
 import org.yccheok.jstock.gui.charting.ChartJDialog;
@@ -2447,6 +2448,120 @@ public class JStock extends javax.swing.JFrame {
         boolean result1 = Statements.newInstanceFromPortfolioInfos(portfolioInfos).saveAsCSVFile(portfolioInfosFile);
         return result0 && result1;
     }
+   
+    // Some users complain download from cloud doesn't work. High chance is that,
+    // they are not in correct country.
+    private Country getBestCountryAfterDownloadFromCloud() {
+        final Country country = jStockOptions.getCountry();
+        
+        Country watchlistCountry = null;
+        Country portfolioCountry = null;
+        int watchlistMaxSize = 0;
+        int portfolioMaxSize = 0;
+
+        ////////////////////////////////////////////////////////////////////////
+        // PROCESSING WATCHLIST
+        ////////////////////////////////////////////////////////////////////////
+        
+        File watchlistInfosFile = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "android" + File.separator + "watchlistinfos.csv");
+        
+        Statements watchlistInfos = Statements.newInstanceFromCSVFile(watchlistInfosFile);
+        final GUIBundleWrapper guiBundleWrapper = GUIBundleWrapper.newInstance(Language.INDEPENDENT);
+        if (watchlistInfos.getType() == Statement.Type.WatchlistInfos) {
+            for (int i = 0, ei = watchlistInfos.size(); i < ei; i++) {
+                Statement statement = watchlistInfos.get(i);
+                String countryString = statement.getValueAsString(guiBundleWrapper.getString("WatchlistInfo_Country"));
+                Country c;
+                
+                try {
+                    c = Country.valueOf(countryString);
+                } catch (IllegalArgumentException ex) {
+                    log.error(null, ex);
+                    continue;
+                }
+                
+                assert(c != null);
+                
+                if (c == country) {
+                    return c;
+                }
+                
+                Double _watchlistSize = statement.getValueAsDouble(guiBundleWrapper.getString("WatchlistInfo_Size"));
+                if (_watchlistSize == null) {
+                    continue;
+                }
+                
+                int watchlistSize = (int)(double)_watchlistSize;
+                if (watchlistSize > watchlistMaxSize) {
+                    watchlistMaxSize = watchlistSize;
+                    watchlistCountry = c;
+                }
+            }
+        }
+
+        ////////////////////////////////////////////////////////////////////////
+        // PROCESSING PORTFOLIO
+        ////////////////////////////////////////////////////////////////////////        
+        File portfolioInfosFile = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "android" + File.separator + "portfolioinfos.csv");
+        
+        Statements portfolioInfos = Statements.newInstanceFromCSVFile(portfolioInfosFile);
+        if (portfolioInfos.getType() == Statement.Type.PortfolioInfos) {
+            for (int i = 0, ei = portfolioInfos.size(); i < ei; i++) {
+                Statement statement = portfolioInfos.get(i);
+                String countryString = statement.getValueAsString(guiBundleWrapper.getString("PortfolioInfo_Country"));
+                Country c;
+                
+                try {
+                    c = Country.valueOf(countryString);
+                } catch (IllegalArgumentException ex) {
+                    log.error(null, ex);
+                    continue;
+                }
+                
+                assert(c != null);
+                
+                if (c == country) {
+                    return c;
+                }
+                
+                Double _portfolioSize = statement.getValueAsDouble(guiBundleWrapper.getString("PortfolioInfo_Size"));
+                if (_portfolioSize == null) {
+                    continue;
+                }
+                
+                int portfolioSize = (int)(double)_portfolioSize;
+                if (portfolioSize > portfolioMaxSize) {
+                    portfolioMaxSize = portfolioSize;
+                    portfolioCountry = c;
+                }
+            }
+        }
+        
+        Component selectedComponent = jTabbedPane1.getSelectedComponent();
+        if (selectedComponent == this.jPanel8) {
+            // Watchlist
+            if (watchlistCountry != null) {
+                return watchlistCountry;
+            }
+        } else if (selectedComponent == this.portfolioManagementJPanel) {
+            // Portfolio
+            if (portfolioCountry != null) {
+                return portfolioCountry;
+            }
+        } else {
+            if (watchlistMaxSize > portfolioMaxSize) {
+                if (watchlistCountry != null) {
+                    return watchlistCountry;
+                }
+            } else {
+                if (portfolioCountry != null) {
+                    return portfolioCountry;
+                }                
+            }
+        }
+                
+        return country;
+    }
     
     /* Reload after downloading from cloud. Take note that we must reload
      * JStockOptions before and outside this method, due to insensitive data
@@ -2472,6 +2587,8 @@ public class JStock extends javax.swing.JFrame {
         }
         
         Utils.updateFactoriesPriceSource();
+        
+        jStockOptions.setCountry(this.getBestCountryAfterDownloadFromCloud());
         
         /* These codes are very similar to clean up code during changing country.
          */
