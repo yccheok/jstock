@@ -156,6 +156,10 @@ public class Utils {
     private Utils() {
     }
     
+    public static boolean isNullOrEmpty(String string) {
+        return string == null || string.trim().isEmpty();
+    }
+    
     public static void updateFactoriesPriceSource() {
         for (Country country : Country.values()) {
             final PriceSource priceSource = JStock.instance().getJStockOptions().getPriceSource(country);
