@@ -19,6 +19,7 @@
 
 package org.yccheok.jstock.alert;
 
+import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.util.Base64;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
@@ -30,6 +31,10 @@ import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.yccheok.jstock.engine.Pair;
+import org.yccheok.jstock.gui.Utils;
 
 /**
  *
@@ -45,7 +50,7 @@ public class GoogleMail {
 
         MimeMessage email = new MimeMessage(session);
         InternetAddress tAddress = new InternetAddress(to);
-        InternetAddress cAddress = cc.isEmpty() ? null : new InternetAddress(cc);
+        InternetAddress cAddress = Utils.isNullOrEmpty(cc) ? null : new InternetAddress(cc);
         InternetAddress fAddress = new InternetAddress(from);
 
         email.setFrom(fAddress);
@@ -71,5 +76,17 @@ public class GoogleMail {
         Message m = createMessageWithEmail(createEmail(recipientEmail, ccEmail, fromEmail, title, message));
         service.users().messages().send("me", m).execute();
     }
+    
+    public static void Send(String ccEmail, String title, String message) throws Exception {
+        final Pair<Credential, String> credentialEx  = org.yccheok.jstock.google.Utils.authorizeGmailOffline();        
+        final Credential credential = credentialEx.first;
+        final Gmail service = org.yccheok.jstock.google.Utils.getGmail(credential);                    
+        final String recipientEmail = credentialEx.second;
+        final String fromEmail = credentialEx.second;
+        
+        Send(service, recipientEmail, ccEmail, fromEmail, title, message);
+    }
+    
+    private static final Log log = LogFactory.getLog(GoogleMail.class);
 }
 
