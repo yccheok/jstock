@@ -110,7 +110,6 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
 
             @Override
             protected Pair<Credential, String> doInBackground() throws Exception {
-                System.out.println("gmail offline");
                 final Pair<Credential, String> pair = org.yccheok.jstock.google.Utils.authorizeGmailOffline();
                 return pair;
             }
