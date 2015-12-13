@@ -47,6 +47,7 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
     private void signOut() {
         this.credentialEx = null;
         jCheckBox2.setSelected(false);
+        JStock.instance().getJStockOptions().setSendEmail(jCheckBox2.isSelected());
         jTextField1.setText("");
         org.yccheok.jstock.google.Utils.logoutGmail();
         updateGUIState();
