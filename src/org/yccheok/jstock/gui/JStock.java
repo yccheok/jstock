@@ -42,6 +42,7 @@ import javax.swing.*;
 import javax.swing.table.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.yccheok.jstock.alert.GoogleMail;
 import org.yccheok.jstock.analysis.Indicator;
 import org.yccheok.jstock.analysis.OperatorIndicator;
 import org.yccheok.jstock.engine.*;
@@ -2904,6 +2905,13 @@ public class JStock extends javax.swing.JFrame {
                     }
 
                     final String message = title + "\n(JStock)";
+                    
+                    final String CCEmail = Utils.decrypt(jStockOptions.getCCEmail());
+                    try {
+                        GoogleMail.Send(CCEmail, title, message);
+                    } catch (Exception ex) {
+                        log.error(null, ex);
+                    }
                 }
             };
 
