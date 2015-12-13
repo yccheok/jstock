@@ -21,11 +21,8 @@ package org.yccheok.jstock.gui;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.json.GoogleJsonError;
-import com.google.api.services.gmail.Gmail;
-import java.io.IOException;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
-import javax.mail.MessagingException;
 import javax.swing.*;
 
 import org.apache.commons.logging.Log;
@@ -50,6 +47,7 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
     private void signOut() {
         this.credentialEx = null;
         jCheckBox2.setSelected(false);
+        JStock.instance().getJStockOptions().setSendEmail(jCheckBox2.isSelected());
         jTextField1.setText("");
         org.yccheok.jstock.google.Utils.logoutGmail();
         updateGUIState();
@@ -110,7 +108,6 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
 
             @Override
             protected Pair<Credential, String> doInBackground() throws Exception {
-                System.out.println("gmail offline");
                 final Pair<Credential, String> pair = org.yccheok.jstock.google.Utils.authorizeGmailOffline();
                 return pair;
             }
@@ -460,20 +457,13 @@ public class OptionsAlertJPanel extends javax.swing.JPanel implements JStockOpti
                 if (credentialEx == null) {
                     status = false;
                 } else {
-                    final Credential credential = credentialEx.first;
-                    final Gmail service = org.yccheok.jstock.google.Utils.getGmail(credential);                    
-                    final String recipientEmail = credentialEx.second;
-                    final String fromEmail = credentialEx.second;
                     final String ccEmail = jTextField1.getText().trim();
                     final String title = MessagesBundle.getString("info_message_congratulation_email_alert_system_is_working");
                     final String message = MessagesBundle.getString("info_message_congratulation_email_alert_system_is_working");
                     
                     try {
-                        GoogleMail.Send(service, recipientEmail, ccEmail, fromEmail, title, message);
-                    } catch (IOException ex) {
-                        log.error(null, ex);
-                        status = false;
-                    } catch (MessagingException ex) {
+                        GoogleMail.Send(ccEmail, title, message);
+                    } catch (Exception ex) {
                         log.error(null, ex);
                         status = false;
                     }

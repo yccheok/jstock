@@ -26,8 +26,6 @@ import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.*;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.AddressException;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
@@ -434,6 +432,13 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                     final String template = GUIBundle.getString("IndicatorScannerJPanel_Hit_template");
                     final String title = MessageFormat.format(template, stock.symbol, price, indicator.toString());
                     final String message = title + "\n(JStock)";
+                    
+                    final String ccEmail = Utils.decrypt(jStockOptions.getCCEmail());
+                    try {
+                        GoogleMail.Send(ccEmail, title, message);
+                    } catch (Exception ex) {
+                        log.error(null, ex);
+                    }
                 }
             };
 
