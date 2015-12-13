@@ -2906,9 +2906,9 @@ public class JStock extends javax.swing.JFrame {
 
                     final String message = title + "\n(JStock)";
                     
-                    final String CCEmail = Utils.decrypt(jStockOptions.getCCEmail());
+                    final String ccEmail = Utils.decrypt(jStockOptions.getCCEmail());
                     try {
-                        GoogleMail.Send(CCEmail, title, message);
+                        GoogleMail.Send(ccEmail, title, message);
                     } catch (Exception ex) {
                         log.error(null, ex);
                     }
