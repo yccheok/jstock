@@ -3,6 +3,7 @@ Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
 JStock 1.0.7.11 - 2015-12-14
   Bugfix:  Email alert by using Google oAuth2.0.
+  Bugfix:  Select best country after open from cloud.
   
 JStock 1.0.7.10 - 2015-09-18
   Feature: Added standard deviation for indicator editor.
