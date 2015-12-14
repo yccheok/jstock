@@ -518,9 +518,12 @@ public class Utils {
      * @return code in Google's format
      */
     public static String toGoogleFormat(Code code) {
-        if (isYahooIndexSubset(code)) {
-            return toGoogleIndex(code);
-        } else if (isYahooCurrency(code)) {
+        String s = toGoogleIndex(code);
+        if (s != null) {
+            return s;
+        }
+
+        if (isYahooCurrency(code)) {
             return toGoogleCurrency(code);
         }
 
@@ -587,7 +590,7 @@ public class Utils {
         if (googleIndex != null) {
             return googleIndex;
         }
-        return string;
+        return null;
     }
     
     private static String toGoogleCurrency(Code code) {
@@ -930,6 +933,7 @@ public class Utils {
         oneLetterSuffixes.put(".B", "BOM:");
         oneLetterSuffixes.put(".L", "LON:");
         oneLetterSuffixes.put(".T", "TYO:");
+        oneLetterSuffixes.put(".V", "CVE:");
 
         twoLetterSuffixes.put(".SS", "SHA:");
         twoLetterSuffixes.put(".SZ", "SHE:");
@@ -944,7 +948,14 @@ public class Utils {
         twoLetterSuffixes.put(".AS", "AMS:");
         twoLetterSuffixes.put(".CO", "CPH:");
         twoLetterSuffixes.put(".HK", "HKG:");
-        
+        twoLetterSuffixes.put(".TO", "TSE:");
+        twoLetterSuffixes.put(".PA", "EPA:");
+        twoLetterSuffixes.put(".TA", "TLV:");
+        twoLetterSuffixes.put(".MI", "BIT:");
+        twoLetterSuffixes.put(".KQ", "KOSDAQ:");
+        twoLetterSuffixes.put(".KX", "KRX:");
+        twoLetterSuffixes.put(".LS", "ELI:");
+
         countries.put("AX", Country.Australia);
         countries.put("VI", Country.Austria);
         countries.put("BR", Country.Belgium);
@@ -1026,6 +1037,12 @@ public class Utils {
         toGoogleIndex.put("^OMXC20", "INDEXNASDAQ:OMXC20");
         toGoogleIndex.put("^N225", "INDEXNIKKEI:NI225");
         toGoogleIndex.put("^HSI", "INDEXHANGSENG:HSI");
+        toGoogleIndex.put("^GSPTSE", "INDEXTSI:OSPTX");
+        toGoogleIndex.put("^FCHI", "INDEXEURO:PX1");
+        toGoogleIndex.put("^TA100", "TLV:TA100");
+        toGoogleIndex.put("FTSEMIB.MI", "INDEXFTSE:FTSEMIB");
+        toGoogleIndex.put("^KS11", "KRX:KOSPI");
+        toGoogleIndex.put("PSI20.LS", "INDEXEURO:PSI20");
 
         defaultPriceSources.put(Country.Australia, PriceSource.Yahoo);
         defaultPriceSources.put(Country.Austria, PriceSource.Yahoo);
@@ -1045,7 +1062,7 @@ public class Utils {
         defaultPriceSources.put(Country.Italy, PriceSource.Yahoo);
         defaultPriceSources.put(Country.Japan, PriceSource.Google);
         defaultPriceSources.put(Country.Korea, PriceSource.Yahoo);
-        defaultPriceSources.put(Country.Malaysia, PriceSource.KLSEInfo);
+        defaultPriceSources.put(Country.Malaysia, PriceSource.Yahoo);
         defaultPriceSources.put(Country.Netherlands, PriceSource.Yahoo);
         defaultPriceSources.put(Country.NewZealand, PriceSource.Yahoo);
         defaultPriceSources.put(Country.Norway, PriceSource.Yahoo);
@@ -1061,7 +1078,6 @@ public class Utils {
         classToPriceSourceMap.put(GoogleStockServerFactory.class, PriceSource.Google);
         classToPriceSourceMap.put(YahooStockServerFactory.class, PriceSource.Yahoo);
         classToPriceSourceMap.put(BrazilYahooStockServerFactory.class, PriceSource.Yahoo);
-        classToPriceSourceMap.put(KLSEInfoStockServerFactory.class, PriceSource.KLSEInfo);
         
         googleUnitedStatesStockExchanges.put("NYSE", 0);
         googleUnitedStatesStockExchanges.put("NASDAQ", 1);
