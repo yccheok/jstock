@@ -1,9 +1,9 @@
 !include x64.nsh
 
 ; Definitions for Java 1.7 Detection
-!define JRE_VERSION "1.7"
-!define JRE_32_URL "http://javadl.sun.com/webapps/download/AutoDL?BundleId=80812"
-!define JRE_64_URL "http://javadl.sun.com/webapps/download/AutoDL?BundleId=80814"
+!define JRE_VERSION "1.8"
+!define JRE_32_URL "http://javadl.sun.com/webapps/download/AutoDL?BundleId=113217"
+!define JRE_64_URL "http://javadl.sun.com/webapps/download/AutoDL?BundleId=113219"
 !define PRODUCT_NAME "JStock"
 ; The name of the installer
 Name ${PRODUCT_NAME}
@@ -11,7 +11,7 @@ Name ${PRODUCT_NAME}
 RequestExecutionLevel admin ;Workaround for Vista
 
 ; The file to write
-OutFile "jstock-1.0.7.10-setup.exe"
+OutFile "jstock-1.0.7.11-setup.exe"
 LicenseData "gpl-2.0.txt"
  
 ; The default installation directory

@@ -1,9 +1,12 @@
 ﻿This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
-JStock 1.0.7.11 - 2015-12-14
+JStock 1.0.7.11 - 2015-12-15
   Bugfix:  Email alert by using Google oAuth2.0.
   Bugfix:  Select best country after open from cloud.
+  Bugfix:  Malaysia stock history speed.
+  Bugfix:  Make indicator scanner less busy to avoid Error message: "Unable to 
+           process request at this time -- error 999".
   
 JStock 1.0.7.10 - 2015-09-18
   Feature: Added standard deviation for indicator editor.
