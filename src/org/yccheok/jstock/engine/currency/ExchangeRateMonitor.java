@@ -106,8 +106,8 @@ public class ExchangeRateMonitor extends Subject<ExchangeRateMonitor, List<Excha
     }
     
     private CurrencyPair toCurrencyPairForRealTimeStockMonitor(CurrencyPair currencyPair) {
-        String from = currencyPair.from().toString();
-        String to = currencyPair.to().toString();
+        String from = currencyPair.from().name();
+        String to = currencyPair.to().name();
         
         if (currencyPair.from().isGBX()) {
             from = "GBP";
@@ -117,7 +117,7 @@ public class ExchangeRateMonitor extends Subject<ExchangeRateMonitor, List<Excha
             to = "GBP";
         }
         
-        if (from.equals(currencyPair.from().toString()) && to.equals(currencyPair.to().toString())) {
+        if (from.equals(currencyPair.from().name()) && to.equals(currencyPair.to().name())) {
             return currencyPair;
         }
         
@@ -127,8 +127,8 @@ public class ExchangeRateMonitor extends Subject<ExchangeRateMonitor, List<Excha
     private Code toCode(CurrencyPair currencyPair) {
         final Currency from = currencyPair.from();
         final Currency to = currencyPair.to();
-        final String fromCurrencyCode = from.toString();
-        final String toCurrencyCode = to.toString();
+        final String fromCurrencyCode = from.name();
+        final String toCurrencyCode = to.name();
         // Format used by Yahoo! Finance.
         return Code.newInstance(fromCurrencyCode + toCurrencyCode + "=X");
     }
