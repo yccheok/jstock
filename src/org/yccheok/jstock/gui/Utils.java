@@ -2752,7 +2752,7 @@ public class Utils {
         multiThreadedHttpConnectionManager.getParams().setDefaultMaxConnectionsPerHost(128);
         httpClientWithAgentInfo = new HttpClient(multiThreadedHttpConnectionManager);
         // Provide agent information, as requested by KLSEInfo owner.
-        httpClientWithAgentInfo.getParams().setParameter(HttpMethodParams.USER_AGENT, "anonymous");
+        httpClientWithAgentInfo.getParams().setParameter(HttpMethodParams.USER_AGENT, "JStock-1.0.6o");
         // To prevent cookie warnings.
         httpClientWithAgentInfo.getParams().setParameter("http.protocol.single-cookie-header", true);
         httpClientWithAgentInfo.getParams().setCookiePolicy(org.apache.commons.httpclient.cookie.CookiePolicy.BROWSER_COMPATIBILITY);
