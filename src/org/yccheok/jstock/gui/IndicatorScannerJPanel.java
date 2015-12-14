@@ -379,7 +379,13 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                             Utils.playAlertSound();
                         }
                         try {
-                            Thread.sleep(jStockOptions.getAlertSpeed() * 1000);
+                            // Make it rest for 1 minute. Yahoo does have quota
+                            // for every ip. If we are too greedy, we will get
+                            // Error message: "Unable to process request at this time -- error 999"
+                            // https://help.yahoo.com/kb/SLN2253.html
+                            Thread.sleep(1*60*1000);
+                            
+                            //Thread.sleep(jStockOptions.getAlertSpeed() * 1000);
                         }
                         catch (InterruptedException exp) {
                             log.error(null, exp);
