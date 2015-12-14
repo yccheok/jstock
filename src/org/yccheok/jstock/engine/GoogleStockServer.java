@@ -440,6 +440,9 @@ public class GoogleStockServer implements StockServer {
         currencySymbolToCurrencyCodeMap.put("\u00A3", "GBP");
         currencySymbolToCurrencyCodeMap.put("\u00A5", "JPY");
         currencySymbolToCurrencyCodeMap.put("HK$", "HKD");
+        currencySymbolToCurrencyCodeMap.put("CA$", "CAD");
+        currencySymbolToCurrencyCodeMap.put("\u20aa", "ILS");
+        currencySymbolToCurrencyCodeMap.put("\u20a9", "KPW");
     }
 
     // Even when internet is in good condition, we will get the following exception sometimes.
