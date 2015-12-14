@@ -2717,11 +2717,11 @@ public class Utils {
 
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
-    private static final String ABOUT_BOX_VERSION_STRING = "1.0.7.10";
+    private static final String ABOUT_BOX_VERSION_STRING = "1.0.7.11";
 
-    // 1.0.7.10
+    // 1.0.7.11
     // For About box comparision on latest version purpose.
-    private static final int APPLICATION_VERSION_ID = 1139;
+    private static final int APPLICATION_VERSION_ID = 1140;
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     
@@ -2752,7 +2752,7 @@ public class Utils {
         multiThreadedHttpConnectionManager.getParams().setDefaultMaxConnectionsPerHost(128);
         httpClientWithAgentInfo = new HttpClient(multiThreadedHttpConnectionManager);
         // Provide agent information, as requested by KLSEInfo owner.
-        httpClientWithAgentInfo.getParams().setParameter(HttpMethodParams.USER_AGENT, "JStock-1.0.6o");
+        httpClientWithAgentInfo.getParams().setParameter(HttpMethodParams.USER_AGENT, "anonymous");
         // To prevent cookie warnings.
         httpClientWithAgentInfo.getParams().setParameter("http.protocol.single-cookie-header", true);
         httpClientWithAgentInfo.getParams().setCookiePolicy(org.apache.commons.httpclient.cookie.CookiePolicy.BROWSER_COMPATIBILITY);

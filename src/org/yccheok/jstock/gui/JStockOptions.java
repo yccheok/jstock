@@ -563,6 +563,12 @@ public class JStockOptions {
         
         if (this.priceSources == null) {
             this.priceSources = new EnumMap<Country, PriceSource>(Country.class);
+        } else {
+            // Still here for xstream backward compatible. Shall be removed
+            // after a while.
+            if (this.priceSources.get(Country.Malaysia) == PriceSource.KLSEInfo) {
+                this.priceSources.put(Country.Malaysia, PriceSource.Yahoo);
+            }
         }
         
         if (this.currencies == null) {
