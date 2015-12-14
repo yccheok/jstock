@@ -3739,7 +3739,7 @@ public class JStock extends javax.swing.JFrame {
 
         /* Hard core fix. */
         if (this.jStockOptions.getScanningSpeed() == 0) {
-            this.jStockOptions.setScanningSpeed(5000);
+            this.jStockOptions.setScanningSpeed(1*60*1000);
         }
                 
         final String proxyHost = this.jStockOptions.getProxyServer();

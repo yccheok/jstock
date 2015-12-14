@@ -119,7 +119,9 @@ public class JStockOptions {
         this.singleIndicatorAlert = true;
         this.proxyServer = "";
         this.proxyPort = -1;
-        this.scanningSpeed = 10000;
+        // In milliseconds.
+        this.scanningSpeed = 1*60*1000;
+        // In seconds.
         this.alertSpeed = 5;
         this.looknFeel = null;
         this.alwaysOnTop = false;
@@ -189,7 +191,9 @@ public class JStockOptions {
     private transient String indicatorPassword;
     private String proxyServer;
     private int proxyPort;
-    private int scanningSpeed;  /* In ms. */
+    // In milliseconds.
+    private int scanningSpeed;
+    // In seconds.
     private int alertSpeed;
     // Opps! Spelling mistake (Should be lookNFeel). However, due to XML
     // serialization compatibility, we decide not to fix it.
@@ -563,6 +567,12 @@ public class JStockOptions {
         
         if (this.priceSources == null) {
             this.priceSources = new EnumMap<Country, PriceSource>(Country.class);
+        } else {
+            // Still here for xstream backward compatible. Shall be removed
+            // after a while.
+            if (this.priceSources.get(Country.Malaysia) == PriceSource.KLSEInfo) {
+                this.priceSources.put(Country.Malaysia, PriceSource.Yahoo);
+            }
         }
         
         if (this.currencies == null) {
