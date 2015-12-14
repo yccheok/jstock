@@ -535,11 +535,10 @@ public class OptionsNetworkJPanel extends javax.swing.JPanel implements JStockOp
 
     private volatile SwingWorker testConnectionSwingWorker = null;
 
-    private static final Map<String, String> priceSourceEntries = new HashMap<String, String>();
+    private static final Map<String, String> priceSourceEntries = new HashMap<>();
     static {
         priceSourceEntries.put(PriceSource.Yahoo.name(), GUIBundle.getString("OptionsNetworkJPanel_YahooFinance"));
         priceSourceEntries.put(PriceSource.Google.name(), GUIBundle.getString("OptionsNetworkJPanel_GoogleFinance"));
-        priceSourceEntries.put(PriceSource.KLSEInfo.name(), GUIBundle.getString("OptionsNetworkJPanel_KLSEInfo"));
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
