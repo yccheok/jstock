@@ -315,6 +315,8 @@ public class JStock extends javax.swing.JFrame {
             this.jRadioButtonMenuItem3.setSelected(true);
         } else if (defaultLocale.getLanguage().equals(Locale.ITALIAN.getLanguage())) {
             this.jRadioButtonMenuItem5.setSelected(true);
+        } else if (defaultLocale.getLanguage().equals(Locale.FRENCH.getLanguage())) {
+            this.jRadioButtonMenuItem6.setSelected(true);
         } else {
             this.jRadioButtonMenuItem1.setSelected(true);
         }
