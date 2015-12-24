@@ -849,7 +849,7 @@ public class Utils {
     }
 
     public static String getHistoryDirectory(Country country) {
-        return Utils.getUserDataDirectory() + country + File.separator + "history";
+        return Utils.getUserDataDirectory() + country + File.separator + "history" + File.separator;
     }
     
     public static AlphaComposite makeComposite(float alpha) {
