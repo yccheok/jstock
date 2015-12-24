@@ -577,17 +577,18 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
         return java.util.Collections.unmodifiableList(extensions);
     }
     
-    private File getJStockZipFile() {
+    // filename can be null, to indicate temp file.
+    private File getJStockZipFile(final String filename) {
         // Look for "user-defined-database.xml" for all countries.
         final List<File> files = getUserDefinedDatabaseFiles();
         final List<FileEx> fileExs = new ArrayList<>();
         for (File file : files) {
-            final String filename = file.getAbsolutePath();
-            final int index = filename.indexOf(Utils.getApplicationVersionString());
+            final String absolutePath = file.getAbsolutePath();
+            final int index = absolutePath.indexOf(Utils.getApplicationVersionString());
             if (index < 0) {
                 continue;
             }
-            final String output = filename.substring(index + Utils.getApplicationVersionString().length() + File.separator.length());
+            final String output = absolutePath.substring(index + Utils.getApplicationVersionString().length() + File.separator.length());
             fileExs.add(FileEx.newInstance(file, output));
         }
 
@@ -636,13 +637,21 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
 
         ZipOutputStream out = null;
         File temp = null;
-        
+
+        boolean exceptionOccur = false;
+
         try {
 
-            // Create the ZIP file
-            temp = File.createTempFile(Utils.getJStockUUID(), ".zip");
-            // Delete temp file when program exits.
-            temp.deleteOnExit();
+            if (Utils.isNullOrEmpty(filename)) {
+                // Create the ZIP file
+                temp = File.createTempFile(Utils.getJStockUUID(), ".zip");
+
+                // Delete temp file when program exits.
+                temp.deleteOnExit();
+            } else {
+                temp = new File(filename);
+            }
+
             out = new ZipOutputStream(new FileOutputStream(temp));
 
             // Compress the files
@@ -659,26 +668,29 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
                     while ((len = in.read(buf)) > 0) {
                         out.write(buf, 0, len);
                     }
-                }
-                catch (IOException exp) {
-                    log.error(null, exp);
-                    // Should we return null? As the saved information is not complete.
-                    continue;
-                }
-                finally {
+                } finally {
                     // Complete the entry
                     Utils.closeEntry(out);
                     Utils.close(in);
                 }
             }
-        } 
-        catch (IOException exp) {
+        } catch (IOException exp) {
             log.error(null, exp);
+
+            exceptionOccur = true;
+
             return null;
-        }
-        finally {
+        } finally {
             Utils.close(out);
+
+            // Deletion should be performed after Utils.close to free up resource.
+            if (exceptionOccur) {
+                if (temp != null) {
+                    temp.delete();
+                }
+            }
         }
+        
         return temp;
     }
 
