@@ -385,7 +385,9 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
 
                 JStock.instance().commitBeforeSaveToCloud();
                 
-                final File zipFile = getJStockZipFile();
+                // Passing null. The file will be deleted automatically when the
+                // app quit.
+                final File zipFile = getJStockZipFile(null);
                 
                 // Place isCancelled check after time consuming operation.
                 // Not the best way, but perhaps the easiest way to cancel
