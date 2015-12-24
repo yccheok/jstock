@@ -48,7 +48,7 @@ public class StockHistorySerializer {
         final long timestamp = stockHistoryServer.getTimestamp(0);
         final Code code = stockHistoryServer.getStock(timestamp).code;
         final Statements statements = Statements.newInstanceFromStockHistoryServer(stockHistoryServer, true);
-        final File file = new File(getFileName(code, duration));
+        final File file = new File(getFilename(code, duration));
         return statements.saveAsCSVFile(file);
     }
 
@@ -62,25 +62,25 @@ public class StockHistorySerializer {
         final long timestamp = stockHistoryServer.getTimestamp(0);
         final Code code = stockHistoryServer.getStock(timestamp).code;
         final Statements statements = Statements.newInstanceFromStockHistoryServer(stockHistoryServer, true);
-        final File file = new File(getFileName(code, period));
+        final File file = new File(getFilename(code, period));
         return statements.saveAsCSVFile(file);
     }
 
     public StockHistoryServer load(Code code, Duration duration)
     {
-        final File file = new File(getFileName(code, duration));
+        final File file = new File(getFilename(code, duration));
         final Statements statements = Statements.newInstanceFromCSVFile(file);
         return StatementsStockHistoryServer.newInstance(statements);
     }
 
     public StockHistoryServer load(Code code, Period period)
     {
-        final File file = new File(getFileName(code, period));
+        final File file = new File(getFilename(code, period));
         final Statements statements = Statements.newInstanceFromCSVFile(file);
         return StatementsStockHistoryServer.newInstance(statements);
     }
 
-    private String getFileName(Code code, Duration duration) {
+    private String getFilename(Code code, Duration duration) {
         final int startYear = duration.getStartDate().getYear();
         // +1, as we prefer based 1 month, for readability.
         final int startMonth = duration.getStartDate().getMonth() + 1;
@@ -91,20 +91,20 @@ public class StockHistorySerializer {
 
         DecimalFormat decimalFormat = new DecimalFormat("00");
 
-        final String fileName = directory + File.separator + code + 
+        final String filename = directory + File.separator + code +
                 "-start_date=" + startYear + "-" + decimalFormat.format(startMonth) + "-" + decimalFormat.format(startDay) +
                 "-end_date=" + endYear + "-" + decimalFormat.format(endMonth) + "-" + decimalFormat.format(endDay) +
                 ".csv";
 
-        return fileName;
+        return filename;
     }
 
-    private String getFileName(Code code, Period period) {
-        final String fileName = directory + File.separator + code +
+    private String getFilename(Code code, Period period) {
+        final String filename = directory + File.separator + code +
                 "-" + period.name() +
                 ".csv";
 
-        return fileName;
+        return filename;
     }
 
     private final String directory;     
