@@ -58,8 +58,8 @@ public enum Country {
     UnitedKingdom("/images/16x16/gb.png", "United Kingdom", Currency.valueOf("GBX"), Currency.valueOf("GBP")),
     UnitedState("/images/16x16/us.png", "United States", Currency.valueOf("USD"), Currency.valueOf("USD"));
             
-    Country(String fileName, String humanString, Currency stockCurrency, Currency localCurrency) {
-        this.icon = new javax.swing.ImageIcon(this.getClass().getResource(fileName));
+    Country(String filename, String humanString, Currency stockCurrency, Currency localCurrency) {
+        this.icon = new javax.swing.ImageIcon(this.getClass().getResource(filename));
         this.humanString = humanString;
         this.stockCurrency = stockCurrency;
         this.localCurrency = localCurrency;

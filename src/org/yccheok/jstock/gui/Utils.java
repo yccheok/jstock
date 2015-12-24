@@ -1846,14 +1846,14 @@ public class Utils {
         return org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "extra" + File.separator;
     }
 
-    public static String toHTMLFileSrcFormat(String fileName) {
+    public static String toHTMLFileSrcFormat(String filename) {
         try {
-            return new File(fileName).toURI().toURL().toString();
+            return new File(filename).toURI().toURL().toString();
         } catch (MalformedURLException ex) {
             log.error(null, ex);
         }
         // http://www.exampledepot.com/egs/javax.swing/checkbox_AddIcon.html
-        return "file:" + fileName;
+        return "file:" + filename;
     }
 
    public static class FileEx {

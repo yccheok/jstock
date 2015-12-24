@@ -37,9 +37,9 @@ public class AppLock {
     public static boolean lock() {
         try {
             String directory = Utils.getUserDataDirectory();
-            String fileName = "jstock.lock";
+            String filename = "jstock.lock";
             Utils.createCompleteDirectoryHierarchyIfDoesNotExist(directory);
-            f = new File(directory + fileName);
+            f = new File(directory + filename);
             // Do we need these code?
             //if (f.exists()) {
             //    f.delete();
