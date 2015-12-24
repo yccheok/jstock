@@ -48,8 +48,8 @@ public class Utils {
         return oldValue.equals(newValue);
     }
 
-    public static long getChecksum(String fileName) {
-        return getChecksum(new File(fileName));
+    public static long getChecksum(String filename) {
+        return getChecksum(new File(filename));
     }
     
     public static long getChecksum(File file) {

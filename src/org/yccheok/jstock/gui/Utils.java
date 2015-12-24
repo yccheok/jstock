@@ -902,9 +902,17 @@ public class Utils {
             for (int i=0; i<children.length; i++) {
                 deleteAllOldFiles(new File(dir, children[i]), days);
             }
+            
+            final String[] list = dir.list();
+            if (list == null) {
+                // For unknown reason, list will be null although it shouldn't be, as dir is a
+                // directory. "The result is null if this file is not a directory.". We just return
+                // early, as we aren't sure how are we going to deal with it.
+                return;
+            }
 
             // Delete empty directory
-            if(dir.list().length == 0)
+            if (list.length == 0)
             {
                 dir.delete();
             }
@@ -916,13 +924,13 @@ public class Utils {
             final long milPerDay = 1000*60*60*24;
             final long d = difMil / milPerDay;
 
-            if(d >= days)
+            if (d >= days)
             {
                 dir.delete();
             }
         }
     }
-
+    
     public static String getAboutBoxVersionString() {
         return ABOUT_BOX_VERSION_STRING;
     }
@@ -1838,14 +1846,14 @@ public class Utils {
         return org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "extra" + File.separator;
     }
 
-    public static String toHTMLFileSrcFormat(String fileName) {
+    public static String toHTMLFileSrcFormat(String filename) {
         try {
-            return new File(fileName).toURI().toURL().toString();
+            return new File(filename).toURI().toURL().toString();
         } catch (MalformedURLException ex) {
             log.error(null, ex);
         }
         // http://www.exampledepot.com/egs/javax.swing/checkbox_AddIcon.html
-        return "file:" + fileName;
+        return "file:" + filename;
     }
 
    public static class FileEx {

@@ -437,9 +437,9 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
         return getFileEx(fileExs, name, extensions, null);
     }
 
-    private static boolean hasExtensions(String fileName, List<String> extensions) {
+    private static boolean hasExtensions(String filename, List<String> extensions) {
         for (String extension : extensions) {
-            if (fileName.endsWith(extension)) {
+            if (filename.endsWith(extension)) {
                 return true;
             }        
         }
