@@ -91,7 +91,7 @@ public class StockHistorySerializer {
 
         DecimalFormat decimalFormat = new DecimalFormat("00");
 
-        final String filename = directory + File.separator + code +
+        final String filename = directory + code +
                 "-start_date=" + startYear + "-" + decimalFormat.format(startMonth) + "-" + decimalFormat.format(startDay) +
                 "-end_date=" + endYear + "-" + decimalFormat.format(endMonth) + "-" + decimalFormat.format(endDay) +
                 ".csv";
@@ -100,7 +100,7 @@ public class StockHistorySerializer {
     }
 
     private String getFilename(Code code, Period period) {
-        final String filename = directory + File.separator + code +
+        final String filename = directory + code +
                 "-" + period.name() +
                 ".csv";
 
