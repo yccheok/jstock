@@ -25,14 +25,13 @@ public class StatementsStockHistoryServer implements StockHistoryServer {
     private StatementsStockHistoryServer(Statements statements) throws ParseException {
         assert(statements.getType() == Statement.Type.StockHistory);
         
-        DateFormat dateFormat = org.yccheok.jstock.gui.Utils.getCommonDateFormat();
         Map<String, String> metadatas = statements.getMetadatas();
         double previousClosePrice = Double.MAX_VALUE;
         
         for (int i = 0, ei = statements.size(); i < ei; i++) {
             Statement statement = statements.get(i);
             assert(statement.getType() == Statement.Type.StockHistory);
-            final long timestamp = dateFormat.parse(statement.getAtom(0).getValue().toString()).getTime();
+            final long timestamp = org.yccheok.jstock.gui.Utils.commonDateParse(statement.getAtom(0).getValue().toString()).getTime();
             double openPrice = Double.parseDouble(statement.getAtom(1).getValue().toString());
             double highPrice = Double.parseDouble(statement.getAtom(2).getValue().toString());
             double lowPrice = Double.parseDouble(statement.getAtom(3).getValue().toString());

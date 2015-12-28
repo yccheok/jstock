@@ -77,6 +77,7 @@ import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -2478,16 +2479,27 @@ public class Utils {
     public static String getDefaultCurrencySymbol() {
         return "$";
     }
-    
-    /**
-     * Returns common used date format, which will be used by Statements. We need
-     * common used date format, as we need to perform data exchange across
-     * different platforms.
-     * 
-     * @return common used date format
-     */
-    public static DateFormat getCommonDateFormat() {
-        return commonDateFormat.get();
+
+    public static String commonDateFormat(long time) {
+        return commonDateFormat.get().format(time);
+    }
+
+    public static String commonDateFormat(Date date) {
+        return commonDateFormat.get().format(date);
+    }
+
+    public static Date commonDateParse(String string) {
+        try {
+            return commonDateFormat.get().parse(string);
+        } catch (ParseException e) {
+            log.error(null, e);
+            try {
+                return legacyCommonDateFormat.get().parse(string);
+            } catch (ParseException e1) {
+                log.error(null, e1);
+            }
+        }
+        return null;
     }
     
     public static boolean isToday(long timestamp) {
@@ -2679,7 +2691,7 @@ public class Utils {
     }
 
     // Use ThreadLocal to ensure thread safety.
-    private static final ThreadLocal <DateFormat> commonDateFormat = new ThreadLocal <DateFormat>() {
+    @Deprecated private static final ThreadLocal <DateFormat> legacyCommonDateFormat = new ThreadLocal <DateFormat>() {
         @Override protected DateFormat initialValue() {
             // We will use a fixed date format (Locale.English), so that it will be
             // easier for Android to process.
@@ -2693,6 +2705,12 @@ public class Utils {
         }
     };
 
+    private static final ThreadLocal <DateFormat> commonDateFormat = new ThreadLocal <DateFormat>() {
+        @Override protected DateFormat initialValue() {
+            return new SimpleDateFormat("MMM d, yyyy", Locale.ENGLISH);
+        }
+    };
+    
     private static final ThreadLocal<DateFormat> todayLastUpdateTimeFormat = new ThreadLocal <DateFormat>() {
         @Override protected DateFormat initialValue() {
             return new SimpleDateFormat("h:mm a");
