@@ -1,6 +1,9 @@
 ﻿This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.7.12 - 2015-12-29
+  Bugfix:  Avoid possible data corruption.
+  
 JStock 1.0.7.11 - 2015-12-15
   Bugfix:  Email alert by using Google oAuth2.0.
   Bugfix:  Select best country after open from cloud.
