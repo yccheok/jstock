@@ -150,8 +150,7 @@ public class Statements {
                 atoms.add(new Atom(stock.code.toString(), tmp[0]));
                 atoms.add(new Atom(stock.symbol.toString(), tmp[1]));
                 
-                DateFormat dateFormat = org.yccheok.jstock.gui.Utils.getCommonDateFormat();
-                final String dateString = transaction.getDate() != null ? dateFormat.format(transaction.getDate().getTime()) : "";                        
+                final String dateString = transaction.getDate() != null ? org.yccheok.jstock.gui.Utils.commonDateFormat(transaction.getDate().getTime()) : "";                        
                 atoms.add(new Atom(dateString, tmp[2]));
                 atoms.add(new Atom(transaction.getQuantity(), tmp[3]));
                 atoms.add(new Atom(transaction.getPrice(), tmp[4]));
@@ -209,15 +208,13 @@ public class Statements {
         
         final int size = server.size();
         
-        final DateFormat dateFormat = org.yccheok.jstock.gui.Utils.getCommonDateFormat();
-        
         Stock stock = null;
         for (int i = 0; i < size; i++) {
             final long timestamp = server.getTimestamp(i);
             stock = server.getStock(timestamp);
             assert(timestamp != 0 && stock != null);
             final List<Atom> atoms = new ArrayList<Atom>();
-            final Atom atom0 = new Atom(dateFormat.format(timestamp), guiBundleWrapper.getString("StockHistory_Date"));
+            final Atom atom0 = new Atom(org.yccheok.jstock.gui.Utils.commonDateFormat(timestamp), guiBundleWrapper.getString("StockHistory_Date"));
             final Atom atom1 = new Atom(Double.valueOf(stock.getOpenPrice()), guiBundleWrapper.getString("StockHistory_Open"));
             final Atom atom2 = new Atom(Double.valueOf(stock.getHighPrice()), guiBundleWrapper.getString("StockHistory_High"));
             final Atom atom3 = new Atom(Double.valueOf(stock.getLowPrice()), guiBundleWrapper.getString("StockHistory_Low"));
@@ -775,8 +772,7 @@ public class Statements {
                     atoms.add(new Atom(stockInfo.symbol.toString(), symbol_string));                    
                 }
                 else if (c.equals(Date.class)) {
-                    DateFormat dateFormat = org.yccheok.jstock.gui.Utils.getCommonDateFormat();
-                    atoms.add(new Atom(object != null ? dateFormat.format(((Date)object).getTime()) : "", type));
+                    atoms.add(new Atom(object != null ? org.yccheok.jstock.gui.Utils.commonDateFormat(((Date)object).getTime()) : "", type));
                 } else {
                     // For fall below and rise above, null value is permitted.
                     // Use empty string to represent null value.
@@ -863,10 +859,9 @@ public class Statements {
                 atoms.add(new Atom(stock.code.toString(), tmp[0]));
                 atoms.add(new Atom(stock.symbol.toString(), tmp[1]));
                 
-                DateFormat dateFormat = org.yccheok.jstock.gui.Utils.getCommonDateFormat();
-                final String referenceDateString = transaction.getReferenceDate() != null ? dateFormat.format(transaction.getReferenceDate().getTime()) : "";
+                final String referenceDateString = transaction.getReferenceDate() != null ? org.yccheok.jstock.gui.Utils.commonDateFormat(transaction.getReferenceDate().getTime()) : "";
                 atoms.add(new Atom(referenceDateString, tmp[2]));
-                final String dateString = transaction.getDate() != null ? dateFormat.format(transaction.getDate().getTime()) : "";
+                final String dateString = transaction.getDate() != null ? org.yccheok.jstock.gui.Utils.commonDateFormat(transaction.getDate().getTime()) : "";
                 atoms.add(new Atom(dateString, tmp[3]));
                 atoms.add(new Atom(transaction.getQuantity(), tmp[4]));
                 atoms.add(new Atom(transaction.getPrice(), tmp[5]));
