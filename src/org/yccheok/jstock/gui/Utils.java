@@ -1280,7 +1280,7 @@ public class Utils {
     public static CloudFile loadFromGoogleDrive(Credential credential) {
         // 25 is based on experiment. Might changed by Google in the future.
         final String titleName = ("jstock-" + Utils.getJStockUUID() + "-checksum=").substring(0, 25);        
-        final String qString = "title contains '" + titleName + "' and trashed = false and 'appdata' in parents";
+        final String qString = "title contains '" + titleName + "' and trashed = false and 'appdata' in parents and 'me' in owners";
         return _loadFromGoogleDrive(credential, qString);
     }
 
@@ -1288,21 +1288,21 @@ public class Utils {
     public static CloudFile loadFromLegacyGoogleDrive(Credential credential) {
         // 25 is based on experiment. Might changed by Google in the future.
         final String titleName = ("jstock-" + Utils.getJStockUUID() + "-checksum=").substring(0, 25);
-        final String qString = "title contains '" + titleName + "' and trashed = false and not 'appdata' in parents";
+        final String qString = "title contains '" + titleName + "' and trashed = false and not 'appdata' in parents and 'me' in owners";
         return _loadFromGoogleDrive(credential, qString);
     }
 
     public static boolean saveToGoogleDrive(Credential credential, File file) {
         // 25 is based on experiment. Might changed by Google in the future.
         final String titleName = ("jstock-" + Utils.getJStockUUID() + "-checksum=").substring(0, 25);        
-        final String qString = "title contains '" + titleName + "' and trashed = false and 'appdata' in parents";        
+        final String qString = "title contains '" + titleName + "' and trashed = false and 'appdata' in parents and 'me' in owners";
         return _saveToGoogleDrive(credential, file, qString, "appdata");
     }
     
     public static boolean saveToLegacyGoogleDrive(Credential credential, File file) {
         // 25 is based on experiment. Might changed by Google in the future.
         final String titleName = ("jstock-" + Utils.getJStockUUID() + "-checksum=").substring(0, 25);
-        final String qString = "title contains '" + titleName + "' and trashed = false and not 'appdata' in parents";       
+        final String qString = "title contains '" + titleName + "' and trashed = false and not 'appdata' in parents and 'me' in owners";
         return _saveToGoogleDrive(credential, file, qString, null);
     }
     
@@ -1391,7 +1391,7 @@ public class Utils {
             // http://stackoverflow.com/questions/23707388/unable-update-file-store-in-appdata-scope-500-internal-server-error
 
             // Send the request to the API.
-            com.google.api.services.drive.model.File updatedFile = service.files().update(fileId, file, mediaContent).execute();
+            com.google.api.services.drive.model.File updatedFile = service.files().update(fileId, file, mediaContent).setNewRevision(false).execute();
 
             return updatedFile;
         } catch (IOException e) {
@@ -2743,11 +2743,11 @@ public class Utils {
 
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
-    private static final String ABOUT_BOX_VERSION_STRING = "1.0.7.12";
+    private static final String ABOUT_BOX_VERSION_STRING = "1.0.7.13";
 
-    // 1.0.7.12
+    // 1.0.7.13
     // For About box comparision on latest version purpose.
-    private static final int APPLICATION_VERSION_ID = 1141;
+    private static final int APPLICATION_VERSION_ID = 1142;
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     

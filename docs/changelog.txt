@@ -1,6 +1,9 @@
 ﻿This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.7.13 - 2015-01-02
+  Bugfix:  Fix cloud storage.
+
 JStock 1.0.7.12 - 2015-12-29
   Bugfix:  Avoid possible data corruption.
   
