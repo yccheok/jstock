@@ -1391,7 +1391,7 @@ public class Utils {
             // http://stackoverflow.com/questions/23707388/unable-update-file-store-in-appdata-scope-500-internal-server-error
 
             // Send the request to the API.
-            com.google.api.services.drive.model.File updatedFile = service.files().update(fileId, file, mediaContent).execute();
+            com.google.api.services.drive.model.File updatedFile = service.files().update(fileId, file, mediaContent).setNewRevision(false).execute();
 
             return updatedFile;
         } catch (IOException e) {
