@@ -3191,6 +3191,25 @@ public class JStock extends javax.swing.JFrame {
         }
     }
 
+    // Asynchronous call. Must be called by event dispatch thread.
+    public void displayStockNews(Stock stock) {
+        // retrieve news from: Google, Yahhoo server
+        // refer Android code
+
+        JOptionPane.showConfirmDialog(JStock.this, "Shuwn Yuan! :D", "Hello", JOptionPane.YES_NO_OPTION);
+    }
+
+    public void displayStocksNews() {
+        int rows[] = jTable1.getSelectedRows();
+        final StockTableModel tableModel = (StockTableModel)jTable1.getModel();
+
+        for (int row : rows) {
+            final int modelIndex = jTable1.getRowSorter().convertRowIndexToModel(row);
+            Stock stock = tableModel.getStock(modelIndex);
+            displayStockNews(stock);
+        }
+    }
+
     private JPopupMenu getMyJTablePopupMenu() {
         final JPopupMenu popup = new JPopupMenu();
         final TableModel tableModel = jTable1.getModel();            
@@ -3249,7 +3268,18 @@ public class JStock extends javax.swing.JFrame {
         });
             
         popup.add(menuItem);
-        
+        popup.addSeparator();
+
+        // Add Stocks news
+        menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_News..."), this.getImageIcon("/images/16x16/editdelete.png"));
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                    displayStocksNews();
+            }
+        });
+        popup.add(menuItem);
+
         return popup;
     }
 
