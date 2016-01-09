@@ -3195,8 +3195,13 @@ public class JStock extends javax.swing.JFrame {
     public void displayStockNews(Stock stock) {
         // retrieve news from: Google, Yahhoo server
         // refer Android code
-
-        JOptionPane.showConfirmDialog(JStock.this, "Shuwn Yuan! :D", "Hello", JOptionPane.YES_NO_OPTION);
+        
+        //JOptionPane.showConfirmDialog(JStock.this, "Shuwn Yuan! :D", "Hello", JOptionPane.YES_NO_OPTION);
+        
+        assert(SwingUtilities.isEventDispatchThread());
+        
+        final StockNews newsDialog = new StockNews();
+        newsDialog.setVisible(true);
     }
 
     public void displayStocksNews() {
@@ -3262,8 +3267,8 @@ public class JStock extends javax.swing.JFrame {
         
         menuItem.addActionListener(new ActionListener() {
             @Override
-        	public void actionPerformed(ActionEvent evt) {
-                    JStock.this.deteleSelectedTableRow();
+            public void actionPerformed(ActionEvent evt) {
+                JStock.this.deteleSelectedTableRow();
             }
         });
             
@@ -3275,7 +3280,7 @@ public class JStock extends javax.swing.JFrame {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
-                    displayStocksNews();
+                displayStocksNews();
             }
         });
         popup.add(menuItem);
