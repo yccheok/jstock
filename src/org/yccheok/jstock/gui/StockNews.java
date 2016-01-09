@@ -16,16 +16,16 @@ import javafx.scene.text.Text;
 import javax.swing.*;
 
 
-public class StockNews extends JDialog {
+public class StockNews extends JFrame {
     private final JFXPanel jfxPanel = new JFXPanel();
-    private final JPanel panel = new JPanel(new BorderLayout());
+    //private final JPanel panel = new JPanel(new BorderLayout());
     
-    private Scene scene;
-    private StackPane stack;
-    private Text hello;
+    Scene scene;
+    StackPane stack;
+    Text hello;
  
-    public StockNews() {
-        super(JStock.instance(), JDialog.ModalityType.APPLICATION_MODAL);
+    public StockNews(String title) {
+        super(title);
         initComponents();
     }
     
@@ -46,10 +46,10 @@ public class StockNews extends JDialog {
             }
         });
         
-        panel.add(jfxPanel, BorderLayout.CENTER);        
-        getContentPane().add(panel);
+        this.add(jfxPanel, BorderLayout.CENTER);
         
         java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
         setBounds((screenSize.width-460)/2, (screenSize.height-680)/2, 460, 680);
+        this.setVisible(true);
     }
 }

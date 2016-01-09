@@ -3193,15 +3193,8 @@ public class JStock extends javax.swing.JFrame {
 
     // Asynchronous call. Must be called by event dispatch thread.
     public void displayStockNews(Stock stock) {
-        // retrieve news from: Google, Yahhoo server
-        // refer Android code
-        
-        //JOptionPane.showConfirmDialog(JStock.this, "Shuwn Yuan! :D", "Hello", JOptionPane.YES_NO_OPTION);
-        
         assert(SwingUtilities.isEventDispatchThread());
-        
-        final StockNews newsDialog = new StockNews();
-        newsDialog.setVisible(true);
+        final StockNews newsDialog = new StockNews("Stock News");
     }
 
     public void displayStocksNews() {
