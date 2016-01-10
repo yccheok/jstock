@@ -89,16 +89,14 @@ public class Utils {
      * @return Returns false if there is an exception during close operation.
      * Otherwise returns true.
      */
-    public static boolean closeEntry(ZipOutputStream zipOutputStream) {
+    public static void closeEntry(ZipOutputStream zipOutputStream) {
         if (null != zipOutputStream) {
             try {
                 zipOutputStream.closeEntry();
             } catch (IOException ex) {
                 log.error(null, ex);
-                return false;
             }
         }
-        return true;
     }
     
     private static final Log log = LogFactory.getLog(Utils.class);

@@ -672,8 +672,8 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
                     }
                 } finally {
                     // Complete the entry
-                    Utils.closeEntry(out);
-                    Utils.close(in);
+                    org.yccheok.jstock.file.Utils.closeEntry(out);
+                    org.yccheok.jstock.file.Utils.close(in);
                 }
             }
         } catch (IOException exp) {
@@ -683,7 +683,7 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
 
             return null;
         } finally {
-            Utils.close(out);
+            org.yccheok.jstock.file.Utils.close(out);
 
             // Deletion should be performed after Utils.close to free up resource.
             if (exceptionOccur) {

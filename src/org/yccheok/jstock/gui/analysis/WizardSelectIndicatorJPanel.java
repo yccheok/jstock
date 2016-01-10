@@ -418,8 +418,8 @@ public class WizardSelectIndicatorJPanel extends javax.swing.JPanel {
                 // want the caller to close InputStream explicitly.
                 final Reader reader = new InputStreamReader(inputStreamAndMethod.inputStream, Charset.forName("UTF-8"));
                 final IndicatorDownloadManager _indicatorDownloadManager = Utils.fromXML(IndicatorDownloadManager.class, reader);
-                Utils.close(reader);
-                Utils.close(inputStreamAndMethod.inputStream);
+                org.yccheok.jstock.file.Utils.close(reader);
+                org.yccheok.jstock.file.Utils.close(inputStreamAndMethod.inputStream);
                 inputStreamAndMethod.method.releaseConnection();
                 if (_indicatorDownloadManager == null) {
                     return null;

@@ -236,8 +236,8 @@ public class IndicatorProjectManager {
                     }
                 }
                 finally {
-                    Utils.close(out);
-                    Utils.closeEntry(in);
+                    org.yccheok.jstock.file.Utils.close(out);
+                    org.yccheok.jstock.file.Utils.closeEntry(in);
                 }
             }
         }
@@ -246,7 +246,7 @@ public class IndicatorProjectManager {
             status = false;
         }
         finally {
-            Utils.close(in);
+            org.yccheok.jstock.file.Utils.close(in);
         }
 
         if (status == false) {
@@ -379,8 +379,8 @@ public class IndicatorProjectManager {
                 }
                 finally {
                     // Complete the entry
-                    Utils.closeEntry(out);
-                    Utils.close(in);
+                    org.yccheok.jstock.file.Utils.closeEntry(out);
+                    org.yccheok.jstock.file.Utils.close(in);
                 }
             }
         } catch (IOException ex) {
@@ -388,7 +388,7 @@ public class IndicatorProjectManager {
             return false;
         }
         finally {
-            Utils.close(out);
+            org.yccheok.jstock.file.Utils.close(out);
         }
         return true;
     }
