@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -373,7 +372,7 @@ public class Statements {
         }
         finally
         {
-            org.yccheok.jstock.gui.Utils.close(fileInputStream);
+            Utils.close(fileInputStream);
         }
         return statementsList;
     }
@@ -496,8 +495,8 @@ public class Statements {
                     log.error(null, ex);
                 }
             }
-            org.yccheok.jstock.gui.Utils.close(inputStreamReader);
-            org.yccheok.jstock.gui.Utils.close(fileInputStream);
+            Utils.close(inputStreamReader);
+            Utils.close(fileInputStream);
             
             ThreadSafeFileLock.unlockRead(lock);
             ThreadSafeFileLock.releaseLock(lock);
@@ -980,8 +979,8 @@ public class Statements {
                     log.error(null, ex);
                 }
             }
-            org.yccheok.jstock.gui.Utils.close(outputStreamWriter);
-            org.yccheok.jstock.gui.Utils.close(fileOutputStream);
+            Utils.close(outputStreamWriter);
+            Utils.close(fileOutputStream);
             
             ThreadSafeFileLock.unlockWrite(lock);
             ThreadSafeFileLock.releaseLock(lock);
@@ -1041,7 +1040,7 @@ public class Statements {
             log.error(null, ex);
         }
         finally {
-            org.yccheok.jstock.gui.Utils.close(fileOut);
+            Utils.close(fileOut);
             
             ThreadSafeFileLock.unlockWrite(lock);
             ThreadSafeFileLock.releaseLock(lock);
@@ -1108,7 +1107,7 @@ public class Statements {
             log.error(null, ex);
         }
         finally {
-            org.yccheok.jstock.gui.Utils.close(fileOut);
+            Utils.close(fileOut);
             
             ThreadSafeFileLock.unlockWrite(lock);
             ThreadSafeFileLock.releaseLock(lock);
