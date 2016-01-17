@@ -22,13 +22,13 @@ public class GoogleSearchNewsServer implements NewsServer {
     @Override
     public List<FeedItem> getMessages(StockInfo stockInfo) {
         final String feedUrl = googleSearchNewsFeedUrl(stockInfo);
-        final List<FeedItem> messages = new ArrayList<FeedItem>();
+        final List<FeedItem> messages = new ArrayList<>();
         
         if (feedUrl == null) {
             return messages; 
         }
         
-        final Set<String> titles = new HashSet<String>();
+        final Set<String> titles = new HashSet<>();
 
         try {
             final URL url = new URL(feedUrl);
