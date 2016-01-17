@@ -3166,7 +3166,6 @@ public class JStock extends javax.swing.JFrame {
     // Asynchronous call. Must be called by event dispatch thread.
     public void displayHistoryChart(Stock stock) {
         final StockHistoryServer stockHistoryServer = stockHistoryMonitor.getStockHistoryServer(stock.code);
-
         if (stockHistoryServer == null) {
             if (stockCodeHistoryGUI.add(stock.code) && stockHistoryMonitor.addStockCode(stock.code)) {                                
                 final String template = GUIBundle.getString("MainFrame_LookingForHistory_template");
@@ -3194,7 +3193,7 @@ public class JStock extends javax.swing.JFrame {
     // Asynchronous call. Must be called by event dispatch thread.
     public void displayStockNews(Stock stock) {
         assert(SwingUtilities.isEventDispatchThread());
-        final StockNews newsDialog = new StockNews("Stock News");
+        final StockNews newsDialog = new StockNews("Stock News", stock);
     }
 
     public void displayStocksNews() {
