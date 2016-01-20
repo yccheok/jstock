@@ -5,9 +5,9 @@
  */
 package org.yccheok.jstock.gui;
 
-import java.util.List;
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.awt.*;
+import javax.swing.*;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -25,34 +25,22 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
-import javax.swing.*;
 import javafx.geometry.Insets;
-
-import it.sauronsoftware.feed4j.bean.FeedItem;
-
-import org.yccheok.jstock.engine.Country;
-import org.yccheok.jstock.engine.Stock;
-import org.yccheok.jstock.engine.StockInfo;
-import org.yccheok.jstock.news.NewsServer;
-import org.yccheok.jstock.news.NewsServerFactory;
 
 
 public class StockNews extends JFrame {
     private final JFXPanel jfxPanel = new JFXPanel();
     
     Scene scene;
-    Text hello;
-    Label label;
+    //Text hello;
+    //Label label;
     VBox vbox;
-    ListView<String> myList;
-    StockInfo stockInfo;
-    Country country;
+    ListView<String> newsList;
+    ArrayList<String> news;
     
-    public StockNews(String title, Stock stock) {
-        super(title);
-        this.stockInfo = StockInfo.newInstance(stock.code, stock.symbol);
-        this.country = org.yccheok.jstock.engine.Utils.toCountry(stock.code);
-                
+    public StockNews(ArrayList<String> news) {
+        super("Stock News");
+        this.news = news;
         initComponents();
     }
     
@@ -61,60 +49,42 @@ public class StockNews extends JFrame {
             @Override 
             public void run() {
                 vbox = new VBox();
-                
                 scene = new Scene(vbox, 200, 200);
-                scene.setFill(Color.BLACK);
+                //scene.setFill(Color.BLACK);
                 //scene.getStylesheets().add("stockNews.css");
                 
-                label = new Label("Stock News");
-                hello = new Text(stockInfo.symbol.toString() + " (" + stockInfo.code.toString() + ")");
-                hello.setFill(Color.CHOCOLATE);
+                //label = new Label("Stock News");
+                //hello = new Text(stockInfo.symbol.toString() + " (" + stockInfo.code.toString() + ")");
+                //hello.setFill(Color.CHOCOLATE);
                 
-                DropShadow dropShadow = new DropShadow();
-                dropShadow.setRadius(5.0);
-                dropShadow.setOffsetX(3.0);
-                dropShadow.setOffsetY(3.0);
-                dropShadow.setColor(Color.color(0.4, 0.5, 0.5));
-                hello.setEffect(dropShadow);
+                //DropShadow dropShadow = new DropShadow();
+                //dropShadow.setRadius(5.0);
+                //dropShadow.setOffsetX(3.0);
+                //dropShadow.setOffsetY(3.0);
+                //dropShadow.setColor(Color.color(0.4, 0.5, 0.5));
+                //hello.setEffect(dropShadow);
                 
                 jfxPanel.setScene(scene);
                 
-                myList = new ListView<String>();
-                ObservableList<String> news = FXCollections.observableArrayList ();
+                newsList = new ListView<>();
+                ObservableList<String> FxNews = FXCollections.observableArrayList (news);
                 
-                final List<NewsServer> newsServers = NewsServerFactory.getNewsServers(country);
-                final NewsServer server = newsServers.get(0);
-                List<FeedItem> messages = server.getMessages(stockInfo);
-                
-                Iterator<FeedItem> messagesIterator = messages.iterator();
-                while (messagesIterator.hasNext()) {
-                    FeedItem msg = messagesIterator.next();
-
-                    String datetime = "";
-                    if (msg.getPubDate() != null) {
-                        datetime = msg.getPubDate().toString();
-                    }
-                    
-                    news.add(msg.getTitle() + " [Date: " + datetime + "]");
-                    news.add(msg.getDescriptionAsText());
-		}
-                
-                myList.setItems(news);
-                myList.setPrefWidth(50);
-                myList.setPrefHeight(50);
+                newsList.setItems(FxNews);
+                newsList.setPrefWidth(50);
+                newsList.setPrefHeight(50);
                 
                 vbox.setPadding(new Insets(10));
-                vbox.setSpacing(8);
+                //vbox.setSpacing(100);
                 
                 vbox.setStyle("-fx-border-color: #2e8b57; -fx-border-width: 2px;");
                 vbox.setAlignment(Pos.CENTER);
-                VBox.setVgrow(myList, Priority.ALWAYS);
+                VBox.setVgrow(newsList, Priority.ALWAYS);
                 
-                vbox.getChildren().addAll(label, hello, myList);
+                vbox.getChildren().addAll(newsList);
                 
-                VBox.setMargin(label, new Insets(10));
-                VBox.setMargin(hello, new Insets(20));
-                VBox.setMargin(myList, new Insets(30));
+                //VBox.setMargin(label, new Insets(10));
+                //VBox.setMargin(hello, new Insets(20));
+                //VBox.setMargin(newsList, new Insets(30));
             }
         });
         

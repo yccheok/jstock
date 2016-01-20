@@ -22,6 +22,7 @@ package org.yccheok.jstock.gui;
 import org.yccheok.jstock.engine.Pair;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.json.GoogleJsonError.ErrorInfo;
+import it.sauronsoftware.feed4j.bean.FeedItem;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
@@ -36,6 +37,8 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Platform;
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -62,8 +65,17 @@ import org.yccheok.jstock.gui.watchlist.WatchlistJDialog;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.internationalization.MessagesBundle;
 import org.yccheok.jstock.network.ProxyDetector;
+import org.yccheok.jstock.news.NewsServer;
+import org.yccheok.jstock.news.NewsServerFactory;
 import org.yccheok.jstock.portfolio.PortfolioInfo;
 import org.yccheok.jstock.watchlist.WatchlistInfo;
+
+import org.yccheok.jstock.engine.Country;
+import org.yccheok.jstock.engine.Stock;
+import org.yccheok.jstock.engine.StockInfo;
+import org.yccheok.jstock.news.NewsServer;
+import org.yccheok.jstock.news.NewsServerFactory;
+
 
 /**
  *
@@ -3190,10 +3202,53 @@ public class JStock extends javax.swing.JFrame {
         }
     }
 
-    // Asynchronous call. Must be called by event dispatch thread.
     public void displayStockNews(Stock stock) {
         assert(SwingUtilities.isEventDispatchThread());
-        final StockNews newsDialog = new StockNews("Stock News", stock);
+        
+        SwingWorker swingWorker = new SwingWorker<ArrayList<String>, Void>() {
+            
+            @Override
+            protected ArrayList<String> doInBackground() throws Exception {
+                
+                ArrayList<String> news = new ArrayList<>();
+                        
+                StockInfo stockInfo = StockInfo.newInstance(stock.code, stock.symbol);
+                Country country = org.yccheok.jstock.engine.Utils.toCountry(stock.code);
+                
+                final java.util.List<NewsServer> newsServers = NewsServerFactory.getNewsServers(country);
+                final NewsServer server = newsServers.get(0);
+                java.util.List<FeedItem> messages = server.getMessages(stockInfo);
+                
+                Iterator<FeedItem> messagesIterator = messages.iterator();
+                while (messagesIterator.hasNext()) {
+                    FeedItem msg = messagesIterator.next();
+
+                    String item = msg.getTitle();
+                    String desc = msg.getDescriptionAsText();
+                    if (desc != null) {
+                        item += "\n" + desc; 
+                    }
+                    item += "\n" + msg.getPubDate().toString();
+                    
+                    news.add(item);
+		}
+                
+                return news;
+            }
+            
+            @Override
+            public void done() {
+                final ArrayList<String> news;
+                try {
+                    news = this.get();
+                    final StockNews newsDialog = new StockNews(news);
+                } catch (InterruptedException | ExecutionException ex) {
+                    Logger.getLogger(JStock.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        };
+        
+        swingWorker.execute();
     }
 
     public void displayStocksNews() {
