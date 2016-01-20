@@ -5,8 +5,10 @@
  */
 package org.yccheok.jstock.gui;
 
+import it.sauronsoftware.feed4j.bean.FeedItem;
 import java.util.ArrayList;
 import java.awt.*;
+import java.util.Iterator;
 import javax.swing.*;
 
 import javafx.application.Platform;
@@ -36,11 +38,12 @@ public class StockNews extends JFrame {
     //Label label;
     VBox vbox;
     ListView<String> newsList;
-    ArrayList<String> news;
+    java.util.List<FeedItem> messages;
+    ArrayList<String> news = new ArrayList<String>();
     
-    public StockNews(ArrayList<String> news) {
+    public StockNews(java.util.List<FeedItem> messages) {
         super("Stock News");
-        this.news = news;
+        this.messages = messages;
         initComponents();
     }
     
@@ -65,6 +68,20 @@ public class StockNews extends JFrame {
                 //hello.setEffect(dropShadow);
                 
                 jfxPanel.setScene(scene);
+
+                Iterator<FeedItem> messagesIterator = messages.iterator();
+                while (messagesIterator.hasNext()) {
+                    FeedItem msg = messagesIterator.next();
+
+                    String item = msg.getTitle();
+                    String desc = msg.getDescriptionAsText();
+                    if (desc != null) {
+                        item += "\n" + desc; 
+                    }
+                    item += "\n" + msg.getPubDate().toString();
+                    
+                    news.add(item);
+		}
                 
                 newsList = new ListView<>();
                 ObservableList<String> FxNews = FXCollections.observableArrayList (news);

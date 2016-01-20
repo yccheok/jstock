@@ -3205,13 +3205,11 @@ public class JStock extends javax.swing.JFrame {
     public void displayStockNews(Stock stock) {
         assert(SwingUtilities.isEventDispatchThread());
         
-        SwingWorker swingWorker = new SwingWorker<ArrayList<String>, Void>() {
+        SwingWorker swingWorker = new SwingWorker<java.util.List<FeedItem>, Void>() {
             
             @Override
-            protected ArrayList<String> doInBackground() throws Exception {
-                
-                ArrayList<String> news = new ArrayList<>();
-                        
+            protected java.util.List<FeedItem> doInBackground() throws Exception {
+
                 StockInfo stockInfo = StockInfo.newInstance(stock.code, stock.symbol);
                 Country country = org.yccheok.jstock.engine.Utils.toCountry(stock.code);
                 
@@ -3219,29 +3217,15 @@ public class JStock extends javax.swing.JFrame {
                 final NewsServer server = newsServers.get(0);
                 java.util.List<FeedItem> messages = server.getMessages(stockInfo);
                 
-                Iterator<FeedItem> messagesIterator = messages.iterator();
-                while (messagesIterator.hasNext()) {
-                    FeedItem msg = messagesIterator.next();
-
-                    String item = msg.getTitle();
-                    String desc = msg.getDescriptionAsText();
-                    if (desc != null) {
-                        item += "\n" + desc; 
-                    }
-                    item += "\n" + msg.getPubDate().toString();
-                    
-                    news.add(item);
-		}
-                
-                return news;
+                return messages;
             }
             
             @Override
             public void done() {
-                final ArrayList<String> news;
+                final java.util.List<FeedItem> messages;
                 try {
-                    news = this.get();
-                    final StockNews newsDialog = new StockNews(news);
+                    messages = this.get();
+                    final StockNews newsDialog = new StockNews(messages);
                 } catch (InterruptedException | ExecutionException ex) {
                     Logger.getLogger(JStock.class.getName()).log(Level.SEVERE, null, ex);
                 }
