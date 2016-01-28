@@ -49,8 +49,8 @@ public class StockNews extends JFrame {
     ListView<FeedItem> newsListView;
     ObservableList<FeedItem> messages_o;
     
-    public StockNews(java.util.List<FeedItem> messages) {
-        super("Stock News");
+    public StockNews(java.util.List<FeedItem> messages, String title) {
+        super("Stock News: " + title);
         this.messages = messages;
         initComponents();
     }
