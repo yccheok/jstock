@@ -50,7 +50,7 @@ public class StockNews extends JFrame {
     ObservableList<FeedItem> messages_o;
     
     public StockNews(java.util.List<FeedItem> messages, String title) {
-        super("Stock News: " + title);
+        super("News: " + title);
         this.messages = messages;
         initComponents();
     }
