@@ -1,0 +1,61 @@
+/*
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2015 Yan Cheng Cheok <yccheok@yahoo.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
+#parent-vbox {
+    -fx-padding: 20;
+}
+
+#news-listview {
+    // this get rid of ListView border
+    -fx-background-insets: 0;
+}
+
+#news-listview .list-cell:odd,
+#news-listview .list-cell:even {
+    -fx-background-color: #D3D3D3;      //light grey
+    -fx-spacing: 10;
+}
+
+.item-border-pane {
+    -fx-padding: 10;
+    -fx-margin: 10;
+    -fx-background-color: #FFFFFF;
+}
+
+.item-title-textflow {
+}
+
+.item-title-text-1 {
+    -fx-font-size: 25px;
+    -fx-font-weight: bold;
+}
+
+.item-title-text-2 {
+    -fx-font-size: 16px;
+}
+
+.item-desc-vbox {
+    -fx-padding: 10 0 0 0;
+}
+
+.item-date-label {
+    -fx-font-size: 10px;
+    -fx-text-alignment: right;
+    -fx-padding: 10 0 0 0;
+}

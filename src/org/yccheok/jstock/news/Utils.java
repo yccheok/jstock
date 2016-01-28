@@ -17,6 +17,7 @@ import java.text.ParseException;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
     
 
 public class Utils {
@@ -107,4 +108,21 @@ public class Utils {
         return null;
     }
 
+    public static String getPubDateDiff (Date pubDate) {
+        Date now = new java.util.Date();
+        long diffInMillies = now.getTime() - pubDate.getTime();
+        String pubDateDiff;
+        
+        long hours = TimeUnit.HOURS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+        if (hours <= 1) {
+            pubDateDiff = "1 hour ago";
+        } else if (hours < 24) {
+            pubDateDiff = hours + " hours ago";
+        } else {
+            SimpleDateFormat formatter = new SimpleDateFormat("dd MMM");
+            pubDateDiff = formatter.format(pubDate);
+        }
+        
+        return pubDateDiff;
+    }
 }

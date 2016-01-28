@@ -1,14 +1,26 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * JStock - Free Stock Market Software
+ * Copyright (C) 2015 Yan Cheng Cheok <yccheok@yahoo.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+
 package org.yccheok.jstock.gui;
 
 import it.sauronsoftware.feed4j.bean.FeedItem;
-import java.util.ArrayList;
 import java.awt.*;
-import java.util.Iterator;
 import javax.swing.*;
 
 import javafx.application.Platform;
@@ -18,28 +30,24 @@ import javafx.embed.swing.JFXPanel;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.ListView;
-import javafx.scene.control.Label;
-import javafx.scene.effect.DropShadow;
-import javafx.scene.effect.Reflection;
+import javafx.scene.control.ListCell;
+import javafx.util.Callback;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.text.FontWeight;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Text;
-import javafx.geometry.Insets;
+import javafx.scene.control.Label;
+import javafx.scene.text.TextFlow;
 
 
 public class StockNews extends JFrame {
     private final JFXPanel jfxPanel = new JFXPanel();
-    
     Scene scene;
-    //Text hello;
-    //Label label;
     VBox vbox;
-    ListView<String> newsList;
+    
     java.util.List<FeedItem> messages;
-    ArrayList<String> news = new ArrayList<String>();
+    ListView<FeedItem> newsListView;
+    ObservableList<FeedItem> messages_o;
     
     public StockNews(java.util.List<FeedItem> messages) {
         super("Stock News");
@@ -49,59 +57,29 @@ public class StockNews extends JFrame {
     
     private void initComponents() {
         Platform.runLater(new Runnable() {
-            @Override 
+            @Override
             public void run() {
                 vbox = new VBox();
-                scene = new Scene(vbox, 200, 200);
-                //scene.setFill(Color.BLACK);
-                //scene.getStylesheets().add("stockNews.css");
-                
-                //label = new Label("Stock News");
-                //hello = new Text(stockInfo.symbol.toString() + " (" + stockInfo.code.toString() + ")");
-                //hello.setFill(Color.CHOCOLATE);
-                
-                //DropShadow dropShadow = new DropShadow();
-                //dropShadow.setRadius(5.0);
-                //dropShadow.setOffsetX(3.0);
-                //dropShadow.setOffsetY(3.0);
-                //dropShadow.setColor(Color.color(0.4, 0.5, 0.5));
-                //hello.setEffect(dropShadow);
-                
+                scene = new Scene(vbox, 600, 600);
+                scene.getStylesheets().add(StockNews.class.getResource("StockNews.css").toExternalForm()); 
                 jfxPanel.setScene(scene);
 
-                Iterator<FeedItem> messagesIterator = messages.iterator();
-                while (messagesIterator.hasNext()) {
-                    FeedItem msg = messagesIterator.next();
-
-                    String item = msg.getTitle();
-                    String desc = msg.getDescriptionAsText();
-                    if (desc != null) {
-                        item += "\n" + desc; 
+                messages_o = FXCollections.observableArrayList (messages);
+                newsListView = new ListView<>(messages_o); 
+                newsListView.setId("news-listview"); 
+                
+                newsListView.setCellFactory(new Callback<ListView<FeedItem>, 
+                    ListCell<FeedItem>>() {
+                        @Override 
+                        public ListCell<FeedItem> call(ListView<FeedItem> list) {
+                            return new DisplaySingleNews();
+                        }
                     }
-                    item += "\n" + msg.getPubDate().toString();
-                    
-                    news.add(item);
-		}
-                
-                newsList = new ListView<>();
-                ObservableList<String> FxNews = FXCollections.observableArrayList (news);
-                
-                newsList.setItems(FxNews);
-                newsList.setPrefWidth(50);
-                newsList.setPrefHeight(50);
-                
-                vbox.setPadding(new Insets(10));
-                //vbox.setSpacing(100);
-                
-                vbox.setStyle("-fx-border-color: #2e8b57; -fx-border-width: 2px;");
-                vbox.setAlignment(Pos.CENTER);
-                VBox.setVgrow(newsList, Priority.ALWAYS);
-                
-                vbox.getChildren().addAll(newsList);
-                
-                //VBox.setMargin(label, new Insets(10));
-                //VBox.setMargin(hello, new Insets(20));
-                //VBox.setMargin(newsList, new Insets(30));
+                );
+
+                vbox.setId("parent-vbox"); 
+                VBox.setVgrow(newsListView, Priority.ALWAYS);
+                vbox.getChildren().addAll(newsListView);
             }
         });
         
@@ -109,8 +87,73 @@ public class StockNews extends JFrame {
         
         //java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
         //setBounds((screenSize.width-460)/2, (screenSize.height-680)/2, 460, 680);
-        this.setBounds(200, 200, 400, 400);
+        this.setBounds(200, 200, 650, 650);
         
         this.setVisible(true);
+    }
+    
+    class DisplaySingleNews extends ListCell<FeedItem> {
+        BorderPane newsBox;
+        VBox descVBox;
+        
+        TextFlow titleTextFlow;
+        Text firstText;
+        Text secondText;
+        
+        Text titleText;
+        Text descText;
+        Label pubDate;
+
+        double textWidth = 500;
+        
+        public DisplaySingleNews() {
+            super();
+        }
+
+        @Override
+        public void updateItem(FeedItem item, boolean empty) {
+            super.updateItem(item, empty);
+
+            if (item != null) {
+                newsBox = new BorderPane();
+                newsBox.setMaxWidth(550);
+                newsBox.getStyleClass().add("item-border-pane");
+                
+                String msgTitle = item.getTitle();
+                firstText = new Text(msgTitle.substring(0, 1));
+                secondText = new Text(msgTitle.substring(1));
+                
+                firstText.getStyleClass().add("item-title-text-1"); 
+                secondText.getStyleClass().add("item-title-text-2");
+                
+                titleTextFlow = new TextFlow(firstText, secondText);
+                titleTextFlow.getStyleClass().add("item-title-textflow");
+                titleTextFlow.setMaxWidth(540);
+                
+                newsBox.setTop(titleTextFlow);
+                
+                
+                if (item.getDescriptionAsText() != null) {
+                    descText = new Text(item.getDescriptionAsText());
+                    descText.setWrappingWidth(this.textWidth);
+
+                    descVBox = new VBox();
+                    descVBox.getChildren().addAll(descText);
+                    descVBox.getStyleClass().add("item-desc-vbox");
+                    
+                    newsBox.setCenter(descVBox);
+                    BorderPane.setAlignment(descText, Pos.CENTER_LEFT);
+                }
+                
+                String pubDateDiff = org.yccheok.jstock.news.Utils.getPubDateDiff(item.getPubDate());
+                pubDate = new Label(pubDateDiff);
+                pubDate.getStyleClass().add("item-date-label");
+                newsBox.setBottom(pubDate);
+                
+                BorderPane.setAlignment(pubDate, Pos.BOTTOM_RIGHT);
+                
+                setGraphic(newsBox);
+            }
+        }
     }
 }
