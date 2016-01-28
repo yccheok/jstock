@@ -28,14 +28,15 @@
 
 #news-listview .list-cell:odd,
 #news-listview .list-cell:even {
-    -fx-background-color: #D3D3D3;      //light grey
-    -fx-spacing: 10;
+    -fx-background-color: #E0E0E0;      //light grey
 }
 
 .item-border-pane {
     -fx-padding: 10;
     -fx-margin: 10;
     -fx-background-color: #FFFFFF;
+    
+    -fx-effect: dropshadow(three-pass-box, #C2C2C2, 0, 1.0, 0, 2);
 }
 
 .item-title-textflow {
