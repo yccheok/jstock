@@ -21,12 +21,14 @@ package org.yccheok.jstock.gui;
 
 import it.sauronsoftware.feed4j.bean.FeedItem;
 import java.awt.*;
+import java.net.URL;
 import javax.swing.*;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.JFXPanel;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.ListView;
@@ -37,13 +39,26 @@ import javafx.scene.layout.VBox;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Text;
 import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.text.TextFlow;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Worker.State;
+import javafx.stage.Modality;
 
 
 public class StockNews extends JFrame {
     private final JFXPanel jfxPanel = new JFXPanel();
     Scene scene;
     VBox vbox;
+    final int width = 700;
+    final int height = 700;
+    final int sceneWidth = width - 50;
+    final int sceneHeight = height - 50;
     
     java.util.List<FeedItem> messages;
     ListView<FeedItem> newsListView;
@@ -60,7 +75,7 @@ public class StockNews extends JFrame {
             @Override
             public void run() {
                 vbox = new VBox();
-                scene = new Scene(vbox, 600, 600);
+                scene = new Scene(vbox, sceneWidth, sceneHeight);
                 scene.getStylesheets().add(StockNews.class.getResource("StockNews.css").toExternalForm()); 
                 jfxPanel.setScene(scene);
 
@@ -77,6 +92,35 @@ public class StockNews extends JFrame {
                     }
                 );
 
+                newsListView.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                    
+                    @Override
+                    public void handle(MouseEvent event) {
+                        if (event.getClickCount() > 1) {
+                            FeedItem msg = newsListView.getSelectionModel().getSelectedItem();
+                            URL link = msg.getLink();
+
+                            Stage stage = new Stage(StageStyle.UTILITY);
+                            WebView browser = new WebView();
+                            stage.setScene(new Scene(browser));
+                            stage.show();
+                            
+                            WebEngine webEngine = browser.getEngine();
+
+                            webEngine.getLoadWorker().stateProperty().addListener(
+                                    new ChangeListener<State>() {
+                                        public void changed(ObservableValue ov, State oldState, State newState) {
+                                            if (newState == State.SUCCEEDED) {
+                                                stage.setTitle(webEngine.getLocation());
+                                            }
+                                        }
+                                    });
+
+                            webEngine.load(link.toString());
+                        }
+                    }
+                });
+                
                 vbox.setId("parent-vbox"); 
                 VBox.setVgrow(newsListView, Priority.ALWAYS);
                 vbox.getChildren().addAll(newsListView);
@@ -85,10 +129,8 @@ public class StockNews extends JFrame {
         
         this.add(jfxPanel, BorderLayout.CENTER);
         
-        //java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        //setBounds((screenSize.width-460)/2, (screenSize.height-680)/2, 460, 680);
-        this.setBounds(200, 200, 650, 650);
-        
+        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        this.setBounds((screenSize.width - width)/2, (screenSize.height - height)/2, width, height);
         this.setVisible(true);
     }
     
@@ -116,7 +158,7 @@ public class StockNews extends JFrame {
 
             if (item != null) {
                 newsBox = new BorderPane();
-                newsBox.setMaxWidth(550);
+                newsBox.setMaxWidth(sceneWidth - 20);
                 newsBox.getStyleClass().add("item-border-pane");
                 
                 String msgTitle = item.getTitle();
@@ -128,14 +170,15 @@ public class StockNews extends JFrame {
                 
                 titleTextFlow = new TextFlow(firstText, secondText);
                 titleTextFlow.getStyleClass().add("item-title-textflow");
-                titleTextFlow.setMaxWidth(540);
+                titleTextFlow.setMaxWidth(sceneWidth - 60);
                 
                 newsBox.setTop(titleTextFlow);
                 
                 
                 if (item.getDescriptionAsText() != null) {
                     descText = new Text(item.getDescriptionAsText());
-                    descText.setWrappingWidth(this.textWidth);
+                    descText.setWrappingWidth(sceneWidth - 60);
+
 
                     descVBox = new VBox();
                     descVBox.getChildren().addAll(descText);
