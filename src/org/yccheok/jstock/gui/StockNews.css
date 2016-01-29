@@ -59,4 +59,6 @@
     -fx-font-size: 10px;
     -fx-text-alignment: right;
     -fx-padding: 10 0 0 0;
+    -fx-text-fill: black;
 }
+
