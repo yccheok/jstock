@@ -48,7 +48,8 @@ import javafx.stage.StageStyle;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker.State;
-import javafx.stage.Modality;
+//import javafx.stage.Modality;
+//import javafx.stage.Window;
 
 
 public class StockNews extends JFrame {
@@ -101,6 +102,9 @@ public class StockNews extends JFrame {
                             URL link = msg.getLink();
 
                             Stage stage = new Stage(StageStyle.UTILITY);
+                            //stage.initOwner(((Node)event.getSource()).getScene().getWindow());
+                            //stage.initModality(Modality.NONE);
+                            
                             WebView browser = new WebView();
                             stage.setScene(new Scene(browser));
                             stage.show();
@@ -146,8 +150,6 @@ public class StockNews extends JFrame {
         Text descText;
         Label pubDate;
 
-        double textWidth = 500;
-        
         public DisplaySingleNews() {
             super();
         }
@@ -173,7 +175,6 @@ public class StockNews extends JFrame {
                 titleTextFlow.setMaxWidth(sceneWidth - 60);
                 
                 newsBox.setTop(titleTextFlow);
-                
                 
                 if (item.getDescriptionAsText() != null) {
                     descText = new Text(item.getDescriptionAsText());
