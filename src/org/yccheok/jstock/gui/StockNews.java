@@ -21,6 +21,8 @@ package org.yccheok.jstock.gui;
 
 import it.sauronsoftware.feed4j.bean.FeedItem;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.net.URL;
 import javax.swing.*;
 
@@ -44,6 +46,7 @@ import javafx.scene.text.TextFlow;
 
 
 public class StockNews extends JFrame {
+    private StockNewsContent newsTab = new StockNewsContent();
     private final JFXPanel jfxPanel = new JFXPanel();
     Scene scene;
     VBox vbox;
@@ -85,7 +88,6 @@ public class StockNews extends JFrame {
                 );
 
                 newsListView.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                    
                     @Override
                     public void handle(MouseEvent event) {
                         if (event.getClickCount() > 1) {
@@ -95,8 +97,9 @@ public class StockNews extends JFrame {
                             SwingUtilities.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
-                                    StockNewsContent newsContent = new StockNewsContent(StockNews.this, link);
-                                }                
+                                    newsTab.addNewsTab(link);
+                                    newsTab.setVisible(true);
+                                }
                             });
                         }
                     }
@@ -113,8 +116,16 @@ public class StockNews extends JFrame {
         java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
         this.setBounds((screenSize.width - width)/2, (screenSize.height - height)/2, width, height);
         this.setVisible(true);
+
+        this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                newsTab.dispose();
+            }
+        });
     }
-    
+
     class DisplaySingleNews extends ListCell<FeedItem> {
         BorderPane newsBox;
         VBox descVBox;

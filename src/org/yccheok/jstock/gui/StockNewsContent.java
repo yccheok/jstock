@@ -21,6 +21,7 @@ package org.yccheok.jstock.gui;
 
 import java.awt.*;
 import java.net.URL;
+import java.util.ArrayList;
 import javax.swing.*;
 
 import javafx.application.Platform;
@@ -33,25 +34,50 @@ import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker.State;
 
 
-public class StockNewsContent extends JDialog {
-    private final JFXPanel jfxPanel = new JFXPanel();
-    Scene scene;
-    URL link;
+public class StockNewsContent extends JFrame {
+    JPanel mainJPanel = new JPanel(new GridLayout(1, 1));
+    JTabbedPane tabbedPane = new JTabbedPane();
+    ArrayList<URL> links = new ArrayList();
+    int width = 800;
+    int height = 800;
+
     
-    public StockNewsContent(Frame parent, URL link) {
-        super(parent, "Loading News....");
-        
-        this.link = link;
+    public StockNewsContent() {
+        super("Stock News");
         initComponents();
     }
-    
+
     private void initComponents() {
+        // JFrame => mainJPanel => tabbedPane
+        this.add(mainJPanel, BorderLayout.CENTER);
+        mainJPanel.add(tabbedPane);
+
+        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        this.setBounds((screenSize.width - width)/2, (screenSize.height - height)/2, width, height);
+    }
+
+    public void addNewsTab (URL link) {
+        if (!links.isEmpty()) {
+            // URL already open in tab, just make tab active
+            for (int i = 0; i < links.size(); i++) {
+                if (link.equals(links.get(i))) {
+                    tabbedPane.setSelectedIndex(i);
+                    return;
+                }
+            }
+        }
+        links.add(link);
+
+        // Each tab content: JPanel => JFXPanel => Scene => WebView
+        JComponent panel = new JPanel(false);
+        JFXPanel jfxPanel = new JFXPanel();
+        panel.add(jfxPanel);
+
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
                 WebView browser = new WebView();
                 jfxPanel.setScene(new Scene(browser));
-
                 WebEngine webEngine = browser.getEngine();
 
                 webEngine.getLoadWorker().stateProperty().addListener(
@@ -71,10 +97,10 @@ public class StockNewsContent extends JDialog {
                 webEngine.load(link.toString());
             }
         });
-        
-        this.add(jfxPanel, BorderLayout.CENTER);
-        this.setBounds(200, 200, 500, 500);
-        this.setVisible(true);
+
+        int index = links.size() - 1;
+        tabbedPane.addTab("Tab " + Integer.toString(index), panel);
+        tabbedPane.setSelectedIndex(index);
     }
 }
     
