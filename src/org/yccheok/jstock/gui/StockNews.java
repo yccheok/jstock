@@ -41,15 +41,6 @@ import javafx.scene.text.Text;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.TextFlow;
-import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebView;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.concurrent.Worker.State;
-//import javafx.stage.Modality;
-//import javafx.stage.Window;
 
 
 public class StockNews extends JFrame {
@@ -101,26 +92,12 @@ public class StockNews extends JFrame {
                             FeedItem msg = newsListView.getSelectionModel().getSelectedItem();
                             URL link = msg.getLink();
 
-                            Stage stage = new Stage(StageStyle.UTILITY);
-                            //stage.initOwner(((Node)event.getSource()).getScene().getWindow());
-                            //stage.initModality(Modality.NONE);
-                            
-                            WebView browser = new WebView();
-                            stage.setScene(new Scene(browser));
-                            stage.show();
-                            
-                            WebEngine webEngine = browser.getEngine();
-
-                            webEngine.getLoadWorker().stateProperty().addListener(
-                                    new ChangeListener<State>() {
-                                        public void changed(ObservableValue ov, State oldState, State newState) {
-                                            if (newState == State.SUCCEEDED) {
-                                                stage.setTitle(webEngine.getLocation());
-                                            }
-                                        }
-                                    });
-
-                            webEngine.load(link.toString());
+                            SwingUtilities.invokeLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    StockNewsContent newsContent = new StockNewsContent(StockNews.this, link);
+                                }                
+                            });
                         }
                     }
                 });
