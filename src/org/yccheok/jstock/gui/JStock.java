@@ -3205,38 +3205,9 @@ public class JStock extends javax.swing.JFrame {
     public void displayStockNews(Stock stock) {
         assert(SwingUtilities.isEventDispatchThread());
         
-        SwingWorker swingWorker = new SwingWorker<Pair<java.util.List<FeedItem>, Stock>, Void>() {
-            
-            @Override
-            protected Pair<java.util.List<FeedItem>, Stock> doInBackground() throws Exception {
-
-                StockInfo stockInfo = StockInfo.newInstance(stock.code, stock.symbol);
-                Country country = org.yccheok.jstock.engine.Utils.toCountry(stock.code);
-                
-                final java.util.List<NewsServer> newsServers = NewsServerFactory.getNewsServers(country);
-                final NewsServer server = newsServers.get(0);
-                java.util.List<FeedItem> messages = server.getMessages(stockInfo);
-                
-                return new Pair<>(messages, stock);
-            }
-            
-            @Override
-            public void done() {
-                final Pair<java.util.List<FeedItem>, Stock> pair;
-                try {
-                    pair = this.get();
-                    
-                    Stock stock = pair.second;
-                    String title = stock.symbol + " (" + stock.code + ")";
-                    
-                    final StockNews newsDialog = new StockNews(pair.first, title);
-                } catch (InterruptedException | ExecutionException ex) {
-                    Logger.getLogger(JStock.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        };
-        
-        swingWorker.execute();
+        StockInfo stockInfo = StockInfo.newInstance(stock.code, stock.symbol);
+        StockNews stockNews = new StockNews(stockInfo, "Stock News: " + stock.code + " (" + stock.symbol + ")");
+        stockNews.retrieveNewsInBackground();
     }
 
     public void displayStocksNews() {
