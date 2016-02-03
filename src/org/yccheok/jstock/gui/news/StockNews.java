@@ -17,7 +17,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package org.yccheok.jstock.gui;
+package org.yccheok.jstock.gui.news;
 
 import it.sauronsoftware.feed4j.bean.FeedItem;
 import java.awt.*;
@@ -49,34 +49,19 @@ import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.TextFlow;
 import org.yccheok.jstock.engine.Country;
-import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.news.NewsServer;
 import org.yccheok.jstock.news.NewsServerFactory;
 
 
 public class StockNews extends JFrame {
-    StockInfo stockInfo;
-    java.util.List<NewsServer> newsServers;
-    int loadedServer = 0;
-
-    private StockNewsContent newsTab;
-    private final JFXPanel jfxPanel = new JFXPanel();
-    Scene scene;
-    VBox vbox;
-    final int width = 700;
-    final int height = 700;
-    final int sceneWidth = width - 50;
-    final int sceneHeight = height - 50;
-
-    java.util.List<FeedItem> messages = new ArrayList<>();
-    ObservableList<FeedItem> messages_o;
-    ListView<FeedItem> newsListView;
-
     public StockNews(StockInfo stockInfo, String title) {
         super(title);
         this.stockInfo = stockInfo;
         initComponents();
+        
+        final Country country = org.yccheok.jstock.engine.Utils.toCountry(stockInfo.code);
+        this.newsServers = NewsServerFactory.getNewsServers(country);
     }
 
     private void initComponents() {
@@ -84,11 +69,11 @@ public class StockNews extends JFrame {
             @Override
             public void run() {
                 vbox = new VBox();
-                scene = new Scene(vbox, sceneWidth, sceneHeight);
+                scene = new Scene(vbox, StockNews.sceneWidth, StockNews.sceneHeight);
                 scene.getStylesheets().add(StockNews.class.getResource("StockNews.css").toExternalForm()); 
                 jfxPanel.setScene(scene);
 
-                messages_o = FXCollections.observableArrayList ();
+                messages_o = FXCollections.observableArrayList();
                 
                 //messages_o.addListener(new ListChangeListener() {
                 //    @Override
@@ -98,44 +83,49 @@ public class StockNews extends JFrame {
 
                 newsListView = new ListView<>(messages_o); 
                 newsListView.setId("news-listview");
+                vbox.setId("parent-vbox"); 
+                VBox.setVgrow(newsListView, Priority.ALWAYS);
+                vbox.getChildren().addAll(newsListView);
 
                 newsListView.setCellFactory(new Callback<ListView<FeedItem>, 
                     ListCell<FeedItem>>() {
                         @Override 
                         public ListCell<FeedItem> call(ListView<FeedItem> list) {
-                            return new DisplaySingleNews();
+                            return new DisplayNewsCard();
                         }
                     }
                 );
-
+                
                 newsListView.setOnMouseClicked(new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent event) {
                         if (event.getClickCount() > 1) {
-                            FeedItem msg = newsListView.getSelectionModel().getSelectedItem();
+                            final FeedItem msg = newsListView.getSelectionModel().getSelectedItem();
                             
                             if (msg != null) {
-                                URL link = msg.getLink();
+                                final URL link = msg.getLink();
 
-                                SwingUtilities.invokeLater(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        if (newsTab == null) {
-                                            newsTab = new StockNewsContent();
-                                            newsTab.setVisible(true);
+                                if (link != null) {
+                                    // Tab title: display first 2 words of news title
+                                    final String[] result = msg.getTitle().split(" ", 3);
+                                    final String title = String.join(" ", result[0], result[1]) + "...";
+
+                                    SwingUtilities.invokeLater(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            if (newsTab == null) {
+                                                newsTab = new StockNewsContent();
+                                                newsTab.setVisible(true);
+                                            }
+                                            newsTab.addNewsTab(link, title);
+                                            newsTab.toFront();
                                         }
-                                        newsTab.addNewsTab(link);
-                                        newsTab.toFront();
-                                    }
-                                });
+                                    });
+                                }
                             }
                         }
                     }
                 });
-                
-                vbox.setId("parent-vbox"); 
-                VBox.setVgrow(newsListView, Priority.ALWAYS);
-                vbox.getChildren().addAll(newsListView);
             }
         });
         
@@ -156,109 +146,71 @@ public class StockNews extends JFrame {
         });
     }
 
-    void retrieveNewsInBackground () {
-        SwingWorker swingWorker = new SwingWorker<java.util.List<FeedItem>, Void>() {
-
-            @Override
-            protected java.util.List<FeedItem> doInBackground() throws Exception {
-                Country country = org.yccheok.jstock.engine.Utils.toCountry(stockInfo.code);
-                newsServers = NewsServerFactory.getNewsServers(country);
-
-                // Only retrieve news from 1st news server, during initial load
-                java.util.List<FeedItem> messages = newsServers.get(0).getMessages(stockInfo);
-                return messages;
-            }
-
-            @Override
-            public void done() {
-                try {
-                    StockNews.this.messages = this.get();
-                    StockNews.this.updateList(StockNews.this.messages);
-                    StockNews.this.loadedServer = 1;
-                } catch (InterruptedException | ExecutionException ex) {
-                    Logger.getLogger(JStock.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        };
-        swingWorker.execute();
-    }
-
-    void retrieveMoreNews () {
-        if (loadedServer >= newsServers.size()) {
+    public void retrieveNewsInBackground () {
+        if (this.newsServers == null || this.loadedServerCnt >= this.newsServers.size()) {
             return;
         }
- 
+        
         SwingWorker swingWorker = new SwingWorker<java.util.List<FeedItem>, Void>() {
 
             @Override
             protected java.util.List<FeedItem> doInBackground() throws Exception {
-                // retrieve more news from next news Server
-                java.util.List<FeedItem> moreMessages = newsServers.get(loadedServer++).getMessages(stockInfo);
-                return moreMessages;
+                // Retrieve news from next available news server
+                final java.util.List<FeedItem> newMessages = newsServers.get(loadedServerCnt).getMessages(stockInfo);
+                return newMessages;
             }
 
             @Override
             public void done() {
                 try {
-                    java.util.List<FeedItem> moreMessages = this.get();
-                    StockNews.this.updateList(moreMessages);
+                    final java.util.List<FeedItem> newMessages = this.get();
+                    messages.addAll(newMessages);
+                    loadedServerCnt++;
+                    
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            for (FeedItem message : messages) {
+                                messages_o.add(message);
+                            }
+                        }
+                    });
                 } catch (InterruptedException | ExecutionException ex) {
-                    Logger.getLogger(JStock.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(org.yccheok.jstock.gui.JStock.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         };
         swingWorker.execute();
     }
-    
-    void updateList (java.util.List<FeedItem> moreMessages) {
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                for (int i = 0; i < moreMessages.size(); i++) {
-                    messages_o.add(moreMessages.get(i));
-                }
-            }
-        });
-    }
 
-    class DisplaySingleNews extends ListCell<FeedItem> {
-        BorderPane newsBox;
-        VBox descVBox;
-        
-        TextFlow titleTextFlow;
-        Text firstText;
-        Text secondText;
-        
-        Text titleText;
-        Text descText;
-        Label pubDate;
-
+    static class DisplayNewsCard extends ListCell<FeedItem> {
         @Override
         public void updateItem(FeedItem item, boolean empty) {
             super.updateItem(item, empty);
 
             if (item != null) {
-                newsBox = new BorderPane();
+                final BorderPane newsBox = new BorderPane();
                 newsBox.setMaxWidth(sceneWidth - 20);
                 newsBox.getStyleClass().add("item-border-pane");
-                
-                String msgTitle = item.getTitle();
-                firstText = new Text(msgTitle.substring(0, 1));
-                secondText = new Text(msgTitle.substring(1));
-                
+
+                final String msgTitle = item.getTitle();
+                final Text firstText = new Text(msgTitle.substring(0, 1));
+                final Text secondText = new Text(msgTitle.substring(1));
+
                 firstText.getStyleClass().add("item-title-text-1"); 
                 secondText.getStyleClass().add("item-title-text-2");
                 
-                titleTextFlow = new TextFlow(firstText, secondText);
+                final TextFlow titleTextFlow = new TextFlow(firstText, secondText);
                 titleTextFlow.getStyleClass().add("item-title-textflow");
                 titleTextFlow.setMaxWidth(sceneWidth - 60);
                 
                 newsBox.setTop(titleTextFlow);
                 
+                final VBox descVBox;
+                final Text descText;
                 if (item.getDescriptionAsText() != null) {
                     descText = new Text(item.getDescriptionAsText());
                     descText.setWrappingWidth(sceneWidth - 60);
-
 
                     descVBox = new VBox();
                     descVBox.getChildren().addAll(descText);
@@ -268,8 +220,8 @@ public class StockNews extends JFrame {
                     BorderPane.setAlignment(descText, Pos.CENTER_LEFT);
                 }
                 
-                String pubDateDiff = org.yccheok.jstock.news.Utils.getPubDateDiff(item.getPubDate());
-                pubDate = new Label(pubDateDiff);
+                final String pubDateDiff = org.yccheok.jstock.news.Utils.getPubDateDiff(item.getPubDate());
+                final Label pubDate = new Label(pubDateDiff);
                 pubDate.getStyleClass().add("item-date-label");
                 newsBox.setBottom(pubDate);
                 
@@ -279,4 +231,21 @@ public class StockNews extends JFrame {
             }
         }
     }
+    
+    private final StockInfo stockInfo;
+    private final java.util.List<NewsServer> newsServers;
+    private int loadedServerCnt = 0;
+
+    private StockNewsContent newsTab;
+    private final JFXPanel jfxPanel = new JFXPanel();
+    private Scene scene;
+    private VBox vbox;
+    private static final int width = 700;
+    private static final int height = 700;
+    private static final int sceneWidth = width - 50;
+    private static final int sceneHeight = height - 50;
+
+    private java.util.List<FeedItem> messages = new ArrayList<>();
+    private ObservableList<FeedItem> messages_o;
+    private ListView<FeedItem> newsListView;
 }

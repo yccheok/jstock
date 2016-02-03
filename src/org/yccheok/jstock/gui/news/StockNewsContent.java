@@ -17,7 +17,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package org.yccheok.jstock.gui;
+package org.yccheok.jstock.gui.news;
 
 import java.awt.*;
 import java.net.URL;
@@ -56,7 +56,7 @@ public class StockNewsContent extends JFrame {
         this.setBounds((screenSize.width - width)/2, (screenSize.height - height)/2, width, height);
     }
 
-    public void addNewsTab (URL link) {
+    public void addNewsTab (URL link, String title) {
         if (!links.isEmpty()) {
             // URL already open in tab, just make tab active
             for (int i = 0; i < links.size(); i++) {
@@ -99,7 +99,7 @@ public class StockNewsContent extends JFrame {
         });
 
         int index = links.size() - 1;
-        tabbedPane.addTab("Tab " + Integer.toString(index), panel);
+        tabbedPane.addTab(title, panel);
         tabbedPane.setSelectedIndex(index);
     }
 }

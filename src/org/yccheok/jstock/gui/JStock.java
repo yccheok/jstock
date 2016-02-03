@@ -65,16 +65,13 @@ import org.yccheok.jstock.gui.watchlist.WatchlistJDialog;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.internationalization.MessagesBundle;
 import org.yccheok.jstock.network.ProxyDetector;
-import org.yccheok.jstock.news.NewsServer;
-import org.yccheok.jstock.news.NewsServerFactory;
 import org.yccheok.jstock.portfolio.PortfolioInfo;
 import org.yccheok.jstock.watchlist.WatchlistInfo;
 
 import org.yccheok.jstock.engine.Country;
 import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.StockInfo;
-import org.yccheok.jstock.news.NewsServer;
-import org.yccheok.jstock.news.NewsServerFactory;
+import org.yccheok.jstock.gui.news.StockNews;
 
 
 /**
@@ -3202,21 +3199,21 @@ public class JStock extends javax.swing.JFrame {
         }
     }
 
-    public void displayStockNews(Stock stock) {
+    private void displayStockNews(Stock stock) {
         assert(SwingUtilities.isEventDispatchThread());
-        
-        StockInfo stockInfo = StockInfo.newInstance(stock.code, stock.symbol);
-        StockNews stockNews = new StockNews(stockInfo, "Stock News: " + stock.code + " (" + stock.symbol + ")");
+
+        final StockInfo stockInfo = StockInfo.newInstance(stock.code, stock.symbol);
+        final StockNews stockNews = new StockNews(stockInfo, "News: " + stock.code + " (" + stock.symbol + ")");
         stockNews.retrieveNewsInBackground();
     }
 
-    public void displayStocksNews() {
+    private void displayStocksNews() {
         int rows[] = jTable1.getSelectedRows();
         final StockTableModel tableModel = (StockTableModel)jTable1.getModel();
 
         for (int row : rows) {
             final int modelIndex = jTable1.getRowSorter().convertRowIndexToModel(row);
-            Stock stock = tableModel.getStock(modelIndex);
+            final Stock stock = tableModel.getStock(modelIndex);
             displayStockNews(stock);
         }
     }
