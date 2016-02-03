@@ -101,28 +101,28 @@ public class StockNews extends JFrame {
                     public void handle(MouseEvent event) {
                         if (event.getClickCount() > 1) {
                             final FeedItem msg = newsListView.getSelectionModel().getSelectedItem();
-                            
-                            if (msg != null) {
-                                final URL link = msg.getLink();
+                            if (msg == null)
+                                return;
 
-                                if (link != null) {
-                                    // Tab title: display first 2 words of news title
-                                    final String[] result = msg.getTitle().split(" ", 3);
-                                    final String title = String.join(" ", result[0], result[1]) + "...";
+                            final URL link = msg.getLink();
+                            if (link == null)
+                                return;
 
-                                    SwingUtilities.invokeLater(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            if (newsTab == null) {
-                                                newsTab = new StockNewsContent();
-                                                newsTab.setVisible(true);
-                                            }
-                                            newsTab.addNewsTab(link, title);
-                                            newsTab.toFront();
-                                        }
-                                    });
+                            // Tab title: display first 2 words of news title
+                            final String[] result = msg.getTitle().split(" ", 3);
+                            final String title = String.join(" ", result[0], result[1]) + "...";
+
+                            SwingUtilities.invokeLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (newsTab == null) {
+                                        newsTab = new StockNewsContent();
+                                        newsTab.setVisible(true);
+                                    }
+                                    newsTab.addNewsTab(link, title);
+                                    newsTab.toFront();
                                 }
-                            }
+                            });
                         }
                     }
                 });
@@ -147,10 +147,9 @@ public class StockNews extends JFrame {
     }
 
     public void retrieveNewsInBackground () {
-        if (this.newsServers == null || this.loadedServerCnt >= this.newsServers.size()) {
+        if (this.newsServers == null || this.loadedServerCnt >= this.newsServers.size())
             return;
-        }
-        
+
         SwingWorker swingWorker = new SwingWorker<java.util.List<FeedItem>, Void>() {
 
             @Override
