@@ -12,6 +12,8 @@ import it.sauronsoftware.feed4j.FeedParser;
 import it.sauronsoftware.feed4j.bean.Feed;
 import it.sauronsoftware.feed4j.bean.FeedItem;
 import it.sauronsoftware.feed4j.FeedException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import org.yccheok.jstock.engine.StockInfo;
 
@@ -57,7 +59,8 @@ public class GoogleFinanceNewsServer implements NewsServer {
                 
                 messages.add(message);
             }
-        } catch (MalformedURLException | FeedException e) {
+        } catch (MalformedURLException | FeedException ex) {
+            log.error(null, ex);
         }
         
         return messages;
@@ -74,9 +77,11 @@ public class GoogleFinanceNewsServer implements NewsServer {
             String url = "https://www.google.com/finance/company_news?output=rss&q=" + query;
             return url;
         } catch (UnsupportedEncodingException ex) {
+            log.error(null, ex);
         }                
         return null;
     }    
     
     private static final String TAG = GoogleFinanceNewsServer.class.getSimpleName();
+    private static final Log log = LogFactory.getLog(GoogleFinanceNewsServer.class);
 }

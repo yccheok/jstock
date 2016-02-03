@@ -18,6 +18,8 @@ import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
     
 
 public class Utils {
@@ -100,7 +102,8 @@ public class Utils {
                 if (name.equals("pubDate") && value != null) {
                     try {
                         return new SimpleDateFormat("EEE', 'dd' 'MMM' 'yyyy' 'HH:mm:ss' 'z", Locale.US).parse(value);
-                    } catch (ParseException e) {
+                    } catch (ParseException ex) {
+                        log.error(null, ex);
                     }
                 }
             }
@@ -125,4 +128,6 @@ public class Utils {
         
         return pubDateDiff;
     }
+    
+    private static final Log log = LogFactory.getLog(Utils.class);
 }

@@ -26,8 +26,6 @@ import java.awt.event.WindowEvent;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.*;
 
 import javafx.application.Platform;
@@ -48,6 +46,8 @@ import javafx.scene.text.Text;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.TextFlow;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.Country;
 import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.news.NewsServer;
@@ -175,7 +175,7 @@ public class StockNews extends JFrame {
                         }
                     });
                 } catch (InterruptedException | ExecutionException ex) {
-                    Logger.getLogger(org.yccheok.jstock.gui.JStock.class.getName()).log(Level.SEVERE, null, ex);
+                    log.error(null, ex);
                 }
             }
         };
@@ -247,4 +247,6 @@ public class StockNews extends JFrame {
     private java.util.List<FeedItem> messages = new ArrayList<>();
     private ObservableList<FeedItem> messages_o;
     private ListView<FeedItem> newsListView;
+    
+    private static final Log log = LogFactory.getLog(StockNews.class);
 }

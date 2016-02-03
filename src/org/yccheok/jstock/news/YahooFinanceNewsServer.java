@@ -11,6 +11,8 @@ import it.sauronsoftware.feed4j.FeedParser;
 import it.sauronsoftware.feed4j.bean.Feed;
 import it.sauronsoftware.feed4j.bean.FeedItem;
 import it.sauronsoftware.feed4j.FeedException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import org.yccheok.jstock.engine.StockInfo;
 
@@ -52,9 +54,12 @@ public class YahooFinanceNewsServer implements NewsServer {
                 
                 messages.add(message);
             }
-        } catch (MalformedURLException | FeedException e) {
+        } catch (MalformedURLException | FeedException ex) {
+            log.error(null, ex);
         }
         
         return messages;
     }
+    
+    private static final Log log = LogFactory.getLog(YahooFinanceNewsServer.class);
 }

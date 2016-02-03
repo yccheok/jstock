@@ -12,6 +12,8 @@ import it.sauronsoftware.feed4j.FeedParser;
 import it.sauronsoftware.feed4j.bean.Feed;
 import it.sauronsoftware.feed4j.bean.FeedItem;
 import it.sauronsoftware.feed4j.FeedException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import org.yccheok.jstock.engine.Country;
 import org.yccheok.jstock.engine.StockInfo;
@@ -58,7 +60,8 @@ public class GoogleSearchNewsServer implements NewsServer {
                 
                 messages.add(message);
             }
-        } catch (MalformedURLException | FeedException e) {
+        } catch (MalformedURLException | FeedException ex) {
+            log.error(null, ex);
         }
         
         return messages;
@@ -78,6 +81,7 @@ public class GoogleSearchNewsServer implements NewsServer {
                 String url = "https://news.google.com/news/feeds?output=rss&q=" + query;
                 return url;
             } catch (UnsupportedEncodingException ex) {
+                log.error(null, ex);
             }                
         } else {
             try {
@@ -86,10 +90,12 @@ public class GoogleSearchNewsServer implements NewsServer {
                 String url = "https://news.google.com/news/feeds?output=rss&q=" + query + "&as_nloc=" + location;
                 return url;
             } catch (UnsupportedEncodingException ex) {
+                log.error(null, ex);
             }
         }
         return null;
     }    
     
     private static final String TAG = GoogleSearchNewsServer.class.getSimpleName();
+    private static final Log log = LogFactory.getLog(GoogleSearchNewsServer.class);
 }
