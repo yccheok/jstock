@@ -35,13 +35,6 @@ import javafx.concurrent.Worker.State;
 
 
 public class StockNewsContent extends JFrame {
-    JPanel mainJPanel = new JPanel(new GridLayout(1, 1));
-    JTabbedPane tabbedPane = new JTabbedPane();
-    ArrayList<URL> links = new ArrayList();
-    int width = 800;
-    int height = 800;
-
-    
     public StockNewsContent() {
         super("Stock News");
         initComponents();
@@ -98,9 +91,14 @@ public class StockNewsContent extends JFrame {
             }
         });
 
-        int index = links.size() - 1;
         tabbedPane.addTab(title, panel);
-        tabbedPane.setSelectedIndex(index);
+        tabbedPane.setSelectedIndex(links.size() - 1);
     }
+
+    private final JPanel mainJPanel = new JPanel(new GridLayout(1, 1));
+    private final JTabbedPane tabbedPane = new JTabbedPane();
+    private final ArrayList<URL> links = new ArrayList();
+    private static final int width = 800;
+    private static final int height = 800;
 }
     
