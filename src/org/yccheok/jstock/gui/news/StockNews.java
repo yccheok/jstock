@@ -108,10 +108,6 @@ public class StockNews extends JFrame {
                             if (link == null)
                                 return;
 
-                            // Tab title: display first 2 words of news title
-                            final String[] result = msg.getTitle().split(" ", 3);
-                            final String title = String.join(" ", result[0], result[1]) + "...";
-
                             SwingUtilities.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
@@ -119,7 +115,7 @@ public class StockNews extends JFrame {
                                         newsTab = new StockNewsContent();
                                         newsTab.setVisible(true);
                                     }
-                                    newsTab.addNewsTab(link, title);
+                                    newsTab.addNewsTab(link, msg.getTitle());
                                     newsTab.toFront();
                                 }
                             });
