@@ -95,7 +95,7 @@ public class StockNews extends JFrame {
                         }
                     }
                 );
-                
+
                 newsListView.setOnMouseClicked(new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent event) {
@@ -241,8 +241,8 @@ public class StockNews extends JFrame {
     private VBox vbox;
     private static final int width = 700;
     private static final int height = 700;
-    private static final int sceneWidth = width - 50;
-    private static final int sceneHeight = height - 50;
+    private static final int sceneWidth = width;
+    private static final int sceneHeight = height;
 
     private java.util.List<FeedItem> messages = new ArrayList<>();
     private ObservableList<FeedItem> messages_o;

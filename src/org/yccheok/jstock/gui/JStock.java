@@ -3279,7 +3279,7 @@ public class JStock extends javax.swing.JFrame {
         popup.addSeparator();
 
         // Add Stocks news
-        menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_News..."), this.getImageIcon("/images/16x16/editdelete.png"));
+        menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_News..."), this.getImageIcon("/images/16x16/news.png"));
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {

@@ -32,6 +32,7 @@ import javafx.scene.web.WebView;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker.State;
+import static javafx.concurrent.Worker.State.FAILED;
 
 
 public class StockNewsContent extends JFrame {
@@ -83,6 +84,8 @@ public class StockNewsContent extends JFrame {
                                         StockNewsContent.this.setTitle(webEngine.getLocation());
                                     }
                                 });
+                            } else if (newState == FAILED) {
+                                // handle failed
                             }
                         }
                     });
