@@ -27,6 +27,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 import javax.swing.*;
+import static javax.swing.JSplitPane.HORIZONTAL_SPLIT;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -46,6 +47,7 @@ import javafx.scene.text.Text;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.TextFlow;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.Country;
@@ -68,6 +70,8 @@ public class StockNews extends JFrame {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
+                
+                // FX component for news list: JFXPanel (Swing FX wrapper) => Scene => VBox => ListView
                 vbox = new VBox();
                 scene = new Scene(vbox, StockNews.sceneWidth, StockNews.sceneHeight);
                 scene.getStylesheets().add(StockNews.class.getResource("StockNews.css").toExternalForm()); 
@@ -96,6 +100,7 @@ public class StockNews extends JFrame {
                     }
                 );
 
+                // register event listener: open single news HTML content
                 newsListView.setOnMouseClicked(new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent event) {
@@ -114,9 +119,11 @@ public class StockNews extends JFrame {
                                     if (newsTab == null) {
                                         newsTab = new StockNewsContent();
                                         newsTab.setVisible(true);
+
+                                        jSplitPane.setRightComponent(newsTab);
+                                        jSplitPane.setResizeWeight(0.5);
                                     }
                                     newsTab.addNewsTab(link, msg.getTitle());
-                                    newsTab.toFront();
                                 }
                             });
                         }
@@ -125,21 +132,40 @@ public class StockNews extends JFrame {
             }
         });
         
-        this.add(jfxPanel, BorderLayout.CENTER);
+        // ####### TODO #########
+        // #### Currently: card view with => hardcoded => WRONG !!!  #####
+        // 1) news list in cards form => make width follow JSplitPane (parent) width => left component
+        // 2) Upon resize of JFrame, card view resize automatically, follow parent width
+        // 3) JSplitPane, user resize Left <-> Right, make card with resize itself, follow parent width
         
+        this.add(jSplitPane, BorderLayout.CENTER);
+        jSplitPane.setLeftComponent(jfxPanel);
+
+/*        
+        jSplitPane.setResizeWeight(1.0);
+        jSplitPane.setDividerLocation(305);
+        jSplitPane.setMinimumSize(new java.awt.Dimension(300, 261));
+        jSplitPane.setPreferredSize(new java.awt.Dimension(150, 368));
+*/
+        
+        // TODO: auto JFrame width / height: pack() ??
         java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
         this.setBounds((screenSize.width - width)/2, (screenSize.height - height)/2, width, height);
         this.setVisible(true);
 
-        this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        // this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        // ####### TODO: JFrame on close, need to explicitly DISPOSE ??
+        // 1) FX Scene => card view
+        // 2) FX Scene => browser tab
+        
+        // register Window onclose: close all HTML content windows
+        /*
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                if (newsTab != null) {
-                    newsTab.dispose();
-                }
             }
         });
+        */
     }
 
     public void retrieveNewsInBackground () {
@@ -165,9 +191,7 @@ public class StockNews extends JFrame {
                     Platform.runLater(new Runnable() {
                         @Override
                         public void run() {
-                            for (FeedItem message : messages) {
-                                messages_o.add(message);
-                            }
+                            messages_o.addAll(messages);
                         }
                     });
                 } catch (InterruptedException | ExecutionException ex) {
@@ -229,7 +253,7 @@ public class StockNews extends JFrame {
     
     private final StockInfo stockInfo;
     private final java.util.List<NewsServer> newsServers;
-    private int loadedServerCnt = 0;
+    private int loadedServerCnt = 1;
 
     private StockNewsContent newsTab;
     private final JFXPanel jfxPanel = new JFXPanel();
@@ -243,6 +267,8 @@ public class StockNews extends JFrame {
     private java.util.List<FeedItem> messages = new ArrayList<>();
     private ObservableList<FeedItem> messages_o;
     private ListView<FeedItem> newsListView;
+
+    private static final JSplitPane jSplitPane = new javax.swing.JSplitPane(HORIZONTAL_SPLIT, null, null);
     
     private static final Log log = LogFactory.getLog(StockNews.class);
 }

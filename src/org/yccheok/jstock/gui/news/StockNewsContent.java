@@ -24,6 +24,7 @@ import java.awt.*;
 import java.net.URL;
 import java.util.ArrayList;
 import javax.swing.*;
+
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -35,24 +36,30 @@ import javafx.scene.web.WebView;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker.State;
 import static javafx.concurrent.Worker.State.FAILED;
+import javax.swing.border.TitledBorder;
 
 
-public class StockNewsContent extends JFrame {
+public class StockNewsContent extends JPanel {
     public StockNewsContent() {
-        super("Stock News");
+        super(new GridLayout(1, 1));
         initComponents();
     }
 
     private void initComponents() {
-        // JFrame => mainJPanel => tabbedPane
-        this.add(mainJPanel, BorderLayout.CENTER);
-        mainJPanel.add(tabbedPane);
+        // JPanel => tabbedPane
+        this.add(tabbedPane);
+        TitledBorder border = new TitledBorder("This is JPanel Title Border");
+        border.setTitleJustification(TitledBorder.CENTER);
+        border.setTitlePosition(TitledBorder.TOP);
+        this.setBorder(border);
 
         tabbedPane.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 final int index = tabbedPane.getSelectedIndex();
-                final String frameTitle = tabsInfo.get(index).second;
-                StockNewsContent.this.setTitle(frameTitle);
+                final String panelTitle = tabsInfo.get(index).second;
+                
+//                StockNewsContent.this.setTitle(frameTitle);
+                
             }
         });
         
@@ -73,9 +80,10 @@ public class StockNewsContent extends JFrame {
         tabsInfo.add(new Pair(link, title));
 
         // Each tab content: JPanel => JFXPanel => Scene => WebView
-        JComponent panel = new JPanel(false);
         JFXPanel jfxPanel = new JFXPanel();
-        panel.add(jfxPanel);
+
+        //JComponent panel = new JPanel(false);                
+        //panel.add(jfxPanel);
 
         Platform.runLater(new Runnable() {
             @Override
@@ -108,17 +116,14 @@ public class StockNewsContent extends JFrame {
         final String[] result = title.split(" ", 3);
         final String shortTitle = String.join(" ", result[0], result[1]) + "...";
 
-        tabbedPane.addTab(shortTitle, panel);
+        tabbedPane.addTab(shortTitle, jfxPanel);
         tabbedPane.setSelectedIndex(tabsInfo.size() - 1);
     }
 
-    //pair.first = URL
-    //pair.second = title
-    
-    private final JPanel mainJPanel = new JPanel(new GridLayout(1, 1));
     private final JTabbedPane tabbedPane = new JTabbedPane();
     private final ArrayList<Pair<URL, String>> tabsInfo = new ArrayList();
     private static final int width = 800;
     private static final int height = 800;
+    
 }
     
