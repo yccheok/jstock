@@ -30,9 +30,12 @@ import javax.swing.*;
 import static javax.swing.JSplitPane.HORIZONTAL_SPLIT;
 
 import javafx.application.Platform;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ListChangeListener;
+import javafx.concurrent.Worker;
+import static javafx.concurrent.Worker.State.FAILED;
 import javafx.embed.swing.JFXPanel;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -47,44 +50,47 @@ import javafx.scene.text.Text;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.TextFlow;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.Country;
+import org.yccheok.jstock.engine.Pair;
 import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.news.NewsServer;
 import org.yccheok.jstock.news.NewsServerFactory;
 
 
 public class StockNews extends JFrame {
+    
     public StockNews(StockInfo stockInfo, String title) {
         super(title);
+        
         this.stockInfo = stockInfo;
+        final Country country = org.yccheok.jstock.engine.Utils.toCountry(this.stockInfo.code);
+        this.newsServers = NewsServerFactory.getNewsServers(country);
+
         initComponents();
         
-        final Country country = org.yccheok.jstock.engine.Utils.toCountry(stockInfo.code);
-        this.newsServers = NewsServerFactory.getNewsServers(country);
+        //jSplitPane.setDividerLocation(305);
+        //jSplitPane.setMinimumSize(new java.awt.Dimension(300, 261));
+        //jSplitPane.setPreferredSize(new java.awt.Dimension(150, 368));
     }
 
     private void initComponents() {
+        
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                
+
                 // FX component for news list: JFXPanel (Swing FX wrapper) => Scene => VBox => ListView
                 vbox = new VBox();
-                scene = new Scene(vbox, StockNews.sceneWidth, StockNews.sceneHeight);
+                scene = new Scene(vbox, sceneWidth, sceneHeight);
                 scene.getStylesheets().add(StockNews.class.getResource("StockNews.css").toExternalForm()); 
-                jfxPanel.setScene(scene);
+                stockNewsList.setScene(scene);
 
                 messages_o = FXCollections.observableArrayList();
-                
-                //messages_o.addListener(new ListChangeListener() {
-                //    @Override
-                //    public void onChanged(ListChangeListener.Change change) {
-                //    }
-                //});
-
                 newsListView = new ListView<>(messages_o); 
                 newsListView.setId("news-listview");
                 vbox.setId("parent-vbox"); 
@@ -100,7 +106,7 @@ public class StockNews extends JFrame {
                     }
                 );
 
-                // register event listener: open single news HTML content
+                // register event listener: add tab for news HTML content
                 newsListView.setOnMouseClicked(new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent event) {
@@ -116,56 +122,34 @@ public class StockNews extends JFrame {
                             SwingUtilities.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
-                                    if (newsTab == null) {
-                                        newsTab = new StockNewsContent();
-                                        newsTab.setVisible(true);
-
-                                        jSplitPane.setRightComponent(newsTab);
+                                    if (stockNewsContent == null) {
+                                        stockNewsContent = new StockNewsContent();
+                                        jSplitPane.setRightComponent(stockNewsContent);
                                         jSplitPane.setResizeWeight(0.5);
                                     }
-                                    newsTab.addNewsTab(link, msg.getTitle());
+                                    stockNewsContent.addNewsTab(link, msg.getTitle());
                                 }
                             });
                         }
                     }
                 });
+
+                // ####### TODO #########
+                // #### Currently: card view width => hardcoded => WRONG !!!  #####
+                // 1) news list in cards form => make width follow JSplitPane (parent) width => left component
+                // 2) Upon resize of JFrame, card view resize automatically, follow parent width
+                // 3) JSplitPane, user resize Left <-> Right, make card with resize itself, follow parent width
             }
         });
         
-        // ####### TODO #########
-        // #### Currently: card view with => hardcoded => WRONG !!!  #####
-        // 1) news list in cards form => make width follow JSplitPane (parent) width => left component
-        // 2) Upon resize of JFrame, card view resize automatically, follow parent width
-        // 3) JSplitPane, user resize Left <-> Right, make card with resize itself, follow parent width
-        
         this.add(jSplitPane, BorderLayout.CENTER);
-        jSplitPane.setLeftComponent(jfxPanel);
-
-/*        
+        jSplitPane.setLeftComponent(stockNewsList);
         jSplitPane.setResizeWeight(1.0);
-        jSplitPane.setDividerLocation(305);
-        jSplitPane.setMinimumSize(new java.awt.Dimension(300, 261));
-        jSplitPane.setPreferredSize(new java.awt.Dimension(150, 368));
-*/
-        
+
         // TODO: auto JFrame width / height: pack() ??
         java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
         this.setBounds((screenSize.width - width)/2, (screenSize.height - height)/2, width, height);
         this.setVisible(true);
-
-        // this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        // ####### TODO: JFrame on close, need to explicitly DISPOSE ??
-        // 1) FX Scene => card view
-        // 2) FX Scene => browser tab
-        
-        // register Window onclose: close all HTML content windows
-        /*
-        this.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-            }
-        });
-        */
     }
 
     public void retrieveNewsInBackground () {
@@ -187,7 +171,7 @@ public class StockNews extends JFrame {
                     final java.util.List<FeedItem> newMessages = this.get();
                     messages.addAll(newMessages);
                     loadedServerCnt++;
-                    
+
                     Platform.runLater(new Runnable() {
                         @Override
                         public void run() {
@@ -202,7 +186,7 @@ public class StockNews extends JFrame {
         swingWorker.execute();
     }
 
-    static class DisplayNewsCard extends ListCell<FeedItem> {
+    public class DisplayNewsCard extends ListCell<FeedItem> {
         @Override
         public void updateItem(FeedItem item, boolean empty) {
             super.updateItem(item, empty);
@@ -218,13 +202,13 @@ public class StockNews extends JFrame {
 
                 firstText.getStyleClass().add("item-title-text-1"); 
                 secondText.getStyleClass().add("item-title-text-2");
-                
+
                 final TextFlow titleTextFlow = new TextFlow(firstText, secondText);
                 titleTextFlow.getStyleClass().add("item-title-textflow");
                 titleTextFlow.setMaxWidth(sceneWidth - 60);
-                
+
                 newsBox.setTop(titleTextFlow);
-                
+
                 final VBox descVBox;
                 final Text descText;
                 if (item.getDescriptionAsText() != null) {
@@ -234,41 +218,44 @@ public class StockNews extends JFrame {
                     descVBox = new VBox();
                     descVBox.getChildren().addAll(descText);
                     descVBox.getStyleClass().add("item-desc-vbox");
-                    
+
                     newsBox.setCenter(descVBox);
                     BorderPane.setAlignment(descText, Pos.CENTER_LEFT);
                 }
-                
+
                 final String pubDateDiff = org.yccheok.jstock.news.Utils.getPubDateDiff(item.getPubDate());
                 final Label pubDate = new Label(pubDateDiff);
                 pubDate.getStyleClass().add("item-date-label");
                 newsBox.setBottom(pubDate);
-                
+
                 BorderPane.setAlignment(pubDate, Pos.BOTTOM_RIGHT);
-                
+
                 setGraphic(newsBox);
             }
         }
     }
+
+    
+    private final JSplitPane jSplitPane = new javax.swing.JSplitPane(HORIZONTAL_SPLIT, null, null);
+    public StockNewsContent stockNewsContent;
+    
+    private static final int width = 700;
+    private static final int height = 700;
     
     private final StockInfo stockInfo;
     private final java.util.List<NewsServer> newsServers;
     private int loadedServerCnt = 1;
 
-    private StockNewsContent newsTab;
-    private final JFXPanel jfxPanel = new JFXPanel();
+    private final int sceneWidth = width;
+    private final int sceneHeight = height;
+
+    private final JFXPanel stockNewsList = new JFXPanel();
     private Scene scene;
     private VBox vbox;
-    private static final int width = 700;
-    private static final int height = 700;
-    private static final int sceneWidth = width;
-    private static final int sceneHeight = height;
-
+    
     private java.util.List<FeedItem> messages = new ArrayList<>();
     private ObservableList<FeedItem> messages_o;
     private ListView<FeedItem> newsListView;
 
-    private static final JSplitPane jSplitPane = new javax.swing.JSplitPane(HORIZONTAL_SPLIT, null, null);
-    
-    private static final Log log = LogFactory.getLog(StockNews.class);
+    private final Log log = LogFactory.getLog(StockNews.class);    
 }
