@@ -21,8 +21,6 @@ package org.yccheok.jstock.gui.news;
 
 import it.sauronsoftware.feed4j.bean.FeedItem;
 import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
@@ -31,6 +29,7 @@ import static javax.swing.JSplitPane.HORIZONTAL_SPLIT;
 
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ListChangeListener;
@@ -50,13 +49,10 @@ import javafx.scene.text.Text;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.TextFlow;
-import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebView;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.Country;
-import org.yccheok.jstock.engine.Pair;
 import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.news.NewsServer;
 import org.yccheok.jstock.news.NewsServerFactory;
@@ -71,11 +67,12 @@ public class StockNews extends JFrame {
         final Country country = org.yccheok.jstock.engine.Utils.toCountry(this.stockInfo.code);
         this.newsServers = NewsServerFactory.getNewsServers(country);
 
-        initComponents();
+        Dimension fullSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        final int extraWidth = jSplitPane.getInsets().left + jSplitPane.getInsets().right + jSplitPane.getDividerSize();
+        sceneWidth = (fullSize.width - extraWidth) / 2;
+        sceneHeight = fullSize.height;
         
-        //jSplitPane.setDividerLocation(305);
-        //jSplitPane.setMinimumSize(new java.awt.Dimension(300, 261));
-        //jSplitPane.setPreferredSize(new java.awt.Dimension(150, 368));
+        initComponents();
     }
 
     private void initComponents() {
@@ -88,8 +85,8 @@ public class StockNews extends JFrame {
                 vbox = new VBox();
                 scene = new Scene(vbox, sceneWidth, sceneHeight);
                 scene.getStylesheets().add(StockNews.class.getResource("StockNews.css").toExternalForm()); 
-                stockNewsList.setScene(scene);
-
+                jfxPanel.setScene(scene);
+                
                 messages_o = FXCollections.observableArrayList();
                 newsListView = new ListView<>(messages_o); 
                 newsListView.setId("news-listview");
@@ -123,9 +120,10 @@ public class StockNews extends JFrame {
                                 @Override
                                 public void run() {
                                     if (stockNewsContent == null) {
-                                        stockNewsContent = new StockNewsContent();
+                                        stockNewsContent = new StockNewsContent(sceneWidth, sceneHeight);
                                         jSplitPane.setRightComponent(stockNewsContent);
-                                        jSplitPane.setResizeWeight(0.5);
+                                        // resize JFrame
+                                        StockNews.this.pack();
                                     }
                                     stockNewsContent.addNewsTab(link, msg.getTitle());
                                 }
@@ -133,57 +131,19 @@ public class StockNews extends JFrame {
                         }
                     }
                 });
-
-                // ####### TODO #########
-                // #### Currently: card view width => hardcoded => WRONG !!!  #####
-                // 1) news list in cards form => make width follow JSplitPane (parent) width => left component
-                // 2) Upon resize of JFrame, card view resize automatically, follow parent width
-                // 3) JSplitPane, user resize Left <-> Right, make card with resize itself, follow parent width
             }
         });
-        
+
+        jfxPanel.setPreferredSize(new Dimension(sceneWidth, sceneHeight));
+        jfxPanel.setMinimumSize(new Dimension(sceneWidth, sceneHeight));
+
+        jSplitPane.setLeftComponent(jfxPanel);
+        // The resize weight of a split pane is 0.0 by default, indicating that the left or top component's size is fixed, and the right or bottom component adjusts its size to fit the remaining space.
+        jSplitPane.setResizeWeight(0);
+
         this.add(jSplitPane, BorderLayout.CENTER);
-        jSplitPane.setLeftComponent(stockNewsList);
-        jSplitPane.setResizeWeight(1.0);
-
-        // TODO: auto JFrame width / height: pack() ??
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        this.setBounds((screenSize.width - width)/2, (screenSize.height - height)/2, width, height);
+        this.pack();
         this.setVisible(true);
-    }
-
-    public void retrieveNewsInBackground () {
-        if (this.newsServers == null || this.loadedServerCnt >= this.newsServers.size())
-            return;
-
-        SwingWorker swingWorker = new SwingWorker<java.util.List<FeedItem>, Void>() {
-
-            @Override
-            protected java.util.List<FeedItem> doInBackground() throws Exception {
-                // Retrieve news from next available news server
-                final java.util.List<FeedItem> newMessages = newsServers.get(loadedServerCnt).getMessages(stockInfo);
-                return newMessages;
-            }
-
-            @Override
-            public void done() {
-                try {
-                    final java.util.List<FeedItem> newMessages = this.get();
-                    messages.addAll(newMessages);
-                    loadedServerCnt++;
-
-                    Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            messages_o.addAll(messages);
-                        }
-                    });
-                } catch (InterruptedException | ExecutionException ex) {
-                    log.error(null, ex);
-                }
-            }
-        };
-        swingWorker.execute();
     }
 
     public class DisplayNewsCard extends ListCell<FeedItem> {
@@ -235,25 +195,54 @@ public class StockNews extends JFrame {
         }
     }
 
+    public void retrieveNewsInBackground () {
+        if (this.newsServers == null || this.loadedServerCnt >= this.newsServers.size())
+            return;
+
+        SwingWorker swingWorker = new SwingWorker<java.util.List<FeedItem>, Void>() {
+
+            @Override
+            protected java.util.List<FeedItem> doInBackground() throws Exception {
+                // Retrieve news from next available news server
+                final java.util.List<FeedItem> newMessages = newsServers.get(loadedServerCnt).getMessages(stockInfo);
+                return newMessages;
+            }
+
+            @Override
+            public void done() {
+                try {
+                    final java.util.List<FeedItem> newMessages = this.get();
+                    loadedServerCnt++;
+
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            messages_o.addAll(newMessages);
+                        }
+                    });
+                } catch (InterruptedException | ExecutionException ex) {
+                    log.error(null, ex);
+                }
+            }
+        };
+        swingWorker.execute();
+    }
+
     
     private final JSplitPane jSplitPane = new javax.swing.JSplitPane(HORIZONTAL_SPLIT, null, null);
     public StockNewsContent stockNewsContent;
-    
-    private static final int width = 700;
-    private static final int height = 700;
     
     private final StockInfo stockInfo;
     private final java.util.List<NewsServer> newsServers;
     private int loadedServerCnt = 1;
 
-    private final int sceneWidth = width;
-    private final int sceneHeight = height;
+    private int sceneWidth;
+    private int sceneHeight;
 
-    private final JFXPanel stockNewsList = new JFXPanel();
+    private final JFXPanel jfxPanel = new JFXPanel();
     private Scene scene;
     private VBox vbox;
     
-    private java.util.List<FeedItem> messages = new ArrayList<>();
     private ObservableList<FeedItem> messages_o;
     private ListView<FeedItem> newsListView;
 

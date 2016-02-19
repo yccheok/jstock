@@ -39,9 +39,11 @@ import static javafx.concurrent.Worker.State.SUCCEEDED;
 
 public class StockNewsContent extends JTabbedPane {
     
-    public StockNewsContent() {
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        this.setBounds((screenSize.width - width)/2, (screenSize.height - height)/2, width, height);
+    public StockNewsContent(int width, int height) {
+        this.width = width;
+        this.height = height;
+        this.setPreferredSize(new Dimension(this.width, this.height));
+        this.setMinimumSize(new Dimension(this.width, this.height));
     }
 
     public void addNewsTab (URL link, String title) {
@@ -95,6 +97,6 @@ public class StockNewsContent extends JTabbedPane {
     }
 
     private final ArrayList<Pair<URL, String>> tabsInfo = new ArrayList();
-    private static final int width = 800;
-    private static final int height = 800;
+    private final int width;
+    private final int height;
 }
