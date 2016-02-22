@@ -22,7 +22,6 @@ package org.yccheok.jstock.gui.news;
 import it.sauronsoftware.feed4j.bean.FeedItem;
 import java.awt.*;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 import javax.swing.*;
 import static javax.swing.JSplitPane.HORIZONTAL_SPLIT;
@@ -33,8 +32,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ListChangeListener;
-import javafx.concurrent.Worker;
-import static javafx.concurrent.Worker.State.FAILED;
 import javafx.embed.swing.JFXPanel;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -62,15 +59,16 @@ public class StockNews extends JFrame {
     
     public StockNews(StockInfo stockInfo, String title) {
         super(title);
-        
+        this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+
         this.stockInfo = stockInfo;
         final Country country = org.yccheok.jstock.engine.Utils.toCountry(this.stockInfo.code);
         this.newsServers = NewsServerFactory.getNewsServers(country);
 
         Dimension fullSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
         final int extraWidth = jSplitPane.getInsets().left + jSplitPane.getInsets().right + jSplitPane.getDividerSize();
-        sceneWidth = (fullSize.width - extraWidth) / 2;
-        sceneHeight = fullSize.height;
+        this.sceneWidth = (fullSize.width - extraWidth) / 2;
+        this.sceneHeight = fullSize.height;
         
         initComponents();
     }
@@ -107,7 +105,7 @@ public class StockNews extends JFrame {
                 newsListView.setOnMouseClicked(new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent event) {
-                        if (event.getClickCount() > 1) {
+                        if (event.getClickCount() >= 1) {
                             final FeedItem msg = newsListView.getSelectionModel().getSelectedItem();
                             if (msg == null)
                                 return;
@@ -236,8 +234,8 @@ public class StockNews extends JFrame {
     private final java.util.List<NewsServer> newsServers;
     private int loadedServerCnt = 1;
 
-    private int sceneWidth;
-    private int sceneHeight;
+    private final int sceneWidth;
+    private final int sceneHeight;
 
     private final JFXPanel jfxPanel = new JFXPanel();
     private Scene scene;
