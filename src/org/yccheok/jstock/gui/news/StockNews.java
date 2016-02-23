@@ -39,13 +39,15 @@ import javafx.scene.Scene;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ListCell;
 import javafx.util.Callback;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Text;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.StackPane;
 import javafx.scene.text.TextFlow;
+import javafx.geometry.Insets;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -79,7 +81,7 @@ public class StockNews extends JFrame {
             @Override
             public void run() {
 
-                // FX component for news list: JFXPanel (Swing FX wrapper) => Scene => VBox => ListView
+                // FX component for news list: JFXPanel (Swing FX wrapper) => Scene => VBox => StackPane => ListView / ProgressIndicator
                 vbox = new VBox();
                 scene = new Scene(vbox, sceneWidth, sceneHeight);
                 scene.getStylesheets().add(StockNews.class.getResource("StockNews.css").toExternalForm()); 
@@ -88,9 +90,19 @@ public class StockNews extends JFrame {
                 messages_o = FXCollections.observableArrayList();
                 newsListView = new ListView<>(messages_o); 
                 newsListView.setId("news-listview");
+
+                stackPane.setId("parent-stackPane");
+                stackPane.setPrefSize(sceneWidth, sceneHeight);
+                final double paddingV = sceneHeight / 2 - 100;
+                final double paddingH = sceneWidth / 2 - 100;
+                stackPane.setPadding(new Insets(paddingV, paddingH, paddingV, paddingH));
+
+                stackPane.getChildren().addAll(newsListView, progressIndicator);
+                progressIndicator.setVisible(true);
+                newsListView.setVisible(false);
+
                 vbox.setId("parent-vbox"); 
-                VBox.setVgrow(newsListView, Priority.ALWAYS);
-                vbox.getChildren().addAll(newsListView);
+                vbox.getChildren().addAll(stackPane);
 
                 newsListView.setCellFactory(new Callback<ListView<FeedItem>, 
                     ListCell<FeedItem>>() {
@@ -216,6 +228,9 @@ public class StockNews extends JFrame {
                         @Override
                         public void run() {
                             messages_o.addAll(newMessages);
+                            stackPane.setPadding(Insets.EMPTY);
+                            progressIndicator.setVisible(false);
+                            newsListView.setVisible(true);
                         }
                     });
                 } catch (InterruptedException | ExecutionException ex) {
@@ -240,6 +255,9 @@ public class StockNews extends JFrame {
     private final JFXPanel jfxPanel = new JFXPanel();
     private Scene scene;
     private VBox vbox;
+
+    private final StackPane stackPane = new StackPane();
+    private final ProgressIndicator progressIndicator = new ProgressIndicator();
     
     private ObservableList<FeedItem> messages_o;
     private ListView<FeedItem> newsListView;

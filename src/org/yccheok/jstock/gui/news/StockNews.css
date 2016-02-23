@@ -21,6 +21,10 @@
     -fx-padding: 0;
 }
 
+#parent-stackPane {
+    -fx-background-color: #ffffff;
+}
+
 #news-listview {
     // this get rid of ListView border
     -fx-background-insets: 0;
