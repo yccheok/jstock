@@ -32,28 +32,36 @@ import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
-import javafx.concurrent.Worker.State;
 import static javafx.concurrent.Worker.State.FAILED;
 import static javafx.concurrent.Worker.State.SUCCEEDED;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.control.SingleSelectionModel;
 
 
-public class StockNewsContent extends JTabbedPane {
-    
+public class StockNewsContent {
+
     public StockNewsContent(int width, int height) {
         this.width = width;
         this.height = height;
-        this.setPreferredSize(new Dimension(this.width, this.height));
-        this.setMinimumSize(new Dimension(this.width, this.height));
-    }
+        jfxPanel = new JFXPanel();
 
+        tabPane = new TabPane();
+        tabPane.setPrefWidth(StockNewsContent.this.width);
+        tabPane.setPrefWidth(StockNewsContent.this.height);
+        //tabPane.setTabMaxWidth(StockNewsContent.this.width);
+        jfxPanel.setScene(new Scene(tabPane));
+    }
+    
     public void addNewsTab (URL link, String title) {
         if (!tabsInfo.isEmpty()) {
             // URL already open in tab, just select tab
             for (int i = 0; i < tabsInfo.size(); i++) {
                 if (link.equals(tabsInfo.get(i).first)) {
-                    this.setSelectedIndex(i);
+                    SingleSelectionModel<Tab> selectionModel = tabPane.getSelectionModel();
+                    selectionModel.select(i);
                     return;
                 }
             }
@@ -61,44 +69,44 @@ public class StockNewsContent extends JTabbedPane {
         tabsInfo.add(new Pair(link, title));
 
         // Each tab content: JPanel => JFXPanel => Scene => WebView
-        JFXPanel jfxPanel = new JFXPanel();
 
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                final StackPane root = new StackPane();
-                final ProgressBar progress = new ProgressBar();
+        final Tab tab = new Tab();
+        final StackPane stackPane = new StackPane();
+        final ProgressBar progress = new ProgressBar();
+        
+        final WebView webView = new WebView();
+        stackPane.getChildren().addAll(webView, progress);
 
-                final WebView webView = new WebView();
-                root.getChildren().addAll(webView, progress);
+        tab.setContent(stackPane);
+        tabPane.getTabs().add(tab);
+        final WebEngine webEngine = webView.getEngine();
+        webEngine.load(link.toString());
 
-                jfxPanel.setScene(new Scene(root));
-                final WebEngine webEngine = webView.getEngine();
-                webEngine.load(link.toString());
+        // update progress bar using binding
+        progress.progressProperty().bind(webEngine.getLoadWorker().progressProperty());
+
+        webEngine.getLoadWorker().stateProperty().addListener(
+            new javafx.beans.value.ChangeListener<Worker.State>() {
+                public void changed(ObservableValue ov, Worker.State oldState, Worker.State newState) {
+                    if (newState == Worker.State.SUCCEEDED) {
+                        progress.setVisible(false);
+                    } else if (newState == FAILED) {
+                        // handle failed
+                    }
+                }
+            });
                 
-                // update progress bar using binding
-                progress.progressProperty().bind(webEngine.getLoadWorker().progressProperty());
-
-                webEngine.getLoadWorker().stateProperty().addListener(
-                    new javafx.beans.value.ChangeListener<Worker.State>() {
-                        public void changed(ObservableValue ov, Worker.State oldState, Worker.State newState) {
-                            if (newState == Worker.State.SUCCEEDED) {
-                                progress.setVisible(false);
-                            } else if (newState == FAILED) {
-                                // handle failed
-                            }
-                        }
-                    });
-            }
-        });
-
         // Tab title: display first 2 words of news title
         final String[] result = title.split(" ", 3);
         final String shortTitle = String.join(" ", result[0], result[1]) + "...";
-
-        this.addTab(shortTitle, jfxPanel);
-        this.setSelectedIndex(tabsInfo.size() - 1);
+        tab.setText(shortTitle);
+        
+        SingleSelectionModel<Tab> selectionModel = tabPane.getSelectionModel();
+        selectionModel.select(tab);
     }
+
+    public final JFXPanel jfxPanel;
+    private TabPane tabPane;
 
     private final ArrayList<Pair<URL, String>> tabsInfo = new ArrayList();
     private final int width;

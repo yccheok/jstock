@@ -123,18 +123,13 @@ public class StockNews extends JFrame {
                             if (link == null)
                                 return;
 
-                            SwingUtilities.invokeLater(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (stockNewsContent == null) {
-                                        stockNewsContent = new StockNewsContent(sceneWidth, sceneHeight);
-                                        jSplitPane.setRightComponent(stockNewsContent);
-                                        // resize JFrame
-                                        StockNews.this.pack();
-                                    }
-                                    stockNewsContent.addNewsTab(link, msg.getTitle());
-                                }
-                            });
+                            if (stockNewsContent == null) {
+                                stockNewsContent = new StockNewsContent(sceneWidth, sceneHeight);
+                                jSplitPane.setRightComponent(stockNewsContent.jfxPanel);
+                                // resize JFrame
+                                StockNews.this.pack();
+                            }
+                            stockNewsContent.addNewsTab(link, msg.getTitle());
                         }
                     }
                 });
