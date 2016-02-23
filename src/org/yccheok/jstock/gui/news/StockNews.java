@@ -27,11 +27,8 @@ import javax.swing.*;
 import static javax.swing.JSplitPane.HORIZONTAL_SPLIT;
 
 import javafx.application.Platform;
-import javafx.beans.value.ObservableValue;
-import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.ListChangeListener;
 import javafx.embed.swing.JFXPanel;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
