@@ -35,6 +35,8 @@ import javafx.concurrent.Worker;
 import javafx.concurrent.Worker.State;
 import static javafx.concurrent.Worker.State.FAILED;
 import static javafx.concurrent.Worker.State.SUCCEEDED;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.layout.StackPane;
 
 
 public class StockNewsContent extends JTabbedPane {
@@ -64,27 +66,29 @@ public class StockNewsContent extends JTabbedPane {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                WebView browser = new WebView();
-                jfxPanel.setScene(new Scene(browser));
-                WebEngine webEngine = browser.getEngine();
+                final StackPane root = new StackPane();
+                final ProgressBar progress = new ProgressBar();
+
+                final WebView webView = new WebView();
+                root.getChildren().addAll(webView, progress);
+
+                jfxPanel.setScene(new Scene(root));
+                final WebEngine webEngine = webView.getEngine();
+                webEngine.load(link.toString());
+                
+                // update progress bar using binding
+                progress.progressProperty().bind(webEngine.getLoadWorker().progressProperty());
 
                 webEngine.getLoadWorker().stateProperty().addListener(
                     new javafx.beans.value.ChangeListener<Worker.State>() {
                         public void changed(ObservableValue ov, Worker.State oldState, Worker.State newState) {
                             if (newState == Worker.State.SUCCEEDED) {
-                                //SwingUtilities.invokeLater(new Runnable() {
-                                //    @Override 
-                                //    public void run() {
-                                //        StockNewsContent.this.setTitle(webEngine.getLocation());
-                                //    }
-                                //});
+                                progress.setVisible(false);
                             } else if (newState == FAILED) {
                                 // handle failed
                             }
                         }
                     });
-
-                webEngine.load(link.toString());
             }
         });
 
