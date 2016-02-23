@@ -97,8 +97,8 @@ public class StockNews extends JFrame {
                 final double paddingH = sceneWidth / 2 - 100;
                 stackPane.setPadding(new Insets(paddingV, paddingH, paddingV, paddingH));
 
-                stackPane.getChildren().addAll(newsListView, progressIndicator);
-                progressIndicator.setVisible(true);
+                stackPane.getChildren().addAll(newsListView, progressIn);
+                progressIn.setVisible(true);
                 newsListView.setVisible(false);
 
                 vbox.setId("parent-vbox"); 
@@ -229,7 +229,7 @@ public class StockNews extends JFrame {
                         public void run() {
                             messages_o.addAll(newMessages);
                             stackPane.setPadding(Insets.EMPTY);
-                            progressIndicator.setVisible(false);
+                            progressIn.setVisible(false);
                             newsListView.setVisible(true);
                         }
                     });
@@ -257,7 +257,7 @@ public class StockNews extends JFrame {
     private VBox vbox;
 
     private final StackPane stackPane = new StackPane();
-    private final ProgressIndicator progressIndicator = new ProgressIndicator();
+    private final ProgressIndicator progressIn = new ProgressIndicator();
     
     private ObservableList<FeedItem> messages_o;
     private ListView<FeedItem> newsListView;
