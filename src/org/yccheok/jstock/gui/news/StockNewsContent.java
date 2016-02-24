@@ -20,14 +20,9 @@
 package org.yccheok.jstock.gui.news;
 
 import org.yccheok.jstock.engine.Pair;
-import java.awt.*;
 import java.net.URL;
 import java.util.ArrayList;
-import javax.swing.*;
 
-import javafx.application.Platform;
-import javafx.embed.swing.JFXPanel;
-import javafx.scene.Scene;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.beans.value.ObservableValue;
@@ -43,18 +38,15 @@ import javafx.scene.control.SingleSelectionModel;
 
 public class StockNewsContent {
 
-    public StockNewsContent(int width, int height) {
+    public StockNewsContent(double width, double height) {
+        // TabPane => Tab => StackPane => WebVIew / ProgressBar
         this.width = width;
         this.height = height;
-        jfxPanel = new JFXPanel();
 
-        tabPane = new TabPane();
-        tabPane.setPrefWidth(StockNewsContent.this.width);
-        tabPane.setPrefWidth(StockNewsContent.this.height);
-        //tabPane.setTabMaxWidth(StockNewsContent.this.width);
-        jfxPanel.setScene(new Scene(tabPane));
+        tabPane.setMinWidth(this.width);
+        tabPane.setMinHeight(this.height);
     }
-    
+
     public void addNewsTab (URL link, String title) {
         if (!tabsInfo.isEmpty()) {
             // URL already open in tab, just select tab
@@ -67,8 +59,6 @@ public class StockNewsContent {
             }
         }
         tabsInfo.add(new Pair(link, title));
-
-        // Each tab content: JPanel => JFXPanel => Scene => WebView
 
         final Tab tab = new Tab();
         final StackPane stackPane = new StackPane();
@@ -100,15 +90,11 @@ public class StockNewsContent {
         final String[] result = title.split(" ", 3);
         final String shortTitle = String.join(" ", result[0], result[1]) + "...";
         tab.setText(shortTitle);
-        
-        SingleSelectionModel<Tab> selectionModel = tabPane.getSelectionModel();
-        selectionModel.select(tab);
+        tabPane.getSelectionModel().select(tab);
     }
 
-    public final JFXPanel jfxPanel;
-    private TabPane tabPane;
-
+    public final TabPane tabPane = new TabPane();
     private final ArrayList<Pair<URL, String>> tabsInfo = new ArrayList();
-    private final int width;
-    private final int height;
+    private final double width;
+    private final double height;
 }
