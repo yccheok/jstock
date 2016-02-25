@@ -34,6 +34,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.control.SingleSelectionModel;
+import javafx.event.EventHandler;
 
 
 public class StockNewsContent {
@@ -42,9 +43,8 @@ public class StockNewsContent {
         // TabPane => Tab => StackPane => WebVIew / ProgressBar
         this.width = width;
         this.height = height;
-
         tabPane.setMinWidth(this.width);
-        tabPane.setMinHeight(this.height);
+        tabPane.setPrefWidth(this.width);
     }
 
     public void addNewsTab (URL link, String title) {
@@ -63,6 +63,12 @@ public class StockNewsContent {
         final Tab tab = new Tab();
         final StackPane stackPane = new StackPane();
         final ProgressBar progress = new ProgressBar();
+        
+        tab.setOnClosed(new EventHandler<javafx.event.Event>() {
+            public void handle(javafx.event.Event e) {
+                // TODO: Actions to be taken on close of tab.
+            }
+        });
         
         final WebView webView = new WebView();
         stackPane.getChildren().addAll(webView, progress);

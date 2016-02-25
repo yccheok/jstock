@@ -66,28 +66,27 @@ public class StockNews extends JFrame {
         this.newsServers = NewsServerFactory.getNewsServers(country);
 
         fullSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        sceneWidth = fullSize.width / 2;
+        sceneHeight = fullSize.height;
+
         initComponents();
     }
 
     private void initComponents() {
-        
+
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
                 // JFXPanel => Scene => SplitPane:
-                //      Left  (news List)       => VBox => StackPane => ViewView / ProgressIndicator
+                //      Left  (news List)       => StackPane => ViewView / ProgressIndicator
                 //      Right (HTML content)    => TabPane => Tab => StackPane => WebView / ProgressBar
 
                 splitPane = new SplitPane();
-                splitPane.setOrientation(Orientation.HORIZONTAL);
+                scene = new Scene(splitPane);
 
-                final double extraW = splitPane.getInsets().getRight() + splitPane.getInsets().getLeft();
-                sceneWidth = (fullSize.width - extraW) / 2;
-                sceneHeight = fullSize.height;
-
-                scene = new Scene(splitPane, fullSize.width, fullSize.height);
                 scene.getStylesheets().add(StockNews.class.getResource("StockNews.css").toExternalForm()); 
                 jfxPanel.setScene(scene);
+                jfxPanel.setPreferredSize(new Dimension((int)sceneWidth, (int)sceneHeight));
 
                 // Left component: News List
                 messages_o = FXCollections.observableArrayList();
@@ -95,17 +94,15 @@ public class StockNews extends JFrame {
                 newsListView.setId("news-listview");
 
                 stackPane.setId("parent-stackPane");
-                stackPane.setPrefSize(sceneWidth, sceneHeight);
+                stackPane.setMinWidth(sceneWidth);
+                stackPane.setPrefWidth(sceneWidth);
+
                 final double paddingV = sceneHeight / 2 - 100;
                 final double paddingH = sceneWidth / 2 - 100;
                 stackPane.setPadding(new Insets(paddingV, paddingH, paddingV, paddingH));
                 stackPane.getChildren().addAll(newsListView, progressIn);
 
-                vBox = new VBox();
-                vBox.setId("parent-vbox"); 
-                vBox.getChildren().addAll(stackPane);
-                
-                splitPane.getItems().add(vBox);
+                splitPane.getItems().add(stackPane);
                 
                 // show progress indicator when loading
                 progressIn.setVisible(true);
@@ -130,36 +127,43 @@ public class StockNews extends JFrame {
                                 return;
 
                             final URL link = msg.getLink();
-                            if (link == null)
+                            if (link == null || link.getHost() == null)
                                 return;
 
                             if (stockNewsContent == null) {
-                                stockNewsContent = new StockNewsContent(sceneWidth, sceneHeight);
+                                stockNewsContent = new StockNewsContent(sceneWidth - 50, sceneHeight);
+                                
+                                jfxPanel.setPreferredSize(new Dimension(fullSize.width, fullSize.height));
+                                splitPane.setMinWidth(fullSize.width);
+                                splitPane.setPrefWidth(fullSize.width);
+
                                 splitPane.getItems().add(stockNewsContent.tabPane);
+                                splitPane.setDividerPositions(0.5f);
 
                                 // resize JFrame
-                                StockNews.this.pack();
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        StockNews.this.pack();
+                                    }
+                                });
                             }
                             stockNewsContent.addNewsTab(link, msg.getTitle());
                         }
                     }
                 });
+                
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        StockNews.this.pack();
+                        StockNews.this.setVisible(true);
+                    }
+                });
             }
         });
 
-        //SplitPane splitPane = new SplitPane();
-        //jfxPanel.setScene(new Scene(splitPane));
-        
-        //jfxPanel.setPreferredSize(new Dimension(sceneWidth, sceneHeight));
-        //jfxPanel.setMinimumSize(new Dimension(sceneWidth, sceneHeight));
-
-        //jSplitPane.setLeftComponent(jfxPanel);
-        // The resize weight of a split pane is 0.0 by default, indicating that the left or top component's size is fixed, and the right or bottom component adjusts its size to fit the remaining space.
-        //jSplitPane.setResizeWeight(0);
-
         this.add(jfxPanel, BorderLayout.CENTER);
-        this.pack();
-        this.setVisible(true);
     }
 
     public class DisplayNewsCard extends ListCell<FeedItem> {
@@ -249,19 +253,18 @@ public class StockNews extends JFrame {
 
     
     public StockNewsContent stockNewsContent;
-    
+
     private final StockInfo stockInfo;
     private final java.util.List<NewsServer> newsServers;
     private int loadedServerCnt = 1;
 
     private final Dimension fullSize;
-    private double sceneWidth;
-    private double sceneHeight;
+    private final double sceneWidth;
+    private final double sceneHeight;
 
     private final JFXPanel jfxPanel = new JFXPanel();
     private SplitPane splitPane;
     private Scene scene;
-    private VBox vBox;
 
     private final StackPane stackPane = new StackPane();
     private final ProgressIndicator progressIn = new ProgressIndicator();
