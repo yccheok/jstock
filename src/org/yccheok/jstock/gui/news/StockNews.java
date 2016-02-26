@@ -103,6 +103,7 @@ public class StockNews extends JFrame {
                 stackPane.getChildren().addAll(newsListView, progressIn);
 
                 splitPane.getItems().add(stackPane);
+                SplitPane.setResizableWithParent(stackPane, Boolean.FALSE);
                 
                 // show progress indicator when loading
                 progressIn.setVisible(true);
