@@ -63,12 +63,13 @@ public class StockNewsContent {
         final Tab tab = new Tab();
         final StackPane stackPane = new StackPane();
         final ProgressBar progress = new ProgressBar();
-        
-        tab.setOnClosed(new EventHandler<javafx.event.Event>() {
+
+        tab.setOnCloseRequest(new EventHandler<javafx.event.Event>() {
             public void handle(javafx.event.Event e) {
-                // TODO: Actions to be taken on close of tab.
+                tabsInfo.remove(tabPane.getSelectionModel().getSelectedIndex());
             }
         });
+        
         
         final WebView webView = new WebView();
         stackPane.getChildren().addAll(webView, progress);
