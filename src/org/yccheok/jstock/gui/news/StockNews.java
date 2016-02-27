@@ -44,7 +44,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.TextFlow;
 import javafx.geometry.Insets;
-import javafx.geometry.Orientation;
 import javafx.scene.control.SplitPane;
 
 import org.apache.commons.logging.Log;
@@ -96,6 +95,7 @@ public class StockNews extends JFrame {
                 stackPane.setId("parent-stackPane");
                 stackPane.setMinWidth(sceneWidth);
                 stackPane.setPrefWidth(sceneWidth);
+                stackPane.setMaxWidth(sceneWidth);
 
                 final double paddingV = sceneHeight / 2 - 100;
                 final double paddingH = sceneWidth / 2 - 100;
@@ -132,22 +132,30 @@ public class StockNews extends JFrame {
                                 return;
 
                             if (stockNewsContent == null) {
-                                stockNewsContent = new StockNewsContent(sceneWidth - 50, sceneHeight);
-                                
-                                jfxPanel.setPreferredSize(new Dimension(fullSize.width, fullSize.height));
-                                splitPane.setMinWidth(fullSize.width);
-                                splitPane.setPrefWidth(fullSize.width);
+                                stockNewsContent = new StockNewsContent(sceneWidth, sceneHeight);
 
-                                splitPane.getItems().add(stockNewsContent.tabPane);
-                                splitPane.setDividerPositions(0.5f);
-
-                                // resize JFrame
                                 SwingUtilities.invokeLater(new Runnable() {
                                     @Override
                                     public void run() {
+                                        // resize JFrame first
+                                        jfxPanel.setPreferredSize(new Dimension(fullSize.width, fullSize.height));
                                         StockNews.this.pack();
+
+                                        Platform.runLater(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                // resize splitPane
+                                                splitPane.setMinWidth(fullSize.width);
+                                                splitPane.setPrefWidth(fullSize.width);
+                                                splitPane.resize(fullSize.width, fullSize.height);
+
+                                                splitPane.getItems().add(stockNewsContent.tabPane);
+                                                splitPane.setDividerPositions(0.5f);
+                                            }
+                                        });
                                     }
                                 });
+
                             }
                             stockNewsContent.addNewsTab(link, msg.getTitle());
                         }
