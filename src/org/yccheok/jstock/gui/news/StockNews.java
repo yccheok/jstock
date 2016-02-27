@@ -28,6 +28,7 @@ import javax.swing.*;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.embed.swing.JFXPanel;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -228,36 +229,29 @@ public class StockNews extends JFrame {
         if (this.newsServers == null || this.loadedServerCnt >= this.newsServers.size())
             return;
 
-        SwingWorker swingWorker = new SwingWorker<java.util.List<FeedItem>, Void>() {
-
-            @Override
-            protected java.util.List<FeedItem> doInBackground() throws Exception {
-                // Retrieve news from next available news server
+        // Retrieve news from next available news server
+        Task task = new Task<Void>() {
+            @Override public Void call() {
                 final java.util.List<FeedItem> newMessages = newsServers.get(loadedServerCnt).getMessages(stockInfo);
-                return newMessages;
-            }
+                loadedServerCnt++;
+                messages_o.addAll(newMessages);
 
-            @Override
-            public void done() {
-                try {
-                    final java.util.List<FeedItem> newMessages = this.get();
-                    loadedServerCnt++;
-
+                if (firstLoad == true) {
+                    firstLoad = false;
+                    
                     Platform.runLater(new Runnable() {
                         @Override
                         public void run() {
-                            messages_o.addAll(newMessages);
                             stackPane.setPadding(Insets.EMPTY);
                             progressIn.setVisible(false);
                             newsListView.setVisible(true);
                         }
                     });
-                } catch (InterruptedException | ExecutionException ex) {
-                    log.error(null, ex);
                 }
+                return null;
             }
         };
-        swingWorker.execute();
+        new Thread(task).start();
     }
 
     
@@ -266,6 +260,7 @@ public class StockNews extends JFrame {
     private final StockInfo stockInfo;
     private final java.util.List<NewsServer> newsServers;
     private int loadedServerCnt = 1;
+    private boolean firstLoad = true;
 
     private final Dimension fullSize;
     private final double sceneWidth;

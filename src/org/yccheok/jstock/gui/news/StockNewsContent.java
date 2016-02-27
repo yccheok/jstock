@@ -85,7 +85,7 @@ public class StockNewsContent {
         webEngine.getLoadWorker().stateProperty().addListener(
             new javafx.beans.value.ChangeListener<Worker.State>() {
                 public void changed(ObservableValue ov, Worker.State oldState, Worker.State newState) {
-                    if (newState == Worker.State.SUCCEEDED) {
+                    if (newState == SUCCEEDED) {
                         progress.setVisible(false);
                     } else if (newState == FAILED) {
                         // handle failed
