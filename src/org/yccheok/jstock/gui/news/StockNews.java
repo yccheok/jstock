@@ -98,15 +98,16 @@ public class StockNews extends JFrame {
                 stackPane.setPrefWidth(sceneWidth);
                 stackPane.setMaxWidth(sceneWidth);
 
-                final double paddingV = sceneHeight / 2 - 100;
-                final double paddingH = sceneWidth / 2 - 100;
-                stackPane.setPadding(new Insets(paddingV, paddingH, paddingV, paddingH));
                 stackPane.getChildren().addAll(newsListView, progressIn);
 
                 splitPane.getItems().add(stackPane);
                 SplitPane.setResizableWithParent(stackPane, Boolean.FALSE);
                 
                 // show progress indicator when loading
+                progressIn.setMaxWidth(100);
+                progressIn.setMaxHeight(100);
+
+                progressIn.setProgress(0);
                 progressIn.setVisible(true);
                 newsListView.setVisible(false);
 
@@ -226,32 +227,46 @@ public class StockNews extends JFrame {
     }
 
     public void retrieveNewsInBackground () {
-        if (this.newsServers == null || this.loadedServerCnt >= this.newsServers.size())
+        if (this.newsServers == null || this.serverCnt >= this.newsServers.size())
             return;
 
         // Retrieve news from next available news server
         Task task = new Task<Void>() {
             @Override public Void call() {
-                final java.util.List<FeedItem> newMessages = newsServers.get(loadedServerCnt).getMessages(stockInfo);
-                loadedServerCnt++;
-                messages_o.addAll(newMessages);
+                boolean firstLoad = true;
 
-                if (firstLoad == true) {
-                    firstLoad = false;
+                // load news from all available news servers, asynchrounusly
+                for (serverCnt = 0; serverCnt < newsServers.size(); serverCnt++) {
+                    final java.util.List<FeedItem> newMessages = newsServers.get(serverCnt).getMessages(stockInfo);
+                    if (newMessages.isEmpty())
+                        continue;
                     
-                    Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            stackPane.setPadding(Insets.EMPTY);
-                            progressIn.setVisible(false);
-                            newsListView.setVisible(true);
-                        }
-                    });
+                    messages_o.addAll(newMessages);
+                    updateProgress(serverCnt, newsServers.size() - 1);
+
+                    if (firstLoad == true) {
+                        firstLoad = false;
+
+                        Platform.runLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                newsListView.setVisible(true);
+                            }
+                        });
+                    }
                 }
+                progressIn.setVisible(false);
                 return null;
             }
         };
         new Thread(task).start();
+
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                progressIn.progressProperty().bind(task.progressProperty());
+            }
+        });
     }
 
     
@@ -259,8 +274,7 @@ public class StockNews extends JFrame {
 
     private final StockInfo stockInfo;
     private final java.util.List<NewsServer> newsServers;
-    private int loadedServerCnt = 1;
-    private boolean firstLoad = true;
+    private int serverCnt = 0;
 
     private final Dimension fullSize;
     private final double sceneWidth;
