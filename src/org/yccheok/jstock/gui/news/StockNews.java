@@ -105,8 +105,6 @@ public class StockNews extends JFrame {
                 // show progress indicator when loading
                 progressIn.setMaxWidth(100);
                 progressIn.setMaxHeight(100);
-
-                progressIn.setProgress(0);
                 progressIn.setVisible(true);
                 newsListView.setVisible(false);
 
@@ -176,7 +174,7 @@ public class StockNews extends JFrame {
         this.add(jfxPanel, BorderLayout.CENTER);
     }
 
-    public class DisplayNewsCard extends ListCell<FeedItem> {
+    private class DisplayNewsCard extends ListCell<FeedItem> {
         @Override
         public void updateItem(FeedItem item, boolean empty) {
             super.updateItem(item, empty);
@@ -241,9 +239,8 @@ public class StockNews extends JFrame {
                         continue;
                     
                     messages_o.addAll(newMessages);
-                    updateProgress(serverCnt, newsServers.size() - 1);
 
-                    if (firstLoad == true) {
+                    if (firstLoad) {
                         firstLoad = false;
 
                         Platform.runLater(new Runnable() {
@@ -254,18 +251,18 @@ public class StockNews extends JFrame {
                         });
                     }
                 }
-                progressIn.setVisible(false);
+                
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        stackPane.getChildren().remove(progressIn);
+                    }
+                });
+
                 return null;
             }
         };
         new Thread(task).start();
-
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                progressIn.progressProperty().bind(task.progressProperty());
-            }
-        });
     }
 
     

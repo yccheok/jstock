@@ -86,7 +86,7 @@ public class StockNewsContent {
             new javafx.beans.value.ChangeListener<Worker.State>() {
                 public void changed(ObservableValue ov, Worker.State oldState, Worker.State newState) {
                     if (newState == SUCCEEDED) {
-                        progress.setVisible(false);
+                        stackPane.getChildren().remove(progress);
                     } else if (newState == FAILED) {
                         // handle failed
                     }

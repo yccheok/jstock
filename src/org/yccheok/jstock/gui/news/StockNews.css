@@ -35,6 +35,16 @@
     -fx-background-color: #E0E0E0;      //light grey
 }
 
+// When the list-cell is selected and focused
+/*
+#news-listview .list-cell:selected {
+    
+    -fx-background-color: -fx-focus-color;
+    
+    //-fx-effect: dropshadow(three-pass-box, -fx-focus-color, 10, 0, 0, 0);
+}
+*/
+
 .item-border-pane {
     -fx-padding: 10;
     -fx-margin: 10;
@@ -43,8 +53,10 @@
     -fx-effect: dropshadow(three-pass-box, #C2C2C2, 0, 1.0, 0, 2);
 }
 
+/*
 .item-title-textflow {
 }
+*/
 
 .item-title-text-1 {
     -fx-font-size: 25px;
