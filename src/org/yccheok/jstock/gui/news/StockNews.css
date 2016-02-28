@@ -17,6 +17,14 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+@font-face {
+    src: url("/assets/fonts/Roboto-Light.ttf");
+}
+
+.root {
+    -fx-font-family: "Roboto Light";
+}
+
 #parent-vbox {
     -fx-padding: 0;
 }
@@ -28,6 +36,7 @@
 #news-listview {
     // this get rid of ListView border
     -fx-background-insets: 0;
+    //-fx-font-family: "Roboto Light";
 }
 
 #news-listview .list-cell:odd,
@@ -35,15 +44,10 @@
     -fx-background-color: #E0E0E0;      //light grey
 }
 
-// When the list-cell is selected and focused
-/*
-#news-listview .list-cell:selected {
-    
-    -fx-background-color: -fx-focus-color;
-    
-    //-fx-effect: dropshadow(three-pass-box, -fx-focus-color, 10, 0, 0, 0);
+// When the list-cell is selected
+#news-listview:focused .list-cell:selected .item-border-pane {
+    -fx-effect: dropshadow(three-pass-box, -fx-focus-color, 10, 0, 2, 2);
 }
-*/
 
 .item-border-pane {
     -fx-padding: 10;
@@ -61,6 +65,7 @@
 .item-title-text-1 {
     -fx-font-size: 25px;
     -fx-font-weight: bold;
+    //-fx-font-family: "Roboto Light";
 }
 
 .item-title-text-2 {
