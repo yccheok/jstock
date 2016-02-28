@@ -22,7 +22,6 @@ package org.yccheok.jstock.gui.news;
 import it.sauronsoftware.feed4j.bean.FeedItem;
 import java.awt.*;
 import java.net.URL;
-import java.util.concurrent.ExecutionException;
 import javax.swing.*;
 
 import javafx.application.Platform;
@@ -119,7 +118,7 @@ public class StockNews extends JFrame {
                         }
                     }
                 );
-
+                
                 // register event listener: add tab for news HTML content
                 newsListView.setOnMouseClicked(new EventHandler<MouseEvent>() {
                     @Override
