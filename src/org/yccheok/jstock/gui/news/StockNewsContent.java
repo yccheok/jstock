@@ -45,6 +45,19 @@ public class StockNewsContent {
         this.height = height;
         tabPane.setMinWidth(this.width);
         tabPane.setPrefWidth(this.width);
+        
+        /*
+        tabPane.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>() {
+
+            @Override
+            public void changed(ObservableValue<? extends Tab> observable, Tab oldTab, Tab newTab) {
+                if(newTab == tabPresentation) {
+                    comboBoxPresYear.setVisible(true);
+                    lblPresYear.setVisible(true);
+                }
+            });
+        });
+        */
     }
 
     public void addNewsTab (URL link, String title) {

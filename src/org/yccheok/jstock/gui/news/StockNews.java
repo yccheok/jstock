@@ -202,7 +202,8 @@ public class StockNews extends JFrame {
                 if (item.getDescriptionAsText() != null) {
                     descText = new Text(item.getDescriptionAsText());
                     descText.setWrappingWidth(sceneWidth - 60);
-
+                    descText.getStyleClass().add("item-desc-text");
+                    
                     descVBox = new VBox();
                     descVBox.getChildren().addAll(descText);
                     descVBox.getStyleClass().add("item-desc-vbox");
