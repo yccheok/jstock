@@ -25,6 +25,8 @@ import java.net.URL;
 import javax.swing.*;
 
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -45,6 +47,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.text.TextFlow;
 import javafx.geometry.Insets;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.Tab;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -155,6 +158,20 @@ public class StockNews extends JFrame {
                                     }
                                 });
 
+                                stockNewsContent.tabPane.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>() {
+                                    @Override
+                                    public void changed(ObservableValue<? extends Tab> observable, Tab oldTab, Tab newTab) {
+                                        int i = stockNewsContent.tabPane.getSelectionModel().getSelectedIndex();
+                                        final String jFrameTitle = stockNewsContent.tabsInfo.get(i).second;
+                                        
+                                        SwingUtilities.invokeLater(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                StockNews.this.setTitle(jFrameTitle);
+                                            }
+                                        });
+                                    }
+                                });
                             }
                             stockNewsContent.addNewsTab(link, msg.getTitle());
                         }

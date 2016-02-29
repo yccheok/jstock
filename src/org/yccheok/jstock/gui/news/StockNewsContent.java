@@ -25,7 +25,6 @@ import java.util.ArrayList;
 
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
-import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
 import static javafx.concurrent.Worker.State.FAILED;
 import static javafx.concurrent.Worker.State.SUCCEEDED;
@@ -35,6 +34,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.control.SingleSelectionModel;
 import javafx.event.EventHandler;
+import javafx.beans.value.ObservableValue; 
 
 
 public class StockNewsContent {
@@ -45,19 +45,6 @@ public class StockNewsContent {
         this.height = height;
         tabPane.setMinWidth(this.width);
         tabPane.setPrefWidth(this.width);
-        
-        /*
-        tabPane.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>() {
-
-            @Override
-            public void changed(ObservableValue<? extends Tab> observable, Tab oldTab, Tab newTab) {
-                if(newTab == tabPresentation) {
-                    comboBoxPresYear.setVisible(true);
-                    lblPresYear.setVisible(true);
-                }
-            });
-        });
-        */
     }
 
     public void addNewsTab (URL link, String title) {
@@ -114,7 +101,7 @@ public class StockNewsContent {
     }
 
     public final TabPane tabPane = new TabPane();
-    private final ArrayList<Pair<URL, String>> tabsInfo = new ArrayList();
+    public final ArrayList<Pair<URL, String>> tabsInfo = new ArrayList();
     private final double width;
     private final double height;
 }
