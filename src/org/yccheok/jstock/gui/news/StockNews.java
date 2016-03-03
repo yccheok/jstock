@@ -45,7 +45,6 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.TextFlow;
-import javafx.geometry.Insets;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 
