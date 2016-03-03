@@ -48,6 +48,7 @@ import javafx.scene.text.TextFlow;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.Country;
@@ -65,8 +66,8 @@ public class StockNews extends JFrame {
         this.stockInfo = stockInfo;
         final Country country = org.yccheok.jstock.engine.Utils.toCountry(this.stockInfo.code);
         this.newsServers = NewsServerFactory.getNewsServers(country);
-
-        fullSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        
+        fullSize = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
         sceneWidth = fullSize.width / 2;
         sceneHeight = fullSize.height;
 
@@ -172,7 +173,7 @@ public class StockNews extends JFrame {
                                     }
                                 });
                             }
-                            stockNewsContent.addNewsTab(link, msg.getTitle());
+                            stockNewsContent.addNewsTab(link, StringEscapeUtils.unescapeHtml(msg.getTitle()));
                         }
                     }
                 });
@@ -200,7 +201,7 @@ public class StockNews extends JFrame {
                 newsBox.setMaxWidth(sceneWidth - 20);
                 newsBox.getStyleClass().add("item-border-pane");
 
-                final String msgTitle = item.getTitle();
+                final String msgTitle = StringEscapeUtils.unescapeHtml(item.getTitle());
                 final Text firstText = new Text(msgTitle.substring(0, 1));
                 final Text secondText = new Text(msgTitle.substring(1));
 
@@ -289,7 +290,7 @@ public class StockNews extends JFrame {
     private final java.util.List<NewsServer> newsServers;
     private int serverCnt = 0;
 
-    private final Dimension fullSize;
+    private final Rectangle fullSize;
     private final double sceneWidth;
     private final double sceneHeight;
 
