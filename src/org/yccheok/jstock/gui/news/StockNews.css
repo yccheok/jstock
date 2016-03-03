@@ -25,10 +25,6 @@
     src: url("/assets/fonts/Roboto-Regular.ttf");
 }
 
-#parent-vbox {
-    -fx-padding: 0;
-}
-
 #parent-stackPane {
     -fx-background-color: #ffffff;
 }
@@ -41,6 +37,7 @@
 #news-listview .list-cell:odd,
 #news-listview .list-cell:even {
     -fx-background-color: #E0E0E0;      //light grey
+    -fx-padding: 7px 5px 7px 5px;
 }
 
 // When the list-cell is selected
@@ -49,8 +46,8 @@
 }
 
 .item-border-pane {
-    -fx-padding: 10;
-    -fx-margin: 10;
+    -fx-padding: 10px;
+    -fx-margin: 10px;
     -fx-background-color: #FFFFFF;
     
     -fx-effect: dropshadow(three-pass-box, #C2C2C2, 0, 1.0, 0, 2);
@@ -83,3 +80,7 @@
     -fx-font-family: "Roboto Regular";
 }
 
+.split-pane > .split-pane-divider {
+    // divider width = 2px
+    -fx-padding: 0 1px 0 1px;  
+}

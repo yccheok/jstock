@@ -96,7 +96,6 @@ public class StockNews extends JFrame {
                 newsListView.setId("news-listview");
 
                 stackPane.setId("parent-stackPane");
-                stackPane.setMinWidth(sceneWidth);
                 stackPane.setPrefWidth(sceneWidth);
                 stackPane.setMaxWidth(sceneWidth);
 
@@ -134,7 +133,9 @@ public class StockNews extends JFrame {
                                 return;
 
                             if (stockNewsContent == null) {
-                                stockNewsContent = new StockNewsContent(sceneWidth, sceneHeight);
+                                // also minus divider width = 2px. Refer css: .split-pane > .split-pane-divider
+                                final double rightWidth = fullSize.width - sceneWidth - 2;
+                                stockNewsContent = new StockNewsContent(rightWidth, sceneHeight);
 
                                 SwingUtilities.invokeLater(new Runnable() {
                                     @Override
@@ -152,7 +153,8 @@ public class StockNews extends JFrame {
                                                 splitPane.resize(fullSize.width, fullSize.height);
 
                                                 splitPane.getItems().add(stockNewsContent.tabPane);
-                                                splitPane.setDividerPositions(0.5f);
+                                                //A position of 1.0 will place the divider at the right/bottom most edge of the SplitPane minus the minimum size of the node.
+                                                splitPane.setDividerPositions(1.0f);
                                             }
                                         });
                                     }
@@ -201,6 +203,11 @@ public class StockNews extends JFrame {
                 newsBox.setMaxWidth(sceneWidth - 20);
                 newsBox.getStyleClass().add("item-border-pane");
 
+                // last cell - has padding bottom
+                if(getIndex() == (getListView().getItems().size() - 1)) {
+                    this.getStyleClass().add("listcell-last");
+                }
+                
                 final String msgTitle = StringEscapeUtils.unescapeHtml(item.getTitle());
                 final Text firstText = new Text(msgTitle.substring(0, 1));
                 final Text secondText = new Text(msgTitle.substring(1));

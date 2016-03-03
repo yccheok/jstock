@@ -35,6 +35,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.control.SingleSelectionModel;
 import javafx.event.EventHandler;
 import javafx.beans.value.ObservableValue; 
+import javafx.scene.control.Tooltip;
 
 
 public class StockNewsContent {
@@ -69,7 +70,8 @@ public class StockNewsContent {
                 tabsInfo.remove(tabPane.getSelectionModel().getSelectedIndex());
             }
         });
-        
+
+        tab.setTooltip(new Tooltip(title));
         
         final WebView webView = new WebView();
         stackPane.getChildren().addAll(webView, progress);
@@ -89,6 +91,7 @@ public class StockNewsContent {
                         stackPane.getChildren().remove(progress);
                     } else if (newState == FAILED) {
                         // handle failed
+                        System.out.println("Web failed to load: " + title);
                     }
                 }
             });
