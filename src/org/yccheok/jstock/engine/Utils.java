@@ -450,8 +450,8 @@ public class Utils {
                     log.error(null, ex);
                 }
             }
-            org.yccheok.jstock.gui.Utils.close(inputStreamReader);
-            org.yccheok.jstock.gui.Utils.close(fileInputStream);
+            org.yccheok.jstock.file.Utils.close(inputStreamReader);
+            org.yccheok.jstock.file.Utils.close(fileInputStream);
         }
         return stocks;
     }

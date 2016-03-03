@@ -68,8 +68,8 @@ public class Utils {
             log.error(null, ex);
         }
         finally {
-            org.yccheok.jstock.gui.Utils.close(cis);
-            org.yccheok.jstock.gui.Utils.close(stream);
+            org.yccheok.jstock.file.Utils.close(cis);
+            org.yccheok.jstock.file.Utils.close(stream);
         }
         return 0;
     }
