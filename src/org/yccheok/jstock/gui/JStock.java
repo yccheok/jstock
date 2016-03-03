@@ -65,6 +65,12 @@ import org.yccheok.jstock.network.ProxyDetector;
 import org.yccheok.jstock.portfolio.PortfolioInfo;
 import org.yccheok.jstock.watchlist.WatchlistInfo;
 
+import org.yccheok.jstock.engine.Country;
+import org.yccheok.jstock.engine.Stock;
+import org.yccheok.jstock.engine.StockInfo;
+import org.yccheok.jstock.gui.news.StockNews;
+
+
 /**
  *
  * @author  doraemon
@@ -3147,7 +3153,6 @@ public class JStock extends javax.swing.JFrame {
     // Asynchronous call. Must be called by event dispatch thread.
     public void displayHistoryChart(Stock stock) {
         final StockHistoryServer stockHistoryServer = stockHistoryMonitor.getStockHistoryServer(stock.code);
-
         if (stockHistoryServer == null) {
             if (stockCodeHistoryGUI.add(stock.code) && stockHistoryMonitor.addStockCode(stock.code)) {                                
                 final String template = GUIBundle.getString("MainFrame_LookingForHistory_template");
@@ -3169,6 +3174,26 @@ public class JStock extends javax.swing.JFrame {
             final int modelIndex = jTable1.getRowSorter().convertRowIndexToModel(row);
             Stock stock = tableModel.getStock(modelIndex);
             displayHistoryChart(stock);
+        }
+    }
+
+    private void displayStockNews(Stock stock) {
+        assert(SwingUtilities.isEventDispatchThread());
+
+        final StockInfo stockInfo = StockInfo.newInstance(stock.code, stock.symbol);
+        final String title = stock.code + " (" + stock.symbol + ")";
+        final StockNews stockNews = new StockNews(stockInfo, title);
+        stockNews.retrieveNewsInBackground();
+    }
+
+    private void displayStocksNews() {
+        int rows[] = jTable1.getSelectedRows();
+        final StockTableModel tableModel = (StockTableModel)jTable1.getModel();
+
+        for (int row : rows) {
+            final int modelIndex = jTable1.getRowSorter().convertRowIndexToModel(row);
+            final Stock stock = tableModel.getStock(modelIndex);
+            displayStockNews(stock);
         }
     }
 
@@ -3224,13 +3249,24 @@ public class JStock extends javax.swing.JFrame {
         
         menuItem.addActionListener(new ActionListener() {
             @Override
-        	public void actionPerformed(ActionEvent evt) {
-                    JStock.this.deteleSelectedTableRow();
+            public void actionPerformed(ActionEvent evt) {
+                JStock.this.deteleSelectedTableRow();
             }
         });
             
         popup.add(menuItem);
-        
+        popup.addSeparator();
+
+        // Add Stocks news
+        menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_News..."), this.getImageIcon("/images/16x16/news.png"));
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                displayStocksNews();
+            }
+        });
+        popup.add(menuItem);
+
         return popup;
     }
 
