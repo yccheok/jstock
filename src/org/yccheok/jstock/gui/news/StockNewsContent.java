@@ -28,20 +28,20 @@ import javafx.scene.web.WebView;
 import javafx.concurrent.Worker;
 import static javafx.concurrent.Worker.State.FAILED;
 import static javafx.concurrent.Worker.State.SUCCEEDED;
-import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.control.SingleSelectionModel;
 import javafx.event.EventHandler;
 import javafx.beans.value.ObservableValue; 
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Tooltip;
 
 
 public class StockNewsContent {
 
     public StockNewsContent(double width, double height) {
-        // TabPane => Tab => StackPane => WebVIew / ProgressBar
+        // TabPane => Tab => StackPane => WebVIew
         this.width = width;
         this.height = height;
         tabPane.setMinWidth(this.width);
@@ -63,7 +63,6 @@ public class StockNewsContent {
 
         final Tab tab = new Tab();
         final StackPane stackPane = new StackPane();
-        final ProgressBar progress = new ProgressBar();
 
         tab.setOnCloseRequest(new EventHandler<javafx.event.Event>() {
             public void handle(javafx.event.Event e) {
@@ -73,32 +72,34 @@ public class StockNewsContent {
 
         tab.setTooltip(new Tooltip(title));
         
+        final ProgressIndicator progressIn = new ProgressIndicator();
+        progressIn.setMaxSize(15, 15);
+        
+        tab.setGraphic(progressIn);
+        
         final WebView webView = new WebView();
-        stackPane.getChildren().addAll(webView, progress);
+        stackPane.getChildren().addAll(webView);
 
         tab.setContent(stackPane);
         tabPane.getTabs().add(tab);
         final WebEngine webEngine = webView.getEngine();
         webEngine.load(link.toString());
 
-        // update progress bar using binding
-        progress.progressProperty().bind(webEngine.getLoadWorker().progressProperty());
-
         webEngine.getLoadWorker().stateProperty().addListener(
             new javafx.beans.value.ChangeListener<Worker.State>() {
                 public void changed(ObservableValue ov, Worker.State oldState, Worker.State newState) {
                     if (newState == SUCCEEDED) {
-                        stackPane.getChildren().remove(progress);
+                        progressIn.setVisible(false);
                     } else if (newState == FAILED) {
                         // handle failed
-                        System.out.println("Web failed to load: " + title);
+                        progressIn.setVisible(false);
                     }
                 }
             });
                 
         // Tab title: display first 2 words of news title
-        final String[] result = title.split(" ", 3);
-        final String shortTitle = String.join(" ", result[0], result[1]) + "...";
+        final String[] result = title.split(" ", 4);
+        final String shortTitle = String.join(" ", result[0], result[1], result[2]) + "...";
         tab.setText(shortTitle);
         tabPane.getSelectionModel().select(tab);
     }
