@@ -108,7 +108,7 @@ public class StockNews extends JFrame {
                 progressIn.setMaxWidth(100);
                 progressIn.setMaxHeight(100);
                 progressIn.setVisible(true);
-                newsListView.setVisible(false);
+                newsListView.setVisible(true);
 
                 newsListView.setCellFactory(new Callback<ListView<FeedItem>, 
                     ListCell<FeedItem>>() {
@@ -255,26 +255,14 @@ public class StockNews extends JFrame {
         // Retrieve news from next available news server
         Task task = new Task<Void>() {
             @Override public Void call() {
-                boolean firstLoad = true;
-
                 // load news from all available news servers, asynchrounusly
-                for (serverCnt = 0; serverCnt < newsServers.size(); serverCnt++) {
+                while (serverCnt < newsServers.size()) {
                     final java.util.List<FeedItem> newMessages = newsServers.get(serverCnt).getMessages(stockInfo);
                     if (newMessages.isEmpty())
                         continue;
                     
                     messages_o.addAll(newMessages);
-
-                    if (firstLoad) {
-                        firstLoad = false;
-
-                        Platform.runLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                newsListView.setVisible(true);
-                            }
-                        });
-                    }
+                    serverCnt++;
                 }
                 
                 Platform.runLater(new Runnable() {

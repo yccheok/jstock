@@ -87,9 +87,11 @@ public class StockNewsContent {
                 public void changed(ObservableValue ov, Worker.State oldState, Worker.State newState) {
                     if (newState == SUCCEEDED) {
                         progressIn.setVisible(false);
+                        tab.setGraphic(null);
                     } else if (newState == FAILED) {
                         // handle failed
                         progressIn.setVisible(false);
+                        tab.setGraphic(null);
                     }
                 }
             });
