@@ -30,7 +30,6 @@ import static javafx.concurrent.Worker.State.FAILED;
 import static javafx.concurrent.Worker.State.SUCCEEDED;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.control.SingleSelectionModel;
 import javafx.event.EventHandler;
 import javafx.beans.value.ObservableValue; 
@@ -41,7 +40,7 @@ import javafx.scene.control.Tooltip;
 public class StockNewsContent {
 
     public StockNewsContent(double width, double height) {
-        // TabPane => Tab => StackPane => WebVIew
+        // TabPane => Tab => WebVIew
         this.width = width;
         this.height = height;
         tabPane.setMinWidth(this.width);
@@ -62,7 +61,6 @@ public class StockNewsContent {
         tabsInfo.add(new Pair(link, title));
 
         final Tab tab = new Tab();
-        final StackPane stackPane = new StackPane();
 
         tab.setOnCloseRequest(new EventHandler<javafx.event.Event>() {
             public void handle(javafx.event.Event e) {
@@ -78,9 +76,8 @@ public class StockNewsContent {
         tab.setGraphic(progressIn);
         
         final WebView webView = new WebView();
-        stackPane.getChildren().addAll(webView);
-
-        tab.setContent(stackPane);
+        tab.setContent(webView);
+        
         tabPane.getTabs().add(tab);
         final WebEngine webEngine = webView.getEngine();
         webEngine.load(link.toString());
@@ -97,7 +94,7 @@ public class StockNewsContent {
                 }
             });
                 
-        // Tab title: display first 2 words of news title
+        // Tab title: display progress Indicator + first 3 words of news title
         final String[] result = title.split(" ", 4);
         final String shortTitle = String.join(" ", result[0], result[1], result[2]) + "...";
         tab.setText(shortTitle);

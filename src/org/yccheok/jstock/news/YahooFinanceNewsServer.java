@@ -22,7 +22,7 @@ public class YahooFinanceNewsServer implements NewsServer {
     @Override
     public List<FeedItem> getMessages(StockInfo stockInfo) {
         // http://feeds.finance.yahoo.com/rss/2.0/headline?s=0005.HK&region=US&lang=en-US
-        final String feedUrl = "http://feeds.finance.yahoo.com/rss/2.0/headline?s=" + stockInfo.code + "&region=US&lang=en-US";
+        final String feedUrl = "https://feeds.finance.yahoo.com/rss/2.0/headline?s=" + stockInfo.code + "&region=US&lang=en-US";
         final List<FeedItem> messages = new ArrayList<>();
         final Set<String> titles = new HashSet<>();
             
