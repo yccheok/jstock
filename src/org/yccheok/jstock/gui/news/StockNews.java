@@ -22,6 +22,8 @@ package org.yccheok.jstock.gui.news;
 import it.sauronsoftware.feed4j.bean.FeedItem;
 import java.awt.*;
 import java.net.URL;
+import java.util.Collections;
+import java.util.Comparator;
 import javax.swing.*;
 
 import javafx.application.Platform;
@@ -257,12 +259,19 @@ public class StockNews extends JFrame {
             @Override public Void call() {
                 // load news from all available news servers, asynchrounusly
                 while (serverCnt < newsServers.size()) {
-                    final java.util.List<FeedItem> newMessages = newsServers.get(serverCnt).getMessages(stockInfo);
+                    final java.util.List<FeedItem> newMessages = newsServers.get(serverCnt++).getMessages(stockInfo);
                     if (newMessages.isEmpty())
                         continue;
                     
+                    // Latest news come first.
+                    Collections.sort(newMessages, new Comparator<FeedItem>() {
+                        @Override
+                        public int compare(FeedItem lhs, FeedItem rhs) {
+                            return -lhs.getPubDate().compareTo(rhs.getPubDate());
+                        }
+                    });
+                    
                     messages_o.addAll(newMessages);
-                    serverCnt++;
                 }
                 
                 Platform.runLater(new Runnable() {
@@ -277,7 +286,6 @@ public class StockNews extends JFrame {
         };
         new Thread(task).start();
     }
-
     
     public StockNewsContent stockNewsContent;
 
