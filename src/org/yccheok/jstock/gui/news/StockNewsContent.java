@@ -22,25 +22,29 @@ package org.yccheok.jstock.gui.news;
 import org.yccheok.jstock.engine.Pair;
 import java.net.URL;
 import java.util.ArrayList;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.concurrent.Worker;
 import static javafx.concurrent.Worker.State.FAILED;
 import static javafx.concurrent.Worker.State.SUCCEEDED;
-import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.control.SingleSelectionModel;
 import javafx.event.EventHandler;
 import javafx.beans.value.ObservableValue; 
+import javafx.event.ActionEvent;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.Tooltip;
+import javafx.util.Duration;
 
 
 public class StockNewsContent {
 
     public StockNewsContent(double width, double height) {
-        // TabPane => Tab => StackPane => WebVIew / ProgressBar
+        // TabPane => Tab => WebVIew
         this.width = width;
         this.height = height;
         tabPane.setMinWidth(this.width);
@@ -61,42 +65,59 @@ public class StockNewsContent {
         tabsInfo.add(new Pair(link, title));
 
         final Tab tab = new Tab();
-        final StackPane stackPane = new StackPane();
-        final ProgressBar progress = new ProgressBar();
 
         tab.setOnCloseRequest(new EventHandler<javafx.event.Event>() {
             public void handle(javafx.event.Event e) {
                 tabsInfo.remove(tabPane.getSelectionModel().getSelectedIndex());
             }
         });
+
+        tab.setTooltip(new Tooltip(title));
         
+        final ProgressIndicator progressIn = new ProgressIndicator();
+        progressIn.setMaxSize(15, 15);
+        
+        tab.setGraphic(progressIn);
         
         final WebView webView = new WebView();
-        stackPane.getChildren().addAll(webView, progress);
-
-        tab.setContent(stackPane);
+        tab.setContent(webView);
+        
         tabPane.getTabs().add(tab);
         final WebEngine webEngine = webView.getEngine();
         webEngine.load(link.toString());
 
-        // update progress bar using binding
-        progress.progressProperty().bind(webEngine.getLoadWorker().progressProperty());
-
         webEngine.getLoadWorker().stateProperty().addListener(
             new javafx.beans.value.ChangeListener<Worker.State>() {
                 public void changed(ObservableValue ov, Worker.State oldState, Worker.State newState) {
-                    if (newState == SUCCEEDED) {
-                        stackPane.getChildren().remove(progress);
-                    } else if (newState == FAILED) {
-                        // handle failed
+                    if (newState == SUCCEEDED || newState == FAILED) {
+                        if (progressIn.isVisible() == true)
+                            progressIn.setVisible(false);
+                        
+                        if (tab.getGraphic() != null)
+                            tab.setGraphic(null);
                     }
                 }
             });
                 
-        // Tab title: display first 2 words of news title
-        final String[] result = title.split(" ", 3);
-        final String shortTitle = String.join(" ", result[0], result[1]) + "...";
+        // Tab title: display progress Indicator + first 3 words of news title
+        final String[] result = title.split(" ", 4);
+        final String shortTitle = String.join(" ", result[0], result[1], result[2]) + "...";
         tab.setText(shortTitle);
+        
+        // remove ProgressIndicator (loading icon on tab) after 15s
+        final Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(15), new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                if (progressIn.isVisible() == true)
+                    progressIn.setVisible(false);
+
+                if (tab.getGraphic() != null)
+                    tab.setGraphic(null);
+            }
+        }));
+        timeline.setCycleCount(1);
+        timeline.play();
+        
         tabPane.getSelectionModel().select(tab);
     }
 

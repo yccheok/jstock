@@ -22,6 +22,8 @@ package org.yccheok.jstock.gui.news;
 import it.sauronsoftware.feed4j.bean.FeedItem;
 import java.awt.*;
 import java.net.URL;
+import java.util.Collections;
+import java.util.Comparator;
 import javax.swing.*;
 
 import javafx.application.Platform;
@@ -48,6 +50,7 @@ import javafx.scene.text.TextFlow;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.Country;
@@ -65,8 +68,8 @@ public class StockNews extends JFrame {
         this.stockInfo = stockInfo;
         final Country country = org.yccheok.jstock.engine.Utils.toCountry(this.stockInfo.code);
         this.newsServers = NewsServerFactory.getNewsServers(country);
-
-        fullSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        
+        fullSize = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
         sceneWidth = fullSize.width / 2;
         sceneHeight = fullSize.height;
 
@@ -95,7 +98,6 @@ public class StockNews extends JFrame {
                 newsListView.setId("news-listview");
 
                 stackPane.setId("parent-stackPane");
-                stackPane.setMinWidth(sceneWidth);
                 stackPane.setPrefWidth(sceneWidth);
                 stackPane.setMaxWidth(sceneWidth);
 
@@ -108,7 +110,7 @@ public class StockNews extends JFrame {
                 progressIn.setMaxWidth(100);
                 progressIn.setMaxHeight(100);
                 progressIn.setVisible(true);
-                newsListView.setVisible(false);
+                newsListView.setVisible(true);
 
                 newsListView.setCellFactory(new Callback<ListView<FeedItem>, 
                     ListCell<FeedItem>>() {
@@ -133,7 +135,9 @@ public class StockNews extends JFrame {
                                 return;
 
                             if (stockNewsContent == null) {
-                                stockNewsContent = new StockNewsContent(sceneWidth, sceneHeight);
+                                // also minus divider width = 2px. Refer css: .split-pane > .split-pane-divider
+                                final double rightWidth = fullSize.width - sceneWidth - 2;
+                                stockNewsContent = new StockNewsContent(rightWidth, sceneHeight);
 
                                 SwingUtilities.invokeLater(new Runnable() {
                                     @Override
@@ -151,7 +155,8 @@ public class StockNews extends JFrame {
                                                 splitPane.resize(fullSize.width, fullSize.height);
 
                                                 splitPane.getItems().add(stockNewsContent.tabPane);
-                                                splitPane.setDividerPositions(0.5f);
+                                                //A position of 1.0 will place the divider at the right/bottom most edge of the SplitPane minus the minimum size of the node.
+                                                splitPane.setDividerPositions(1.0f);
                                             }
                                         });
                                     }
@@ -172,7 +177,7 @@ public class StockNews extends JFrame {
                                     }
                                 });
                             }
-                            stockNewsContent.addNewsTab(link, msg.getTitle());
+                            stockNewsContent.addNewsTab(link, StringEscapeUtils.unescapeHtml(msg.getTitle()));
                         }
                     }
                 });
@@ -200,7 +205,12 @@ public class StockNews extends JFrame {
                 newsBox.setMaxWidth(sceneWidth - 20);
                 newsBox.getStyleClass().add("item-border-pane");
 
-                final String msgTitle = item.getTitle();
+                // last cell - has padding bottom
+                if(getIndex() == (getListView().getItems().size() - 1)) {
+                    this.getStyleClass().add("listcell-last");
+                }
+                
+                final String msgTitle = StringEscapeUtils.unescapeHtml(item.getTitle());
                 final Text firstText = new Text(msgTitle.substring(0, 1));
                 final Text secondText = new Text(msgTitle.substring(1));
 
@@ -247,26 +257,21 @@ public class StockNews extends JFrame {
         // Retrieve news from next available news server
         Task task = new Task<Void>() {
             @Override public Void call() {
-                boolean firstLoad = true;
-
                 // load news from all available news servers, asynchrounusly
-                for (serverCnt = 0; serverCnt < newsServers.size(); serverCnt++) {
-                    final java.util.List<FeedItem> newMessages = newsServers.get(serverCnt).getMessages(stockInfo);
+                while (serverCnt < newsServers.size()) {
+                    final java.util.List<FeedItem> newMessages = newsServers.get(serverCnt++).getMessages(stockInfo);
                     if (newMessages.isEmpty())
                         continue;
                     
+                    // Latest news come first.
+                    Collections.sort(newMessages, new Comparator<FeedItem>() {
+                        @Override
+                        public int compare(FeedItem lhs, FeedItem rhs) {
+                            return -lhs.getPubDate().compareTo(rhs.getPubDate());
+                        }
+                    });
+                    
                     messages_o.addAll(newMessages);
-
-                    if (firstLoad) {
-                        firstLoad = false;
-
-                        Platform.runLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                newsListView.setVisible(true);
-                            }
-                        });
-                    }
                 }
                 
                 Platform.runLater(new Runnable() {
@@ -281,7 +286,6 @@ public class StockNews extends JFrame {
         };
         new Thread(task).start();
     }
-
     
     public StockNewsContent stockNewsContent;
 
@@ -289,7 +293,7 @@ public class StockNews extends JFrame {
     private final java.util.List<NewsServer> newsServers;
     private int serverCnt = 0;
 
-    private final Dimension fullSize;
+    private final Rectangle fullSize;
     private final double sceneWidth;
     private final double sceneHeight;
 

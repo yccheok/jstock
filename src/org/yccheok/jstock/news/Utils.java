@@ -16,6 +16,7 @@ import it.sauronsoftware.feed4j.bean.RawElement;
 import java.text.ParseException;
 import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.logging.Log;
@@ -113,17 +114,27 @@ public class Utils {
 
     public static String getPubDateDiff (Date pubDate) {
         Date now = new java.util.Date();
-        long diffInMillies = now.getTime() - pubDate.getTime();
         String pubDateDiff;
         
-        long hours = TimeUnit.HOURS.convert(diffInMillies, TimeUnit.MILLISECONDS);
-        if (hours <= 1) {
-            pubDateDiff = "1 hour ago";
-        } else if (hours < 24) {
-            pubDateDiff = hours + " hours ago";
-        } else {
-            SimpleDateFormat formatter = new SimpleDateFormat("dd MMM");
+        Calendar cal1 = Calendar.getInstance();
+        cal1.setTime(pubDate);
+        Calendar cal2 = Calendar.getInstance();
+        cal2.setTime(now);
+
+        if (cal1.get(Calendar.YEAR) != cal2.get(Calendar.YEAR)) {
+            SimpleDateFormat formatter = new SimpleDateFormat("MMM dd, yyyy");
             pubDateDiff = formatter.format(pubDate);
+        } else {
+            long diffInMillies = now.getTime() - pubDate.getTime();
+            long hours = TimeUnit.HOURS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+            if (hours <= 1) {
+                pubDateDiff = "1 hour ago";
+            } else if (hours < 24) {
+                pubDateDiff = hours + " hours ago";
+            } else {
+                SimpleDateFormat formatter = new SimpleDateFormat("MMM dd");
+                pubDateDiff = formatter.format(pubDate);
+            }
         }
         
         return pubDateDiff;
