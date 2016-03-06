@@ -22,6 +22,8 @@ package org.yccheok.jstock.gui.news;
 import org.yccheok.jstock.engine.Pair;
 import java.net.URL;
 import java.util.ArrayList;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
@@ -33,8 +35,10 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.SingleSelectionModel;
 import javafx.event.EventHandler;
 import javafx.beans.value.ObservableValue; 
+import javafx.event.ActionEvent;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Tooltip;
+import javafx.util.Duration;
 
 
 public class StockNewsContent {
@@ -85,13 +89,12 @@ public class StockNewsContent {
         webEngine.getLoadWorker().stateProperty().addListener(
             new javafx.beans.value.ChangeListener<Worker.State>() {
                 public void changed(ObservableValue ov, Worker.State oldState, Worker.State newState) {
-                    if (newState == SUCCEEDED) {
-                        progressIn.setVisible(false);
-                        tab.setGraphic(null);
-                    } else if (newState == FAILED) {
-                        // handle failed
-                        progressIn.setVisible(false);
-                        tab.setGraphic(null);
+                    if (newState == SUCCEEDED || newState == FAILED) {
+                        if (progressIn.isVisible() == true)
+                            progressIn.setVisible(false);
+                        
+                        if (tab.getGraphic() != null)
+                            tab.setGraphic(null);
                     }
                 }
             });
@@ -100,6 +103,21 @@ public class StockNewsContent {
         final String[] result = title.split(" ", 4);
         final String shortTitle = String.join(" ", result[0], result[1], result[2]) + "...";
         tab.setText(shortTitle);
+        
+        // remove ProgressIndicator (loading icon on tab) after 15s
+        final Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(15), new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                if (progressIn.isVisible() == true)
+                    progressIn.setVisible(false);
+
+                if (tab.getGraphic() != null)
+                    tab.setGraphic(null);
+            }
+        }));
+        timeline.setCycleCount(1);
+        timeline.play();
+        
         tabPane.getSelectionModel().select(tab);
     }
 
