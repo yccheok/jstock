@@ -78,6 +78,21 @@ public class StockNews extends JFrame {
 
     private void initComponents() {
 
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+            }
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                Task task = StockNews.this.task;
+                if (task != null) {
+                    task.cancel(true);
+                }
+            }
+            public void windowDeiconified(java.awt.event.WindowEvent evt) {
+            }
+            public void windowIconified(java.awt.event.WindowEvent evt) {
+            }
+        });
+        
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
@@ -129,7 +144,7 @@ public class StockNews extends JFrame {
                             final FeedItem msg = newsListView.getSelectionModel().getSelectedItem();
                             if (msg == null)
                                 return;
-
+                            
                             final URL link = msg.getLink();
                             if (link == null || link.getHost() == null)
                                 return;
@@ -255,17 +270,28 @@ public class StockNews extends JFrame {
     }
 
     public void retrieveNewsInBackground () {
-        if (this.newsServers == null || this.serverCnt >= this.newsServers.size())
+        if (this.newsServers == null || this.serverCnt >= this.newsServers.size()) {
             return;
-
+        }
+        
+        if (task != null) {
+            throw new java.lang.RuntimeException("Being called more than once");
+        }
+        
         // Retrieve news from next available news server
-        Task task = new Task<Void>() {
+        task = new Task<Void>() {
             @Override public Void call() {
                 // load news from all available news servers, asynchrounusly
-                while (serverCnt < newsServers.size()) {
+                while (serverCnt < newsServers.size()) {                   
                     final java.util.List<FeedItem> newMessages = newsServers.get(serverCnt++).getMessages(stockInfo);
-                    if (newMessages.isEmpty())
+                    
+                    if (isCancelled()) {
+                        return null;
+                    }
+                    
+                    if (newMessages.isEmpty()) {
                         continue;
+                    }
                     
                     // Latest news come first.
                     Collections.sort(newMessages, new Comparator<FeedItem>() {
@@ -274,13 +300,20 @@ public class StockNews extends JFrame {
                             return -lhs.getPubDate().compareTo(rhs.getPubDate());
                         }
                     });
-                    
-                    messages_o.addAll(newMessages);
+
+                    messages_o.addAll(newMessages);                    
                 }
                 
+                if (isCancelled()) {
+                    return null;
+                }
+
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
+                        if (isCancelled()) {
+                            return;
+                        }
                         stackPane.getChildren().remove(progressIn);
                     }
                 });
@@ -311,5 +344,7 @@ public class StockNews extends JFrame {
     private ObservableList<FeedItem> messages_o;
     private ListView<FeedItem> newsListView;
 
+    private Task task;
+    
     private final Log log = LogFactory.getLog(StockNews.class);    
 }
