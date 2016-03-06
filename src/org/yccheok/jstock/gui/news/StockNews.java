@@ -166,6 +166,10 @@ public class StockNews extends JFrame {
                                     @Override
                                     public void changed(ObservableValue<? extends Tab> observable, Tab oldTab, Tab newTab) {
                                         int i = stockNewsContent.tabPane.getSelectionModel().getSelectedIndex();
+                                        if (i < 0) {
+                                            return;
+                                        }
+                                        
                                         final String jFrameTitle = stockNewsContent.tabsInfo.get(i).second;
                                         
                                         SwingUtilities.invokeLater(new Runnable() {
