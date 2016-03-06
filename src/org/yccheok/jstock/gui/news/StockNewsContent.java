@@ -90,11 +90,13 @@ public class StockNewsContent {
             new javafx.beans.value.ChangeListener<Worker.State>() {
                 public void changed(ObservableValue ov, Worker.State oldState, Worker.State newState) {
                     if (newState == SUCCEEDED || newState == FAILED) {
-                        if (progressIn.isVisible() == true)
+                        if (progressIn.isVisible() == true) {
                             progressIn.setVisible(false);
+                        }
                         
-                        if (tab.getGraphic() != null)
+                        if (tab.getGraphic() != null) {
                             tab.setGraphic(null);
+                        }
                     }
                 }
             });
@@ -108,11 +110,13 @@ public class StockNewsContent {
         final Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(15), new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                if (progressIn.isVisible() == true)
+                if (progressIn.isVisible() == true) {
                     progressIn.setVisible(false);
+                }
 
-                if (tab.getGraphic() != null)
+                if (tab.getGraphic() != null) {
                     tab.setGraphic(null);
+                }
             }
         }));
         timeline.setCycleCount(1);
