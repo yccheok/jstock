@@ -69,10 +69,21 @@ public class StockNewsJFrame extends JFrame {
         final Country country = org.yccheok.jstock.engine.Utils.toCountry(this.stockInfo.code);
         this.newsServers = NewsServerFactory.getNewsServers(country);
         
+        /*
         fullSize = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
         sceneWidth = fullSize.width / 2;
         sceneHeight = fullSize.height;
+        */
+                
+        fullSize = Toolkit.getDefaultToolkit().getScreenSize();
+        //height of the task bar
+        Insets scnMax = Toolkit.getDefaultToolkit().getScreenInsets(getGraphicsConfiguration());
+        int taskBarSize = scnMax.bottom;
 
+        sceneWidth = fullSize.width / 2;
+        sceneHeight = fullSize.height - taskBarSize;
+        fullSize.setSize(fullSize.width, sceneHeight);
+        
         initComponents();
     }
 
@@ -333,7 +344,7 @@ public class StockNewsJFrame extends JFrame {
     private final java.util.List<NewsServer> newsServers;
     private int serverCnt = 0;
 
-    private final Rectangle fullSize;
+    private final Dimension fullSize;
     private final double sceneWidth;
     private final double sceneHeight;
 
