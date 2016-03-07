@@ -59,9 +59,9 @@ import org.yccheok.jstock.news.NewsServer;
 import org.yccheok.jstock.news.NewsServerFactory;
 
 
-public class StockNews extends JFrame {
+public class StockNewsJFrame extends JFrame {
     
-    public StockNews(StockInfo stockInfo, String title) {
+    public StockNewsJFrame(StockInfo stockInfo, String title) {
         super(title);
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
@@ -82,7 +82,7 @@ public class StockNews extends JFrame {
             public void windowClosed(java.awt.event.WindowEvent evt) {
             }
             public void windowClosing(java.awt.event.WindowEvent evt) {
-                Task task = StockNews.this.task;
+                Task task = StockNewsJFrame.this.task;
                 if (task != null) {
                     task.cancel(true);
                 }
@@ -103,7 +103,7 @@ public class StockNews extends JFrame {
                 splitPane = new SplitPane();
                 scene = new Scene(splitPane);
 
-                scene.getStylesheets().add(StockNews.class.getResource("StockNews.css").toExternalForm()); 
+                scene.getStylesheets().add(StockNewsJFrame.class.getResource("StockNewsJFrame.css").toExternalForm()); 
                 jfxPanel.setScene(scene);
                 jfxPanel.setPreferredSize(new Dimension((int)sceneWidth, (int)sceneHeight));
 
@@ -115,6 +115,7 @@ public class StockNews extends JFrame {
                 stackPane.setId("parent-stackPane");
                 stackPane.setPrefWidth(sceneWidth);
                 stackPane.setMaxWidth(sceneWidth);
+                stackPane.setMinWidth(sceneWidth / 4);
 
                 stackPane.getChildren().addAll(newsListView, progressIn);
 
@@ -142,12 +143,14 @@ public class StockNews extends JFrame {
                     public void handle(MouseEvent event) {
                         if (event.getClickCount() >= 1) {
                             final FeedItem msg = newsListView.getSelectionModel().getSelectedItem();
-                            if (msg == null)
+                            if (msg == null) {
                                 return;
+                            }
                             
                             final URL link = msg.getLink();
-                            if (link == null || link.getHost() == null)
+                            if (link == null || link.getHost() == null) {
                                 return;
+                            }
 
                             if (stockNewsContent == null) {
                                 // also minus divider width = 2px. Refer css: .split-pane > .split-pane-divider
@@ -159,7 +162,7 @@ public class StockNews extends JFrame {
                                     public void run() {
                                         // resize JFrame first
                                         jfxPanel.setPreferredSize(new Dimension(fullSize.width, fullSize.height));
-                                        StockNews.this.pack();
+                                        StockNewsJFrame.this.pack();
 
                                         Platform.runLater(new Runnable() {
                                             @Override
@@ -190,7 +193,7 @@ public class StockNews extends JFrame {
                                         SwingUtilities.invokeLater(new Runnable() {
                                             @Override
                                             public void run() {
-                                                StockNews.this.setTitle(jFrameTitle);
+                                                StockNewsJFrame.this.setTitle(jFrameTitle);
                                             }
                                         });
                                     }
@@ -204,8 +207,8 @@ public class StockNews extends JFrame {
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        StockNews.this.pack();
-                        StockNews.this.setVisible(true);
+                        StockNewsJFrame.this.pack();
+                        StockNewsJFrame.this.setVisible(true);
                     }
                 });
             }
@@ -346,5 +349,5 @@ public class StockNews extends JFrame {
 
     private Task task;
     
-    private final Log log = LogFactory.getLog(StockNews.class);    
+    private final Log log = LogFactory.getLog(StockNewsJFrame.class);    
 }

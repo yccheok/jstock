@@ -68,7 +68,7 @@ import org.yccheok.jstock.watchlist.WatchlistInfo;
 import org.yccheok.jstock.engine.Country;
 import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.StockInfo;
-import org.yccheok.jstock.gui.news.StockNews;
+import org.yccheok.jstock.gui.news.StockNewsJFrame;
 
 
 /**
@@ -3182,8 +3182,8 @@ public class JStock extends javax.swing.JFrame {
 
         final StockInfo stockInfo = StockInfo.newInstance(stock.code, stock.symbol);
         final String title = stock.code + " (" + stock.symbol + ")";
-        final StockNews stockNews = new StockNews(stockInfo, title);
-        stockNews.retrieveNewsInBackground();
+        final StockNewsJFrame stockNewsJFrame = new StockNewsJFrame(stockInfo, title);
+        stockNewsJFrame.retrieveNewsInBackground();
     }
 
     private void displayStocksNews() {
