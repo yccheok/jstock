@@ -21,6 +21,7 @@ package org.yccheok.jstock.gui.news;
 
 import it.sauronsoftware.feed4j.bean.FeedItem;
 import java.awt.*;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Comparator;
@@ -69,21 +70,11 @@ public class StockNewsJFrame extends JFrame {
         final Country country = org.yccheok.jstock.engine.Utils.toCountry(this.stockInfo.code);
         this.newsServers = NewsServerFactory.getNewsServers(country);
         
-        /*
         fullSize = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
         sceneWidth = fullSize.width / 2;
         sceneHeight = fullSize.height;
-        */
-                
-        fullSize = Toolkit.getDefaultToolkit().getScreenSize();
-        //height of the task bar
-        Insets scnMax = Toolkit.getDefaultToolkit().getScreenInsets(getGraphicsConfiguration());
-        int taskBarSize = scnMax.bottom;
+        this.setSize((int)sceneWidth, (int)sceneHeight);
 
-        sceneWidth = fullSize.width / 2;
-        sceneHeight = fullSize.height - taskBarSize;
-        fullSize.setSize(fullSize.width, sceneHeight);
-        
         initComponents();
     }
 
@@ -116,7 +107,6 @@ public class StockNewsJFrame extends JFrame {
 
                 scene.getStylesheets().add(StockNewsJFrame.class.getResource("StockNewsJFrame.css").toExternalForm()); 
                 jfxPanel.setScene(scene);
-                jfxPanel.setPreferredSize(new Dimension((int)sceneWidth, (int)sceneHeight));
 
                 // Left component: News List
                 messages_o = FXCollections.observableArrayList();
@@ -124,10 +114,6 @@ public class StockNewsJFrame extends JFrame {
                 newsListView.setId("news-listview");
 
                 stackPane.setId("parent-stackPane");
-                stackPane.setPrefWidth(sceneWidth);
-                stackPane.setMaxWidth(sceneWidth);
-                stackPane.setMinWidth(sceneWidth / 4);
-
                 stackPane.getChildren().addAll(newsListView, progressIn);
 
                 splitPane.getItems().add(stackPane);
@@ -164,68 +150,72 @@ public class StockNewsJFrame extends JFrame {
                             }
 
                             if (stockNewsContent == null) {
-                                // also minus divider width = 2px. Refer css: .split-pane > .split-pane-divider
-                                final double rightWidth = fullSize.width - sceneWidth - 2;
-                                stockNewsContent = new StockNewsContent(rightWidth, sceneHeight);
-
-                                SwingUtilities.invokeLater(new Runnable() {
+                                stackPane.setPrefWidth(stackPane.getWidth());
+                                stackPane.setMaxWidth(stackPane.getWidth());
+                                stackPane.setMinWidth(stackPane.getWidth() / 5);
+                                    
+                                try {
+                                    SwingUtilities.invokeAndWait(new Runnable() {
+                                    //SwingUtilities.invokeLater(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            // resize JFrame first
+                                            StockNewsJFrame.this.setSize(fullSize.width, fullSize.height);
+                                            Insets in = StockNewsJFrame.this.getInsets();
+                                            jfxPanel.setSize(StockNewsJFrame.this.getWidth() - in.left - in.right, jfxPanel.getHeight());
+                                            
+                                            Insets in2 = jfxPanel.getInsets();
+                                            splitPane.resize(jfxPanel.getWidth() - in2.left - in2.right, jfxPanel.getHeight() - in2.top - in2.bottom);
+                                            
+                                            System.out.println("jframe width[" + StockNewsJFrame.this.getWidth() + "], height[" + StockNewsJFrame.this.getHeight() + "]");
+                                            System.out.println("jframe insets top[" + in.top + "], bottom[" + in.bottom + "], left[" + in.left + "]; right[" + in.right + "]");
+                                            System.out.println("jfxPanel width[" + jfxPanel.getWidth() + "], height[" + jfxPanel.getHeight() + "]");
+                                        }
+                                    });
+                                } catch (InterruptedException | InvocationTargetException ex) {
+                                    log.error(null, ex);
+                                }
+                                
+                                Platform.runLater(new Runnable() {
                                     @Override
                                     public void run() {
-                                        // resize JFrame first
-                                        jfxPanel.setPreferredSize(new Dimension(fullSize.width, fullSize.height));
-                                        StockNewsJFrame.this.pack();
+                                        stockNewsContent = new StockNewsContent();
+                                        splitPane.getItems().add(stockNewsContent.tabPane);
+                                        splitPane.setDividerPositions(0.5f);
 
-                                        Platform.runLater(new Runnable() {
+                                        stockNewsContent.tabPane.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>() {
                                             @Override
-                                            public void run() {
-                                                // resize splitPane
-                                                splitPane.setMinWidth(fullSize.width);
-                                                splitPane.setPrefWidth(fullSize.width);
-                                                splitPane.resize(fullSize.width, fullSize.height);
+                                            public void changed(ObservableValue<? extends Tab> observable, Tab oldTab, Tab newTab) {
+                                                int i = stockNewsContent.tabPane.getSelectionModel().getSelectedIndex();
+                                                if (i < 0) {
+                                                    return;
+                                                }
 
-                                                splitPane.getItems().add(stockNewsContent.tabPane);
-                                                //A position of 1.0 will place the divider at the right/bottom most edge of the SplitPane minus the minimum size of the node.
-                                                splitPane.setDividerPositions(1.0f);
+                                                final String jFrameTitle = stockNewsContent.tabsInfo.get(i).second;
+
+                                                SwingUtilities.invokeLater(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        StockNewsJFrame.this.setTitle(jFrameTitle);
+                                                    }
+                                                });
                                             }
                                         });
-                                    }
-                                });
 
-                                stockNewsContent.tabPane.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>() {
-                                    @Override
-                                    public void changed(ObservableValue<? extends Tab> observable, Tab oldTab, Tab newTab) {
-                                        int i = stockNewsContent.tabPane.getSelectionModel().getSelectedIndex();
-                                        if (i < 0) {
-                                            return;
-                                        }
-                                        
-                                        final String jFrameTitle = stockNewsContent.tabsInfo.get(i).second;
-                                        
-                                        SwingUtilities.invokeLater(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                StockNewsJFrame.this.setTitle(jFrameTitle);
-                                            }
-                                        });
+                                        stockNewsContent.addNewsTab(link, StringEscapeUtils.unescapeHtml(msg.getTitle()));
                                     }
                                 });
+                            } else {
+                                stockNewsContent.addNewsTab(link, StringEscapeUtils.unescapeHtml(msg.getTitle()));
                             }
-                            stockNewsContent.addNewsTab(link, StringEscapeUtils.unescapeHtml(msg.getTitle()));
                         }
-                    }
-                });
-                
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        StockNewsJFrame.this.pack();
-                        StockNewsJFrame.this.setVisible(true);
                     }
                 });
             }
         });
 
         this.add(jfxPanel, BorderLayout.CENTER);
+        this.setVisible(true);
     }
 
     private class DisplayNewsCard extends ListCell<FeedItem> {
@@ -315,7 +305,12 @@ public class StockNewsJFrame extends JFrame {
                         }
                     });
 
-                    messages_o.addAll(newMessages);                    
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            messages_o.addAll(newMessages);
+                        }
+                    });
                 }
                 
                 if (isCancelled()) {
@@ -344,7 +339,7 @@ public class StockNewsJFrame extends JFrame {
     private final java.util.List<NewsServer> newsServers;
     private int serverCnt = 0;
 
-    private final Dimension fullSize;
+    private final Rectangle fullSize;
     private final double sceneWidth;
     private final double sceneHeight;
 

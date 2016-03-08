@@ -43,12 +43,8 @@ import javafx.util.Duration;
 
 public class StockNewsContent {
 
-    public StockNewsContent(double width, double height) {
+    public StockNewsContent() {
         // TabPane => Tab => WebVIew
-        this.width = width;
-        this.height = height;
-        tabPane.setMinWidth(this.width);
-        tabPane.setPrefWidth(this.width);
     }
 
     public void addNewsTab (URL link, String title) {
@@ -127,6 +123,4 @@ public class StockNewsContent {
 
     public final TabPane tabPane = new TabPane();
     public final ArrayList<Pair<URL, String>> tabsInfo = new ArrayList();
-    private final double width;
-    private final double height;
 }
