@@ -156,7 +156,6 @@ public class StockNewsJFrame extends JFrame {
                                     
                                 try {
                                     SwingUtilities.invokeAndWait(new Runnable() {
-                                    //SwingUtilities.invokeLater(new Runnable() {
                                         @Override
                                         public void run() {
                                             // resize JFrame first
@@ -166,48 +165,36 @@ public class StockNewsJFrame extends JFrame {
                                             
                                             Insets in2 = jfxPanel.getInsets();
                                             splitPane.resize(jfxPanel.getWidth() - in2.left - in2.right, jfxPanel.getHeight() - in2.top - in2.bottom);
-                                            
-                                            System.out.println("jframe width[" + StockNewsJFrame.this.getWidth() + "], height[" + StockNewsJFrame.this.getHeight() + "]");
-                                            System.out.println("jframe insets top[" + in.top + "], bottom[" + in.bottom + "], left[" + in.left + "]; right[" + in.right + "]");
-                                            System.out.println("jfxPanel width[" + jfxPanel.getWidth() + "], height[" + jfxPanel.getHeight() + "]");
                                         }
                                     });
                                 } catch (InterruptedException | InvocationTargetException ex) {
                                     log.error(null, ex);
                                 }
                                 
-                                Platform.runLater(new Runnable() {
+                                stockNewsContent = new StockNewsContent();
+                                splitPane.getItems().add(stockNewsContent.tabPane);
+                                splitPane.setDividerPositions(0.5f);
+
+                                stockNewsContent.tabPane.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>() {
                                     @Override
-                                    public void run() {
-                                        stockNewsContent = new StockNewsContent();
-                                        splitPane.getItems().add(stockNewsContent.tabPane);
-                                        splitPane.setDividerPositions(0.5f);
+                                    public void changed(ObservableValue<? extends Tab> observable, Tab oldTab, Tab newTab) {
+                                        int i = stockNewsContent.tabPane.getSelectionModel().getSelectedIndex();
+                                        if (i < 0) {
+                                            return;
+                                        }
 
-                                        stockNewsContent.tabPane.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>() {
+                                        final String jFrameTitle = stockNewsContent.tabsInfo.get(i).second;
+
+                                        SwingUtilities.invokeLater(new Runnable() {
                                             @Override
-                                            public void changed(ObservableValue<? extends Tab> observable, Tab oldTab, Tab newTab) {
-                                                int i = stockNewsContent.tabPane.getSelectionModel().getSelectedIndex();
-                                                if (i < 0) {
-                                                    return;
-                                                }
-
-                                                final String jFrameTitle = stockNewsContent.tabsInfo.get(i).second;
-
-                                                SwingUtilities.invokeLater(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        StockNewsJFrame.this.setTitle(jFrameTitle);
-                                                    }
-                                                });
+                                            public void run() {
+                                                StockNewsJFrame.this.setTitle(jFrameTitle);
                                             }
                                         });
-
-                                        stockNewsContent.addNewsTab(link, StringEscapeUtils.unescapeHtml(msg.getTitle()));
                                     }
                                 });
-                            } else {
-                                stockNewsContent.addNewsTab(link, StringEscapeUtils.unescapeHtml(msg.getTitle()));
                             }
+                            stockNewsContent.addNewsTab(link, StringEscapeUtils.unescapeHtml(msg.getTitle()));
                         }
                     }
                 });

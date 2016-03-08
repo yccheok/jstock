@@ -62,12 +62,6 @@ public class StockNewsContent {
 
         final Tab tab = new Tab();
 
-        tab.setOnCloseRequest(new EventHandler<javafx.event.Event>() {
-            public void handle(javafx.event.Event e) {
-                tabsInfo.remove(tabPane.getSelectionModel().getSelectedIndex());
-            }
-        });
-
         tab.setTooltip(new Tooltip(title));
         
         final ProgressIndicator progressIn = new ProgressIndicator();
@@ -78,6 +72,13 @@ public class StockNewsContent {
         final WebView webView = new WebView();
         tab.setContent(webView);
         
+        tab.setOnCloseRequest(new EventHandler<javafx.event.Event>() {
+            public void handle(javafx.event.Event e) {
+                tabsInfo.remove(tabPane.getSelectionModel().getSelectedIndex());
+                webView.getEngine().load(null);
+            }
+        });
+
         tabPane.getTabs().add(tab);
         final WebEngine webEngine = webView.getEngine();
         webEngine.load(link.toString());
