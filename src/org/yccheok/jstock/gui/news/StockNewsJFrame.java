@@ -74,6 +74,7 @@ public class StockNewsJFrame extends JFrame {
         sceneWidth = fullSize.width / 2;
         sceneHeight = fullSize.height;
         this.setSize((int)sceneWidth, (int)sceneHeight);
+        this.setResizable(false);
 
         initComponents();
     }
@@ -160,6 +161,8 @@ public class StockNewsJFrame extends JFrame {
                                         public void run() {
                                             // resize JFrame first
                                             StockNewsJFrame.this.setSize(fullSize.width, fullSize.height);
+                                            StockNewsJFrame.this.setResizable(true);
+
                                             Insets in = StockNewsJFrame.this.getInsets();
                                             jfxPanel.setSize(StockNewsJFrame.this.getWidth() - in.left - in.right, jfxPanel.getHeight());
                                             
