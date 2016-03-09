@@ -43,12 +43,8 @@ import javafx.util.Duration;
 
 public class StockNewsContent {
 
-    public StockNewsContent(double width, double height) {
+    public StockNewsContent() {
         // TabPane => Tab => WebVIew
-        this.width = width;
-        this.height = height;
-        tabPane.setMinWidth(this.width);
-        tabPane.setPrefWidth(this.width);
     }
 
     public void addNewsTab (URL link, String title) {
@@ -66,12 +62,6 @@ public class StockNewsContent {
 
         final Tab tab = new Tab();
 
-        tab.setOnCloseRequest(new EventHandler<javafx.event.Event>() {
-            public void handle(javafx.event.Event e) {
-                tabsInfo.remove(tabPane.getSelectionModel().getSelectedIndex());
-            }
-        });
-
         tab.setTooltip(new Tooltip(title));
         
         final ProgressIndicator progressIn = new ProgressIndicator();
@@ -82,6 +72,13 @@ public class StockNewsContent {
         final WebView webView = new WebView();
         tab.setContent(webView);
         
+        tab.setOnCloseRequest(new EventHandler<javafx.event.Event>() {
+            public void handle(javafx.event.Event e) {
+                tabsInfo.remove(tabPane.getSelectionModel().getSelectedIndex());
+                webView.getEngine().load(null);
+            }
+        });
+
         tabPane.getTabs().add(tab);
         final WebEngine webEngine = webView.getEngine();
         webEngine.load(link.toString());
@@ -127,6 +124,4 @@ public class StockNewsContent {
 
     public final TabPane tabPane = new TabPane();
     public final ArrayList<Pair<URL, String>> tabsInfo = new ArrayList();
-    private final double width;
-    private final double height;
 }
