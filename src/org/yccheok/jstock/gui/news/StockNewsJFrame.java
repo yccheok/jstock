@@ -23,8 +23,11 @@ import it.sauronsoftware.feed4j.bean.FeedItem;
 import java.awt.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import javax.swing.*;
 
 import javafx.application.Platform;
@@ -74,7 +77,6 @@ public class StockNewsJFrame extends JFrame {
         sceneWidth = fullSize.width / 2;
         sceneHeight = fullSize.height;
         this.setSize((int)sceneWidth, (int)sceneHeight);
-        this.setResizable(false);
 
         initComponents();
     }
@@ -161,7 +163,6 @@ public class StockNewsJFrame extends JFrame {
                                         public void run() {
                                             // resize JFrame first
                                             StockNewsJFrame.this.setSize(fullSize.width, fullSize.height);
-                                            StockNewsJFrame.this.setResizable(true);
 
                                             Insets in = StockNewsJFrame.this.getInsets();
                                             jfxPanel.setSize(StockNewsJFrame.this.getWidth() - in.left - in.right, jfxPanel.getHeight());
@@ -251,7 +252,7 @@ public class StockNewsJFrame extends JFrame {
                     BorderPane.setAlignment(descText, Pos.CENTER_LEFT);
                 }
 
-                final String pubDateDiff = org.yccheok.jstock.news.Utils.getPubDateDiff(item.getPubDate());
+                final String pubDateDiff = toHumanReadableDate(item.getPubDate());
                 final Label pubDate = new Label(pubDateDiff);
                 pubDate.getStyleClass().add("item-date-label");
                 newsBox.setBottom(pubDate);
@@ -322,6 +323,56 @@ public class StockNewsJFrame extends JFrame {
         };
         new Thread(task).start();
     }
+    
+    private boolean isSameDay(Date date0, Date date1) {
+        return date0.getDate() == date1.getDate() && date0.getMonth() == date1.getMonth() && date0.getYear() == date1.getYear(); 
+    }
+    
+    private boolean isSameYear(Date date0, Date date1) {
+        return date0.getYear() == date1.getYear(); 
+    }
+    
+    private String toHumanReadableDate(Date date) {
+        Date today = new Date();
+        if (isSameDay(today, date)) {
+            // Check the differences in timestamp.
+            long timestampDiff = today.getTime() - date.getTime();
+            if (timestampDiff <= 0) {
+                return org.yccheok.jstock.internationalization.GUIBundle.getString("StockNewsJFrame_Now");
+            } else if (timestampDiff < 60 * 60 * 1000) {
+                int minutesAgo = (int)(timestampDiff / 60.0 / 1000.0);
+                if (minutesAgo > 1) {
+                    return MessageFormat.format(org.yccheok.jstock.internationalization.GUIBundle.getString("StockNewsJFrame_MinutesAgo_template"), minutesAgo);
+                } else {
+                    return MessageFormat.format(org.yccheok.jstock.internationalization.GUIBundle.getString("StockNewsJFrame_MinuteAgo_template"), minutesAgo);
+                }
+            } else if (timestampDiff < 24 * 60 * 60 * 1000) {
+                int hoursAgo = (int)(timestampDiff / 60.0 / 60.0 / 1000.0);
+                if (hoursAgo > 1) {
+                    return MessageFormat.format(org.yccheok.jstock.internationalization.GUIBundle.getString("StockNewsJFrame_HoursAgo_template"), hoursAgo);
+                } else {
+                    return MessageFormat.format(org.yccheok.jstock.internationalization.GUIBundle.getString("StockNewsJFrame_HourAgo_template"), hoursAgo);
+                }                
+            }
+        } else if (isSameYear(today, date)) {
+            return formatter.get().format(date);
+        }
+        return formatterWithYear.get().format(date);
+    }
+
+
+    // Use ThreadLocal to ensure thread safety.
+    private static final ThreadLocal <SimpleDateFormat> formatterWithYear = new ThreadLocal <SimpleDateFormat>() {
+        @Override protected SimpleDateFormat initialValue() {
+            return new SimpleDateFormat("MMM dd, yyyy");
+        }
+    };
+
+    private static final ThreadLocal <SimpleDateFormat> formatter = new ThreadLocal <SimpleDateFormat>() {
+        @Override protected SimpleDateFormat initialValue() {
+            return new SimpleDateFormat("MMM dd");
+        }
+    };
     
     public StockNewsContent stockNewsContent;
 

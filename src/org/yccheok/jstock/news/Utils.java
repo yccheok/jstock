@@ -16,9 +16,7 @@ import it.sauronsoftware.feed4j.bean.RawElement;
 import java.text.ParseException;
 import java.util.Date;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
     
@@ -47,7 +45,28 @@ public class Utils {
         }
         return set;
     }
-
+    
+    // explicitly set pubDate for FeedItem, as feed4j failed to handle in it.sauronsoftware.feed4j.TypeRSS_2_0
+    public static Date getProperPubDate (FeedItem message) {
+        for (int j = 0, ej = message.getNodeCount(); j < ej; j++) {
+            RawNode node = message.getNode(j);
+            if (node instanceof RawElement) {
+                RawElement element = (RawElement) node;
+                String name = element.getName();
+                String value = element.getValue();               
+                
+                if (value != null && name.equals("pubDate")) {
+                    try {
+                        return FORMATTER.get().parse(value);
+                    } catch (ParseException ex) {
+                        log.error(null, ex);
+                    }
+                }
+            }
+        }
+        return null;
+    }
+    
     private static final Map<Country, NewsSource> defaultNewsSources = new EnumMap<>(Country.class);
     private static final Map<Class<? extends NewsServer>, NewsSource> classToNewsSourceMap = new HashMap<>();
     private static final List<String> paidNewsUrls = new ArrayList<String>();
@@ -91,54 +110,13 @@ public class Utils {
         paidNewsUrls.add("www.ft.com");
     }
     
-    // explicitly set pubDate for FeedItem, as feed4j failed to handle in it.sauronsoftware.feed4j.TypeRSS_2_0
-    public static Date getProperPubDate (FeedItem message) {
-        for (int j = 0; j < message.getNodeCount(); j++) {
-            RawNode node = message.getNode(j);
-            if (node instanceof RawElement) {
-                RawElement element = (RawElement) node;
-                String name = element.getName();
-                String value = element.getValue();
-
-                if (name.equals("pubDate") && value != null) {
-                    try {
-                        return new SimpleDateFormat("EEE', 'dd' 'MMM' 'yyyy' 'HH:mm:ss' 'z", Locale.US).parse(value);
-                    } catch (ParseException ex) {
-                        log.error(null, ex);
-                    }
-                }
-            }
+    // Use ThreadLocal to ensure thread safety.
+    private static final ThreadLocal <SimpleDateFormat> FORMATTER = new ThreadLocal <SimpleDateFormat>() {
+        @Override protected SimpleDateFormat initialValue() {
+            // Having a fixed locale is important. If not, it will break when the device is in non-english locale.
+            return new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z", Locale.ENGLISH);
         }
-        return null;
-    }
-
-    public static String getPubDateDiff (Date pubDate) {
-        Date now = new java.util.Date();
-        String pubDateDiff;
+    };
         
-        Calendar cal1 = Calendar.getInstance();
-        cal1.setTime(pubDate);
-        Calendar cal2 = Calendar.getInstance();
-        cal2.setTime(now);
-
-        if (cal1.get(Calendar.YEAR) != cal2.get(Calendar.YEAR)) {
-            SimpleDateFormat formatter = new SimpleDateFormat("MMM dd, yyyy");
-            pubDateDiff = formatter.format(pubDate);
-        } else {
-            long diffInMillies = now.getTime() - pubDate.getTime();
-            long hours = TimeUnit.HOURS.convert(diffInMillies, TimeUnit.MILLISECONDS);
-            if (hours <= 1) {
-                pubDateDiff = "1 hour ago";
-            } else if (hours < 24) {
-                pubDateDiff = hours + " hours ago";
-            } else {
-                SimpleDateFormat formatter = new SimpleDateFormat("MMM dd");
-                pubDateDiff = formatter.format(pubDate);
-            }
-        }
-        
-        return pubDateDiff;
-    }
-    
     private static final Log log = LogFactory.getLog(Utils.class);
 }
