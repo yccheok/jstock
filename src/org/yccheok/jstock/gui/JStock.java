@@ -3177,12 +3177,12 @@ public class JStock extends javax.swing.JFrame {
         }
     }
 
-    private void displayStockNews(Stock stock) {
+    public void displayStockNews(Stock stock) {
         assert(SwingUtilities.isEventDispatchThread());
 
         final StockInfo stockInfo = StockInfo.newInstance(stock.code, stock.symbol);
-        final String title = stock.code + " (" + stock.symbol + ")";
-        final StockNewsJFrame stockNewsJFrame = new StockNewsJFrame(stockInfo, title);
+        final String title = stock.symbol + " (" + stock.code + ")";
+        final StockNewsJFrame stockNewsJFrame = new StockNewsJFrame(this, stockInfo, title);
         stockNewsJFrame.retrieveNewsInBackground();
     }
 
@@ -3211,8 +3211,6 @@ public class JStock extends javax.swing.JFrame {
         });
                 
         popup.add(menuItem);
-        
-        popup.addSeparator();
 
         menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_News..."), this.getImageIcon("/images/16x16/news.png"));
         menuItem.addActionListener(new ActionListener() {
