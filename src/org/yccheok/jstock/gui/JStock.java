@@ -3212,6 +3212,17 @@ public class JStock extends javax.swing.JFrame {
                 
         popup.add(menuItem);
         
+        popup.addSeparator();
+
+        menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_News..."), this.getImageIcon("/images/16x16/news.png"));
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                displayStocksNews();
+            }
+        });
+        popup.add(menuItem);
+
         popup.addSeparator();        
         
         if (jTable1.getSelectedRowCount() == 1) {
@@ -3255,18 +3266,7 @@ public class JStock extends javax.swing.JFrame {
         });
             
         popup.add(menuItem);
-        popup.addSeparator();
-
-        // Add Stocks news
-        menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_News..."), this.getImageIcon("/images/16x16/news.png"));
-        menuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                displayStocksNews();
-            }
-        });
-        popup.add(menuItem);
-
+        
         return popup;
     }
 
