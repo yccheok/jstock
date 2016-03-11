@@ -43,10 +43,6 @@ import javafx.util.Duration;
 
 public class StockNewsContent {
 
-    public StockNewsContent() {
-        // TabPane => Tab => WebVIew
-    }
-
     public void addNewsTab (URL link, String title) {
         if (!tabsInfo.isEmpty()) {
             // URL already open in tab, just select tab
