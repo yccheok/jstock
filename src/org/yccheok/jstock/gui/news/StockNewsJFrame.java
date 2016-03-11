@@ -21,6 +21,8 @@ package org.yccheok.jstock.gui.news;
 
 import it.sauronsoftware.feed4j.bean.FeedItem;
 import java.awt.*;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.text.MessageFormat;
@@ -63,12 +65,16 @@ import org.yccheok.jstock.news.NewsServer;
 import org.yccheok.jstock.news.NewsServerFactory;
 
 
-public class StockNewsJFrame extends JFrame {
+public class StockNewsJFrame extends JFrame implements WindowListener {
     
-    public StockNewsJFrame(StockInfo stockInfo, String title) {
+    public StockNewsJFrame(java.awt.Frame parent, StockInfo stockInfo, String title) {
         super(title);
-        this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
+        this.parent = parent;
+        this.parent.addWindowListener(this);
+
+        this.setIconImage(parent.getIconImage());
+        
         this.stockInfo = stockInfo;
         final Country country = org.yccheok.jstock.engine.Utils.toCountry(this.stockInfo.code);
         this.newsServers = NewsServerFactory.getNewsServers(country);
@@ -81,7 +87,55 @@ public class StockNewsJFrame extends JFrame {
         initComponents();
     }
 
+    public void windowActivated(WindowEvent e) {
+       // this only works becuase AutoRequestFocus is false, so this stays on
+       // top, but looses focus 
+       this.toFront();
+    }
+    public void windowDeactivated(WindowEvent e) {
+       // JFrame is set to AlwaysOnTop = true at design time. So this is only
+       // useful on first deactivation. After that it is meaningless. But without
+       // initial AlwaysOnTop, it would not receive focus because autoRequestFocus
+       // is false.
+       this.setAlwaysOnTop(false);
+    }
+    @Override
+    public void windowIconified(WindowEvent e) {
+       // when main app goes away, this child window should also go away 
+       this.setVisible(false);
+    }
+    @Override
+    public void windowDeiconified(WindowEvent e) {
+       // when main app comes back, this child window should also come back
+       this.setVisible(true);
+    }
+    @Override
+    public void windowClosed(WindowEvent e) {}
+    @Override
+    public void windowClosing(WindowEvent e) {}
+    @Override
+    public void windowOpened(WindowEvent e) {}
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {  
+        Task task = StockNewsJFrame.this.task;
+        if (task != null) {
+            task.cancel(true);
+        }
+                
+        // To avoid memory leak.
+        parent.removeWindowListener(this);
+        this.dispose();
+    }
+    
     private void initComponents() {
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+        setAlwaysOnTop(true);
+        setAutoRequestFocus(false);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosed(java.awt.event.WindowEvent evt) {
@@ -396,5 +450,8 @@ public class StockNewsJFrame extends JFrame {
 
     private Task task;
     
+    /* To avoid memory leak */
+    private java.awt.Frame parent;
+
     private final Log log = LogFactory.getLog(StockNewsJFrame.class);    
 }

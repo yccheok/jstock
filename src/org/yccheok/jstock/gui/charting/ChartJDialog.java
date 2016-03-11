@@ -21,7 +21,6 @@ package org.yccheok.jstock.gui.charting;
 
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentEvent;
@@ -200,6 +199,7 @@ public class ChartJDialog extends javax.swing.JFrame implements WindowListener {
        // top, but looses focus 
        this.toFront();
     }
+    @Override
     public void windowDeactivated(WindowEvent e) {
        // JFrame is set to AlwaysOnTop = true at design time. So this is only
        // useful on first deactivation. After that it is meaningless. But without
@@ -207,16 +207,21 @@ public class ChartJDialog extends javax.swing.JFrame implements WindowListener {
        // is false.
        this.setAlwaysOnTop(false);
     }
+    @Override
     public void windowIconified(WindowEvent e) {
        // when main app goes away, this child window should also go away 
        this.setVisible(false);
     }
+    @Override
     public void windowDeiconified(WindowEvent e) {
        // when main app comes back, this child window should also come back
        this.setVisible(true);
     }
+    @Override
     public void windowClosed(WindowEvent e) {}
+    @Override
     public void windowClosing(WindowEvent e) {}
+    @Override
     public void windowOpened(WindowEvent e) {}
     
     /**
