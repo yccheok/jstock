@@ -56,7 +56,6 @@ import java.beans.PropertyChangeListener;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -96,7 +95,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -441,8 +439,8 @@ public class Utils {
                     status = false;
                     break;
                 } finally {
-                    close(outputStream);
-                    closeEntry(zipInputStream);
+                    org.yccheok.jstock.file.Utils.close(outputStream);
+                    org.yccheok.jstock.file.Utils.closeEntry(zipInputStream);
                 }
 
             }   // while(true)
@@ -450,8 +448,8 @@ public class Utils {
             log.error(null, exp);
             status = false;
         } finally {
-            close(zipInputStream);
-            close(inputStream);
+            org.yccheok.jstock.file.Utils.close(zipInputStream);
+            org.yccheok.jstock.file.Utils.close(inputStream);
         }
         return status;
     }
@@ -480,7 +478,7 @@ public class Utils {
             return null;
         }
         finally {
-            close(inputStreamAndMethod.inputStream);
+            org.yccheok.jstock.file.Utils.close(inputStreamAndMethod.inputStream);
             inputStreamAndMethod.method.releaseConnection();
         }
         final String _id = properties.getProperty("id");
@@ -525,7 +523,7 @@ public class Utils {
             return java.util.Collections.emptyMap();
         }
         finally {
-            close(inputStreamAndMethod.inputStream);
+            org.yccheok.jstock.file.Utils.close(inputStreamAndMethod.inputStream);
             inputStreamAndMethod.method.releaseConnection();
         }
         final String _id = properties.getProperty("id");
@@ -1259,8 +1257,8 @@ public class Utils {
         } catch (IOException ex) {
             log.error(null, ex);
         } finally {
-            Utils.close(outputStream);
-            Utils.close(inputStream);
+            org.yccheok.jstock.file.Utils.close(outputStream);
+            org.yccheok.jstock.file.Utils.close(inputStream);
             if (resp != null) {
                 try {
                     resp.disconnect();
@@ -1723,7 +1721,7 @@ public class Utils {
 
         }
         finally {
-            close(inputStreamAndMethod.inputStream);
+            org.yccheok.jstock.file.Utils.close(inputStreamAndMethod.inputStream);
             inputStreamAndMethod.method.releaseConnection();
         }
 
@@ -1801,8 +1799,8 @@ public class Utils {
             log.error(null, exp);
         }
         finally {
-            close(reader);
-            close(inputStream);
+            org.yccheok.jstock.file.Utils.close(reader);
+            org.yccheok.jstock.file.Utils.close(inputStream);
         }
 
         return null;
@@ -1828,8 +1826,8 @@ public class Utils {
             return false;
         }
         finally {
-            close(writer);
-            close(outputStream);
+            org.yccheok.jstock.file.Utils.close(writer);
+            org.yccheok.jstock.file.Utils.close(outputStream);
         }
 
         return true;
@@ -2188,26 +2186,6 @@ public class Utils {
     }
 
     /**
-     * Performs close operation on ZIP output stream, without the need of
-     * writing cumbersome try...catch block.
-     *
-     * @param zipOutputStream The ZIP input stream.
-     * @return Returns false if there is an exception during close operation.
-     * Otherwise returns true.
-     */
-    public static boolean closeEntry(ZipOutputStream zipOutputStream) {
-        if (null != zipOutputStream) {
-            try {
-                zipOutputStream.closeEntry();
-            } catch (IOException ex) {
-                log.error(null, ex);
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
      * Returns a JXLayer with busy indicator, which wraps around the auto
      * complete combo box.
      *
@@ -2223,50 +2201,6 @@ public class Utils {
         layer.setUI(jComboBoxLayerUI);
         autoCompleteJComboBox.attachBusyObserver(jComboBoxLayerUI);
         return layer;
-    }
-
-    /**
-     * Performs close operation on ZIP input stream, without the need of
-     * writing cumbersome try...catch block.
-     *
-     * @param zipInputStream The ZIP input stream.
-     */
-    public static void closeEntry(ZipInputStream zipInputStream) {
-        // Instead of returning boolean, we will just simply swallow any
-        // exception silently. This is because this method will usually be
-        // invoked within finally block. If we are having control statement
-        // (return, break, continue) within finally block, a lot of surprise may
-        // happen.
-        // http://stackoverflow.com/questions/48088/returning-from-a-finally-block-in-java
-        if (null != zipInputStream) {
-            try {
-                zipInputStream.closeEntry();
-            } catch (IOException ex) {
-                log.error(null, ex);
-            }
-        }
-    }
-
-    /**
-     * Performs close operation on Closeable stream, without the need of
-     * writing cumbersome try...catch block.
-     *
-     * @param closeable The closeable stream.
-     */
-    public static void close(Closeable closeable) {
-        // Instead of returning boolean, we will just simply swallow any
-        // exception silently. This is because this method will usually be
-        // invoked within finally block. If we are having control statement
-        // (return, break, continue) within finally block, a lot of surprise may
-        // happen.
-        // http://stackoverflow.com/questions/48088/returning-from-a-finally-block-in-java
-        if (null != closeable) {
-            try {
-                closeable.close();
-            } catch (IOException ex) {
-                log.error(null, ex);
-            }
-        }
     }
 
     /**
@@ -2327,7 +2261,7 @@ public class Utils {
         } catch (IOException ex) {
             log.error(null, ex);
         } finally {
-            close(lnr);
+            org.yccheok.jstock.file.Utils.close(lnr);
         }
         
         return line - metaLineNumber;
@@ -2343,7 +2277,7 @@ public class Utils {
             java.util.Scanner s = new java.util.Scanner(inputStreamAndMethod.inputStream, "UTF-8").useDelimiter("\\A");
             return s.hasNext() ? s.next() : null;        
         } finally {
-            close(inputStreamAndMethod.inputStream);
+            org.yccheok.jstock.file.Utils.close(inputStreamAndMethod.inputStream);
             inputStreamAndMethod.method.releaseConnection();
         }
     }
@@ -2383,8 +2317,8 @@ public class Utils {
         } catch (IOException ex) {
             log.error(null, ex);
         } finally {
-            close(out);
-            close(inputStreamAndMethod.inputStream);
+            org.yccheok.jstock.file.Utils.close(out);
+            org.yccheok.jstock.file.Utils.close(inputStreamAndMethod.inputStream);
             inputStreamAndMethod.method.releaseConnection();
         }
         return null;
@@ -2591,7 +2525,7 @@ public class Utils {
         } catch (IOException ex) {
             log.error(null, ex);
         } finally {
-            close(inputStream);
+            org.yccheok.jstock.file.Utils.close(inputStream);
         }
         Font oldLabelFont = UIManager.getFont("Label.font");
         return oldLabelFont;
@@ -2743,11 +2677,11 @@ public class Utils {
 
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
-    private static final String ABOUT_BOX_VERSION_STRING = "1.0.7.13";
+    private static final String ABOUT_BOX_VERSION_STRING = "1.0.7.14";
 
-    // 1.0.7.13
+    // 1.0.7.14
     // For About box comparision on latest version purpose.
-    private static final int APPLICATION_VERSION_ID = 1142;
+    private static final int APPLICATION_VERSION_ID = 1143;
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     

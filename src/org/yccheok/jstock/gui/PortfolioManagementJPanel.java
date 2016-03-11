@@ -1528,8 +1528,26 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     }
                 }
             });
-                        
+
+            popup.addSeparator();
+            
             popup.add(menuItem);
+            
+            menuItem = new JMenuItem(GUIBundle.getString("PortfolioManagement_News..."), this.getImageIcon("/images/16x16/news.png"));
+
+            menuItem.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent evt) {
+                    List<Stock> stocks = getSelectedStocks(sellTreeTable);
+
+                    for(Stock stock : stocks) {
+                        m.displayStockNews(stock);
+                    }
+                }
+            });
+            
+            popup.add(menuItem);
+
             popup.addSeparator();
             
             menuItem = new JMenuItem(GUIBundle.getString("PortfolioManagement_Delete"), this.getImageIcon("/images/16x16/editdelete.png"));
@@ -1718,8 +1736,26 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     }
                 }
             });
+
+            popup.addSeparator();
+            
+            popup.add(menuItem);
+
+            menuItem = new JMenuItem(GUIBundle.getString("PortfolioManagement_News..."), this.getImageIcon("/images/16x16/news.png"));
+
+            menuItem.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent evt) {
+                    List<Stock> stocks = getSelectedStocks(sellTreeTable);
+
+                    for(Stock stock : stocks) {
+                        m.displayStockNews(stock);
+                    }
+                }
+            });
                         
             popup.add(menuItem);
+
             popup.addSeparator();
             
             menuItem = new JMenuItem(GUIBundle.getString("PortfolioManagement_Delete"), this.getImageIcon("/images/16x16/editdelete.png"));

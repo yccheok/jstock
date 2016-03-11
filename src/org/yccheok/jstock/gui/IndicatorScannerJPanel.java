@@ -1014,7 +1014,29 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         });
 
         popup.add(menuItem);
+        
+        menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("IndicatorScannerJPanel_News..."), this.getImageIcon("/images/16x16/news.png"));
+        
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                int rows[] = jTable1.getSelectedRows();
+                final IndicatorTableModel tableModel = (IndicatorTableModel)jTable1.getModel();
 
+                for (int row : rows) {
+                    final int modelIndex = jTable1.convertRowIndexToModel(row);
+                    final Indicator indicator = tableModel.getIndicator(modelIndex);
+                    if (indicator != null) {
+                        m.displayStockNews(indicator.getStock());
+                    }
+                }
+            }
+        });
+        
+        popup.add(menuItem);
+        
+        popup.addSeparator();
+        
         menuItem = new JMenuItem(GUIBundle.getString("IndicatorScannerJPanel_AddToRealTimeInfo"), this.getImageIcon("/images/16x16/add.png"));
         
         menuItem.addActionListener(new ActionListener() {
