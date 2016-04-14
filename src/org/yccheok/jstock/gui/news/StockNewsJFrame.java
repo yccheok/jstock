@@ -331,7 +331,7 @@ public class StockNewsJFrame extends JFrame implements WindowListener {
         // Retrieve news from next available news server
         task = new Task<Void>() {
             @Override public Void call() {
-                java.util.List<FeedItem> allMessages = null;
+                java.util.List<FeedItem> allMessages = new java.util.ArrayList<FeedItem>();
 
                 // load news from all available news servers, asynchrounusly
                 while (serverCnt < newsServers.size()) {
@@ -350,23 +350,21 @@ public class StockNewsJFrame extends JFrame implements WindowListener {
                     return null;
                 }
 
+                // sort news in DESC order
+                Collections.sort(allMessages, new Comparator<FeedItem>() {
+                    @Override
+                    public int compare(FeedItem lhs, FeedItem rhs) {
+                        return -lhs.getPubDate().compareTo(rhs.getPubDate());
+                    }
+                });
+
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
                         if (isCancelled()) {
                             return;
                         }
-
-                        // sort news in DESC order
-                        Collections.sort(allMessages, new Comparator<FeedItem>() {
-                            @Override
-                            public int compare(FeedItem lhs, FeedItem rhs) {
-                                return -lhs.getPubDate().compareTo(rhs.getPubDate());
-                            }
-                        });
                         messages_o.addAll(allMessages);
-
-                        // remove progress Indicator
                         stackPane.getChildren().remove(progressIn);
                     }
                 });
