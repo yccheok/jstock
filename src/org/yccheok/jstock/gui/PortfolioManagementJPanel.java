@@ -1746,7 +1746,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             menuItem.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent evt) {
-                    List<Stock> stocks = getSelectedStocks(sellTreeTable);
+                    List<Stock> stocks = getSelectedStocks(buyTreeTable);
 
                     for(Stock stock : stocks) {
                         m.displayStockNews(stock);
