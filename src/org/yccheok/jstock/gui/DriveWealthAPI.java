@@ -466,6 +466,12 @@ public class DriveWealthAPI {
         "ask"
     ));
     
+    static final List<String> settingFields = new ArrayList<>(Arrays.asList(
+        "userID",
+        "key",
+        // only for create setting, list all settings
+        "value"
+    ));
     
     /********************
      * API: Accounts
@@ -924,7 +930,7 @@ public class DriveWealthAPI {
     public boolean cancelSession(String sessionKey) {
         System.out.println("\n[Cancel Session] sessionKey: " + sessionKey);
 
-        Map<String, Object> result = executeDelete(hostURL + "userSessions/" + sessionKey, this.getSessionKey());
+        Map<String, Object> result = executeDelete("userSessions/" + sessionKey, this.getSessionKey());
         int statusCode = (int) result.get("code");
 
         if (statusCode == 200) {
@@ -1167,7 +1173,7 @@ public class DriveWealthAPI {
     public boolean cancelOrder (String orderID) {
         System.out.println("\n[Cancel order]: " + orderID);
 
-        Map<String, Object> result = executeDelete(hostURL + "orders/" + orderID, this.getSessionKey());
+        Map<String, Object> result = executeDelete("orders/" + orderID, this.getSessionKey());
         int statusCode = (int) result.get("code");
 
         return statusCode == 200;
@@ -1275,6 +1281,80 @@ public class DriveWealthAPI {
         return marketData;
     }
     
+    /********************
+     * API: Settings
+     ********************/
+
+    public Map<String, Object> getSetting (String key) {
+        System.out.println("\n[Get Setting]");
+
+        Map<String, Object> respondMap = executeGet("users/" + this.user.userID + "/settings/" + key, this.getSessionKey());
+        Map<String, Object> result = gson.fromJson(respondMap.get("respond").toString(), HashMap.class);
+        Map<String, Object> setting = new HashMap<>();
+
+        for (String k: this.settingFields) {
+            if (result.containsKey(k)) {
+                Object v = result.get(k);
+                setting.put(k, v);
+                //System.out.println("key: " + k + ", value: " + v);
+            }
+        }
+        return setting;
+    }
+    
+    public List<Map<String, Object>> listAllSettings () {
+        System.out.println("\n[List all Settings]");
+
+        Map<String, Object> respondMap = executeGet("users/" + this.user.userID + "/settings", this.getSessionKey());
+        List<Map<String, Object>> result = gson.fromJson(respondMap.get("respond").toString(), ArrayList.class);
+        List<Map<String, Object>> settings = new ArrayList<>();
+        
+        for (Map<String, Object> a : result) {
+            Map<String, Object> setting = new HashMap<>();
+            for (String k: this.settingFields) {
+                if (a.containsKey(k)) {
+                    Object v = a.get(k);
+                    setting.put(k, v);
+                    //System.out.println("key: " + k + ", value: " + v);
+                }
+            }
+            settings.add(setting);
+        }
+        return settings;
+    }
+
+    public Map<String, Object> createSetting (Map<String, String> args) {
+        System.out.println("\n[Create Setting]");
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("userID", this.user.userID);
+        params.put("key", args.get("key"));
+        params.put("value", args.get("value"));
+        
+        Map<String, Object> respondMap = executePost("users/" + this.user.userID + "/settings", params, this.getSessionKey());
+        String respond = respondMap.get("respond").toString();
+        Map<String, Object> result = gson.fromJson(respond, HashMap.class);
+
+        Map<String, Object> setting = new HashMap<>();
+            
+        for (String k: this.settingFields) {
+            if (result.containsKey(k)) {
+                Object v = result.get(k);
+                setting.put(k, v);
+                //System.out.println("key: " + k + ", value: " + v);
+            }
+        }
+        return setting;
+    }
+    
+    public boolean deleteSetting (String key) {
+        System.out.println("\n[Delete Setting]");
+
+        Map<String, Object> result = executeDelete("users/" + this.user.userID + "/settings/" + key, this.getSessionKey());
+        int statusCode = (int) result.get("code");
+
+        return statusCode == 200;
+    }
     
     
     /************************
@@ -1433,7 +1513,7 @@ public class DriveWealthAPI {
     }
 
     private static Map<String, Object> executeDelete(String url, String sessionKey) {
-        DeleteMethod deleteMethod = new DeleteMethod(url);
+        DeleteMethod deleteMethod = new DeleteMethod(hostURL + url);
         deleteMethod = (DeleteMethod) setJsonHeader(deleteMethod, sessionKey);
         return executeHttpCall(deleteMethod);
     }
