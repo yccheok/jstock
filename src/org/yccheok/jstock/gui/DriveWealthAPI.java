@@ -5,7 +5,6 @@
  */
 package org.yccheok.jstock.gui;
 
-
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 import com.google.gson.reflect.TypeToken;
@@ -53,7 +52,7 @@ public class DriveWealthAPI {
         this.user = new User(params.get("username"), params.get("password"));
         this.getSessionKey();
     }
-    
+
     public DriveWealthAPI() {
         this.user = new User();
     }
@@ -472,7 +471,15 @@ public class DriveWealthAPI {
         // only for create setting, list all settings
         "value"
     ));
-    
+
+    static final List<String> chartFields = new ArrayList<>(Arrays.asList(
+        "instrumentID",
+        "compression",
+        "dateStart",
+        "dateEnd",
+        "tradingDay"
+    ));
+
     /********************
      * API: Accounts
      ********************/
@@ -1354,6 +1361,77 @@ public class DriveWealthAPI {
         int statusCode = (int) result.get("code");
 
         return statusCode == 200;
+    }
+    
+    /********************
+     * API: Charts
+     ********************/
+
+    public static enum ChartCompression {
+        Daily(0),
+        OneMinute(1),
+        TwoMinute(2),
+        ThreeMinute(3),
+        FiveMinute(4),
+        TenMinute(5),
+        FifteenMinute(6),
+        TwentyMinute(7),
+        ThirtyMinute(8),
+        OneHour(9),
+        TwoHour(102),
+        FourHour(14),
+        EightHour(108),
+        Weekly(10),
+        Monthly(11),
+        Yearly(12);
+        
+        public final int value;
+
+        private ChartCompression(int value) {
+           this.value = value;
+        }
+    }
+
+    public List<String[]> getCharts (Map<String, Object> args) {
+        System.out.println("\n[get Charts]");
+
+        // required fields: instrumentID, compression
+        // if tradingDays set, dateStart & dateEnd are ignored
+        
+        String instrumentID = args.get("instrumentID").toString();
+        int compression = ( (ChartCompression) args.get("compression") ).value;
+        String url = "bars?instrumentID=" + instrumentID + "&compression=" + compression;
+
+        if (args.containsKey("dateStart") && args.containsKey("dateEnd")) {
+            String dateStart = args.get("dateStart").toString();
+            String dateEnd = args.get("dateEnd").toString();
+            url = url + "&dateStart=" + dateStart + "&dateEnd=" + dateEnd;
+        } else if (args.containsKey("tradingDays")) {
+            url = url + "&tradingDays=" + args.get("tradingDays").toString();
+        }
+        System.out.println("\n url: " + url);
+        
+        Map<String, Object> respondMap = executeGet(url, this.getSessionKey());
+        Map<String, Object> result = gson.fromJson(respondMap.get("respond").toString(), HashMap.class);
+
+        List<String[]> data = new ArrayList<String[]>();
+        
+        if (   result.get("instrumentID").toString().equals(instrumentID)
+            && (Double) result.get("compression") == compression)
+        {
+            // Format: date_time, open, high, low, close, volume
+            // 2016-01-11T14:49:00Z,7.34,7.34,7.34,7.34,100|2016-01-11T15:05:00Z,7.33,7.33,7.33,7.33,100
+            String line = result.get("data").toString();
+            System.out.println("data: " + line);
+
+            String[] items = line.split("\\|");
+            
+            for (int i=0; i<items.length; i++) {
+                String[] ohlc = items[i].split(",");
+                data.add(ohlc);
+            }
+        }
+        return data;
     }
     
     
