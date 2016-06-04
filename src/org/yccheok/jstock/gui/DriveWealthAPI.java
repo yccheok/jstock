@@ -52,7 +52,7 @@ public class DriveWealthAPI {
         this.user = new User(params.get("username"), params.get("password"));
         this.getSessionKey();
     }
-
+    
     public DriveWealthAPI() {
         this.user = new User();
     }
@@ -480,6 +480,31 @@ public class DriveWealthAPI {
         "tradingDay"
     ));
 
+    static final List<String> FinancialTransactionFields = new ArrayList<>(Arrays.asList(
+        "accountNo",
+        "accountID",
+        "accountType",
+        "dateRange",
+        "transaction"
+    ));
+
+    static final List<String> TransactionFields = new ArrayList<>(Arrays.asList(
+        "accountAmount",
+        "accountBalance",
+        "comment",
+        "currencyID",
+        "finTranID",
+        "finTranTypeID",
+        "orderID",
+        "orderNo",
+        "systemAmount",
+        "tranAmount",
+        "tranWhen",
+        "wlpAmount",
+        "execID",
+        "dnb"
+    ));
+    
     /********************
      * API: Accounts
      ********************/
@@ -1434,6 +1459,81 @@ public class DriveWealthAPI {
         return data;
     }
     
+    /********************
+     * API: Reports
+     ********************/
+
+    public static enum ReportName {
+        FinTrans("FinTrans"),
+        OrderTrans("OrderTrans"),
+        PositionRestingOrder("PositionRestingOrder"),
+        Instrument("Instrument"),
+        ReferralSummaryPerformance("ReferralSummaryPerformance");
+
+        public final String name;
+
+        private ReportName(String name) {
+           this.name = name;
+        }
+    }
+
+    public Map<String, Object> financialTransaction (Map<String, String> args) {
+        System.out.println("\n[Financial Transaction - Report]");
+
+        String DateStart = args.get("DateStart");
+        String DateEnd = args.get("DateEnd");
+
+        String url = "DriveWealth?ReportName=FinTrans&ReportFormat=JSON&wlpID=DW&LanguageID=en_US"
+                + "&sessionKey=" + this.user.sessionKey
+                + "&AccountNumber=" + this.practiceAccount.accountNo
+                + "&DateStart=" + DateStart
+                + "&DateEnd=" + DateEnd;
+
+        Map<String, Object> params = new HashMap<>();
+        Map<String, Object> respondMap = executePost(url, params, this.getSessionKey(), "reportServer");
+
+        String respond = respondMap.get("respond").toString();
+        Map<String, Object> result = gson.fromJson(respond, HashMap.class);
+
+        Map<String, Object> financialTxn = new HashMap<>();
+        for (String k: this.FinancialTransactionFields) {
+            if (result.containsKey(k)) {
+                Object v = result.get(k);
+                financialTxn.put(k, v);
+                System.out.println("key: " + k + ", value: " + v);
+            }
+        }
+        
+        List<Map<String, Object>> resultTxn = (ArrayList) financialTxn.get("transaction");
+        List<Map<String, Object>> txns = new ArrayList<>();
+        
+        int cnt = 0;
+        for (Map<String, Object> a : resultTxn) {
+            System.out.println("\n\n txn [" + cnt++ + "]\n\n");
+            
+            Map<String, Object> txn = new HashMap<>();
+            for (String k: this.TransactionFields) {
+                if (a.containsKey(k)) {
+                    Object v = a.get(k);
+                    txn.put(k, v);
+                    System.out.println("key: " + k + ", value: " + v);
+                }
+            }
+            txns.add(txn);
+        }
+        financialTxn.put("transaction", txns);
+        
+        return financialTxn;
+    }
+
+
+    // Reports TODO:
+    //      order Transaction
+    //      Open Positions and Resting Orders
+    //      Stocks, ETFs and ADRs Offered
+    //      Referral Summary
+
+    
     
     /************************
      * API Utility Functions
@@ -1548,7 +1648,7 @@ public class DriveWealthAPI {
         return executeHttpCall(getMethod);
     }
 
-    private static Map<String, Object> executePost(String url, Map<String, Object> params, String sessionKey) {
+    private static Map<String, Object> executePost(String url, Map<String, Object> params, String sessionKey, String server) {
         Gson gson = new Gson();
         String paramsJson = gson.toJson(params);
 
@@ -1562,11 +1662,25 @@ public class DriveWealthAPI {
             Logger.getLogger(DriveWealthAPI.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        PostMethod postMethod = new PostMethod(hostURL + url);
+        String host = null;
+        if (server.equals("apiServer")) {
+            host = hostURL;
+        } else if (server.equals("reportServer")) {
+            host = reportURL;
+        } else {
+            System.out.println("[executePost] unknown hostType: " + server);
+            return null;
+        }
+        
+        PostMethod postMethod = new PostMethod(host + url);
         postMethod.setRequestEntity(requestEntity);
 
         postMethod = (PostMethod) setJsonHeader(postMethod, sessionKey);
         return executeHttpCall(postMethod);
+    }
+    
+    private static Map<String, Object> executePost(String url, Map<String, Object> params, String sessionKey) {
+        return executePost(url, params, sessionKey, "apiServer");
     }
     
     private static Map<String, Object> executePut(String url, Map<String, Object> params, String sessionKey) {
@@ -1639,9 +1753,11 @@ public class DriveWealthAPI {
     
     private final Gson gson = new Gson();
     public static String hostURL = "https://api.drivewealth.io/v1/";
+    public static String reportURL = "http://reports.drivewealth.io/";
     
     public User user;
     public Account practiceAccount;
     public Account liveAccount;
     public Map<String, Account> accountsMap = new HashMap<>();
 }
+
