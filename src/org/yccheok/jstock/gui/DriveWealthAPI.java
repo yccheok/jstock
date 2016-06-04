@@ -1482,8 +1482,10 @@ public class DriveWealthAPI {
 
         String DateStart = args.get("DateStart");
         String DateEnd = args.get("DateEnd");
+        String reportName = ReportName.FinTrans.name;
 
-        String url = "DriveWealth?ReportName=FinTrans&ReportFormat=JSON&wlpID=DW&LanguageID=en_US"
+        String url = "DriveWealth?ReportFormat=JSON&wlpID=DW&LanguageID=en_US"
+                + "&ReportName=" + reportName
                 + "&sessionKey=" + this.user.sessionKey
                 + "&AccountNumber=" + this.practiceAccount.accountNo
                 + "&DateStart=" + DateStart
