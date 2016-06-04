@@ -480,15 +480,7 @@ public class DriveWealthAPI {
         "tradingDay"
     ));
 
-    static final List<String> FinancialTransactionFields = new ArrayList<>(Arrays.asList(
-        "accountNo",
-        "accountID",
-        "accountType",
-        "dateRange",
-        "transaction"
-    ));
-
-    static final List<String> TransactionFields = new ArrayList<>(Arrays.asList(
+    static final List<String> FinancialTxnFields = new ArrayList<>(Arrays.asList(
         "accountAmount",
         "accountBalance",
         "comment",
@@ -505,6 +497,20 @@ public class DriveWealthAPI {
         "dnb"
     ));
     
+    static final List<String> OrderTxnFields = new ArrayList<>(Arrays.asList(
+        "orderNo",
+        "transactTime",
+        "execType",
+        "ordStatus",
+        "ordType",
+        "side",
+        "symbol",
+        "lastShares",
+        "lastPx",
+        "cumQty",
+        "leavesQty"
+    ));
+
     /********************
      * API: Accounts
      ********************/
@@ -1477,44 +1483,82 @@ public class DriveWealthAPI {
         }
     }
 
-    public Map<String, Object> financialTransaction (Map<String, String> args) {
-        System.out.println("\n[Financial Transaction - Report]");
+    public List<Map<String, Object>> transactionReport (String reportType, Map<String, String> args) {
+        System.out.println("\n[Transaction Report] - " + reportType);
 
         String DateStart = args.get("DateStart");
         String DateEnd = args.get("DateEnd");
-        String reportName = ReportName.FinTrans.name;
+        String AccountNumber = args.get("AccountNumber");
+        
+        String reportName = null;
+        String symbol = "";
+        List<String> txnFields;
+
+        if (reportType.equals("financial")) {
+            reportName = ReportName.FinTrans.name;
+            txnFields = this.FinancialTxnFields;
+        } else if (reportType.equals("order")) {
+            reportName = ReportName.OrderTrans.name;
+            txnFields = this.OrderTxnFields;
+
+            // for Order Transaction, "symbol" is optional
+            if (args.containsKey("symbol")) {
+                symbol = "&symbol=" + args.get("symbol");
+            }
+        } else {
+            System.out.println("unknown reportType: " + reportType);
+            return null;
+        }
 
         String url = "DriveWealth?ReportFormat=JSON&wlpID=DW&LanguageID=en_US"
                 + "&ReportName=" + reportName
                 + "&sessionKey=" + this.user.sessionKey
-                + "&AccountNumber=" + this.practiceAccount.accountNo
+                + "&AccountNumber=" + AccountNumber
                 + "&DateStart=" + DateStart
-                + "&DateEnd=" + DateEnd;
+                + "&DateEnd=" + DateEnd
+                + symbol;
 
+        System.out.println("URL: " + url);
+        
         Map<String, Object> params = new HashMap<>();
         Map<String, Object> respondMap = executePost(url, params, this.getSessionKey(), "reportServer");
 
-        String respond = respondMap.get("respond").toString();
-        Map<String, Object> result = gson.fromJson(respond, HashMap.class);
+        int statusCode = (int) respondMap.get("code");
+        if (statusCode != 200) {
+            System.out.println("Error status code: " + statusCode);
+            return null;
+        }
 
-        Map<String, Object> financialTxn = new HashMap<>();
-        for (String k: this.FinancialTransactionFields) {
-            if (result.containsKey(k)) {
-                Object v = result.get(k);
-                financialTxn.put(k, v);
-                System.out.println("key: " + k + ", value: " + v);
-            }
+        String respond = respondMap.get("respond").toString();
+        Map<String, Object> result;
+        try {
+            result = gson.fromJson(respond, HashMap.class);
+        } catch(com.google.gson.JsonSyntaxException ex) { 
+            System.out.println("Error respond: " + respond);
+            return null;
         }
         
-        List<Map<String, Object>> resultTxn = (ArrayList) financialTxn.get("transaction");
-        List<Map<String, Object>> txns = new ArrayList<>();
+        String accountNo = result.get("accountNo").toString();
+        String accountID = result.get("accountID").toString();
+        String dateRange = result.get("dateRange").toString();
+        String accountType = null;
         
+        if (result.containsKey("accountType")) {
+            accountType = result.get("accountType").toString();
+        }
+        System.out.println("accountNo: " + accountNo + ", accountID: " + accountID
+                + ", accountType: " + accountType + ", dateRange: " + dateRange);
+
+        
+        List<Map<String, Object>> resultTxn = (ArrayList) result.get("transaction");
+        List<Map<String, Object>> txns = new ArrayList<>();
+
         int cnt = 0;
         for (Map<String, Object> a : resultTxn) {
             System.out.println("\n\n txn [" + cnt++ + "]\n\n");
-            
+
             Map<String, Object> txn = new HashMap<>();
-            for (String k: this.TransactionFields) {
+            for (String k: txnFields) {
                 if (a.containsKey(k)) {
                     Object v = a.get(k);
                     txn.put(k, v);
@@ -1523,9 +1567,7 @@ public class DriveWealthAPI {
             }
             txns.add(txn);
         }
-        financialTxn.put("transaction", txns);
-        
-        return financialTxn;
+        return txns;
     }
 
 
@@ -1762,4 +1804,3 @@ public class DriveWealthAPI {
     public Account liveAccount;
     public Map<String, Account> accountsMap = new HashMap<>();
 }
-
