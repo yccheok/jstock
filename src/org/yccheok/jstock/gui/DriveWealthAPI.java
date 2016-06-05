@@ -7,7 +7,6 @@ package org.yccheok.jstock.gui;
 
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
-import com.google.gson.reflect.TypeToken;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -21,22 +20,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
-import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
-import org.apache.commons.httpclient.params.HttpMethodParams;
 
-import org.apache.commons.httpclient.methods.multipart.ByteArrayPartSource;
 import org.apache.commons.httpclient.methods.multipart.FilePart;
-import org.apache.commons.httpclient.methods.multipart.FilePartSource;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
@@ -548,6 +540,16 @@ public class DriveWealthAPI {
         "minTic",
         "pipMultiplier",
         "rebateSpread"
+    ));
+    
+    static final List<String> listStatementFields = new ArrayList<>(Arrays.asList(
+        "displayName",  // Display name of the file
+        "fileKey"       // Key to access the file via "Get Statements"
+    ));
+    
+    static final List<String> getStatementFields = new ArrayList<>(Arrays.asList(
+        "accountID",
+        "url"           // URL to download statement directly. Note: this url will expire in 30 minutes.
     ));
     
     /********************
@@ -1711,6 +1713,74 @@ public class DriveWealthAPI {
         return stocks;
     }
 
+    /********************
+     * API: Statements
+     ********************/
+
+    public List<Map<String, Object>> listStatements (String type, Map<String, String> args) {
+        switch (type) {
+            // List trade confirms
+            case "trade":
+                type = "01";
+                break;
+            // List statements
+            case "statement":
+                type = "02";
+                break;
+            // List 1099-B Documents
+            case "doc":
+                type = "03";
+                break;
+            default:
+                System.out.println("Unknown listStatements - type: " + type);
+                return null;
+        }
+
+        String url = "statements?accountID=" + args.get("accountID")
+                + "&startDate=" + args.get("startDate")
+                + "&endDate="   + args.get("endDate")
+                + "&type="      + type;
+
+        System.out.println("URL: " + url);
+
+        Map<String, Object> respondMap = executeGet(url, this.getSessionKey());
+        List<Map<String, Object>> result = gson.fromJson(respondMap.get("respond").toString(), ArrayList.class);
+        List<Map<String, Object>> statements = new ArrayList<>();
+        
+        for (Map<String, Object> a : result) {
+            Map<String, Object> statement = new HashMap<>();
+            for (String k: this.listStatementFields) {
+                if (a.containsKey(k)) {
+                    Object v = a.get(k);
+                    statement.put(k, v);
+                    System.out.println("key: " + k + ", value: " + v);
+                }
+            }
+            statements.add(statement);
+        }
+        return statements;
+    }
+    
+    public Map<String, Object> getStatement (String accountID, String fileKey) {
+        String url = "statements/" + accountID + "/" + fileKey;
+        System.out.println("URL: " + url);
+
+        Map<String, Object> respondMap = executeGet(url, this.getSessionKey());
+        Map<String, Object> result = gson.fromJson(respondMap.get("respond").toString(), HashMap.class);
+
+        Map<String, Object> statement = new HashMap<>();
+        for (String k: this.getStatementFields) {
+            if (result.containsKey(k)) {
+                Object v = result.get(k);
+                statement.put(k, v);
+                System.out.println("key: " + k + ", value: " + v);
+            }
+        }                
+        return statement;
+    }
+    
+    
+    
     /************************
      * API Utility Functions
      ************************/
