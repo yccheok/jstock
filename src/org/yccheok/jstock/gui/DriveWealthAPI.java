@@ -480,7 +480,7 @@ public class DriveWealthAPI {
         "tradingDay"
     ));
 
-    static final List<String> FinancialTxnFields = new ArrayList<>(Arrays.asList(
+    static final List<String> financialTxnFields = new ArrayList<>(Arrays.asList(
         "accountAmount",
         "accountBalance",
         "comment",
@@ -497,7 +497,7 @@ public class DriveWealthAPI {
         "dnb"
     ));
     
-    static final List<String> OrderTxnFields = new ArrayList<>(Arrays.asList(
+    static final List<String> orderTxnFields = new ArrayList<>(Arrays.asList(
         "orderNo",
         "transactTime",
         "execType",
@@ -511,6 +511,45 @@ public class DriveWealthAPI {
         "leavesQty"
     ));
 
+    static final List<String> openPosFields = new ArrayList<>(Arrays.asList(
+        "costBasis",
+        "initQty",
+        "side",
+        "openQty",
+        "instrument",
+        "price",
+        "mtm",
+        "mtmPL"
+    ));
+    
+    static final List<String> stockFields = new ArrayList<>(Arrays.asList(
+        "instrument",
+        "instrumentTypeDescr",
+        "tradeStatusDescr",
+        "tagDescr",
+        "linkable10K"
+    ));
+
+    static final List<String> stockInstrumentFields = new ArrayList<>(Arrays.asList(
+        "currencyID",
+        "instrumentID",
+        "limitStatus",
+        "instrumentTypeID",
+        "marginCurrencyID",
+        "name",
+        "orderSizeMax",
+        "orderSizeMin",
+        "orderSizeStep",
+        "symbol",
+        "tradeStatus",
+        "urlInvestor",
+        "priorClose",
+        "marketState",
+        "minTic",
+        "pipMultiplier",
+        "rebateSpread"
+    ));
+    
     /********************
      * API: Accounts
      ********************/
@@ -1469,6 +1508,8 @@ public class DriveWealthAPI {
      * API: Reports
      ********************/
 
+    // Reports TODO: Referral Summary
+    
     public static enum ReportName {
         FinTrans("FinTrans"),
         OrderTrans("OrderTrans"),
@@ -1483,39 +1524,63 @@ public class DriveWealthAPI {
         }
     }
 
+    /*
+        "transactionReport" covers 3 types:
+
+        1) Financial Transaction
+            This report allows users to generate all of their financial transactions for their specified account.
+        2) Order Transaction
+            This report allows users to generate order related transactions for the specified account number
+            over the specified date interval. These transactions can be also filtered by symbol if desired.
+        3) Open Positions and Resting Orders
+            Provides the user their current open positions and resting orders.
+    */
+    
     public List<Map<String, Object>> transactionReport (String reportType, Map<String, String> args) {
         System.out.println("\n[Transaction Report] - " + reportType);
 
-        String DateStart = args.get("DateStart");
-        String DateEnd = args.get("DateEnd");
         String AccountNumber = args.get("AccountNumber");
-        
         String reportName = null;
+        String DateStart = "";
+        String DateEnd = "";
         String symbol = "";
         List<String> txnFields;
 
-        if (reportType.equals("financial")) {
-            reportName = ReportName.FinTrans.name;
-            txnFields = this.FinancialTxnFields;
-        } else if (reportType.equals("order")) {
-            reportName = ReportName.OrderTrans.name;
-            txnFields = this.OrderTxnFields;
+        switch (reportType) {
+            case "financial":
+                reportName = ReportName.FinTrans.name;
+                DateStart = "&DateStart=" + args.get("DateStart");
+                DateEnd = "&DateEnd=" + args.get("DateEnd");
 
-            // for Order Transaction, "symbol" is optional
-            if (args.containsKey("symbol")) {
-                symbol = "&symbol=" + args.get("symbol");
-            }
-        } else {
-            System.out.println("unknown reportType: " + reportType);
-            return null;
+                txnFields = this.financialTxnFields;
+                break;
+            case "order":
+                reportName = ReportName.OrderTrans.name;
+                DateStart = "&DateStart=" + args.get("DateStart");
+                DateEnd = "&DateEnd=" + args.get("DateEnd");
+
+                // for Order Transaction, "symbol" is optional
+                if (args.containsKey("symbol")) {
+                    symbol = "&symbol=" + args.get("symbol");
+                }
+
+                txnFields = this.orderTxnFields;
+                break;
+            case "openPos":
+                reportName = ReportName.PositionRestingOrder.name;
+                txnFields = this.openPosFields;
+                break;
+            default:
+                System.out.println("unknown reportType: " + reportType);
+                return null;
         }
-
+        
         String url = "DriveWealth?ReportFormat=JSON&wlpID=DW&LanguageID=en_US"
-                + "&ReportName=" + reportName
-                + "&sessionKey=" + this.user.sessionKey
+                + "&ReportName="    + reportName
+                + "&sessionKey="    + this.getSessionKey()
                 + "&AccountNumber=" + AccountNumber
-                + "&DateStart=" + DateStart
-                + "&DateEnd=" + DateEnd
+                + DateStart
+                + DateEnd
                 + symbol;
 
         System.out.println("URL: " + url);
@@ -1540,19 +1605,29 @@ public class DriveWealthAPI {
         
         String accountNo = result.get("accountNo").toString();
         String accountID = result.get("accountID").toString();
-        String dateRange = result.get("dateRange").toString();
+        String dateRange = null;
         String accountType = null;
         
         if (result.containsKey("accountType")) {
             accountType = result.get("accountType").toString();
         }
+        if (result.containsKey("dateRange")) {
+            dateRange = result.get("dateRange").toString();
+        }
+        
         System.out.println("accountNo: " + accountNo + ", accountID: " + accountID
                 + ", accountType: " + accountType + ", dateRange: " + dateRange);
 
-        
-        List<Map<String, Object>> resultTxn = (ArrayList) result.get("transaction");
-        List<Map<String, Object>> txns = new ArrayList<>();
 
+        List<Map<String, Object>> resultTxn;
+        if (reportType.equals("openPos")) {
+            resultTxn = (ArrayList) result.get("positions");
+        } else {
+            resultTxn = (ArrayList) result.get("transaction");
+        }
+
+        // convert List node from LinkedTreeMap -> HashMap
+        List<Map<String, Object>> txns = new ArrayList<>();
         int cnt = 0;
         for (Map<String, Object> a : resultTxn) {
             System.out.println("\n\n txn [" + cnt++ + "]\n\n");
@@ -1570,15 +1645,72 @@ public class DriveWealthAPI {
         return txns;
     }
 
+    // View all instruments available on the DriveWealth platform
+    public List<Map<String, Object>> stocksReport (Map<String, String> args) {
+        System.out.println("\n[Stocks, ETFs and ADRs Report]");
 
-    // Reports TODO:
-    //      order Transaction
-    //      Open Positions and Resting Orders
-    //      Stocks, ETFs and ADRs Offered
-    //      Referral Summary
+        String url = "DriveWealth?ReportFormat=JSON&wlpID=DW&LanguageID=en_US"
+                + "&ReportName="    + ReportName.Instrument.name
+                + "&sessionKey="    + this.getSessionKey()
+                + "&AccountNumber=" + args.get("AccountNumber")
+                + "&DateStart="     + args.get("DateStart")
+                + "&DateEnd="       + args.get("DateEnd")
+                // All: -1, Inactive: 0, Active: 1
+                + "&TradeStatus=-1"
+                // All: -1, Stocks: 6, ETFs: 7
+                + "&InstrumentType=-1";
 
-    
-    
+        System.out.println("URL: " + url);
+
+        Map<String, Object> params = new HashMap<>();
+        Map<String, Object> respondMap = executePost(url, params, this.getSessionKey(), "reportServer");
+
+        int statusCode = (int) respondMap.get("code");
+        if (statusCode != 200) {
+            System.out.println("Error status code: " + statusCode);
+            return null;
+        }
+
+        String respond = respondMap.get("respond").toString();
+        List<Map<String, Object>> result;
+        try {
+            result = (ArrayList) gson.fromJson(respond, HashMap.class).get("instruments");
+        } catch(com.google.gson.JsonSyntaxException ex) { 
+            System.out.println("Error respond: " + respond);
+            return null;
+        }
+
+        List<Map<String, Object>> stocks = new ArrayList<>();
+        int cnt = 0;
+        for (Map<String, Object> a : result) {
+            System.out.println("\n\n stock [" + cnt++ + "]\n\n");
+
+            Map<String, Object> stock = new HashMap<>();
+            for (String k: this.stockFields) {
+                if (a.containsKey(k)) {
+                    Object v = a.get(k);
+                    stock.put(k, v);
+                    System.out.println("key: " + k + ", value: " + v);
+                }
+            }
+            
+            // convert instrument from LinkedTreeMap -> HashMap
+            Map<String, Object> ins = (Map<String, Object>) stock.get("instrument");
+            Map<String, Object> instrument = new HashMap<>();
+
+            for (String k: this.stockInstrumentFields) {
+                if (ins.containsKey(k)) {
+                    Object v = ins.get(k);
+                    instrument.put(k, v);
+                    System.out.println("key: " + k + ", value: " + v);
+                }
+            }
+            stock.put("instrument", instrument);
+            stocks.add(stock);
+        }
+        return stocks;
+    }
+
     /************************
      * API Utility Functions
      ************************/
