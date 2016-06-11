@@ -2677,7 +2677,7 @@ public class Utils {
 
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
-    private static final String ABOUT_BOX_VERSION_STRING = "1.0.7.14";
+    private static final String ABOUT_BOX_VERSION_STRING = "1.0.7.15";
 
     // 1.0.7.15
     // For About box comparision on latest version purpose.
