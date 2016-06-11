@@ -3,7 +3,8 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.yccheok.jstock.gui;
+package org.yccheok.jstock.trade;
+
 
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
@@ -44,7 +45,7 @@ public class DriveWealthAPI {
         this.user = new User(params.get("username"), params.get("password"));
         this.getSessionKey();
     }
-    
+
     public DriveWealthAPI() {
         this.user = new User();
     }
