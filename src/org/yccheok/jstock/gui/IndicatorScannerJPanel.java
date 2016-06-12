@@ -36,6 +36,7 @@ import org.yccheok.jstock.analysis.*;
 import org.yccheok.jstock.analysis.Indicator;
 import org.yccheok.jstock.engine.*;
 import org.yccheok.jstock.internationalization.GUIBundle;
+import org.yccheok.jstock.internationalization.MessagesBundle;
 
 /**
  *
@@ -130,6 +131,8 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         // this.startScanThread must be null, as "stop" button must be pressed
         // before we can press "start" button.
         assert(this.startScanThread == null);
+        
+        JOptionPane.showMessageDialog(this, MessagesBundle.getString("info_message_stop_indicator_scanner_once_done"), MessagesBundle.getString("info_title_stop_indicator_scanner_once_done"), JOptionPane.INFORMATION_MESSAGE);
 
         stop_button_pressed = false;
 

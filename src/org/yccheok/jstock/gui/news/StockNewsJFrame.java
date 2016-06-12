@@ -323,45 +323,40 @@ public class StockNewsJFrame extends JFrame implements WindowListener {
         if (this.newsServers == null || this.serverCnt >= this.newsServers.size()) {
             return;
         }
-        
+
         if (task != null) {
             throw new java.lang.RuntimeException("Being called more than once");
         }
-        
+
         // Retrieve news from next available news server
         task = new Task<Void>() {
             @Override public Void call() {
+                java.util.List<FeedItem> allMessages = new java.util.ArrayList<FeedItem>();
+
                 // load news from all available news servers, asynchrounusly
-                while (serverCnt < newsServers.size()) {                   
+                while (serverCnt < newsServers.size()) {
                     final java.util.List<FeedItem> newMessages = newsServers.get(serverCnt++).getMessages(stockInfo);
-                    
+
                     if (isCancelled()) {
                         return null;
                     }
-                    
                     if (newMessages.isEmpty()) {
                         continue;
                     }
-                    
-                    // Latest news come first.
-                    Collections.sort(newMessages, new Comparator<FeedItem>() {
-                        @Override
-                        public int compare(FeedItem lhs, FeedItem rhs) {
-                            return -lhs.getPubDate().compareTo(rhs.getPubDate());
-                        }
-                    });
-
-                    Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            messages_o.addAll(newMessages);
-                        }
-                    });
+                    allMessages.addAll(newMessages);
                 }
-                
+
                 if (isCancelled()) {
                     return null;
                 }
+
+                // sort news in DESC order
+                Collections.sort(allMessages, new Comparator<FeedItem>() {
+                    @Override
+                    public int compare(FeedItem lhs, FeedItem rhs) {
+                        return -lhs.getPubDate().compareTo(rhs.getPubDate());
+                    }
+                });
 
                 Platform.runLater(new Runnable() {
                     @Override
@@ -369,6 +364,7 @@ public class StockNewsJFrame extends JFrame implements WindowListener {
                         if (isCancelled()) {
                             return;
                         }
+                        messages_o.addAll(allMessages);
                         stackPane.getChildren().remove(progressIn);
                     }
                 });
@@ -378,15 +374,15 @@ public class StockNewsJFrame extends JFrame implements WindowListener {
         };
         new Thread(task).start();
     }
-    
+
     private boolean isSameDay(Date date0, Date date1) {
         return date0.getDate() == date1.getDate() && date0.getMonth() == date1.getMonth() && date0.getYear() == date1.getYear(); 
     }
-    
+
     private boolean isSameYear(Date date0, Date date1) {
         return date0.getYear() == date1.getYear(); 
     }
-    
+
     private String toHumanReadableDate(Date date) {
         Date today = new Date();
         if (isSameDay(today, date)) {
