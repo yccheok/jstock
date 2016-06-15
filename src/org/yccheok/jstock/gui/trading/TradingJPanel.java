@@ -67,7 +67,9 @@ public class TradingJPanel extends javax.swing.JPanel {
                 grid.setVgap(10);
                 grid.setPadding(new Insets(25, 25, 25, 25));
 
-                scene = new Scene(grid, 300, 275);
+                scene = new Scene(grid, 600, 550);
+                scene.getStylesheets().add(TradingJPanel.class.getResource("trading.css").toExternalForm());
+                
                 jfxPanel.setScene(scene);
 
                 Text scenetitle = new Text("Drive Wealth Login");
