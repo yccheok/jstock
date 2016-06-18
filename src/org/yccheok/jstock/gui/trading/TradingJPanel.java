@@ -23,6 +23,8 @@ import java.awt.BorderLayout;
 import java.util.HashMap;
 import java.util.Map;
 import javafx.application.Platform;
+import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.embed.swing.JFXPanel;
 import javafx.event.EventHandler;
 import javafx.event.ActionEvent;
@@ -50,8 +52,6 @@ public class TradingJPanel extends javax.swing.JPanel {
     /** Creates new form TradingJPanel */
     public TradingJPanel() {
         initComponents();
-        
-//        this.initPortfolio();
     }
     
     public void initComponents() {
@@ -88,28 +88,53 @@ public class TradingJPanel extends javax.swing.JPanel {
                 PasswordField pwBox = new PasswordField();
                 grid.add(pwBox, 1, 2);
 
-                Button btn = new Button("Sign in");
+                Button signInBtn = new Button("Sign in");
                 HBox hbBtn = new HBox(10);
 
                 hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
-                hbBtn.getChildren().add(btn);
+                hbBtn.getChildren().add(signInBtn);
                 grid.add(hbBtn, 1, 4);
                 
-                btn.setOnAction(new EventHandler<ActionEvent>() {
+                signInBtn.setOnAction(new EventHandler<ActionEvent>() {
                     @Override
                     public void handle(ActionEvent e) {
                         Map<String, String> params = new HashMap<>();
                         params.put("username", userTextField.getText());
                         params.put("password", pwBox.getText());
                         
-                        DriveWealthAPI api = new DriveWealthAPI(params);
-                        DriveWealthAPI.User user = api.user;
+                        Task<DriveWealthAPI> task = new Task<DriveWealthAPI>() {
+                            @Override protected DriveWealthAPI call() throws Exception {
+                                System.out.println("Drive Wealth User Sign In....\n\n ");
 
-                        System.out.println("DriveWealth: username: " + userTextField.getText()
-                                            + ", pwd: " + pwBox.getText()
-                                            + ", sessionKey: " + user.sessionKey
-                                            + ", userID: " + user.userID
-                                            + ", commission: " + user.commissionRate);
+                                // sleep 20s
+                                Thread.sleep(20000);
+                                
+                                DriveWealthAPI _api = new DriveWealthAPI(params);
+                                DriveWealthAPI.User user = _api.user;
+
+                                System.out.println("DriveWealth: username: " + userTextField.getText()
+                                                    + ", pwd: " + pwBox.getText()
+                                                    + ", sessionKey: " + user.sessionKey
+                                                    + ", userID: " + user.userID
+                                                    + ", commission: " + user.commissionRate);
+                                return _api;
+                            }
+                        };
+                        
+                        task.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+                            @Override
+                            public void handle(WorkerStateEvent t) {
+                                api = task.getValue();
+                                
+                                // reenable "Sign In" button
+                                signInBtn.setDisable(false);
+                            }
+                        });
+                        
+                        new Thread(task).start();
+                        
+                        // disable "Sign In" button
+                        signInBtn.setDisable(true);
                     }
                 });
             }
@@ -122,4 +147,6 @@ public class TradingJPanel extends javax.swing.JPanel {
     private final JFXPanel jfxPanel = new JFXPanel();
     private GridPane grid = new GridPane();
     private Scene scene;
+    DriveWealthAPI api;
+                
 }
