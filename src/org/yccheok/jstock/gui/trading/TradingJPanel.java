@@ -95,6 +95,10 @@ public class TradingJPanel extends javax.swing.JPanel {
                 hbBtn.getChildren().add(signInBtn);
                 grid.add(hbBtn, 1, 4);
                 
+                // to display msg when Sign In successful
+                final Text successText = new Text();
+                grid.add(successText, 1, 6);
+                
                 signInBtn.setOnAction(new EventHandler<ActionEvent>() {
                     @Override
                     public void handle(ActionEvent e) {
@@ -107,7 +111,7 @@ public class TradingJPanel extends javax.swing.JPanel {
                                 System.out.println("Drive Wealth User Sign In....\n\n ");
 
                                 // sleep in ms
-                                Thread.sleep(5000);
+                                //Thread.sleep(5000);
                                 
                                 DriveWealthAPI _api = new DriveWealthAPI(params);
                                 DriveWealthAPI.User user = _api.user;
@@ -130,6 +134,9 @@ public class TradingJPanel extends javax.swing.JPanel {
                                 
                                 // reenable "Sign In" button
                                 signInBtn.setDisable(false);
+                                
+                                successText.setFill(Color.FIREBRICK);
+                                successText.setText("Successfully Sign In, userID: " + api.user.userID);
                             }
                         });
                         
