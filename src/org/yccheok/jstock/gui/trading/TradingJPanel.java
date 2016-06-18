@@ -106,8 +106,8 @@ public class TradingJPanel extends javax.swing.JPanel {
                             @Override protected DriveWealthAPI call() throws Exception {
                                 System.out.println("Drive Wealth User Sign In....\n\n ");
 
-                                // sleep 20s
-                                Thread.sleep(20000);
+                                // sleep in ms
+                                Thread.sleep(5000);
                                 
                                 DriveWealthAPI _api = new DriveWealthAPI(params);
                                 DriveWealthAPI.User user = _api.user;
@@ -125,6 +125,8 @@ public class TradingJPanel extends javax.swing.JPanel {
                             @Override
                             public void handle(WorkerStateEvent t) {
                                 api = task.getValue();
+                                
+                                System.out.println("Successfully Sign In, userID: " + api.user.userID);
                                 
                                 // reenable "Sign In" button
                                 signInBtn.setDisable(false);
