@@ -119,7 +119,7 @@ public class StockNewsJFrame extends JFrame implements WindowListener {
     public void windowOpened(WindowEvent e) {}
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {  
-        Task task = StockNewsJFrame.this.task;
+        NewsTask task = StockNewsJFrame.this.newsTask;
         if (task != null) {
             task.cancel(true);
         }
@@ -143,7 +143,7 @@ public class StockNewsJFrame extends JFrame implements WindowListener {
             public void windowClosed(java.awt.event.WindowEvent evt) {
             }
             public void windowClosing(java.awt.event.WindowEvent evt) {
-                Task task = StockNewsJFrame.this.task;
+                NewsTask task = StockNewsJFrame.this.newsTask;
                 if (task != null) {
                     task.cancel(true);
                 }
@@ -250,7 +250,7 @@ public class StockNewsJFrame extends JFrame implements WindowListener {
                                             return;
                                         }
 
-                                        final String jFrameTitle = stockNewsContent.tabsInfo.get(i).second;
+                                        jFrameTitle = stockNewsContent.tabsInfo.get(i).second;
 
                                         SwingUtilities.invokeLater(new Runnable() {
                                             @Override
@@ -329,62 +329,68 @@ public class StockNewsJFrame extends JFrame implements WindowListener {
         }
     }
 
-    public void retrieveNewsInBackground () {
-        if (newsServers == null) {
-            return;
-        }
-        
-        if (task != null) {
-            throw new java.lang.RuntimeException("Being called more than once");
-        }
-        
-        // Retrieve news in background task
-        task = new Task< java.util.List<FeedItem> >() {
-            @Override protected java.util.List<FeedItem> call() {
-                java.util.List<FeedItem> allMessages = new java.util.ArrayList<FeedItem>();
-                int serverCnt = 0;
-                
-                // load news from all available news servers, asynchrounusly
-                while (serverCnt < newsServers.size()) {
-                    final java.util.List<FeedItem> newMessages = newsServers.get(serverCnt++).getMessages(stockInfo);
+    private class NewsTask extends Task< java.util.List<FeedItem> > {
+        private final java.util.List<NewsServer> newsServers;
 
-                    if (isCancelled()) {
-                        return null;
-                    }
-                    if (newMessages.isEmpty()) {
-                        continue;
-                    }
-                    allMessages.addAll(newMessages);
-                }
+        public NewsTask (java.util.List<NewsServer> servers) {
+            this.newsServers = servers;
+        }
+
+        @Override protected java.util.List<FeedItem> call() {
+            java.util.List<FeedItem> allMessages = new java.util.ArrayList<FeedItem>();
+            int serverCnt = 0;
+
+            // load news from all available news servers, asynchrounusly
+            while (serverCnt < this.newsServers.size()) {
+                final java.util.List<FeedItem> newMessages = this.newsServers.get(serverCnt++).getMessages(stockInfo);
 
                 if (isCancelled()) {
                     return null;
                 }
-
-                // sort news in DESC order
-                Collections.sort(allMessages, new Comparator<FeedItem>() {
-                    @Override
-                    public int compare(FeedItem lhs, FeedItem rhs) {
-                        return -lhs.getPubDate().compareTo(rhs.getPubDate());
-                    }
-                });
-
-                return allMessages;
+                if (newMessages.isEmpty()) {
+                    continue;
+                }
+                allMessages.addAll(newMessages);
             }
-        };
+
+            if (isCancelled()) {
+                return null;
+            }
+
+            // sort news in DESC order
+            Collections.sort(allMessages, new Comparator<FeedItem>() {
+                @Override
+                public int compare(FeedItem lhs, FeedItem rhs) {
+                    return -lhs.getPubDate().compareTo(rhs.getPubDate());
+                }
+            });
+
+            return allMessages;
+        }
+    }
+    
+    public void retrieveNewsInBackground () {
+        if (newsServers == null) {
+            return;
+        }
+        if (newsTask != null) {
+            throw new java.lang.RuntimeException("Being called more than once");
+        }
+
+        newsTask = new NewsTask(newsServers);
         
-        // on task successfully executed
-        task.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+        // on newsTask successfully executed
+        newsTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(WorkerStateEvent t) {
-                java.util.List<FeedItem> allMessages = task.getValue();
+                java.util.List<FeedItem> allMessages = newsTask.getValue();
 
                 messages_o.addAll(allMessages);
                 stackPane.getChildren().remove(progressIn);
             }
         });
         
-        new Thread(task).start();
+        new Thread(newsTask).start();
     }
 
     private boolean isSameDay(Date date0, Date date1) {
@@ -456,13 +462,15 @@ public class StockNewsJFrame extends JFrame implements WindowListener {
     private ObservableList<FeedItem> messages_o;
     private ListView<FeedItem> newsListView;
 
-    private Task< java.util.List<FeedItem> > task;
+    private NewsTask newsTask;
     
     /* To avoid memory leak */
     private java.awt.Frame parent;
 
     private double splitPaneWidth;
     private double splitPaneHeight;
+    
+    private String jFrameTitle;
     
     private final Log log = LogFactory.getLog(StockNewsJFrame.class);    
 }
