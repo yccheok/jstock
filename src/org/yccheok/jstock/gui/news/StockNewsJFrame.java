@@ -39,6 +39,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.embed.swing.JFXPanel;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -157,7 +158,7 @@ public class StockNewsJFrame extends JFrame implements WindowListener {
             @Override
             public void run() {
                 // JFXPanel => Scene => SplitPane:
-                //      Left  (news List)       => StackPane => ViewView / ProgressIndicator
+                //      Left  (news List)       => StackPane => ListView / ProgressIndicator
                 //      Right (HTML content)    => TabPane => Tab => StackPane => WebView / ProgressBar
 
                 splitPane = new SplitPane();
@@ -223,12 +224,19 @@ public class StockNewsJFrame extends JFrame implements WindowListener {
                                             jfxPanel.setSize(StockNewsJFrame.this.getWidth() - in.left - in.right, jfxPanel.getHeight());
                                             
                                             Insets in2 = jfxPanel.getInsets();
-                                            splitPane.resize(jfxPanel.getWidth() - in2.left - in2.right, jfxPanel.getHeight() - in2.top - in2.bottom);
+                                            
+                                            // calculate width & height, but not resize in AWT event dispatching thread
+                                            // javafx.scene.control.SplitPane should only be accessed from JavaFX Application Thread
+                                            splitPaneWidth = jfxPanel.getWidth() - in2.left - in2.right;
+                                            splitPaneHeight = jfxPanel.getHeight() - in2.top - in2.bottom;
                                         }
                                     });
                                 } catch (InterruptedException | InvocationTargetException ex) {
                                     log.error(null, ex);
                                 }
+                                
+                                // resize to full screen size of jfxPanel
+                                splitPane.resize(splitPaneWidth, splitPaneHeight);
                                 
                                 stockNewsContent = new StockNewsContent();
                                 splitPane.getItems().add(stockNewsContent.tabPane);
@@ -257,6 +265,8 @@ public class StockNewsJFrame extends JFrame implements WindowListener {
                         }
                     }
                 });
+                
+                retrieveNewsInBackground();
             }
         });
 
@@ -320,19 +330,20 @@ public class StockNewsJFrame extends JFrame implements WindowListener {
     }
 
     public void retrieveNewsInBackground () {
-        if (this.newsServers == null || this.serverCnt >= this.newsServers.size()) {
+        if (newsServers == null) {
             return;
         }
-
+        
         if (task != null) {
             throw new java.lang.RuntimeException("Being called more than once");
         }
-
-        // Retrieve news from next available news server
-        task = new Task<Void>() {
-            @Override public Void call() {
+        
+        // Retrieve news in background task
+        task = new Task< java.util.List<FeedItem> >() {
+            @Override protected java.util.List<FeedItem> call() {
                 java.util.List<FeedItem> allMessages = new java.util.ArrayList<FeedItem>();
-
+                int serverCnt = 0;
+                
                 // load news from all available news servers, asynchrounusly
                 while (serverCnt < newsServers.size()) {
                     final java.util.List<FeedItem> newMessages = newsServers.get(serverCnt++).getMessages(stockInfo);
@@ -358,20 +369,21 @@ public class StockNewsJFrame extends JFrame implements WindowListener {
                     }
                 });
 
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (isCancelled()) {
-                            return;
-                        }
-                        messages_o.addAll(allMessages);
-                        stackPane.getChildren().remove(progressIn);
-                    }
-                });
-
-                return null;
+                return allMessages;
             }
         };
+        
+        // on task successfully executed
+        task.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+            @Override
+            public void handle(WorkerStateEvent t) {
+                java.util.List<FeedItem> allMessages = task.getValue();
+
+                messages_o.addAll(allMessages);
+                stackPane.getChildren().remove(progressIn);
+            }
+        });
+        
         new Thread(task).start();
     }
 
@@ -429,7 +441,6 @@ public class StockNewsJFrame extends JFrame implements WindowListener {
 
     private final StockInfo stockInfo;
     private final java.util.List<NewsServer> newsServers;
-    private int serverCnt = 0;
 
     private final Rectangle fullSize;
     private final double sceneWidth;
@@ -445,10 +456,13 @@ public class StockNewsJFrame extends JFrame implements WindowListener {
     private ObservableList<FeedItem> messages_o;
     private ListView<FeedItem> newsListView;
 
-    private Task task;
+    private Task< java.util.List<FeedItem> > task;
     
     /* To avoid memory leak */
     private java.awt.Frame parent;
 
+    private double splitPaneWidth;
+    private double splitPaneHeight;
+    
     private final Log log = LogFactory.getLog(StockNewsJFrame.class);    
 }
