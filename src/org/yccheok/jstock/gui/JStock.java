@@ -2067,7 +2067,10 @@ public class JStock extends javax.swing.JFrame {
     }
 
     private void createTradingJPanel() {
-        tradingJPanel = new TradingJPanel();
+        
+        System.out.println("tab count: " + jTabbedPane1.getTabCount());
+        
+        tradingJPanel = new TradingJPanel();    //jTabbedPane1.getTabComponentAt(1).getBounds());
         jTabbedPane1.addTab(GUIBundle.getString("TradingJPanel_Title"), tradingJPanel);
     }
 

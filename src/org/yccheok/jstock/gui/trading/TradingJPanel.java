@@ -20,6 +20,8 @@
 package org.yccheok.jstock.gui.trading;
 
 import java.awt.BorderLayout;
+import java.awt.GraphicsEnvironment;
+import java.awt.Rectangle;
 import java.util.HashMap;
 import java.util.Map;
 import javafx.application.Platform;
@@ -50,7 +52,13 @@ import org.yccheok.jstock.trade.DriveWealthAPI;
 public class TradingJPanel extends javax.swing.JPanel {
     
     /** Creates new form TradingJPanel */
-    public TradingJPanel() {
+    public TradingJPanel() {  // Rectangle rec) {
+        this.height = 500;  // rec.height;
+        this.width = 500;   // rec.width;
+        
+        System.out.println("width: " + this.width + ", height: " + this.height);
+
+        //this.setBounds(rec);
         initComponents();
     }
     
@@ -67,7 +75,8 @@ public class TradingJPanel extends javax.swing.JPanel {
                 grid.setVgap(10);
                 grid.setPadding(new Insets(25, 25, 25, 25));
 
-                scene = new Scene(grid, 600, 550);
+                scene = new Scene(grid, width, height);
+                
                 scene.getStylesheets().add(TradingJPanel.class.getResource("trading.css").toExternalForm());
                 
                 jfxPanel.setScene(scene);
@@ -157,5 +166,12 @@ public class TradingJPanel extends javax.swing.JPanel {
     private GridPane grid = new GridPane();
     private Scene scene;
     DriveWealthAPI api;
-                
+
+    int width;
+    int height;
+    
+    //private final Rectangle fullSize;
+    //private final double sceneWidth;
+    //private final double sceneHeight;
+
 }
