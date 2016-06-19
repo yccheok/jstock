@@ -97,10 +97,15 @@ public class StockNewsContent {
                     }
                 }
             });
-                
+
         // Tab title: display progress Indicator + first 3 words of news title
         final String[] result = title.split(" ", 4);
-        final String shortTitle = String.join(" ", result[0], result[1], result[2]) + "...";
+        String shortTitle = "";
+        for (int i=0; i<3; i++) {
+            shortTitle = shortTitle + " " + result[i];
+        }
+        shortTitle = shortTitle + "....";
+        
         tab.setText(shortTitle);
         
         // remove ProgressIndicator (loading icon on tab) after 15s

@@ -57,6 +57,8 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.text.TextFlow;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
+import javafx.scene.text.TextAlignment;
+import javafx.geometry.Insets;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
@@ -220,10 +222,10 @@ public class StockNewsJFrame extends JFrame implements WindowListener {
                                             // resize JFrame first
                                             StockNewsJFrame.this.setSize(fullSize.width, fullSize.height);
 
-                                            Insets in = StockNewsJFrame.this.getInsets();
+                                            java.awt.Insets in = StockNewsJFrame.this.getInsets();
                                             jfxPanel.setSize(StockNewsJFrame.this.getWidth() - in.left - in.right, jfxPanel.getHeight());
                                             
-                                            Insets in2 = jfxPanel.getInsets();
+                                            java.awt.Insets in2 = jfxPanel.getInsets();
                                             
                                             // calculate width & height, but not resize in AWT event dispatching thread
                                             // javafx.scene.control.SplitPane should only be accessed from JavaFX Application Thread
@@ -284,11 +286,7 @@ public class StockNewsJFrame extends JFrame implements WindowListener {
                 newsBox.setMaxWidth(sceneWidth - 20);
                 newsBox.getStyleClass().add("item-border-pane");
 
-                // last cell - has padding bottom
-                if(getIndex() == (getListView().getItems().size() - 1)) {
-                    this.getStyleClass().add("listcell-last");
-                }
-                
+                // News Title
                 final String msgTitle = StringEscapeUtils.unescapeHtml(item.getTitle());
                 final Text firstText = new Text(msgTitle.substring(0, 1));
                 final Text secondText = new Text(msgTitle.substring(1));
@@ -297,26 +295,24 @@ public class StockNewsJFrame extends JFrame implements WindowListener {
                 secondText.getStyleClass().add("item-title-text-2");
 
                 final TextFlow titleTextFlow = new TextFlow(firstText, secondText);
-                titleTextFlow.getStyleClass().add("item-title-textflow");
                 titleTextFlow.setMaxWidth(sceneWidth - 60);
 
                 newsBox.setTop(titleTextFlow);
-
-                final VBox descVBox;
+                
+                // News description
                 final Text descText;
                 if (item.getDescriptionAsText() != null) {
                     descText = new Text(item.getDescriptionAsText());
                     descText.setWrappingWidth(sceneWidth - 60);
                     descText.getStyleClass().add("item-desc-text");
                     
-                    descVBox = new VBox();
-                    descVBox.getChildren().addAll(descText);
-                    descVBox.getStyleClass().add("item-desc-vbox");
-
-                    newsBox.setCenter(descVBox);
+                    BorderPane.setMargin(descText, new javafx.geometry.Insets(10, 0, 0, 0));
                     BorderPane.setAlignment(descText, Pos.CENTER_LEFT);
+
+                    newsBox.setCenter(descText);
                 }
 
+                // News published date
                 final String pubDateDiff = toHumanReadableDate(item.getPubDate());
                 final Label pubDate = new Label(pubDateDiff);
                 pubDate.getStyleClass().add("item-date-label");
