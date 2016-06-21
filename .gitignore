@@ -1,5 +1,5 @@
 /nbproject/private/
 /build/
 /dist/
-/nbproject/
+nbproject/*
 /src/org/yccheok/jstock/engine/
