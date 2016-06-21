@@ -157,8 +157,8 @@ public class StockNewsJFrame extends JFrame implements WindowListener {
             @Override
             public void run() {
                 // JFXPanel => Scene => SplitPane:
-                //      Left  (news List)       => StackPane => ViewView / ProgressIndicator
-                //      Right (HTML content)    => TabPane => Tab => StackPane => WebView / ProgressBar
+                //      Left  (news List)       => StackPane => ListView / ProgressIndicator
+                //      Right (HTML content)    => TabPane => Tab (ProgressIndicator as graphic) => WebView
 
                 splitPane = new SplitPane();
                 scene = new Scene(splitPane);
