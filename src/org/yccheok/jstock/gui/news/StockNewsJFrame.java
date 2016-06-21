@@ -39,6 +39,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.embed.swing.JFXPanel;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -56,6 +57,8 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.text.TextFlow;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
+import javafx.scene.text.TextAlignment;
+import javafx.geometry.Insets;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
@@ -118,7 +121,7 @@ public class StockNewsJFrame extends JFrame implements WindowListener {
     public void windowOpened(WindowEvent e) {}
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {  
-        Task task = StockNewsJFrame.this.task;
+        NewsTask task = StockNewsJFrame.this.newsTask;
         if (task != null) {
             task.cancel(true);
         }
@@ -142,7 +145,7 @@ public class StockNewsJFrame extends JFrame implements WindowListener {
             public void windowClosed(java.awt.event.WindowEvent evt) {
             }
             public void windowClosing(java.awt.event.WindowEvent evt) {
-                Task task = StockNewsJFrame.this.task;
+                NewsTask task = StockNewsJFrame.this.newsTask;
                 if (task != null) {
                     task.cancel(true);
                 }
@@ -158,7 +161,7 @@ public class StockNewsJFrame extends JFrame implements WindowListener {
             public void run() {
                 // JFXPanel => Scene => SplitPane:
                 //      Left  (news List)       => StackPane => ListView / ProgressIndicator
-                //      Right (HTML content)    => TabPane => Tab (ProgressIndicator as graphic) => WebView
+                //      Right (HTML content)    => TabPane => Tab => StackPane => WebView / ProgressBar
 
                 splitPane = new SplitPane();
                 scene = new Scene(splitPane);
@@ -219,16 +222,23 @@ public class StockNewsJFrame extends JFrame implements WindowListener {
                                             // resize JFrame first
                                             StockNewsJFrame.this.setSize(fullSize.width, fullSize.height);
 
-                                            Insets in = StockNewsJFrame.this.getInsets();
+                                            java.awt.Insets in = StockNewsJFrame.this.getInsets();
                                             jfxPanel.setSize(StockNewsJFrame.this.getWidth() - in.left - in.right, jfxPanel.getHeight());
                                             
-                                            Insets in2 = jfxPanel.getInsets();
-                                            splitPane.resize(jfxPanel.getWidth() - in2.left - in2.right, jfxPanel.getHeight() - in2.top - in2.bottom);
+                                            java.awt.Insets in2 = jfxPanel.getInsets();
+                                            
+                                            // calculate width & height, but not resize in AWT event dispatching thread
+                                            // javafx.scene.control.SplitPane should only be accessed from JavaFX Application Thread
+                                            splitPaneWidth = jfxPanel.getWidth() - in2.left - in2.right;
+                                            splitPaneHeight = jfxPanel.getHeight() - in2.top - in2.bottom;
                                         }
                                     });
                                 } catch (InterruptedException | InvocationTargetException ex) {
                                     log.error(null, ex);
                                 }
+                                
+                                // resize to full screen size of jfxPanel
+                                splitPane.resize(splitPaneWidth, splitPaneHeight);
                                 
                                 stockNewsContent = new StockNewsContent();
                                 splitPane.getItems().add(stockNewsContent.tabPane);
@@ -242,7 +252,7 @@ public class StockNewsJFrame extends JFrame implements WindowListener {
                                             return;
                                         }
 
-                                        final String jFrameTitle = stockNewsContent.tabsInfo.get(i).second;
+                                        jFrameTitle = stockNewsContent.tabsInfo.get(i).second;
 
                                         SwingUtilities.invokeLater(new Runnable() {
                                             @Override
@@ -257,6 +267,8 @@ public class StockNewsJFrame extends JFrame implements WindowListener {
                         }
                     }
                 });
+                
+                retrieveNewsInBackground();
             }
         });
 
@@ -274,11 +286,7 @@ public class StockNewsJFrame extends JFrame implements WindowListener {
                 newsBox.setMaxWidth(sceneWidth - 20);
                 newsBox.getStyleClass().add("item-border-pane");
 
-                // last cell - has padding bottom
-                if(getIndex() == (getListView().getItems().size() - 1)) {
-                    this.getStyleClass().add("listcell-last");
-                }
-                
+                // News Title
                 final String msgTitle = StringEscapeUtils.unescapeHtml(item.getTitle());
                 final Text firstText = new Text(msgTitle.substring(0, 1));
                 final Text secondText = new Text(msgTitle.substring(1));
@@ -287,26 +295,24 @@ public class StockNewsJFrame extends JFrame implements WindowListener {
                 secondText.getStyleClass().add("item-title-text-2");
 
                 final TextFlow titleTextFlow = new TextFlow(firstText, secondText);
-                titleTextFlow.getStyleClass().add("item-title-textflow");
                 titleTextFlow.setMaxWidth(sceneWidth - 60);
 
                 newsBox.setTop(titleTextFlow);
-
-                final VBox descVBox;
+                
+                // News description
                 final Text descText;
                 if (item.getDescriptionAsText() != null) {
                     descText = new Text(item.getDescriptionAsText());
                     descText.setWrappingWidth(sceneWidth - 60);
                     descText.getStyleClass().add("item-desc-text");
                     
-                    descVBox = new VBox();
-                    descVBox.getChildren().addAll(descText);
-                    descVBox.getStyleClass().add("item-desc-vbox");
-
-                    newsBox.setCenter(descVBox);
+                    BorderPane.setMargin(descText, new javafx.geometry.Insets(10, 0, 0, 0));
                     BorderPane.setAlignment(descText, Pos.CENTER_LEFT);
+
+                    newsBox.setCenter(descText);
                 }
 
+                // News published date
                 final String pubDateDiff = toHumanReadableDate(item.getPubDate());
                 final Label pubDate = new Label(pubDateDiff);
                 pubDate.getStyleClass().add("item-date-label");
@@ -319,60 +325,68 @@ public class StockNewsJFrame extends JFrame implements WindowListener {
         }
     }
 
-    public void retrieveNewsInBackground () {
-        if (this.newsServers == null || this.serverCnt >= this.newsServers.size()) {
-            return;
+    private class NewsTask extends Task< java.util.List<FeedItem> > {
+        private final java.util.List<NewsServer> newsServers;
+
+        public NewsTask (java.util.List<NewsServer> servers) {
+            this.newsServers = servers;
         }
 
-        if (task != null) {
-            throw new java.lang.RuntimeException("Being called more than once");
-        }
+        @Override protected java.util.List<FeedItem> call() {
+            java.util.List<FeedItem> allMessages = new java.util.ArrayList<FeedItem>();
+            int serverCnt = 0;
 
-        // Retrieve news from next available news server
-        task = new Task<Void>() {
-            @Override public Void call() {
-                java.util.List<FeedItem> allMessages = new java.util.ArrayList<FeedItem>();
-
-                // load news from all available news servers, asynchrounusly
-                while (serverCnt < newsServers.size()) {
-                    final java.util.List<FeedItem> newMessages = newsServers.get(serverCnt++).getMessages(stockInfo);
-
-                    if (isCancelled()) {
-                        return null;
-                    }
-                    if (newMessages.isEmpty()) {
-                        continue;
-                    }
-                    allMessages.addAll(newMessages);
-                }
+            // load news from all available news servers, asynchrounusly
+            while (serverCnt < this.newsServers.size()) {
+                final java.util.List<FeedItem> newMessages = this.newsServers.get(serverCnt++).getMessages(stockInfo);
 
                 if (isCancelled()) {
                     return null;
                 }
+                if (newMessages.isEmpty()) {
+                    continue;
+                }
+                allMessages.addAll(newMessages);
+            }
 
-                // sort news in DESC order
-                Collections.sort(allMessages, new Comparator<FeedItem>() {
-                    @Override
-                    public int compare(FeedItem lhs, FeedItem rhs) {
-                        return -lhs.getPubDate().compareTo(rhs.getPubDate());
-                    }
-                });
-
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (isCancelled()) {
-                            return;
-                        }
-                        messages_o.addAll(allMessages);
-                        stackPane.getChildren().remove(progressIn);
-                    }
-                });
-
+            if (isCancelled()) {
                 return null;
             }
-        };
-        new Thread(task).start();
+
+            // sort news in DESC order
+            Collections.sort(allMessages, new Comparator<FeedItem>() {
+                @Override
+                public int compare(FeedItem lhs, FeedItem rhs) {
+                    return -lhs.getPubDate().compareTo(rhs.getPubDate());
+                }
+            });
+
+            return allMessages;
+        }
+    }
+    
+    public void retrieveNewsInBackground () {
+        if (newsServers == null) {
+            return;
+        }
+        if (newsTask != null) {
+            throw new java.lang.RuntimeException("Being called more than once");
+        }
+
+        newsTask = new NewsTask(newsServers);
+        
+        // on newsTask successfully executed
+        newsTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+            @Override
+            public void handle(WorkerStateEvent t) {
+                java.util.List<FeedItem> allMessages = newsTask.getValue();
+
+                messages_o.addAll(allMessages);
+                stackPane.getChildren().remove(progressIn);
+            }
+        });
+        
+        new Thread(newsTask).start();
     }
 
     private boolean isSameDay(Date date0, Date date1) {
@@ -429,7 +443,6 @@ public class StockNewsJFrame extends JFrame implements WindowListener {
 
     private final StockInfo stockInfo;
     private final java.util.List<NewsServer> newsServers;
-    private int serverCnt = 0;
 
     private final Rectangle fullSize;
     private final double sceneWidth;
@@ -445,10 +458,15 @@ public class StockNewsJFrame extends JFrame implements WindowListener {
     private ObservableList<FeedItem> messages_o;
     private ListView<FeedItem> newsListView;
 
-    private Task task;
+    private NewsTask newsTask;
     
     /* To avoid memory leak */
     private java.awt.Frame parent;
 
+    private double splitPaneWidth;
+    private double splitPaneHeight;
+    
+    private String jFrameTitle;
+    
     private final Log log = LogFactory.getLog(StockNewsJFrame.class);    
 }
