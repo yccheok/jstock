@@ -3200,7 +3200,6 @@ public class JStock extends javax.swing.JFrame {
         final StockInfo stockInfo = StockInfo.newInstance(stock.code, stock.symbol);
         final String title = stock.symbol + " (" + stock.code + ")";
         final StockNewsJFrame stockNewsJFrame = new StockNewsJFrame(this, stockInfo, title);
-        stockNewsJFrame.retrieveNewsInBackground();
     }
 
     private void displayStocksNews() {
