@@ -2067,11 +2067,13 @@ public class JStock extends javax.swing.JFrame {
     }
 
     private void createTradingJPanel() {
-        
         System.out.println("tab count: " + jTabbedPane1.getTabCount());
         
-        tradingJPanel = new TradingJPanel();    //jTabbedPane1.getTabComponentAt(1).getBounds());
-        jTabbedPane1.addTab(GUIBundle.getString("TradingJPanel_Title"), tradingJPanel);
+        tradingJPanel = new TradingJPanel();
+        ImageIcon icon = new javax.swing.ImageIcon(getClass().getResource("/images/16x16/drivewealth_logo.png"));
+        
+        //jTabbedPane1.addTab(GUIBundle.getString("TradingJPanel_Title"), tradingJPanel);
+        jTabbedPane1.addTab(GUIBundle.getString("TradingJPanel_Title"), icon, tradingJPanel);
     }
 
     private void createStockIndicatorEditor() {

@@ -42,14 +42,18 @@ import org.apache.commons.httpclient.methods.multipart.StringPart;
 public class DriveWealthAPI {
 
     public DriveWealthAPI(Map<String, String>params) {
-        this.user = new User(params.get("username"), params.get("password"));
-        this.getSessionKey();
+        _initUserSession(params.get("username"), params.get("password"));
     }
 
     public DriveWealthAPI() {
         this.user = new User();
     }
 
+    private void _initUserSession(String username, String password) {
+        this.user = new User(username, password);
+        this.getSessionKey();
+    }
+    
     /********************
      * API Functions
      ********************/
@@ -636,21 +640,22 @@ public class DriveWealthAPI {
             Double accountTypeID = (Double) account.get("accountType");
             Double cash = (Double) account.get("cash");
 
-            // acc type: 1 => Practice a/c, 2 => Live a/c
-            String accountType = null;
+            // accountTypeID: 1 => Practice a/c, 2 => Live a/c
+            String accountType = (accountTypeID == 1) ? "Practice" : "Live";
+
+            Account acc = this.new Account(account);
             if (accountTypeID == 1) {
-                accountType = "Practice";
-                this.practiceAccount = this.new Account(accountID, accountNo, accountTypeID, cash);
+                this.user.practiceAccount = acc;
             } else if (accountTypeID == 2) {
-                accountType = "Live";
-                this.liveAccount = this.new Account(accountID, accountNo, accountTypeID, cash);
+                this.user.liveAccount = acc;
             }
             
-            if (!this.user.accountIDs.contains(accountID)) {
-                this.user.accountIDs.add(accountID);
+            if (!this.user.accountsMap.containsKey(accountID)) {
+                this.user.accountsMap.put(accountID, acc);
             }
 
-            System.out.println("accountID: " + accountID + ", accountNo: " + accountNo + ", accountType: " + accountType);
+            
+            System.out.println("accountID: " + accountID + ", accountNo: " + accountNo + ", accountType: " + accountType + ", cash" + cash);
         }
         return accounts;
     }
@@ -661,7 +666,7 @@ public class DriveWealthAPI {
         if user & practice account exist, POST with userID returns existing accountID
     */
 
-    public Map<String, Object> createPracticeAccount(Map<String, Object> args) {
+    public Account createPracticeAccount(Map<String, Object> args) {
         System.out.println("\n[create Practice Account]");
         String api = "signups/practice";
         
@@ -669,22 +674,17 @@ public class DriveWealthAPI {
             // user already exist, create practice a/c
             String userID = args.get("userID").toString();
             
-            // practice a/c exists?
-            // accountType: 1 => Practice a/c, 2 => Live a/c
-            List<Map<String, Object>> accounts = this.listAllAccounts(userID);
-            Map<String, Object> account = new HashMap<>();
+            // existing user requires SignIn: to create SessionKey
+            if (this.user == null || !this.user.userID.equals(userID)) {
+                System.out.println("Please Sign In, userID: " + userID);
+                return null;
+            }
 
-            for (Map<String, Object> a : accounts) {
-                if ((Double) a.get("accountType") == 1) {
-                    String accountID = a.get("accountID").toString();
-                    String accountNo = a.get("accountNo").toString();
-
-                    account.put("accountID", accountID);
-                    account.put("accountNo", accountNo);
-
-                    System.out.println("Practice a/c exists: accountID: " + accountID + ", accountNo: " + accountNo);
-                    return account;
-                }
+            // practice acc exists
+            if (this.user.practiceAccount != null) {
+                Account acc = this.user.practiceAccount;
+                System.out.println("Practice a/c exists: accountID: " + acc.accountID + ", accountNo: " + acc.accountNo);
+                return acc;
             }
 
             // create practice account
@@ -696,42 +696,42 @@ public class DriveWealthAPI {
             Map<String, Object> result = gson.fromJson(respond, HashMap.class);
 
             String accountID = result.get("accountID").toString();
-            account.put("accountID", accountID);
             System.out.println("user already exist, created practice accountID: " + accountID);
-            return account;
-        }
 
-        // create new user + practice a/c
-        System.out.println("create User + Practice a/c + funded");
-        
-        Map<String, Object> params = new HashMap<>();
-        for (String k: this.userFields) {
-            if (args.containsKey(k)) {
-                Object v = args.get(k);
-                params.put(k, v);
-                //System.out.println("key: " + k + ", value: " + v);
-            }
-        }
-
-        Map<String, Object> respondMap = executePost(api, params, null);
-        Map<String, Object> user = new HashMap<>();
-
-        // status code: 400 => duplicate username, 200 => OK
-        String respond = respondMap.get("respond").toString();
-        Map<String, Object> result = gson.fromJson(respond, HashMap.class);
-        int statusCode = (int) respondMap.get("code");
-        
-        if (statusCode == 200) {
-            user.put("username",    result.get("username"));
-            user.put("password",    result.get("password"));
-            user.put("userID",      result.get("userID"));
+            this._initUserSession(this.user.username, this.user.password);
             
-            System.out.println("New user + practice a/c created");
-        } else if (statusCode == 400) {
-            System.out.println("User already exists, error: " + result.get("message").toString());
+            return this.user.practiceAccount;
+        } else {
+            // create new user + practice a/c
+            System.out.println("create User + Practice a/c + funded");
+
+            Map<String, Object> params = new HashMap<>();
+            for (String k: this.userFields) {
+                if (args.containsKey(k)) {
+                    Object v = args.get(k);
+                    params.put(k, v);
+                    //System.out.println("key: " + k + ", value: " + v);
+                }
+            }
+            Map<String, Object> respondMap = executePost(api, params, null);
+
+            String respond = respondMap.get("respond").toString();
+            Map<String, Object> result = gson.fromJson(respond, HashMap.class);
+            int statusCode = (int) respondMap.get("code");
+
+            Account acc = null;
+            // status code: 400 => duplicate username, 200 => OK
+            if (statusCode == 200) {
+                this._initUserSession(result.get("username").toString(), result.get("password").toString());
+                acc = this.user.practiceAccount;
+                
+                System.out.println("New user + practice a/c created");
+            } else if (statusCode == 400) {
+                System.out.println("User already exists, error: " + result.get("message").toString());
+            }
+
+            return acc;
         }
-        
-        return user;
     }
 
     public Map<String, Object> createLiveAccount(Map<String, Object> args) {
@@ -1821,16 +1821,16 @@ public class DriveWealthAPI {
                 Double accountType = (Double) a.get("accountType");
                 Double cash        = (Double) a.get("cash");
                 
-                final Account account = new Account(accountID, accountNo, accountType, cash);
-                
+                final Account account = new Account(a);
+
                 if (accountType == 1) {
-                    this.practiceAccount = account;
+                    this.user.practiceAccount = account;
                 } else if (accountType == 2) {
-                    this.liveAccount = account;
+                    this.user.liveAccount = account;
                 }
 
-                if (!this.accountsMap.containsKey(accountID)) {
-                    this.accountsMap.put(accountID, account);
+                if (!this.user.accountsMap.containsKey(accountID)) {
+                    this.user.accountsMap.put(accountID, account);
                 }
             }                    
         }
@@ -1981,21 +1981,32 @@ public class DriveWealthAPI {
         public String sessionKey;
         public String userID;
         public Double commissionRate;
-        public List<String> accountIDs = new ArrayList<>();
+        
+        public Account practiceAccount;
+        public Account liveAccount;
+        public Map<String, Account> accountsMap = new HashMap<>();
     }
     
     public class Account {
-        public Account (String accountID, String accountNo, Double accountType, Double cash) {
+        public Account (Map<String, Object> account) {
+            String accountID = account.get("accountID").toString();
+            String accountNo = account.get("accountNo").toString();
+            Double accountTypeID = (Double) account.get("accountType");
+            Double cash = (Double) account.get("cash");
+            String nickname = account.get("nickname").toString();
+            
             this.accountID = accountID;
             this.accountNo = accountNo;
-            this.accountType = accountType;
+            this.accountType = accountTypeID;
             this.cash = cash;
+            this.nickname = nickname;
         }
 
         public String accountID;
         public String accountNo;
         public Double accountType;
         public Double cash;
+        public String nickname;
     }
     
     private final Gson gson = new Gson();
@@ -2003,7 +2014,4 @@ public class DriveWealthAPI {
     public static String reportURL = "http://reports.drivewealth.io/";
     
     public User user;
-    public Account practiceAccount;
-    public Account liveAccount;
-    public Map<String, Account> accountsMap = new HashMap<>();
 }
