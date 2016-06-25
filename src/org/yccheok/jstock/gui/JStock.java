@@ -2072,8 +2072,9 @@ public class JStock extends javax.swing.JFrame {
         tradingJPanel = new TradingJPanel();
         ImageIcon icon = new javax.swing.ImageIcon(getClass().getResource("/images/16x16/drivewealth_logo.png"));
         
-        //jTabbedPane1.addTab(GUIBundle.getString("TradingJPanel_Title"), tradingJPanel);
         jTabbedPane1.addTab(GUIBundle.getString("TradingJPanel_Title"), icon, tradingJPanel);
+        
+        System.out.println("trading panel height: " + tradingJPanel.getHeight() + ", width: " + tradingJPanel.getWidth());
     }
 
     private void createStockIndicatorEditor() {

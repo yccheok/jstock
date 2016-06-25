@@ -20,8 +20,11 @@
 package org.yccheok.jstock.gui.trading;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
+import javax.swing.JScrollPane;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import javafx.application.Platform;
@@ -33,21 +36,27 @@ import javafx.event.ActionEvent;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.RowConstraints;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import javax.swing.SwingUtilities;
+import org.yccheok.jstock.gui.news.StockNewsJFrame;
 import org.yccheok.jstock.trade.DriveWealthAPI;
 
 /**
@@ -56,14 +65,7 @@ import org.yccheok.jstock.trade.DriveWealthAPI;
  */
 public class TradingJPanel extends javax.swing.JPanel {
     
-    /** Creates new form TradingJPanel */
-    public TradingJPanel() {  // Rectangle rec) {
-        this.height = 500;  // rec.height;
-        this.width = 500;   // rec.width;
-        
-        System.out.println("width: " + this.width + ", height: " + this.height);
-
-        //this.setBounds(rec);
+    public TradingJPanel() {
         initComponents();
     }
     
@@ -79,17 +81,9 @@ public class TradingJPanel extends javax.swing.JPanel {
                 grid.setHgap(10);
                 grid.setVgap(30);
                 grid.setPadding(new Insets(25, 25, 25, 25));
-
-                ColumnConstraints column1 = new ColumnConstraints();
-                column1.setPercentWidth(80);
-                grid.getColumnConstraints().addAll(column1);
-
-                scene = new Scene(grid, width, height);
-                scene.getStylesheets().add(TradingJPanel.class.getResource("trading.css").toExternalForm());
-                jfxPanel.setScene(scene);
-
                 grid.setId("grid");
                 
+                // Drive Wealth Logo as Title
                 Label titleLabel = new Label();
                 Image image = new Image(getClass().getResourceAsStream("drivewealth-logo.png"));
                 titleLabel.setGraphic(new ImageView(image));
@@ -97,48 +91,63 @@ public class TradingJPanel extends javax.swing.JPanel {
                 grid.add(titleLabel, 0, 0);
                 GridPane.setHalignment(titleLabel, HPos.CENTER);
 
-                // username
-                TextField username = new TextField();
-                username.setPromptText("Username");
-                grid.add(username, 0, 1);
+                // username field
+                TextField userField = new TextField();
+                userField.setPromptText("Username");
+                grid.add(userField, 0, 1);
 
-                // password
-                PasswordField password = new PasswordField();
-                password.setPromptText("Password");
-                grid.add(password, 0, 2);
+                // password field
+                PasswordField pwdField = new PasswordField();
+                pwdField.setPromptText("Password");
+                grid.add(pwdField, 0, 2);
 
-                /*
-                Button signInBtn = new Button("Sign in");
-                signInBtn.setId("green");
-                HBox hbBtn = new HBox(10);
-
-                hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
-                hbBtn.getChildren().add(signInBtn);
-                grid.add(hbBtn, 0, 4);
-                */
-                
-                
+                // Sign In button
                 Button signInBtn = new Button("Sign in");
                 signInBtn.setId("green");
                 signInBtn.setMaxWidth(Double.MAX_VALUE);
                 signInBtn.setMaxHeight(Double.MAX_VALUE);
                 signInBtn.setTextAlignment(TextAlignment.CENTER);
-                
                 // rowspan = 2
                 grid.add(signInBtn, 0, 4, 1, 2);
                 GridPane.setHalignment(signInBtn, HPos.CENTER);
-                        
+
                 // Sign In successful msg
                 final Label successText = new Label();
                 successText.setWrapText(true);
                 grid.add(successText, 0, 6);
                 
+                // make components auto resize
+                ColumnConstraints cc = new ColumnConstraints();
+                cc.setPercentWidth(80);
+                cc.setHgrow(Priority.ALWAYS);
+                grid.getColumnConstraints().setAll(cc);
+                
+                RowConstraints rr = new RowConstraints();
+                rr.setVgrow(Priority.ALWAYS);
+                grid.getRowConstraints().setAll(rr, rr, rr, rr, rr, rr);
+                
+                // add to scene
+                scene = new Scene(grid);
+                scene.getStylesheets().add(TradingJPanel.class.getResource("trading.css").toExternalForm());
+                jfxPanel.setScene(scene);
+                jfxPanel.setPreferredSize(new Dimension(500, 500));
+
+                
                 signInBtn.setOnAction(new EventHandler<ActionEvent>() {
                     @Override
                     public void handle(ActionEvent e) {
                         Map<String, String> params = new HashMap<>();
-                        params.put("username", username.getText());
-                        params.put("password", password.getText());
+                        
+                        String username = userField.getText();
+                        String pwd = pwdField.getText();
+                        
+                        if (username == null || pwd == null) {
+                            System.out.println("Please enter username and password.");
+                            return;
+                        }
+                        
+                        params.put("username", username);
+                        params.put("password", pwd);
                         
                         Task<DriveWealthAPI> task = new Task<DriveWealthAPI>() {
                             @Override protected DriveWealthAPI call() throws Exception {
@@ -147,8 +156,8 @@ public class TradingJPanel extends javax.swing.JPanel {
                                 DriveWealthAPI _api = new DriveWealthAPI(params);
                                 DriveWealthAPI.User user = _api.user;
 
-                                System.out.println("DriveWealth: username: " + username.getText()
-                                                    + ", pwd: " + password.getText()
+                                System.out.println("DriveWealth: username: " + username
+                                                    + ", pwd: " + pwd
                                                     + ", sessionKey: " + user.sessionKey
                                                     + ", userID: " + user.userID
                                                     + ", commission: " + user.commissionRate);
@@ -175,6 +184,9 @@ public class TradingJPanel extends javax.swing.JPanel {
                                 
                                 successText.setTextFill(Color.FIREBRICK);
                                 successText.setText(welcomeStr);
+                                
+                                System.out.println("JPanel width: " + jfxPanel.getParent().getWidth()
+                                    + ", height: " + jfxPanel.getParent().getHeight());
                             }
                         });
                         
@@ -187,20 +199,23 @@ public class TradingJPanel extends javax.swing.JPanel {
             }
         });
 
-        this.add(jfxPanel, BorderLayout.CENTER);
+        jScrollPane.getViewport().add(jfxPanel);        
+        jScrollPane.setPreferredSize(new Dimension(200, 200));
+
+        //this.setLayout(new java.awt.BorderLayout(5, 5));
+        //this.add(this.jScrollPane, BorderLayout.NORTH);
+        
+        this.setLayout(new java.awt.GridLayout(0, 1, 5, 5));
+        this.add(this.jScrollPane);
+        
         this.setVisible(true);
     }
-    
+
+    private final JScrollPane jScrollPane = new javax.swing.JScrollPane();
     private final JFXPanel jfxPanel = new JFXPanel();
-    private GridPane grid = new GridPane();
-    private Scene scene;
-    DriveWealthAPI api;
-
-    int width;
-    int height;
     
-    //private final Rectangle fullSize;
-    //private final double sceneWidth;
-    //private final double sceneHeight;
-
+    private GridPane grid;
+    private Scene scene;
+    
+    public DriveWealthAPI api;
 }
