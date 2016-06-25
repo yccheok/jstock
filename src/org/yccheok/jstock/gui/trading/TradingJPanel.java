@@ -19,12 +19,8 @@
 
 package org.yccheok.jstock.gui.trading;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.GraphicsEnvironment;
-import java.awt.Rectangle;
 import javax.swing.JScrollPane;
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import javafx.application.Platform;
@@ -36,27 +32,19 @@ import javafx.event.ActionEvent;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
-import javax.swing.SwingUtilities;
-import org.yccheok.jstock.gui.news.StockNewsJFrame;
 import org.yccheok.jstock.trade.DriveWealthAPI;
 
 /**
@@ -200,7 +188,7 @@ public class TradingJPanel extends javax.swing.JPanel {
         });
 
         jScrollPane.getViewport().add(jfxPanel);        
-        jScrollPane.setPreferredSize(new Dimension(200, 200));
+        jScrollPane.setPreferredSize(new Dimension(500, 500));
 
         //this.setLayout(new java.awt.BorderLayout(5, 5));
         //this.add(this.jScrollPane, BorderLayout.NORTH);
