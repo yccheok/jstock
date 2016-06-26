@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.yccheok.jstock.trade;
+package org.yccheok.jstock.trading;
 
 
 import com.google.gson.Gson;

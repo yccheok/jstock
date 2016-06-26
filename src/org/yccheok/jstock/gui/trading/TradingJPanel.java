@@ -60,7 +60,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
-import org.yccheok.jstock.trade.DriveWealthAPI;
+import org.yccheok.jstock.trading.DriveWealthAPI;
 
 /**
  *
@@ -261,13 +261,23 @@ public class TradingJPanel extends javax.swing.JPanel {
                                     System.out.println("Successfully Sign In, userID: " + api.user.userID);
 
                                     DriveWealthAPI.Account acc = api.user.practiceAccount;
+                                    String welcomeStr;
+                                    
+                                    if (acc == null) {
+                                        System.out.println("No practice account, creating....");
+
+                                        Map<String, Object> params = new HashMap<>();
+                                        params.put("userID", api.user.userID);
+                                        acc = api.createPracticeAccount(params);
+                                    }
+
                                     String accountNo =  acc.accountNo;
                                     String nickname = acc.nickname;
                                     Double cash = acc.cash;
 
-                                    String welcomeStr = "Start trading now with " + acc.nickname + ".\n AccountNo: " + acc.accountNo
-                                            + "\n AccountID: " + acc.accountID + "\n Balance: " + acc.cash;
-
+                                    welcomeStr = "Start trading now with " + acc.nickname + ".\n AccountNo: " + acc.accountNo
+                                        + "\n AccountID: " + acc.accountID + "\n Balance: " + acc.cash;
+                                    
                                     successText.setText(welcomeStr);
                                 } else {
                                     System.out.println("Sign In failed");
