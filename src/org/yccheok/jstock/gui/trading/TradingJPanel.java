@@ -19,12 +19,16 @@
 
 package org.yccheok.jstock.gui.trading;
 
+import com.google.gson.internal.LinkedTreeMap;
 import java.awt.Dimension;
 import javax.swing.JScrollPane;
 import java.util.HashMap;
 import java.util.Map;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 import static javafx.concurrent.Worker.State.FAILED;
@@ -46,8 +50,11 @@ import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabClosingPolicy;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
@@ -256,6 +263,15 @@ public class TradingJPanel extends javax.swing.JPanel {
 
                             // reenable "Sign In" button
                             signInBtn.setDisable(false);
+                            
+                            
+                            // create account summary tab => call Account Blotter for practice acc
+                            System.out.println("call account Blotter for summary....");
+                            AccountSummary summary = new AccountSummary();
+                            summary.createTab();
+                            System.out.println("Account Blotter DONE....");
+
+                            
                         }
                     });
 
@@ -330,6 +346,88 @@ public class TradingJPanel extends javax.swing.JPanel {
         private final Hyperlink licenceLink = new Hyperlink("Drive Wealth's Terms of Use");
     }
 
+    public class AccountSummary {
+        public final Tab summaryTab  = new Tab();
+        private TableView table = new TableView();
+
+        public AccountSummary () {}
+
+        public void createTab() {
+            String userID = api.user.userID;
+            String accountID = api.user.practiceAccount.accountID;
+            
+            Map<String, Object> account = api.accountBlotter(userID, accountID);                
+
+            LinkedTreeMap<String, Object> equity = (LinkedTreeMap) account.get("equity");
+            Object positionsValue = equity.get("equityValue");
+        
+            LinkedTreeMap<String, Object> balance = (LinkedTreeMap) account.get("cash");
+            Object cashBalance = balance.get("cashBalance");
+            String cashForTrade = balance.get("cashAvailableForTrade").toString();
+            String cashForWithdraw = balance.get("cashAvailableForWithdrawal").toString();
+            Double accountTotal = (Double) cashBalance + (Double) positionsValue;
+            
+            System.out.println("Table: " + positionsValue.toString() + ", " + cashBalance.toString() + ", " + cashForTrade + ", " + cashForWithdraw + ", " + accountTotal.toString());
+
+            final ObservableList<Summary> data = FXCollections.observableArrayList(
+                new Summary("cashBalance", cashBalance.toString()),
+                new Summary("cashForTrade", cashForTrade),
+                new Summary("cashForWithdraw", cashForWithdraw),
+                new Summary("positionsValue", positionsValue.toString()),
+                new Summary("accountTotal", accountTotal.toString())
+            );
+            
+            TableColumn fieldCol = new TableColumn();
+            TableColumn valueCol = new TableColumn();
+
+            table.getColumns().addAll(fieldCol, valueCol);
+            
+            fieldCol.setCellValueFactory(
+                new PropertyValueFactory<Summary,String>("field")
+            );
+
+            valueCol.setCellValueFactory(
+                new PropertyValueFactory<Summary,String>("value")
+            );
+            
+            table.setItems(data);
+            
+            // add account summary tab
+            summaryTab.setText("Practice Account Summary");
+            summaryTab.setClosable(false);
+            summaryTab.setContent(table);
+            tabPane.getTabs().add(summaryTab);
+            
+            // select tab
+            SingleSelectionModel<Tab> selectionModel = tabPane.getSelectionModel();
+            selectionModel.select(summaryTab);
+        }
+
+        public class Summary {
+            private final SimpleStringProperty field;
+            private final SimpleStringProperty value;
+
+            private Summary(String sField, String sValue) {
+                this.field = new SimpleStringProperty(sField);
+                this.value = new SimpleStringProperty(sValue);
+            }
+
+            public String getField() {
+                return field.get();
+            }
+            public void setField(String sField) {
+                field.set(sField);
+            }
+            
+            public String getValue() {
+                return value.get();
+            }
+            public void setValue(String sValue) {
+                value.set(sValue);
+            }
+        }
+    }
+    
     private final JScrollPane jScrollPane = new javax.swing.JScrollPane();
     private final JFXPanel jfxPanel = new JFXPanel();
     private Scene scene;
