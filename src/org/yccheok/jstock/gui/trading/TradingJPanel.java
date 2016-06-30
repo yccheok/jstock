@@ -25,6 +25,7 @@ import javax.swing.JScrollPane;
 import java.util.HashMap;
 import java.util.Map;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -63,6 +64,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.RowConstraints;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.web.WebEngine;
@@ -210,8 +212,8 @@ public class TradingJPanel extends javax.swing.JPanel {
                     params.put("username", username);
                     params.put("password", pwd);
 
-                    Task<DriveWealthAPI> task = new Task<DriveWealthAPI>() {
-                        @Override protected DriveWealthAPI call() throws Exception {
+                    Task< Map<String, Object> > task = new Task< Map<String, Object> >() {
+                        @Override protected Map<String, Object> call() throws Exception {
                             System.out.println("Drive Wealth User Sign In....\n\n ");
 
                             DriveWealthAPI _api = new DriveWealthAPI(params);
@@ -222,14 +224,28 @@ public class TradingJPanel extends javax.swing.JPanel {
                                                 + ", sessionKey: " + user.sessionKey
                                                 + ", userID: " + user.userID
                                                 + ", commission: " + user.commissionRate);
-                            return _api;
+
+                            Map<String, Object> result = new HashMap<>();
+                            result.put("api", _api);
+                            
+                            // get account info
+                            String userID = _api.user.userID;
+                            String accountID = _api.user.practiceAccount.accountID;
+                            if (userID != null && accountID != null) {
+                                Map<String, Object> accountMap = _api.accountBlotter(userID, accountID);              
+                                result.put("accountMap", accountMap);
+                                System.out.println("calling account Blotter DONE...");
+                            }
+
+                            return result;
                         }
                     };
 
                     task.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
                         @Override
                         public void handle(WorkerStateEvent t) {
-                            api = task.getValue();
+                            Map<String, Object> result = task.getValue();
+                            api = (DriveWealthAPI) result.get("api");
 
                             if (api.user != null && api.getSessionKey() != null) {
                                 System.out.println("Successfully Sign In, userID: " + api.user.userID);
@@ -238,20 +254,22 @@ public class TradingJPanel extends javax.swing.JPanel {
                                 String welcomeStr;
 
                                 if (acc == null) {
-                                    System.out.println("No practice account, creating....");
+                                    System.out.println("No practice account, prompt for creating ??");
+                                    welcomeStr = "Successfully Sign In, create practice account to start trading";
 
+                                    /*
                                     Map<String, Object> params = new HashMap<>();
                                     params.put("userID", api.user.userID);
                                     acc = api.createPracticeAccount(params);
+                                    */
+                                } else {
+                                    String accountNo =  acc.accountNo;
+                                    String nickname = acc.nickname;
+                                    Double cash = acc.cash;
+
+                                    welcomeStr = "Start trading now with " + acc.nickname + ".\n AccountNo: " + acc.accountNo
+                                        + "\n AccountID: " + acc.accountID + "\n Balance: " + acc.cash;
                                 }
-
-                                String accountNo =  acc.accountNo;
-                                String nickname = acc.nickname;
-                                Double cash = acc.cash;
-
-                                welcomeStr = "Start trading now with " + acc.nickname + ".\n AccountNo: " + acc.accountNo
-                                    + "\n AccountID: " + acc.accountID + "\n Balance: " + acc.cash;
-
                                 successText.setText(welcomeStr);
                             } else {
                                 System.out.println("Sign In failed");
@@ -260,18 +278,17 @@ public class TradingJPanel extends javax.swing.JPanel {
 
                             successText.setTextFill(Color.FIREBRICK);
                             successText.setVisible(true);
-
                             // reenable "Sign In" button
                             signInBtn.setDisable(false);
-                            
-                            
-                            // create account summary tab => call Account Blotter for practice acc
-                            System.out.println("call account Blotter for summary....");
-                            AccountSummary summary = new AccountSummary();
-                            summary.createTab();
-                            System.out.println("Account Blotter DONE....");
 
-                            
+                            // create account summary tab
+                            if (result.containsKey("accountMap")) {
+                                Map<String, Object> accountMap = (HashMap) result.get("accountMap");
+                                
+                                AccountSummary summary = new AccountSummary(accountMap);
+                                summary.createTab();
+                                System.out.println("Account Blotter DONE....");
+                            }
                         }
                     });
 
@@ -347,35 +364,37 @@ public class TradingJPanel extends javax.swing.JPanel {
     }
 
     public class AccountSummary {
-        public final Tab summaryTab  = new Tab();
-        private TableView table = new TableView();
-
-        public AccountSummary () {}
+        public AccountSummary (Map<String, Object> accountMap) {
+            this.accountMap = accountMap;
+        }
 
         public void createTab() {
+            /*
             String userID = api.user.userID;
             String accountID = api.user.practiceAccount.accountID;
             
             Map<String, Object> account = api.accountBlotter(userID, accountID);                
-
-            LinkedTreeMap<String, Object> equity = (LinkedTreeMap) account.get("equity");
+            */
+                    
+            LinkedTreeMap<String, Object> equity = (LinkedTreeMap) accountMap.get("equity");
             Object positionsValue = equity.get("equityValue");
-        
-            LinkedTreeMap<String, Object> balance = (LinkedTreeMap) account.get("cash");
+
+            LinkedTreeMap<String, Object> balance = (LinkedTreeMap) accountMap.get("cash");
             Object cashBalance = balance.get("cashBalance");
             String cashForTrade = balance.get("cashAvailableForTrade").toString();
             String cashForWithdraw = balance.get("cashAvailableForWithdrawal").toString();
             Double accountTotal = (Double) cashBalance + (Double) positionsValue;
-            
+
             System.out.println("Table: " + positionsValue.toString() + ", " + cashBalance.toString() + ", " + cashForTrade + ", " + cashForWithdraw + ", " + accountTotal.toString());
 
             final ObservableList<Summary> data = FXCollections.observableArrayList(
-                new Summary("cashBalance", cashBalance.toString()),
-                new Summary("cashForTrade", cashForTrade),
-                new Summary("cashForWithdraw", cashForWithdraw),
-                new Summary("positionsValue", positionsValue.toString()),
-                new Summary("accountTotal", accountTotal.toString())
+                new Summary("Cash Available For Trading", cashForTrade),
+                new Summary("Cash Available For Withdrawal", cashForWithdraw),
+                new Summary("Total Cash Balance", cashBalance.toString()),
+                new Summary("Total Positions Market Value", positionsValue.toString()),
+                new Summary("Total Account Value", accountTotal.toString())
             );
+
             
             TableColumn fieldCol = new TableColumn();
             TableColumn valueCol = new TableColumn();
@@ -392,10 +411,20 @@ public class TradingJPanel extends javax.swing.JPanel {
             
             table.setItems(data);
             
+            // try to limit table height, based on row number
+            table.setFixedCellSize(30);
+            table.prefHeightProperty().bind(Bindings.size(table.getItems()).multiply(table.getFixedCellSize()).add(30));
+            table.prefWidthProperty().bind(fieldCol.prefWidthProperty().add(valueCol.prefWidthProperty()));
+
+            System.out.println("table row: " + table.getItems().size() + ", cell size: " + table.getFixedCellSize());
+
+            VBox vBox = new VBox();
+            vBox.getChildren().addAll(table);
+            
             // add account summary tab
             summaryTab.setText("Practice Account Summary");
             summaryTab.setClosable(false);
-            summaryTab.setContent(table);
+            summaryTab.setContent(vBox);
             tabPane.getTabs().add(summaryTab);
             
             // select tab
@@ -426,6 +455,10 @@ public class TradingJPanel extends javax.swing.JPanel {
                 value.set(sValue);
             }
         }
+
+        public final Tab summaryTab  = new Tab();
+        private TableView table = new TableView();
+        private Map<String, Object> accountMap;
     }
     
     private final JScrollPane jScrollPane = new javax.swing.JScrollPane();
