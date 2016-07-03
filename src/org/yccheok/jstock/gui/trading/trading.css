@@ -23,3 +23,8 @@ and open the template in the editor.
     -fx-background-color: #FFFFFF;
 }
 
+.right-align { 
+    -fx-alignment: center-right; 
+}
+
+

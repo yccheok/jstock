@@ -21,8 +21,11 @@ package org.yccheok.jstock.gui.trading;
 
 import com.google.gson.internal.LinkedTreeMap;
 import java.awt.Dimension;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
 import javax.swing.JScrollPane;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -106,9 +109,6 @@ public class TradingJPanel extends javax.swing.JPanel {
         jScrollPane.getViewport().add(jfxPanel);        
         jScrollPane.setPreferredSize(new Dimension(500, 500));
 
-        //this.setLayout(new java.awt.BorderLayout(5, 5));
-        //this.add(this.jScrollPane, BorderLayout.NORTH);
-        
         this.setLayout(new java.awt.GridLayout(0, 1, 5, 5));
         this.add(this.jScrollPane);
         
@@ -232,8 +232,8 @@ public class TradingJPanel extends javax.swing.JPanel {
                             String userID = _api.user.userID;
                             String accountID = _api.user.practiceAccount.accountID;
                             if (userID != null && accountID != null) {
-                                Map<String, Object> accountMap = _api.accountBlotter(userID, accountID);              
-                                result.put("accountMap", accountMap);
+                                Map<String, Object> accBlotter = _api.accountBlotter(userID, accountID);              
+                                result.put("accBlotter", accBlotter);
                                 System.out.println("calling account Blotter DONE...");
                             }
 
@@ -282,10 +282,10 @@ public class TradingJPanel extends javax.swing.JPanel {
                             signInBtn.setDisable(false);
 
                             // create account summary tab
-                            if (result.containsKey("accountMap")) {
-                                Map<String, Object> accountMap = (HashMap) result.get("accountMap");
+                            if (result.containsKey("accBlotter")) {
+                                Map<String, Object> accBlotter = (HashMap) result.get("accBlotter");
                                 
-                                AccountSummary summary = new AccountSummary(accountMap);
+                                AccBlotter summary = new AccBlotter(accBlotter);
                                 summary.createTab();
                                 System.out.println("Account Blotter DONE....");
                             }
@@ -363,80 +363,119 @@ public class TradingJPanel extends javax.swing.JPanel {
         private final Hyperlink licenceLink = new Hyperlink("Drive Wealth's Terms of Use");
     }
 
-    public class AccountSummary {
-        public AccountSummary (Map<String, Object> accountMap) {
-            this.accountMap = accountMap;
+    public class AccBlotter {
+        public AccBlotter (Map<String, Object> accBlotter) {
+            this.accBlotter = accBlotter;
         }
 
+        private String formatNumber(Double number) {
+            final DecimalFormat df1 = new DecimalFormat("#.00");
+            return df1.format(number);
+        }
+        
         public void createTab() {
-            /*
-            String userID = api.user.userID;
-            String accountID = api.user.practiceAccount.accountID;
-            
-            Map<String, Object> account = api.accountBlotter(userID, accountID);                
-            */
-                    
-            LinkedTreeMap<String, Object> equity = (LinkedTreeMap) accountMap.get("equity");
-            Object positionsValue = equity.get("equityValue");
+            LinkedTreeMap<String, Object> equity    = (LinkedTreeMap) accBlotter.get("equity");
+            LinkedTreeMap<String, Object> balance   = (LinkedTreeMap) accBlotter.get("cash");
 
-            LinkedTreeMap<String, Object> balance = (LinkedTreeMap) accountMap.get("cash");
-            Object cashBalance = balance.get("cashBalance");
-            String cashForTrade = balance.get("cashAvailableForTrade").toString();
-            String cashForWithdraw = balance.get("cashAvailableForWithdrawal").toString();
-            Double accountTotal = (Double) cashBalance + (Double) positionsValue;
+            Double positionsValue   = (Double) equity.get("equityValue");
+            Double cashBalance      = (Double) balance.get("cashBalance");
+            Double cashForTrade     = (Double) balance.get("cashAvailableForTrade");
+            Double cashForWithdraw  = (Double) balance.get("cashAvailableForWithdrawal");
+            Double accountTotal     = (Double) cashBalance + (Double) positionsValue;
 
-            System.out.println("Table: " + positionsValue.toString() + ", " + cashBalance.toString() + ", " + cashForTrade + ", " + cashForWithdraw + ", " + accountTotal.toString());
+            System.out.println("Table: " + positionsValue + ", " + cashBalance + ", "
+                    + cashForTrade + ", " + cashForWithdraw + ", " + accountTotal);
 
-            final ObservableList<Summary> data = FXCollections.observableArrayList(
-                new Summary("Cash Available For Trading", cashForTrade),
-                new Summary("Cash Available For Withdrawal", cashForWithdraw),
-                new Summary("Total Cash Balance", cashBalance.toString()),
-                new Summary("Total Positions Market Value", positionsValue.toString()),
-                new Summary("Total Account Value", accountTotal.toString())
+            final ObservableList<Data> tableData = FXCollections.observableArrayList(
+                new Data("Cash Available For Trading",      formatNumber(cashForTrade) ),
+                new Data("Cash Available For Withdrawal",   formatNumber(cashForWithdraw) ),
+                new Data("Total Cash Balance",              formatNumber(cashBalance) ),
+                new Data("Total Positions Market Value",    formatNumber(positionsValue) ),
+                new Data("Total Account Value",             formatNumber(accountTotal) )
             );
 
-            
-            TableColumn fieldCol = new TableColumn();
-            TableColumn valueCol = new TableColumn();
+            // get open positions
+            List<LinkedTreeMap<String, Object>> result = (List) equity.get("equityPositions");
+            int cnt = 0;
+            for (LinkedTreeMap<String, Object> a : result) {
+                String symbol       = a.get("symbol").toString();
+                Double costBasis    = (Double) a.get("costBasis");
+                Double tradingQty   = (Double) a.get("availableForTradingQty");
+                // spot price
+                Double marketPrice  = (Double) a.get("mktPrice");
+                // spot price * qty
+                Double marketValue  = (Double) a.get("marketValue");
+                Double PL           = (Double) a.get("unrealizedPL");
+                Double dayPL        = (Double) a.get("unrealizedDayPL");
+                Double dayPLPercent = (Double) a.get("unrealizedDayPLPercent");
 
-            table.getColumns().addAll(fieldCol, valueCol);
-            
-            fieldCol.setCellValueFactory(
-                new PropertyValueFactory<Summary,String>("field")
-            );
+                Map<String, Object> p = new HashMap<>();
+                p.put("symbol", symbol);
+                p.put("availableForTradingQty", tradingQty);
+                p.put("costBasis", costBasis);
+                p.put("mktPrice", marketPrice);
+                p.put("marketValue", marketValue);
+                p.put("unrealizedPL", PL);
+                p.put("unrealizedDayPL", dayPL);
+                p.put("unrealizedDayPLPercent", dayPLPercent);
 
-            valueCol.setCellValueFactory(
-                new PropertyValueFactory<Summary,String>("value")
-            );
-            
-            table.setItems(data);
-            
-            // try to limit table height, based on row number
-            table.setFixedCellSize(30);
-            table.prefHeightProperty().bind(Bindings.size(table.getItems()).multiply(table.getFixedCellSize()).add(30));
-            table.prefWidthProperty().bind(fieldCol.prefWidthProperty().add(valueCol.prefWidthProperty()));
+                this.positions.add(p);
 
-            System.out.println("table row: " + table.getItems().size() + ", cell size: " + table.getFixedCellSize());
+                System.out.println("[" + cnt + "] Position: symbol: " + a.get("symbol")
+                        + ", instrumentID: " + a.get("instrumentID")
+                        + ", openQty: " + a.get("openQty")
+                        + ", costBasis: " + a.get("costBasis"));
+                cnt++;
+            }
 
-            VBox vBox = new VBox();
-            vBox.getChildren().addAll(table);
+            // build UI
+            TableColumn fieldCol = new TableColumn<Data, String>("Account Summary");
+            fieldCol.setCellValueFactory(new PropertyValueFactory("field"));
             
+            TableColumn valueCol = new TableColumn<Data, String>();
+            valueCol.setCellValueFactory(new PropertyValueFactory("value"));
+            valueCol.getStyleClass().add( "right-align");
+            
+            accTable.setEditable(false);
+            accTable.setItems(tableData);
+            accTable.getColumns().setAll(fieldCol, valueCol);
+
+            // limit accTable height, based on row number
+            accTable.setFixedCellSize(30);
+            accTable.prefHeightProperty().bind(Bindings.size(accTable.getItems()).multiply(accTable.getFixedCellSize()).add(30));
+            
+            // manually fix table width, any better way??
+            accTable.setMaxWidth(400);
+            accTable.setPrefWidth(400);
+            accTable.setMinWidth(400);
+            accTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+            
+            System.out.println("table row: " + accTable.getItems().size() + ", cell size: " + accTable.getFixedCellSize());
+            System.out.println("Table field width: " + fieldCol.prefWidthProperty().getValue()
+                    + ", value width: " + valueCol.prefWidthProperty().getValue());
+
+            final VBox vBox = new VBox();
+            vBox.setSpacing(5);
+            vBox.setPadding(new Insets(10, 0, 0, 10));
+            vBox.getChildren().addAll(accTable);
+            vBox.setPrefWidth(500);
+
             // add account summary tab
-            summaryTab.setText("Practice Account Summary");
-            summaryTab.setClosable(false);
-            summaryTab.setContent(vBox);
-            tabPane.getTabs().add(summaryTab);
+            accTab.setText("Account Summary (Practice Account)");
+            accTab.setClosable(false);
+            accTab.setContent(vBox);
+            tabPane.getTabs().add(accTab);
             
             // select tab
             SingleSelectionModel<Tab> selectionModel = tabPane.getSelectionModel();
-            selectionModel.select(summaryTab);
+            selectionModel.select(accTab);
         }
 
-        public class Summary {
+        public class Data {
             private final SimpleStringProperty field;
             private final SimpleStringProperty value;
 
-            private Summary(String sField, String sValue) {
+            private Data(String sField, String sValue) {
                 this.field = new SimpleStringProperty(sField);
                 this.value = new SimpleStringProperty(sValue);
             }
@@ -456,9 +495,11 @@ public class TradingJPanel extends javax.swing.JPanel {
             }
         }
 
-        public final Tab summaryTab  = new Tab();
-        private TableView table = new TableView();
-        private Map<String, Object> accountMap;
+        private final Map<String, Object> accBlotter;
+        private final List<Map<String, Object>> positions = new ArrayList<>();
+
+        public  final Tab accTab  = new Tab();
+        private final TableView accTable = new TableView();
     }
     
     private final JScrollPane jScrollPane = new javax.swing.JScrollPane();
