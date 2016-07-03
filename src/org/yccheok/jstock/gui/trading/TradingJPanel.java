@@ -382,12 +382,12 @@ public class TradingJPanel extends javax.swing.JPanel {
             Double cashForWithdraw  = (Double) balance.get("cashAvailableForWithdrawal");
             Double accountTotal     = (Double) cashBalance + (Double) positionsValue;
 
-            final ObservableList<Data> tableData = FXCollections.observableArrayList(
-                new Data("Cash Available For Trading",      formatNumber(cashForTrade) ),
-                new Data("Cash Available For Withdrawal",   formatNumber(cashForWithdraw) ),
-                new Data("Total Cash Balance",              formatNumber(cashBalance) ),
-                new Data("Total Positions Market Value",    formatNumber(positionsValue) ),
-                new Data("Total Account Value",             formatNumber(accountTotal) )
+            final ObservableList<AccData> accTableData = FXCollections.observableArrayList(
+                new AccData("Cash Available For Trading",      formatNumber(cashForTrade) ),
+                new AccData("Cash Available For Withdrawal",   formatNumber(cashForWithdraw) ),
+                new AccData("Total Cash Balance",              formatNumber(cashBalance) ),
+                new AccData("Total Positions Market Value",    formatNumber(positionsValue) ),
+                new AccData("Total Account Value",             formatNumber(accountTotal) )
             );
 
             // get open positions
@@ -420,15 +420,17 @@ public class TradingJPanel extends javax.swing.JPanel {
                 System.out.println("[" + cnt + "] Position: symbol: " + a.get("symbol")
                         + ", instrumentID: " + a.get("instrumentID")
                         + ", openQty: " + a.get("openQty")
-                        + ", costBasis: " + a.get("costBasis"));
+                        + ", costBasis: " + a.get("costBasis")
+                        + ", trading Qty: " + tradingQty
+                );
                 cnt++;
             }
 
-            // build UI
-            TableColumn fieldCol = new TableColumn<Data, String>("Account Summary");
+            // Account Summary Table
+            TableColumn fieldCol = new TableColumn("Account Summary");
             fieldCol.setCellValueFactory(new PropertyValueFactory("field"));
             
-            TableColumn valueCol = new TableColumn<Data, String>();
+            TableColumn valueCol = new TableColumn();
             valueCol.setCellValueFactory(new PropertyValueFactory("value"));
             valueCol.getStyleClass().add( "right-align");
 
@@ -436,13 +438,13 @@ public class TradingJPanel extends javax.swing.JPanel {
             valueCol.setSortable(false);
             
             accTable.setEditable(false);
-            accTable.setItems(tableData);
+            accTable.setItems(accTableData);
             accTable.getColumns().setAll(fieldCol, valueCol);
 
-            // limit accTable height, based on row number
+            // limit Table height, based on row number
             accTable.setFixedCellSize(30);
             accTable.prefHeightProperty().bind(Bindings.size(accTable.getItems()).multiply(accTable.getFixedCellSize()).add(30));
-            
+
             // manually fix table width
             accTable.setMaxWidth(400);
             accTable.setPrefWidth(400);
@@ -453,9 +455,68 @@ public class TradingJPanel extends javax.swing.JPanel {
             final VBox vBox = new VBox();
             vBox.setSpacing(5);
             vBox.setPadding(new Insets(10, 0, 0, 10));
-            vBox.getChildren().addAll(accTable);
+            vBox.getChildren().add(accTable);
             vBox.setPrefWidth(500);
 
+            
+            // Open Positions table
+            TableColumn symbolCol = new TableColumn("Symbol");
+            symbolCol.setCellValueFactory(new PropertyValueFactory("symbol"));
+            
+            TableColumn qtyCol = new TableColumn("Qty");
+            qtyCol.setCellValueFactory(new PropertyValueFactory("qty"));
+
+            TableColumn costCol = new TableColumn("Cost");
+            costCol.setCellValueFactory(new PropertyValueFactory("costBasis"));
+
+            TableColumn mktPriceCol = new TableColumn("Market Price");
+            mktPriceCol.setCellValueFactory(new PropertyValueFactory("mktPrice"));
+            
+            TableColumn mktValueCol = new TableColumn("Market Value");
+            mktValueCol.setCellValueFactory(new PropertyValueFactory("marketValue"));
+            
+            TableColumn plCol = new TableColumn("PL");
+            plCol.setCellValueFactory(new PropertyValueFactory("pl"));
+            
+            TableColumn dayPlCol = new TableColumn("Day PL");
+            dayPlCol.setCellValueFactory(new PropertyValueFactory("dayPl"));
+            
+            TableColumn dayPlPercentCol = new TableColumn("Day PL %");
+            dayPlPercentCol.setCellValueFactory(new PropertyValueFactory("dayPlPercent"));
+
+            symbolCol.setSortable(false);
+            qtyCol.setSortable(false);
+            costCol.setSortable(false);
+            mktPriceCol.setSortable(false);
+            mktValueCol.setSortable(false);
+            plCol.setSortable(false);
+            dayPlCol.setSortable(false);
+            dayPlPercentCol.setSortable(false);
+            
+            posTable.setEditable(false);
+            
+            final ObservableList<PosData> posTableData = FXCollections.observableArrayList(
+                new PosData(this.positions.get(0))
+            );
+            
+            posTable.setItems(posTableData);
+            posTable.getColumns().setAll(symbolCol, qtyCol, costCol, mktPriceCol, mktValueCol, plCol, dayPlCol, dayPlPercentCol);
+
+            // limit Table height, based on row number
+            posTable.setFixedCellSize(30);
+            posTable.prefHeightProperty().bind(Bindings.size(posTable.getItems()).multiply(posTable.getFixedCellSize()).add(30));
+
+            // manually fix table width
+            posTable.setMaxWidth(900);
+            posTable.setPrefWidth(900);
+            posTable.setMinWidth(900);
+            // set all columns having equal width
+            posTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+            
+            final Label posLabel = new Label("Open Positions");
+            vBox.getChildren().addAll(posLabel, posTable);
+            
             // add account summary tab
             accTab.setText("Account Summary (Practice Account)");
             accTab.setClosable(false);
@@ -467,35 +528,114 @@ public class TradingJPanel extends javax.swing.JPanel {
             selectionModel.select(accTab);
         }
 
-        public class Data {
+        public class AccData {
             private final SimpleStringProperty field;
             private final SimpleStringProperty value;
 
-            private Data(String sField, String sValue) {
-                this.field = new SimpleStringProperty(sField);
-                this.value = new SimpleStringProperty(sValue);
+            private AccData(String f, String v) {
+                this.field = new SimpleStringProperty(f);
+                this.value = new SimpleStringProperty(v);
             }
 
             public String getField() {
                 return field.get();
             }
-            public void setField(String sField) {
-                field.set(sField);
+            public void setField(String v) {
+                field.set(v);
             }
             
             public String getValue() {
                 return value.get();
             }
-            public void setValue(String sValue) {
-                value.set(sValue);
+            public void setValue(String v) {
+                value.set(v);
             }
         }
 
+        public class PosData {
+            private final SimpleStringProperty symbol;
+            private final SimpleStringProperty qty;
+            private final SimpleStringProperty costBasis;
+            private final SimpleStringProperty mktPrice;
+            private final SimpleStringProperty marketValue;
+            private final SimpleStringProperty pl;
+            private final SimpleStringProperty dayPl;
+            private final SimpleStringProperty dayPlPercent;
+            
+            private PosData(Map<String, Object> pos) {
+                this.symbol         = new SimpleStringProperty(pos.get("symbol").toString());
+                this.qty            = new SimpleStringProperty(pos.get("availableForTradingQty").toString());
+                this.costBasis      = new SimpleStringProperty(pos.get("costBasis").toString());
+                this.mktPrice       = new SimpleStringProperty(pos.get("mktPrice").toString());
+                this.marketValue    = new SimpleStringProperty(pos.get("marketValue").toString());
+                this.pl             = new SimpleStringProperty(pos.get("unrealizedPL").toString());
+                this.dayPl          = new SimpleStringProperty(pos.get("unrealizedDayPL").toString());
+                this.dayPlPercent   = new SimpleStringProperty(pos.get("unrealizedDayPLPercent").toString());
+            }
+
+            public String getSymbol() {
+                return symbol.get();
+            }
+            public void setSymbol(String v) {
+                symbol.set(v);
+            }
+            
+            public String getQty() {
+                return qty.get();
+            }
+            public void setQty(String v) {
+                qty.set(v);
+            }
+
+            public String getCostBasis() {
+                return costBasis.get();
+            }
+            public void setCostBasis(String v) {
+                costBasis.set(v);
+            }
+            
+            public String getMktPrice() {
+                return mktPrice.get();
+            }
+            public void setMktPrice(String v) {
+                mktPrice.set(v);
+            }
+
+            public String getMarketValue() {
+                return marketValue.get();
+            }
+            public void setMarketValue(String v) {
+                marketValue.set(v);
+            }
+
+            public String getPl() {
+                return pl.get();
+            }
+            public void setPl(String v) {
+                pl.set(v);
+            }
+            
+            public String getDayPl() {
+                return dayPl.get();
+            }
+            public void setDayPl(String v) {
+                dayPl.set(v);
+            }
+            
+            public String getDayPlPercent() {
+                return dayPlPercent.get();
+            }
+            public void setDayPlPercent(String v) {
+                dayPlPercent.set(v);
+            }
+        }
+        
         private final Map<String, Object> accBlotter;
         private final List<Map<String, Object>> positions = new ArrayList<>();
 
         public  final Tab accTab  = new Tab();
         private final TableView accTable = new TableView();
+        private final TableView posTable = new TableView();
     }
     
     private final JScrollPane jScrollPane = new javax.swing.JScrollPane();
