@@ -431,6 +431,9 @@ public class TradingJPanel extends javax.swing.JPanel {
             TableColumn valueCol = new TableColumn<Data, String>();
             valueCol.setCellValueFactory(new PropertyValueFactory("value"));
             valueCol.getStyleClass().add( "right-align");
+
+            fieldCol.setSortable(false);
+            valueCol.setSortable(false);
             
             accTable.setEditable(false);
             accTable.setItems(tableData);
@@ -440,10 +443,11 @@ public class TradingJPanel extends javax.swing.JPanel {
             accTable.setFixedCellSize(30);
             accTable.prefHeightProperty().bind(Bindings.size(accTable.getItems()).multiply(accTable.getFixedCellSize()).add(30));
             
-            // manually fix table width, any better way??
+            // manually fix table width
             accTable.setMaxWidth(400);
             accTable.setPrefWidth(400);
             accTable.setMinWidth(400);
+            // set all columns having equal width
             accTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
             
             final VBox vBox = new VBox();
