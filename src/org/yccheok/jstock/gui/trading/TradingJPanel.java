@@ -369,8 +369,7 @@ public class TradingJPanel extends javax.swing.JPanel {
         }
 
         private String formatNumber(Double number) {
-            final DecimalFormat df1 = new DecimalFormat("#.00");
-            return df1.format(number);
+            return new DecimalFormat("#.00").format(number);
         }
         
         public void createTab() {
