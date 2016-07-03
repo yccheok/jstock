@@ -382,9 +382,6 @@ public class TradingJPanel extends javax.swing.JPanel {
             Double cashForWithdraw  = (Double) balance.get("cashAvailableForWithdrawal");
             Double accountTotal     = (Double) cashBalance + (Double) positionsValue;
 
-            System.out.println("Table: " + positionsValue + ", " + cashBalance + ", "
-                    + cashForTrade + ", " + cashForWithdraw + ", " + accountTotal);
-
             final ObservableList<Data> tableData = FXCollections.observableArrayList(
                 new Data("Cash Available For Trading",      formatNumber(cashForTrade) ),
                 new Data("Cash Available For Withdrawal",   formatNumber(cashForWithdraw) ),
@@ -449,10 +446,6 @@ public class TradingJPanel extends javax.swing.JPanel {
             accTable.setMinWidth(400);
             accTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
             
-            System.out.println("table row: " + accTable.getItems().size() + ", cell size: " + accTable.getFixedCellSize());
-            System.out.println("Table field width: " + fieldCol.prefWidthProperty().getValue()
-                    + ", value width: " + valueCol.prefWidthProperty().getValue());
-
             final VBox vBox = new VBox();
             vBox.setSpacing(5);
             vBox.setPadding(new Insets(10, 0, 0, 10));
