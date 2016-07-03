@@ -406,13 +406,13 @@ public class TradingJPanel extends javax.swing.JPanel {
                 Double dayPLPercent = (Double) a.get("unrealizedDayPLPercent");
 
                 Map<String, Object> p = new HashMap<>();
-                p.put("symbol", symbol);
+                p.put("symbol",                 symbol);
                 p.put("availableForTradingQty", tradingQty);
-                p.put("costBasis", costBasis);
-                p.put("mktPrice", marketPrice);
-                p.put("marketValue", marketValue);
-                p.put("unrealizedPL", PL);
-                p.put("unrealizedDayPL", dayPL);
+                p.put("costBasis",              costBasis);
+                p.put("mktPrice",               marketPrice);
+                p.put("marketValue",            marketValue);
+                p.put("unrealizedPL",           PL);
+                p.put("unrealizedDayPL",        dayPL);
                 p.put("unrealizedDayPLPercent", dayPLPercent);
 
                 this.positions.add(p);
