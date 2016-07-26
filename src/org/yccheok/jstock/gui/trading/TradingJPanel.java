@@ -192,8 +192,6 @@ public class TradingJPanel extends javax.swing.JPanel {
             signInBtn.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent e) {
-                    Map<String, String> params = new HashMap<>();
-
                     successText.setVisible(false);
                     String username = userField.getText();
                     String pwd = pwdField.getText();
@@ -209,14 +207,19 @@ public class TradingJPanel extends javax.swing.JPanel {
                         return;
                     }
 
-                    params.put("username", username);
-                    params.put("password", pwd);
-
                     Task< Map<String, Object> > task = new Task< Map<String, Object> >() {
                         @Override protected Map<String, Object> call() throws Exception {
                             System.out.println("Drive Wealth User Sign In....\n\n ");
 
-                            DriveWealthAPI _api = new DriveWealthAPI(params);
+                            Map<String, Object> result = new HashMap<>();
+                            DriveWealthAPI _api = new DriveWealthAPI();
+                            Map<String, Object> login = _api.login(username, pwd);
+                            
+                            if (login.containsKey("code") && login.containsKey("message")) {
+                                result.put("error", login.get("message"));
+                                return result;
+                            }
+                            
                             DriveWealthAPI.User user = _api.user;
 
                             System.out.println("DriveWealth: username: " + username
@@ -225,9 +228,8 @@ public class TradingJPanel extends javax.swing.JPanel {
                                                 + ", userID: " + user.userID
                                                 + ", commission: " + user.commissionRate);
 
-                            Map<String, Object> result = new HashMap<>();
                             result.put("api", _api);
-                            
+
                             // get account info
                             String userID = _api.user.userID;
                             String accountID = _api.user.practiceAccount.accountID;
@@ -245,35 +247,41 @@ public class TradingJPanel extends javax.swing.JPanel {
                         @Override
                         public void handle(WorkerStateEvent t) {
                             Map<String, Object> result = task.getValue();
-                            api = (DriveWealthAPI) result.get("api");
 
-                            if (api.user != null && api.getSessionKey() != null) {
-                                System.out.println("Successfully Sign In, userID: " + api.user.userID);
-
-                                DriveWealthAPI.Account acc = api.user.practiceAccount;
-                                String welcomeStr;
-
-                                if (acc == null) {
-                                    System.out.println("No practice account, prompt for creating ??");
-                                    welcomeStr = "Successfully Sign In, create practice account to start trading";
-
-                                    /*
-                                    Map<String, Object> params = new HashMap<>();
-                                    params.put("userID", api.user.userID);
-                                    acc = api.createPracticeAccount(params);
-                                    */
-                                } else {
-                                    String accountNo =  acc.accountNo;
-                                    String nickname = acc.nickname;
-                                    Double cash = acc.cash;
-
-                                    welcomeStr = "Start trading now with " + acc.nickname + ".\n AccountNo: " + acc.accountNo
-                                        + "\n AccountID: " + acc.accountID + "\n Balance: " + acc.cash;
-                                }
-                                successText.setText(welcomeStr);
+                            if (result.containsKey("error")) {
+                                System.out.println("Sign In failed, code: " + result.get("error"));
+                                successText.setText("Sign In failed: " + result.get("error"));
                             } else {
-                                System.out.println("Sign In failed");
-                                successText.setText("Sign In failed");
+                                api = (DriveWealthAPI) result.get("api");
+
+                                if (api.user != null && api.getSessionKey() != null) {
+                                    System.out.println("Successfully Sign In, userID: " + api.user.userID);
+
+                                    DriveWealthAPI.Account acc = api.user.practiceAccount;
+                                    String welcomeStr;
+
+                                    if (acc == null) {
+                                        System.out.println("No practice account, prompt for creating ??");
+                                        welcomeStr = "Successfully Sign In, create practice account to start trading";
+
+                                        /*
+                                        Map<String, Object> params = new HashMap<>();
+                                        params.put("userID", api.user.userID);
+                                        acc = api.createPracticeAccount(params);
+                                        */
+                                    } else {
+                                        String accountNo =  acc.accountNo;
+                                        String nickname = acc.nickname;
+                                        Double cash = acc.cash;
+
+                                        welcomeStr = "Start trading now with " + acc.nickname + ".\n AccountNo: " + acc.accountNo
+                                            + "\n AccountID: " + acc.accountID + "\n Balance: " + acc.cash;
+                                    }
+                                    successText.setText(welcomeStr);
+                                } else {
+                                    System.out.println("Sign In failed");
+                                    successText.setText("Sign In failed");
+                                }
                             }
 
                             successText.setTextFill(Color.FIREBRICK);
@@ -495,10 +503,11 @@ public class TradingJPanel extends javax.swing.JPanel {
             
             posTable.setEditable(false);
             
-            final ObservableList<PosData> posTableData = FXCollections.observableArrayList(
-                new PosData(this.positions.get(0))
-            );
-            
+            final ObservableList<PosData> posTableData = FXCollections.observableArrayList();
+            for (Map<String, Object> pos : this.positions) {
+                posTableData.add(new PosData(pos));
+            }
+
             posTable.setItems(posTableData);
             posTable.getColumns().setAll(symbolCol, qtyCol, costCol, mktPriceCol, mktValueCol, plCol, dayPlCol, dayPlPercentCol);
 

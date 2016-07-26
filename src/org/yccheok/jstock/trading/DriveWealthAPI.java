@@ -41,17 +41,58 @@ import org.apache.commons.httpclient.methods.multipart.StringPart;
  */
 public class DriveWealthAPI {
 
-    public DriveWealthAPI(Map<String, String>params) {
-        _initUserSession(params.get("username"), params.get("password"));
-    }
-
     public DriveWealthAPI() {
         this.user = new User();
     }
 
-    private void _initUserSession(String username, String password) {
-        this.user = new User(username, password);
-        this.getSessionKey();
+    public Map<String, Object> login(String username, String password) {
+        this.user.username = username;
+        this.user.password = password;
+
+        Map<String, String> args = new HashMap<>();
+        args.put("username",    this.user.username);
+        args.put("password",    this.user.password);
+        args.put("appTypeID",   "26");
+        args.put("appVersion",  "0.1");
+        args.put("languageID",  "en_US");
+        args.put("osType",      "iOS");
+        args.put("osVersion",   "iOS 9.1");
+        args.put("scrRes",      "1920x1080");
+        args.put("ipAddress",   "1.1.1.1");
+
+        Map<String, Object> session = createSession(args);
+
+        // error create session
+        if (session.containsKey("code") && session.containsKey("message")) {
+            System.out.println("create session ERROR, code: " + session.get("code") + ", message: " + session.get("message"));
+            return session;
+        }
+
+        this.user.sessionKey = session.get("sessionKey").toString();
+        this.user.userID = session.get("userID").toString();
+        this.user.commissionRate = (Double) session.get("commissionRate");
+
+        List<Map<String, Object>> accounts = (ArrayList) session.get("accounts");
+
+        for (Map<String, Object> a : accounts) {
+            String accountID   = a.get("accountID").toString();
+            String accountNo   = a.get("accountNo").toString();
+            Double accountType = (Double) a.get("accountType");
+            Double cash        = (Double) a.get("cash");
+
+            final Account account = new Account(a);
+
+            if (accountType == 1) {
+                this.user.practiceAccount = account;
+            } else if (accountType == 2) {
+                this.user.liveAccount = account;
+            }
+
+            if (!this.user.accountsMap.containsKey(accountID)) {
+                this.user.accountsMap.put(accountID, account);
+            }
+        }
+        return session;
     }
     
     /********************
@@ -698,7 +739,7 @@ public class DriveWealthAPI {
             String accountID = result.get("accountID").toString();
             System.out.println("user already exist, created practice accountID: " + accountID);
 
-            this._initUserSession(this.user.username, this.user.password);
+            this.login(this.user.username, this.user.password);
             
             return this.user.practiceAccount;
         } else {
@@ -722,7 +763,7 @@ public class DriveWealthAPI {
             Account acc = null;
             // status code: 400 => duplicate username, 200 => OK
             if (statusCode == 200) {
-                this._initUserSession(result.get("username").toString(), result.get("password").toString());
+                this.login(result.get("username").toString(), result.get("password").toString());
                 acc = this.user.practiceAccount;
                 
                 System.out.println("New user + practice a/c created");
@@ -1002,7 +1043,7 @@ public class DriveWealthAPI {
                 }
             }
         } else {
-            session = this.getError(respondMap);
+            session = this.getError(result);
         }
         return session;
     }
@@ -1787,52 +1828,11 @@ public class DriveWealthAPI {
      ************************/
     
     public String getSessionKey() {
-        Map<String, Object> session = new HashMap<>();
-        
         if (this.user.sessionKey == null) {
-            Map<String, String> args = new HashMap<>();
-            
-            args.put("username", this.user.username);
-            args.put("password", this.user.password);
-            args.put("appTypeID", "26");
-            args.put("appVersion", "0.1");
-            args.put("languageID", "en_US");
-            args.put("osType", "iOS");
-            args.put("osVersion", "iOS 9.1");
-            args.put("scrRes", "1920x1080");
-            args.put("ipAddress", "1.1.1.1");
-            
-            session = createSession(args);
-            
-            // error create session
-            if (session.containsKey("code") && session.containsKey("message")) {
+            Map<String, Object> result = login(this.user.username, this.user.password);
+            if (result.containsKey("code") && result.containsKey("message")) {
                 return null;
             }
-            
-            this.user.sessionKey = session.get("sessionKey").toString();
-            this.user.userID = session.get("userID").toString();
-            this.user.commissionRate = (Double) session.get("commissionRate");
-            
-            List<Map<String, Object>> accounts = (ArrayList) session.get("accounts");
-
-            for (Map<String, Object> a : accounts) {
-                String accountID   = a.get("accountID").toString();
-                String accountNo   = a.get("accountNo").toString();
-                Double accountType = (Double) a.get("accountType");
-                Double cash        = (Double) a.get("cash");
-                
-                final Account account = new Account(a);
-
-                if (accountType == 1) {
-                    this.user.practiceAccount = account;
-                } else if (accountType == 2) {
-                    this.user.liveAccount = account;
-                }
-
-                if (!this.user.accountsMap.containsKey(accountID)) {
-                    this.user.accountsMap.put(accountID, account);
-                }
-            }                    
         }
         return this.user.sessionKey;
     }
