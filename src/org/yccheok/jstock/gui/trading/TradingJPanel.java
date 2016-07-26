@@ -295,6 +295,9 @@ public class TradingJPanel extends javax.swing.JPanel {
                                 
                                 AccBlotter summary = new AccBlotter(accBlotter);
                                 summary.createTab();
+                                
+                                tabPane.getTabs().remove(signInTab);
+                                
                                 System.out.println("Account Blotter DONE....");
                             }
                         }
@@ -404,6 +407,8 @@ public class TradingJPanel extends javax.swing.JPanel {
             for (LinkedTreeMap<String, Object> a : result) {
                 String symbol       = a.get("symbol").toString();
                 Double costBasis    = (Double) a.get("costBasis");
+                // average buy price
+                Double averagePrice = (Double) a.get("avgPrice");
                 Double tradingQty   = (Double) a.get("availableForTradingQty");
                 // spot price
                 Double marketPrice  = (Double) a.get("mktPrice");
@@ -416,6 +421,7 @@ public class TradingJPanel extends javax.swing.JPanel {
                 Map<String, Object> p = new HashMap<>();
                 p.put("symbol",                 symbol);
                 p.put("availableForTradingQty", tradingQty);
+                p.put("avgPrice",               averagePrice);
                 p.put("costBasis",              costBasis);
                 p.put("mktPrice",               marketPrice);
                 p.put("marketValue",            marketValue);
@@ -474,6 +480,9 @@ public class TradingJPanel extends javax.swing.JPanel {
             TableColumn qtyCol = new TableColumn("Qty");
             qtyCol.setCellValueFactory(new PropertyValueFactory("qty"));
 
+            TableColumn avgPriceCol = new TableColumn("Average Price");
+            avgPriceCol.setCellValueFactory(new PropertyValueFactory("avgPrice"));
+            
             TableColumn costCol = new TableColumn("Cost");
             costCol.setCellValueFactory(new PropertyValueFactory("costBasis"));
 
@@ -494,6 +503,7 @@ public class TradingJPanel extends javax.swing.JPanel {
 
             symbolCol.setSortable(false);
             qtyCol.setSortable(false);
+            avgPriceCol.setSortable(false);
             costCol.setSortable(false);
             mktPriceCol.setSortable(false);
             mktValueCol.setSortable(false);
@@ -509,7 +519,7 @@ public class TradingJPanel extends javax.swing.JPanel {
             }
 
             posTable.setItems(posTableData);
-            posTable.getColumns().setAll(symbolCol, qtyCol, costCol, mktPriceCol, mktValueCol, plCol, dayPlCol, dayPlPercentCol);
+            posTable.getColumns().setAll(symbolCol, qtyCol, avgPriceCol, costCol, mktPriceCol, mktValueCol, plCol, dayPlCol, dayPlPercentCol);
 
             // limit Table height, based on row number
             posTable.setFixedCellSize(30);
@@ -523,11 +533,11 @@ public class TradingJPanel extends javax.swing.JPanel {
             posTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
             
-            final Label posLabel = new Label("Open Positions");
+            final Label posLabel = new Label("Current Investments");
             vBox.getChildren().addAll(posLabel, posTable);
             
             // add account summary tab
-            accTab.setText("Account Summary (Practice Account)");
+            accTab.setText("Portfolio (Practice Account)");
             accTab.setClosable(false);
             accTab.setContent(vBox);
             tabPane.getTabs().add(accTab);
@@ -564,6 +574,7 @@ public class TradingJPanel extends javax.swing.JPanel {
         public class PosData {
             private final SimpleStringProperty symbol;
             private final SimpleStringProperty qty;
+            private final SimpleStringProperty avgPrice;
             private final SimpleStringProperty costBasis;
             private final SimpleStringProperty mktPrice;
             private final SimpleStringProperty marketValue;
@@ -574,6 +585,7 @@ public class TradingJPanel extends javax.swing.JPanel {
             private PosData(Map<String, Object> pos) {
                 this.symbol         = new SimpleStringProperty(pos.get("symbol").toString());
                 this.qty            = new SimpleStringProperty(pos.get("availableForTradingQty").toString());
+                this.avgPrice       = new SimpleStringProperty(pos.get("avgPrice").toString());
                 this.costBasis      = new SimpleStringProperty(pos.get("costBasis").toString());
                 this.mktPrice       = new SimpleStringProperty(pos.get("mktPrice").toString());
                 this.marketValue    = new SimpleStringProperty(pos.get("marketValue").toString());
@@ -596,6 +608,13 @@ public class TradingJPanel extends javax.swing.JPanel {
                 qty.set(v);
             }
 
+            public String getAvgPrice() {
+                return mktPrice.get();
+            }
+            public void setAvgPrice(String v) {
+                mktPrice.set(v);
+            }
+            
             public String getCostBasis() {
                 return costBasis.get();
             }
