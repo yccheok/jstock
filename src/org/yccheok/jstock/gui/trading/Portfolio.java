@@ -8,7 +8,6 @@ package org.yccheok.jstock.gui.trading;
 import com.google.gson.internal.LinkedTreeMap;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javafx.beans.binding.Bindings;
@@ -22,6 +21,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
+import org.yccheok.jstock.trading.OpenPos;
+import org.yccheok.jstock.trading.AccountSummary;
 
 /**
  *
@@ -37,65 +38,58 @@ public class Portfolio {
         return new DecimalFormat("#.00").format(number);
     }
 
-    private void getOpenPositions() {
-    }
-    
-    public Tab createTab() {
-        LinkedTreeMap<String, Object> equity    = (LinkedTreeMap) accBlotter.get("equity");
-        LinkedTreeMap<String, Object> balance   = (LinkedTreeMap) accBlotter.get("cash");
-
-        Double positionsValue   = (Double) equity.get("equityValue");
-        Double cashBalance      = (Double) balance.get("cashBalance");
-        Double cashForTrade     = (Double) balance.get("cashAvailableForTrade");
-        Double cashForWithdraw  = (Double) balance.get("cashAvailableForWithdrawal");
-        Double accountTotal     = (Double) cashBalance + (Double) positionsValue;
-
-        final ObservableList<AccData> accTableData = FXCollections.observableArrayList(
-            new AccData("Cash Available For Trading",      formatNumber(cashForTrade) ),
-            new AccData("Cash Available For Withdrawal",   formatNumber(cashForWithdraw) ),
-            new AccData("Total Cash Balance",              formatNumber(cashBalance) ),
-            new AccData("Total Positions Market Value",    formatNumber(positionsValue) ),
-            new AccData("Total Account Value",             formatNumber(accountTotal) )
-        );
-
-        // get open positions
+    public void getOpenPositions () {
+        LinkedTreeMap<String, Object> equity = (LinkedTreeMap) this.accBlotter.get("equity");
         List<LinkedTreeMap<String, Object>> result = (List) equity.get("equityPositions");
+
         int cnt = 0;
         for (LinkedTreeMap<String, Object> a : result) {
-            String symbol       = a.get("symbol").toString();
-            Double costBasis    = (Double) a.get("costBasis");
-            // average buy price
-            Double averagePrice = (Double) a.get("avgPrice");
-            Double tradingQty   = (Double) a.get("availableForTradingQty");
-            // spot price
-            Double marketPrice  = (Double) a.get("mktPrice");
-            // spot price * qty
-            Double marketValue  = (Double) a.get("marketValue");
-            Double PL           = (Double) a.get("unrealizedPL");
-            Double dayPL        = (Double) a.get("unrealizedDayPL");
-            Double dayPLPercent = (Double) a.get("unrealizedDayPLPercent");
+            OpenPos pos = new OpenPos(a);
+            this.positions.add(pos);
 
-            Map<String, Object> p = new HashMap<>();
-            p.put("symbol",                 symbol);
-            p.put("availableForTradingQty", tradingQty);
-            p.put("avgPrice",               averagePrice);
-            p.put("costBasis",              costBasis);
-            p.put("mktPrice",               marketPrice);
-            p.put("marketValue",            marketValue);
-            p.put("unrealizedPL",           PL);
-            p.put("unrealizedDayPL",        dayPL);
-            p.put("unrealizedDayPLPercent", dayPLPercent);
-
-            this.positions.add(p);
-
-            System.out.println("[" + cnt + "] Position: symbol: " + a.get("symbol")
-                    + ", instrumentID: " + a.get("instrumentID")
-                    + ", openQty: " + a.get("openQty")
-                    + ", costBasis: " + a.get("costBasis")
-                    + ", trading Qty: " + tradingQty
+            System.out.println("[" + cnt + "] Position: symbol: " + pos.symbol
+                    + ", instrumentID: " + pos.instrumentID
+                    + ", openQty: "      + pos.units
+                    + ", costBasis: "    + pos.costBasis
             );
             cnt++;
         }
+    }
+    
+    public Tab createTab() {
+        // Account Summary
+        initAccTable();
+        
+        final VBox vBox = new VBox();
+        vBox.setSpacing(5);
+        vBox.setPadding(new Insets(10, 0, 0, 10));
+        vBox.getChildren().add(this.accTable);
+        vBox.setPrefWidth(500);
+
+        // Open Positions
+        initOpenPosTable();
+
+        final Label posLabel = new Label("Current Investments");
+        vBox.getChildren().addAll(posLabel, posTable);
+
+        // add account summary tab
+        accTab.setText("Portfolio (Practice Account)");
+        accTab.setClosable(false);
+        accTab.setContent(vBox);
+
+        return accTab;
+    }
+
+    public void initAccTable () {
+        AccountSummary acc = new AccountSummary(accBlotter);
+
+        final ObservableList<AccData> accTableData = FXCollections.observableArrayList(
+            new AccData("Cash Available For Trading",      formatNumber(acc.cashForTrade) ),
+            new AccData("Cash Available For Withdrawal",   formatNumber(acc.cashForWithdraw) ),
+            new AccData("Total Cash Balance",              formatNumber(acc.cashBalance) ),
+            new AccData("Total Positions Market Value",    formatNumber(acc.positionsValue) ),
+            new AccData("Total Account Value",             formatNumber(acc.accountTotal) )
+        );
 
         // Account Summary Table
         TableColumn fieldCol = new TableColumn("Account Summary");
@@ -108,28 +102,25 @@ public class Portfolio {
         fieldCol.setSortable(false);
         valueCol.setSortable(false);
 
-        accTable.setEditable(false);
-        accTable.setItems(accTableData);
-        accTable.getColumns().setAll(fieldCol, valueCol);
+        this.accTable.setEditable(false);
+        this.accTable.setItems(accTableData);
+        this.accTable.getColumns().setAll(fieldCol, valueCol);
 
         // limit Table height, based on row number
-        accTable.setFixedCellSize(30);
-        accTable.prefHeightProperty().bind(Bindings.size(accTable.getItems()).multiply(accTable.getFixedCellSize()).add(30));
+        this.accTable.setFixedCellSize(30);
+        this.accTable.prefHeightProperty().bind(Bindings.size(accTable.getItems()).multiply(accTable.getFixedCellSize()).add(30));
 
         // manually fix table width
-        accTable.setMaxWidth(400);
-        accTable.setPrefWidth(400);
-        accTable.setMinWidth(400);
+        this.accTable.setMaxWidth(400);
+        this.accTable.setPrefWidth(400);
+        this.accTable.setMinWidth(400);
         // set all columns having equal width
-        accTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        this.accTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+    }
 
-        final VBox vBox = new VBox();
-        vBox.setSpacing(5);
-        vBox.setPadding(new Insets(10, 0, 0, 10));
-        vBox.getChildren().add(accTable);
-        vBox.setPrefWidth(500);
-
-
+    public void initOpenPosTable () {
+        getOpenPositions();
+        
         // Open Positions table
         TableColumn symbolCol = new TableColumn("Stock");
         symbolCol.setCellValueFactory(new PropertyValueFactory("symbol"));
@@ -152,12 +143,6 @@ public class Portfolio {
         TableColumn plCol = new TableColumn("Gain/Loss Value");
         plCol.setCellValueFactory(new PropertyValueFactory("pl"));
 
-        TableColumn dayPlCol = new TableColumn("Day Gain/Loss Value");
-        dayPlCol.setCellValueFactory(new PropertyValueFactory("dayPl"));
-
-        TableColumn dayPlPercentCol = new TableColumn("Day Gain/Loss %");
-        dayPlPercentCol.setCellValueFactory(new PropertyValueFactory("dayPlPercent"));
-
         symbolCol.setSortable(false);
         qtyCol.setSortable(false);
         avgPriceCol.setSortable(false);
@@ -165,22 +150,20 @@ public class Portfolio {
         costCol.setSortable(false);
         mktValueCol.setSortable(false);
         plCol.setSortable(false);
-        dayPlCol.setSortable(false);
-        dayPlPercentCol.setSortable(false);
 
-        posTable.setEditable(false);
+        this.posTable.setEditable(false);
 
         final ObservableList<PosData> posTableData = FXCollections.observableArrayList();
-        for (Map<String, Object> pos : this.positions) {
+        for (OpenPos pos : this.positions) {
             posTableData.add(new PosData(pos));
         }
 
-        posTable.setItems(posTableData);
-        posTable.getColumns().setAll(symbolCol, qtyCol, avgPriceCol, costCol, mktPriceCol, mktValueCol, plCol, dayPlCol, dayPlPercentCol);
+        this.posTable.setItems(posTableData);
+        this.posTable.getColumns().setAll(symbolCol, qtyCol, avgPriceCol, costCol, mktPriceCol, mktValueCol, plCol);
 
         // limit Table height, based on row number
-        posTable.setFixedCellSize(30);
-        posTable.prefHeightProperty().bind(Bindings.size(posTable.getItems()).multiply(posTable.getFixedCellSize()).add(30));
+        this.posTable.setFixedCellSize(30);
+        this.posTable.prefHeightProperty().bind(Bindings.size(this.posTable.getItems()).multiply(this.posTable.getFixedCellSize()).add(30));
 
         // manually fix table width
         //posTable.setMaxWidth(900);
@@ -188,28 +171,9 @@ public class Portfolio {
         //posTable.setMinWidth(900);
 
         // set all columns having equal width
-        posTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-
-
-        final Label posLabel = new Label("Current Investments");
-        vBox.getChildren().addAll(posLabel, posTable);
-
-        // add account summary tab
-        accTab.setText("Portfolio (Practice Account)");
-        accTab.setClosable(false);
-        accTab.setContent(vBox);
-
-        return accTab;
-
-        /*
-        tabPane.getTabs().add(accTab);
-
-        // select tab
-        SingleSelectionModel<Tab> selectionModel = tabPane.getSelectionModel();
-        selectionModel.select(accTab);
-        */
+        this.posTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }
-
+    
     public class AccData {
         private final SimpleStringProperty field;
         private final SimpleStringProperty value;
@@ -242,19 +206,15 @@ public class Portfolio {
         private final SimpleStringProperty mktPrice;
         private final SimpleStringProperty marketValue;
         private final SimpleStringProperty pl;
-        private final SimpleStringProperty dayPl;
-        private final SimpleStringProperty dayPlPercent;
 
-        private PosData(Map<String, Object> pos) {
-            this.symbol         = new SimpleStringProperty(pos.get("symbol").toString());
-            this.qty            = new SimpleStringProperty(pos.get("availableForTradingQty").toString());
-            this.avgPrice       = new SimpleStringProperty(pos.get("avgPrice").toString());
-            this.costBasis      = new SimpleStringProperty(pos.get("costBasis").toString());
-            this.mktPrice       = new SimpleStringProperty(pos.get("mktPrice").toString());
-            this.marketValue    = new SimpleStringProperty(pos.get("marketValue").toString());
-            this.pl             = new SimpleStringProperty(pos.get("unrealizedPL").toString());
-            this.dayPl          = new SimpleStringProperty(pos.get("unrealizedDayPL").toString());
-            this.dayPlPercent   = new SimpleStringProperty(pos.get("unrealizedDayPLPercent").toString());
+        private PosData(OpenPos pos) {
+            this.symbol         = new SimpleStringProperty(pos.symbol);
+            this.qty            = new SimpleStringProperty(pos.units.toString());
+            this.avgPrice       = new SimpleStringProperty(pos.averagePrice.toString());
+            this.costBasis      = new SimpleStringProperty(pos.costBasis.toString());
+            this.mktPrice       = new SimpleStringProperty(pos.marketPrice.toString());
+            this.marketValue    = new SimpleStringProperty(pos.marketValue.toString());
+            this.pl             = new SimpleStringProperty(pos.unrealizedPL.toString());
         }
 
         public String getSymbol() {
@@ -305,25 +265,11 @@ public class Portfolio {
         public void setPl(String v) {
             pl.set(v);
         }
-
-        public String getDayPl() {
-            return dayPl.get();
-        }
-        public void setDayPl(String v) {
-            dayPl.set(v);
-        }
-
-        public String getDayPlPercent() {
-            return dayPlPercent.get();
-        }
-        public void setDayPlPercent(String v) {
-            dayPlPercent.set(v);
-        }
     }
 
     private final Map<String, Object> accBlotter;
     private final List<Map<String, Object>> openTxns;
-    private final List<Map<String, Object>> positions = new ArrayList<>();
+    private final List<OpenPos> positions = new ArrayList<>();
 
     public  final Tab accTab  = new Tab();
     private final TableView accTable = new TableView();
