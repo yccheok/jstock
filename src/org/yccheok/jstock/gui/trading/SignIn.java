@@ -268,7 +268,7 @@ public class SignIn {
 
                             tabPane.getTabs().remove(signInTab);
 
-                            System.out.println("Account Blotter DONE....");
+                            System.out.println("Portfolio tab DONE....");
                         }
                     }
                 });

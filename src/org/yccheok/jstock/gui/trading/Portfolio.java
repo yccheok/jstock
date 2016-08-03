@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -35,7 +36,7 @@ public class Portfolio {
     }
 
     private String formatNumber(Double number) {
-        return new DecimalFormat("#.00").format(number);
+        return new DecimalFormat("0.00").format(number);
     }
 
     public void getOpenPositions () {
@@ -81,100 +82,6 @@ public class Portfolio {
         return accTab;
     }
 
-    public void initAccTable () {
-        AccountSummary acc = new AccountSummary(accBlotter);
-
-        final ObservableList<AccData> accTableData = FXCollections.observableArrayList(
-            new AccData("Cash Available For Trading",      formatNumber(acc.cashForTrade) ),
-            new AccData("Cash Available For Withdrawal",   formatNumber(acc.cashForWithdraw) ),
-            new AccData("Total Cash Balance",              formatNumber(acc.cashBalance) ),
-            new AccData("Total Positions Market Value",    formatNumber(acc.positionsValue) ),
-            new AccData("Total Account Value",             formatNumber(acc.accountTotal) )
-        );
-
-        // Account Summary Table
-        TableColumn fieldCol = new TableColumn("Account Summary");
-        fieldCol.setCellValueFactory(new PropertyValueFactory("field"));
-
-        TableColumn valueCol = new TableColumn();
-        valueCol.setCellValueFactory(new PropertyValueFactory("value"));
-        valueCol.getStyleClass().add( "right-align");
-
-        fieldCol.setSortable(false);
-        valueCol.setSortable(false);
-
-        this.accTable.setEditable(false);
-        this.accTable.setItems(accTableData);
-        this.accTable.getColumns().setAll(fieldCol, valueCol);
-
-        // limit Table height, based on row number
-        this.accTable.setFixedCellSize(30);
-        this.accTable.prefHeightProperty().bind(Bindings.size(accTable.getItems()).multiply(accTable.getFixedCellSize()).add(30));
-
-        // manually fix table width
-        this.accTable.setMaxWidth(400);
-        this.accTable.setPrefWidth(400);
-        this.accTable.setMinWidth(400);
-        // set all columns having equal width
-        this.accTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-    }
-
-    public void initOpenPosTable () {
-        getOpenPositions();
-        
-        // Open Positions table
-        TableColumn symbolCol = new TableColumn("Stock");
-        symbolCol.setCellValueFactory(new PropertyValueFactory("symbol"));
-
-        TableColumn qtyCol = new TableColumn("Units");
-        qtyCol.setCellValueFactory(new PropertyValueFactory("qty"));
-
-        TableColumn avgPriceCol = new TableColumn("Average Purchase Price");
-        avgPriceCol.setCellValueFactory(new PropertyValueFactory("avgPrice"));
-
-        TableColumn mktPriceCol = new TableColumn("Current Price");
-        mktPriceCol.setCellValueFactory(new PropertyValueFactory("mktPrice"));
-
-        TableColumn costCol = new TableColumn("Purchase Value");
-        costCol.setCellValueFactory(new PropertyValueFactory("costBasis"));
-
-        TableColumn mktValueCol = new TableColumn("Current Value");
-        mktValueCol.setCellValueFactory(new PropertyValueFactory("marketValue"));
-
-        TableColumn plCol = new TableColumn("Gain/Loss Value");
-        plCol.setCellValueFactory(new PropertyValueFactory("pl"));
-
-        symbolCol.setSortable(false);
-        qtyCol.setSortable(false);
-        avgPriceCol.setSortable(false);
-        mktPriceCol.setSortable(false);
-        costCol.setSortable(false);
-        mktValueCol.setSortable(false);
-        plCol.setSortable(false);
-
-        this.posTable.setEditable(false);
-
-        final ObservableList<PosData> posTableData = FXCollections.observableArrayList();
-        for (OpenPos pos : this.positions) {
-            posTableData.add(new PosData(pos));
-        }
-
-        this.posTable.setItems(posTableData);
-        this.posTable.getColumns().setAll(symbolCol, qtyCol, avgPriceCol, costCol, mktPriceCol, mktValueCol, plCol);
-
-        // limit Table height, based on row number
-        this.posTable.setFixedCellSize(30);
-        this.posTable.prefHeightProperty().bind(Bindings.size(this.posTable.getItems()).multiply(this.posTable.getFixedCellSize()).add(30));
-
-        // manually fix table width
-        //posTable.setMaxWidth(900);
-        //posTable.setPrefWidth(900);
-        //posTable.setMinWidth(900);
-
-        // set all columns having equal width
-        this.posTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-    }
-    
     public class AccData {
         private final SimpleStringProperty field;
         private final SimpleStringProperty value;
@@ -198,45 +105,83 @@ public class Portfolio {
             value.set(v);
         }
     }
+    
+    public void initAccTable () {
+        AccountSummary acc = new AccountSummary(accBlotter);
+
+        final ObservableList<AccData> accTableData = FXCollections.observableArrayList(
+            new AccData("Cash Available For Trading",      formatNumber(acc.cashForTrade) ),
+            new AccData("Cash Available For Withdrawal",   formatNumber(acc.cashForWithdraw) ),
+            new AccData("Total Cash Balance",              formatNumber(acc.cashBalance) ),
+            new AccData("Total Positions Market Value",    formatNumber(acc.positionsValue) ),
+            new AccData("Total Account Value",             formatNumber(acc.accountTotal) )
+        );
+
+        // Account Summary Table
+        TableColumn fieldCol = new TableColumn("Account Summary");
+        fieldCol.setCellValueFactory(new PropertyValueFactory("field"));
+
+        TableColumn valueCol = new TableColumn();
+        valueCol.setCellValueFactory(new PropertyValueFactory("value"));
+        valueCol.getStyleClass().add("right-align");
+
+        fieldCol.setSortable(false);
+        valueCol.setSortable(false);
+
+        this.accTable.setEditable(false);
+        this.accTable.setItems(accTableData);
+        this.accTable.getColumns().setAll(fieldCol, valueCol);
+
+        // limit Table height, based on row number
+        this.accTable.setFixedCellSize(30);
+        this.accTable.prefHeightProperty().bind(Bindings.size(accTable.getItems()).multiply(accTable.getFixedCellSize()).add(30));
+
+        // manually fix table width
+        this.accTable.setMaxWidth(400);
+        this.accTable.setPrefWidth(400);
+        this.accTable.setMinWidth(400);
+        // set all columns having equal width
+        this.accTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+    }
 
     public class PosData {
-        private final SimpleStringProperty symbol;
-        private final SimpleStringProperty qty;
-        private final SimpleStringProperty avgPrice;
+        private final SimpleStringProperty name;
+        private final SimpleStringProperty units;
+        private final SimpleStringProperty averagePrice;
         private final SimpleStringProperty costBasis;
-        private final SimpleStringProperty mktPrice;
+        private final SimpleStringProperty marketPrice;
         private final SimpleStringProperty marketValue;
-        private final SimpleStringProperty pl;
+        private final SimpleStringProperty unrealizedPL;
 
         private PosData(OpenPos pos) {
-            this.symbol         = new SimpleStringProperty(pos.name);
-            this.qty            = new SimpleStringProperty(pos.units.toString());
-            this.avgPrice       = new SimpleStringProperty(pos.averagePrice.toString());
-            this.costBasis      = new SimpleStringProperty(pos.costBasis.toString());
-            this.mktPrice       = new SimpleStringProperty(pos.marketPrice.toString());
-            this.marketValue    = new SimpleStringProperty(pos.marketValue.toString());
-            this.pl             = new SimpleStringProperty(pos.unrealizedPL.toString());
+            this.name           = new SimpleStringProperty(pos.name);
+            this.units          = new SimpleStringProperty(formatNumber(pos.units));
+            this.averagePrice   = new SimpleStringProperty(formatNumber(pos.averagePrice));
+            this.costBasis      = new SimpleStringProperty(formatNumber(pos.costBasis));
+            this.marketPrice    = new SimpleStringProperty(formatNumber(pos.marketPrice));
+            this.marketValue    = new SimpleStringProperty(formatNumber(pos.marketValue));
+            this.unrealizedPL   = new SimpleStringProperty(formatNumber(pos.unrealizedPL));
         }
 
-        public String getSymbol() {
-            return symbol.get();
+        public String getName() {
+            return name.get();
         }
-        public void setSymbol(String v) {
-            symbol.set(v);
-        }
-
-        public String getQty() {
-            return qty.get();
-        }
-        public void setQty(String v) {
-            qty.set(v);
+        public void setName(String v) {
+            name.set(v);
         }
 
-        public String getAvgPrice() {
-            return avgPrice.get();
+        public String getUnits() {
+            return units.get();
         }
-        public void setAvgPrice(String v) {
-            avgPrice.set(v);
+        public void setUnits(String v) {
+            units.set(v);
+        }
+
+        public String getAveragePrice() {
+            return averagePrice.get();
+        }
+        public void setAveragePrice(String v) {
+            averagePrice.set(v);
         }
 
         public String getCostBasis() {
@@ -246,11 +191,11 @@ public class Portfolio {
             costBasis.set(v);
         }
 
-        public String getMktPrice() {
-            return mktPrice.get();
+        public String getMarketPrice() {
+            return marketPrice.get();
         }
-        public void setMktPrice(String v) {
-            mktPrice.set(v);
+        public void setMarketPrice(String v) {
+            marketPrice.set(v);
         }
 
         public String getMarketValue() {
@@ -260,14 +205,76 @@ public class Portfolio {
             marketValue.set(v);
         }
 
-        public String getPl() {
-            return pl.get();
+        public String getUnrealizedPL() {
+            return unrealizedPL.get();
         }
-        public void setPl(String v) {
-            pl.set(v);
+        public void setUnrealizedPL(String v) {
+            unrealizedPL.set(v);
         }
     }
 
+    public void initOpenPosTable () {
+        getOpenPositions();
+        
+        // Open Positions table
+        TableColumn nameCol = new TableColumn("Stock");
+        nameCol.setCellValueFactory(new PropertyValueFactory("name"));
+
+        TableColumn unitsCol = new TableColumn("Units");
+        unitsCol.setCellValueFactory(new PropertyValueFactory("units"));
+        unitsCol.getStyleClass().add("right-align");
+
+        TableColumn avgPriceCol = new TableColumn("Average Purchase Price");
+        avgPriceCol.setCellValueFactory(new PropertyValueFactory("averagePrice"));
+        avgPriceCol.getStyleClass().add("right-align");
+
+        TableColumn mktPriceCol = new TableColumn("Current Price");
+        mktPriceCol.setCellValueFactory(new PropertyValueFactory("marketPrice"));
+        mktPriceCol.getStyleClass().add("right-align");
+
+        TableColumn costCol = new TableColumn("Purchase Value");
+        costCol.setCellValueFactory(new PropertyValueFactory("costBasis"));
+        costCol.getStyleClass().add("right-align");
+
+        TableColumn mktValueCol = new TableColumn("Current Value");
+        mktValueCol.setCellValueFactory(new PropertyValueFactory("marketValue"));
+        mktValueCol.getStyleClass().add("right-align");
+        
+        TableColumn plCol = new TableColumn("Gain/Loss Value");
+        plCol.setCellValueFactory(new PropertyValueFactory("unrealizedPL"));
+        plCol.getStyleClass().add("right-align");
+
+        nameCol.setSortable(false);
+        unitsCol.setSortable(false);
+        avgPriceCol.setSortable(false);
+        mktPriceCol.setSortable(false);
+        costCol.setSortable(false);
+        mktValueCol.setSortable(false);
+        plCol.setSortable(false);
+
+        this.posTable.setEditable(false);
+
+        final ObservableList<PosData> posTableData = FXCollections.observableArrayList();
+        for (OpenPos pos : this.positions) {
+            posTableData.add(new PosData(pos));
+        }
+
+        this.posTable.setItems(posTableData);
+        this.posTable.getColumns().setAll(nameCol, unitsCol, avgPriceCol, costCol, mktPriceCol, mktValueCol, plCol);
+
+        // limit Table height, based on row number
+        this.posTable.setFixedCellSize(30);
+        this.posTable.prefHeightProperty().bind(Bindings.size(this.posTable.getItems()).multiply(this.posTable.getFixedCellSize()).add(30));
+
+        // manually fix table width
+        //posTable.setMaxWidth(900);
+        //posTable.setPrefWidth(900);
+        //posTable.setMinWidth(900);
+
+        // set all columns having equal width
+        this.posTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+    }
+    
     private final Map<String, Object> accBlotter;
     private final Map<String, Map> instruments;
     
