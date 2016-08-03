@@ -17,14 +17,14 @@ public class AccountSummary {
         LinkedTreeMap<String, Object> equity  = (LinkedTreeMap) accBlotter.get("equity");
         LinkedTreeMap<String, Object> balance = (LinkedTreeMap) accBlotter.get("cash");
 
-        this.positionsValue   = (Double) equity.get("equityValue");
-        this.cashBalance      = (Double) balance.get("cashBalance");
-        this.cashForTrade     = (Double) balance.get("cashAvailableForTrade");
-        this.cashForWithdraw  = (Double) balance.get("cashAvailableForWithdrawal");
-        this.accountTotal     = (Double) cashBalance + (Double) positionsValue;
+        this.equityValue     = (Double) equity.get("equityValue");
+        this.cashBalance     = (Double) balance.get("cashBalance");
+        this.cashForTrade    = (Double) balance.get("cashAvailableForTrade");
+        this.cashForWithdraw = (Double) balance.get("cashAvailableForWithdrawal");
+        this.accountTotal    = cashBalance + equityValue;
     }
 
-    public Double positionsValue;
+    public Double equityValue;
     public Double cashBalance;
     public Double cashForTrade;
     public Double cashForWithdraw;

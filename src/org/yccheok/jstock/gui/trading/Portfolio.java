@@ -104,7 +104,7 @@ public class Portfolio {
             new AccData("Cash Available For Trading",      formatNumber(acc.cashForTrade) ),
             new AccData("Cash Available For Withdrawal",   formatNumber(acc.cashForWithdraw) ),
             new AccData("Total Cash Balance",              formatNumber(acc.cashBalance) ),
-            new AccData("Total Positions Market Value",    formatNumber(acc.positionsValue) ),
+            new AccData("Total Positions Market Value",    formatNumber(acc.equityValue) ),
             new AccData("Total Account Value",             formatNumber(acc.accountTotal) )
         );
 
