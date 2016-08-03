@@ -5,6 +5,7 @@
  */
 package org.yccheok.jstock.gui.trading;
 
+import com.google.gson.internal.LinkedTreeMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -186,11 +187,17 @@ public class SignIn {
                             result.put("accBlotter", accBlotter);
                             System.out.println("calling account Blotter DONE...");
 
-                            Map<String, String> param = new HashMap<>();
-                            param.put("AccountNumber", _api.user.practiceAccount.accountNo);
-                            List<Map<String, Object>> txns = _api.transactionReport("openPos", param);
-                            result.put("openTxns", txns);
-                            System.out.println("calling open positions report DONE...");
+                            // loop through open positions, call "get instrument" to get symbol long name           
+                            Map<String, Map> instruments = new HashMap<>();
+                            LinkedTreeMap<String, Object> equity = (LinkedTreeMap) accBlotter.get("equity");
+                            List<LinkedTreeMap<String, Object>> pos = (List) equity.get("equityPositions");
+
+                            for (LinkedTreeMap<String, Object> a : pos) {
+                                Map<String, Object> ins = _api.getInstrument(a.get("instrumentID").toString());
+                                instruments.put(ins.get("symbol").toString(), ins);
+                            }
+                            result.put("instruments", instruments);
+                            System.out.println("calling get instruments open positions DONE...");
                         }
 
                         return result;
@@ -244,11 +251,15 @@ public class SignIn {
                         signInBtn.setDisable(false);
 
                         // create portfolio tab
-                        if (result.containsKey("accBlotter") && result.containsKey("openTxns")) {
+                        if (result.containsKey("accBlotter")) {
                             Map<String, Object> accBlotter = (Map) result.get("accBlotter");
-                            List<Map<String, Object>> openTxns = (List) result.get("openTxns");
+                            
+                            Map<String, Map> instruments = new HashMap<>();
+                            if (result.containsKey("instruments")) {
+                                instruments = (Map) result.get("instruments");
+                            }
 
-                            Portfolio portfolio = new Portfolio(accBlotter, openTxns);
+                            Portfolio portfolio = new Portfolio(accBlotter, instruments);
                             Tab portfolioTab = portfolio.createTab();
                             tabPane.getTabs().add(portfolioTab);
                             // select tab

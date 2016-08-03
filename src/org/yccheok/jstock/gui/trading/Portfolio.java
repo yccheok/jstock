@@ -29,9 +29,9 @@ import org.yccheok.jstock.trading.AccountSummary;
  * @author shuwnyuan
  */
 public class Portfolio {
-    public Portfolio (Map<String, Object> accBlotter, List<Map<String, Object>> openTxns) {
+    public Portfolio (Map<String, Object> accBlotter, Map<String, Map> instruments) {
         this.accBlotter = accBlotter;
-        this.openTxns = openTxns;
+        this.instruments = instruments;
     }
 
     private String formatNumber(Double number) {
@@ -44,7 +44,8 @@ public class Portfolio {
 
         int cnt = 0;
         for (LinkedTreeMap<String, Object> a : result) {
-            OpenPos pos = new OpenPos(a);
+            String name = this.instruments.get(a.get("symbol").toString()).get("name").toString();
+            OpenPos pos = new OpenPos(a, name);
             this.positions.add(pos);
 
             System.out.println("[" + cnt + "] Position: symbol: " + pos.symbol
@@ -70,7 +71,7 @@ public class Portfolio {
         initOpenPosTable();
 
         final Label posLabel = new Label("Current Investments");
-        vBox.getChildren().addAll(posLabel, posTable);
+        vBox.getChildren().addAll(posLabel, this.posTable);
 
         // add account summary tab
         accTab.setText("Portfolio (Practice Account)");
@@ -208,7 +209,7 @@ public class Portfolio {
         private final SimpleStringProperty pl;
 
         private PosData(OpenPos pos) {
-            this.symbol         = new SimpleStringProperty(pos.symbol);
+            this.symbol         = new SimpleStringProperty(pos.name);
             this.qty            = new SimpleStringProperty(pos.units.toString());
             this.avgPrice       = new SimpleStringProperty(pos.averagePrice.toString());
             this.costBasis      = new SimpleStringProperty(pos.costBasis.toString());
@@ -268,7 +269,8 @@ public class Portfolio {
     }
 
     private final Map<String, Object> accBlotter;
-    private final List<Map<String, Object>> openTxns;
+    private final Map<String, Map> instruments;
+    
     private final List<OpenPos> positions = new ArrayList<>();
 
     public  final Tab accTab  = new Tab();

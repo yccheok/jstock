@@ -12,7 +12,8 @@ import com.google.gson.internal.LinkedTreeMap;
  * @author shuwnyuan
  */
 public class OpenPos {
-    public OpenPos (LinkedTreeMap<String, Object> pos) {
+    public OpenPos (LinkedTreeMap<String, Object> pos, String name) {
+        this.name           = name;
         this.symbol         = pos.get("symbol").toString();
         this.instrumentID   = pos.get("instrumentID").toString();
         this.units          = (Double) pos.get("availableForTradingQty");
@@ -24,6 +25,7 @@ public class OpenPos {
     }
 
     public String symbol;
+    public String name;
     public String instrumentID;
     public Double units;
     public Double averagePrice;
