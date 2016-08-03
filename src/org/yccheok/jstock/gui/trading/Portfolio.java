@@ -43,18 +43,10 @@ public class Portfolio {
         LinkedTreeMap<String, Object> equity = (LinkedTreeMap) this.accBlotter.get("equity");
         List<LinkedTreeMap<String, Object>> result = (List) equity.get("equityPositions");
 
-        int cnt = 0;
         for (LinkedTreeMap<String, Object> a : result) {
             String name = this.instruments.get(a.get("symbol").toString()).get("name").toString();
             OpenPos pos = new OpenPos(a, name);
             this.positions.add(pos);
-
-            System.out.println("[" + cnt + "] Position: symbol: " + pos.symbol
-                    + ", instrumentID: " + pos.instrumentID
-                    + ", openQty: "      + pos.units
-                    + ", costBasis: "    + pos.costBasis
-            );
-            cnt++;
         }
     }
     
