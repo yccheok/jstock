@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -137,6 +136,7 @@ public class Portfolio {
     }
 
     public class PosData {
+        private final SimpleStringProperty symbol;
         private final SimpleStringProperty name;
         private final SimpleStringProperty units;
         private final SimpleStringProperty averagePrice;
@@ -146,6 +146,7 @@ public class Portfolio {
         private final SimpleStringProperty unrealizedPL;
 
         private PosData(OpenPos pos) {
+            this.symbol         = new SimpleStringProperty(pos.symbol);
             this.name           = new SimpleStringProperty(pos.name);
             this.units          = new SimpleStringProperty(formatNumber(pos.units));
             this.averagePrice   = new SimpleStringProperty(formatNumber(pos.averagePrice));
@@ -155,6 +156,13 @@ public class Portfolio {
             this.unrealizedPL   = new SimpleStringProperty(formatNumber(pos.unrealizedPL));
         }
 
+        public String getSymbol() {
+            return symbol.get();
+        }
+        public void setSymbol(String v) {
+            symbol.set(v);
+        }
+        
         public String getName() {
             return name.get();
         }
@@ -209,7 +217,10 @@ public class Portfolio {
         getOpenPositions();
         
         // Open Positions table
-        TableColumn nameCol = new TableColumn("Stock");
+        TableColumn symbolCol = new TableColumn("Stock");
+        symbolCol.setCellValueFactory(new PropertyValueFactory("symbol"));
+
+        TableColumn nameCol = new TableColumn("Name");
         nameCol.setCellValueFactory(new PropertyValueFactory("name"));
 
         TableColumn unitsCol = new TableColumn("Units");
@@ -236,6 +247,7 @@ public class Portfolio {
         plCol.setCellValueFactory(new PropertyValueFactory("unrealizedPL"));
         plCol.getStyleClass().add("right-align");
 
+        symbolCol.setSortable(false);
         nameCol.setSortable(false);
         unitsCol.setSortable(false);
         avgPriceCol.setSortable(false);
@@ -252,7 +264,7 @@ public class Portfolio {
         }
 
         this.posTable.setItems(posTableData);
-        this.posTable.getColumns().setAll(nameCol, unitsCol, avgPriceCol, costCol, mktPriceCol, mktValueCol, plCol);
+        this.posTable.getColumns().setAll(symbolCol, nameCol, unitsCol, avgPriceCol, costCol, mktPriceCol, mktValueCol, plCol);
 
         // limit Table height, based on row number
         this.posTable.setFixedCellSize(30);
