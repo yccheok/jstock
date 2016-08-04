@@ -80,15 +80,15 @@ public class Portfolio {
         HBox leftHbox = new HBox(8);
         
         // Total Open positions value
-        Label shareText = new Label("Share ($):");
-        Label shareAmount = new Label(Utils.formatNumber(acc.equityValue));
+        Label shareText = new Label("Share:");
+        Label shareAmount = new Label(Utils.monetaryFormat(acc.equityValue));
         shareAmount.getStyleClass().add("profit");
         
         // Total unrealized PL
-        Label profitText = new Label("Paper Profit ($):");
+        Label profitText = new Label("Paper Profit:");
         profitText.setPadding(new Insets(0, 0, 0, 10));
 
-        String amountStr = Utils.formatNumber(acc.totalUnrealizedPL) + " (" + Utils.formatNumber(acc.totalUnrealizedPLPercent) + "%)";
+        String amountStr = Utils.monetaryFormat(acc.totalUnrealizedPL) + " (" + Utils.formatNumber(acc.totalUnrealizedPLPercent) + "%)";
         Label profitAmount = new Label(amountStr);
         profitAmount.getStyleClass().add((acc.totalUnrealizedPL > 0) ? "profit" : "loss");
 
@@ -98,14 +98,14 @@ public class Portfolio {
         HBox rightHbox = new HBox(8);
         
         // Cash for trading
-        Label cashText = new Label("Cash to Invest ($): ");
-        Label cashAmount = new Label(Utils.formatNumber(acc.cashForTrade));
+        Label cashText = new Label("Cash to Invest:");
+        Label cashAmount = new Label(Utils.monetaryFormat(acc.cashForTrade));
         cashAmount.getStyleClass().add((acc.cashForTrade > 0) ? "profit" : "loss");
 
         // Total
-        Label totalText = new Label("Total ($):");
+        Label totalText = new Label("Total:");
         totalText.setPadding(new Insets(0, 0, 0, 10));
-        Label totalAmount = new Label(Utils.formatNumber(acc.accountTotal));
+        Label totalAmount = new Label(Utils.monetaryFormat(acc.accountTotal));
         totalAmount.getStyleClass().add((acc.accountTotal > 0) ? "profit" : "loss");
 
         rightHbox.getChildren().addAll(cashText, cashAmount, totalText, totalAmount);

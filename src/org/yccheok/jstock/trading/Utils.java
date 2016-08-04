@@ -6,12 +6,25 @@
 package org.yccheok.jstock.trading;
 
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 /**
  *
  * @author shuwnyuan
  */
 public class Utils {
+    
+    public static String monetaryFormat (Double number) {
+        Locale locale = new Locale("en", "US");
+        DecimalFormat formatter = (DecimalFormat) NumberFormat.getCurrencyInstance(locale);
+        String symbol = formatter.getCurrency().getSymbol();
+        formatter.setNegativePrefix("-" + symbol);
+        formatter.setNegativeSuffix("");
+
+        return formatter.format(number);
+    }
+    
     // default to 2 decimal places
     public static String formatNumber(Double number) {
         return formatNumber(number, 2);
