@@ -187,7 +187,9 @@ public class SignIn {
                             result.put("accBlotter", accBlotter);
                             System.out.println("calling account Blotter DONE...");
 
-                            // loop through open positions, call "get instrument" to get symbol long name           
+                            // loop through the below, call "get instrument" to get symbol long name
+                            //      a) open positions
+                            //      b) pending orders
                             Map<String, Map> instruments = new HashMap<>();
                             LinkedTreeMap<String, Object> equity = (LinkedTreeMap) accBlotter.get("equity");
                             List<LinkedTreeMap<String, Object>> pos = (List) equity.get("equityPositions");
@@ -196,6 +198,20 @@ public class SignIn {
                                 Map<String, Object> ins = _api.getInstrument(a.get("instrumentID").toString());
                                 instruments.put(ins.get("symbol").toString(), ins);
                             }
+                            
+                            List<LinkedTreeMap<String, Object>> orders = (List) accBlotter.get("orders");
+                            for (LinkedTreeMap<String, Object> a : orders) {
+                                String symbol = a.get("symbol").toString();
+                                if (instruments.containsKey(symbol)) {
+                                    continue;
+                                }
+
+                                Map<String, String> param = new HashMap<>();
+                                param.put("symbol", symbol);
+                                Map<String, Object> ins = _api.searchInstruments(param).get(0);
+                                instruments.put(ins.get("symbol").toString(), ins);
+                            }
+                            
                             result.put("instruments", instruments);
                             System.out.println("calling get instruments open positions DONE...");
                         }

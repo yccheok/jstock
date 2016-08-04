@@ -22,6 +22,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import org.yccheok.jstock.trading.OpenPos;
+import org.yccheok.jstock.trading.Order;
 import org.yccheok.jstock.trading.AccountSummary;
 import org.yccheok.jstock.trading.OpenPosModel;
 import org.yccheok.jstock.trading.Utils;
@@ -47,8 +48,19 @@ public class Portfolio {
         }
     }
     
+    public void getPendingOrders () {
+        List<LinkedTreeMap<String, Object>> result = (List) this.accBlotter.get("orders");
+
+        for (LinkedTreeMap<String, Object> a : result) {
+            Map<String, Object> ins = this.instruments.get(a.get("symbol").toString());
+            Order order = new Order(a, ins);
+            this.orders.add(order);
+        }
+    }
+    
     public Tab createTab() {
         getOpenPositions();
+        getPendingOrders();
 
         final VBox vBox = new VBox();
         vBox.setSpacing(5);
@@ -171,11 +183,6 @@ public class Portfolio {
         this.posTable.setFixedCellSize(30);
         this.posTable.prefHeightProperty().bind(Bindings.size(this.posTable.getItems()).multiply(this.posTable.getFixedCellSize()).add(30));
 
-        // manually fix table width
-        //posTable.setMaxWidth(900);
-        //posTable.setPrefWidth(900);
-        //posTable.setMinWidth(900);
-
         // set all columns having equal width
         this.posTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }
@@ -184,9 +191,12 @@ public class Portfolio {
     private final Map<String, Map> instruments;
     
     private final List<OpenPos> positions = new ArrayList<>();
+    private final List<Order> orders = new ArrayList<>();
     
     public  final Tab accTab  = new Tab();
     private final BorderPane accBorderPane = new BorderPane();
     private final TableView posTable = new TableView();
+    
+    private final TableView orderTable = new TableView();
 }
     
