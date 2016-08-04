@@ -12,7 +12,7 @@ import javafx.beans.property.SimpleStringProperty;
  * @author shuwnyuan
  */
 
-public class OpenPosData {
+public class OpenPosModel {
     private final SimpleStringProperty symbol;
     private final SimpleStringProperty name;
     private final SimpleStringProperty units;
@@ -22,7 +22,7 @@ public class OpenPosData {
     private final SimpleStringProperty marketValue;
     private final SimpleStringProperty unrealizedPL;
 
-    public OpenPosData(OpenPos pos) {
+    public OpenPosModel(OpenPos pos) {
         this.symbol         = new SimpleStringProperty(pos.symbol);
         this.name           = new SimpleStringProperty(pos.name);
         this.units          = new SimpleStringProperty(Utility.formatNumber(pos.units));

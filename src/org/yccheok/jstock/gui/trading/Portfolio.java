@@ -21,8 +21,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import org.yccheok.jstock.trading.OpenPos;
 import org.yccheok.jstock.trading.AccountSummary;
-import org.yccheok.jstock.trading.OpenPosData;
-import org.yccheok.jstock.trading.AccData;
+import org.yccheok.jstock.trading.OpenPosModel;
+import org.yccheok.jstock.trading.AccountModel;
 
 /**
  *
@@ -72,12 +72,12 @@ public class Portfolio {
     public void initAccTable () {
         AccountSummary acc = new AccountSummary(accBlotter);
 
-        final ObservableList<AccData> accTableData = FXCollections.observableArrayList(
-            new AccData("Cash Available For Trading",      acc.cashForTrade),
-            new AccData("Cash Available For Withdrawal",   acc.cashForWithdraw),
-            new AccData("Total Cash Balance",              acc.cashBalance),
-            new AccData("Total Positions Market Value",    acc.equityValue),
-            new AccData("Total Account Value",             acc.accountTotal)
+        final ObservableList<AccountModel> accTableData = FXCollections.observableArrayList(
+            new AccountModel("Cash Available For Trading",      acc.cashForTrade),
+            new AccountModel("Cash Available For Withdrawal",   acc.cashForWithdraw),
+            new AccountModel("Total Cash Balance",              acc.cashBalance),
+            new AccountModel("Total Positions Market Value",    acc.equityValue),
+            new AccountModel("Total Account Value",             acc.accountTotal)
         );
 
         // Account Summary Table
@@ -152,9 +152,9 @@ public class Portfolio {
 
         this.posTable.setEditable(false);
 
-        final ObservableList<OpenPosData> posTableData = FXCollections.observableArrayList();
+        final ObservableList<OpenPosModel> posTableData = FXCollections.observableArrayList();
         for (OpenPos pos : this.positions) {
-            posTableData.add(new OpenPosData(pos));
+            posTableData.add(new OpenPosModel(pos));
         }
 
         this.posTable.setItems(posTableData);

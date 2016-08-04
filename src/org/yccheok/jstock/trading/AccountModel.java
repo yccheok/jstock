@@ -12,11 +12,11 @@ import javafx.beans.property.SimpleStringProperty;
  * @author shuwnyuan
  */
 
-public class AccData {
+public class AccountModel {
     private final SimpleStringProperty field;
     private final SimpleStringProperty value;
 
-    public AccData(String f, Double v) {
+    public AccountModel(String f, Double v) {
         this.field = new SimpleStringProperty(f);
         this.value = new SimpleStringProperty(Utility.formatNumber(v));
     }
