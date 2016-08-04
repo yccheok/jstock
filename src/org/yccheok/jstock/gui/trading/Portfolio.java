@@ -6,12 +6,10 @@
 package org.yccheok.jstock.gui.trading;
 
 import com.google.gson.internal.LinkedTreeMap;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -23,6 +21,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import org.yccheok.jstock.trading.OpenPos;
 import org.yccheok.jstock.trading.AccountSummary;
+import org.yccheok.jstock.trading.OpenPosData;
+import org.yccheok.jstock.trading.AccData;
 
 /**
  *
@@ -34,17 +34,13 @@ public class Portfolio {
         this.instruments = instruments;
     }
 
-    private String formatNumber(Double number) {
-        return new DecimalFormat("0.00").format(number);
-    }
-
     public void getOpenPositions () {
         LinkedTreeMap<String, Object> equity = (LinkedTreeMap) this.accBlotter.get("equity");
         List<LinkedTreeMap<String, Object>> result = (List) equity.get("equityPositions");
 
         for (LinkedTreeMap<String, Object> a : result) {
-            String name = this.instruments.get(a.get("symbol").toString()).get("name").toString();
-            OpenPos pos = new OpenPos(a, name);
+            String stockName = this.instruments.get(a.get("symbol").toString()).get("name").toString();
+            OpenPos pos = new OpenPos(a, stockName);
             this.positions.add(pos);
         }
     }
@@ -73,39 +69,15 @@ public class Portfolio {
         return accTab;
     }
 
-    public class AccData {
-        private final SimpleStringProperty field;
-        private final SimpleStringProperty value;
-
-        private AccData(String f, String v) {
-            this.field = new SimpleStringProperty(f);
-            this.value = new SimpleStringProperty(v);
-        }
-
-        public String getField() {
-            return field.get();
-        }
-        public void setField(String v) {
-            field.set(v);
-        }
-
-        public String getValue() {
-            return value.get();
-        }
-        public void setValue(String v) {
-            value.set(v);
-        }
-    }
-    
     public void initAccTable () {
         AccountSummary acc = new AccountSummary(accBlotter);
 
         final ObservableList<AccData> accTableData = FXCollections.observableArrayList(
-            new AccData("Cash Available For Trading",      formatNumber(acc.cashForTrade) ),
-            new AccData("Cash Available For Withdrawal",   formatNumber(acc.cashForWithdraw) ),
-            new AccData("Total Cash Balance",              formatNumber(acc.cashBalance) ),
-            new AccData("Total Positions Market Value",    formatNumber(acc.equityValue) ),
-            new AccData("Total Account Value",             formatNumber(acc.accountTotal) )
+            new AccData("Cash Available For Trading",      acc.cashForTrade),
+            new AccData("Cash Available For Withdrawal",   acc.cashForWithdraw),
+            new AccData("Total Cash Balance",              acc.cashBalance),
+            new AccData("Total Positions Market Value",    acc.equityValue),
+            new AccData("Total Account Value",             acc.accountTotal)
         );
 
         // Account Summary Table
@@ -133,84 +105,6 @@ public class Portfolio {
         this.accTable.setMinWidth(400);
         // set all columns having equal width
         this.accTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-    }
-
-    public class PosData {
-        private final SimpleStringProperty symbol;
-        private final SimpleStringProperty name;
-        private final SimpleStringProperty units;
-        private final SimpleStringProperty averagePrice;
-        private final SimpleStringProperty costBasis;
-        private final SimpleStringProperty marketPrice;
-        private final SimpleStringProperty marketValue;
-        private final SimpleStringProperty unrealizedPL;
-
-        private PosData(OpenPos pos) {
-            this.symbol         = new SimpleStringProperty(pos.symbol);
-            this.name           = new SimpleStringProperty(pos.name);
-            this.units          = new SimpleStringProperty(formatNumber(pos.units));
-            this.averagePrice   = new SimpleStringProperty(formatNumber(pos.averagePrice));
-            this.costBasis      = new SimpleStringProperty(formatNumber(pos.costBasis));
-            this.marketPrice    = new SimpleStringProperty(formatNumber(pos.marketPrice));
-            this.marketValue    = new SimpleStringProperty(formatNumber(pos.marketValue));
-            this.unrealizedPL   = new SimpleStringProperty(formatNumber(pos.unrealizedPL));
-        }
-
-        public String getSymbol() {
-            return symbol.get();
-        }
-        public void setSymbol(String v) {
-            symbol.set(v);
-        }
-        
-        public String getName() {
-            return name.get();
-        }
-        public void setName(String v) {
-            name.set(v);
-        }
-
-        public String getUnits() {
-            return units.get();
-        }
-        public void setUnits(String v) {
-            units.set(v);
-        }
-
-        public String getAveragePrice() {
-            return averagePrice.get();
-        }
-        public void setAveragePrice(String v) {
-            averagePrice.set(v);
-        }
-
-        public String getCostBasis() {
-            return costBasis.get();
-        }
-        public void setCostBasis(String v) {
-            costBasis.set(v);
-        }
-
-        public String getMarketPrice() {
-            return marketPrice.get();
-        }
-        public void setMarketPrice(String v) {
-            marketPrice.set(v);
-        }
-
-        public String getMarketValue() {
-            return marketValue.get();
-        }
-        public void setMarketValue(String v) {
-            marketValue.set(v);
-        }
-
-        public String getUnrealizedPL() {
-            return unrealizedPL.get();
-        }
-        public void setUnrealizedPL(String v) {
-            unrealizedPL.set(v);
-        }
     }
 
     public void initOpenPosTable () {
@@ -258,9 +152,9 @@ public class Portfolio {
 
         this.posTable.setEditable(false);
 
-        final ObservableList<PosData> posTableData = FXCollections.observableArrayList();
+        final ObservableList<OpenPosData> posTableData = FXCollections.observableArrayList();
         for (OpenPos pos : this.positions) {
-            posTableData.add(new PosData(pos));
+            posTableData.add(new OpenPosData(pos));
         }
 
         this.posTable.setItems(posTableData);
