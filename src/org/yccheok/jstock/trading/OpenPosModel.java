@@ -25,12 +25,12 @@ public class OpenPosModel {
     public OpenPosModel(OpenPos pos) {
         this.symbol         = new SimpleStringProperty(pos.symbol);
         this.name           = new SimpleStringProperty(pos.name);
-        this.units          = new SimpleStringProperty(Utility.formatNumber(pos.units));
-        this.averagePrice   = new SimpleStringProperty(Utility.formatNumber(pos.averagePrice));
-        this.costBasis      = new SimpleStringProperty(Utility.formatNumber(pos.costBasis));
-        this.marketPrice    = new SimpleStringProperty(Utility.formatNumber(pos.marketPrice));
-        this.marketValue    = new SimpleStringProperty(Utility.formatNumber(pos.marketValue));
-        this.unrealizedPL   = new SimpleStringProperty(Utility.formatNumber(pos.unrealizedPL));
+        this.units          = new SimpleStringProperty(Utils.formatNumber(pos.units));
+        this.averagePrice   = new SimpleStringProperty(Utils.formatNumber(pos.averagePrice));
+        this.costBasis      = new SimpleStringProperty(Utils.formatNumber(pos.costBasis));
+        this.marketPrice    = new SimpleStringProperty(Utils.formatNumber(pos.marketPrice));
+        this.marketValue    = new SimpleStringProperty(Utils.formatNumber(pos.marketValue));
+        this.unrealizedPL   = new SimpleStringProperty(Utils.formatNumber(pos.unrealizedPL));
     }
 
     public String getSymbol() {

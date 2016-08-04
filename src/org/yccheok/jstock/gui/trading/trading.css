@@ -27,4 +27,22 @@ and open the template in the editor.
     -fx-alignment: center-right; 
 }
 
+.profit {
+    -fx-text-fill: green;
+}
 
+.loss {
+    -fx-text-fill: red;
+}
+
+.table-view .column-header{
+    -fx-font-size: 12px;
+}
+
+.table-cell {
+    -fx-font-size: 12px;
+}
+
+#accBorderPane .label {
+    -fx-font-size: 14px;
+}

@@ -18,11 +18,13 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import org.yccheok.jstock.trading.OpenPos;
 import org.yccheok.jstock.trading.AccountSummary;
 import org.yccheok.jstock.trading.OpenPosModel;
-import org.yccheok.jstock.trading.AccountModel;
+import org.yccheok.jstock.trading.Utils;
 
 /**
  *
@@ -46,15 +48,17 @@ public class Portfolio {
     }
     
     public Tab createTab() {
-        // Account Summary
-        initAccTable();
-        
+        getOpenPositions();
+
         final VBox vBox = new VBox();
         vBox.setSpacing(5);
-        vBox.setPadding(new Insets(10, 0, 0, 10));
-        vBox.getChildren().add(this.accTable);
+        vBox.setPadding(new Insets(10, 20, 0, 20));  // Insets: top, right, bottom, left
         vBox.setPrefWidth(500);
 
+        // Account Summary
+        initAccSummary();
+        vBox.getChildren().add(this.accBorderPane);
+        
         // Open Positions
         initOpenPosTable();
 
@@ -62,54 +66,57 @@ public class Portfolio {
         vBox.getChildren().addAll(posLabel, this.posTable);
 
         // add account summary tab
-        accTab.setText("Portfolio (Practice Account)");
-        accTab.setClosable(false);
-        accTab.setContent(vBox);
+        this.accTab.setText("Portfolio (Practice Account)");
+        this.accTab.setClosable(false);
+        this.accTab.setContent(vBox);
 
-        return accTab;
+        return this.accTab;
     }
 
-    public void initAccTable () {
-        AccountSummary acc = new AccountSummary(accBlotter);
+    public void initAccSummary () {
+        AccountSummary acc = new AccountSummary(this.accBlotter, this.positions);
 
-        final ObservableList<AccountModel> accTableData = FXCollections.observableArrayList(
-            new AccountModel("Cash Available For Trading",      acc.cashForTrade),
-            new AccountModel("Cash Available For Withdrawal",   acc.cashForWithdraw),
-            new AccountModel("Total Cash Balance",              acc.cashBalance),
-            new AccountModel("Total Positions Market Value",    acc.equityValue),
-            new AccountModel("Total Account Value",             acc.accountTotal)
-        );
-
-        // Account Summary Table
-        TableColumn fieldCol = new TableColumn("Account Summary");
-        fieldCol.setCellValueFactory(new PropertyValueFactory("field"));
-
-        TableColumn valueCol = new TableColumn();
-        valueCol.setCellValueFactory(new PropertyValueFactory("value"));
-        valueCol.getStyleClass().add("right-align");
-
-        fieldCol.setSortable(false);
-        valueCol.setSortable(false);
-
-        this.accTable.setEditable(false);
-        this.accTable.setItems(accTableData);
-        this.accTable.getColumns().setAll(fieldCol, valueCol);
-
-        // limit Table height, based on row number
-        this.accTable.setFixedCellSize(30);
-        this.accTable.prefHeightProperty().bind(Bindings.size(accTable.getItems()).multiply(accTable.getFixedCellSize()).add(30));
-
-        // manually fix table width
-        this.accTable.setMaxWidth(400);
-        this.accTable.setPrefWidth(400);
-        this.accTable.setMinWidth(400);
-        // set all columns having equal width
-        this.accTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-    }
-
-    public void initOpenPosTable () {
-        getOpenPositions();
+        // Left content
+        HBox leftHbox = new HBox(8);
         
+        // Total Open positions value
+        Label shareText = new Label("Share ($):");
+        Label shareAmount = new Label(Utils.formatNumber(acc.equityValue));
+        shareAmount.getStyleClass().add("profit");
+        
+        // Total unrealized PL
+        Label profitText = new Label("Paper Profit ($):");
+        profitText.setPadding(new Insets(0, 0, 0, 10));
+
+        String amountStr = Utils.formatNumber(acc.totalUnrealizedPL) + " (" + Utils.formatNumber(acc.totalUnrealizedPLPercent) + "%)";
+        Label profitAmount = new Label(amountStr);
+        profitAmount.getStyleClass().add((acc.totalUnrealizedPL > 0) ? "profit" : "loss");
+
+        leftHbox.getChildren().addAll(shareText, shareAmount, profitText, profitAmount);
+        
+        // Right content
+        HBox rightHbox = new HBox(8);
+        
+        // Cash for trading
+        Label cashText = new Label("Cash to Invest ($): ");
+        Label cashAmount = new Label(Utils.formatNumber(acc.cashForTrade));
+        cashAmount.getStyleClass().add((acc.cashForTrade > 0) ? "profit" : "loss");
+
+        // Total
+        Label totalText = new Label("Total ($):");
+        totalText.setPadding(new Insets(0, 0, 0, 10));
+        Label totalAmount = new Label(Utils.formatNumber(acc.accountTotal));
+        totalAmount.getStyleClass().add((acc.accountTotal > 0) ? "profit" : "loss");
+
+        rightHbox.getChildren().addAll(cashText, cashAmount, totalText, totalAmount);
+        
+        this.accBorderPane.setPadding(new Insets(10, 0, 30, 0));    // Insets: top, right, bottom, left
+        this.accBorderPane.setLeft(leftHbox);
+        this.accBorderPane.setRight(rightHbox);
+        this.accBorderPane.setId("accBorderPane");
+    }
+    
+    public void initOpenPosTable () {
         // Open Positions table
         TableColumn symbolCol = new TableColumn("Stock");
         symbolCol.setCellValueFactory(new PropertyValueFactory("symbol"));
@@ -177,9 +184,9 @@ public class Portfolio {
     private final Map<String, Map> instruments;
     
     private final List<OpenPos> positions = new ArrayList<>();
-
+    
     public  final Tab accTab  = new Tab();
-    private final TableView accTable = new TableView();
+    private final BorderPane accBorderPane = new BorderPane();
     private final TableView posTable = new TableView();
 }
     

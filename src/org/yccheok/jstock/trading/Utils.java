@@ -11,8 +11,7 @@ import java.text.DecimalFormat;
  *
  * @author shuwnyuan
  */
-public class Utility {
-    
+public class Utils {
     // default to 2 decimal places
     public static String formatNumber(Double number) {
         return formatNumber(number, 2);
