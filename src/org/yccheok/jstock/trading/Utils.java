@@ -15,6 +15,10 @@ import java.util.Locale;
  */
 public class Utils {
     
+    // Prevent from being instantiated.
+    private Utils() {
+    }
+    
     public static String monetaryFormat (Double number) {
         Locale locale = new Locale("en", "US");
         DecimalFormat formatter = (DecimalFormat) NumberFormat.getCurrencyInstance(locale);
