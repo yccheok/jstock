@@ -16,22 +16,25 @@ public class Order {
     public Order (Map<String, Object> order, Map<String, Object> instrument) {
         this.symbol = order.get("symbol").toString();
         this.units = (Double) order.get("orderQty");
-        this.side = order.get("side").toString();
-        this.type = order.get("orderType").toString();
-
-        // limit order
-        if (this.type.equals("2")) {
+        this.side = (order.get("side").toString().equals("B")) ? "buy" : "sell";
+        
+        String type = order.get("orderType").toString();
+        if (type.equals("1")) {
+            this.type = "Market";
+        } else if (type.equals("2")) {
+            this.type = "Limit";
             this.limitPrice = (Double) order.get("limitPrice");
-        }
-        // stop order
-        if (this.type.equals("3")) {
+        } else if (type.equals("3")) {
+            this.type = "Stop";
             this.stopPrice = (Double) order.get("stopPrice");
+        } else {
+            System.out.println("Invalid order type: " + type);
         }
 
         this.name = instrument.get("name").toString();
         this.marketPrice = (Double) instrument.get("lastTrade");
     }
-    
+
     public String symbol;
     public String name;
     public Double units;

@@ -25,6 +25,7 @@ import org.yccheok.jstock.trading.OpenPos;
 import org.yccheok.jstock.trading.Order;
 import org.yccheok.jstock.trading.AccountSummary;
 import org.yccheok.jstock.trading.OpenPosModel;
+import org.yccheok.jstock.trading.OrderModel;
 import org.yccheok.jstock.trading.Utils;
 
 /**
@@ -73,10 +74,14 @@ public class Portfolio {
         
         // Open Positions
         initOpenPosTable();
-
         final Label posLabel = new Label("Current Investments");
         vBox.getChildren().addAll(posLabel, this.posTable);
 
+        // Pending orders
+        initOrderTable();
+        final Label ordLabel = new Label("Pending Orders");
+        vBox.getChildren().addAll(ordLabel, this.ordTable);
+        
         // add account summary tab
         this.accTab.setText("Portfolio (Practice Account)");
         this.accTab.setClosable(false);
@@ -171,12 +176,12 @@ public class Portfolio {
 
         this.posTable.setEditable(false);
 
-        final ObservableList<OpenPosModel> posTableData = FXCollections.observableArrayList();
+        final ObservableList<OpenPosModel> posList = FXCollections.observableArrayList();
         for (OpenPos pos : this.positions) {
-            posTableData.add(new OpenPosModel(pos));
+            posList.add(new OpenPosModel(pos));
         }
 
-        this.posTable.setItems(posTableData);
+        this.posTable.setItems(posList);
         this.posTable.getColumns().setAll(symbolCol, nameCol, unitsCol, avgPriceCol, costCol, mktPriceCol, mktValueCol, plCol);
 
         // limit Table height, based on row number
@@ -185,6 +190,63 @@ public class Portfolio {
 
         // set all columns having equal width
         this.posTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+    }
+    
+    public void initOrderTable () {
+        // Pending Orders table
+        TableColumn symbolCol = new TableColumn("Stock");
+        symbolCol.setCellValueFactory(new PropertyValueFactory("symbol"));
+
+        TableColumn nameCol = new TableColumn("Name");
+        nameCol.setCellValueFactory(new PropertyValueFactory("name"));
+
+        TableColumn unitsCol = new TableColumn("Units");
+        unitsCol.setCellValueFactory(new PropertyValueFactory("units"));
+        unitsCol.getStyleClass().add("right-align");
+
+        TableColumn mktPriceCol = new TableColumn("Current Price");
+        mktPriceCol.setCellValueFactory(new PropertyValueFactory("marketPrice"));
+        mktPriceCol.getStyleClass().add("right-align");
+        
+        TableColumn typeCol = new TableColumn("Type");
+        typeCol.setCellValueFactory(new PropertyValueFactory("type"));
+
+        TableColumn sideCol = new TableColumn("Side");
+        sideCol.setCellValueFactory(new PropertyValueFactory("side"));
+        
+        TableColumn limitCol = new TableColumn("Limit Price");
+        limitCol.setCellValueFactory(new PropertyValueFactory("limitPrice"));
+        limitCol.getStyleClass().add("right-align");
+
+        TableColumn stopCol = new TableColumn("Stop Price");
+        stopCol.setCellValueFactory(new PropertyValueFactory("stopPrice"));
+        stopCol.getStyleClass().add("right-align");
+        
+        symbolCol.setSortable(false);
+        nameCol.setSortable(false);
+        unitsCol.setSortable(false);
+        mktPriceCol.setSortable(false);
+        typeCol.setSortable(false);
+        sideCol.setSortable(false);
+        limitCol.setSortable(false);
+        stopCol.setSortable(false);
+
+        this.ordTable.setEditable(false);
+
+        final ObservableList<OrderModel> ordList = FXCollections.observableArrayList();
+        for (Order ord : this.orders) {
+            ordList.add(new OrderModel(ord));
+        }
+
+        this.ordTable.setItems(ordList);
+        this.ordTable.getColumns().setAll(symbolCol, nameCol, unitsCol, mktPriceCol, typeCol, sideCol, limitCol, stopCol);
+
+        // limit Table height, based on row number
+        this.ordTable.setFixedCellSize(30);
+        this.ordTable.prefHeightProperty().bind(Bindings.size(this.ordTable.getItems()).multiply(this.ordTable.getFixedCellSize()).add(30));
+
+        // set all columns having equal width
+        this.ordTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }
     
     private final Map<String, Object> accBlotter;
@@ -196,7 +258,6 @@ public class Portfolio {
     public  final Tab accTab  = new Tab();
     private final BorderPane accBorderPane = new BorderPane();
     private final TableView posTable = new TableView();
-    
-    private final TableView orderTable = new TableView();
+    private final TableView ordTable = new TableView();
 }
     
