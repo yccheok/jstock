@@ -192,24 +192,30 @@ public class SignIn {
                             //      b) pending orders
                             Map<String, Map> instruments = new HashMap<>();
                             LinkedTreeMap<String, Object> equity = (LinkedTreeMap) accBlotter.get("equity");
-                            List<LinkedTreeMap<String, Object>> pos = (List) equity.get("equityPositions");
+                            List<LinkedTreeMap<String, Object>> posList = (List) equity.get("equityPositions");
 
-                            for (LinkedTreeMap<String, Object> a : pos) {
-                                Map<String, Object> ins = _api.getInstrument(a.get("instrumentID").toString());
+                            for (LinkedTreeMap<String, Object> pos : posList) {
+                                Map<String, Object> ins = _api.getInstrument(pos.get("instrumentID").toString());
                                 instruments.put(ins.get("symbol").toString(), ins);
                             }
                             
                             List<LinkedTreeMap<String, Object>> orders = (List) accBlotter.get("orders");
-                            for (LinkedTreeMap<String, Object> a : orders) {
-                                String symbol = a.get("symbol").toString();
+                            for (LinkedTreeMap<String, Object> ord : orders) {
+                                String symbol = ord.get("symbol").toString();
                                 if (instruments.containsKey(symbol)) {
                                     continue;
                                 }
 
                                 Map<String, String> param = new HashMap<>();
                                 param.put("symbol", symbol);
-                                Map<String, Object> ins = _api.searchInstruments(param).get(0);
-                                instruments.put(ins.get("symbol").toString(), ins);
+                                List<Map<String, Object>> insList = _api.searchInstruments(param);
+                                
+                                for (Map<String, Object> ins : insList) {
+                                    if (symbol.equals( ins.get("symbol").toString() )) {
+                                        instruments.put(symbol, ins);
+                                        break;
+                                    }
+                                }
                             }
                             
                             result.put("instruments", instruments);

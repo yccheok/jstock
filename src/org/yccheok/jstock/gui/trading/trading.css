@@ -23,8 +23,12 @@ and open the template in the editor.
     -fx-background-color: #FFFFFF;
 }
 
-.right-align { 
+.right {
     -fx-alignment: center-right; 
+}
+
+.left {
+    -fx-alignment: center-left; 
 }
 
 .profit {

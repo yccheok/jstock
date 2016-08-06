@@ -13,7 +13,10 @@ import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import static javafx.geometry.Orientation.VERTICAL;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -43,8 +46,8 @@ public class Portfolio {
         List<LinkedTreeMap<String, Object>> result = (List) equity.get("equityPositions");
 
         for (LinkedTreeMap<String, Object> a : result) {
-            String stockName = this.instruments.get(a.get("symbol").toString()).get("name").toString();
-            OpenPos pos = new OpenPos(a, stockName);
+            Map<String, Object> ins = this.instruments.get(a.get("symbol").toString());
+            OpenPos pos = new OpenPos(a, ins);
             this.positions.add(pos);
         }
     }
@@ -66,7 +69,7 @@ public class Portfolio {
         final VBox vBox = new VBox();
         vBox.setSpacing(5);
         vBox.setPadding(new Insets(10, 20, 0, 20));  // Insets: top, right, bottom, left
-        vBox.setPrefWidth(500);
+        vBox.setPrefWidth(1000);
 
         // Account Summary
         initAccSummary();
@@ -74,14 +77,34 @@ public class Portfolio {
         
         // Open Positions
         initOpenPosTable();
+        
+        VBox vboxOpenPos = new VBox(5);
+        vboxOpenPos.setPadding(new Insets(5, 5, 5, 5));  // Insets: top, right, bottom, left
+        vboxOpenPos.setPrefWidth(1000);
+
         final Label posLabel = new Label("Current Investments");
-        vBox.getChildren().addAll(posLabel, this.posTable);
+        vboxOpenPos.getChildren().addAll(posLabel, this.posTable);
 
         // Pending orders
         initOrderTable();
-        final Label ordLabel = new Label("Pending Orders");
-        vBox.getChildren().addAll(ordLabel, this.ordTable);
         
+        VBox vboxOrder = new VBox(5);
+        vboxOrder.setPadding(new Insets(5, 5, 5, 5));  // Insets: top, right, bottom, left
+
+        final Label ordLabel = new Label("Pending Orders");
+        vboxOrder.getChildren().addAll(ordLabel, this.ordTable);
+
+        // Up Down partition
+        SplitPane splitPane = new SplitPane();
+        splitPane.setOrientation(VERTICAL);
+        splitPane.setDividerPositions(0.5);
+        splitPane.getItems().addAll(vboxOpenPos, vboxOrder);
+        splitPane.setPrefHeight(500);
+        vBox.getChildren().add(splitPane);
+        
+        vboxOpenPos.prefWidthProperty().bind(splitPane.widthProperty());
+        vboxOrder.prefWidthProperty().bind(splitPane.widthProperty());
+
         // add account summary tab
         this.accTab.setText("Portfolio (Practice Account)");
         this.accTab.setClosable(false);
@@ -137,33 +160,35 @@ public class Portfolio {
         // Open Positions table
         TableColumn symbolCol = new TableColumn("Stock");
         symbolCol.setCellValueFactory(new PropertyValueFactory("symbol"));
+        symbolCol.getStyleClass().add("left");
 
         TableColumn nameCol = new TableColumn("Name");
         nameCol.setCellValueFactory(new PropertyValueFactory("name"));
+        nameCol.getStyleClass().add("left");
 
         TableColumn unitsCol = new TableColumn("Units");
         unitsCol.setCellValueFactory(new PropertyValueFactory("units"));
-        unitsCol.getStyleClass().add("right-align");
+        unitsCol.getStyleClass().add("right");
 
         TableColumn avgPriceCol = new TableColumn("Average Purchase Price");
         avgPriceCol.setCellValueFactory(new PropertyValueFactory("averagePrice"));
-        avgPriceCol.getStyleClass().add("right-align");
+        avgPriceCol.getStyleClass().add("right");
 
         TableColumn mktPriceCol = new TableColumn("Current Price");
         mktPriceCol.setCellValueFactory(new PropertyValueFactory("marketPrice"));
-        mktPriceCol.getStyleClass().add("right-align");
+        mktPriceCol.getStyleClass().add("right");
 
         TableColumn costCol = new TableColumn("Purchase Value");
         costCol.setCellValueFactory(new PropertyValueFactory("costBasis"));
-        costCol.getStyleClass().add("right-align");
+        costCol.getStyleClass().add("right");
 
         TableColumn mktValueCol = new TableColumn("Current Value");
         mktValueCol.setCellValueFactory(new PropertyValueFactory("marketValue"));
-        mktValueCol.getStyleClass().add("right-align");
+        mktValueCol.getStyleClass().add("right");
         
         TableColumn plCol = new TableColumn("Gain/Loss Value");
         plCol.setCellValueFactory(new PropertyValueFactory("unrealizedPL"));
-        plCol.getStyleClass().add("right-align");
+        plCol.getStyleClass().add("right");
 
         symbolCol.setSortable(false);
         nameCol.setSortable(false);
@@ -196,31 +221,35 @@ public class Portfolio {
         // Pending Orders table
         TableColumn symbolCol = new TableColumn("Stock");
         symbolCol.setCellValueFactory(new PropertyValueFactory("symbol"));
+        symbolCol.getStyleClass().add("left");
 
         TableColumn nameCol = new TableColumn("Name");
         nameCol.setCellValueFactory(new PropertyValueFactory("name"));
+        nameCol.getStyleClass().add("left");
 
         TableColumn unitsCol = new TableColumn("Units");
         unitsCol.setCellValueFactory(new PropertyValueFactory("units"));
-        unitsCol.getStyleClass().add("right-align");
+        unitsCol.getStyleClass().add("right");
 
         TableColumn mktPriceCol = new TableColumn("Current Price");
         mktPriceCol.setCellValueFactory(new PropertyValueFactory("marketPrice"));
-        mktPriceCol.getStyleClass().add("right-align");
+        mktPriceCol.getStyleClass().add("right");
         
         TableColumn typeCol = new TableColumn("Type");
         typeCol.setCellValueFactory(new PropertyValueFactory("type"));
+        typeCol.getStyleClass().add("left");
 
         TableColumn sideCol = new TableColumn("Side");
         sideCol.setCellValueFactory(new PropertyValueFactory("side"));
+        sideCol.getStyleClass().add("left");
         
         TableColumn limitCol = new TableColumn("Limit Price");
         limitCol.setCellValueFactory(new PropertyValueFactory("limitPrice"));
-        limitCol.getStyleClass().add("right-align");
+        limitCol.getStyleClass().add("right");
 
         TableColumn stopCol = new TableColumn("Stop Price");
         stopCol.setCellValueFactory(new PropertyValueFactory("stopPrice"));
-        stopCol.getStyleClass().add("right-align");
+        stopCol.getStyleClass().add("right");
         
         symbolCol.setSortable(false);
         nameCol.setSortable(false);

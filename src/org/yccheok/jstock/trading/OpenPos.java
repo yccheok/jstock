@@ -6,14 +6,15 @@
 package org.yccheok.jstock.trading;
 
 import com.google.gson.internal.LinkedTreeMap;
+import java.util.Map;
 
 /**
  *
  * @author shuwnyuan
  */
 public class OpenPos {
-    public OpenPos (LinkedTreeMap<String, Object> pos, String stockName) {
-        this.name           = stockName;
+    public OpenPos (LinkedTreeMap<String, Object> pos, Map<String, Object> instrument) {
+        this.name           = instrument.get("name").toString();
         this.symbol         = pos.get("symbol").toString();
         this.instrumentID   = pos.get("instrumentID").toString();
         this.units          = (Double) pos.get("availableForTradingQty");

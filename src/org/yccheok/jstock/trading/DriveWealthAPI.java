@@ -389,7 +389,8 @@ public class DriveWealthAPI {
         "sector",
         "longOnly",
         "instrumentTypeID",
-        "ratePrecision"
+        "ratePrecision",
+        "lastTrade"
     ));
 
     static final List<String> searchInstrumentFields = new ArrayList<>(Arrays.asList(
@@ -416,7 +417,8 @@ public class DriveWealthAPI {
         "urlImage",
         "urlInvestor",
         "sector",
-        "longOnly"
+        "longOnly",
+        "lastTrade"
     ));
     
     static final List<String> createOrderFields = new ArrayList<>(Arrays.asList(

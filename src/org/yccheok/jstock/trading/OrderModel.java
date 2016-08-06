@@ -14,10 +14,10 @@ import javafx.beans.property.SimpleStringProperty;
 public class OrderModel {
     private final SimpleStringProperty symbol;
     private final SimpleStringProperty name;
-    private final SimpleStringProperty units;
-    private final SimpleStringProperty marketPrice;
     private final SimpleStringProperty type;
     private final SimpleStringProperty side;
+    private final SimpleStringProperty units;
+    private final SimpleStringProperty marketPrice;
     private final SimpleStringProperty limitPrice;
     private final SimpleStringProperty stopPrice;
     
@@ -26,7 +26,6 @@ public class OrderModel {
         this.name           = new SimpleStringProperty(ord.name);
         this.type           = new SimpleStringProperty(ord.type);
         this.side           = new SimpleStringProperty(ord.side);
-
         this.units          = new SimpleStringProperty(Utils.formatNumber(ord.units));
         this.marketPrice    = new SimpleStringProperty(Utils.formatNumber(ord.marketPrice));
         this.limitPrice     = new SimpleStringProperty(Utils.formatNumber(ord.limitPrice));
@@ -47,20 +46,6 @@ public class OrderModel {
         name.set(v);
     }
 
-    public String getUnits() {
-        return units.get();
-    }
-    public void setUnits(String v) {
-        units.set(v);
-    }
-
-    public String getMarketPrice() {
-        return marketPrice.get();
-    }
-    public void setMarketPrice(String v) {
-        marketPrice.set(v);
-    }
-
     public String getType() {
         return type.get();
     }
@@ -75,6 +60,20 @@ public class OrderModel {
         side.set(v);
     }
     
+    public String getUnits() {
+        return units.get();
+    }
+    public void setUnits(String v) {
+        units.set(v);
+    }
+
+    public String getMarketPrice() {
+        return marketPrice.get();
+    }
+    public void setMarketPrice(String v) {
+        marketPrice.set(v);
+    }
+
     public String getLimitPrice() {
         return limitPrice.get();
     }

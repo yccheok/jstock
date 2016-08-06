@@ -14,11 +14,16 @@ import java.util.Map;
 public class Order {
     
     public Order (Map<String, Object> order, Map<String, Object> instrument) {
-        this.symbol = order.get("symbol").toString();
-        this.units = (Double) order.get("orderQty");
-        this.side = (order.get("side").toString().equals("B")) ? "buy" : "sell";
+        this.symbol      = order.get("symbol").toString();
+        this.name        = instrument.get("name").toString();
+        this.units       = (Double) order.get("orderQty");
+        this.side        = (order.get("side").toString().equals("B")) ? "buy" : "sell";
+        this.marketPrice = (Double) instrument.get("lastTrade");
+
+        this.limitPrice  = 0.00;
+        this.stopPrice   = 0.00;
+        String type      = order.get("orderType").toString();
         
-        String type = order.get("orderType").toString();
         if (type.equals("1")) {
             this.type = "Market";
         } else if (type.equals("2")) {
@@ -30,9 +35,6 @@ public class Order {
         } else {
             System.out.println("Invalid order type: " + type);
         }
-
-        this.name = instrument.get("name").toString();
-        this.marketPrice = (Double) instrument.get("lastTrade");
     }
 
     public String symbol;
@@ -40,7 +42,7 @@ public class Order {
     public Double units;
     public String type;
     public String side;
+    public Double marketPrice;
     public Double limitPrice;
     public Double stopPrice;
-    public Double marketPrice;
 }
