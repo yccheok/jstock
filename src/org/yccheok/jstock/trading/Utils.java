@@ -20,22 +20,32 @@ public class Utils {
     }
     
     public static String monetaryFormat (Double number) {
-        Locale locale = new Locale("en", "US");
-        DecimalFormat formatter = (DecimalFormat) NumberFormat.getCurrencyInstance(locale);
-        String symbol = formatter.getCurrency().getSymbol();
-        formatter.setNegativePrefix("-" + symbol);
-        formatter.setNegativeSuffix("");
+        return monetaryFormat(number, false);
+    }
 
+    public static String monetaryFormat (Double number, boolean displayCurrency) {
+        DecimalFormat formatter;
+        
+        if (displayCurrency == true) {
+            Locale locale = new Locale("en", "US");
+            formatter = (DecimalFormat) NumberFormat.getCurrencyInstance(locale);
+            String symbol = formatter.getCurrency().getSymbol();
+            formatter.setNegativePrefix("-" + symbol);
+            formatter.setNegativeSuffix("");
+        } else {
+            formatter = (DecimalFormat) NumberFormat.getCurrencyInstance();
+            // no currency symbol
+            formatter.setNegativePrefix("-");
+            formatter.setNegativeSuffix("");
+            formatter.setPositivePrefix("");
+            formatter.setPositiveSuffix("");
+        }
+        
         return formatter.format(number);
     }
-    
-    // default to 2 decimal places
-    public static String formatNumber(Double number) {
-        return formatNumber(number, 2);
-    }
-    
+
     public static String formatNumber(Double number, int decimal) {
-        String formatter = "0.";
+        String formatter = "###,###,###,###,###,###,##0.";
         do {
             formatter = formatter.concat("0");
             decimal--;

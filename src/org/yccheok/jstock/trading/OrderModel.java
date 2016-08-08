@@ -26,10 +26,10 @@ public class OrderModel {
         this.name           = new SimpleStringProperty(ord.name);
         this.type           = new SimpleStringProperty(ord.type);
         this.side           = new SimpleStringProperty(ord.side);
-        this.units          = new SimpleStringProperty(Utils.formatNumber(ord.units));
-        this.marketPrice    = new SimpleStringProperty(Utils.formatNumber(ord.marketPrice));
-        this.limitPrice     = new SimpleStringProperty(Utils.formatNumber(ord.limitPrice));
-        this.stopPrice      = new SimpleStringProperty(Utils.formatNumber(ord.stopPrice));
+        this.units          = new SimpleStringProperty(Utils.formatNumber(ord.units, 2));
+        this.marketPrice    = new SimpleStringProperty(Utils.monetaryFormat(ord.marketPrice));
+        this.limitPrice     = new SimpleStringProperty(Utils.monetaryFormat(ord.limitPrice));
+        this.stopPrice      = new SimpleStringProperty(Utils.monetaryFormat(ord.stopPrice));
     }
 
     public String getSymbol() {

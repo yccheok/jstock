@@ -15,7 +15,6 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import static javafx.geometry.Orientation.VERTICAL;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
@@ -68,7 +67,7 @@ public class Portfolio {
 
         final VBox vBox = new VBox();
         vBox.setSpacing(5);
-        vBox.setPadding(new Insets(10, 20, 0, 20));  // Insets: top, right, bottom, left
+        vBox.setPadding(new Insets(5, 10, 5, 10));  // Insets: top, right, bottom, left
         vBox.setPrefWidth(1000);
 
         // Account Summary
@@ -97,7 +96,7 @@ public class Portfolio {
         // Up Down partition
         SplitPane splitPane = new SplitPane();
         splitPane.setOrientation(VERTICAL);
-        splitPane.setDividerPositions(0.5);
+        splitPane.setDividerPositions(0.6);
         splitPane.getItems().addAll(vboxOpenPos, vboxOrder);
         splitPane.setPrefHeight(500);
         vBox.getChildren().add(splitPane);
@@ -121,14 +120,14 @@ public class Portfolio {
         
         // Total Open positions value
         Label shareText = new Label("Share:");
-        Label shareAmount = new Label(Utils.monetaryFormat(acc.equityValue));
+        Label shareAmount = new Label(Utils.monetaryFormat(acc.equityValue, true));
         shareAmount.getStyleClass().add("profit");
         
         // Total unrealized PL
         Label profitText = new Label("Paper Profit:");
         profitText.setPadding(new Insets(0, 0, 0, 10));
 
-        String amountStr = Utils.monetaryFormat(acc.totalUnrealizedPL) + " (" + Utils.formatNumber(acc.totalUnrealizedPLPercent) + "%)";
+        String amountStr = Utils.monetaryFormat(acc.totalUnrealizedPL, true) + " (" + Utils.monetaryFormat(acc.totalUnrealizedPLPercent) + "%)";
         Label profitAmount = new Label(amountStr);
         profitAmount.getStyleClass().add((acc.totalUnrealizedPL > 0) ? "profit" : "loss");
 
@@ -139,18 +138,18 @@ public class Portfolio {
         
         // Cash for trading
         Label cashText = new Label("Cash to Invest:");
-        Label cashAmount = new Label(Utils.monetaryFormat(acc.cashForTrade));
+        Label cashAmount = new Label(Utils.monetaryFormat(acc.cashForTrade, true));
         cashAmount.getStyleClass().add((acc.cashForTrade > 0) ? "profit" : "loss");
 
         // Total
         Label totalText = new Label("Total:");
         totalText.setPadding(new Insets(0, 0, 0, 10));
-        Label totalAmount = new Label(Utils.monetaryFormat(acc.accountTotal));
+        Label totalAmount = new Label(Utils.monetaryFormat(acc.accountTotal, true));
         totalAmount.getStyleClass().add((acc.accountTotal > 0) ? "profit" : "loss");
 
         rightHbox.getChildren().addAll(cashText, cashAmount, totalText, totalAmount);
         
-        this.accBorderPane.setPadding(new Insets(10, 0, 30, 0));    // Insets: top, right, bottom, left
+        this.accBorderPane.setPadding(new Insets(5, 0, 10, 0));    // Insets: top, right, bottom, left
         this.accBorderPane.setLeft(leftHbox);
         this.accBorderPane.setRight(rightHbox);
         this.accBorderPane.setId("accBorderPane");
@@ -210,7 +209,7 @@ public class Portfolio {
         this.posTable.getColumns().setAll(symbolCol, nameCol, unitsCol, avgPriceCol, costCol, mktPriceCol, mktValueCol, plCol);
 
         // limit Table height, based on row number
-        this.posTable.setFixedCellSize(30);
+        this.posTable.setFixedCellSize(20);
         this.posTable.prefHeightProperty().bind(Bindings.size(this.posTable.getItems()).multiply(this.posTable.getFixedCellSize()).add(30));
 
         // set all columns having equal width
@@ -271,7 +270,7 @@ public class Portfolio {
         this.ordTable.getColumns().setAll(symbolCol, nameCol, unitsCol, mktPriceCol, typeCol, sideCol, limitCol, stopCol);
 
         // limit Table height, based on row number
-        this.ordTable.setFixedCellSize(30);
+        this.ordTable.setFixedCellSize(20);
         this.ordTable.prefHeightProperty().bind(Bindings.size(this.ordTable.getItems()).multiply(this.ordTable.getFixedCellSize()).add(30));
 
         // set all columns having equal width
