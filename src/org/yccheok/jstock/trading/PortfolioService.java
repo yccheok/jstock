@@ -20,11 +20,18 @@ import javafx.concurrent.Task;
 public class PortfolioService extends ScheduledService<Map<String, Object>> {
 
     private final DriveWealthAPI api;
+    private Map<String, Object> accBlotter = new HashMap<>();
+    private final Map<String, Map> instruments = new HashMap<>();
+    private int count = 0;
 
     public PortfolioService (DriveWealthAPI api) {
         this.api = api;
     }
 
+    private boolean needFullRefresh () {
+        return (count <= 0);
+    }
+    
     @Override
     protected Task<Map<String, Object>> createTask() {
         
@@ -36,45 +43,56 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
                 String userID = api.user.userID;
                 String accountID = api.user.practiceAccount.accountID;
                 if (userID != null && accountID != null) {
-                    Map<String, Object> accBlotter = api.accountBlotter(userID, accountID);              
-                    result.put("accBlotter", accBlotter);
-                    System.out.println("calling account Blotter DONE...");
+                    
+                    // if needFullRefresh = true, call accountBlotter to get full info, call get instruments to get all stocks name
+                    // else just call quote api to get updated price
+                    
+                    if (needFullRefresh() == true) {
+                        accBlotter = api.accountBlotter(userID, accountID);              
+                        System.out.println("calling account Blotter DONE...");
 
-                    // loop through the below, call "get instrument" to get symbol long name
-                    //      a) open positions
-                    //      b) pending orders
-                    Map<String, Map> instruments = new HashMap<>();
-                    LinkedTreeMap<String, Object> equity = (LinkedTreeMap) accBlotter.get("equity");
-                    List<LinkedTreeMap<String, Object>> posList = (List) equity.get("equityPositions");
+                        // loop through the below, call "get instrument" to get symbol long name
+                        //      a) open positions
+                        //      b) pending orders
+                        LinkedTreeMap<String, Object> equity = (LinkedTreeMap) accBlotter.get("equity");
+                        List<LinkedTreeMap<String, Object>> posList = (List) equity.get("equityPositions");
 
-                    for (LinkedTreeMap<String, Object> pos : posList) {
-                        Map<String, Object> ins = api.getInstrument(pos.get("instrumentID").toString());
-                        instruments.put(ins.get("symbol").toString(), ins);
-                    }
-
-                    List<LinkedTreeMap<String, Object>> orders = (List) accBlotter.get("orders");
-                    for (LinkedTreeMap<String, Object> ord : orders) {
-                        String symbol = ord.get("symbol").toString();
-                        if (instruments.containsKey(symbol)) {
-                            continue;
+                        for (LinkedTreeMap<String, Object> pos : posList) {
+                            String symbol = pos.get("symbol").toString();
+                            if (instruments.containsKey(symbol)) {
+                                continue;
+                            }
+                            
+                            Map<String, Object> ins = api.getInstrument(pos.get("instrumentID").toString());
+                            instruments.put(symbol, ins);
                         }
 
-                        Map<String, String> param = new HashMap<>();
-                        param.put("symbol", symbol);
-                        List<Map<String, Object>> insList = api.searchInstruments(param);
+                        List<LinkedTreeMap<String, Object>> orders = (List) accBlotter.get("orders");
+                        for (LinkedTreeMap<String, Object> ord : orders) {
+                            String symbol = ord.get("symbol").toString();
+                            if (instruments.containsKey(symbol)) {
+                                continue;
+                            }
 
-                        for (Map<String, Object> ins : insList) {
-                            if (symbol.equals( ins.get("symbol").toString() )) {
-                                instruments.put(symbol, ins);
-                                break;
+                            Map<String, String> param = new HashMap<>();
+                            param.put("symbol", symbol);
+                            List<Map<String, Object>> insList = api.searchInstruments(param);
+
+                            for (Map<String, Object> ins : insList) {
+                                if (symbol.equals( ins.get("symbol").toString() )) {
+                                    instruments.put(symbol, ins);
+                                    break;
+                                }
                             }
                         }
+                        System.out.println("calling get instruments open positions DONE...");
                     }
-
-                    result.put("instruments", instruments);
-                    System.out.println("calling get instruments open positions DONE...");
                 }
 
+                result.put("accBlotter", accBlotter);
+                result.put("instruments", instruments);
+                
+                count++;
                 return result;
             }
         };

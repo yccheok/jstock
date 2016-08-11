@@ -48,9 +48,9 @@ public class Portfolio {
     private void startBackgroundService () {
         PortfolioService service = new PortfolioService(api);
         
-        // start immediately once
+        // start immediately
         service.setDelay(new Duration(0));
-        // run every 5 sec
+        // run every 30 sec
         service.setPeriod(new Duration(30000));
         
         service.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
@@ -123,17 +123,10 @@ public class Portfolio {
     }
     
     private void updateAccSummary () {
-        AccountSummary acc = new AccountSummary(this.accBlotter, this.positions);
+        this.acc.update(this.accBlotter, this.positions);
 
-        this.shareAmount.setText(Utils.monetaryFormat(acc.equityValue, true));
-        String amountStr = Utils.monetaryFormat(acc.totalUnrealizedPL, true) + " (" + Utils.monetaryFormat(acc.totalUnrealizedPLPercent) + "%)";
-        this.profitAmount.setText(amountStr);
         this.profitAmount.getStyleClass().add((acc.totalUnrealizedPL > 0) ? "profit" : "loss");
-        
-        this.cashAmount.setText(Utils.monetaryFormat(acc.cashForTrade, true));
         this.cashAmount.getStyleClass().add((acc.cashForTrade > 0) ? "profit" : "loss");
-
-        this.totalAmount.setText(Utils.monetaryFormat(acc.accountTotal, true));
         this.totalAmount.getStyleClass().add((acc.accountTotal > 0) ? "profit" : "loss");
     }
     
@@ -185,6 +178,8 @@ public class Portfolio {
     }
     
     private void initAccSummary () {
+        acc = new AccountSummary();
+        
         // Left content
         HBox leftHbox = new HBox(8);
         
@@ -214,6 +209,11 @@ public class Portfolio {
         this.accBorderPane.setLeft(leftHbox);
         this.accBorderPane.setRight(rightHbox);
         this.accBorderPane.setId("accBorderPane");
+        
+        this.shareAmount.textProperty().bind(acc.equityProperty);
+        this.profitAmount.textProperty().bind(acc.totalUnrealizedPLProperty);
+        this.cashAmount.textProperty().bind(acc.cashForTradeProperty);
+        this.totalAmount.textProperty().bind(acc.accountTotalProperty);
     }
 
     private void initOpenPosTable () {
@@ -348,5 +348,7 @@ public class Portfolio {
     
     private final TableView posTable = new TableView();
     private final TableView ordTable = new TableView();
+    
+    private AccountSummary acc;
 }
     
