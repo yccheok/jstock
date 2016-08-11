@@ -210,6 +210,7 @@ public class Portfolio {
         this.accBorderPane.setRight(rightHbox);
         this.accBorderPane.setId("accBorderPane");
         
+        // data binding
         this.shareAmount.textProperty().bind(acc.equityProperty);
         this.profitAmount.textProperty().bind(acc.totalUnrealizedPLProperty);
         this.cashAmount.textProperty().bind(acc.cashForTradeProperty);
