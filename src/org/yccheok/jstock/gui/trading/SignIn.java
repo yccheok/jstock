@@ -5,9 +5,7 @@
  */
 package org.yccheok.jstock.gui.trading;
 
-import com.google.gson.internal.LinkedTreeMap;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
@@ -176,52 +174,6 @@ public class SignIn {
                                             + ", commission: " + user.commissionRate);
 
                         result.put("api", _api);
-
-                        // get:
-                        //  (a) account info
-                        //  (b) open positions & resting orders
-                        String userID = _api.user.userID;
-                        String accountID = _api.user.practiceAccount.accountID;
-                        if (userID != null && accountID != null) {
-                            Map<String, Object> accBlotter = _api.accountBlotter(userID, accountID);              
-                            result.put("accBlotter", accBlotter);
-                            System.out.println("calling account Blotter DONE...");
-
-                            // loop through the below, call "get instrument" to get symbol long name
-                            //      a) open positions
-                            //      b) pending orders
-                            Map<String, Map> instruments = new HashMap<>();
-                            LinkedTreeMap<String, Object> equity = (LinkedTreeMap) accBlotter.get("equity");
-                            List<LinkedTreeMap<String, Object>> posList = (List) equity.get("equityPositions");
-
-                            for (LinkedTreeMap<String, Object> pos : posList) {
-                                Map<String, Object> ins = _api.getInstrument(pos.get("instrumentID").toString());
-                                instruments.put(ins.get("symbol").toString(), ins);
-                            }
-                            
-                            List<LinkedTreeMap<String, Object>> orders = (List) accBlotter.get("orders");
-                            for (LinkedTreeMap<String, Object> ord : orders) {
-                                String symbol = ord.get("symbol").toString();
-                                if (instruments.containsKey(symbol)) {
-                                    continue;
-                                }
-
-                                Map<String, String> param = new HashMap<>();
-                                param.put("symbol", symbol);
-                                List<Map<String, Object>> insList = _api.searchInstruments(param);
-                                
-                                for (Map<String, Object> ins : insList) {
-                                    if (symbol.equals( ins.get("symbol").toString() )) {
-                                        instruments.put(symbol, ins);
-                                        break;
-                                    }
-                                }
-                            }
-                            
-                            result.put("instruments", instruments);
-                            System.out.println("calling get instruments open positions DONE...");
-                        }
-
                         return result;
                     }
                 };
@@ -261,6 +213,19 @@ public class SignIn {
                                         + "\n AccountID: " + acc.accountID + "\n Balance: " + acc.cash;
                                 }
                                 successText.setText(welcomeStr);
+                                
+                                // create Portfolio Tab
+                                if (acc != null) {
+                                    Portfolio portfolio = new Portfolio(api);
+                                    Tab portfolioTab = portfolio.createTab();
+                                    tabPane.getTabs().add(portfolioTab);
+                                    // select tab
+                                    SingleSelectionModel<Tab> selectionModel = tabPane.getSelectionModel();
+                                    selectionModel.select(portfolioTab);
+
+                                    tabPane.getTabs().remove(signInTab);
+                                    System.out.println("Init Portfolio tab DONE....");
+                                }
                             } else {
                                 System.out.println("Sign In failed");
                                 successText.setText("Sign In failed");
@@ -271,27 +236,6 @@ public class SignIn {
                         successText.setVisible(true);
                         // reenable "Sign In" button
                         signInBtn.setDisable(false);
-
-                        // create portfolio tab
-                        if (result.containsKey("accBlotter")) {
-                            Map<String, Object> accBlotter = (Map) result.get("accBlotter");
-                            
-                            Map<String, Map> instruments = new HashMap<>();
-                            if (result.containsKey("instruments")) {
-                                instruments = (Map) result.get("instruments");
-                            }
-
-                            Portfolio portfolio = new Portfolio(accBlotter, instruments);
-                            Tab portfolioTab = portfolio.createTab();
-                            tabPane.getTabs().add(portfolioTab);
-                            // select tab
-                            SingleSelectionModel<Tab> selectionModel = tabPane.getSelectionModel();
-                            selectionModel.select(portfolioTab);
-
-                            tabPane.getTabs().remove(signInTab);
-
-                            System.out.println("Portfolio tab DONE....");
-                        }
                     }
                 });
 
