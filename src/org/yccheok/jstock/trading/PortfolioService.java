@@ -23,16 +23,12 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
     private final DriveWealthAPI api;
     public Map<String, Object> accBlotter = new HashMap<>();
     private final Map<String, Map> instruments = new HashMap<>();
-    private int count = 0;
+    private boolean needFullRefresh = true;
 
     public PortfolioService (DriveWealthAPI api) {
         this.api = api;
     }
 
-    private boolean needFullRefresh () {
-        return (count <= 0);
-    }
-    
     @Override
     protected Task<Map<String, Object>> createTask() {
         
@@ -44,7 +40,10 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
                 String userID = api.user.userID;
                 String accountID = api.user.practiceAccount.accountID;
                 if (userID != null && accountID != null) {
-                    if (needFullRefresh() == true) {
+                    // only call account Blotter & get instruments during first run
+                    if (needFullRefresh == true) {
+                        needFullRefresh = false;
+                        
                         accBlotter = api.accountBlotter(userID, accountID);              
                         System.out.println("calling account Blotter DONE...");
 
@@ -85,7 +84,7 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
                         result.put("accBlotter", accBlotter);
                         result.put("instruments", instruments);
                         
-                        System.out.println("calling get instruments open positions DONE...");
+                        System.out.println("DONE calling accBlotter & get instruments for positions / orders...");
                     } else {
                         // get latest prices for all symbols
                         ArrayList<String> symbols = new ArrayList<>(instruments.keySet());
@@ -97,10 +96,9 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
                         }
                         
                         result.put("marketPrices", prices);
+                        System.out.println("DONE calling get market data for positions / orders...");
                     }
                 }
-                
-                count++;
                 return result;
             }
         };

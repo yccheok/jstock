@@ -34,9 +34,10 @@ public class OrderModel {
             typeStr = "Market";
         } else if (typeStr.equals("2")) {
             typeStr = "Limit";
-            
+            limitPriceD = (Double) ord.get("limitPrice");
         } else if (typeStr.equals("3")) {
             typeStr = "Stop";
+            stopPriceD = (Double) ord.get("stopPrice");
         }
         
         this.type = new SimpleStringProperty(typeStr);

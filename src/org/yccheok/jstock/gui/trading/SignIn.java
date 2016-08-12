@@ -142,13 +142,12 @@ public class SignIn {
                 String pwd = pwdField.getText();
 
                 if (username.isEmpty() || pwd.isEmpty()) {
-                    System.out.println("Please enter username and password.");
-
                     String welcomeStr = "Please enter username and password";
                     successText.setTextFill(Color.FIREBRICK);
                     successText.setText(welcomeStr);
                     successText.setVisible(true);
 
+                    System.out.println(welcomeStr);
                     return;
                 }
 
@@ -156,10 +155,11 @@ public class SignIn {
                     @Override protected Map<String, Object> call() throws Exception {
                         System.out.println("Drive Wealth User Sign In....\n\n ");
 
-                        Map<String, Object> result = new HashMap<>();
-                        DriveWealthAPI _api = new DriveWealthAPI();
-                        Map<String, Object> login = _api.login(username, pwd);
+                        final DriveWealthAPI _api = new DriveWealthAPI();
+                        final Map<String, Object> login = _api.login(username, pwd);
 
+                        final Map<String, Object> result = new HashMap<>();
+                        
                         if (login.containsKey("code") && login.containsKey("message")) {
                             result.put("error", login.get("message"));
                             return result;
@@ -205,10 +205,6 @@ public class SignIn {
                                     acc = api.createPracticeAccount(params);
                                     */
                                 } else {
-                                    String accountNo =  acc.accountNo;
-                                    String nickname = acc.nickname;
-                                    Double cash = acc.cash;
-
                                     welcomeStr = "Start trading now with " + acc.nickname + ".\n AccountNo: " + acc.accountNo
                                         + "\n AccountID: " + acc.accountID + "\n Balance: " + acc.cash;
                                 }
