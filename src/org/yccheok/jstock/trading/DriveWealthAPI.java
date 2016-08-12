@@ -502,7 +502,8 @@ public class DriveWealthAPI {
     static final List<String> marketDataFields = new ArrayList<>(Arrays.asList(
         "symbol",
         "bid",
-        "ask"
+        "ask",
+        "lastTrade"
     ));
     
     static final List<String> settingFields = new ArrayList<>(Arrays.asList(
@@ -1182,7 +1183,7 @@ public class DriveWealthAPI {
         
         // get Market Data for: bid, ask
         ArrayList<String> symbols = new ArrayList<>( Arrays.asList(params.get("symbol").toString()) );
-        List<Map<String, Object>> dataArray = this.getMarketData(symbols);
+        List<Map<String, Object>> dataArray = this.getMarketData(symbols, false);
         Map<String, Object> marketData = dataArray.get(0);
         
         Double rateAsk = (Double) marketData.get("ask");
@@ -1367,7 +1368,7 @@ public class DriveWealthAPI {
      * Market Data
      ************************/
     
-    public List<Map<String, Object>> getMarketData (ArrayList<String> args) {
+    public List<Map<String, Object>> getMarketData (ArrayList<String> args, boolean lastTradeOnly) {
         System.out.println("\n[Get Market Data]");
 
         String symbols = null;
@@ -1383,7 +1384,13 @@ public class DriveWealthAPI {
 	}
         System.out.println("symbols: " + symbols);
         
-        Map<String, Object> respondMap = executeGet("quotes?symbols=" + symbols, this.getSessionKey());
+        String url = "quotes?symbols=" + symbols;
+        // get last Traded price only, no bid & ask return
+        if (lastTradeOnly == true) {
+            url = url + "&lastTrade=true";
+        }
+        
+        Map<String, Object> respondMap = executeGet(url, this.getSessionKey());
         List<Map<String, Object>> marketData = new ArrayList<>();
 
         if ((int) respondMap.get("code") == 200) {

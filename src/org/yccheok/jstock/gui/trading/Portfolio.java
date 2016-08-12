@@ -6,7 +6,7 @@
 package org.yccheok.jstock.gui.trading;
 
 import com.google.gson.internal.LinkedTreeMap;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javafx.beans.binding.Bindings;
@@ -26,13 +26,10 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
-import org.yccheok.jstock.trading.OpenPos;
-import org.yccheok.jstock.trading.Order;
-import org.yccheok.jstock.trading.AccountSummary;
 import org.yccheok.jstock.trading.DriveWealthAPI;
+import org.yccheok.jstock.trading.AccountModel;
 import org.yccheok.jstock.trading.OpenPosModel;
 import org.yccheok.jstock.trading.OrderModel;
-import org.yccheok.jstock.trading.Utils;
 import org.yccheok.jstock.trading.PortfolioService;
 
 /**
@@ -46,88 +43,128 @@ public class Portfolio {
     }
 
     private void startBackgroundService () {
-        PortfolioService service = new PortfolioService(api);
+        PortfolioService service = new PortfolioService(this.api);
         
         // start immediately
         service.setDelay(new Duration(0));
-        // run every 30 sec
-        service.setPeriod(new Duration(30000));
+        // run every 10 sec
+        service.setPeriod(new Duration(10000));
         
         service.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(final WorkerStateEvent workerStateEvent) {
                 Map<String, Object> result = (Map<String, Object>) workerStateEvent.getSource().getValue();
                 
-                accBlotter = (Map<String, Object>) result.get("accBlotter");
-                instruments = (Map<String, Map>) result.get("instruments");
+                // First run calls account Blotter & get instruments
+                // Following run just call get market data to get latest market price
                 
-                getOpenPositions();
-                getPendingOrders();
-                
-                updateAccSummary();
-                updateOpenPosTableData();
-                updateOrderTableData();
+                if (result.containsKey("accBlotter") && result.containsKey("instruments")) {
+                    accBlotter = (Map<String, Object>) result.get("accBlotter");
+                    instruments = (Map<String, Map>) result.get("instruments");
+
+                    initOpenPosTableData();
+                    initOrderTableData();
+                    initAccData();
+                } else if (result.containsKey("marketPrices")) {
+                    marketPrices = (Map) result.get("marketPrices");
+                    updateOpenPosPrice();
+                    updateOrderPrice();
+                    updateAccData();
+                }
             }
         });
         
         service.start();
     }
     
-    private void getOpenPositions () {
+    private void initOpenPosTableData () {
         LinkedTreeMap<String, Object> equity = (LinkedTreeMap) this.accBlotter.get("equity");
-        List<LinkedTreeMap<String, Object>> result = (List) equity.get("equityPositions");
+        List<LinkedTreeMap<String, Object>> positions = (List) equity.get("equityPositions");
         
-        this.positions = new ArrayList<>();
-        
-        for (LinkedTreeMap<String, Object> a : result) {
-            Map<String, Object> ins = this.instruments.get(a.get("symbol").toString());
-            OpenPos pos = new OpenPos(a, ins);
-            this.positions.add(pos);
+        for (LinkedTreeMap<String, Object> pos : positions) {
+            Map<String, Object> ins = this.instruments.get(pos.get("symbol").toString());
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("name",            ins.get("name"));
+            data.put("symbol",          pos.get("symbol"));
+            data.put("instrumentID",    pos.get("instrumentID"));
+            data.put("units",           pos.get("availableForTradingQty"));
+            data.put("averagePrice",    pos.get("avgPrice"));
+            data.put("costBasis",       pos.get("costBasis"));
+            data.put("marketPrice",     pos.get("mktPrice"));
+            data.put("marketValue",     pos.get("marketValue"));
+            data.put("unrealizedPL",    pos.get("unrealizedPL"));
+            
+            this.posList.add(new OpenPosModel(data));
         }
-    }
-    
-    private void getPendingOrders () {
-        List<LinkedTreeMap<String, Object>> result = (List) this.accBlotter.get("orders");
-        
-        this.orders = new ArrayList<>();
-        
-        for (LinkedTreeMap<String, Object> a : result) {
-            Map<String, Object> ins = this.instruments.get(a.get("symbol").toString());
-            Order order = new Order(a, ins);
-            this.orders.add(order);
-        }
-    }
-    
-    private void updateOpenPosTableData () {
-        final ObservableList<OpenPosModel> list = FXCollections.observableArrayList();
-        for (OpenPos pos : this.positions) {
-            list.add(new OpenPosModel(pos));
-        }
-        
-        this.posList = list;
+
         this.posTable.setItems(this.posList);
-        
         this.posTable.prefHeightProperty().bind(Bindings.size(this.posTable.getItems()).multiply(this.posTable.getFixedCellSize()).add(30));
     }
     
-    private void updateOrderTableData () {
-        final ObservableList<OrderModel> list = FXCollections.observableArrayList();
-        for (Order ord : this.orders) {
-            list.add(new OrderModel(ord));
-        }
+    private void initOrderTableData () {
+        List<LinkedTreeMap<String, Object>> orders = (List) this.accBlotter.get("orders");
 
-        this.ordList = list;
-        this.ordTable.setItems(this.ordList);
+        for (LinkedTreeMap<String, Object> ord : orders) {
+            Map<String, Object> ins = this.instruments.get(ord.get("symbol").toString());
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("name",        ins.get("name"));
+            data.put("marketPrice", ins.get("lastTrade"));
+            data.put("symbol",      ord.get("symbol"));
+            data.put("units",       ord.get("orderQty"));
+            data.put("side",        ord.get("side"));
+            data.put("orderType",   ord.get("orderType"));
+
+            if (ord.containsKey("limitPrice")) {
+                data.put("limitPrice", ord.get("limitPrice"));
+            }
+            if (ord.containsKey("stopPrice")) {
+                data.put("stopPrice", ord.get("stopPrice"));
+            }
+            
+            this.ordList.add(new OrderModel(data));
+        }
         
+        this.ordTable.setItems(this.ordList);
         this.ordTable.prefHeightProperty().bind(Bindings.size(this.ordTable.getItems()).multiply(this.ordTable.getFixedCellSize()).add(30));
     }
     
-    private void updateAccSummary () {
-        this.acc.update(this.accBlotter, this.positions);
+    private void initAccData () {
+        this.acc = new AccountModel(this.accBlotter, this.posList);
 
-        this.profitAmount.getStyleClass().add((acc.totalUnrealizedPL > 0) ? "profit" : "loss");
-        this.cashAmount.getStyleClass().add((acc.cashForTrade > 0) ? "profit" : "loss");
-        this.totalAmount.getStyleClass().add((acc.accountTotal > 0) ? "profit" : "loss");
+        this.shareAmount.textProperty().bind(this.acc.equity);
+        this.profitAmount.textProperty().bind(this.acc.unrealizedPL);
+        this.cashAmount.textProperty().bind(this.acc.cashForTrade);
+        this.totalAmount.textProperty().bind(this.acc.accountTotal);
+
+        this.profitAmount.getStyleClass().add(this.acc.unrealizedPLCss());
+        this.cashAmount.getStyleClass().add(this.acc.cashForTradeCss());
+        this.totalAmount.getStyleClass().add(this.acc.accountTotalCss());
+        this.shareAmount.getStyleClass().add(this.acc.equityValueCss());
+    }
+    
+    private void updateOpenPosPrice () {
+        for (OpenPosModel pos : this.posList) {
+            final String symbol = pos.getSymbol();
+            final Double price = this.marketPrices.get(symbol);
+            pos.updateMarketPrice(price);
+        }
+    }
+    
+    private void updateOrderPrice () {
+        for (OrderModel ord : this.ordList) {
+            final String symbol = ord.getSymbol();
+            final Double price = this.marketPrices.get(symbol);
+            ord.updateMarketPrice(price);
+        }
+    }
+    
+    private void updateAccData () {
+        this.acc.update(this.posList);
+
+        this.profitAmount.getStyleClass().clear();
+        this.profitAmount.getStyleClass().add(acc.unrealizedPLCss());
     }
     
     public Tab createTab() {
@@ -178,16 +215,13 @@ public class Portfolio {
     }
     
     private void initAccSummary () {
-        acc = new AccountSummary();
-        
         // Left content
         HBox leftHbox = new HBox(8);
         
-        // Total Open positions value
+        // Stocks on hand value
         Label shareText = new Label("Share:");
-        this.shareAmount.getStyleClass().add("profit");
         
-        // Total unrealized PL
+        // Unrealized PL
         Label profitText = new Label("Paper Profit:");
         profitText.setPadding(new Insets(0, 0, 0, 10));
 
@@ -199,7 +233,7 @@ public class Portfolio {
         // Cash for trading
         Label cashText = new Label("Cash to Invest:");
 
-        // Total
+        // Total: Cash balance + Stocks
         Label totalText = new Label("Total:");
         totalText.setPadding(new Insets(0, 0, 0, 10));
         
@@ -209,45 +243,39 @@ public class Portfolio {
         this.accBorderPane.setLeft(leftHbox);
         this.accBorderPane.setRight(rightHbox);
         this.accBorderPane.setId("accBorderPane");
-        
-        // data binding
-        this.shareAmount.textProperty().bind(acc.equityProperty);
-        this.profitAmount.textProperty().bind(acc.totalUnrealizedPLProperty);
-        this.cashAmount.textProperty().bind(acc.cashForTradeProperty);
-        this.totalAmount.textProperty().bind(acc.accountTotalProperty);
     }
 
     private void initOpenPosTable () {
         // Open Positions table
-        TableColumn symbolCol = new TableColumn("Stock");
+        TableColumn<OpenPosModel, String> symbolCol = new TableColumn<>("Stock");
         symbolCol.setCellValueFactory(new PropertyValueFactory("symbol"));
         symbolCol.getStyleClass().add("left");
 
-        TableColumn nameCol = new TableColumn("Name");
+        TableColumn<OpenPosModel, String> nameCol = new TableColumn<>("Name");
         nameCol.setCellValueFactory(new PropertyValueFactory("name"));
         nameCol.getStyleClass().add("left");
 
-        TableColumn unitsCol = new TableColumn("Units");
+        TableColumn<OpenPosModel, String> unitsCol = new TableColumn<>("Units");
         unitsCol.setCellValueFactory(new PropertyValueFactory("units"));
         unitsCol.getStyleClass().add("right");
 
-        TableColumn avgPriceCol = new TableColumn("Average Purchase Price");
+        TableColumn<OpenPosModel, String> avgPriceCol = new TableColumn<>("Average Purchase Price");
         avgPriceCol.setCellValueFactory(new PropertyValueFactory("averagePrice"));
         avgPriceCol.getStyleClass().add("right");
 
-        TableColumn mktPriceCol = new TableColumn("Current Price");
+        TableColumn<OpenPosModel, String> mktPriceCol = new TableColumn<>("Current Price");
         mktPriceCol.setCellValueFactory(new PropertyValueFactory("marketPrice"));
         mktPriceCol.getStyleClass().add("right");
 
-        TableColumn costCol = new TableColumn("Purchase Value");
+        TableColumn<OpenPosModel, String> costCol = new TableColumn<>("Purchase Value");
         costCol.setCellValueFactory(new PropertyValueFactory("costBasis"));
         costCol.getStyleClass().add("right");
 
-        TableColumn mktValueCol = new TableColumn("Current Value");
+        TableColumn<OpenPosModel, String> mktValueCol = new TableColumn<>("Current Value");
         mktValueCol.setCellValueFactory(new PropertyValueFactory("marketValue"));
         mktValueCol.getStyleClass().add("right");
         
-        TableColumn plCol = new TableColumn("Gain/Loss Value");
+        TableColumn<OpenPosModel, String> plCol = new TableColumn<>("Gain/Loss Value");
         plCol.setCellValueFactory(new PropertyValueFactory("unrealizedPL"));
         plCol.getStyleClass().add("right");
 
@@ -332,10 +360,8 @@ public class Portfolio {
     private DriveWealthAPI api;
     private Map<String, Object> accBlotter;
     private Map<String, Map> instruments;
+    private Map<String, Double> marketPrices;
 
-    private List<OpenPos> positions = new ArrayList<>();
-    private List<Order> orders = new ArrayList<>();
-    
     private ObservableList<OpenPosModel> posList = FXCollections.observableArrayList();
     private ObservableList<OrderModel> ordList = FXCollections.observableArrayList();
     
@@ -350,6 +376,6 @@ public class Portfolio {
     private final TableView posTable = new TableView();
     private final TableView ordTable = new TableView();
     
-    private AccountSummary acc;
+    private AccountModel acc;
 }
     

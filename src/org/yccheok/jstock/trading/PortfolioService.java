@@ -6,6 +6,7 @@
 package org.yccheok.jstock.trading;
 
 import com.google.gson.internal.LinkedTreeMap;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +21,7 @@ import javafx.concurrent.Task;
 public class PortfolioService extends ScheduledService<Map<String, Object>> {
 
     private final DriveWealthAPI api;
-    private Map<String, Object> accBlotter = new HashMap<>();
+    public Map<String, Object> accBlotter = new HashMap<>();
     private final Map<String, Map> instruments = new HashMap<>();
     private int count = 0;
 
@@ -43,10 +44,6 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
                 String userID = api.user.userID;
                 String accountID = api.user.practiceAccount.accountID;
                 if (userID != null && accountID != null) {
-                    
-                    // if needFullRefresh = true, call accountBlotter to get full info, call get instruments to get all stocks name
-                    // else just call quote api to get updated price
-                    
                     if (needFullRefresh() == true) {
                         accBlotter = api.accountBlotter(userID, accountID);              
                         System.out.println("calling account Blotter DONE...");
@@ -85,12 +82,23 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
                                 }
                             }
                         }
+                        result.put("accBlotter", accBlotter);
+                        result.put("instruments", instruments);
+                        
                         System.out.println("calling get instruments open positions DONE...");
+                    } else {
+                        // get latest prices for all symbols
+                        ArrayList<String> symbols = new ArrayList<>(instruments.keySet());
+                        List<Map<String, Object>> priceList = api.getMarketData(symbols, true);
+
+                        Map<String, Double> prices = new HashMap<>();
+                        for (Map<String, Object> price : priceList) {
+                            prices.put(price.get("symbol").toString(), (Double) price.get("lastTrade"));
+                        }
+                        
+                        result.put("marketPrices", prices);
                     }
                 }
-
-                result.put("accBlotter", accBlotter);
-                result.put("instruments", instruments);
                 
                 count++;
                 return result;
