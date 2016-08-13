@@ -26,11 +26,11 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
-import org.yccheok.jstock.trading.DriveWealthAPI;
 import org.yccheok.jstock.trading.AccountModel;
 import org.yccheok.jstock.trading.OpenPosModel;
 import org.yccheok.jstock.trading.OrderModel;
 import org.yccheok.jstock.trading.PortfolioService;
+import org.yccheok.jstock.trading.DriveWealthAPI;
 
 /**
  *
@@ -39,16 +39,16 @@ import org.yccheok.jstock.trading.PortfolioService;
 public class Portfolio {
     public Portfolio (DriveWealthAPI api) {
         this.api = api;
-        startBackgroundService();
+        startBackgroundService(api);
     }
 
-    private void startBackgroundService () {
-        PortfolioService service = new PortfolioService(this.api);
+    private void startBackgroundService (DriveWealthAPI api) {
+        PortfolioService service = new PortfolioService(api);
         
         // start immediately
-        service.setDelay(new Duration(0));
+        service.setDelay(Duration.seconds(0));
         // run every 10 sec
-        service.setPeriod(new Duration(10000));
+        service.setPeriod(Duration.seconds(10));
         
         service.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
             @Override
@@ -357,7 +357,8 @@ public class Portfolio {
         this.ordTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }
 
-    private DriveWealthAPI api;
+    private final DriveWealthAPI api;
+    
     private Map<String, Object> accBlotter;
     private Map<String, Map> instruments;
     private Map<String, Double> marketPrices;
