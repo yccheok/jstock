@@ -43,14 +43,8 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
             String accountID = api.user.practiceAccount.accountID;
             if (userID != null && accountID != null) {
                 // only call account Blotter & get instruments during first run
-                
-                System.out.println("1111111111   needFullRefresh: " + needFullRefresh);
-                
                 if (needFullRefresh == true) {
                     needFullRefresh = false;
-
-                    System.out.println("22222222   needFullRefresh: " + needFullRefresh);
-                
                     
                     accBlotter = api.accountBlotter(userID, accountID);              
                     System.out.println("calling account Blotter DONE...");
@@ -91,13 +85,7 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
                     result.put("instruments", instruments);
 
                     System.out.println("DONE calling accBlotter & get instruments for positions / orders...");
-                    
-                    System.out.println("3333333   needFullRefresh: " + needFullRefresh);
                 } else {
-                    
-                    System.out.println("44444444   needFullRefresh: " + needFullRefresh);
-
-                    
                     // get latest prices for all symbols
                     ArrayList<String> symbols = new ArrayList<>(instruments.keySet());
                     List<Map<String, Object>> priceList = api.getMarketData(symbols, true);
