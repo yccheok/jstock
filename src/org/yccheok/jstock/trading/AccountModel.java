@@ -7,133 +7,128 @@ package org.yccheok.jstock.trading;
 
 import com.google.gson.internal.LinkedTreeMap;
 import java.util.Map;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.DoubleProperty;
 import javafx.collections.ObservableList;
+import javafx.beans.binding.Bindings;
 
 /**
  *
  * @author shuwnyuan
  */
 public class AccountModel {
-    private Double equityD;
-    private Double cashBalanceD;
-    private Double cashForTradeD;
-    private Double cashForWithdrawD;
-    private Double accountTotalD;
-    private Double totalUnrealizedPLD = 0.0;
-    private Double totalUnrealizedPLPercentD = 0.0;
+    public final SimpleDoubleProperty equity;
+    public final SimpleDoubleProperty cashBalance;
+    public final SimpleDoubleProperty cashForTrade;
+    public final SimpleDoubleProperty cashForWithdraw;
+    public final SimpleDoubleProperty accountTotal;
+    public final SimpleDoubleProperty totalUnrealizedPL;
+    public final SimpleDoubleProperty totalUnrealizedPLPercent;
 
-    public final SimpleStringProperty equity;
-    public final SimpleStringProperty cashBalance;
-    public final SimpleStringProperty cashForTrade;
-    public final SimpleStringProperty cashForWithdraw;
-    public final SimpleStringProperty accountTotal;
-    public final SimpleStringProperty unrealizedPL;
 
     public AccountModel (Map<String, Object> accBlotter, ObservableList<OpenPosModel> posList) {
         LinkedTreeMap<String, Object> equity  = (LinkedTreeMap) accBlotter.get("equity");
         LinkedTreeMap<String, Object> balance = (LinkedTreeMap) accBlotter.get("cash");
 
-        this.equityD          = (Double) equity.get("equityValue");
-        this.cashBalanceD     = (Double) balance.get("cashBalance");
-        this.cashForTradeD    = (Double) balance.get("cashAvailableForTrade");
-        this.cashForWithdrawD = (Double) balance.get("cashAvailableForWithdrawal");
-        this.accountTotalD    = this.cashBalanceD + this.equityD;
-        
-        for (OpenPosModel pos : posList) {
-            this.totalUnrealizedPLD += pos.unrealizedPLD;
-        }
-        this.totalUnrealizedPLPercentD = (this.totalUnrealizedPLD / (this.equityD - this.totalUnrealizedPLD)) * 100;
-        
-        this.equity          = new SimpleStringProperty(Utils.monetaryFormat(this.equityD, true));
-        this.cashBalance     = new SimpleStringProperty(Utils.monetaryFormat(this.cashBalanceD, true));
-        this.cashForTrade    = new SimpleStringProperty(Utils.monetaryFormat(this.cashForTradeD, true));
-        this.cashForWithdraw = new SimpleStringProperty(Utils.monetaryFormat(this.cashForWithdrawD, true));
-        this.accountTotal    = new SimpleStringProperty(Utils.monetaryFormat(this.accountTotalD, true));
+        this.equity          = new SimpleDoubleProperty((Double) equity.get("equityValue"));
+        this.cashBalance     = new SimpleDoubleProperty((Double) balance.get("cashBalance"));
+        this.cashForTrade    = new SimpleDoubleProperty((Double) balance.get("cashAvailableForTrade"));
+        this.cashForWithdraw = new SimpleDoubleProperty((Double) balance.get("cashAvailableForWithdrawal"));
 
-        String PLStr = Utils.monetaryFormat(this.totalUnrealizedPLD, true) + " (" + Utils.monetaryFormat(this.totalUnrealizedPLPercentD) + "%)";
-        this.unrealizedPL = new SimpleStringProperty(PLStr);
+        Double totalUnrealizedPLD = 0.0;
+        for (OpenPosModel pos : posList) {
+            totalUnrealizedPLD += pos.unrealizedPLD;
+        }
+        this.totalUnrealizedPL = new SimpleDoubleProperty(totalUnrealizedPLD);
+        
+        this.accountTotal = new SimpleDoubleProperty();
+        this.accountTotal.bind(Bindings.add(this.cashBalance, this.equity));
+        
+        this.totalUnrealizedPLPercent = new SimpleDoubleProperty();
+        this.totalUnrealizedPLPercent.bind(this.totalUnrealizedPL.divide(this.equity.subtract(this.totalUnrealizedPL)).multiply(100));
     }
 
     public void update (ObservableList<OpenPosModel> posList) {
-        this.equityD = 0.0;
-        this.totalUnrealizedPLD = 0.0;
-        this.totalUnrealizedPLPercentD = 0.0;
-        this.accountTotalD = 0.0;
-        
-        for (OpenPosModel pos : posList) {
-            this.equityD += pos.marketValueD;
-            this.totalUnrealizedPLD += pos.unrealizedPLD;
-        }
-        this.totalUnrealizedPLPercentD = (this.totalUnrealizedPLD / (this.equityD - this.totalUnrealizedPLD)) * 100;
-        this.accountTotalD = this.cashBalanceD + this.equityD;
-        
-        this.setEquity(Utils.monetaryFormat(this.equityD, true));
-        this.setAccountTotal(Utils.monetaryFormat(this.accountTotalD, true));
+        Double equityD = 0.0;
+        Double totalUnrealizedPLD = 0.0;
 
-        String PLStr = Utils.monetaryFormat(this.totalUnrealizedPLD, true) + " (" + Utils.monetaryFormat(this.totalUnrealizedPLPercentD) + "%)";
-        this.setUnrealizedPL(PLStr);
+        for (OpenPosModel pos : posList) {
+            equityD += pos.marketValueD;
+            totalUnrealizedPLD += pos.unrealizedPLD;
+        }
+
+        this.setEquity(equityD);
+        this.setTotalUnrealizedPL(totalUnrealizedPLD);
     }
     
-    public String getEquity() {
+    public final Double getEquity() {
         return equity.get();
     }
-    public void setEquity(String v) {
+    public final void setEquity(Double v) {
         equity.set(v);
     }
-    public StringProperty equityProperty() {
+    public DoubleProperty equityProperty() {
         return equity;
     }
 
-    public String getCashBalance() {
+    public final Double getCashBalance() {
         return cashBalance.get();
     }
-    public void setCashBalance(String v) {
+    public final void setCashBalance(Double v) {
         cashBalance.set(v);
     }
-    public StringProperty cashBalanceProperty() {
+    public DoubleProperty cashBalanceProperty() {
         return cashBalance;
     }
     
-    public String getCashForTrade() {
+    public final Double getCashForTrade() {
         return cashForTrade.get();
     }
-    public void setCashForTrade(String v) {
+    public final void setCashForTrade(Double v) {
         cashForTrade.set(v);
     }
-    public StringProperty cashForTradeProperty() {
+    public DoubleProperty cashForTradeProperty() {
         return cashForTrade;
     }
 
-    public String getCashForWithdraw() {
+    public final Double getCashForWithdraw() {
         return cashForWithdraw.get();
     }
-    public void setCashForWithdraw(String v) {
+    public final void setCashForWithdraw(Double v) {
         cashForWithdraw.set(v);
     }
-    public StringProperty cashForWithdrawProperty() {
+    public DoubleProperty cashForWithdrawProperty() {
         return cashForWithdraw;
     }
 
-    public String getAccountTotal() {
-        return accountTotal.get();
+    public final Double getTotalUnrealizedPL() {
+        return totalUnrealizedPL.get();
     }
-    public void setAccountTotal(String v) {
-        accountTotal.set(v);
+    public final void setTotalUnrealizedPL(Double v) {
+        totalUnrealizedPL.set(v);
     }
-    public StringProperty accountTotalProperty() {
-        return accountTotal;
+    public DoubleProperty totalUnrealizedPLProperty() {
+        return totalUnrealizedPL;
+    }
+    
+    public final Double getTotalUnrealizedPLPercent() {
+        return totalUnrealizedPLPercent.get();
+    }
+    public final void setTotalUnrealizedPLPercent(Double v) {
+        totalUnrealizedPLPercent.set(v);
+    }
+    public DoubleProperty totalUnrealizedPLPercentProperty() {
+        return totalUnrealizedPLPercent;
     }
 
-    public String getUnrealizedPL() {
-        return unrealizedPL.get();
+    public final Double getAccountTotal() {
+        return accountTotal.get();
     }
-    public void setUnrealizedPL(String v) {
-        unrealizedPL.set(v);
+    public final void setAccountTotal(Double v) {
+        accountTotal.set(v);
     }
-    public StringProperty unrealizedPLProperty() {
-        return unrealizedPL;
+    public DoubleProperty accountTotalProperty() {
+        return accountTotal;
     }
 
     // Css class: display profit in green, loss in red
@@ -142,15 +137,15 @@ public class AccountModel {
     }
     
     public String unrealizedPLCss () {
-        return cssClass(this.totalUnrealizedPLD);
+        return cssClass(this.getTotalUnrealizedPL());
     }
     
     public String cashForTradeCss () {
-        return cssClass(this.cashForTradeD);
+        return cssClass(this.getCashForTrade());
     }
     
     public String accountTotalCss () {
-        return cssClass(this.accountTotalD);
+        return cssClass(this.getAccountTotal());
     }
     
     private String cssClass (Double value) {

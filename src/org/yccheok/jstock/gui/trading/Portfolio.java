@@ -8,6 +8,7 @@ package org.yccheok.jstock.gui.trading;
 import com.google.gson.internal.LinkedTreeMap;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
@@ -133,10 +134,11 @@ public class Portfolio {
     private void initAccData () {
         this.acc = new AccountModel(this.accBlotter, this.posList);
 
-        this.shareAmount.textProperty().bind(this.acc.equity);
-        this.profitAmount.textProperty().bind(this.acc.unrealizedPL);
-        this.cashAmount.textProperty().bind(this.acc.cashForTrade);
-        this.totalAmount.textProperty().bind(this.acc.accountTotal);
+        Locale locale  = new Locale("en", "US");
+        this.shareAmount.textProperty().bind(Bindings.format(locale, "$%,.2f", this.acc.equity));
+        this.profitAmount.textProperty().bind(Bindings.format(locale, "$%,.2f (%,.2f%%)", this.acc.totalUnrealizedPL, this.acc.totalUnrealizedPLPercent));
+        this.cashAmount.textProperty().bind(Bindings.format(locale, "$%,.2f", this.acc.cashForTrade));
+        this.totalAmount.textProperty().bind(Bindings.format(locale, "$%,.2f", this.acc.accountTotal));
 
         this.profitAmount.getStyleClass().add(this.acc.unrealizedPLCss());
         this.cashAmount.getStyleClass().add(this.acc.cashForTradeCss());
@@ -267,7 +269,7 @@ public class Portfolio {
         mktPriceCol.setCellValueFactory(new PropertyValueFactory("marketPrice"));
         mktPriceCol.getStyleClass().add("right");
 
-        TableColumn<OpenPosModel, String> costCol = new TableColumn<>("Purchase Value");
+        TableColumn<OpenPosModel, Double> costCol = new TableColumn<>("Purchase Value");
         costCol.setCellValueFactory(new PropertyValueFactory("costBasis"));
         costCol.getStyleClass().add("right");
 

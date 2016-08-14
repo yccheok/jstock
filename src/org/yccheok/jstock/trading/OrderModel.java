@@ -53,80 +53,80 @@ public class OrderModel {
         this.setMarketPrice(Utils.monetaryFormat(price));
     }
     
-    public String getSymbol() {
+    public final String getSymbol() {
         return symbol.get();
     }
-    public void setSymbol(String v) {
+    public final void setSymbol(String v) {
         symbol.set(v);
     }
     public SimpleStringProperty symbolProperty () {
         return symbol;
     }
     
-    public String getName() {
+    public final String getName() {
         return name.get();
     }
-    public void setName(String v) {
+    public final void setName(String v) {
         name.set(v);
     }
     public SimpleStringProperty nameProperty () {
         return name;
     }
     
-    public String getType() {
+    public final String getType() {
         return type.get();
     }
-    public void setType(String v) {
+    public final void setType(String v) {
         type.set(v);
     }
     public SimpleStringProperty typeProperty () {
         return type;
     }
     
-    public String getSide() {
+    public final String getSide() {
         return side.get();
     }
-    public void setSide(String v) {
+    public final void setSide(String v) {
         side.set(v);
     }
     public SimpleStringProperty sideProperty () {
         return side;
     }
     
-    public String getUnits() {
+    public final String getUnits() {
         return units.get();
     }
-    public void setUnits(String v) {
+    public final void setUnits(String v) {
         units.set(v);
     }
     public SimpleStringProperty unitsProperty () {
         return units;
     }
     
-    public String getMarketPrice() {
+    public final String getMarketPrice() {
         return marketPrice.get();
     }
-    public void setMarketPrice(String v) {
+    public final void setMarketPrice(String v) {
         marketPrice.set(v);
     }
     public SimpleStringProperty marketPriceProperty () {
         return marketPrice;
     }
 
-    public String getLimitPrice() {
+    public final String getLimitPrice() {
         return limitPrice.get();
     }
-    public void setLimitPrice(String v) {
+    public final void setLimitPrice(String v) {
         limitPrice.set(v);
     }
     public SimpleStringProperty limitPriceProperty () {
         return limitPrice;
     }
     
-    public String getStopPrice() {
+    public final String getStopPrice() {
         return stopPrice.get();
     }
-    public void setStopPrice(String v) {
+    public final void setStopPrice(String v) {
         stopPrice.set(v);
     }
     public SimpleStringProperty stopPriceProperty () {

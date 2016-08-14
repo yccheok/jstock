@@ -7,6 +7,7 @@ package org.yccheok.jstock.trading;
 
 import javafx.beans.property.SimpleStringProperty;
 import java.util.Map;
+import javafx.beans.property.SimpleDoubleProperty;
 
 /**
  *
@@ -18,7 +19,10 @@ public class OpenPosModel {
     private final SimpleStringProperty name;
     private final SimpleStringProperty units;
     private final SimpleStringProperty averagePrice;
-    private final SimpleStringProperty costBasis;
+    
+    //private final SimpleStringProperty costBasis;
+    private final SimpleDoubleProperty costBasis;
+    
     private final SimpleStringProperty marketPrice;
     private final SimpleStringProperty marketValue;
     private final SimpleStringProperty unrealizedPL;
@@ -38,7 +42,9 @@ public class OpenPosModel {
 
         this.symbol         = new SimpleStringProperty(pos.get("symbol").toString());
         this.name           = new SimpleStringProperty(pos.get("name").toString());
-        this.costBasis      = new SimpleStringProperty(Utils.monetaryFormat( (Double)pos.get("costBasis") ));
+        
+        //this.costBasis      = new SimpleStringProperty(Utils.monetaryFormat( (Double)pos.get("costBasis") ));
+        this.costBasis      = new SimpleDoubleProperty((Double)pos.get("costBasis"));
         
         this.units          = new SimpleStringProperty(Utils.formatNumber(this.unitsD, 2));
         this.averagePrice   = new SimpleStringProperty(Utils.monetaryFormat(this.averagePriceD));
@@ -57,80 +63,80 @@ public class OpenPosModel {
         this.setUnrealizedPL(Utils.monetaryFormat(this.unrealizedPLD));
     }
     
-    public String getSymbol() {
+    public final String getSymbol() {
         return symbol.get();
     }
-    public void setSymbol(String v) {
+    public final void setSymbol(String v) {
         symbol.set(v);
     }
     public SimpleStringProperty symbolProperty() {
         return symbol;
     }
     
-    public String getName() {
+    public final String getName() {
         return name.get();
     }
-    public void setName(String v) {
+    public final void setName(String v) {
         name.set(v);
     }
     public SimpleStringProperty nameProperty() {
         return name;
     }
 
-    public String getUnits() {
+    public final String getUnits() {
         return units.get();
     }
-    public void setUnits(String v) {
+    public final void setUnits(String v) {
         units.set(v);
     }
     public SimpleStringProperty unitsProperty() {
         return units;
     }
 
-    public String getAveragePrice() {
+    public final String getAveragePrice() {
         return averagePrice.get();
     }
-    public void setAveragePrice(String v) {
+    public final void setAveragePrice(String v) {
         averagePrice.set(v);
     }
     public SimpleStringProperty averagePriceProperty() {
         return averagePrice;
     }
 
-    public String getCostBasis() {
+    public final Double getCostBasis() {
         return costBasis.get();
     }
-    public void setCostBasis(String v) {
+    public final void setCostBasis(Double v) {
         costBasis.set(v);
     }
-    public SimpleStringProperty costBasisProperty() {
+    public SimpleDoubleProperty costBasisProperty() {
         return costBasis;
     }
     
-    public String getMarketPrice() {
+    public final String getMarketPrice() {
         return marketPrice.get();
     }
-    public void setMarketPrice(String v) {
+    public final void setMarketPrice(String v) {
         marketPrice.set(v);
     }
     public SimpleStringProperty marketPriceProperty() {
         return marketPrice;
     }
 
-    public String getMarketValue() {
+    public final String getMarketValue() {
         return marketValue.get();
     }
-    public void setMarketValue(String v) {
+    public final void setMarketValue(String v) {
         marketValue.set(v);
     }
     public SimpleStringProperty marketValueProperty() {
         return marketValue;
     }
 
-    public String getUnrealizedPL() {
+    public final String getUnrealizedPL() {
         return unrealizedPL.get();
     }
-    public void setUnrealizedPL(String v) {
+    public final void setUnrealizedPL(String v) {
         unrealizedPL.set(v);
     }
     public SimpleStringProperty unrealizedPLProperty() {
