@@ -5,8 +5,8 @@
  */
 package org.yccheok.jstock.trading;
 
-import javafx.beans.property.SimpleStringProperty;
 import java.util.Map;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 
 /**
@@ -17,50 +17,34 @@ import javafx.beans.property.SimpleDoubleProperty;
 public class OpenPosModel {
     private final SimpleStringProperty symbol;
     private final SimpleStringProperty name;
-    private final SimpleStringProperty units;
-    private final SimpleStringProperty averagePrice;
     
-    //private final SimpleStringProperty costBasis;
+    private final SimpleDoubleProperty units;
+    private final SimpleDoubleProperty averagePrice;
     private final SimpleDoubleProperty costBasis;
-    
-    private final SimpleStringProperty marketPrice;
-    private final SimpleStringProperty marketValue;
-    private final SimpleStringProperty unrealizedPL;
+    private final SimpleDoubleProperty marketPrice;
+    private final SimpleDoubleProperty marketValue;
+    private final SimpleDoubleProperty unrealizedPL;
 
-    private final Double unitsD;
-    private final Double averagePriceD;
-    private Double marketPriceD;
-    public Double marketValueD;
-    public Double unrealizedPLD;
     
     public OpenPosModel(Map<String, Object> pos) {
-        this.unitsD         = (Double) pos.get("units");
-        this.averagePriceD  = (Double) pos.get("averagePrice");
-        this.marketPriceD   = (Double) pos.get("marketPrice");
-        this.marketValueD   = (Double) pos.get("marketValue");
-        this.unrealizedPLD  = (Double) pos.get("unrealizedPL");
-
         this.symbol         = new SimpleStringProperty(pos.get("symbol").toString());
         this.name           = new SimpleStringProperty(pos.get("name").toString());
         
-        //this.costBasis      = new SimpleStringProperty(Utils.monetaryFormat( (Double)pos.get("costBasis") ));
-        this.costBasis      = new SimpleDoubleProperty((Double)pos.get("costBasis"));
+        this.costBasis      = new SimpleDoubleProperty((Double) pos.get("costBasis"));
+        this.units          = new SimpleDoubleProperty((Double) pos.get("units"));
+        this.averagePrice   = new SimpleDoubleProperty((Double) pos.get("averagePrice"));
+        this.marketPrice    = new SimpleDoubleProperty((Double) pos.get("marketPrice"));
         
-        this.units          = new SimpleStringProperty(Utils.formatNumber(this.unitsD, 2));
-        this.averagePrice   = new SimpleStringProperty(Utils.monetaryFormat(this.averagePriceD));
-        this.marketPrice    = new SimpleStringProperty(Utils.monetaryFormat(this.marketPriceD));
-        this.marketValue    = new SimpleStringProperty(Utils.monetaryFormat(this.marketValueD));
-        this.unrealizedPL   = new SimpleStringProperty(Utils.monetaryFormat(this.unrealizedPLD));
+        this.marketValue    = new SimpleDoubleProperty();
+        this.marketValue.bind(this.units.multiply(this.marketPrice));
+        
+        this.unrealizedPL   = new SimpleDoubleProperty();
+        this.unrealizedPL.bind(this.units.multiply(this.marketPrice.subtract(this.averagePrice)));
+        
     }
 
     public void updateMarketPrice (Double price) {
-        this.marketPriceD  = price;
-        this.marketValueD  = this.unitsD * price;
-        this.unrealizedPLD = this.unitsD * (price - this.averagePriceD);
-
-        this.setMarketPrice(Utils.monetaryFormat(this.marketPriceD));
-        this.setMarketValue(Utils.monetaryFormat(this.marketValueD));
-        this.setUnrealizedPL(Utils.monetaryFormat(this.unrealizedPLD));
+        this.setMarketPrice(price);
     }
     
     public final String getSymbol() {
@@ -83,23 +67,23 @@ public class OpenPosModel {
         return name;
     }
 
-    public final String getUnits() {
+    public final Double getUnits() {
         return units.get();
     }
-    public final void setUnits(String v) {
+    public final void setUnits(Double v) {
         units.set(v);
     }
-    public SimpleStringProperty unitsProperty() {
+    public SimpleDoubleProperty unitsProperty() {
         return units;
     }
 
-    public final String getAveragePrice() {
+    public final Double getAveragePrice() {
         return averagePrice.get();
     }
-    public final void setAveragePrice(String v) {
+    public final void setAveragePrice(Double v) {
         averagePrice.set(v);
     }
-    public SimpleStringProperty averagePriceProperty() {
+    public SimpleDoubleProperty averagePriceProperty() {
         return averagePrice;
     }
 
@@ -113,33 +97,33 @@ public class OpenPosModel {
         return costBasis;
     }
     
-    public final String getMarketPrice() {
+    public final Double getMarketPrice() {
         return marketPrice.get();
     }
-    public final void setMarketPrice(String v) {
+    public final void setMarketPrice(Double v) {
         marketPrice.set(v);
     }
-    public SimpleStringProperty marketPriceProperty() {
+    public SimpleDoubleProperty marketPriceProperty() {
         return marketPrice;
     }
 
-    public final String getMarketValue() {
+    public final Double getMarketValue() {
         return marketValue.get();
     }
-    public final void setMarketValue(String v) {
+    public final void setMarketValue(Double v) {
         marketValue.set(v);
     }
-    public SimpleStringProperty marketValueProperty() {
+    public SimpleDoubleProperty marketValueProperty() {
         return marketValue;
     }
 
-    public final String getUnrealizedPL() {
+    public final Double getUnrealizedPL() {
         return unrealizedPL.get();
     }
-    public final void setUnrealizedPL(String v) {
+    public final void setUnrealizedPL(Double v) {
         unrealizedPL.set(v);
     }
-    public SimpleStringProperty unrealizedPLProperty() {
+    public SimpleDoubleProperty unrealizedPLProperty() {
         return unrealizedPL;
     }
 

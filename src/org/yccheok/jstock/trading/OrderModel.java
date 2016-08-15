@@ -5,6 +5,7 @@
  */
 package org.yccheok.jstock.trading;
 
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import java.util.Map;
 
@@ -17,40 +18,41 @@ public class OrderModel {
     private final SimpleStringProperty name;
     private final SimpleStringProperty type;
     private final SimpleStringProperty side;
-    private final SimpleStringProperty units;
-    private final SimpleStringProperty marketPrice;
-    private final SimpleStringProperty limitPrice;
-    private final SimpleStringProperty stopPrice;
+    
+    private final SimpleDoubleProperty units;
+    private final SimpleDoubleProperty marketPrice;
+    private final SimpleDoubleProperty limitPrice;
+    private final SimpleDoubleProperty stopPrice;
     
     public OrderModel(Map<String, Object> ord) {
         this.symbol = new SimpleStringProperty(ord.get("symbol").toString());
         this.name   = new SimpleStringProperty(ord.get("name").toString());
         
-        Double stopPriceD = 0.0;
-        Double limitPriceD = 0.0;
+        Double _stopPrice = 0.0;
+        Double _limitPrice = 0.0;
         String typeStr = ord.get("orderType").toString();
         
         if (typeStr.equals("1")) {
             typeStr = "Market";
         } else if (typeStr.equals("2")) {
             typeStr = "Limit";
-            limitPriceD = (Double) ord.get("limitPrice");
+            _limitPrice = (Double) ord.get("limitPrice");
         } else if (typeStr.equals("3")) {
             typeStr = "Stop";
-            stopPriceD = (Double) ord.get("stopPrice");
+            _stopPrice = (Double) ord.get("stopPrice");
         }
         
         this.type = new SimpleStringProperty(typeStr);
-        this.limitPrice = new SimpleStringProperty(Utils.monetaryFormat(limitPriceD));
-        this.stopPrice = new SimpleStringProperty(Utils.monetaryFormat(stopPriceD));
-        
-        this.side           = new SimpleStringProperty( ord.get("side").toString().equals("B") ? "buy" : "sell" ) ;
-        this.units          = new SimpleStringProperty(Utils.formatNumber((Double)ord.get("units"), 2));
-        this.marketPrice    = new SimpleStringProperty(Utils.monetaryFormat((Double)ord.get("marketPrice")));
+        this.side = new SimpleStringProperty( ord.get("side").toString().equals("B") ? "buy" : "sell" ) ;
+
+        this.units       = new SimpleDoubleProperty((Double) ord.get("units"));
+        this.marketPrice = new SimpleDoubleProperty((Double) ord.get("marketPrice"));
+        this.limitPrice  = new SimpleDoubleProperty(_limitPrice);
+        this.stopPrice   = new SimpleDoubleProperty(_stopPrice);
     }
 
     public void updateMarketPrice (Double price) {
-        this.setMarketPrice(Utils.monetaryFormat(price));
+        this.setMarketPrice(price);
     }
     
     public final String getSymbol() {
@@ -93,43 +95,43 @@ public class OrderModel {
         return side;
     }
     
-    public final String getUnits() {
+    public final Double getUnits() {
         return units.get();
     }
-    public final void setUnits(String v) {
+    public final void setUnits(Double v) {
         units.set(v);
     }
-    public SimpleStringProperty unitsProperty () {
+    public SimpleDoubleProperty unitsProperty () {
         return units;
     }
     
-    public final String getMarketPrice() {
+    public final Double getMarketPrice() {
         return marketPrice.get();
     }
-    public final void setMarketPrice(String v) {
+    public final void setMarketPrice(Double v) {
         marketPrice.set(v);
     }
-    public SimpleStringProperty marketPriceProperty () {
+    public SimpleDoubleProperty marketPriceProperty () {
         return marketPrice;
     }
 
-    public final String getLimitPrice() {
+    public final Double getLimitPrice() {
         return limitPrice.get();
     }
-    public final void setLimitPrice(String v) {
+    public final void setLimitPrice(Double v) {
         limitPrice.set(v);
     }
-    public SimpleStringProperty limitPriceProperty () {
+    public SimpleDoubleProperty limitPriceProperty () {
         return limitPrice;
     }
     
-    public final String getStopPrice() {
+    public final Double getStopPrice() {
         return stopPrice.get();
     }
-    public final void setStopPrice(String v) {
+    public final void setStopPrice(Double v) {
         stopPrice.set(v);
     }
-    public SimpleStringProperty stopPriceProperty () {
+    public SimpleDoubleProperty stopPriceProperty () {
         return stopPrice;
     }
 }

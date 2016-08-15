@@ -20,18 +20,22 @@ import static javafx.geometry.Orientation.VERTICAL;
 import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import org.yccheok.jstock.trading.AccountModel;
 import org.yccheok.jstock.trading.OpenPosModel;
 import org.yccheok.jstock.trading.OrderModel;
 import org.yccheok.jstock.trading.PortfolioService;
 import org.yccheok.jstock.trading.DriveWealthAPI;
+import org.yccheok.jstock.trading.Utils;
+
 
 /**
  *
@@ -247,6 +251,30 @@ public class Portfolio {
         this.accBorderPane.setId("accBorderPane");
     }
 
+    public class PosMoneyCell extends TableCell<OpenPosModel, Number> {
+        boolean style = false;
+
+        public PosMoneyCell() {}
+
+        public PosMoneyCell (boolean style) {
+            this.style = style;
+        }
+
+        @Override
+        protected void updateItem(Number item, boolean empty) {
+            super.updateItem(item, empty);
+
+            // 1000.56 => 1,000.56, -9999.80 => -9,999.80
+            setText(item == null ? "" : Utils.monetaryFormat((Double) item));
+
+            // show profit as GREEN, loss as RED
+            if (this.style == true && item != null) {
+                double value = item.doubleValue();
+                setTextFill(value < 0 ? Color.RED : Color.GREEN);
+            }
+        }
+    }
+    
     private void initOpenPosTable () {
         // Open Positions table
         TableColumn<OpenPosModel, String> symbolCol = new TableColumn<>("Stock");
@@ -257,28 +285,34 @@ public class Portfolio {
         nameCol.setCellValueFactory(new PropertyValueFactory("name"));
         nameCol.getStyleClass().add("left");
 
-        TableColumn<OpenPosModel, String> unitsCol = new TableColumn<>("Units");
-        unitsCol.setCellValueFactory(new PropertyValueFactory("units"));
+        TableColumn<OpenPosModel, Number> unitsCol = new TableColumn<>("Units");
+        unitsCol.setCellValueFactory(cellData -> cellData.getValue().unitsProperty());
+        unitsCol.setCellFactory((TableColumn<OpenPosModel, Number> col) -> new PosMoneyCell());
         unitsCol.getStyleClass().add("right");
 
-        TableColumn<OpenPosModel, String> avgPriceCol = new TableColumn<>("Average Purchase Price");
-        avgPriceCol.setCellValueFactory(new PropertyValueFactory("averagePrice"));
+        TableColumn<OpenPosModel, Number> avgPriceCol = new TableColumn<>("Average Purchase Price");
+        avgPriceCol.setCellValueFactory(cellData -> cellData.getValue().averagePriceProperty());
+        avgPriceCol.setCellFactory((TableColumn<OpenPosModel, Number> col) -> new PosMoneyCell());
         avgPriceCol.getStyleClass().add("right");
 
-        TableColumn<OpenPosModel, String> mktPriceCol = new TableColumn<>("Current Price");
-        mktPriceCol.setCellValueFactory(new PropertyValueFactory("marketPrice"));
+        TableColumn<OpenPosModel, Number> mktPriceCol = new TableColumn<>("Current Price");
+        mktPriceCol.setCellValueFactory(cellData -> cellData.getValue().marketPriceProperty());
+        mktPriceCol.setCellFactory((TableColumn<OpenPosModel, Number> col) -> new PosMoneyCell());
         mktPriceCol.getStyleClass().add("right");
 
-        TableColumn<OpenPosModel, Double> costCol = new TableColumn<>("Purchase Value");
-        costCol.setCellValueFactory(new PropertyValueFactory("costBasis"));
+        TableColumn<OpenPosModel, Number> costCol = new TableColumn<>("Purchase Value");
+        costCol.setCellValueFactory(cellData -> cellData.getValue().costBasisProperty());
+        costCol.setCellFactory((TableColumn<OpenPosModel, Number> col) -> new PosMoneyCell());
         costCol.getStyleClass().add("right");
 
-        TableColumn<OpenPosModel, String> mktValueCol = new TableColumn<>("Current Value");
-        mktValueCol.setCellValueFactory(new PropertyValueFactory("marketValue"));
+        TableColumn<OpenPosModel, Number> mktValueCol = new TableColumn<>("Current Value");
+        mktValueCol.setCellValueFactory(cellData -> cellData.getValue().marketValueProperty());
+        mktValueCol.setCellFactory((TableColumn<OpenPosModel, Number> col) -> new PosMoneyCell());
         mktValueCol.getStyleClass().add("right");
         
-        TableColumn<OpenPosModel, String> plCol = new TableColumn<>("Gain/Loss Value");
-        plCol.setCellValueFactory(new PropertyValueFactory("unrealizedPL"));
+        TableColumn<OpenPosModel, Number> plCol = new TableColumn<>("Gain/Loss Value");
+        plCol.setCellValueFactory(cellData -> cellData.getValue().unrealizedPLProperty());
+        plCol.setCellFactory((TableColumn<OpenPosModel, Number> col) -> new PosMoneyCell(true));
         plCol.getStyleClass().add("right");
 
         symbolCol.setSortable(false);
@@ -296,29 +330,41 @@ public class Portfolio {
         this.posTable.setItems(this.posList);
 
         // limit Table height, based on row number
-        this.posTable.setFixedCellSize(20);
+        this.posTable.setFixedCellSize(this.tableCellSize);
         this.posTable.prefHeightProperty().bind(Bindings.size(this.posTable.getItems()).multiply(this.posTable.getFixedCellSize()).add(30));
 
         // set all columns having equal width
         this.posTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }
     
+    public class OrdMoneyCell extends TableCell<OrderModel, Number> {
+        public OrdMoneyCell() {}
+
+        @Override
+        protected void updateItem(Number item, boolean empty) {
+            super.updateItem(item, empty);
+            setText(item == null ? "" : Utils.monetaryFormat((Double) item));
+        }
+    }
+    
     private void initOrderTable () {
         // Pending Orders table
-        TableColumn symbolCol = new TableColumn("Stock");
+        TableColumn<OrderModel, String> symbolCol = new TableColumn("Stock");
         symbolCol.setCellValueFactory(new PropertyValueFactory("symbol"));
         symbolCol.getStyleClass().add("left");
 
-        TableColumn nameCol = new TableColumn("Name");
+        TableColumn<OrderModel, String> nameCol = new TableColumn("Name");
         nameCol.setCellValueFactory(new PropertyValueFactory("name"));
         nameCol.getStyleClass().add("left");
 
-        TableColumn unitsCol = new TableColumn("Units");
-        unitsCol.setCellValueFactory(new PropertyValueFactory("units"));
+        TableColumn<OrderModel, Number> unitsCol = new TableColumn("Units");
+        unitsCol.setCellValueFactory(cellData -> cellData.getValue().unitsProperty());
+        unitsCol.setCellFactory((TableColumn<OrderModel, Number> col) -> new OrdMoneyCell());
         unitsCol.getStyleClass().add("right");
 
-        TableColumn mktPriceCol = new TableColumn("Current Price");
-        mktPriceCol.setCellValueFactory(new PropertyValueFactory("marketPrice"));
+        TableColumn<OrderModel, Number> mktPriceCol = new TableColumn("Current Price");
+        mktPriceCol.setCellValueFactory(cellData -> cellData.getValue().marketPriceProperty());
+        mktPriceCol.setCellFactory((TableColumn<OrderModel, Number> col) -> new OrdMoneyCell());
         mktPriceCol.getStyleClass().add("right");
         
         TableColumn typeCol = new TableColumn("Type");
@@ -329,12 +375,14 @@ public class Portfolio {
         sideCol.setCellValueFactory(new PropertyValueFactory("side"));
         sideCol.getStyleClass().add("left");
         
-        TableColumn limitCol = new TableColumn("Limit Price");
-        limitCol.setCellValueFactory(new PropertyValueFactory("limitPrice"));
+        TableColumn<OrderModel, Number> limitCol = new TableColumn("Limit Price");
+        limitCol.setCellValueFactory(cellData -> cellData.getValue().limitPriceProperty());
+        limitCol.setCellFactory((TableColumn<OrderModel, Number> col) -> new OrdMoneyCell());
         limitCol.getStyleClass().add("right");
 
-        TableColumn stopCol = new TableColumn("Stop Price");
-        stopCol.setCellValueFactory(new PropertyValueFactory("stopPrice"));
+        TableColumn<OrderModel, Number> stopCol = new TableColumn("Stop Price");
+        stopCol.setCellValueFactory(cellData -> cellData.getValue().stopPriceProperty());
+        stopCol.setCellFactory((TableColumn<OrderModel, Number> col) -> new OrdMoneyCell());
         stopCol.getStyleClass().add("right");
         
         symbolCol.setSortable(false);
@@ -352,7 +400,7 @@ public class Portfolio {
         this.ordTable.setItems(this.ordList);
         
         // limit Table height, based on row number
-        this.ordTable.setFixedCellSize(20);
+        this.ordTable.setFixedCellSize(this.tableCellSize);
         this.ordTable.prefHeightProperty().bind(Bindings.size(this.ordTable.getItems()).multiply(this.ordTable.getFixedCellSize()).add(30));
 
         // set all columns having equal width
@@ -367,7 +415,8 @@ public class Portfolio {
 
     private ObservableList<OpenPosModel> posList = FXCollections.observableArrayList();
     private ObservableList<OrderModel> ordList = FXCollections.observableArrayList();
-    
+    private AccountModel acc;
+
     public  final Tab accTab  = new Tab();
     
     private final BorderPane accBorderPane = new BorderPane();
@@ -379,6 +428,6 @@ public class Portfolio {
     private final TableView posTable = new TableView();
     private final TableView ordTable = new TableView();
     
-    private AccountModel acc;
+    private double tableCellSize = 25;
 }
     

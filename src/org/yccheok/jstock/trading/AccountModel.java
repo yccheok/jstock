@@ -8,6 +8,7 @@ package org.yccheok.jstock.trading;
 import com.google.gson.internal.LinkedTreeMap;
 import java.util.Map;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.beans.binding.Bindings;
@@ -25,19 +26,19 @@ public class AccountModel {
     public final SimpleDoubleProperty totalUnrealizedPL;
     public final SimpleDoubleProperty totalUnrealizedPLPercent;
 
-
+    
     public AccountModel (Map<String, Object> accBlotter, ObservableList<OpenPosModel> posList) {
-        LinkedTreeMap<String, Object> equity  = (LinkedTreeMap) accBlotter.get("equity");
+        LinkedTreeMap<String, Object> _equity  = (LinkedTreeMap) accBlotter.get("equity");
         LinkedTreeMap<String, Object> balance = (LinkedTreeMap) accBlotter.get("cash");
 
-        this.equity          = new SimpleDoubleProperty((Double) equity.get("equityValue"));
+        this.equity          = new SimpleDoubleProperty((Double) _equity.get("equityValue"));
         this.cashBalance     = new SimpleDoubleProperty((Double) balance.get("cashBalance"));
         this.cashForTrade    = new SimpleDoubleProperty((Double) balance.get("cashAvailableForTrade"));
         this.cashForWithdraw = new SimpleDoubleProperty((Double) balance.get("cashAvailableForWithdrawal"));
 
         Double totalUnrealizedPLD = 0.0;
         for (OpenPosModel pos : posList) {
-            totalUnrealizedPLD += pos.unrealizedPLD;
+            totalUnrealizedPLD += pos.getUnrealizedPL();
         }
         this.totalUnrealizedPL = new SimpleDoubleProperty(totalUnrealizedPLD);
         
@@ -49,16 +50,16 @@ public class AccountModel {
     }
 
     public void update (ObservableList<OpenPosModel> posList) {
-        Double equityD = 0.0;
-        Double totalUnrealizedPLD = 0.0;
+        Double _equity = 0.0;
+        Double pl = 0.0;
 
         for (OpenPosModel pos : posList) {
-            equityD += pos.marketValueD;
-            totalUnrealizedPLD += pos.unrealizedPLD;
+            _equity += pos.getMarketValue();
+            pl += pos.getUnrealizedPL();
         }
 
-        this.setEquity(equityD);
-        this.setTotalUnrealizedPL(totalUnrealizedPLD);
+        this.setEquity(_equity);
+        this.setTotalUnrealizedPL(pl);
     }
     
     public final Double getEquity() {
