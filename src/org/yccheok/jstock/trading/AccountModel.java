@@ -8,7 +8,6 @@ package org.yccheok.jstock.trading;
 import com.google.gson.internal.LinkedTreeMap;
 import java.util.Map;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.beans.binding.Bindings;
