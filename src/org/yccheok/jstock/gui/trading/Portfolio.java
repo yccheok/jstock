@@ -24,6 +24,8 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -251,12 +253,10 @@ public class Portfolio {
         this.accBorderPane.setId("accBorderPane");
     }
 
-    public class PosMoneyCell extends TableCell<OpenPosModel, Number> {
-        boolean style = false;
+    public class PosTableNumCell extends TableCell<OpenPosModel, Number> {
+        private final boolean style;
 
-        public PosMoneyCell() {}
-
-        public PosMoneyCell (boolean style) {
+        public PosTableNumCell (boolean style) {
             this.style = style;
         }
 
@@ -275,44 +275,77 @@ public class Portfolio {
         }
     }
     
+    public PosTableNumCell posNumCell (boolean style) {
+        final PosTableNumCell cell = new PosTableNumCell(style);
+        
+        cell.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if (event.getButton() == MouseButton.SECONDARY) {
+                    System.out.println("Pos Table UNITS col clicked...");
+
+                }
+            }
+        });
+        return cell;
+    }
+
+    public TableCell<OpenPosModel, String> posStrCell () {
+        final TableCell<OpenPosModel, String> cell = new TableCell<>();
+        cell.textProperty().bind(cell.itemProperty());
+        
+        cell.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if (event.getButton() == MouseButton.SECONDARY) {
+                    System.out.println("Pos Table UNITS col clicked...");
+
+                }
+            }
+        });
+        return cell;
+    }
+    
     private void initOpenPosTable () {
         // Open Positions table
         TableColumn<OpenPosModel, String> symbolCol = new TableColumn<>("Stock");
         symbolCol.setCellValueFactory(new PropertyValueFactory("symbol"));
+        symbolCol.setCellFactory((TableColumn<OpenPosModel, String> col) -> posStrCell());
         symbolCol.getStyleClass().add("left");
 
         TableColumn<OpenPosModel, String> nameCol = new TableColumn<>("Name");
         nameCol.setCellValueFactory(new PropertyValueFactory("name"));
+        nameCol.setCellFactory((TableColumn<OpenPosModel, String> col) -> posStrCell());
         nameCol.getStyleClass().add("left");
 
         TableColumn<OpenPosModel, Number> unitsCol = new TableColumn<>("Units");
         unitsCol.setCellValueFactory(cellData -> cellData.getValue().unitsProperty());
-        unitsCol.setCellFactory((TableColumn<OpenPosModel, Number> col) -> new PosMoneyCell());
+        unitsCol.setCellFactory((TableColumn<OpenPosModel, Number> col) -> posNumCell(false));
         unitsCol.getStyleClass().add("right");
 
         TableColumn<OpenPosModel, Number> avgPriceCol = new TableColumn<>("Average Purchase Price");
         avgPriceCol.setCellValueFactory(cellData -> cellData.getValue().averagePriceProperty());
-        avgPriceCol.setCellFactory((TableColumn<OpenPosModel, Number> col) -> new PosMoneyCell());
+        avgPriceCol.setCellFactory((TableColumn<OpenPosModel, Number> col) -> posNumCell(false));
         avgPriceCol.getStyleClass().add("right");
 
         TableColumn<OpenPosModel, Number> mktPriceCol = new TableColumn<>("Current Price");
         mktPriceCol.setCellValueFactory(cellData -> cellData.getValue().marketPriceProperty());
-        mktPriceCol.setCellFactory((TableColumn<OpenPosModel, Number> col) -> new PosMoneyCell());
+        mktPriceCol.setCellFactory((TableColumn<OpenPosModel, Number> col) -> posNumCell(false));
         mktPriceCol.getStyleClass().add("right");
 
         TableColumn<OpenPosModel, Number> costCol = new TableColumn<>("Purchase Value");
         costCol.setCellValueFactory(cellData -> cellData.getValue().costBasisProperty());
-        costCol.setCellFactory((TableColumn<OpenPosModel, Number> col) -> new PosMoneyCell());
+        costCol.setCellFactory((TableColumn<OpenPosModel, Number> col) -> posNumCell(false));
         costCol.getStyleClass().add("right");
 
         TableColumn<OpenPosModel, Number> mktValueCol = new TableColumn<>("Current Value");
         mktValueCol.setCellValueFactory(cellData -> cellData.getValue().marketValueProperty());
-        mktValueCol.setCellFactory((TableColumn<OpenPosModel, Number> col) -> new PosMoneyCell());
+        mktValueCol.setCellFactory((TableColumn<OpenPosModel, Number> col) -> posNumCell(false));
         mktValueCol.getStyleClass().add("right");
         
         TableColumn<OpenPosModel, Number> plCol = new TableColumn<>("Gain/Loss Value");
         plCol.setCellValueFactory(cellData -> cellData.getValue().unrealizedPLProperty());
-        plCol.setCellFactory((TableColumn<OpenPosModel, Number> col) -> new PosMoneyCell(true));
+        plCol.setCellFactory((TableColumn<OpenPosModel, Number> col) -> posNumCell(true));
         plCol.getStyleClass().add("right");
 
         symbolCol.setSortable(false);
@@ -337,8 +370,8 @@ public class Portfolio {
         this.posTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }
     
-    public class OrdMoneyCell extends TableCell<OrderModel, Number> {
-        public OrdMoneyCell() {}
+    public class OrdTableNumCell extends TableCell<OrderModel, Number> {
+        public OrdTableNumCell() {}
 
         @Override
         protected void updateItem(Number item, boolean empty) {
@@ -347,42 +380,77 @@ public class Portfolio {
         }
     }
     
+    public OrdTableNumCell ordNumCell () {
+        final OrdTableNumCell cell = new OrdTableNumCell();
+        
+        cell.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if (event.getButton() == MouseButton.SECONDARY) {
+                    System.out.println("Order Table UNITS col clicked...");
+
+                }
+            }
+        });
+        return cell;
+    }
+
+    public TableCell<OrderModel, String> ordStrCell () {
+        final TableCell<OrderModel, String> cell = new TableCell<>();
+        cell.textProperty().bind(cell.itemProperty());
+        
+        cell.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if (event.getButton() == MouseButton.SECONDARY) {
+                    System.out.println("Order Table UNITS col clicked...");
+
+                }
+            }
+        });
+        return cell;
+    }
+    
     private void initOrderTable () {
         // Pending Orders table
         TableColumn<OrderModel, String> symbolCol = new TableColumn("Stock");
         symbolCol.setCellValueFactory(new PropertyValueFactory("symbol"));
+        symbolCol.setCellFactory((TableColumn<OrderModel, String> col) -> ordStrCell());
         symbolCol.getStyleClass().add("left");
 
         TableColumn<OrderModel, String> nameCol = new TableColumn("Name");
         nameCol.setCellValueFactory(new PropertyValueFactory("name"));
+        nameCol.setCellFactory((TableColumn<OrderModel, String> col) -> ordStrCell());
         nameCol.getStyleClass().add("left");
 
         TableColumn<OrderModel, Number> unitsCol = new TableColumn("Units");
         unitsCol.setCellValueFactory(cellData -> cellData.getValue().unitsProperty());
-        unitsCol.setCellFactory((TableColumn<OrderModel, Number> col) -> new OrdMoneyCell());
+        unitsCol.setCellFactory((TableColumn<OrderModel, Number> col) -> ordNumCell());
         unitsCol.getStyleClass().add("right");
 
         TableColumn<OrderModel, Number> mktPriceCol = new TableColumn("Current Price");
         mktPriceCol.setCellValueFactory(cellData -> cellData.getValue().marketPriceProperty());
-        mktPriceCol.setCellFactory((TableColumn<OrderModel, Number> col) -> new OrdMoneyCell());
+        mktPriceCol.setCellFactory((TableColumn<OrderModel, Number> col) -> ordNumCell());
         mktPriceCol.getStyleClass().add("right");
         
-        TableColumn typeCol = new TableColumn("Type");
+        TableColumn<OrderModel, String> typeCol = new TableColumn("Type");
         typeCol.setCellValueFactory(new PropertyValueFactory("type"));
+        typeCol.setCellFactory((TableColumn<OrderModel, String> col) -> ordStrCell());
         typeCol.getStyleClass().add("left");
 
-        TableColumn sideCol = new TableColumn("Side");
+        TableColumn<OrderModel, String> sideCol = new TableColumn("Side");
         sideCol.setCellValueFactory(new PropertyValueFactory("side"));
+        sideCol.setCellFactory((TableColumn<OrderModel, String> col) -> ordStrCell());
         sideCol.getStyleClass().add("left");
         
         TableColumn<OrderModel, Number> limitCol = new TableColumn("Limit Price");
         limitCol.setCellValueFactory(cellData -> cellData.getValue().limitPriceProperty());
-        limitCol.setCellFactory((TableColumn<OrderModel, Number> col) -> new OrdMoneyCell());
+        limitCol.setCellFactory((TableColumn<OrderModel, Number> col) -> ordNumCell());
         limitCol.getStyleClass().add("right");
 
         TableColumn<OrderModel, Number> stopCol = new TableColumn("Stop Price");
         stopCol.setCellValueFactory(cellData -> cellData.getValue().stopPriceProperty());
-        stopCol.setCellFactory((TableColumn<OrderModel, Number> col) -> new OrdMoneyCell());
+        stopCol.setCellFactory((TableColumn<OrderModel, Number> col) -> ordNumCell());
         stopCol.getStyleClass().add("right");
         
         symbolCol.setSortable(false);

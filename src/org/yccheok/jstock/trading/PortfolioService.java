@@ -32,8 +32,7 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
 
     public class PortfolioTask extends Task<Map<String, Object>> {
         
-        public PortfolioTask() {
-        }
+        public PortfolioTask() {}
 
         private void getAccBlotter (String userID, String accountID) {
             accBlotter = api.accountBlotter(userID, accountID);              
