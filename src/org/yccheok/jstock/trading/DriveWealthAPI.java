@@ -1322,11 +1322,13 @@ public class DriveWealthAPI {
         final Double leavesQty  = (Double) status.get("leavesQty");
         final Double orderQty   = (Double) status.get("orderQty");
 
+        String ordStatus = "";
         // accepted
         if (    orderQty.compareTo(leavesQty) == 0
                 && status.get("execType").equals("0")
                 && status.get("ordStatus").toString().equals("0")
         ) {
+            ordStatus = "accepted";
             System.out.println("Order accepted: " + orderID);
         }
         // filled
@@ -1334,6 +1336,7 @@ public class DriveWealthAPI {
                 && status.get("execType").equals("2")
                 && status.get("ordStatus").toString().equals("2")
         ) {
+            ordStatus = "filled";
             System.out.println("Order filled: " + orderID);
         }
         // partially filled
@@ -1341,6 +1344,7 @@ public class DriveWealthAPI {
                 && status.get("execType").equals("1")
                 && status.get("ordStatus").toString().equals("1")
         ) {
+            ordStatus = "partialfilled";
             System.out.println("Order partially filled: " + orderID);
         }
         // Cancelled
@@ -1349,6 +1353,7 @@ public class DriveWealthAPI {
                 && status.get("ordStatus").toString().equals("4")
                 
         ) {
+            ordStatus = "cancelled";
             System.out.println("Order cancelled: " + orderID);
         }
         // Rejected
@@ -1356,10 +1361,12 @@ public class DriveWealthAPI {
                 && status.get("execType").equals("8")
                 && status.get("ordStatus").toString().equals("8")
         ) {
+            ordStatus = "rejected";
             System.out.println("Order cancelled: " + orderID + ", reason: "
                     + status.get("ordRejReason").toString());
         }
-
+        status.put("ordStatus", ordStatus);
+        
         return status;
     }
     

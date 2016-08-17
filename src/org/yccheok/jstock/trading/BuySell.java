@@ -40,8 +40,27 @@ public class BuySell {
                 //  4) Cancelled
                 //  5) Rejected
                 
+                String ordStatus = status.get("ordStatus").toString();
+                
+                // declare as ENUM
+                switch (ordStatus) {
+                    case "accepted":
+                        break;
+                    case "filled":
+                        done = true;
+                        break;
+                    case "partialfilled":
+                        break;
+                    case "cancelled":
+                        done = true;
+                        break;
+                    case "rejected":
+                        done = true;
+                        break;
+                }
                 
                 if (done == true) {
+                    // how to call PortfolioService.setFullRefresh() ??
                     break;
                 }
             }
