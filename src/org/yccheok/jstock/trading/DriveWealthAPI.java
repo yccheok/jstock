@@ -1228,8 +1228,6 @@ public class DriveWealthAPI {
             return null;
         }
         
-        Map<String, Object> order = new HashMap<>();
-        
         if (action.equals("buy")) {
             params.put("side", "B");
             
@@ -1283,6 +1281,7 @@ public class DriveWealthAPI {
         String respond = respondMap.get("respond").toString();
         Map<String, Object> result = gson.fromJson(respond, HashMap.class);
 
+        Map<String, Object> order = new HashMap<>();
         for (String k: this.orderFields) {
             if (result.containsKey(k)) {
                 Object v = result.get(k);

@@ -23,13 +23,17 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
     private DriveWealthAPI api;
     private Map<String, Object> accBlotter = new HashMap<>();
     private final Map<String, Map> instruments = new HashMap<>();
-    private boolean needFullRefresh = true;
+    private boolean fullRefresh = true;
 
     
     public PortfolioService (DriveWealthAPI api) {
         this.api = api;
     }
 
+    public void setFullRefresh () {
+        this.fullRefresh = true;
+    }
+    
     public class PortfolioTask extends Task<Map<String, Object>> {
         
         public PortfolioTask() {}
@@ -93,8 +97,8 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
             String accountID = api.user.practiceAccount.accountID;
             if (userID != null && accountID != null) {
                 // only call account Blotter & get instruments during first run
-                if (needFullRefresh == true) {
-                    needFullRefresh = false;
+                if (fullRefresh == true) {
+                    fullRefresh = false;
 
                     getAccBlotter(userID, accountID);
                     result.put("accBlotter", accBlotter);
