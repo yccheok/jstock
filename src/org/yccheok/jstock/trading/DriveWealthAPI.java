@@ -1302,6 +1302,15 @@ public class DriveWealthAPI {
         return statusCode == 200;
     }
 
+    public static enum OrderStatus {
+        ACCEPTED,
+        FILLED,
+        PARTIALFILLED,
+        CANCELLED,
+        REJECTED,
+        // shouldn't be this in any case
+        UNKNOWN;
+    }
     
     public Map<String, Object> orderStatus (String orderID) {
         System.out.println("\n[Order Status]");
@@ -1322,13 +1331,13 @@ public class DriveWealthAPI {
         final Double leavesQty  = (Double) status.get("leavesQty");
         final Double orderQty   = (Double) status.get("orderQty");
 
-        String ordStatus = "";
+        OrderStatus ordStatus = OrderStatus.UNKNOWN;
         // accepted
         if (    orderQty.compareTo(leavesQty) == 0
                 && status.get("execType").equals("0")
                 && status.get("ordStatus").toString().equals("0")
         ) {
-            ordStatus = "accepted";
+            ordStatus = OrderStatus.ACCEPTED;
             System.out.println("Order accepted: " + orderID);
         }
         // filled
@@ -1336,7 +1345,7 @@ public class DriveWealthAPI {
                 && status.get("execType").equals("2")
                 && status.get("ordStatus").toString().equals("2")
         ) {
-            ordStatus = "filled";
+            ordStatus = OrderStatus.FILLED;
             System.out.println("Order filled: " + orderID);
         }
         // partially filled
@@ -1344,7 +1353,7 @@ public class DriveWealthAPI {
                 && status.get("execType").equals("1")
                 && status.get("ordStatus").toString().equals("1")
         ) {
-            ordStatus = "partialfilled";
+            ordStatus = OrderStatus.PARTIALFILLED;
             System.out.println("Order partially filled: " + orderID);
         }
         // Cancelled
@@ -1353,7 +1362,7 @@ public class DriveWealthAPI {
                 && status.get("ordStatus").toString().equals("4")
                 
         ) {
-            ordStatus = "cancelled";
+            ordStatus = OrderStatus.CANCELLED;
             System.out.println("Order cancelled: " + orderID);
         }
         // Rejected
@@ -1361,7 +1370,7 @@ public class DriveWealthAPI {
                 && status.get("execType").equals("8")
                 && status.get("ordStatus").toString().equals("8")
         ) {
-            ordStatus = "rejected";
+            ordStatus = OrderStatus.REJECTED;
             System.out.println("Order cancelled: " + orderID + ", reason: "
                     + status.get("ordRejReason").toString());
         }

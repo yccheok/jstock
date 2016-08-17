@@ -34,27 +34,21 @@ public class BuySell {
                 Map<String, Object> status = api.orderStatus(orderID);
 
                 // Decide how many times / how long to check status in LOOP
-                //  1) accepted
-                //  2) Filled
-                //  3) Partial filled
-                //  4) Cancelled
-                //  5) Rejected
                 
-                String ordStatus = status.get("ordStatus").toString();
+                DriveWealthAPI.OrderStatus ordStatus = (DriveWealthAPI.OrderStatus) status.get("ordStatus");
                 
-                // declare as ENUM
                 switch (ordStatus) {
-                    case "accepted":
+                    case ACCEPTED:
                         break;
-                    case "filled":
+                    case FILLED:
                         done = true;
                         break;
-                    case "partialfilled":
+                    case PARTIALFILLED:
                         break;
-                    case "cancelled":
+                    case CANCELLED:
                         done = true;
                         break;
-                    case "rejected":
+                    case REJECTED:
                         done = true;
                         break;
                 }
