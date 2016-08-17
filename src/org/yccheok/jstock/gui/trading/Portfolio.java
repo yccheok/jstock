@@ -5,9 +5,7 @@
  */
 package org.yccheok.jstock.gui.trading;
 
-import java.util.Locale;
 import java.util.Map;
-import javafx.beans.binding.Bindings;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -17,12 +15,8 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
-import org.yccheok.jstock.trading.AccountModel;
-import org.yccheok.jstock.trading.OpenPosModel;
-import org.yccheok.jstock.trading.OrderModel;
 import org.yccheok.jstock.trading.PortfolioService;
 import org.yccheok.jstock.trading.DriveWealthAPI;
 
@@ -34,7 +28,7 @@ import org.yccheok.jstock.trading.DriveWealthAPI;
 public class Portfolio {
     public Portfolio (DriveWealthAPI api) {
         this.api = api;
-        startBackgroundService(api);
+        startBackgroundService(this.api);
     }
 
     private void startBackgroundService (DriveWealthAPI api) {
@@ -60,14 +54,14 @@ public class Portfolio {
                     posTableBuilder.initData(accBlotter, instruments);
                     ordTableBuilder.initData(accBlotter, instruments);
                     
-                    initAccData();
+                    accSummaryBuilder.initData(accBlotter, posTableBuilder.getPosList());
                 } else if (result.containsKey("marketPrices")) {
                     marketPrices = (Map) result.get("marketPrices");
                     
                     posTableBuilder.updatePrices(marketPrices);
                     ordTableBuilder.updatePrices(marketPrices);
                     
-                    updateAccData();
+                    accSummaryBuilder.update(posTableBuilder.getPosList());
                 }
             }
         });
@@ -75,28 +69,6 @@ public class Portfolio {
         service.start();
     }
 
-    private void initAccData () {
-        this.acc = new AccountModel(this.accBlotter, this.posTableBuilder.getPosList());
-
-        Locale locale  = new Locale("en", "US");
-        this.shareAmount.textProperty().bind(Bindings.format(locale, "$%,.2f", this.acc.equity));
-        this.profitAmount.textProperty().bind(Bindings.format(locale, "$%,.2f (%,.2f%%)", this.acc.totalUnrealizedPL, this.acc.totalUnrealizedPLPercent));
-        this.cashAmount.textProperty().bind(Bindings.format(locale, "$%,.2f", this.acc.cashForTrade));
-        this.totalAmount.textProperty().bind(Bindings.format(locale, "$%,.2f", this.acc.accountTotal));
-
-        this.profitAmount.getStyleClass().add(this.acc.unrealizedPLCss());
-        this.cashAmount.getStyleClass().add(this.acc.cashForTradeCss());
-        this.totalAmount.getStyleClass().add(this.acc.accountTotalCss());
-        this.shareAmount.getStyleClass().add(this.acc.equityValueCss());
-    }
-    
-    private void updateAccData () {
-        this.acc.update(this.posTableBuilder.getPosList());
-
-        this.profitAmount.getStyleClass().clear();
-        this.profitAmount.getStyleClass().add(acc.unrealizedPLCss());
-    }
-    
     public Tab createTab() {
         final VBox vBox = new VBox();
         vBox.setSpacing(5);
@@ -104,8 +76,8 @@ public class Portfolio {
         vBox.setPrefWidth(1000);
 
         // Account Summary
-        initAccSummary();
-        vBox.getChildren().add(this.accBorderPane);
+        final BorderPane accBorderPane = accSummaryBuilder.build();
+        vBox.getChildren().add(accBorderPane);
         
         // Open Positions
         final TableView posTable = this.posTableBuilder.build();
@@ -144,55 +116,17 @@ public class Portfolio {
         return this.accTab;
     }
     
-    private void initAccSummary () {
-        // Left content
-        HBox leftHbox = new HBox(8);
-        
-        // Stocks on hand value
-        Label shareText = new Label("Share:");
-        
-        // Unrealized PL
-        Label profitText = new Label("Paper Profit:");
-        profitText.setPadding(new Insets(0, 0, 0, 10));
-
-        leftHbox.getChildren().addAll(shareText, this.shareAmount, profitText, this.profitAmount);
-        
-        // Right content
-        HBox rightHbox = new HBox(8);
-        
-        // Cash for trading
-        Label cashText = new Label("Cash to Invest:");
-
-        // Total: Cash balance + Stocks
-        Label totalText = new Label("Total:");
-        totalText.setPadding(new Insets(0, 0, 0, 10));
-        
-        rightHbox.getChildren().addAll(cashText, this.cashAmount, totalText, this.totalAmount);
-        
-        this.accBorderPane.setPadding(new Insets(5, 0, 10, 0));    // Insets: top, right, bottom, left
-        this.accBorderPane.setLeft(leftHbox);
-        this.accBorderPane.setRight(rightHbox);
-        this.accBorderPane.setId("accBorderPane");
-    }
-
     private final DriveWealthAPI api;
     
     private Map<String, Object> accBlotter;
     private Map<String, Map> instruments;
     private Map<String, Double> marketPrices;
 
-    private AccountModel acc;
-
     public  final Tab accTab  = new Tab();
-    
-    private final BorderPane accBorderPane = new BorderPane();
-    private final Label shareAmount = new Label();
-    private final Label profitAmount = new Label();
-    private final Label cashAmount = new Label();
-    private final Label totalAmount = new Label();
     
     private final PositionsTableBuilder posTableBuilder = new PositionsTableBuilder();
     private final OrdersTableBuilder ordTableBuilder = new OrdersTableBuilder();
+    private final AccountSummaryBuilder accSummaryBuilder = new AccountSummaryBuilder();
     
     public static final double tableCellSize = 25;
 }
