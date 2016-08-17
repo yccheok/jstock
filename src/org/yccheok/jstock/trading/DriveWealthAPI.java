@@ -1115,6 +1115,11 @@ public class DriveWealthAPI {
     public List<Map<String, Object>> searchInstruments (Map<String, String> args) {
         System.out.println("\n[searchInstruments]");
 
+        // 1) For exact symbol match (only return 1 symbol)
+        //      https://api.drivewealth.io/v1/instruments?symbols=SCS
+        // 2) search by symbol pattern (return >= 1 symbols)
+        //      https://api.drivewealth.io/v1/instruments?symbol=SCS
+        
         String params = null;
         final List<String> searchFields = new ArrayList<>(Arrays.asList(
             "symbol",

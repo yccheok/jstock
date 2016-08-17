@@ -64,14 +64,13 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
                 }
 
                 Map<String, String> param = new HashMap<>();
-                param.put("symbol", symbol);
+                // only search for exact symbol match
+                param.put("symbols", symbol);
                 List<Map<String, Object>> insList = api.searchInstruments(param);
 
-                for (Map<String, Object> ins : insList) {
-                    if (symbol.equals( ins.get("symbol").toString() )) {
-                        instruments.put(symbol, ins);
-                        break;
-                    }
+                if (insList.size() > 0) {
+                    Map<String, Object> ins = insList.get(0);
+                    instruments.put(symbol, ins);
                 }
             }
         }
