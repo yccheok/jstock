@@ -5,7 +5,13 @@
  */
 package org.yccheok.jstock.gui.trading;
 
+import com.google.gson.internal.LinkedTreeMap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javafx.beans.binding.Bindings;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -20,10 +26,15 @@ import org.yccheok.jstock.trading.Utils;
  *
  * @author shuwnyuan
  */
-public class OrdersTable {
+public class OrdersTableBuilder {
     public final TableView ordTable = new TableView();
+    private final ObservableList<OrderModel> ordList = FXCollections.observableArrayList();
     
-    public OrdersTable () {}
+    public OrdersTableBuilder () {}
+    
+    public ObservableList<OrderModel> getOrdList () {
+        return this.ordList;
+    }
     
     private class FormatNumberCell extends TableCell<OrderModel, Number> {
         public FormatNumberCell() {}
@@ -129,5 +140,41 @@ public class OrdersTable {
         this.ordTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         
         return this.ordTable;
+    }
+    
+    public void initData (Map<String, Object> accBlotter, Map<String, Map> instruments) {
+        List<LinkedTreeMap<String, Object>> orders = (List) accBlotter.get("orders");
+
+        for (LinkedTreeMap<String, Object> ord : orders) {
+            Map<String, Object> ins = instruments.get(ord.get("symbol").toString());
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("name",        ins.get("name"));
+            data.put("marketPrice", ins.get("lastTrade"));
+            data.put("symbol",      ord.get("symbol"));
+            data.put("units",       ord.get("orderQty"));
+            data.put("side",        ord.get("side"));
+            data.put("orderType",   ord.get("orderType"));
+
+            if (ord.containsKey("limitPrice")) {
+                data.put("limitPrice", ord.get("limitPrice"));
+            }
+            if (ord.containsKey("stopPrice")) {
+                data.put("stopPrice", ord.get("stopPrice"));
+            }
+            
+            this.ordList.add(new OrderModel(data));
+        }
+        
+        this.ordTable.setItems(this.ordList);
+        this.ordTable.prefHeightProperty().bind(Bindings.size(this.ordTable.getItems()).multiply(this.ordTable.getFixedCellSize()).add(30));
+    }
+    
+    public void updatePrices (Map<String, Double> marketPrices) {
+        for (OrderModel ord : this.ordList) {
+            final String symbol = ord.getSymbol();
+            final Double price = marketPrices.get(symbol);
+            ord.updateMarketPrice(price);
+        }
     }
 }

@@ -5,7 +5,13 @@
  */
 package org.yccheok.jstock.gui.trading;
 
+import com.google.gson.internal.LinkedTreeMap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javafx.beans.binding.Bindings;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -21,10 +27,16 @@ import org.yccheok.jstock.trading.Utils;
  *
  * @author shuwnyuan
  */
-public class PositionsTable {
+public class PositionsTableBuilder {
     public final TableView posTable = new TableView();
+    private final ObservableList<OpenPosModel> posList = FXCollections.observableArrayList();
+
     
-    public PositionsTable () {}
+    public PositionsTableBuilder () {}
+    
+    public ObservableList<OpenPosModel> getPosList () {
+        return this.posList;
+    }
     
     private class FormatNumberCell extends TableCell<OpenPosModel, Number> {
         private final boolean style;
@@ -143,4 +155,39 @@ public class PositionsTable {
         
         return this.posTable;
     }
+    
+    public void initData (Map<String, Object> accBlotter, Map<String, Map> instruments) {
+        LinkedTreeMap<String, Object> equity = (LinkedTreeMap) accBlotter.get("equity");
+        List<LinkedTreeMap<String, Object>> positions = (List) equity.get("equityPositions");
+        
+        for (LinkedTreeMap<String, Object> pos : positions) {
+            Map<String, Object> ins = instruments.get(pos.get("symbol").toString());
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("name",            ins.get("name"));
+            data.put("symbol",          pos.get("symbol"));
+            data.put("instrumentID",    pos.get("instrumentID"));
+            data.put("units",           pos.get("availableForTradingQty"));
+            data.put("averagePrice",    pos.get("avgPrice"));
+            data.put("costBasis",       pos.get("costBasis"));
+            data.put("marketPrice",     pos.get("mktPrice"));
+            data.put("marketValue",     pos.get("marketValue"));
+            data.put("unrealizedPL",    pos.get("unrealizedPL"));
+            
+            this.posList.add(new OpenPosModel(data));
+        }
+
+        this.posTable.setItems(this.posList);
+        this.posTable.prefHeightProperty().bind(Bindings.size(this.posTable.getItems()).multiply(this.posTable.getFixedCellSize()).add(30));
+    }
+
+    public void updatePrices (Map<String, Double> marketPrices) {
+        for (OpenPosModel pos : this.posList) {
+            final String symbol = pos.getSymbol();
+            final Double price = marketPrices.get(symbol);
+            pos.updateMarketPrice(price);
+        }
+    }
+
+    
 }

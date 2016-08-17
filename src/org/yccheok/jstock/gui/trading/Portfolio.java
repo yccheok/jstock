@@ -5,14 +5,9 @@
  */
 package org.yccheok.jstock.gui.trading;
 
-import com.google.gson.internal.LinkedTreeMap;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import javafx.beans.binding.Bindings;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -20,23 +15,16 @@ import static javafx.geometry.Orientation.VERTICAL;
 import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import org.yccheok.jstock.trading.AccountModel;
 import org.yccheok.jstock.trading.OpenPosModel;
 import org.yccheok.jstock.trading.OrderModel;
 import org.yccheok.jstock.trading.PortfolioService;
 import org.yccheok.jstock.trading.DriveWealthAPI;
-import org.yccheok.jstock.trading.Utils;
 
 
 /**
@@ -69,13 +57,16 @@ public class Portfolio {
                     accBlotter = (Map<String, Object>) result.get("accBlotter");
                     instruments = (Map<String, Map>) result.get("instruments");
 
-                    initOpenPosTableData();
-                    initOrderTableData();
+                    posTableBuilder.initData(accBlotter, instruments);
+                    ordTableBuilder.initData(accBlotter, instruments);
+                    
                     initAccData();
                 } else if (result.containsKey("marketPrices")) {
                     marketPrices = (Map) result.get("marketPrices");
-                    updateOpenPosPrice();
-                    updateOrderPrice();
+                    
+                    posTableBuilder.updatePrices(marketPrices);
+                    ordTableBuilder.updatePrices(marketPrices);
+                    
                     updateAccData();
                 }
             }
@@ -84,61 +75,8 @@ public class Portfolio {
         service.start();
     }
 
-    private void initOpenPosTableData () {
-        LinkedTreeMap<String, Object> equity = (LinkedTreeMap) this.accBlotter.get("equity");
-        List<LinkedTreeMap<String, Object>> positions = (List) equity.get("equityPositions");
-        
-        for (LinkedTreeMap<String, Object> pos : positions) {
-            Map<String, Object> ins = this.instruments.get(pos.get("symbol").toString());
-
-            Map<String, Object> data = new HashMap<>();
-            data.put("name",            ins.get("name"));
-            data.put("symbol",          pos.get("symbol"));
-            data.put("instrumentID",    pos.get("instrumentID"));
-            data.put("units",           pos.get("availableForTradingQty"));
-            data.put("averagePrice",    pos.get("avgPrice"));
-            data.put("costBasis",       pos.get("costBasis"));
-            data.put("marketPrice",     pos.get("mktPrice"));
-            data.put("marketValue",     pos.get("marketValue"));
-            data.put("unrealizedPL",    pos.get("unrealizedPL"));
-            
-            this.posList.add(new OpenPosModel(data));
-        }
-
-        this.posTable.setItems(this.posList);
-        this.posTable.prefHeightProperty().bind(Bindings.size(this.posTable.getItems()).multiply(this.posTable.getFixedCellSize()).add(30));
-    }
-    
-    private void initOrderTableData () {
-        List<LinkedTreeMap<String, Object>> orders = (List) this.accBlotter.get("orders");
-
-        for (LinkedTreeMap<String, Object> ord : orders) {
-            Map<String, Object> ins = this.instruments.get(ord.get("symbol").toString());
-
-            Map<String, Object> data = new HashMap<>();
-            data.put("name",        ins.get("name"));
-            data.put("marketPrice", ins.get("lastTrade"));
-            data.put("symbol",      ord.get("symbol"));
-            data.put("units",       ord.get("orderQty"));
-            data.put("side",        ord.get("side"));
-            data.put("orderType",   ord.get("orderType"));
-
-            if (ord.containsKey("limitPrice")) {
-                data.put("limitPrice", ord.get("limitPrice"));
-            }
-            if (ord.containsKey("stopPrice")) {
-                data.put("stopPrice", ord.get("stopPrice"));
-            }
-            
-            this.ordList.add(new OrderModel(data));
-        }
-        
-        this.ordTable.setItems(this.ordList);
-        this.ordTable.prefHeightProperty().bind(Bindings.size(this.ordTable.getItems()).multiply(this.ordTable.getFixedCellSize()).add(30));
-    }
-    
     private void initAccData () {
-        this.acc = new AccountModel(this.accBlotter, this.posList);
+        this.acc = new AccountModel(this.accBlotter, this.posTableBuilder.getPosList());
 
         Locale locale  = new Locale("en", "US");
         this.shareAmount.textProperty().bind(Bindings.format(locale, "$%,.2f", this.acc.equity));
@@ -152,24 +90,8 @@ public class Portfolio {
         this.shareAmount.getStyleClass().add(this.acc.equityValueCss());
     }
     
-    private void updateOpenPosPrice () {
-        for (OpenPosModel pos : this.posList) {
-            final String symbol = pos.getSymbol();
-            final Double price = this.marketPrices.get(symbol);
-            pos.updateMarketPrice(price);
-        }
-    }
-    
-    private void updateOrderPrice () {
-        for (OrderModel ord : this.ordList) {
-            final String symbol = ord.getSymbol();
-            final Double price = this.marketPrices.get(symbol);
-            ord.updateMarketPrice(price);
-        }
-    }
-    
     private void updateAccData () {
-        this.acc.update(this.posList);
+        this.acc.update(this.posTableBuilder.getPosList());
 
         this.profitAmount.getStyleClass().clear();
         this.profitAmount.getStyleClass().add(acc.unrealizedPLCss());
@@ -186,22 +108,22 @@ public class Portfolio {
         vBox.getChildren().add(this.accBorderPane);
         
         // Open Positions
-        this.posTable = (new PositionsTable()).build();
+        final TableView posTable = this.posTableBuilder.build();
         
         VBox vboxOpenPos = new VBox(5);
         vboxOpenPos.setPadding(new Insets(5, 5, 5, 5));  // Insets: top, right, bottom, left
 
         final Label posLabel = new Label("Current Investments");
-        vboxOpenPos.getChildren().addAll(posLabel, this.posTable);
+        vboxOpenPos.getChildren().addAll(posLabel, posTable);
 
         // Pending orders
-        this.ordTable = (new OrdersTable()).build();
+        final TableView ordTable = this.ordTableBuilder.build();
         
         VBox vboxOrder = new VBox(5);
         vboxOrder.setPadding(new Insets(5, 5, 5, 5));  // Insets: top, right, bottom, left
 
         final Label ordLabel = new Label("Pending Orders");
-        vboxOrder.getChildren().addAll(ordLabel, this.ordTable);
+        vboxOrder.getChildren().addAll(ordLabel, ordTable);
 
         // Up Down partition
         SplitPane splitPane = new SplitPane();
@@ -253,119 +175,12 @@ public class Portfolio {
         this.accBorderPane.setId("accBorderPane");
     }
 
-    public class OrdTableNumCell extends TableCell<OrderModel, Number> {
-        public OrdTableNumCell() {}
-
-        @Override
-        protected void updateItem(Number item, boolean empty) {
-            super.updateItem(item, empty);
-            setText(item == null ? "" : Utils.monetaryFormat((Double) item));
-        }
-    }
-    
-    public OrdTableNumCell ordNumCell () {
-        final OrdTableNumCell cell = new OrdTableNumCell();
-        
-        cell.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                if (event.getButton() == MouseButton.SECONDARY) {
-                    System.out.println("Order Table UNITS col clicked...");
-
-                }
-            }
-        });
-        return cell;
-    }
-
-    public TableCell<OrderModel, String> ordStrCell () {
-        final TableCell<OrderModel, String> cell = new TableCell<>();
-        cell.textProperty().bind(cell.itemProperty());
-        
-        cell.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                if (event.getButton() == MouseButton.SECONDARY) {
-                    System.out.println("Order Table UNITS col clicked...");
-
-                }
-            }
-        });
-        return cell;
-    }
-    
-    private void initOrderTable () {
-        // Pending Orders table
-        TableColumn<OrderModel, String> symbolCol = new TableColumn("Stock");
-        symbolCol.setCellValueFactory(new PropertyValueFactory("symbol"));
-        symbolCol.setCellFactory((TableColumn<OrderModel, String> col) -> ordStrCell());
-        symbolCol.getStyleClass().add("left");
-
-        TableColumn<OrderModel, String> nameCol = new TableColumn("Name");
-        nameCol.setCellValueFactory(new PropertyValueFactory("name"));
-        nameCol.setCellFactory((TableColumn<OrderModel, String> col) -> ordStrCell());
-        nameCol.getStyleClass().add("left");
-
-        TableColumn<OrderModel, Number> unitsCol = new TableColumn("Units");
-        unitsCol.setCellValueFactory(cellData -> cellData.getValue().unitsProperty());
-        unitsCol.setCellFactory((TableColumn<OrderModel, Number> col) -> ordNumCell());
-        unitsCol.getStyleClass().add("right");
-
-        TableColumn<OrderModel, Number> mktPriceCol = new TableColumn("Current Price");
-        mktPriceCol.setCellValueFactory(cellData -> cellData.getValue().marketPriceProperty());
-        mktPriceCol.setCellFactory((TableColumn<OrderModel, Number> col) -> ordNumCell());
-        mktPriceCol.getStyleClass().add("right");
-        
-        TableColumn<OrderModel, String> typeCol = new TableColumn("Type");
-        typeCol.setCellValueFactory(new PropertyValueFactory("type"));
-        typeCol.setCellFactory((TableColumn<OrderModel, String> col) -> ordStrCell());
-        typeCol.getStyleClass().add("left");
-
-        TableColumn<OrderModel, String> sideCol = new TableColumn("Side");
-        sideCol.setCellValueFactory(new PropertyValueFactory("side"));
-        sideCol.setCellFactory((TableColumn<OrderModel, String> col) -> ordStrCell());
-        sideCol.getStyleClass().add("left");
-        
-        TableColumn<OrderModel, Number> limitCol = new TableColumn("Limit Price");
-        limitCol.setCellValueFactory(cellData -> cellData.getValue().limitPriceProperty());
-        limitCol.setCellFactory((TableColumn<OrderModel, Number> col) -> ordNumCell());
-        limitCol.getStyleClass().add("right");
-
-        TableColumn<OrderModel, Number> stopCol = new TableColumn("Stop Price");
-        stopCol.setCellValueFactory(cellData -> cellData.getValue().stopPriceProperty());
-        stopCol.setCellFactory((TableColumn<OrderModel, Number> col) -> ordNumCell());
-        stopCol.getStyleClass().add("right");
-        
-        symbolCol.setSortable(false);
-        nameCol.setSortable(false);
-        unitsCol.setSortable(false);
-        mktPriceCol.setSortable(false);
-        typeCol.setSortable(false);
-        sideCol.setSortable(false);
-        limitCol.setSortable(false);
-        stopCol.setSortable(false);
-
-        this.ordTable.getColumns().setAll(symbolCol, nameCol, unitsCol, mktPriceCol, typeCol, sideCol, limitCol, stopCol);
-
-        this.ordTable.setEditable(false);
-        this.ordTable.setItems(this.ordList);
-        
-        // limit Table height, based on row number
-        this.ordTable.setFixedCellSize(this.tableCellSize);
-        this.ordTable.prefHeightProperty().bind(Bindings.size(this.ordTable.getItems()).multiply(this.ordTable.getFixedCellSize()).add(30));
-
-        // set all columns having equal width
-        this.ordTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-    }
-
     private final DriveWealthAPI api;
     
     private Map<String, Object> accBlotter;
     private Map<String, Map> instruments;
     private Map<String, Double> marketPrices;
 
-    private final ObservableList<OpenPosModel> posList = FXCollections.observableArrayList();
-    private final ObservableList<OrderModel> ordList = FXCollections.observableArrayList();
     private AccountModel acc;
 
     public  final Tab accTab  = new Tab();
@@ -376,8 +191,8 @@ public class Portfolio {
     private final Label cashAmount = new Label();
     private final Label totalAmount = new Label();
     
-    private TableView posTable;
-    private TableView ordTable;
+    private final PositionsTableBuilder posTableBuilder = new PositionsTableBuilder();
+    private final OrdersTableBuilder ordTableBuilder = new OrdersTableBuilder();
     
     public static final double tableCellSize = 25;
 }
