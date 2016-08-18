@@ -32,14 +32,14 @@ public class Portfolio {
     }
 
     private void startBackgroundService (DriveWealthAPI api) {
-        PortfolioService service = new PortfolioService(api);
+        portfolioService = new PortfolioService(api);
         
         // start immediately
-        service.setDelay(Duration.seconds(0));
+        portfolioService.setDelay(Duration.seconds(0));
         // run every 10 sec
-        service.setPeriod(Duration.seconds(10));
+        portfolioService.setPeriod(Duration.seconds(10));
         
-        service.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+        portfolioService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(final WorkerStateEvent workerStateEvent) {
                 Map<String, Object> result = (Map<String, Object>) workerStateEvent.getSource().getValue();
@@ -73,7 +73,7 @@ public class Portfolio {
             }
         });
         
-        service.start();
+        portfolioService.start();
     }
 
     public Tab createTab() {
@@ -136,5 +136,7 @@ public class Portfolio {
     private final AccountSummaryBuilder accSummaryBuilder = new AccountSummaryBuilder();
     
     public static final double tableCellSize = 25;
+    
+    public PortfolioService portfolioService;
 }
     

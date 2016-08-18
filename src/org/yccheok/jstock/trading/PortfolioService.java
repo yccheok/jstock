@@ -27,11 +27,16 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
     private final Map<String, Map> instruments = new HashMap<>();
     private Set symbolsSet;
     private TaskState taskState = TaskState.ACCBLOTTER;
+    private boolean refresh = false;
 
     private static enum TaskState {
         ACCBLOTTER,
         INSTRUMENTS,
         PRICES;
+    }
+    
+    public void setRefresh () {
+        this.refresh = true;
     }
     
     public PortfolioService (DriveWealthAPI api) {
@@ -130,6 +135,11 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
                 result.put("marketPrices", prices);
 
                 System.out.println("DONE calling get market data for positions / orders...");
+                
+                // This is set to TRUE after Create Order
+                if (refresh == true) {
+                    taskState = TaskState.ACCBLOTTER;
+                }
             }
             return result;
         }

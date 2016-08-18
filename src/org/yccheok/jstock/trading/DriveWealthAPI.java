@@ -1313,8 +1313,8 @@ public class DriveWealthAPI {
         PARTIALFILLED,
         CANCELLED,
         REJECTED,
-        // shouldn't be this in any case
-        UNKNOWN;
+        // something went wrong, eg: failed to call create order
+        ERROR;
     }
     
     public Map<String, Object> orderStatus (String orderID) {
@@ -1336,7 +1336,7 @@ public class DriveWealthAPI {
         final Double leavesQty  = (Double) status.get("leavesQty");
         final Double orderQty   = (Double) status.get("orderQty");
 
-        OrderStatus ordStatus = OrderStatus.UNKNOWN;
+        OrderStatus ordStatus = OrderStatus.ERROR;
         // accepted
         if (    orderQty.compareTo(leavesQty) == 0
                 && status.get("execType").equals("0")
@@ -1354,7 +1354,7 @@ public class DriveWealthAPI {
             System.out.println("Order filled: " + orderID);
         }
         // partially filled
-        else if (  orderQty.compareTo(cumQty) < 0
+        else if (  orderQty.compareTo(cumQty) > 0
                 && status.get("execType").equals("1")
                 && status.get("ordStatus").toString().equals("1")
         ) {
