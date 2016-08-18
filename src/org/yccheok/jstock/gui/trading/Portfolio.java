@@ -44,23 +44,30 @@ public class Portfolio {
             public void handle(final WorkerStateEvent workerStateEvent) {
                 Map<String, Object> result = (Map<String, Object>) workerStateEvent.getSource().getValue();
                 
-                // First run calls account Blotter & get instruments
-                // Following run just call get market data to get latest market price
-                
-                if (result.containsKey("accBlotter") && result.containsKey("instruments")) {
-                    accBlotter = (Map<String, Object>) result.get("accBlotter");
-                    instruments = (Map<String, Map>) result.get("instruments");
+                // 1st run calls account Blotter & get latest quotes
+                // 2nd run calls get instruments & get quotes
+                // Following run just call get quotes
 
-                    posTableBuilder.initData(accBlotter, instruments);
-                    ordTableBuilder.initData(accBlotter, instruments);
-                    
-                    accSummaryBuilder.initData(accBlotter, posTableBuilder.getPosList());
-                } else if (result.containsKey("marketPrices")) {
+                if (result.containsKey("marketPrices")) {
                     marketPrices = (Map) result.get("marketPrices");
+                }
+
+                if (result.containsKey("accBlotter")) {
+                    accBlotter = (Map<String, Object>) result.get("accBlotter");
+
+                    posTableBuilder.initData(accBlotter);
+                    ordTableBuilder.initData(accBlotter, marketPrices);
+                    accSummaryBuilder.initData(accBlotter, posTableBuilder.getPosList());
+                } else {
+                    if (result.containsKey("instruments")) {
+                        instruments = (Map<String, Map>) result.get("instruments");
+
+                        posTableBuilder.updateStocksName(instruments);
+                        ordTableBuilder.updateStocksName(instruments);
+                    }
                     
                     posTableBuilder.updatePrices(marketPrices);
                     ordTableBuilder.updatePrices(marketPrices);
-                    
                     accSummaryBuilder.update(posTableBuilder.getPosList());
                 }
             }

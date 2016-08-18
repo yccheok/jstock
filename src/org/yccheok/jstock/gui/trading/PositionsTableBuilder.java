@@ -156,15 +156,13 @@ public class PositionsTableBuilder {
         return this.posTable;
     }
     
-    public void initData (Map<String, Object> accBlotter, Map<String, Map> instruments) {
+    public void initData (Map<String, Object> accBlotter) {
         LinkedTreeMap<String, Object> equity = (LinkedTreeMap) accBlotter.get("equity");
         List<LinkedTreeMap<String, Object>> positions = (List) equity.get("equityPositions");
         
         for (LinkedTreeMap<String, Object> pos : positions) {
-            Map<String, Object> ins = instruments.get(pos.get("symbol").toString());
-
             Map<String, Object> data = new HashMap<>();
-            data.put("name",            ins.get("name"));
+            data.put("name",            "");
             data.put("symbol",          pos.get("symbol"));
             data.put("instrumentID",    pos.get("instrumentID"));
             data.put("units",           pos.get("availableForTradingQty"));
@@ -181,6 +179,14 @@ public class PositionsTableBuilder {
         this.posTable.prefHeightProperty().bind(Bindings.size(this.posTable.getItems()).multiply(this.posTable.getFixedCellSize()).add(30));
     }
 
+    public void updateStocksName (Map<String, Map> instruments) {
+        for (OpenPosModel pos : this.posList) {
+            final String symbol = pos.getSymbol();
+            final Map<String, Object> ins = instruments.get(symbol);
+            pos.updateStockName(ins.get("name").toString());
+        }
+    }
+    
     public void updatePrices (Map<String, Double> marketPrices) {
         for (OpenPosModel pos : this.posList) {
             final String symbol = pos.getSymbol();

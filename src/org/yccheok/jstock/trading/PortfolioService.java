@@ -8,8 +8,10 @@ package org.yccheok.jstock.trading;
 import com.google.gson.internal.LinkedTreeMap;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javafx.concurrent.ScheduledService;
 import javafx.concurrent.Task;
 
@@ -23,25 +25,38 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
     private DriveWealthAPI api;
     private Map<String, Object> accBlotter = new HashMap<>();
     private final Map<String, Map> instruments = new HashMap<>();
-    private boolean fullRefresh = true;
+    private Set symbolsSet;
+    private TaskState taskState = TaskState.ACCBLOTTER;
 
+    private static enum TaskState {
+        ACCBLOTTER,
+        INSTRUMENTS,
+        PRICES;
+    }
     
     public PortfolioService (DriveWealthAPI api) {
         this.api = api;
     }
 
-    public void setFullRefresh () {
-        this.fullRefresh = true;
-    }
-    
     public class PortfolioTask extends Task<Map<String, Object>> {
         
         public PortfolioTask() {}
 
         private void getAccBlotter (String userID, String accountID) {
             accBlotter = api.accountBlotter(userID, accountID);              
-            System.out.println("calling account Blotter DONE...");
+            LinkedTreeMap<String, Object> equity = (LinkedTreeMap) accBlotter.get("equity");
+            List<LinkedTreeMap<String, Object>> posList = (List) equity.get("equityPositions");
 
+            symbolsSet = new HashSet();
+            for (LinkedTreeMap<String, Object> pos : posList) {
+                String symbol = pos.get("symbol").toString();
+                symbolsSet.add(symbol);
+            }
+            
+            System.out.println("calling account Blotter DONE...");
+        }
+        
+        public void getInstruments () {
             // LOOP: call "get instrument" to get stock name for open positions + pending orders
             LinkedTreeMap<String, Object> equity = (LinkedTreeMap) accBlotter.get("equity");
             List<LinkedTreeMap<String, Object>> posList = (List) equity.get("equityPositions");
@@ -77,7 +92,7 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
         
         private Map<String, Double> getMarketPrices () {
             // get latest prices for all symbols
-            ArrayList<String> symbols = new ArrayList<>(instruments.keySet());
+            ArrayList<String> symbols = new ArrayList<>(symbolsSet);
             List<Map<String, Object>> priceList = api.getMarketData(symbols, true);
 
             Map<String, Double> prices = new HashMap<>();
@@ -96,20 +111,25 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
             String accountID = api.user.practiceAccount.accountID;
             if (userID != null && accountID != null) {
                 // only call account Blotter & get instruments during first run
-                if (fullRefresh == true) {
-                    fullRefresh = false;
-
+                if (taskState == TaskState.ACCBLOTTER) {
                     getAccBlotter(userID, accountID);
                     result.put("accBlotter", accBlotter);
-                    result.put("instruments", instruments);
-
-                    System.out.println("DONE calling accBlotter & get instruments for positions / orders...");
-                } else {
-                    Map<String, Double> prices = getMarketPrices();
-                    result.put("marketPrices", prices);
+                    taskState = TaskState.INSTRUMENTS;
                     
-                    System.out.println("DONE calling get market data for positions / orders...");
+                    System.out.println("DONE calling accBlotter...");
+                } else if (taskState == TaskState.INSTRUMENTS) {
+                    getInstruments();
+                    result.put("instruments", instruments);
+                    taskState = TaskState.PRICES;
+
+                    System.out.println("DONE calling get instruments for positions & orders...");
                 }
+                
+                // always get latest prices
+                Map<String, Double> prices = getMarketPrices();
+                result.put("marketPrices", prices);
+
+                System.out.println("DONE calling get market data for positions / orders...");
             }
             return result;
         }

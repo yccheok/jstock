@@ -27,28 +27,43 @@ public class BuySell {
         
         @Override protected Boolean call() throws Exception {
             order = api.createOrder("buy", "market", params);
+            
+            if (!order.containsKey("orderID")) {
+                System.out.println("BUY market order failed....");
+                return false;
+            }
             String orderID = order.get("orderID").toString();
+
+            // check order status: Decide how many times / how long to check status in LOOP
+            
+            // 1) call get instrument, if now is not trading time, order is accepted for next trading day
+            //      Once status = ACCEPTED, return TRUE
+            // 2) If now is trading time, should loop through
+            
             
             while (true) {
-                // check order status
-                Map<String, Object> status = api.orderStatus(orderID);
-
-                // Decide how many times / how long to check status in LOOP
+                if (isCancelled()) {
+                    break;
+                }
                 
+                Map<String, Object> status = api.orderStatus(orderID);
                 DriveWealthAPI.OrderStatus ordStatus = (DriveWealthAPI.OrderStatus) status.get("ordStatus");
                 
                 switch (ordStatus) {
                     case ACCEPTED:
                         break;
+                    case PARTIALFILLED:
+                        break;
                     case FILLED:
                         done = true;
-                        break;
-                    case PARTIALFILLED:
                         break;
                     case CANCELLED:
                         done = true;
                         break;
                     case REJECTED:
+                        done = true;
+                        break;
+                    case UNKNOWN:
                         done = true;
                         break;
                 }
@@ -58,7 +73,6 @@ public class BuySell {
                     break;
                 }
             }
-            
             return true;
         }
     }

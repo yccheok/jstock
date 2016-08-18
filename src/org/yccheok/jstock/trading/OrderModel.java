@@ -51,6 +51,10 @@ public class OrderModel {
         this.stopPrice   = new SimpleDoubleProperty(_stopPrice);
     }
 
+    public void updateStockName (String name) {
+        this.setName(name);
+    }
+    
     public void updateMarketPrice (Double price) {
         this.setMarketPrice(price);
     }

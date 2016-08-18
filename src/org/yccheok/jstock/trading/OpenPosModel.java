@@ -47,6 +47,10 @@ public class OpenPosModel {
         this.setMarketPrice(price);
     }
     
+    public void updateStockName (String name) {
+        this.setName(name);
+    }
+    
     public final String getSymbol() {
         return symbol.get();
     }
