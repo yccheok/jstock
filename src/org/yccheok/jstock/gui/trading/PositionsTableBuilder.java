@@ -182,16 +182,22 @@ public class PositionsTableBuilder {
     public void updateStocksName (Map<String, Map> instruments) {
         for (OpenPosModel pos : this.posList) {
             final String symbol = pos.getSymbol();
-            final Map<String, Object> ins = instruments.get(symbol);
-            pos.updateStockName(ins.get("name").toString());
+            
+            if (instruments.containsKey(symbol)) {
+                Map<String, Object> ins = instruments.get(symbol);
+                pos.updateStockName(ins.get("name").toString());
+            }
         }
     }
     
     public void updatePrices (Map<String, Double> marketPrices) {
         for (OpenPosModel pos : this.posList) {
             final String symbol = pos.getSymbol();
-            final Double price = marketPrices.get(symbol);
-            pos.updateMarketPrice(price);
+            
+            if (marketPrices.containsKey(symbol)) {
+                Double price = marketPrices.get(symbol);
+                pos.updateMarketPrice(price);
+            }
         }
     }
 

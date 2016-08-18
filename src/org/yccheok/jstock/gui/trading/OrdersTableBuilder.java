@@ -173,16 +173,22 @@ public class OrdersTableBuilder {
     public void updateStocksName (Map<String, Map> instruments) {
         for (OrderModel ord : this.ordList) {
             final String symbol = ord.getSymbol();
-            final Map<String, Object> ins = instruments.get(symbol);
-            ord.updateStockName(ins.get("name").toString());
+            
+            if (instruments.containsKey(symbol)) {
+                Map<String, Object> ins = instruments.get(symbol);
+                ord.updateStockName(ins.get("name").toString());
+            }
         }
     }
     
     public void updatePrices (Map<String, Double> marketPrices) {
         for (OrderModel ord : this.ordList) {
             final String symbol = ord.getSymbol();
-            final Double price = marketPrices.get(symbol);
-            ord.updateMarketPrice(price);
+            
+            if (marketPrices.containsKey(symbol)) {
+                Double price = marketPrices.get(symbol);
+                ord.updateMarketPrice(price);
+            }
         }
     }
 }
